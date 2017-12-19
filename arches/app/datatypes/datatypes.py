@@ -217,9 +217,15 @@ class EDTFDataType(BaseDataType):
     def append_to_document(self, document, nodevalue, nodeid, tile):
         def add_date_to_doc(edtf):
             if edtf.lower != edtf.upper:
-                document['date_ranges'].append({'date_range': {'gte': edtf.lower, 'lte': edtf.upper}, 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid})
+                dr = {}
+                if edtf.lower is not None:
+                    dr['gte'] = edtf.lower
+                if edtf.upper is not None:
+                    dr['lte'] = edtf.upper
+                document['date_ranges'].append({'date_range': dr, 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid})
             else:
-                document['dates'].append({'date': edtf.lower, 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid})
+                if edtf.lower is not None:
+                    document['dates'].append({'date': edtf.lower, 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid})
         
         edtf = ExtendedDateFormat(nodevalue)
         if edtf.result_set:
