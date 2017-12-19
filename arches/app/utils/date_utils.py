@@ -42,8 +42,12 @@ class ExtendedDateFormat(SortableDateRange):
         self.edtf = None
         self.result_set = None
         self.sortable_date = None
+        self.error = None
         
-        self.parse(date)
+        try:
+            self.parse(date)
+        except Exception as err:
+            self.error = err
 
     def parse(self, date=None):
         if date == None:
@@ -52,6 +56,7 @@ class ExtendedDateFormat(SortableDateRange):
         self.edtf = None
         self.orig_date = date
         self.result_set = None
+        self.error = None
 
         try: 
             # handle for incorrectly formatted year only dates 

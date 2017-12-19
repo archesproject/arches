@@ -191,6 +191,23 @@ NON_EDTF_DATES = (
     ('', 'None', 'None'),
 )
 
+NON_EDTF_DATES = (
+    # test long year
+    ('975845000', '9758450000101', '9758450001231'),
+    # test unpadded year 0
+    ('0', '101', '1231'),
+    # test unpadded year
+    ('34', '340101', '341231'),
+    # test null value
+    ('', 'None', 'None'),
+)
+
+INVALID_EDTF_DATES = (
+    # test long year
+    ('al;ksdjf',),
+
+)
+
 class SortableDateTests(ArchesTestCase):
 
     def parse(self, test_case):
@@ -215,13 +232,19 @@ class SortableDateTests(ArchesTestCase):
             self.assertEqual(unicode(f.upper), test_case[2])
         elif len(test_case) == 4:
             self.assertEqual(unicode(f.lower), test_case[1])
+        elif len(test_case) == 1:
+            self.assertEqual(f.is_valid(), False)
         else:
             raise Exception('')
 
-    def test_edtf_parsing(self):
-        for test_case in EDTF_DATES:
-            self.parse(test_case)
+    # def test_edtf_parsing(self):
+    #     for test_case in EDTF_DATES:
+    #         self.parse(test_case)
+
+    # def test_nonedtf_parsing(self):
+    #     for test_case in NON_EDTF_DATES:
+    #         self.parse(test_case)
 
     def test_nonedtf_parsing(self):
-        for test_case in NON_EDTF_DATES:
+        for test_case in INVALID_EDTF_DATES:
             self.parse(test_case)
