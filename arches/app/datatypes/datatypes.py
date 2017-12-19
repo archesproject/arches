@@ -209,13 +209,24 @@ class EDTFDataType(BaseDataType):
 
     def validate(self, value, source=''):
         errors = []
-
-        # use the EDTF parser to validate that the user supplied string is a valid EDTF
+        if not ExtendedDateFormat(value).is_valid():
+            errors.append({'type': 'ERROR', 'message': '{0} is not in the correct Extended Date Time Format, see http://www.loc.gov/standards/datetime/ for supported formats. This data was not imported.'.format(value)})
 
         return errors
 
     def append_to_document(self, document, nodevalue, nodeid, tile):
-        document['dates'].append({'edtf': nodevalue, 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid})
+        def add_date_to_doc(edtf):
+            if edtf.lower != edtf.upper:
+                document['date_ranges'].append({'date_range': {'gte': edtf.lower, 'lte': edtf.upper}, 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid})
+            else:
+                document['dates'].append({'date': edtf.lower, 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid})
+        
+        edtf = ExtendedDateFormat(nodevalue)
+        if edtf.result_set:
+            for result in edtf.result_set:
+                add_date_to_doc(result)
+        else:
+            add_date_to_doc(edtf)
 
     def append_search_filters(self, value, node, query, request):
         pass
