@@ -186,7 +186,7 @@ class Card(models.CardModel):
         ret['visible'] = self.visible
         ret['active'] = self.active
         ret['widgets'] = self.widgets
-        ret['is_editable'] = self.is_editable
+        ret['is_editable'] = self.is_editable()
         ret['ontologyproperty'] = self.ontologyproperty
         ret['disabled'] = self.disabled
 

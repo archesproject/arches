@@ -290,7 +290,6 @@ class Graph(models.GraphModel):
 
         return function
 
-
     def _compare(self, obj1, obj2, additional_excepted_keys = []):
         excluded_keys = ['_state'] + additional_excepted_keys
         d1, d2 = obj1.__dict__, obj2.__dict__
@@ -348,7 +347,7 @@ class Graph(models.GraphModel):
         return self
 
     def delete(self):
-        if self.is_editable == True:
+        if self.is_editable() == True:
             with transaction.atomic():
                 for nodegroup in self.get_nodegroups():
                     nodegroup.delete()
@@ -719,7 +718,7 @@ class Graph(models.GraphModel):
             tree = self.get_tree(root=node)
             tiles = models.TileModel.objects.filter(nodegroup=node.nodegroup)
 
-            if self.is_editable == False and len(tiles) > 0:
+            if self.is_editable() == False and len(tiles) > 0:
                 raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot delete nodes from a Resource Model with instances.".format(self.name)), 1006)
 
             def traverse_tree(tree):
@@ -1078,11 +1077,13 @@ class Graph(models.GraphModel):
 
         cards = []
         for card in self.cards.itervalues():
+            is_editable = True
             if self.isresource:
                 if not card.name:
                     card.name = self.nodes[card.nodegroup.pk].name
                 if not card.description:
                     card.description = self.nodes[card.nodegroup.pk].description
+                is_editable = card.is_editable()
             else:
                 if card.nodegroup.parentnodegroup is None:
                     card.name = self.name
@@ -1092,8 +1093,9 @@ class Graph(models.GraphModel):
                         card.name = self.nodes[card.nodegroup.pk].name
                     if not card.description:
                         card.description = self.nodes[card.nodegroup.pk].description
-
-            cards.append(card)
+            card_dict = JSONSerializer().serializeToPython(card)
+            card_dict['is_editable'] = True
+            cards.append(card_dict)
 
         return cards
 
@@ -1114,7 +1116,7 @@ class Graph(models.GraphModel):
         ret['domain_connections'] = self.get_valid_domain_ontology_classes()
         ret['edges'] = [edge for key, edge in self.edges.iteritems()]
         ret['nodes'] = []
-        ret['is_editable'] = self.is_editable
+        ret['is_editable'] = self.is_editable()
         ret['functions'] = models.FunctionXGraph.objects.filter(graph_id=self.graphid)
 
         parentproperties = {
@@ -1127,7 +1129,8 @@ class Graph(models.GraphModel):
             nodeobj['parentproperty'] = parentproperties[node.nodeid]
             ret['nodes'].append(nodeobj)
 
-        return JSONSerializer().serializeToPython(ret)
+        test = JSONSerializer().serializeToPython(ret)
+        return test
 
     def check_if_resource_is_editable(self):
 
@@ -1150,7 +1153,7 @@ class Graph(models.GraphModel):
             return res
 
         if self.isresource == True:
-            if self.is_editable == False:
+            if self.is_editable() == False:
                 unpermitted_edits = []
                 db_nodes = models.Node.objects.filter(graph=self)
                 for db_node in db_nodes:
