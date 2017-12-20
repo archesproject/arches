@@ -55,7 +55,7 @@ define([
                 var id = $(element).val();
                 var tileList = self.tileList();
                 if (id !== "") {
-                    var findSelection = function (tileList, callback)   {
+                    var setSelection = function (tileList, callback)   {
                         var selection =  _.find(tileList, function (tile) {
                             return tile.tileid === id;
                         });
@@ -65,11 +65,11 @@ define([
                     };
                     if (tileList.length === 0)   {
                         var subscription = self.tileList.subscribe(function (tileList) {
-                            var selection = findSelection(tileList, callback);
+                            setSelection(tileList, callback);
                             subscription.dispose();
                         });
                     } else {
-                        var selection = findSelection(tileList, callback);
+                        setSelection(tileList, callback);
                     }
                 }
             },

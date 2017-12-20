@@ -8,7 +8,7 @@ from django.core import management
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '2626_mobilesurveymodel_datadownload'),
+        ('models', '2714_mobilesurveymodel_bounds'),
     ]
 
     operations = [

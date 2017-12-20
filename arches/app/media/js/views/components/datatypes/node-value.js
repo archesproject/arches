@@ -45,7 +45,6 @@ define([
                                         })
                                     )
                                 );
-                                console.log(self.properties());
                             }
                         });
                     } else {
