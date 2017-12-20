@@ -1099,7 +1099,7 @@ class Graph(models.GraphModel):
 
         return cards
 
-    def serialize(self):
+    def serialize(self, fields=None, exclude=None):
         """
         serialize to a different form then used by the internal class structure
 
@@ -1107,30 +1107,70 @@ class Graph(models.GraphModel):
         internal objects (like models.Nodes) don't support
 
         """
+        exclude = [] if exclude == None else exclude
 
-        ret = JSONSerializer().handle_model(self)
+        ret = JSONSerializer().handle_model(self, fields, exclude)
         ret['root'] = self.root
-        ret['relatable_resource_model_ids'] = [str(relatable_node.graph.graphid) for relatable_node in self.root.get_relatable_resources()]
-        ret['cards'] = self.get_cards()
-        ret['nodegroups'] = self.get_nodegroups()
-        ret['domain_connections'] = self.get_valid_domain_ontology_classes()
-        ret['edges'] = [edge for key, edge in self.edges.iteritems()]
-        ret['nodes'] = []
-        ret['is_editable'] = self.is_editable()
-        ret['functions'] = models.FunctionXGraph.objects.filter(graph_id=self.graphid)
+
+        if 'relatable_resource_model_ids' not in exclude:
+            ret['relatable_resource_model_ids'] = [str(relatable_node.graph.graphid) for relatable_node in self.root.get_relatable_resources()]
+        else:
+            ret.pop('relatable_resource_model_ids', None)
+
+        if 'cards' not in exclude:
+            ret['cards'] = self.get_cards()
+        else:
+            ret.pop('cards', None)
+
+        if 'nodegroups' not in exclude:
+            ret['nodegroups'] = self.get_nodegroups()
+        else:
+            ret.pop('nodegroups', None)
+
+        if 'domain_connections' not in exclude:
+            ret['domain_connections'] = self.get_valid_domain_ontology_classes()
+        else:
+            ret.pop('domain_connections', None)
+
+        if 'is_editable' not in exclude:
+            ret['is_editable'] = self.is_editable()
+        else:
+            ret.pop('is_editable', None)
+
+        if 'functions' not in exclude:
+            ret['functions'] = models.FunctionXGraph.objects.filter(graph_id=self.graphid)
+        else:
+            ret.pop('functions', None)
 
         parentproperties = {
             self.root.nodeid: ''
         }
+
         for edge_id, edge in self.edges.iteritems():
             parentproperties[edge.rangenode_id] = edge.ontologyproperty
-        for key, node in self.nodes.iteritems():
-            nodeobj = JSONSerializer().serializeToPython(node)
-            nodeobj['parentproperty'] = parentproperties[node.nodeid]
-            ret['nodes'].append(nodeobj)
 
-        test = JSONSerializer().serializeToPython(ret)
-        return test
+
+        if 'edges' not in exclude:
+            ret['edges'] = [edge for key, edge in self.edges.iteritems()]
+        else:
+            ret.pop('edges', None)
+
+        if 'nodes' not in exclude:
+            ret['nodes'] = []
+            for key, node in self.nodes.iteritems():
+                nodeobj = JSONSerializer().serializeToPython(node)
+                nodeobj['parentproperty'] = parentproperties[node.nodeid]
+                ret['nodes'].append(nodeobj)
+        else:
+            ret.pop('nodes', None)
+
+        if len(exclude) > 0:
+            import ipdb
+            ipdb.set_trace()
+
+        res = JSONSerializer().serializeToPython(ret)
+
+        return res
 
     def check_if_resource_is_editable(self):
 
