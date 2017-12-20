@@ -75,16 +75,18 @@ define(['knockout', 'underscore', 'uuid'], function (ko, _, uuid) {
             }
 
             if (!self.form) {
-                self.value.subscribe(function(val){
-                    if (self.defaultValue() != val) {
-                        self.defaultValue(val)
-                    };
-                });
-                self.defaultValue.subscribe(function(val){
-                    if (self.value() != val) {
-                        self.value(val)
-                    };
-                });
+                if (ko.isObservable(self.value)) {
+                    self.value.subscribe(function(val){
+                        if (self.defaultValue() != val) {
+                            self.defaultValue(val)
+                        };
+                    });
+                    self.defaultValue.subscribe(function(val){
+                        if (self.value() != val) {
+                            self.value(val)
+                        };
+                    });
+                }
             };
         };
     };

@@ -111,6 +111,13 @@ class NumberDataType(BaseDataType):
     def transform_import_values(self, value, nodeid):
         return float(value)
 
+    def convert_value(self, tile, nodeid):
+        try:
+            tile.data[nodeid].upper()
+            tile.data[nodeid] = float(tile.data[nodeid])
+        except:
+            pass
+
     def append_to_document(self, document, nodevalue, nodeid, tile):
         document['numbers'].append({'number': nodevalue, 'nodegroup_id': tile.nodegroup_id})
 
@@ -961,10 +968,7 @@ class DomainDataType(BaseDomainDataType):
 
     def validate(self, value, source=''):
         errors = []
-
-        try:
-            models.Node.objects.filter(config__options__contains=[{"id": value}])
-        except:
+        if len(models.Node.objects.filter(config__options__contains=[{"id": value}])) < 1:
             errors.append({'type': 'ERROR', 'message': '{0} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(value)})
         return errors
 
@@ -1021,9 +1025,7 @@ class DomainListDataType(BaseDomainDataType):
         errors = []
 
         for v in value:
-            try:
-                models.Node.objects.filter(config__options__contains=[{"id": v}])
-            except:
+            if len(models.Node.objects.filter(config__options__contains=[{"id": v}])) < 1:
                 errors.append({'type': 'ERROR', 'message': '{0} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(v)})
         return errors
 

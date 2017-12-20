@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import sys
 import uuid
 from arches.app.models.graph import Graph
-from arches.app.models.models import CardXNodeXWidget, Form, FormXCard, Report, NodeGroup, DDataType, Widget, ReportTemplate, Function
+from arches.app.models.models import CardXNodeXWidget, Form, FormXCard, Report, NodeGroup, DDataType, Widget, ReportTemplate, Function, Ontology, OntologyClass
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.models.models import GraphXMapping
 from django.db import transaction
@@ -76,11 +76,19 @@ def import_graph(graphs, overwrite_graphs=True):
         errors = []
         for resource in graphs:
             try:
+                if resource['ontology_id'] != None:
+                    if resource['ontology_id'] not in [str(f['ontologyid']) for f in Ontology.objects.all().values('ontologyid')]:
+                        errors.append('The ontologyid of the graph you\'re trying to load does not exist in Arches.')
+
                 reporter.name = resource['name']
                 reporter.resource_model = resource['isresource']
                 graph = Graph(resource)
+                ontology_classes = [str(f['source']) for f in OntologyClass.objects.all().values('source')]
 
                 for node in graph.nodes.values():
+                    if resource['ontology_id'] != None:
+                        if node.ontologyclass not in ontology_classes:
+                            errors.append('The ontology class of this node does not exist in the indicated ontology scheme.')
                     node_config = node.config
                     default_config = DDataType.objects.get(datatype=node.datatype).defaultconfig
                     node.config = check_default_configs(default_config, node_config)

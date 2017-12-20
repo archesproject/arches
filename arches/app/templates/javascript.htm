@@ -272,7 +272,7 @@
                 'icon': '{{ manifest.icon }}'
             },{% endfor %}{% endautoescape %}],
             conceptCollections: [{% autoescape off %}{% for concept_collection in concept_collections %}{
-                'label': '{{ concept_collection.label }}',
+                'label': '{{ concept_collection.label | escapejs }}',
                 'id': '{{ concept_collection.id }}',
             },{% endfor %}{% endautoescape %}],
             geocodingProviders: [{% autoescape off %}{% for provider in geocoding_providers %}{

@@ -10,10 +10,10 @@
         <!-- /ko -->
         <div class="col-xs-12 dropzone" data-bind="dropzone: dropzoneOptions">
             <div class="bord-top pad-ver">
-                <span class="btn btn-success fileinput-button dz-clickable" data-bind="css: uniqueidClass">
+                <button type="button" class="btn btn-success fileinput-button dz-clickable" data-bind="css: uniqueidClass, disable: disabled">
                     <i class="fa fa-plus"></i>
                     <span>{% trans "Add files..." %}</span>
-                </span>
+                </button>
 
                 <div class="btn-group pull-right">
                     <button id="dz-remove-btn" class="btn btn-danger cancel" type="reset" data-bind="click: reset">

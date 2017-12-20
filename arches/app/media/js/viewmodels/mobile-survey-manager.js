@@ -5,6 +5,7 @@ define([
     'views/mobile-survey-manager/identity-list',
     'views/mobile-survey-manager/resource-list',
     'models/mobile-survey',
+    'views/components/widgets/map',
     'bindings/sortable'
 ], function(arches, _, ko, IdentityList, ResourceList, MobileSurveyModel) {
     /**
@@ -22,6 +23,24 @@ define([
         this.identityList = new IdentityList({
             items: ko.observableArray(params.identities)
         });
+
+        this.basemap = _.filter(arches.mapLayers, function(layer) {
+            return !layer.isoverlay;
+        })[0];
+
+        this.resizeMap = function() {
+            setTimeout(
+                function() {
+                    dispatchEvent(new Event('resize'))
+                }, 200)
+        }
+
+        this.defaultCenterX = arches.mapDefaultX;
+        this.defaultCenterY = arches.mapDefaultY;
+        this.geocoderDefault = arches.geocoderDefault;
+        this.mapDefaultZoom = arches.mapDefaultZoom;
+        this.mapDefaultMaxZoom = arches.mapDefaultMaxZoom;
+        this.mapDefaultMinZoom = arches.mapDefaultMinZoom;
 
         this.flattenCards = function(r) {
             var addedCardIds = [];
@@ -66,21 +85,20 @@ define([
             }
         }
 
-        this.getProjectResources = function(project){
+        this.getMobileSurveyResources = function(mobilesurvey){
             var successCallback = function(data){
-                project.collectedResources(true)
+                mobilesurvey.collectedResources(true)
                 _.each(data.resources, self.processResources)
                 _.each(self.resourceList.items(), self.flattenCards)
             }
-            if (!project.collectedResources()) {
+            if (!mobilesurvey.collectedResources()) {
                 $.ajax({
-                    url: arches.urls.mobile_survey_resources(project.id)
+                    url: arches.urls.mobile_survey_resources(mobilesurvey.id)
                 })
                 .done(successCallback)
                 .fail(function(data){console.log('request failed', data)})
             }
         }
-
 
         this.resourceList.selected.subscribe(function(val){
             if (val) {
@@ -121,7 +139,6 @@ define([
         this.selectedProject.subscribe(function(val){
             if (val) {
                 self.identityList.clearSelection();
-                self.identityList.items()[0].selected(true);
                 self.resourceList.clearSelection();
                 self.resourceList.resetCards(val.cards());
                 val.update();

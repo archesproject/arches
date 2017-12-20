@@ -23,6 +23,8 @@ define([
             self.showDetails = ko.observable(false);
             self.cards = ko.observableArray([]);
             self.datadownload = ko.observable();
+            self.tilecache = ko.observable();
+            self.bounds = ko.observable(self.getDefaultBounds(null));
             self.collectedResources = ko.observable(false);
 
             var getUserName = function(id) {
@@ -62,12 +64,41 @@ define([
                 return getUserName(self.lasteditedby());
             });
 
+            self.userFilter = ko.observable('');
+            self.selectedUser = ko.observable();
+
+            self.filteredUsers = ko.computed(function() {
+                var filter = self.userFilter();
+                this.selected = _.filter(self.identities, function(identity) {
+                    return ko.unwrap(identity.selected);
+                });
+                var list = []
+
+                if (this.selected.length === 1) {
+                    list = this.selected[0].users;
+                    if (filter.length === 0) {
+                        return list;
+                    }
+                }
+
+                return _.filter(list, function(user) {
+                    if (user.username.startsWith(filter)) {
+                        return user
+                    }
+                });
+
+            });
+
             self.selectedIdentity = ko.computed(function() {
                 var selected = _.filter(self.identities, function(identity) {
                     return ko.unwrap(identity.selected);
                 });
+                if (selected.length === 1 && selected[0].users) {
+                    self.selectedUser(selected[0].users.length > 0 ? selected[0].users[0] : undefined);
+                }
                 return selected.length > 0 ? selected[0] : undefined;
             });
+
 
             self.approvedUserNames = ko.computed(function() {
                 names = [];
@@ -89,27 +120,6 @@ define([
                 return names;
             })
 
-            self.userFilter = ko.observable('');
-
-            self.filteredUsers = ko.computed(function() {
-                var filter = self.userFilter();
-                var selected = _.filter(self.identities, function(identity) {
-                    return ko.unwrap(identity.selected);
-                });
-                var list = []
-                if (selected.length === 1) {
-                    list = selected[0].users;
-                    if (filter.length === 0) {
-                        return list;
-                    }
-                }
-                return _.filter(list, function(user) {
-                    if (user.username.startsWith(filter)) {
-                        return user
-                    }
-                });
-            });
-
             self.hasIdentity = function() {
                 var approved = false;
                 var identity = self.selectedIdentity();
@@ -130,8 +140,8 @@ define([
                         } else {
                             identity.approved(false);
                             _.chain(self.identities).filter(function(id) {
-                                return id.type === 'user'
-                            }).each(function(user) {
+                                return id.type === 'user' && _.contains(_.pluck(this.selectedIdentity().users, 'id'), id.id)
+                            }, this).each(function(user) {
                                 if (_.intersection(user.group_ids, self.groups()).length === 0) { // user does not belong to any accepted groups
                                     user.approved(false);
                                     self.users.remove(user.id);
@@ -143,16 +153,21 @@ define([
                             currentIdentities.push(identity.id);
                         }
                         identity.approved(true);
-                        _.chain(self.identities).filter(function(id) {
-                            return id.type === 'user'
-                        }).each(function(user) {
-                            if (_.intersection(user.group_ids, self.groups()).length > 0) {
-                                user.approved(true);
-                                if (!_.contains(self.users(), user.id)) {
-                                    self.users.push(user.id);
+                        if (identity.type === 'user') {
+                            self.users.push(identity.id);
+                        } else {
+                            _.chain(self.identities).filter(function(id) {
+                                var identity = identity;
+                                return id.type === 'user'
+                            }).each(function(user) {
+                                if (_.intersection(user.group_ids, self.groups()).length > 0) {
+                                    user.approved(true);
+                                    if (!_.contains(self.users(), user.id)) {
+                                        self.users.push(user.id);
+                                    }
                                 }
-                            }
-                        })
+                            })
+                        }
                     };
                 };
             };
@@ -199,6 +214,8 @@ define([
                     groups: self.groups,
                     users: self.users,
                     cards: self.cards,
+                    bounds: self.bounds,
+                    tilecache: self.tilecache,
                     datadownload: self.datadownload
                 });
                 return JSON.stringify(_.extend(JSON.parse(self._project()), jsObj))
@@ -207,6 +224,35 @@ define([
             self.dirty = ko.computed(function() {
                 return self.json() !== self._project() || !self.get('id');
             });
+        },
+
+        getDefaultBounds: function(geojson) {
+            result = geojson;
+            if (!geojson) {
+                var fc = {"type": "FeatureCollection", "features": []}
+                var geomFactory = function(coords){
+                    return { "type": "Feature",
+                                "geometry": {
+                                    "type": "Polygon",
+                                    "coordinates": coords
+                                },
+                                "properties": {}
+                            };
+                        }
+                //TODO: make the true project boundry available in the arches object rather than just the hexBinBounds
+                //and use the true bounds here instead of the hexBinBounds.
+                var extent = arches.hexBinBounds
+                var coords = [[
+                    [extent[0], extent[1]],
+                    [extent[2], extent[1]],
+                    [extent[2], extent[3]],
+                    [extent[0], extent[3]],
+                    [extent[0], extent[1]]
+                ]]
+                fc.features.push(geomFactory(coords));
+                result = fc;
+            }
+            return result;
         },
 
         parse: function(source) {
@@ -222,6 +268,8 @@ define([
             self.groups(source.groups);
             self.users(source.users);
             self.cards(source.cards);
+            self.tilecache(source.tilecache);
+            self.bounds(self.getDefaultBounds(source.bounds));
             self.datadownload(source.datadownload);
             self.set('id', source.id);
         },
@@ -233,6 +281,7 @@ define([
         _getURL: function(method) {
             return this.url;
         },
+
 
         save: function(userCallback, scope) {
             var self = this;
@@ -248,6 +297,8 @@ define([
                     self.groups(request.responseJSON.mobile_survey.groups);
                     self.users(request.responseJSON.mobile_survey.users);
                     self.cards(request.responseJSON.mobile_survey.cards);
+                    self.tilecache(request.responseJSON.mobile_survey.tilecache);
+                    self.bounds(self.getDefaultBounds(request.responseJSON.mobile_survey.bounds));
                     self.datadownload(request.responseJSON.mobile_survey.datadownload);
                     this._project(this.json());
                 };

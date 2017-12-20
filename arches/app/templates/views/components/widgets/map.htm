@@ -12,7 +12,7 @@
         <img data-bind="attr: {src: mapImage() }">
     </div>
     <!-- /ko -->
-
+    <div data-bind="css:{'map-disabled': disabled}"></div>
     <div class="relative" data-bind="mapboxgl: {
         mapOptions: {
             style: mapStyle,
@@ -130,10 +130,10 @@
 
 
                         <!--ko ifnot: featureEditingDisabled -->
-
+                        <!--ko ifnot: disabled -->
                         <div class="leaflet-draw-section">
                             <div class="leaflet-draw-toolbar leaflet-bar">
-
+                                <!--ko ifnot: _.contains(['survey-bounds'], context) -->
                                 <a class="" style="background-position: -342px -2px;" href="#" title='{% trans "Add Easting/Northing" %}' data-bind="click: function(){xyInput.active(!xyInput.active())}, css: {'active': xyInput.active}"><i class="fa fa-thumb-tack"></i></a>
                                 <div class="map-tool-container map-tool-item xy" data-bind="fadeVisible: xyInput.active, delay:100, fade: 200, css: {'buffer': context === 'search-filter'}">
                                     <div class="form-control">
@@ -149,7 +149,7 @@
                                         <button class="btn btn-primary btn-sm btn-block mar-top" disabled data-bind="click: function(){xyInput.addLocation()}, enable: xyInput.validCoords">{% trans "Add Location" %}</button>
                                     </div>
                                 </div>
-
+                                <!--/ko-->
                                 <!-- ko foreach: geometryTypes -->
                                 <a class="" href="#" data-bind="click: function(){self.selectEditingTool(self, self.geometryTypeDetails[$data.id].name)}, attr: {'class': self.geometryTypeDetails[$data.id].class, 'title': self.geometryTypeDetails[$data.id].title}, css: {'active': self.geometryTypeDetails[$data.id].active}">
                                         <span class="sr-only" data-bind="text: self.geometryTypeDetails[$data.id].title"></span>
@@ -187,6 +187,7 @@
                             </div>
                             <ul class="leaflet-draw-actions"></ul>
                         </div>
+                        <!--/ko-->
                         <!--/ko-->
                         <!--/ko-->
                     </div>
@@ -599,6 +600,26 @@
             </div>
         </div>
 
+    </div>
+
+    <div class="panel">
+
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-default-value" aria-expanded="false" class="collapsed">{% trans "Default Value" %}</a>
+            </h4>
+        </div>
+
+        <div class="panel-collapse collapse" id="map-config-default-value" aria-expanded="false" style="height: 0px;">
+            <div class="panel-body accordion-body">
+                <div class="control-label">
+                    {% trans "Select Location" %}
+                </div>
+                <div class="col-xs-12 pad-no crud-widget-container" style="height: 200px;">
+                    <select type="" id="" placeholder="{% trans " Default Value " %}" data-bind="options: defaultValueOptions, optionsText:'name', optionsValue:'defaultOptionid', value: defaultValueType, chosen: {width: '100%', allow_single_deselect: true, disable_search: true}"></select>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock config_form %}

@@ -290,13 +290,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         {% trans 'My Surveys' %}
                     </div>
 
-                    <!--ko ifnot: projectManager.projects().length -->
+                    <!--ko ifnot: mobileSurveyManager.projects().length -->
                     <div id="default-mobile-projects" class="profile-default-message-panel">
                         {% trans "Sorry, but you haven't been invited to a survey yet..." %}
                     </div>
                     <!--/ko-->
 
-                    <!--ko if: projectManager.projects().length -->
+                    <!--ko if: mobileSurveyManager.projects().length -->
                     <!-- Project Invitations List -->
                     <div id="mobile-projects-list" class="profile-default-message-panel">
                         <div class="row">
@@ -304,8 +304,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <!-- Find a survey -->
                             <div class="col-sm-9 col-sm-offset-3 relative">
                                 <div class="project-search-widget">
-                                    <input type="text" class="form-control" placeholder="{% trans 'Find a survey...' %}" data-bind="value: projectManager.projectFilter, valueUpdate: 'keyup'">
-                                    <span class="clear-node-search" data-bind="visible: projectManager.projectFilter().length > 0, click: function() { projectManager.projectFilter(''); }"><i class="fa fa-times-circle"></i></span>
+                                    <input type="text" class="form-control" placeholder="{% trans 'Find a survey...' %}" data-bind="value: mobileSurveyManager.projectFilter, valueUpdate: 'keyup'">
+                                    <span class="clear-node-search" data-bind="visible: mobileSurveyManager.projectFilter().length > 0, click: function() { mobileSurveyManager.projectFilter(''); }"><i class="fa fa-times-circle"></i></span>
                                 </div>
                             </div>
                         </div>
@@ -314,7 +314,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div id="" class="row">
                             <div class="col-sm-9 col-sm-offset-3 mar-top">
                                 <div class="">
-                                    <!--ko foreach: {data: projectManager.filteredProjects(), as: 'project'} -->
+                                    <!--ko foreach: {data: mobileSurveyManager.filteredProjects(), as: 'project'} -->
                                     <div class="project-panel">
 
                                         <div class="project-panel-header">
@@ -332,7 +332,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                             <div class="">
                                                 <div class="project-details">
-                                                    <a id="view-project-details-btn" class="text-primary text-semibold" data-bind="click: function(val){val.toggleShowDetails(); $parent.projectManager.getProjectResources(val)}">{% trans 'View Details' %}</a>
+                                                    <a id="view-project-details-btn" class="text-primary text-semibold" data-bind="click: function(val){val.toggleShowDetails(); $parent.mobileSurveyManager.getMobileSurveyResources(val)}">{% trans 'View Details' %}</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -416,160 +416,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </div>
     <!--END  Main Editor -->
 
-
-
-    <!--MAIN NAVIGATION-->
-    <nav id="mainnav-container" class="arches-background">
-        <div id="mainnav">
-
-            <!--Shortcut buttons-->
-            <div id="mainnav-shortcut" class="hidden">
-                <ul class="list-unstyled">
-                    <li class="col-xs-4" data-content="Home">
-                        <a class="shortcut-grid" href="#">
-                            <i class="fa fa-home"></i>
-                        </a>
-                    </li>
-                    <li class="col-xs-4" data-content="Dashboard">
-                        <a class="shortcut-grid" href="#">
-                            <i class="fa fa-tachometer"></i>
-                        </a>
-                    </li>
-                    <li class="col-xs-4" data-content="Add New Resource">
-                        <a class="shortcut-grid" href="#">
-                            <i class="fa fa-building-o"></i>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            <!--End shortcut buttons-->
-
-
-            <!--Menu-->
-            <div id="mainnav-menu-wrap">
-                <div class="nano arches-header-shim">
-                    <div class="nano-content">
-                        <ul id="mainnav-menu" class="list-group">
-
-                            <!--Menu list item-->
-                            <li>
-                                <a href="#">
-                                    <i class="fa fa-tachometer"></i>
-                                    <span class="menu-title">
-                                        <strong>Dashboard</strong>
-                                    </span>
-                                </a>
-                            </li>
-
-                            <!--Menu list item-->
-                            <li class="active-link">
-                                <a href="#">
-                                    <i class="fa fa-building-o"></i>
-                                    <span class="menu-title">
-                                        <strong>Resource Manager</strong>
-                                    </span>
-                                </a>
-                                <!-- Submenu -->
-                                <ul class="collapse in" aria-expanded="true">
-                                    <li class="link-submenu-item"><a class="link-submenu" href="forms-general.html"><i class="fa fa-university arches-menu-icon"></i> New Archaeological Resource</a></li>
-                                    <li class="link-submenu-item"><a class="link-submenu" href="forms-components.html"><i class="fa fa-building-o arches-menu-icon"></i> New Architectural Resource</a></li>
-                                    <li class="link-submenu-item"><a class="link-submenu" href="forms-validation.html"><i class="fa fa-tasks arches-menu-icon"></i> New Activity</a></li>
-                                    <li class="link-submenu-item"><a class="link-submenu" href="forms-wizard.html"><i class="fa fa-calendar arches-menu-icon"></i> New Historic Event</a></li>
-                                    <li class="link-submenu-item"><a class="link-submenu" href="forms-wizard.html"><i class="fa fa-group arches-menu-icon"></i> New Agent</a></li>
-                                    <li class="link-submenu-item"><a class="link-submenu" href="forms-wizard.html"><i class="fa fa-file-o arches-menu-icon"></i> New Information Resource</a></li>
-                                </ul>
-                            </li>
-
-
-                            <!--Menu list item-->
-                            <li>
-                                <a href="#">
-                                    <i class="ti-alarm-clock"></i>
-                                    <span class="menu-title">
-                                        <strong>System Settings</strong>
-                                    </span>
-                                </a>
-                            </li>
-
-                            <!--Menu list item-->
-                            <li>
-                                <a href="#">
-                                    <i class="fa fa-bookmark"></i>
-                                    <span class="menu-title">
-                                        <strong>Resource Designer</strong>
-                                    </span>
-                                </a>
-
-                            </li>
-
-                            <!--Menu list item-->
-                            <li>
-                                <a href="#">
-                                    <i class="fa fa-server"></i>
-                                    <span class="menu-title">
-                                        <strong>Map Server Manager</strong>
-                                    </span>
-                                </a>
-                            </li>
-
-                            <!--Menu list item-->
-                            <li>
-                                <a href="#">
-                                    <i class="fa fa-globe"></i>
-                                    <span class="menu-title">
-                                        <strong>Field Project Manager</strong>
-                                    </span>
-                                </a>
-                            </li>
-
-                            <!--Menu list item-->
-                            <li>
-                                <a href="#">
-                                    <i class="fa fa-cloud-upload"></i>
-                                    <span class="menu-title">
-                                        <strong>Import/Export Manager</strong>
-                                    </span>
-                                </a>
-                            </li>
-
-                            <!--Menu list item-->
-                            <li>
-                                <a href="#">
-                                    <i class="fa fa-user-md"></i>
-                                    <span class="menu-title">
-                                        <strong>Profile Manager</strong>
-                                    </span>
-                                </a>
-                            </li>
-
-                            <li class="list-divider-dark"></li>
-
-                            <!-- Tools -->
-                            <li class="list-header">Modules</li>
-
-                            <!--Menu list item-->
-                            <li>
-                                <a href="#">
-                                    <i class="fa fa-align-left"></i>
-                                    <span class="menu-title">
-                                        RDM
-
-                                    </span>
-                                </a>
-                            </li>
-
-                        </ul>
-
-                    </div>
-                </div>
-            </div>
-            <!--End menu-->
-
-        </div>
-    </nav>
-    <!--END MAIN NAVIGATION-->
-
-    <!--ASIDE-->
 </div>
 
 <!-- SCROLL TOP BUTTON -->

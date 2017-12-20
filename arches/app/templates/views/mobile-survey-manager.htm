@@ -136,7 +136,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             </a>
                                         </li>
                                         <li id="card-group" class="">
-                                            <a id="map-tab" data-toggle="tab" href="#location-card" class="card-tab-title" aria-expanded="false">
+                                            <a id="map-tab" data-toggle="tab" href="#location-card" class="card-tab-title" aria-expanded="false" data-bind="click: resizeMap">
                                                                 {% trans 'Location' %}
                                                             </a>
                                         </li>
@@ -247,8 +247,47 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </div>
 
                                         <!-- Map Card -->
-                                        <div id="location-card" class="mpm-card tab-pane fade">
-                                            Location....
+                                        <div id="location-card" class="mpm-card tab-pane fade msm-location-card ">
+                                            <div>
+                                              <!-- ko component: {
+                                                  name: 'map-widget',
+                                                  params: {
+                                                    type: 'survey-bounds',
+                                                    configForm: false,
+                                                    node: null,
+                                                    value: selectedProject().bounds,
+                                                    state: 'form',
+                                                    config: {
+                                                        basemap: basemap.name,
+                                                        bearing: 0,
+                                                        centerX: defaultCenterX,
+                                                        centerY: defaultCenterY,
+                                                        featureColor: "rgba(55,32,196,0.85)",
+                                                        featureEditingDisabled: false,
+                                                        featureLineWidth: 2,
+                                                        featurePointSize: 6,
+                                                        geocodePlaceholder: "Locate a Place or Address",
+                                                        geocodeProvider: geocoderDefault,
+                                                        geocoderVisible: true,
+                                                        geometryTypes: [{'id':'Polygon','text':'Polygon'}],
+                                                        mapControlsHidden: false,
+                                                        maxZoom: mapDefaultMaxZoom,
+                                                        minZoom: mapDefaultMinZoom,
+                                                        overlayConfigs: [],
+                                                        overlayOpacity: 0,
+                                                        pitch: 0,
+                                                        zoom: mapDefaultZoom
+                                                    }
+                                                }
+                                              } --><!-- /ko -->
+                                            </div>
+                                            <div class="col-sm-12 msm-basemap-location">
+                                                <div class="form-group">
+                                                    <label class="control-label account-label">{% trans 'Basemap location (MBTiles file url)' %}</label>
+                                                    <input type="text" class="form-control input-lg" data-bind="value: selectedProject().tilecache, valueUpdate: 'keyup'">
+                                                </div>
+                                            </div>
+
                                         </div>
 
                                         <!-- Models Card -->
@@ -277,6 +316,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                     </div>
                                                                 </div>
                                                                 <div class="mpm-card-container">
+
+
                                                                     <div class="mpm-card-list available">
                                                                     <div class="mpm-card-list-header">{% trans 'Available forms' %}</div>
                                                                     <div class="mpm-card-list-items">
@@ -383,41 +424,24 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </div>
 
 
-                                        <div id="identities-card" class="identities-list mpm-card tab-pane fade">
+                            <!-- Models Card -->
+                            <div id="identities-card" class="identities-list tab-pane fade">
+                                <div class="mpm-card-content">
+                                    <div>
+                                        <div class="flex relative">
 
-                                            <div>
-                                                <div>
-                                                    <div class="flex relative">
 
-                                                        <div class="mpm-left-panel" style="" data-bind="with:identityList">
+
+                                                        <div class="msm-resource-panel identities" style="" data-bind="with:identityList">
                                                             {% include 'views/mobile-survey-manager/identity-list.htm' %}
                                                         </div>
 
-                                                        <div class="mpm-right-panel">
+                                                        <!-- start identity content -->
+                                                        <div class="msm-resource-cards identities" data-bind="style: {top: ((identityList.selectedIndex() * 60 + 120) + (identityList.selectedIndex() * 5.0)) + 'px' }, visible: identityList.selected()  && identityList.hideIdentityDetails() != true">
 
                                                             <div class="relative">
 
                                                                 <div class="row">
-                                                                    <div class="col-xs-12 col-sm-5 col-md-3">
-                                                                        <!-- ko if: identityList.selected().type === 'group' -->
-                                                                        <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-purple">
-                                                                            <i class="fa fa-group"></i>
-                                                                        </span>
-                                                                        <div class="mpm-group-name">
-                                                                            <a class="listitem_name" data-bind='text:identityList.selected().name'></a>
-                                                                        </div>
-                                                                        <div class="mpm-group-subtitle">{% trans 'Arches Group' %} </div>
-                                                                        <!-- /ko -->
-                                                                        <!-- ko if: identityList.selected().type === 'user' -->
-                                                                        <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-mint">
-                                                                            <i class="fa fa-user"></i>
-                                                                        </span>
-                                                                        <div class="mpm-group-name">
-                                                                            <a class="listitem_name" data-bind='text:identityList.selected().name'></a>
-                                                                        </div>
-                                                                        <div class="mpm-group-subtitle" data-bind="">{% trans 'Arches User' %}</div>
-                                                                        <!-- /ko -->
-                                                                    </div>
                                                                     <div class="col-sm-6" style="" data-bind="">
                                                                         <div class="box-inline">
 
@@ -458,85 +482,85 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                                 <input class="form-control input-lg" placeholder="{% trans 'find a user in this group...' %}"  type="text" data-bind="value: selectedProject().userFilter, valueUpdate: 'keyup'">
                                                                             </div>
                                                                         </div>
-                                                                        <div class='mpm-group-users'>
-                                                                        <!-- ko foreach: selectedProject().filteredUsers() -->
-                                                                            <div href="#" class="list-group-item get-user-detail" data-bind="click: function(){ $data.expanded(!$data.expanded()) }">
-                                                                                <div class="mpm-user-title mpm-user-name"><h4 data-bind='text: $data.username'></h4>
-                                                                                <!--ko if: $data.groups-->
-                                                                                    <!--ko if: _.contains($parent.selectedProject().users(), $data.id) -->
-                                                                                    <div class='mpm-user-status invited pull-right'>
-                                                                                        <span>{% trans 'Approved' %}</span>
-                                                                                    </div>
+
+                                                                        <div class="msm-user-summary">
+                                                                            <div class='msm-group-users'>
+                                                                            <!-- ko foreach: selectedProject().filteredUsers() -->
+                                                                            <div href="#" class="list-group-item get-user-detail" data-bind="click: function(){ $data.expanded(!$data.expanded());  $parent.selectedProject().selectedUser($data)}, css: {selected: $parent.selectedProject().selectedUser() == $data}">
+                                                                                    <div class="mpm-user-title mpm-user-name"><h4 data-bind='text: $data.username'></h4>
+                                                                                    <!--ko if: $data.groups-->
+                                                                                        <div class='mpm-user-status pull-right' data-bind="css: {invited : _.contains($parent.selectedProject().users(), $data.id)}">
+                                                                                            <span data-bind="text: _.contains($parent.selectedProject().users(), $data.id) ? '{% trans 'Approved' %}': '{% trans 'Not Approved' %}'"></span>
+                                                                                        </div>
                                                                                     <!--/ko-->
-                                                                                    <!--ko ifnot: _.contains($parent.selectedProject().users(), $data.id) -->
-                                                                                    <div class='mpm-user-status pull-right'>
-                                                                                        <span>{% trans 'Not Approved' %}</span>
-                                                                                    </div>
-                                                                                    <!--/ko-->
-                                                                                <!--/ko-->
-                                                                            </div>
+                                                                                </div>
                                                                                 <div class="mpm-user-subtitle"><p>{% trans 'Activity: 0 edits' %}</p><div><span>{% trans 'Last Login:' %}</span><span class="last-login" data-bind="text: $data.last_login"></span></div></div>
-                                                                                <div class="mpm-user-summary" data-bind="css: {'expanded': $data.expanded()}">
-                                                                                    <div class="mpm-model-detail-panel">
-                                                                                        <div class="mpm-node-name">
-                                                                                            {% trans 'User Information' %}
-                                                                                        </div>
-                                                                                        <ul class="mpm-node-detail-metadata">
-                                                                                            <li class="">
-                                                                                                <span>{% trans 'Name:' %}
-                                                                                                    <span class="last-login" data-bind="text: $data.first_name"></span>
-                                                                                                    <span class="last-login" data-bind="text: $data.last_name"></span>
-                                                                                                </span>
-                                                                                            </li>
-                                                                                            <li class="">
-                                                                                                {% trans 'Email:' %} <a href="" data-bind="text: $data.email"></a>
-                                                                                            </li>
-                                                                                            <li class="">
-                                                                                                {% trans 'Groups:' %}
-                                                                                                <span class="last-login" data-bind="text: $data.group_names"></span>
-                                                                                            </li>
-                                                                                        </ul>
-                                                                                    </div>
+                                                                            </div>
+                                                                            <!-- /ko -->
 
-                                                                                    <div class="mpm-model-detail-panel">
-                                                                                        <div class="mpm-node-name">
-                                                                                            Contributions
-                                                                                        </div>
-                                                                                        <ul class="mpm-node-detail-metadata">
-                                                                                            <li class="">
-                                                                                                Edits: 0
-                                                                                            </li>
-                                                                                            <li>
-                                                                                                Devices (1)
-                                                                                                <ul class="mpm-node-detail-metadata">
-                                                                                                    <li class="">
-                                                                                                        <span>Name: iPhone (last login:<span class="last-login" data-bind="text: $data.last_login"></span>)</span>
-                                                                                                    </li>
-                                                                                                </ul>
-                                                                                            </li>
-                                                                                        </ul>
+                                                                        </div>
+                                                                        <!-- ko if: selectedProject().selectedUser() -->
+                                                                            <div class="mpm-user-summary">
+                                                                                <div class="mpm-model-detail-panel">
+                                                                                    <div class="mpm-node-name">
+                                                                                        {% trans 'User Information' %}
                                                                                     </div>
+                                                                                    <ul class="mpm-node-detail-metadata">
+                                                                                        <li class="">
+                                                                                            <span>{% trans 'Name:' %}
+                                                                                                <span class="last-login" data-bind="text: selectedProject().selectedUser().first_name"></span>
+                                                                                                <span class="last-login" data-bind="text: selectedProject().selectedUser().last_name"></span>
+                                                                                            </span>
+                                                                                        </li>
+                                                                                        <li class="">
+                                                                                            {% trans 'Email:' %} <a href="" data-bind="text: selectedProject().selectedUser().email"></a>
+                                                                                        </li>
+                                                                                        <li class="">
+                                                                                            {% trans 'Groups:' %}
+                                                                                            <span class="last-login" data-bind="text: selectedProject().selectedUser().group_names"></span>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </div>
 
-                                                                                    <div class="mpm-model-detail-panel">
-                                                                                        <div class="mpm-node-name">
-                                                                                            Security
-                                                                                        </div>
-                                                                                        <ul class="mpm-node-detail-metadata">
-                                                                                            <li class="">
-                                                                                                Remove survey data from from user's device on next login?
-                                                                                            </li>
-                                                                                            <li class="">
-                                                                                                <!--Switchery : Unchecked-->
-                                                                                                <!--===================================================-->
-                                                                                                <input id="wipe-project" class="js-switch-small" type="checkbox" style="margin-top: 0px; display: none;" data-switchery="true"><span class="switchery switchery-small" style="box-shadow: rgb(223, 223, 223) 0px 0px 0px 0px inset; border-color: rgb(223, 223, 223); background-color: rgb(255, 255, 255); transition: border 0.4s, box-shadow 0.4s;"><small style="left: 0px; background-color: rgb(255, 255, 255); transition: left 0.2s;"></small></span>
-                                                                                                <!--===================================================-->
-                                                                                            </li>
-                                                                                        </ul>
+                                                                                <div class="mpm-model-detail-panel">
+                                                                                    <div class="mpm-node-name">
+                                                                                        Contributions
                                                                                     </div>
+                                                                                    <ul class="mpm-node-detail-metadata">
+                                                                                        <li class="">
+                                                                                            Edits: 0
+                                                                                        </li>
+                                                                                        <li>
+                                                                                            Devices (1)
+                                                                                            <ul class="mpm-node-detail-metadata">
+                                                                                                <li class="">
+                                                                                                    <span>Name: iPhone (last login:<span class="last-login" data-bind="text: selectedProject().selectedUser().last_login"></span>)</span>
+                                                                                                </li>
+                                                                                            </ul>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </div>
+
+                                                                                <div class="mpm-model-detail-panel">
+                                                                                    <div class="mpm-node-name">
+                                                                                        Security
+                                                                                    </div>
+                                                                                    <ul class="mpm-node-detail-metadata">
+                                                                                        <li class="">
+                                                                                            Remove survey data from from user's device on next login?
+                                                                                        </li>
+                                                                                        <li class="">
+                                                                                            <!--Switchery : Unchecked-->
+                                                                                            <!--===================================================-->
+                                                                                            <input id="wipe-project" class="js-switch-small" type="checkbox" style="margin-top: 0px; display: none;" data-switchery="true"><span class="switchery switchery-small" style="box-shadow: rgb(223, 223, 223) 0px 0px 0px 0px inset; border-color: rgb(223, 223, 223); background-color: rgb(255, 255, 255); transition: border 0.4s, box-shadow 0.4s;"><small style="left: 0px; background-color: rgb(255, 255, 255); transition: left 0.2s;"></small></span>
+                                                                                            <!--===================================================-->
+                                                                                        </li>
+                                                                                    </ul>
                                                                                 </div>
                                                                             </div>
                                                                         <!-- /ko -->
-                                                                    </div>
+                                                                        </div>
+
                                                                         <!--/ko-->
                                                                         <!--ko if: identityList.selected().type === 'user' -->
                                                                         <a href="#" class="get-user-detail">
@@ -638,11 +662,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                 </div>
                                                             </div>
                                                         </div>
-
-                                                    </div>
-                                                </div>
+                                                        <!-- end identity content -->
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
 
                                         <!-- Summary Card -->
                                         <div id="project-summary-card" class="mpm-card tab-pane fade">

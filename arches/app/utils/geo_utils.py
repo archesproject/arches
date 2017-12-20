@@ -1,3 +1,4 @@
+import json
 from django.contrib.gis.geos import GEOSGeometry, GeometryCollection
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
@@ -28,3 +29,20 @@ class GeoUtils(object):
         geom_collection = self.create_geom_collection_from_geojson(geojson)
         centroid = geom_collection.centroid.geojson
         return JSONDeserializer().deserialize(centroid)
+
+    def convert_multipart_to_singlepart(self, geom, format="geojson"):
+        result = None
+        if geom != None:
+            multipart = json.loads(geom)
+            fc = {"type": "FeatureCollection", "features": []}
+            for coords in multipart['coordinates']:
+                geom = { "type": "Feature",
+                            "geometry": {
+                                "type": "Polygon",
+                                "coordinates": coords
+                            },
+                            "properties": {}
+                        };
+                fc['features'].append(geom)
+            result = fc
+        return result

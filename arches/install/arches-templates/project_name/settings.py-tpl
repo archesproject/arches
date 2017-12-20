@@ -26,6 +26,9 @@ SECRET_KEY = '{{ secret_key }}'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# a prefix to append to all elasticsearch indexes, note: must be lower case
+ELASTICSEARCH_PREFIX = '{{ project_name }}'
+
 DATABASES = {
     "default": {
         "ATOMIC_REQUESTS": False,
