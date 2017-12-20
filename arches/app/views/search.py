@@ -312,8 +312,6 @@ def build_search_results_dsl(request):
         now = str(datetime.utcnow())
         start_date = ExtendedDateFormat(temporal_filter['fromDate'])
         end_date = ExtendedDateFormat(temporal_filter['toDate'])
-        print start_date
-        print end_date
         date_nodeid = str(temporal_filter['dateNodeId']) if 'dateNodeId' in temporal_filter and temporal_filter['dateNodeId'] != '' else None
         query_inverted = False if 'inverted' not in temporal_filter else temporal_filter['inverted']
 
