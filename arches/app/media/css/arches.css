@@ -9447,7 +9447,8 @@ a.search-facet-item.disabled {
 .mobile-project-manager-editor .identities-list .library-card {
     margin-left: 0;
     border-left: 0;
-    height: 65px;
+    height: 75px;
+    border-left: 1px solid transparent;
 }
 
 .mobile-project-manager-editor .identities-list .library-card:first-child {
@@ -9648,16 +9649,17 @@ a.search-facet-item.disabled {
 }
 
 .library-card-main.mpm-resource-list {
-    top: 8px;
+    top: 12px;
     overflow:visible;
     cursor: pointer;
     width:100%;
 }
 
 .selected-card div .library-card-main.mpm-resource-list {
+    height: 75px;
     background: #fbfbfb;
-    padding: 6px 0px;
-    margin-top: -8px;
+    padding: 12px 0px;
+    margin-top: -12px;
     border-bottom: 1px solid #eee;
 }
 
@@ -9686,7 +9688,8 @@ a.search-facet-item.disabled {
     /* Safari */
     transition: height 0.25s;
     background: #ffffff;
-    border: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
 }
 
 .msm-resource-panel.identities .library-card.selected.selected-card {
