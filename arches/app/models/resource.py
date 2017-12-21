@@ -235,13 +235,14 @@ class Resource(models.ResourceInstance):
         """
         root_nodes = models.Node.objects.filter(istopnode=True)
         node_config_lookup = {}
-
+        graphs = models.GraphModel.objects.all().exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False)
+        graph_lookup = {str(graph.graphid): {'name':graph.name, 'iconclass': graph.iconclass} for graph in graphs}
         for node in root_nodes:
             graph_id = unicode(node.graph_id)
             if node.config != None:
                 node_config_lookup[graph_id] = node.config
-                node_config_lookup[graph_id]['iconclass'] = node.graph.iconclass
-                node_config_lookup[graph_id]['name'] = node.graph.name
+                node_config_lookup[graph_id]['iconclass'] = graph_lookup[graph_id]['iconclass']
+                node_config_lookup[graph_id]['name'] = graph_lookup[graph_id]['name']
 
         ret = {
             'resource_instance': self,

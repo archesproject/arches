@@ -105,16 +105,19 @@ class Graph(models.GraphModel):
                 nodes = self.node_set.all()
                 edges = self.edge_set.all()
                 cards = self.cardmodel_set.all()
-
+                edge_dicts = json.loads(JSONSerializer().serialize(edges))
+                node_lookup = {}
+                edge_lookup = {edge['edgeid']: edge for edge in edge_dicts}
                 for node in nodes:
                     self.add_node(node)
+                    node_lookup[str(node.nodeid)] = node
                 for card in cards:
                     self.add_card(card)
                 for edge in edges:
-                    edge.domainnode = self.nodes[edge.domainnode.pk]
-                    edge.rangenode = self.nodes[edge.rangenode.pk]
+                    edge_dict = edge_lookup[str(edge.edgeid)]
+                    edge.domainnode = node_lookup[edge_dict['domainnode_id']]
+                    edge.rangenode = node_lookup[edge_dict['rangenode_id']]
                     self.add_edge(edge)
-
                 self.populate_null_nodegroups()
 
     @staticmethod
@@ -1149,7 +1152,6 @@ class Graph(models.GraphModel):
         for edge_id, edge in self.edges.iteritems():
             parentproperties[edge.rangenode_id] = edge.ontologyproperty
 
-
         if 'edges' not in exclude:
             ret['edges'] = [edge for key, edge in self.edges.iteritems()]
         else:
@@ -1163,10 +1165,6 @@ class Graph(models.GraphModel):
                 ret['nodes'].append(nodeobj)
         else:
             ret.pop('nodes', None)
-
-        if len(exclude) > 0:
-            import ipdb
-            ipdb.set_trace()
 
         res = JSONSerializer().serializeToPython(ret)
 
