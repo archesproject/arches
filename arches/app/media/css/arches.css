@@ -9551,6 +9551,41 @@ a.search-facet-item.disabled {
     margin: 20px 0px;
 }
 
+.mpm-form-finder {
+    width: 300px;
+    margin-bottom: 10px;
+    margin-left: 8px;
+}
+
+.mpm-selector-header {
+    height: 55px;
+    padding: 10px 5px;
+    border-style: solid;
+    border-width: 0.25px;
+    border-color: #eee;
+    background-color: #f8f8f8;
+}
+
+.mpm-selector-header-txt {
+    padding: 10px;
+    font-size: 13px;
+}
+
+.mpm-select-switch-label {
+    color: #999;
+    float: right;
+    padding-right: 5px;
+}
+
+.mpm-selector-btns {
+    position: absolute;
+    top: 20px;
+    right: 10px;
+}
+
+.list-group-item.get-user-detail:first-of-type {
+    border-top-width: 0px;
+}
 
 .msm-resource-panel .mpm-group-name {
     position: relative;
@@ -9605,7 +9640,7 @@ a.search-facet-item.disabled {
 
 .mpm-card-container {
     position: absolute;
-    top: 120px;
+    top: 80px;
     display: flex;
     flex-direction: row;
     justify-content: space-around;
@@ -9653,12 +9688,13 @@ a.search-facet-item.disabled {
     overflow:visible;
     cursor: pointer;
     width:100%;
+    padding: 0px 5px;
 }
 
 .selected-card div .library-card-main.mpm-resource-list {
     height: 75px;
     background: #fbfbfb;
-    padding: 12px 0px;
+    padding: 12px 5px;
     margin-top: -12px;
     border-bottom: 1px solid #eee;
 }
@@ -9853,7 +9889,7 @@ a.search-facet-item.disabled {
 
 .mpm-instructions {
     position: absolute;
-    top: 10px;
+    top: 15px;
     color: #555;
     font-size: 13px;
     padding: 15px 20px 5px 5px;
