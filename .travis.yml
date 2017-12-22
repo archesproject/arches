@@ -1,4 +1,4 @@
-dist: trusty
+dist: xenial
 language: python
 
 python:
@@ -19,7 +19,7 @@ addons:
       - elasticsearch
       - libxml2-dev
       - libpq-dev
-      - openjdk-7-jdk
+      - openjdk-8-jdk
       - python-dev
       - postgresql-9.6-postgis-2.3
 
