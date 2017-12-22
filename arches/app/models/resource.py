@@ -343,20 +343,20 @@ class Resource(models.ResourceInstance):
     def get_node_values(self, node_name):
         """
         Take a node_name (string) as an argument and return a list of values.
-        If an invalid node 
-
-        only string, domain, domain-list, concept, and concept-list datatypes
-        are handled at this time.
+        If an invalid node_name is used, or if multiple nodes with the same
+        name are found, the method returns False.
         """
-        datatype_list = [
-            'string', 'domain', 'domain-list', 'concept', 'concept-list']
+
         nodes = models.Node.objects.filter(
-            name=node_name, datatype__in=datatype_list,graph_id=self.graph_id)
+            name=node_name, graph_id=self.graph_id)
+
         if len(nodes) != 1:
-            print "invalid node name or multiple nodes with the same name"
+            print("invalid node name or multiple nodes with the same name")
             return False
 
-        tiles = self.tilemodel_set.filter(nodegroup_id=nodes[0].nodegroup_id)
+        tiles = self.tilemodel_set.filter(
+            nodegroup_id=nodes[0].nodegroup_id)
+
         values = []
         for tile in tiles:
             for node_id, value in tile.data.iteritems():
