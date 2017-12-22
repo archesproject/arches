@@ -82,20 +82,15 @@ class JSONSerializer(object):
             return self.handle_list(object)
         elif isinstance(object, Model):
             if hasattr(object, 'serialize'):
-                # print 'serializing', object.__class__.__name__, self.exclude
-                # if object.__class__.__name__ == 'Graph':
-                #     print 'this is the exclude', exclude
-                #     exclude = self.exclude
+                exclude = self.exclude
                 return self.handle_object(getattr(object, 'serialize')(fields, exclude), fields, exclude)
             else:
-                return self.handle_model(object, fields, exclude)
+                return self.handle_model(object, fields, self.exclude)
             #return PythonSerializer().serialize([object],**self.options.copy())[0]['fields']
         elif isinstance(object, QuerySet):
             #return super(JSONSerializer,self).serialize(object, **self.options.copy())[0]
             ret = []
             for item in object:
-                if object.__class__.__name__ == 'Graph':
-                    exclude = self.exclude
                 ret.append(self.handle_object(item, fields, exclude))
             return ret
         elif (isinstance(object, int) or
@@ -223,7 +218,7 @@ class JSONDeserializer(object):
         return ret
 
 
-    def handle_object(self, object):
+    def handle_object(self, object, fields=None, exclude=None):
         """ Called to handle everything, looks for the correct handling """
         if isinstance(object, dict):
             if ('pk' in object and 'model' in object and 'fields' in object):
