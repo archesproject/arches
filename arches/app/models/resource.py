@@ -326,7 +326,7 @@ class Resource(models.ResourceInstance):
 
         return new_resource
 
-    def serialize(self):
+    def serialize(self, fields=None, exclude=None):
         """
         Serialize to a different form then used by the internal class structure
 
