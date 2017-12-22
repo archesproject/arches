@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
 function install_postgres {
-    sudo add-apt-repository "deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg 9.6"
+    sudo add-apt-repository "deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main"
     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
     sudo apt-get update
     sudo apt-get install postgresql-9.6 postgresql-contrib-9.6 -y
-    sudo apt-get install postgresql-9.6-postgis-2.3 postgis -y -q
+    sudo apt-get install postgresql-9.6-postgis-2.3 -y
     sudo -u postgres psql -d postgres -c "ALTER USER postgres with encrypted password 'postgis';"
     sudo echo "*:*:*:postgres:postgis" >> ~/.pgpass
     sudo chmod 600 ~/.pgpass
