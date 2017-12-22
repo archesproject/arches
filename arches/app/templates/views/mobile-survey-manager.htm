@@ -248,46 +248,48 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!-- Map Card -->
                                         <div id="location-card" class="mpm-card tab-pane fade msm-location-card ">
-                                            <div>
-                                              <!-- ko component: {
-                                                  name: 'map-widget',
-                                                  params: {
-                                                    type: 'survey-bounds',
-                                                    configForm: false,
-                                                    node: null,
-                                                    value: selectedProject().bounds,
-                                                    state: 'form',
-                                                    config: {
-                                                        basemap: basemap.name,
-                                                        bearing: 0,
-                                                        centerX: defaultCenterX,
-                                                        centerY: defaultCenterY,
-                                                        featureColor: "rgba(55,32,196,0.85)",
-                                                        featureEditingDisabled: false,
-                                                        featureLineWidth: 2,
-                                                        featurePointSize: 6,
-                                                        geocodePlaceholder: "Locate a Place or Address",
-                                                        geocodeProvider: geocoderDefault,
-                                                        geocoderVisible: true,
-                                                        geometryTypes: [{'id':'Polygon','text':'Polygon'}],
-                                                        mapControlsHidden: false,
-                                                        maxZoom: mapDefaultMaxZoom,
-                                                        minZoom: mapDefaultMinZoom,
-                                                        overlayConfigs: [],
-                                                        overlayOpacity: 0,
-                                                        pitch: 0,
-                                                        zoom: mapDefaultZoom
+                                            <div class="msm-map-container">
+                                                <div class="col-sm-12 msm-basemap-location">
+                                                    <div class="form-group" style="margin-bottom: 0px;">
+                                                        <label class="control-label account-label">{% trans 'Basemap location (MBTiles file url)' %}</label>
+                                                        <input type="text" class="form-control input-lg" data-bind="value: selectedProject().tilecache, valueUpdate: 'keyup'">
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                  <!-- ko component: {
+                                                      name: 'map-widget',
+                                                      params: {
+                                                        type: 'survey-bounds',
+                                                        configForm: false,
+                                                        node: null,
+                                                        value: selectedProject().bounds,
+                                                        state: 'form',
+                                                        config: {
+                                                            basemap: basemap.name,
+                                                            bearing: 0,
+                                                            centerX: defaultCenterX,
+                                                            centerY: defaultCenterY,
+                                                            featureColor: "rgba(55,32,196,0.85)",
+                                                            featureEditingDisabled: false,
+                                                            featureLineWidth: 2,
+                                                            featurePointSize: 6,
+                                                            geocodePlaceholder: "Locate a Place or Address",
+                                                            geocodeProvider: geocoderDefault,
+                                                            geocoderVisible: true,
+                                                            geometryTypes: [{'id':'Polygon','text':'Polygon'}],
+                                                            mapControlsHidden: false,
+                                                            maxZoom: mapDefaultMaxZoom,
+                                                            minZoom: mapDefaultMinZoom,
+                                                            overlayConfigs: [],
+                                                            overlayOpacity: 0,
+                                                            pitch: 0,
+                                                            zoom: mapDefaultZoom
+                                                        }
                                                     }
-                                                }
-                                              } --><!-- /ko -->
-                                            </div>
-                                            <div class="col-sm-12 msm-basemap-location">
-                                                <div class="form-group">
-                                                    <label class="control-label account-label">{% trans 'Basemap location (MBTiles file url)' %}</label>
-                                                    <input type="text" class="form-control input-lg" data-bind="value: selectedProject().tilecache, valueUpdate: 'keyup'">
+                                                  } --><!-- /ko -->
                                                 </div>
                                             </div>
-
                                         </div>
 
                                         <!-- Models Card -->
@@ -475,7 +477,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                         </div>
 
                                                         <!-- Survey Summary -->
-                                                        <div class="msm-settings">
+                                                        <div class="msm-settings-summary">
 
                                                             <!-- Survey Settings -->
                                                             <div class="mpm-summary-panel">
@@ -604,105 +606,123 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                     <div id="user-cards" class="list-group user-cards">
                                                                         <!-- Title/Filter/Pagination -->
                                                                         <!--ko if: identityList.selected().type === 'group' -->
-                                                                        <div class="relative mpm-item-listing-header-panel">
-
-                                                                            <div class="mpm-toggle-container">
-                                                                                <span class="switch switch-small" data-bind="css: {'on': selectedProject().hasIdentity()}, click: function(){selectedProject().toggleIdentity()}"><small></small></span>
-
-                                                                                <h4 class="mpm-item-listing-header">{% trans 'Add accounts in this group' %}</h4>
-                                                                            </div>
-
-                                                                            <div class="project-search-widget mpm-item-listing">
-                                                                                <input class="form-control input-lg" placeholder="{% trans 'find a user in this group...' %}"  type="text" data-bind="value: selectedProject().userFilter, valueUpdate: 'keyup'">
-                                                                            </div>
-                                                                        </div>
-
+                                                                        
                                                                         <div class="msm-user-summary">
                                                                             <div class='msm-group-users'>
-                                                                                <!-- ko foreach: selectedProject().filteredUsers() -->
-                                                                                <div href="#" class="list-group-item get-user-detail" data-bind="click: function(){ $data.expanded(!$data.expanded());  $parent.selectedProject().selectedUser($data)}, css: {selected: $parent.selectedProject().selectedUser() == $data}">
-                                                                                    
-                                                                                    <div class="mpm-user-title mpm-user-name">
 
-                                                                                        <h4 data-bind='text: $data.username'></h4>
+
+                                                                                <div class="mpm-selector-header relative">
                                                                                         
-                                                                                        <!--ko if: $data.groups-->
-                                                                                        <div class='mpm-user-status pull-right' data-bind="css: {invited : _.contains($parent.selectedProject().users(), $data.id)}">
-                                                                                            <span data-bind="text: _.contains($parent.selectedProject().users(), $data.id) ? '{% trans 'Approved' %}': '{% trans 'Not Approved' %}'"></span>
-                                                                                        </div>
-                                                                                        <!--/ko-->
+                                                                                    <!-- Panel Header -->
+                                                                                    <div class="mpm-selector-header-txt">
+                                                                                        <input class="form-control input-lg" style="    margin-top: -13px;width: 300px;" placeholder="{% trans 'find a user in this group...' %}"  type="text" data-bind="value: selectedProject().userFilter, valueUpdate: 'keyup'">
                                                                                     </div>
-                                                                                    
-                                                                                    <div class="mpm-user-subtitle">
-                                                                                        <p>{% trans 'Activity: 0 edits' %}</p>
 
-                                                                                        <div>
-                                                                                            <span>{% trans 'Last Login:' %}</span>
-                                                                                            <span class="last-login" data-bind="text: $data.last_login"></span>
+                                                                                    <div class="mpm-selector-btns">
+                                                                                        <a class="" href="">Select all</a>
+                                                                                        <span class="switch switch-small" data-bind="css: {'on': selectedProject().hasIdentity()}, click: function(){selectedProject().toggleIdentity()}"><small></small></span>
+                                                                                    </div>
+
+                                                                                    <!-- Info panel -->
+                                                                                    <div class="mpm-user-info-panel" style="padding: 0px;">
+
+                                                                                        <!-- ko foreach: selectedProject().filteredUsers() -->
+                                                                                        <div href="#" class="list-group-item get-user-detail" data-bind="click: function(){ $data.expanded(!$data.expanded());  $parent.selectedProject().selectedUser($data)}, css: {selected: $parent.selectedProject().selectedUser() == $data}">
+                                                                                            
+                                                                                            <div class="mpm-user-title mpm-user-name">
+
+                                                                                                <h4 data-bind='text: $data.username'></h4>
+                                                                                                
+                                                                                                <!--ko if: $data.groups-->
+                                                                                                <div class='mpm-user-status pull-right' data-bind="css: {invited : _.contains($parent.selectedProject().users(), $data.id)}">
+                                                                                                    <span data-bind="text: _.contains($parent.selectedProject().users(), $data.id) ? '{% trans 'Approved' %}': '{% trans 'Not Approved' %}'"></span>
+                                                                                                </div>
+                                                                                                <!--/ko-->
+                                                                                            </div>
+                                                                                            
+                                                                                            <div class="mpm-user-subtitle">
+                                                                                                <p>{% trans 'Activity: 0 edits' %}</p>
+
+                                                                                                <div>
+                                                                                                    <span>{% trans 'Last Login:' %}</span>
+                                                                                                    <span class="last-login" data-bind="text: $data.last_login"></span>
+                                                                                                </div>
+                                                                                            </div>
                                                                                         </div>
+                                                                                        <!-- /ko -->
+
+
+
+
+
+
                                                                                     </div>
                                                                                 </div>
-                                                                                <!-- /ko -->
+
+                                                                                
 
                                                                             </div>
                                                                             
                                                                             <!-- ko if: selectedProject().selectedUser() -->
                                                                             <div class="mpm-user-summary">
                                                                                 <div class="mpm-model-detail-panel">
-                                                                                    <div class="mpm-node-name">
-                                                                                        {% trans 'User Information' %}
-                                                                                    </div>
-                                                                                    <ul class="mpm-node-detail-metadata">
-                                                                                        <li class="">
-                                                                                            <span>{% trans 'Name:' %}
-                                                                                                <span class="last-login" data-bind="text: selectedProject().selectedUser().first_name"></span>
-                                                                                                <span class="last-login" data-bind="text: selectedProject().selectedUser().last_name"></span>
-                                                                                            </span>
-                                                                                        </li>
-                                                                                        <li class="">
-                                                                                            {% trans 'Email:' %} <a href="" data-bind="text: selectedProject().selectedUser().email"></a>
-                                                                                        </li>
-                                                                                        <li class="">
-                                                                                            {% trans 'Groups:' %}
-                                                                                            <span class="last-login" data-bind="text: selectedProject().selectedUser().group_names"></span>
-                                                                                        </li>
-                                                                                    </ul>
-                                                                                </div>
+                                                                                    
+                                                                                    <!-- User Info -->
+                                                                                    <div class="mpm-selector-header relative">
+                                                                                        
+                                                                                        <!-- Panel Header -->
+                                                                                        <div class="mpm-selector-header-txt">
+                                                                                            <strong>{% trans 'User Summary' %}</strong>
+                                                                                        </div>
 
-                                                                                <div class="mpm-model-detail-panel">
-                                                                                    <div class="mpm-node-name">
-                                                                                        Contributions
-                                                                                    </div>
-                                                                                    <ul class="mpm-node-detail-metadata">
-                                                                                        <li class="">
-                                                                                            Edits: 0
-                                                                                        </li>
-                                                                                        <li>
-                                                                                            Devices (1)
+                                                                                        <!-- Info panel -->
+                                                                                        <div class="mpm-user-info-panel" style="margin-top: 9px;">
+                                                                                            
+                                                                                            <div class="mpm-node-name">
+                                                                                                User
+                                                                                            </div>
                                                                                             <ul class="mpm-node-detail-metadata">
                                                                                                 <li class="">
-                                                                                                    <span>Name: iPhone (last login:<span class="last-login" data-bind="text: selectedProject().selectedUser().last_login"></span>)</span>
+                                                                                                    <span>{% trans 'Name:' %}
+                                                                                                        <span class="last-login" data-bind="text: selectedProject().selectedUser().first_name"></span>
+                                                                                                        <span class="last-login" data-bind="text: selectedProject().selectedUser().last_name"></span>
+                                                                                                    </span>
+                                                                                                </li>
+                                                                                                <li class="">
+                                                                                                    {% trans 'Email:' %} <a href="" data-bind="text: selectedProject().selectedUser().email"></a>
+                                                                                                </li>
+                                                                                                <li class="">
+                                                                                                    {% trans 'Groups:' %}
+                                                                                                    <span class="last-login" data-bind="text: selectedProject().selectedUser().group_names"></span>
                                                                                                 </li>
                                                                                             </ul>
-                                                                                        </li>
-                                                                                    </ul>
+
+                                                                                            <div class="mpm-node-name">
+                                                                                                Contributions
+                                                                                            </div>
+                                                                                            <ul class="mpm-node-detail-metadata">
+                                                                                                <li class="">
+                                                                                                    Edits: 0
+                                                                                                </li>
+                                                                                                <li>
+                                                                                                    Devices (1)
+                                                                                                    <ul class="mpm-node-detail-metadata">
+                                                                                                        <li class="">
+                                                                                                            <span>Name: iPhone (last login:<span class="last-login" data-bind="text: selectedProject().selectedUser().last_login"></span>)</span>
+                                                                                                        </li>
+                                                                                                    </ul>
+                                                                                                </li>
+                                                                                            </ul>
+                                                                                            
+                                                                                        </div>
+                                                                                    </div>
+
                                                                                 </div>
 
+                                                                               
+
                                                                                 <div class="mpm-model-detail-panel">
-                                                                                    <div class="mpm-node-name">
-                                                                                        Security
-                                                                                    </div>
-                                                                                    <ul class="mpm-node-detail-metadata">
-                                                                                        <li class="">
-                                                                                            Remove survey data from from user's device on next login?
-                                                                                        </li>
-                                                                                        <li class="">
-                                                                                            <!--Switchery : Unchecked-->
-                                                                                            <!--===================================================-->
-                                                                                            <input id="wipe-project" class="js-switch-small" type="checkbox" style="margin-top: 0px; display: none;" data-switchery="true"><span class="switchery switchery-small" style="box-shadow: rgb(223, 223, 223) 0px 0px 0px 0px inset; border-color: rgb(223, 223, 223); background-color: rgb(255, 255, 255); transition: border 0.4s, box-shadow 0.4s;"><small style="left: 0px; background-color: rgb(255, 255, 255); transition: left 0.2s;"></small></span>
-                                                                                            <!--===================================================-->
-                                                                                        </li>
-                                                                                    </ul>
+                                                                                    
                                                                                 </div>
                                                                             </div>
                                                                         <!-- /ko -->

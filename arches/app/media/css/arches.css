@@ -9402,7 +9402,7 @@ a.search-facet-item.disabled {
 }
 
 #identities-card .library-card:not(.selected-card) {
-    border-left: 5px solid #f8f8f8;
+    border-left: 1px solid transparent;
 }
 
 .identities-list .mpm-left-panel {
@@ -9532,11 +9532,13 @@ a.search-facet-item.disabled {
 .msm-group-users {
     height: 350px;
     overflow-y: scroll;
-    margin-top: 5px;
+    margin-top: 10px;
+    margin-bottom: 15px;
     border-top: solid;
     border-width: 0.25px;
     border-color: #eee;
     width: 50%;
+    background: #fcfcfc;
 }
 
 .get-user-detail:hover {
@@ -9671,6 +9673,14 @@ a.search-facet-item.disabled {
     margin-bottom: 5px;
 }
 
+.mpm-user-info-panel {
+    margin-top: -1px;
+    padding: 15px 20px;
+    background: #fcfcfc;
+    margin-right: -5px;
+    margin-left: -5px;
+}
+
 .mpm-user-name.mpm-user-title {
     display: flex;
     flex-direction: row;
@@ -9729,12 +9739,13 @@ a.search-facet-item.disabled {
 }
 
 .msm-resource-panel.identities .library-card.selected.selected-card {
-    height: 490px;
+    height: 510px;
     -webkit-transition: height 0.25s;
     /* Safari */
     transition: height 0.25s;
     background: #ffffff;
-    border: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
 }
 
 
@@ -9887,6 +9898,7 @@ a.search-facet-item.disabled {
     text-align: left;
 }
 
+
 .mpm-instructions {
     position: absolute;
     top: 15px;
@@ -9982,6 +9994,11 @@ a.search-facet-item.disabled {
     min-height: 500px;
     overflow-y: scroll;
 }
+
+.msm-map-container {
+    padding: 20px;
+}
+
 
 .profile-mpm-panel {
     margin-left: 20px;
