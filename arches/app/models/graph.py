@@ -1120,30 +1120,11 @@ class Graph(models.GraphModel):
         else:
             ret.pop('relatable_resource_model_ids', None)
 
-        if 'cards' not in exclude:
-            ret['cards'] = self.get_cards()
-        else:
-            ret.pop('cards', None)
-
-        if 'nodegroups' not in exclude:
-            ret['nodegroups'] = self.get_nodegroups()
-        else:
-            ret.pop('nodegroups', None)
-
-        if 'domain_connections' not in exclude:
-            ret['domain_connections'] = self.get_valid_domain_ontology_classes()
-        else:
-            ret.pop('domain_connections', None)
-
-        if 'is_editable' not in exclude:
-            ret['is_editable'] = self.is_editable()
-        else:
-            ret.pop('is_editable', None)
-
-        if 'functions' not in exclude:
-            ret['functions'] = models.FunctionXGraph.objects.filter(graph_id=self.graphid)
-        else:
-            ret.pop('functions', None)
+        ret['cards'] = self.get_cards() if 'cards' not in exclude else ret.pop('cards', None)
+        ret['nodegroups'] = self.get_nodegroups() if 'nodegroups' not in exclude else ret.pop('nodegroups', None)
+        ret['domain_connections'] = self.get_valid_domain_ontology_classes() if 'domain_connections' not in exclude else ret.pop('domain_connections', None)
+        ret['is_editable'] = self.is_editable() if 'is_editable' not in exclude else ret.pop('is_editable', None)
+        ret['functions'] = models.FunctionXGraph.objects.filter(graph_id=self.graphid) if 'functions' not in exclude else ret.pop('functions', None)
 
         parentproperties = {
             self.root.nodeid: ''
@@ -1152,10 +1133,7 @@ class Graph(models.GraphModel):
         for edge_id, edge in self.edges.iteritems():
             parentproperties[edge.rangenode_id] = edge.ontologyproperty
 
-        if 'edges' not in exclude:
-            ret['edges'] = [edge for key, edge in self.edges.iteritems()]
-        else:
-            ret.pop('edges', None)
+        ret['edges'] = [edge for key, edge in self.edges.iteritems()] if 'edges' not in exclude else ret.pop('edges', None)
 
         if 'nodes' not in exclude:
             ret['nodes'] = []
@@ -1171,7 +1149,6 @@ class Graph(models.GraphModel):
         return res
 
     def check_if_resource_is_editable(self):
-
 
         def find_unpermitted_edits(obj_a, obj_b, ignore_list):
             res = None
