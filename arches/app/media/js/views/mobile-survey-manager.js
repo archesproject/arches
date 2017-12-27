@@ -27,6 +27,7 @@ define([
         if (!this.selectedProject().get('id')) {
             this.selectedProject(null)
         } else {
+            this.resourceList.resetCards(this.selectedProject().get('source').cards)
             this.selectedProject().reset();
         }
     }
