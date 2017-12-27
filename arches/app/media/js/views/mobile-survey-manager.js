@@ -45,7 +45,7 @@ define([
                     users: [],
                     groups: [],
                     bounds: null,
-                    datadownload: false
+                    datadownloadconfig: {download:false, count:1000, resources:[]}
                 },
                 identities: data.identities
             }));

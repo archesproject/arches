@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import json
 from datetime import datetime
 from django.db import transaction
 from django.shortcuts import render
@@ -79,6 +80,10 @@ class MobileSurveyManagerView(BaseManagerView):
         mobile_surveys, resources = self.get_survey_resources(mobile_survey_models)
 
         for mobile_survey in mobile_surveys:
+            try:
+                mobile_survey['datadownloadconfig'] = json.loads(mobile_survey['datadownloadconfig'])
+            except TypeError:
+                pass
             multipart = mobile_survey['bounds']
             singlepart = GeoUtils().convert_multipart_to_singlepart(multipart)
             mobile_survey['bounds'] = singlepart
@@ -173,7 +178,7 @@ class MobileSurveyManagerView(BaseManagerView):
             mobile_survey.startdate = data['startdate']
         if data['enddate'] != '':
             mobile_survey.enddate = data['enddate']
-        mobile_survey.datadownload = data['datadownload']
+        mobile_survey.datadownloadconfig = data['datadownloadconfig']
         mobile_survey.active = data['active']
         mobile_survey.tilecache = data['tilecache']
 

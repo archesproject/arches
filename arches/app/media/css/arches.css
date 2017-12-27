@@ -9401,6 +9401,10 @@ a.search-facet-item.disabled {
     border-right: 1px solid #ddd;
 }
 
+.msm-data-selection .form-text.form-checkbox:not(.btn), .form-text.form-radio:not(.btn) {
+    margin-top: 10px;
+}
+
 #identities-card .library-card:not(.selected-card) {
     border-left: 1px solid transparent;
 }

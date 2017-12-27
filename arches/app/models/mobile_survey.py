@@ -46,7 +46,7 @@ class MobileSurvey(models.MobileSurveyModel):
         # self.description = models.TextField(null=True)
         # self.bounds = models.MultiPolygonField(null=True)
         # self.tilecache = models.TextField(null=True)
-        # self.datadownload = models.BooleanField(default=False)
+        # self.datadownloadconfig = JSONField(blank=True, null=True, default='{"download":false, "count":1000, "resources":[]}')
         # end from models.MobileSurvey
 
     def save(self):

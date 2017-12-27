@@ -1,9 +1,10 @@
 define([
     'underscore',
     'knockout',
+    'knockout-mapping',
     'models/abstract',
     'arches'
-], function(_, ko, AbstractModel, arches) {
+], function(_, ko, koMapping, AbstractModel, arches) {
     return AbstractModel.extend({
         url: arches.urls.project,
 
@@ -22,7 +23,7 @@ define([
             self.groups = ko.observableArray([]);
             self.showDetails = ko.observable(false);
             self.cards = ko.observableArray([]);
-            self.datadownload = ko.observable();
+            self.datadownloadconfig = koMapping.fromJS(options.source.datadownloadconfig) || ko.observable();
             self.tilecache = ko.observable();
             self.bounds = ko.observable(self.getDefaultBounds(null));
             self.collectedResources = ko.observable(false);
@@ -172,6 +173,13 @@ define([
                 };
             };
 
+            self.updateResourceDownloadList = function(val){
+                if (_.contains(self.datadownloadconfig.resources(), val.id)) {
+                    self.datadownloadconfig.resources.remove(val.id)
+                } else {
+                    self.datadownloadconfig.resources.push(val.id)
+                }
+            }
 
             self.updateCards = function(val) {
                 var approvedCards = _.chain(val.targetParent())
@@ -216,7 +224,7 @@ define([
                     cards: self.cards,
                     bounds: self.bounds,
                     tilecache: self.tilecache,
-                    datadownload: self.datadownload
+                    datadownloadconfig: koMapping.toJS(self.datadownloadconfig)
                 });
                 return JSON.stringify(_.extend(JSON.parse(self._project()), jsObj))
             });
@@ -270,7 +278,6 @@ define([
             self.cards(source.cards);
             self.tilecache(source.tilecache);
             self.bounds(self.getDefaultBounds(source.bounds));
-            self.datadownload(source.datadownload);
             self.set('id', source.id);
         },
 
@@ -299,7 +306,9 @@ define([
                     self.cards(request.responseJSON.mobile_survey.cards);
                     self.tilecache(request.responseJSON.mobile_survey.tilecache);
                     self.bounds(self.getDefaultBounds(request.responseJSON.mobile_survey.bounds));
-                    self.datadownload(request.responseJSON.mobile_survey.datadownload);
+                    self.datadownloadconfig.download(request.responseJSON.mobile_survey.datadownloadconfig.download);
+                    self.datadownloadconfig.count(request.responseJSON.mobile_survey.datadownloadconfig.count);
+                    self.datadownloadconfig.resources(request.responseJSON.mobile_survey.datadownloadconfig.resources);
                     this._project(this.json());
                 };
             };
