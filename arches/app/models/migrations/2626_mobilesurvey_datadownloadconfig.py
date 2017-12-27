@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='mobilesurveymodel',
             name='datadownloadconfig',
-            field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, default='{"download":false, "count":1000, "resources":[]}', null=True),
+            field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, default='{"download":false, "count":1000, "resources":[], "custom":null}', null=True),
         ),
         migrations.RemoveField(
             model_name='mobilesurveymodel',

@@ -27,6 +27,7 @@ define([
             self.tilecache = ko.observable();
             self.bounds = ko.observable(self.getDefaultBounds(null));
             self.collectedResources = ko.observable(false);
+            self.showCustomDataDownload = ko.observable(false);
 
             var getUserName = function(id) {
                 var user = _.find(self.identities, function(i) {
@@ -309,6 +310,7 @@ define([
                     self.datadownloadconfig.download(request.responseJSON.mobile_survey.datadownloadconfig.download);
                     self.datadownloadconfig.count(request.responseJSON.mobile_survey.datadownloadconfig.count);
                     self.datadownloadconfig.resources(request.responseJSON.mobile_survey.datadownloadconfig.resources);
+                    self.datadownloadconfig.custom(request.responseJSON.mobile_survey.datadownloadconfig.custom);
                     this._project(this.json());
                 };
             };
