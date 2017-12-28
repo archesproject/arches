@@ -27,6 +27,7 @@ define([
         if (!this.selectedProject().get('id')) {
             this.selectedProject(null)
         } else {
+            this.resourceList.resetCards(this.selectedProject().get('source').cards)
             this.selectedProject().reset();
         }
     }
@@ -45,7 +46,7 @@ define([
                     users: [],
                     groups: [],
                     bounds: null,
-                    datadownload: false
+                    datadownloadconfig: {download:false, count:1000, resources:[]}
                 },
                 identities: data.identities
             }));

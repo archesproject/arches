@@ -5,7 +5,7 @@
         {% trans "Concept Collection" %}
     </div>
     <div>
-        <select data-bind="disable: isEditable === false, placeholder: '{% trans "Select a concept collection" %}', value: topConcept, options: conceptCollections , optionsText: 'label', optionsValue: 'id', chosen: {width: '100%'}"></select>
+        <select data-bind="disable: isEditable === false, placeholder: '{% trans "Select a concept collection" %}', value: topConcept, options: conceptCollections , optionsText: 'label', optionsValue: 'id', chosen: {width: '100%', allow_single_deselect: true}"></select>
     </div>
 </div>
 <!-- /ko -->

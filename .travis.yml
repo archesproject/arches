@@ -1,5 +1,6 @@
 dist: trusty
 language: python
+filter_secrets: false
 
 python:
   - 2.7
