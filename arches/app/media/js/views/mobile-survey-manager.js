@@ -46,7 +46,8 @@ define([
                     users: [],
                     groups: [],
                     bounds: null,
-                    datadownloadconfig: {download:false, count:1000, resources:[]}
+                    datadownloadconfig: {download:false, count:1000, resources:[], custom: null},
+                    tilecache: ''
                 },
                 identities: data.identities
             }));

@@ -6,12 +6,12 @@ define([
     'arches'
 ], function(_, ko, koMapping, AbstractModel, arches) {
     return AbstractModel.extend({
-        url: arches.urls.project,
+        url: arches.urls.mobile_survey,
 
         initialize: function(options) {
             var self = this;
             self.identities = options.identities || [];
-            self._project = ko.observable('{}');
+            self._mobilesurvey = ko.observable('{}');
             self.name = ko.observable('');
             self.description = ko.observable('');
             self.startdate = ko.observable(null);
@@ -24,7 +24,7 @@ define([
             self.showDetails = ko.observable(false);
             self.cards = ko.observableArray([]);
             self.datadownloadconfig = koMapping.fromJS(options.source.datadownloadconfig) || ko.observable();
-            self.tilecache = ko.observable();
+            self.tilecache = ko.observable('');
             self.bounds = ko.observable(self.getDefaultBounds(null));
             self.collectedResources = ko.observable(false);
             self.showCustomDataDownload = ko.observable(false);
@@ -243,11 +243,11 @@ define([
                     tilecache: self.tilecache,
                     datadownloadconfig: koMapping.toJS(self.datadownloadconfig)
                 });
-                return JSON.stringify(_.extend(JSON.parse(self._project()), jsObj))
+                return JSON.stringify(_.extend(JSON.parse(self._mobilesurvey()), jsObj))
             });
 
             self.dirty = ko.computed(function() {
-                return self.json() !== self._project() || !self.get('id');
+                return self.json() !== self._mobilesurvey() || !self.get('id');
             });
         },
 
@@ -282,7 +282,7 @@ define([
 
         parse: function(source) {
             var self = this;
-            self._project(JSON.stringify(source));
+            self._mobilesurvey(JSON.stringify(source));
             self.name(source.name);
             self.description(source.description);
             self.startdate(source.startdate);
@@ -299,7 +299,7 @@ define([
         },
 
         reset: function() {
-            this.parse(JSON.parse(this._project()), self);
+            this.parse(JSON.parse(this._mobilesurvey()), self);
         },
 
         _getURL: function(method) {
@@ -327,7 +327,7 @@ define([
                     self.datadownloadconfig.count(request.responseJSON.mobile_survey.datadownloadconfig.count);
                     self.datadownloadconfig.resources(request.responseJSON.mobile_survey.datadownloadconfig.resources);
                     self.datadownloadconfig.custom(request.responseJSON.mobile_survey.datadownloadconfig.custom);
-                    this._project(this.json());
+                    this._mobilesurvey(this.json());
                 };
             };
             this._doRequest({
