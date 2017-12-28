@@ -319,7 +319,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                                                             <!-- select all switch -->
                                                                             <div class="mpm-selector-btns">
-                                                                                <a class="" href="">Select all</a>
+                                                                                <a class="" data-bind="click: function(val) {selectedProject().addAllCardsByResource(val)}">{% trans 'Select all' %}</a>
                                                                             </div>
                                                                         </div>
 
@@ -360,7 +360,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                                                                 <!-- remove all switch -->
                                                                                 <span class="mpm-select-switch-label">
-                                                                                    <a class="pad-lft" href="">Remove all</a>
+                                                                                    <a class="pad-lft" data-bind="click: function(val) {selectedProject().removeAllCardsByResource(val)}">{% trans 'Remove all' %}</a>
                                                                                 </span>
                                                                             </div>
                                                                         </div>

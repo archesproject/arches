@@ -182,8 +182,8 @@ define([
                 }
             }
 
-            self.updateCards = function(val) {
-                var approvedCards = _.chain(val.targetParent())
+            self.updateCards = function(cards) {
+                var approvedCards = _.chain(cards)
                 .filter(function(card){
                     if (card.approved()) {
                         return card.cardid
@@ -196,13 +196,29 @@ define([
 
             self.updateApproved = function(val){
                 val.item.approved(true);
-                self.updateCards(val)
+                self.updateCards(val.targetParent())
             };
 
             self.updateUnapproved = function(val){
                 val.item.approved(false);
                 self.cards.remove(val.item.cardid)
             };
+
+            self.addAllCardsByResource = function(val) {
+                var resource = val.resourceList.selected()
+                _.each(resource.cards(), function(card){
+                    card.approved(true)
+                })
+                self.updateCards(resource.cards())
+            }
+
+            self.removeAllCardsByResource = function(val) {
+                var resource = val.resourceList.selected()
+                _.each(resource.cards(), function(card){
+                    card.approved(false);
+                    self.cards.remove(card.cardid)
+                })
+            }
 
             self.toggleShowDetails = function() {
                 self.setIdentityApproval();
