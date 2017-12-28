@@ -319,17 +319,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                                                             <!-- select all switch -->
                                                                             <div class="mpm-selector-btns">
-                                                                                <a class="" href="">Select all</a>
+                                                                                <a class="" data-bind="click: function(val) {selectedProject().addAllCardsByResource(val)}">{% trans 'Select all' %}</a>
                                                                             </div>
                                                                         </div>
-                                                                    
+
                                                                         <div class="mpm-card-list-items">
                                                                             <div data-bind="sortable: {data:resourceList.selected().cards, afterMove: selectedProject().updateUnapproved,  addToSelf: true}" class="ko_container ui-sortable">
                                                                                 <div class="list-group-item get-user-detail" data-bind="click: function(){ $data.expanded(!$data.expanded()) }, visible: ($data.filtered() === false && $data.approved() === false)">
                                                                                     <div class="mpm-user-title mpm-user-name">
                                                                                         <h4 data-bind='text: $data.name'></h4>
                                                                                     </div>
-                                                                                    
+
                                                                                     <p class="mpm-user-subtitle resource">
                                                                                         <span>{% trans 'Fields:' %}</span><span class="mpm-widget-labels" data-bind="text: $data.widgetlabels"></span>
                                                                                     </p>
@@ -352,27 +352,27 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                    
+
                                                                     <div class="mpm-card-list approved">
                                                                         <div class="mpm-selector-header relative">
                                                                             <div class="mpm-selector-header-txt">
                                                                                 <strong>{% trans 'Selected forms' %}</strong>
-                                                                            
+
                                                                                 <!-- remove all switch -->
                                                                                 <span class="mpm-select-switch-label">
-                                                                                    <a class="pad-lft" href="">Remove all</a> 
+                                                                                    <a class="pad-lft" data-bind="click: function(val) {selectedProject().removeAllCardsByResource(val)}">{% trans 'Remove all' %}</a>
                                                                                 </span>
                                                                             </div>
                                                                         </div>
-                                                                        
+
                                                                         <div class="mpm-card-list-items">
                                                                             <div data-bind="sortable: {data: resourceList.selected().cards, afterMove: selectedProject().updateApproved, addToSelf: true}" class="ko_container ui-sortable" style="min-height:100%">
-                                                                                
+
                                                                                 <div class="list-group-item get-user-detail" data-bind="click: function(){ $data.expanded(!$data.expanded()) }, visible: ($data.filtered() === false && $data.approved() === true)">
                                                                                     <div class="mpm-user-title mpm-user-name">
                                                                                         <h4 data-bind='text: $data.name'></h4>
                                                                                     </div>
-                                                                                    
+
                                                                                     <p class="mpm-user-subtitle resource">
                                                                                         <span>{% trans 'Fields:' %}</span>
                                                                                         <span class="mpm-widget-labels" data-bind="text: $data.widgetlabels"></span>
@@ -422,8 +422,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                         </p>
 
                                                                         <div class="toggle-container">
-                                                                            <span class="switch switch-small" data-bind="css: {'on': selectedProject().datadownload()}, click: function(){
-                                                                                selectedProject().datadownload(!selectedProject().datadownload());
+                                                                            <span class="switch switch-small" data-bind="css: {'on': selectedProject().datadownloadconfig.download()}, click: function(){
+                                                                                selectedProject().datadownloadconfig.download(!selectedProject().datadownloadconfig.download());
                                                                             }"><small></small></span>
                                                                         </div>
                                                                     </div>
@@ -436,6 +436,45 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                     </p>
                                                                 </div>
                                                             </div>
+                                                            <!-- ko if: selectedProject().datadownloadconfig.download() -->
+                                                            <div id="data-definition" class="mpm-summary-panel">
+
+                                                                <!-- Download Selector -->
+                                                                <div class="msm-download-selector" style="display: block;">
+                                                                    <div id="standard-download" class="category-title" href="" data-bind="css: {active: selectedProject().showCustomDataDownload() === false }, click: function(){ selectedProject().showCustomDataDownload(false)}">{% trans 'Download Records' %}</div>
+                                                                    <div id="custom-download" class="category-title" href="" data-bind="css: {active: selectedProject().showCustomDataDownload() === true}, click: function(){ selectedProject().showCustomDataDownload(true)}">{% trans 'Custom Download' %}</div>
+                                                                </div>
+
+
+                                                                <!-- Standard Download -->
+                                                                <div id="standard-download-panel" class="msm-download-panel" data-bind="visible: selectedProject().showCustomDataDownload() === false">
+                                                                    <p class="text-muted">
+                                                                        {% trans 'Allow users to download the' %} <strong> {% trans 'first 1000 records in the project extent' %} </strong> {% trans "for the resource models you've associated with this project." %}
+                                                                    </p>
+
+                                                                    <div class="form-group pad-ver msm-data-selection">
+
+                                                                        <!-- Inline Checkboxes -->
+                                                                        <div class="checkbox">
+                                                                            <!-- ko foreach: {data:resourceList.items, as: 'resource'} -->
+                                                                            <label class="form-checkbox form-normal form-primary form-text" data-bind="text: resource.name, css: {disabled : !resource.added(), active: _.contains($parent.selectedProject().datadownloadconfig.resources(), resource.id)}, click: function(r){$parent.selectedProject().updateResourceDownloadList(r)}"><input type="checkbox"></label>
+                                                                            <!-- /ko -->
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <!-- Custom Query -->
+                                                                <div id="custom-download-panel" class="msm-download-panel" data-bind="visible: selectedProject().showCustomDataDownload() === true">
+                                                                    <p class="text-muted">
+                                                                        {% trans 'To define records for download' %} <strong> {% trans 'copy and paste the URL from Arches search page' %}</strong>
+                                                                    </p>
+
+                                                                    <div class="form-group">
+                                                                        <input type="text" id="" class="form-control" placeholder="Search query URL" data-bind="textInput: selectedProject().datadownloadconfig.custom">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <!-- /ko -->
                                                         </div>
                                                     </div>
                                                 </div>
@@ -606,13 +645,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                     <div id="user-cards" class="list-group user-cards">
                                                                         <!-- Title/Filter/Pagination -->
                                                                         <!--ko if: identityList.selected().type === 'group' -->
-                                                                        
+
                                                                         <div class="msm-user-summary">
                                                                             <div class='msm-group-users'>
 
 
                                                                                 <div class="mpm-selector-header relative">
-                                                                                        
+
                                                                                     <!-- Panel Header -->
                                                                                     <div class="mpm-selector-header-txt">
                                                                                         <input class="form-control input-lg" style="    margin-top: -13px;width: 300px;" placeholder="{% trans 'find a user in this group...' %}"  type="text" data-bind="value: selectedProject().userFilter, valueUpdate: 'keyup'">
@@ -628,18 +667,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                                                                         <!-- ko foreach: selectedProject().filteredUsers() -->
                                                                                         <div href="#" class="list-group-item get-user-detail" data-bind="click: function(){ $data.expanded(!$data.expanded());  $parent.selectedProject().selectedUser($data)}, css: {selected: $parent.selectedProject().selectedUser() == $data}">
-                                                                                            
+
                                                                                             <div class="mpm-user-title mpm-user-name">
 
                                                                                                 <h4 data-bind='text: $data.username'></h4>
-                                                                                                
+
                                                                                                 <!--ko if: $data.groups-->
                                                                                                 <div class='mpm-user-status pull-right' data-bind="css: {invited : _.contains($parent.selectedProject().users(), $data.id)}">
                                                                                                     <span data-bind="text: _.contains($parent.selectedProject().users(), $data.id) ? '{% trans 'Approved' %}': '{% trans 'Not Approved' %}'"></span>
                                                                                                 </div>
                                                                                                 <!--/ko-->
                                                                                             </div>
-                                                                                            
+
                                                                                             <div class="mpm-user-subtitle">
                                                                                                 <p>{% trans 'Activity: 0 edits' %}</p>
 
@@ -659,17 +698,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                                     </div>
                                                                                 </div>
 
-                                                                                
+
 
                                                                             </div>
-                                                                            
+
                                                                             <!-- ko if: selectedProject().selectedUser() -->
                                                                             <div class="mpm-user-summary">
                                                                                 <div class="mpm-model-detail-panel">
-                                                                                    
+
                                                                                     <!-- User Info -->
                                                                                     <div class="mpm-selector-header relative">
-                                                                                        
+
                                                                                         <!-- Panel Header -->
                                                                                         <div class="mpm-selector-header-txt">
                                                                                             <strong>{% trans 'User Summary' %}</strong>
@@ -677,7 +716,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                                                                         <!-- Info panel -->
                                                                                         <div class="mpm-user-info-panel" style="margin-top: 9px;">
-                                                                                            
+
                                                                                             <div class="mpm-node-name">
                                                                                                 User
                                                                                             </div>
@@ -713,16 +752,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                                                     </ul>
                                                                                                 </li>
                                                                                             </ul>
-                                                                                            
+
                                                                                         </div>
                                                                                     </div>
 
                                                                                 </div>
 
-                                                                               
+
 
                                                                                 <div class="mpm-model-detail-panel">
-                                                                                    
+
                                                                                 </div>
                                                                             </div>
                                                                         <!-- /ko -->
@@ -743,7 +782,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                                 </div>
                                                                                 <!--/ko-->
                                                                             </div>
-                                                                            
+
                                                                             <div class="mpm-user-subtitle user">
                                                                                 <div class="mpm-user-summary">
                                                                                     <div class="mpm-model-detail-panel">
@@ -803,7 +842,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                                         </ul>
                                                                                     </div>
                                                                                 </div>
-                                                                            </div> 
+                                                                            </div>
                                                                         </a>
 
                                                                         <!--ko if: _.filter(identityList.usersGroups(), function(u){return u.approved()}).length > 0 -->
