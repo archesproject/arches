@@ -9495,6 +9495,7 @@ a.search-facet-item.disabled {
 }
 
 .msm-basemap-location {
+    z-index: 100;
     background-color: #fff;
 }
 
