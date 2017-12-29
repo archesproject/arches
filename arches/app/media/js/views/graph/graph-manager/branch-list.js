@@ -2,8 +2,9 @@ define([
     'views/list',
     'views/graph/graph-manager/graph-base',
     'models/graph',
-    'knockout'
-], function(ListView, GraphBase, GraphModel , ko) {
+    'knockout',
+    'arches'
+], function(ListView, GraphBase, GraphModel, ko, arches) {
     var BranchList = ListView.extend({
         /**
         * A backbone view to manage a list of branch graphs
@@ -38,6 +39,33 @@ define([
             }, this);
             this.selectedBranch = ko.observable(null);
             this.viewMetadata = ko.observable(false);
+            this.loadedDomainConnections = ko.observableArray();
+
+
+            /**
+            * Downloads domain connection data relevant to the selected node's ontology class
+            * @memberof BranchList.prototype
+            * @param {object} graph - the branch or graph for which domain connection data is requested
+            * @param {boolean} filter - if true updates the branch filter for the selected node
+            */
+            this.loadDomainConnections = function(graph, filter){
+                var self = this;
+                if (_.contains(this.loadedDomainConnections(), self.selectedNode().nodeid) === false) {
+                    $.ajax({
+                        url: arches.urls.get_domain_connections(graph.get('graphid')),
+                        data: {'nodeid': self.selectedNode().nodeid}
+                    })
+                    .done(function(data){
+                        graph.get('domain_connections') || graph.set('domain_connections', data)
+                        self.loadedDomainConnections.push(self.selectedNode().nodeid)
+                        if (filter) {
+                            self.filter_function()
+                        }
+                    })
+                } else if (filter) {
+                    self.filter_function()
+                }
+            }
 
             var valueListener = ko.computed(function() {
                 var node = self.selectedNode;
@@ -50,15 +78,16 @@ define([
                 return false;
             });
 
-
             valueListener.subscribe(function(){
                 if (!!this.selectedNode()){
-                    this.filter_function();
+                    this.items().forEach(function(branch){
+                        this.loadDomainConnections(branch.graphModel, true)
+                    }, this)
                 }
             }, this);
 
             // need to call this on init so that branches that can't be appended get filtered out initially
-            this.filter_function();
+            this.loadDomainConnections(this.graphModel, true)
         },
 
         /**
@@ -132,7 +161,6 @@ define([
             this.clearSelection();
             this.selectedBranch(null);
             this.viewMetadata(false);
-
             this.trigger('close');
         },
 
