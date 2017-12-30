@@ -235,11 +235,10 @@ class GraphDataView(View):
         elif self.action == 'get_domain_connections':
             res = []
             graph = Graph.objects.get(graphid=graphid)
-            nodeid = request.GET.get('nodeid', None)
-            node = models.Node.objects.get(pk=nodeid)
+            ontology_class = request.GET.get('ontology_class', None)
             ret = graph.get_valid_domain_ontology_classes()
             for r in ret:
-                res.append({'ontology_property': r['ontology_property'], 'ontology_classes':[c for c in r['ontology_classes'] if c == node.ontologyclass]})
+                res.append({'ontology_property': r['ontology_property'], 'ontology_classes':[c for c in r['ontology_classes'] if c == ontology_class]})
             return JSONResponse(res)
 
         else:

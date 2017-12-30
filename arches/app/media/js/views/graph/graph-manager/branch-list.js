@@ -39,7 +39,7 @@ define([
             }, this);
             this.selectedBranch = ko.observable(null);
             this.viewMetadata = ko.observable(false);
-            this.loadedDomainConnections = ko.observableArray();
+            this.loadedDomainConnections = {};
 
 
             /**
@@ -50,22 +50,50 @@ define([
             */
             this.loadDomainConnections = function(graph, filter){
                 var self = this;
-                if (_.contains(this.loadedDomainConnections(), self.selectedNode().nodeid) === false) {
-                    $.ajax({
-                        url: arches.urls.get_domain_connections(graph.get('graphid')),
-                        data: {'nodeid': self.selectedNode().nodeid}
-                    })
-                    .done(function(data){
-                        graph.get('domain_connections') || graph.set('domain_connections', data)
-                        self.loadedDomainConnections.push(self.selectedNode().nodeid)
-                        if (filter) {
-                            self.filter_function()
-                        }
-                    })
-                } else if (filter) {
-                    self.filter_function()
+
+                this.updateDomainConnections = function(newdc, graph) {
+                    var property = newdc.ontology_property
+                    var new_domain_connection = newdc;
+                    _.each(newdc.ontology_classes, function(oc) {
+                        _.each(graph.get('domain_connections'), function(currentdc) {
+                            var new_ontology_class = oc;
+                            if (currentdc.ontology_property === property) {
+                                if (_.contains(currentdc.ontology_classes, new_ontology_class) === false) {
+                                    currentdc.ontology_classes.push(new_ontology_class)
+                                }
+                            }
+                        }, self)
+                    }, self)
                 }
-            }
+
+                if (self.selectedNode().ontologyclass() === _.property(self.selectedNode().nodeid)(self.loadedDomainConnections) === false) {
+                        $.ajax({
+                                url: arches.urls.get_domain_connections(graph.get('graphid')),
+                                data: {
+                                    'ontology_class': self.selectedNode().ontologyclass()
+                                }
+                            })
+                            .done(function(data) {
+                                if (graph.get('domain_connections') === null) {
+                                    graph.set('domain_connections', data)
+                                } else {
+                                    _.each(data, function(new_domain_connection) {
+                                        self.updateDomainConnections(new_domain_connection, graph)
+                                    })
+                                }
+                                if (self.selectedNode()) {
+                                    if (self.selectedNode().ontologyclass() === _.property(self.selectedNode().nodeid)(self.loadedDomainConnections) === false) {
+                                        self.loadedDomainConnections[self.selectedNode().nodeid] = self.selectedNode().ontologyclass()
+                                    }
+                                    if (filter) {
+                                        self.filter_function()
+                                    }
+                                }
+                            })
+                    } else if (filter) {
+                        self.filter_function()
+                    }
+                }
 
             var valueListener = ko.computed(function() {
                 var node = self.selectedNode;
@@ -80,8 +108,9 @@ define([
 
             valueListener.subscribe(function(){
                 if (!!this.selectedNode()){
-                    this.items().forEach(function(branch){
-                        this.loadDomainConnections(branch.graphModel, true)
+                    var lastBranch = this.items().length - 1;
+                    this.items().forEach(function(branch, i){
+                        i === lastBranch ? this.loadDomainConnections(branch.graphModel, true) : this.loadDomainConnections(branch.graphModel)
                     }, this)
                 }
             }, this);
