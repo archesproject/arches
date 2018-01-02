@@ -27,8 +27,6 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 
-
-
 # can't use "arches.app.models.system_settings.SystemSettings" because of circular refernce issue
 # so make sure the only settings we use in this file are ones that are static (fixed at run time)
 from django.conf import settings
@@ -50,7 +48,6 @@ class CardModel(models.Model):
     visible = models.BooleanField(default=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
 
-    @property
     def is_editable(self):
         result = True
         tiles = TileModel.objects.filter(nodegroup=self.nodegroup).count()
@@ -340,7 +337,6 @@ class GraphModel(models.Model):
             return False
         return _('To make this resource editable: ') + ', '.join(msg)
 
-    @property
     def is_editable(self):
         result = True
         if self.isresource:

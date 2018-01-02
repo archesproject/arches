@@ -163,8 +163,8 @@ class GraphManagerView(GraphBaseView):
 
         context = self.get_context_data(
             main_script='views/graph/graph-manager',
-            branches=JSONSerializer().serialize(branch_graphs),
-            datatypes_json=JSONSerializer().serialize(datatypes),
+            branches=JSONSerializer().serialize(branch_graphs, exclude=['cards','domain_connections', 'functions', 'cards', 'deploymentfile', 'deploymentdate']),
+            datatypes_json=JSONSerializer().serialize(datatypes, exclude=['iconclass','modulename','isgeometric']),
             datatypes=datatypes,
             concept_collections=concept_collections,
             node_list={
@@ -231,6 +231,15 @@ class GraphDataView(View):
             response['Content-Type'] = 'application/zip'
             response.write(zip_stream)
             return response
+
+        elif self.action == 'get_domain_connections':
+            res = []
+            graph = Graph.objects.get(graphid=graphid)
+            ontology_class = request.GET.get('ontology_class', None)
+            ret = graph.get_valid_domain_ontology_classes()
+            for r in ret:
+                res.append({'ontology_property': r['ontology_property'], 'ontology_classes':[c for c in r['ontology_classes'] if c == ontology_class]})
+            return JSONResponse(res)
 
         else:
             graph = Graph.objects.get(graphid=graphid)
@@ -323,9 +332,8 @@ class CardManagerView(GraphBaseView):
 
         context = self.get_context_data(
             main_script='views/graph/card-manager',
-            branches=JSONSerializer().serialize(branch_graphs),
+            branches=JSONSerializer().serialize(branch_graphs, exclude=['functions', 'relatable_resource_model_ids', 'domain_connections', 'nodes', 'edges']),
         )
-
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
         context['nav']['help'] = (_('Managing Cards'),'help/card-manager-help.htm')
