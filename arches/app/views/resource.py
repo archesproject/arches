@@ -266,10 +266,9 @@ class ResourceDescriptors(View):
 class ResourceReportView(BaseManagerView):
     def get(self, request, resourceid=None):
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
-        resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
         resource = Resource.objects.get(pk=resourceid)
         displayname = resource.displayname
-        resource_models = Graph.objects.filter(isresource=True).exclude(isactive=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+        resource_models = models.GraphModel.objects.filter(isresource=True).exclude(isactive=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         related_resource_summary = [{'graphid':str(g.graphid), 'name':g.name, 'resources':[]} for g in resource_models]
         related_resources_search_results = resource.get_related_resources(lang=lang, start=0, limit=1000)
         related_resources = related_resources_search_results['related_resources']
@@ -286,16 +285,16 @@ class ResourceReportView(BaseManagerView):
                             relationship_summary.append(rr_type)
                     summary['resources'].append({'instance_id':rr['resourceinstanceid'],'displayname':rr['displayname'], 'relationships':relationship_summary})
 
-        tiles = models.TileModel.objects.filter(resourceinstance=resource_instance)
+        tiles = Tile.objects.filter(resourceinstance=resource)
         try:
-           report = models.Report.objects.get(graph=resource_instance.graph, active=True)
+           report = models.Report.objects.get(graph=resource.graph, active=True)
         except models.Report.DoesNotExist:
            report = None
-        graph = Graph.objects.get(graphid=resource_instance.graph.pk)
-        resource_graphs = Graph.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
-        forms = resource_instance.graph.form_set.filter(visible=True)
+
+        graph = Graph.objects.get(graphid=resource.graph.pk)
+        forms = resource.graph.form_set.filter(visible=True)
         forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
-        cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=resource_instance.graph)
+        cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=resource.graph)
         permitted_cards = []
         permitted_forms_x_cards = []
         permitted_forms = []
@@ -311,36 +310,41 @@ class ResourceReportView(BaseManagerView):
 
         for tile in tiles:
             if request.user.has_perm(perm, tile.nodegroup):
-                tile = Tile.objects.get(pk=tile.tileid)
                 tile.filter_by_perm(request.user, perm)
                 permitted_tiles.append(tile)
 
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
-        map_layers = models.MapLayer.objects.all()
-        map_sources = models.MapSource.objects.all()
-        geocoding_providers = models.Geocoder.objects.all()
+
+        if str(report.template.templateid) == '50000000-0000-0000-0000-000000000002':
+            map_layers = models.MapLayer.objects.all()
+            map_sources = models.MapSource.objects.all()
+            geocoding_providers = models.Geocoder.objects.all()
+        else:
+            map_layers = []
+            map_sources = []
+            geocoding_providers = []
+
         templates = models.ReportTemplate.objects.all()
 
         context = self.get_context_data(
             main_script='views/resource/report',
             report=JSONSerializer().serialize(report),
             report_templates=templates,
-            templates_json=JSONSerializer().serialize(templates),
-            forms=JSONSerializer().serialize(forms),
-            tiles=JSONSerializer().serialize(permitted_tiles),
-            forms_x_cards=JSONSerializer().serialize(forms_x_cards),
-            cards=JSONSerializer().serialize(permitted_cards),
-            datatypes_json=JSONSerializer().serialize(datatypes),
+            templates_json=JSONSerializer().serialize(templates, sort_keys=False),
+            forms=JSONSerializer().serialize(forms, sort_keys=False, exclude=['iconclass', 'subtitle']),
+            tiles=JSONSerializer().serialize(permitted_tiles, sort_keys=False),
+            forms_x_cards=JSONSerializer().serialize(forms_x_cards, sort_keys=False),
+            cards=JSONSerializer().serialize(permitted_cards, sort_keys=False, exclude=['is_editable', 'description', 'instructions', 'helpenabled', 'helptext', 'helptitle', 'ontologyproperty', 'widgets']),
+            datatypes_json=JSONSerializer().serialize(datatypes, exclude=['modulename', 'issearchable', 'configcomponent','configname', 'iconclass']),
             geocoding_providers = geocoding_providers,
-            related_resources=JSONSerializer().serialize(related_resource_summary),
+            related_resources=JSONSerializer().serialize(related_resource_summary, sort_keys=False),
             widgets=widgets,
             map_layers=map_layers,
             map_sources=map_sources,
-            resource_graphs=resource_graphs,
-            graph_id=resource_instance.graph.pk,
-            graph_name=resource_instance.graph.name,
-            graph_json = JSONSerializer().serialize(graph),
+            graph_id=resource.graph.pk,
+            graph_name=resource.graph.name,
+            graph_json = JSONSerializer().serialize(graph, sort_keys=False, exclude=['functions', 'relatable_resource_model_ids', 'domain_connections', 'edges', 'is_editable', 'description', 'iconclass', 'subtitle', 'author']),
             resourceid=resourceid,
             displayname=displayname,
          )
