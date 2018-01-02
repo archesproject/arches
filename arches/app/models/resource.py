@@ -239,7 +239,7 @@ class Resource(models.ResourceInstance):
         graph_lookup = {str(graph.graphid): {'name':graph.name, 'iconclass': graph.iconclass} for graph in graphs}
         for node in root_nodes:
             graph_id = unicode(node.graph_id)
-            if node.config != None:
+            if node.config != None and graph_id in graph_lookup:
                 node_config_lookup[graph_id] = node.config
                 node_config_lookup[graph_id]['iconclass'] = graph_lookup[graph_id]['iconclass']
                 node_config_lookup[graph_id]['name'] = graph_lookup[graph_id]['name']
