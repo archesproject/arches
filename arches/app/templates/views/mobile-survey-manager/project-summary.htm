@@ -1,8 +1,8 @@
 
-<!-- Project Settings -->
+<!-- Mobile Survey Settings -->
 <div class="mpm-summary-panel">
     <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-        Project Summary
+        Mobile Survey Summary
     </p>
     <ul class="mpm-node-detail-metadata">
         <li class="">
@@ -20,12 +20,12 @@
 <!-- User Summary -->
 <div class="mpm-summary-panel">
     <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-        Groups/Users
+        {% trans 'Groups/Users' %}
     </p>
     <ul class="mpm-node-detail-metadata">
         <li class="">
-            Groups (<span data-bind="text: selectedProject().approvedGroupNames().length"></span>)
-            <ul class="mpm-node-detail-metadata" data-bind="foreach: selectedProject().approvedGroupNames">
+            {% trans 'Groups' %} (<span data-bind="text: selectedMobileSurvey().approvedGroupNames().length"></span>)
+            <ul class="mpm-node-detail-metadata" data-bind="foreach: selectedMobileSurvey().approvedGroupNames">
                 <li class="" data-bind="text: $data">
 
                 </li>
@@ -34,9 +34,9 @@
     </ul>
     <ul class="mpm-node-detail-metadata">
         <li class="">
-            Users (<span data-bind="text: selectedProject().approvedUserNames().length"></span>)
+            {% trans 'Users' %} (<span data-bind="text: selectedMobileSurvey().approvedUserNames().length"></span>)
             <ul class="mpm-node-detail-metadata">
-                <li class="" data-bind="text: selectedProject().approvedUserNames().join(', ')">
+                <li class="" data-bind="text: selectedMobileSurvey().approvedUserNames().join(', ')">
 
                 </li>
             </ul>
@@ -51,7 +51,7 @@
     </p>
         <ul class="mpm-node-detail-metadata">
             <li class="">
-                Assets!! (3 data entry cards)
+                Assets (3 data entry cards)
                 <ul class="mpm-node-detail-metadata">
                     <li class="">
                         Name, Modification Event, Condition Assessment

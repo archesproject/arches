@@ -88,8 +88,8 @@ define([
             this.resetCards = function(cards){
                 _.each(this.items(), function(item){
                     item.cards.sort(function(a,b){
-                        var inProjectCards = _.contains(cards, a.cardid) || _.contains(cards, b.cardid);
-                        if (inProjectCards) {
+                        var inMobileSurveyCards = _.contains(cards, a.cardid) || _.contains(cards, b.cardid);
+                        if (inMobileSurveyCards) {
                             res = cards.indexOf(a.cardid) < cards.indexOf(b.cardid) ? -1 : 1
                         } else {
                             res = a.name < b.name ? -1 : 1;

@@ -9,31 +9,33 @@ define([
     'arches',
     'bindings/datepicker'
 ], function(_, ko, BaseManagerView, MobileSurveyManagerViewModel, AlertViewModel, MobileSurveyModel, data, arches) {
+    console.log(data)
     var viewModel = new MobileSurveyManagerViewModel(data);
 
-    viewModel.saveProject = function() {
+    viewModel.saveMobileSurvey = function() {
         var self = this;
         this.loading(true);
-        var addProject = !this.selectedProject().get('id');
-        this.selectedProject().save(function() {
-            if (addProject) {
-                self.projects.push(self.selectedProject());
+        var addMobileSurvey = !this.selectedMobileSurvey().get('id');
+        this.selectedMobileSurvey().save(function() {
+            if (addMobileSurvey) {
+                self.mobilesurveys.push(self.selectedMobileSurvey());
             }
             self.loading(false);
         });
     }
 
     viewModel.discardEdits = function() {
-        if (!this.selectedProject().get('id')) {
-            this.selectedProject(null)
+        if (!this.selectedMobileSurvey().get('id')) {
+            this.selectedMobileSurvey(null)
         } else {
-            this.selectedProject().reset();
+            this.resourceList.resetCards(this.selectedMobileSurvey().get('source').cards)
+            this.selectedMobileSurvey().reset();
         }
     }
 
-    viewModel.newProject = function() {
-        if (!this.selectedProject() || !this.selectedProject().dirty()) {
-            this.selectedProject(new MobileSurveyModel({
+    viewModel.newMobileSurvey = function() {
+        if (!this.selectedMobileSurvey() || !this.selectedMobileSurvey().dirty()) {
+            this.selectedMobileSurvey(new MobileSurveyModel({
                 source: {
                     name: '',
                     active: false,
@@ -45,44 +47,45 @@ define([
                     users: [],
                     groups: [],
                     bounds: null,
-                    datadownload: false
+                    datadownloadconfig: {download:false, count:1000, resources:[], custom: null},
+                    tilecache: ''
                 },
                 identities: data.identities
             }));
         }
     }
 
-    viewModel.deleteProject = function(project){
-        if (!project.active()) {
+    viewModel.deleteMobileSurvey = function(mobilesurvey){
+        if (!mobilesurvey.active()) {
             var self = this;
             pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmSurveyDelete.title, arches.confirmSurveyDelete.text, function() {
                 return;
             }, function(a){
                 self.loading(true)
-                if (project) {
-                    project.delete(function(){
+                if (mobilesurvey) {
+                    mobilesurvey.delete(function(){
                         self.loading(false);
-                        self.projects.remove(project);
+                        self.mobilesurveys.remove(mobilesurvey);
                     });
-                    if (project === self.selectedProject()) {
-                        self.selectedProject(undefined);
+                    if (mobilesurvey === self.selectedMobileSurvey()) {
+                        self.selectedMobileSurvey(undefined);
                     }
                 };
             }));
         }
     }
 
-    viewModel.deleteSelectedProject = function(){
-        if (this.selectedProject()) {
-            this.deleteProject(this.selectedProject())
-            this.selectedProject(undefined)
+    viewModel.deleteSelectedMobileSurvey = function(){
+        if (this.selectedMobileSurvey()) {
+            this.deleteMobileSurvey(this.selectedMobileSurvey())
+            this.selectedMobileSurvey(undefined)
         };
     }
 
-    if (viewModel.projects().length === 0) {
-        viewModel.newProject()
+    if (viewModel.mobilesurveys().length === 0) {
+        viewModel.newMobileSurvey()
     } else {
-        viewModel.selectedProject(viewModel.projects()[0])
+        viewModel.selectedMobileSurvey(viewModel.mobilesurveys()[0])
     }
 
     var pageView = new BaseManagerView({

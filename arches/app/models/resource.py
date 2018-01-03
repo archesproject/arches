@@ -235,13 +235,14 @@ class Resource(models.ResourceInstance):
         """
         root_nodes = models.Node.objects.filter(istopnode=True)
         node_config_lookup = {}
-
+        graphs = models.GraphModel.objects.all().exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False)
+        graph_lookup = {str(graph.graphid): {'name':graph.name, 'iconclass': graph.iconclass} for graph in graphs}
         for node in root_nodes:
             graph_id = unicode(node.graph_id)
-            if node.config != None:
+            if node.config != None and graph_id in graph_lookup:
                 node_config_lookup[graph_id] = node.config
-                node_config_lookup[graph_id]['iconclass'] = node.graph.iconclass
-                node_config_lookup[graph_id]['name'] = node.graph.name
+                node_config_lookup[graph_id]['iconclass'] = graph_lookup[graph_id]['iconclass']
+                node_config_lookup[graph_id]['name'] = graph_lookup[graph_id]['name']
 
         ret = {
             'resource_instance': self,
@@ -325,7 +326,7 @@ class Resource(models.ResourceInstance):
 
         return new_resource
 
-    def serialize(self):
+    def serialize(self, fields=None, exclude=None):
         """
         Serialize to a different form then used by the internal class structure
 
