@@ -1129,6 +1129,7 @@ class ResourceInstanceDataType(BaseDataType):
         return errors
 
     def get_display_value(self, tile, node):
+        nodevalue = tile.data[str(node.nodeid)]
         resource_names = self.get_resource_names(nodevalue)
         return ', '.join(resource_names)
 
@@ -1158,7 +1159,12 @@ class NodeValueDataType(BaseDataType):
         return errors
 
     def get_display_value(self, tile, node):
-        pass
+        datatype_factory = DataTypeFactory()
+        value_node = models.Node.objects.get(nodeid=node.config['nodeid'])
+        value_tile = models.TileModel.objects.get(tileid=tile.data[str(node.nodeid)])
+        datatype = datatype_factory.get_instance(value_node.datatype)
+        # datatype.get_display_value(tile, node)
+        return 'test';
 
     def append_to_document(self, document, nodevalue, nodeid, tile):
         pass

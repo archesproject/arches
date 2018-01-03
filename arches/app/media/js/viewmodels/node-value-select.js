@@ -37,6 +37,13 @@ define([
             });
         }
 
+        var getDisplayValueMarkup = function(displayValue) {
+            return '<div>' +
+                    '<span class="node-value-select-label">' + displayValue.label + '</span>: ' +
+                    '<span class="node-value-select-value">' + displayValue.value + '</span>' +
+                '</div>';
+        };
+
         this.select2Config = {
             value: this.value,
             clickBubble: true,
@@ -73,16 +80,24 @@ define([
                     }
                 }
             },
-            // dropdownCssClass: "bigdrop", // apply css that makes the dropdown taller
             escapeMarkup: function (m) { return m; },
             id: function(tile) {
                 return tile.tileid;
             },
             formatResult: function(tile) {
-                return JSON.stringify(tile);
+                var markup = '<div>';
+                tile.display_values.forEach(function(displayValue) {
+                    markup += getDisplayValueMarkup(displayValue);
+                });
+                markup += '</div>';
+                return markup;
             },
             formatSelection: function(tile) {
-                return JSON.stringify(tile);
+                var nodeid = params.node.config.nodeid();
+                var nodeDisplayValue = _.find(tile.display_values, function(displayValue) {
+                    return nodeid === displayValue.nodeid;
+                });
+                return getDisplayValueMarkup(nodeDisplayValue);
             },
         };
     };

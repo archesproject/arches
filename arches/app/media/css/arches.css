@@ -10065,6 +10065,14 @@ a.search-facet-item.disabled {
 	font-size: 14px;
 }
 
+.node-value-select-label {
+    font-weight: bold;
+}
+
+.node-value-select-value {
+
+}
+
 @keyframes loader {
     0% {
         background: #ddd;
