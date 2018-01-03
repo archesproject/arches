@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
                     'node-value-datatype-config',
                     FALSE,
                     'f5d6b190-bbf0-4dc9-b991-1debab8cb4a9',
-                    TRUE
+                    FALSE
                 );
 
                 INSERT INTO widgets(

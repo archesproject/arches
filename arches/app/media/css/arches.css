@@ -10132,12 +10132,17 @@ a.search-facet-item.disabled {
 	font-size: 14px;
 }
 
-.node-value-select-label {
-    font-weight: bold;
+.node-value-select-tile {
+    padding: 5px;
+    font-size: 0.9em;
 }
 
-.node-value-select-value {
+.selected-node-value {
+    font-size: 1.3em;
+}
 
+.node-value-select-label {
+    font-weight: bold;
 }
 
 @keyframes loader {

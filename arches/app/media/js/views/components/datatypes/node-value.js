@@ -11,7 +11,16 @@ define([
             this.nodes = [{
                 id: null,
                 name: ko.observable('')
-            }].concat(params.graph ? params.graph.get('nodes')() : []);
+            }]
+            if (params.graph) {
+                this.nodes = this.nodes.concat(
+                    _.filter(params.graph.get('nodes')(), function(node) {
+                        return node.datatypelookup[node.datatype()].defaultwidget_id &&
+                            node.datatype() !== 'node-value' &&
+                            node.nodeid !== params.nodeid;
+                    })
+                );
+            }
             this.config = params.config;
             this.search = params.search;
 

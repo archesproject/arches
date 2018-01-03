@@ -41,5 +41,6 @@
 {% block report %}
 <dt data-bind="text: label"></dt>
 <dd>
+    <a data-bind="attr: { href: '#' + value() }, text: displayValue"></a>
 </dd>
 {% endblock report %}
