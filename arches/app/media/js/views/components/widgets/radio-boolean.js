@@ -31,6 +31,13 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
                 }
             }
 
+            if (this.value() === true) {
+                this.displayValue = this.trueLabel;
+            }
+            else if (this.value() === false) {
+                this.displayValue = this.falseLabel;
+            }
+
             this.setDefaultValue = function (val) {
                 if (val === self.defaultValue()) {
                     self.defaultValue(null)
