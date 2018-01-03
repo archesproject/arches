@@ -22,6 +22,7 @@ from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.generic import View
+from django.forms.models import model_to_dict
 from arches.app.models import models
 from arches.app.models.forms import Form
 from arches.app.models.card import Card
@@ -38,6 +39,7 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Terms
 from arches.app.views.base import BaseManagerView
 from arches.app.views.concept import Concept
+from arches.app.datatypes.datatypes import DataTypeFactory
 from elasticsearch import Elasticsearch
 
 # print system_settings
@@ -234,6 +236,38 @@ class ResourceData(View):
             return JSONResponse(form)
 
         return HttpResponseNotFound()
+
+
+@method_decorator(can_read_resource_instance(), name='dispatch')
+class ResourceTiles(View):
+    def get(self, request, resourceid=None, include_display_values=True):
+        datatype_factory = DataTypeFactory()
+        nodeid = request.GET.get('nodeid', None)
+        permitted_tiles = []
+        perm = 'read_nodegroup'
+        tiles = models.TileModel.objects.filter(resourceinstance_id=resourceid)
+        if nodeid is not None:
+            node = models.Node.objects.get(pk=nodeid)
+            tiles = tiles.filter(nodegroup=node.nodegroup)
+
+        for tile in tiles:
+            if request.user.has_perm(perm, tile.nodegroup):
+                tile = Tile.objects.get(pk=tile.tileid)
+                tile.filter_by_perm(request.user, perm)
+                tile_dict = model_to_dict(tile)
+                if include_display_values:
+                    tile_dict['display_values'] = []
+                    for node in models.Node.objects.filter(nodegroup=tile.nodegroup):
+                        if str(node.nodeid) in tile.data:
+                            datatype = datatype_factory.get_instance(node.datatype)
+                            tile_dict['display_values'].append({
+                                'value': datatype.get_display_value(tile, node),
+                                'label': node.name,
+                                'nodeid': node.nodeid
+                            })
+                permitted_tiles.append(tile_dict)
+
+        return JSONResponse({'tiles': permitted_tiles})
 
 
 @method_decorator(can_read_resource_instance(), name='dispatch')
