@@ -20,7 +20,7 @@
             'js-cookie': '{{ STATIC_URL }}bower_components/js-cookie/src/js.cookie',
             'select2': '{{ STATIC_URL }}bower_components/select2v3/index',
             'bootstrap': '{{ STATIC_URL }}bower_components/bootstrap/dist/js/bootstrap.min',
-            'jquery-ui': '{{ STATIC_URL }}bower_components/jqueryui/ui/jquery-ui',
+            'jquery-ui': '{{ STATIC_URL }}bower_components/jqueryui/ui//minified/jquery-ui.min',
             'flexslider': '{{ STATIC_URL }}bower_components/flexslider/2.2.2/jquery.flexslider-min',
             'easing': '{{ STATIC_URL }}bower_components/jquery-easing/jquery.easing.min',
             'backbone': '{{ STATIC_URL }}bower_components/backbone/backbone',
@@ -349,7 +349,12 @@
     });
 
     define('datatype-config-components',
-        [{% for datatype in datatypes %}{% if datatype.configcomponent != None %}'{{ datatype.configcomponent }}',{% endif %}{% endfor %}],
+        [{% for datatype in datatypes %}
+            {% if datatype.configcomponent != None %}
+            "{{ datatype.configcomponent }}",
+            {% endif %}
+        {% endfor %}
+        ],
         function () { return });
 
     define('geoms', function () {
