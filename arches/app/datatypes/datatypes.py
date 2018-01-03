@@ -1165,9 +1165,9 @@ class NodeValueDataType(BaseDataType):
     def get_display_value(self, tile, node):
         datatype_factory = DataTypeFactory()
         value_node = models.Node.objects.get(nodeid=node.config['nodeid'])
-        value_tile = models.TileModel.objects.get(tileid=tile.data[node.config['nodeid']])
+        value_tile = models.TileModel.objects.get(tileid=tile.data[str(node.pk)])
         datatype = datatype_factory.get_instance(value_node.datatype)
-        return datatype.get_display_value(value_tile, node)
+        return datatype.get_display_value(value_tile, value_node)
 
     def append_to_document(self, document, nodevalue, nodeid, tile):
         pass
