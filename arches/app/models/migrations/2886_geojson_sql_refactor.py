@@ -28,7 +28,6 @@ class Migration(migrations.Migration):
                 REFRESH MATERIALIZED VIEW mv_geojson_geoms;
             """,
             """
-                -- down
                 DROP MATERIALIZED VIEW mv_geojson_geoms;
                 CREATE MATERIALIZED VIEW mv_geojson_geoms AS
                     SELECT t.tileid,
