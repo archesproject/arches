@@ -58,6 +58,7 @@ define([
         loadForm: function(formid, callback){
             var self = this;
             self.graph = new GraphModel({data: data.graph});
+            $('.card-form-preview-container').animate({scrollTop: 0}, 100);
             $.ajax({
                 type: "GET",
                 url: arches.urls.resource_data.replace('//', '/' + this.resourceid + '/') + formid,
