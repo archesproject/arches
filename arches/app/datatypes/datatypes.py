@@ -1119,7 +1119,7 @@ class ResourceInstanceDataType(BaseDataType):
 
     def validate(self, value, source=''):
         errors = []
-        id_list = self.get_id_list(nodevalue)
+        id_list = self.get_id_list(value)
 
         for resourceid in id_list:
             try:
@@ -1129,6 +1129,7 @@ class ResourceInstanceDataType(BaseDataType):
         return errors
 
     def get_display_value(self, tile, node):
+        nodevalue = tile.data[str(node.nodeid)]
         resource_names = self.get_resource_names(nodevalue)
         return ', '.join(resource_names)
 
@@ -1150,3 +1151,26 @@ class ResourceInstanceDataType(BaseDataType):
                     query.must(search_query)
         except KeyError, e:
             pass
+
+
+class NodeValueDataType(BaseDataType):
+    def validate(self, value, source=''):
+        errors = []
+        try:
+            models.TileModel.objects.get(tileid=value)
+        except:
+            errors.append({'type': 'ERROR', 'message': '{0} is not a valid tile id. This data was not imported.'.format(v)})
+        return errors
+
+    def get_display_value(self, tile, node):
+        datatype_factory = DataTypeFactory()
+        value_node = models.Node.objects.get(nodeid=node.config['nodeid'])
+        value_tile = models.TileModel.objects.get(tileid=tile.data[str(node.pk)])
+        datatype = datatype_factory.get_instance(value_node.datatype)
+        return datatype.get_display_value(value_tile, value_node)
+
+    def append_to_document(self, document, nodevalue, nodeid, tile):
+        pass
+
+    def append_search_filters(self, value, node, query, request):
+        pass

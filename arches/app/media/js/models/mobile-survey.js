@@ -1,16 +1,17 @@
 define([
     'underscore',
     'knockout',
+    'knockout-mapping',
     'models/abstract',
     'arches'
-], function(_, ko, AbstractModel, arches) {
+], function(_, ko, koMapping, AbstractModel, arches) {
     return AbstractModel.extend({
-        url: arches.urls.project,
+        url: arches.urls.mobile_survey,
 
         initialize: function(options) {
             var self = this;
             self.identities = options.identities || [];
-            self._project = ko.observable('{}');
+            self._mobilesurvey = ko.observable('{}');
             self.name = ko.observable('');
             self.description = ko.observable('');
             self.startdate = ko.observable(null);
@@ -22,10 +23,11 @@ define([
             self.groups = ko.observableArray([]);
             self.showDetails = ko.observable(false);
             self.cards = ko.observableArray([]);
-            self.datadownload = ko.observable();
-            self.tilecache = ko.observable();
+            self.datadownloadconfig = koMapping.fromJS(options.source.datadownloadconfig) || ko.observable();
+            self.tilecache = ko.observable('');
             self.bounds = ko.observable(self.getDefaultBounds(null));
             self.collectedResources = ko.observable(false);
+            self.showCustomDataDownload = ko.observable(false);
 
             var getUserName = function(id) {
                 var user = _.find(self.identities, function(i) {
@@ -172,9 +174,16 @@ define([
                 };
             };
 
+            self.updateResourceDownloadList = function(val){
+                if (_.contains(self.datadownloadconfig.resources(), val.id)) {
+                    self.datadownloadconfig.resources.remove(val.id)
+                } else {
+                    self.datadownloadconfig.resources.push(val.id)
+                }
+            }
 
-            self.updateCards = function(val) {
-                var approvedCards = _.chain(val.targetParent())
+            self.updateCards = function(cards) {
+                var approvedCards = _.chain(cards)
                 .filter(function(card){
                     if (card.approved()) {
                         return card.cardid
@@ -187,13 +196,29 @@ define([
 
             self.updateApproved = function(val){
                 val.item.approved(true);
-                self.updateCards(val)
+                self.updateCards(val.targetParent())
             };
 
             self.updateUnapproved = function(val){
                 val.item.approved(false);
                 self.cards.remove(val.item.cardid)
             };
+
+            self.addAllCardsByResource = function(val) {
+                var resource = val.resourceList.selected()
+                _.each(resource.cards(), function(card){
+                    card.approved(true)
+                })
+                self.updateCards(resource.cards())
+            }
+
+            self.removeAllCardsByResource = function(val) {
+                var resource = val.resourceList.selected()
+                _.each(resource.cards(), function(card){
+                    card.approved(false);
+                    self.cards.remove(card.cardid)
+                })
+            }
 
             self.toggleShowDetails = function() {
                 self.setIdentityApproval();
@@ -216,13 +241,13 @@ define([
                     cards: self.cards,
                     bounds: self.bounds,
                     tilecache: self.tilecache,
-                    datadownload: self.datadownload
+                    datadownloadconfig: koMapping.toJS(self.datadownloadconfig)
                 });
-                return JSON.stringify(_.extend(JSON.parse(self._project()), jsObj))
+                return JSON.stringify(_.extend(JSON.parse(self._mobilesurvey()), jsObj))
             });
 
             self.dirty = ko.computed(function() {
-                return self.json() !== self._project() || !self.get('id');
+                return self.json() !== self._mobilesurvey() || !self.get('id');
             });
         },
 
@@ -257,7 +282,7 @@ define([
 
         parse: function(source) {
             var self = this;
-            self._project(JSON.stringify(source));
+            self._mobilesurvey(JSON.stringify(source));
             self.name(source.name);
             self.description(source.description);
             self.startdate(source.startdate);
@@ -270,12 +295,11 @@ define([
             self.cards(source.cards);
             self.tilecache(source.tilecache);
             self.bounds(self.getDefaultBounds(source.bounds));
-            self.datadownload(source.datadownload);
             self.set('id', source.id);
         },
 
         reset: function() {
-            this.parse(JSON.parse(this._project()), self);
+            this.parse(JSON.parse(this._mobilesurvey()), self);
         },
 
         _getURL: function(method) {
@@ -299,8 +323,11 @@ define([
                     self.cards(request.responseJSON.mobile_survey.cards);
                     self.tilecache(request.responseJSON.mobile_survey.tilecache);
                     self.bounds(self.getDefaultBounds(request.responseJSON.mobile_survey.bounds));
-                    self.datadownload(request.responseJSON.mobile_survey.datadownload);
-                    this._project(this.json());
+                    self.datadownloadconfig.download(request.responseJSON.mobile_survey.datadownloadconfig.download);
+                    self.datadownloadconfig.count(request.responseJSON.mobile_survey.datadownloadconfig.count);
+                    self.datadownloadconfig.resources(request.responseJSON.mobile_survey.datadownloadconfig.resources);
+                    self.datadownloadconfig.custom(request.responseJSON.mobile_survey.datadownloadconfig.custom);
+                    this._mobilesurvey(this.json());
                 };
             };
             this._doRequest({

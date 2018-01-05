@@ -173,22 +173,23 @@ class Card(models.CardModel):
                 return None
         return self
 
-    def serialize(self):
+    def serialize(self, fields=None, exclude=None):
         """
         serialize to a different form then used by the internal class structure
 
         """
 
-        ret = JSONSerializer().handle_model(self)
-        ret['cardinality'] = self.cardinality
-        ret['cards'] = self.cards
-        ret['nodes'] = list(self.nodegroup.node_set.all())
-        ret['visible'] = self.visible
-        ret['active'] = self.active
-        ret['widgets'] = self.widgets
-        ret['is_editable'] = self.is_editable
-        ret['ontologyproperty'] = self.ontologyproperty
-        ret['disabled'] = self.disabled
+        exclude = [] if exclude == None else exclude
+        ret = JSONSerializer().handle_model(self, fields, exclude)
+
+        ret['cardinality'] = self.cardinality if 'cardinality' not in exclude else ret.pop('cardinality', None)
+        ret['cards'] = self.cards if 'cards' not in exclude else ret.pop('cards', None)
+        ret['nodes'] = list(self.nodegroup.node_set.all()) if 'nodes' not in exclude else ret.pop('nodes', None)
+        ret['visible'] = self.visible if 'visible' not in exclude else ret.pop('visible', None)
+        ret['active'] = self.active if 'active' not in exclude else ret.pop('active', None)
+        ret['is_editable'] = self.is_editable() if 'is_editable' not in exclude else ret.pop('is_editable', None)
+        ret['ontologyproperty'] = self.ontologyproperty if 'ontologyproperty' not in exclude else ret.pop('ontologyproperty', None)
+        ret['disabled'] = self.disabled if 'disabled' not in exclude else ret.pop('disabled', None)
 
         if self.graph and self.graph.ontology and self.graph.isresource:
             edge = self.get_edge_to_parent()
@@ -196,21 +197,26 @@ class Card(models.CardModel):
 
         # provide a models.CardXNodeXWidget model for every node
         # even if a widget hasn't been configured
-        for node in ret['nodes']:
-            found = False
-            for widget in ret['widgets']:
-                if node.nodeid == widget.node_id:
-                    found = True
-            if not found:
-                widget = models.DDataType.objects.get(pk=node.datatype).defaultwidget
-                if widget:
-                    widget_model = models.CardXNodeXWidget()
-                    widget_model.node_id = node.nodeid
-                    widget_model.card_id = self.cardid
-                    widget_model.widget_id = widget.pk
-                    widget_model.config = JSONSerializer().serialize(widget.defaultconfig)
-                    widget_model.label = node.name
-                    ret['widgets'].append(widget_model)
+        ret['widgets'] = self.widgets
+        if 'widgets' not in exclude:
+            for node in ret['nodes']:
+                found = False
+                for widget in ret['widgets']:
+                    if node.nodeid == widget.node_id:
+                        found = True
+                if not found:
+                    widget = models.DDataType.objects.get(pk=node.datatype).defaultwidget
+                    if widget:
+                        widget_model = models.CardXNodeXWidget()
+                        widget_model.node_id = node.nodeid
+                        widget_model.card_id = self.cardid
+                        widget_model.widget_id = widget.pk
+                        widget_model.config = JSONSerializer().serialize(widget.defaultconfig)
+                        widget_model.label = node.name
+                        ret['widgets'].append(widget_model)
+        else:
+            ret.pop('widgets', None)
+
         return ret
 
 

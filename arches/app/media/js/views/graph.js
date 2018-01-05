@@ -133,7 +133,7 @@ require([
                             if (typeof(response[0])) {
                               response = response[0].join('<br />')
                             }
-                              self.viewModel.alert(new AlertViewModel('ep-alert-red', arches.graphImportFailed.title, response[0]));
+                              self.viewModel.alert(new AlertViewModel('ep-alert-red', arches.graphImportFailed.title, response));
                             }
                             else {
                               window.location.reload(true);

@@ -9,7 +9,7 @@ define([
     'bindings/sortable'
 ], function(arches, _, ko, IdentityList, ResourceList, MobileSurveyModel) {
     /**
-    * A base viewmodel for project management
+    * A base viewmodel for mobile survey management
     *
     * @constructor
     * @name MobileSurveyManagerViewModel
@@ -112,31 +112,34 @@ define([
             }
         }, self);
 
-        this.projects = ko.observableArray(
-            params.projects.map(function (project) {
+        this.mobilesurveys = ko.observableArray(
+            params.mobilesurveys.map(function (mobilesurvey) {
                 return new MobileSurveyModel({
-                    source: project,
+                    source: mobilesurvey,
                     identities: params.identities
                 });
             })
         );
 
-        this.projectFilter = ko.observable('');
-        this.filteredProjects = ko.computed(function () {
-            var filter = self.projectFilter();
-            var list = self.projects();
+        console.log(this.mobilesurveys())
+
+        this.mobileSurveyFilter = ko.observable('');
+
+        this.filteredMobileSurveys = ko.computed(function () {
+            var filter = self.mobileSurveyFilter();
+            var list = self.mobilesurveys();
             if (filter.length === 0) {
                 return list;
             }
-            return _.filter(list, function(project) {
-                return project.name().toLowerCase().indexOf(filter.toLowerCase()) >= 0;
+            return _.filter(list, function(mobilesurvey) {
+                return mobilesurvey.name().toLowerCase().indexOf(filter.toLowerCase()) >= 0;
             });
         });
 
         this.loading = ko.observable(false);
-        this.selectedProject = ko.observable(null);
+        this.selectedMobileSurvey = ko.observable(null);
 
-        this.selectedProject.subscribe(function(val){
+        this.selectedMobileSurvey.subscribe(function(val){
             if (val) {
                 self.identityList.clearSelection();
                 self.resourceList.clearSelection();

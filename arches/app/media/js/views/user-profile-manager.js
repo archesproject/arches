@@ -33,16 +33,16 @@ define([
             self.viewModel.toggleEditUserForm = function(val) {
                 this.showEditUserForm(!this.showEditUserForm())
             };
-
+            console.log(data)
             self.viewModel.mobileSurveyManager = new MobileSurveyManagerViewModel(data);
 
-            _.each(self.viewModel.mobileSurveyManager.projects(), function(project) {
-                project.resources = ko.computed(function() {
+            _.each(self.viewModel.mobileSurveyManager.mobilesurveys(), function(mobilesurvey) {
+                mobilesurvey.resources = ko.computed(function() {
                     var resources = [];
                     var resource_lookup = {};
                     _.each(self.viewModel.mobileSurveyManager.resourceList.items(), function(resource) {
                         _.each(resource.cards(), function(card) {
-                                if (_.contains(project.cards(), card.cardid)) {
+                                if (_.contains(mobilesurvey.cards(), card.cardid)) {
                                     if (resource_lookup[resource.id]) {
                                         resource_lookup[resource.id].cards.push(card)
                                     } else {

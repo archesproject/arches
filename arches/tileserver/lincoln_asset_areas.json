@@ -1,0 +1,35 @@
+{
+    "type": "vector",
+    "layers": [{
+        "id": "lhd_heritage_asset_area",
+        "type": "fill",
+        "source": "lhd_heritage_asset_area",
+        "source-layer": "lhd_heritage_asset_area",
+        "layout": {},
+        "filter": ["all", ["==", "poly_outline", false]],
+        "paint": {
+            "fill-color": "rgba(68, 106, 221, 0.5)"
+        }
+    }],
+    "config": {
+        "provider": {
+            "class": "TileStache.Goodies.VecTiles:Provider",
+            "kwargs": {
+                "dbinfo": {
+                    "host": "localhost",
+                    "user": "postgres",
+                    "password": "postgis",
+                    "database": "project",
+                    "port": "5432"
+                },
+                "simplify": 0.5,
+                "queries": [
+                    "select ResourceID::text as __id__, Conservati as name, st_asgeojson(st_transform(geom, 4326)) as geojson, false AS poly_outline, st_transform(geom, 900913) as __geometry__ from lhd_heritage_asset_area"
+                ]
+            }
+        },
+        "allowed origin": "*",
+        "compress": true,
+        "write cache": false
+    }
+}
