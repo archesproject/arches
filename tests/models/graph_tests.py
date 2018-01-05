@@ -22,6 +22,7 @@ from tests import test_settings
 from tests.base_test import ArchesTestCase
 from arches.app.models import models
 from arches.app.models.graph import Graph, GraphValidationError
+from arches.app.models.card import Card
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 # these tests can be run from the command line via
@@ -772,15 +773,16 @@ class GraphTests(ArchesTestCase):
 
         self.assertEqual(len(graph.cards), 1)
         for card in graph.get_cards():
-            self.assertEqual(card.name, graph.name)
-            self.assertEqual(card.description, graph.description)
+            self.assertEqual(card['name'], graph.name)
+            self.assertEqual(card['description'], graph.description)
+            card = Card.objects.get(pk=card['cardid'])
             card.name = 'TEST card name'
             card.description = 'TEST card description'
             card.save()
 
         for card in graph.get_cards():
-            self.assertEqual(card.name, 'TEST')
-            self.assertEqual(card.description, 'A test description')
+            self.assertEqual(card['name'], 'TEST')
+            self.assertEqual(card['description'], 'A test description')
 
         graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
         graph.save()
@@ -795,14 +797,14 @@ class GraphTests(ArchesTestCase):
 
         self.assertEqual(len(graph.get_cards()), 2)
         for card in graph.get_cards():
-            if str(card.nodegroup_id) == str(graph.root.nodegroup_id):
-                self.assertEqual(card.name, graph.name)
-                self.assertEqual(card.description, graph.description)
+            if str(card['nodegroup_id']) == str(graph.root.nodegroup_id):
+                self.assertEqual(card['name'], graph.name)
+                self.assertEqual(card['description'], graph.description)
             else:
-                self.assertTrue(len(graph.nodes[card.nodegroup.pk].name) > 0)
-                self.assertTrue(len(graph.nodes[card.nodegroup.pk].description) > 0)
-                self.assertEqual(card.name, graph.nodes[card.nodegroup.pk].name)
-                self.assertEqual(card.description, graph.nodes[card.nodegroup.pk].description)
+                self.assertTrue(len(graph.nodes[card['nodegroup_id']].name) > 0)
+                self.assertTrue(len(graph.nodes[card['nodegroup_id']].description) > 0)
+                self.assertEqual(card['name'], graph.nodes[card['nodegroup_id']].name)
+                self.assertEqual(card['description'], graph.nodes[card['nodegroup_id']].description)
 
 
         # TESTING A RESOURCE
@@ -812,31 +814,19 @@ class GraphTests(ArchesTestCase):
         resource_graph.save()
 
         self.assertEqual(len(resource_graph.get_cards()), 2)
-        for card in resource_graph.get_cards():
-            if card.nodegroup.parentnodegroup is None:
-                self.assertEqual(card.name, graph.name)
-                self.assertEqual(card.description, graph.description)
-                card.name = 'altered root card name'
-                card.description = 'altered root card description'
-            else:
-                self.assertTrue(len(resource_graph.nodes[card.nodegroup.pk].name) > 0)
-                self.assertTrue(len(resource_graph.nodes[card.nodegroup.pk].description) > 0)
-                self.assertEqual(card.name, resource_graph.nodes[card.nodegroup.pk].name)
-                self.assertEqual(card.description, resource_graph.nodes[card.nodegroup.pk].description)
-                card.name = 'altered child card name'
-                card.description = 'altered child card description'
 
-        # loop through the cards again now looking for the updated desctiptions
         for card in resource_graph.get_cards():
-            if card.nodegroup.parentnodegroup is None:
-                self.assertEqual(card.name, 'altered root card name')
-                self.assertEqual(card.description, 'altered root card description')
+            cardobj = Card.objects.get(pk=card['cardid'])
+            if cardobj.nodegroup.parentnodegroup is None:
+                self.assertEqual(card['name'], graph.name)
+                self.assertEqual(card['description'], graph.description)
             else:
-                self.assertEqual(card.name, 'altered child card name')
-                self.assertEqual(card.description, 'altered child card description')
+                self.assertEqual(card['name'], resource_graph.nodes[card['nodegroup_id']].name)
+                self.assertEqual(card['description'], resource_graph.nodes[card['nodegroup_id']].description)
+                self.assertTrue(len(resource_graph.nodes[card['nodegroup_id']].name) > 0)
+                self.assertTrue(len(resource_graph.nodes[card['nodegroup_id']].description) > 0)
 
         resource_graph.delete()
-
 
         # TESTING A RESOURCE
         resource_graph = Graph.new(name='TEST',is_resource=True,author='TEST')
@@ -847,15 +837,15 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(len(resource_graph.cards), 1)
         the_card = resource_graph.cards.itervalues().next()
         for card in resource_graph.get_cards():
-            self.assertEqual(card.name, the_card.name)
-            self.assertEqual(card.description, the_card.description)
+            self.assertEqual(card['name'], the_card.name)
+            self.assertEqual(card['description'], the_card.description)
 
         # after removing the card name and description, the cards should take on the node name and description
         the_card.name = ''
         the_card.description = ''
         for card in resource_graph.get_cards():
-            self.assertEqual(card.name, resource_graph.nodes[card.nodegroup.pk].name)
-            self.assertEqual(card.description, resource_graph.nodes[card.nodegroup.pk].description)
+            self.assertEqual(card['name'], resource_graph.nodes[card['nodegroup_id']].name)
+            self.assertEqual(card['description'], resource_graph.nodes[card['nodegroup_id']].description)
 
     def test_get_root_nodegroup(self):
         """

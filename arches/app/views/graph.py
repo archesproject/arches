@@ -160,12 +160,12 @@ class GraphManagerView(GraphBaseView):
             branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         concept_collections = Concept().concept_tree(mode='collections', lang=lang)
-
+        datatypes_json = JSONSerializer().serialize(datatypes, exclude=['iconclass','modulename','isgeometric'])
         context = self.get_context_data(
             main_script='views/graph/graph-manager',
-            branches=JSONSerializer().serialize(branch_graphs),
-            datatypes_json=JSONSerializer().serialize(datatypes),
-            datatypes=datatypes,
+            branches=JSONSerializer().serialize(branch_graphs, exclude=['cards','domain_connections', 'functions', 'cards', 'deploymentfile', 'deploymentdate']),
+            datatypes_json=datatypes_json,
+            datatypes=json.loads(datatypes_json),
             concept_collections=concept_collections,
             node_list={
                 'title': _('Node List'),
@@ -181,7 +181,6 @@ class GraphManagerView(GraphBaseView):
             },
             ontology_namespaces = get_ontology_namespaces()
         )
-
         context['nav']['title'] = self.graph.name
         context['nav']['help'] = (_('Using the Graph Manager'),'help/graph-designer-help.htm')
         context['nav']['menu'] = True
@@ -232,10 +231,20 @@ class GraphDataView(View):
             response.write(zip_stream)
             return response
 
+        elif self.action == 'get_domain_connections':
+            res = []
+            graph = Graph.objects.get(graphid=graphid)
+            ontology_class = request.GET.get('ontology_class', None)
+            ret = graph.get_valid_domain_ontology_classes()
+            for r in ret:
+                res.append({'ontology_property': r['ontology_property'], 'ontology_classes':[c for c in r['ontology_classes'] if c == ontology_class]})
+            return JSONResponse(res)
+
         else:
             graph = Graph.objects.get(graphid=graphid)
             if self.action == 'get_related_nodes':
-                ret = graph.get_valid_ontology_classes(nodeid=nodeid)
+                parent_nodeid = request.GET.get('parent_nodeid', None)
+                ret = graph.get_valid_ontology_classes(nodeid=nodeid, parent_nodeid=parent_nodeid)
 
             elif self.action == 'get_valid_domain_nodes':
                 ret = graph.get_valid_domain_ontology_classes(nodeid=nodeid)
@@ -323,9 +332,8 @@ class CardManagerView(GraphBaseView):
 
         context = self.get_context_data(
             main_script='views/graph/card-manager',
-            branches=JSONSerializer().serialize(branch_graphs),
+            branches=JSONSerializer().serialize(branch_graphs, exclude=['functions', 'relatable_resource_model_ids', 'domain_connections', 'nodes', 'edges']),
         )
-
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
         context['nav']['help'] = (_('Managing Cards'),'help/card-manager-help.htm')

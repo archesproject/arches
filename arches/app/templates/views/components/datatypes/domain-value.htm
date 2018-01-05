@@ -16,8 +16,9 @@
     <div class="control-label">
         {% trans "Added options" %}
     </div>
-    <div data-bind="foreach: options">
+    <div data-bind="sortable: {data: options}">
         <div class="added-domain-option">
+            <i class="fa fa-ellipsis-v" aria-hidden="true" style="color: #999; cursor: move">  </i>
             <input type="text" class="form-control library-search" data-bind="disable: !$parent.isEditable, value: text, valueUpdate: 'keyup'">
             <a href="#" data-bind="disable: !$parent.isEditable, click: function(){if($parent.isEditable){remove()}}">
                  <i class="fa fa-minus-circle pull-right"></i>

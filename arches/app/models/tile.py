@@ -269,7 +269,7 @@ class Tile(models.TileModel):
                 return None
         return self
 
-    def serialize(self):
+    def serialize(self, fields=None, exclude=None):
         """
         serialize to a different form then used by the internal class structure
 

@@ -16,10 +16,13 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import json
 from datetime import datetime
 from django.db import transaction
 from django.shortcuts import render
 from django.contrib.auth.models import User, Group
+from django.contrib.gis.geos import MultiPolygon
+from django.contrib.gis.geos import Polygon
 from django.core.urlresolvers import reverse
 from django.core.mail import EmailMultiAlternatives
 from django.http import HttpResponseNotFound
@@ -31,6 +34,7 @@ from django.views.generic import View
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.decorators import group_required
+from arches.app.utils.geo_utils import GeoUtils
 from arches.app.models import models
 from arches.app.models.card import Card
 from arches.app.models.mobile_survey import MobileSurvey
@@ -46,7 +50,8 @@ class MobileSurveyManagerView(BaseManagerView):
         def get_last_login(date):
             result = _("Not yet logged in")
             try:
-                result = datetime.strftime(date, '%Y-%m-%d %H:%M')
+                if date is not None:
+                    result = datetime.strftime(date, '%Y-%m-%d %H:%M')
             except TypeError as e:
                 print e
             return result
@@ -67,13 +72,27 @@ class MobileSurveyManagerView(BaseManagerView):
                 default_perms = default_perms + list(group.permissions.all())
             identities.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions': set(default_perms), 'is_superuser':user.is_superuser, 'group_ids': group_ids, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email})
 
+        map_layers = models.MapLayer.objects.all()
+        map_sources = models.MapSource.objects.all()
+        geocoding_providers = models.Geocoder.objects.all()
 
         mobile_survey_models = models.MobileSurveyModel.objects.order_by('name')
-
         mobile_surveys, resources = self.get_survey_resources(mobile_survey_models)
+
+        for mobile_survey in mobile_surveys:
+            try:
+                mobile_survey['datadownloadconfig'] = json.loads(mobile_survey['datadownloadconfig'])
+            except TypeError:
+                pass
+            multipart = mobile_survey['bounds']
+            singlepart = GeoUtils().convert_multipart_to_singlepart(multipart)
+            mobile_survey['bounds'] = singlepart
 
         serializer = JSONSerializer()
         context = self.get_context_data(
+            map_layers=map_layers,
+            map_sources=map_sources,
+            geocoding_providers=geocoding_providers,
             mobile_surveys=serializer.serialize(mobile_surveys, sort_keys=False),
             identities=serializer.serialize(identities, sort_keys=False),
             resources=serializer.serialize(resources, sort_keys=False),
@@ -159,8 +178,23 @@ class MobileSurveyManagerView(BaseManagerView):
             mobile_survey.startdate = data['startdate']
         if data['enddate'] != '':
             mobile_survey.enddate = data['enddate']
-        mobile_survey.datadownload = data['datadownload']
+        mobile_survey.datadownloadconfig = data['datadownloadconfig']
         mobile_survey.active = data['active']
+        mobile_survey.tilecache = data['tilecache']
+        polygons = []
+
+        try:
+            data['bounds'].upper()
+            data['bounds'] = json.loads(data['bounds'])
+        except AttributeError:
+            pass
+
+        if 'features' in data['bounds']:
+            for feature in data['bounds']['features']:
+                for coord in feature['geometry']['coordinates']:
+                    polygons.append(Polygon(coord))
+
+        mobile_survey.bounds = MultiPolygon(polygons)
         mobile_survey.lasteditedby = self.request.user
 
         with transaction.atomic():
@@ -172,9 +206,9 @@ class MobileSurveyManagerView(BaseManagerView):
         mobile_survey_dict['cards'] = ordered_ids
         mobile_survey_dict['users'] = [u.id for u in mobile_survey.users.all()]
         mobile_survey_dict['groups'] = [g.id for g in mobile_survey.groups.all()]
+        mobile_survey_dict['bounds'] = mobile_survey.bounds.geojson
 
         return JSONResponse({'success':True, 'mobile_survey': mobile_survey_dict})
-
 
     def get_mobile_survey_users(self, mobile_survey):
         users = set(mobile_survey.users.all())
@@ -253,9 +287,7 @@ class MobileSurveyResources(View):
 
         proj = MobileSurvey.objects.get(id=surveyid)
         all_ordered_card_ids = proj.get_ordered_cards()
-        print all_ordered_card_ids
         active_graphs = set([unicode(card.graph_id) for card in models.CardModel.objects.filter(cardid__in=all_ordered_card_ids)])
-        print active_graphs
         for i, graph in enumerate(graphs):
             cards = []
             if unicode(graph.graphid) in active_graphs:

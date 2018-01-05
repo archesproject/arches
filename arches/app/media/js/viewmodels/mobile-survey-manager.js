@@ -5,10 +5,11 @@ define([
     'views/mobile-survey-manager/identity-list',
     'views/mobile-survey-manager/resource-list',
     'models/mobile-survey',
+    'views/components/widgets/map',
     'bindings/sortable'
 ], function(arches, _, ko, IdentityList, ResourceList, MobileSurveyModel) {
     /**
-    * A base viewmodel for project management
+    * A base viewmodel for mobile survey management
     *
     * @constructor
     * @name MobileSurveyManagerViewModel
@@ -22,6 +23,24 @@ define([
         this.identityList = new IdentityList({
             items: ko.observableArray(params.identities)
         });
+
+        this.basemap = _.filter(arches.mapLayers, function(layer) {
+            return !layer.isoverlay;
+        })[0];
+
+        this.resizeMap = function() {
+            setTimeout(
+                function() {
+                    dispatchEvent(new Event('resize'))
+                }, 200)
+        }
+
+        this.defaultCenterX = arches.mapDefaultX;
+        this.defaultCenterY = arches.mapDefaultY;
+        this.geocoderDefault = arches.geocoderDefault;
+        this.mapDefaultZoom = arches.mapDefaultZoom;
+        this.mapDefaultMaxZoom = arches.mapDefaultMaxZoom;
+        this.mapDefaultMinZoom = arches.mapDefaultMinZoom;
 
         this.flattenCards = function(r) {
             var addedCardIds = [];
@@ -93,31 +112,32 @@ define([
             }
         }, self);
 
-        this.projects = ko.observableArray(
-            params.projects.map(function (project) {
+        this.mobilesurveys = ko.observableArray(
+            params.mobilesurveys.map(function (mobilesurvey) {
                 return new MobileSurveyModel({
-                    source: project,
+                    source: mobilesurvey,
                     identities: params.identities
                 });
             })
         );
 
-        this.projectFilter = ko.observable('');
-        this.filteredProjects = ko.computed(function () {
-            var filter = self.projectFilter();
-            var list = self.projects();
+        this.mobileSurveyFilter = ko.observable('');
+
+        this.filteredMobileSurveys = ko.computed(function () {
+            var filter = self.mobileSurveyFilter();
+            var list = self.mobilesurveys();
             if (filter.length === 0) {
                 return list;
             }
-            return _.filter(list, function(project) {
-                return project.name().toLowerCase().indexOf(filter.toLowerCase()) >= 0;
+            return _.filter(list, function(mobilesurvey) {
+                return mobilesurvey.name().toLowerCase().indexOf(filter.toLowerCase()) >= 0;
             });
         });
 
         this.loading = ko.observable(false);
-        this.selectedProject = ko.observable(null);
+        this.selectedMobileSurvey = ko.observable(null);
 
-        this.selectedProject.subscribe(function(val){
+        this.selectedMobileSurvey.subscribe(function(val){
             if (val) {
                 self.identityList.clearSelection();
                 self.resourceList.clearSelection();

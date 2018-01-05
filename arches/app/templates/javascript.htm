@@ -20,7 +20,7 @@
             'js-cookie': '{{ STATIC_URL }}bower_components/js-cookie/src/js.cookie',
             'select2': '{{ STATIC_URL }}bower_components/select2v3/index',
             'bootstrap': '{{ STATIC_URL }}bower_components/bootstrap/dist/js/bootstrap.min',
-            'jquery-ui': '{{ STATIC_URL }}bower_components/jqueryui/ui/jquery-ui',
+            'jquery-ui': '{{ STATIC_URL }}bower_components/jqueryui/ui//minified/jquery-ui.min',
             'flexslider': '{{ STATIC_URL }}bower_components/flexslider/2.2.2/jquery.flexslider-min',
             'easing': '{{ STATIC_URL }}bower_components/jquery-easing/jquery.easing.min',
             'backbone': '{{ STATIC_URL }}bower_components/backbone/backbone',
@@ -168,6 +168,7 @@
                 resource_cards: "{% url 'resource_cards' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 related_resources: "{% url 'related_resources' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 resource_descriptors: "{% url 'resource_descriptors' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
+                resource_tiles: "{% url 'resource_tiles' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 tile: "{% url 'tile' %}",
                 report_editor: "{% url 'report_editor' '' %}",
                 reorder_tiles: "{% url 'reorder_tiles' %}",
@@ -177,6 +178,7 @@
                 time_wheel_config: "{% url 'time_wheel_config' %}",
                 reindex: "{% url 'reindex' %}",
                 permission_data: "{% url 'permission_data' %}",
+                get_domain_connections: function(graphid){return "{% url 'get_domain_connections' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 clone_graph: function(graphid){return "{% url 'clone_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 export_graph: function(graphid){return "{% url 'export_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 export_mapping_file: function(graphid){return "{% url 'export_mapping_file' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
@@ -271,7 +273,7 @@
                 'icon': '{{ manifest.icon }}'
             },{% endfor %}{% endautoescape %}],
             conceptCollections: [{% autoescape off %}{% for concept_collection in concept_collections %}{
-                'label': '{{ concept_collection.label }}',
+                'label': '{{ concept_collection.label | escapejs }}',
                 'id': '{{ concept_collection.id }}',
             },{% endfor %}{% endautoescape %}],
             geocodingProviders: [{% autoescape off %}{% for provider in geocoding_providers %}{
@@ -348,7 +350,12 @@
     });
 
     define('datatype-config-components',
-        [{% for datatype in datatypes %}{% if datatype.configcomponent != None %}'{{ datatype.configcomponent }}',{% endif %}{% endfor %}],
+        [{% for datatype in datatypes %}
+            {% if datatype.configcomponent != None %}
+            "{{ datatype.configcomponent }}",
+            {% endif %}
+        {% endfor %}
+        ],
         function () { return });
 
     define('geoms', function () {
