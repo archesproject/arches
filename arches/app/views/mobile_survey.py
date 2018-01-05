@@ -176,8 +176,14 @@ class MobileSurveyManagerView(BaseManagerView):
         mobile_survey.datadownload = data['datadownload']
         mobile_survey.active = data['active']
         mobile_survey.tilecache = data['tilecache']
-
         polygons = []
+
+        try:
+            data['bounds'].upper()
+            data['bounds'] = json.loads(data['bounds'])
+        except AttributeError:
+            pass
+
         if 'features' in data['bounds']:
             for feature in data['bounds']['features']:
                 for coord in feature['geometry']['coordinates']:
