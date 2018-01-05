@@ -9,7 +9,7 @@ define([
     'arches',
     'bindings/datepicker'
 ], function(_, ko, BaseManagerView, MobileSurveyManagerViewModel, AlertViewModel, MobileSurveyModel, data, arches) {
-    console.log(data)
+    
     var viewModel = new MobileSurveyManagerViewModel(data);
 
     viewModel.saveMobileSurvey = function() {

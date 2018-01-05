@@ -121,8 +121,6 @@ define([
             })
         );
 
-        console.log(this.mobilesurveys())
-
         this.mobileSurveyFilter = ko.observable('');
 
         this.filteredMobileSurveys = ko.computed(function () {
