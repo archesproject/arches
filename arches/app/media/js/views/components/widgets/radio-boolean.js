@@ -32,10 +32,10 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
             }
 
             if (this.value() === true) {
-                this.displayValue = this.trueLabel;
+                this.displayValue = this.node.config.trueLabel;
             }
             else if (this.value() === false) {
-                this.displayValue = this.falseLabel;
+                this.displayValue = this.node.config.falseLabel;
             }
 
             this.setDefaultValue = function (val) {
