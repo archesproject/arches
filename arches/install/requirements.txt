@@ -12,7 +12,7 @@ django-guardian==1.4.9
 TileStache==1.51.6
 Shapely==1.6.1
 python-memcached==1.58
-mapbox-vector-tile==0.5.0
+mapbox-vector-tile==1.2.0
 mapnik==0.1
 flexidate==1.0
 SPARQLWrapper==1.8.0
