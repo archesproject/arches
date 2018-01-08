@@ -167,7 +167,8 @@ define(['arches',
                         self.get('nodes').push(new NodeModel({
                             source: node,
                             datatypelookup: self.get('datatypelookup'),
-                            graph: self
+                            graph: self,
+                            ontology_namespaces: self.get('root').ontology_namespaces
                         }));
                     }, this);
                     response.responseJSON.edges.forEach(function(edge){
