@@ -4,6 +4,11 @@ define(['knockout'], function (ko) {
         viewModel: function(params) {
             var self = this;
             this.search = params.search;
+            this.graph = params.graph;
+
+            this.trueLabel = params.config ? params.config.trueLabel : params.node.config.trueLabel;
+            this.falseLabel = params.config ? params.config.falseLabel : params.node.config.falseLabel;
+
             if (this.search) {
                 var filter = params.filterValue();
                 this.searchValue = ko.observable(filter.val || '');
