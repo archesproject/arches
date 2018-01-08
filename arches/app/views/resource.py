@@ -95,8 +95,7 @@ class ResourceEditorView(BaseManagerView):
             forms_x_cards = models.FormXCard.objects.filter(form__in=forms)
             forms_w_cards = []
             for form_x_card in forms_x_cards:
-                cm = models.CardModel.objects.get(pk=form_x_card.card_id)
-                if request.user.has_perm('read_nodegroup', cm.nodegroup):
+                if request.user.has_perm('read_nodegroup', form_x_card.card.nodegroup):
                     forms_w_cards.append(form_x_card.form)
             displayname = Resource.objects.get(pk=resourceid).displayname
             if displayname == 'undefined':
