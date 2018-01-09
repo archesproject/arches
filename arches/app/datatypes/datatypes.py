@@ -11,8 +11,9 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.date_utils import ExtendedDateFormat
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Exists
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Exists, RangeDSLException
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from django.utils.translation import ugettext as _
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import fromstr
@@ -215,7 +216,7 @@ class EDTFDataType(BaseDataType):
         return errors
 
     def append_to_document(self, document, nodevalue, nodeid, tile):
-        def add_date_to_doc(edtf):
+        def add_date_to_doc(document, edtf):
             if edtf.lower != edtf.upper:
                 dr = {}
                 if edtf.lower is not None:
@@ -227,15 +228,52 @@ class EDTFDataType(BaseDataType):
                 if edtf.lower is not None:
                     document['dates'].append({'date': edtf.lower, 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid})
         
+        # update the indexed tile value to support adv. search
+        tile.data[nodeid] = {
+            'value': nodevalue,
+            'dates': [],
+            'date_ranges': []
+        }
+
         edtf = ExtendedDateFormat(nodevalue)
         if edtf.result_set:
             for result in edtf.result_set:
-                add_date_to_doc(result)
+                add_date_to_doc(document, result)
+                add_date_to_doc(tile.data[nodeid], result)
         else:
-            add_date_to_doc(edtf)
+            add_date_to_doc(document, edtf)
+            add_date_to_doc(tile.data[nodeid], edtf)
 
     def append_search_filters(self, value, node, query, request):
-        pass
+        def add_date_to_doc(query, edtf):
+            if value['op'] == 'eq':
+                if edtf.lower != edtf.upper:
+                    raise Exception(_('Only dates that specify an exact year, month, and day can be used with the "=" operator'))
+                query.should(Match(field='tiles.data.%s.dates.date' % (str(node.pk)), query=edtf.lower, type='phrase_prefix', fuzziness=0))
+            else:
+                if value['op'] == 'overlaps':
+                    operators = {'gte': edtf.lower, 'lte': edtf.upper}
+                else:
+                    if edtf.lower != edtf.upper:
+                        raise Exception(_('Only dates that specify an exact year, month, and day can be used with the ">", "<", ">=", and "<=" operators'))
+                        
+                    operators = {
+                        value['op']: edtf.lower or edtf.upper
+                    }
+
+                try:    
+                    query.should(Range(field='tiles.data.%s.dates.date' % (str(node.pk)), **operators))
+                    query.should(Range(field='tiles.data.%s.date_ranges.date_range' % (str(node.pk)), relation='intersects', **operators))    
+                except RangeDSLException:
+                    if edtf.lower == None and edtf.upper == None:
+                        raise Exception(_('Invalid date specified.'))
+
+        edtf = ExtendedDateFormat(value['val'])
+        if edtf.result_set:
+            for result in edtf.result_set:
+                add_date_to_doc(query, result)
+        else:
+            add_date_to_doc(query, edtf)
 
 
 class GeojsonFeatureCollectionDataType(BaseDataType):
