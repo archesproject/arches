@@ -14,8 +14,16 @@ class Migration(migrations.Migration):
     operations = [
             migrations.RunSQL("""
                 UPDATE d_data_types
-                SET defaultconfig = jsonb_build_object('trueLabel', '', 'falseLabel', '') || COALESCE(defaultconfig, '{}'::jsonb)
+                SET defaultconfig = jsonb_build_object('trueLabel', 'Yes', 'falseLabel', 'No') || COALESCE(defaultconfig, '{}'::jsonb)
                 WHERE datatype = 'boolean';
+                --
+                UPDATE widgets
+                SET defaultconfig = defaultconfig - 'falseLabel'
+                WHERE name = 'radio-boolean-widget';
+
+                UPDATE widgets
+                SET defaultconfig = defaultconfig - 'trueLabel'
+                WHERE name = 'radio-boolean-widget';
                 --
                 UPDATE nodes AS n
                 SET config = COALESCE(n.config, '{}'::jsonb) || jsonb_build_object('trueLabel', c.config->>'trueLabel', 'falseLabel', c.config->>'falseLabel')
@@ -41,6 +49,10 @@ class Migration(migrations.Migration):
                 UPDATE d_data_types
                 SET defaultconfig = defaultconfig - 'falseLabel'
                 WHERE datatype = 'boolean';
+                --
+                UPDATE widgets
+                SET defaultconfig = COALESCE(defaultconfig, '{}'::jsonb) || jsonb_build_object('trueLabel', 'Yes', 'falseLabel', 'No')
+                WHERE name = 'radio-boolean-widget';
                 --
                 UPDATE nodes
                 SET config = config - 'trueLabel'
