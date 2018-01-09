@@ -94,9 +94,15 @@ class ResourceEditorView(BaseManagerView):
             forms = resource_instance.graph.form_set.filter(visible=True)
             forms_x_cards = models.FormXCard.objects.filter(form__in=forms)
             forms_w_cards = []
+            required_widgets = []
+
             for form_x_card in forms_x_cards:
                 if request.user.has_perm('read_nodegroup', form_x_card.card.nodegroup):
                     forms_w_cards.append(form_x_card.form)
+
+            widget_datatypes = [v.datatype for k, v in graph.nodes.iteritems()]
+            widgets = widgets.filter(datatype__in=widget_datatypes)
+
             displayname = Resource.objects.get(pk=resourceid).displayname
             if displayname == 'undefined':
                 displayname = 'Unnamed Resource'
