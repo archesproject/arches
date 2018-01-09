@@ -71,7 +71,7 @@ define([
             return displayVal;
         });
         updateName();
-        
+
         this.select2Config = {
             value: this.value,
             clickBubble: true,
@@ -89,12 +89,16 @@ define([
                         no_filters: true,
                         page: page
                     };
-                    if (graphid) {
+                    if (graphid && graphid.length > 0) {
                         data.no_filters = false;
-                        data.typeFilter = JSON.stringify([{
-                            "graphid": graphid,
-                            "inverted": false
-                        }]);
+                        data.typeFilter = JSON.stringify(
+                            graphid.map(function(id) {
+                                return {
+                                    "graphid": id,
+                                    "inverted": false
+                                }
+                            })
+                        );
                     }
                     if (term) {
                         data.no_filters = false;
