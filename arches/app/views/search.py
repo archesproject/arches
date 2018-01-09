@@ -159,7 +159,11 @@ def search_terms(request):
     return JSONResponse(ret)
 
 def search_results(request):
-    search_results_dsl = build_search_results_dsl(request)
+    try:
+        search_results_dsl = build_search_results_dsl(request)
+    except Exception as err:
+        return JSONResponse(err.message, status=500)
+        
     dsl = search_results_dsl['query']
     search_buffer = search_results_dsl['search_buffer']
     dsl.include('graph_id')
