@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '2591_formatted_numbers'),
+        ('models', '2532_boolean_datatype_display_value'),
     ]
 
     operations = [
