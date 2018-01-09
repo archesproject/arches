@@ -2652,10 +2652,14 @@ ul .collapse li:last-of-type {
     margin-top: -6px;
 }
 
+.eh_resource_descriptors h4.report-toolbar-title {
+    margin-top: -10px;
+}
+
 .eh_description {
     font-size: 11px;
-    color: #999;
-    padding-left: 45px;
+    color: #777;
+    padding-left: 25px;
     margin-top: -15px;
 }
 

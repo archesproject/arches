@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-sudo yum install -y http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-2.noarch.rpm
+sudo yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 sudo yum check-update
 sudo yum install -y libxml2-devel.x86_64
 sudo yum install -y proj-devel.x86_64
