@@ -174,6 +174,7 @@ define([
                 context: this,
                 success: function(response) {
                     var data = this.viewModel.searchResults.updateResults(response);
+                    this.viewModel.alert(false);
                 },
                 error: function(response, status, error) {
                     if(this.updateRequest.statusText !== 'abort'){
