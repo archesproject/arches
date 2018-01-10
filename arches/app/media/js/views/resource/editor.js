@@ -87,6 +87,7 @@ require([
             formList: formList,
             formView: formView,
             openRelatedResources: ko.observable(false),
+            rrLoaded: ko.observable(false),
             dirty: ko.computed(function() {
                 var dirty = false;
                 _.each(formView.formTiles(), function (tile) {
@@ -134,9 +135,28 @@ require([
                         loading(false);
                     },
                 });
+            },
+            renderSearch: function() {
+                var self = this;
+                $.ajax({
+                    type: "GET",
+                    url: arches.urls.resource_editor + data.resourceid,
+                    data: {'search': true, 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+                    success : function(data) {
+                         $('.related-resources-editor-container').html(data);
+                         ko.applyBindings(self, $('.related-resources-editor-container')[0]);
+                     }
+                });
             }
         }
     });
+
+    pageView.viewModel.openRelatedResources.subscribe(function(val){
+        if (pageView.viewModel.rrLoaded() === false) {
+            pageView.viewModel.rrLoaded(true)
+            pageView.viewModel.renderSearch()
+        }
+    })
 
     pageView.viewModel.searchResults.relationshipCandidates.subscribe(function () {
         if (!pageView.viewModel.openRelatedResources()) {

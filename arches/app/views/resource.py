@@ -18,11 +18,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid
 from django.http import HttpResponseNotFound
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.generic import View
 from django.forms.models import model_to_dict
+from django.template.loader import render_to_string
 from arches.app.models import models
 from arches.app.models.forms import Form
 from arches.app.models.card import Card
@@ -74,15 +76,17 @@ class ResourceEditorView(BaseManagerView):
         if self.action == 'copy':
             return self.copy(request, resourceid)
 
+
         if graphid is not None:
             resource_instance = Resource()
             resource_instance.graph_id = graphid
             resource_instance.save(**{'request':request})
             resource_instance.index()
             return redirect('resource_editor', resourceid=resource_instance.pk)
+
         if resourceid is not None:
             resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
-            resource_graphs = Graph.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
+            resource_graphs = models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
             graph = Graph.objects.get(graphid=resource_instance.graph.pk)
             relationship_type_values = get_resource_relationship_types()
             form = Form(resource_instance.pk)
@@ -117,7 +121,7 @@ class ResourceEditorView(BaseManagerView):
                 iconclass=resource_instance.graph.iconclass,
                 form=JSONSerializer().serialize(form),
                 forms=JSONSerializer().serialize(forms_w_cards),
-                datatypes_json=JSONSerializer().serialize(datatypes),
+                datatypes_json=JSONSerializer().serialize(datatypes, exclude=['iconclass']),
                 widgets=widgets,
                 date_nodes=date_nodes,
                 map_layers=map_layers,
@@ -126,7 +130,7 @@ class ResourceEditorView(BaseManagerView):
                 widgets_json=JSONSerializer().serialize(widgets),
                 resourceid=resourceid,
                 resource_graphs=resource_graphs,
-                graph_json=JSONSerializer().serialize(graph),
+                graph_json=JSONSerializer().serialize(graph, exclude=['iconclass', 'functions', 'name', 'description', 'deploymentfile', 'author', 'deploymentdate', 'version', 'isresource', 'isactive', 'iconclass', 'ontology']),
                 displayname=displayname,
                 resource_cards=JSONSerializer().serialize(resource_cards),
                 searchable_nodes=JSONSerializer().serialize(searchable_nodes),
@@ -141,6 +145,30 @@ class ResourceEditorView(BaseManagerView):
                 context['nav']['help'] = (_('Managing System Settings'),'help/system-settings-help.htm')
             else:
                 context['nav']['help'] = (_('Using the Resource Editor'),'help/resource-editor-help.htm')
+
+            tempcontext = self.get_context_data(
+                main_script=main_script,
+                resource_type=resource_instance.graph.name,
+                relationship_types=relationship_type_values,
+                datatypes_json=JSONSerializer().serialize(datatypes, exclude=['iconclass']),
+                widgets=widgets,
+                date_nodes=date_nodes,
+                map_layers=map_layers,
+                map_sources=map_sources,
+                geocoding_providers = geocoding_providers,
+                widgets_json=JSONSerializer().serialize(widgets),
+                resourceid=resourceid,
+                resource_graphs=resource_graphs,
+                graph_json=JSONSerializer().serialize(graph, exclude=['iconclass', 'functions', 'name', 'description', 'deploymentfile', 'author', 'deploymentdate', 'version', 'isresource', 'isactive', 'iconclass', 'ontology']),
+                resource_cards=JSONSerializer().serialize(resource_cards),
+                searchable_nodes=JSONSerializer().serialize(searchable_nodes),
+                saved_searches=JSONSerializer().serialize(settings.SAVED_SEARCHES),
+            )
+
+            if request.is_ajax() and request.GET.get('search') == 'true':
+                html = render_to_string('views/search/search-base-manager.htm', tempcontext, request)
+                print html
+                return HttpResponse(html)
 
             return render(request, view_template, context)
 
