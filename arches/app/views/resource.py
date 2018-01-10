@@ -56,7 +56,8 @@ class ResourceListView(BaseManagerView):
         context['nav']['icon'] = "fa fa-bookmark"
         context['nav']['title'] = _("Resource Manager")
         context['nav']['login'] = True
-        context['nav']['help'] = (_('Creating Resources'),'help/resource-editor-landing-help.htm')
+        context['nav']['help'] = (_('Creating Resources'),'help/base-help.htm')
+        context['help'] = 'resource-editor-landing-help'
 
         return render(request, 'views/resource.htm', context)
 
@@ -147,9 +148,11 @@ class ResourceEditorView(BaseManagerView):
             context['nav']['title'] = graph.name
             context['nav']['menu'] = nav_menu
             if resourceid == settings.RESOURCE_INSTANCE_ID:
-                context['nav']['help'] = (_('Managing System Settings'),'help/system-settings-help.htm')
+                context['nav']['help'] = (_('Managing System Settings'),'help/base-help.htm')
+                context['help'] = 'system-settings-help'
             else:
-                context['nav']['help'] = (_('Using the Resource Editor'),'help/resource-editor-help.htm')
+                context['nav']['help'] = (_('Using the Resource Editor'),'help/base-help.htm')
+                context['help'] = 'resource-editor-help'
 
 
             return render(request, view_template, context)

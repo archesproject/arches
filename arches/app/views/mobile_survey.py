@@ -101,7 +101,9 @@ class MobileSurveyManagerView(BaseManagerView):
 
         context['nav']['title'] = _('Mobile Survey Manager')
         context['nav']['icon'] = 'fa-server'
-        context['nav']['help'] = (_('Mobile Survey Manager'),'help/mobile-survey-manager-help.htm')
+        context['nav']['help'] = (_('Mobile Survey Manager'),'help/base-help.htm')
+        context['help'] = 'mobile-survey-manager-help'
+
 
         return render(request, 'views/mobile-survey-manager.htm', context)
 
