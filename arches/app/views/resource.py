@@ -127,7 +127,8 @@ class ResourceEditorView(BaseManagerView):
                 iconclass=resource_instance.graph.iconclass,
                 form=JSONSerializer().serialize(form),
                 forms=JSONSerializer().serialize(forms_w_cards),
-                datatypes_json=JSONSerializer().serialize(datatypes, exclude=['iconclass']),
+                datatypes_json=JSONSerializer().serialize(datatypes, exclude=['iconclass', 'modulename', 'classname']),
+                datatypes=datatypes,
                 widgets=widgets,
                 date_nodes=date_nodes,
                 map_layers=map_layers,
@@ -138,10 +139,13 @@ class ResourceEditorView(BaseManagerView):
                 resource_graphs=resource_graphs,
                 graph_json=JSONSerializer().serialize(graph, exclude=['iconclass', 'functions', 'name', 'description', 'deploymentfile', 'author', 'deploymentdate', 'version', 'isresource', 'isactive', 'iconclass', 'ontology']),
                 displayname=displayname,
-                resource_cards=JSONSerializer().serialize(resource_cards),
-                searchable_nodes=JSONSerializer().serialize(searchable_nodes),
+                resource_cards=JSONSerializer().serialize(resource_cards, exclude=['description','instructions','active','isvisible']),
+                searchable_nodes=JSONSerializer().serialize(searchable_nodes, exclude=['description', 'ontologyclass','isrequired', 'issearchable', 'istopnode']),
                 saved_searches=JSONSerializer().serialize(settings.SAVED_SEARCHES),
             )
+
+            from pprint import pprint as pp
+            pp(context['widgets_json'])
 
             if graph.iconclass:
                 context['nav']['icon'] = graph.iconclass
