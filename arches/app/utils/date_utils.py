@@ -1,5 +1,5 @@
 import calendar
-from edtf import parse_edtf
+from edtf import parse_edtf, text_to_edtf
 from edtf.parser.parser_classes import Date, DateAndTime, Interval, Unspecified, \
     UncertainOrApproximate, Level1Interval, LongYear, Season, \
     PartialUncertainOrApproximate, PartialUnspecified, OneOfASet, \
@@ -10,7 +10,6 @@ class SortableDateRange(object):
     def __init__(self):
         self.lower = None
         self.upper = None
-
 
 class ExtendedDateFormat(SortableDateRange):
     def __init__(self, date=None):
@@ -23,8 +22,11 @@ class ExtendedDateFormat(SortableDateRange):
         
         try:
             self.parse(date)
-        except Exception as err:
-            self.error = err
+        except:
+            try:
+                self.parse(text_to_edtf(self.orig_date))
+            except Exception as err:
+                self.error = err
 
     def parse(self, date=None):
         if date == None:
