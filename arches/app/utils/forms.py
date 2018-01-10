@@ -49,11 +49,12 @@ class ArchesUserCreationForm(UserCreationForm):
 
     def clean(self):
         cleaned_data = super(ArchesUserCreationForm, self).clean()
-        if User.objects.filter(email=cleaned_data['email']).count() > 0:
-            self.add_error('email', forms.ValidationError(
-                _('This email address has already been regisitered with the system. If you forgot your password, click the "exit" link below and go to the login page to reset your password.'),
-                code='unique',
-            ))
+        if 'email' in cleaned_data:
+            if User.objects.filter(email=cleaned_data['email']).count() > 0:
+                self.add_error('email', forms.ValidationError(
+                    _('This email address has already been regisitered with the system. If you forgot your password, click the "exit" link below and go to the login page to reset your password.'),
+                    code='unique',
+                ))
 
 class ArchesUserProfileForm(ArchesUserCreationForm):
     """
