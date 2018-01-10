@@ -2465,6 +2465,17 @@ div.dropdown-menu.open {
     z-index: 100000001;
 }
 
+.resource-editor-search.loading-mask {
+    position: relative;
+    opacity: .5;
+    background-color: gray;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100000000;
+}
+
 .list-divider-dark {
     border-bottom: 1px solid rgba(0, 0, 0, 0.4);
 }

@@ -78,6 +78,7 @@ require([
     var pageView = new SearchBaseManagerView({
         viewModel:{
             loading: loading,
+            loadingSearch: ko.observable(false),
             cardLoading: cardLoading,
             displayName: displayName,
             resourceEditorContext: true,
@@ -138,13 +139,16 @@ require([
             },
             renderSearch: function() {
                 var self = this;
+                var el = $('.related-resources-editor-container');
+                self.loadingSearch(true);
                 $.ajax({
                     type: "GET",
                     url: arches.urls.resource_editor + data.resourceid,
                     data: {'search': true, 'csrfmiddlewaretoken': '{{ csrf_token }}'},
                     success : function(data) {
-                         $('.related-resources-editor-container').html(data);
-                         ko.applyBindings(self, $('.related-resources-editor-container')[0]);
+                         self.loadingSearch(false);
+                         el.html(data);
+                         ko.applyBindings(self, el[0]);
                      }
                 });
             }

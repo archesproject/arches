@@ -85,6 +85,11 @@ class ResourceEditorView(BaseManagerView):
             return redirect('resource_editor', resourceid=resource_instance.pk)
 
         if resourceid is not None:
+
+            if request.is_ajax() and request.GET.get('search') == 'true':
+                html = render_to_string('views/search/search-base-manager.htm', {'statement':'shozbot'}, request)
+                return HttpResponse(html)
+
             resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
             resource_graphs = models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
             graph = Graph.objects.get(graphid=resource_instance.graph.pk)
@@ -146,29 +151,6 @@ class ResourceEditorView(BaseManagerView):
             else:
                 context['nav']['help'] = (_('Using the Resource Editor'),'help/resource-editor-help.htm')
 
-            tempcontext = self.get_context_data(
-                main_script=main_script,
-                resource_type=resource_instance.graph.name,
-                relationship_types=relationship_type_values,
-                datatypes_json=JSONSerializer().serialize(datatypes, exclude=['iconclass']),
-                widgets=widgets,
-                date_nodes=date_nodes,
-                map_layers=map_layers,
-                map_sources=map_sources,
-                geocoding_providers = geocoding_providers,
-                widgets_json=JSONSerializer().serialize(widgets),
-                resourceid=resourceid,
-                resource_graphs=resource_graphs,
-                graph_json=JSONSerializer().serialize(graph, exclude=['iconclass', 'functions', 'name', 'description', 'deploymentfile', 'author', 'deploymentdate', 'version', 'isresource', 'isactive', 'iconclass', 'ontology']),
-                resource_cards=JSONSerializer().serialize(resource_cards),
-                searchable_nodes=JSONSerializer().serialize(searchable_nodes),
-                saved_searches=JSONSerializer().serialize(settings.SAVED_SEARCHES),
-            )
-
-            if request.is_ajax() and request.GET.get('search') == 'true':
-                html = render_to_string('views/search/search-base-manager.htm', tempcontext, request)
-                print html
-                return HttpResponse(html)
 
             return render(request, view_template, context)
 
