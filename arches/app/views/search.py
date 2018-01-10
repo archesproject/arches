@@ -57,7 +57,7 @@ class SearchView(BaseManagerView):
         map_layers = models.MapLayer.objects.all()
         map_sources = models.MapSource.objects.all()
         date_nodes = models.Node.objects.filter(datatype='date', graph__isresource=True, graph__isactive=True)
-        resource_graphs = Graph.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
+        resource_graphs = models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
         searchable_datatypes = [d.pk for d in models.DDataType.objects.filter(issearchable=True)]
         searchable_nodes = models.Node.objects.filter(graph__isresource=True, graph__isactive=True, datatype__in=searchable_datatypes, issearchable=True)
         resource_cards = models.CardModel.objects.filter(graph__isresource=True, graph__isactive=True)
@@ -93,7 +93,8 @@ class SearchView(BaseManagerView):
         context['nav']['title'] = _('Search')
         context['nav']['icon'] = 'fa-search'
         context['nav']['search'] = False
-        context['nav']['help'] = (_('Searching the Arches Database'),'help/search-help.htm')
+        context['nav']['help'] = (_('Searching the Arches Database'),'help/base-help.htm')
+        context['help'] = 'search-help'
 
         return render(request, 'views/search.htm', context)
 

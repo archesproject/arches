@@ -43,6 +43,10 @@ def function_templates(request, template):
 def templates(request, template):
     return render(request, template)
 
+def help_templates(request):
+    template = request.GET.get('template')
+    return render(request, 'help/%s.htm' % template)
+
 def custom_404(request):
     request = None
     return render(request, 'errors/404.htm')

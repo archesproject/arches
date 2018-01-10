@@ -78,6 +78,7 @@ require([
     var pageView = new SearchBaseManagerView({
         viewModel:{
             loading: loading,
+            loadingSearch: ko.observable(false),
             cardLoading: cardLoading,
             displayName: displayName,
             resourceEditorContext: true,
@@ -87,6 +88,7 @@ require([
             formList: formList,
             formView: formView,
             openRelatedResources: ko.observable(false),
+            rrLoaded: ko.observable(false),
             dirty: ko.computed(function() {
                 var dirty = false;
                 _.each(formView.formTiles(), function (tile) {
@@ -134,9 +136,31 @@ require([
                         loading(false);
                     },
                 });
+            },
+            renderSearch: function() {
+                var self = this;
+                var el = $('.related-resources-editor-container');
+                self.loadingSearch(true);
+                $.ajax({
+                    type: "GET",
+                    url: arches.urls.resource_editor + data.resourceid,
+                    data: {'search': true, 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+                    success : function(data) {
+                         self.loadingSearch(false);
+                         el.html(data);
+                         ko.applyBindings(self, el[0]);
+                     }
+                });
             }
         }
     });
+
+    pageView.viewModel.openRelatedResources.subscribe(function(val){
+        if (pageView.viewModel.rrLoaded() === false) {
+            pageView.viewModel.rrLoaded(true)
+            pageView.viewModel.renderSearch()
+        }
+    })
 
     pageView.viewModel.searchResults.relationshipCandidates.subscribe(function () {
         if (!pageView.viewModel.openRelatedResources()) {
