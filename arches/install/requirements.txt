@@ -5,7 +5,7 @@ rdflib==4.2.2
 rdflib-jsonld==0.4.0
 unicodecsv==0.14.1
 PyYAML==3.12
-pyshp==1.2.3
+pyshp==1.2.12
 pycrypto==2.6.1
 django-guardian==1.4.9
 TileStache==1.51.6
