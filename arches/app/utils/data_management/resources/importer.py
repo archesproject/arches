@@ -115,7 +115,6 @@ class BusinessDataImporter(object):
                         zipfile = ZipFile(StringIO(open(file[0], 'r').read()))
                         filenames = [y for y in sorted(zipfile.namelist()) for ending in ['dbf', 'prj', 'shp', 'shx'] if y.endswith(ending)]
                         dbf, prj, shp, shx = [StringIO(zipfile.read(filename)) for filename in filenames]
-                        shape_file = shapefile.Reader(shp=shp, shx=shx, dbf=dbf)
                         self.business_data = self.shape_to_csv(path)
                     elif self.file_format == 'shp':
                         self.business_data = self.shape_to_csv(path)
