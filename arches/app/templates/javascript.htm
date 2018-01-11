@@ -1,5 +1,5 @@
-
 {% load staticfiles %}
+{% load l10n %}
 {% load i18n %}
 
 <script>
@@ -232,8 +232,8 @@
             mapboxSprites: '{{ map_info.mapbox_sprites }}',
             mapboxGlyphs: '{{ map_info.mapbox_glyphs }}',
             hexBinBounds: {{ map_info.hex_bin_bounds }},
-            mapDefaultX: {{ map_info.x }},
-            mapDefaultY: {{ map_info.y }},
+            mapDefaultX: {{ map_info.x|unlocalize }},
+            mapDefaultY: {{ map_info.y|unlocalize }},
             mapDefaultZoom: {{ map_info.zoom }},
             mapDefaultMinZoom: {{ map_info.map_min_zoom }},
             mapDefaultMaxZoom: {{ map_info.map_max_zoom }},
@@ -254,8 +254,8 @@
                 'activated': {{ map_layer.activated|lower }},
                 'addtomap': {{ map_layer.addtomap|lower }},
                 'is_resource_layer': false,
-                'centerx': {{ map_layer.centerx|default_if_none:"null" }},
-                'centery': {{ map_layer.centery|default_if_none:"null" }},
+                'centerx': {{ map_layer.centerx|default_if_none:"null"|unlocalize }},
+                'centery': {{ map_layer.centery|default_if_none:"null"|unlocalize }},
                 'zoom': {{ map_layer.zoom|default_if_none:"null" }}
             },{% endfor %}{% for resource_map_layer in resource_map_layers %}{
                 'maplayerid': '{{ resource_map_layer.nodeid }}',
