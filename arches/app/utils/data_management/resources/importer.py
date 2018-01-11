@@ -6,7 +6,6 @@ import uuid
 import importlib
 import datetime
 import unicodecsv
-from zipfile import ZipFile
 from time import time
 from copy import deepcopy
 from optparse import make_option
@@ -34,6 +33,7 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.management.commands import utils
+from arches.setup import unzip_file
 from formats.archesjson import JsonReader
 from formats.csvfile import CsvReader
 from formats.archesfile import ArchesFileReader
@@ -112,10 +112,26 @@ class BusinessDataImporter(object):
                         data = unicodecsv.DictReader(open(file[0], 'rU'), encoding='utf-8-sig', restkey='ADDITIONAL', restval='MISSING')
                         self.business_data = list(data)
                     elif self.file_format == 'zip':
-                        zipfile = ZipFile(StringIO(open(file[0], 'r').read()))
-                        filenames = [y for y in sorted(zipfile.namelist()) for ending in ['dbf', 'prj', 'shp', 'shx'] if y.endswith(ending)]
-                        dbf, prj, shp, shx = [StringIO(zipfile.read(filename)) for filename in filenames]
-                        self.business_data = self.shape_to_csv(path)
+                        shp_zipfile = os.path.basename(path)
+                        shp_zipfile_name = os.path.splitext(shp_zipfile)[0]
+                        unzip_dir = os.path.join(os.path.dirname(path),shp_zipfile_name)
+                        unzip_file(path,unzip_dir)
+                        shp = [i for i in os.listdir(unzip_dir) if i.endswith(".shp")]
+                        if len(shp) == 0:
+                            print '*'*80
+                            print "ERROR: There is no shapefile in this zipfile."
+                            print '*'*80
+                            exit()
+                        elif len(shp) > 1:
+                            print '*'*80
+                            print "ERROR: There are multiple shapefiles in this zipfile. Please load each individually:"
+                            for s in shp:
+                                print "\npython manage.py packages -o import_business_data -s {0} -c {1} -ow [append or overwrite]".format(
+                                    os.path.join(unzip_dir,s),mapping_file[0])
+                            print '*'*80
+                            exit()
+                        shp_path = os.path.join(unzip_dir,shp[0])
+                        self.business_data = self.shape_to_csv(shp_path)
                     elif self.file_format == 'shp':
                         self.business_data = self.shape_to_csv(path)
                 else:
