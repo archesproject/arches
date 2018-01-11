@@ -5,6 +5,7 @@ import sys
 import math
 import json
 from django.http import HttpResponse
+from django.core.urlresolvers import reverse
 from ModestMaps.Core import Coordinate
 from ModestMaps.Geo import Location
 from arches.app.datatypes import datatypes
@@ -40,7 +41,7 @@ def get_tileserver_config(layer_id, request=None):
 
 
 def handle_request(request):
-    path_info = request.path.replace('/tileserver/', '')
+    path_info = request.path.replace(reverse('tileserver') + '/', '')
     layer_id = path_info.split('/')[0]
     config_dict = get_tileserver_config(layer_id, request=request)
     config = TileStache.Config.buildConfiguration(config_dict)
