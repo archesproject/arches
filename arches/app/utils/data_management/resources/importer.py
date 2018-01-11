@@ -6,9 +6,7 @@ import uuid
 import importlib
 import datetime
 import unicodecsv
-import shapefile
 from zipfile import ZipFile
-from shapely.geometry import shape
 from time import time
 from copy import deepcopy
 from optparse import make_option
@@ -118,9 +116,9 @@ class BusinessDataImporter(object):
                         filenames = [y for y in sorted(zipfile.namelist()) for ending in ['dbf', 'prj', 'shp', 'shx'] if y.endswith(ending)]
                         dbf, prj, shp, shx = [StringIO(zipfile.read(filename)) for filename in filenames]
                         shape_file = shapefile.Reader(shp=shp, shx=shx, dbf=dbf)
-                        self.business_data = self.shape_to_csv(shape_file)
+                        self.business_data = self.shape_to_csv(path)
                     elif self.file_format == 'shp':
-                        self.business_data = self.shape_to_csv(shapefile.Reader(file[0]))
+                        self.business_data = self.shape_to_csv(path)
                 else:
                     print str(file) + ' is not a valid file'
             else:
@@ -163,14 +161,15 @@ class BusinessDataImporter(object):
                 datatype_instance = datatype_factory.get_instance(datatype.datatype)
                 datatype_instance.after_update_all()
 
-    def shape_to_csv(self, shapefile):
+    def shape_to_csv(self, shp_path):
         csv_records = []
-        field_names = [field[0] for field in shapefile.fields[1:]]
-        for feature in shapefile.shapeRecords():
-            csv_record = (dict(zip(field_names, feature.record)))
-            csv_record['geom'] = shape(feature.shape.__geo_interface__).wkt
+        ds = DataSource(shp_path)
+        layer = ds[0]
+        field_names = layer.fields
+        for feat in layer:
+            csv_record = dict((f, feat.get(f)) for f in field_names)
+            csv_record['geom'] = feat.geom.wkt
             csv_records.append(csv_record)
-
         return csv_records
 
 class ResourceLoader(object):

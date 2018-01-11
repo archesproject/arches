@@ -19,7 +19,6 @@ from django.contrib.gis.geos import fromstr
 from django.contrib.gis.geos import Polygon
 from django.core.exceptions import ValidationError
 from django.db import connection, transaction
-from shapely.geometry import asShape
 from elasticsearch import Elasticsearch
 
 EARTHCIRCUM = 40075016.6856
