@@ -332,7 +332,7 @@ class BaseDataType(object):
         """
         pass
 
-    def manage_files(self, previously_saved_tile, current_tile, request, node):
+    def handle_request(self, current_tile, request, node):
         """
         Updates files
         """

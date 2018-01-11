@@ -130,6 +130,8 @@ class Tile(models.TileModel):
                 node = models.Node.objects.get(nodeid=nodeid)
                 datatype = datatype_factory.get_instance(node.datatype)
                 datatype.convert_value(self, nodeid)
+                if request is not None:
+                    datatype.handle_request(self, request, node)
                 if self.data[nodeid] == None and node.isrequired == True:
                     missing_nodes.append(node.name)
 

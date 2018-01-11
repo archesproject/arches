@@ -818,7 +818,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
 
 class FileListDataType(BaseDataType):
-    def manage_files(self, previously_saved_tile, current_tile, request, node):
+    def handle_request(self, current_tile, request, node):
+        previously_saved_tile = models.TileModel.objects.filter(pk=current_tile.tileid)
         if previously_saved_tile.count() == 1:
             if previously_saved_tile[0].data[str(node.pk)] != None:
                 for previously_saved_file in previously_saved_tile[0].data[str(node.pk)]:
@@ -903,8 +904,9 @@ class CSVChartJsonDataType(FileListDataType):
     def __init__(self, model=None):
         super(CSVChartJsonDataType, self).__init__(model=model)
 
-    def manage_files(self, previously_saved_tile, current_tile, request, node):
+    def handle_request(self, current_tile, request, node):
         try:
+            previously_saved_tile = models.TileModel.objects.filter(pk=current_tile.tileid)
             if previously_saved_tile.count() == 1:
                 for previously_saved_file in previously_saved_tile[0].data[str(node.pk)]['files']:
                     previously_saved_file_has_been_removed = True
