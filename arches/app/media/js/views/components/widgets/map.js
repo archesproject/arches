@@ -208,7 +208,7 @@ define([
             this.clearGeometries = function(val, key) {
                 if (self.draw !== undefined && val === null) {
                     self.draw.deleteAll()
-                } else if (val.features) {
+                } else if (val !== null && val.features) {
                     if (val.features.length === 0 && self.context === 'search-filter') {
                         self.searchBuffer(null);
                         self.updateSearchQueryLayer([]);
