@@ -248,7 +248,6 @@ class Resource(models.ResourceInstance):
             'resource_instance': self,
             'resource_relationships': [],
             'related_resources': [],
-            'root_node_config': models.Node.objects.filter(graph_id=self.graph.graphid).filter(istopnode=True)[0].config,
             'node_config_lookup': node_config_lookup
         }
         se = SearchEngineFactory().create()

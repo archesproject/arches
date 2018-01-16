@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import uuid, importlib
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
+from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from arches.app.models.system_settings import settings
 from arches.app.utils.response import JSONResponse
@@ -28,7 +29,7 @@ from arches.app.views.tileserver import clean_resource_cache
 from django.http import HttpResponseNotFound
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.views.generic import View
 from django.db import transaction
 
@@ -41,6 +42,15 @@ class TileData(View):
             json = request.POST.get('data', None)
             if json != None:
                 data = JSONDeserializer().deserialize(json)
+                try:
+                    models.ResourceInstance.objects.get(pk=data['resourceinstance_id'])
+                except ObjectDoesNotExist:
+                    resource = Resource()
+                    resource.resourceinstanceid = data['resourceinstance_id']
+                    graphid = models.Node.objects.filter(nodegroup=data['nodegroup_id'])[0].graph.graphid
+                    resource.graph_id = graphid
+                    resource.save()
+                    resource.index()
                 tile_id = data['tileid']
                 if tile_id != None and tile_id != '':
                     old_tile = Tile.objects.get(pk=tile_id)
