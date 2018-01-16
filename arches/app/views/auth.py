@@ -31,7 +31,7 @@ from django.utils.http import urlencode
 from django.core.mail import EmailMultiAlternatives
 from django.core.urlresolvers import reverse
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 import django.contrib.auth.password_validation as validation
@@ -158,6 +158,8 @@ class ConfirmSignupView(View):
         if datetime.fromtimestamp(userinfo['ts']) + timedelta(days=1) >= datetime.fromtimestamp(int(time.time())):
             if form.is_valid():
                 user = form.save()
+                crowdsource_editor_group = Group.objects.get(name=settings.USER_SIGNUP_GROUP)
+                user.groups.add(crowdsource_editor_group)
                 return redirect('auth')
             else:
                 try:

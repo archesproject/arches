@@ -365,6 +365,9 @@ ENABLE_CAPTCHA = True
 NOCAPTCHA = True
 # RECAPTCHA_PROXY = 'http://127.0.0.1:8000'
 
+# group to assign users who self sign up via the web ui
+USER_SIGNUP_GROUP = 'Crowdsource Editor'
+
 #######################################
 ###       END STATIC SETTINGS       ###
 #######################################
