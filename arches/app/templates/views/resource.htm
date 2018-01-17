@@ -84,7 +84,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!-- /ko -->
                         <!-- ko if: !disable_instance_creation-->
                         <div class="pull-right">
-                            <a href="#" class="btn btn-primary btn-labeled fa fa-plus" role="button" data-bind="attr: { href: $parent.arches.urls.add_resource(graphid), 'data-arches-graphid': graphid}, css: { 'disabled': disable_instance_creation }">{% trans "Create Resource" %}</a>
+                            <a href="#" class="btn btn-primary btn-labeled fa fa-plus" role="button" data-bind="attr: { href: $parent.arches.urls.add_resource(UUID.generate, graphid), 'data-arches-graphid': graphid}, css: { 'disabled': disable_instance_creation }">{% trans "Create Resource" %}</a>
                         </div>
                         <!-- /ko -->
                     </div>

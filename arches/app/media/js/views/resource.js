@@ -2,10 +2,11 @@ require([
     'jquery',
     'underscore',
     'knockout',
+    'uuid',
     'arches',
     'views/base-manager',
-    'bindings/chosen'
-], function($, _, ko, arches, BaseManagerView) {
+    'bindings/chosen',
+], function($, _, ko, uuid, arches, BaseManagerView) {
     /**
     * a BaseManagerView representing the resource listing and recent edits pages
     */
@@ -21,7 +22,7 @@ require([
 
             this.viewModel.graphId.subscribe(function (graphid) {
                 if(graphid && graphid !== ""){
-                    self.viewModel.navigate(arches.urls.add_resource(graphid));
+                    self.viewModel.navigate(arches.urls.add_resource(uuid.UUID.generate(), graphid));
                 }
             });
 
