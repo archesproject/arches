@@ -45,7 +45,6 @@ from arches.app.views.concept import Concept
 from arches.app.datatypes.datatypes import DataTypeFactory
 from elasticsearch import Elasticsearch
 
-# print system_settings
 
 @method_decorator(can_edit_resource_instance(), name='dispatch')
 class ResourceListView(BaseManagerView):
@@ -81,13 +80,13 @@ class ResourceEditorView(BaseManagerView):
         resource_instance_exists = False
 
         try:
-            resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
+            resource_instance = Resource.objects.get(pk=resourceid)
             resource_instance_exists = True
             graphid = resource_instance.graph.graphid
 
         except ObjectDoesNotExist:
             resource_instance = Resource()
-            resourceid = str(resource_instance.resourceinstanceid)
+            resource_instance.resourceinstanceid = resourceid
             resource_instance.graph_id = graphid
 
         if resourceid is not None:
@@ -96,8 +95,6 @@ class ResourceEditorView(BaseManagerView):
                 html = render_to_string('views/search/search-base-manager.htm', {}, request)
                 return HttpResponse(html)
 
-            resource_instance = Resource()
-            resource_instance.resourceinstanceid = uuid.UUID(resourceid)
             resource_graphs = models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
             graph = Graph.objects.get(graphid=graphid)
             relationship_type_values = get_resource_relationship_types()
@@ -119,7 +116,7 @@ class ResourceEditorView(BaseManagerView):
             widget_datatypes = [v.datatype for k, v in graph.nodes.iteritems()]
             widgets = widgets.filter(datatype__in=widget_datatypes)
 
-            if resource_instance_exists:
+            if resource_instance_exists == True:
                 displayname = Resource.objects.get(pk=resourceid).displayname
                 if displayname == 'undefined':
                     displayname = 'Unnamed Resource'
@@ -152,6 +149,7 @@ class ResourceEditorView(BaseManagerView):
                 resource_cards=JSONSerializer().serialize(resource_cards, exclude=['description','instructions','active','isvisible']),
                 searchable_nodes=JSONSerializer().serialize(searchable_nodes, exclude=['description', 'ontologyclass','isrequired', 'issearchable', 'istopnode']),
                 saved_searches=JSONSerializer().serialize(settings.SAVED_SEARCHES),
+                resource_instance_exists=resource_instance_exists
             )
 
             if graph.iconclass:
