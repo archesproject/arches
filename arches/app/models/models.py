@@ -842,7 +842,7 @@ class MobileSurveyModel(models.Model):
     description = models.TextField(null=True)
     bounds = models.MultiPolygonField(null=True)
     tilecache = models.TextField(null=True)
-    datadownloadconfig = JSONField(blank=True, null=True, default='{"download":false, "count":1000, "resources":[]}')
+    datadownloadconfig = JSONField(blank=True, null=True, default='{"download":false, "count":1000, "resources":[], "custom":null}')
 
     def __unicode__(self):
         return self.name
