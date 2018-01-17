@@ -16,6 +16,7 @@ require([
     var loading = ko.observable(false);
     var cardLoading = ko.observable(false);
     var displayName = ko.observable(data.displayName);
+    var resourceInstanceExists = ko.observable(data.resourceInstanceExists === "True" || false)
     var formList = new FormList({
         forms: ko.observableArray(data.forms)
     });
@@ -25,7 +26,8 @@ require([
         formid: formList.items()[0].formid,
         resourceid: data.resourceid,
         tiles: data.tiles,
-        blanks: data.blanks
+        blanks: data.blanks,
+        resourceexists: resourceInstanceExists
     });
 
     var loadForm = function(form) {
@@ -82,6 +84,7 @@ require([
             cardLoading: cardLoading,
             displayName: displayName,
             resourceEditorContext: true,
+            resourceInstanceExists: resourceInstanceExists,
             editingInstanceId: data.resourceid,
             relationship_types: data.relationship_types,
             graph: data.graph,
