@@ -15,7 +15,7 @@ To begin development or make a test installation of Arches, you will need the fo
 
 + **4gb memory (RAM)**
 	+ This recommendation is based on the fact that ElasticSearch requires 2gb to run, and as per `official ElasticSearch documentation <https://www.elastic.co/guide/en/elasticsearch/guide/current/heap-sizing.html#_give_less_than_half_your_memory_to_lucene>`_ no more than half of your system's memory should be dedicated to ElasticSearch.
-	+ In development, it's possible to force ElasticSearch to run with only 1gb of memory, as we have noted `here <https://github.com/archesproject/arches/wiki/Installing-and-Running-Elasticsearch#running-elasticsearch>`_.
+	+ In development, it's possible to force ElasticSearch to run with only 1gb of memory, see `note 1 <https://github.com/archesproject/arches/wiki/Installing-and-Running-Elasticsearch#running-elasticsearch>`_.
 	+ In production, you may want to increase your memory, and allow ElasticSearch to use `up to 32gb of memory <https://www.elastic.co/guide/en/elasticsearch/guide/current/heap-sizing.html#compressed_oops>`_.
 
 *Please note that Arches v4 is only fully supported in Chrome.*
@@ -69,10 +69,6 @@ Once installed, find Java on your operating system. It will be somewhere like ``
 **pip** - Python 2.7.13 comes with pip already, but we do recommend upgrading pip::
 
     python -m pip install --upgrade pip
-
-**Shapely** - On Windows, the Shapely python library **doesn't install correctly by default**. We recommend that *after* creating and activating your virtual environment but *before* installing Arches, you download the appropriate file for your system architecture (32-bit or 64-bit), Shapely-1.5.17-cp27-cp27m-<win32 or win-amd64>.whl, from `here <http://www.lfd.uci.edu/~gohlke/pythonlibs/#shapely>`_ and then run::
-
-    pip install path\to\Shapely....whl
     
 **Elasticsearch** - Take care of this after you have Arches fully installed. Use the command recommended in `Installing and Running Elasticsearch <https://github.com/archesproject/arches/wiki/Installing-and-Running-Elasticsearch>`_.
 
