@@ -8,7 +8,7 @@ Resource Manager
 
 You may create new Resources only if you have access to the Resource Manager page. From there, you will begin by choosing which Resource Model you would like to use. Note that a Resource Model must have its status set to **active** and must have **at least one menu** added it in order for it to be used.
 
-.. image:: images/Resource-Manager.png
+.. image:: ../arches/app/media/img/help/rtd/Resource-Manager.png
 
 *Your Resource Manager page may look different, depending on what Resource Models you have set up in your database.*
 
@@ -19,7 +19,7 @@ Resource Editor
 The Resource Editor is used to create new or edit existing Resources. On the left-hand side of the page you are presented with the list of Menus associated with this Resource Model, each holding one or more data-entry cards. Cards may be further divided, with tabs appearing across the top.
 
     .. image:: ../arches/app/media/img/help/switch_menus.gif
-       :target: _images/switch_menus.gif
+       :target: ../arches/app/media/img/help/switch_menus.gif
 
 The procedure for entering data depends on the widget: sometimes you'll enter text, sometimes select from a dropdown menu, or sometimes record a location by drawing geometry on a map. One thing to keep in mind generally is that certain attributes are allowed to have multiple values recorded, while some will only allow one value.
 
