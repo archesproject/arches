@@ -199,6 +199,293 @@ To import a shapefile use the same command as csv import, simply point to your s
 
 **Note:** More complex geometries may encounter a ``mapping_parser_exception`` error. This error occurs when a geometry is not valid in elasticsearch. To resolve this, first make sure your geometry is valid using ArcMap, QGIS, or PostGIS. Next, you can modify the precision of your geometry to 5 decimals or you can simplify your geometry using the QGIS simplify geometry geoprocessing tool, or the PostGIS st_snaptogrid function.
 
+Importing JSON Data
+-------------------
+
+JSON import of business data is primarily intended for transferring business data between arches instances. Because of this it's especially user-friendly to create or interpret, but doing so is not impossible.
+
+First, there are at least two ways you can familiarize yourself with the format. The system settings in an Arches package is stored in this json format, you can open one of those up and take a look. Perhaps a better way in your case is to create some business data via the ui in your instance of arches and export it to the json format using the business data export command defined here https://github.com/archesproject/arches/wiki/Command-Line-Reference#export-commands. This can act as a template json for data creation. For the rest of this section it may be helpful to have one of these files open to make it easier to follow along. 
+
+General structure of the entire file::
+
+    {
+        "business_data": {
+            "resources": [
+                {
+                    "resourceinstance": {. . .},
+                    "tiles": [. . .],
+                }
+            ]
+        }
+    }
+
+The json format is primarily a representation of the tiles table in the arches postgres database with some information about the resource instance(s) included. Within the business_data object of the json are two objects, the tiles object and the resourceinstance object. Let's start with the resource instance object.
+
+Structure of the ``resourceinstance`` object::
+
+    {
+        "graph_id": "<uuid,
+        "resourceinstanceid": uuid,
+        "legacyid": uuid or text
+    }
+    
+* ``graph_id`` - the id of the resource model for which this data was created
+* ``resourceinstanceid`` - the unique identifier of this resource instance within Arches (this will need to be unique for every resource in Arches)
+* ``legacyid`` - an identifier that was used for this resource before its inclusion in Arches. This can be the same as the resourceinstanceid (this is the case when you provide a UUID to the ResourceID column in a csv) or it can be another id. Either way it has to be unique among every resource in Arches.
+
+The ``tiles`` object is a list of tiles that compose a resource instance. The ``tiles`` object is a bit more complicated than the ``resourceinstance`` object, and the structure can vary depending on the cardinality of your nodes. The following cardinality examples will be covered below: 
+
+#. `1 card`_
+#. `n cards`_
+#. `1 parent card with 1 child card`_
+#. `1 parent card with n child cards`_
+#. `n parent cards with 1 child card`_
+#. `n parent cards with n child cards`_
+
+But first a description of the general structure of a single tile::
+
+    {
+        "tileid": "<uuid>",
+        "resourceinstance_id": "<uuid>",
+        "nodegroupid": "<uuid>",
+        "sortorder": 0,
+        "parenttile_id": "<uuid>" or null,
+        "data": {. . .}
+    }
+
+* ``tileid`` - unique identifier of the tile this is the primary key in the tiles table and must be a unique uuid
+* ``resourceinstance_id`` - the uuid corresponding to the instance this tile belongs to (this should be the same as the resourceinstance_id from the resourceinstance object.
+* ``nodegroup_id`` - the node group for which the nodes within the data array participate
+* ``sortorder`` - the sort order of this data in the form/report relative to other tiles (only applicable if cardinality is n)
+* ``parenttile_id`` - unique identifier of the parenttile of this tile (will be null if this is a parent tile or the tile has no parent)
+* ``data`` - json structure of a node group including the nodeid and data populating that node. For example::
+
+        {
+            "<uuid for building name node>":"Smith Cottage"
+        }
+
+The tile object is tied to a resource model in two ways: 1) through the nodegroup_id 2) in the data object where nodeids are used as keys for the business data itself.
+
+Now for a detailed look at the actual contents of ``tiles``. Note that below we are using simplified values for ``tileid``, like ``"A"`` and ``"B"``, to clearly illustrate parent/child relationships. In reality these must be valid UUIDs.
+
+1 card
+^^^^^^
+
+1: There is one and only one instance of this nodegroup/card in a resource::
+
+    [
+        {
+            "tileid": "A",
+            "resourceinstance_id": "<uuid from resourceinstance.resourceinstanceid>",
+            "nodegroupid": "<uuid from resource model>",
+            "sortorder": 0,
+            "parenttile_id": null,
+            "data" {
+                "nodeid": "some data",
+                "nodeid": "some other data"
+            }
+        }
+    ]
+    
+This structure represents a tile for a nodegroup (consisting of two nodes) with no parents collecting data with a cardinality of 1.
+
+n cards
+^^^^^^^
+
+n: There are multiple instances of this nodegroup/card in a resource::
+
+    [
+        {
+            "tileid": "A",
+            "resourceinstance_id": "<uuid from resourceinstance.resourceinstanceid">,
+            "nodegroupid": "<uuid from resource model">,
+            "sortorder": 0,
+            "parenttile_id": null,
+            "data" {
+                "nodeid": "some data",
+                "nodeid": "some other data"
+            }
+        },
+            {
+            "tileid": "B",
+            "resourceinstance_id": "<uuid from resourceinstance.resourceinstanceid>",
+            "nodegroupid": "<uuid from resource model>",
+            "sortorder": 0,
+            "parenttile_id": null,
+            "data" {
+                "nodeid": "more data",
+                "nodeid": "more other data"
+            }
+        }
+    ]
+
+1 parent card with 1 child card
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1-1: One and only one parent nodegroup/card contains one and only one child nodegroup/card::
+    
+    [
+        {
+            "tileid": "A",
+            "resourceinstance_id": "<uuid from resourceinstance.resourceinstanceid>",
+            "nodegroupid": "<uuid from resource model>",
+            "sortorder": 0,
+            "parenttile_id": null,
+            "data" {}
+        },
+        {
+            "tileid": "X",
+            "resourceinstance_id": "<uuid from resourceinstance.resourceinstanceid>",
+            "nodegroupid": "<uuid from resource model>",
+            "sortorder": 0,
+            "parenttile_id": "A",
+            "data" {
+                "nodeid": "data",
+                "nodeid": "other data"
+            }
+        }
+    ]
+
+1 parent card with n child cards
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    
+1-n: One and only one parent nodegroup/card containing multiple instances of child nodegroups/cards::
+
+    [
+        {
+            "tileid": "A",
+            "resourceinstance_id": "<uuid from resourceinstance.resourceinstanceid>",
+            "nodegroupid": "<uuid from resource model>",
+            "sortorder": 0,
+            "parenttile_id": null,
+            "data" {}
+        },
+        {
+            "tileid": "X",
+            "resourceinstance_id": "<uuid from resourceinstance.resourceinstanceid>",
+            "nodegroupid": "<uuid from resource model>",
+            "sortorder": 0,
+            "parenttile_id": "A",
+            "data" {
+                "nodeid": "data",
+                "nodeid": "other data"
+            }
+        },
+        {
+            "tileid": "Y",
+            "resourceinstance_id": "<uuid from resourceinstance.resourceinstanceid>",
+            "nodegroupid": "<uuid from resource model>",
+            "sortorder": 0,
+            "parenttile_id": "A",
+            "data" {
+                "nodeid": "more data",
+                "nodeid": "more other data"
+            }
+        }
+    ]
+
+n parent cards with 1 child card
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+n-1: Many parent nodegroups/cards each with one child nodegroup/card::
+
+    [
+        {
+            "tileid": "A",
+            "resourceinstance_id": "<uuid from resourceinstance.resourceinstanceid>",
+            "nodegroupid": "<uuid from resource model>",
+            "sortorder": 0,
+            "parenttile_id": null,
+            "data" {}
+        },
+        {
+            "tileid": "X",
+            "resourceinstance_id": "<uuid from resourceinstance.resourceinstanceid>",
+            "nodegroupid": "<uuid from resource model>",
+            "sortorder": 0,
+            "parenttile_id": "A",
+            "data" {
+                "nodeid": "data",
+                "nodeid": "other data"
+            }
+        },
+        {
+            "tileid": "B",
+            "resourceinstance_id": "<uuid from resourceinstance.resourceinstanceid>",
+            "nodegroupid": "<uuid from resource model>",
+            "sortorder": 0,
+            "parenttile_id": null,
+            "data" {}
+        },
+        {
+            "tileid": "Y",
+            "resourceinstance_id": "<uuid from resourceinstance.resourceinstanceid>",
+            "nodegroupid": "<uuid from resource model>",
+            "sortorder": 0,
+            "parenttile_id": "B",
+            "data" {
+                "nodeid": "more data",
+                "nodeid": "more other data"
+            }
+        }
+    ]
+
+n parent cards with n child cards
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+n-n: Many parent nodegroups/cards containing many child nodegroups/cards::
+
+    [
+        {
+            "tileid": "A",
+            "resourceinstance_id": "<uuid from resourceinstance.resourceinstanceid>",
+            "nodegroupid": "<uuid from resource model>",
+            "sortorder": 0,
+            "parenttile_id": null,
+            "data" {}
+        },
+        {
+            "tileid": "X",
+            "resourceinstance_id": "<uuid from resourceinstance.resourceinstanceid>",
+            "nodegroupid": "<uuid from resource model>",
+            "sortorder": 0,
+            "parenttile_id": "A",
+            "data" {
+                "nodeid": "data",
+                "nodeid": "other data"
+            }
+        },
+        {
+            "tileid": "B",
+            "resourceinstance_id": "<uuid from resourceinstance.resourceinstanceid>",
+            "nodegroupid":  uuid from resource model,
+            "sortorder": 0,
+            "parenttile_id": null,
+            "data" {}
+        },
+        {
+            "tileid": "Y",
+            "resourceinstance_id": "<uuid from resourceinstance.resourceinstanceid>",
+            "nodegroupid": "<uuid from resource model>",
+            "sortorder": 0,
+            "parenttile_id": "B",
+            "data" {
+                "nodeid": "more data",
+                "nodeid": "more other data"
+            }
+        },
+        {
+            "tileid": "Z",
+            "resourceinstance_id": "<uuid from resourceinstance.resourceinstanceid>",
+            "nodegroupid": "<uuid from resource model>",
+            "sortorder": 0,
+            "parenttile_id": "B",
+            "data" {
+                "nodeid": "even more data",
+                "nodeid": even "more other data"
+            }
+        }
+    ]
 
 Exporting Arches Data
 ---------------------
