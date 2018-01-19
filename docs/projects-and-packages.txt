@@ -43,7 +43,7 @@ A package is an external collection of arches data (resource models, business da
 
 
 Loading a Package
-`````````````````
+^^^^^^^^^^^^^^^^^
 
 To load a package simply run the load_package command using your \*project's manage.py file:
 
@@ -94,7 +94,7 @@ If you are a developer running the latest arches you probably want to create a p
 
 
 Creating a New Package
-``````````````````````
+^^^^^^^^^^^^^^^^^^^^^^
 
 If you want to create additional projects with the same data or share your data with others that need to create similar projects, you probably want to create a package.
 
