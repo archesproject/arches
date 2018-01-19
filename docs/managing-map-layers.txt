@@ -47,4 +47,4 @@ Settings
 * Default search map - For basemaps, you can designate one to be the default. For overlays, you can choose whether a layer appears on the in the search map by default. Note that in the search map itself you can change the order of overlays.
 * Layer icon - Associate an icon with this layer
 
-If you are a developer interested in creating new map layers, please see `Adding New Map Layers`_.
+If you are a developer interested in creating new map layers, please see :ref:`Creating New Map Layers`.
