@@ -104,7 +104,7 @@ All CSV files must be accompanied by a **mapping file**. This is a JSON-structur
 
 To create a mapping file for a Resource Model in your database, go to the Arches Designer landing page. Find the Resource Model into which you plan to load resources, and choose Export Mapping File from the Manage menu.
 
-.. image:: images/create_mapping_file.gif
+.. image:: ../arches/app/media/img/help/rtd/create_mapping_file.gif
 
 Unzip the download, and you'll find a ``.mapping`` file as well as a ``...concepts.json`` file (more on the latter below). The contents of the mapping file will look something like this::
 
