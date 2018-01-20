@@ -1,5 +1,5 @@
 #######################
-Arches v4 Documentation
+Arches Documentation
 #######################
 
 .. toctree::
@@ -9,24 +9,27 @@ Arches v4 Documentation
     overview
 
 .. toctree::
-    :caption: User Documentation
+    :caption: Installation and Configuration
     :maxdepth: 2
 
     requirements-and-dependencies
     installation
-    projects-and-packages
     initial-configuration
-    managing-map-layers
+    projects-and-packages
+    
+.. toctree::
+    :caption: Using Arches
+    :maxdepth: 2
+
     managing-resources
-    using-the-arches-designer
     creating-resources
-    import-export
+    using-the-arches-designer
+    managing-map-layers
     ontologies-in-arches
     rdm
-    additional-configuration
 
 .. toctree::
-    :caption: Tutorials
+    :caption: User Tutorials
     :maxdepth: 2
 
     create-resource-model
@@ -35,6 +38,15 @@ Arches v4 Documentation
     create-menu
     add-function
     create-report
+    
+.. toctree::
+    :caption: Developing With Arches
+    :maxdepth: 2
+    
+    import-export
+    command-line-reference
+    additional-configuration
+    creating-new-map-layers
 
 .. toctree::
     :caption: Reference
