@@ -25,7 +25,6 @@ def convert_html(file_path):
                 line = line.replace('" %}',"")
                 line = line.replace('{% blocktrans %}',"")
                 line = line.replace('{% endblocktrans %}',"")
-                line = line.replace('{% endif %}',"")
                 line = line.replace("&nbsp;","")
                 if line.rstrip() == "":
                     continue
