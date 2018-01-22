@@ -614,7 +614,6 @@ class Concept(object):
         return self.get_preflabel(lang=lang).value
 
     def get_preflabel(self, lang=settings.LANGUAGE_CODE):
-        score = 0
         ranked_labels = []
         pref_labels = []
         max_weight = 0
