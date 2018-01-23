@@ -39,7 +39,8 @@ from arches.app.views.base import BaseManagerView
 class RDMView(BaseManagerView):
     def get(self, request, conceptid):
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
-        languages = models.DLanguage.objects.all()
+
+        languages = sort_languages(models.DLanguage.objects.all(), lang)
 
         concept_schemes = []
         for concept in models.Concept.objects.filter(nodetype='ConceptScheme'):
@@ -78,6 +79,22 @@ def get_sparql_providers(endpoint=None):
     else:
         return sparql_providers
 
+def sort_languages(languages, lang):
+    """
+    Sorts languages from the d_languages model by name. If there is more than
+    one default language or no default language, the default language is defined
+    by lang (the settings.LANGUAGE_CODE)
+    """
+
+    if len([l for l in languages if l.isdefault == True]) != 1:
+        for l in languages:
+            if l.languageid == lang:
+                l.isdefault = True
+            else:
+                l.isdefault = False
+
+    return sorted(languages, key=lambda x: x.languagename)
+
 
 @group_required('RDM Administrator')
 def concept(request, conceptid):
@@ -107,13 +124,13 @@ def concept(request, conceptid):
 
 
             labels = []
-            #concept_graph = Concept().get(id=conceptid)
 
             concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
                 include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
                 depth_limit=depth_limit, up_depth_limit=None, lang=lang, semantic=(mode == 'semantic' or mode == ''))
 
-            languages = models.DLanguage.objects.all()
+            languages = sort_languages(models.DLanguage.objects.all(), lang)
+
             valuetypes = models.DValueType.objects.all()
             relationtypes = models.DRelationType.objects.all()
             prefLabel = concept_graph.get_preflabel(lang=lang)
