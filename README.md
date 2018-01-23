@@ -27,9 +27,10 @@ then
 enter the new `myproject` directory
 
     cd myproject
-    
+
 and run
 
+    python manage.py packages -o setup_db
     python manage.py runserver
     
 and visit `localhost:8000` in a browser (only Chrome is fully supported at this time).
