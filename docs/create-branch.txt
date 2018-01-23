@@ -37,7 +37,7 @@ Now that you've defined the Branch settings, you need to create its graph. A gra
 
 You have now completed your first graph, and it should look like this:
 
-  .. image:: images/simple-branch-graph.png
+  .. image:: ../arches/app/media/img/help/rtd/simple-branch-graph.png
 
 Configure the Branch's Card
 ===========================
@@ -52,15 +52,15 @@ By creating the graph, you defined what information will be contained in this Br
 
 You have now finished creating a new Branch, albeit, a very simple one. First, you updated the settings--name, ontology, etc.--of the Branch. Then, you created the graph that models what information will be collected through this Branch, and, finally, you configured the Card that will be used to collect this information. Now, we have to add this Branch to the Resource Model we created earlier. Return to the Arches Designer main page and head to :doc:`add-branch-to-resource-model`.
 
-.. |add-btn| image:: images/add-btn.png
+.. |add-btn| image:: ../arches/app/media/img/help/rtd/add-btn.png
   :align: middle
-.. |save-edits-btn| image:: images/save-edits-btn.png
+.. |save-edits-btn| image:: ../arches/app/media/img/help/rtd/save-edits-btn.png
   :align: middle
-.. |done-btn| image:: images/done-btn.png
+.. |done-btn| image:: ../arches/app/media/img/help/rtd/done-btn.png
   :align: middle
-.. |add-node-confirm-btn| image:: images/add-node-confirm-btn.png
+.. |add-node-confirm-btn| image:: ../arches/app/media/img/help/rtd/add-node-confirm-btn.png
   :align: middle
-.. |manage-btn| image:: images/manage-btn.png
+.. |manage-btn| image:: ../arches/app/media/img/help/rtd/manage-btn.png
   :align: middle
-.. |plus-btn| image:: images/plus-btn.png
+.. |plus-btn| image:: ../arches/app/media/img/help/rtd/plus-btn.png
   :align: middle

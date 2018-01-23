@@ -1,0 +1,116 @@
+#######################
+Creating New Map Layers
+#######################
+
+A developer can add new layers to the map by registering them through the command line interface. A newly registered layer can be designated as either a basemap or an overlay. However, because the treatment of basemaps and overlays differs only in the front-end of the app, consider the following documentation to apply equally to both.
+
+New map layers can come from many different geospatial sources -- from shapefiles to GeoTIFFs to external Web Map Services to reconfigurations of the actual resource data stored within Arches.
+
+New map layers can be created with two general definitions, as MapBox layers or tileserver layers, each with its own wide range of options.
+
+For working examples, please see our `arches4-geo-examples <https://github.com/legiongis/arches4-geo-examples>`_ repo.
+
+MapBox Layers
+`````````````
+
+``python manage.py packages -o add_mapbox_layer -j /path/to/mapbox_style.json -n "New MapBox Layer"``
+
+Arches allows you to make direct references to styles or layers that have been previously defined in `MapBox Studio <https://www.mapbox.com/studio/>`_. You can make entirely new basemap renderings, save them in your MapBox account, then download the style definition and use it here. Read more about `MapBox Styles <https://www.mapbox.com/help/studio-manual-styles/>`_.
+
+Additionally, you can take a MapBox JSON file and place any mapbox.js layer definition in the ``layers`` section, as long as you define its source in the ``sources`` section.
+
+.. note:: One thing to be aware of when trying to cascade a WMS through a MapBox layer is that mapbox.js is `much pickier <https://github.com/mapbox/mapbox-gl-js/issues/2171>`_ about CORS than other js mapping libraries like Leaflet. To use an external WMS or tileset, you may be better off using a tileserver layer as described below.
+
+Tileserver Layers
+``````````````````
+
+``python manage.py packages -o add_tileserver_layer -t /path/to/tileserver_config.json -n "New Tileserver Layer"``
+
+Arches comes with an embedded tileserver called `TileStache <http://tilestache.org/>`_, which allows Arches to generate tiles internally from many different data sources. In fact, this tileserver is what creates layers from your database resources that are visible on the map.
+
+To add a new tileserver layer, you need a .json file that contains a TileStache-compliant layer definition. Within this file, you can use any of the many different data `provider classes <http://tilestache.org/doc/#layers>`_ from Tilestache. The .json file that you load into Arches for a tileserver layer should have three sections::
+
+    {
+        "type" :   ## This value should be "raster" or "vector".
+        "layers" : ## This is a mapbox.js layer definition which defines the style
+                   ## of the layer and links the source name with the layer name.
+        "config" : ## This is the tileserver configuration that will be used by 
+                   ## TileStache. Refer to TileStache docs and place the entire 
+                   ## "provider" section into this "config" section.
+    }
+        
+Here's a full example of a tilestache file that makes a layer from data in PostGIS (a table called "rivers")::
+
+    {
+        "type": "vector",
+        "layers": [{
+            "id": "rivers",
+            "type": "line",
+            "source": "rivers",
+            "source-layer": "rivers",
+            "layout": {
+                "visibility": "visible"
+            },
+            "paint": {
+                "line-width": 2,
+                "line-color": "rgb(37, 58, 241)"
+            }
+        }],
+        "config": {
+            "provider": {
+                "class": "TileStache.Goodies.VecTiles:Provider",
+                "kwargs": {
+                    "dbinfo": {
+                        "host": "localhost",
+                        "user": "postgres",
+                        "password": "postgis",
+                        "database": "arches",
+                        "port": "5432"
+                    },
+                    "simplify": 0.5,
+                    "queries": [
+                        "select gid as __id__, name, st_asgeojson(geom) as geojson, st_transform(geom, 900913) as __geometry__ from rivers"
+                    ]
+                }
+            },
+            "allowed origin": "*",
+            "compress": true,
+            "write cache": false
+        }
+    }
+    
+Tileserver Mapnik Layers
+````````````````````````
+
+``python manage.py packages -o add_tileserver_layer -m /path/to/mapnik_config.xml -n "New Mapnik Tileserver Layer"``
+
+Mapnik is the provider that TileStache uses to serve rasters, and is very commonly used in Arches. Arches allows you to upload a Mapnik XML file to configure a new tileserver layer, instead of creating the full JSON file. This is the **easiest way to make layers from GeoTiffs and shapefiles**. A basic example of a Mapnik XML file is shown below (it points to a geotiff named ``hillshade.tif``). For more about creating these XML files, see the `Mapnik XML reference <https://github.com/mapnik/mapnik/wiki/XMLConfigReference>`_::
+
+    <Map background-color="transparent">
+        <Layer name="Hillshade">
+            <StyleName>raster</StyleName>
+            <Datasource>
+                <Parameter name="type">gdal</Parameter>
+                <Parameter name="file">hillshade.tif</Parameter>
+                <Parameter name="nodata">0</Parameter>
+            </Datasource>
+        </Layer>
+        <Style name="raster">
+            <Rule name="rule 1">
+                <RasterSymbolizer opacity=".7" scaling="bilinear" mode="normal" />
+            </Rule>
+        </Style>
+    </Map>
+
+
+Making Selectable Vector Layers
+-------------------------------
+
+In Arches, it's possible to add a vector layer whose features may be "selectable". This is especially useful during drawing operations. For example, a building footprint dataset could be added as a selectable vector layer, and while creating new building resources you would select and "transfer" these geometries from the overlay to the new Arches resource.
+
+1. First, the data source for the layer may be geojson or vector tiles. This could be a tile server layer serving vector features from PostGIS, for example.
+2. Add a property to your vector features called "geojson".
+3. Populate this property with either the entire geojson geometry for the feature, or a url that will return a json response containing the entire geojson geometry for the feature. This is necessary to handle the fact that certain geometries may extend across multiple vector tiles.
+4. Add the overlay as you would any tileserver layer (see above).
+
+You will now be able to add this layer to the map and select its features by clicking on them.

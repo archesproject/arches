@@ -30,15 +30,15 @@ Method 2: Add the Branch's Card to the Resource Model
 
 That's all! You can now head to the Graph Designer to see that a new branch has been added to the graph.
 
-.. |add-btn| image:: images/add-btn.png
+.. |add-btn| image:: ../arches/app/media/img/help/rtd/add-btn.png
   :align: middle
-.. |save-edits-btn| image:: images/save-edits-btn.png
+.. |save-edits-btn| image:: ../arches/app/media/img/help/rtd/save-edits-btn.png
   :align: middle
-.. |done-btn| image:: images/done-btn.png
+.. |done-btn| image:: ../arches/app/media/img/help/rtd/done-btn.png
   :align: middle
-.. |add-node-confirm-btn| image:: images/add-node-confirm-btn.png
+.. |add-node-confirm-btn| image:: ../arches/app/media/img/help/rtd/add-node-confirm-btn.png
   :align: middle
-.. |manage-btn| image:: images/manage-btn.png
+.. |manage-btn| image:: ../arches/app/media/img/help/rtd/manage-btn.png
   :align: middle
-.. |plus-btn| image:: images/plus-btn.png
+.. |plus-btn| image:: ../arches/app/media/img/help/rtd/plus-btn.png
   :align: middle

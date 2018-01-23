@@ -13,15 +13,15 @@ The final step in configuring our Resource Model is to create a report. Reports 
 7. Select the Header section, click the Active button, and type "Building Resource" for the Report Title.
 8. Click |back-to-reports-btn|.
 
-.. |add-btn| image:: images/add-btn.png
+.. |add-btn| image:: ../arches/app/media/img/help/rtd/add-btn.png
   :align: middle
-.. |save-edits-btn| image:: images/save-edits-btn.png
+.. |save-edits-btn| image:: ../arches/app/media/img/help/rtd/save-edits-btn.png
   :align: middle
-.. |done-btn| image:: images/done-btn.png
+.. |done-btn| image:: ../arches/app/media/img/help/rtd/done-btn.png
   :align: middle
-.. |add-node-confirm-btn| image:: images/add-node-confirm-btn.png
+.. |add-node-confirm-btn| image:: ../arches/app/media/img/help/rtd/add-node-confirm-btn.png
   :align: middle
-.. |manage-btn| image:: images/manage-btn.png
+.. |manage-btn| image:: ../arches/app/media/img/help/rtd/manage-btn.png
   :align: middle
-.. |back-to-reports-btn| image:: images/back-to-reports-btn.png
+.. |back-to-reports-btn| image:: ../arches/app/media/img/help/rtd/back-to-reports-btn.png
   :align: middle

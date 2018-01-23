@@ -43,7 +43,7 @@ A package is an external collection of arches data (resource models, business da
 
 
 Loading a Package
-`````````````````
+^^^^^^^^^^^^^^^^^
 
 To load a package simply run the load_package command using your \*project's manage.py file:
 
@@ -60,9 +60,9 @@ To load a package simply run the load_package command using your \*project's man
 
 If you do not pass the `-db True` to the load_package command, your database will not be recreated. If you already have resource models and branches with the same id as those you are importing, you will be prompted to confirm whether you would like to keep or overwrite each model or branch.
 
-\*It is important to note that you cannot load a package directly into core Arches. Currently packages must be loaded into a project. :doc:`Create a project <../project-setup>`.
+.. note:: It is important to note that you cannot load a package directly into core Arches. Packages must be loaded into a project.
 
-If you are a developer running the latest arches you probably want to create a project with a new arches installation. This ensures that the `arches_project create` command uses the latest project templates.
+If you are a developer running the latest arches you probably want to create a project with a new Arches installation. This ensures that the `arches_project create` command uses the latest project templates.
 
     #. Uninstall arches from your virtualenv
 
@@ -77,7 +77,6 @@ If you are a developer running the latest arches you probably want to create a p
         .. code-block:: bash
 
             python setup.py install
-
             python setup.py develop
 
     #. Navigate to where you want to create your new project and run:
@@ -94,7 +93,7 @@ If you are a developer running the latest arches you probably want to create a p
 
 
 Creating a New Package
-``````````````````````
+^^^^^^^^^^^^^^^^^^^^^^
 
 If you want to create additional projects with the same data or share your data with others that need to create similar projects, you probably want to create a package.
 
