@@ -220,9 +220,193 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
                 <!-- My Devices -->
+                <div class="profile-list">
+                    <div class="profile-header">
+                        My Devices
+                    </div>
+
+                    <!-- No Device Registered Yet -->
+                    <div class="">
+
+                        <!-- Download panel -->
+                        <div id="download-buttons-panel" class="">
+                            <span class="hidden-xs">You haven't registered a device yet.</span> Download the App:
+                            <div class="">
+                                <a class="download-app" href=""><img class="apple_app_store_icon" src="{{ STATIC_URL }}img/user/apple.png" alt="ios"></a>
+                                <a class="download-app" href=""><img class="android_app_store_icon" src="{{ STATIC_URL }}img/user/google.png" alt="android"></a>
+                            </div>
+                        </div>
+
+                        <!-- Devices Panel -->
+                        <div id="devices-panel" class="" style="display: none;">
+                            <div class="row">
+                                <div class="col-sm-9 col-sm-offset-3">
+                                    <!-- Device Listing -->
+                                    <ul class="device-listing">
+                                        <li class="device-list-item">
+                                            <div class="">
+                                                <dl class="device-summary">
+                                                    <dt>Alison's iPhone 8</dt>
+                                                </dl>
+                                            </div>
+                                            <img src="img/arches/devices/smart_phone.png" alt="Tablet" class="mar-btm" style="height: 80px; margin-top: 10px; margin-left: 15px; margin-right: 15px;">
+                                            <div class="">
+                                                <dl class="device-summary">
+                                                    <dt>December 18, 2017</dt>
+                                                    <dd class="profile-label-shim">9:18:52</dd>
+                                                    <dd class="profile-label-shim">Last login</dd>
+                                                </dl>
+                                            </div>
+                                        </li>
+
+                                        <li class="device-list-item">
+                                            <div class="">
+                                                <dl class="device-summary">
+                                                    <dt>Getty iPad #14</dt>
+                                                </dl>
+                                            </div>
+                                            <img src="img/arches/devices/tablet.png" alt="Tablet" class="mar-btm" style="height: 80px; margin-top: 10px; margin-left: 15px; margin-right: 15px;">
+                                            <div class="">
+                                                <dl class="device-summary">
+                                                    <dt>November 9, 2017</dt>
+                                                    <dd class="profile-label-shim">17:45:12</dd>
+                                                    <dd class="profile-label-shim">Last login</dd>
+                                                </dl>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
 
                 <!-- My Surveys -->
+                <div class="profile-list profile-projects">
+                    <div class="profile-header">
+                        {% trans 'My Surveys' %}
+                    </div>
 
+                    <!--ko ifnot: mobileSurveyManager.mobilesurveys().length -->
+                    <div id="default-mobile-projects" class="profile-default-message-panel">
+                        {% trans "Sorry, but you haven't been invited to a survey yet..." %}
+                    </div>
+                    <!--/ko-->
+
+                    <!--ko if: mobileSurveyManager.mobilesurveys().length -->
+                    <!-- Survey Invitations List -->
+                    <div id="mobile-projects-list" class="profile-default-message-panel">
+                        <div class="row">
+
+                            <!-- Find a survey -->
+                            <div class="col-sm-9 col-sm-offset-3 relative">
+                                <div class="project-search-widget">
+                                    <input type="text" class="form-control" placeholder="{% trans 'Find a survey...' %}" data-bind="value: mobileSurveyManager.mobileSurveyFilter, valueUpdate: 'keyup'">
+                                    <span class="clear-node-search" data-bind="visible: mobileSurveyManager.mobileSurveyFilter().length > 0, click: function() { mobileSurveyManager.mobileSurveyFilter(''); }"><i class="fa fa-times-circle"></i></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Survey List -->
+                        <div id="" class="row">
+                            <div class="col-sm-9 col-sm-offset-3 mar-top">
+                                <div class="">
+                                    <!--ko foreach: {data: mobileSurveyManager.filteredMobileSurveys(), as: 'mobilesurvey'} -->
+                                    <div class="project-panel">
+
+                                        <div class="project-panel-header">
+                                            <div class="user-survey">
+                                                <div class="project-status" data-bind="text:mobilesurvey.active() ? '{% trans "Active" %}' : '{% trans "Inactive" %}', css: {active: mobilesurvey.active()}"></div>
+                                                <ul class="project-metadata">
+                                                    <li class="project-metadata-item">
+                                                        <span data-bind="text: mobilesurvey.startdate() || '?'"></span>
+                                                        {% trans 'to' %}
+                                                        <span data-bind="text: mobilesurvey.enddate() || '?'"></span>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <h3 class="project-panel-title" data-bind="text: mobilesurvey.name() === '' ? '{% trans "Unnamed Survey" %}' : mobilesurvey.name()"></h3>
+
+                                            <div class="">
+                                                <div class="project-details">
+                                                    <a id="view-project-details-btn" class="text-primary text-semibold" data-bind="click: function(val){val.toggleShowDetails(); $parent.mobileSurveyManager.getMobileSurveyResources(val)}">{% trans 'View Details' %}</a>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class='profile-mpm-panel' data-bind="css: {'show-details': mobilesurvey.showDetails}">
+                                        <!-- <div class='profile-mpm-panel' data-bind="slideToggle: $data.showDetails, duration: 400, easing: 'swing'"> -->
+                                            <div class="">
+                                                <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
+                                                    {% trans 'Survey Summary' %}
+                                                </p>
+                                                <ul class="mpm-node-detail-metadata">
+                                                    <li class="">
+                                                        Number of edits: 0
+                                                    </li>
+                                                    <li class="">
+                                                        Contributors: 0
+                                                    </li>
+                                                    <li class="">
+                                                        Offline Basemap: Streets-Grey
+                                                    </li>
+                                                </ul>
+                                            </div>
+
+                                            <div class="">
+                                                <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
+                                                    {% trans 'Groups/Users' %}
+                                                </p>
+                                                <ul class="mpm-node-detail-metadata">
+                                                    <li class="">
+
+                                                        {% trans 'Groups' %} (<span data-bind="text: mobilesurvey.groups().length"></span>)
+                                                        <ul class="mpm-node-detail-metadata" data-bind="foreach: _.filter(mobilesurvey.identities, function(id){return (id.type === 'group' && _.contains(mobilesurvey.groups(), id.id))})">
+                                                            <li class="" data-bind="text: $data.name"></li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                                <ul class="mpm-node-detail-metadata">
+                                                    <li class="">
+                                                        {% trans 'Users' %} (<span data-bind="text: mobilesurvey.users().length"></span>)
+                                                        <ul class="mpm-node-detail-metadata" data-bind="foreach: _.filter(mobilesurvey.identities, function(id){return (id.type === 'user' && _.contains(mobilesurvey.users(), id.id))})">
+                                                            <li class="" data-bind="text: $data.name"></li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </div>
+
+                                            <div class="">
+                                                <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
+                                                    {% trans 'Models and Data Entry Cards' %}
+                                                </p>
+
+                                                    <ul class="mpm-node-detail-metadata">
+                                                        <!--ko foreach: {data: mobilesurvey.resources(), as: 'resource'} -->
+                                                        <li class="">
+                                                            <div data-bind="text: resource.name + ' (' + resource.cards.length + ' data entry cards)'"></div>
+                                                            <!--ko foreach: {data: resource.cards, as: 'card'} -->
+                                                            <ul class="mpm-node-detail-metadata">
+                                                                <li data-bind="text: card.name"></li>
+                                                            </ul>
+                                                            <!--/ko-->
+                                                        </li>
+                                                        <!--/ko-->
+                                                    </ul>
+                                            </div>
+
+                                        </div>
+
+                                </div>
+                                <!--/ko-->
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
                 <!--/ko-->
             </div>
 

@@ -270,6 +270,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </li>
                                             </ul>
                                         </li>
+
+                                        <li{% if "views/mobile-survey-manager" in main_script %} class="active-sub"{% endif %}>
+                                            <a href="{% url 'mobile_survey_manager' %}" data-bind="click: navigate.bind(this, '{% url 'mobile_survey_manager' %}') ">
+                                                <i class="fa fa-globe"></i>
+                                                <span class="menu-title">
+                                                    <strong>{% trans "Mobile Survey Manager" %}</strong>
+                                                </span>
+                                            </a>
+                                        </li>
                                         {% endif %}
 
 
