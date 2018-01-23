@@ -85,8 +85,8 @@ The ``data_type`` attribute in the `mapping file`_ will help you determine what 
 * ``number`` - Numbers don't need quotes.
 * ``date`` - All dates must be formatted as YYYY-MM-DD. Dates that are not four digits must be zero padded (01-02-1999). No quotes.
 * ``geojson-feature-collection`` - All geometry must be formatted in `"well-known text" (WKT) <https://en.wikipedia.org/wiki/Well-known_text>`_, and all coordinates stored as WGS 84 (EPSG:4326) decimal degrees. Multi geometries must be single-quoted.
-* ``concept`` - You must use the prefLabel for the concept. If a prefLabel has a comma in it, it must be triple-quoted: ``"""Shingles, original"""``. In some cases, you may get errors during import because the prefLabel is not unique throughout your database. If this happens, see `Concepts File`_ below.
-* ``concept-list`` - This must be a single-quoted list of prefLabels (or ValueId uuids if necessary, see `Concepts File`_): ``"Slate,Thatch"``. If a prefLabel contains a comma, then that prefLabel must have double-quotes: ``"Slate,""Shingles, original"",Thatch"``.
+* ``concept`` - If the values in your concept collection are `unique` you can use the label (prefLabel) for a concept. If not, you will get an error during import and you must use UUIDs instead of labels (if this happens, see `Concepts File`_ below). If a prefLabel has a comma in it, it must be triple-quoted: ``"""Shingles, original"""``.
+* ``concept-list`` - This must be a single-quoted list of prefLabels (or UUIDs if necessary): ``"Slate,Thatch"``. If a prefLabel contains a comma, then that prefLabel must have double-quotes: ``"Slate,""Shingles, original"",Thatch"``.
 * ``domain-value`` - A string that matches a valid domain value for this node, single-quoted if it contains a comma.
 * ``domain-value-list`` - A single-quoted list of strings that match valid domain values for this node. Follow quoting guidelines for ``concept-list`` if any of the values contain commas.
 
@@ -147,7 +147,7 @@ To map more than one column to a single node, simply copy and paste that node wi
 Concepts File
 -------------
 
-When populating ``concept`` nodes from a CSV you should generally use the prefLabel for that concept. However, in rare instances there may be two or more concepts in your database that have identical prefLabels (this is allowed in Arches). For example, perhaps "Primary" is the prefLabel for a concept within the "Name Type" concept collection, but is also used as a prefLabel for a concept within the "Address Type" concept collection. In this case you will need to replace the prefLabel in your CSV with the UUID for the Value that represents that prefLabel.
+When populating ``concept`` nodes from a CSV you should generally use the prefLabel for that concept. However, in rare instances there may be two or more concepts in your collection that have identical prefLabels (this is allowed in Arches). In this case you will need to replace the prefLabel in your CSV with the UUID for the Value that represents that prefLabel.
 
 To aid with the process, a "concepts file" is created every time you download a mapping file, which lists the valueids and corresponding labels for all of the concepts in all of the concept collections associated with any of the Resource Model's nodes. For example::
 
