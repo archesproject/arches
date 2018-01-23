@@ -78,6 +78,9 @@ define([
                                     contentEl = $(sectionEl).find('.ep-help-topic-content').first();
                                     contentEl.slideToggle();
                                 });
+                                $('.reloadable-img').click(function(){
+                                    $(this).attr('src', $(this).attr('src'));
+                                });
                             }
                         });
                     }
@@ -99,11 +102,6 @@ define([
             $('.ep-help-toggle').click(function (){
                 $('#ep-help-panel').toggle('slide', { direction: 'right' });
             });
-
-            $('.reloadable-img').click(function(){
-                $(this).attr('src', $(this).attr('src'));
-            });
-
         }
     });
     return PageView;

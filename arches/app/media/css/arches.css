@@ -8037,10 +8037,9 @@ a.clear-geojson-button:hover {
     cursor: default;
 }
 
-.category-title:not(.active):hover{
+.category-title:not(.active):hover {
     cursor: pointer;
     background: #ececec;
-}
 }
 
 .carousel, .carousel .item {

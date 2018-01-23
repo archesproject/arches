@@ -7,6 +7,8 @@ Installation
 
 Once you have all the dependencies taken care of you are ready to install Arches.
 
+.. note:: If you are a developer hoping to contribute to the Arches project, please check out the Creating a Development Environment section under "Developing With Arches".
+
 #. **Create and enter a new directory called Projects**::
 
     mkdir Projects && cd Projects
@@ -25,8 +27,6 @@ Once you have all the dependencies taken care of you are ready to install Arches
 
         ENV\Scripts\activate
 
-    .. note:: Once the virtual environment is activated for the first time, Windows users need to manually install Shapely. See the Shapely note in :ref:`WindowsInstallation`.
-    
     When you activate your virtual environment, your command prompt will be prefixed with ``(ENV)``. If you need to deactivate it for any reason, run ``deactivate``.
 
 #. **Install Arches into your virtual environment**
@@ -34,8 +34,6 @@ Once you have all the dependencies taken care of you are ready to install Arches
     Use the following to get the latest stable release of Arches::
 
         pip install arches --no-binary :all:
-
-    .. note:: If you are a developer hoping to contribute to the Arches project, it's here that you should `install from directly from the repo <https://github.com/archesproject/arches/wiki/Developer-Installation-(draft-2)#installing-from-the-repo>`_.
 
     .. warning:: Running a pip installation without the ``--no-binary :all:`` argument will install ``arches`` in your virtual environment, but will not install all of the separate python packages that you need. This will cause you to not be able to proceed with the following steps.
 

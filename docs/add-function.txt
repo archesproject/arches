@@ -10,11 +10,11 @@ Functions allow Arches to automatically perform operations on input data after i
 4. Change the template from ``<Name>, <Name Type>`` to ``<Name> (<Name Type> Name)``. With this template, a building with a primary name of "Scott House" will have a display name of "Scott House (Primary Name)".
 5. Click |done-btn|.
 
-.. |add-btn| image:: images/add-btn.png
+.. |add-btn| image:: ../arches/app/media/img/help/rtd/add-btn.png
   :align: middle
-.. |save-edits-btn| image:: images/save-edits-btn.png
+.. |save-edits-btn| image:: ../arches/app/media/img/help/rtd/save-edits-btn.png
   :align: middle
-.. |done-btn| image:: images/done-btn.png
+.. |done-btn| image:: ../arches/app/media/img/help/rtd/done-btn.png
   :align: middle
-.. |manage-btn| image:: images/manage-btn.png
+.. |manage-btn| image:: ../arches/app/media/img/help/rtd/manage-btn.png
   :align: middle

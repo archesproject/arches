@@ -16,13 +16,13 @@ Now that you've adding at least one Card to the Resource Model, you are ready to
 
 Even though we only have one Card at this point, and a very simple Identification Menu, you should now see how easy it is to create and configure Menus. Note that if you have more than one Card in your Menu, the order you set them in the central area will be the order they appear in the Menu.
 
-.. |add-btn| image:: images/add-btn.png
+.. |add-btn| image:: ../arches/app/media/img/help/rtd/add-btn.png
   :align: middle
-.. |save-edits-btn| image:: images/save-edits-btn.png
+.. |save-edits-btn| image:: ../arches/app/media/img/help/rtd/save-edits-btn.png
   :align: middle
-.. |done-btn| image:: images/done-btn.png
+.. |done-btn| image:: ../arches/app/media/img/help/rtd/done-btn.png
   :align: middle
-.. |add-node-confirm-btn| image:: images/add-node-confirm-btn.png
+.. |add-node-confirm-btn| image:: ../arches/app/media/img/help/rtd/add-node-confirm-btn.png
   :align: middle
-.. |manage-btn| image:: images/manage-btn.png
+.. |manage-btn| image:: ../arches/app/media/img/help/rtd/manage-btn.png
   :align: middle
