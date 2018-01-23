@@ -614,8 +614,9 @@ class Concept(object):
         return self.get_preflabel(lang=lang).value
 
     def get_preflabel(self, lang=settings.LANGUAGE_CODE):
-        score = 0
         ranked_labels = []
+        pref_labels = []
+        max_weight = 0
         if self.values == []:
             concept = Concept().get(id=self.id, include_subconcepts=False, include_parentconcepts=False, include=['label'])
         else:
@@ -628,6 +629,7 @@ class Concept(object):
             }
             if value.type == 'prefLabel':
                 ranked_label['weight'] = ranked_label['weight'] * 10
+                pref_labels.append(ranked_label)
             elif value.type == 'altLabel':
                 ranked_label['weight'] = ranked_label['weight'] * 4
 
@@ -636,7 +638,16 @@ class Concept(object):
             elif value.language.split('-')[0] == lang.split('-')[0]:
                 ranked_label['weight'] = ranked_label['weight'] * 5
 
+            if ranked_label['weight'] > max_weight:
+                max_weight = ranked_label['weight']
+
             ranked_labels.append(ranked_label)
+
+        if len(pref_labels) == 1:
+            if pref_labels[0]['value'].language != lang:
+                for lab in ranked_labels:
+                    if lab == pref_labels[0]:
+                        lab['weight'] = max_weight + 1
 
         ranked_labels = sorted(ranked_labels, key=lambda label: label['weight'], reverse=True)
         if len(ranked_labels) == 0:
