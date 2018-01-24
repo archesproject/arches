@@ -737,7 +737,10 @@ define([
                                     }, 0);
                                 });
 
-                                return aggregated;
+                                return {
+                                    points: pointsFC,
+                                    agg: aggregated
+                                };
                             }
                             var updateSearchPointsGeoJSON = function() {
                                 var pointSource = self.map.getSource('search-results-points')
@@ -770,9 +773,11 @@ define([
                             }
                             self.overlays.unshift(self.createOverlay(self.searchQueryLayer))
                             self.updateSearchResultsLayer = function() {
-                                var aggSource = self.map.getSource('search-results-hex')
+                                var aggSource = self.map.getSource('search-results-hex');
+                                var hashSource = self.map.getSource('search-results-hashes');
                                 var aggData = getSearchAggregationGeoJSON();
-                                aggSource.setData(aggData)
+                                aggSource.setData(aggData.agg);
+                                hashSource.setData(aggData.points);
                                 updateSearchPointsGeoJSON();
                             }
                             self.searchAggregations.subscribe(self.updateSearchResultsLayer);
@@ -1594,6 +1599,13 @@ define([
                 }
             };
             this.sources["search-results-hex"] = {
+                "type": "geojson",
+                "data": {
+                    "type": "FeatureCollection",
+                    "features": []
+                }
+            };
+            this.sources["search-results-hashes"] = {
                 "type": "geojson",
                 "data": {
                     "type": "FeatureCollection",
