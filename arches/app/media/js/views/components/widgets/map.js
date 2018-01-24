@@ -128,6 +128,12 @@ define([
                 this.minZoom(arches.mapDefaultMinZoom);
             }
 
+            this.zoomConfigOpen = ko.observable(false);
+            this.positionConfigOpen = ko.observable(false);
+            this.geocoderConfigOpen = ko.observable(false);
+            this.resourcePropertiesConfigOpen = ko.observable(false);
+            this.defaultValueConfigOpen = ko.observable(false);
+
             if (this.context === 'search-filter') {
                 this.query = params.query;
                 this.clearSearch = params.clearSearch;

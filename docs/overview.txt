@@ -14,26 +14,26 @@ Arches is a web-based, geospatial information system for cultural heritage inven
 
 Arches allows administrators to create their own database schema, and manage their own thesauri, while end users can search, explore and download the resources directly. In this way Arches is not only a robust and easy to use inventory system, it is also a perfect way to publish and disseminate your organization's cultural heritage information.
 
-To try Arches out, you can view the v4 demo installation, go to the Arches project page for more background, or join our Google Group to engage with the active Arches community.
-
-Arches is a web framework for Django and is designed to make it easier to build applications that need:
+Arches is a web framework built on Dango and is designed to make it easier to build applications that need:
 
     * **Geospatial data management** and geoprocessing like a GIS (Geograhic Information System) offers, but with a much more flexible approach for modeling the geometries associated with a resource.
     * the ability to **import arbitrary data schema** in the form of graphs as a means of defining the set of attributes that describe data resources
     * an **Ontology** as a means of formally naming and defining data types, properties, and the relationships between the data entities that describe a resource.
     * **Thesauri** to manage the controlled vocabularies needed to describe and index information in a consistent and uniform way.
 
-Arches manages data "resources".  Resources can represent almost anything you want: physical things (such as a cultural heritage object), temporal things (such as activities or events), actors (such as a person or organization), or conceptual objects (such as an image. document, or other information carrier).  
+Arches manages data "resources". Resources can represent almost anything you want: physical things (such as a cultural heritage object), temporal things (such as activities or events), actors (such as a person or organization), or conceptual objects (such as an image. document, or other information carrier). 
 
-Resources are defined as directed graphs (nodes connected by edges).  Nodes in the graph are used to represent the attributes (or collection of attributes) of a resource and edges define the type of relationship between attributes.  In practice, a resource graph in Arches functions much like a schema does in a relational database.
+Resources are defined as directed graphs (nodes connected by edges). Nodes in the graph are used to represent the attributes (or collection of attributes) of a resource and edges define the type of relationship between attributes. In practice, a resource graph in Arches functions much like a schema does in a relational database.
 
-Arches provides core services for creating, reading, updating, and deleting resources.  Because resources are defined as graphs, Arches provides the services needed to import and parse resource graphs, as well the ability to create and interact with instance graphs (e.g.: an instance of a resource graph).
+Arches provides core services for creating, reading, updating, and deleting resources. Because resources are defined as graphs, Arches provides the services needed to import and parse resource graphs, as well the ability to create and interact with instance graphs (e.g. an instance of a resource graph).
 
-To promote consistent data creation, update, and indexing workflows, Arches implements a Reference Data Manager (RDM) that can manage thesauri.  The RDM allows users with the appropriate privileges to update thesaurus entries in a manner compliant with SKOS (http://www.w3.org/2004/02/skos/) and assign the concepts within a thesaurus with data entry forms.
+To promote consistent data creation, update, and indexing workflows, Arches implements a Reference Data Manager (RDM) that can manage thesauri. The RDM allows users with the appropriate privileges to update thesaurus entries in a manner compliant with SKOS (http://www.w3.org/2004/02/skos/) and assign the concepts within a thesaurus with data entry forms.
 
-**Arches' User and Developer forum:**  http://archesproject.org/forum/
+**Arches User and Developer forum:** https://groups.google.com/d/forum/archesproject?hl=en
 
 **Version History**
+
+    v4.0  July, 2017: Significant site redesign, addition of graph creation UI, system settings UI, internal tileserver (TileStache), updated dependencies (MapBox GL, ElasticSearch 5.2, Bower)
 
     v3.0  April, 2015: Updated architecture, inclusion of the Reference Data Manager, updated dependencies (ElasticSearch, OpenLayers, Knockout)
 
@@ -48,11 +48,11 @@ To promote consistent data creation, update, and indexing workflows, Arches impl
 Who is Arches for?
 ==================
 
-Arches is primarily intended for software developers who need to build flexible and responsive web applications, and who wish to hide the complexities of ontologies, thesauri, and geospatial data management from their users.
+Arches is primarily intended for software developers who need to build flexible web applications and wish to hide the complexities of ontologies, thesauri, and geospatial data management from their users.
 
-The Arches framework is largely invisible to end users; Arches applications are responsible for defining resource graphs and implementing data entry, data presentation, and data reporting workflows.  
+The Arches framework is largely invisible to end users; Arches applications are responsible for defining resource graphs and implementing data entry, data presentation, and data reporting workflows. 
 
-One major exception to this rule is the Reference Data Manager (RDM).  The RDM is a core component of the Arches framework and can support the creation and curation of thesauri without the need to implement an Arches application.
+One major exception to this rule is the Reference Data Manager (RDM). The RDM is a core component of the Arches framework and can support the creation and curation of thesauri without the need to implement an Arches application.
 
 Contributing To Arches
 ======================
