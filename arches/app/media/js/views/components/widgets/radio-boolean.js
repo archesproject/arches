@@ -22,7 +22,7 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
             WidgetViewModel.apply(this, [params]);
             var self = this;
             this.setValue = function (val) {
-                if (self.disabled() === false) {
+                if (ko.unwrap(self.disabled) === false) {
                     if (val === self.value()) {
                         self.value(null)
                     } else {

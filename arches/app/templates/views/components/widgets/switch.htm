@@ -3,9 +3,9 @@
 
 {% block form %}
 <div class="toggle-container">
-    <span class="switch switch-small switch-widget" data-bind="css: {'on': getvalue() === true, 'null': getvalue() === null}, click: setvalue"><small></small></span>
+    <span class="switch switch-small switch-widget" data-bind="css: {'on': getvalue() === true, 'null': getvalue() === null, 'disabled': disabled }, click: setvalue"><small></small></span>
             <div style="display:flex; flex-direction:row;">
-            <div class="arches-toggle-sm" data-bind="text:label"></div>
+            <div class="arches-toggle-sm" data-bind="text:label, css: {'disabled': disabled}"></div>
                 <div style="margin-top: -17px;">
                 <!-- ko if: node -->
                 <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
