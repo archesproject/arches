@@ -1,25 +1,26 @@
-#####################
-Initial Configuration
-#####################
+####################
+Configuring Settings
+####################
 
 Quick Start
 ===========
 
-Now that you have Arches installed, there are a few extra settings you must configure to make it fully operational. In the Arches interface, head to the **System Settings** menu.
+Once Arches is installed, there are a few settings you must configure to make it fully operational. In the Arches interface, head to the **System Settings** menu (you must be logged in as the `admin` user, default password is `admin`).
 
 The most important settings to begin with are related to the map on the Search page.
 
 1. Enter your Mapbox API Key.
-    By default, Arches uses a few basemap services from Mapbox, for which you need to provide a key. You can get a free key at mapbox.com, and for installations that do not expect exceptionally heavy traffic, this free key will be sufficient. Once you have obtained the key, copy it from Mapbox (it will start with ``pk.``). Go to **System Settings -- > Map Settings --> Mapbox API** and enter key there.
+    By default, Arches uses a few basemap services from Mapbox, for which you need to provide a key. You can get a free key at `mapbox.com <https://mapbox.com>`_, and for installations that do not expect exceptionally heavy traffic, this free key will be sufficient. Once you have obtained the key, copy it from Mapbox (it will start with ``pk.``). Go to **System Settings -- > Map Settings --> Mapbox API** and enter it there.
 
     If you don't want to use MapBox, you can avoid this step by loading in a different basemap and removing all of the default MapBox layers. More about loading different basemaps in the `command line reference <https://github.com/archesproject/arches/wiki/Command-Line-Reference#importexport-commands>`_ documentation.
 
 2. Set the default Map Zoom and Project Extent settings
     The Map Zoom is useful for geometry editing, but note that the Search page will automatically zoom to the extent of your search results every time they are updated. The Project Area is very important as it defines the area for your hexagon bins. It may be best to open a new tab with your Search page, make a change here in the Settings, and then refresh your Search page to preview the changes you make.
+    
 3. Change Hexagon Bin Settings
     Finally, you can change the size and precision of the search result hexagon bins. We recommend changing these settings in small increments, as making a *small* bin size with a *large* project area (for example) can be costly for your browser and may cause it to crash when loading the Search page.
 
-After getting the Map Settings figured out, you will probably want to change the name of your app (System Settings), or create some Saved Searches to make it easier for the users to explore your database (Saved Searches).
+After getting the Map Settings figured out, you may want to change the name of your app (System Settings), or create some Saved Searches to make it easier for the users to explore your database (Saved Searches).
 
 Full Explanation of the System Settings UI
 ==========================================
@@ -86,3 +87,47 @@ Arches allows you save a search and present it as convenience for your users. Sa
 #. **Specify Search Criteria** - Go to the Search page and enter all the criteria you would like to use to configure your Saved Search. You may notice that with the addition of each new search filter (either by using the term filter, map filtering tools, or temporal filters) the URL for the page will change.
 #. **Copy the URL** - In your browser address bar, copy the *entire* URL. This will be a long string that defines each of the search filters created in step 1.
 #. **Create the Saved Search** - Finally, head back to this page and fill out the settings that you see at left. You can also upload an image that will be shown along with your Search Search.
+
+Settings - Beyond the UI
+========================
+
+In reality, many more settings variables are used than are exposed in the UI described above. Here is the full inheritance pattern for a typical Arches project:
+
+- arches/settings.py
+    If you installed Arches through pypi (``pip install arches``) this file will be deep in your virtual environment, and you shouldn't touch it.
+    
+    ↓  `values here can be superceded by...`  ↓
+    
+- my_project/my_project/settings.py
+    Settings here define backend information specific to your app. For example, this is where you would add new references to template context processors.
+    
+    ↓  `values here can be superceded by...`  ↓
+    
+- my_project/my_project/settings_local.py (optional)
+    Typically kept out of version control, a settings_local.py file is used for 1) sensitive information like db credentials or keys and 2) environment-specific settings, like paths needed for production configuration.
+    
+    ↓  `values here can be superceded by...`  ↓
+    
+- System Settings Manager
+    Settings exposed to the UI are the end of the inheritance chain. In fact, these settings are stored as a resource in the database, and the contents of this resource is defined in the System Settings Graph. Nodes in this graph with a name that matches a previously defined setting (i.e. in the files above) will override that value with whatever has been entered through the UI.
+
+----
+    
+If you're a developer, you'll notice that the codebase uses::
+
+    from arches.app.models.system_settings import settings
+
+in favor of::
+
+    from django.conf import settings
+
+This is to ensure that UI settings are implemented properly. If you are using settings outside of a UI context you will need to follow the import statement with ``settings.update_from_db()``.
+    
+Maintaining UI-Defined Settings
+-------------------------------
+
+Because these settings are stored in the database, as opposed to a ``settings.py`` file, if you drop and recreate your database, you will lose them and need to re-enter them by hand. To avoid this, you should run this command *after* you have finished configuring settings through the UI::
+
+    python manage.py packages -o save_system_settings [-d arches/db/system_settings]
+    
+A file named "System_Settings.json" will be saved to the directory indicated. If no directory is indicated the file will be saved to settings.SYSTEM_SETTINGS_LOCAL_PATH, which is ``my_project/my_project/system_settings/`` by default. This same path is used to import settings when a new package is loaded into your project.

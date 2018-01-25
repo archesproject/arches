@@ -16,6 +16,6 @@ You can define these Resource Models within the Arches app itself, and to make t
 
 Consider the following example: You need to create a Building Resource Model and an Architect Resource Model. For resources of both types you will need to record a name. However, for the buildings you'd like to record building materials, while the architects should get some biographical information. Thus, we are talking about two new Resource Models (Building, Architect) and three new Branches (Name, Materials, Biography). You will make all five entities, and then add the appropriate Branches to the appropriate Resource Models.
 
-.. image:: images/models-and-branches-draft.png
+.. image:: ../arches/app/media/img/help/rtd/models-and-branches-draft.png
 
 Managing Resource Models and Branches happens in the Arches Designer, and to enter this part of the system you must have the appropriate permissions. Once you have logged in, choose MANAGE DATA from the Arches home page, and find the Arches Designer in the left side-bar menu. You are now ready to create, modify, and remove Resource Models and Branches.

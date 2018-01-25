@@ -1,5 +1,5 @@
-
 {% load staticfiles %}
+{% load l10n %}
 {% load i18n %}
 
 <script>
@@ -182,7 +182,7 @@
                 clone_graph: function(graphid){return "{% url 'clone_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 export_graph: function(graphid){return "{% url 'export_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 export_mapping_file: function(graphid){return "{% url 'export_mapping_file' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
-                add_resource: function(graphid){return "{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
+                add_resource: function(resourceid, graphid){return "{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', resourceid).replace('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', graphid)},
                 graph_settings: function(graphid){return "{% url 'graph_settings' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 card_manager: function(graphid){return "{% url 'card_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 report_manager: function(graphid){return "{% url 'report_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
@@ -190,7 +190,8 @@
                 form_manager: function(graphid){return "{% url 'form_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 permission_manager: function(graphid){return "{% url 'permission_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 mobile_survey_resources: function(surveyid){return "{% url 'mobile_survey_resources' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', surveyid)},
-                mobile_survey: "{% url 'mobile_survey_manager' %}"
+                mobile_survey: "{% url 'mobile_survey_manager' %}",
+                help_template: "{% url 'help_templates' %}"
             },
             confirmNav: {
                 title: "{% trans 'Edits pending...' %}",
@@ -227,13 +228,12 @@
                 text: "{% trans 'Sorry! The copy request failed. Please try again.  Contact your system administrator if the problem persists.' %}"
             },
             mapboxApiKey: '{{ map_info.mapbox_api_key }}',
-            mapzenApiKey: '{{ map_info.mapzen_api_key }}',
             hexBinSize: {{ map_info.hex_bin_size }},
             mapboxSprites: '{{ map_info.mapbox_sprites }}',
             mapboxGlyphs: '{{ map_info.mapbox_glyphs }}',
             hexBinBounds: {{ map_info.hex_bin_bounds }},
-            mapDefaultX: {{ map_info.x }},
-            mapDefaultY: {{ map_info.y }},
+            mapDefaultX: {{ map_info.x|unlocalize }},
+            mapDefaultY: {{ map_info.y|unlocalize }},
             mapDefaultZoom: {{ map_info.zoom }},
             mapDefaultMinZoom: {{ map_info.map_min_zoom }},
             mapDefaultMaxZoom: {{ map_info.map_max_zoom }},
@@ -254,8 +254,8 @@
                 'activated': {{ map_layer.activated|lower }},
                 'addtomap': {{ map_layer.addtomap|lower }},
                 'is_resource_layer': false,
-                'centerx': {{ map_layer.centerx|default_if_none:"null" }},
-                'centery': {{ map_layer.centery|default_if_none:"null" }},
+                'centerx': {{ map_layer.centerx|default_if_none:"null"|unlocalize }},
+                'centery': {{ map_layer.centery|default_if_none:"null"|unlocalize }},
                 'zoom': {{ map_layer.zoom|default_if_none:"null" }}
             },{% endfor %}{% for resource_map_layer in resource_map_layers %}{
                 'maplayerid': '{{ resource_map_layer.nodeid }}',

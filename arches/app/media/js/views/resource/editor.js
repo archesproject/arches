@@ -16,6 +16,7 @@ require([
     var loading = ko.observable(false);
     var cardLoading = ko.observable(false);
     var displayName = ko.observable(data.displayName);
+    var resourceInstanceExists = ko.observable(data.resourceInstanceExists === "True" || false)
     var formList = new FormList({
         forms: ko.observableArray(data.forms)
     });
@@ -25,7 +26,8 @@ require([
         formid: formList.items()[0].formid,
         resourceid: data.resourceid,
         tiles: data.tiles,
-        blanks: data.blanks
+        blanks: data.blanks,
+        resourceexists: resourceInstanceExists
     });
 
     var loadForm = function(form) {
@@ -78,15 +80,18 @@ require([
     var pageView = new SearchBaseManagerView({
         viewModel:{
             loading: loading,
+            loadingSearch: ko.observable(false),
             cardLoading: cardLoading,
             displayName: displayName,
             resourceEditorContext: true,
+            resourceInstanceExists: resourceInstanceExists,
             editingInstanceId: data.resourceid,
             relationship_types: data.relationship_types,
             graph: data.graph,
             formList: formList,
             formView: formView,
             openRelatedResources: ko.observable(false),
+            rrLoaded: ko.observable(false),
             dirty: ko.computed(function() {
                 var dirty = false;
                 _.each(formView.formTiles(), function (tile) {
@@ -134,9 +139,31 @@ require([
                         loading(false);
                     },
                 });
+            },
+            renderSearch: function() {
+                var self = this;
+                var el = $('.related-resources-editor-container');
+                self.loadingSearch(true);
+                $.ajax({
+                    type: "GET",
+                    url: arches.urls.resource_editor + data.resourceid,
+                    data: {'search': true, 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+                    success : function(data) {
+                         self.loadingSearch(false);
+                         el.html(data);
+                         ko.applyBindings(self, el[0]);
+                     }
+                });
             }
         }
     });
+
+    pageView.viewModel.openRelatedResources.subscribe(function(val){
+        if (pageView.viewModel.rrLoaded() === false) {
+            pageView.viewModel.rrLoaded(true)
+            pageView.viewModel.renderSearch()
+        }
+    })
 
     pageView.viewModel.searchResults.relationshipCandidates.subscribe(function () {
         if (!pageView.viewModel.openRelatedResources()) {

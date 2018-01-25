@@ -128,6 +128,12 @@ define([
                 this.minZoom(arches.mapDefaultMinZoom);
             }
 
+            this.zoomConfigOpen = ko.observable(false);
+            this.positionConfigOpen = ko.observable(false);
+            this.geocoderConfigOpen = ko.observable(false);
+            this.resourcePropertiesConfigOpen = ko.observable(false);
+            this.defaultValueConfigOpen = ko.observable(false);
+
             if (this.context === 'search-filter') {
                 this.query = params.query;
                 this.clearSearch = params.clearSearch;
@@ -208,7 +214,7 @@ define([
             this.clearGeometries = function(val, key) {
                 if (self.draw !== undefined && val === null) {
                     self.draw.deleteAll()
-                } else if (val.features) {
+                } else if (val !== null && val.features) {
                     if (val.features.length === 0 && self.context === 'search-filter') {
                         self.searchBuffer(null);
                         self.updateSearchQueryLayer([]);

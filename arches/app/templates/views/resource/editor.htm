@@ -24,7 +24,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock graph_header_title %}
 
 {% block graph_header_buttons %}
-    <button id="related-resources-open-btn" class="btn btn-md btn-mint btn-labeled fa fa-code-fork" data-bind="click: function(){openRelatedResources(!openRelatedResources())}, text: openRelatedResources() ? '{% trans "Return to Resource" %}' : '{% trans "Related Resources" %}'"></button>
+    <button id="related-resources-open-btn" class="btn btn-md btn-mint btn-labeled fa fa-code-fork" data-bind="disable: !resourceInstanceExists(), click: function(){openRelatedResources(!openRelatedResources())}, text: openRelatedResources() ? '{% trans "Return to Resource" %}' : '{% trans "Related Resources" %}'"></button>
     {{ block.super }}
 {% endblock graph_header_buttons %}
 
@@ -45,9 +45,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 <div class="flex relative" data-bind="visible: openRelatedResources()">
     <div class="related-resources-editor-container">
-        {% include 'views/search/search-base-manager.htm' %}
+        <div class="resource-editor-search" data-bind="css: {'loading-mask': loadingSearch()}"></div>
     </div>
 </div>
+
 {% endblock content %}
 
 {% block pre_require_js %}
@@ -63,7 +64,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             resourceid: '{{resourceid}}',
             graph: {{graph_json}},
             relationship_types: {{ relationship_types }},
-            displayName: '{{ displayname | escapejs }}'
+            displayName: '{{ displayname | escapejs }}',
+            resourceInstanceExists: '{{resource_instance_exists}}'
         };
     });
     define('search-data', [], function() {

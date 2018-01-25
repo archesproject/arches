@@ -365,6 +365,9 @@ ENABLE_CAPTCHA = True
 NOCAPTCHA = True
 # RECAPTCHA_PROXY = 'http://127.0.0.1:8000'
 
+# group to assign users who self sign up via the web ui
+USER_SIGNUP_GROUP = 'Crowdsource Editor'
+
 #######################################
 ###       END STATIC SETTINGS       ###
 #######################################
@@ -388,8 +391,6 @@ ETL_USERNAME = 'ETL' # override this setting in your packages settings.py file
 GOOGLE_ANALYTICS_TRACKING_ID = None
 
 DEFAULT_GEOCODER = "10000000-0000-0000-0000-010000000000"
-
-MAPZEN_API_KEY = ""
 
 SPARQL_ENDPOINT_PROVIDERS = (
     {'SPARQL_ENDPOINT_PROVIDER':'arches.app.utils.data_management.sparql_providers.aat_provider.AAT_Provider'},

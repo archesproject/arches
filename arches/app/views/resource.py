@@ -17,12 +17,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import uuid
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseNotFound
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.generic import View
 from django.forms.models import model_to_dict
+from django.template.loader import render_to_string
 from arches.app.models import models
 from arches.app.models.forms import Form
 from arches.app.models.card import Card
@@ -42,7 +45,6 @@ from arches.app.views.concept import Concept
 from arches.app.datatypes.datatypes import DataTypeFactory
 from elasticsearch import Elasticsearch
 
-# print system_settings
 
 @method_decorator(can_edit_resource_instance(), name='dispatch')
 class ResourceListView(BaseManagerView):
@@ -54,7 +56,8 @@ class ResourceListView(BaseManagerView):
         context['nav']['icon'] = "fa fa-bookmark"
         context['nav']['title'] = _("Resource Manager")
         context['nav']['login'] = True
-        context['nav']['help'] = (_('Creating Resources'),'help/resource-editor-landing-help.htm')
+        context['nav']['help'] = (_('Creating Resources'),'help/base-help.htm')
+        context['help'] = 'resource-editor-landing-help'
 
         return render(request, 'views/resource.htm', context)
 
@@ -74,16 +77,26 @@ class ResourceEditorView(BaseManagerView):
         if self.action == 'copy':
             return self.copy(request, resourceid)
 
-        if graphid is not None:
+        resource_instance_exists = False
+
+        try:
+            resource_instance = Resource.objects.get(pk=resourceid)
+            resource_instance_exists = True
+            graphid = resource_instance.graph.graphid
+
+        except ObjectDoesNotExist:
             resource_instance = Resource()
+            resource_instance.resourceinstanceid = resourceid
             resource_instance.graph_id = graphid
-            resource_instance.save(**{'request':request})
-            resource_instance.index()
-            return redirect('resource_editor', resourceid=resource_instance.pk)
+
         if resourceid is not None:
-            resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
-            resource_graphs = Graph.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
-            graph = Graph.objects.get(graphid=resource_instance.graph.pk)
+
+            if request.is_ajax() and request.GET.get('search') == 'true':
+                html = render_to_string('views/search/search-base-manager.htm', {}, request)
+                return HttpResponse(html)
+
+            resource_graphs = models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
+            graph = Graph.objects.get(graphid=graphid)
             relationship_type_values = get_resource_relationship_types()
             form = Form(resource_instance.pk)
             datatypes = models.DDataType.objects.all()
@@ -91,28 +104,38 @@ class ResourceEditorView(BaseManagerView):
             map_layers = models.MapLayer.objects.all()
             map_sources = models.MapSource.objects.all()
             geocoding_providers = models.Geocoder.objects.all()
-            forms = resource_instance.graph.form_set.filter(visible=True)
+            forms = graph.form_set.filter(visible=True)
             forms_x_cards = models.FormXCard.objects.filter(form__in=forms)
             forms_w_cards = []
+            required_widgets = []
+
             for form_x_card in forms_x_cards:
-                cm = models.CardModel.objects.get(pk=form_x_card.card_id)
-                if request.user.has_perm('read_nodegroup', cm.nodegroup):
+                if request.user.has_perm('read_nodegroup', form_x_card.card.nodegroup):
                     forms_w_cards.append(form_x_card.form)
-            displayname = Resource.objects.get(pk=resourceid).displayname
-            if displayname == 'undefined':
+
+            widget_datatypes = [v.datatype for k, v in graph.nodes.iteritems()]
+            widgets = widgets.filter(datatype__in=widget_datatypes)
+
+            if resource_instance_exists == True:
+                displayname = Resource.objects.get(pk=resourceid).displayname
+                if displayname == 'undefined':
+                    displayname = 'Unnamed Resource'
+            else:
                 displayname = 'Unnamed Resource'
+
             date_nodes = models.Node.objects.filter(datatype='date', graph__isresource=True, graph__isactive=True)
             searchable_datatypes = [d.pk for d in models.DDataType.objects.filter(issearchable=True)]
             searchable_nodes = models.Node.objects.filter(graph__isresource=True, graph__isactive=True, datatype__in=searchable_datatypes, issearchable=True)
             resource_cards = models.CardModel.objects.filter(graph__isresource=True, graph__isactive=True)
             context = self.get_context_data(
                 main_script=main_script,
-                resource_type=resource_instance.graph.name,
+                resource_type=graph.name,
                 relationship_types=relationship_type_values,
-                iconclass=resource_instance.graph.iconclass,
+                iconclass=graph.iconclass,
                 form=JSONSerializer().serialize(form),
                 forms=JSONSerializer().serialize(forms_w_cards),
-                datatypes_json=JSONSerializer().serialize(datatypes),
+                datatypes_json=JSONSerializer().serialize(datatypes, exclude=['iconclass', 'modulename', 'classname']),
+                datatypes=datatypes,
                 widgets=widgets,
                 date_nodes=date_nodes,
                 map_layers=map_layers,
@@ -121,11 +144,12 @@ class ResourceEditorView(BaseManagerView):
                 widgets_json=JSONSerializer().serialize(widgets),
                 resourceid=resourceid,
                 resource_graphs=resource_graphs,
-                graph_json=JSONSerializer().serialize(graph),
+                graph_json=JSONSerializer().serialize(graph, exclude=['iconclass', 'functions', 'name', 'description', 'deploymentfile', 'author', 'deploymentdate', 'version', 'isresource', 'isactive', 'iconclass', 'ontology']),
                 displayname=displayname,
-                resource_cards=JSONSerializer().serialize(resource_cards),
-                searchable_nodes=JSONSerializer().serialize(searchable_nodes),
+                resource_cards=JSONSerializer().serialize(resource_cards, exclude=['description','instructions','active','isvisible']),
+                searchable_nodes=JSONSerializer().serialize(searchable_nodes, exclude=['description', 'ontologyclass','isrequired', 'issearchable', 'istopnode']),
                 saved_searches=JSONSerializer().serialize(settings.SAVED_SEARCHES),
+                resource_instance_exists=resource_instance_exists
             )
 
             if graph.iconclass:
@@ -133,9 +157,12 @@ class ResourceEditorView(BaseManagerView):
             context['nav']['title'] = graph.name
             context['nav']['menu'] = nav_menu
             if resourceid == settings.RESOURCE_INSTANCE_ID:
-                context['nav']['help'] = (_('Managing System Settings'),'help/system-settings-help.htm')
+                context['nav']['help'] = (_('Managing System Settings'),'help/base-help.htm')
+                context['help'] = 'system-settings-help'
             else:
-                context['nav']['help'] = (_('Using the Resource Editor'),'help/resource-editor-help.htm')
+                context['nav']['help'] = (_('Using the Resource Editor'),'help/base-help.htm')
+                context['help'] = 'resource-editor-help'
+
 
             return render(request, view_template, context)
 
@@ -425,10 +452,13 @@ class RelatedResourcesView(BaseManagerView):
     def get(self, request, resourceid=None):
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         start = request.GET.get('start', 0)
-        resource = Resource.objects.get(pk=resourceid)
+        ret = []
+        try:
+            resource = Resource.objects.get(pk=resourceid)
+        except ObjectDoesNotExist:
+            resource = Resource()
         page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
         related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page)
-        ret = []
 
         if related_resources is not None:
             ret = self.paginate_related_resources(related_resources, page, request)

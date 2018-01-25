@@ -38,7 +38,7 @@ In this section you will learn about:
 - Deleting a scheme
 
 
-.. image:: images/ArchesRDM.jpg
+.. image:: ../arches/app/media/img/help/rtd/ArchesRDM.jpg
 
 **Adding a new concept scheme**
 ``````````````````````````````` 
@@ -185,7 +185,7 @@ Method 2: Graph view
 4. Click **Open**. You will be returned to the Import New Concept Scheme pop-up and the name of the file will have populated the form.
 5. Click **Upload File**. The number of Concept Schemes will have increased by 1 and the imported concept scheme will appear in the **ConceptSchemes** panel.
 
-.. image:: images/ImportConceptScheme.jpg
+.. image:: ../arches/app/media/img/help/rtd/ImportConceptScheme.jpg
 
 **Exporting a scheme**
 ``````````````````````

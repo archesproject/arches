@@ -136,7 +136,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         {% endif %}
 
                         {% if nav.help.0 != '' %}
-                        <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right">
+                        <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right" data-bind="click: function(){ getHelp('{{ help }}') }">
                             <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Help" %}'>
                               <i class="ion-help"></i>
                             </div>
@@ -158,7 +158,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </div>
 
                         <!-- help content loaded from contextually referenced template -->
-                        <div class="ep-help-body" style="float:left">
+                        <div class="ep-help-body" style="float:left" data-bind="css: {'loading-mask': helploading()}">
                             {% if nav.help.1 %}
                                 {% include nav.help.1 %}
                             {% endif %}
@@ -217,10 +217,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <ul class="collapse in pop-in" aria-expanded="false">
                                                 <!-- ko foreach: createableResources -->
                                                 <li class="link-submenu-item">
-                                                    <a class="link-submenu" href="#" data-bind="click: disable_instance_creation ? null: $parent.navigate.bind(this, '{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}'.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)),
+                                                    <a class="link-submenu" href="#" data-bind="click: disable_instance_creation ? null: $parent.navigate.bind(this, '{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' %}'.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', UUID.generate ).replace('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', graphid)),
                                                         css: { 'arches-menu-item-disabled': disable_instance_creation },
                                                         attr: {
-                                                            href: disable_instance_creation ? '#' : ('{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}'.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid))
+                                                            href: disable_instance_creation ? '#' : ('{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' %}'.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', UUID.generate ).replace('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', graphid))
                                                         }">
                                                         <i class="fa arches-menu-icon" data-bind="css: iconclass"></i> <span data-bind="text:name"></span></a>
                                                 </li>

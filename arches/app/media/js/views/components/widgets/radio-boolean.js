@@ -31,12 +31,14 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
                 }
             }
 
-            if (this.value() === true) {
-                this.displayValue = this.node.config.trueLabel;
-            }
-            else if (this.value() === false) {
-                this.displayValue = this.node.config.falseLabel;
-            }
+            this.displayValue = ko.computed(function () {
+                if (this.value()===true) {
+                    return this.node.config.trueLabel;
+                }
+                else if (this.value()===false) {
+                    return this.node.config.falseLabel;
+                }
+            }, self)
 
             this.setDefaultValue = function (val) {
                 if (val === self.defaultValue()) {

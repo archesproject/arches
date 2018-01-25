@@ -17,7 +17,7 @@
     </li>
     <li>
         <a href="#branch-library" class="nav-library-tab-link" data-toggle="tab" data-bind="visible: node() && !node().dirty()">
-            <i class="ion-ios-plus add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Add Child Nodes" %}"></i>
+            <i class="ion-ios-plus add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% if graph.isresource %}{% trans "Add Branch" %}{% else %}{% trans "Add Child Node" %}{% endif %}"></i>
         </a>
     </li>
     <li data-bind="visible: node() && !node().istopnode">

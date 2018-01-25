@@ -2465,6 +2465,51 @@ div.dropdown-menu.open {
     z-index: 100000001;
 }
 
+.resource-editor-search.loading-mask {
+    position: relative;
+    opacity: .5;
+    background-color: gray;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100000000;
+}
+
+.ep-help-body.loading-mask::before {
+    position: fixed;
+    opacity: .5;
+    color: #000;
+    content: '\f110';
+    -webkit-animation: fa-spin 2s infinite linear;
+    animation: fa-spin 2s infinite linear;
+    display: inline-block;
+    font: normal normal normal 10px/1 FontAwesome;
+    font-size: 10vw;
+    margin-top: 42vh;
+    margin-left: 18vw;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transform: translate(0, 0);
+    z-index: 100000001;
+}
+
+.ep-help-body.loading-mask:after {
+    display: none;
+}
+
+.ep-help-body.loading-mask {
+    position: relative;
+    opacity: .5;
+    background-color: gray;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100000000;
+}
+
 .list-divider-dark {
     border-bottom: 1px solid rgba(0, 0, 0, 0.4);
 }
@@ -2874,6 +2919,10 @@ ul .collapse li:last-of-type {
     background: #fff;
     opacity: .99;
     position: relative;
+}
+
+.edit-menu-item.disabled {
+    left: 0.5px;
 }
 
 .edit-menu-item:hover {
@@ -4919,6 +4968,7 @@ ul.jqtree_common li.jqtree-folder {
 
 .ep-help-body {
     height: 100%;
+    width: 100%;
     overflow-y: auto;
     display: table-row;
     float: left;
@@ -6722,6 +6772,19 @@ a .csv-chart-menubar-item {
     line-height: 1.5;
 }
 
+.panel-group.accordion .panel-heading.map-widget-config-accoridan-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-right: 10px;
+}
+
+
+.panel-heading.map-widget-config-accoridan-item .panel-title {
+    width: 100%;
+}
+
 .map-disabled {
     background-color: black;
     height: 500px;
@@ -7987,10 +8050,9 @@ a.clear-geojson-button:hover {
     cursor: default;
 }
 
-.category-title:not(.active):hover{
+.category-title:not(.active):hover {
     cursor: pointer;
     background: #ececec;
-}
 }
 
 .carousel, .carousel .item {

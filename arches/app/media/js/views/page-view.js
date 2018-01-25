@@ -38,6 +38,8 @@ define([
             _.defaults(this.viewModel, {
                 alert: ko.observable(null),
                 loading: ko.observable(false),
+                helploaded: ko.observable(false),
+                helploading: ko.observable(false),
                 showTabs: ko.observable(false),
                 tabsActive: ko.observable(false),
                 menuActive: ko.observable(false),
@@ -58,6 +60,30 @@ define([
                     self.viewModel.alert(null)
                     self.viewModel.loading(true);
                     window.location = url;
+                },
+                getHelp: function(template){
+                    if (!self.viewModel.helploaded()) {
+                        self.viewModel.helploading(true);
+                        var el = $('.ep-help-content');
+                        $.ajax({
+                            type: "GET",
+                            url: arches.urls.help_template,
+                            data: {'template': template},
+                            success : function(data) {
+                                el.html(data);
+                                self.viewModel.helploaded(true);
+                                self.viewModel.helploading(false);
+                                $('.ep-help-topic-toggle').click(function (){
+                                    var sectionEl = $(this).closest('div');
+                                    contentEl = $(sectionEl).find('.ep-help-topic-content').first();
+                                    contentEl.slideToggle();
+                                });
+                                $('.reloadable-img').click(function(){
+                                    $(this).attr('src', $(this).attr('src'));
+                                });
+                            }
+                        });
+                    }
                 }
             });
 
@@ -72,21 +98,10 @@ define([
         initialize: function(options) {
             ko.applyBindings(this.viewModel);
             $('[data-toggle="tooltip"]').tooltip();
-            
-            $('.ep-help-topic-toggle').click(function (){
-                var sectionEl = $(this).closest('div');
-                contentEl = $(sectionEl).find('.ep-help-topic-content').first();
-                contentEl.slideToggle();
-            });
-            
+
             $('.ep-help-toggle').click(function (){
                 $('#ep-help-panel').toggle('slide', { direction: 'right' });
             });
-            
-            $('.reloadable-img').click(function(){
-                $(this).attr('src', $(this).attr('src'));
-            });
-            
         }
     });
     return PageView;
