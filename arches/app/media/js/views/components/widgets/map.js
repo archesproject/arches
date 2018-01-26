@@ -12,6 +12,7 @@ define([
     'geojson-extent',
     'views/list',
     'views/components/widgets/map/map-styles',
+    'views/components/widgets/map/bin-feature-collection',
     'viewmodels/map-controls',
     'viewmodels/xy-input',
     'mathjs',
@@ -22,7 +23,7 @@ define([
     'bindings/chosen',
     'bindings/color-picker',
     'geocoder-templates'
-], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, turf, geohash, koMapping, geojsonExtent, ListView, mapStyles, MapControlsViewModel, XYInputViewModel, mathjs) {
+], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, turf, geohash, koMapping, geojsonExtent, ListView, mapStyles, binFeatureCollection, MapControlsViewModel, XYInputViewModel, mathjs) {
     /**
      * knockout components namespace used in arches
      * @external "ko.components"
@@ -698,12 +699,7 @@ define([
 
                         if (self.context === 'search-filter') {
                             self.searchAggregations = params.searchAggregations;
-                            var cellWidth = arches.hexBinSize;
-                            var units = 'kilometers';
-                            var hexGrid = turf.hexGrid(arches.hexBinBounds, cellWidth, units);
-                            _.each(hexGrid.features, function(feature, i) {
-                                feature.properties.id = i;
-                            });
+                            var bins = binFeatureCollection(self.searchAggregations);
                             self.searchBuffer.subscribe(function(val){
                                 self.updateSearchQueryLayer([{geometry: JSON.parse(self.searchBuffer())}, self.queryFeature])
                             })
@@ -736,7 +732,7 @@ define([
                                 });
                                 var pointsFC = turf.featureCollection(features);
 
-                                var aggregated = turf.collect(hexGrid, pointsFC, 'doc_count', 'doc_count');
+                                var aggregated = turf.collect(ko.unwrap(bins), pointsFC, 'doc_count', 'doc_count');
                                 _.each(aggregated.features, function(feature) {
                                     feature.properties.doc_count = _.reduce(feature.properties.doc_count, function(i, ii) {
                                         return i + ii;
@@ -787,6 +783,9 @@ define([
                                 updateSearchPointsGeoJSON();
                             }
                             self.searchAggregations.subscribe(self.updateSearchResultsLayer);
+                            if (ko.isObservable(bins)) {
+                                bins.subscribe(self.updateSearchResultsLayer);
+                            }
                             if (self.searchAggregations) {
                                 self.updateSearchResultsLayer()
                             }
