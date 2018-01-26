@@ -1,17 +1,20 @@
 define([
+    'jquery',
     'knockout',
     'underscore',
     'turf',
+    'geohash',
     'views/base-manager',
     'models/node',
     'viewmodels/alert',
+    'views/components/widgets/map/bin-feature-collection',
     'map-layer-manager-data',
     'arches',
     'bindings/mapbox-gl',
     'bindings/codemirror',
     'codemirror/mode/javascript/javascript',
     'datatype-config-components'
-], function(ko, _, turf, BaseManagerView, NodeModel, AlertViewModel, data, arches) {
+], function($, ko, _, turf, geohash, BaseManagerView, NodeModel, AlertViewModel, binFeatureCollection, data, arches) {
     var vm = {
         map: null,
         geomNodes: [],
@@ -171,34 +174,27 @@ define([
     };
     var sources = $.extend(true, {}, arches.mapSources);
 
-    var cellWidth = arches.hexBinSize;
-    var units = 'kilometers';
-    var hexGrid = turf.hexGrid(arches.hexBinBounds, cellWidth, units);
-    var pointsFC = turf.random('points', 200, {
-        bbox: arches.hexBinBounds
-    });
-    _.each(pointsFC.features, function (feature) {
-        feature.properties.doc_count = Math.round(Math.random()*1000);
-    });
-
-    var aggregated = turf.collect(hexGrid, pointsFC, 'doc_count', 'doc_count');
-    _.each(aggregated.features, function(feature) {
-        feature.properties.doc_count = _.reduce(feature.properties.doc_count, function(i,ii) {
-            return i+ii;
-        }, 0);
-    });
-
-    var resultsPoints = pointsFC.features.slice(0, 5);
-    resultsPoints[0].properties.highlight = true
-    var pointsFC = turf.featureCollection(resultsPoints);
 
     sources["search-results-hex"] = {
         "type": "geojson",
-        "data": aggregated
+        "data": {
+            "type": "FeatureCollection",
+            "features": []
+        }
     };
     sources["search-results-points"] = {
         "type": "geojson",
-        "data": pointsFC
+        "data": {
+            "type": "FeatureCollection",
+            "features": []
+        }
+    };
+    sources["search-results-hashes"] = {
+        "type": "geojson",
+        "data": {
+            "type": "FeatureCollection",
+            "features": []
+        }
     };
 
     _.each(sources, function(sourceConfig, name) {
@@ -281,6 +277,80 @@ define([
         "layers": basemapLayers.concat(displayLayers)
     };
 
+    var searchAggregations = ko.observable(null);
+    var searchResults = ko.observable(null);
+    var bins = binFeatureCollection(searchAggregations);
+
+    var getSearchAggregationGeoJSON = function() {
+        var agg = ko.unwrap(searchAggregations);
+        if (!agg || !agg.geo_aggs.grid.buckets) {
+            return {
+                "type": "FeatureCollection",
+                "features": []
+            };
+        }
+        var features = [];
+        _.each(agg.geo_aggs.grid.buckets, function(cell) {
+            var pt = geohash.decode(cell.key);
+            var feature = turf.point([pt.lon, pt.lat], {
+                doc_count: cell.doc_count
+            });
+            features.push(feature);
+        });
+        var pointsFC = turf.featureCollection(features);
+
+        var aggregated = turf.collect(ko.unwrap(bins), pointsFC, 'doc_count', 'doc_count');
+        _.each(aggregated.features, function(feature) {
+            feature.properties.doc_count = _.reduce(feature.properties.doc_count, function(i, ii) {
+                return i + ii;
+            }, 0);
+        });
+
+        return {
+            points: pointsFC,
+            agg: aggregated
+        };
+    }
+    var updateSearchPointsGeoJSON = function() {
+        var pointSource = vm.map.getSource('search-results-points')
+        if (vm.map && pointSource) {
+            var aggResults = ko.unwrap(searchResults);
+            if (!aggResults || !aggResults.results) {
+                return {
+                    "type": "FeatureCollection",
+                    "features": []
+                };
+            }
+
+            var features = [];
+            _.each(aggResults.results.hits.hits, function(result) {
+                _.each(result._source.points, function(point) {
+                    var feature = turf.point([point.point.lon, point.point.lat], _.extend(result._source, {
+                        resourceinstanceid: result._id,
+                        highlight: false
+                    }));
+                    features.push(feature);
+                });
+            });
+
+            var pointsFC = turf.featureCollection(features);
+            pointSource.setData(pointsFC)
+        }
+    }
+
+    var updateSearchResultsLayer = function() {
+        if (vm.map && searchAggregations()) {
+            var aggSource = vm.map.getSource('search-results-hex');
+            var hashSource = vm.map.getSource('search-results-hashes');
+            if (aggSource && hashSource) {
+                var aggData = getSearchAggregationGeoJSON();
+                aggSource.setData(aggData.agg);
+                hashSource.setData(aggData.points);
+            }
+            updateSearchPointsGeoJSON();
+        }
+    }
+
     vm.setupMap = function(map) {
         vm.map = map;
         map.on('moveend', function (e) {
@@ -294,7 +364,26 @@ define([
                 vm.centerY(center.lat);
             }
         });
+
+        searchAggregations.subscribe(updateSearchResultsLayer);
+        if (ko.isObservable(bins)) {
+        	bins.subscribe(updateSearchResultsLayer);
+        }
+        updateSearchResultsLayer();
     }
+
+    $.ajax({
+        dataType: "json",
+        url: arches.urls.search_results,
+        data: {
+            no_filters: true,
+            page: 1
+        },
+        success: function (results) {
+            searchAggregations(results.results.aggregations);
+            searchResults(results);
+        }
+    });
 
     var updateMapStyle = function () {
         var displayLayers;
@@ -312,6 +401,7 @@ define([
         }
         if (vm.map) {
             vm.map.setStyle(vm.mapStyle);
+            updateSearchResultsLayer();
         }
     };
 
