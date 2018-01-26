@@ -1003,7 +1003,8 @@ define([
                     'icon',
                     'raster',
                     'circle',
-                    'fill-extrusion'
+                    'fill-extrusion',
+                    'heatmap'
                 ];
                 var multiplyStopValues = function(stops, multiplier) {
                     _.each(stops, function(stop) {
