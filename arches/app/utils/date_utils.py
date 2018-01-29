@@ -19,7 +19,7 @@ class SortableDateRange(object):
 
 class ExtendedDateFormat(SortableDateRange):
     def __init__(self, date=None, fuzzy_year_padding=1, fuzzy_month_padding=1, fuzzy_day_padding=1, 
-        multiplier_if_uncertain=1, multiplier_if_approximate=1, multiplier_if_both=1):
+        fuzzy_season_padding=12, multiplier_if_uncertain=1, multiplier_if_approximate=1, multiplier_if_both=1):
         super(ExtendedDateFormat, self).__init__()
         self.orig_date = None
         self.edtf = None
@@ -30,6 +30,7 @@ class ExtendedDateFormat(SortableDateRange):
         self.fuzzy_year_padding = fuzzy_year_padding
         self.fuzzy_month_padding = fuzzy_month_padding
         self.fuzzy_day_padding = fuzzy_day_padding
+        self.fuzzy_season_padding = fuzzy_season_padding
 
         self.multiplier_if_uncertain = multiplier_if_uncertain
         self.multiplier_if_approximate = multiplier_if_approximate
@@ -103,15 +104,16 @@ class ExtendedDateFormat(SortableDateRange):
         # print type(object)
         # print object
         if (isinstance(object, Date) or
-            isinstance(object, DateAndTime) or
             isinstance(object, Season) or
-            isinstance(object, Unspecified) or
-            isinstance(object, PartialUnspecified)):
+            isinstance(object, Unspecified)):
+            if (isinstance(object, PartialUncertainOrApproximate)):
+                fuzzy_padding = self.get_fuzzy_padding(object)
             return self.handle_date(object, fuzzy_padding)
-        elif (isinstance(object, UncertainOrApproximate) or
-              isinstance(object, PartialUncertainOrApproximate)):
-            # print  self.get_fuzzy_padding(object)
+        elif (isinstance(object, UncertainOrApproximate)):
             return self.handle_object(object.date, self.get_fuzzy_padding(object))
+        elif (isinstance(object, DateAndTime) or
+              isinstance(object, PartialUnspecified)):
+            return self.handle_object(object.date)
         elif (isinstance(object, Interval) or
               isinstance(object, Level1Interval) or
               isinstance(object, Level2Interval)):
@@ -209,6 +211,7 @@ class ExtendedDateFormat(SortableDateRange):
         padding_day_precision = relativedelta(days=self.fuzzy_day_padding).normalized()
         padding_month_precision = relativedelta(months=self.fuzzy_month_padding).normalized()
         padding_year_precision = relativedelta(years=self.fuzzy_year_padding).normalized()
+        padding_season_precision = relativedelta(weeks=self.fuzzy_season_padding).normalized()
 
         if isinstance(object, UncertainOrApproximate):
             # from https://github.com/ixc/python-edtf/blob/master/edtf/parser/parser_classes.py#L366
@@ -243,7 +246,7 @@ class ExtendedDateFormat(SortableDateRange):
                 result += padding_month_precision * object.month_day_ua._get_multiplier()
 
             if object.season_ua:
-                result += PADDING_SEASON_PRECISION * object.season_ua._get_multiplier()
+                result += padding_season_precision * object.season_ua._get_multiplier()
 
             if object.all_ua:
                 multiplier = object.all_ua._get_multiplier()
@@ -259,3 +262,5 @@ class ExtendedDateFormat(SortableDateRange):
                     result += multiplier * padding_year_precision
 
             return result
+
+        return None

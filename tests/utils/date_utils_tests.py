@@ -62,6 +62,7 @@ EDTF_DATES = (
     ('1984~', '19840101', '19841231', '19830101', '19851231'),
     # the year is approximately 1984 and even that is uncertain
     ('1984?~', '19840101', '19841231', '19820101', '19861231'),
+    
     # Unspecified
     # some unspecified year in the 1990s.
     ('199u', '19900101', '19991231'),
@@ -90,7 +91,8 @@ EDTF_DATES = (
     # interval whose beginning is uncertain but thought to be 1984, and whose end is uncertain and approximate but thought to be 2004
     ('1984-06?/2004-08?', '19840601', '20040831', '19840501', '20040930'),
     ('1984-06-02?/2004-08-08~', '19840602', '20040808', '19840601', '20040809'),
-    ('1984-06-02?/unknown', '19840602', 'unknown', '19840601', '19940602'),
+    ('1984-06-02?/unknown', '19840602', 'unknown', '19840601', 'unknown'),
+    
     # Year exceeding 4 digits
     # the year 170000002
     ('y170000002', '1700000020101', '1700000021231'),
@@ -137,6 +139,7 @@ EDTF_DATES = (
     ('2011-23~', '20110901', '20111130', '20110609', '20120222'),
     # Years wrapping
     ('2011-24~', '20111201', '20111231', '20110908', '20120324'),
+    
     # Partial unspecified
     # December 25 sometime during the 1560s
     ('156u-12-25', '15601225', '15691225'),
@@ -145,6 +148,7 @@ EDTF_DATES = (
     # Year and day of month specified, month unspecified
     ('1560-uu-25', '15600125', '15601225'),
     ('15uu-12-uu', '15001201', '15991231'),
+    
     # One of a Set
     # One of the years 1667, 1668, 1670, 1671, 1672
     ('[1667,1668, 1670..1672]',  [['16670101', '16671231'], ['16680101', '16681231'], ['16700101', '16721231']]),
@@ -156,21 +160,25 @@ EDTF_DATES = (
     ('[1760-01, 1760-02, 1760-12..]', [['17600101', '17600131'], ['17600201', '17600229'], ['17601201', 'None']]),
     # Either the year 1667 or the month December of 1760.
     ('[1667, 1760-12]', [['16670101', '16671231'], ['17601201', '17601231']]),
+    
     # Multiple Dates
     # All of the years 1667, 1668, 1670, 1671, 1672
     ('{1667,1668, 1670..1672}', [['16670101', '16671231'], ['16680101', '16681231'], ['16700101', '16721231']]),
     # The year 1960 and the month December of 1961.
     ('{1960, 1961-12}', [['19600101', '19601231'], ['19611201', '19611231']]),
+    
     # Masked Precision
     # A date during the 1960s
     ('196x', '19600101', '19691231'),
     # A date during the 1900s
     ('19xx', '19000101', '19991231'),
+    
     # L2 Extended Interval
     # An interval in June 2004 beginning approximately the first and ending approximately the 20th.
     ('2004-06-(01)~/2004-06-(20)~', '20040601', '20040620', '20040531', '20040621'),
     # The interval began on an unspecified day in June 2004.
     ('2004-06-uu/2004-07-03', '20040601', '20040703'),
+    
     # Year Requiring More than Four Digits - Exponential Form
     # the year 170000000
     ('y17e7', '1700000000101', '1700000001231'),
@@ -216,11 +224,19 @@ class SortableDateTests(ArchesTestCase):
                     self.assertEqual(unicode(item.upper), test_case[1][i][1])
             else:
                 self.assertEqual(unicode(f.lower), test_case[1])
-        elif len(test_case) == 3 or len(test_case) == 5:
+        elif len(test_case) == 3:
             self.assertEqual(unicode(f.lower), test_case[1])
             self.assertEqual(unicode(f.upper), test_case[2])
         elif len(test_case) == 4:
             self.assertEqual(unicode(f.lower), test_case[1])
+            self.assertEqual(unicode(f.upper), test_case[1])
+            self.assertEqual(unicode(f.lower_fuzzy), test_case[2])
+            self.assertEqual(unicode(f.upper_fuzzy), test_case[3])
+        elif len(test_case) == 5:
+            self.assertEqual(unicode(f.lower), test_case[1])
+            self.assertEqual(unicode(f.upper), test_case[2])
+            self.assertEqual(unicode(f.lower_fuzzy), test_case[3])
+            self.assertEqual(unicode(f.upper_fuzzy), test_case[4])
         elif len(test_case) == 1:
             self.assertEqual(f.is_valid(), False)
         else:
