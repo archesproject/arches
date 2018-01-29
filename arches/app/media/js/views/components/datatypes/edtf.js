@@ -3,6 +3,7 @@ define(['knockout'], function (ko) {
     ko.components.register(name, {
         viewModel: function(params) {
             var self = this;
+            this.config = params.config;
             this.search = params.search;
             if (this.search) {
                 var filter = params.filterValue();
