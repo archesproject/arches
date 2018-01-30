@@ -35,7 +35,7 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.pagination import get_paginator
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.date_utils import SortableDate
+from arches.app.utils.date_utils import ExtendedDateFormat
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Term, Terms, GeoShape, Range, MinAgg, MaxAgg, RangeAgg, Aggregation, GeoHashGridAgg, GeoBoundsAgg, FiltersAgg, NestedAgg
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
@@ -160,7 +160,11 @@ def search_terms(request):
     return JSONResponse(ret)
 
 def search_results(request):
-    search_results_dsl = build_search_results_dsl(request)
+    try:
+        search_results_dsl = build_search_results_dsl(request)
+    except Exception as err:
+        return JSONResponse(err.message, status=500)
+        
     dsl = search_results_dsl['query']
     search_buffer = search_results_dsl['search_buffer']
     dsl.include('graph_id')
@@ -311,8 +315,8 @@ def build_search_results_dsl(request):
 
     if 'fromDate' in temporal_filter and 'toDate' in temporal_filter:
         now = str(datetime.utcnow())
-        start_date = SortableDate(temporal_filter['fromDate'])
-        end_date = SortableDate(temporal_filter['toDate'])
+        start_date = ExtendedDateFormat(temporal_filter['fromDate'])
+        end_date = ExtendedDateFormat(temporal_filter['toDate'])
         date_nodeid = str(temporal_filter['dateNodeId']) if 'dateNodeId' in temporal_filter and temporal_filter['dateNodeId'] != '' else None
         query_inverted = False if 'inverted' not in temporal_filter else temporal_filter['inverted']
 
@@ -325,11 +329,11 @@ def build_search_results_dsl(request):
             inverted_date_ranges_query = Bool()
 
             if start_date.is_valid():
-                inverted_date_query.should(Range(field='dates.date', lt=start_date.as_float()))
-                inverted_date_ranges_query.should(Range(field='date_ranges.date_range', lt=start_date.as_float()))
+                inverted_date_query.should(Range(field='dates.date', lt=start_date.lower))
+                inverted_date_ranges_query.should(Range(field='date_ranges.date_range', lt=start_date.lower))
             if end_date.is_valid():
-                inverted_date_query.should(Range(field='dates.date', gt=end_date.as_float()))
-                inverted_date_ranges_query.should(Range(field='date_ranges.date_range', gt=end_date.as_float()))
+                inverted_date_query.should(Range(field='dates.date', gt=end_date.upper))
+                inverted_date_ranges_query.should(Range(field='date_ranges.date_range', gt=end_date.upper))
 
             date_query = Bool()
             date_query.filter(inverted_date_query)
@@ -345,13 +349,13 @@ def build_search_results_dsl(request):
 
         else:
             date_query = Bool()
-            date_query.filter(Range(field='dates.date', gte=start_date.as_float(), lte=end_date.as_float()))
+            date_query.filter(Range(field='dates.date', gte=start_date.lower, lte=end_date.upper))
             date_query.filter(Terms(field='dates.nodegroup_id', terms=permitted_nodegroups))
             if date_nodeid:
                 date_query.filter(Term(field='dates.nodeid', term=date_nodeid))
             else:
                 date_ranges_query = Bool()
-                date_ranges_query.filter(Range(field='date_ranges.date_range', gte=start_date.as_float(), lte=end_date.as_float(), relation='intersects'))
+                date_ranges_query.filter(Range(field='date_ranges.date_range', gte=start_date.lower, lte=end_date.upper, relation='intersects'))
                 date_ranges_query.filter(Terms(field='date_ranges.nodegroup_id', terms=permitted_nodegroups))
                 temporal_query.should(Nested(path='date_ranges', query=date_ranges_query))
             temporal_query.should(Nested(path='dates', query=date_query))
@@ -486,8 +490,8 @@ def time_wheel_config(request):
             min_millenium = millennium
             max_millenium = millennium + 1000
             millenium_name = "Millennium (%s - %s)"%(min_millenium, max_millenium)
-            mill_boolquery = gen_range_agg(gte=SortableDate(min_millenium).as_float()-1,
-                lte=SortableDate(max_millenium).as_float(),
+            mill_boolquery = gen_range_agg(gte=ExtendedDateFormat(min_millenium).lower,
+                lte=ExtendedDateFormat(max_millenium).lower,
                 permitted_nodegroups=get_permitted_nodegroups(request.user))
             millenium_agg = FiltersAgg(name=millenium_name)
             millenium_agg.add_filter(mill_boolquery)
@@ -497,7 +501,8 @@ def time_wheel_config(request):
                 min_century = century
                 max_century = century + 100
                 century_name="Century (%s - %s)"%(min_century, max_century)
-                cent_boolquery = gen_range_agg(gte=SortableDate(min_century).as_float()-1, lte=SortableDate(max_century).as_float())
+                cent_boolquery = gen_range_agg(gte=ExtendedDateFormat(min_century).lower, 
+                    lte=ExtendedDateFormat(max_century).lower)
                 century_agg = FiltersAgg(name=century_name)
                 century_agg.add_filter(cent_boolquery)
                 millenium_agg.add_aggregation(century_agg)
@@ -507,7 +512,8 @@ def time_wheel_config(request):
                     min_decade = decade
                     max_decade = decade + 10
                     decade_name = "Decade (%s - %s)"%(min_decade, max_decade)
-                    dec_boolquery = gen_range_agg(gte=SortableDate(min_decade).as_float()-1, lte=SortableDate(max_decade).as_float())
+                    dec_boolquery = gen_range_agg(gte=ExtendedDateFormat(min_decade).lower, 
+                        lte=ExtendedDateFormat(max_decade).lower)
                     decade_agg = FiltersAgg(name=decade_name)
                     decade_agg.add_filter(dec_boolquery)
                     century_agg.add_aggregation(decade_agg)
