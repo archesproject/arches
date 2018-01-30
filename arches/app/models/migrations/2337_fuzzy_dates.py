@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '0010_4_1_0'),
+        ('models', '2533_duplicated_concept_relation_import'),
     ]
 
     operations = [
