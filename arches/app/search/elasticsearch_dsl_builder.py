@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from arches.app.utils.betterJSONSerializer import JSONSerializer
+from django.utils.translation import ugettext as _
 
 class Dsl(object):
     def __init__(self, dsl=None):
@@ -311,11 +312,11 @@ class Range(Dsl):
         }
 
         if self.gte is None and self.gt is None and self.lte is None and self.lt is None:
-            raise Exception('You need at least one of the following: gte, gt, lte, or lt')
+            raise RangeDSLException(_('You need at least one of the following operators in a Range expression: gte, gt, lte, or lt'))
         if self.gte is not None and self.gt is not None:
-            raise Exception('You can only use one of either: gte or gt')
+            raise RangeDSLException(_('You can only use one of either: gte or gt'))
         if self.lte is not None and self.lt is not None:
-            raise Exception('You can only use one of either: lte or lt')
+            raise RangeDSLException(_('You can only use one of either: lte or lt'))
 
         if self.gte is not None:
             self.dsl['range'][self.field]['gte'] = self.gte
@@ -328,6 +329,8 @@ class Range(Dsl):
         if self.relation is not None:
             self.dsl['range'][self.field]['relation'] = self.relation
 
+class RangeDSLException(Exception):
+    pass
 
 class SimpleQueryString(Dsl):
     """
@@ -387,13 +390,11 @@ class Aggregation(Dsl):
         self.size = kwargs.pop('size', None)
 
         if self.field is not None and self.script is not None:
-            raise Exception('You need to specify either a "field" or a "script"')
-        # if self.field is None and self.script is None:
-        #     raise Exception('You need to specify either a "field" or a "script"')
+            raise AggregationDSLException(_('You need to specify either a "field" or a "script"'))
         if self.name is None:
-            raise Exception('You need to specify a name for your aggregation')
+            raise AggregationDSLException(_('You need to specify a name for your aggregation'))
         if self.type is None:
-            raise Exception('You need to specify an aggregation type')
+            raise AggregationDSLException(_('You need to specify an aggregation type'))
 
         self.agg = {
             self.name: {
@@ -421,6 +422,10 @@ class Aggregation(Dsl):
     def set_size(self, size):
         if size is not None and size > 0:
             self.agg[self.name][self.type]['size'] = size
+
+
+class AggregationDSLException(Exception):
+    pass
 
 
 class GeoHashGridAgg(Aggregation):
@@ -584,8 +589,12 @@ class NestedAgg(Aggregation):
         self.aggregation = kwargs.pop('agg', {})
         self.path = kwargs.pop('path', None)
         if self.path is None:
-            raise Exception('You need to specify a path for your nested aggregation')
+            raise NestedAggDSLException(_('You need to specify a path for your nested aggregation'))
         super(NestedAgg, self).__init__(type='nested', path=self.path, **kwargs)
 
         if self.name:
             self.agg[self.name]['aggs'] = self.aggregation
+
+
+class NestedAggDSLException(Exception):
+    pass
