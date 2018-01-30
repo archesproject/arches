@@ -216,16 +216,16 @@ class EDTFDataType(BaseDataType):
 
     def append_to_document(self, document, nodevalue, nodeid, tile):
         def add_date_to_doc(document, edtf):
-            if edtf.lower != edtf.upper:
-                dr = {}
-                if edtf.lower is not None:
-                    dr['gte'] = edtf.lower
-                if edtf.upper is not None:
-                    dr['lte'] = edtf.upper
-                document['date_ranges'].append({'date_range': dr, 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid})
-            else:
+            if edtf.lower == edtf.upper:
                 if edtf.lower is not None:
                     document['dates'].append({'date': edtf.lower, 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid})
+            else:
+                dr = {}
+                if edtf.lower_fuzzy is not None:
+                    dr['gte'] = edtf.lower_fuzzy
+                if edtf.upper_fuzzy is not None:
+                    dr['lte'] = edtf.upper_fuzzy
+                document['date_ranges'].append({'date_range': dr, 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid})
         
         # update the indexed tile value to support adv. search
         tile.data[nodeid] = {
@@ -234,7 +234,8 @@ class EDTFDataType(BaseDataType):
             'date_ranges': []
         }
 
-        edtf = ExtendedDateFormat(nodevalue)
+        node = models.Node.objects.get(nodeid=nodeid)
+        edtf = ExtendedDateFormat(nodevalue, **node.config)
         if edtf.result_set:
             for result in edtf.result_set:
                 add_date_to_doc(document, result)

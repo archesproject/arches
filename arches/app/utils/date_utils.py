@@ -27,14 +27,14 @@ class ExtendedDateFormat(SortableDateRange):
         self.sortable_date = None
         self.error = None
 
-        self.fuzzy_year_padding = fuzzy_year_padding
-        self.fuzzy_month_padding = fuzzy_month_padding
-        self.fuzzy_day_padding = fuzzy_day_padding
-        self.fuzzy_season_padding = fuzzy_season_padding
+        self.fuzzy_year_padding = int(fuzzy_year_padding)
+        self.fuzzy_month_padding = int(fuzzy_month_padding)
+        self.fuzzy_day_padding = int(fuzzy_day_padding)
+        self.fuzzy_season_padding = int(fuzzy_season_padding)
 
-        self.multiplier_if_uncertain = multiplier_if_uncertain
-        self.multiplier_if_approximate = multiplier_if_approximate
-        self.multiplier_if_both = multiplier_if_both
+        self.multiplier_if_uncertain = int(multiplier_if_uncertain)
+        self.multiplier_if_approximate = int(multiplier_if_approximate)
+        self.multiplier_if_both = int(multiplier_if_both)
         
         try:
             self.parse(date)
@@ -78,7 +78,7 @@ class ExtendedDateFormat(SortableDateRange):
             self.upper_fuzzy = result.upper_fuzzy
 
     def is_valid(self):
-        return True if self.lower or self.upper or self.result_set else False
+        return True if self.lower or self.upper or self.lower_fuzzy or self.upper_fuzzy or self.result_set else False
 
     def is_leap_year(self, year):
         if ((year % 4 == 0) and (year % 100 != 0)) or (year % 400 == 0):
@@ -133,7 +133,7 @@ class ExtendedDateFormat(SortableDateRange):
                 dr.lower = dr.lower_fuzzy = dr.upper = dr.upper_fuzzy = object
                 return dr
         else:
-            raise Exception('')
+            raise UnhandledEDTFException()
 
     def handle_date(self, date, fuzzy_padding=None):
         dr = SortableDateRange()
@@ -264,3 +264,6 @@ class ExtendedDateFormat(SortableDateRange):
             return result
 
         return None
+
+class UnhandledEDTFException(Exception):
+    pass
