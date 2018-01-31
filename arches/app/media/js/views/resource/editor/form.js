@@ -32,6 +32,7 @@ define([
             this.resourceid = options.resourceid;
             this.widgetLookup = widgets;
             this.cards = ko.observableArray([new CardModel({})]);
+            this.resourceexists = options.resourceexists
             this.tiles = koMapping.fromJS({});
             this.blanks = koMapping.fromJS({});
             this.ready = ko.observable(false);
@@ -294,6 +295,7 @@ define([
                         }
                     }
                     this.trigger('after-update', response, tile);
+                    this.resourceexists(true);
                 }, this, tile.formData);
             }
         },
@@ -326,6 +328,7 @@ define([
                 if(response.status === 200){
                     this.tiles[parentTile.nodegroup_id()].push(this.initTile(koMapping.fromJS(response.responseJSON)));
                     this.clearTile(parentTile);
+                    this.resourceexists(true)
                 }
                 this.trigger('after-update', response, parentTile);
             }, this, parentTile.formData);

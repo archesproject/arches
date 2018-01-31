@@ -2925,6 +2925,10 @@ ul .collapse li:last-of-type {
     position: relative;
 }
 
+.edit-menu-item.disabled {
+    left: 0.5px;
+}
+
 .edit-menu-item:hover {
     background: #f8f8f8;
     border-left: 3px solid #579ddb;
