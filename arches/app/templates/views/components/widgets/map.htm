@@ -462,11 +462,12 @@
     <!-- /ko -->
 
     <div class="panel">
-        <div class="panel-heading map-widget-config-accoridan-item" data-bind="click: function(){positionConfigOpen(!positionConfigOpen())}">
+        <div class="panel-heading map-widget-config-accoridan-item">
             <h4 class="panel-title">
-                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-position" class="collapsed" aria-expanded="false">{% trans "Position" %}</a>
+                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-position" class="collapsed" aria-expanded="false" data-bind="click: function(){positionConfigOpen(!positionConfigOpen())}">{% trans "Position" %}
+                    <i class="fa" data-bind="css: {'fa-caret-down': positionConfigOpen(), 'fa-caret-right': !positionConfigOpen()}"></i>
+                </a>
             </h4>
-            <i class="fa" data-bind="css: {'fa-caret-down': positionConfigOpen(), 'fa-caret-right': !positionConfigOpen()}"></i>
 
         </div>
         <div class="panel-collapse collapse" id="map-config-position" aria-expanded="false" style="height: 0px;">
@@ -500,11 +501,12 @@
     </div>
     <div class="panel">
 
-        <div class="panel-heading map-widget-config-accoridan-item" data-bind="click: function(){zoomConfigOpen(!zoomConfigOpen())}">
+        <div class="panel-heading map-widget-config-accoridan-item">
             <h4 class="panel-title">
-                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-zoom" class="collapsed" aria-expanded="false">{% trans "Zoom" %}</a>
+                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-zoom" class="collapsed" aria-expanded="false" data-bind="click: function(){zoomConfigOpen(!zoomConfigOpen())}">{% trans "Zoom" %}
+                    <i class="fa" data-bind="css: {'fa-caret-down': zoomConfigOpen(), 'fa-caret-right': !zoomConfigOpen()}"></i>
+                </a>
             </h4>
-            <i class="fa" data-bind="css: {'fa-caret-down': zoomConfigOpen(), 'fa-caret-right': !zoomConfigOpen()}"></i>
         </div>
 
         <div class="panel-collapse collapse" id="map-config-zoom" aria-expanded="false" style="height: 0px;">
@@ -532,11 +534,12 @@
     </div>
     <div class="panel">
 
-        <div class="panel-heading map-widget-config-accoridan-item" data-bind="click: function(){geocoderConfigOpen(!geocoderConfigOpen())}">
+        <div class="panel-heading map-widget-config-accoridan-item">
             <h4 class="panel-title">
-                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-geocoder" aria-expanded="false" class="collapsed">{% trans "Geocoder" %}</a>
+                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-geocoder" aria-expanded="false" class="collapsed" data-bind="click: function(){geocoderConfigOpen(!geocoderConfigOpen())}">{% trans "Geocoder" %}
+                    <i class="fa" data-bind="css: {'fa-caret-down': geocoderConfigOpen(), 'fa-caret-right': !geocoderConfigOpen()}"></i>
+                </a>
             </h4>
-            <i class="fa" data-bind="css: {'fa-caret-down': geocoderConfigOpen(), 'fa-caret-right': !geocoderConfigOpen()}"></i>
         </div>
 
         <div class="panel-collapse collapse" id="map-config-geocoder" aria-expanded="false" style="height: 0px;">
@@ -567,11 +570,12 @@
     </div>
 
     <div class="panel">
-        <div class="panel-heading map-widget-config-accoridan-item" data-bind="click: function(){resourcePropertiesConfigOpen(!resourcePropertiesConfigOpen())}">
+        <div class="panel-heading map-widget-config-accoridan-item">
             <h4 class="panel-title">
-                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-resource-style" aria-expanded="false" class="collapsed">{% trans "Resource Properties" %}</a>
+                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-resource-style" aria-expanded="false" class="collapsed" data-bind="click: function(){resourcePropertiesConfigOpen(!resourcePropertiesConfigOpen())}">{% trans "Resource Properties" %}
+                <i class="fa" data-bind="css: {'fa-caret-down': resourcePropertiesConfigOpen(), 'fa-caret-right': !resourcePropertiesConfigOpen()}"></i>
+                </a>
             </h4>
-            <i class="fa" data-bind="css: {'fa-caret-down': resourcePropertiesConfigOpen(), 'fa-caret-right': !resourcePropertiesConfigOpen()}"></i>
         </div>
 
         <div class="panel-collapse collapse" id="map-config-resource-style" aria-expanded="false" style="height: 0px;">
@@ -609,11 +613,12 @@
 
     <div class="panel">
 
-        <div class="panel-heading map-widget-config-accoridan-item" data-bind="click: function(){defaultValueConfigOpen(!defaultValueConfigOpen())}">
+        <div class="panel-heading map-widget-config-accoridan-item">
             <h4 class="panel-title">
-                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-default-value" aria-expanded="false" class="collapsed">{% trans "Default Value" %}</a>
+                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-default-value" aria-expanded="false" class="collapsed" data-bind="click: function(){defaultValueConfigOpen(!defaultValueConfigOpen())}">{% trans "Default Value" %}
+                    <i class="fa" data-bind="css: {'fa-caret-down': defaultValueConfigOpen(), 'fa-caret-right': !defaultValueConfigOpen()}"></i>
+                </a>
             </h4>
-            <i class="fa" data-bind="css: {'fa-caret-down': defaultValueConfigOpen(), 'fa-caret-right': !defaultValueConfigOpen()}"></i>
         </div>
 
         <div class="panel-collapse collapse" id="map-config-default-value" aria-expanded="false" style="height: 0px;">
