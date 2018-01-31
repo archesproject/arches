@@ -178,6 +178,37 @@ class EditLog(models.Model):
         db_table = 'edit_log'
 
 
+class ProvisionalEdit(models.Model):
+    review = 'review'
+    approved = 'approved'
+    rejected = 'rejected'
+    tile_status_options = (
+        (review, 'review'),
+        (approved, 'approved'),
+        (rejected, 'rejected'),
+        )
+    created = 'created'
+    updated = 'updated'
+    deleted = 'deleted'
+    tile_action_options = (
+        (created, 'created'),
+        (updated, 'updated'),
+        (deleted, 'deleted'),
+        )
+    prototile = models.ForeignKey('TileModel', models.SET_NULL, blank=True, null=True, related_name='tile')
+    tile = models.OneToOneField('TileModel', on_delete=models.CASCADE, primary_key=True, related_name='provisionaledit')
+    status = models.TextField(choices=tile_status_options)
+    action = models.TextField(choices=tile_action_options)
+    editor = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, related_name='editor')
+    reviewer = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, related_name='reviewer')
+    timestamp = models.DateTimeField(blank=True, null=True)
+    reviewtimestamp = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'provisional_edits'
+
+
 class File(models.Model):
     fileid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     path = models.FileField(upload_to='uploadedfiles')
