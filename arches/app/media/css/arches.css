@@ -191,6 +191,10 @@
     background-clip: content-box;
 }
 
+.arches-toggle-sm.disabled {
+    color: #888;
+}
+
 .switch.switch-small.switch-widget {
     width: 35px;
 }

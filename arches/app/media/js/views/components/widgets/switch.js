@@ -24,12 +24,14 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
             this.off = this.config().off || false;
             this.null = this.config().null || null;
             this.setvalue = this.config().setvalue || function(self, evt){
-                if(self.value() === self.on){
-                    self.value(self.null);
-                }else if (self.value() === self.null) {
-                    self.value(self.off);
-                }else if (self.value() === self.off) {
-                    self.value(self.on);
+                if (ko.unwrap(self.disabled) === false) {
+                    if(self.value() === self.on){
+                        self.value(self.null);
+                    }else if (self.value() === self.null) {
+                        self.value(self.off);
+                    }else if (self.value() === self.off) {
+                        self.value(self.on);
+                    }
                 }
             }
             this.getvalue = this.config().getvalue || ko.computed(function(){
