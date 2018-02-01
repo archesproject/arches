@@ -162,7 +162,7 @@ class Tile(models.TileModel):
                             self.data = existing_model.data
                 else:
                     self.save_edit(user=user, edit_type=edit_type, old_value=self.data, new_value=self.data)
-            except:
+            except AttributeError: #In cases when there is no user - eg on import
                 self.save_edit(user={}, edit_type=edit_type, old_value=self.data, new_value=self.data)
 
             for nodeid, value in self.data.iteritems():
@@ -186,8 +186,8 @@ class Tile(models.TileModel):
                 is_resource_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
                 if self.is_provisional() == False and is_resource_reviewer == False:
                     self.save_provisional_edit(request.user, self, prototile=None, action='created')
-        except Exception as e:
-            print e
+        except AttributeError: #In cases when there is no user - eg on import
+            pass
         if index and unicode(self.resourceinstance.graph_id) != unicode(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
             self.index()
         for tiles in self.tiles.itervalues():
