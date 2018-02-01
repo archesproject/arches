@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('models', '0010_4_1_0'),
+        ('models', '2337_fuzzy_dates'),
     ]
 
     def add_permissions(apps, schema_editor, with_create_permissions=True):
