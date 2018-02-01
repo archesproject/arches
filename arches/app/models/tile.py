@@ -169,7 +169,7 @@ class Tile(models.TileModel):
                 datatype_factory = DataTypeFactory()
                 node = models.Node.objects.get(nodeid=nodeid)
                 datatype = datatype_factory.get_instance(node.datatype)
-                datatype.convert_value(self, nodeid)
+                datatype.clean(self, nodeid)
                 if request is not None:
                     datatype.handle_request(self, request, node)
                 if self.data[nodeid] == None and node.isrequired == True:

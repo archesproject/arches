@@ -10,9 +10,10 @@ from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.betterJSONSerializer import JSONSerializer
-from arches.app.utils.date_utils import SortableDate
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Exists
+from arches.app.utils.date_utils import ExtendedDateFormat
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Exists, RangeDSLException
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from django.utils.translation import ugettext as _
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import fromstr
@@ -20,6 +21,7 @@ from django.contrib.gis.geos import Polygon
 from django.core.exceptions import ValidationError
 from django.db import connection, transaction
 from elasticsearch import Elasticsearch
+from edtf import parse_edtf
 
 EARTHCIRCUM = 40075016.6856
 PIXELSPERTILE = 256
@@ -64,7 +66,7 @@ class StringDataType(BaseDataType):
             errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, 'this is not a string', 'This data was not imported.')})
         return errors
 
-    def convert_value(self, tile, nodeid):
+    def clean(self, tile, nodeid):
         if tile.data[nodeid] in ['', "''"]:
             tile.data[nodeid] = None
 
@@ -110,7 +112,7 @@ class NumberDataType(BaseDataType):
     def transform_import_values(self, value, nodeid):
         return float(value)
 
-    def convert_value(self, tile, nodeid):
+    def clean(self, tile, nodeid):
         try:
             tile.data[nodeid].upper()
             tile.data[nodeid] = float(tile.data[nodeid])
@@ -186,7 +188,7 @@ class DateDataType(BaseDataType):
         return value
 
     def append_to_document(self, document, nodevalue, nodeid, tile):
-        document['dates'].append({'date': SortableDate(nodevalue).as_float(), 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid})
+        document['dates'].append({'date': ExtendedDateFormat(nodevalue).lower, 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid})
 
     def append_search_filters(self, value, node, query, request):
         try:
@@ -201,6 +203,77 @@ class DateDataType(BaseDataType):
                 query.must(search_query)
         except KeyError, e:
             pass
+
+
+class EDTFDataType(BaseDataType):
+
+    def validate(self, value, source=''):
+        errors = []
+        if not ExtendedDateFormat(value).is_valid():
+            errors.append({'type': 'ERROR', 'message': '{0} is not in the correct Extended Date Time Format, see http://www.loc.gov/standards/datetime/ for supported formats. This data was not imported.'.format(value)})
+
+        return errors
+
+    def append_to_document(self, document, nodevalue, nodeid, tile):
+        def add_date_to_doc(document, edtf):
+            if edtf.lower == edtf.upper:
+                if edtf.lower is not None:
+                    document['dates'].append({'date': edtf.lower, 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid})
+            else:
+                dr = {}
+                if edtf.lower_fuzzy is not None:
+                    dr['gte'] = edtf.lower_fuzzy
+                if edtf.upper_fuzzy is not None:
+                    dr['lte'] = edtf.upper_fuzzy
+                document['date_ranges'].append({'date_range': dr, 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid})
+        
+        # update the indexed tile value to support adv. search
+        tile.data[nodeid] = {
+            'value': nodevalue,
+            'dates': [],
+            'date_ranges': []
+        }
+
+        node = models.Node.objects.get(nodeid=nodeid)
+        edtf = ExtendedDateFormat(nodevalue, **node.config)
+        if edtf.result_set:
+            for result in edtf.result_set:
+                add_date_to_doc(document, result)
+                add_date_to_doc(tile.data[nodeid], result)
+        else:
+            add_date_to_doc(document, edtf)
+            add_date_to_doc(tile.data[nodeid], edtf)
+
+    def append_search_filters(self, value, node, query, request):
+        def add_date_to_doc(query, edtf):
+            if value['op'] == 'eq':
+                if edtf.lower != edtf.upper:
+                    raise Exception(_('Only dates that specify an exact year, month, and day can be used with the "=" operator'))
+                query.should(Match(field='tiles.data.%s.dates.date' % (str(node.pk)), query=edtf.lower, type='phrase_prefix', fuzziness=0))
+            else:
+                if value['op'] == 'overlaps':
+                    operators = {'gte': edtf.lower, 'lte': edtf.upper}
+                else:
+                    if edtf.lower != edtf.upper:
+                        raise Exception(_('Only dates that specify an exact year, month, and day can be used with the ">", "<", ">=", and "<=" operators'))
+                        
+                    operators = {
+                        value['op']: edtf.lower or edtf.upper
+                    }
+
+                try:    
+                    query.should(Range(field='tiles.data.%s.dates.date' % (str(node.pk)), **operators))
+                    query.should(Range(field='tiles.data.%s.date_ranges.date_range' % (str(node.pk)), relation='intersects', **operators))    
+                except RangeDSLException:
+                    if edtf.lower == None and edtf.upper == None:
+                        raise Exception(_('Invalid date specified.'))
+
+        edtf = ExtendedDateFormat(value['val'])
+        if edtf.result_set:
+            for result in edtf.result_set:
+                add_date_to_doc(query, result)
+        else:
+            add_date_to_doc(query, edtf)
 
 
 class GeojsonFeatureCollectionDataType(BaseDataType):
@@ -235,7 +308,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
         return errors
 
-    def convert_value(self, tile, nodeid):
+    def clean(self, tile, nodeid):
         if 'features' in tile.data[nodeid]:
             if len(tile.data[nodeid]['features']) == 0:
                 tile.data[nodeid] = None
@@ -324,7 +397,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 )
 
                 SELECT resourceinstanceid::text,
-                        false AS poly_outline,
                 		row_number() over () as __id__,
                 		1 as total,
                 		ST_Centroid(geom) AS __geometry__,
@@ -335,7 +407,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 UNION
 
                 SELECT NULL as resourceinstanceid,
-                		false AS poly_outline,
                 		row_number() over () as __id__,
                 		count(*) as total,
                 		ST_Centroid(
@@ -361,24 +432,13 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
             sql_list.append("""
                 SELECT resourceinstanceid::text,
-                        false AS poly_outline,
                         (row_number() over ())::text as __id__,
                         1 as total,
                         geom AS __geometry__,
                         '' AS extent
                     FROM mv_geojson_geoms
                     WHERE nodeid = '%s'
-                UNION
-                SELECT resourceinstanceid::text,
-                        true AS poly_outline,
-                        (row_number() over ())::text||'-outline' as __id__,
-                        1 as total,
-                        ST_ExteriorRing(geom) AS __geometry__,
-                        '' AS extent
-                    FROM mv_geojson_geoms
-                    WHERE ST_GeometryType(geom) = 'ST_Polygon'
-                    AND nodeid = '%s'
-            """ % (node.pk, node.pk))
+            """ % node.pk)
 
         else:
             config = {"cacheTiles": False}
@@ -402,6 +462,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                         "port": database["PORT"]
                     },
                     "simplify": simplification,
+                    "clip": False,
                     "queries": sql_list
                 },
             },
@@ -498,7 +559,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "layout": {
                         "visibility": "visible"
                     },
-                    "filter": ["all", ["!=", "poly_outline", false],["==", "total", 1]],
+                    "filter": ["all",["==", "$type", "Polygon"],["==", "total", 1]],
                     "paint": {
                         "line-width": %(outlineWeight)s,
                         "line-color": "%(outlineColor)s"
@@ -512,7 +573,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "layout": {
                         "visibility": "visible"
                     },
-                    "filter": ["all", ["!=", "poly_outline", false],["==", "total", 1],["==", "resourceinstanceid", ""]],
+                    "filter": ["all",["==", "$type", "Polygon"],["==", "total", 1],["==", "resourceinstanceid", ""]],
                     "paint": {
                         "line-width": %(expanded_outlineWeight)s,
                         "line-color": "%(outlineColor)s"
@@ -526,7 +587,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "layout": {
                         "visibility": "visible"
                     },
-                    "filter": ["all", ["!=", "poly_outline", false],["==", "total", 1],["==", "resourceinstanceid", ""]],
+                    "filter": ["all",["==", "$type", "Polygon"],["==", "total", 1],["==", "resourceinstanceid", ""]],
                     "paint": {
                         "line-width": %(expanded_outlineWeight)s,
                         "line-color": "%(outlineColor)s"
@@ -540,7 +601,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "layout": {
                         "visibility": "visible"
                     },
-                    "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "total", 1]],
+                    "filter": ["all", ["==", "$type", "LineString"],["==", "total", 1]],
                     "paint": {
                         "line-width": %(haloWeight)s,
                         "line-color": "%(lineHaloColor)s"
@@ -554,7 +615,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "layout": {
                         "visibility": "visible"
                     },
-                    "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "total", 1]],
+                    "filter": ["all",["==", "$type", "LineString"],["==", "total", 1]],
                     "paint": {
                         "line-width": %(weight)s,
                         "line-color": "%(lineColor)s"
@@ -568,7 +629,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "layout": {
                         "visibility": "visible"
                     },
-                    "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "total", 1],["==", "resourceinstanceid", ""]],
+                    "filter": ["all",["==", "$type", "LineString"],["==", "total", 1],["==", "resourceinstanceid", ""]],
                     "paint": {
                         "line-width": %(expanded_haloWeight)s,
                         "line-color": "%(lineHaloColor)s"
@@ -582,7 +643,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "layout": {
                         "visibility": "visible"
                     },
-                    "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "total", 1],["==", "resourceinstanceid", ""]],
+                    "filter": ["all",["==", "$type", "LineString"],["==", "total", 1],["==", "resourceinstanceid", ""]],
                     "paint": {
                         "line-width": %(expanded_weight)s,
                         "line-color": "%(lineColor)s"
@@ -596,7 +657,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "layout": {
                         "visibility": "visible"
                     },
-                    "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "total", 1],["==", "resourceinstanceid", ""]],
+                    "filter": ["all", ["==", "$type", "LineString"],["==", "total", 1],["==", "resourceinstanceid", ""]],
                     "paint": {
                         "line-width": %(expanded_haloWeight)s,
                         "line-color": "%(lineHaloColor)s"
@@ -610,7 +671,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "layout": {
                         "visibility": "visible"
                     },
-                    "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "total", 1],["==", "resourceinstanceid", ""]],
+                    "filter": ["all", ["==", "$type", "LineString"],["==", "total", 1],["==", "resourceinstanceid", ""]],
                     "paint": {
                         "line-width": %(expanded_weight)s,
                         "line-color": "%(lineColor)s"

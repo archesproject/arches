@@ -4,7 +4,7 @@
     <!-- ko if: selection() === 'header' -->
     <div class="library-title-block">
         <h4 class="title-block-title"> {% trans "Header" %}</h4>
-        <div class="mar-lft" data-bind="component: { name: 'switch-widget', params: {value: report.get('active'), config:{label: '{% trans "Active" %}', subtitle: ''}}}"></div>
+        <div class="mar-lft" data-bind="component: { name: 'views/components/simple-switch', params: {value: report.get('active'), config:{label: '{% trans "Active" %}', subtitle: ''}}}"></div>
     </div>
 
     <div class="node-widget-label" style="">
@@ -31,7 +31,7 @@
     <!-- ko if: selection().formid -->
     <div class="library-title-block">
         <h4 class="title-block-title"> {% trans "Report Section" %}</h4>
-        <div class="mar-lft" data-bind="component: { name: 'switch-widget', params: {value: selection().active, config:{label: '{% trans "Publish Section" %}', subtitle: ''}}}"></div>
+        <div class="mar-lft" data-bind="component: { name: 'views/components/simple-switch', params: {value: selection().active, config:{label: '{% trans "Publish Section" %}', subtitle: ''}}}"></div>
     </div>
     <div style="padding-bottom: 5px;">
         <div class="node-widget-label" style="">

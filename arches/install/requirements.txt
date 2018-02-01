@@ -9,12 +9,12 @@ pycrypto==2.6.1
 django-guardian==1.4.9
 TileStache==1.51.6
 python-memcached==1.59
-mapbox-vector-tile==0.5.0
+mapbox-vector-tile==1.2.0
 mapnik==0.1
-flexidate==1.0
 SPARQLWrapper==1.8.0
 django-recaptcha==1.3.1
 python-jose==1.4.0
+edtf==2.7.0
 
 # Leave the following line commented so that pip install will ignore this
 # The installer uses the following line to download the proper version of ES

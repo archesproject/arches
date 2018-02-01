@@ -6,7 +6,7 @@ from arches.app.datatypes.base import BaseDataType
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.concept import get_preflabel_from_valueid
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Nested, Exists
-from arches.app.utils.date_utils import SortableDate
+from arches.app.utils.date_utils import ExtendedDateFormat
 from django.core.exceptions import ObjectDoesNotExist
 
 
@@ -52,8 +52,8 @@ class BaseConceptDataType(BaseDataType):
             value = self.get_value(valueid)
             date_range = self.get_concept_dates(value.concept)
             if date_range is not None:
-                min_date = SortableDate(date_range['min_year']).as_float()
-                max_date = SortableDate(date_range['max_year']).as_float()
+                min_date = ExtendedDateFormat(date_range['min_year']).lower
+                max_date = ExtendedDateFormat(date_range['max_year']).upper
                 if {'gte': min_date, 'lte': max_date} not in document['date_ranges']:
                     document['date_ranges'].append({'date_range': {'gte': min_date, 'lte': max_date}, 'nodegroup_id': tile.nodegroup_id})
             document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': valueid, 'nodegroup_id': tile.nodegroup_id})
