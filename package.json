@@ -46,7 +46,7 @@
         "requirejs-plugins": "1.0.2",
         "requirejs-text": "2.0.12",
         "select2v3": "select2/select2#3.5.1",
-        "turf": "3.0.14",
+        "@turf/turf": "4.4.0",
         "underscore": "1.8.3",
         "uuidjs": "^3.3.0"
     }
