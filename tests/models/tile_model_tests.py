@@ -240,7 +240,7 @@ class TileTests(ArchesTestCase):
 
     def test_save_provisional_from_athoritative(self):
         """
-        Test that a provisional tile is created when a user that is not a
+        Test that a provisional edit is created when a user that is not a
         reviewer edits an athoritative tile
 
         """
@@ -270,6 +270,7 @@ class TileTests(ArchesTestCase):
         self.user = User.objects.create_user(username='testuser', password='TestingTesting123!')
         login = self.client.login(username='testuser', password='TestingTesting123!')
         tiles = Tile.objects.filter(resourceinstance_id="40000000-0000-0000-0000-000000000000")
+
         provisional_tile = None
         for tile in tiles:
             if "72048cb3-adbc-11e6-9ccf-14109fd34195" in tile.data:
@@ -280,19 +281,11 @@ class TileTests(ArchesTestCase):
         provisional_tile.save(index=False, request=request)
         tiles = Tile.objects.filter(resourceinstance_id="40000000-0000-0000-0000-000000000000")
         saved_provisional_tile = None
-        saved_authoritative_tile = None
 
-        for tile in tiles:
-            try:
-                if tile.provisionaledit is not None:
-                    saved_provisional_tile = tile
-            except ObjectDoesNotExist:
-                if '72048cb3-adbc-11e6-9ccf-14109fd34195' in tile.data:
-                    saved_authoritative_tile = tile
-
-        self.assertEqual(tiles.count(), 3)
-        self.assertEqual(saved_provisional_tile.data["72048cb3-adbc-11e6-9ccf-14109fd34195"], 'PROVISIONAL')
-        self.assertEqual(saved_authoritative_tile.data["72048cb3-adbc-11e6-9ccf-14109fd34195"], 'AUTHORITATIVE')
+        self.assertEqual(tiles.count(), 2)
+        self.assertEqual(provisional_tile.data["72048cb3-adbc-11e6-9ccf-14109fd34195"], 'AUTHORITATIVE')
+        self.assertEqual(provisional_tile.provisionaledits[user.id]['action'], 'update')
+        self.assertEqual(provisional_tile.provisionaledits[user.id]['status'], 'review')
 
 
 

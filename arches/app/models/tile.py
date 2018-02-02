@@ -113,24 +113,32 @@ class Tile(models.TileModel):
         edit.edittype = edit_type
         edit.save()
 
-    def save_provisional_edit(self, user, tile, prototile=None, action='created', status='review'):
-        provisional_edit = models.ProvisionalEdit()
-        if prototile != None:
-            provisional_edit.prototile = prototile
-        provisional_edit.tile = tile
-        provisional_edit.editor = user
-        provisional_edit.timestamp = timezone.now()
-        provisional_edit.save()
+    def apply_provisional_edit(self, user, data, action='create', status='review'):
+        provisionaledit =  {
+            "value": data,
+            "status": status,
+            "action": action,
+            "reviewer": None,
+            "timestamp": timezone.now(),
+            "reviewtimestamp": None
+        }
+        if self.provisionaledits is not None:
+            provisionaledits = JSONDeserializer().deserialize(self.provisionaledits)
+            provisionaledits[user.id] = provisionaledit
+        else:
+            provisionaledits = {
+                user.id: provisionaledit
+                }
+        self.provisionaledits = JSONSerializer().serialize(provisionaledits)
 
     def is_provisional(self, tile=None):
         result = False
-        if tile == None:
-            tile = self
-        try:
-            if tile.provisionaledit is not None:
-                result = True
-        except ObjectDoesNotExist:
-            pass
+        if self.provisionaledits is not None:
+            provisionaledits = JSONDeserializer().deserialize(self.provisionaledits)
+            for user, edit in provisionaledits.iteritems():
+                if edit['status'] != 'approved' and edit['action'] == 'create':
+                    result = True
+                    break
         return result
 
     def save(self, *args, **kwargs):
@@ -139,30 +147,27 @@ class Tile(models.TileModel):
         self.__preSave(request)
         missing_nodes = []
         creating_new_tile = True
-        # models.TileModel.objects.filter(provisionaledit__isnull=True)
+
+        try:
+            user = request.user
+            user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
+        except AttributeError: #no user - probably importing data
+            user = None
+
         if self.data != {}:
             creating_new_tile = models.TileModel.objects.filter(pk=self.tileid).exists() == False
             edit_type = 'tile create' if (creating_new_tile == True) else 'tile edit'
-            try:
-                user = request.user
+            if user is not None:
                 if creating_new_tile == False:
                     existing_model = models.TileModel.objects.get(pk=self.tileid)
-                    user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists() == True
-                    if self.is_provisional(tile=existing_model) == False:
-                        if user_is_reviewer:
-                            self.save_edit(user=user, edit_type=edit_type, old_value=existing_model.data, new_value=self.data)
-                        else:
-                            provisional_concrete_model = models.TileModel()
-                            provisional_concrete_model.resourceinstance = self.resourceinstance
-                            provisional_concrete_model.nodegroup = self.nodegroup
-                            provisional_concrete_model.parenttile = self.parenttile
-                            provisional_concrete_model.data = self.data
-                            self.save_provisional_edit(user, provisional_concrete_model, existing_model, action='updated')
-                            provisional_concrete_model.save()
-                            self.data = existing_model.data
+                    if user_is_reviewer:
+                        self.save_edit(user=user, edit_type=edit_type, old_value=existing_model.data, new_value=self.data)
+                    else:
+                        self.apply_provisional_edit(user, self.data, action='update')
+                        self.data = existing_model.data
                 else:
                     self.save_edit(user=user, edit_type=edit_type, old_value=self.data, new_value=self.data)
-            except AttributeError: #In cases when there is no user - eg on import
+            else:
                 self.save_edit(user={}, edit_type=edit_type, old_value=self.data, new_value=self.data)
 
             for nodeid, value in self.data.iteritems():
@@ -179,15 +184,12 @@ class Tile(models.TileModel):
             message = _('This card requires values for the following:')
             raise ValidationError(message, (', ').join(missing_nodes))
 
-        super(Tile, self).save(*args, **kwargs)
-        try:
-            user = request.user
+        if user is not None:
             if creating_new_tile == True:
-                is_resource_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
-                if self.is_provisional() == False and is_resource_reviewer == False:
-                    self.save_provisional_edit(request.user, self, prototile=None, action='created')
-        except AttributeError: #In cases when there is no user - eg on import
-            pass
+                if self.is_provisional() == False and user_is_reviewer == False:
+                    self.apply_provisional_edit(user, data={}, action='create')
+
+        super(Tile, self).save(*args, **kwargs)
         if index and unicode(self.resourceinstance.graph_id) != unicode(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
             self.index()
         for tiles in self.tiles.itervalues():
