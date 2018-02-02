@@ -114,6 +114,11 @@ class Tile(models.TileModel):
         edit.save()
 
     def apply_provisional_edit(self, user, data, action='create', status='review'):
+        """
+        Creates or updates the json stored in a tile's provisionaledits db_column
+
+        """
+
         provisionaledit =  {
             "value": data,
             "status": status,
@@ -131,7 +136,13 @@ class Tile(models.TileModel):
                 }
         self.provisionaledits = JSONSerializer().serialize(provisionaledits)
 
-    def is_provisional(self, tile=None):
+    def is_provisional(self):
+        """
+        Returns True if a tile has been created as provisional and has not yet
+        been approved by a user in the resource reviewer group
+
+        """
+
         result = False
         if self.provisionaledits is not None:
             provisionaledits = JSONDeserializer().deserialize(self.provisionaledits)
@@ -139,6 +150,22 @@ class Tile(models.TileModel):
                 if edit['status'] != 'approved' and edit['action'] == 'create':
                     result = True
                     break
+        return result
+
+    def user_owns_provisional(self, user):
+        """
+        Returns True if a user was the creator of a provisional tile that has not
+        yet been approved. This is used to confirm whether a provisional user
+        is allowed to edit and delete their provisional data.
+
+        """
+        result = False
+        if self.provisionaledits is not None:
+            provisionaledits = JSONDeserializer().deserialize(self.provisionaledits)
+            if str(user.id) in provisionaledits:
+                edit = provisionaledits[str(user.id)]
+                if edit['action'] == 'create' and edit['status'] != 'approved':
+                    result = True
         return result
 
     def save(self, *args, **kwargs):
@@ -205,20 +232,31 @@ class Tile(models.TileModel):
         for tiles in self.tiles.itervalues():
             for tile in tiles:
                 tile.delete(*args, request=request, **kwargs)
+        try:
+            user = request.user
+            user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
+        except AttributeError: #no user
+            user = None
 
-        query = Query(se)
-        bool_query = Bool()
-        bool_query.filter(Terms(field='tileid', terms=[self.tileid]))
-        query.add_query(bool_query)
-        results = query.search(index='strings', doc_type='term')['hits']['hits']
-        for result in results:
-            se.delete(index='strings', doc_type='term', id=result['_id'])
+        if user_is_reviewer is True or self.user_owns_provisional(user):
+            query = Query(se)
+            bool_query = Bool()
+            bool_query.filter(Terms(field='tileid', terms=[self.tileid]))
+            query.add_query(bool_query)
+            results = query.search(index='strings', doc_type='term')['hits']['hits']
 
-        self.__preDelete(request)
-        self.save_edit(user=request.user, edit_type='tile delete', old_value=self.data)
-        super(Tile, self).delete(*args, **kwargs)
-        resource = Resource.objects.get(resourceinstanceid=self.resourceinstance.resourceinstanceid)
-        resource.index()
+            for result in results:
+                se.delete(index='strings', doc_type='term', id=result['_id'])
+
+            self.__preDelete(request)
+            self.save_edit(user=request.user, edit_type='tile delete', old_value=self.data)
+            super(Tile, self).delete(*args, **kwargs)
+            resource = Resource.objects.get(resourceinstanceid=self.resourceinstance.resourceinstanceid)
+            resource.index()
+
+        else:
+            self.apply_provisional_edit(user, data={}, action='delete')
+            super(Tile, self).save(*args, **kwargs)
 
 
     def index(self):
