@@ -33,7 +33,7 @@ from arches.app.models import models
 from django.contrib.auth.models import AnonymousUser, User
 from django.http import HttpRequest
 from django.core.exceptions import ObjectDoesNotExist
-
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 # these tests can be run from the command line via
 # python manage.py test tests/models/tile_model_tests.py --pattern="*.py" --settings="tests.test_settings"
@@ -240,7 +240,7 @@ class TileTests(ArchesTestCase):
 
     def test_save_provisional_from_athoritative(self):
         """
-        Test that a provisional tile is created when a user that is not a
+        Test that a provisional edit is created when a user that is not a
         reviewer edits an athoritative tile
 
         """
@@ -270,6 +270,7 @@ class TileTests(ArchesTestCase):
         self.user = User.objects.create_user(username='testuser', password='TestingTesting123!')
         login = self.client.login(username='testuser', password='TestingTesting123!')
         tiles = Tile.objects.filter(resourceinstance_id="40000000-0000-0000-0000-000000000000")
+
         provisional_tile = None
         for tile in tiles:
             if "72048cb3-adbc-11e6-9ccf-14109fd34195" in tile.data:
@@ -279,20 +280,133 @@ class TileTests(ArchesTestCase):
         request.user = self.user
         provisional_tile.save(index=False, request=request)
         tiles = Tile.objects.filter(resourceinstance_id="40000000-0000-0000-0000-000000000000")
-        saved_provisional_tile = None
-        saved_authoritative_tile = None
 
-        for tile in tiles:
-            try:
-                if tile.provisionaledit is not None:
-                    saved_provisional_tile = tile
-            except ObjectDoesNotExist:
-                if '72048cb3-adbc-11e6-9ccf-14109fd34195' in tile.data:
-                    saved_authoritative_tile = tile
+        provisionaledits = JSONDeserializer().deserialize(provisional_tile.provisionaledits)
+        self.assertEqual(tiles.count(), 2)
+        self.assertEqual(provisional_tile.data["72048cb3-adbc-11e6-9ccf-14109fd34195"], 'AUTHORITATIVE')
+        self.assertEqual(provisionaledits[str(self.user.id)]['action'], 'update')
+        self.assertEqual(provisionaledits[str(self.user.id)]['status'], 'review')
 
-        self.assertEqual(tiles.count(), 3)
-        self.assertEqual(saved_provisional_tile.data["72048cb3-adbc-11e6-9ccf-14109fd34195"], 'PROVISIONAL')
-        self.assertEqual(saved_authoritative_tile.data["72048cb3-adbc-11e6-9ccf-14109fd34195"], 'AUTHORITATIVE')
+
+    def test_apply_provisional_edit(self):
+        """
+        Tests that provisional edit data is properly created
+
+        """
+
+        json = {
+            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "parenttile_id": '',
+            "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
+            "tileid": "",
+            "data": {
+              "72048cb3-adbc-11e6-9ccf-14109fd34195": "TEST 1"
+            }
+        }
+
+        user = User.objects.create_user(username='testuser', password='TestingTesting123!')
+        provisional_tile = Tile(json)
+        request = HttpRequest()
+        request.user = user
+        provisional_tile.save(index=False, request=request)
+        provisional_tile.apply_provisional_edit(user, {"test":"test"}, 'update')
+        provisionaledits = JSONDeserializer().deserialize(provisional_tile.provisionaledits)
+        userid = str(user.id)
+        self.assertEqual(provisionaledits[userid]['action'], 'update')
+        self.assertEqual(provisionaledits[userid]['reviewer'], None)
+        self.assertEqual(provisionaledits[userid]['value'], {"test":"test"})
+        self.assertEqual(provisionaledits[userid]['status'], "review")
+        self.assertEqual(provisionaledits[userid]['reviewtimestamp'], None)
+
+
+    def test_user_owns_provisional(self):
+        """
+        Tests that a user is the owner of a provisional edit
+
+        """
+
+        json = {
+            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "parenttile_id": '',
+            "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
+            "tileid": "",
+            "data": {
+              "72048cb3-adbc-11e6-9ccf-14109fd34195": "TEST 1"
+            }
+        }
+
+        user = User.objects.create_user(username='testuser', password='TestingTesting123!')
+        provisional_tile = Tile(json)
+        request = HttpRequest()
+        request.user = user
+        provisional_tile.save(index=False, request=request)
+
+        self.assertEqual(provisional_tile.user_owns_provisional(user), True)
+
+    def test_tile_deletion(self):
+        """
+        Tests that a tile is deleted when a user is a reviewer or owner.
+
+        """
+
+        json = {
+            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "parenttile_id": '',
+            "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
+            "tileid": "",
+            "data": {
+              "72048cb3-adbc-11e6-9ccf-14109fd34195": "TEST 1"
+            }
+        }
+
+        owner = User.objects.create_user(username='testuser', password='TestingTesting123!')
+        reviewer = User.objects.get(username='admin')
+
+        tile1 = Tile(json)
+        owner_request = HttpRequest()
+        owner_request.user = owner
+        tile1.save(index=False, request=owner_request)
+        tile1.delete(request=owner_request)
+
+        tile2 = Tile(json)
+        reviewer_request = HttpRequest()
+        reviewer_request.user = reviewer
+        tile2.save(index=False, request=reviewer_request)
+        tile2.delete(request=reviewer_request)
+
+        self.assertEqual(len(Tile.objects.all()), 0)
+
+    def test_provisional_deletion(self):
+        """
+        Tests that a tile is NOT deleted if a user does not have the
+        privlages to delete a tile and that the proper provisionaledit is
+        applied.
+
+        """
+
+        json = {
+            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "parenttile_id": '',
+            "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
+            "tileid": "",
+            "data": {
+              "72048cb3-adbc-11e6-9ccf-14109fd34195": "TEST 1"
+            }
+        }
+
+        provisional_user = User.objects.create_user(username='testuser', password='TestingTesting123!')
+        reviewer = User.objects.get(username='admin')
+
+        tile = Tile(json)
+        reviewer_request = HttpRequest()
+        reviewer_request.user = reviewer
+        tile.save(index=False, request=reviewer_request)
+
+        provisional_request = HttpRequest()
+        provisional_request.user = provisional_user
+        tile.delete(request=provisional_request)
+
+        self.assertEqual(len(Tile.objects.all()), 1)
 
 
 

@@ -178,37 +178,6 @@ class EditLog(models.Model):
         db_table = 'edit_log'
 
 
-class ProvisionalEdit(models.Model):
-    review = 'review'
-    approved = 'approved'
-    rejected = 'rejected'
-    tile_status_options = (
-        (review, 'review'),
-        (approved, 'approved'),
-        (rejected, 'rejected'),
-        )
-    created = 'created'
-    updated = 'updated'
-    deleted = 'deleted'
-    tile_action_options = (
-        (created, 'created'),
-        (updated, 'updated'),
-        (deleted, 'deleted'),
-        )
-    prototile = models.ForeignKey('TileModel', models.SET_NULL, blank=True, null=True, related_name='tile')
-    tile = models.OneToOneField('TileModel', on_delete=models.CASCADE, primary_key=True, related_name='provisionaledit')
-    status = models.TextField(choices=tile_status_options)
-    action = models.TextField(choices=tile_action_options)
-    editor = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, related_name='editor')
-    reviewer = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, related_name='reviewer')
-    timestamp = models.DateTimeField(blank=True, null=True)
-    reviewtimestamp = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        managed = True
-        db_table = 'provisional_edits'
-
-
 class File(models.Model):
     fileid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     path = models.FileField(upload_to='uploadedfiles')
@@ -648,6 +617,47 @@ class TileModel(models.Model): #Tile
             "20000000-0000-0000-0000-000000000004": "Primary"
         }
 
+    the provisionaledits JSONField has this schema:
+
+    values are dictionaries with n number of keys that represent nodeid's and values the value of that node instance
+
+    .. code-block:: python
+
+        {
+            userid: {
+                value: node value,
+                status: "review", "approved", or "rejected"
+                action: "create", "update", or "delete"
+                reviewer: reviewer's user id,
+                timestamp: time of last provisional change,
+                reviewtimestamp: time of review
+                }
+            ...
+        }
+
+        {
+            1: {
+                "value": {
+                        "20000000-0000-0000-0000-000000000002": "Jack",
+                        "20000000-0000-0000-0000-000000000003": "Smith",
+                        "20000000-0000-0000-0000-000000000004": "Primary"
+                      },
+                "status": "rejected",
+                "action": "update",
+                "reviewer": 8,
+                "timestamp": "20180101T1500",
+                "reviewtimestamp": "20180102T0800",
+                },
+            15: {
+                "value": {
+                        "20000000-0000-0000-0000-000000000002": "John",
+                        "20000000-0000-0000-0000-000000000003": "Smith",
+                        "20000000-0000-0000-0000-000000000004": "Secondary"
+                      },
+                "status": "review",
+                "action": "update",
+        }
+
     """
 
     tileid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
@@ -656,6 +666,7 @@ class TileModel(models.Model): #Tile
     data = JSONField(blank=True, null=True, db_column='tiledata')  # This field type is a guess.
     nodegroup = models.ForeignKey(NodeGroup, db_column='nodegroupid')
     sortorder = models.IntegerField(blank=True, null=True, default=0)
+    provisionaledits = JSONField(blank=True, null=True, db_column='provisionaledits')  # This field type is a guess.
 
     class Meta:
         managed = True
