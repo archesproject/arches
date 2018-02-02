@@ -30,6 +30,9 @@ from django.core import management
 from tests.base_test import ArchesTestCase
 from arches.app.models.tile import Tile
 from arches.app.models import models
+from django.contrib.auth.models import AnonymousUser, User
+from django.http import HttpRequest
+from django.core.exceptions import ObjectDoesNotExist
 
 
 # these tests can be run from the command line via
@@ -40,7 +43,7 @@ class TileTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
         management.call_command('packages', operation='import_graphs', source=os.path.join(test_settings.RESOURCE_GRAPH_LOCATIONS))
-        
+
         sql = """
         INSERT INTO public.resource_instances(resourceinstanceid, legacyid, graphid, createdtime)
             VALUES ('40000000-0000-0000-0000-000000000000', '40000000-0000-0000-0000-000000000000', '2f7f8e40-adbc-11e6-ac7f-14109fd34195', '1/1/2000');
@@ -69,7 +72,7 @@ class TileTests(ArchesTestCase):
         nodegroupid = '32999999-0000-0000-0000-000000000000' OR
         nodegroupid = '19999999-0000-0000-0000-000000000000' OR
         nodegroupid = '21111111-0000-0000-0000-000000000000';
-        
+
         DELETE FROM public.resource_instances
         WHERE resourceinstanceid = '40000000-0000-0000-0000-000000000000';
 
@@ -137,6 +140,7 @@ class TileTests(ArchesTestCase):
         Test that we can save a Tile object back to the database
 
         """
+        login = self.client.login(username='admin', password='admin')
 
         json = {
             "tiles": {
@@ -162,6 +166,7 @@ class TileTests(ArchesTestCase):
         t.save(index=False)
 
         tiles = Tile.objects.filter(resourceinstance_id="40000000-0000-0000-0000-000000000000")
+
         self.assertEqual(tiles.count(), 2)
 
     def test_simple_get(self):
@@ -188,27 +193,130 @@ class TileTests(ArchesTestCase):
         self.assertEqual(t.tileid, t2.tileid)
         self.assertEqual(t2.data["72048cb3-adbc-11e6-9ccf-14109fd34195"], "TEST 1")
 
-    # def test_validation(self):
-    #     """
-    #     Test that we can get a Tile object
+    def test_create_new_provisional(self):
+        """
+        Test that a new provisional tile is created when a user IS NOT a reviwer
+        and that an authoritative tile is created when a user IS a reviwer.
 
-    #     """
+        """
 
-    #     json = {
-    #         "tiles": {},
-    #         "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
-    #         "parenttile_id": '',
-    #         "nodegroup_id": "20000000-0000-0000-0000-000000000001",
-    #         "tileid": "",
-    #         "data": {
-    #           "20000000-0000-0000-0000-000000000004": "TEST 1"
-    #         }
-    #     }
+        self.user = User.objects.get(username='admin')
 
-    #     t = Tile(json)
-    #     self.assertTrue(t.validate()['is_valid'])
+        json = {
+            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "parenttile_id": '',
+            "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
+            "tileid": "",
+            "data": {
+              "72048cb3-adbc-11e6-9ccf-14109fd34195": "AUTHORITATIVE"
+            }
+        }
 
-    #     json['data']['20000000-0000-0000-0000-000000000004'] = ''
+        authoritative_tile = Tile(json)
+        request = HttpRequest()
+        request.user = self.user
+        authoritative_tile.save(index=False, request=request)
 
-    #     t2 = Tile(json)
-    #     self.assertFalse(t2.validate()['is_valid'])
+        self.user = User.objects.create_user(username='testuser', password='TestingTesting123!')
+
+        json = {
+            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "parenttile_id": '',
+            "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
+            "tileid": "",
+            "data": {
+              "72048cb3-adbc-11e6-9ccf-14109fd34195": "PROVISIONAL"
+            }
+        }
+
+        provisional_tile = Tile(json)
+        request = HttpRequest()
+        request.user = self.user
+        provisional_tile.save(index=False, request=request)
+
+        self.assertEqual(provisional_tile.is_provisional(), True)
+        self.assertEqual(authoritative_tile.is_provisional(), False)
+
+
+    def test_save_provisional_from_athoritative(self):
+        """
+        Test that a provisional tile is created when a user that is not a
+        reviewer edits an athoritative tile
+
+        """
+
+        json = {
+            "tiles": {
+                "72048cb3-adbc-11e6-9ccf-14109fd34195": [{
+                    "tiles": {},
+                    "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+                    "parenttile_id": '',
+                    "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
+                    "tileid": "",
+                    "data": {
+                      "72048cb3-adbc-11e6-9ccf-14109fd34195": "AUTHORITATIVE"
+                    }
+                }]
+            },
+            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "parenttile_id": '',
+            "nodegroup_id": "7204869c-adbc-11e6-8bec-14109fd34195",
+            "tileid": "",
+            "data": {}
+        }
+
+        t = Tile(json)
+        t.save(index=False)
+        self.user = User.objects.create_user(username='testuser', password='TestingTesting123!')
+        login = self.client.login(username='testuser', password='TestingTesting123!')
+        tiles = Tile.objects.filter(resourceinstance_id="40000000-0000-0000-0000-000000000000")
+        provisional_tile = None
+        for tile in tiles:
+            if "72048cb3-adbc-11e6-9ccf-14109fd34195" in tile.data:
+                provisional_tile = tile
+                provisional_tile.data["72048cb3-adbc-11e6-9ccf-14109fd34195"] = 'PROVISIONAL'
+        request = HttpRequest()
+        request.user = self.user
+        provisional_tile.save(index=False, request=request)
+        tiles = Tile.objects.filter(resourceinstance_id="40000000-0000-0000-0000-000000000000")
+        saved_provisional_tile = None
+        saved_authoritative_tile = None
+
+        for tile in tiles:
+            try:
+                if tile.provisionaledit is not None:
+                    saved_provisional_tile = tile
+            except ObjectDoesNotExist:
+                if '72048cb3-adbc-11e6-9ccf-14109fd34195' in tile.data:
+                    saved_authoritative_tile = tile
+
+        self.assertEqual(tiles.count(), 3)
+        self.assertEqual(saved_provisional_tile.data["72048cb3-adbc-11e6-9ccf-14109fd34195"], 'PROVISIONAL')
+        self.assertEqual(saved_authoritative_tile.data["72048cb3-adbc-11e6-9ccf-14109fd34195"], 'AUTHORITATIVE')
+
+
+
+        # def test_validation(self):
+        #     """
+        #     Test that we can get a Tile object
+
+        #     """
+
+        #     json = {
+        #         "tiles": {},
+        #         "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+        #         "parenttile_id": '',
+        #         "nodegroup_id": "20000000-0000-0000-0000-000000000001",
+        #         "tileid": "",
+        #         "data": {
+        #           "20000000-0000-0000-0000-000000000004": "TEST 1"
+        #         }
+        #     }
+
+        #     t = Tile(json)
+        #     self.assertTrue(t.validate()['is_valid'])
+
+        #     json['data']['20000000-0000-0000-0000-000000000004'] = ''
+
+        #     t2 = Tile(json)
+        #     self.assertFalse(t2.validate()['is_valid'])
