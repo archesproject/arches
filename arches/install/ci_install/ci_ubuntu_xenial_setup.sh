@@ -30,11 +30,11 @@ function install_postgres {
     sudo -u postgres createdb training -T template_postgis_20
 }
 
-function install_bower {
+function install_yarn {
     sudo apt-get update -y
     sudo apt-get install nodejs-legacy -y
     sudo apt-get install npm -y
-    sudo npm install -g bower
+    sudo npm install -g yarn
 }
 
 function main {
@@ -54,7 +54,7 @@ function main {
   pip install virtualenv==15.1.0
 
   install_postgres
-  install_bower
+  install_yarn
 }
 
 main

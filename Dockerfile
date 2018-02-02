@@ -35,7 +35,7 @@ RUN apt-get update -y &&\
         pkg-config &&\
 	curl -sL https://deb.nodesource.com/setup_6.x | bash - &&\
 	apt-get install nodejs &&\
-	npm install -g bower &&\
+	npm install -g yarn &&\
 	wget https://bootstrap.pypa.io/get-pip.py &&\
 	python get-pip.py
 
@@ -65,9 +65,9 @@ RUN rm -rf /tmp/*
 # From here, run commands from ARCHES_ROOT
 WORKDIR ${ARCHES_ROOT}
 
-# Install Bower components
-COPY ./bower.json ${ARCHES_ROOT}/bower.json
-RUN bower --allow-root install
+# Install Yarn components
+COPY ./package.json ${ARCHES_ROOT}/package.json
+RUN yarn install
 
 # Install pip requirements
 COPY ./arches/install/requirements.txt ${ARCHES_ROOT}/arches/install/requirements.txt

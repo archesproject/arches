@@ -38,8 +38,8 @@ install:
   - python setup.py install
   - pip install -r arches/install/requirements_dev.txt
   - pip install coveralls
-  # - npm install -g bower
-  # - bower install
+  # - npm install -g yarn
+  # - yarn install
 
 script:
   - python manage.py test tests --pattern="*.py" --settings="tests.test_settings"

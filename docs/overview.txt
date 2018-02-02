@@ -21,7 +21,7 @@ Arches is a web framework built on Dango and is designed to make it easier to bu
     * an **Ontology** as a means of formally naming and defining data types, properties, and the relationships between the data entities that describe a resource.
     * **Thesauri** to manage the controlled vocabularies needed to describe and index information in a consistent and uniform way.
 
-Arches manages data "resources". Resources can represent almost anything you want: physical things (such as a cultural heritage object), temporal things (such as activities or events), actors (such as a person or organization), or conceptual objects (such as an image. document, or other information carrier). 
+Arches manages data "resources". Resources can represent almost anything you want: physical things (such as a cultural heritage object), temporal things (such as activities or events), actors (such as a person or organization), or conceptual objects (such as an image. document, or other information carrier).
 
 Resources are defined as directed graphs (nodes connected by edges). Nodes in the graph are used to represent the attributes (or collection of attributes) of a resource and edges define the type of relationship between attributes. In practice, a resource graph in Arches functions much like a schema does in a relational database.
 
@@ -33,7 +33,7 @@ To promote consistent data creation, update, and indexing workflows, Arches impl
 
 **Version History**
 
-    v4.0  July, 2017: Significant site redesign, addition of graph creation UI, system settings UI, internal tileserver (TileStache), updated dependencies (MapBox GL, ElasticSearch 5.2, Bower)
+    v4.0  July, 2017: Significant site redesign, addition of graph creation UI, system settings UI, internal tileserver (TileStache), updated dependencies (MapBox GL, ElasticSearch 5.2, Yarn)
 
     v3.0  April, 2015: Updated architecture, inclusion of the Reference Data Manager, updated dependencies (ElasticSearch, OpenLayers, Knockout)
 
@@ -50,7 +50,7 @@ Who is Arches for?
 
 Arches is primarily intended for software developers who need to build flexible web applications and wish to hide the complexities of ontologies, thesauri, and geospatial data management from their users.
 
-The Arches framework is largely invisible to end users; Arches applications are responsible for defining resource graphs and implementing data entry, data presentation, and data reporting workflows. 
+The Arches framework is largely invisible to end users; Arches applications are responsible for defining resource graphs and implementing data entry, data presentation, and data reporting workflows.
 
 One major exception to this rule is the Reference Data Manager (RDM). The RDM is a core component of the Arches framework and can support the creation and curation of thesauri without the need to implement an Arches application.
 

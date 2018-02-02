@@ -503,7 +503,7 @@ class Command(BaseCommand):
         """
         files = [
             {'src': 'arches/app/templates/index.htm', 'dst':'arches/install/arches-templates/project_name/templates/index.htm'},
-            {'src':'bower.json', 'dst':'arches/install/arches-templates/project_name/bower.json'}
+            {'src':'package.json', 'dst':'arches/install/arches-templates/project_name/package.json'}
             ]
         for f in files:
             shutil.copyfile(f['src'], f['dst'])

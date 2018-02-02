@@ -42,39 +42,39 @@ Once you have all the dependencies taken care of you are ready to install Arches
     Now that Arches is installed, you can make a Project. This is where you will make all of the customizations and branding that will make one installation of Arches different from the next. The name of your project should only be lowercase, and should use underscores instead of spaces or hyphens. The example below uses `my_project`.
 
     Linux and macOS::
-    
+
         arches-project create my_project
 
     Windows::
 
         python ENV\Scripts\arches-project create my_project
-        
-    .. note:: If this command ends in an error related to bower, you will need to enter ``my_project\my_project\`` (the directory that contains ``bower.json``) and run this command: ``bower install``.
+
+    .. note:: If this command ends in an error related to yarn, you will need to enter ``my_project\my_project\`` (the directory that contains ``package.json``) and run this command: ``yarn install``.
 
 #. **Update settings_local.py**
 
     Before you continue, you may need to open ``my_project\my_project\settings_local.py`` and change some environment-specific settings.
-    
+
     * Depending on your Postgres/PostGIS installation, you may need to uncomment the DATABASES section and change the username and password, as well as the name of your PostGIS template database. If you will have multiple Arches projects using the same database, make sure to change the database name here as well.
-    
+
     * On Windows, you must specify the path to your GDAL library. Add the following line. Be sure to adjust the path as necessary for your GDAL installation, and note the *forward* slashes::
 
             GDAL_LIBRARY_PATH = "C:/OSGeo4W64/bin/gdal201.dll"
-            
+
     * See Arches System Settings for a full rundown of how settings are handled in Arches.
-            
+
     .. note:: At this point you must `install ElasticSearch <https://github.com/archesproject/arches/wiki/Installing-and-Running-Elasticsearch>`_ and make sure it is running before continuing.
-    
+
 #. **Setup the database**
 
     To begin working with your Project, first enter it::
-    
+
         cd my_project
 
     and then (with ElasticSearch running) run::
 
         python manage.py packages -o setup_db
-        
+
     .. note:: You may be prompted to enter a password for the ``postgres`` user, depending on your OS and how you installed Postgres/Postgis. Generally, our installation scripts set this password to ``postgis``.
 
 #. **Run the development server**
@@ -84,9 +84,9 @@ Once you have all the dependencies taken care of you are ready to install Arches
         python manage.py runserver
 
     and navigate to ``localhost:8000`` in Chrome.
-    
+
     The default login credentials are 'admin' for both username and password. To change this password and create new users, navigate to `localhost:8000/admin`.
-    
+
 **Next steps...**
 
 Now that you have Arches installed and a Project created, you are ready to begin.
@@ -94,20 +94,20 @@ Now that you have Arches installed and a Project created, you are ready to begin
 * Modify some :doc:`Initial Configuration </initial-configuration>` settings
 
 * Read more about :doc:`Projects and Packages </projects-and-packages>`
-    
+
 * For a quick start that will create an example database schema in your new Arches project (and allow you to begin recording data right away), you can **load a sample package** with the following command::
 
     python manage.py packages -o load_package -s https://github.com/archesproject/arches-sample-data/archive/master.zip -db true
-    
+
 General Troubleshooting
 =======================
 
 * On macOS, If you get this error ``ValueError: --enable-zlib requested but zlib not found, aborting.``
-    
+
     try running ``xcode-select --install`` (`reference <http://stackoverflow.com/questions/32909426/zlib-error-when-installing-pillow-on-mac>`_)
-    
+
 * Getting a connection error like this (in the dev server output or in the browser)
 
     `ConnectionError: ConnectionError(<urllib3.connection.HTTPConnection object at 0x0000000005C6BC50>: Failed to establish a new connection: [Errno 10061] No connection could be made because the target machine actively refused it) caused by: NewConnectionError(<urllib3.connection.HTTPConnection object at 0x0000000005C6BC50>: Failed to establish a new connection: [Errno 10061] No connection could be made because the target machine actively refused it)`
-    
+
     means Arches is not able to communicate with ElasticSearch. Most likely, ElasticSearch is just not running, so just start it up and reload the page. If you can confirm that it `is` running, make sure Arches is pointed to to correct port.

@@ -23,7 +23,7 @@ Setting Everything Up
 
         virtualenv ENV
         source ENV/bin/activate
-        
+
     or, to activate on Windows:
 
     .. code-block:: bash
@@ -45,28 +45,28 @@ Setting Everything Up
         (ENV)$ pip install -r arches/install/requirements.txt
         (ENV)$ pip install -r arches/install/requirements_dev.txt
         (ENV)$ cd ..
-    
-#. Create the new project you will be working on. In this project you'll make all of the necessary changes to your templates, define all of your settings.py variables, run ``manage.py``, etc. This is also where all your ``bower`` components will be installed.
+
+#. Create the new project you will be working on. In this project you'll make all of the necessary changes to your templates, define all of your settings.py variables, run ``manage.py``, etc. This is also where all your ``yarn`` components will be installed.
 
     .. code-block:: bash
-    
+
         (ENV)$ arches-project create my_project
-        
+
     or on Windows::
-    
+
         (ENV)\> ENV\Scripts\python.exe ENV\Scripts\arches-project create my_project
-        
+
 #. You can now enter your new project and create a package
 
     .. code-block:: bash
-        
+
         (ENV)$ cd my_project
         (ENV)$ python manage.py packages -o create_package -d ../my_package
-        
+
     on Windows remember to change the forward slashes to backward slashes.
-        
+
 ----
-        
+
 You now have your development environment ready. It should look like::
 
     /Projects
@@ -76,4 +76,3 @@ You now have your development environment ready. It should look like::
         /my_package # the package, where you should export your resource models, etc. so you can share them (could be a git repo)
 
 Before proceeding, you should either alter the ``settings.py`` file in your project to give it your postgres/postgis credentials ``DATABASES['default']``, or add a ``settings_local.py`` file and put the credentials there to keep them out of version control (and, if you are on windows, you need ``GDAL_LIBRARY_PATH = path/to/gdalxxx.dll``. Then get ElasticSearch running and you can run ``python manage.py packages -o setup_db``. Now you can run ``python manage.py runserver`` and view Arches in a browser.
- 
