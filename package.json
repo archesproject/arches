@@ -45,6 +45,7 @@
         "nouislider": "8.5.1",
         "nvd3": "^1.8.5",
         "proj4": "^2.3.15",
+        "react": "^16.2.0",
         "requirejs": "~2.3.2",
         "requirejs-plugins": "1.0.2",
         "requirejs-text": "2.0.12",
