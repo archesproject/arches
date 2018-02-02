@@ -406,8 +406,6 @@ class TileTests(ArchesTestCase):
         provisional_request.user = provisional_user
         tile.delete(request=provisional_request)
 
-        import ipdb
-        ipdb.set_trace()
         self.assertEqual(len(Tile.objects.all()), 1)
 
 
