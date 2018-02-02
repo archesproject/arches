@@ -33,7 +33,7 @@ from arches.app.models import models
 from django.contrib.auth.models import AnonymousUser, User
 from django.http import HttpRequest
 from django.core.exceptions import ObjectDoesNotExist
-
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 # these tests can be run from the command line via
 # python manage.py test tests/models/tile_model_tests.py --pattern="*.py" --settings="tests.test_settings"
@@ -280,12 +280,12 @@ class TileTests(ArchesTestCase):
         request.user = self.user
         provisional_tile.save(index=False, request=request)
         tiles = Tile.objects.filter(resourceinstance_id="40000000-0000-0000-0000-000000000000")
-        saved_provisional_tile = None
 
+        provisionaledits = JSONDeserializer().deserialize(provisional_tile.provisionaledits)
         self.assertEqual(tiles.count(), 2)
         self.assertEqual(provisional_tile.data["72048cb3-adbc-11e6-9ccf-14109fd34195"], 'AUTHORITATIVE')
-        self.assertEqual(provisional_tile.provisionaledits[user.id]['action'], 'update')
-        self.assertEqual(provisional_tile.provisionaledits[user.id]['status'], 'review')
+        self.assertEqual(provisionaledits[str(self.user.id)]['action'], 'update')
+        self.assertEqual(provisionaledits[str(self.user.id)]['status'], 'review')
 
 
 
