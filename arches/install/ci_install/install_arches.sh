@@ -7,7 +7,7 @@ sudo curl -XDELETE 'http://localhost:9200/_all'
 sudo apt-get install -y git
 sudo apt-get install -y python-pip
 sudo -H pip install virtualenv==13.1.2
-sudo npm install -g bower
+sudo npm install -g yarn
 
 git clone -b master https://github.com/archesproject/arches.git /home/ubuntu/arches
 
@@ -16,7 +16,7 @@ source /home/ubuntu/ENV/bin/activate
 
 cd /home/ubuntu/arches
 python setup.py install
-bower install
+yarn install
 
 python manage.py packages -o setup
 

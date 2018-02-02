@@ -21,6 +21,8 @@ Net.html
 arches/Net_files
 .idea
 arches/app/media/bower_components
+arches/app/media/packages
+node_modules
 arches/tileserver/cache
 docs/_build
 arches/logs/*.log

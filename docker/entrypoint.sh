@@ -18,10 +18,10 @@ display_help() {
 CUSTOM_SCRIPT_FOLDER=${CUSTOM_SCRIPT_FOLDER:-/docker/entrypoint}
 if [[ -z ${ARCHES_PROJECT} ]]; then
 	APP_FOLDER=${ARCHES_ROOT}
-	BOWER_JSON_FOLDER=${ARCHES_ROOT}
+	PACKAGE_JSON_FOLDER=${ARCHES_ROOT}
 else
 	APP_FOLDER=${WEB_ROOT}/${ARCHES_PROJECT}
-	BOWER_JSON_FOLDER=${APP_FOLDER}/${ARCHES_PROJECT}
+	PACKAGE_JSON_FOLDER=${APP_FOLDER}/${ARCHES_PROJECT}
 fi
 
 DJANGO_PORT=${DJANGO_PORT:-8000}
@@ -41,9 +41,9 @@ cd_app_folder() {
 	echo "Current work directory: ${APP_FOLDER}"
 }
 
-cd_bower_folder() {
-	cd ${BOWER_JSON_FOLDER}
-	echo "Current work directory: ${BOWER_JSON_FOLDER}"
+cd_yarn_folder() {
+	cd ${PACKAGE_JSON_FOLDER}
+	echo "Current work directory: ${PACKAGE_JSON_FOLDER}"
 }
 
 activate_virtualenv() {
@@ -158,15 +158,15 @@ set_dev_mode() {
 	python ${ARCHES_ROOT}/setup.py develop
 }
 
-# This is also done in Dockerfile, but that does not include user's custom Arches app bower.json
-# Also, the bower_components folder may have been overlaid by a Docker volume.
-install_bower_components() {
+# This is also done in Dockerfile, but that does not include user's custom Arches app package.json
+# Also, the packages folder may have been overlaid by a Docker volume.
+install_yarn_components() {
 	echo ""
 	echo ""
-	echo "----- INSTALLING BOWER COMPONENTS -----"
+	echo "----- INSTALLING YARN COMPONENTS -----"
 	echo ""
-	cd_bower_folder
-	bower --allow-root install
+	cd_yarn_folder
+	yarn install
 }
 
 
@@ -315,7 +315,7 @@ run_gunicorn_server() {
 run_arches() {
 
 	init_arches
-	install_bower_components
+	install_yarn_components
 
 	if [[ "${DJANGO_MODE}" == "DEV" ]]; then
 		set_dev_mode

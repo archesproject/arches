@@ -16,7 +16,7 @@ recursive-exclude virtualenv *
 recursive-exclude arches/elasticsearch *
 recursive-exclude arches/uploadedfiles *
 recursive-exclude arches/tileserver *
-recursive-exclude arches/app/media/bower_components *
+recursive-exclude arches/app/media/packages *
 recursive-exclude arches/app/media/js/docs *
 global-exclude *.log
 global-exclude *.pyc

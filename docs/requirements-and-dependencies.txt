@@ -26,12 +26,12 @@ Software Dependencies
 * **PostgreSQL 9.6 with PostGIS 2.3** (see below)
 * **GDAL > 1.11.5** and **GEOS** (see below)
 * **Python 2.7** https://www.python.org/downloads/
-    
+
     .. note:: We have tested with Python versions 2.7.6 to 2.7.13, but any later 2.7.x release should also work. If you are able to confirm that > 2.7.13 is compatible, let us know.
-        
+
     .. note:: Python 2.7.9 and later comes with pip, however, with < 2.7.9, you will need to get pip from here: https://pip.pypa.io/en/latest/installing.html. We also recommend upgrading pip with this command ``python -m pip install --upgrade pip``.
-        
-* **Bower** https://bower.io/#install-bower (requires NodeJS/npm)
+
+* **Yarn** https://yarnpkg.com/lang/en/docs/install/ (requires NodeJS/npm)
 * **Mapnik 2.2** http://mapnik.org/pages/downloads.html. *Windows users, see below*.
 * **JDK** http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
 * **Elasticsearch 5.2.1**
@@ -57,7 +57,7 @@ Be aware that you must install 32-bit or 64-bit versions of all dependencies bas
 
 **GDAL and GEOS** - Use the OSgeo4W installer found here: https://trac.osgeo.org/osgeo4w/, and choose to install the GDAL package (you don't need to install QGIS or GRASS). After installation, add the following to your system's PATH environment variable: ``C:\OSGeo4W64\bin``.
 
-**bower** - Requires NodeJS/npm. Installation instructions here: https://bower.io/#install-bower
+**Yarn** - Requires NodeJS/npm. Installation instructions here: https://yarnpkg.com/lang/en/docs/install/
 
 **Mapnik** - *If you are on 64-bit Windows you will not be able to install Mapnik; the Python bindings are not compatible.* Arches is fully functional without Mapnik, but some of the extra map overlay capabilities are lost. Specifically, if you are adding a Tilestache layer as a map overlay, you will not be able to use any of the Mapnik-based providers as described in this section of the `Tilestache documentation <http://tilestache.org/doc/#providers>`_.
 
@@ -69,7 +69,7 @@ Once installed, find Java on your operating system. It will be somewhere like ``
 **pip** - Python 2.7.13 comes with pip already, but we do recommend upgrading pip::
 
     python -m pip install --upgrade pip
-    
+
 **Elasticsearch** - Take care of this after you have Arches fully installed. Use the command recommended in `Installing and Running Elasticsearch <https://github.com/archesproject/arches/wiki/Installing-and-Running-Elasticsearch>`_.
 
 Installing Dependencies on macOS
