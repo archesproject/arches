@@ -7,6 +7,7 @@
     "dependencies": {
         "@mapbox/extent": "0.4.0",
         "@mapbox/mapbox-gl-draw": "1.0.4",
+        "@turf/turf": "4.4.0",
         "backbone": "1.1.2",
         "blueimp-gallery": "2.15.2",
         "bootstrap": "3.3.2",
@@ -25,7 +26,8 @@
         "font-awesome": "~4.6.3",
         "geohash": "chrisveness/latlon-geohash#1.1.0",
         "ionicons": "~2.0.1",
-        "jquery": "2.2.1",
+        "jquery": "3.3.1",
+        "jquery-migrate": "3.0.1",
         "jquery-validate": "1.0.2",
         "jquery.easing": "^1.4.1",
         "jqueryui": "1.11.1",
@@ -38,6 +40,7 @@
         "leaflet-iiif": "^1.1.1",
         "mapbox-gl": "0.44.0",
         "mathjs": "^3.11.4",
+        "metismenu": "^2.7.2",
         "moment": ">=2.10.5",
         "nouislider": "8.5.1",
         "nvd3": "^1.8.5",
@@ -46,7 +49,6 @@
         "requirejs-plugins": "1.0.2",
         "requirejs-text": "2.0.12",
         "select2v3": "select2/select2#3.5.1",
-        "@turf/turf": "4.4.0",
         "underscore": "1.8.3",
         "uuidjs": "^3.3.0"
     }
