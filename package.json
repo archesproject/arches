@@ -5,7 +5,7 @@
         "type": "git"
     },
     "dependencies": {
-        "@mapbox/extent": "0.4.0",
+        "@mapbox/geojson-extent": "0.3.2",
         "@mapbox/mapbox-gl-draw": "1.0.4",
         "@turf/turf": "4.4.0",
         "backbone": "1.1.2",
@@ -28,7 +28,7 @@
         "ionicons": "~2.0.1",
         "jquery": "3.3.1",
         "jquery-migrate": "3.0.1",
-        "jquery-validate": "1.0.2",
+        "jquery-validation": "1.17.0",
         "jquery.easing": "^1.4.1",
         "jqueryui": "1.11.1",
         "js-cookie": "2.1.1",
