@@ -9,11 +9,10 @@
 {% endblock title %}
 
 {% block css %}
-    <link rel="stylesheet" href="{% static 'css/plugins/select2/select2-bootstrap.min.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
     <link rel="stylesheet" href="{% static 'css/plugins/smartadmin-production.css' %}" type="text/css" media="screen">
     {{ block.super }}
-    <link rel="stylesheet" href="{% static 'plugins/jqtree/jqtree.css' %}">
+    <link rel="stylesheet" href="{% static 'packages/jqtree/jqtree.css' %}">
 {% endblock css %}
 
 {% block main_content %}
