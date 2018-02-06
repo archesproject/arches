@@ -171,7 +171,7 @@ class ResourceEditorView(BaseManagerView):
     def delete(self, request, resourceid=None):
         if resourceid is not None:
             ret = Resource.objects.get(pk=resourceid)
-            ret.delete()
+            ret.delete(user=request.user)
             return JSONResponse(ret)
         return HttpResponseNotFound()
 
@@ -203,7 +203,7 @@ class ResourceEditLogView(BaseManagerView):
 
     def get(self, request, resourceid=None, view_template='views/resource/edit-log.htm'):
         if resourceid is None:
-            recent_edits = models.EditLog.objects.all().order_by('-timestamp')[:100]
+            recent_edits = models.EditLog.objects.all().exclude(resourceclassid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).order_by('-timestamp')[:100]
             edited_ids = list(set([edit.resourceinstanceid for edit in recent_edits]))
             resources = Resource.objects.filter(resourceinstanceid__in = edited_ids)
             edit_type_lookup = {
@@ -219,8 +219,11 @@ class ResourceEditLogView(BaseManagerView):
                 for resource in resources:
                     if str(resource.resourceinstanceid) == edit.resourceinstanceid:
                         edit.displayname = resource.displayname
+                        if resource.displayname in ('', None):
+                            edit.displayname = edit.note
                         edit.resource_model_name = resource.graph.name
                         break
+                edit.displayname = edit.note
                 if edit.resource_model_name is None:
                     try:
                         edit.resource_model_name = models.GraphModel.objects.get(pk=edit.resourceclassid).name
