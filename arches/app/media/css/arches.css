@@ -5,10 +5,10 @@
 @import url(nifty.min.css);
 @import url(../packages/font-awesome/css/font-awesome.min.css);
 @import url(../packages/ionicons/css/ionicons.min.css);
-@import url(../plugins/themify-icons/themify-icons.min.css);
-@import url(../plugins/chosen.min.css);
-@import url(plugins/select2/select2.min.css);
-@import url(plugins/select2/select2-bootstrap.min.css);
+@import url(../packages/lt-themify-icons/themify-icons.css);
+@import url(../packages/chosen-js/chosen.css);
+@import url(../packages/select2/select2.css);
+@import url(../packages/select2/select2-bootstrap.css);
 @import url(../packages/mapbox-gl/dist/mapbox-gl.css);
 @import url(../packages/nouislider/distribute/nouislider.min.css);
 @import url(../packages/codemirror/lib/codemirror.css);
