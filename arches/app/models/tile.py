@@ -118,7 +118,7 @@ class Tile(models.TileModel):
         missing_nodes = []
         user = {}
         edit_type = ''
-        old_value = ''
+        old_data = ''
         new_value = ''
         if self.data != {}:
             old_model = models.TileModel.objects.filter(pk=self.tileid)
