@@ -475,24 +475,24 @@ class Command(BaseCommand):
         load_preliminary_sql(package_location)
         print 'loading system settings'
         load_system_settings(package_location)
-        # print 'loading widgets'
-        # load_widgets(package_location)
-        # print 'loading functions'
-        # load_functions(package_location)
-        # print 'loading datatypes'
-        # load_datatypes(package_location)
-        # print 'loading concepts'
-        # load_concepts(package_location, overwrite_concepts, stage_concepts)
-        # print 'loading resource models and branches'
-        # load_graphs(package_location)
-        # print 'loading resource to resource constraints'
-        # load_resource_to_resource_constraints(package_location)
-        # print 'loading map layers'
-        # load_map_layers(package_location)
-        # print 'loading business data - resource instances and relationships'
-        # load_business_data(package_location)
-        # print 'loading resource views'
-        # load_resource_views(package_location)
+        print 'loading widgets'
+        load_widgets(package_location)
+        print 'loading functions'
+        load_functions(package_location)
+        print 'loading datatypes'
+        load_datatypes(package_location)
+        print 'loading concepts'
+        load_concepts(package_location, overwrite_concepts, stage_concepts)
+        print 'loading resource models and branches'
+        load_graphs(package_location)
+        print 'loading resource to resource constraints'
+        load_resource_to_resource_constraints(package_location)
+        print 'loading map layers'
+        load_map_layers(package_location)
+        print 'loading business data - resource instances and relationships'
+        load_business_data(package_location)
+        print 'loading resource views'
+        load_resource_views(package_location)
 
     def update_project_templates(self):
         """
