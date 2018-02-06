@@ -218,9 +218,6 @@ class ResourceEditLogView(BaseManagerView):
                 edit.resource_model_name = None
                 for resource in resources:
                     if str(resource.resourceinstanceid) == edit.resourceinstanceid:
-                        edit.displayname = resource.displayname
-                        if resource.displayname in ('', None):
-                            edit.displayname = edit.note
                         edit.resource_model_name = resource.graph.name
                         break
                 edit.displayname = edit.note

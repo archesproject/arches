@@ -106,7 +106,8 @@ class Tile(models.TileModel):
         edit.user_email = getattr(user, 'email', '')
         edit.user_firstname = getattr(user, 'first_name', '')
         edit.user_lastname = getattr(user, 'last_name', '')
-        edit.note = Resource.objects.get(resourceinstanceid=self.resourceinstance.resourceinstanceid).displayname
+        edit.user_username = getattr(user, 'username', '')
+        edit.resourcedisplayname = Resource.objects.get(resourceinstanceid=self.resourceinstance.resourceinstanceid).displayname
         edit.oldvalue = old_value
         edit.newvalue = new_value
         edit.timestamp = timestamp
