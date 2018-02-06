@@ -19,7 +19,7 @@
     "@mapbox/geojson-normalize" "0.0.1"
     geojson-flatten "~0.2.1"
 
-"@mapbox/geojson-extent@^0.3.2":
+"@mapbox/geojson-extent@0.3.2", "@mapbox/geojson-extent@^0.3.2":
   version "0.3.2"
   resolved "https://registry.yarnpkg.com/@mapbox/geojson-extent/-/geojson-extent-0.3.2.tgz#a1bdb2015afd0e031c18c3f29f7eb229e4e1950f"
   dependencies:
@@ -1489,15 +1489,17 @@ jquery-migrate@3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/jquery-migrate/-/jquery-migrate-3.0.1.tgz#141de3abfe6d301baaa4130b0ec7b9a839845e72"
 
-jquery-validate@1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/jquery-validate/-/jquery-validate-1.0.2.tgz#db6ca14566816abd41dfb81091812be75c85387d"
+jquery-validation@1.17.0:
+  version "1.17.0"
+  resolved "https://registry.yarnpkg.com/jquery-validation/-/jquery-validation-1.17.0.tgz#ab66b6b583d7740b9bbd148993e50e8ac041f35b"
+  dependencies:
+    jquery "^1.7 || ^2.0 || ^3.1"
 
 jquery.easing@^1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/jquery.easing/-/jquery.easing-1.4.1.tgz#47982c5836bd758fd48494923c4a101ef6e93e3b"
 
-jquery@3.3.1, jquery@>=1.10, jquery@>=1.11.3, jquery@>=1.4.4, jquery@>=1.7, "jquery@^1.8.3 || ^2.0 || ^3.0":
+jquery@3.3.1, jquery@>=1.10, jquery@>=1.11.3, jquery@>=1.4.4, jquery@>=1.7, "jquery@^1.7 || ^2.0 || ^3.1", "jquery@^1.8.3 || ^2.0 || ^3.0":
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.3.1.tgz#958ce29e81c9790f31be7792df5d4d95fc57fbca"
 
