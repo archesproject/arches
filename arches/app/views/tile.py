@@ -49,7 +49,7 @@ class TileData(View):
                     resource.resourceinstanceid = data['resourceinstance_id']
                     graphid = models.Node.objects.filter(nodegroup=data['nodegroup_id'])[0].graph.graphid
                     resource.graph_id = graphid
-                    resource.save()
+                    resource.save(user=request.user)
                     resource.index()
                 tile_id = data['tileid']
                 if tile_id != None and tile_id != '':

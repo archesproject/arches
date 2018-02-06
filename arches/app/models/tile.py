@@ -104,7 +104,7 @@ class Tile(models.TileModel):
         edit.user_email = getattr(user, 'email', '')
         edit.user_firstname = getattr(user, 'first_name', '')
         edit.user_lastname = getattr(user, 'last_name', '')
-        edit.note = note
+        edit.note = Resource.objects.get(resourceinstanceid=self.resourceinstance.resourceinstanceid).displayname
         edit.oldvalue = old_value
         edit.newvalue = new_value
         edit.timestamp = timestamp
@@ -116,6 +116,10 @@ class Tile(models.TileModel):
         index = kwargs.pop('index', True)
         self.__preSave(request)
         missing_nodes = []
+        user = {}
+        edit_type = ''
+        old_value = ''
+        new_value = ''
         if self.data != {}:
             old_model = models.TileModel.objects.filter(pk=self.tileid)
             old_data = old_model[0].data if len(old_model) > 0 else None
@@ -124,7 +128,6 @@ class Tile(models.TileModel):
                 user = request.user
             except:
                 user = {}
-            self.save_edit(user=user, edit_type=edit_type, old_value=old_data, new_value=self.data)
             for nodeid, value in self.data.iteritems():
                 datatype_factory = DataTypeFactory()
                 node = models.Node.objects.get(nodeid=nodeid)
@@ -140,6 +143,8 @@ class Tile(models.TileModel):
             raise ValidationError(message, (', ').join(missing_nodes))
 
         super(Tile, self).save(*args, **kwargs)
+        self.save_edit(user=user, edit_type=edit_type, old_value=old_data, new_value=self.data)
+
         if index and unicode(self.resourceinstance.graph_id) != unicode(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
             self.index()
         for tiles in self.tiles.itervalues():
