@@ -86,15 +86,19 @@ class Resource(models.ResourceInstance):
         Saves and indexes a single resource
 
         """
+
         request = kwargs.pop('request', '')
+        user = kwargs.pop('user', '')
         super(Resource, self).save(*args, **kwargs)
         for tile in self.tiles:
             tile.resourceinstance_id = self.resourceinstanceid
             saved_tile = tile.save(index=False)
         if request == '':
-            user = {}
+            if user == '':
+                user = {}
         else:
             user = request.user
+
         self.save_edit(user=user, edit_type='create')
         self.index()
 
@@ -225,7 +229,8 @@ class Resource(models.ResourceInstance):
         for result in results:
             se.delete(index='strings', doc_type='term', id=result['_id'])
         se.delete(index='resource', doc_type=str(self.graph_id), id=self.resourceinstanceid)
-        self.save_edit(edit_type='delete')
+
+        self.save_edit(edit_type='delete', user=user, note=self.displayname)
         super(Resource, self).delete()
 
     def get_related_resources(self, lang='en-US', limit=settings.RELATED_RESOURCES_EXPORT_LIMIT, start=0, page=0):
