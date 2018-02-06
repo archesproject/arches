@@ -222,6 +222,7 @@ class ResourceEditLogView(BaseManagerView):
                         break
                 edit.displayname = edit.note
                 if edit.resource_model_name is None:
+                    edit.deleted = True
                     try:
                         edit.resource_model_name = models.GraphModel.objects.get(pk=edit.resourceclassid).name
                     except:
