@@ -288,6 +288,7 @@ class Command(BaseCommand):
                         resource2resourceid=uuid.UUID(relationship['resource2resourceid'])
                     )
 
+        @transaction.atomic
         def load_preliminary_sql(package_dir):
             resource_views = glob.glob(os.path.join(package_dir, 'preliminary_sql', '*.sql'))
             try:
@@ -299,7 +300,6 @@ class Command(BaseCommand):
             except Exception as e:
                 print e
                 print 'Could not connect to db'
-
 
         def load_resource_views(package_dir):
             resource_views = glob.glob(os.path.join(package_dir, 'business_data','resource_views', '*.sql'))
