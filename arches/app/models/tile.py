@@ -120,23 +120,23 @@ class Tile(models.TileModel):
         edit_type = ''
         old_data = ''
         new_value = ''
-        if self.data != {}:
-            old_model = models.TileModel.objects.filter(pk=self.tileid)
-            old_data = old_model[0].data if len(old_model) > 0 else None
-            edit_type = 'tile create' if (old_data == None) else 'tile edit'
-            try:
-                user = request.user
-            except:
-                user = {}
-            for nodeid, value in self.data.iteritems():
-                datatype_factory = DataTypeFactory()
-                node = models.Node.objects.get(nodeid=nodeid)
-                datatype = datatype_factory.get_instance(node.datatype)
-                datatype.convert_value(self, nodeid)
-                if request is not None:
-                    datatype.handle_request(self, request, node)
-                if self.data[nodeid] == None and node.isrequired == True:
-                    missing_nodes.append(node.name)
+
+        old_model = models.TileModel.objects.filter(pk=self.tileid)
+        old_data = old_model[0].data if len(old_model) > 0 else None
+        edit_type = 'tile create' if (old_data == None) else 'tile edit'
+        try:
+            user = request.user
+        except:
+            user = {}
+        for nodeid, value in self.data.iteritems():
+            datatype_factory = DataTypeFactory()
+            node = models.Node.objects.get(nodeid=nodeid)
+            datatype = datatype_factory.get_instance(node.datatype)
+            datatype.convert_value(self, nodeid)
+            if request is not None:
+                datatype.handle_request(self, request, node)
+            if self.data[nodeid] == None and node.isrequired == True:
+                missing_nodes.append(node.name)
 
         if missing_nodes != []:
             message = _('This card requires values for the following:')
