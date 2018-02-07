@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="../../dist/leaflet.css" />
+    <script type="text/javascript" src="../../build/deps.js"></script>
+    <script src="../leaflet-include.js"></script>
+  <meta charset="utf-8">
+  <title>Leaflet JS Bin</title>
+  <style>
+    #map {
+      width:600px;
+      height:400px;
+    }
+  </style>
+</head>
+<body>
+  <div id='map'></div>
+
+  <button id="button">
+    Color Map
+  </button>
+
+  <script>
+
+
+var map = null;
+
+
+function renderMap() {
+  map = L.map("map", {
+    renderer: L.canvas({
+      padding: 1.5,
+    }),
+	zoomControl: false,
+	attributionControl: false
+  }).fitWorld();
+
+  //Add zoom controls
+//   L.control.zoom({
+//     position: "bottomright"
+//   }).addTo(map);
+
+  //Color all rooms gray by default
+  var defaultRoomStyle = {
+    "color": "#636363",
+    "weight": 1,
+    "opacity": 0,
+    "fillOpacity": 1
+  };
+
+  //Add GeoJSON
+//   var group = L.featureGroup().addTo(map);
+
+  for (var i=0; i<50; i++) {
+    var lat = -85 + 170 * Math.random();
+    var lng = -180 + 360 * Math.random();
+    var w = 2 * Math.random();
+    var h = 2 * Math.random();
+    L.rectangle( [[lat, lng],[lat+h, lng+w]] ).addTo(map);
+  }
+
+
+//   map.fitBounds(group.getBounds());
+}
+
+function clearMap() {
+  map.remove();
+  map = null;
+}
+
+
+//Bind click event to button
+L.DomEvent.on(document.getElementById('button'), 'click', function() {
+  clearMap();
+  renderMap();
+});
+
+var destroyCount = 0;
+
+renderMap();
+
+function recreate(){
+	clearMap();
+	renderMap();
+// 	if (destroyCount++ < 50) { setTimeout(recreate, 100); }
+};
+
+setTimeout(recreate, 100);
+
+  </script>
+</body>
+</html>

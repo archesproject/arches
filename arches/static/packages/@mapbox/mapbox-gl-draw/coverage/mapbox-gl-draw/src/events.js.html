@@ -1,0 +1,674 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for mapbox-gl-draw/src/events.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../index.html">all files</a> / <a href="index.html">mapbox-gl-draw/src/</a> events.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">88.89% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>104/117</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">75.93% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>41/54</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">83.33% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>20/24</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">89.42% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>93/104</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">116×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">73×</span>
+<span class="cline-any cline-yes">73×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">254×</span>
+<span class="cline-any cline-yes">116×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">138×</span>
+<span class="cline-any cline-yes">138×</span>
+<span class="cline-any cline-yes">138×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">155×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">155×</span>
+<span class="cline-any cline-yes">155×</span>
+<span class="cline-any cline-yes">155×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">157×</span>
+<span class="cline-any cline-yes">157×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">157×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">136×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">24×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">48×</span>
+<span class="cline-any cline-yes">142×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">142×</span>
+<span class="cline-any cline-yes">142×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">142×</span>
+<span class="cline-any cline-yes">142×</span>
+<span class="cline-any cline-yes">141×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">141×</span>
+<span class="cline-any cline-yes">48×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">141×</span>
+<span class="cline-any cline-yes">141×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">260×</span>
+<span class="cline-any cline-yes">260×</span>
+<span class="cline-any cline-yes">780×</span>
+<span class="cline-any cline-yes">780×</span>
+<span class="cline-any cline-yes">780×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">260×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">569×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">136×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">149×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const setupModeHandler = require('./lib/mode_handler');
+const getFeaturesAndSetCursor = require('./lib/get_features_and_set_cursor');
+const isClick = require('./lib/is_click');
+const Constants = require('./constants');
+&nbsp;
+const modes = {
+  [Constants.modes.SIMPLE_SELECT]: require('./modes/simple_select'),
+  [Constants.modes.DIRECT_SELECT]: require('./modes/direct_select'),
+  [Constants.modes.DRAW_POINT]: require('./modes/draw_point'),
+  [Constants.modes.DRAW_LINE_STRING]: require('./modes/draw_line_string'),
+  [Constants.modes.DRAW_POLYGON]: require('./modes/draw_polygon'),
+  [Constants.modes.STATIC]: require('./modes/static')
+};
+&nbsp;
+module.exports = function(ctx) {
+&nbsp;
+  let mouseDownInfo = {};
+  const events = {};
+  let currentModeName = Constants.modes.SIMPLE_SELECT;
+  let currentMode = setupModeHandler(modes.simple_select(ctx), ctx);
+&nbsp;
+  events.drag = function(event) {
+    if (isClick(mouseDownInfo, {
+      point: event.point,
+      time: new Date().getTime()
+    })) {
+      event.originalEvent.stopPropagation();
+    } else {
+      ctx.ui.queueMapClasses({ mouse: Constants.cursors.DRAG });
+      currentMode.drag(event);
+    }
+  };
+&nbsp;
+  events.mousemove = function(event) {
+    if (event.originalEvent.which === 1) {
+      return events.drag(event);
+    }
+    const target = getFeaturesAndSetCursor(event, ctx);
+    event.featureTarget = target;
+    currentMode.mousemove(event);
+  };
+&nbsp;
+  events.mousedown = function(event) {
+    mouseDownInfo = {
+      time: new Date().getTime(),
+      point: event.point
+    };
+    const target = getFeaturesAndSetCursor(event, ctx);
+    event.featureTarget = target;
+    currentMode.mousedown(event);
+  };
+&nbsp;
+  events.mouseup = function(event) {
+    const target = getFeaturesAndSetCursor(event, ctx);
+    event.featureTarget = target;
+&nbsp;
+    if (isClick(mouseDownInfo, {
+      point: event.point,
+      time: new Date().getTime()
+    })) {
+      currentMode.click(event);
+    } else {
+      currentMode.mouseup(event);
+    }
+  };
+&nbsp;
+  events.mouseout = function(event) {
+    currentMode.mouseout(event);
+  };
+&nbsp;
+  // 8 - Backspace
+  // 46 - Delete
+  const isKeyModeValid = (code) =&gt; !(code === 8 || code === 46 || (code &gt;= 48 &amp;&amp; code &lt;= 57));
+&nbsp;
+  events.keydown = function(event) {
+&nbsp;
+    if ((event.keyCode === 8 || event.keyCode === 46) &amp;&amp; ctx.options.controls.trash) {
+      event.preventDefault();
+      currentMode.trash();
+    } else if (isKeyModeValid(event.keyCode)) <span class="missing-if-branch" title="if path not taken" >I</span>{
+<span class="cstat-no" title="statement not covered" >      currentMode.keydown(event);</span>
+    } else if (event.keyCode === 49 &amp;&amp; ctx.options.controls.point) {
+      changeMode(Constants.modes.DRAW_POINT);
+    } else if (event.keyCode === 50 &amp;&amp; ctx.options.controls.line_string) {
+      changeMode(Constants.modes.DRAW_LINE_STRING);
+    } else if (event.keyCode === 51 &amp;&amp; ctx.options.controls.polygon) <span class="missing-if-branch" title="else path not taken" >E</span>{
+      changeMode(Constants.modes.DRAW_POLYGON);
+    }
+  };
+&nbsp;
+  events.keyup = function(event) {
+    if (isKeyModeValid(event.keyCode)) <span class="missing-if-branch" title="else path not taken" >E</span>{
+      currentMode.keyup(event);
+    }
+  };
+&nbsp;
+  events.zoomend = <span class="fstat-no" title="function not covered" >function() {</span>
+<span class="cstat-no" title="statement not covered" >    ctx.store.changeZoom();</span>
+  };
+&nbsp;
+  events.data = <span class="fstat-no" title="function not covered" >function(event) {</span>
+<span class="cstat-no" title="statement not covered" >    if (event.dataType === 'style') {</span>
+      const { setup, map, options, store } = ctx;
+      const hasLayers = <span class="cstat-no" title="statement not covered" >!!options.styles.find(<span class="fstat-no" title="function not covered" >style =&gt; <span class="cstat-no" title="statement not covered" >map.getLayer(style.id))</span></span>;</span>
+<span class="cstat-no" title="statement not covered" >      if (!hasLayers) {</span>
+<span class="cstat-no" title="statement not covered" >        setup.addLayers();</span>
+<span class="cstat-no" title="statement not covered" >        store.setDirty();</span>
+<span class="cstat-no" title="statement not covered" >        store.render();</span>
+      }
+    }
+  };
+&nbsp;
+  function changeMode(modename, nextModeOptions, eventOptions = {}) {
+    currentMode.stop();
+&nbsp;
+    const modebuilder = modes[modename];
+    if (modebuilder === undefined) <span class="missing-if-branch" title="if path not taken" >I</span>{
+<span class="cstat-no" title="statement not covered" >      throw new Error(`${modename} is not valid`);</span>
+    }
+    currentModeName = modename;
+    const mode = modebuilder(ctx, nextModeOptions);
+    currentMode = setupModeHandler(mode, ctx);
+&nbsp;
+    if (!eventOptions.silent) {
+      ctx.map.fire(Constants.events.MODE_CHANGE, { mode: modename});
+    }
+&nbsp;
+    ctx.store.setDirty();
+    ctx.store.render();
+  }
+&nbsp;
+  const actionState = {
+    trash: false,
+    combineFeatures: false,
+    uncombineFeatures: false
+  };
+&nbsp;
+  function actionable(actions) {
+    let changed = false;
+    Object.keys(actions).forEach(action =&gt; {
+      <span class="missing-if-branch" title="if path not taken" >I</span>if (actionState[action] === undefined) <span class="cstat-no" title="statement not covered" >throw new Error('Invalid action type');</span>
+      if (actionState[action] !== actions[action]) changed = true;
+      actionState[action] = actions[action];
+    });
+    if (changed) ctx.map.fire(Constants.events.ACTIONABLE, { actions: actionState });
+  }
+&nbsp;
+  const api = {
+    changeMode,
+    actionable,
+    currentModeName: function() {
+      return currentModeName;
+    },
+    currentModeRender: function(geojson, push) {
+      return currentMode.render(geojson, push);
+    },
+    fire: <span class="fstat-no" title="function not covered" >function(name, event) {</span>
+<span class="cstat-no" title="statement not covered" >      if (events[name]) {</span>
+<span class="cstat-no" title="statement not covered" >        events[name](event);</span>
+      }
+    },
+    addEventListeners: function() {
+      ctx.map.on('mousemove', events.mousemove);
+      ctx.map.on('mousedown', events.mousedown);
+      ctx.map.on('mouseup', events.mouseup);
+      ctx.map.on('data', events.data);
+&nbsp;
+      ctx.container.addEventListener('mouseout', events.mouseout);
+&nbsp;
+      if (ctx.options.keybindings) <span class="missing-if-branch" title="else path not taken" >E</span>{
+        ctx.container.addEventListener('keydown', events.keydown);
+        ctx.container.addEventListener('keyup', events.keyup);
+      }
+    },
+    removeEventListeners: function() {
+      ctx.map.off('mousemove', events.mousemove);
+      ctx.map.off('mousedown', events.mousedown);
+      ctx.map.off('mouseup', events.mouseup);
+      ctx.map.off('data', events.data);
+&nbsp;
+      ctx.container.removeEventListener('mouseout', events.mouseout);
+&nbsp;
+      if (ctx.options.keybindings) <span class="missing-if-branch" title="else path not taken" >E</span>{
+        ctx.container.removeEventListener('keydown', events.keydown);
+        ctx.container.removeEventListener('keyup', events.keyup);
+      }
+    },
+    trash: function(options) {
+      currentMode.trash(options);
+    },
+    combineFeatures: function() {
+      currentMode.combineFeatures();
+    },
+    uncombineFeatures: function() {
+      currentMode.uncombineFeatures();
+    },
+    getMode: function() {
+      return currentModeName;
+    }
+  };
+&nbsp;
+  return api;
+};
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Nov 17 2016 15:31:58 GMT-0500 (EST)
+</div>
+</div>
+<script src="../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../sorter.js"></script>
+</body>
+</html>

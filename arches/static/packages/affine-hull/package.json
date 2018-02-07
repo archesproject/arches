@@ -1,0 +1,33 @@
+{
+  "name": "affine-hull",
+  "version": "1.0.0",
+  "description": "Finds the affine hull of a point set",
+  "main": "aff.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "robust-orientation": "^1.1.3"
+  },
+  "devDependencies": {
+    "tape": "^3.0.3"
+  },
+  "scripts": {
+    "test": "tape test/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mikolalysenko/affine-hull.git"
+  },
+  "keywords": [
+    "affine",
+    "hull",
+    "geometry"
+  ],
+  "author": "Mikola Lysenko",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mikolalysenko/affine-hull/issues"
+  },
+  "homepage": "https://github.com/mikolalysenko/affine-hull"
+}

@@ -1,0 +1,31 @@
+{
+  "name": "@mapbox/extent",
+  "version": "0.4.0",
+  "description": "a geographic extent object",
+  "main": "index.js",
+  "scripts": {
+    "test": "tap test/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:mapbox/extent.git"
+  },
+  "keywords": [
+    "extent",
+    "geographic",
+    "lat",
+    "lon",
+    "browser"
+  ],
+  "author": "Tom MacWright",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mapbox/extent/issues"
+  },
+  "homepage": "https://github.com/mapbox/extent",
+  "devDependencies": {
+    "tap": "~0.4.8",
+    "benchmark": "~1.0.0",
+    "point-in-polygon": "0.0.0"
+  }
+}

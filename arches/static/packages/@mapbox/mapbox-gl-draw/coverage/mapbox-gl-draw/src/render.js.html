@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for mapbox-gl-draw/src/render.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../index.html">all files</a> / <a href="index.html">mapbox-gl-draw/src/</a> render.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>54/54</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>22/22</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>12/12</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>42/42</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">120×</span>
+<span class="cline-any cline-yes">120×</span>
+<span class="cline-any cline-yes">120×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">119×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">119×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">119×</span>
+<span class="cline-any cline-yes">119×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">119×</span>
+<span class="cline-any cline-yes">58×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">63×</span>
+<span class="cline-any cline-yes">61×</span>
+<span class="cline-any cline-yes">91×</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">119×</span>
+<span class="cline-any cline-yes">119×</span>
+<span class="cline-any cline-yes">119×</span>
+<span class="cline-any cline-yes">129×</span>
+<span class="cline-any cline-yes">129×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">119×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">119×</span>
+<span class="cline-any cline-yes">119×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">136×</span>
+<span class="cline-any cline-yes">136×</span>
+<span class="cline-any cline-yes">136×</span>
+<span class="cline-any cline-yes">396×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">119×</span>
+<span class="cline-any cline-yes">74×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">119×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">119×</span>
+<span class="cline-any cline-yes">38×</span>
+<span class="cline-any cline-yes">32×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">38×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">119×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">119×</span>
+<span class="cline-any cline-yes">119×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">120×</span>
+<span class="cline-any cline-yes">120×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const Constants = require('./constants');
+&nbsp;
+module.exports = function render() {
+  const store = this;
+  const mapExists = store.ctx.map &amp;&amp; store.ctx.map.getSource(Constants.sources.HOT) !== undefined;
+  if (!mapExists) return cleanup();
+&nbsp;
+  const mode = store.ctx.events.currentModeName();
+&nbsp;
+  store.ctx.ui.queueMapClasses({ mode });
+&nbsp;
+  let newHotIds = [];
+  let newColdIds = [];
+&nbsp;
+  if (store.isDirty) {
+    newColdIds = store.getAllIds();
+  } else {
+    newHotIds = store.getChangedIds().filter(id =&gt; store.get(id) !== undefined);
+    newColdIds = store.sources.hot.filter((geojson) =&gt; {
+      return geojson.properties.id &amp;&amp; newHotIds.indexOf(geojson.properties.id) === -1 &amp;&amp; store.get(geojson.properties.id) !== undefined;
+    }).map(geojson =&gt; geojson.properties.id);
+  }
+&nbsp;
+  store.sources.hot = [];
+  const lastColdCount = store.sources.cold.length;
+  store.sources.cold = store.isDirty ? [] : store.sources.cold.filter((geojson) =&gt; {
+    const id = geojson.properties.id || geojson.properties.parent;
+    return newHotIds.indexOf(id) === -1;
+  });
+&nbsp;
+  const coldChanged = lastColdCount !== store.sources.cold.length || newColdIds.length &gt; 0;
+&nbsp;
+  newHotIds.forEach(id =&gt; renderFeature(id, 'hot'));
+  newColdIds.forEach(id =&gt; renderFeature(id, 'cold'));
+&nbsp;
+  function renderFeature(id, source) {
+    const feature = store.get(id);
+    const featureInternal = feature.internal(mode);
+    store.ctx.events.currentModeRender(featureInternal, (geojson) =&gt; {
+      store.sources[source].push(geojson);
+    });
+  }
+&nbsp;
+  if (coldChanged) {
+    store.ctx.map.getSource(Constants.sources.COLD).setData({
+      type: Constants.geojsonTypes.FEATURE_COLLECTION,
+      features: store.sources.cold
+    });
+  }
+&nbsp;
+  store.ctx.map.getSource(Constants.sources.HOT).setData({
+    type: Constants.geojsonTypes.FEATURE_COLLECTION,
+    features: store.sources.hot
+  });
+&nbsp;
+  if (store._emitSelectionChange) {
+    store.ctx.map.fire(Constants.events.SELECTION_CHANGE, {
+      features: store.getSelected().map(feature =&gt; feature.toGeoJSON())
+    });
+    store._emitSelectionChange = false;
+  }
+&nbsp;
+  if (store._deletedFeaturesToEmit.length) {
+    const geojsonToEmit = store._deletedFeaturesToEmit.map(feature =&gt; feature.toGeoJSON());
+&nbsp;
+    store._deletedFeaturesToEmit = [];
+&nbsp;
+    store.ctx.map.fire(Constants.events.DELETE, {
+      features: geojsonToEmit
+    });
+  }
+&nbsp;
+  store.ctx.map.fire(Constants.events.RENDER, {});
+  cleanup();
+&nbsp;
+  function cleanup() {
+    store.isDirty = false;
+    store.clearChangedIds();
+  }
+};
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Nov 17 2016 15:31:58 GMT-0500 (EST)
+</div>
+</div>
+<script src="../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../sorter.js"></script>
+</body>
+</html>

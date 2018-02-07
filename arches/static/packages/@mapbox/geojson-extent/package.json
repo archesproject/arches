@@ -1,0 +1,50 @@
+{
+  "name": "@mapbox/geojson-extent",
+  "version": "0.3.2",
+  "description": "compute the bounding box of geojson features",
+  "main": "index.js",
+  "scripts": {
+    "test": "eslint index.js && tap test/*.js",
+    "build": "browserify -s geojsonExtent index.js | uglifyjs -c > geojson-extent.js"
+  },
+  "bin": {
+    "geojson-extent": "./bin/geojson-extent"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:mapbox/geojson-extent.git"
+  },
+  "keywords": [
+    "geojson",
+    "extent",
+    "browser",
+    "geo",
+    "boundingbox",
+    "bounds"
+  ],
+  "author": "Tom MacWright",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mapbox/geojson-extent/issues"
+  },
+  "homepage": "https://github.com/mapbox/geojson-extent",
+  "dependencies": {
+    "@mapbox/extent": "0.4.0",
+    "@mapbox/geojson-coords": "0.0.0",
+    "rw": "~0.1.4",
+    "traverse": "~0.6.6"
+  },
+  "devDependencies": {
+    "browserify": "~5.9.3",
+    "cz-conventional-changelog": "1.2.0",
+    "eslint": "~1.00.0",
+    "eslint-config-unstyled": "^1.1.0",
+    "tap": "~0.4.8",
+    "uglifyjs": "~2.4.10"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}

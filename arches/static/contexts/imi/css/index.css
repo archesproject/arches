@@ -1,0 +1,24 @@
+@import url(../../styles-nexus.css);
+
+/*SELECTION*/
+::selection {color: #fff !important;background: #3390ff !important;}
+a:hover {color: #3390ff;}
+/*PAGINA PRINCIPAL*/
+.one-page-header{background:rgba(256,256,256,0.6) !important;}
+.one-page-header .navbar-nav>li>a {color:#4d4d4d !important;}
+.one-page-header .navbar-nav>li>a:before{color:#4d4d4d !important;}
+#share .title-v1{text-align: justify !important;}
+#share h3,h4{color:#0069e1 !important;text-align: left !important;}
+#share .separator{margin:30px 0px; border-bottom: 1px solid rgba(110,110,110,0.8);}
+#share .bg-white{}
+#share .color_modernisme{color:rgb(182,43,43) !important;}
+#share .color_poblenou{color:rgb(112,184,175) !important;}
+#share .color_barcelona_antiga{color:rgb(216,113,187) !important;}
+.separator_gruixut{ border-bottom: 10px solid;}
+.logo_mes:before{display:block; content: "\f055"; float:left;margin:3px;font: normal normal normal 14px/1 FontAwesome;}
+
+#contact .contact-association{background:rgb(83,103,110) !important;color:#fff !important;}
+#contact h3{color:#fff !important;}
+#contact a{color:#fff;}
+
+

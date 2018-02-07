@@ -67,4 +67,7 @@ class BaseManagerView(TemplateView):
         context['resource_map_sources'] = resource_sources
         context['iiif_manifests'] = models.IIIFManifest.objects.all()
 
+        if (hasattr(settings, 'CONTEXT') and settings.CONTEXT !=""):
+            context['context_name'] = settings.CONTEXT
+
         return context

@@ -1,0 +1,54 @@
+.auth-options {
+    margin-top: 17px;
+}
+
+div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
+    margin-right: 40px;
+}
+
+.one-page-header .navbar-nav>li> .fa-chevron-circle-down {
+    padding: 0px 0px 0px;
+    z-index: 100;
+    margin-top: 20px;
+}
+
+@media (min-width: 768px) {
+    .one-page-header .navbar-nav>li> .fa-chevron-circle-down {
+        color: #eee;
+    }
+}
+
+@media (max-width: 1000px) {
+    .one-page-header .navbar-nav>li> .fa-chevron-circle-down {
+        padding-left: 12px;
+        margin-top: 14px;
+    }
+}
+
+
+@media (max-width: 1000px) {
+    ul .auth-options {
+        position: inherit;
+        float:left;
+        right: 3px;
+        list-style: none;
+        margin-top: 0px;
+        margin-right: -142px;
+    }
+}
+
+@media (min-width: 1000px) {
+    ul .auth-options {
+        position: inherit;
+        float:right;
+        right: 3px;
+        list-style: none;
+        margin-top: 40px;
+        margin-right: -142px;
+    }
+}
+
+body.dark p, li, .auth-options li a {
+    color: #eee;
+    font-size: 12.5px;
+}

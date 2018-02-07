@@ -1,0 +1,45 @@
+{
+  "name": "latlon-geohash",
+  "description": "Gustavo Niemeyer’s geocoding system",
+  "author": "Chris Veness",
+  "version": "1.1.0",
+  "license": "MIT",
+  "homepage": "http://www.movable-type.co.uk/scripts/geohash.html",
+  "main": "latlon-geohash.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chrisveness/latlon-geohash"
+  },
+  "keywords": [ "geohash", "geocode", "geolocation", "latitude", "longitude" ],
+  "scripts": {
+    "test": "mocha test.js",
+    "lint": "eslint latlon-geohash.js"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "eslint": "^3.5.0",
+    "mocha": "^3.0.2"
+  },
+  "eslintConfig": {
+    "env": {
+      "node": true,
+      "mocha": true
+    },
+    "extends": "eslint:recommended",
+    "rules": {
+      "array-bracket-spacing": [ "error", "always" ],
+      "comma-dangle": [ "error", "always-multiline" ],
+      "curly": [ "error", "multi-line" ],
+      "indent": [ "error", 4, { "SwitchCase": 1 } ],
+      "key-spacing": [ "error", { "align": "value" } ],
+      "no-console": "warn",
+      "no-redeclare": "warn",
+      "no-shadow": "warn",
+      "no-unused-vars": "warn",
+      "object-curly-spacing": [ "error", "always" ],
+      "quotes": [ "error", "single", "avoid-escape" ],
+      "semi": [ "error", "always" ],
+      "strict": [ "error", "global" ]
+    }
+  }
+}

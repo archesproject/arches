@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for mapbox-gl-draw/src/feature_types/multi_feature.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../prettify.css" />
+    <link rel="stylesheet" href="../../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../../index.html">all files</a> / <a href="index.html">mapbox-gl-draw/src/feature_types/</a> multi_feature.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">89.58% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>43/48</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">83.33% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>5/6</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">85.71% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>12/14</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">90.48% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>38/42</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">20×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">20×</span>
+<span class="cline-any cline-yes">20×</span>
+<span class="cline-any cline-yes">20×</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-yes">49×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">61×</span>
+<span class="cline-any cline-yes">116×</span>
+<span class="cline-any cline-yes">87×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const Feature = require('./feature');
+const Constants = require('../constants');
+const hat = require('hat');
+&nbsp;
+const models = {
+  MultiPoint: require('./point'),
+  MultiLineString: require('./line_string'),
+  MultiPolygon: require('./polygon')
+};
+&nbsp;
+const takeAction = (features, action, path, lng, lat) =&gt; {
+  const parts = path.split('.');
+  const idx = parseInt(parts[0], 10);
+  const tail = <span class="branch-1 cbranch-no" title="branch not covered" >(!parts[1]) ? null : <span class="cstat-no" title="statement not covered" >parts.slice(1).join('.');</span></span>
+  return features[idx][action](tail, lng, lat);
+};
+&nbsp;
+const MultiFeature = function(ctx, geojson) {
+  Feature.call(this, ctx, geojson);
+&nbsp;
+  delete this.coordinates;
+  this.model = models[geojson.geometry.type];
+  if (this.model === undefined) throw new TypeError(`${geojson.geometry.type} is not a valid type`);
+  this.features = this._coordinatesToFeatures(geojson.geometry.coordinates);
+};
+&nbsp;
+MultiFeature.prototype = Object.create(Feature.prototype);
+&nbsp;
+MultiFeature.prototype._coordinatesToFeatures = function(coordinates) {
+  const Model = this.model.bind(this);
+  return coordinates.map(coords =&gt; new Model(this.ctx, {
+    id: hat(),
+    type: Constants.geojsonTypes.FEATURE,
+    properties: {},
+    geometry: {
+      coordinates: coords,
+      type: this.type.replace('Multi', '')
+    }
+  }));
+};
+&nbsp;
+MultiFeature.prototype.isValid = function() {
+  return this.features.every(f =&gt; f.isValid());
+};
+&nbsp;
+MultiFeature.prototype.setCoordinates = function(coords) {
+  this.features = this._coordinatesToFeatures(coords);
+  this.changed();
+};
+&nbsp;
+MultiFeature.prototype.getCoordinate = function(path) {
+  return takeAction(this.features, 'getCoordinate', path);
+};
+&nbsp;
+MultiFeature.prototype.getCoordinates = function() {
+  return JSON.parse(JSON.stringify(this.features.map(f =&gt; {
+    if (f.type === Constants.geojsonTypes.POLYGON) return f.getCoordinates();
+    return f.coordinates;
+  })));
+};
+&nbsp;
+MultiFeature.prototype.updateCoordinate = function(path, lng, lat) {
+  takeAction(this.features, 'updateCoordinate', path, lng, lat);
+  this.changed();
+};
+&nbsp;
+MultiFeature.prototype.addCoordinate = <span class="fstat-no" title="function not covered" >function(path, lng, lat) {</span>
+<span class="cstat-no" title="statement not covered" >  takeAction(this.features, 'addCoordinate', path, lng, lat);</span>
+<span class="cstat-no" title="statement not covered" >  this.changed();</span>
+};
+&nbsp;
+MultiFeature.prototype.removeCoordinate = <span class="fstat-no" title="function not covered" >function(path) {</span>
+<span class="cstat-no" title="statement not covered" >  takeAction(this.features, 'removeCoordinate', path);</span>
+<span class="cstat-no" title="statement not covered" >  this.changed();</span>
+};
+&nbsp;
+MultiFeature.prototype.getFeatures = function() {
+  return this.features;
+};
+&nbsp;
+module.exports = MultiFeature;
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Nov 17 2016 15:31:58 GMT-0500 (EST)
+</div>
+</div>
+<script src="../../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../../sorter.js"></script>
+</body>
+</html>

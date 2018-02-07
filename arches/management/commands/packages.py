@@ -288,7 +288,6 @@ class Command(BaseCommand):
                         resource2resourceid=uuid.UUID(relationship['resource2resourceid'])
                     )
 
-        @transaction.atomic
         def load_preliminary_sql(package_dir):
             resource_views = glob.glob(os.path.join(package_dir, 'preliminary_sql', '*.sql'))
             try:

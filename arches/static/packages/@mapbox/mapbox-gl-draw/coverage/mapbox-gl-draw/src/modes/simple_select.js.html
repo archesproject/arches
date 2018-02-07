@@ -1,0 +1,1136 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for mapbox-gl-draw/src/modes/simple_select.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../prettify.css" />
+    <link rel="stylesheet" href="../../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../../index.html">all files</a> / <a href="index.html">mapbox-gl-draw/src/modes/</a> simple_select.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>209/209</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">92.65% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>63/68</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>33/33</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>185/185</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">40×</span>
+<span class="cline-any cline-yes">86×</span>
+<span class="cline-any cline-yes">86×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">86×</span>
+<span class="cline-any cline-yes">86×</span>
+<span class="cline-any cline-yes">86×</span>
+<span class="cline-any cline-yes">86×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">86×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">86×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">86×</span>
+<span class="cline-any cline-yes">177×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">177×</span>
+<span class="cline-any cline-yes">157×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">177×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">177×</span>
+<span class="cline-any cline-yes">23×</span>
+<span class="cline-any cline-yes">23×</span>
+<span class="cline-any cline-yes">23×</span>
+<span class="cline-any cline-yes">85×</span>
+<span class="cline-any cline-yes">33×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">177×</span>
+<span class="cline-any cline-yes">177×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">177×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">86×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">86×</span>
+<span class="cline-any cline-yes">69×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">69×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">69×</span>
+<span class="cline-any cline-yes">69×</span>
+<span class="cline-any cline-yes">69×</span>
+<span class="cline-any cline-yes">69×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">86×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">51×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">86×</span>
+<span class="cline-any cline-yes">69×</span>
+<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">69×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">86×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">86×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">86×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">86×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">86×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">86×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">86×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">86×</span>
+<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">86×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">86×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">86×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">86×</span>
+<span class="cline-any cline-yes">23×</span>
+<span class="cline-any cline-yes">23×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">23×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">23×</span>
+<span class="cline-any cline-yes">23×</span>
+<span class="cline-any cline-yes">23×</span>
+<span class="cline-any cline-yes">23×</span>
+<span class="cline-any cline-yes">23×</span>
+<span class="cline-any cline-yes">23×</span>
+<span class="cline-any cline-yes">23×</span>
+<span class="cline-any cline-yes">23×</span>
+<span class="cline-any cline-yes">23×</span>
+<span class="cline-any cline-yes">23×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">96×</span>
+<span class="cline-any cline-yes">48×</span>
+<span class="cline-any cline-yes">96×</span>
+<span class="cline-any cline-yes">96×</span>
+<span class="cline-any cline-yes">96×</span>
+<span class="cline-any cline-yes">67×</span>
+<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const CommonSelectors = require('../lib/common_selectors');
+const mouseEventPoint = require('../lib/mouse_event_point');
+const featuresAt = require('../lib/features_at');
+const createSupplementaryPoints = require('../lib/create_supplementary_points');
+const StringSet = require('../lib/string_set');
+const doubleClickZoom = require('../lib/double_click_zoom');
+const moveFeatures = require('../lib/move_features');
+const Constants = require('../constants');
+const MultiFeature = require('../feature_types/multi_feature');
+&nbsp;
+module.exports = function(ctx, options = {}) {
+  let dragMoveLocation = null;
+  let boxSelectStartLocation = null;
+  let boxSelectElement;
+  let boxSelecting = false;
+  let canBoxSelect = false;
+  let dragMoving = false;
+  let canDragMove = false;
+&nbsp;
+  const initiallySelectedFeatureIds = options.featureIds || [];
+&nbsp;
+  const fireUpdate = function() {
+    ctx.map.fire(Constants.events.UPDATE, {
+      action: Constants.updateActions.MOVE,
+      features: ctx.store.getSelected().map(f =&gt; f.toGeoJSON())
+    });
+  };
+&nbsp;
+  const fireActionable = () =&gt; {
+    const selectedFeatures = ctx.store.getSelected();
+&nbsp;
+    const multiFeatures = selectedFeatures.filter(
+      feature =&gt; feature instanceof MultiFeature
+    );
+&nbsp;
+    let combineFeatures = false;
+&nbsp;
+    if (selectedFeatures.length &gt; 1) {
+      combineFeatures = true;
+      const featureType = selectedFeatures[0].type.replace('Multi', '');
+      selectedFeatures.forEach(feature =&gt; {
+        if (feature.type.replace('Multi', '') !== featureType) {
+          combineFeatures = false;
+        }
+      });
+    }
+&nbsp;
+    const uncombineFeatures = multiFeatures.length &gt; 0;
+    const trash = selectedFeatures.length &gt; 0;
+&nbsp;
+    ctx.events.actionable({
+      combineFeatures, uncombineFeatures, trash
+    });
+  };
+&nbsp;
+  const getUniqueIds = function(allFeatures) {
+    if (!allFeatures.length) return [];
+    const ids = allFeatures.map(s =&gt; s.properties.id)
+      .filter(id =&gt; id !== undefined)
+      .reduce((memo, id) =&gt; {
+        memo.add(id);
+        return memo;
+      }, new StringSet());
+&nbsp;
+    return ids.values();
+  };
+&nbsp;
+  const stopExtendedInteractions = function() {
+    if (boxSelectElement) {
+      <span class="missing-if-branch" title="else path not taken" >E</span>if (boxSelectElement.parentNode) boxSelectElement.parentNode.removeChild(boxSelectElement);
+      boxSelectElement = null;
+    }
+&nbsp;
+    ctx.map.dragPan.enable();
+&nbsp;
+    boxSelecting = false;
+    canBoxSelect = false;
+    dragMoving = false;
+    canDragMove = false;
+  };
+&nbsp;
+  return {
+    stop: function() {
+      doubleClickZoom.enable(ctx);
+    },
+    start: function() {
+      // Select features that should start selected,
+      // probably passed in from a `draw_*` mode
+      if (ctx.store) {
+        ctx.store.setSelected(initiallySelectedFeatureIds.filter(id =&gt; {
+          return ctx.store.get(id) !== undefined;
+        }));
+        fireActionable();
+      }
+&nbsp;
+      // Any mouseup should stop box selecting and dragMoving
+      this.on('mouseup', CommonSelectors.true, stopExtendedInteractions);
+&nbsp;
+      // On mousemove that is not a drag, stop extended interactions.
+      // This is useful if you drag off the canvas, release the button,
+      // then move the mouse back over the canvas --- we don't allow the
+      // interaction to continue then, but we do let it continue if you held
+      // the mouse button that whole time
+      this.on('mousemove', CommonSelectors.true, stopExtendedInteractions);
+&nbsp;
+      // As soon as you mouse leaves the canvas, update the feature
+      this.on('mouseout', () =&gt; dragMoving, fireUpdate);
+&nbsp;
+      // Click (with or without shift) on no feature
+      this.on('click', CommonSelectors.noTarget, function() {
+        // Clear the re-render selection
+        const wasSelected = ctx.store.getSelectedIds();
+        if (wasSelected.length) {
+          ctx.store.clearSelected();
+          wasSelected.forEach(id =&gt; this.render(id));
+        }
+        doubleClickZoom.enable(ctx);
+        stopExtendedInteractions();
+      });
+&nbsp;
+      // Click (with or without shift) on a vertex
+      this.on('click', CommonSelectors.isOfMetaType(Constants.meta.VERTEX), (e) =&gt; {
+        // Enter direct select mode
+        ctx.events.changeMode(Constants.modes.DIRECT_SELECT, {
+          featureId: e.featureTarget.properties.parent,
+          coordPath: e.featureTarget.properties.coord_path,
+          startPos: e.lngLat
+        });
+        ctx.ui.queueMapClasses({ mouse: Constants.cursors.MOVE });
+      });
+&nbsp;
+      // Mousedown on a selected feature
+      this.on('mousedown', CommonSelectors.isActiveFeature, function(e) {
+        // Stop any already-underway extended interactions
+        stopExtendedInteractions();
+&nbsp;
+        // Disable map.dragPan immediately so it can't start
+        ctx.map.dragPan.disable();
+&nbsp;
+        // Re-render it and enable drag move
+        this.render(e.featureTarget.properties.id);
+&nbsp;
+        // Set up the state for drag moving
+        canDragMove = true;
+        dragMoveLocation = e.lngLat;
+      });
+&nbsp;
+      // Click (with or without shift) on any feature
+      this.on('click', CommonSelectors.isFeature, function(e) {
+        // Stop everything
+        doubleClickZoom.disable(ctx);
+        stopExtendedInteractions();
+&nbsp;
+        const isShiftClick = CommonSelectors.isShiftDown(e);
+        const selectedFeatureIds = ctx.store.getSelectedIds();
+        const featureId = e.featureTarget.properties.id;
+        const isFeatureSelected = ctx.store.isSelected(featureId);
+&nbsp;
+        // Click (without shift) on any selected feature but a point
+        if (!isShiftClick &amp;&amp; isFeatureSelected &amp;&amp; ctx.store.get(featureId).type !== Constants.geojsonTypes.POINT) {
+          // Enter direct select mode
+          return ctx.events.changeMode(Constants.modes.DIRECT_SELECT, {
+            featureId: featureId
+          });
+        }
+&nbsp;
+        // Shift-click on a selected feature
+        if (isFeatureSelected &amp;&amp; isShiftClick) {
+          // Deselect it
+          ctx.store.deselect(featureId);
+          ctx.ui.queueMapClasses({ mouse: Constants.cursors.POINTER });
+          if (selectedFeatureIds.length === 1) <span class="missing-if-branch" title="else path not taken" >E</span>{
+            doubleClickZoom.enable(ctx);
+          }
+        // Shift-click on an unselected feature
+        } else if (!isFeatureSelected &amp;&amp; isShiftClick) {
+          // Add it to the selection
+          ctx.store.select(featureId);
+          ctx.ui.queueMapClasses({ mouse: Constants.cursors.MOVE });
+        // Click (without shift) on an unselected feature
+        } else if (!isFeatureSelected &amp;&amp; !isShiftClick) <span class="missing-if-branch" title="else path not taken" >E</span>{
+          // Make it the only selected feature
+          selectedFeatureIds.forEach(this.render);
+          ctx.store.setSelected(featureId);
+          ctx.ui.queueMapClasses({ mouse: Constants.cursors.MOVE });
+        }
+&nbsp;
+        // No matter what, re-render the clicked feature
+        this.render(featureId);
+      });
+&nbsp;
+      // Dragging when drag move is enabled
+      this.on('drag', () =&gt; canDragMove, (e) =&gt; {
+        dragMoving = true;
+        e.originalEvent.stopPropagation();
+&nbsp;
+        const delta = {
+          lng: e.lngLat.lng - dragMoveLocation.lng,
+          lat: e.lngLat.lat - dragMoveLocation.lat
+        };
+&nbsp;
+        moveFeatures(ctx.store.getSelected(), delta);
+&nbsp;
+        dragMoveLocation = e.lngLat;
+      });
+&nbsp;
+      // Mouseup, always
+      this.on('mouseup', CommonSelectors.true, function(e) {
+        // End any extended interactions
+        if (dragMoving) {
+          fireUpdate();
+        } else if (boxSelecting) {
+          const bbox = [
+            boxSelectStartLocation,
+            mouseEventPoint(e.originalEvent, ctx.container)
+          ];
+          const featuresInBox = featuresAt(null, bbox, ctx);
+          const idsToSelect = getUniqueIds(featuresInBox)
+            .filter(id =&gt; !ctx.store.isSelected(id));
+&nbsp;
+          if (idsToSelect.length) {
+            ctx.store.select(idsToSelect);
+            idsToSelect.forEach(this.render);
+            ctx.ui.queueMapClasses({ mouse: Constants.cursors.MOVE });
+          }
+        }
+        stopExtendedInteractions();
+      });
+&nbsp;
+      if (ctx.options.boxSelect) <span class="missing-if-branch" title="else path not taken" >E</span>{
+        // Shift-mousedown anywhere
+        this.on('mousedown', CommonSelectors.isShiftMousedown, (e) =&gt; {
+          stopExtendedInteractions();
+          ctx.map.dragPan.disable();
+          // Enable box select
+          boxSelectStartLocation = mouseEventPoint(e.originalEvent, ctx.container);
+          canBoxSelect = true;
+        });
+&nbsp;
+        // Drag when box select is enabled
+        this.on('drag', () =&gt; canBoxSelect, (e) =&gt; {
+          boxSelecting = true;
+          ctx.ui.queueMapClasses({ mouse: Constants.cursors.ADD });
+&nbsp;
+          // Create the box node if it doesn't exist
+          if (!boxSelectElement) {
+            boxSelectElement = document.createElement('div');
+            boxSelectElement.classList.add(Constants.classes.BOX_SELECT);
+            ctx.container.appendChild(boxSelectElement);
+          }
+&nbsp;
+          // Adjust the box node's width and xy position
+          const current = mouseEventPoint(e.originalEvent, ctx.container);
+          const minX = Math.min(boxSelectStartLocation.x, current.x);
+          const maxX = Math.max(boxSelectStartLocation.x, current.x);
+          const minY = Math.min(boxSelectStartLocation.y, current.y);
+          const maxY = Math.max(boxSelectStartLocation.y, current.y);
+          const translateValue = `translate(${minX}px, ${minY}px)`;
+          boxSelectElement.style.transform = translateValue;
+          boxSelectElement.style.WebkitTransform = translateValue;
+          boxSelectElement.style.width = `${maxX - minX}px`;
+          boxSelectElement.style.height = `${maxY - minY}px`;
+        });
+      }
+    },
+    render: function(geojson, push) {
+      geojson.properties.active = (ctx.store.isSelected(geojson.properties.id)) ?
+        Constants.activeStates.ACTIVE : Constants.activeStates.INACTIVE;
+      push(geojson);
+      fireActionable();
+      if (geojson.properties.active !== Constants.activeStates.ACTIVE ||
+        geojson.geometry.type === Constants.geojsonTypes.POINT) return;
+      createSupplementaryPoints(geojson).forEach(push);
+    },
+    trash: function() {
+      ctx.store.delete(ctx.store.getSelectedIds());
+      fireActionable();
+    },
+    combineFeatures: function() {
+      const selectedFeatures = ctx.store.getSelected();
+&nbsp;
+      if (selectedFeatures.length === 0 || selectedFeatures.length &lt; 2) return;
+&nbsp;
+      const coordinates = [], featuresCombined = [];
+      const featureType = selectedFeatures[0].type.replace('Multi', '');
+&nbsp;
+      for (let i = 0; i &lt; selectedFeatures.length; i++) {
+        const feature = selectedFeatures[i];
+&nbsp;
+        if (feature.type.replace('Multi', '') !== featureType) {
+          return;
+        }
+        if (feature.type.includes('Multi')) {
+          feature.getCoordinates().forEach((subcoords) =&gt; {
+            coordinates.push(subcoords);
+          });
+        } else {
+          coordinates.push(feature.getCoordinates());
+        }
+&nbsp;
+        featuresCombined.push(feature.toGeoJSON());
+      }
+&nbsp;
+      if (featuresCombined.length &gt; 1) <span class="missing-if-branch" title="else path not taken" >E</span>{
+&nbsp;
+        const multiFeature = new MultiFeature(ctx, {
+          type: Constants.geojsonTypes.FEATURE,
+          properties: featuresCombined[0].properties,
+          geometry: {
+            type: `Multi${featureType}`,
+            coordinates: coordinates
+          }
+        });
+&nbsp;
+        ctx.store.add(multiFeature);
+        ctx.store.delete(ctx.store.getSelectedIds(), { silent: true });
+        ctx.store.setSelected([multiFeature.id]);
+&nbsp;
+        ctx.map.fire(Constants.events.COMBINE_FEATURES, {
+          createdFeatures: [multiFeature.toGeoJSON()],
+          deletedFeatures: featuresCombined
+        });
+      }
+      fireActionable();
+    },
+    uncombineFeatures: function() {
+      const selectedFeatures = ctx.store.getSelected();
+      if (selectedFeatures.length === 0) return;
+&nbsp;
+      const createdFeatures = [];
+      const featuresUncombined = [];
+&nbsp;
+      for (let i = 0; i &lt; selectedFeatures.length; i++) {
+        const feature = selectedFeatures[i];
+&nbsp;
+        if (feature instanceof MultiFeature) {
+          feature.getFeatures().forEach((subFeature) =&gt; {
+            ctx.store.add(subFeature);
+            subFeature.properties = feature.properties;
+            createdFeatures.push(subFeature.toGeoJSON());
+            ctx.store.select([subFeature.id]);
+          });
+          ctx.store.delete(feature.id, { silent: true });
+          featuresUncombined.push(feature.toGeoJSON());
+        }
+      }
+&nbsp;
+      if (createdFeatures.length &gt; 1) {
+        ctx.map.fire(Constants.events.UNCOMBINE_FEATURES, {
+          createdFeatures: createdFeatures,
+          deletedFeatures: featuresUncombined
+        });
+      }
+      fireActionable();
+    }
+  };
+};
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Nov 17 2016 15:31:58 GMT-0500 (EST)
+</div>
+</div>
+<script src="../../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../../sorter.js"></script>
+</body>
+</html>

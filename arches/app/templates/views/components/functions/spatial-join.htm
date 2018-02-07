@@ -1,0 +1,79 @@
+{% load i18n %}
+
+<style>
+.sj-target {
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ccc;
+    padding: 10px;
+    margin: 10px 0px;
+}
+
+.sj-target .widget-container {
+    padding: 0px 10px 10px;
+}
+
+.sj-target .remove-btn {
+    position: relative;
+    float: right;
+    margin-top: -5px;
+    text-align: right;
+    color: #777;
+}
+
+</style>
+
+<div style="">
+  <div class="row widget-container">
+    <div class="col-xs-12">
+      <h5>usage notes</h5>
+      <ul>
+        <li>There is no table or field name validation, so be sure you get those right. The format must be <code>table_name.field_name</code>.</li>
+        <li>The table is assumed to be within your Arches db, as defined in settings.py.</li>
+        <li>Only <code>concept</code>, <code>concept-list</code>, and <code>string</code> target nodes are supported at this time, and there is no validation in this interface to verify your choices.</li>
+        <li>For <code>concept</code> or <code>concept-list</code> input, the field in your PostGIS table should have the <strong>prefLabel</strong> for that concept, not the concept UUID.</li>
+        <li>If your target node does not happen to be the same nodegroup as the spatial coordinates node (which was not the circumstances under which this function was created), this function will only work if a tile already exists in that target node. <em>A new tile will not be created.</em></li>
+        <li>At present, input is allowed for two separate table.field/target node combinations. In the future, a more flexible interface could allow for "n" table.field/target node sets to be entered here.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="row widget-container">
+    <div class="form-group">
+      <div class="relative">
+          <label class="col-xs-12 control-label widget-input-label"> {% trans "Name of Spatial Coordinates Node" %}</label>
+      </div>
+      <div class="col-xs-12">
+          <select data-placeholder="{% trans 'select spatial coordinates node' %}"
+          data-bind="chosen: {width: '100%', disable_search_threshold: 15}, value: spatial_node_id, options: nodes, optionsText: 'name', optionsValue: 'nodeid', valueAllowUnset: true"></select>
+      </div>
+    </div>
+  </div>
+  <hr>
+  <button id="" class="btn btn-mint btn-active-dark btn-labeled ion-plus-round" data-bind="click: addTarget">{% trans "Add Target" %}</button>
+  <div data-bind="foreach: inputs">
+  <div class="sj-target">
+      <span id="" class="remove-btn" data-bind="click: $parent.removeTarget">x</span>
+      <div class="row widget-container">
+        <div class="form-group">
+          <div class="relative">
+              <label class="col-xs-12 control-label widget-input-label"> {% trans "PostGIS Table and Field Name" %}</label>
+          </div>
+          <div class="col-xs-12 crud-widget-container">
+            <input type="" placeholder="{% trans 'table_name.field_name' %}" id="" class="form-control input-md widget-input" data-bind="textInput: $data.table_field">
+          </div>
+        </div>
+      </div>
+      <div class="row widget-container">
+        <div class="form-group">
+          <div class="relative">
+              <label class="col-xs-12 control-label widget-input-label"> {% trans "Target Node to Update" %}</label>
+          </div>
+          <div class="col-xs-12">
+              <select data-placeholder="{% trans 'select target node to be updated' %}" data-bind="chosen: {width: '100%', disable_search_threshold: 15}, value: $data.target_node_id, options: $parent.nodes, optionsText: 'name', optionsValue: 'nodeid'"></select>
+          </div>
+        </div>
+      </div>
+  </div>
+  </div>
+  <hr>
+</div>

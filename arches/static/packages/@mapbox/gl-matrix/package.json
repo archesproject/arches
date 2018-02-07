@@ -1,0 +1,50 @@
+{
+  "name": "@mapbox/gl-matrix",
+  "description": "Javascript Matrix and Vector library for High Performance WebGL apps (Mapbox custom build)",
+  "version": "0.0.1",
+  "main": "dist/gl-matrix.js",
+  "jsnext:main": "src/gl-matrix.js",
+  "homepage": "http://glmatrix.net",
+  "bugs": {
+    "url": "https://github.com/mapbox/gl-matrix/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mapbox/gl-matrix.git"
+  },
+  "contributors": [
+    {
+      "name": "Brandon Jones",
+      "email": "tojiro@gmail.com"
+    },
+    {
+      "name": "Colin MacKenzie IV",
+      "email": "sinisterchipmunk@gmail.com"
+    }
+  ],
+  "devDependencies": {
+    "eslint": "^3.11.1",
+    "eslint-config-mourner": "^2.0.1",
+    "jasmine-node": "1.14.5",
+    "rollup": "^0.36.4",
+    "rollup-plugin-cleanup": "^0.1.4",
+    "rollup-watch": "^2.5.0",
+    "uglify-js": "^2.7.5"
+  },
+  "license": "MIT",
+  "scripts": {
+    "build": "rollup -c rollup.config.js",
+    "watch": "rollup -c rollup.config.js -w",
+    "build-min": "npm run build && uglifyjs dist/gl-matrix.js -c -m > dist/gl-matrix-min.js",
+    "pretest": "npm run build && npm run lint",
+    "test": "jasmine-node spec",
+    "lint": "eslint src",
+    "prepublish": "npm run build-min"
+  },
+  "eslintConfig": {
+    "extends": "mourner",
+    "parserOptions": {
+      "sourceType": "module"
+    }
+  }
+}

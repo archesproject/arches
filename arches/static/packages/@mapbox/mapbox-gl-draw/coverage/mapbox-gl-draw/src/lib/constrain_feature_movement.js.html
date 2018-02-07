@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for mapbox-gl-draw/src/lib/constrain_feature_movement.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../prettify.css" />
+    <link rel="stylesheet" href="../../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../../index.html">all files</a> / <a href="index.html">mapbox-gl-draw/src/lib/</a> constrain_feature_movement.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>41/41</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>24/24</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>2/2</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>35/35</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">87×</span>
+<span class="cline-any cline-yes">87×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">87×</span>
+<span class="cline-any cline-yes">87×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">87×</span>
+<span class="cline-any cline-yes">87×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">87×</span>
+<span class="cline-any cline-yes">138×</span>
+<span class="cline-any cline-yes">138×</span>
+<span class="cline-any cline-yes">138×</span>
+<span class="cline-any cline-yes">138×</span>
+<span class="cline-any cline-yes">138×</span>
+<span class="cline-any cline-yes">138×</span>
+<span class="cline-any cline-yes">138×</span>
+<span class="cline-any cline-yes">138×</span>
+<span class="cline-any cline-yes">138×</span>
+<span class="cline-any cline-yes">138×</span>
+<span class="cline-any cline-yes">138×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">87×</span>
+<span class="cline-any cline-yes">87×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">87×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">87×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">87×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">87×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">87×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">87×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const extent = require('geojson-extent');
+const Constants = require('../constants');
+&nbsp;
+const {
+  LAT_MIN,
+  LAT_MAX,
+  LAT_RENDERED_MIN,
+  LAT_RENDERED_MAX,
+  LNG_MIN,
+  LNG_MAX
+} = Constants;
+&nbsp;
+// Ensure that we do not drag north-south far enough for
+// - any part of any feature to exceed the poles
+// - any feature to be completely lost in the space between the projection's
+//   edge and the poles, such that it couldn't be re-selected and moved back
+module.exports = function(geojsonFeatures, delta) {
+  // "inner edge" = a feature's latitude closest to the equator
+  let northInnerEdge = LAT_MIN;
+  let southInnerEdge = LAT_MAX;
+  // "outer edge" = a feature's latitude furthest from the equator
+  let northOuterEdge = LAT_MIN;
+  let southOuterEdge = LAT_MAX;
+&nbsp;
+  let westEdge = LNG_MAX;
+  let eastEdge = LNG_MIN;
+&nbsp;
+  geojsonFeatures.forEach(feature =&gt; {
+    const bounds = extent(feature);
+    const featureSouthEdge = bounds[1];
+    const featureNorthEdge = bounds[3];
+    const featureWestEdge = bounds[0];
+    const featureEastEdge = bounds[2];
+    if (featureSouthEdge &gt; northInnerEdge) northInnerEdge = featureSouthEdge;
+    if (featureNorthEdge &lt; southInnerEdge) southInnerEdge = featureNorthEdge;
+    if (featureNorthEdge &gt; northOuterEdge) northOuterEdge = featureNorthEdge;
+    if (featureSouthEdge &lt; southOuterEdge) southOuterEdge = featureSouthEdge;
+    if (featureWestEdge &lt; westEdge) westEdge = featureWestEdge;
+    if (featureEastEdge &gt; eastEdge) eastEdge = featureEastEdge;
+  });
+&nbsp;
+&nbsp;
+  // These changes are not mutually exclusive: we might hit the inner
+  // edge but also have hit the outer edge and therefore need
+  // another readjustment
+  const constrainedDelta = delta;
+  if (northInnerEdge + constrainedDelta.lat &gt; LAT_RENDERED_MAX) {
+    constrainedDelta.lat = LAT_RENDERED_MAX - northInnerEdge;
+  }
+  if (northOuterEdge + constrainedDelta.lat &gt; LAT_MAX) {
+    constrainedDelta.lat = LAT_MAX - northOuterEdge;
+  }
+  if (southInnerEdge + constrainedDelta.lat &lt; LAT_RENDERED_MIN) {
+    constrainedDelta.lat = LAT_RENDERED_MIN - southInnerEdge;
+  }
+  if (southOuterEdge + constrainedDelta.lat &lt; LAT_MIN) {
+    constrainedDelta.lat = LAT_MIN - southOuterEdge;
+  }
+  if (westEdge + constrainedDelta.lng &lt;= LNG_MIN) {
+    constrainedDelta.lng += Math.ceil(Math.abs(constrainedDelta.lng) / 360) * 360;
+  }
+  if (eastEdge + constrainedDelta.lng &gt;= LNG_MAX) {
+    constrainedDelta.lng -= Math.ceil(Math.abs(constrainedDelta.lng) / 360) * 360;
+  }
+&nbsp;
+  return constrainedDelta;
+};
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Nov 17 2016 15:31:58 GMT-0500 (EST)
+</div>
+</div>
+<script src="../../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../../sorter.js"></script>
+</body>
+</html>

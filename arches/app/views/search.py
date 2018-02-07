@@ -236,6 +236,9 @@ def get_doc_type(request):
 
 def build_search_results_dsl(request):
     term_filter = request.GET.get('termFilter', '')
+    
+    spatial_filter_bcn = settings.DATA_SPATIAL_FILTER_BCN
+    
     spatial_filter = JSONDeserializer().deserialize(request.GET.get('mapFilter', '{}'))
     export = request.GET.get('export', None)
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
@@ -308,6 +311,18 @@ def build_search_results_dsl(request):
                 spatial_query.must_not(geoshape)
             else:
                 spatial_query.filter(geoshape)
+
+            # get the nodegroup_ids that the user has permission to search
+            spatial_query.filter(Terms(field='geometries.nodegroup_id', terms=permitted_nodegroups))
+            search_query.filter(Nested(path='geometries', query=spatial_query))
+
+    #Si tenim filtre per part de group
+    if spatial_filter_bcn !=None and 'features' not in spatial_filter:
+        if len(spatial_filter_bcn['features']) > 0:
+            feature_geom = spatial_filter_bcn['features'][0]['geometry']
+            geoshape = GeoShape(field='geometries.geom.features.geometry', type=feature_geom['type'], coordinates=feature_geom['coordinates'] )
+            spatial_query = Bool()
+            spatial_query.filter(geoshape)
 
             # get the nodegroup_ids that the user has permission to search
             spatial_query.filter(Terms(field='geometries.nodegroup_id', terms=permitted_nodegroups))

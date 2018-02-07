@@ -1,0 +1,40 @@
+{
+  "name": "get-closest",
+  "description": "Compare your item to items in an array and get the closest one.",
+  "version": "0.0.4",
+  "homepage": "https://github.com/cosmosio/get-closest",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://raw.github.com/cosmosio/get-closest/master/LICENSE"
+    }
+  ],
+  "files": [
+    "LICENSE",
+    "index.js"
+  ],
+  "author": "Olivier Scherrer <pode.fr@gmail.com>",
+  "keywords": [
+    "get",
+    "closest",
+    "item",
+    "array",
+    "compare"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:cosmosio/get-closest.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cosmosio/get-closest/issues"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "main": "index.js",
+  "devDependencies": {
+    "chai": "~1.9.1",
+    "mocha": "~1.18.2",
+    "levenshtein": "~1.0.4"
+  }
+}

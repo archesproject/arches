@@ -1,0 +1,1606 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"lin",
+				"lineIndex"
+			],
+			[
+				"clip",
+				"clipLines"
+			],
+			[
+				"line",
+				"lineLen"
+			],
+			[
+				"geom",
+				"geometry"
+			],
+			[
+				"conv",
+				"converted"
+			],
+			[
+				"conve",
+				"convertPoint"
+			],
+			[
+				"convert",
+				"convertFeature"
+			],
+			[
+				"simpli",
+				"simplify"
+			],
+			[
+				"max",
+				"maxSqDist"
+			],
+			[
+				"sq",
+				"sqTolerance"
+			],
+			[
+				"coo",
+				"coords"
+			],
+			[
+				"con",
+				"converted"
+			],
+			[
+				"poly",
+				"polygon"
+			],
+			[
+				"tile",
+				"tileFeature"
+			],
+			[
+				"Ini",
+				"Infinity"
+			],
+			[
+				"calc",
+				"calcBBox"
+			],
+			[
+				"conver",
+				"convertFeature"
+			],
+			[
+				"simp",
+				"simplifiedRing"
+			],
+			[
+				"sim",
+				"simplifiedRing"
+			],
+			[
+				"lat",
+				"latY2"
+			],
+			[
+				"tran",
+				"transformPoint"
+			],
+			[
+				"slice",
+				"sliceLen"
+			],
+			[
+				"sli",
+				"sliceLen"
+			],
+			[
+				"inte",
+				"intersectX"
+			],
+			[
+				"new",
+				"newGeometry"
+			],
+			[
+				"shif",
+				"shiftCoords"
+			],
+			[
+				"pro",
+				"prototype"
+			],
+			[
+				"get",
+				"getJSON"
+			],
+			[
+				"newM",
+				"newMin"
+			],
+			[
+				"_upda",
+				"_updateTransform"
+			],
+			[
+				"_remove",
+				"_removeAllTiles"
+			],
+			[
+				"_reset",
+				"_resetAll"
+			],
+			[
+				"_update",
+				"_updateTransform"
+			],
+			[
+				"pane",
+				"panePos"
+			],
+			[
+				"fun",
+				"function"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "src/index.js",
+			"settings":
+			{
+				"buffer_size": 8483,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/tile.js",
+			"settings":
+			{
+				"buffer_size": 2847,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "README.md",
+			"settings":
+			{
+				"buffer_size": 5593,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "test/test-full.js",
+			"settings":
+			{
+				"buffer_size": 1199,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "test/test-get-tile.js",
+			"settings":
+			{
+				"buffer_size": 1155,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/convert.js",
+			"settings":
+			{
+				"buffer_size": 3582,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "{\n    id: 12345,\n    type: \"MultiPolygon\",\n    properties: {\"foo\": \"bar\"},\n    geometry: [3, 5, 10, 10, 15, 15, ...]\n}\n// geometry is <num_polygons, ring1_len, x0, y0, x1, y1, ..., ring2_len, ...\n",
+			"settings":
+			{
+				"buffer_size": 196,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "debug/debug.js",
+			"settings":
+			{
+				"buffer_size": 803,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "\nvar convert = require('../src/convert.js');\n\nconsole.time('load data');\nvar data = require('./data/hrr.json');\nconsole.timeEnd('load data');\n\nconsole.time('convert');\nconvert(data, 5e-8);\nconsole.timeEnd('convert');\n",
+			"file": "debug/debug-prep.js",
+			"file_size": 217,
+			"file_write_time": 131491911500000000,
+			"settings":
+			{
+				"buffer_size": 217,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/clip.js",
+			"settings":
+			{
+				"buffer_size": 4315,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "test/fixtures/dateline.json",
+			"settings":
+			{
+				"buffer_size": 5220,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "test/test-clip.js",
+			"settings":
+			{
+				"buffer_size": 2451,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/feature.js",
+			"settings":
+			{
+				"buffer_size": 1055,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/wrap.js",
+			"settings":
+			{
+				"buffer_size": 1674,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": ".npmignore",
+			"settings":
+			{
+				"buffer_size": 32,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "",
+			"file": ".eslintrc",
+			"file_size": 27,
+			"file_write_time": 130874980260000000,
+			"settings":
+			{
+				"buffer_size": 0,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "package.json",
+			"settings":
+			{
+				"buffer_size": 1377,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "debug/index.html",
+			"settings":
+			{
+				"buffer_size": 781,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "debug/viz.js",
+			"settings":
+			{
+				"buffer_size": 5194,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/simplify.js",
+			"settings":
+			{
+				"buffer_size": 1649,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "test/gen-tiles.js",
+			"settings":
+			{
+				"buffer_size": 746,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "test/fixtures/feature-tiles.json",
+			"settings":
+			{
+				"buffer_size": 149,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 357.0,
+		"last_filter": "json",
+		"selected_items":
+		[
+			[
+				"json",
+				"Set Syntax: JSON"
+			],
+			[
+				"pretty",
+				"Pretty JSON: Format (Pretty Print) JSON"
+			],
+			[
+				"java",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"packa",
+				"Package Control: Upgrade Package"
+			],
+			[
+				"spac",
+				"Indentation: Convert to Spaces"
+			],
+			[
+				"jso",
+				"Set Syntax: JSON"
+			],
+			[
+				"spa",
+				"Indentation: Convert to Spaces"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"install ",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 462.0
+	},
+	"console":
+	{
+		"height": 126.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = 'eb2297e1a458f27d836c04bb0cbaf282' + 'd0e7a3098092775ccb37ca9d6b2e4b7d'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/Users/mourner/projects/geojson-vt",
+		"/Users/mourner/projects/geojson-vt/src",
+		"/Users/mourner/projects/geojson-vt/test",
+		"/Users/mourner/projects/geojson-vt/test/fixtures"
+	],
+	"file_history":
+	[
+		"/Users/mourner/projects/geojson-vt/debug/data/test2.json",
+		"/Users/mourner/projects/geojson-vt/debug/data/test.json",
+		"/Users/mourner/projects/geojson-vt/approx.js",
+		"/Users/mourner/projects/geojson-vt/test/fixtures/dateline2.json",
+		"/Users/mourner/projects/geojson-vt/test/fixtures/feature.json",
+		"/Users/mourner/projects/geojson-vt/debug/index.html",
+		"/Users/mourner/projects/geojson-vt/README.md",
+		"/Users/mourner/projects/geojson-vt/.eslintrc",
+		"/Users/mourner/projects/geojson-vt/debug/debug.js",
+		"/Users/mourner/projects/geojson-vt/src/index.js",
+		"/Users/mourner/projects/geojson-vt/src/transform.js",
+		"/Users/mourner/projects/geojson-vt/package.json",
+		"/Users/mourner/projects/geojson-vt/debug/viz.js",
+		"/Users/mourner/projects/geojson-vt/src/convert.js",
+		"/Users/mourner/projects/geojson-vt/test/test-clip.js",
+		"/Users/mourner/projects/geojson-vt/test/test-full.js",
+		"/Users/mourner/projects/geojson-vt/test/fixtures/single-geom-tiles.json",
+		"/Users/mourner/projects/geojson-vt/src/tile.js",
+		"/Users/mourner/projects/geojson-vt/src/clip.js",
+		"/Users/mourner/projects/geojson-vt/test/test-get-tile.js",
+		"/Users/mourner/projects/geojson-vt/test/fixtures/collection-tiles.json",
+		"/Users/mourner/projects/geojson-vt/test/fixtures/single-geom.json",
+		"/Users/mourner/projects/geojson-vt/test/gen-tiles.js",
+		"/Users/mourner/projects/geojson-vt/geojson-vt.sublime-project",
+		"/Users/mourner/projects/geojson-vt/test/fixtures/collection.json",
+		"/Users/mourner/projects/geojson-vt/test/fixtures/empty.json",
+		"/Users/mourner/projects/geojson-vt/bench/bench-clip.js",
+		"/etc/hosts",
+		"/Users/mourner/projects/geojson-vt/test/fixtures/us-states-z7-37-48.json",
+		"/Users/mourner/projects/geojson-vt/src/simplify.js",
+		"/Users/mourner/projects/geojson-vt/src/wrap.js",
+		"/Users/mourner/projects/geojson-vt/.gitignore",
+		"/Users/mourner/projects/geojson-vt/test/test-simplify.js",
+		"/Users/mourner/projects/geojson-vt/.travis.yml",
+		"/Users/mourner/Library/Application Support/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
+		"/Users/mourner/Library/Application Support/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+		"/Users/mourner/projects/geojson-vt/LICENSE",
+		"/Users/mourner/projects/Leaflet/CHANGELOG.md",
+		"/usr/local/Library/Formula/node.rb",
+		"/Users/mourner/projects/Leaflet/package.json",
+		"/Users/mourner/projects/Leaflet/src/layer/tile/GridLayer.js",
+		"/Users/mourner/projects/Leaflet/Leaflet.sublime-project",
+		"/Users/mourner/projects/Leaflet/.eslintrc",
+		"/Users/mourner/projects/Leaflet/src/layer/marker/Icon.js",
+		"/Users/mourner/.inputrc",
+		"/Users/mourner/.bash_profile",
+		"/Users/mourner/.gitignore"
+	],
+	"find":
+	{
+		"height": 23.0
+	},
+	"find_in_files":
+	{
+		"height": 132.0,
+		"where_history":
+		[
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"indexmaxzoom",
+			"z ",
+			"options.maxZoom",
+			"index + 1",
+			"isClosed",
+			"slices",
+			"convertRings",
+			"convertRing",
+			"geometry",
+			"converted",
+			"features",
+			"feature",
+			"e",
+			"geom",
+			"a[1]",
+			"b[1]",
+			"a[0]",
+			"intersectX",
+			"bk",
+			"ak",
+			"output",
+			"slice",
+			"ak",
+			"polygon",
+			"ring",
+			"convertPolygon",
+			"y",
+			"updateBBox",
+			"geometry",
+			"ring[j]",
+			"sqSegDist",
+			"createFeature",
+			"hrr",
+			"simplify",
+			"coords",
+			"geom.coordinates",
+			"coords",
+			"min",
+			"bbox",
+			"geom.type",
+			"drill down",
+			"preprocess",
+			"min",
+			"convert(",
+			"convert",
+			"project",
+			"14",
+			"maxzoom",
+			"baseZoom",
+			"zoom",
+			"simplify",
+			"simplif",
+			"options",
+			"create",
+			"type: 3, ",
+			"same",
+			"JSON.stringify(",
+			"same",
+			"id",
+			"create(",
+			"calcsize",
+			"2.1.8",
+			"newRing",
+			"convertedRing",
+			"newSlice",
+			"console",
+			".y",
+			".x",
+			"solid",
+			".",
+			"normal",
+			"0.00000000000000000000000000e+00",
+			" + ",
+			"+",
+			".0",
+			"solid",
+			"console.log(",
+			"var ",
+			"');\n",
+			"tileTolerance",
+			"min",
+			"transform.tile",
+			"transform.point",
+			"createtile",
+			"wrap",
+			"minAll",
+			"isclippedsquare",
+			"transform",
+			"transformPoint",
+			"transform",
+			"undef",
+			" > 0",
+			"cpp",
+			"time",
+			");\n",
+			"features =",
+			"features",
+			"tile.features",
+			"solid",
+			"z2",
+			"isclippedsquare",
+			"tiles[",
+			"tiles ",
+			"indexMaxPoints",
+			"nosimplify",
+			"simpli",
+			"simplify",
+			"slice[slice.length - 1]",
+			"simplify",
+			".0",
+			"feature",
+			"intersectX)",
+			"toID",
+			"transformTile",
+			"transformPoint",
+			"scale",
+			"us-states",
+			"wrapWorld",
+			"profile",
+			"time",
+			"features",
+			"JSON.stringify",
+			"processDateLine",
+			"points",
+			", min, max",
+			"processDateLine",
+			"features[i]",
+			"processDate"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 2,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "src/index.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8483,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1081,
+								1093
+							]
+						],
+						"settings":
+						{
+							"git_gutter_enabled": true,
+							"git_gutter_is_enabled": true,
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 212.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "src/tile.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2847,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								259,
+								259
+							]
+						],
+						"settings":
+						{
+							"git_gutter_enabled": true,
+							"git_gutter_is_enabled": true,
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 10,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "README.md",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5593,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3224,
+								3224
+							]
+						],
+						"settings":
+						{
+							"git_gutter_is_enabled": true,
+							"syntax": "Packages/Markdown/Markdown.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 655.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "test/test-full.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1199,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								973,
+								975
+							]
+						],
+						"settings":
+						{
+							"git_gutter_is_enabled": true,
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "test/test-get-tile.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1155,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								959,
+								959
+							]
+						],
+						"settings":
+						{
+							"git_gutter_is_enabled": true,
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "src/convert.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3582,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1275,
+								1275
+							]
+						],
+						"settings":
+						{
+							"git_gutter_enabled": true,
+							"git_gutter_is_enabled": true,
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 529.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 196,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								196
+							]
+						],
+						"settings":
+						{
+							"auto_name": "",
+							"default_dir": "/Users/mourner/projects/geojson-vt",
+							"syntax": "Packages/JavaScript/JSON.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 11,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "debug/debug.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 803,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								100,
+								103
+							]
+						],
+						"settings":
+						{
+							"git_gutter_is_enabled": true,
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 14,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "debug/debug-prep.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 217,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								188,
+								188
+							]
+						],
+						"settings":
+						{
+							"git_gutter_is_enabled": true,
+							"open_with_edit": true,
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 13,
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "src/clip.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4315,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2240,
+								2240
+							]
+						],
+						"settings":
+						{
+							"git_gutter_is_enabled": true,
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1188.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "test/fixtures/dateline.json",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 5220,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"git_gutter_is_enabled": true,
+							"syntax": "Packages/JavaScript/JSON.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "test/test-clip.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2451,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4,
+								4
+							]
+						],
+						"settings":
+						{
+							"git_gutter_is_enabled": true,
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 12,
+					"file": "src/feature.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1055,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								692,
+								704
+							]
+						],
+						"settings":
+						{
+							"git_gutter_is_enabled": true,
+							"open_with_edit": true,
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 12,
+					"type": "text"
+				},
+				{
+					"buffer": 13,
+					"file": "src/wrap.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1674,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								247,
+								257
+							]
+						],
+						"settings":
+						{
+							"git_gutter_is_enabled": true,
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 103.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 9,
+					"type": "text"
+				},
+				{
+					"buffer": 14,
+					"file": ".npmignore",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 32,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								15,
+								15
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 19,
+					"type": "text"
+				},
+				{
+					"buffer": 15,
+					"file": ".eslintrc",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 0,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 18,
+					"type": "text"
+				},
+				{
+					"buffer": 16,
+					"file": "package.json",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1377,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 17,
+					"type": "text"
+				},
+				{
+					"buffer": 17,
+					"file": "debug/index.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 781,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								608,
+								608
+							]
+						],
+						"settings":
+						{
+							"git_gutter_enabled": true,
+							"syntax": "Packages/HTML/HTML.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 16,
+					"type": "text"
+				},
+				{
+					"buffer": 18,
+					"file": "debug/viz.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5194,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"git_gutter_enabled": true,
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 15,
+					"type": "text"
+				},
+				{
+					"buffer": 19,
+					"file": "src/simplify.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1649,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"git_gutter_enabled": true,
+							"git_gutter_is_enabled": true,
+							"open_with_edit": true,
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				},
+				{
+					"buffer": 20,
+					"file": "test/gen-tiles.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 746,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								108,
+								108
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 20,
+					"type": "text"
+				},
+				{
+					"buffer": 21,
+					"file": "test/fixtures/feature-tiles.json",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 149,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								149,
+								149
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 21,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 23.0
+	},
+	"input":
+	{
+		"height": 39.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "geojson-vt.sublime-project",
+	"replace":
+	{
+		"height": 42.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"test",
+				"test/test-full.js"
+			],
+			[
+				"te",
+				"debug/data/test.json"
+			],
+			[
+				"pack",
+				"package.json"
+			],
+			[
+				"tile",
+				"src/tile.js"
+			],
+			[
+				"featu",
+				"test/fixtures/feature.json"
+			],
+			[
+				"clip",
+				"src/clip.js"
+			],
+			[
+				"in",
+				"debug/index.html"
+			],
+			[
+				"gen-t",
+				"test/gen-tiles.js"
+			],
+			[
+				"ind",
+				"src/index.js"
+			],
+			[
+				"ci",
+				"src/clip.js"
+			],
+			[
+				"viz",
+				"debug/viz.js"
+			],
+			[
+				"",
+				"test/test-full.js"
+			],
+			[
+				"vi",
+				"debug/viz.js"
+			],
+			[
+				"popu",
+				"src/layer/Popup.js"
+			],
+			[
+				"rend",
+				"src/layer/vector/Renderer.js"
+			],
+			[
+				"image",
+				"src/layer/ImageOverlay.js"
+			],
+			[
+				"path",
+				"src/layer/vector/Path.js"
+			],
+			[
+				"render",
+				"src/layer/vector/Renderer.js"
+			],
+			[
+				"marker",
+				"src/layer/marker/Marker.js"
+			],
+			[
+				"fl",
+				"src/map/anim/Map.FlyTo.js"
+			],
+			[
+				"grid",
+				"src/layer/tile/GridLayer.js"
+			],
+			[
+				"map",
+				"src/map/Map.js"
+			],
+			[
+				"polyli",
+				"src/layer/vector/Polyline.js"
+			],
+			[
+				"mapsp",
+				"spec/suites/map/MapSpec.js"
+			],
+			[
+				"popup",
+				"src/layer/Popup.js"
+			],
+			[
+				"crs",
+				"src/geo/crs/CRS.js"
+			],
+			[
+				"touch",
+				"src/map/handler/Map.TouchZoom.js"
+			],
+			[
+				"poly",
+				"src/layer/vector/Polyline.js"
+			],
+			[
+				"leafl",
+				"dist/leaflet.css"
+			],
+			[
+				"zoompa",
+				"debug/map/zoompan.html"
+			],
+			[
+				"map.dra",
+				"src/map/handler/Map.Drag.js"
+			],
+			[
+				"chan",
+				"CHANGELOG.md"
+			],
+			[
+				"domut",
+				"src/dom/DomUtil.js"
+			],
+			[
+				"scroll",
+				"src/map/handler/Map.ScrollWheelZoom.js"
+			],
+			[
+				"leaf",
+				"dist/leaflet.css"
+			],
+			[
+				"dom",
+				"src/dom/DomUtil.js"
+			],
+			[
+				"sv",
+				"src/layer/vector/SVG.js"
+			],
+			[
+				"re",
+				"src/layer/vector/Renderer.js"
+			],
+			[
+				"ren",
+				"src/layer/vector/Renderer.js"
+			],
+			[
+				"svg",
+				"src/layer/vector/SVG.js"
+			],
+			[
+				"even",
+				"src/core/Events.js"
+			],
+			[
+				"iamge",
+				"src/layer/ImageOverlay.js"
+			],
+			[
+				"icon",
+				"src/layer/marker/Icon.js"
+			],
+			[
+				"drag",
+				"src/map/handler/Map.Drag.js"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"nat",
+				"~/projects/mapbox-gl-native/mapbox-gl-native.sublime-project"
+			],
+			[
+				"cpp",
+				"~/projects/geojson-vt-cpp/geojson-vt-cpp.sublime-project"
+			],
+			[
+				"L",
+				"~/projects/Leaflet/Leaflet.sublime-project"
+			],
+			[
+				"che",
+				"~/projects/cheap-ruler/cheap-ruler.sublime-project"
+			],
+			[
+				"gl",
+				"~/projects/mapbox-gl-js/mapbox-gl-js.sublime-project"
+			],
+			[
+				"ear",
+				"~/projects/earcut/earcut.sublime-project"
+			],
+			[
+				"geo",
+				"~/projects/geobuf/geobuf.sublime-project"
+			],
+			[
+				"",
+				"~/projects/rbush/rbush.sublime-project"
+			],
+			[
+				"lea",
+				"~/projects/Leaflet/Leaflet.sublime-project"
+			],
+			[
+				"l",
+				"~/projects/Leaflet/Leaflet.sublime-project"
+			]
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 243.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

@@ -1,0 +1,35 @@
+{
+  "name": "@mapbox/whoots-js",
+  "description": "Request tiles from WMS servers that support EPSG:3857",
+  "version": "3.0.0",
+  "main": "index.umd.js",
+  "jsnext:main": "index.js",
+  "license": "ISC",
+  "author": "Bryan Housel <bryan@mapbox.com>",
+  "repository": "mapbox/whoots-js",
+  "keywords": [
+    "WMS",
+    "tiles",
+    "EPSG:3857"
+  ],
+  "dependencies": {},
+  "devDependencies": {
+    "coveralls": "^2.11.12",
+    "documentation": "4.0.0-beta5",
+    "eslint": "^3.8.0",
+    "greenkeeper-postpublish": "^1.0.1",
+    "rollup": "0.41.4",
+    "tap": "^10.1.0"
+  },
+  "engines": {
+    "node": ">=4.0.0"
+  },
+  "scripts": {
+    "build": "rollup -f umd -n WhooTS index.js --no-indent --no-strict -o index.umd.js",
+    "docs": "documentation build index.js --lint --github --format html --output docs/",
+    "lint": "eslint index.js server.js test",
+    "start": "node server.js",
+    "test": "npm run lint && npm run build && tap --cov test/*.js",
+    "postpublish": "greenkeeper-postpublish"
+  }
+}

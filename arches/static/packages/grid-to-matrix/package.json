@@ -1,0 +1,60 @@
+{
+  "name": "grid-to-matrix",
+  "version": "1.2.0",
+  "description": "Takes a GeoJSON pointGrid and returns a correspondent matrix array of 'property' values of the points",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "dist"
+  ],
+  "scripts": {
+    "prepublish": "npm run test && npm run build",
+    "pretest": "npm run lint",
+    "test": "node test.js",
+    "bench": "node bench.js",
+    "lint": "eslint index.js",
+    "build": "npm run rollup && npm run uglify",
+    "rollup": "rollup -c rollup.config.js",
+    "uglify": "uglifyjs dist/grid-to-matrix.js -c -m > dist/grid-to-matrix.min.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stebogit/grid-to-matrix"
+  },
+  "keywords": [
+    "geojson",
+    "grid",
+    "points",
+    "array",
+    "matrix"
+  ],
+  "author": "Stefano Borghi <stefano.borghi@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/stebogit/grid-to-matrix/issues"
+  },
+  "devDependencies": {
+    "@turf/truncate": "^4.1.0",
+    "benchmark": "^2.1.3",
+    "eslint": "^2.0.0",
+    "eslint-config-mourner": "^2.0.0",
+    "load-json-file": "^2.0.0",
+    "rollup": "^0.41.5",
+    "rollup-plugin-commonjs": "^8.0.2",
+    "rollup-plugin-json": "^2.1.0",
+    "rollup-plugin-node-builtins": "^2.1.0",
+    "rollup-plugin-node-globals": "^1.1.0",
+    "rollup-plugin-node-resolve": "^2.0.0",
+    "tape": "^3.5.0",
+    "typescript": "^2.2.1",
+    "uglifyjs": "^2.4.10",
+    "write-json-file": "^2.0.0"
+  },
+  "dependencies": {
+    "@turf/meta": "^4.1.0",
+    "@turf/invariant": "^4.1.0",
+    "@turf/helpers": "^4.1.0"
+  }
+}

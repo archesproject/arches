@@ -1,0 +1,42 @@
+{
+  "name": "geojson-equality",
+  "version": "0.1.6",
+  "description": "Check two valid geojson geometries for equality.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test/test.js",
+    "build-debug": "browserify index.js --debug --standalone GeojsonEquality | exorcist dist/geojson-equality.js.map > dist/geojson-equality.js",
+    "build-min": "browserify index.js --standalone GeojsonEquality | uglifyjs -c -m > dist/geojson-equality.min.js",
+    "build": "npm run build-debug && npm run build-min"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/geosquare/geojson-equality.git"
+  },
+  "bugs": {
+    "url": "https://github.com/geosquare/geojson-equality/issues"
+  },
+  "homepage": "https://github.com/geosquare/geojson-equality",
+  "keywords": [
+    "geojson",
+    "equality",
+    "equal",
+    "assertion"
+  ],
+  "author": "Gagan Bansal <gaganbansal123@gmail.com>",
+  "contributors": [
+    "Tim Oram <mitmaro@gmail.com>"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "deep-equal": "^1.0.0"
+  },
+  "devDependencies": {
+    "browserify": "~5.10.1",
+    "chai": "~1.9.1",
+    "exorcist": "^0.4.0",
+    "mocha": "~1.21.4",
+    "uglify-js": "~2.4.15",
+    "watchify": "~1.0.2"
+  }
+}

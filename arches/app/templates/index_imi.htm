@@ -1,0 +1,353 @@
+
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% load staticfiles %}
+{% load template_tags %}
+{% load i18n %}
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+<!--<![endif]-->
+
+<head>
+    <title>{{app_title}}</title>
+
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link rel="shortcut icon" href="{% static 'img/favicon.png' %}" />
+
+    <link rel='stylesheet' type='text/css' href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600&amp;subset=cyrillic,latin'>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/css/bootstrap.min.css">
+
+    <link href="{% static 'css/unify.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
+    <link href="{% static 'css/index.css' %}" rel="stylesheet">
+ 
+    <link href="{% static 'contexts/imi/css/index.css' %}" rel="stylesheet">
+</head>
+
+<!--
+The #page-top ID is part of the scrolling feature.
+The data-spy and data-target are part of the built-in Bootstrap scrollspy function.
+-->
+
+<body id="body" data-spy="scroll" data-target=".one-page-header" class="demo-lightbox-gallery">
+
+    <!--=== Header ===-->
+    <nav class="one-page-header navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="container">
+
+
+            <div class="menu-container page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">{% trans "Toggle navigation" %}</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" style="padding-top: 5px;" href="#intro">
+                    <img src="{% static 'contexts/imi/img/logo.png' %}" style="height: 44px; width: 136px;" alt="Logo">
+                </a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <div class="menu-container">
+                    <ul class="nav navbar-nav">
+                        <!--<li class="page-scroll">
+                            <a href="#about">{% trans "About Arches" %}</a>
+                        </li>-->
+                        <!--<li class="page-scroll">
+                            <a href="#services">{% trans "Capabilities" %}</a>
+                        </li>-->
+                        <li class="page-scroll">
+                            <a href="#intro">{% trans "Home" %}</a>
+                        </li>
+                        <li class="page-scroll">
+                            <a href="{% url 'search_home' %}">{% trans "Search" %}</a>
+                        </li>
+                        <li class="page-scroll">
+                            <a href="#share">{% trans "Share" %}</a>
+                        </li>
+                        <li class="page-scroll">
+                         {% get_current_language as LANGUAGE_CODE %}
+                            <a id="lang-selector">Languages</a>
+                            <ul class="lenguages">
+                                    {% for lang in LANGUAGES %}
+                                    <li class="active">
+                                        <form id="lang-form-{{ lang.0 }}" action="/imi/i18n/setlang/" method="post">
+                                        
+                                        <input name="next" type="hidden" value="/" />
+                                        {% csrf_token %}
+                                        <input name="language" type="hidden" value="{{ lang.0 }}" />
+                                        <a href="javascript:{}"  value="{{ lang.0 }}" onclick="document.getElementById('lang-form-{{ lang.0 }}').submit();">{{ lang.1 }} {% if lang.0|upper == LANGUAGE_CODE|upper %}<i class="fa fa-check"></i>{% endif %}</a>
+                                        </form>
+                                    </li>
+                                    {% endfor %}
+                                
+                            </ul>
+                        </li>
+                        {% if user|can_create_resource_instance %}
+                        <li class="page-scroll">
+                            <a href="{% url 'resource' %}">{% trans "Manage Data" %}</a>
+                        </li>
+                        {% endif %}
+                        {% if user|has_group:"Graph Editor" %}
+                        <li class="page-scroll">
+                            <a href="{% url 'graph' '' %}">{% trans "Design" %}</a>
+                        </li>
+                        {% endif %}
+                        <li class="page-scroll" style="display: flex; flex-direction: row">
+                            {% if user.username == 'anonymous' %}
+                            <a id="auth-link" href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">
+                                {% trans "Login" %}
+                            </a>
+                            {% else %}
+                            <a id="auth-link" data-bind="click: function(){showAuthMenu(!showAuthMenu())}">
+                                {% trans "Welcome" %} {{ user.first_name|default:user.username }}
+                            </a>
+                            <span class="fa fa-chevron-circle-down auth-options" data-bind="click: function(){showAuthMenu(!showAuthMenu())}"></span>
+                            {% endif %}
+                        </li>
+                        <!-- ko if: showAuthMenu -->
+                        <ul class="auth-options">
+                            <li><a href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% trans 'Logout' %}</a></li>
+                            <li><a href="{% url 'user_profile_manager' %}">{% trans 'User Profile' %}</a></li>
+                        </ul>
+                        
+                        <!-- /ko -->
+                    </ul>
+                </div>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+    <!--=== End Header ===-->
+
+    <!-- Intro Section -->
+    <section id="intro" class="intro-section">
+        <div class="fullscreenbanner-container">
+            <div class="fullscreenbanner">
+                <ul>
+                    <!-- SLIDE 1 -->
+                    <li data-transition="slideright" data-slotamount="5" data-masterspeed="700" data-title="Slide 1">
+                        <!-- MAIN IMAGE -->
+                        <img src="{% static 'contexts/imi/landing/landing1.jpg' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="no-repeat">
+
+                        <!-- LAYERS -->
+                        <div class="tp-caption rs-caption-1 sft start text-bold" delay="4500" data-x="center" data-hoffset="0" data-y="100" data-speed="800" data-start="1000" data-easing="Back.easeInOut" data-endspeed="300">
+                             {% trans "Cathedral of Barcelona" %}
+                        </div>
+
+                        <!-- LAYER -->
+                        <div class="tp-caption rs-caption-2 sft" data-x="center" data-hoffset="0" data-y="200" data-speed="1000" data-start="3000" data-easing="Power4.easeOut" data-endspeed="300" data-endeasing="Power1.easeIn" data-captionhidden="off" style="z-index: 6">
+                            {% trans "Architectural Heritage Inventory" %}
+                        </div>
+
+                        <!-- LAYER -->
+                        <!--<div class="tp-caption rs-caption-3 sft" data-x="center" data-hoffset="0" data-y="360" data-speed="800" data-start="3500" data-easing="Power4.easeOut" data-endspeed="300" data-endeasing="Power1.easeIn" data-captionhidden="off" style="z-index: 6">
+                            <span class="page-scroll"><a href="#about" class="btn-u btn-brd btn-brd-hover btn-u-light">{% trans "Learn More" %}</a></span>
+                            {% if user.username == 'anonymous' %}
+                            <span class="page-scroll"><a href="{% url 'auth' %}?next={% url 'graph' '' %}" class="btn-u btn-brd btn-brd-hover btn-u-light">{% trans "Login" %}</a></span>
+                            {% endif %}
+                            {% if user|can_create_resource_instance %}
+                            <span class="page-scroll"><a href="{% url 'resource' %}" class="btn-u btn-brd btn-brd-hover btn-u-light">{% trans "Manage Data" %}</a></span>
+                            {% endif %}
+                        </div>-->
+
+                        <!-- Attribution -->
+                        <!--<div class="" style="position: absolute; top: 95%; left: 15px; color: #fff; padding: 10px; background: rgba(0,0,0,.5);">
+                            <span class="">Photo:  https://www.flickr.com/photos/bibendum84/ (CC BY 2.0)</span>
+                        </div>-->
+                    </li>
+
+                    <!-- SLIDE 2 -->
+                    <li data-transition="slideup" data-slotamount="5" data-masterspeed="1000" data-title="Slide 2">
+                        <!-- MAIN IMAGE -->
+                        <img src="{% static 'contexts/imi/landing/landing2.jpg' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="no-repeat">
+
+                        <!-- LAYERS -->
+                        <div class="tp-caption rs-caption-1 sft start text-bold" data-x="center" data-hoffset="0" data-y="100" data-speed="800" data-start="1500" data-easing="Back.easeInOut" data-endspeed="300">
+                             {% trans "Picasso Museum" %}
+                        </div>
+
+                        <!-- LAYER -->
+                        <div class="tp-caption rs-caption-2 sft" data-x="center" data-hoffset="0" data-y="200" data-speed="1000" data-start="2500" data-easing="Power4.easeOut" data-endspeed="300" data-endeasing="Power1.easeIn" data-captionhidden="off" style="z-index: 6">
+                            {% trans "Architectural Heritage Inventory" %}
+                        </div>
+
+                        <!-- LAYER -->
+                        <!--<div class="tp-caption rs-caption-3 sft" data-x="center" data-hoffset="0" data-y="360" data-speed="800" data-start="3500" data-easing="Power4.easeOut" data-endspeed="300" data-endeasing="Power1.easeIn" data-captionhidden="off" style="z-index: 6">
+                            <span class="page-scroll"><a href="#about" class="btn-u btn-brd btn-brd-hover btn-u-light">{% trans "Learn More" %}</a></span>
+                        </div>-->
+
+                        <!-- Attribution -->
+                        <!--<div class="" style="position: absolute; top: 95%; left: 15px; color: #fff; padding: 10px; background: rgba(0,0,0,.5);">
+                            <span class="">Photo:  https://www.flickr.com/photos/davidedamico/ (CC BY 2.0)</span>
+                        </div>-->
+                    </li>
+
+                    <!-- SLIDE 3 -->
+                    <li data-transition="slideup" data-slotamount="5" data-masterspeed="700" data-title="Slide 3">
+                        <!-- MAIN IMAGE -->
+                        <img src="{% static 'contexts/imi/landing/landing3.jpg' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="no-repeat">
+
+                        <!-- LAYERS -->
+                        <div class="tp-caption rs-caption-1 sft start text-bold" data-x="center" data-hoffset="0" data-y="0" data-speed="800" data-start="1500" data-easing="Back.easeInOut" data-endspeed="300">
+                            {% trans "Santa Caterina market" %}
+                        </div>
+
+                        <!-- LAYER -->
+                        <div class="tp-caption rs-caption-2 sfb" data-x="center" data-hoffset="0" data-y="210" data-speed="800" data-start="2500" data-easing="Power4.easeOut" data-endspeed="300" data-endeasing="Power1.easeIn" data-captionhidden="off" style="z-index: 6">
+                            {% trans "Architectural Heritage Inventory" %}
+                        </div>
+
+                        <!-- LAYER -->
+                        <!--<div class="tp-caption rs-caption-3 sfb" data-x="center" data-hoffset="0" data-y="370" data-speed="800" data-start="3500" data-easing="Power4.easeOut" data-endspeed="300" data-endeasing="Power1.easeIn" data-captionhidden="off" style="z-index: 6">
+                            <span class="page-scroll"><a href="#about" class="btn-u btn-brd btn-brd-hover btn-u-light">{% trans "Search Arches" %}</a></span>
+                        </div>-->
+
+                        <!-- Attribution -->
+                        <!--<div class="" style="position: absolute; top: 95%; left: 15px; color: #fff; padding: 10px; background: rgba(0,0,0,.5);">
+                            <span class="">Photo:  https://www.flickr.com/photos/pedrosz/ (CC BY 2.0)</span>
+                        </div>-->
+                    </li>
+                </ul>
+                <div class="tp-bannertimer tp-bottom"></div>
+            </div>
+        </div>
+    </section>
+    <!-- End Intro Section -->
+
+
+    <section id="share" class="news-section bg-grey" >
+        <div class="container content-lg">
+            <div class="title-v1">
+                <h3>{% trans "Architectural Heritage Inventory" %}</h3>
+                <b>{% trans "Architectural Heritage Inventory" %}</b> és el primer sistema d'informació i administració online creat específicament per inventariar, mapejar i ajudar a
+                protegir els importants recursos històrics de la Ciutat de Barcelona. Mostra la diversitat de recursos històrics de la ciutat, incloent edicifics d'importància arquitectònica i llocs d'importància social, així com districtes històrics, ponts, parcs i paissatges urbans.
+            </div>
+            <div class="text-center">
+                <img src="{% static 'img/imi/search.png' %}" style="height: 245px; width: 500px;" alt="Search"></img>
+            </div>
+        </div>
+        <div style="background-color:rgb(220,220,220) !important;">
+            <div class="container content-lg">
+                <div class="col-md-12">
+                    <div class="title-v1 ">
+                        <h3 style="text-align:center !important;">{% trans "Highlighted Searches" %}</h3>
+                    </div>
+                    <div>
+                         <div class="col-md-4 md-margin-bottom-40 bg-white">
+                             <img class="img-responsive" src="{% static 'contexts/imi/img/landing/modernisme.png' %}" alt=""></img>
+                             <div><h4 class="color_modernisme">Modernisme a Barcelona</h4></div>
+                             <div>Barcelona té una de les coleccions d'arquitectura modernista més grans i variades a tot l'estat Espanyol. Descrubeix els tresors modernistes de la ciutat.</div>
+                             <div class="separator"></div>
+                             <div class="logo_mes color_modernisme"><h5>VEURE MÉS<h5></div>
+                             <div class="separator_gruixut color_modernisme"></div>
+                        </div>
+                        <div class="col-md-4 md-margin-bottom-40 bg-white">
+                             <img class="img-responsive" src="{% static 'contexts/imi/img/landing/poblenou.png' %}" alt=""></img>
+                             <div><h4 class="color_poblenou" style="">Poblenou, el petit Silicon Valley</h4></div>
+                             <div>A l'antic barri industrial barceloní es desenvolupa una xarxa de creadors independents que aposten per transformar el sistema productiu de la ciutat mitjançant les noves tecnologies.</div>
+                             <div class="separator"></div>
+                             <div class="logo_mes color_poblenou"><h5>VEURE MÉS<h5></div>
+                              <div class="separator_gruixut color_poblenou"></div>
+                        </div>
+                        <div class="col-md-4 md-margin-bottom-40 ">
+                             <img class="img-responsive" src="{% static 'contexts/imi/img/landing/barcelona_antiga.png' %}" alt=""></img>
+                              <div><h4 class="color_barcelona_antiga">La Barcelona Pre-1900</h4></div>
+                             <div>Troba els llocs històrics que van ajudar a donar forma a la ciutat molt abans que es convertís en la ciutat global que és avui.</div>
+                             <div class="separator"></div>
+                             <div class="logo_mes color_barcelona_antiga"><h5>VEURE MÉS<h5></div>
+                              <div class="separator_gruixut color_barcelona_antiga"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="margin-top:50px;"></div>
+    </section>
+    <!-- End SHARE Section -->
+
+
+    <!-- Contact Section -->
+    <section id="contact" class="contacts-section">
+        <div class="col-md-12" style="background-color: rgb(220,220,220); padding:30px 0px">
+             <div class="col-md-3 text-right">
+                <img src="{% static 'contexts/imi/img/logo.png' %}" style="height: 44px; width: 136px;" alt="Logo">
+            </div>
+            <div class="col-md-3 text-left">
+                <img src="{% static 'img/PoweredByArches.png' %}" style="height: 32px; width: 200px;" alt="Logo">
+            </div>
+            <div class="col-md-3"></div>
+        </div>
+    </section>
+    <!-- End Contact Section -->
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-migrate/1.4.0/jquery-migrate.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/smoothscroll/1.3.8/SmoothScroll.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-parallax/1.1.3/jquery-parallax-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.0/jquery.waypoints.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/Counter-Up/1.0.0/jquery.counterup.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/owl-carousel/1.3.3/owl.carousel.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.15.0/jquery.validate.min.js"></script>
+    <script src="{% static 'plugins/revolution-slider/rs-plugin/js/jquery.themepunch.tools.min.js' %}"></script>
+    <script src="{% static 'plugins/revolution-slider/rs-plugin/js/jquery.themepunch.revolution.min.js' %}"></script>
+    <script src="{% static 'plugins/cube-portfolio/cubeportfolio/js/jquery.cubeportfolio.min.js' %}"></script>
+    <script src="{% static 'plugins/one.app.js' %}"></script>
+    <script src="{% static 'plugins/pace-loader.js' %}"></script>
+    <script src="{% static 'plugins/owl-carousel.js' %}"></script>
+    <script src="{% static 'plugins/style-switcher.js' %}"></script>
+    <script src="{% static 'plugins/revolution-slider.js' %}"></script>
+    <script src="{% static 'plugins/cube-portfolio-lightbox.js' %}"></script>
+    <script src="{% static 'packages/knockout/build/output/knockout-latest.js' %}"></script>
+
+
+    <script>
+        jQuery(document).ready(function() {
+            App.init();
+            App.initCounter();
+            App.initParallaxBg();
+            OwlCarousel.initOwlCarousel();
+            StyleSwitcher.initStyleSwitcher();
+            RevolutionSlider.initRSfullScreen();
+        });
+
+        var ViewModel = function(first, last) {
+            this.showAuthMenu = ko.observable(false);
+        };
+        ko.applyBindings(new ViewModel());
+
+    </script>
+
+</body>
+
+</html>

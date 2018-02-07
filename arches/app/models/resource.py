@@ -47,9 +47,9 @@ class Resource(models.ResourceInstance):
         self.tiles = []
 
     def get_descriptor(self, descriptor):
-        module = importlib.import_module('arches.app.functions.primary_descriptors')
-        PrimaryDescriptorsFunction = getattr(module, 'PrimaryDescriptorsFunction')()
-        functionConfig = models.FunctionXGraph.objects.filter(graph_id=self.graph_id, function__functiontype='primarydescriptors')
+        module = importlib.import_module('arches.app.functions.primary_descriptors_multiple')
+        PrimaryDescriptorsFunction = getattr(module, 'PrimaryDescriptorsMultipleFunction')()
+        functionConfig = models.FunctionXGraph.objects.filter(graph_id=self.graph_id, function__functiontype='primarydescriptorsmultiple')
         if len(functionConfig) == 1:
             return PrimaryDescriptorsFunction.get_primary_descriptor_from_nodes(self, functionConfig[0].config[descriptor])
         else:
@@ -66,6 +66,10 @@ class Resource(models.ResourceInstance):
     @property
     def displayname(self):
         return self.get_descriptor('name')
+
+    @property
+    def marker(self):
+        return self.get_descriptor('marker')
 
     def save_edit(self, user={}, note='', edit_type=''):
         timestamp = datetime.datetime.now()
@@ -86,19 +90,15 @@ class Resource(models.ResourceInstance):
         Saves and indexes a single resource
 
         """
-
         request = kwargs.pop('request', '')
-        user = kwargs.pop('user', '')
         super(Resource, self).save(*args, **kwargs)
         for tile in self.tiles:
             tile.resourceinstance_id = self.resourceinstanceid
             saved_tile = tile.save(index=False)
         if request == '':
-            if user == '':
-                user = {}
+            user = {}
         else:
             user = request.user
-
         self.save_edit(user=user, edit_type='create')
         self.index()
 
@@ -229,8 +229,7 @@ class Resource(models.ResourceInstance):
         for result in results:
             se.delete(index='strings', doc_type='term', id=result['_id'])
         se.delete(index='resource', doc_type=str(self.graph_id), id=self.resourceinstanceid)
-
-        self.save_edit(edit_type='delete', user=user, note=self.displayname)
+        self.save_edit(edit_type='delete')
         super(Resource, self).delete()
 
     def get_related_resources(self, lang='en-US', limit=settings.RELATED_RESOURCES_EXPORT_LIMIT, start=0, page=0):

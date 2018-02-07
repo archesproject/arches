@@ -1,0 +1,45 @@
+{
+  "name": "geojson-flatten",
+  "version": "0.2.1",
+  "description": "transform geojson into single-parts",
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "geojson-flatten"
+  ],
+  "directories": {
+    "test": "test"
+  },
+  "bin": {
+    "geojson-flatten": "./geojson-flatten"
+  },
+  "scripts": {
+    "test": "eslint index.js && tap --coverage test/flatten.js",
+    "make": "browserify -s geojsonFlatten index.js > geojson-flatten.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mapbox/geojson-flatten.git"
+  },
+  "keywords": [
+    "geojson",
+    "maps",
+    "flatten"
+  ],
+  "author": "Tom MacWright",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/mapbox/geojson-flatten/issues"
+  },
+  "homepage": "https://github.com/mapbox/geojson-flatten",
+  "dependencies": {
+    "concat-stream": "~1.2.1",
+    "minimist": "0.0.5"
+  },
+  "devDependencies": {
+    "tap": "^2.3.1",
+    "browserify": "^12.0.1",
+    "eslint": "~1.00.0",
+    "eslint-config-unstyled": "^1.1.0"
+  }
+}

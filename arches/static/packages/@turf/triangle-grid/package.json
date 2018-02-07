@@ -1,0 +1,42 @@
+{
+  "name": "@turf/triangle-grid",
+  "version": "4.7.3",
+  "description": "turf triangle-grid module",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "files": [
+    "index.js",
+    "index.d.ts"
+  ],
+  "scripts": {
+    "test": "node test.js",
+    "bench": "node bench.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Turfjs/turf.git"
+  },
+  "keywords": [
+    "turf",
+    "triangle",
+    "grid",
+    "polygons",
+    "analysis",
+    "gis"
+  ],
+  "author": "Turf Authors",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Turfjs/turf/issues"
+  },
+  "homepage": "https://github.com/Turfjs/turf",
+  "devDependencies": {
+    "@turf/bbox-polygon": "^4.7.3",
+    "benchmark": "^2.1.4",
+    "tape": "^4.6.3"
+  },
+  "dependencies": {
+    "@turf/distance": "^4.7.3",
+    "@turf/helpers": "^4.7.3"
+  }
+}

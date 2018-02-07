@@ -130,5 +130,13 @@ urlpatterns = [
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
     # Uncomment the next line to enable the admin:
-    url(r'^admin/', admin.site.urls),
+    #url(r'^admin/', admin.site.urls),
+
+    #Languages
+    url(r'^i18n/', include('django.conf.urls.i18n')),
 ]
+
+
+if hasattr(settings, 'ADMIN_ACCES') and settings.ADMIN_ACCES:
+    # Uncomment the next line to enable the admin:
+    urlpatterns.append(url(r'^admin/', admin.site.urls))
