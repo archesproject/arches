@@ -36,7 +36,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div id="navbar-container" class="boxed" style="background-color: inherit; padding-right: 0px">
                     <div class="navbar-header">
                         <a href="{% url 'home' %}" class="navbar-brand">
-                            <img src="{{ STATIC_URL }}img/arches_logo_light.png" alt="Nifty Logo" class="brand-icon">
+                            {% if context_name %}
+                            <img src="{{ baseUrl }}contexts/{{context_name}}/img/manager-logo.png" alt="Nifty Logo" class="brand-icon">
+                            {% else %}
+                            <img src="{{ baseUrl }}img/arches_logo_light.png" alt="Nifty Logo" class="brand-icon">
+                            {% endif %}
                             <div class="brand-title">
                                 <span class="brand-text">{{ app_name }}</span>
                             </div>
