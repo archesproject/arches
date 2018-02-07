@@ -214,18 +214,20 @@ class ResourceEditLogView(BaseManagerView):
                 'tile edit': _('Tile Updated')
             }
             for edit in recent_edits:
-                edit.friendly_edittype = edit_type_lookup[edit.edittype]
+                edit.friendly_edittype = ''
+                if edit.edittype in edit_type_lookup: 
+                    edit.friendly_edittype = edit_type_lookup[edit.edittype]
                 edit.resource_model_name = None
                 for resource in resources:
                     if str(resource.resourceinstanceid) == edit.resourceinstanceid:
                         edit.displayname = resource.displayname
-                        print 'displayname', edit.displayname, edit.edittype
                         if resource.displayname in ('', None):
                             edit.displayname = edit.note
                         edit.resource_model_name = resource.graph.name
                         break
                 edit.displayname = edit.note
                 if edit.resource_model_name is None:
+                    edit.deleted = True
                     try:
                         edit.resource_model_name = models.GraphModel.objects.get(pk=edit.resourceclassid).name
                     except:

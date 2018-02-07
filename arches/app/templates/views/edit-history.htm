@@ -25,8 +25,8 @@
               <tbody>
                   {% for edit in recent_edits %}
                   <tr>
-                    {% if edit.edittype == 'delete' %}
-                      <td><div>{{edit.resourceinstanceid}}</div></td>
+                    {% if edit.deleted == True %}
+                      <td><div>{{edit.resourceinstanceid}}</div><span>{% trans ' (Deleted)' %}</span></td>
                     {% else %}
                       <td><a href="{% url 'resource_editor' edit.resourceinstanceid %}" class="regular-link" target="_blank">{{edit.resourceinstanceid}}</a></td>
                     {% endif %}
@@ -36,8 +36,8 @@
                       <td>{{edit.friendly_edittype}}</td>
                       <td>{{edit.user_firstname}} {{edit.user_lastname}}</td>
                       <td>
-                        {% if edit.edittype == 'delete' %}
-                          <a href="" class="btn btn-default" disabled>{% trans "View Report" %}</a>
+                        {% if edit.deleted == True %}
+                          <a href="" class="btn btn-primary" disabled>{% trans "View Report" %}</a>
                         {% else %}
                           <a href="{% url 'resource_report' edit.resourceinstanceid %}" target="_blank" class="btn btn-primary">{% trans "View Report" %}</a>
                         {% endif %}
