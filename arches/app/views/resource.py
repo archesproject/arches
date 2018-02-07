@@ -215,7 +215,7 @@ class ResourceEditLogView(BaseManagerView):
             }
             for edit in recent_edits:
                 edit.friendly_edittype = ''
-                if edit.edittype in edit_type_lookup: 
+                if edit.edittype in edit_type_lookup:
                     edit.friendly_edittype = edit_type_lookup[edit.edittype]
                 edit.resource_model_name = None
                 for resource in resources:
