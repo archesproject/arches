@@ -35,7 +35,7 @@ DATABASES = {
         'NAME': 'arches',                      # Or path to database file if using sqlite3.
         'USER': 'postgres',                      # Not used with sqlite3.
         'PASSWORD': 'postgis',                  # Not used with sqlite3.
-        'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
+        'HOST': '192.168.0.99',                 # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '5432',                      # Set to empty string for default. Not used with sqlite3.
         'POSTGIS_TEMPLATE': 'template_postgis_20',
     }
@@ -48,7 +48,7 @@ ELASTICSEARCH_HTTP_PORT = 9200 # this should be in increments of 200, eg: 9400, 
 SEARCH_BACKEND = 'arches.app.search.search.SearchEngine'
 # see http://elasticsearch-py.readthedocs.org/en/master/api.html#elasticsearch.Elasticsearch
 ELASTICSEARCH_HOSTS = [
-    {'host': 'localhost', 'port': ELASTICSEARCH_HTTP_PORT}
+    {'host': '192.168.0.99', 'port': ELASTICSEARCH_HTTP_PORT}
 ]
 ELASTICSEARCH_CONNECTION_OPTIONS = {'timeout': 30}
 # a prefix to append to all elasticsearch indexes, note: must be lower case
@@ -56,7 +56,7 @@ ELASTICSEARCH_PREFIX = ''
 
 USE_SEMANTIC_RESOURCE_RELATIONSHIPS = True
 #ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-ROOT_DIR = '/usr/src/Projects/arches/arches' #os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+ROOT_DIR = 'C:/Projectes/arches/arches' #os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 PACKAGE_ROOT = ROOT_DIR
 PACKAGE_NAME = PACKAGE_ROOT.split(os.sep)[-1]
 
@@ -311,7 +311,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'arches.urls'
 
 WSGI_APPLICATION = 'arches.wsgi.application'
-
+GDAL_LIBRARY_PATH = 'C:/Projectes/gdal202.dll'
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -327,7 +327,7 @@ LOGGING = {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(ROOT_DIR, 'arches.log'),
+            'filename': 'C:/Projectes/arches/arches/arches.log',
         },
     },
     'loggers': {
