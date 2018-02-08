@@ -31,7 +31,7 @@ LOGGING = {
 
 
 #Filtre espaial per al grup imi
-DATA_SPATIAL_FILTER_BCN = {
+DATA_SPATIAL_FILTER = {
     "type": "FeatureCollection",
     "features": [{
         "geometry": {
