@@ -55,8 +55,8 @@ ELASTICSEARCH_CONNECTION_OPTIONS = {'timeout': 30}
 ELASTICSEARCH_PREFIX = ''
 
 USE_SEMANTIC_RESOURCE_RELATIONSHIPS = True
-#ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-ROOT_DIR = 'C:/Projectes/arches/arches' #os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+#ROOT_DIR = 'C:/Projectes/arches/arches' #os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 PACKAGE_ROOT = ROOT_DIR
 PACKAGE_NAME = PACKAGE_ROOT.split(os.sep)[-1]
 
@@ -311,7 +311,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'arches.urls'
 
 WSGI_APPLICATION = 'arches.wsgi.application'
-GDAL_LIBRARY_PATH = 'C:/Projectes/gdal202.dll'
+#GDAL_LIBRARY_PATH = 'C:/Projectes/gdal202.dll'
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -327,7 +327,7 @@ LOGGING = {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': 'C:/Projectes/arches/arches/arches.log',
+            'filename': os.path.join(ROOT_DIR, 'arches.log')
         },
     },
     'loggers': {
