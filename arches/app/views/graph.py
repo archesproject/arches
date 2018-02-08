@@ -335,13 +335,12 @@ class CardManagerView(GraphBaseView):
 
         context = self.get_context_data(
             main_script='views/graph/card-manager',
-            branches=JSONSerializer().serialize(branch_graphs, exclude=['functions', 'relatable_resource_model_ids', 'domain_connections', 'nodes', 'edges']),
+            branches=JSONSerializer().serialize(branch_graphs, exclude=['functions', 'relatable_resource_model_ids', 'edges']),
         )
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
         context['nav']['help'] = (_('Managing Cards'),'help/base-help.htm')
         context['help'] = 'card-manager-help'
-
         return render(request, 'views/graph/card-manager.htm', context)
 
 
