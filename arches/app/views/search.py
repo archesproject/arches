@@ -43,6 +43,7 @@ from arches.app.views.base import BaseManagerView
 from arches.app.views.concept import get_preflabel_from_conceptid
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
+from django.core.urlresolvers import resolve
 
 
 try:
@@ -95,7 +96,8 @@ class SearchView(BaseManagerView):
         context['nav']['search'] = False
         context['nav']['help'] = (_('Searching the Arches Database'),'help/base-help.htm')
         context['help'] = 'search-help'
-
+        context['map'] = resolve(request.path_info).url_name == 'map_home'
+    
         return render(request, 'views/search.htm', context)
 
 def home_page(request):
