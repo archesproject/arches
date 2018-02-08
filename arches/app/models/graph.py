@@ -1100,7 +1100,7 @@ class Graph(models.GraphModel):
                     if not card.description:
                         card.description = self.nodes[card.nodegroup.pk].description
             card_dict = JSONSerializer().serializeToPython(card)
-            card_dict['is_editable'] = True
+            card_dict['is_editable'] = is_editable
             cards.append(card_dict)
 
         return cards
