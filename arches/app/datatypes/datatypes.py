@@ -70,8 +70,11 @@ class StringDataType(BaseDataType):
         if tile.data[nodeid] in ['', "''"]:
             tile.data[nodeid] = None
 
-    def append_to_document(self, document, nodevalue, nodeid, tile):
-        document['strings'].append({'string': nodevalue, 'nodegroup_id': tile.nodegroup_id})
+    def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
+        val = {'string': nodevalue, 'nodegroup_id': tile.nodegroup_id}
+        if provisional is not False:
+            val['provisional'] = provisional
+        document['strings'].append(val)
 
     def transform_export_values(self, value, *args, **kwargs):
         if value != None:
@@ -119,7 +122,7 @@ class NumberDataType(BaseDataType):
         except:
             pass
 
-    def append_to_document(self, document, nodevalue, nodeid, tile):
+    def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         document['numbers'].append({'number': nodevalue, 'nodegroup_id': tile.nodegroup_id})
 
     def append_search_filters(self, value, node, query, request):
@@ -187,7 +190,7 @@ class DateDataType(BaseDataType):
                 pass
         return value
 
-    def append_to_document(self, document, nodevalue, nodeid, tile):
+    def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         document['dates'].append({'date': ExtendedDateFormat(nodevalue).lower, 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid})
 
     def append_search_filters(self, value, node, query, request):
@@ -214,7 +217,7 @@ class EDTFDataType(BaseDataType):
 
         return errors
 
-    def append_to_document(self, document, nodevalue, nodeid, tile):
+    def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         def add_date_to_doc(document, edtf):
             if edtf.lower == edtf.upper:
                 if edtf.lower is not None:
@@ -226,7 +229,7 @@ class EDTFDataType(BaseDataType):
                 if edtf.upper_fuzzy is not None:
                     dr['lte'] = edtf.upper_fuzzy
                 document['date_ranges'].append({'date_range': dr, 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid})
-        
+
         # update the indexed tile value to support adv. search
         tile.data[nodeid] = {
             'value': nodevalue,
@@ -256,14 +259,14 @@ class EDTFDataType(BaseDataType):
                 else:
                     if edtf.lower != edtf.upper:
                         raise Exception(_('Only dates that specify an exact year, month, and day can be used with the ">", "<", ">=", and "<=" operators'))
-                        
+
                     operators = {
                         value['op']: edtf.lower or edtf.upper
                     }
 
-                try:    
+                try:
                     query.should(Range(field='tiles.data.%s.dates.date' % (str(node.pk)), **operators))
-                    query.should(Range(field='tiles.data.%s.date_ranges.date_range' % (str(node.pk)), relation='intersects', **operators))    
+                    query.should(Range(field='tiles.data.%s.date_ranges.date_range' % (str(node.pk)), relation='intersects', **operators))
                 except RangeDSLException:
                     if edtf.lower == None and edtf.upper == None:
                         raise Exception(_('Invalid date specified.'))
@@ -342,7 +345,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             wkt_geoms.append(GEOSGeometry(json.dumps(feature['geometry'])))
         return GeometryCollection(wkt_geoms)
 
-    def append_to_document(self, document, nodevalue, nodeid, tile):
+    def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         document['geometries'].append({'geom':nodevalue, 'nodegroup_id': tile.nodegroup_id})
         bounds = self.get_bounds_from_value(nodevalue)
         if bounds is not None:
@@ -999,7 +1002,7 @@ class IIIFDrawingDataType(BaseDataType):
                 string_list.append(feature['properties']['name'])
         return string_list
 
-    def append_to_document(self, document, nodevalue, nodeid, tile):
+    def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         string_list = self.get_strings(nodevalue)
         for string_item in string_list:
             document['strings'].append({'string': string_item, 'nodegroup_id': tile.nodegroup_id})
@@ -1043,7 +1046,7 @@ class DomainDataType(BaseDomainDataType):
                 terms.append(domain_text)
         return terms
 
-    def append_to_document(self, document, nodevalue, nodeid, tile):
+    def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         domain_text = None
         for tile in document['tiles']:
             for k, v in tile.data.iteritems():
@@ -1105,7 +1108,7 @@ class DomainListDataType(BaseDomainDataType):
 
         return terms
 
-    def append_to_document(self, document, nodevalue, nodeid, tile):
+    def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         domain_text_values = set([])
         for tile in document['tiles']:
             for k, v in tile.data.iteritems():
@@ -1195,7 +1198,7 @@ class ResourceInstanceDataType(BaseDataType):
         resource_names = self.get_resource_names(nodevalue)
         return ', '.join(resource_names)
 
-    def append_to_document(self, document, nodevalue, nodeid, tile):
+    def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         resource_names = self.get_resource_names(nodevalue)
         for value in resource_names:
             if value not in document['strings']:
@@ -1231,7 +1234,7 @@ class NodeValueDataType(BaseDataType):
         datatype = datatype_factory.get_instance(value_node.datatype)
         return datatype.get_display_value(value_tile, value_node)
 
-    def append_to_document(self, document, nodevalue, nodeid, tile):
+    def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         pass
 
     def append_search_filters(self, value, node, query, request):

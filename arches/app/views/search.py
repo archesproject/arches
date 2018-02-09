@@ -164,7 +164,7 @@ def search_results(request):
         search_results_dsl = build_search_results_dsl(request)
     except Exception as err:
         return JSONResponse(err.message, status=500)
-        
+
     dsl = search_results_dsl['query']
     search_buffer = search_results_dsl['search_buffer']
     dsl.include('graph_id')
@@ -254,8 +254,10 @@ def build_search_results_dsl(request):
     nested_agg.add_aggregation(GeoHashGridAgg(field='points.point', name='grid', precision=settings.HEX_BIN_PRECISION))
     nested_agg.add_aggregation(GeoBoundsAgg(field='points.point', name='bounds'))
     query.add_aggregation(nested_agg)
-
     search_query = Bool()
+    provisional_filter = Bool()
+    provisional_filter.filter(Terms(field='provisional', terms=['false']))
+    # search_query.must(provisional_filter)
     permitted_nodegroups = get_permitted_nodegroups(request.user)
 
     if term_filter != '':
@@ -501,7 +503,7 @@ def time_wheel_config(request):
                 min_century = century
                 max_century = century + 100
                 century_name="Century (%s - %s)"%(min_century, max_century)
-                cent_boolquery = gen_range_agg(gte=ExtendedDateFormat(min_century).lower, 
+                cent_boolquery = gen_range_agg(gte=ExtendedDateFormat(min_century).lower,
                     lte=ExtendedDateFormat(max_century).lower)
                 century_agg = FiltersAgg(name=century_name)
                 century_agg.add_filter(cent_boolquery)
@@ -512,7 +514,7 @@ def time_wheel_config(request):
                     min_decade = decade
                     max_decade = decade + 10
                     decade_name = "Decade (%s - %s)"%(min_decade, max_decade)
-                    dec_boolquery = gen_range_agg(gte=ExtendedDateFormat(min_decade).lower, 
+                    dec_boolquery = gen_range_agg(gte=ExtendedDateFormat(min_decade).lower,
                         lte=ExtendedDateFormat(max_decade).lower)
                     decade_agg = FiltersAgg(name=decade_name)
                     decade_agg.add_filter(dec_boolquery)

@@ -188,7 +188,8 @@ class Resource(models.ResourceInstance):
         """
 
         document = JSONSerializer().serializeToPython(self)
-        document['tiles'] = list(models.TileModel.objects.filter(resourceinstance=self)) if fetchTiles else self.tiles
+        tiles = list(models.TileModel.objects.filter(resourceinstance=self)) if fetchTiles else self.tiles
+        document['tiles'] = tiles
         document['strings'] = []
         document['dates'] = []
         document['domains'] = []
@@ -196,6 +197,7 @@ class Resource(models.ResourceInstance):
         document['points'] = []
         document['numbers'] = []
         document['date_ranges'] = []
+        document['provisional'] = True if sum([len(t.data) for t in tiles]) == 0 else False
 
         terms = []
 
@@ -207,7 +209,22 @@ class Resource(models.ResourceInstance):
                     datatype_instance.append_to_document(document, nodevalue, nodeid, tile)
                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
                     for index, term in enumerate(node_terms):
-                        terms.append({'_id':unicode(nodeid)+unicode(tile.tileid)+unicode(index), '_source': {'value': term, 'nodeid': nodeid, 'nodegroupid': tile.nodegroup_id, 'tileid': tile.tileid, 'resourceinstanceid':tile.resourceinstance_id}})
+                        terms.append({'_id':unicode(nodeid)+unicode(tile.tileid)+unicode(index), '_source': {'value': term, 'nodeid': nodeid, 'nodegroupid': tile.nodegroup_id, 'tileid': tile.tileid, 'resourceinstanceid':tile.resourceinstance_id, 'provisional': False}})
+
+            if tile.provisionaledits is not None:
+                provisionaledits = JSONDeserializer().deserialize(tile.provisionaledits)
+                if len(provisionaledits) > 0:
+                    for user, edit in provisionaledits.iteritems():
+                        if edit['status'] == 'review':
+                            for nodeid, nodevalue in edit['value'].iteritems():
+                                datatype = node_datatypes[nodeid]
+                                if nodevalue != '' and nodevalue != [] and nodevalue != {} and nodevalue is not None:
+                                    datatype_instance = datatype_factory.get_instance(datatype)
+                                    datatype_instance.append_to_document(document, nodevalue, nodeid, tile, True)
+                                    node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
+                                    for index, term in enumerate(node_terms):
+                                        terms.append({'_id':unicode(nodeid)+unicode(tile.tileid)+unicode(index), '_source': {'value': term, 'nodeid': nodeid, 'nodegroupid': tile.nodegroup_id, 'tileid': tile.tileid, 'resourceinstanceid':tile.resourceinstance_id, 'provisional': True}})
+
 
         return document, terms
 

@@ -43,7 +43,7 @@ class BaseConceptDataType(BaseDataType):
             result = date_range
         return result
 
-    def append_to_document(self, document, nodevalue, nodeid, tile):
+    def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         try:
             assert isinstance(nodevalue, (list, tuple)) #assert nodevalue is an array
         except AssertionError:
@@ -64,7 +64,7 @@ class ConceptDataType(BaseConceptDataType):
 
     def validate(self, value, source=''):
         errors = []
-        
+
         ## first check to see if the validator has been passed a valid UUID,
         ## which should be the case at this point. return error if not.
         try:
@@ -73,7 +73,7 @@ class ConceptDataType(BaseConceptDataType):
             message = "This is an invalid concept prefLabel, or an incomplete UUID"
             errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, message, 'This data was not imported.')})
             return errors
-            
+
         ## if good UUID, test whether it corresponds to an actual Value object
         try:
             models.Value.objects.get(pk=value)

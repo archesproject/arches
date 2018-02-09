@@ -212,7 +212,8 @@ class Tile(models.TileModel):
 
             if creating_new_tile == True:
                 if self.is_provisional() == False and user_is_reviewer == False:
-                    self.apply_provisional_edit(user, data={}, action='create')
+                    self.apply_provisional_edit(user, data=self.data, action='create')
+                    self.data = {}
 
         super(Tile, self).save(*args, **kwargs)
         #We have to save the edit log record after calling save so that the
