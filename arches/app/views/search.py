@@ -240,7 +240,9 @@ def get_doc_type(request):
 def build_search_results_dsl(request):
     term_filter = request.GET.get('termFilter', '')
     
-    spatial_filter_organization = settings.DATA_SPATIAL_FILTER
+    spatial_filter_organization = None
+    if hasattr(settings, 'DATA_SPATIAL_FILTER') and settings.DATA_SPATIAL_FILTER != '':
+         spatial_filter_organization = settings.DATA_SPATIAL_FILTER
     
     spatial_filter = JSONDeserializer().deserialize(request.GET.get('mapFilter', '{}'))
     export = request.GET.get('export', None)
@@ -321,15 +323,13 @@ def build_search_results_dsl(request):
 
     #Si tenim filtre per part de group
     if spatial_filter_organization !=None and 'features' not in spatial_filter:
-        if len(spatial_filter_organization['features']) > 0:
-            feature_geom = spatial_filter_organization['features'][0]['geometry']
-            geoshape = GeoShape(field='geometries.geom.features.geometry', type=feature_geom['type'], coordinates=feature_geom['coordinates'] )
-            spatial_query = Bool()
-            spatial_query.filter(geoshape)
+        geoshape = GeoShape(field='geometries.geom.features.geometry', type=spatial_filter_organization['type'], coordinates=spatial_filter_organization['coordinates'] )
+        spatial_query = Bool()
+        spatial_query.filter(geoshape)
 
-            # get the nodegroup_ids that the user has permission to search
-            spatial_query.filter(Terms(field='geometries.nodegroup_id', terms=permitted_nodegroups))
-            search_query.filter(Nested(path='geometries', query=spatial_query))
+        # get the nodegroup_ids that the user has permission to search
+        spatial_query.filter(Terms(field='geometries.nodegroup_id', terms=permitted_nodegroups))
+        search_query.filter(Nested(path='geometries', query=spatial_query))
 
     if 'fromDate' in temporal_filter and 'toDate' in temporal_filter:
         now = str(datetime.utcnow())
