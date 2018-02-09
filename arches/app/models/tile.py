@@ -106,7 +106,8 @@ class Tile(models.TileModel):
         edit.user_email = getattr(user, 'email', '')
         edit.user_firstname = getattr(user, 'first_name', '')
         edit.user_lastname = getattr(user, 'last_name', '')
-        edit.note = note
+        edit.user_username = getattr(user, 'username', '')
+        edit.resourcedisplayname = Resource.objects.get(resourceinstanceid=self.resourceinstance.resourceinstanceid).displayname
         edit.oldvalue = old_value
         edit.newvalue = new_value
         edit.timestamp = timestamp
@@ -168,12 +169,29 @@ class Tile(models.TileModel):
                     result = True
         return result
 
+    def check_for_missing_nodes(self, request):
+        for nodeid, value in self.data.iteritems():
+            datatype_factory = DataTypeFactory()
+            node = models.Node.objects.get(nodeid=nodeid)
+            datatype = datatype_factory.get_instance(node.datatype)
+            datatype.clean(self, nodeid)
+            if request is not None:
+                datatype.handle_request(self, request, node)
+                if self.data[nodeid] == None and node.isrequired == True:
+                    missing_nodes.append(node.name)
+                    if missing_nodes != []:
+                        message = _('This card requires values for the following:')
+                        raise ValidationError(message, (', ').join(missing_nodes))
+
     def save(self, *args, **kwargs):
         request = kwargs.pop('request', None)
         index = kwargs.pop('index', True)
         self.__preSave(request)
         missing_nodes = []
         creating_new_tile = True
+        user_is_reviewer = False
+
+        self.check_for_missing_nodes(request)
 
         try:
             user = request.user
@@ -181,42 +199,32 @@ class Tile(models.TileModel):
         except AttributeError: #no user - probably importing data
             user = None
 
-        if self.data != {}:
-            creating_new_tile = models.TileModel.objects.filter(pk=self.tileid).exists() == False
-            edit_type = 'tile create' if (creating_new_tile == True) else 'tile edit'
-            if user is not None:
-                if creating_new_tile == False:
-                    existing_model = models.TileModel.objects.get(pk=self.tileid)
-                    if user_is_reviewer:
-                        self.save_edit(user=user, edit_type=edit_type, old_value=existing_model.data, new_value=self.data)
-                    else:
-                        self.apply_provisional_edit(user, self.data, action='update')
-                        self.data = existing_model.data
-                else:
-                    self.save_edit(user=user, edit_type=edit_type, old_value=self.data, new_value=self.data)
-            else:
-                self.save_edit(user={}, edit_type=edit_type, old_value=self.data, new_value=self.data)
+        creating_new_tile = models.TileModel.objects.filter(pk=self.tileid).exists() == False
+        edit_type = 'tile create' if (creating_new_tile == True) else 'tile edit'
 
-            for nodeid, value in self.data.iteritems():
-                datatype_factory = DataTypeFactory()
-                node = models.Node.objects.get(nodeid=nodeid)
-                datatype = datatype_factory.get_instance(node.datatype)
-                datatype.clean(self, nodeid)
-                if request is not None:
-                    datatype.handle_request(self, request, node)
-                if self.data[nodeid] == None and node.isrequired == True:
-                    missing_nodes.append(node.name)
-
-        if missing_nodes != []:
-            message = _('This card requires values for the following:')
-            raise ValidationError(message, (', ').join(missing_nodes))
+        if creating_new_tile == False:
+            existing_model = models.TileModel.objects.get(pk=self.tileid)
 
         if user is not None:
+            if user_is_reviewer == False and creating_new_tile == False:
+                self.apply_provisional_edit(user, self.data, action='update')
+                self.data = existing_model.data
+
             if creating_new_tile == True:
                 if self.is_provisional() == False and user_is_reviewer == False:
-                    self.apply_provisional_edit(user, data={}, action='create')
+                    self.apply_provisional_edit(user, data=self.data, action='create')
+                    self.data = {}
 
         super(Tile, self).save(*args, **kwargs)
+        #We have to save the edit log record after calling save so that the
+        #resource's displayname changes are avaliable
+        if user is None or user_is_reviewer == True:
+            user = {} if user == None else user
+            if creating_new_tile == True:
+                self.save_edit(user=user, edit_type=edit_type, old_value={}, new_value=self.data)
+            else:
+                self.save_edit(user=user, edit_type=edit_type, old_value=existing_model.data, new_value=self.data)
+
         if index and unicode(self.resourceinstance.graph_id) != unicode(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
             self.index()
         for tiles in self.tiles.itervalues():

@@ -171,7 +171,7 @@ class ResourceEditorView(BaseManagerView):
     def delete(self, request, resourceid=None):
         if resourceid is not None:
             ret = Resource.objects.get(pk=resourceid)
-            ret.delete()
+            ret.delete(user=request.user)
             return JSONResponse(ret)
         return HttpResponseNotFound()
 
@@ -203,10 +203,36 @@ class ResourceEditLogView(BaseManagerView):
 
     def get(self, request, resourceid=None, view_template='views/resource/edit-log.htm'):
         if resourceid is None:
+            recent_edits = models.EditLog.objects.all().exclude(resourceclassid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).order_by('-timestamp')[:100]
+            edited_ids = list(set([edit.resourceinstanceid for edit in recent_edits]))
+            resources = Resource.objects.filter(resourceinstanceid__in = edited_ids)
+            edit_type_lookup = {
+                'create': _('Resource Created'),
+                'delete': _('Resource Deleted'),
+                'tile delete': _('Tile Deleted'),
+                'tile create': _('Tile Created'),
+                'tile edit': _('Tile Updated')
+            }
+            deleted_instances = [e.resourceinstanceid for e in recent_edits if e.edittype == 'delete']
+            graph_name_lookup = {str(r.resourceinstanceid): r.graph.name for r in resources}
+            for edit in recent_edits:
+                edit.friendly_edittype = edit_type_lookup[edit.edittype]
+                edit.resource_model_name = None
+                edit.deleted = edit.resourceinstanceid in deleted_instances
+                if edit.resourceinstanceid in graph_name_lookup:
+                    edit.resource_model_name = graph_name_lookup[edit.resourceinstanceid]
+                edit.displayname = edit.note
+                if edit.resource_model_name is None:
+                    try:
+                        edit.resource_model_name = models.GraphModel.objects.get(pk=edit.resourceclassid).name
+                    except:
+                        pass
+
             context = self.get_context_data(
                 main_script='views/edit-history',
-                resource_instances=Resource.objects.all().exclude(graph_id=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).order_by('-createdtime')[:100]
+                recent_edits=recent_edits
             )
+
             context['nav']['title'] = _('Recent Edits')
 
             return render(request, 'views/edit-history.htm', context)
