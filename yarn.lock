@@ -1068,9 +1068,9 @@ chalk@~0.4.0:
     has-color "~0.1.0"
     strip-ansi "~0.1.0"
 
-chosen-js@1.8.2:
-  version "1.8.2"
-  resolved "https://registry.yarnpkg.com/chosen-js/-/chosen-js-1.8.2.tgz#bfd8ed1266ef667fbbc453c7e5b88d4c470e897e"
+chosen-js@1.8.3:
+  version "1.8.3"
+  resolved "https://registry.yarnpkg.com/chosen-js/-/chosen-js-1.8.3.tgz#1f953aef905d9760c14b5facc839a5f47eb356ec"
 
 ckeditor@~4.6.2:
   version "4.6.2"
