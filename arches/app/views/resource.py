@@ -213,16 +213,17 @@ class ResourceEditLogView(BaseManagerView):
                 'tile create': _('Tile Created'),
                 'tile edit': _('Tile Updated')
             }
+            deleted_instances = [e.resourceinstanceid for e in recent_edits if e.edittype == 'delete']
             for edit in recent_edits:
                 edit.friendly_edittype = edit_type_lookup[edit.edittype]
                 edit.resource_model_name = None
+                edit.deleted = edit.resourceinstanceid in deleted_instances
                 for resource in resources:
                     if str(resource.resourceinstanceid) == edit.resourceinstanceid:
                         edit.resource_model_name = resource.graph.name
                         break
                 edit.displayname = edit.note
                 if edit.resource_model_name is None:
-                    edit.deleted = True
                     try:
                         edit.resource_model_name = models.GraphModel.objects.get(pk=edit.resourceclassid).name
                     except:
