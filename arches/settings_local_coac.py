@@ -32,24 +32,19 @@ LOGGING = {
 
 #Filtre espaial per al grup imi
 DATA_SPATIAL_FILTER = {
-    "type": "FeatureCollection",
-    "features": [{
-        "geometry": {
-            "type": "Polygon",
-            "coordinates": [
-                [
-                    [0.159413237942827,40.5230250165038], 
-                    [0.159413237942827,42.8614503135853],
-                    [3.33254231638153,42.8614503135853],
-                    [3.33254231638153,40.5230250165038],
-                    [0.159413237942827,40.5230250165038]
-                ]
+    "type": "Polygon",
+    "coordinates": [
+            [
+                [0.159413237942827,40.5230250165038], 
+                [0.159413237942827,42.8614503135853],
+                [3.33254231638153,42.8614503135853],
+                [3.33254231638153,40.5230250165038],
+                [0.159413237942827,40.5230250165038]
             ]
-        },
-        "type": "Feature",
-        "properties": {}
-    }]
+    ],
+    "crs":{"type":"name","properties":{"name":"EPSG:4326"}}
 }
+
 
 #AMB PERMISOS D'ADMINISTRADOR
 ADMIN_ACCES=True
