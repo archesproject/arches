@@ -1068,11 +1068,9 @@ chalk@~0.4.0:
     has-color "~0.1.0"
     strip-ansi "~0.1.0"
 
-chosen-js@1.5.1:
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/chosen-js/-/chosen-js-1.5.1.tgz#3aa003d2e591d00c37ea6dca5105179458d11bb0"
-  dependencies:
-    jquery ">=1.4.4"
+chosen-js@1.8.2:
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/chosen-js/-/chosen-js-1.8.2.tgz#bfd8ed1266ef667fbbc453c7e5b88d4c470e897e"
 
 ckeditor@~4.6.2:
   version "4.6.2"
@@ -1501,7 +1499,7 @@ jquery.easing@^1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/jquery.easing/-/jquery.easing-1.4.1.tgz#47982c5836bd758fd48494923c4a101ef6e93e3b"
 
-jquery@3.3.1, jquery@>=1.10, jquery@>=1.11.3, jquery@>=1.4.4, jquery@>=1.7, jquery@>=1.9, jquery@>=1.9.0, "jquery@^1.7 || ^2.0 || ^3.1", "jquery@^1.8.3 || ^2.0 || ^3.0":
+jquery@3.3.1, jquery@>=1.10, jquery@>=1.11.3, jquery@>=1.7, jquery@>=1.9, jquery@>=1.9.0, "jquery@^1.7 || ^2.0 || ^3.1", "jquery@^1.8.3 || ^2.0 || ^3.0":
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.3.1.tgz#958ce29e81c9790f31be7792df5d4d95fc57fbca"
 
