@@ -214,14 +214,13 @@ class ResourceEditLogView(BaseManagerView):
                 'tile edit': _('Tile Updated')
             }
             deleted_instances = [e.resourceinstanceid for e in recent_edits if e.edittype == 'delete']
+            graph_name_lookup = {str(r.resourceinstanceid): r.graph.name for r in resources}
             for edit in recent_edits:
                 edit.friendly_edittype = edit_type_lookup[edit.edittype]
                 edit.resource_model_name = None
                 edit.deleted = edit.resourceinstanceid in deleted_instances
-                for resource in resources:
-                    if str(resource.resourceinstanceid) == edit.resourceinstanceid:
-                        edit.resource_model_name = resource.graph.name
-                        break
+                if edit.resourceinstanceid in graph_name_lookup:
+                    edit.resource_model_name = graph_name_lookup[edit.resourceinstanceid]
                 edit.displayname = edit.note
                 if edit.resource_model_name is None:
                     try:
