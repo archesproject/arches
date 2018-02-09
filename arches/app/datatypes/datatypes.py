@@ -22,7 +22,7 @@ from django.core.exceptions import ValidationError
 from django.db import connection, transaction
 from elasticsearch import Elasticsearch
 from edtf import parse_edtf
-import sys
+
 
 
 EARTHCIRCUM = 40075016.6856
@@ -394,8 +394,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
             #Afegim filtre espaial
             if hasattr(settings, 'DATA_SPATIAL_FILTER') and settings.DATA_SPATIAL_FILTER != '':
-                print >>sys.stderr, 'spatial_filter: ' + JSONSerializer().serialize(settings.DATA_SPATIAL_FILTER)
-                
+                print 'spatial filter settled'
                 cluster_sql = (
                     " WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid) AS ("
                     " SELECT m.*, ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid"
@@ -404,8 +403,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     " WHERE nodeid = '%s'"
                     " and st_intersects(g.geom_filter, m.geom)"
                     ")")
-                
-                print >>sys.stderr, 'cluster_sql:' + cluster_sql
                 
             else :
                 cluster_sql = """
@@ -446,15 +443,12 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     GROUP BY cid
             """
 
-            print >>sys.stderr, 'cluster_sql2:' + cluster_sql
-
             for i in range(int(config['clusterMaxZoom']) + 1):
                 arc = EARTHCIRCUM / ((1 << i) * PIXELSPERTILE)
                 distance = arc * int(config['clusterDistance'])
                 sql_string = cluster_sql % (distance, int(config['clusterMinPoints']), node.pk)
                 sql_list.append(sql_string)
-                print >>sys.stderr, 'sql_list:' + sql_string
-
+                
             
             if hasattr(settings, 'DATA_SPATIAL_FILTER') and settings.DATA_SPATIAL_FILTER != '':
                 sql_string = (" SELECT resourceinstanceid::text,"
@@ -467,7 +461,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                         " WHERE nodeid = '%s'"
                         " and st_intersects(g.geom_filter, m.geom)"
                 ) % node.pk
-                print >>sys.stderr, 'sql_list_unic:' + sql_string
                 sql_list.append(sql_string)
 
             else:
