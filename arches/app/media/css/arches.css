@@ -10238,7 +10238,7 @@ a.search-facet-item.disabled {
     padding: 6px 12px;
     white-space: nowrap;
 }
-.chosen-container-single .chosen-single div b {
+.chosen-container-single .chosen-single div b, .chosen-container-single .chosen-single .search-choice-close {
     background-image: none !important;
 }
 
@@ -10263,6 +10263,9 @@ a.search-facet-item.disabled {
     border-style: none solid solid;
     border-width: 0 1px 1px;
     border-radius: 3px;
+}
+.chosen-container .chosen-search {
+    background: #fff;
 }
 .chosen-container-active.chosen-with-drop .chosen-single {
     background: #fff;
@@ -10326,7 +10329,20 @@ a.search-facet-item.disabled {
 .chosen-container .chosen-results li{
     padding: 8px 6px
 }
+ul.select2-choices {
+    padding-right: 30px !important;
+}
 
+ul.select2-choices:after {
+    content: "";
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-top: 5px solid #333;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+}
 
 @keyframes loader {
     0% {
