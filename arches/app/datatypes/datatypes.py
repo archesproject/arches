@@ -394,7 +394,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
             #Afegim filtre espaial
             if hasattr(settings, 'DATA_SPATIAL_FILTER') and settings.DATA_SPATIAL_FILTER != '':
-                print 'spatial filter settled'
                 cluster_sql = (
                     " WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid) AS ("
                     " SELECT m.*, ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid"
