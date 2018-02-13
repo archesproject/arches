@@ -132,4 +132,6 @@ class SystemSettings(LazySettings):
         for edge in models.Edge.objects.filter(domainnode=node):
             nodes.append(edge.rangenode)
         return nodes
+    
+    
 settings = SystemSettings()
