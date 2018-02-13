@@ -235,6 +235,7 @@ def get_doc_type(request):
     return list(doc_type)
 
 def build_search_results_dsl(request):
+    user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
     term_filter = request.GET.get('termFilter', '')
     spatial_filter = JSONDeserializer().deserialize(request.GET.get('mapFilter', '{}'))
     export = request.GET.get('export', None)
@@ -255,14 +256,17 @@ def build_search_results_dsl(request):
     nested_agg.add_aggregation(GeoBoundsAgg(field='points.point', name='bounds'))
     query.add_aggregation(nested_agg)
     search_query = Bool()
-    provisional_filter = Bool()
-    provisional_filter.filter(Terms(field='provisional', terms=['false']))
-    # search_query.must(provisional_filter)
+    if user_is_reviewer == False:
+        provisional_resource_filter = Bool()
+        provisional_resource_filter.filter(Terms(field='provisional', terms=['false']))
+        search_query.must(provisional_resource_filter)
+
     permitted_nodegroups = get_permitted_nodegroups(request.user)
 
     if term_filter != '':
         for term in JSONDeserializer().deserialize(term_filter):
             term_query = Bool()
+            provisional_term_filter = Bool()
             if term['type'] == 'term' or term['type'] == 'string':
                 string_filter = Bool()
                 if term['type'] == 'term':
@@ -270,6 +274,9 @@ def build_search_results_dsl(request):
                 elif term['type'] == 'string':
                     string_filter.should(Match(field='strings.string', query=term['value'], type='phrase_prefix'))
                     string_filter.should(Match(field='strings.string.folded', query=term['value'], type='phrase_prefix'))
+
+                if user_is_reviewer == False:
+                    string_filter.must_not(Match(field='strings.provisional', query='true', type='phrase'))
 
                 string_filter.filter(Terms(field='strings.nodegroup_id', terms=permitted_nodegroups))
                 nested_string_filter = Nested(path='strings', query=string_filter)
@@ -284,6 +291,9 @@ def build_search_results_dsl(request):
                 conceptid_filter = Bool()
                 conceptid_filter.filter(Terms(field='domains.conceptid', terms=concept_ids))
                 conceptid_filter.filter(Terms(field='domains.nodegroup_id', terms=permitted_nodegroups))
+                if user_is_reviewer == False:
+                    conceptid_filter.must_not(Match(field='domains.provisional', query='true', type='phrase'))
+
                 nested_conceptid_filter = Nested(path='domains', query=conceptid_filter)
                 if term['inverted']:
                     search_query.must_not(nested_conceptid_filter)
@@ -391,6 +401,7 @@ def build_search_results_dsl(request):
     query.add_query(search_query)
     if search_buffer != None:
         search_buffer = search_buffer.geojson
+
     return {'query': query, 'search_buffer':search_buffer}
 
 def get_permitted_nodegroups(user):
