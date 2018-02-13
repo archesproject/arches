@@ -20,7 +20,12 @@ from django.shortcuts import render
 from arches.app.models.system_settings import settings
 
 def index(request):
-    return render(request, 'index.htm', {
+
+    template = 'index.htm'
+    if (hasattr(settings, 'INDEX_TEMPLATE') and settings.INDEX_TEMPLATE !=''):
+        template = settings.INDEX_TEMPLATE
+
+    return render(request, template, {
         'main_script': 'index',
         'active_page': 'Home',
         'app_title': settings.APP_TITLE,

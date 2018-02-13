@@ -1,0 +1,10 @@
+{
+    "name": "wkt-widget",
+    "component": "views/components/widgets/wkt-widget",
+    "defaultconfig": {
+        "x_placeholder":"Longitude",
+        "y_placeholder":"Latitude"
+    },
+    "helptext": null,
+    "datatype": "wkt-datatype"
+}

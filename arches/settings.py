@@ -15,18 +15,19 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
-
 import os
 import inspect
-
+from django.utils.translation import gettext_lazy as _
 
 #########################################
 ###          STATIC SETTINGS          ###
 #########################################
 
 MODE = 'PROD' #options are either "PROD" or "DEV" (installing with Dev mode set, gets you extra dependencies)
-DEBUG = True
+DEBUG = False
 INTERNAL_IPS = ('127.0.0.1',)
+ALLOWED_HOSTS = ['192.168.0.99']
+
 
 DATABASES = {
     'default': {
@@ -34,7 +35,7 @@ DATABASES = {
         'NAME': 'arches',                      # Or path to database file if using sqlite3.
         'USER': 'postgres',                      # Not used with sqlite3.
         'PASSWORD': 'postgis',                  # Not used with sqlite3.
-        'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
+        'HOST': '192.168.0.99',                 # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '5432',                      # Set to empty string for default. Not used with sqlite3.
         'POSTGIS_TEMPLATE': 'template_postgis_20',
     }
@@ -47,7 +48,7 @@ ELASTICSEARCH_HTTP_PORT = 9200 # this should be in increments of 200, eg: 9400, 
 SEARCH_BACKEND = 'arches.app.search.search.SearchEngine'
 # see http://elasticsearch-py.readthedocs.org/en/master/api.html#elasticsearch.Elasticsearch
 ELASTICSEARCH_HOSTS = [
-    {'host': 'localhost', 'port': ELASTICSEARCH_HTTP_PORT}
+    {'host': '192.168.0.99', 'port': ELASTICSEARCH_HTTP_PORT}
 ]
 ELASTICSEARCH_CONNECTION_OPTIONS = {'timeout': 30}
 # a prefix to append to all elasticsearch indexes, note: must be lower case
@@ -55,9 +56,10 @@ ELASTICSEARCH_PREFIX = ''
 
 USE_SEMANTIC_RESOURCE_RELATIONSHIPS = True
 ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+#ROOT_DIR = 'C:/Projectes/arches/arches' #os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 PACKAGE_ROOT = ROOT_DIR
 PACKAGE_NAME = PACKAGE_ROOT.split(os.sep)[-1]
-RESOURCE_IMPORT_LOG = 'arches/logs/resource_import.log'
+
 
 RESOURCE_FORMATERS = {
     'csv': 'arches.app.utils.data_management.resources.formats.csvfile.CsvWriter',
@@ -181,6 +183,12 @@ USE_TZ = False
 # run
 # django-admin.py makemessages --ignore=virtualenv/* --local=en --extension=htm,py
 # django-admin.py compilemessages
+LANGUAGES = (
+    ('en-US', _('English')),
+    ('es', _('Spanish')),
+    ('ca', _('Catalan'))
+)
+
 LANGUAGE_CODE = 'en-US'
 
 # the path where your translation strings are stored
@@ -207,7 +215,7 @@ STATIC_ROOT = ''
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = '/media/'
+STATIC_URL = '/static/'
 
 # URL prefix for admin static files -- CSS, JavaScript and images.
 # Make sure to use a trailing slash.
@@ -290,7 +298,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'arches.app.utils.middleware.TokenMiddleware',
-    #'django.middleware.locale.LocaleMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -303,15 +311,23 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'arches.urls'
 
 WSGI_APPLICATION = 'arches.wsgi.application'
-
+#GDAL_LIBRARY_PATH = 'C:/Projectes/gdal202.dll'
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+            'verbose': {
+                'format': '%(levelname)s %(asctime)s %(module)s %(message)s'
+            },
+            'simple': {
+                'format': '%(levelname)s %(message)s'
+            },
+    },
     'handlers': {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(ROOT_DIR, 'arches.log'),
+            'filename': os.path.join(ROOT_DIR, 'arches.log')
         },
     },
     'loggers': {
@@ -404,7 +420,8 @@ COPYRIGHT_YEAR = '2016'
 
 # Bounding box for geometry data validation. By default set to coordinate system bounding box.
 # NOTE: This is not used by the front end of the application.
-DATA_VALIDATION_BBOX = [(-180,-90), (-180,90), (180,90), (180,-90), (-180,-90)]
+DATA_VALIDATION_BBOX = [(2.05245125523825,41.3169235933913),(2.05245125523825,41.4682511768069),(2.22920292690723,41.4682511768069),(2.22920292690723,41.3169235933913),(2.05245125523825,41.3169235933913)]
+
 
 RESOURCE_GRAPH_LOCATIONS = (
     # Put strings here, like "/home/data/resource_graphs" or "C:/data/resource_graphs".
@@ -473,11 +490,11 @@ DEFAULT_BOUNDS = {
             "type": "Polygon",
             "coordinates": [
                 [
-                    [-122, -52],
-                    [128, -52],
-                    [128, 69],
-                    [-122, 69],
-                    [-122, -52]
+                    [2.05245125523825,41.3169235933913],
+                    [2.05245125523825,41.4682511768069],
+                    [2.22920292690723,41.4682511768069],
+                    [2.22920292690723,41.3169235933913],
+                    [2.05245125523825,41.3169235933913]
                 ]
             ]
         },
@@ -494,12 +511,4 @@ HEX_BIN_SIZE = 100
 # high precision binning may result in performance issues.
 HEX_BIN_PRECISION = 4
 
-##########################################
-### END RUN TIME CONFIGURABLE SETTINGS ###
-##########################################
-
-
-try:
-    from settings_local import *
-except ImportError:
-    pass
+STATIC_ROOT = os.path.join(PACKAGE_ROOT, 'static')

@@ -23,6 +23,8 @@ from django.db import connection, transaction
 from elasticsearch import Elasticsearch
 from edtf import parse_edtf
 
+
+
 EARTHCIRCUM = 40075016.6856
 PIXELSPERTILE = 256
 
@@ -386,30 +388,46 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
     def get_layer_config(self, node=None):
         sql_list = []
         database = settings.DATABASES['default']
+
         if node is not None and node.config is not None:
             config = node.config
 
-            cluster_sql = """
+            #Afegim filtre espaial
+            if hasattr(settings, 'DATA_SPATIAL_FILTER') and settings.DATA_SPATIAL_FILTER != '':
+                cluster_sql = (
+                    " WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid) AS ("
+                    " SELECT m.*, ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid"
+                    " FROM mv_geojson_geoms m,"
+                    " (SELECT ST_TRANSFORM(ST_GeomFromGeoJSON('" + JSONSerializer().serialize(settings.DATA_SPATIAL_FILTER) + "'),900913) as geom_filter) g"
+                    " WHERE nodeid = '%s'"
+                    " and st_intersects(g.geom_filter, m.geom)"
+                    ")")
+                
+            else :
+                cluster_sql = """
                 WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid) AS (
                     SELECT m.*, ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid
-                	FROM mv_geojson_geoms m
+                    FROM mv_geojson_geoms m
                     WHERE nodeid = '%s'
-                )
+                )"""
+
+
+            cluster_sql += """
 
                 SELECT resourceinstanceid::text,
-                		row_number() over () as __id__,
-                		1 as total,
-                		ST_Centroid(geom) AS __geometry__,
+                        row_number() over () as __id__,
+                        1 as total,
+                        ST_Centroid(geom) AS __geometry__,
                         '' AS extent
-                	FROM clusters
-                	WHERE cid is NULL
+                    FROM clusters
+                    WHERE cid is NULL
 
                 UNION
 
                 SELECT NULL as resourceinstanceid,
-                		row_number() over () as __id__,
-                		count(*) as total,
-                		ST_Centroid(
+                        row_number() over () as __id__,
+                        count(*) as total,
+                        ST_Centroid(
                             ST_Collect(geom)
                         ) AS __geometry__,
                         ST_AsGeoJSON(
@@ -419,9 +437,9 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                                 ), 4326
                             )
                         ) AS extent
-                	FROM clusters
-                	WHERE cid IS NOT NULL
-                	GROUP BY cid
+                    FROM clusters
+                    WHERE cid IS NOT NULL
+                    GROUP BY cid
             """
 
             for i in range(int(config['clusterMaxZoom']) + 1):
@@ -429,16 +447,31 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 distance = arc * int(config['clusterDistance'])
                 sql_string = cluster_sql % (distance, int(config['clusterMinPoints']), node.pk)
                 sql_list.append(sql_string)
+                
+            
+            if hasattr(settings, 'DATA_SPATIAL_FILTER') and settings.DATA_SPATIAL_FILTER != '':
+                sql_string = (" SELECT resourceinstanceid::text,"
+                            " (row_number() over ())::text as __id__,"
+                            " 1 as total,"
+                            " geom AS __geometry__,"
+                            " '' AS extent"
+                        " FROM mv_geojson_geoms m,"
+                        " (SELECT ST_TRANSFORM(ST_GeomFromGeoJSON('" + JSONSerializer().serialize(settings.DATA_SPATIAL_FILTER) + "'),900913) as geom_filter) g"
+                        " WHERE nodeid = '%s'"
+                        " and st_intersects(g.geom_filter, m.geom)"
+                ) % node.pk
+                sql_list.append(sql_string)
 
-            sql_list.append("""
-                SELECT resourceinstanceid::text,
-                        (row_number() over ())::text as __id__,
-                        1 as total,
-                        geom AS __geometry__,
-                        '' AS extent
-                    FROM mv_geojson_geoms
-                    WHERE nodeid = '%s'
-            """ % node.pk)
+            else:
+                sql_list.append("""
+                    SELECT resourceinstanceid::text,
+                            (row_number() over ())::text as __id__,
+                            1 as total,
+                            geom AS __geometry__,
+                            '' AS extent
+                        FROM mv_geojson_geoms m
+                        WHERE nodeid = '%s'
+                """ % node.pk)
 
         else:
             config = {"cacheTiles": False}

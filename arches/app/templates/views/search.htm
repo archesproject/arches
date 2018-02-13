@@ -6,7 +6,11 @@
 
 
 {% block main_content %}
-    {% include 'views/search/search-base-manager.htm' %}
+	{% if map %}
+		{% include 'views/search/simplified-search-base-manager.htm' %}
+	{% else %}
+    	{% include 'views/search/search-base-manager.htm' %}
+    {% endif %}
 {% endblock main_content %}
 
 {% block tabs %}{% endblock tabs %}

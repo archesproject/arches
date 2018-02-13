@@ -3,7 +3,7 @@ define([
     'knockout',
     'viewmodels/report',
     'arches',
-    'knockstrap',
+    'plugins/knockstrap',
     'bindings/chosen'
 ], function(_, ko, ReportViewModel, arches) {
     return ko.components.register('image-report', {
