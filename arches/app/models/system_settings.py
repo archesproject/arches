@@ -133,5 +133,4 @@ class SystemSettings(LazySettings):
             nodes.append(edge.rangenode)
         return nodes
 
-
 settings = SystemSettings()
