@@ -91,8 +91,7 @@ class SystemSettings(LazySettings):
                     return getattr(self, node.name)
 
                 if parent_node is not None:
-                    if (not hasattr(self, node.name)):
-                        setattr(self, node.name, None)
+                    setattr(self, node.name, None)
 
             setup_node(node)
 
@@ -103,8 +102,7 @@ class SystemSettings(LazySettings):
                     if node.datatype != 'semantic':
                         try:
                             val = tile.data[str(node.nodeid)]
-                            if(val !=None):
-                                setattr(self, node.name, val)
+                            setattr(self, node.name, val)
                         except:
                             pass
 

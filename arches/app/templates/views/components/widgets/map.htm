@@ -238,14 +238,14 @@
                 </div>
                 <div class="hover-feature-body">
                     <div class="hover-feature" data-bind="html: popupData().map_popup"></div>
-                    <!--<div class="hover-feature-metadata">
+                    <div class="hover-feature-metadata">
                         {% trans "Resource ID:" %}
                         <span data-bind="text: popupData().resourceinstanceid"></span>
                     </div>
                     <div class="hover-feature-metadata">
                         {% trans "Resource Model:" %}
                         <span data-bind="text: popupData().graph_name"></span>
-                    </div>-->
+                    </div>
                 </div>
                 <div class="hover-feature-footer">
                     <a data-bind="click: function () { window.open(reportURL + ko.unwrap(popupData().resourceinstanceid)); }" href="javascript:void(0)"><i class="ion-document-text"></i> {% trans "Report" %}</a>

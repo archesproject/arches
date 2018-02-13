@@ -5,7 +5,7 @@ define([
     'widgets',
     'card-configuration-data',
     'bindings/ckeditor',
-    'plugins/knockstrap',
+    'knockstrap',
     'component-templates'
 ], function(_, Backbone,  ko, widgets, data) {
     var CardComponentForm = Backbone.View.extend({
