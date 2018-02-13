@@ -116,7 +116,6 @@ def prepare_search_index(resource_model_id, create=False):
                     'displayname': {'type': 'keyword'},
                     'displaydescription': {'type': 'keyword'},
                     'map_popup': {'type': 'keyword'},
-                    'marker':{'type': 'keyword'},
                     'tiles' : {
                         'type' : 'nested',
                         'properties' : {

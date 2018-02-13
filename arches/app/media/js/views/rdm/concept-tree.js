@@ -2,7 +2,7 @@ define([
     'jquery',
     'backbone',
     'arches',
-    'plugins/jqtree/tree.jquery.min'
+    'jqtree'
 ], function($, Backbone, arches) {
     return Backbone.View.extend({
 
@@ -59,8 +59,8 @@ define([
             // The clicked node is 'event.node'
             var node = event.node;
             if (! node.load_on_demand){
-                this.$el.tree('toggle', node);                    
-            }            
+                this.$el.tree('toggle', node);
+            }
             if (this.model.get('id') !== node.id) {
                 this.trigger('conceptSelected', node.id);
             } else {

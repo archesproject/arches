@@ -19,7 +19,7 @@
     "@mapbox/geojson-normalize" "0.0.1"
     geojson-flatten "~0.2.1"
 
-"@mapbox/geojson-extent@^0.3.2":
+"@mapbox/geojson-extent@0.3.2", "@mapbox/geojson-extent@^0.3.2":
   version "0.3.2"
   resolved "https://registry.yarnpkg.com/@mapbox/geojson-extent/-/geojson-extent-0.3.2.tgz#a1bdb2015afd0e031c18c3f29f7eb229e4e1950f"
   dependencies:
@@ -1319,10 +1319,6 @@ geodesy@1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/geodesy/-/geodesy-1.1.2.tgz#84cbdf7e7b98907bd3b13b09ae86c65926391a50"
 
-geohash@chrisveness/latlon-geohash#1.1.0:
-  version "1.1.0"
-  resolved "https://codeload.github.com/chrisveness/latlon-geohash/tar.gz/53c3d4742b580b00e27387631f367ac0a42e0eb0"
-
 geojson-dissolve@3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/geojson-dissolve/-/geojson-dissolve-3.1.0.tgz#86823271680a1a381f3e72f02648bbcc710ecda1"
@@ -1485,19 +1481,27 @@ javascript-natural-sort@0.7.1:
   version "0.7.1"
   resolved "https://registry.yarnpkg.com/javascript-natural-sort/-/javascript-natural-sort-0.7.1.tgz#f9e2303d4507f6d74355a73664d1440fb5a0ef59"
 
+jqtree@1.3.4:
+  version "1.3.4"
+  resolved "https://registry.yarnpkg.com/jqtree/-/jqtree-1.3.4.tgz#dd56ef3bc96d1098115392d41ef1b1f5aec47469"
+  dependencies:
+    jquery ">=1.9"
+
 jquery-migrate@3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/jquery-migrate/-/jquery-migrate-3.0.1.tgz#141de3abfe6d301baaa4130b0ec7b9a839845e72"
 
-jquery-validate@1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/jquery-validate/-/jquery-validate-1.0.2.tgz#db6ca14566816abd41dfb81091812be75c85387d"
+jquery-validation@1.17.0:
+  version "1.17.0"
+  resolved "https://registry.yarnpkg.com/jquery-validation/-/jquery-validation-1.17.0.tgz#ab66b6b583d7740b9bbd148993e50e8ac041f35b"
+  dependencies:
+    jquery "^1.7 || ^2.0 || ^3.1"
 
 jquery.easing@^1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/jquery.easing/-/jquery.easing-1.4.1.tgz#47982c5836bd758fd48494923c4a101ef6e93e3b"
 
-jquery@3.3.1, jquery@>=1.10, jquery@>=1.11.3, jquery@>=1.4.4, jquery@>=1.7, "jquery@^1.8.3 || ^2.0 || ^3.0":
+jquery@3.3.1, jquery@>=1.10, jquery@>=1.11.3, jquery@>=1.4.4, jquery@>=1.7, jquery@>=1.9, jquery@>=1.9.0, "jquery@^1.7 || ^2.0 || ^3.1", "jquery@^1.8.3 || ^2.0 || ^3.0":
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.3.1.tgz#958ce29e81c9790f31be7792df5d4d95fc57fbca"
 
@@ -1508,10 +1512,6 @@ jqueryui@1.11.1:
 js-cookie@2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/js-cookie/-/js-cookie-2.1.1.tgz#26ada7902e91fe7f8bb01b4831912c724739f381"
-
-"js-shapefile-to-geojson@https://github.com/wavded/js-shapefile-to-geojson":
-  version "0.1.0"
-  resolved "https://github.com/wavded/js-shapefile-to-geojson#6ee60833bc0a8bd23fadab1227fd73441dda9712"
 
 js-yaml@^3.10.0:
   version "3.10.0"
@@ -1554,6 +1554,22 @@ knockout@3.4.0:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/knockout/-/knockout-3.4.0.tgz#59d7261815a11eb7c1a3f3c7077ca898a44caadb"
 
+knockout@>=2.3.0:
+  version "3.4.2"
+  resolved "https://registry.yarnpkg.com/knockout/-/knockout-3.4.2.tgz#e87958de77ad1e936f7ce645bab8b5d7c456d937"
+
+knockstrap@1.3.2:
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/knockstrap/-/knockstrap-1.3.2.tgz#546b713dc8eee9cf56900f9a772d8e51e67aab06"
+  dependencies:
+    jquery ">=1.9.0"
+    knockout ">=2.3.0"
+    twitter-bootstrap-3.0.0 "~3"
+
+latlon-geohash@1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/latlon-geohash/-/latlon-geohash-1.1.0.tgz#7abe15224c4800e3eaecac71c753a20bfb6cbf65"
+
 leaflet-draw@^0.4.9:
   version "0.4.14"
   resolved "https://registry.yarnpkg.com/leaflet-draw/-/leaflet-draw-0.4.14.tgz#1b5b06d570873a015aa96b80d664dab496c45a4a"
@@ -1586,6 +1602,10 @@ log-symbols@^1.0.2:
   resolved "https://registry.yarnpkg.com/log-symbols/-/log-symbols-1.0.2.tgz#376ff7b58ea3086a0f09facc74617eca501e1a18"
   dependencies:
     chalk "^1.0.0"
+
+lt-themify-icons@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/lt-themify-icons/-/lt-themify-icons-1.1.0.tgz#945401d5a7205eff653ad5ef4ce94b912ba98c58"
 
 magic-string@^0.14.0:
   version "0.14.0"
@@ -1906,9 +1926,9 @@ seedrandom@^2.4.2:
   version "2.4.3"
   resolved "https://registry.yarnpkg.com/seedrandom/-/seedrandom-2.4.3.tgz#2438504dad33917314bff18ac4d794f16d6aaecc"
 
-select2v3@select2/select2#3.5.1:
+select2@3.5.1:
   version "3.5.1"
-  resolved "https://codeload.github.com/select2/select2/tar.gz/8cc9d48d5881a5760178b5cd615c5174fbd98672"
+  resolved "https://registry.yarnpkg.com/select2/-/select2-3.5.1.tgz#f2819489bbc65fd6d328be72bbe2b95dd7e87cfe"
 
 shallow-copy@~0.0.1:
   version "0.0.1"
@@ -2078,6 +2098,10 @@ traverse@~0.6.6:
 trim@0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/trim/-/trim-0.0.1.tgz#5858547f6b290757ee95cccc666fb50084c460dd"
+
+twitter-bootstrap-3.0.0@~3:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/twitter-bootstrap-3.0.0/-/twitter-bootstrap-3.0.0-3.0.0.tgz#30a24297b48373f93cd9abe10fd9924415c3d17a"
 
 two-product@^1.0.2:
   version "1.0.2"
