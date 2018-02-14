@@ -242,10 +242,10 @@
                 text: "{% trans 'Sorry! The copy request failed. Please try again.  Contact your system administrator if the problem persists.' %}"
             },
             mapboxApiKey: '{{ map_info.mapbox_api_key }}',
-            hexBinSize: {{ map_info.hex_bin_size }},
+            hexBinSize: {{ map_info.hex_bin_size|unlocalize }},
             mapboxSprites: '{{ map_info.mapbox_sprites }}',
             mapboxGlyphs: '{{ map_info.mapbox_glyphs }}',
-            hexBinBounds: {{ map_info.hex_bin_bounds }},
+            hexBinBounds: {{ map_info.hex_bin_bounds|unlocalize }},
             mapDefaultX: {{ map_info.x|unlocalize }},
             mapDefaultY: {{ map_info.y|unlocalize }},
             mapDefaultZoom: {{ map_info.zoom }},
