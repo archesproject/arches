@@ -159,6 +159,20 @@ def search_terms(request):
 
     return JSONResponse(ret)
 
+
+def select_geoms_for_results(features, geojson_nodes, user_is_reviewer):
+    res = []
+    for feature in features:
+        if 'provisional' in feature:
+            if feature['provisional'] == False or (user_is_reviewer is True and feature['provisional'] is True):
+                if feature['nodegroup_id'] in geojson_nodes:
+                    res.append(feature)
+        else:
+            if feature['nodegroup_id'] in geojson_nodes:
+                res.append(feature)
+
+    return res
+
 def search_results(request):
     try:
         search_results_dsl = build_search_results_dsl(request)
@@ -179,6 +193,7 @@ def search_results(request):
     results = dsl.search(index='resource', doc_type=get_doc_type(request))
 
     if results is not None:
+        user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
         total = results['hits']['total']
         page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
 
@@ -187,18 +202,10 @@ def search_results(request):
 
         # only reuturn points and geometries a user is allowed to view
         geojson_nodes = get_nodegroups_by_datatype_and_perm(request, 'geojson-feature-collection', 'read_nodegroup')
-        for result in results['hits']['hits']:
-            points = []
-            for point in result['_source']['points']:
-                if point['nodegroup_id'] in geojson_nodes:
-                    points.append(point)
-            result['_source']['points'] = points
 
-            geoms = []
-            for geom in result['_source']['geometries']:
-                if geom['nodegroup_id'] in geojson_nodes:
-                    geoms.append(geom)
-            result['_source']['geometries'] = geoms
+        for result in results['hits']['hits']:
+            result['_source']['points'] = select_geoms_for_results(result['_source']['points'], geojson_nodes, user_is_reviewer)
+            result['_source']['geometries'] = select_geoms_for_results(result['_source']['geometries'], geojson_nodes, user_is_reviewer)
 
         ret = {}
         ret['results'] = results
@@ -213,6 +220,7 @@ def search_results(request):
         ret['paginator']['start_index'] = page.start_index()
         ret['paginator']['end_index'] = page.end_index()
         ret['paginator']['pages'] = pages
+
         return JSONResponse(ret)
     else:
         return HttpResponseNotFound(_("There was an error retrieving the search results"))
@@ -251,15 +259,23 @@ def build_search_results_dsl(request):
         limit = settings.SEARCH_ITEMS_PER_PAGE
 
     query = Query(se, start=limit*int(page-1), limit=limit)
-    nested_agg = NestedAgg(path='points', name='geo_aggs')
-    nested_agg.add_aggregation(GeoHashGridAgg(field='points.point', name='grid', precision=settings.HEX_BIN_PRECISION))
-    nested_agg.add_aggregation(GeoBoundsAgg(field='points.point', name='bounds'))
-    query.add_aggregation(nested_agg)
     search_query = Bool()
+
+    nested_agg = NestedAgg(path='points', name='geo_aggs')
+    nested_agg_filter = FiltersAgg(name='inner')
+
     if user_is_reviewer == False:
         provisional_resource_filter = Bool()
         provisional_resource_filter.filter(Terms(field='provisional', terms=['false']))
         search_query.must(provisional_resource_filter)
+        nested_agg_filter.add_filter(Terms(field='points.provisional', terms=['false']))
+    else:
+        nested_agg_filter.add_filter(Terms(field='points.provisional', terms=['false','true']))
+
+    nested_agg_filter.add_aggregation(GeoHashGridAgg(field='points.point', name='grid', precision=settings.HEX_BIN_PRECISION))
+    nested_agg_filter.add_aggregation(GeoBoundsAgg(field='points.point', name='bounds'))
+    nested_agg.add_aggregation(nested_agg_filter)
+    query.add_aggregation(nested_agg)
 
     permitted_nodegroups = get_permitted_nodegroups(request.user)
 
@@ -311,6 +327,7 @@ def build_search_results_dsl(request):
             feature_geom = JSONDeserializer().deserialize(search_buffer.json)
             geoshape = GeoShape(field='geometries.geom.features.geometry', type=feature_geom['type'], coordinates=feature_geom['coordinates'] )
 
+
             invert_spatial_search = False
             if 'inverted' in feature_properties:
                 invert_spatial_search = feature_properties['inverted']
@@ -323,6 +340,8 @@ def build_search_results_dsl(request):
 
             # get the nodegroup_ids that the user has permission to search
             spatial_query.filter(Terms(field='geometries.nodegroup_id', terms=permitted_nodegroups))
+            if user_is_reviewer == False:
+                spatial_query.filter(Terms(field='geometries.provisional', terms=['false']))
             search_query.filter(Nested(path='geometries', query=spatial_query))
 
     if 'fromDate' in temporal_filter and 'toDate' in temporal_filter:
@@ -350,12 +369,16 @@ def build_search_results_dsl(request):
             date_query = Bool()
             date_query.filter(inverted_date_query)
             date_query.filter(Terms(field='dates.nodegroup_id', terms=permitted_nodegroups))
+            if user_is_reviewer == False:
+                date_query.filter(Terms(field='dates.provisional', terms=['false']))
             if date_nodeid:
                 date_query.filter(Term(field='dates.nodeid', term=date_nodeid))
             else:
                 date_ranges_query = Bool()
                 date_ranges_query.filter(inverted_date_ranges_query)
                 date_ranges_query.filter(Terms(field='date_ranges.nodegroup_id', terms=permitted_nodegroups))
+                if user_is_reviewer == False:
+                    date_ranges_query.filter(Terms(field='date_ranges.provisional', terms=['false']))
                 temporal_query.should(Nested(path='date_ranges', query=date_ranges_query))
             temporal_query.should(Nested(path='dates', query=date_query))
 
@@ -363,12 +386,16 @@ def build_search_results_dsl(request):
             date_query = Bool()
             date_query.filter(Range(field='dates.date', gte=start_date.lower, lte=end_date.upper))
             date_query.filter(Terms(field='dates.nodegroup_id', terms=permitted_nodegroups))
+            if user_is_reviewer == False:
+                date_query.filter(Terms(field='dates.provisional', terms=['false']))
             if date_nodeid:
                 date_query.filter(Term(field='dates.nodeid', term=date_nodeid))
             else:
                 date_ranges_query = Bool()
                 date_ranges_query.filter(Range(field='date_ranges.date_range', gte=start_date.lower, lte=end_date.upper, relation='intersects'))
                 date_ranges_query.filter(Terms(field='date_ranges.nodegroup_id', terms=permitted_nodegroups))
+                if user_is_reviewer == False:
+                    date_ranges_query.filter(Terms(field='date_ranges.provisional', terms=['false']))
                 temporal_query.should(Nested(path='date_ranges', query=date_ranges_query))
             temporal_query.should(Nested(path='dates', query=date_query))
 
