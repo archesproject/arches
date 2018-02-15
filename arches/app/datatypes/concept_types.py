@@ -56,8 +56,8 @@ class BaseConceptDataType(BaseDataType):
                 max_date = ExtendedDateFormat(date_range['max_year']).upper
                 if {'gte': min_date, 'lte': max_date} not in document['date_ranges']:
                     document['date_ranges'].append({'date_range': {'gte': min_date, 'lte': max_date}, 'nodegroup_id': tile.nodegroup_id})
-            document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': valueid, 'nodegroup_id': tile.nodegroup_id})
-            document['strings'].append({'string': value.value, 'nodegroup_id': tile.nodegroup_id})
+            document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': valueid, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
+            document['strings'].append({'string': value.value, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
 
 
 class ConceptDataType(BaseConceptDataType):
