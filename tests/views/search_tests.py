@@ -488,6 +488,9 @@ def get_response_json(client, temporal_filter=None, term_filter=None, spatial_fi
     if spatial_filter is not None:
         query['mapFilter'] = JSONSerializer().serialize(spatial_filter)
 
+    resource_reviewer_group = Group.objects.get(name='Resource Reviewer')
+    test_user = User.objects.get(username='test')
+    test_user.groups.add(resource_reviewer_group)
     client.login(username='test', password='test')
     response = client.get('/search/resources', query)
     response_json = json.loads(response.content)
