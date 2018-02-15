@@ -47,6 +47,10 @@
                 <!-- Title Block -->
                 <h3 class="search-title" data-bind="text: '{% trans 'Results: ' %}' + total()"></h3>
                 <div id="search-results-container">
+                    <div class="search-inline-filters">
+                    {% if user_is_reviewer %}
+                    <div data-bind="component: { name: 'views/components/simple-switch', params: {value: $parent.provisionalFilter.filter, config:{label: '{% trans "Include provisional" %}', subtitle: ''}}}"></div>
+                    {% endif %}
                     <span class="resource-selector-button pull-right" data-bind="with:$parent.resourceTypeFilter">
                         <div class="btn-group btn-group-xs">
                             <button class="btn btn-primary btn-active-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="true"> {% trans "Select..." %} <i class="dropdown-caret fa fa-caret-down"></i>
@@ -59,6 +63,7 @@
                             </ul>
                         </div>
                     </span>
+                    </div>
                     {% include 'views/search/search-results.htm' %}
                 </div>
             </div>

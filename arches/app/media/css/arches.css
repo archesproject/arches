@@ -8389,6 +8389,15 @@ a.search-query-link-captions:focus {
     flex: 0 0 400px;
 }
 
+.search-inline-filters {
+        display: flex;
+        flex-direction: row;
+        align-content: normal;
+        margin-top: -30px;
+        float: right;
+        width: 200px;
+}
+
 .search-control-container {
     -ms-flex: 0 0 400px;
     -webkit-flex: 0 0 400px;
@@ -8500,7 +8509,6 @@ ul.pagination {
 }
 
 .resource-selector-button {
-    margin-top: -30px;
     padding-bottom: 0px;
 }
 
