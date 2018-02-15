@@ -46,9 +46,11 @@ define([
             this.aggregations = ko.observable();
             this.searchBuffer = ko.observable();
             this.filters = {};
-            this.filters.provisionalFilter = new ProvisionalFilter();
             this.filters.termFilter = new TermFilter();
             this.filters.timeFilter = new TimeFilter({
+                termFilter: this.filters.termFilter
+            });
+            this.filters.provisionalFilter = new ProvisionalFilter({
                 termFilter: this.filters.termFilter
             });
             this.filters.resourceTypeFilter = new ResourceTypeFilter({

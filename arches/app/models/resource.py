@@ -214,6 +214,8 @@ class Resource(models.ResourceInstance):
             if tile.provisionaledits is not None:
                 provisionaledits = JSONDeserializer().deserialize(tile.provisionaledits)
                 if len(provisionaledits) > 0:
+                    if document['provisional'] == False:
+                        document['provisional'] = 'partial'
                     for user, edit in provisionaledits.iteritems():
                         if edit['status'] == 'review':
                             for nodeid, nodevalue in edit['value'].iteritems():

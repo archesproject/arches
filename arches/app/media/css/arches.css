@@ -8392,10 +8392,10 @@ a.search-query-link-captions:focus {
 .search-inline-filters {
         display: flex;
         flex-direction: row;
-        align-content: normal;
+        justify-content: space-between;
         margin-top: -30px;
         float: right;
-        width: 200px;
+        width: 150px;
 }
 
 .search-control-container {
