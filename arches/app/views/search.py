@@ -244,16 +244,38 @@ def get_doc_type(request):
 
     return list(doc_type)
 
-def build_search_results_dsl(request):
+def get_provisional_type(request):
+    """
+    Parses the provisional filter data to determine if a search results will
+    include provisional (True) exclude provisional (False) or inlude only
+    provisional 'only provisional'
+    """
+
+    result = False
+    provisional_filter = JSONDeserializer().deserialize(request.GET.get('provisionalFilter', '[]'))
     user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
+    if user_is_reviewer != False:
+        if len(provisional_filter) == 0:
+            result = True
+        else:
+            inverted = provisional_filter[0]['inverted']
+            if provisional_filter[0]['provisionaltype'] == 'Provisional':
+                if inverted == False:
+                    result = 'only provisional'
+                else:
+                    result = False
+            if provisional_filter[0]['provisionaltype'] == 'Authoritative':
+                if inverted == False:
+                    result = False
+                else:
+                    result = 'only provisional'
+
+    return result
+
+def build_search_results_dsl(request):
     term_filter = request.GET.get('termFilter', '')
     spatial_filter = JSONDeserializer().deserialize(request.GET.get('mapFilter', '{}'))
-    provisional_filter = JSONDeserializer().deserialize(request.GET.get('provisionalFilter', '[]'))
-    print provisional_filter
-    if len(provisional_filter) == 0 or len(provisional_filter) == 2:
-        include_provisional = True
-    else:
-        include_provisional = 'only provisional' if provisional_filter[0]['provisionaltype'] == 'Provisional' else False
+    include_provisional = get_provisional_type(request)
 
     export = request.GET.get('export', None)
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
@@ -280,7 +302,7 @@ def build_search_results_dsl(request):
         provisional_resource_filter = Bool()
 
         if include_provisional == False:
-            provisional_resource_filter.filter(Terms(field='provisional', terms=['false']))
+            provisional_resource_filter.filter(Terms(field='provisional', terms=['false', 'partial']))
             nested_agg_filter.add_filter(Terms(field='points.provisional', terms=['false']))
 
         elif include_provisional == 'only provisional':
