@@ -47,7 +47,22 @@
                 <!-- Title Block -->
                 <h3 class="search-title" data-bind="text: '{% trans 'Results: ' %}' + total()"></h3>
                 <div id="search-results-container">
-                    <span class="resource-selector-button pull-right" data-bind="with:$parent.resourceTypeFilter">
+                    <div class="search-inline-filters">
+                    {% if user_is_reviewer %}
+                    <div class="resource-selector-button pull-right" data-bind="with:$parent.provisionalFilter">
+                        <div class="btn-group btn-group-xs">
+                            <button class="btn btn-primary btn-active-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="true"> {% trans "QA Type" %} <i class="dropdown-caret fa fa-caret-down"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                <li><a href="#" data-bind="click: selectProvisional.bind($data, null)">{% trans "All edits" %}</a></li>
+                                <!-- ko foreach: provisionalOptions -->
+                                <li><a href="#" data-bind="text: name, click: $parent.selectProvisional.bind($parent)"></a></li>
+                                <!-- /ko -->
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="resource-selector-button pull-right" data-bind="with:$parent.resourceTypeFilter">
                         <div class="btn-group btn-group-xs">
                             <button class="btn btn-primary btn-active-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="true"> {% trans "Select..." %} <i class="dropdown-caret fa fa-caret-down"></i>
                             </button>
@@ -58,7 +73,8 @@
                                 <!-- /ko -->
                             </ul>
                         </div>
-                    </span>
+                    </div>
+                    </div>
                     {% include 'views/search/search-results.htm' %}
                 </div>
             </div>

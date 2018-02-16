@@ -8,6 +8,7 @@ define([
     'views/search/time-filter',
     'views/search/term-filter',
     'views/search/map-filter',
+    'views/search/provisional-filter',
     'views/search/advanced-search',
     'views/search/resource-type-filter',
     'views/resource/related-resources-manager',
@@ -15,8 +16,9 @@ define([
     'views/search/saved-searches',
     'views/base-manager',
     'view-data',
-    'search-data'
-], function($, _, ko, arches, AlertViewModel, BaseFilter, TimeFilter, TermFilter, MapFilter, AdvancedSearch, ResourceTypeFilter, RelatedResourcesManager, SearchResults, SavedSearches, BaseManagerView, viewData, searchData) {
+    'search-data',
+    'views/components/simple-switch'
+], function($, _, ko, arches, AlertViewModel, BaseFilter, TimeFilter, TermFilter, MapFilter, ProvisionalFilter, AdvancedSearch, ResourceTypeFilter, RelatedResourcesManager, SearchResults, SavedSearches, BaseManagerView, viewData, searchData) {
     // a method to track the old and new values of a subscribable
     // from https://github.com/knockout/knockout/issues/914
     //
@@ -46,6 +48,9 @@ define([
             this.filters = {};
             this.filters.termFilter = new TermFilter();
             this.filters.timeFilter = new TimeFilter({
+                termFilter: this.filters.termFilter
+            });
+            this.filters.provisionalFilter = new ProvisionalFilter({
                 termFilter: this.filters.termFilter
             });
             this.filters.resourceTypeFilter = new ResourceTypeFilter({
@@ -116,6 +121,7 @@ define([
                 this.filters.resourceTypeFilter.appendFilters(params);
                 this.filters.mapFilter.appendFilters(params);
                 this.filters.advancedFilter.appendFilters(params);
+                this.filters.provisionalFilter.appendFilters(params);
 
                 params.no_filters = !Object.keys(params).length;
                 return params;

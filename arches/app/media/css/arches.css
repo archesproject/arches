@@ -8389,6 +8389,15 @@ a.search-query-link-captions:focus {
     flex: 0 0 400px;
 }
 
+.search-inline-filters {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        margin-top: -30px;
+        float: right;
+        width: 150px;
+}
+
 .search-control-container {
     -ms-flex: 0 0 400px;
     -webkit-flex: 0 0 400px;
@@ -8500,7 +8509,6 @@ ul.pagination {
 }
 
 .resource-selector-button {
-    margin-top: -30px;
     padding-bottom: 0px;
 }
 
@@ -8675,6 +8683,11 @@ ul.pagination {
     margin-top: 0px;
     margin-bottom: 0px;
     padding: 10px 5px 0px 10px;
+}
+
+.search-listing-title.provisional-edits {
+    font-size: 12px;
+    color: #888;
 }
 
 .search-listing-body {

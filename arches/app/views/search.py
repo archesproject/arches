@@ -88,6 +88,7 @@ class SearchView(BaseManagerView):
             resource_graphs=resource_graphs,
             datatypes=datatypes,
             datatypes_json=JSONSerializer().serialize(datatypes),
+            user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
         )
 
         context['nav']['title'] = _('Search')
@@ -189,6 +190,7 @@ def search_results(request):
     dsl.include('displayname')
     dsl.include('displaydescription')
     dsl.include('map_popup')
+    dsl.include('provisional')
 
     results = dsl.search(index='resource', doc_type=get_doc_type(request))
 
@@ -242,10 +244,39 @@ def get_doc_type(request):
 
     return list(doc_type)
 
-def build_search_results_dsl(request):
+def get_provisional_type(request):
+    """
+    Parses the provisional filter data to determine if a search results will
+    include provisional (True) exclude provisional (False) or inlude only
+    provisional 'only provisional'
+    """
+
+    result = False
+    provisional_filter = JSONDeserializer().deserialize(request.GET.get('provisionalFilter', '[]'))
     user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
+    if user_is_reviewer != False:
+        if len(provisional_filter) == 0:
+            result = True
+        else:
+            inverted = provisional_filter[0]['inverted']
+            if provisional_filter[0]['provisionaltype'] == 'Provisional':
+                if inverted == False:
+                    result = 'only provisional'
+                else:
+                    result = False
+            if provisional_filter[0]['provisionaltype'] == 'Authoritative':
+                if inverted == False:
+                    result = False
+                else:
+                    result = 'only provisional'
+
+    return result
+
+def build_search_results_dsl(request):
     term_filter = request.GET.get('termFilter', '')
     spatial_filter = JSONDeserializer().deserialize(request.GET.get('mapFilter', '{}'))
+    include_provisional = get_provisional_type(request)
+
     export = request.GET.get('export', None)
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
     temporal_filter = JSONDeserializer().deserialize(request.GET.get('temporalFilter', '{}'))
@@ -264,13 +295,22 @@ def build_search_results_dsl(request):
     nested_agg = NestedAgg(path='points', name='geo_aggs')
     nested_agg_filter = FiltersAgg(name='inner')
 
-    if user_is_reviewer == False:
-        provisional_resource_filter = Bool()
-        provisional_resource_filter.filter(Terms(field='provisional', terms=['false']))
-        search_query.must(provisional_resource_filter)
-        nested_agg_filter.add_filter(Terms(field='points.provisional', terms=['false']))
-    else:
+    if include_provisional == True:
         nested_agg_filter.add_filter(Terms(field='points.provisional', terms=['false','true']))
+
+    else:
+        provisional_resource_filter = Bool()
+
+        if include_provisional == False:
+            provisional_resource_filter.filter(Terms(field='provisional', terms=['false', 'partial']))
+            nested_agg_filter.add_filter(Terms(field='points.provisional', terms=['false']))
+
+        elif include_provisional == 'only provisional':
+            provisional_resource_filter.filter(Terms(field='provisional', terms=['true', 'partial']))
+            nested_agg_filter.add_filter(Terms(field='points.provisional', terms=['true']))
+
+        search_query.must(provisional_resource_filter)
+
 
     nested_agg_filter.add_aggregation(GeoHashGridAgg(field='points.point', name='grid', precision=settings.HEX_BIN_PRECISION))
     nested_agg_filter.add_aggregation(GeoBoundsAgg(field='points.point', name='bounds'))
@@ -291,8 +331,10 @@ def build_search_results_dsl(request):
                     string_filter.should(Match(field='strings.string', query=term['value'], type='phrase_prefix'))
                     string_filter.should(Match(field='strings.string.folded', query=term['value'], type='phrase_prefix'))
 
-                if user_is_reviewer == False:
+                if include_provisional == False:
                     string_filter.must_not(Match(field='strings.provisional', query='true', type='phrase'))
+                elif include_provisional == 'only provisional':
+                    string_filter.must_not(Match(field='strings.provisional', query='false', type='phrase'))
 
                 string_filter.filter(Terms(field='strings.nodegroup_id', terms=permitted_nodegroups))
                 nested_string_filter = Nested(path='strings', query=string_filter)
@@ -307,8 +349,11 @@ def build_search_results_dsl(request):
                 conceptid_filter = Bool()
                 conceptid_filter.filter(Terms(field='domains.conceptid', terms=concept_ids))
                 conceptid_filter.filter(Terms(field='domains.nodegroup_id', terms=permitted_nodegroups))
-                if user_is_reviewer == False:
+
+                if include_provisional == False:
                     conceptid_filter.must_not(Match(field='domains.provisional', query='true', type='phrase'))
+                elif include_provisional == 'only provisional':
+                    conceptid_filter.must_not(Match(field='domains.provisional', query='false', type='phrase'))
 
                 nested_conceptid_filter = Nested(path='domains', query=conceptid_filter)
                 if term['inverted']:
@@ -340,8 +385,13 @@ def build_search_results_dsl(request):
 
             # get the nodegroup_ids that the user has permission to search
             spatial_query.filter(Terms(field='geometries.nodegroup_id', terms=permitted_nodegroups))
-            if user_is_reviewer == False:
+
+            if include_provisional == False:
                 spatial_query.filter(Terms(field='geometries.provisional', terms=['false']))
+
+            elif include_provisional == 'only provisional':
+                spatial_query.filter(Terms(field='geometries.provisional', terms=['true']))
+
             search_query.filter(Nested(path='geometries', query=spatial_query))
 
     if 'fromDate' in temporal_filter and 'toDate' in temporal_filter:
@@ -369,16 +419,26 @@ def build_search_results_dsl(request):
             date_query = Bool()
             date_query.filter(inverted_date_query)
             date_query.filter(Terms(field='dates.nodegroup_id', terms=permitted_nodegroups))
-            if user_is_reviewer == False:
+
+            if include_provisional == False:
                 date_query.filter(Terms(field='dates.provisional', terms=['false']))
+
+            elif include_provisional == 'only provisional':
+                date_query.filter(Terms(field='dates.provisional', terms=['true']))
+
             if date_nodeid:
                 date_query.filter(Term(field='dates.nodeid', term=date_nodeid))
             else:
                 date_ranges_query = Bool()
                 date_ranges_query.filter(inverted_date_ranges_query)
                 date_ranges_query.filter(Terms(field='date_ranges.nodegroup_id', terms=permitted_nodegroups))
-                if user_is_reviewer == False:
+
+                if include_provisional == False:
                     date_ranges_query.filter(Terms(field='date_ranges.provisional', terms=['false']))
+
+                elif include_provisional == 'only provisional':
+                    date_ranges_query.filter(Terms(field='date_ranges.provisional', terms=['true']))
+
                 temporal_query.should(Nested(path='date_ranges', query=date_ranges_query))
             temporal_query.should(Nested(path='dates', query=date_query))
 
@@ -386,16 +446,24 @@ def build_search_results_dsl(request):
             date_query = Bool()
             date_query.filter(Range(field='dates.date', gte=start_date.lower, lte=end_date.upper))
             date_query.filter(Terms(field='dates.nodegroup_id', terms=permitted_nodegroups))
-            if user_is_reviewer == False:
+
+            if include_provisional == False:
                 date_query.filter(Terms(field='dates.provisional', terms=['false']))
+            elif include_provisional == 'only provisional':
+                date_query.filter(Terms(field='dates.provisional', terms=['true']))
+
             if date_nodeid:
                 date_query.filter(Term(field='dates.nodeid', term=date_nodeid))
             else:
                 date_ranges_query = Bool()
                 date_ranges_query.filter(Range(field='date_ranges.date_range', gte=start_date.lower, lte=end_date.upper, relation='intersects'))
                 date_ranges_query.filter(Terms(field='date_ranges.nodegroup_id', terms=permitted_nodegroups))
-                if user_is_reviewer == False:
+
+                if include_provisional == False:
                     date_ranges_query.filter(Terms(field='date_ranges.provisional', terms=['false']))
+                if include_provisional == 'only provisional':
+                    date_ranges_query.filter(Terms(field='date_ranges.provisional', terms=['true']))
+
                 temporal_query.should(Nested(path='date_ranges', query=date_ranges_query))
             temporal_query.should(Nested(path='dates', query=date_query))
 

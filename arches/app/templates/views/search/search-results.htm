@@ -21,7 +21,12 @@
             <div class="search-listing" data-bind="event: { mouseover: mouseoverInstance, mouseout: mouseoverInstance('')}, css: {'selected': selected()}">
                 <h3 class="search-listing-title"><a class="search-candidate-title" href="" data-bind="click: $parent.viewReport.bind($parent)"><i class="search-listing-icon" data-bind="css: iconclass"></i> <span data-bind="text: displayname"></span></a></h3>
 
-                <div class="search-listing-body" data-bind="html: displaydescription"></div>
+                <!--ko if: provisional != false -->
+                <a class="search-listing-title provisional-edits pull-left" href=""><i class="fa fa-exclamation-circle"></i> {% trans "Has provisional edits" %} </a>
+                <!--/ko-->
+
+                <div class="search-listing-body" data-bind="html: displaydescription">
+                </div>
 
                 <div class="search-listing-footer">
                     {% if user|can_edit_resource_instance %}<a class="search-candidate-link" href="" data-bind="click: $parent.editResource.bind($parent)"><i class="ion-ios-refresh-empty"></i> {% trans "Edit" %} </a>{% endif %}
@@ -39,6 +44,7 @@
                         <a class="search-candidate-link unrelatable-search-result pull-right" href=""><i class="fa fa-code-fork"></i> {% trans "Cannot Be Related" %} </a>
                         <!--/ko-->
                     <!--/ko-->
+
                 </div>
             </div>
 
