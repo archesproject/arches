@@ -302,7 +302,7 @@ def build_search_results_dsl(request):
         provisional_resource_filter = Bool()
 
         if include_provisional == False:
-            provisional_resource_filter.filter(Terms(field='provisional', terms=['false']))
+            provisional_resource_filter.filter(Terms(field='provisional', terms=['false', 'partial']))
             nested_agg_filter.add_filter(Terms(field='points.provisional', terms=['false']))
 
         elif include_provisional == 'only provisional':
