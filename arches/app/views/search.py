@@ -190,6 +190,7 @@ def search_results(request):
     dsl.include('displayname')
     dsl.include('displaydescription')
     dsl.include('map_popup')
+    dsl.include('provisional')
 
     results = dsl.search(index='resource', doc_type=get_doc_type(request))
 
