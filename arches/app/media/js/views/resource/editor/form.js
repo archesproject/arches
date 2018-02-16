@@ -127,6 +127,23 @@ define([
             return data;
         },
 
+
+        /**
+         * Selects the provisional data to be used in lieu of authoritative data
+         * @memberof Form.prototype
+         * @param  {object} tile
+         * @return {null}
+         */
+        getProvisionalTile: function(tile) {
+            var result = null;
+            var edits;
+            if (tile.provisionaledits()){
+                edits = JSON.parse(tile.provisionaledits())
+                result = _.sortBy(_.pairs(edits), 'timestamp')[0][1].value
+            }
+            return koMapping.fromJS(result)
+        },
+
         /**
          * initializes a single tile object
          * @memberof Form.prototype
@@ -134,12 +151,16 @@ define([
          * @return {null}
          */
         initTile: function(tile){
+            var data = null;
             if('tiles' in tile && _.keys(tile.tiles).length > 0){
                 tile.dirty = ko.observable(false);
                 tile.isParent = true;
             }else{
                 tile.isParent = false;
+                var provisionaledit = this.getProvisionalTile(tile);
+                data = _.keys(tile.data).length === 0 ? provisionaledit : tile.data
                 tile._data = ko.observable(koMapping.toJSON(tile.data));
+                tile.data = data;
                 tile.dirty = ko.computed(function(){
                     return !_.isEqual(JSON.parse(tile._data()), JSON.parse(koMapping.toJSON(tile.data)));
                 });
@@ -153,7 +174,6 @@ define([
             this.formTiles.push(tile);
             return tile;
         },
-
         /**
          * gets a copy of a new blank tile
          * @memberof Form.prototype
