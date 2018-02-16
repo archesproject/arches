@@ -10,10 +10,21 @@ define([
             this.provisionalOptions = [{'name': 'Authoritative'},{'name': 'Provisional'}]
         },
 
-        restoreState: function(filter) {
-            return;
+        restoreState: function(query) {
+            var doQuery = false;
+            if ('provisionalFilter' in query) {
+                query.provisionalFilter = JSON.parse(query.provisionalFilter);
+                if (query.provisionalFilter.length > 0) {
+                    query.provisionalFilter.forEach(function(type){
+                        type.inverted = ko.observable(!!type.inverted);
+                        this.termFilter.addTag(type.provisionaltype, this.provisionaltype, type.inverted);
+                    }, this)
+                    this.filter(query.provisionalFilter);
+                }
+                doQuery = true;
+            }
+            return doQuery;
         },
-
 
         selectProvisional: function(item) {
             this.filter().forEach(function(val){
