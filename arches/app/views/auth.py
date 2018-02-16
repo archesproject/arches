@@ -216,19 +216,16 @@ class ChangePasswordView(View):
 @method_decorator(csrf_exempt, name='dispatch')
 class GetTokenView(View):
     def post(self, request):
-
-        """
-        the above token need to be saved in database, and a one-to-one
-        relation should exist with the username/user_pk
-        """
-
-        username = request.POST['username']
-        password = request.POST['password']
+        username = request.POST.get('username', None)
+        password = request.POST.get('password', None)
         user = authenticate(username=username, password=password)
         if user:
             expiration = int(time.time()) + timedelta(days=settings.JWT_TOKEN_EXPIRATION).total_seconds()
             token = jws.sign({'username': user.username, 'expiration':expiration}, settings.JWT_KEY, algorithm=settings.JWT_ALGORITHM)
 
-            return HttpResponse(token)
+            response = HttpResponse(token, content_type='text/plain')
         else:
-            return Http401Response(www_auth_header='Bearer')
+            response = Http401Response(www_auth_header='Bearer')
+
+        response['Access-Control-Allow-Origin'] = '*'
+        return response
