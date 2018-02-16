@@ -8694,6 +8694,12 @@ ul.pagination {
     color: #888;
 }
 
+.provisional-tile.icon {
+    padding-left: 7px;
+    font-size: 11px;
+    color: #f1b202;
+}
+
 .search-listing-body {
     height: 4.6em;
     font-size: 12px;
