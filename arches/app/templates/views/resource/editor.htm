@@ -65,7 +65,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             graph: {{graph_json}},
             relationship_types: {{ relationship_types }},
             displayName: '{{ displayname | escapejs }}',
-            resourceInstanceExists: '{{resource_instance_exists}}'
+            resourceInstanceExists: '{{resource_instance_exists}}',
+            userisreviewer: {{ user_is_reviewer }},
+            userid: '{{ userid }}'
         };
     });
     define('search-data', [], function() {
