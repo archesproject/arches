@@ -47,9 +47,9 @@ class Resource(models.ResourceInstance):
         self.tiles = []
 
     def get_descriptor(self, descriptor):
-        module = importlib.import_module('arches.app.functions.primary_descriptors')
-        PrimaryDescriptorsFunction = getattr(module, 'PrimaryDescriptorsFunction')()
-        functionConfig = models.FunctionXGraph.objects.filter(graph_id=self.graph_id, function__functiontype='primarydescriptors')
+        module = importlib.import_module('arches.app.functions.primary_descriptors_multiple')
+        PrimaryDescriptorsFunction = getattr(module, 'PrimaryDescriptorsMultipleFunction')()
+        functionConfig = models.FunctionXGraph.objects.filter(graph_id=self.graph_id, function__functiontype='primarydescriptorsmultiple')
         if len(functionConfig) == 1:
             return PrimaryDescriptorsFunction.get_primary_descriptor_from_nodes(self, functionConfig[0].config[descriptor])
         else:
@@ -66,6 +66,10 @@ class Resource(models.ResourceInstance):
     @property
     def displayname(self):
         return self.get_descriptor('name')
+    
+    @property
+    def marker(self):
+        return self.get_descriptor('marker')
 
     def save_edit(self, user={}, note='', edit_type=''):
         timestamp = datetime.datetime.now()
