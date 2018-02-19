@@ -2085,6 +2085,9 @@ INSERT INTO functions(functionid, modulename, classname, functiontype, name, des
 
 INSERT INTO functions(functionid, modulename, classname, functiontype, name, description, defaultconfig, component)
     VALUES ('60000000-0000-0000-0000-000000000002', 'required_nodes.py', 'RequiredNodesFunction', 'validation', 'Define Required Nodes', 'Define which values are required for a user to save card', '{"required_nodes":"{}"}', 'views/components/functions/required-nodes');
+INSERT INTO functions(functionid, modulename, classname, functiontype, name, description, defaultconfig, component)
+    VALUES ('60000000-0000-0000-0000-000000000003', 'primary_descriptors_multiple.py', 'PrimaryDescriptorsMultipleFunction', 'primarydescriptorsmultiple', 'Define Resource Descriptors with Multiple cards', 'Configure the name, description, marker and map popup of a resource', '{"name": {"nodegroup_id": [], "string_template": ""}, "marker": {"nodegroup_id": [], "string_template": ""}, "map_popup": {"nodegroup_id": [], "string_template": ""}, "description": {"nodegroup_id": [], "string_template": ""}}', 'views/components/functions/primary-descriptors-multiple');
+    
 
 
 
