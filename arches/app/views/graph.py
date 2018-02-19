@@ -45,7 +45,7 @@ from arches.app.views.base import BaseManagerView
 from tempfile import NamedTemporaryFile
 from guardian.shortcuts import get_perms_for_model, assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
 from rdflib import Graph as RDFGraph, RDF, RDFS
-
+import unicodedata
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -214,7 +214,8 @@ class GraphDataView(View):
         elif self.action == 'export_mapping_file':
             files_for_export = create_mapping_configuration_file(graphid)
             file_name = Graph.objects.get(graphid=graphid).name
-
+            file_name = unicodedata.normalize('NFKD', file_name.replace(" ", "_").replace("'", "").replace("/", "")).encode('ASCII', 'ignore')
+            
             buffer = StringIO()
 
             with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zip:
