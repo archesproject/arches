@@ -175,6 +175,8 @@ def search_results(request):
     dsl.include('displayname')
     dsl.include('displaydescription')
     dsl.include('map_popup')
+    dsl.include('marker')
+    
 
     results = dsl.search(index='resource', doc_type=get_doc_type(request))
 
