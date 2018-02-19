@@ -8,6 +8,7 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query
 from arches.app.datatypes.datatypes import DataTypeFactory
 from datetime import datetime
+import unicodedata
 
 
 def index_db(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE):
@@ -64,6 +65,7 @@ def index_resources_by_type(resource_types, clear_index=True, batch_size=setting
         start = datetime.now()
         resources = Resource.objects.filter(graph_id=str(resource_type))
         graph_name = models.GraphModel.objects.get(graphid=str(resource_type)).name
+        graph_name = unicodedata.normalize('NFKD', graph_name.replace(" ", "_").replace("'", "").replace("/", "")).encode('ASCII', 'ignore')
         print "Indexing resource type '{0}'".format(graph_name)
         result_summary = {'database':len(resources), 'indexed':0}
 
