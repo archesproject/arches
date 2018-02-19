@@ -103,6 +103,7 @@ define(['jquery',
                 this.total(response.results.hits.total);
                 this.results.removeAll();
                 this.userRequestedNewPage(false);
+                response.results.aggregations.geo_aggs = response.results.aggregations.geo_aggs.inner.buckets[0]
                 this.aggregations(
                     _.extend(response.results.aggregations, {
                         results: response.results.hits.hits
@@ -136,6 +137,7 @@ define(['jquery',
                         resourceinstanceid: result._source.resourceinstanceid,
                         displaydescription: result._source.displaydescription,
                         map_popup: result._source.map_popup,
+                        provisional: result._source.provisional,
                         geometries: ko.observableArray(result._source.geometries),
                         iconclass: graphdata ? graphdata.iconclass : '',
                         showrelated: this.showRelatedResources(result._source.resourceinstanceid),

@@ -71,9 +71,7 @@ class StringDataType(BaseDataType):
             tile.data[nodeid] = None
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        val = {'string': nodevalue, 'nodegroup_id': tile.nodegroup_id}
-        if provisional is not False:
-            val['provisional'] = provisional
+        val = {'string': nodevalue, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional}
         document['strings'].append(val)
 
     def transform_export_values(self, value, *args, **kwargs):
@@ -123,7 +121,7 @@ class NumberDataType(BaseDataType):
             pass
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        document['numbers'].append({'number': nodevalue, 'nodegroup_id': tile.nodegroup_id})
+        document['numbers'].append({'number': nodevalue, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
 
     def append_search_filters(self, value, node, query, request):
         try:
@@ -191,7 +189,7 @@ class DateDataType(BaseDataType):
         return value
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        document['dates'].append({'date': ExtendedDateFormat(nodevalue).lower, 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid})
+        document['dates'].append({'date': ExtendedDateFormat(nodevalue).lower, 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid, 'provisional': provisional})
 
     def append_search_filters(self, value, node, query, request):
         try:
@@ -221,14 +219,14 @@ class EDTFDataType(BaseDataType):
         def add_date_to_doc(document, edtf):
             if edtf.lower == edtf.upper:
                 if edtf.lower is not None:
-                    document['dates'].append({'date': edtf.lower, 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid})
+                    document['dates'].append({'date': edtf.lower, 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid, 'provisional': provisional})
             else:
                 dr = {}
                 if edtf.lower_fuzzy is not None:
                     dr['gte'] = edtf.lower_fuzzy
                 if edtf.upper_fuzzy is not None:
                     dr['lte'] = edtf.upper_fuzzy
-                document['date_ranges'].append({'date_range': dr, 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid})
+                document['date_ranges'].append({'date_range': dr, 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid, 'provisional': provisional})
 
         # update the indexed tile value to support adv. search
         tile.data[nodeid] = {
@@ -346,7 +344,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         return GeometryCollection(wkt_geoms)
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        document['geometries'].append({'geom':nodevalue, 'nodegroup_id': tile.nodegroup_id})
+        document['geometries'].append({'geom':nodevalue, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
         bounds = self.get_bounds_from_value(nodevalue)
         if bounds is not None:
             minx, miny, maxx, maxy = bounds
@@ -357,7 +355,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "lon": centerx,
                     "lat": centery
                 },
-                'nodegroup_id': tile.nodegroup_id
+                'nodegroup_id': tile.nodegroup_id,
+                'provisional': provisional
             })
 
     def get_bounds(self, tile, node):
@@ -1010,7 +1009,7 @@ class IIIFDrawingDataType(BaseDataType):
             if feature['properties']['type'] is not None:
                 valueid = feature['properties']['type']
                 value = models.Value.objects.get(pk=valueid)
-                document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': valueid, 'nodegroup_id': tile.nodegroup_id})
+                document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': valueid, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
 
     def get_search_terms(self, nodevalue, nodeid=None):
         terms = []
@@ -1055,7 +1054,7 @@ class DomainDataType(BaseDomainDataType):
                     domain_text = self.get_option_text(node, v)
 
         if domain_text not in document['strings'] and domain_text != None:
-            document['strings'].append({'string': domain_text, 'nodegroup_id': tile.nodegroup_id})
+            document['strings'].append({'string': domain_text, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
 
     def get_display_value(self, tile, node):
         return self.get_option_text(node, tile.data[str(node.nodeid)])
@@ -1120,7 +1119,7 @@ class DomainListDataType(BaseDomainDataType):
 
         for value in domain_text_values:
             if value not in document['strings']:
-                document['strings'].append({'string': value, 'nodegroup_id': tile.nodegroup_id})
+                document['strings'].append({'string': value, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
 
     def get_display_value(self, tile, node):
         new_values = []
@@ -1202,7 +1201,7 @@ class ResourceInstanceDataType(BaseDataType):
         resource_names = self.get_resource_names(nodevalue)
         for value in resource_names:
             if value not in document['strings']:
-                document['strings'].append({'string': value, 'nodegroup_id': tile.nodegroup_id})
+                document['strings'].append({'string': value, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
 
     def append_search_filters(self, value, node, query, request):
         try:
