@@ -5,6 +5,7 @@ import json
 import uuid
 import csv
 import zipfile
+import unicodedata
 from arches.app.models.graph import Graph
 from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
@@ -186,7 +187,8 @@ def create_mapping_configuration_file(graphid, data_dir=None):
         values['Resource to Resource Relationship Types'] = relation_concepts
 
     file_name_prefix = export_json['resource_model_name']
-
+    file_name_prefix = unicodedata.normalize('NFKD', file_name_prefix.replace(" ", "_").replace("'", "").replace("/", "")).encode('ASCII', 'ignore')
+    
     # Concept lookup file
     file_name = os.path.join('{0}_{1}.{2}'.format(file_name_prefix, 'concepts', 'json'))
     dest = StringIO()
