@@ -38,6 +38,7 @@ define([
             this.ready = ko.observable(false);
             this.formTiles = ko.observableArray();
             this.loadForm(this.formid);
+            this.user = {reviewer: data.userisreviewer, id: data.userid}
             this.expanded = ko.computed(function () {
                 var expanded = false;
                 _.each(self.formTiles(), function(tile) {
@@ -137,8 +138,9 @@ define([
         getProvisionalTile: function(tile) {
             var result = null;
             var edits;
-            if (tile.provisionaledits()){
-                edits = JSON.parse(tile.provisionaledits())
+            provisionaledits = ko.unwrap(tile.provisionaledits)
+            if (provisionaledits){
+                edits = JSON.parse(provisionaledits)
                 result = _.sortBy(_.pairs(edits), 'timestamp')[0][1].value
             }
             return koMapping.fromJS(result)
@@ -159,6 +161,9 @@ define([
                 tile.isParent = false;
                 var provisionaledit = this.getProvisionalTile(tile);
                 data = _.keys(tile.data).length === 0 ? provisionaledit : tile.data
+                if (!this.user.reviewer) {
+                    tile.data = data;
+                }
                 tile._data = ko.observable(koMapping.toJSON(tile.data));
                 tile.data = data;
                 tile.dirty = ko.computed(function(){
@@ -282,8 +287,6 @@ define([
                 this.trigger('before-update');
                 model.save(function(response, status, model){
                     if(response.status === 200){
-                        // if we had to save a parentTile
-                        // console.log(response.responseJSON)
                         if(updatingTile){
                             var updatedTileData;
                             if(savingParentTile){
@@ -299,8 +302,11 @@ define([
 
                             tile.tileid(updatedTileData.tileid);
                             tile.parenttile_id(updatedTileData.parenttile_id);
+
                             if(!!tile._data()){
-                                tile._data(JSON.stringify(updatedTileData.data));
+                                var provisionaledit = this.getProvisionalTile(response.responseJSON);
+                                var updatedData = _.keys(updatedTileData.data).length === 0 ? koMapping.toJS(provisionaledit) : updatedTileData.data
+                                tile._data(JSON.stringify(updatedData));
                             }
                         }else{
                             if(savingParentTile){
