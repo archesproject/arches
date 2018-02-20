@@ -8700,6 +8700,12 @@ ul.pagination {
     color: #f1b202;
 }
 
+.provisional-tile.icon.authoritative {
+    padding-left: 7px;
+    font-size: 11px;
+    color: #ccc;
+}
+
 .search-listing-body {
     height: 4.6em;
     font-size: 12px;

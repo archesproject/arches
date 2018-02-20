@@ -154,13 +154,20 @@ define([
          */
         initTile: function(tile){
             var data = null;
+            tile.hasAuthoritativeData = ko.observable(false)
             if('tiles' in tile && _.keys(tile.tiles).length > 0){
                 tile.dirty = ko.observable(false);
                 tile.isParent = true;
             }else{
                 tile.isParent = false;
                 var provisionaledit = this.getProvisionalTile(tile);
-                data = _.keys(tile.data).length === 0 ? provisionaledit : tile.data
+                if (_.keys(tile.data).length === 0) {
+                    data = provisionaledit;
+                } else {
+                    data = tile.data;
+                    tile.hasAuthoritativeData(true);
+                };
+                
                 if (!this.user.reviewer) {
                     tile.data = data;
                 }
