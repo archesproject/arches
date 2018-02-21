@@ -19,8 +19,6 @@ Arches allows you to make direct references to styles or layers that have been p
 
 Additionally, you can take a MapBox JSON file and place any mapbox.js layer definition in the ``layers`` section, as long as you define its source in the ``sources`` section.
 
-.. note:: One thing to be aware of when trying to cascade a WMS through a MapBox layer is that mapbox.js is `much pickier <https://github.com/mapbox/mapbox-gl-js/issues/2171>`_ about CORS than other js mapping libraries like Leaflet. To use an external WMS or tileset, you may be better off using a tileserver layer as described below.
-
 Tileserver Layers
 ``````````````````
 
@@ -78,6 +76,70 @@ Here's a full example of a tilestache file that makes a layer from data in PostG
             "write cache": false
         }
     }
+
+Tileserver WMS Layers
+`````````````````````
+
+You can easily incorporate an external Web Map Service (WMS) by using the "url template" provider. The following example will add precipitation data published by the US NOAA::
+
+    {
+        "type": "raster",
+        "layers": [{
+            "id": "NOAA-precip",
+            "type": "raster",
+            "minzoom": 0,
+            "maxzoom": 22
+         }],
+        "config": {
+          "provider":
+          {
+            "name": "url template", 
+            "template": "http://nowcoast.noaa.gov/arcgis/services/nowcoast/analysis_meteohydro_sfc_qpe_time/MapServer/WmsServer?request=GetMap&service=WMS&version=1.1.1&layers=5&styles=&srs=EPSG%3A3857&transparent=true&format=image/png&bbox=$xmin,$ymin,$xmax,$ymax&width=$width&height=$height&bboxSR=3857&size=$width,$height&imageSR=3857&f=image"
+          }
+        }
+    }
+
+To break the url template down, the base request above is
+
+``http://nowcoast.noaa.gov/arcgis/services/nowcoast/analysis_meteohydro_sfc_qpe_time/MapServer/WmsServer``
+
+and is requesting a WMS from MapServer. If you are requesting from GeoServer, the base request will probably look something like
+
+``http://example.com:8080/geoserver/wms``
+
+To the base request you must add the normal WMS arguments, in addition to a few others that TileStache requires. Luckily, TileStache handles some variables for us to make this a little easier. Depending on the service you are using, you may be able to omit some of the following, and you may need to alter the EPSG code.
+
++------------+--------------------------------------------------------------------------------------------------------------------+
+| parameter  | value                                                                                                              |
++============+====================================================================================================================+
+| request    | ``GetMap``                                                                                                         |
++------------+--------------------------------------------------------------------------------------------------------------------+
+|service     |``WMS``                                                                                                             |
++------------+--------------------------------------------------------------------------------------------------------------------+
+|version     |``1.1.1`` other versions may be available depending on the service                                                  |
++------------+--------------------------------------------------------------------------------------------------------------------+
+|layers      |``layer_name`` (in GeoServer a layer's name should be prepended with its workspace: ``workspace:layer_name``)       |
++------------+--------------------------------------------------------------------------------------------------------------------+
+|styles      |leave blank to use the service's default style                                                                      |
++------------+--------------------------------------------------------------------------------------------------------------------+
+|srs         |``EPSG:3857``                                                                                                       |
++------------+--------------------------------------------------------------------------------------------------------------------+
+|transparent |``true`` or ``false``                                                                                               |
++------------+--------------------------------------------------------------------------------------------------------------------+
+|format      |``image/png``                                                                                                       |
++------------+--------------------------------------------------------------------------------------------------------------------+
+|bbox        |``$xmin,$ymin,$xmax,$ymax``                                                                                         |
++------------+--------------------------------------------------------------------------------------------------------------------+
+|bboxSR      |``3857``                                                                                                            |
++------------+--------------------------------------------------------------------------------------------------------------------+
+|size        |``$width,$height``                                                                                                  |
++------------+--------------------------------------------------------------------------------------------------------------------+
+|imageSR     |``3857``                                                                                                            |
++------------+--------------------------------------------------------------------------------------------------------------------+
+|f           |``image``                                                                                                           |
++------------+--------------------------------------------------------------------------------------------------------------------+
+
+Finally, note that once you have loaded a tileserver layer, you can edit its configuration directly through the Django admin interface if you have staff privileges. Go to ``localhost:8000/admin`` and find your layer in the "Tileserver layers" in Models.
     
 Tileserver Mapnik Layers
 ````````````````````````
