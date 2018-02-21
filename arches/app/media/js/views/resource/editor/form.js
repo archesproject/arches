@@ -32,7 +32,10 @@ define([
             this.resourceid = options.resourceid;
             this.widgetLookup = widgets;
             this.cards = ko.observableArray([new CardModel({})]);
-            this.resourceexists = options.resourceexists
+            this.resourceexists = options.resourceexists;
+            this.selectedProvisionalTile = options.selectedProvisionalTile;
+            this.provisionalTileViewModel = options.provisionalTileViewModel;
+            this.provisionalTileViewModel.cards = this.cards;
             this.tiles = koMapping.fromJS({});
             this.blanks = koMapping.fromJS({});
             this.ready = ko.observable(false);
@@ -49,7 +52,6 @@ define([
                 return expanded;
             });
         },
-
         /**
          * asynchronously loads a form into the UI
          * @memberof Form.prototype
@@ -146,6 +148,10 @@ define([
             return koMapping.fromJS(result)
         },
 
+        loadSelectedProvisionalTile: function(tile) {
+            this.selectedProvisionalTile(tile);
+        },
+
         /**
          * initializes a single tile object
          * @memberof Form.prototype
@@ -167,7 +173,7 @@ define([
                     data = tile.data;
                     tile.hasAuthoritativeData(true);
                 };
-                
+
                 if (!this.user.reviewer) {
                     tile.data = data;
                 }

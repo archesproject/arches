@@ -5,13 +5,14 @@ require([
     'arches',
     'views/search-base-manager',
     'views/resource/editor/form-list',
+    'viewmodels/provisional-tile',
     'views/resource/editor/form',
     'models/card',
     'viewmodels/alert',
     'resource-editor-data',
     'bindings/sortable',
     'bindings/let'
-], function($, _, ko, arches, SearchBaseManagerView, FormList, FormView, CardModel, AlertViewModel, data) {
+], function($, _, ko, arches, SearchBaseManagerView, FormList, ProvisionalTileViewModel, FormView, CardModel, AlertViewModel, data) {
     var self = this;
     var loading = ko.observable(false);
     var cardLoading = ko.observable(false);
@@ -22,12 +23,24 @@ require([
     });
     formList.selectItem(formList.items()[0]);
 
+    var selectedProvisionalTile = ko.observable()
+
+    var provisionalTileViewModel = new ProvisionalTileViewModel(
+        {
+            selectedProvisionalTile: selectedProvisionalTile,
+            cardModel: CardModel,
+            graph: data.graph
+        }
+    );
+
     var formView = new FormView({
         formid: formList.items()[0].formid,
         resourceid: data.resourceid,
         tiles: data.tiles,
         blanks: data.blanks,
-        resourceexists: resourceInstanceExists
+        resourceexists: resourceInstanceExists,
+        selectedProvisionalTile: selectedProvisionalTile,
+        provisionalTileViewModel: provisionalTileViewModel
     });
 
     var loadForm = function(form) {
@@ -89,6 +102,7 @@ require([
             relationship_types: data.relationship_types,
             graph: data.graph,
             formList: formList,
+            provisionalTileViewModel: provisionalTileViewModel,
             formView: formView,
             openRelatedResources: ko.observable(false),
             rrLoaded: ko.observable(false),

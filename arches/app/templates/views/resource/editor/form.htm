@@ -91,7 +91,7 @@
                                                 } --><!-- /ko -->
                                                 <!-- ko if: innerTile.provisionaledits -->
                                                 <i class="fa fa-exclamation-triangle add-tooltip provisional-tile icon" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Show/Hide" %}' data-bind="css: {'authoritative': innerTile.hasAuthoritativeData()}"></i>
-                                                <span data-bind="text: innerTile.hasAuthoritativeData() ? '{% trans "has provisional edits" %}' : '{% trans "is provisional" %}'"></span>
+                                                <span data-bind="text: innerTile.hasAuthoritativeData() ? '{% trans "has provisional edits" %}' : '{% trans "is provisional" %}', click: function(){form.loadSelectedProvisionalTile(innerTile)}"></span>
                                                 <!-- /ko -->
                                             <!-- /ko -->
                                         </span>

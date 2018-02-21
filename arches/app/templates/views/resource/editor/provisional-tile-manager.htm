@@ -1,0 +1,35 @@
+{% load staticfiles %}
+{% load i18n %}
+
+<div style="width: 300px">
+    <div data-bind="text: provisionalTileViewModel.cat"></div>
+    <div class="library-icon" style="">
+        <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-primary">
+            <i class="" data-bind="css: 'a timestamp'"></i>
+        </span>
+    </div>
+    <div class="">
+        <!-- ko if: provisionalTileViewModel.edits().length > 0 -->
+            <!--ko foreach: {data: provisionalTileViewModel.edits, as: 'edit'} -->
+
+            <div data-bind="text:edit.user, click: function(val){console.log('cat', val, $parent.provisionalTileViewModel.card)}"></div>
+            <!-- ko foreach: { data: $parent.provisionalTileViewModel.card.get('widgets'), as: 'widget' } -->
+                <!-- ko component: {
+                    name: widget.widgetLookup[widget.get("widget_id")()].name,
+                    params: {
+                        config: {},
+                        label: widget.get("label")(),
+                        node: widget.node,
+                        value: edit.value[widget.node.nodeid],
+                        state: "report"
+                    }
+                } --><!-- /ko -->
+            <!-- /ko -->
+
+
+            <!--/ko-->
+        <!-- /ko -->
+    </div>
+    <div class="crud-card-subtitle" data-bind="text: 'a timestamp'">
+    </div>
+</div>

@@ -41,6 +41,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         {% include 'views/resource/editor/form.htm' %}
     </div>
 
+    <!--Provisional Edit Listing -->
+    <div class="right-column-crud-container provisional-edits-list">
+        {% include 'views/resource/editor/provisional-tile-manager.htm' %}
+    </div>
+
+
 </div>
 
 <div class="flex relative" data-bind="visible: openRelatedResources()">
