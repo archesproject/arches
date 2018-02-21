@@ -93,7 +93,28 @@ Or in your `docker-compose.yml` file:
 `command: run_tests run_server`
 
 ### Running Docker in Production
-When running Arches in production, be sure to set your domain name in the DOMAIN_NAMES variable in all appropriate services (Arches, Nginx and LetsEcrypt) in the `docker-compose.yml` file. Separate your domain names by spaces if you have multiple.
+When running Arches in production, be sure to set your domain name in the DOMAIN_NAMES variable in all appropriate services (Arches, Nginx and LetsEcrypt) in the `docker-compose.yml` file. Separate your domain names by spaces if you have multiple. You should also ensure your docker-compose.yml sets PRODUCTION_MODE=True as the default False setting will not issue verifyable certificates and cause your https: connections to be marked as insecure. Documentation for the letsencrypt setup can be found at https://hub.docker.com/r/cvast/cvast-letsencrypt/ an example production config appears below:
+
+    letsencrypt:
+      container_name: letsencrypt
+      image: cvast/cvast-letsencrypt:1.1
+      volumes:
+        - letsencrypt-acme-challenge:/var/www
+        - letsencrypt:/etc/letsencrypt
+        - letsencrypt-log:/var/log/letsencrypt
+      command: get_certificate
+      environment:
+        - MODE=regular
+        - FORCE_RENEWAL=False
+        - LETSENCRYPT_EMAIL=YOUR_EMAIL
+        - DOMAIN_NAMES=YOUR_DOMAIN_NAMES
+        - PRODUCTION_MODE=True
+        - PERSISTENT_MODE=True
+        - TZ=GMT
+        - FORCE_NON_ELB=True
+        - AWS_DEFAULT_REGION=YOUR_REGION - eg eu_west
+
+
 
 In order to enable https (`port 443`), scroll down to the `nginx` service in your `docker-compose.yml` and change this environment variable:  
 `NGINX_PROTOCOL=http`  
