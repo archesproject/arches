@@ -12,7 +12,6 @@ define(['knockout', 'knockout-mapping', 'arches'], function (ko, koMapping, arch
         self.card = null;
         self.edits = ko.observableArray()
         self.parseProvisionalEdits = function(editsjson){
-            console.log('edit')
             _.each(JSON.parse(editsjson), function(edit, key){
                     edit.user = key;
                     edit.tileid = self.selectedProvisionalTile().tileid();
@@ -20,26 +19,35 @@ define(['knockout', 'knockout-mapping', 'arches'], function (ko, koMapping, arch
             });
         }
 
+        self.deleteProvisionalEdit = function(val){
+            $.ajax({
+                url: arches.urls.delete_provisional_tile,
+                context: this,
+                method: 'POST',
+                dataType: 'json',
+                data: koMapping.toJS(val)
+            })
+            .done(function(data) {
+                self.edits.remove(val);
+                self.form.loadForm(self.form.formid);
+            })
+            .fail(function(data) {
+                console.log('Related resource request failed', data)
+            });
+        }
+
         self.acceptProvisionalEdit = function(val){
-            console.log(val)
+            this.selectedProvisionalTile().data = val.value
+            var tile = this.selectedProvisionalTile()
+            var cardinality = '1-' + this.card.get('cardinality')()
+            this.form.saveTile(tile, cardinality, this.selectedProvisionalTile())
+            this.form.on('after-update', function(){
+                this.deleteProvisionalEdit(val);
+            }, this)
         }
 
         self.rejectProvisionalEdit = function(val){
-            $.ajax({
-                    url: arches.urls.delete_provisional_tile,
-                    context: this,
-                    method: 'POST',
-                    dataType: 'json',
-                    data: koMapping.toJS(val)
-                })
-                .done(function(data) {
-                    console.log('done', data)
-                    self.edits.remove(val);
-                    self.form.loadForm(self.form.formid);
-                })
-                .fail(function(data) {
-                    console.log('Related resource request failed', data)
-                });
+            self.deleteProvisionalEdit(val);
         }
 
         self.selectedProvisionalTile = params.selectedProvisionalTile
