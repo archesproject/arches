@@ -36,6 +36,7 @@ define([
             this.selectedProvisionalTile = options.selectedProvisionalTile;
             this.provisionalTileViewModel = options.provisionalTileViewModel;
             this.provisionalTileViewModel.cards = this.cards;
+            this.provisionalTileViewModel.form = this;
             this.tiles = koMapping.fromJS({});
             this.blanks = koMapping.fromJS({});
             this.ready = ko.observable(false);

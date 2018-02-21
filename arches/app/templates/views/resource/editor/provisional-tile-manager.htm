@@ -11,8 +11,16 @@
     <div class="">
         <!-- ko if: provisionalTileViewModel.edits().length > 0 -->
             <!--ko foreach: {data: provisionalTileViewModel.edits, as: 'edit'} -->
+            <div class="provisional-edit">
+            <div>
+                <span>{% trans 'User: ' %}</span><span data-bind='text: edit.user'></span>
+            </div>
+            <div>
+                <span>{% trans 'Time: ' %}</span><span data-bind='text: edit.timestamp'></span>
+            </div>
+            <div>
+                <span>{% trans 'Value: ' %}</span>
 
-            <div data-bind="text:edit.user, click: function(val){console.log('cat', val, $parent.provisionalTileViewModel.card)}"></div>
             <!-- ko foreach: { data: $parent.provisionalTileViewModel.card.get('widgets'), as: 'widget' } -->
                 <!-- ko component: {
                     name: widget.widgetLookup[widget.get("widget_id")()].name,
@@ -26,6 +34,14 @@
                 } --><!-- /ko -->
             <!-- /ko -->
 
+            </div>
+            <a type="button" class="btn btn-default btn-sm" data-bind="click: function(){$parent.provisionalTileViewModel.acceptProvisionalEdit(edit)}">
+              <span class="glyphicon glyphicon-" aria-hidden="true"></span> {%  trans 'Accept' %}
+            </a>
+            <a type="button" class="btn btn-default btn-sm" data-bind="click: function(){$parent.provisionalTileViewModel.rejectProvisionalEdit(edit)}">
+              <span class="glyphicon glyphicon-" aria-hidden="true"></span> {% trans 'Decline' %}
+            </a>
+            </div>
 
             <!--/ko-->
         <!-- /ko -->

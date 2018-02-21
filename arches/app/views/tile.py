@@ -16,7 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import uuid, importlib
+import uuid, importlib, json as jsonparser
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from arches.app.models.resource import Resource
@@ -86,6 +86,26 @@ class TileData(View):
 
                     return JSONResponse(data)
 
+        if self.action == 'delete_provisional_tile':
+            data = request.POST
+            tile = Tile.objects.get(tileid = data['tileid'])
+            provisionaledits = None
+            if tile.provisionaledits is not None:
+                provisionaledits = jsonparser.loads(tile.provisionaledits)
+                if data['user'] in provisionaledits:
+                    provisionaledits.pop(data['user'])
+                    if len(provisionaledits) == 0:
+                        tile.provisionaledits = None
+                    else:
+                        tile.provisionaledits = jsonparser.dumps(provisionaledits)
+
+                    if len(tile.data) == 0 and tile.provisionaledits == None:
+                        tile.delete(request=request)
+                    else:
+                        tile.save()
+
+            return JSONResponse(provisionaledits)
+
         return HttpResponseNotFound()
 
     def delete(self, request):
@@ -107,6 +127,7 @@ class TileData(View):
                     return JSONResponse({'status':'false','message': [_('Request Failed'), _('Permission Denied')]}, status=500)
 
         return HttpResponseNotFound()
+
 
 # Move to util function
 def get(id):

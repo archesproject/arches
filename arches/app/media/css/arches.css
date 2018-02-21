@@ -5182,7 +5182,23 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .provisional-edits-list {
-    
+    width: 300px;
+    background-color: white;
+    padding: 5px;
+    border-style: solid;
+    border-color: #ccc;
+    border-width: 1px;
+    margin-top: 0px;
+}
+
+.provisional-edit {
+    padding: 5px;
+    margin-top: 7px;
+    margin-right: 12px;
+    background-color: #f1f1f1;
+    border-style: solid;
+    border-color: #ccc;
+    border-width: 1px;
 }
 
 .layer-list {
