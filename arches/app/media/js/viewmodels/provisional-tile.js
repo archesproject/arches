@@ -39,8 +39,7 @@ define(['knockout', 'knockout-mapping', 'arches'], function (ko, koMapping, arch
         self.acceptProvisionalEdit = function(val){
             this.selectedProvisionalTile().data = val.value
             var tile = this.selectedProvisionalTile()
-            var cardinality = '1-' + this.card.get('cardinality')()
-            this.form.saveTile(tile, cardinality, this.selectedProvisionalTile())
+            this.form.saveTile(this.parentTile, this.cardinality, this.selectedProvisionalTile())
             this.form.on('after-update', function(){
                 this.deleteProvisionalEdit(val);
             }, this)
@@ -50,14 +49,21 @@ define(['knockout', 'knockout-mapping', 'arches'], function (ko, koMapping, arch
             self.deleteProvisionalEdit(val);
         }
 
+        self.findCard = function(cards, nodegroupid){
+            _.each(cards, function(card) {
+                if (card.get('nodegroup_id') == nodegroupid) {
+                    this.card = card
+                }
+                if (this.card == null) {
+                    self.findCard(card.get('cards')(), nodegroupid)
+                }
+            }, self);
+        }
+
         self.selectedProvisionalTile = params.selectedProvisionalTile
         self.selectedProvisionalTile.subscribe(function(val) {
             self.edits.removeAll();
-            _.each(this.cards(), function(card) {
-                if (card.get('nodegroup_id') == val.nodegroup_id()) {
-                    this.card = card
-                }
-            }, self);
+            self.findCard(this.cards(), val.nodegroup_id())
             this.parseProvisionalEdits(val.provisionaledits());
         }, self)
     };

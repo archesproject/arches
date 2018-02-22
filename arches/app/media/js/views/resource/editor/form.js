@@ -149,8 +149,10 @@ define([
             return koMapping.fromJS(result)
         },
 
-        loadSelectedProvisionalTile: function(tile) {
+        loadSelectedProvisionalTile: function(tile, parentTile, cardinality) {
             this.selectedProvisionalTile(tile);
+            this.provisionalTileViewModel.parentTile = parentTile;
+            this.provisionalTileViewModel.cardinality = cardinality;
         },
 
         /**

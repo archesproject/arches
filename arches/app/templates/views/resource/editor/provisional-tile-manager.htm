@@ -2,12 +2,6 @@
 {% load i18n %}
 
 <div style="width: 300px">
-    <div data-bind="text: provisionalTileViewModel.cat"></div>
-    <div class="library-icon" style="">
-        <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-primary">
-            <i class="" data-bind="css: 'a timestamp'"></i>
-        </span>
-    </div>
     <div class="">
         <!-- ko if: provisionalTileViewModel.edits().length > 0 -->
             <!--ko foreach: {data: provisionalTileViewModel.edits, as: 'edit'} -->

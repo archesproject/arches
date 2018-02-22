@@ -91,7 +91,7 @@
                                                 } --><!-- /ko -->
                                                 <!-- ko if: innerTile.provisionaledits -->
                                                 <i class="fa fa-exclamation-triangle add-tooltip provisional-tile icon" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Show/Hide" %}' data-bind="css: {'authoritative': innerTile.hasAuthoritativeData()}"></i>
-                                                <span data-bind="text: innerTile.hasAuthoritativeData() ? '{% trans "has provisional edits" %}' : '{% trans "is provisional" %}', click: function(){form.loadSelectedProvisionalTile(innerTile)}"></span>
+                                                <span data-bind="text: innerTile.hasAuthoritativeData() ? '{% trans "has provisional edits" %}' : '{% trans "is provisional" %}', click: function(){form.loadSelectedProvisionalTile(innerTile, parentTile, cardinality)}"></span>
                                                 <!-- /ko -->
                                             <!-- /ko -->
                                         </span>
@@ -181,10 +181,14 @@
                                 <!-- Form -->
                                 <div data-bind="with: form.getFormEditingContext(outerCard, card, parentTile)" >
                                     <div class="card-form-container" data-bind="let: {'tile': $data}">
-
+                                        <!-- ko if: tile.provisionaledits -->
+                                        <i class="fa fa-exclamation-triangle add-tooltip provisional-tile icon" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Show/Hide" %}' data-bind="css: {'authoritative': tile.hasAuthoritativeData()}"></i>
+                                        <span data-bind="text: tile.hasAuthoritativeData() ? '{% trans "has provisional edits" %}' : '{% trans "is provisional" %}', click: function(){form.loadSelectedProvisionalTile(tile, parentTile, cardinality)}"></span>
+                                        <!-- /ko -->
                                         <form class="widgets" style="margin-bottom: 20px;" data-bind="foreach: {
                                                 data:card.get('widgets'), as: 'widget'
                                             }">
+
                                             <div class='' data-bind='component: {
                                                 name: form.widgetLookup[widget.get("widget_id")()].name,
                                                 params: {
