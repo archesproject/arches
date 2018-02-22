@@ -5182,7 +5182,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .provisional-edits-list {
-    width: 300px;
+    width: 0px;
     background-color: white;
     padding: 5px;
     border-style: solid;
@@ -5191,13 +5191,35 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     margin-top: 0px;
 }
 
+.provisional-edits-list-header {
+    display: inline-flex;
+    width: 100%;
+    justify-content: baseline;
+    margin: 0px;
+}
+
+.provisional-edits-list-header span {
+    padding-left: 8px;
+}
+
+.provisional-edits-list.expanded {
+    width: 300px;
+    transition: all .30s ease;
+    padding: 8px;
+}
+
+.provisional-edits-list.closed {
+    width: 0px;
+    transition: all .30s ease;
+    padding: 0px
+}
+
 .provisional-edit {
     padding: 5px;
     margin-top: 7px;
-    margin-right: 12px;
-    background-color: #f1f1f1;
+    background-color: #fafafa;
     border-style: solid;
-    border-color: #ccc;
+    border-color: #f1f1f1;
     border-width: 1px;
 }
 

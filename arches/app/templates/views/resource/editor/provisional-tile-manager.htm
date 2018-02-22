@@ -1,9 +1,10 @@
 {% load staticfiles %}
 {% load i18n %}
 
-<div style="width: 300px">
+<div>
     <div class="">
         <!-- ko if: provisionalTileViewModel.edits().length > 0 -->
+            <h4 class='provisional-edits-list-header ep-form-toolbar-title'><div data-bind="text: provisionalTileViewModel.card.get('name')()"></div><span>{% trans 'Provisional Edits' %}</span></h4>
             <!--ko foreach: {data: provisionalTileViewModel.edits, as: 'edit'} -->
             <div class="provisional-edit">
             <div>
@@ -29,10 +30,10 @@
             <!-- /ko -->
 
             </div>
-            <a type="button" class="btn btn-default btn-sm" data-bind="click: function(){$parent.provisionalTileViewModel.acceptProvisionalEdit(edit)}">
+            <a type="button" class="btn btn-default btn-sm btn-mint" data-bind="click: function(){$parent.provisionalTileViewModel.acceptProvisionalEdit(edit)}">
               <span class="glyphicon glyphicon-" aria-hidden="true"></span> {%  trans 'Accept' %}
             </a>
-            <a type="button" class="btn btn-default btn-sm" data-bind="click: function(){$parent.provisionalTileViewModel.rejectProvisionalEdit(edit)}">
+            <a type="button" class="btn btn-default btn-sm btn-danger" data-bind="click: function(){$parent.provisionalTileViewModel.rejectProvisionalEdit(edit)}">
               <span class="glyphicon glyphicon-" aria-hidden="true"></span> {% trans 'Decline' %}
             </a>
             </div>

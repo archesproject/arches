@@ -42,7 +42,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </div>
 
     <!--Provisional Edit Listing -->
-    <div class="right-column-crud-container provisional-edits-list">
+    <div class="right-column-crud-container provisional-edits-list" data-bind="css: {'expanded': provisionalTileViewModel.edits().length > 0, 'closed': provisionalTileViewModel.edits().length == 0}">
         {% include 'views/resource/editor/provisional-tile-manager.htm' %}
     </div>
 

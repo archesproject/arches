@@ -150,9 +150,15 @@ define([
         },
 
         loadSelectedProvisionalTile: function(tile, parentTile, cardinality) {
-            this.selectedProvisionalTile(tile);
-            this.provisionalTileViewModel.parentTile = parentTile;
-            this.provisionalTileViewModel.cardinality = cardinality;
+            if (tile === this.selectedProvisionalTile()) {
+                this.selectedProvisionalTile(null);
+                this.provisionalTileViewModel.parentTile = null;
+                this.provisionalTileViewModel.cardinality = null;
+            } else {
+                this.selectedProvisionalTile(tile);
+                this.provisionalTileViewModel.parentTile = parentTile;
+                this.provisionalTileViewModel.cardinality = cardinality;
+            }
         },
 
         /**
@@ -338,6 +344,7 @@ define([
                     }
                     this.trigger('after-update', response, tile);
                     this.resourceexists(true);
+                    tile.provisionaledits.valueHasMutated()
                 }, this, tile.formData);
             }
         },
