@@ -116,17 +116,22 @@ class TileData(View):
 
             with transaction.atomic():
                 tile = Tile.objects.get(tileid = data['tileid'])
-                if tile.filter_by_perm(request.user, 'delete_nodegroup'):
-                    nodegroup = models.NodeGroup.objects.get(pk=tile.nodegroup_id)
-                    clean_resource_cache(tile)
-                    tile.delete(request=request)
-                    tile.after_update_all()
-                    update_system_settings_cache(tile)
-                    return JSONResponse(tile)
+                user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
+                if user_is_reviewer or tile.is_provisional() == True:
+                    if tile.filter_by_perm(request.user, 'delete_nodegroup'):
+                        nodegroup = models.NodeGroup.objects.get(pk=tile.nodegroup_id)
+                        clean_resource_cache(tile)
+                        tile.delete(request=request)
+                        tile.after_update_all()
+                        update_system_settings_cache(tile)
+                        return JSONResponse(tile)
+                    else:
+                        return JSONResponse({'status':'false','message': [_('Request Failed'), _('Permission Denied')]}, status=500)
                 else:
-                    return JSONResponse({'status':'false','message': [_('Request Failed'), _('Permission Denied')]}, status=500)
+                    return JSONResponse({'status':'false','message': [_('Request Failed'), _('You do not have permissions to delete a tile with authoritative data.')]}, status=500)
 
         return HttpResponseNotFound()
+
 
 
 # Move to util function
