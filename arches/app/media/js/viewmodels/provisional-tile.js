@@ -12,6 +12,7 @@ define(['knockout', 'knockout-mapping', 'moment', 'arches'], function (ko, koMap
         self.card = null;
         self.edits = ko.observableArray()
         self.users = []
+        self.selectedForm = params.selectedForm;
         self.parseProvisionalEdits = function(editsjson){
             _.each(JSON.parse(editsjson), function(edit, key){
                     self.users.push(key);
@@ -33,7 +34,7 @@ define(['knockout', 'knockout-mapping', 'moment', 'arches'], function (ko, koMap
             })
             .done(function(data) {
                 self.edits.remove(val);
-                self.form.loadForm(self.form.formid);
+                self.form.loadForm(self.selectedForm());
             })
             .fail(function(data) {
                 console.log('Related resource request failed', data)

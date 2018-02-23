@@ -16,6 +16,7 @@ require([
     var self = this;
     var loading = ko.observable(false);
     var cardLoading = ko.observable(false);
+    var selectedForm = ko.observable();
     var displayName = ko.observable(data.displayName);
     var resourceInstanceExists = ko.observable(data.resourceInstanceExists === "True" || false)
     var formList = new FormList({
@@ -29,7 +30,7 @@ require([
         {
             selectedProvisionalTile: selectedProvisionalTile,
             cardModel: CardModel,
-            graph: data.graph
+            selectedForm: selectedForm
         }
     );
 
@@ -45,6 +46,7 @@ require([
 
     var loadForm = function(form) {
         cardLoading(true);
+        selectedForm(form.formid)
         formView.loadForm(form.formid, function(){
             cardLoading(false);
         });
