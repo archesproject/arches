@@ -179,7 +179,11 @@ define([
                 if (_.keys(tile.data).length === 0) {
                     data = provisionaledit;
                 } else {
-                    data = tile.data;
+                    if (this.user.reviewer || ko.unwrap(provisionaledit) == null) {
+                        data = tile.data;
+                    } else {
+                        data = provisionaledit
+                    }
                     tile.hasAuthoritativeData(true);
                 };
 
