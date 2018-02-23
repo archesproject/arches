@@ -85,6 +85,9 @@ define(['knockout', 'knockout-mapping', 'moment', 'arches'], function (ko, koMap
 
         self.selectedProvisionalTile = params.selectedProvisionalTile
         self.selectedProvisionalTile.subscribe(function(val) {
+            if (!self.selectedForm()) {
+                self.selectedForm(self.form.formid)
+            };
             self.edits.removeAll();
             if (val) {
                 self.card = null;
