@@ -14,24 +14,17 @@ git clone -b master https://github.com/archesproject/arches.git /home/ubuntu/arc
 virtualenv /home/ubuntu/ENV
 source /home/ubuntu/ENV/bin/activate
 
-cd /home/ubuntu/arches
-python setup.py install
+pip install arches --no-binary :all:
+
+arches-project create arches_dev
+cd /home/ubuntu/arches_dev/arches_dev
 yarn install
+cd /home/ubuntu/arches_dev
+cp /home/ubuntu/settings_local.py /home/ubuntu/arches_dev/arches_dev
 
-python manage.py packages -o setup
+sudo chown ubuntu:ubuntu /home/ubuntu/arches_dev/arches_dev/arches.log
 
-cp /home/ubuntu/settings_local.py /home/ubuntu/arches/arches
-
-sudo chown ubuntu:ubuntu /home/ubuntu/arches/arches/arches.log
-
-python manage.py packages -o setup_db
-python manage.py packages -o import_reference_data -s arches/db/schemes/arches_concept_scheme.rdf -ow overwrite -st keep
-python manage.py packages -o import_reference_data -s arches/db/schemes/arches_concept_collections.rdf -ow overwrite -st keep
-python manage.py packages -o import_graphs
-python manage.py packages -o import_business_data -s /home/ubuntu/arches/tests/fixtures/data/csv/heritage_resource_model.csv -ow overwrite
-python manage.py packages -o import_business_data_relations -s /home/ubuntu/arches/tests/fixtures/data/csv/heritage_resource_model.relations
-python manage.py packages -o add_tileserver_layer -m arches/tileserver/hillshade.xml -n hillshade
-python manage.py packages -o add_tileserver_layer -m arches/tileserver/world.xml -n world
+python manage.py packages -o load_package -s https://github.com/archesproject/arches4-example-pkg/archive/master.zip -db true
 
 python manage.py collectstatic --noinput
 sudo chown www-data:www-data /home/ubuntu/arches/arches/arches.log
