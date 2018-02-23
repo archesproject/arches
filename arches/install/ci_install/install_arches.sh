@@ -16,6 +16,7 @@ source /home/ubuntu/ENV/bin/activate
 
 pip install arches --no-binary :all:
 
+cd /home/ubuntu
 arches-project create arches_dev
 cd /home/ubuntu/arches_dev/arches_dev
 yarn install
