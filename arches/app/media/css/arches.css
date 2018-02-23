@@ -8763,6 +8763,10 @@ ul.pagination {
     color: #f1b202;
 }
 
+.provisional-tile.icon.submitted {
+    color: green;
+}
+
 .provisional-tile.icon.authoritative {
     padding-left: 7px;
     font-size: 11px;

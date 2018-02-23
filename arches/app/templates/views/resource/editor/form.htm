@@ -88,11 +88,19 @@
                                                         state: "display_value"
                                                     }
                                                 } --><!-- /ko -->
-                                                <!-- ko if: innerTile.provisionaledits -->
-                                                <i class="fa fa-exclamation-triangle add-tooltip provisional-tile icon" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Show/Hide" %}' data-bind="css: {'authoritative': innerTile.hasAuthoritativeData()}"></i>
-                                                <span data-bind="text: innerTile.hasAuthoritativeData() ? '{% trans "has provisional edits" %}' : '{% trans "is provisional" %}'"></span>
-                                                    <!-- ko if: form.user.reviewer -->
-                                                    <span  class="provisional-tile qa-btn" data-bind="text: innerTile === form.selectedProvisionalTile() ? '{% trans "End QA" %}' : '{% trans "Start QA" %}', click: function(){form.loadSelectedProvisionalTile(innerTile, parentTile, cardinality)}, clickBubble: false"></span>
+
+                                                <!-- ko if: form.user.reviewer == true -->
+                                                    <!-- ko if: innerTile.provisionaledits() && innerTile.modified() == false -->
+                                                    <i class="fa fa-exclamation-triangle add-tooltip provisional-tile icon" data-placement="bottom" data-toggle="tooltip" data-bind="css: {'authoritative': innerTile.hasAuthoritativeData()}"></i>
+                                                    <span data-bind="text: innerTile.hasAuthoritativeData() ? '{% trans "has provisional edits" %}' : '{% trans "is provisional" %}'"></span>
+                                                        <span class="provisional-tile qa-btn" data-bind="text: innerTile === form.selectedProvisionalTile() ? '{% trans "End QA" %}' : '{% trans "Start QA" %}', click: function(){form.loadSelectedProvisionalTile(innerTile, parentTile, cardinality)}, clickBubble: false"></span>
+                                                    <!-- /ko -->
+                                                <!-- /ko -->
+
+                                                <!-- ko if: form.user.reviewer == false -->
+                                                    <!-- ko if: innerTile.modified() || innerTile.provisionaledits() -->
+                                                    <i class="fa fa-check-circle add-tooltip provisional-tile icon submitted" data-placement="bottom" data-toggle="tooltip"></i>
+                                                    <span data-bind="text: '{% trans "Your changes have been submitted for review!" %}'"></span>
                                                     <!-- /ko -->
                                                 <!-- /ko -->
                                             <!-- /ko -->
@@ -183,13 +191,21 @@
                                 <!-- Form -->
                                 <div data-bind="with: form.getFormEditingContext(outerCard, card, parentTile)" >
                                     <div class="card-form-container" data-bind="let: {'tile': $data}">
-                                        <!-- ko if: tile.provisionaledits -->
-                                        <i class="fa fa-exclamation-triangle add-tooltip provisional-tile icon" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Show/Hide" %}' data-bind="css: {'authoritative': tile.hasAuthoritativeData()}"></i>
+                                        <!-- ko if: form.user.reviewer == true -->
+                                        <!-- ko if: tile.provisionaledits() -->
+                                        <i class="fa fa-exclamation-triangle add-tooltip provisional-tile icon" data-placement="bottom" data-toggle="tooltip" data-bind="css: {'authoritative': tile.hasAuthoritativeData()}"></i>
                                         <span data-bind="text: tile.hasAuthoritativeData() ? '{% trans "has provisional edits" %}' : '{% trans "is provisional" %}'"></span>
-                                            <!-- ko if: form.user.reviewer -->
                                             <span class="provisional-tile qa-btn" data-bind="text: tile === form.selectedProvisionalTile() ? '{% trans "End QA" %}' : '{% trans "Start QA" %}', click: function(){form.loadSelectedProvisionalTile(tile, parentTile, cardinality)}, clickBubble: false"></span>
-                                            <!-- /ko -->
                                         <!-- /ko -->
+                                        <!-- /ko -->
+
+                                        <!-- ko if: form.user.reviewer == false -->
+                                        <!-- ko if: tile.modified() || tile.provisionaledits() -->
+                                        <i class="fa fa-check-circle add-tooltip provisional-tile icon submitted" data-placement="bottom" data-toggle="tooltip"></i>
+                                        <span data-bind="text: '{% trans "Your changes have been submitted for review" %}'"></span>
+                                        <!-- /ko -->
+                                        <!-- /ko -->
+
                                         <form class="widgets" style="margin-bottom: 20px;" data-bind="foreach: {
                                                 data:card.get('widgets'), as: 'widget'
                                             }">

@@ -67,6 +67,7 @@ require([
     formView.on('before-update', function(){
         cardLoading(true);
     });
+
     formView.on('after-update', function(response){
         cardLoading(false);
         var updateDisplayName = function(){

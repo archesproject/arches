@@ -192,6 +192,7 @@ define([
                 tile.dirty = ko.computed(function(){
                     return !_.isEqual(JSON.parse(tile._data()), JSON.parse(koMapping.toJSON(tile.data)));
                 });
+                tile.modified = ko.observable(false)
             }
             if(!!tile.tiles){
                 this.initTiles(tile.tiles);
@@ -335,6 +336,7 @@ define([
                                     updatedData = koMapping.toJS(provisionaledit)
                                 }
                                 tile._data(JSON.stringify(updatedData));
+                                tile.modified(true);
                             }
                         }else{
                             if(savingParentTile){
