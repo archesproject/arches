@@ -5183,8 +5183,8 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .provisional-edits-list {
     width: 0px;
-    background-color: white;
-    padding: 5px;
+    background-color: #f0f0f0;
+    padding: 0px;
     border-style: solid;
     border-color: #ccc;
     border-width: 1px;
@@ -5194,18 +5194,22 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 .provisional-edits-list-header {
     display: inline-flex;
     width: 100%;
-    justify-content: baseline;
-    margin: 0px;
+    align-items: center;
+    background-color: #f8f8f8;
+    height: 35px;
+    margin-top: 0px;
+    margin-bottom:1px;
 }
 
 .provisional-edits-list-header span {
-    padding-left: 8px;
+    padding-left: 4px;
+
 }
 
 .provisional-edits-list.expanded {
-    width: 300px;
+    width: 350px;
     transition: all .30s ease;
-    padding: 8px;
+    padding: 0px;
 }
 
 .provisional-edits-list.closed {
@@ -5215,12 +5219,23 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .provisional-edit {
-    padding: 5px;
-    margin-top: 7px;
+    padding: 15px;
     background-color: #fafafa;
-    border-style: solid;
-    border-color: #f1f1f1;
-    border-width: 1px;
+}
+
+.rp-report-tile.provisional-edit-cards {
+    padding-left: 0px;
+    padding-bottom: 0px;
+}
+
+
+.provisional-edit .content-title {
+    font-weight: 600;
+}
+
+.provisional-edit-cards dd {
+    position: relative;
+    padding-left: 15px;
 }
 
 .layer-list {
@@ -8738,6 +8753,8 @@ ul.pagination {
 
 .provisional-tile.qa-btn {
     float: right;
+    margin-right: 30px;
+    margin-top: 3px;
 }
 
 .provisional-tile.icon {
