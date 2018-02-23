@@ -146,12 +146,9 @@ class Tile(models.TileModel):
         """
 
         result = False
-        if self.provisionaledits is not None:
-            provisionaledits = JSONDeserializer().deserialize(self.provisionaledits)
-            for user, edit in provisionaledits.iteritems():
-                if edit['status'] != 'approved' and edit['action'] == 'create':
-                    result = True
-                    break
+        if self.provisionaledits is not None and len(self.data) == 0:
+            result = True
+
         return result
 
     def user_owns_provisional(self, user):
