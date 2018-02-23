@@ -11,9 +11,12 @@ define(['knockout', 'knockout-mapping', 'arches'], function (ko, koMapping, arch
         var self = this;
         self.card = null;
         self.edits = ko.observableArray()
+        self.users = []
         self.parseProvisionalEdits = function(editsjson){
             _.each(JSON.parse(editsjson), function(edit, key){
+                    self.users.push(key);
                     edit.user = key;
+                    edit.username = '';
                     edit.tileid = self.selectedProvisionalTile().tileid();
                     self.edits.push(koMapping.fromJS(edit))
             });
@@ -33,6 +36,25 @@ define(['knockout', 'knockout-mapping', 'arches'], function (ko, koMapping, arch
             })
             .fail(function(data) {
                 console.log('Related resource request failed', data)
+            });
+        }
+
+        self.getUserNames = function(edits){
+            $.ajax({
+                url: arches.urls.get_user_names,
+                context: this,
+                method: 'POST',
+                data: { userids: this.users },
+                dataType: 'json'
+            })
+            .done(function(data) {
+                _.each(this.edits(), function(edit) {
+                    edit.username(data[edit.user()])
+                })
+                console.log(koMapping.toJS(this.edits))
+            })
+            .fail(function(data) {
+                console.log('User name request failed', data)
             });
         }
 
@@ -66,6 +88,7 @@ define(['knockout', 'knockout-mapping', 'arches'], function (ko, koMapping, arch
             if (val) {
                 self.findCard(this.cards(), val.nodegroup_id())
                 this.parseProvisionalEdits(val.provisionaledits());
+                this.getUserNames(self.edits())
             }
         }, self)
     };

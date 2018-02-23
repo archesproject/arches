@@ -40,9 +40,8 @@ class Form(object):
             other_users_tiles_provisional_tiles = []
             if user_is_reviewer == False:
                 for tile in tiles:
-                    if len(tile.data) == 0:
-                        if tile.user_owns_provisional(user) == False:
-                            other_users_tiles_provisional_tiles.append(str(tile.tileid))
+                    if len(tile.data) == 0 and tile.provisionaledits is not None and tile.user_owns_provisional(user) == False:
+                                other_users_tiles_provisional_tiles.append(str(tile.tileid))
             tiles = tiles.exclude(pk__in=other_users_tiles_provisional_tiles)
 
         # get the form and card data

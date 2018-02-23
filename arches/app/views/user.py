@@ -35,6 +35,7 @@ from arches.app.utils.forms import ArchesUserProfileForm
 from arches.app.utils.response import JSONResponse
 
 class UserManagerView(BaseManagerView):
+    action = ''
 
     def get_last_login(self, date):
         result = _("Not yet logged in")
@@ -96,6 +97,13 @@ class UserManagerView(BaseManagerView):
             return render(request, 'views/user-profile-manager.htm', context)
 
     def post(self, request):
+
+        if self.action == 'get_user_names':
+            data = {}
+            if self.request.user.is_authenticated() and request.user.groups.filter(name='Resource Reviewer').exists():
+                userids = [str(id) for id in request.POST.get('userids[]', [])]
+                data = {u.id:u.username for u in User.objects.filter(id__in=userids)}
+                return JSONResponse(data)
 
         if self.request.user.is_authenticated() and self.request.user.username != 'anonymous':
 

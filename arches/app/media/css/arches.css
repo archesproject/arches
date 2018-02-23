@@ -8736,6 +8736,10 @@ ul.pagination {
     color: #888;
 }
 
+.provisional-tile.qa-btn {
+    float: right;
+}
+
 .provisional-tile.icon {
     padding-left: 7px;
     font-size: 11px;

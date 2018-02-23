@@ -186,6 +186,7 @@ define([
                 if (!this.user.reviewer) {
                     tile.data = data;
                 }
+
                 tile._data = ko.observable(koMapping.toJSON(tile.data));
                 tile.data = data;
                 tile.dirty = ko.computed(function(){
@@ -327,7 +328,12 @@ define([
 
                             if(!!tile._data()){
                                 var provisionaledit = this.getProvisionalTile(response.responseJSON);
-                                var updatedData = _.keys(updatedTileData.data).length === 0 ? koMapping.toJS(provisionaledit) : updatedTileData.data
+                                var updatedData;
+                                if (this.user.reviewer) {
+                                    updatedData = _.keys(updatedTileData.data).length === 0 ? koMapping.toJS(provisionaledit) : updatedTileData.data
+                                } else {
+                                    updatedData = koMapping.toJS(provisionaledit)
+                                }
                                 tile._data(JSON.stringify(updatedData));
                             }
                         }else{
@@ -344,7 +350,6 @@ define([
                     }
                     this.trigger('after-update', response, tile);
                     this.resourceexists(true);
-                    tile.provisionaledits.valueHasMutated()
                 }, this, tile.formData);
             }
         },
