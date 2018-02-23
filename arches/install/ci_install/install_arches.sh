@@ -14,7 +14,9 @@ git clone -b master https://github.com/archesproject/arches.git /home/ubuntu/arc
 virtualenv /home/ubuntu/ENV
 source /home/ubuntu/ENV/bin/activate
 
-pip install arches --no-binary :all:
+cd /home/ubuntu/arches
+pip install -e . --no-binary :all:
+pip install -r arches/install/requirements.txt
 
 cd /home/ubuntu
 arches-project create arches_dev
