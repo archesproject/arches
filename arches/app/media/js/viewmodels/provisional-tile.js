@@ -86,6 +86,7 @@ define(['knockout', 'knockout-mapping', 'moment', 'arches'], function (ko, koMap
         self.selectedProvisionalTile.subscribe(function(val) {
             self.edits.removeAll();
             if (val) {
+                self.card = null;
                 self.findCard(this.cards(), val.nodegroup_id())
                 this.parseProvisionalEdits(val.provisionaledits());
                 this.getUserNames(self.edits())
