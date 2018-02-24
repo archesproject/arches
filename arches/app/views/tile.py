@@ -105,7 +105,7 @@ class TileData(View):
 
         if self.action == 'delete_provisional_tile':
             data = request.POST
-            if 'tiles' in data:
+            if 'tileid' in data:
                 provisionaledits = self.delete_provisional_tile(data)
                 return JSONResponse(provisionaledits)
 
