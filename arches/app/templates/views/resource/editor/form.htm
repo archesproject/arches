@@ -160,6 +160,9 @@
                                             <!-- ko if: innerTile.hasAuthoritativeData() && form.user.reviewer == true -->
                                             <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, parentTile, innerTile)">{% trans "Cancel!" %}</button>
                                             <!-- /ko -->
+                                            <!-- ko if: innerTile.hasAuthoritativeData() == false && form.user.reviewer == false -->
+                                            <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, parentTile, innerTile)">{% trans "Cancel!" %}</button>
+                                            <!-- /ko -->
                                             <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: form.saveTile.bind(form, parentTile, cardinality)">{% trans "Save" %}</button>
                                         </div>
                                         <!-- /ko -->
