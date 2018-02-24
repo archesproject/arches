@@ -365,6 +365,7 @@ def build_search_results_dsl(request):
                     search_query.filter(nested_conceptid_filter)
 
     if 'features' in spatial_filter:
+
         if len(spatial_filter['features']) > 0:
             feature_geom = spatial_filter['features'][0]['geometry']
             feature_properties = spatial_filter['features'][0]['properties']

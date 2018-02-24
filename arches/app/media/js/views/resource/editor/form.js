@@ -3,6 +3,7 @@ define([
     'backbone',
     'knockout',
     'knockout-mapping',
+    'moment',
     'arches',
     'widgets',
     'models/card',
@@ -13,7 +14,7 @@ define([
     'bindings/let',
     'bindings/sortable',
     //'plugins/ko-reactor.min'
-], function($, Backbone, ko, koMapping, arches, widgets, CardModel, TileModel, GraphModel, data) {
+], function($, Backbone, ko, koMapping, moment, arches, widgets, CardModel, TileModel, GraphModel, data) {
     var FormView = Backbone.View.extend({
         /**
         * A backbone view representing a card form preview
@@ -32,12 +33,17 @@ define([
             this.resourceid = options.resourceid;
             this.widgetLookup = widgets;
             this.cards = ko.observableArray([new CardModel({})]);
-            this.resourceexists = options.resourceexists
+            this.resourceexists = options.resourceexists;
+            this.selectedProvisionalTile = options.selectedProvisionalTile;
+            this.provisionalTileViewModel = options.provisionalTileViewModel;
+            this.provisionalTileViewModel.cards = this.cards;
+            this.provisionalTileViewModel.form = this;
             this.tiles = koMapping.fromJS({});
             this.blanks = koMapping.fromJS({});
             this.ready = ko.observable(false);
             this.formTiles = ko.observableArray();
             this.loadForm(this.formid);
+            this.user = {reviewer: data.userisreviewer, id: data.userid}
             this.expanded = ko.computed(function () {
                 var expanded = false;
                 _.each(self.formTiles(), function(tile) {
@@ -48,7 +54,6 @@ define([
                 return expanded;
             });
         },
-
         /**
          * asynchronously loads a form into the UI
          * @memberof Form.prototype
@@ -127,6 +132,42 @@ define([
             return data;
         },
 
+
+        /**
+         * Selects the provisional data to be used in lieu of authoritative data
+         * @memberof Form.prototype
+         * @param  {object} tile
+         * @return {null}
+         */
+        getProvisionalTile: function(tile) {
+            var result = null;
+            var edits;
+            provisionaledits = ko.unwrap(tile.provisionaledits)
+            if (provisionaledits){
+                edits = JSON.parse(provisionaledits)
+                if (this.user.reviewer) {
+                    result = _.sortBy(_.pairs(edits), function(val){ return moment(val.timestamp) })[0][1].value
+                } else {
+                    if (edits[this.user.id]) {
+                        result = edits[this.user.id].value
+                    }
+                }
+            }
+            return koMapping.fromJS(result)
+        },
+
+        loadSelectedProvisionalTile: function(tile, parentTile, cardinality) {
+            if (tile === this.selectedProvisionalTile()) {
+                this.selectedProvisionalTile(null);
+                this.provisionalTileViewModel.parentTile = null;
+                this.provisionalTileViewModel.cardinality = null;
+            } else {
+                this.selectedProvisionalTile(tile);
+                this.provisionalTileViewModel.parentTile = parentTile;
+                this.provisionalTileViewModel.cardinality = cardinality;
+            }
+        },
+
         /**
          * initializes a single tile object
          * @memberof Form.prototype
@@ -134,15 +175,38 @@ define([
          * @return {null}
          */
         initTile: function(tile){
+            var data = null;
+            tile.hasAuthoritativeData = ko.observable(false)
             if('tiles' in tile && _.keys(tile.tiles).length > 0){
                 tile.dirty = ko.observable(false);
                 tile.isParent = true;
             }else{
                 tile.isParent = false;
+                tile.userHasProvisionalEdits = false;
+                var provisionaledit = this.getProvisionalTile(tile);
+                if (_.keys(tile.data).length === 0) {
+                    data = provisionaledit;
+                    tile.userHasProvisionalEdits = true;
+                } else {
+                    if (this.user.reviewer || ko.unwrap(provisionaledit) == null) {
+                        data = tile.data;
+                    } else {
+                        data = provisionaledit
+                        tile.userHasProvisionalEdits = true;
+                    }
+                    tile.hasAuthoritativeData(true);
+                };
+
+                if (!this.user.reviewer) {
+                    tile.data = data;
+                }
+
                 tile._data = ko.observable(koMapping.toJSON(tile.data));
+                tile.data = data;
                 tile.dirty = ko.computed(function(){
                     return !_.isEqual(JSON.parse(tile._data()), JSON.parse(koMapping.toJSON(tile.data)));
                 });
+                tile.modified = ko.observable(false)
             }
             if(!!tile.tiles){
                 this.initTiles(tile.tiles);
@@ -153,7 +217,6 @@ define([
             this.formTiles.push(tile);
             return tile;
         },
-
         /**
          * gets a copy of a new blank tile
          * @memberof Form.prototype
@@ -262,8 +325,6 @@ define([
                 this.trigger('before-update');
                 model.save(function(response, status, model){
                     if(response.status === 200){
-                        // if we had to save a parentTile
-                        // console.log(response.responseJSON)
                         if(updatingTile){
                             var updatedTileData;
                             if(savingParentTile){
@@ -279,8 +340,17 @@ define([
 
                             tile.tileid(updatedTileData.tileid);
                             tile.parenttile_id(updatedTileData.parenttile_id);
+
                             if(!!tile._data()){
-                                tile._data(JSON.stringify(updatedTileData.data));
+                                var provisionaledit = this.getProvisionalTile(response.responseJSON);
+                                var updatedData;
+                                if (this.user.reviewer) {
+                                    updatedData = _.keys(updatedTileData.data).length === 0 ? koMapping.toJS(provisionaledit) : updatedTileData.data
+                                } else {
+                                    updatedData = koMapping.toJS(provisionaledit)
+                                }
+                                tile._data(JSON.stringify(updatedData));
+                                tile.modified(true);
                             }
                         }else{
                             if(savingParentTile){

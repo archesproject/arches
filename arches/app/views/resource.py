@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import uuid
+import json
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseNotFound
 from django.http import HttpResponse
@@ -149,7 +150,9 @@ class ResourceEditorView(BaseManagerView):
                 resource_cards=JSONSerializer().serialize(resource_cards, exclude=['description','instructions','active','isvisible']),
                 searchable_nodes=JSONSerializer().serialize(searchable_nodes, exclude=['description', 'ontologyclass','isrequired', 'issearchable', 'istopnode']),
                 saved_searches=JSONSerializer().serialize(settings.SAVED_SEARCHES),
-                resource_instance_exists=resource_instance_exists
+                resource_instance_exists=resource_instance_exists,
+                user_is_reviewer=json.dumps(request.user.groups.filter(name='Resource Reviewer').exists()),
+                userid=request.user.id
             )
 
             if graph.iconclass:

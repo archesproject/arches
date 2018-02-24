@@ -5181,6 +5181,71 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     border-top: none;
 }
 
+.provisional-edits-list {
+    width: 0px;
+    background-color: #f0f0f0;
+    padding: 0px;
+    border-style: solid;
+    border-color: #ccc;
+    border-width: 1px;
+    margin-top: 0px;
+}
+
+.provisional-edits-list-header {
+    display: inline-flex;
+    width: 100%;
+    align-items: center;
+    background-color: #f8f8f8;
+    height: 35px;
+    margin-top: 0px;
+    margin-bottom:1px;
+}
+
+.provisional-edits-list-header span {
+    padding-left: 4px;
+
+}
+
+.provisional-edit-qa-tool {
+    height: 28px;
+}
+
+.provisional-edit-qa-tool .toggle-container {
+    padding-left: 0px;
+}
+
+.provisional-edits-list.expanded {
+    width: 350px;
+    transition: all .30s ease;
+    padding: 0px;
+}
+
+.provisional-edits-list.closed {
+    width: 0px;
+    transition: all .30s ease;
+    padding: 0px
+}
+
+.provisional-edit {
+    padding: 15px;
+    background-color: #fafafa;
+}
+
+.rp-report-tile.provisional-edit-cards {
+    padding-left: 0px;
+    padding-bottom: 0px;
+}
+
+
+.provisional-edit .content-title {
+    font-weight: 600;
+}
+
+.provisional-edit-cards dd {
+    position: relative;
+    padding-left: 15px;
+}
+
 .layer-list {
     height: 50px;
     margin-right: -10px;
@@ -8692,6 +8757,28 @@ ul.pagination {
 .search-listing-title.provisional-edits {
     font-size: 12px;
     color: #888;
+}
+
+.provisional-tile.qa-btn {
+    float: right;
+    margin-right: 30px;
+    margin-top: 3px;
+}
+
+.provisional-tile.icon {
+    padding-left: 7px;
+    font-size: 11px;
+    color: #f1b202;
+}
+
+.provisional-tile.icon.submitted {
+    color: green;
+}
+
+.provisional-tile.icon.authoritative {
+    padding-left: 7px;
+    font-size: 11px;
+    color: #ccc;
 }
 
 .search-listing-body {

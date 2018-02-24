@@ -16,7 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import uuid, importlib
+import uuid, importlib, json as jsonparser
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from arches.app.models.resource import Resource
@@ -36,6 +36,23 @@ from django.db import transaction
 @method_decorator(can_edit_resource_instance(), name='dispatch')
 class TileData(View):
     action = 'update_tile'
+
+    def delete_provisional_edit(self, data):
+        tile = Tile.objects.get(tileid = data['tileid'])
+        provisionaledits = None
+        if tile.provisionaledits is not None:
+            provisionaledits = jsonparser.loads(tile.provisionaledits)
+            if data['user'] in provisionaledits:
+                provisionaledits.pop(data['user'])
+                if len(provisionaledits) == 0:
+                    tile.provisionaledits = None
+                else:
+                    tile.provisionaledits = jsonparser.dumps(provisionaledits)
+
+                if len(tile.data) == 0 and tile.provisionaledits == None:
+                    tile.delete(request=request)
+                else:
+                    tile.save()
 
     def post(self, request):
         if self.action == 'update_tile':
@@ -86,6 +103,20 @@ class TileData(View):
 
                     return JSONResponse(data)
 
+        if self.action == 'delete_provisional_tile':
+            data = request.POST
+            if 'tileid' in data:
+                provisionaledits = self.delete_provisional_tile(data)
+                return JSONResponse(provisionaledits)
+
+            else:
+                payload = data.get('payload', None)
+                if payload is not None:
+                    edits = jsonparser.loads(payload)
+                    for edit in edits['edits']:
+                        provisionaledits = self.delete_provisional_edit(edit)
+                return JSONResponse({'result':'success'})
+
         return HttpResponseNotFound()
 
     def delete(self, request):
@@ -96,17 +127,23 @@ class TileData(View):
 
             with transaction.atomic():
                 tile = Tile.objects.get(tileid = data['tileid'])
-                if tile.filter_by_perm(request.user, 'delete_nodegroup'):
-                    nodegroup = models.NodeGroup.objects.get(pk=tile.nodegroup_id)
-                    clean_resource_cache(tile)
-                    tile.delete(request=request)
-                    tile.after_update_all()
-                    update_system_settings_cache(tile)
-                    return JSONResponse(tile)
+                user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
+                if user_is_reviewer or tile.is_provisional() == True:
+                    if tile.filter_by_perm(request.user, 'delete_nodegroup'):
+                        nodegroup = models.NodeGroup.objects.get(pk=tile.nodegroup_id)
+                        clean_resource_cache(tile)
+                        tile.delete(request=request)
+                        tile.after_update_all()
+                        update_system_settings_cache(tile)
+                        return JSONResponse(tile)
+                    else:
+                        return JSONResponse({'status':'false','message': [_('Request Failed'), _('Permission Denied')]}, status=500)
                 else:
-                    return JSONResponse({'status':'false','message': [_('Request Failed'), _('Permission Denied')]}, status=500)
+                    return JSONResponse({'status':'false','message': [_('Request Failed'), _('You do not have permissions to delete a tile with authoritative data.')]}, status=500)
 
         return HttpResponseNotFound()
+
+
 
 # Move to util function
 def get(id):

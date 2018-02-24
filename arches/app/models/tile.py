@@ -128,9 +128,10 @@ class Tile(models.TileModel):
             "timestamp": timezone.now(),
             "reviewtimestamp": None
         }
+
         if self.provisionaledits is not None:
             provisionaledits = JSONDeserializer().deserialize(self.provisionaledits)
-            provisionaledits[user.id] = provisionaledit
+            provisionaledits[str(user.id)] = provisionaledit
         else:
             provisionaledits = {
                 user.id: provisionaledit
@@ -145,12 +146,9 @@ class Tile(models.TileModel):
         """
 
         result = False
-        if self.provisionaledits is not None:
-            provisionaledits = JSONDeserializer().deserialize(self.provisionaledits)
-            for user, edit in provisionaledits.iteritems():
-                if edit['status'] != 'approved' and edit['action'] == 'create':
-                    result = True
-                    break
+        if self.provisionaledits is not None and len(self.data) == 0:
+            result = True
+
         return result
 
     def user_owns_provisional(self, user):
@@ -165,8 +163,7 @@ class Tile(models.TileModel):
             provisionaledits = JSONDeserializer().deserialize(self.provisionaledits)
             if str(user.id) in provisionaledits:
                 edit = provisionaledits[str(user.id)]
-                if edit['action'] == 'create' and edit['status'] != 'approved':
-                    result = True
+                result = True
         return result
 
     def check_for_missing_nodes(self, request):
@@ -209,7 +206,6 @@ class Tile(models.TileModel):
             if user_is_reviewer == False and creating_new_tile == False:
                 self.apply_provisional_edit(user, self.data, action='update')
                 self.data = existing_model.data
-
             if creating_new_tile == True:
                 if self.is_provisional() == False and user_is_reviewer == False:
                     self.apply_provisional_edit(user, data=self.data, action='create')
