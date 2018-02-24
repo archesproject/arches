@@ -3,6 +3,7 @@ define([
     'backbone',
     'knockout',
     'knockout-mapping',
+    'moment',
     'arches',
     'widgets',
     'models/card',
@@ -13,7 +14,7 @@ define([
     'bindings/let',
     'bindings/sortable',
     //'plugins/ko-reactor.min'
-], function($, Backbone, ko, koMapping, arches, widgets, CardModel, TileModel, GraphModel, data) {
+], function($, Backbone, ko, koMapping, moment, arches, widgets, CardModel, TileModel, GraphModel, data) {
     var FormView = Backbone.View.extend({
         /**
         * A backbone view representing a card form preview
@@ -144,7 +145,13 @@ define([
             provisionaledits = ko.unwrap(tile.provisionaledits)
             if (provisionaledits){
                 edits = JSON.parse(provisionaledits)
-                result = _.sortBy(_.pairs(edits), 'timestamp')[0][1].value
+                if (this.user.reviewer) {
+                    result = _.sortBy(_.pairs(edits), function(val){ return moment(val.timestamp) })[0][1].value
+                } else {
+                    if (edits[this.user.id]) {
+                        result = edits[this.user.id].value
+                    }
+                }
             }
             return koMapping.fromJS(result)
         },
@@ -175,14 +182,17 @@ define([
                 tile.isParent = true;
             }else{
                 tile.isParent = false;
+                tile.userHasProvisionalEdits = false;
                 var provisionaledit = this.getProvisionalTile(tile);
                 if (_.keys(tile.data).length === 0) {
                     data = provisionaledit;
+                    tile.userHasProvisionalEdits = true;
                 } else {
                     if (this.user.reviewer || ko.unwrap(provisionaledit) == null) {
                         data = tile.data;
                     } else {
                         data = provisionaledit
+                        tile.userHasProvisionalEdits = true;
                     }
                     tile.hasAuthoritativeData(true);
                 };

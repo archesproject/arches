@@ -1,4 +1,10 @@
-define(['knockout', 'knockout-mapping', 'moment', 'arches'], function (ko, koMapping, moment, arches) {
+define([
+    'knockout',
+    'knockout-mapping',
+    'moment',
+    'arches',
+    'views/components/simple-switch'
+], function (ko, koMapping, moment, arches) {
     /**
     * A viewmodel for managing provisional edits
     *
@@ -12,6 +18,7 @@ define(['knockout', 'knockout-mapping', 'moment', 'arches'], function (ko, koMap
         self.card = null;
         self.edits = ko.observableArray()
         self.users = []
+        self.declineUnacceptedEdits = ko.observable(true);
         self.selectedForm = params.selectedForm;
         self.parseProvisionalEdits = function(editsjson){
             _.each(JSON.parse(editsjson), function(edit, key){
@@ -34,6 +41,24 @@ define(['knockout', 'knockout-mapping', 'moment', 'arches'], function (ko, koMap
             })
             .done(function(data) {
                 self.edits.remove(val);
+                self.form.loadForm(self.selectedForm());
+            })
+            .fail(function(data) {
+                console.log('Related resource request failed', data)
+            });
+        }
+
+        self.deleteAllProvisionalEdits = function() {
+            var edits = koMapping.toJSON({'edits':self.edits()})
+            $.ajax({
+                url: arches.urls.delete_provisional_tile,
+                context: this,
+                method: 'POST',
+                dataType: 'json',
+                data: {payload: edits}
+            })
+            .done(function(data) {
+                self.edits.removeAll();
                 self.form.loadForm(self.selectedForm());
             })
             .fail(function(data) {
@@ -64,7 +89,11 @@ define(['knockout', 'knockout-mapping', 'moment', 'arches'], function (ko, koMap
             var tile = this.selectedProvisionalTile()
             this.form.saveTile(this.parentTile, this.cardinality, this.selectedProvisionalTile())
             this.form.on('after-update', function(){
-                this.deleteProvisionalEdit(val);
+                if (this.declineUnacceptedEdits()) {
+                    this.deleteAllProvisionalEdits();
+                } else {
+                    this.deleteProvisionalEdit(val);
+                }
             }, this)
         }
 

@@ -98,7 +98,7 @@
                                                 <!-- /ko -->
 
                                                 <!-- ko if: form.user.reviewer == false -->
-                                                    <!-- ko if: innerTile.modified() || innerTile.provisionaledits() -->
+                                                    <!-- ko if: innerTile.modified() || innerTile.userHasProvisionalEdits -->
                                                     <i class="fa fa-check-circle add-tooltip provisional-tile icon submitted" data-placement="bottom" data-toggle="tooltip"></i>
                                                     <span data-bind="text: '{% trans "Your changes have been submitted for review!" %}'"></span>
                                                     <!-- /ko -->
@@ -200,7 +200,7 @@
                                         <!-- /ko -->
 
                                         <!-- ko if: form.user.reviewer == false -->
-                                        <!-- ko if: tile.modified() || tile.provisionaledits() -->
+                                        <!-- ko if: tile.modified() || tile.userHasProvisionalEdits -->
                                         <i class="fa fa-check-circle add-tooltip provisional-tile icon submitted" data-placement="bottom" data-toggle="tooltip"></i>
                                         <span data-bind="text: '{% trans "Your changes have been submitted for review" %}'"></span>
                                         <!-- /ko -->

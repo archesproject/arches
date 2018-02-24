@@ -5206,6 +5206,14 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 }
 
+.provisional-edit-qa-tool {
+    height: 28px;
+}
+
+.provisional-edit-qa-tool .toggle-container {
+    padding-left: 0px;
+}
+
 .provisional-edits-list.expanded {
     width: 350px;
     transition: all .30s ease;

@@ -37,6 +37,23 @@ from django.db import transaction
 class TileData(View):
     action = 'update_tile'
 
+    def delete_provisional_edit(self, data):
+        tile = Tile.objects.get(tileid = data['tileid'])
+        provisionaledits = None
+        if tile.provisionaledits is not None:
+            provisionaledits = jsonparser.loads(tile.provisionaledits)
+            if data['user'] in provisionaledits:
+                provisionaledits.pop(data['user'])
+                if len(provisionaledits) == 0:
+                    tile.provisionaledits = None
+                else:
+                    tile.provisionaledits = jsonparser.dumps(provisionaledits)
+
+                if len(tile.data) == 0 and tile.provisionaledits == None:
+                    tile.delete(request=request)
+                else:
+                    tile.save()
+
     def post(self, request):
         if self.action == 'update_tile':
             json = request.POST.get('data', None)
@@ -88,23 +105,17 @@ class TileData(View):
 
         if self.action == 'delete_provisional_tile':
             data = request.POST
-            tile = Tile.objects.get(tileid = data['tileid'])
-            provisionaledits = None
-            if tile.provisionaledits is not None:
-                provisionaledits = jsonparser.loads(tile.provisionaledits)
-                if data['user'] in provisionaledits:
-                    provisionaledits.pop(data['user'])
-                    if len(provisionaledits) == 0:
-                        tile.provisionaledits = None
-                    else:
-                        tile.provisionaledits = jsonparser.dumps(provisionaledits)
+            if 'tiles' in data:
+                provisionaledits = self.delete_provisional_tile(data)
+                return JSONResponse(provisionaledits)
 
-                    if len(tile.data) == 0 and tile.provisionaledits == None:
-                        tile.delete(request=request)
-                    else:
-                        tile.save()
-
-            return JSONResponse(provisionaledits)
+            else:
+                payload = data.get('payload', None)
+                if payload is not None:
+                    edits = jsonparser.loads(payload)
+                    for edit in edits['edits']:
+                        provisionaledits = self.delete_provisional_edit(edit)
+                return JSONResponse({'result':'success'})
 
         return HttpResponseNotFound()
 
