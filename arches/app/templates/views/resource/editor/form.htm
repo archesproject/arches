@@ -157,7 +157,9 @@
                                         <!-- ko if: innerTile.dirty() && !forceBlank -->
                                         <!--ko if: !card.get('disabled') -->
                                         <div class="install-buttons" data-bind="css: { 'expanded-buttons': innerTile.expanded() }">
-                                            <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, parentTile, innerTile)">{% trans "Cancel" %}</button>
+                                            <!-- ko if: innerTile.hasAuthoritativeData() && form.user.reviewer == true -->
+                                            <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, parentTile, innerTile)">{% trans "Cancel!" %}</button>
+                                            <!-- /ko -->
                                             <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: form.saveTile.bind(form, parentTile, cardinality)">{% trans "Save" %}</button>
                                         </div>
                                         <!-- /ko -->
