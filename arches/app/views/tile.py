@@ -52,7 +52,7 @@ class TileData(View):
                 if len(tile.data) == 0 and tile.provisionaledits == None:
                     tile.delete(request=request)
                 else:
-                    tile.save()
+                    tile.save(log=False)
 
     def post(self, request):
         if self.action == 'update_tile':
@@ -106,7 +106,7 @@ class TileData(View):
         if self.action == 'delete_provisional_tile':
             data = request.POST
             if 'tileid' in data:
-                provisionaledits = self.delete_provisional_tile(data)
+                provisionaledits = self.delete_provisional_edit(data)
                 return JSONResponse(provisionaledits)
 
             else:

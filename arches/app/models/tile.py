@@ -183,6 +183,7 @@ class Tile(models.TileModel):
     def save(self, *args, **kwargs):
         request = kwargs.pop('request', None)
         index = kwargs.pop('index', True)
+        log = kwargs.pop('log', True)
         self.__preSave(request)
         missing_nodes = []
         creating_new_tile = True
@@ -214,7 +215,7 @@ class Tile(models.TileModel):
         super(Tile, self).save(*args, **kwargs)
         #We have to save the edit log record after calling save so that the
         #resource's displayname changes are avaliable
-        if user is None or user_is_reviewer == True:
+        if (user is None or user_is_reviewer == True) and log == True:
             user = {} if user == None else user
             if creating_new_tile == True:
                 self.save_edit(user=user, edit_type=edit_type, old_value={}, new_value=self.data)

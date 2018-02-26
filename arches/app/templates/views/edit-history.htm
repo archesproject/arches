@@ -34,7 +34,11 @@
                       <td>{{edit.resource_model_name}}</td>
                       <td>{{edit.timestamp}}</td>
                       <td>{{edit.friendly_edittype}}</td>
-                      <td>{{edit.user_firstname}} {{edit.user_lastname}}</td>
+                      {% if edit.user_firstname == '' and edit.user_lastname == '' %}
+                        <td>{{edit.user_username}}</td>
+                      {% else %}
+                        <td>{{edit.user_firstname}} {{edit.user_lastname}}</td>
+                      {% endif %}
                       <td>
                         {% if edit.deleted == True %}
                           <a href="" class="btn btn-primary" disabled>{% trans "View Report" %}</a>
