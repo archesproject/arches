@@ -52,7 +52,8 @@ require([
     var permissionSettingsForm = new PermissionSettingsForm({
         selectedIdentities: identityList.selectedItems,
         selectedCards: groupedNodeList.selectedItems,
-        nodegroupPermissions: data.nodegroupPermissions
+        nodegroupPermissions: data.nodegroupPermissions,
+        groupedNodeList: groupedNodeList
     })
     permissionSettingsForm.on('save', function(){
         updatePermissions();

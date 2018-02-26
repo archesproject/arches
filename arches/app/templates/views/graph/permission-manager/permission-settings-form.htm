@@ -1,8 +1,8 @@
 {% load i18n %}
 <div id="card-preview" class="pad-all" style="">
 
-    <div id="permissions-form" class="panel">
-        <div class="panel-heading">
+    <div id="permissions-form" class="project-panel">
+        <div class="permissions-form permission-manager header">
             <div class="">
                 <h3 id="cc-title" class="panel-title card-main-title">{% trans "Permissions" %}</h3>
             </div>
@@ -11,95 +11,80 @@
         <!-- Alert Panel -->
         <div id="basemap-delete-alert" class="panel wizard-data-card-alert" style=""></div>
 
+
         <!-- Data Entry -->
-        <div id="card-preview-crud" class="panel-body card-body fade in" style="padding-top: 0px;">
-            <div id="cards" class="tab-base card-content-container outline" style="margin-bottom: 20px; margin-top: -2px;">
+        <div id="card-preview-crud" class="fade in" style="padding-top: 0px;">
+            <div id="cards" class="tab-base card-content-container" style="margin-bottom: 20px; margin-top: -2px;">
                 <div class="" style="margin-left: 0px;">
                     <!-- Card -->
-                    <div class="panel-body " style="">
-
-                        <!-- Selection Summary -->
-                        <div>
-
-                            <!-- Groups/Users -->
-                            <div class="permissions-list">
-                                <div class="">
-                                    <ul class="permissions-selected" data-bind="visible: selectedIdentities().length === 0">
-                                        <li class="permissions-default">
-                                            <i class="confirmation permissions-title"></i> <span class="permissions-account-warning">{% trans "No Groups/Accounts selected" %}</span>
-                                        </li>
-                                    </ul>
-                                    <ul class="permissions-selected" style="display:none;" data-bind="foreach: selectedIdentities, visible: selectedIdentities().length !== 0">
-                                        <li class="">
-
-                                            <div class="library-icon-permissions" style="">
-                                                <span class="icon-wrap icon-wrap-sm icon-circle" data-bind="css: $data.type === 'group' ? 'bg-purple' : 'bg-mint'">
-                                                    <i data-bind="attr: {class: 'fa fa-' + $data.type}" class="fa fa-group"></i>
-                                                </span>
-                                                <div class="permissions-title-panel">
-                                                    <span class="permissions-title" data-bind="text: $data.name"></span>
-                                                    <div class="confirmation-permissions">{% trans "Default Permissions" %}
-                                                        <span data-bind="text: $data.permsLiteral"></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-
-                                           
-                                        </li>
-                                    </ul>
+                    <div class="row">
+                        <!-- Available Cards -->
+                        <div class="col-xs-6">
+                                <div class="permission-manager" data-bind="with:groupedNodeList">
+                                    {% include 'views/graph/permission-manager/grouped-node-list.htm' %}
                                 </div>
-
-                                <!-- Nodes -->
-                                <div class="node-list-panel">
-                                    <span class="permissions-title">{% trans "Node List" %}</span>
-                                    <ul class="permissions-selected" data-bind="visible: selectedCards().length === 0">
-                                        <li class="">
-                                            <i class="confirmation ion-information-circled"></i> <span>{% trans "No nodes selected" %}</span>
-                                        </li>
-                                    </ul>
-                                    <ul class="permissions-selected" style="display:none;" data-bind="foreach: selectedCards, visible: selectedCards().length !== 0">
-                                        <li class="permissions-node-row">
-                                            <i class="confirmation ion-ios-checkmark"></i>
-                                            <span class="permissions-node" data-bind="text: $data.name"></span>
-                                            <span class="permissions-readout" data-bind="text: $data.permsLiteral()"></span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
                         </div>
 
-                        <!-- Permissions Selector -->
-                        <div id="" class="permission-selector" style="">
-                            <div class="row widget-container" style="">
-                                <div class="col-xs-12">
-                                    <div class="form-group">
-                                        <div class="relative">
-                                            <label class="col-xs-12 control-label widget-input-label" for=""> {% trans "Select the permissions you wish to grant to the selected  Groups/Accounts and nodes" %}</label>
-                                        </div>
+                        <!-- Available Cards -->
+                        <div class="col-xs-6">
+                            <div class="mpm-selector-header">
+                                <div class="mpm-selector-header-txt">
+                                    <strong>Set Permissions</strong>
 
-                                        <div class="col-xs-12">
-                                            <div class="pad-hor columns" data-bind="foreach: nodegroupPermissions">
-                                                <label class="form-checkbox form-normal form-primary form-text"
-                                                    data-bind="css: {
-                                                        'active': $data.selected
-                                                    },
-                                                    click: $data.selected.bind($data, !$data.selected())">
-                                                    <input type="checkbox" data-bind="checked: $data.selected">
-                                                    <i data-bind="css: $data.icon"></i> <span data-bind="text: $data.name"></span>
+                                    <!-- remove all switch -->
+                                    <span class="mpm-select-switch-label">
+                                        <a class="pad-lft" href="">Clear</a>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Card List -->
+                            <div class="mpm-card-list-items pad-top">
+
+                                <ul class="mpm-node-detail-metadata">
+                                    <li class="">
+                                        Selected cards (<span>2</span>)
+                                        <ul class="mpm-node-detail-metadata">
+                                            <li class="">Location: Map, Condition Assessment</li>
+                                        </ul>
+                                    </li>
+
+                                    <li class="pad-top">
+                                        Permissions
+
+                                        <ul class="" style="list-style: none; margin-left: -5px;">
+                                            <li class="">
+                                                <label class="form-checkbox form-normal form-primary form-text">
+                                                    <input type="checkbox">
+                                                    <i class="ion-close"></i> <span>No Access</span>
                                                 </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                                            </li>
 
-                        <!-- Buttons -->
-                        <div class="permission-buttons pull-right mar-btm">
-                            <button id="cc-delete-btn" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt disabled" data-bind="click: revert, css: {'disabled': selectedCards().length === 0 || selectedIdentities().length === 0}">{% trans "Revert Permissions" %}
-                            </button>
-                            <button id="cc-save-btn" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-check disabled" data-bind="click: save, css: {'disabled': selectedCards().length === 0 || selectedIdentities().length === 0}">{% trans "Apply Permissions" %}</button>
+                                            <li class="">
+                                                <label class="form-checkbox form-normal form-primary form-text">
+                                                    <input type="checkbox">
+                                                    <i class="ion-android-delete"></i> <span>Delete</span>
+                                                </label>
+                                            </li>
+
+                                            <li class="">
+                                                <label class="form-checkbox form-normal form-primary form-text">
+                                                    <input type="checkbox">
+                                                    <i class="ion-ios-book"></i> <span>Read</span>
+                                                </label>
+                                            </li>
+
+                                            <li class="">
+                                                <label class="form-checkbox form-normal form-primary form-text">
+                                                    <input type="checkbox">
+                                                    <i class="ion-edit"></i> <span>Create/Update</span>
+                                                </label>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -23,6 +23,7 @@ define([
             this.selectedCards = options.selectedCards;
             this.noAccessPerm = undefined;
             this.whiteListPerms = [];
+            this.groupedNodeList = options.groupedNodeList;
 
             options.nodegroupPermissions.forEach(function(perm){
                 perm.selected = ko.observable(false);

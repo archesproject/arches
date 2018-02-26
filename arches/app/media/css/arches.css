@@ -1170,6 +1170,56 @@ a.select2-search-choice-close {
     margin-left: 5px;
 }
 
+.permission-manager.panel-body {
+    display: flex;
+    background-color: white;
+    margin: 1px;
+    height: 675px;
+}
+
+.permission-manager-filter {
+    height: 58px;
+    width: 100%;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-bottom-color: #ccc;
+    margin-bottom: 2px;
+}
+
+.permission-manager-filter .clear-selection-link {
+    padding-right: 5px;
+    font-size: 13px;
+}
+
+.permission-manager .filter-bar {
+    display: flex;
+    flex-direction: row;
+    padding: 15px;
+}
+
+.permission-manager {
+    background-color: #f4f4f4;
+    margin-left: 1px;
+}
+
+.permission-manager-item-list {
+    padding-left: 10px;
+}
+
+.permission-manager.header {
+    position: relative;
+    height: 55px;
+    margin-left: 2px;
+    padding-left: 10px;
+    color: #2b425b;
+    background: #fff;
+    border-bottom: 1px solid #eee;
+}
+
+.permission-manager .control-panel {
+    display: flex;
+}
+
 .permission-level-icon {
     height: 20px;
     margin-top: -5px;
