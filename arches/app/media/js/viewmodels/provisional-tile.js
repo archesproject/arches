@@ -19,6 +19,7 @@ define([
         self.edits = ko.observableArray()
         self.users = []
         self.declineUnacceptedEdits = ko.observable(true);
+        self.loading = params.loading;
         self.selectedForm = params.selectedForm;
         self.parseProvisionalEdits = function(editsjson){
             _.each(JSON.parse(editsjson), function(edit, key){
@@ -85,6 +86,7 @@ define([
         }
 
         self.acceptProvisionalEdit = function(val){
+            self.loading(true);
             this.selectedProvisionalTile().data = val.value
             var tile = this.selectedProvisionalTile()
             this.form.saveTile(this.parentTile, this.cardinality, this.selectedProvisionalTile())
@@ -94,6 +96,7 @@ define([
                 } else {
                     this.deleteProvisionalEdit(val);
                 }
+                this.loading(false);
             }, this)
         }
 

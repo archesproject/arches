@@ -16,6 +16,7 @@ require([
     var self = this;
     var loading = ko.observable(false);
     var cardLoading = ko.observable(false);
+    var provisionalLoading = ko.observable(false);
     var selectedForm = ko.observable();
     var displayName = ko.observable(data.displayName);
     var resourceInstanceExists = ko.observable(data.resourceInstanceExists === "True" || false)
@@ -30,7 +31,8 @@ require([
         {
             selectedProvisionalTile: selectedProvisionalTile,
             cardModel: CardModel,
-            selectedForm: selectedForm
+            selectedForm: selectedForm,
+            loading: provisionalLoading
         }
     );
 
@@ -98,6 +100,7 @@ require([
             loading: loading,
             loadingSearch: ko.observable(false),
             cardLoading: cardLoading,
+            provisionalLoading: provisionalLoading,
             displayName: displayName,
             resourceEditorContext: true,
             resourceInstanceExists: resourceInstanceExists,
