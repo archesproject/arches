@@ -392,6 +392,7 @@ do
 			display_help
 		;;
 		*)
+            cd_app_folder
 			"$@"
 			exit 0
 		;;
