@@ -97,6 +97,7 @@ define([
                     // });
 
                     self.cards.removeAll();
+                    self.provisionalTileViewModel.edits.removeAll();
                     response.forms[0].cardgroups.forEach(function(cardgroup){
                         self.cards.push(new CardModel({
                             data: cardgroup,
