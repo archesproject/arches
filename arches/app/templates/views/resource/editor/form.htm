@@ -100,7 +100,7 @@
                                                 <!-- ko if: form.user.reviewer == false -->
                                                     <!-- ko if: innerTile.modified() || innerTile.userHasProvisionalEdits -->
                                                     <i class="fa fa-check-circle add-tooltip provisional-tile icon submitted" data-placement="bottom" data-toggle="tooltip"></i>
-                                                    <span data-bind="text: '{% trans "Your changes have been submitted for review!" %}'"></span>
+                                                    <span data-bind="text: '{% trans "Your changes have been submitted for review" %}'"></span>
                                                     <!-- /ko -->
                                                 <!-- /ko -->
                                             <!-- /ko -->
@@ -158,10 +158,10 @@
                                         <!--ko if: !card.get('disabled') -->
                                         <div class="install-buttons" data-bind="css: { 'expanded-buttons': innerTile.expanded() }">
                                             <!-- ko if: innerTile.hasAuthoritativeData() && form.user.reviewer == true -->
-                                            <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, parentTile, innerTile)">{% trans "Cancel!" %}</button>
+                                            <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, parentTile, innerTile)">{% trans "Cancel" %}</button>
                                             <!-- /ko -->
                                             <!-- ko if: innerTile.hasAuthoritativeData() == false && form.user.reviewer == false -->
-                                            <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, parentTile, innerTile)">{% trans "Cancel!" %}</button>
+                                            <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, parentTile, innerTile)">{% trans "Cancel" %}</button>
                                             <!-- /ko -->
                                             <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: form.saveTile.bind(form, parentTile, cardinality)">{% trans "Save" %}</button>
                                         </div>
