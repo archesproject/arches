@@ -320,6 +320,13 @@ define([
                     model = new TileModel(koMapping.toJS(parentTile));
                     model.set('tiles', tilemodel);
                 }else{
+                    if ((tile.hasAuthoritativeData() === false || this.provisionalTileViewModel.declineUnacceptedEdits() === true) &&
+                        tile.data &&
+                        this.user.reviewer == true
+                    ) {
+                        this.provisionalTileViewModel.edits.removeAll();
+                        tile.provisionaledits(null);
+                    }
                     model = new TileModel(koMapping.toJS(tile))
                 }
                 this.trigger('before-update');
