@@ -61,8 +61,9 @@
             <!--/ko-->
 
             <div class="eh-node-group">
-                <div class="eh-edit-title">{% trans 'Tile Data' %}</div>
 
+                <!--ko if: full_new_value.length > 0 -->
+                <div class="eh-edit-title">{% trans 'Tile Data' %}</div>
                 <div class="tile-data-container">
                     <ul class="tile-data-list">
                         <div data-bind="foreach: full_new_value">
@@ -72,6 +73,19 @@
                         </div>
                     </ul>
                 </div>
+                <!-- /ko -->
+                <!--ko if: full_new_provisional_value.length > 0 -->
+                <div class="eh-edit-title">{% trans 'Provisional Tile Data' %}</div>
+                <div>
+                <ul class="tile-data-list">
+                    <div data-bind="foreach: full_new_provisional_value">
+                        <li class="tile-data-item">
+                            <span class="tile-node-name" data-bind="text: node.name"></span><span class="tile-node-value" data-bind="text: ' ' + new_value"></span>
+                        </li>
+                    </div>
+                </ul>
+                </div>
+                <!-- /ko -->
             </div>
             <!--/ko-->
             <!--ko if: edittype == 'tile edit'-->
@@ -83,8 +97,9 @@
             <!--/ko-->
 
             <div class="eh-node-group">
-                <div class="eh-edit-title">{% trans 'New Tile Data' %}</div>
 
+                <!--ko if: full_new_value.length > 0 -->
+                <div class="eh-edit-title">{% trans 'New Tile Data' %}</div>
                 <div class="tile-data-container">
                     <ul class="tile-data-list">
                         <div data-bind="foreach: full_new_value">
@@ -94,13 +109,27 @@
                         </div>
                     </ul>
                 </div>
+                <!-- /ko -->
+                <!--ko if: full_new_provisional_value.length > 0 -->
+                <div class="eh-edit-title">{% trans 'Provisional Tile Data' %}</div>
+                <div>
+                <ul class="tile-data-list">
+                    <div data-bind="foreach: full_new_provisional_value">
+                        <li class="tile-data-item">
+                            <span class="tile-node-name" data-bind="text: node.name"></span><span class="tile-node-value" data-bind="text: ' ' + new_value"></span>
+                        </li>
+                    </div>
+                </ul>
+                </div>
+                <!-- /ko -->
             </div>
 
-            <hr>
 
             <div class="eh-node-group">
-                <div class="eh-edit-title">{% trans 'Previous Tile Data' %}</div>
 
+                <!--ko if: full_old_value.length > 0 -->
+                <hr>
+                <div class="eh-edit-title">{% trans 'Previous Tile Data' %}</div>
                 <div class="tile-data-container">
                     <ul class="tile-data-list">
                         <div data-bind="foreach: full_old_value">
@@ -110,6 +139,22 @@
                         </div>
                     </ul>
                 </div>
+                <!--/ko-->
+
+                <!--ko if: full_old_provisional_value.length > 0 -->
+                <hr>
+                <div class="eh-edit-title">{% trans 'Previous Provisional Tile Data' %}</div>
+                <div class="tile-data-container">
+                    <ul class="tile-data-list">
+                        <div data-bind="foreach: full_old_provisional_value">
+                        <li class="tile-data-item">
+                            <span class="tile-node-name" data-bind="text: node.name"></span><span class="tile-node-value" data-bind="text: ' ' + new_value"></span>
+                        </li>
+                        </div>
+                    </ul>
+                </div>
+                <!--/ko-->
+
             </div>
             <!--/ko-->
             <!--ko if: edittype == 'tile delete'-->
@@ -118,6 +163,7 @@
             <!--/ko-->
             <!--ko ifnot: card_container_name -->
             <h4 class="mar-no pad-btm"><span data-bind="text: card.name + ' '"></span>{% trans 'Deleted' %}</h4>
+
             <!--/ko-->
             <div class="eh-node-group">
                 <div class="eh-edit-title">{% trans 'Tile Data' %}</div>
@@ -135,7 +181,7 @@
             <!--/ko-->
 
             <div class="eh-footer">
-                {% trans 'edited by' %}: <span data-bind="text: user_email"></span>
+                {% trans 'edited by' %}: <span data-bind="text: editor"></span>
             </div>
         </div>
     </div>

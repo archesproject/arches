@@ -37,7 +37,7 @@ from django.db import transaction
 class TileData(View):
     action = 'update_tile'
 
-    def delete_provisional_edit(self, data):
+    def delete_provisional_edit(self, data, request):
         tile = Tile.objects.get(tileid = data['tileid'])
         provisionaledits = None
         if tile.provisionaledits is not None:
@@ -106,7 +106,7 @@ class TileData(View):
         if self.action == 'delete_provisional_tile':
             data = request.POST
             if 'tileid' in data:
-                provisionaledits = self.delete_provisional_edit(data)
+                provisionaledits = self.delete_provisional_edit(data, request)
                 return JSONResponse(provisionaledits)
 
             else:
@@ -114,7 +114,7 @@ class TileData(View):
                 if payload is not None:
                     edits = jsonparser.loads(payload)
                     for edit in edits['edits']:
-                        provisionaledits = self.delete_provisional_edit(edit)
+                        provisionaledits = self.delete_provisional_edit(edit, request)
                 return JSONResponse({'result':'success'})
 
         return HttpResponseNotFound()
