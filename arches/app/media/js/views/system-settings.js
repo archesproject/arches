@@ -7,24 +7,40 @@ require([
     'views/resource/editor/form-list',
     'views/resource/editor/form',
     'models/card',
+    'viewmodels/provisional-tile',
     'viewmodels/alert',
     'resource-editor-data',
     'bindings/sortable',
     'bindings/let'
-], function($, _, ko, arches, BaseManagerView, FormList, FormView, CardModel, AlertViewModel, data) {
+], function($, _, ko, arches, BaseManagerView, FormList, FormView, CardModel, ProvisionalTileViewModel, AlertViewModel, data) {
     var self = this;
     var loading = ko.observable(false);
     var cardLoading = ko.observable(false);
+    var selectedForm = ko.observable();
+    var provisionalLoading = ko.observable(false);
     var formList = new FormList({
         forms: ko.observableArray(data.forms)
     });
     formList.selectItem(formList.items()[0]);
 
+    var selectedProvisionalTile = ko.observable()
+
+    var provisionalTileViewModel = new ProvisionalTileViewModel(
+        {
+            selectedProvisionalTile: selectedProvisionalTile,
+            cardModel: CardModel,
+            selectedForm: selectedForm,
+            loading: provisionalLoading
+        }
+    );
+
     var formView = new FormView({
         formid: formList.items()[0].formid,
         resourceid: data.resourceid,
         tiles: data.tiles,
-        blanks: data.blanks
+        blanks: data.blanks,
+        selectedProvisionalTile: selectedProvisionalTile,
+        provisionalTileViewModel: provisionalTileViewModel
     });
 
     var loadForm = function(form) {
@@ -73,6 +89,7 @@ require([
             resourceEditorContext: true,
             editingInstanceId: data.resourceid,
             relationship_types: data.relationship_types,
+            provisionalTileViewModel: provisionalTileViewModel,
             graph: data.graph,
             formList: formList,
             formView: formView,

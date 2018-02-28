@@ -29,6 +29,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock graph_header_buttons %}
 
 {% block content %}
+<div class="resource-editor-search" data-bind="css: {'loading-mask': provisionalLoading()}"></div>
 <div class="flex relative" data-bind="visible: !openRelatedResources()" style="display:none;">
 
     <!--Form Listing -->
