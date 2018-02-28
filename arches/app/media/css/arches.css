@@ -8815,6 +8815,16 @@ ul.pagination {
     margin-top: 3px;
 }
 
+.selected-provisional-tile {
+    border-color: #3B8DD5;
+    z-index: 1;
+    border-style: solid;
+    border-width: 1px;
+    padding-top: 5px;
+    padding-left: 5px;
+    padding-bottom: 3px;
+}
+
 .provisional-tile.icon {
     padding-left: 7px;
     font-size: 11px;

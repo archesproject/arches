@@ -167,6 +167,8 @@ class EditLog(models.Model):
     edittype = models.TextField(blank=True, null=True)
     newvalue = JSONField(blank=True, null=True, db_column='newvalue')
     oldvalue = JSONField(blank=True, null=True, db_column='oldvalue')
+    newprovisionalvalue = JSONField(blank=True, null=True, db_column='newprovisionalvalue')
+    oldprovisionalvalue = JSONField(blank=True, null=True, db_column='oldprovisionalvalue')
     timestamp = models.DateTimeField(blank=True, null=True)
     userid = models.TextField(blank=True, null=True)
     user_firstname = models.TextField(blank=True, null=True)
@@ -675,7 +677,7 @@ class TileModel(models.Model): #Tile
         db_table = 'tiles'
 
     def save(self, *args, **kwargs):
-        if(self.sortorder is None):
+        if(self.sortorder is None or (self.provisionaledits is not None and self.data == {})):
             sortorder_max = TileModel.objects.filter(nodegroup_id=self.nodegroup_id, resourceinstance_id=self.resourceinstance_id).aggregate(Max('sortorder'))['sortorder__max']
             self.sortorder = sortorder_max + 1 if sortorder_max is not None else 0
         super(TileModel, self).save(*args, **kwargs) # Call the "real" save() method.

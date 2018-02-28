@@ -97,6 +97,7 @@ define([
                     // });
 
                     self.cards.removeAll();
+                    self.provisionalTileViewModel.edits.removeAll();
                     response.forms[0].cardgroups.forEach(function(cardgroup){
                         self.cards.push(new CardModel({
                             data: cardgroup,
@@ -320,6 +321,14 @@ define([
                     model = new TileModel(koMapping.toJS(parentTile));
                     model.set('tiles', tilemodel);
                 }else{
+                    if ((tile.hasAuthoritativeData() === false || this.provisionalTileViewModel.declineUnacceptedEdits() === true) &&
+                        tile.data &&
+                        this.user.reviewer == true
+                    ) {
+                        this.provisionalTileViewModel.edits.removeAll();
+                        tile.provisionaledits(null);
+                        this.provisionalTileViewModel.selectedProvisionalTile(null);
+                    }
                     model = new TileModel(koMapping.toJS(tile))
                 }
                 this.trigger('before-update');
