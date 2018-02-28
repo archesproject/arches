@@ -199,7 +199,7 @@ class Command(BaseCommand):
             self.update_project_templates()
 
         if options['operation'] == 'load_package':
-            self.load_package(options['source'], options['setup_db'], options['overwrite'], options['stage'])
+            self.load_package(options['source'], options['setup_db'], options['overwrite'], options['stage'], options['yes'])
 
         if options['operation'] == 'create_package':
             self.create_package(options['dest_dir'])
@@ -258,17 +258,18 @@ class Command(BaseCommand):
                 print e
                 print "Could not save system settings"
 
-    def load_package(self, source, setup_db=True, overwrite_concepts='ignore', stage_concepts='keep'):
+    def load_package(self, source, setup_db=True, overwrite_concepts='ignore', stage_concepts='keep', yes=False):
 
         def load_system_settings(package_dir):
             update_system_settings = True
             if os.path.exists(settings.SYSTEM_SETTINGS_LOCAL_PATH):
-                response = raw_input('Overwrite current system settings with package settings? (Y/N): ')
-                if response.lower() in ('t', 'true', 'y', 'yes'):
-                    update_system_settings = True
-                    print 'Using package system settings'
-                else:
-                    update_system_settings = False
+                if yes == False:
+                    response = raw_input('Overwrite current system settings with package settings? (Y/N): ')
+                    if response.lower() in ('t', 'true', 'y', 'yes'):
+                        update_system_settings = True
+                        print 'Using package system settings'
+                    else:
+                        update_system_settings = False
 
             if update_system_settings == True:
                 if len(glob.glob(os.path.join(package_dir, 'system_settings', 'System_Settings.json'))) > 0:
@@ -318,8 +319,9 @@ class Command(BaseCommand):
             branches = glob.glob(os.path.join(package_dir, 'graphs', 'branches'))[0]
             resource_models = glob.glob(os.path.join(package_dir, 'graphs', 'resource_models'))[0]
             # self.import_graphs(os.path.join(settings.ROOT_DIR, 'db', 'graphs','branches'), overwrite_graphs=False)
-            self.import_graphs(branches, overwrite_graphs=False)
-            self.import_graphs(resource_models, overwrite_graphs=False)
+            overwrite_graphs = True if yes == True else False
+            self.import_graphs(branches, overwrite_graphs=overwrite_graphs)
+            self.import_graphs(resource_models, overwrite_graphs=overwrite_graphs)
 
         def load_concepts(package_dir, overwrite, stage):
             concept_data = glob.glob(os.path.join(package_dir, 'reference_data', 'concepts', '*.xml'))
