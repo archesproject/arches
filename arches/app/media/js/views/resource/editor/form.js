@@ -327,6 +327,7 @@ define([
                     ) {
                         this.provisionalTileViewModel.edits.removeAll();
                         tile.provisionaledits(null);
+                        this.provisionalTileViewModel.selectedProvisionalTile(null);
                     }
                     model = new TileModel(koMapping.toJS(tile))
                 }

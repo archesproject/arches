@@ -65,7 +65,7 @@
 
                             <div class="list-group" style="margin-top: 5px;" data-bind="sortable: {data: parentTile.tiles[card.get('nodegroup_id')], afterMove: form.reorderTiles.bind(form, parentTile.tiles[card.get('nodegroup_id')]), as: 'innerTile', connectClass: 'list-group', options: {'placeholder': 'ui-sortable-placeholder sortable-placeholder', forcePlaceholderSize: true}}">
 
-                                <div class="list-group-item crud-record-item" style="">
+                                <div class="list-group-item crud-record-item" style="" data-bind="css: {'selected-provisional-tile': innerTile === form.selectedProvisionalTile()}">
                                     <h5 style="cursor: pointer; padding: 6px 6px 6px 10px;" class="list-group-item-heading text-thin" data-bind="click: form.toggleTile">
                                         <i class="ion-ios-loop-strong add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Show/Hide" %}'></i>
                                         <span style="position: relative; top: -2px;">
@@ -194,8 +194,9 @@
                                 </div>
 
                                 <!-- Form -->
-                                <div data-bind="with: form.getFormEditingContext(outerCard, card, parentTile)" >
+                                <div data-bind="with: form.getFormEditingContext(outerCard, card, parentTile)">
                                     <div class="card-form-container" data-bind="let: {'tile': $data}">
+                                    <div class="tacos" data-bind="css:{'selected-provisional-tile': tile === form.selectedProvisionalTile()}">
                                         <!-- ko if: form.user.reviewer == true -->
                                         <!-- ko if: tile.provisionaledits() -->
                                         <i class="fa fa-exclamation-triangle add-tooltip provisional-tile icon" data-placement="bottom" data-toggle="tooltip" data-bind="css: {'authoritative': tile.hasAuthoritativeData()}"></i>
@@ -233,7 +234,8 @@
                                                 }
                                             }, css: {
                                                 "hidden": !tile.expanded() && form.expanded()
-                                            }'></div>
+                                            }'>
+                                        </div>
                                         </form>
 
 
@@ -265,6 +267,7 @@
                                         <!-- /ko -->
                                         <!-- /ko -->
 
+                                    </div>
                                     </div>
                                 </div>
                             </div>
