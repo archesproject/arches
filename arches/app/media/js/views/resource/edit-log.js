@@ -12,7 +12,7 @@ require([
         initialize: function(options){
             var self = this;
             var cards = data.cards;
-            var edits = _.filter(data.edits, function(edit){ return (_.isEmpty(edit.newvalue) === false && edit.edittype == 'tile create') || edit.edittype != 'tile create'  });
+            var edits = data.edits;
             var editTypeLookup = {
                 'create': {icon: 'fa fa-chevron-circle-right fa-lg', color: 'bg-mint'},
                 'tile edit': {icon: 'fa fa-repeat fa-lg', color: 'bg-purple'},
@@ -61,10 +61,13 @@ require([
                 var datetime = moment(edit.timestamp)
                 edit.time = datetime.format("HH:mm");
                 edit.day = datetime.format('DD MMMM, YYYY');
+                edit.editor = edit.user_email != '' ? edit.user_email : edit.user_username
                 edit.edit_type_icon = editTypeLookup[edit.edittype];
                 if (edit.nodegroupid) {
                     edit.full_new_value = createFullValue(edit.newvalue, edit)
                     edit.full_old_value = createFullValue(edit.oldvalue, edit)
+                    edit.full_new_provisional_value = createFullValue(edit.newprovisionalvalue, edit)
+                    edit.full_old_provisional_value = createFullValue(edit.oldprovisionalvalue, edit)
                 };
             })
 

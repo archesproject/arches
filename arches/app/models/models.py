@@ -167,6 +167,8 @@ class EditLog(models.Model):
     edittype = models.TextField(blank=True, null=True)
     newvalue = JSONField(blank=True, null=True, db_column='newvalue')
     oldvalue = JSONField(blank=True, null=True, db_column='oldvalue')
+    newprovisionalvalue = JSONField(blank=True, null=True, db_column='newprovisionalvalue')
+    oldprovisionalvalue = JSONField(blank=True, null=True, db_column='oldprovisionalvalue')
     timestamp = models.DateTimeField(blank=True, null=True)
     userid = models.TextField(blank=True, null=True)
     user_firstname = models.TextField(blank=True, null=True)

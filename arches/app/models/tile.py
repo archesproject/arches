@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid, importlib
 import datetime
+import json
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import ValidationError
 from django.utils import timezone
@@ -95,7 +96,7 @@ class Tile(models.TileModel):
                             tile.parenttile = self
                             self.tiles[key].append(tile)
 
-    def save_edit(self, user={}, note='', edit_type='', old_value=None, new_value=None):
+    def save_edit(self, user={}, note='', edit_type='', old_value=None, new_value=None, newprovisionalvalue=None, oldprovisionalvalue=None):
         timestamp = datetime.datetime.now()
         edit = EditLog()
         edit.resourceclassid = self.resourceinstance.graph_id
@@ -112,6 +113,8 @@ class Tile(models.TileModel):
         edit.newvalue = new_value
         edit.timestamp = timestamp
         edit.edittype = edit_type
+        edit.newprovisionalvalue = newprovisionalvalue
+        edit.oldprovisionalvalue = oldprovisionalvalue
         edit.save()
 
     def apply_provisional_edit(self, user, data, action='create', status='review'):
@@ -166,6 +169,14 @@ class Tile(models.TileModel):
                 result = True
         return result
 
+    def get_provisional_edit(self, tile, user):
+        edit = None
+        if tile.provisionaledits is not None:
+            edits = json.loads(tile.provisionaledits)
+            if str(user.id) in edits:
+                edit = edits[str(user.id)]
+        return edit
+
     def check_for_missing_nodes(self, request):
         for nodeid, value in self.data.iteritems():
             datatype_factory = DataTypeFactory()
@@ -188,7 +199,8 @@ class Tile(models.TileModel):
         missing_nodes = []
         creating_new_tile = True
         user_is_reviewer = False
-
+        newprovisionalvalue = None
+        oldprovisionalvalue = None
         self.check_for_missing_nodes(request)
 
         try:
@@ -206,21 +218,27 @@ class Tile(models.TileModel):
         if user is not None:
             if user_is_reviewer == False and creating_new_tile == False:
                 self.apply_provisional_edit(user, self.data, action='update')
+                newprovisionalvalue = self.data
+                oldprovisional = self.get_provisional_edit(existing_model, user)
+                if oldprovisional is not None:
+                    oldprovisionalvalue = oldprovisional['value']
+
                 self.data = existing_model.data
             if creating_new_tile == True:
                 if self.is_provisional() == False and user_is_reviewer == False:
                     self.apply_provisional_edit(user, data=self.data, action='create')
+                    newprovisionalvalue = self.data
                     self.data = {}
 
         super(Tile, self).save(*args, **kwargs)
         #We have to save the edit log record after calling save so that the
         #resource's displayname changes are avaliable
-        if (user is None or user_is_reviewer == True) and log == True:
+        if log == True:
             user = {} if user == None else user
             if creating_new_tile == True:
-                self.save_edit(user=user, edit_type=edit_type, old_value={}, new_value=self.data)
+                self.save_edit(user=user, edit_type=edit_type, old_value={}, new_value=self.data, newprovisionalvalue=newprovisionalvalue)
             else:
-                self.save_edit(user=user, edit_type=edit_type, old_value=existing_model.data, new_value=self.data)
+                self.save_edit(user=user, edit_type=edit_type, old_value=existing_model.data, new_value=self.data, newprovisionalvalue=newprovisionalvalue, oldprovisionalvalue=oldprovisionalvalue)
 
         if index and unicode(self.resourceinstance.graph_id) != unicode(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
             self.index()
