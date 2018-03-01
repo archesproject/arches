@@ -131,7 +131,7 @@ class Graph(models.GraphModel):
             description="",
             version="",
             isresource=is_resource,
-            isactive=False,
+            isactive=not is_resource,
             iconclass="",
             ontology=None
         )
