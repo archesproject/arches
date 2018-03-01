@@ -30,7 +30,7 @@ sudo chown ubuntu:ubuntu /home/ubuntu/arches_dev/arches_dev/arches.log
 sudo chown ubuntu:ubuntu /home/ubuntu/fileuploads/ -R
 
 cd /home/ubuntu/arches_dev
-python manage.py packages -o load_package -s https://github.com/archesproject/arches4-example-pkg/archive/master.zip -db true
+python manage.py packages -o load_package -s https://github.com/archesproject/arches4-example-pkg/archive/master.zip -db true -y
 
 python manage.py collectstatic --noinput
 
