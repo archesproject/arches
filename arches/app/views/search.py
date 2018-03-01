@@ -154,7 +154,7 @@ def search_terms(request):
             ret.append({
                 'type': 'term',
                 'context': '',
-                'context_label': '',
+                'context_label': get_resource_model_label(result),
                 'id': i,
                 'text': result['key'],
                 'value': result['key']
@@ -163,6 +163,16 @@ def search_terms(request):
 
     return JSONResponse(ret)
 
+
+def get_resource_model_label(result):
+    if len(result['nodegroupid']['buckets']) > 0:
+        for nodegroup in result['nodegroupid']['buckets']:
+            nodegroup_id = nodegroup['key']
+            node = models.Node.objects.get(nodeid = nodegroup_id)
+            graph = node.graph
+        return "{0} - {1}".format(graph.name, node.name)
+    else:
+        return ''
 
 def select_geoms_for_results(features, geojson_nodes, user_is_reviewer):
     res = []
