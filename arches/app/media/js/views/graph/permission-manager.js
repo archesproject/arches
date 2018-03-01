@@ -49,17 +49,6 @@ require([
         perm.icon = perm_icons[perm.codename];
     });
 
-    var permissionSettingsForm = new PermissionSettingsForm({
-        selectedIdentities: identityList.selectedItems,
-        selectedCards: groupedNodeList.selectedItems,
-        nodegroupPermissions: data.nodegroupPermissions
-    })
-    permissionSettingsForm.on('save', function(){
-        updatePermissions();
-    });
-    permissionSettingsForm.on('revert', function(){
-        updatePermissions();
-    })
 
 
     var updatePermissions = function(){
@@ -107,6 +96,20 @@ require([
         }
 
     }
+
+    var permissionSettingsForm = new PermissionSettingsForm({
+        identityList: identityList,
+        selectedIdentities: identityList.selectedItems,
+        selectedCards: groupedNodeList.selectedItems,
+        nodegroupPermissions: data.nodegroupPermissions,
+        groupedNodeList: groupedNodeList
+    })
+    permissionSettingsForm.on('save', function(){
+        updatePermissions();
+    });
+    permissionSettingsForm.on('revert', function(){
+        updatePermissions();
+    })
 
     /**
     * a GraphPageView representing the graph manager page

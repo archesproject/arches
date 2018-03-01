@@ -36,11 +36,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         {% include 'views/graph/permission-manager/identity-list.htm' %}
     </div>
 
-    <!-- Node list -->
-    <div id="node-crud" class="middle-column-container" class="ep-node-card" data-bind="with:groupedNodeList">
-        {% include 'views/graph/permission-manager/grouped-node-list.htm' %}
-    </div>
-
     <!-- Persmission settings form -->
     <div style="width:100%; overflow-y: scroll;" data-bind="with:permissionSettingsForm">
         {% include 'views/graph/permission-manager/permission-settings-form.htm' %}

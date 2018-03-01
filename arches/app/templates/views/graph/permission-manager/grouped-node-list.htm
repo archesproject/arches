@@ -2,18 +2,32 @@
 {% load staticfiles %}
 {% load i18n %}
 
-{% block title %}{% trans "Cards" %}{% endblock %}
+{% block header %}
+{% endblock %}
 
-{% block search_placeholder %}{% trans "Find cards or card containers" %}{% endblock %}
+{% block filter %}
+<!-- ko if: $data.filter_function -->
+<div class="permission-manager-filter" style="display:none" data-bind="visible: $data.filter_function">
+    <div class='filter-bar'>
+    <input type="text" class="form-control" style="" placeholder="{% trans 'Find a card' %}" data-bind="value: $data.filter, valueUpdate: 'afterkeydown'">
+
+    <!-- Clear Search -->
+    <span class="clear-node-search" data-bind="click: $data.clearSearch"><i class="fa fa-times-circle"></i></span>
+
+    <!-- ko if: $data.single_select == false -->
+    <div class="pad-rgt pad-btm clear-selection">
+        <a class="clear-selection-link" style="" data-bind="click: clearSelection">{% trans "Clear" %}</a>
+    </div>
+    <!-- /ko -->
+    </div>
+</div>
+{% endblock %}
 
 
 {% block list_wrapper %}
-<span class="display-nodes-toggle">
-    <button class="btn btn-shim btn-primary btn-labeled btn-lg" style="width: 100%; height: 22px; margin-bottom: 10px; font-size: 11px; padding-bottom: 3px;" data-bind="click: function(){showNodes(!showNodes());}, text: showNodes() ? '{% trans "Hide Nodes" %}' : '{% trans "Show Nodes" %}'">{% trans "Show Nodes" %}</button>
-</span>
 
 <!-- ko foreach: { data: [$data], as: 'self' } -->
-<div class="perm-nodes-list" style="display: none;" data-bind="visible: self">
+<div class="permission-manager-item-list" style="display: none;" data-bind="visible: self">
 
     <!-- TOC Cards/Widgets -->
     <div class="card-tree-container">
@@ -69,7 +83,7 @@
                 <i class="node-permission-icon" data-bind="css: $data.icon"></i>
                 <!-- /ko -->
             </span>
-            
+
             <!-- ko if: card.type === 'card' -->
             <span class="expando">
                 <i class="expand-icon" id="cc-expand-1" class="expand-cc-child-nodes" data-bind="click: self.toggleNodes, css: {'ion-arrow-down-b': card.visible(), 'ion-arrow-left-b': !card.visible()}"></i>
