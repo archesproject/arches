@@ -28,7 +28,7 @@
             <div id="report-image-grid" class="report-image-grid" data-bind="foreach: items">
 
                 <!-- card -->
-                <div class="data-widget-grid-item relative" data-bind="drag: {value: $data}, visible: $data.filtered() == false">
+                <div class="data-widget-grid-item relative" data-bind="drag: {value: $data, preventDrag: isactive === false}, visible: $data.filtered() == false, css:{'card-locked': isactive === false}">
                     <div class="panel mar-no">
 
                         <!-- card Name -->
@@ -48,7 +48,12 @@
 
                         <!-- card Tools -->
                         <div class="panel-footer" style="height: 40px;">
+                            <!--ko if: isactive === true -->
                             <a href="#" class="pull-right" data-bind="click: $root.addCard.bind($root)"><i class="ion-plus-circled"></i>{% trans "Add Card" %}</a>
+                            <!--/ko-->
+                            <!--ko if: isactive === false -->
+                            <a href="#" class="pull-right disabled"></i>{% trans "Inactive" %}</a>
+                            <!--/ko-->
                         </div>
                     </div>
                 </div>

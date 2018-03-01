@@ -1019,6 +1019,11 @@ a.select2-search-choice-close {
     font-weight: 600;
 }
 
+.disabled .listitem_name {
+    font-weight: 600;
+    color: #999;
+}
+
 .selected div .name {
     font-weight: 600;
 }
@@ -5648,6 +5653,15 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     opacity: .9;
     margin: 3px;
 }
+
+.data-widget-grid-item .disabled {
+    color: #999;
+}
+
+.data-widget-grid-item.disabled {
+    color: #999;
+}
+
 
 .data-widget-grid-item:hover {
     cursor: move;
