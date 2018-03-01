@@ -145,17 +145,19 @@ define([
         */
         selectItem: function(item, evt){
             ListView.prototype.selectItem.apply(this, arguments);
+            if (item.isactive) {
 
-            if(item.selected()){
-                this.selectedBranch(item);
-                this.graph = new GraphBase({
-                    el: $('#branch-preview'),
-                    graphModel: item.graphModel
-                });
-                this.viewMetadata(true);
-            }else{
-                this.selectedBranch(null);
-                this.viewMetadata(false);
+                if(item.selected()){
+                    this.selectedBranch(item);
+                    this.graph = new GraphBase({
+                        el: $('#branch-preview'),
+                        graphModel: item.graphModel
+                    });
+                    this.viewMetadata(true);
+                }else{
+                    this.selectedBranch(null);
+                    this.viewMetadata(false);
+                }
             }
         },
 

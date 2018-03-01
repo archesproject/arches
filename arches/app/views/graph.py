@@ -157,7 +157,7 @@ class GraphManagerView(GraphBaseView):
 
         self.graph = Graph.objects.get(graphid=graphid)
         datatypes = models.DDataType.objects.all()
-        branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True).exclude(isactive=False)
+        branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True)
         if self.graph.ontology is not None:
             branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
@@ -329,7 +329,7 @@ class CardManagerView(GraphBaseView):
             cardid = card.cardid
             return redirect('card', cardid=cardid)
 
-        branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True).exclude(isactive=False)
+        branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True)
         if self.graph.ontology is not None:
             branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
 
