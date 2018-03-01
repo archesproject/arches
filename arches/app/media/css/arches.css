@@ -1029,10 +1029,25 @@ a.select2-search-choice-close {
     cursor: default;
 }
 
+.library-card.permissions.selected.selected-card {
+    background: #fff;
+    color: #656665;
+    border-left: 0px;
+    cursor: default;
+}
+
 .library-card:hover {
     background-color: #fff;
     cursor: pointer;
     border-left: 5px solid steelblue;
+    opacity: 1.0;
+}
+
+
+.library-card.permissions.library-card-wide:hover {
+    background-color: #fff;
+    cursor: pointer;
+    border-left: 0px;
     opacity: 1.0;
 }
 
@@ -1170,11 +1185,40 @@ a.select2-search-choice-close {
     margin-left: 5px;
 }
 
+.selected-group-user-permissions {
+    position: absolute;
+    left: 30px;
+    width: 100%;
+}
+
+.permissions-options {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-checkbox.form-normal.form-primary.permission-option {
+    padding-left: 22px;
+    padding-bottom: 5px;
+}
+
+.selected-group-user-permissions .library-icon-permissions {
+    top: 0px;
+}
+
+.permission-manager {
+    background-color: white;
+}
+
 .permission-manager.panel-body {
     display: flex;
     background-color: white;
     margin: 1px;
     height: 675px;
+}
+
+.permission-manager .card-content-container {
+    padding: 10px 50px 10px;
+    background-color: white;
 }
 
 .permission-manager-filter {
@@ -1186,9 +1230,21 @@ a.select2-search-choice-close {
     margin-bottom: 2px;
 }
 
-.permission-manager-filter .clear-selection-link {
+.permission-manager-filter .clear-selection a.clear-selection-link {
     padding-right: 5px;
     font-size: 13px;
+}
+
+.permission-manager-filter .clear-node-search {
+    position: absolute;
+    top: 22px;
+    font-size: 14px;
+    left: 46%;
+    width: 15px;
+}
+
+.permission-manager-item-list .card-tree-container {
+    margin-right: 0px;
 }
 
 .permission-manager .filter-bar {
@@ -1208,7 +1264,7 @@ a.select2-search-choice-close {
 
 .permission-manager.header {
     position: relative;
-    height: 55px;
+    height: 100px;
     margin-left: 2px;
     padding-left: 10px;
     color: #2b425b;
@@ -1218,6 +1274,7 @@ a.select2-search-choice-close {
 
 .permission-manager .control-panel {
     display: flex;
+    margin-left: 15px;
 }
 
 .permission-level-icon {
@@ -1270,22 +1327,41 @@ a.select2-search-choice-close {
     padding-top: 6px;
     padding-bottom: 6px;
     padding-left: 10px;
-    margin-left: -20px;
     margin-right: 10px;
-    border-left: 1px solid #ddd;
-    border-right: 1px solid #ddd;
+}
+
+.account-card-main {
+    width: 220px;
+    position: absolute;
+    left: 17px;
+    top: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+}
+
+.account-card-main a {
+    padding-left: 4px;
+}
+
+.account-card-subtitle {
+    width: 190px;
+    position: absolute;
+    left: 17px;
+    top: 25px;
+    padding: 4px 2px 3px 0px;
+    color: #8ba2b9;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .permissions-node-row:nth-child(even) {
     background: #f9f9f9;
-}
-
-.permissions-node-row:first-child {
-    border-top: 1px solid #ddd;
-}
-
-.permissions-node-row:last-child {
-    border-bottom: 1px solid #ddd;
 }
 
 .index-selector {
@@ -1328,6 +1404,7 @@ a.select2-search-choice-close {
     padding-bottom: 15px;
     margin-bottom: 10px;
     background: #fff;
+    width: 100%;
 }
 
 .permissions-list-divider {
@@ -1340,11 +1417,6 @@ a.select2-search-choice-close {
     line-height: 1.2;
     padding-left: 15px;
     font-size: 15px;
-}
-
-.node-list-panel {
-    margin-top: 50px;
-    padding-left: 15px;
 }
 
 .library-search {

@@ -20,6 +20,7 @@ define([
         */
         initialize: function(options) {
             this.selectedIdentities = options.selectedIdentities;
+            this.identityList = options.identityList;
             this.selectedCards = options.selectedCards;
             this.noAccessPerm = undefined;
             this.whiteListPerms = [];
@@ -46,6 +47,7 @@ define([
                 }
             }, this)
             this.nodegroupPermissions = ko.observableArray(options.nodegroupPermissions);
+            this.identityList.items()[0].selected(true);
         },
 
         save: function(){
