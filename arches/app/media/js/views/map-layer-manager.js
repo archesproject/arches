@@ -380,6 +380,7 @@ define([
             page: 1
         },
         success: function (results) {
+            results.results.aggregations.geo_aggs = results.results.aggregations.geo_aggs.inner.buckets[0]
             searchAggregations(results.results.aggregations);
             searchResults(results);
         }
