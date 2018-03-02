@@ -156,7 +156,7 @@ def concept(request, conceptid):
                     'sparql_providers': get_sparql_providers(),
                     'valuetype_labels': valuetypes.filter(category='label'),
                     'valuetype_notes': valuetypes.filter(category='note'),
-                    'valuetype_related_values': valuetypes.filter(category='undefined'),
+                    'valuetype_related_values': valuetypes.filter(category__in=['undefined','identifiers']),
                     'parent_relations': parent_relations,
                     'related_relations': relationtypes.filter(Q(category='Mapping Properties') | Q(relationtype = 'related')),
                     'concept_paths': concept_graph.get_paths(lang=lang),
@@ -172,7 +172,7 @@ def concept(request, conceptid):
                     'languages': languages,
                     'valuetype_labels': valuetypes.filter(category='label'),
                     'valuetype_notes': valuetypes.filter(category='note'),
-                    'valuetype_related_values': valuetypes.filter(category='undefined'),
+                    'valuetype_related_values': valuetypes.filter(category__in=['undefined','identifiers']),
                     'related_relations': relationtypes.filter(relationtype = 'member'),
                     'concept_paths': concept_graph.get_paths(lang=lang)
                 })
