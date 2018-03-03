@@ -276,7 +276,20 @@
             </div>
             <!--/ko-->
 
-            <!-- ko if: popupData().geojson -->
+            <!--ko if: popupData().arches_description-->
+            <div class="hover-feature-metadata">
+                <i class="ion-ios-close pull-right add-tooltip hover-panel-dismiss"
+                style="cursor: pointer;"
+                data-placement="left"
+                data-toggle="tooltip"
+                data-original-title="add overlay"
+                data-bind="visible: popupData() === clickData(), click: function () { clickData(null); }"
+                ></i>
+                <div class="hover-feature-body" data-bind="html: popupData().arches_description"></div>
+            </div>
+            <!--/ko-->
+
+            <!-- ko if: popupData().geojson && context != 'search-filter' -->
             <div class="hover-panel-small">
                 <div class="hover-feature-title-bar">
                     <div class="hover-feature-title">{% trans "Add drawing?" %}</div>

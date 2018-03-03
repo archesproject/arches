@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from django.shortcuts import render
 from arches.app.models.system_settings import settings
+from django.http import HttpResponseNotFound, HttpResponse
 
 def index(request):
     return render(request, 'index.htm', {
@@ -46,6 +47,15 @@ def templates(request, template):
 def help_templates(request):
     template = request.GET.get('template')
     return render(request, 'help/%s.htm' % template)
+
+def feature_popup_content(request):
+    url = request.POST.get('url', None)
+    if url is not None:
+        import urllib2
+        f = urllib2.urlopen(url)
+        return HttpResponse(f.read(100))
+
+
 
 def custom_404(request):
     request = None
