@@ -5308,6 +5308,15 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     border-top: none;
 }
 
+.provisional-edits {
+    pointer-events: none;
+    cursor: default;
+    padding: 3px 5px 5px 5px;
+    margin-right: 10px;
+    background: #F5BB25;
+    color: #fff;
+}
+
 .provisional-edits-list {
     width: 0px;
     background-color: #f0f0f0;
@@ -5345,6 +5354,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     width: 350px;
     transition: all .30s ease;
     padding: 0px;
+    border-top-width: 0px;
 }
 
 .provisional-edits-list.closed {
@@ -5371,6 +5381,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 .provisional-edit-cards dd {
     position: relative;
     padding-left: 15px;
+    word-wrap: break-word;
 }
 
 .layer-list {
@@ -7054,7 +7065,7 @@ div.row.widget-wrapper.report-header:hover {
     padding: 10px 25px;
     width: calc(100% - 325px);
     background: #fcfcfc;
-    height: calc(100vh - 35px);
+    /*height: calc(100vh - 35px);*/
     border: 1px solid #bbb;
     z-index: 1100;
 }
@@ -7063,6 +7074,11 @@ div.row.widget-wrapper.report-header:hover {
     margin-left: 10px;
     margin-right: 0px;
     border-top-width: 0px;
+}
+
+#overlay-grid.grid {
+    height: 1600px;
+    overflow-y: scroll;
 }
 
 .overlay-selection-container.selector-closed {
@@ -7095,8 +7111,8 @@ div.row.widget-wrapper.report-header:hover {
     padding-top: 0px;
     padding-left: 0px;
     padding-bottom: 5px;
-    height: 100vh;
-    overflow-y: auto;
+    height: 1000px;
+    overflow-y: scroll;
 }
 
 .overlay-filter {
@@ -8899,6 +8915,11 @@ ul.pagination {
     float: right;
     margin-right: 30px;
     margin-top: 3px;
+    font-weight: 500;
+}
+
+.provisional-tile.qa-btn:hover {
+    cursor: pointer;
 }
 
 .selected-provisional-tile {
