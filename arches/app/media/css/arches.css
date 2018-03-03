@@ -7065,7 +7065,7 @@ div.row.widget-wrapper.report-header:hover {
     padding: 10px 25px;
     width: calc(100% - 325px);
     background: #fcfcfc;
-    height: calc(100vh - 35px);
+    /*height: calc(100vh - 35px);*/
     border: 1px solid #bbb;
     z-index: 1100;
 }
@@ -7074,6 +7074,11 @@ div.row.widget-wrapper.report-header:hover {
     margin-left: 10px;
     margin-right: 0px;
     border-top-width: 0px;
+}
+
+#overlay-grid.grid {
+    height: 1600px;
+    overflow-y: scroll;
 }
 
 .overlay-selection-container.selector-closed {
@@ -7106,8 +7111,8 @@ div.row.widget-wrapper.report-header:hover {
     padding-top: 0px;
     padding-left: 0px;
     padding-bottom: 5px;
-    height: 100vh;
-    overflow-y: auto;
+    height: 1000px;
+    overflow-y: scroll;
 }
 
 .overlay-filter {
