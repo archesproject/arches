@@ -122,6 +122,7 @@ urlpatterns = [
     url(r'^tileserver/*', tileserver.handle_request, name="tileserver"),
     url(r'^map_layer_manager/(?P<maplayerid>%s)$' % uuid_regex, MapLayerManagerView.as_view(), name='map_layer_update'),
     url(r'^map_layer_manager/*', MapLayerManagerView.as_view(), name="map_layer_manager"),
+    url(r'^feature_popup_content$', main.feature_popup_content, name="feature_popup_content"),
     url(r'^user$', UserManagerView.as_view(), name="user_profile_manager"),
 
     # Uncomment the admin/doc line below to enable admin documentation:
