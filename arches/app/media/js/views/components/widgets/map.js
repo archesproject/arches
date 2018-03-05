@@ -1441,47 +1441,56 @@ define([
                         }
                     });
                 };
-
+                self.map.hoverFeatures = [];
                 self.map.on('mousemove', function(e) {
                     var features = self.map.queryRenderedFeatures(e.point);
-                    var hoverData = null;
-                    var clickable = false;
-                    var hoverFeature = _.find(features, function(feature) {
-                        if (feature.properties.arches_description) {
-                            hoverData = feature.properties;
+                        var updateFeatures = features.length !== self.map.hoverFeatures.length
+                        if (!updateFeatures && features.length > 0 && self.map.hoverFeatures.length > 0) {
+                            updateFeatures = features[0].id !== self.map.hoverFeatures[0].id
                         }
-                        if (feature.properties.resourceinstanceid) {
-                            return isFeatureVisible(feature);
-                        }
-                    }) || _.find(features, function(feature) {
-                        if (feature.layer.id === 'search-results-hex') {
-                            return isFeatureVisible(feature);
-                        }
-                    }) || (
-                        self.context === 'resource-editor' && _.find(features, function(feature) {
-                            if (feature.properties.geojson) {
-                                return isFeatureVisible(feature);
+                        if (updateFeatures) {
+                            var hoverData = null;
+                            var clickable = false;
+                            var hoverFeature = _.find(features, function(feature) {
+                                if (feature.properties.arches_description) {
+                                    hoverData = feature.properties;
+                                }
+                                if (feature.properties.resourceinstanceid) {
+                                    return isFeatureVisible(feature);
+                                }
+                            }) || _.find(features, function(feature) {
+                                if (feature.layer.id === 'search-results-hex') {
+                                    return isFeatureVisible(feature);
+                                }
+                            }) || (
+                                self.context === 'resource-editor' && _.find(features, function(feature) {
+                                    if (feature.properties.geojson) {
+                                        return isFeatureVisible(feature);
+                                    }
+                                })
+                            ) || null;
+
+                            if (hoverFeature && hoverFeature.properties) {
+                                hoverData = hoverFeature.properties;
+                                if (hoverFeature.properties.resourceinstanceid) {
+                                    hoverData = lookupResourceData(hoverData);
+                                    clickable = true;
+                                }
+                                if (hoverFeature.properties.geojson) {
+                                    clickable = true;
+                                }
                             }
-                        })
-                    ) || null;
 
-                    if (hoverFeature && hoverFeature.properties) {
-                        hoverData = hoverFeature.properties;
-                        if (hoverFeature.properties.resourceinstanceid) {
-                            hoverData = lookupResourceData(hoverData);
-                            clickable = true;
+                            if (self.hoverData() !== hoverData) {
+                                self.hoverData(hoverData);
+                                var hoverFeatureId = hoverFeature && hoverFeature.properties.resourceinstanceid ? hoverFeature.properties.resourceinstanceid : '';
+                                highlightResource(hoverFeatureId, 'hover')
+                            }
+                            self.map.getCanvas().style.cursor = clickable ? 'pointer' : '';
+                            self.map.hoverFeatures = features;
+                        } else {
+                            console.log('already on that feature')
                         }
-                        if (hoverFeature.properties.geojson) {
-                            clickable = true;
-                        }
-                    }
-
-                    if (self.hoverData() !== hoverData) {
-                        self.hoverData(hoverData);
-                        var hoverFeatureId = hoverFeature && hoverFeature.properties.resourceinstanceid ? hoverFeature.properties.resourceinstanceid : '';
-                        highlightResource(hoverFeatureId, 'hover')
-                    }
-                    self.map.getCanvas().style.cursor = clickable ? 'pointer' : '';
                 });
 
                 map.on('click', function(e) {
