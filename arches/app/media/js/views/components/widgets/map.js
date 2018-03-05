@@ -174,17 +174,20 @@ define([
                     var popupdata = val()
                     var expression = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
                     var regex = new RegExp(expression);
-                    if (popupdata.arches_description.match(regex)) {
-                        $.ajax({
-                            url: arches.urls.feature_popup_content,
-                            data: {url:popupdata.arches_description},
-                            method: 'POST'
-                        }).done(function(data){
-                            popupdata.arches_description = data;
-                            val(popupdata);
-                        }, this).fail(function(data){
-                            console.log('error', data)
-                        })
+                    var match = popupdata.arches_description.match(regex)
+                    if (match) {
+                        if (popupdata.arches_description === match[0]) {
+                            $.ajax({
+                                url: arches.urls.feature_popup_content,
+                                data: {url:popupdata.arches_description},
+                                method: 'POST'
+                            }).done(function(data){
+                                popupdata.arches_description = data;
+                                val(popupdata);
+                            }, this).fail(function(data) {
+                                console.log('failed', data)
+                            })
+                        }
                     }
                 }
             }
@@ -1488,8 +1491,6 @@ define([
                             }
                             self.map.getCanvas().style.cursor = clickable ? 'pointer' : '';
                             self.map.hoverFeatures = features;
-                        } else {
-                            console.log('already on that feature')
                         }
                 });
 
