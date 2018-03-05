@@ -56,7 +56,7 @@ def feature_popup_content(request):
     if url is not None:
         host = '{uri.hostname}'.format(uri=urlparse(url))
         try:
-            if host in settings.ALLOWED_HOSTS:
+            if host in settings.ALLOWED_POPUP_HOSTS:
                 if url is not None:
                     f = urllib2.urlopen(url)
                     return HttpResponse(f.read())
