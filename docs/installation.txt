@@ -97,7 +97,7 @@ Now that you have Arches installed and a Project created, you are ready to begin
 
 * For a quick start that will create an example database schema in your new Arches project (and allow you to begin recording data right away), you can **load a sample package** with the following command::
 
-    python manage.py packages -o load_package -s https://github.com/archesproject/arches-sample-data/archive/master.zip -db true
+    python manage.py packages -o load_package -s https://github.com/archesproject/arches4-example-pkg/archive/master.zip -db true
 
 General Troubleshooting
 =======================
