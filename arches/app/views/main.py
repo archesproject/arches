@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import urllib2
+from urlparse import urlparse
 from django.shortcuts import render
 from arches.app.models.system_settings import settings
 from django.http import HttpResponseNotFound, HttpResponse
@@ -51,14 +52,20 @@ def help_templates(request):
 
 def feature_popup_content(request):
     url = request.POST.get('url', None)
-    try:
-        if url is not None:
-            f = urllib2.urlopen(url)
-            return HttpResponse(f.read(100))
-    except:
+
+    if url is not None:
+        host = '{uri.hostname}'.format(uri=urlparse(url))
+        try:
+            if host in settings.ALLOWED_HOSTS:
+                if url is not None:
+                    f = urllib2.urlopen(url)
+                    return HttpResponse(f.read())
+            else:
+                raise Exception()
+        except:
+            return HttpResponseNotFound()
+    else:
         return HttpResponseNotFound()
-
-
 
 def custom_404(request):
     request = None
