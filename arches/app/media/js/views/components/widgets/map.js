@@ -170,7 +170,35 @@ define([
 
             this.hoverData = ko.observable(null);
             this.clickData = ko.observable(null);
+            this.getMarkup = function(val){
+                if (val().arches_description) {
+                    var popupdata = val()
+                    var expression = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
+                    var regex = new RegExp(expression);
+                    var match = popupdata.arches_description.match(regex)
+                    if (match) {
+                        if (popupdata.arches_description === match[0]) {
+                            $.ajax({
+                                url: arches.urls.feature_popup_content,
+                                data: {url:popupdata.arches_description},
+                                method: 'POST'
+                            }).done(function(data){
+                                popupdata.arches_description = data;
+                                val(popupdata);
+                            }, this).fail(function(data) {
+                                console.log('failed', data)
+                            })
+                        }
+                    }
+                }
+            }
             this.popupData = ko.computed(function() {
+                if (self.hoverData()) {
+                    self.getMarkup(self.hoverData);
+                }
+                if (self.clickData()) {
+                    self.getMarkup(self.clickData);
+                }
                 var clickData = self.clickData();
                 return clickData ? clickData : self.hoverData();
             });
@@ -1421,44 +1449,54 @@ define([
                         }
                     });
                 };
-
+                self.map.hoverFeatures = [];
                 self.map.on('mousemove', function(e) {
                     var features = self.map.queryRenderedFeatures(e.point);
-                    var hoverData = null;
-                    var clickable = false;
-                    var hoverFeature = _.find(features, function(feature) {
-                        if (feature.properties.resourceinstanceid) {
-                            return isFeatureVisible(feature);
+                        var updateFeatures = features.length !== self.map.hoverFeatures.length
+                        if (!updateFeatures && features.length > 0 && self.map.hoverFeatures.length > 0) {
+                            updateFeatures = features[0].id !== self.map.hoverFeatures[0].id
                         }
-                    }) || _.find(features, function(feature) {
-                        if (feature.layer.id === 'search-results-hex') {
-                            return isFeatureVisible(feature);
-                        }
-                    }) || (
-                        self.context === 'resource-editor' && _.find(features, function(feature) {
-                            if (feature.properties.geojson) {
-                                return isFeatureVisible(feature);
+                        if (updateFeatures) {
+                            var hoverData = null;
+                            var clickable = false;
+                            var hoverFeature = _.find(features, function(feature) {
+                                if (feature.properties.arches_description) {
+                                    hoverData = feature.properties;
+                                }
+                                if (feature.properties.resourceinstanceid) {
+                                    return isFeatureVisible(feature);
+                                }
+                            }) || _.find(features, function(feature) {
+                                if (feature.layer.id === 'search-results-hex') {
+                                    return isFeatureVisible(feature);
+                                }
+                            }) || (
+                                self.context === 'resource-editor' && _.find(features, function(feature) {
+                                    if (feature.properties.geojson) {
+                                        return isFeatureVisible(feature);
+                                    }
+                                })
+                            ) || null;
+
+                            if (hoverFeature && hoverFeature.properties) {
+                                hoverData = hoverFeature.properties;
+                                if (hoverFeature.properties.resourceinstanceid) {
+                                    hoverData = lookupResourceData(hoverData);
+                                    clickable = true;
+                                }
+                                if (hoverFeature.properties.geojson) {
+                                    clickable = true;
+                                }
                             }
-                        })
-                    ) || null;
 
-                    if (hoverFeature && hoverFeature.properties) {
-                        hoverData = hoverFeature.properties;
-                        if (hoverFeature.properties.resourceinstanceid) {
-                            hoverData = lookupResourceData(hoverData);
-                            clickable = true;
+                            if (self.hoverData() !== hoverData) {
+                                self.hoverData(hoverData);
+                                var hoverFeatureId = hoverFeature && hoverFeature.properties.resourceinstanceid ? hoverFeature.properties.resourceinstanceid : '';
+                                highlightResource(hoverFeatureId, 'hover')
+                            }
+                            self.map.getCanvas().style.cursor = clickable ? 'pointer' : '';
+                            self.map.hoverFeatures = features;
                         }
-                        if (hoverFeature.properties.geojson) {
-                            clickable = true;
-                        }
-                    }
-
-                    if (self.hoverData() !== hoverData) {
-                        self.hoverData(hoverData);
-                        var hoverFeatureId = hoverFeature && hoverFeature.properties.resourceinstanceid ? hoverFeature.properties.resourceinstanceid : '';
-                        highlightResource(hoverFeatureId, 'hover')
-                    }
-                    self.map.getCanvas().style.cursor = clickable ? 'pointer' : '';
                 });
 
                 map.on('click', function(e) {
@@ -1468,6 +1506,9 @@ define([
                     var features = self.map.queryRenderedFeatures(e.point);
                     var clickData = null;
                     var clickFeature = _.find(features, function(feature) {
+                        if (feature.properties.arches_description) {
+                            clickData = feature.properties;
+                        }
                         if (feature.properties.resourceinstanceid) {
                             return isFeatureVisible(feature);
                         }
@@ -1477,6 +1518,7 @@ define([
                         }
                     }) || null;
                     if (clickFeature) {
+
                         if (clickFeature.properties.resourceinstanceid) {
                             clickData = lookupResourceData(clickFeature.properties);
                         } else if (clickFeature.properties.total > 1) {
