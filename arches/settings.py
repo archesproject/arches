@@ -494,6 +494,7 @@ HEX_BIN_SIZE = 100
 # high precision binning may result in performance issues.
 HEX_BIN_PRECISION = 4
 
+ALLOWED_POPUP_HOSTS = []
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###
 ##########################################
