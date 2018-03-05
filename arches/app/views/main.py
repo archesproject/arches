@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import urllib2
 from django.shortcuts import render
 from arches.app.models.system_settings import settings
 from django.http import HttpResponseNotFound, HttpResponse
@@ -50,10 +51,12 @@ def help_templates(request):
 
 def feature_popup_content(request):
     url = request.POST.get('url', None)
-    if url is not None:
-        import urllib2
-        f = urllib2.urlopen(url)
-        return HttpResponse(f.read(100))
+    try:
+        if url is not None:
+            f = urllib2.urlopen(url)
+            return HttpResponse(f.read(100))
+    except:
+        return HttpResponseNotFound()
 
 
 
