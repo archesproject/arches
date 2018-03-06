@@ -929,3 +929,15 @@ class MobileSurveyXCard(models.Model):
         managed = True
         db_table = 'mobile_surveys_x_cards'
         unique_together = ('mobile_survey', 'card',)
+
+
+class MapMarker(models.Model):
+    name = models.TextField(unique=True)
+    url = models.TextField()
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        managed = True
+        db_table = 'map_markers'
