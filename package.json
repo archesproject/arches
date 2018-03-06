@@ -40,7 +40,7 @@
         "leaflet-draw": "^0.4.9",
         "leaflet-iiif": "^1.1.1",
         "lt-themify-icons": "^1.1.0",
-        "mapbox-gl": "0.44.0",
+        "mapbox-gl": "0.44.1",
         "mathjs": "^3.11.4",
         "metismenu": "^2.7.2",
         "moment": ">=2.10.5",
