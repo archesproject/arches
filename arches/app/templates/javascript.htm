@@ -257,12 +257,6 @@
             preferredCoordinateSystems: {% autoescape off %}{{ map_info.preferred_coordinate_systems }}{% endautoescape %},
             useSemanticRelationships: {{ app_settings.USE_SEMANTIC_RESOURCE_RELATIONSHIPS|lower }},
             geocoderDefault: '{{ map_info.geocoder_default }}',
-            // mapMarkers:[
-            //     {
-            //         name: 'custom-marker',
-            //         url: 'https://i.imgur.com/MK4NUzI.png'
-            //     }
-            // ],
             mapMarkers: [{% autoescape off %}{% for map_marker in map_markers %}{
                 'name': '{{ map_marker.name }}',
                 'url': '{{ map_marker.url }}',
