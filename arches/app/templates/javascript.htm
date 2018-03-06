@@ -257,6 +257,10 @@
             preferredCoordinateSystems: {% autoescape off %}{{ map_info.preferred_coordinate_systems }}{% endautoescape %},
             useSemanticRelationships: {{ app_settings.USE_SEMANTIC_RESOURCE_RELATIONSHIPS|lower }},
             geocoderDefault: '{{ map_info.geocoder_default }}',
+            mapMarkers: [{% autoescape off %}{% for map_marker in map_markers %}{
+                'name': '{{ map_marker.name }}',
+                'url': '{{ map_marker.url }}',
+            },{% endfor %}{% endautoescape %}],
             mapSources: {{% autoescape off %}{% for map_source in map_sources %}
                 '{{ map_source.name }}': {{ map_source.source_json }},
             {% endfor %}{% for resource_map_source in resource_map_sources %}

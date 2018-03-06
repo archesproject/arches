@@ -55,6 +55,7 @@ class SearchView(BaseManagerView):
     def get(self, request):
         saved_searches = JSONSerializer().serialize(settings.SAVED_SEARCHES)
         map_layers = models.MapLayer.objects.all()
+        map_markers = models.MapMarker.objects.all()
         map_sources = models.MapSource.objects.all()
         date_nodes = models.Node.objects.filter(datatype='date', graph__isresource=True, graph__isactive=True)
         resource_graphs = models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
@@ -82,6 +83,7 @@ class SearchView(BaseManagerView):
             saved_searches=saved_searches,
             date_nodes=searchable_date_nodes,
             map_layers=map_layers,
+            map_markers=map_markers,
             map_sources=map_sources,
             geocoding_providers=geocoding_providers,
             main_script='views/search',

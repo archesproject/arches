@@ -73,6 +73,7 @@ class MobileSurveyManagerView(BaseManagerView):
             identities.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions': set(default_perms), 'is_superuser':user.is_superuser, 'group_ids': group_ids, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email})
 
         map_layers = models.MapLayer.objects.all()
+        map_markers = models.MapMarker.objects.all()
         map_sources = models.MapSource.objects.all()
         geocoding_providers = models.Geocoder.objects.all()
 
@@ -91,6 +92,7 @@ class MobileSurveyManagerView(BaseManagerView):
         serializer = JSONSerializer()
         context = self.get_context_data(
             map_layers=map_layers,
+            map_markers=map_markers,
             map_sources=map_sources,
             geocoding_providers=geocoding_providers,
             mobile_surveys=serializer.serialize(mobile_surveys, sort_keys=False),

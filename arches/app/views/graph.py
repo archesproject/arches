@@ -365,6 +365,7 @@ class CardView(GraphBaseView):
         widgets = models.Widget.objects.all()
         geocoding_providers = models.Geocoder.objects.all()
         map_layers = models.MapLayer.objects.all()
+        map_markers = models.MapMarker.objects.all()
         map_sources = models.MapSource.objects.all()
         resource_graphs = Graph.objects.exclude(pk=card.graph_id).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
@@ -386,6 +387,7 @@ class CardView(GraphBaseView):
             widgets=widgets,
             widgets_json=JSONSerializer().serialize(widgets),
             map_layers=map_layers,
+            map_markers=map_markers,
             map_sources=map_sources,
             resource_graphs=resource_graphs,
             concept_collections=concept_collections,
@@ -569,6 +571,7 @@ class ReportEditorView(GraphBaseView):
             forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
             cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
             map_layers = models.MapLayer.objects.all()
+            map_markers = models.MapMarker.objects.all()
             map_sources = models.MapSource.objects.all()
             resource_graphs = Graph.objects.exclude(pk=report.graph.pk).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
             datatypes = models.DDataType.objects.all()
@@ -588,6 +591,7 @@ class ReportEditorView(GraphBaseView):
                 cards=JSONSerializer().serialize(cards),
                 datatypes_json=JSONSerializer().serialize(datatypes),
                 map_layers=map_layers,
+                map_markers=map_markers,
                 map_sources=map_sources,
                 geocoding_providers=geocoding_providers,
                 resource_graphs=resource_graphs,

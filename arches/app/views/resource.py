@@ -103,6 +103,7 @@ class ResourceEditorView(BaseManagerView):
             datatypes = models.DDataType.objects.all()
             widgets = models.Widget.objects.all()
             map_layers = models.MapLayer.objects.all()
+            map_markers = models.MapMarker.objects.all()
             map_sources = models.MapSource.objects.all()
             geocoding_providers = models.Geocoder.objects.all()
             forms = graph.form_set.filter(visible=True)
@@ -140,6 +141,7 @@ class ResourceEditorView(BaseManagerView):
                 widgets=widgets,
                 date_nodes=date_nodes,
                 map_layers=map_layers,
+                map_markers=map_markers,
                 map_sources=map_sources,
                 geocoding_providers = geocoding_providers,
                 widgets_json=JSONSerializer().serialize(widgets),
@@ -408,6 +410,7 @@ class ResourceReportView(BaseManagerView):
 
         if str(report.template.templateid) == '50000000-0000-0000-0000-000000000002':
             map_layers = models.MapLayer.objects.all()
+            map_markers = models.MapMarker.objects.all()
             map_sources = models.MapSource.objects.all()
             geocoding_providers = models.Geocoder.objects.all()
         else:
@@ -431,6 +434,7 @@ class ResourceReportView(BaseManagerView):
             related_resources=JSONSerializer().serialize(related_resource_summary, sort_keys=False),
             widgets=widgets,
             map_layers=map_layers,
+            map_markers=map_markers,
             map_sources=map_sources,
             graph_id=resource.graph.pk,
             graph_name=resource.graph.name,
