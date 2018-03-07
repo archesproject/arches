@@ -1,3 +1,4 @@
+dist: trusty
 notifications:
     email:  false
 
@@ -22,7 +23,7 @@ addons:
       - libpq-dev
       - openjdk-7-jdk
       - python-dev
-      - postgresql-9.6-postgis-2.3
+      - postgresql-9.3-postgis-2.3
       
 services:
   - postgresql
