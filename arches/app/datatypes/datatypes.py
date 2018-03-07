@@ -1113,9 +1113,11 @@ class ResourceInstanceDataType(BaseDataType):
         se = SearchEngineFactory().create()
         id_list = self.get_id_list(nodevalue)
         for resourceid in id_list:
-            print resourceid
-            resource_document = se.search(index='resource', doc_type='_all', id=resourceid)
-            resource_names.add(resource_document['_source']['displayname'])
+            try:
+                resource_document = se.search(index='resource', doc_type='_all', id=resourceid)
+                resource_names.add(resource_document['_source']['displayname'])
+            except:
+                print 'resource not available'
         return resource_names
 
     def validate(self, value, source=''):
@@ -1124,9 +1126,9 @@ class ResourceInstanceDataType(BaseDataType):
 
         for resourceid in id_list:
             try:
-                models.Resource.objects.get(pk=resourceid)
+                models.ResourceInstance.objects.get(pk=resourceid)
             except:
-                errors.append({'type': 'ERROR', 'message': '{0} is not a valid resource id. This data was not imported.'.format(v)})
+                errors.append({'type': 'ERROR', 'message': 'The resource id: {0} does not exist in the system. This data was not imported.'.format(resourceid)})
         return errors
 
     def get_display_value(self, tile, node):
