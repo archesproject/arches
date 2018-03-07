@@ -111,6 +111,16 @@ class Tile(models.TileModel):
         edit.edittype = edit_type
         edit.save()
 
+    def validate(self, errors=None):
+        for nodeid, value in self.data.iteritems():
+            datatype_factory = DataTypeFactory()
+            node = models.Node.objects.get(nodeid=nodeid)
+            datatype = datatype_factory.get_instance(node.datatype)
+            error = datatype.validate(value)
+            if errors != None:
+                errors += error
+        return errors
+
     def save(self, *args, **kwargs):
         request = kwargs.pop('request', None)
         index = kwargs.pop('index', True)
