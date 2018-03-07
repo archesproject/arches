@@ -1,100 +1,25 @@
-# Arches
-
-A web-based, geospatial information system for cultural heritage inventory and management.
-
-Arches is purpose-built for the international cultural heritage field, and it is designed to record all types of immovable heritage, including archaeological sites, buildings and other historic structures, landscapes, and heritage ensembles or districts.
-
-Please see the [project page](http://archesproject.org/) for more information on the Arches project.
-
-The Arches Installation Guide and Arches User Guide are available [here](http://archesproject.org/documentation/).
-
-## System Requirements
-
-Please note that Arches has been developed for modern browsers. It supports:
-
-* Firefox
-* Chrome
-* Safari
-* Opera
-* Internet Explorer 10 or higher.
-
-Minimum system requirements:
-
-* At least 4GB of RAM for evaluation and testing, or 8 to 16GB for production.
-* 10GB minimum to install the code base and test dataset, but disk space requirements will vary greatly depending on the size of your dataset
-
-## Dependencies
-
-* PostgreSQL relational database (version 9.3)
-* PostGIS (version 2.x) spatial module for PostgreSQL
-* Python (version 2.7.6 - there seem to be issues with later versions of python)
-* GEOS
-
-These instructions will provide some guidance on installing
-the required dependencies and getting Arches up and running quickly:
-
-http://arches3.readthedocs.org/en/latest/installing-dependencies-linux/
-
-http://arches3.readthedocs.org/en/latest/installing-dependencies-windows/
-
-## Installing Arches
-
-For the installation process you will need **pip** installed on your system. If you don't already have it, you can find instructions to install it here: https://pip.pypa.io/en/latest/installing.html
-
-If you have installed the dependencies, you're ready to install Arches.
-
-1. Create the Arches Project folder:
-
-    * Create a folder called 'Projects' (or some other meaningful name) on your system.    
-2.  Install virtualenv:
-
-    * Open a command prompt and type:
-
-            $ pip install virtualenv==1.11.4
-
-    * virtualenv creates a directory with it's own installation of Python and Python executables.
-
-3. Create the ENV folder:
-
-    Navigate to your Projects directory (or wherever you named the root Arches folder) and create your virtual environment with the following command:
-
-        $ virtualenv ENV
-
-4. Install Arches:
-
-    * Activate your virtual environment with the following command:
-
-        * On Linux (and other POSIX systems):
-
-                $ source ENV/bin/activate
-
-        * On Windows:
-
-                \path to 'Projects'\ENV\Scripts\activate
-
-    * You should see the name of your virtual environment in parentheses proceeding your command prompt like so `(ENV)`:
-
-            (ENV)$
-
-    Install Arches (your virtual environment must be activated):
-
-            (ENV)$ pip install arches
+# EAMENA - Endangered Archaeology in the Middle East and North Africa
 
 
+## Background 
 
-That's it, you're done.  You should now have a folder structure that looks like this:
+The Endangered Archaeology in the Middle East and North Africa (EAMENA) project is funded by the [Arcadia Fund](https://www.arcadiafund.org.uk/) and by the British Council's [Cultural Protection Fund](https://www.britishcouncil.org/arts/culture-development/cultural-protection-fund) and it is based at the Universities of [Oxford](http://www.ox.ac.uk/), [Leicester](https://le.ac.uk/) and [Durham](https://www.dur.ac.uk/).
 
-    /Projects
-        /ENV
+EAMENA’s primary aim is to rapidly record and evaluate the status of the archaeological landscape of the MENA region in order to create an accessible body of data which can be used by national and international heritage professionals to target those sites most in danger and better plan and implement the preservation and protection of this heritage.
 
-## Arches Applications
+EAMENA’s spatial database, based on a modified Arches platform, will provide the fundamental information for each site, including the level of risk and how each site relates to one another. It will be accessible to all heritage professionals and institutions with an interest and passion for the wonderfully rich and diverse archaeological heritage of the Middle East and North Africa. Not all damage and threats to the archaeology can be prevented, but they can be mitigated and so at the core of our project is the desire for excellence in heritage management. To this end, EAMENA works with relevant authorities on the ground to limit likely damage, share information and skills, strengthen networks and raise awareness. Fieldwork and outreach are essential components of the project and the EAMENA team will target investigations to the most threatened sites, visiting (where possible) to assess site conditions, make detailed records and liaise with national authorities to share data and findings.
 
-Generally arches applications are installed in a folder directly under the Arches root folder.  You can install as many Arches applications as you like, and they'll all use the same Arches framework and virtual environment.  A typical Arches application installation will therefore look something like this::
+## This repo
 
-    /Projects
-        /ENV (virtual environment where the Arches framework is installed)
-        /my_arches_app
-        /another_arches_app
+The EAMENA Github repo contains both the EAMENA app and the Arches app root files. The former is a modified version of the Arches HIP app. The latter is a fork of the Arches Project's repo and contains several changes, most of which project-specific, to the underlying Arches codebase (e.g. inclusion of new database models).
 
-**Note:**
-    If you want to install an existing Arches application, such as the Heritage Inventory Package (HIP), you should stop here and go to: http://arches-hip.readthedocs.org/en/latest/getting-started/#installation.
+> **Note:**
+If you are planning to install the EAMENA app only, you may do so by first of all following the Arches installation instructions available [here](http://arches3.readthedocs.io/en/latest/getting-started/#installing-arches), then by installing the Arches HIP package (instructions [here](http://arches-hip.readthedocs.org/en/latest/getting-started/#installating-arches-hip)). Once you have done this, and have created your app, download the codebase from this repo and replace the content of your app folder with that of eamena/eamena.
+If you are planning to test the Arches root codebase changes adapted by the EAMENA project, you may do so by overwriting the arches folder in your system's virtual environement with the arches folder present in this repo under ENV/lib/python2.7/site-packages/arches
+
+## Website
+Visit EAMENA at [www.eamena.org](www.eamena.org) or [eamena.arch.ox.ac.uk](eamena.arch.ox.ac.uk)
+
+## Authors
+
+** Andrea Zerbini ** andrea.zerbini@arch.ox.ac.uk
