@@ -20,7 +20,7 @@ from optparse import make_option
 from formats.archesfile import ArchesReader
 from formats.archesjson import JsonReader
 from formats.shpfile import ShapeReader
-
+from django.core.exceptions import ObjectDoesNotExist
 
 class ResourceLoader(object):
 
@@ -42,7 +42,7 @@ class ResourceLoader(object):
             help='format extension that you would like to load: arches or shp'),
         )
 
-    def load(self, source):
+    def load(self, source, appending = False):
         file_name, file_format = os.path.splitext(source)
         archesjson = False
         if file_format == '.shp':
@@ -64,7 +64,7 @@ class ResourceLoader(object):
         relationships_file = file_name + '.relations'
         elapsed = (time() - start)
         print 'time to parse {0} resources = {1}'.format(file_name, elapsed)
-        results = self.resource_list_to_entities(resources, archesjson)
+        results = self.resource_list_to_entities(resources, archesjson, appending)     
         if os.path.exists(relationships_file):
             relationships = csv.DictReader(open(relationships_file, 'r'), delimiter='|')
             for relationship in relationships:
@@ -75,9 +75,8 @@ class ResourceLoader(object):
         #self.se.bulk_index(self.resources)
 
 
-    def resource_list_to_entities(self, resource_list, archesjson=False):
+    def resource_list_to_entities(self, resource_list, archesjson=False, append=False):
         '''Takes a collection of imported resource records and saves them as arches entities'''
-
         start = time()
         d = datetime.datetime.now()
         load_id = 'LOADID:{0}-{1}-{2}-{3}-{4}-{5}'.format(d.year, d.month, d.day, d.hour, d.minute, d.microsecond) #Should we append the timestamp to the exported filename?
@@ -93,7 +92,6 @@ class ResourceLoader(object):
             if count >= progress_interval and count % progress_interval == 0:
                 print count, 'of', len(resource_list), 'loaded'
 
-
             if archesjson == False:
                 masterGraph = None
                 if current_entitiy_type != resource.entitytypeid:
@@ -108,14 +106,25 @@ class ResourceLoader(object):
                 except(ValueError):
                     entityid = ''
                     
+                if append == True:
+                  try:
+                      resource_to_delete = Resource(entityid)
+                      resource_to_delete.delete_index()
+                  except ObjectDoesNotExist:
+                      print 'Entity ',entityid,' does not exist. Nothing to delete'          
+
                 master_graph.save(user=self.user, note=load_id, resource_uuid=entityid)
-                master_graph.index()
                 resource.entityid = master_graph.entityid
+                new_resource = Resource().get(resource.entityid)
+                try:
+                    new_resource.index()
+                except:
+                    print 'Could not index resource. This may be because the valueid of a concept is not in the database.'                
                 legacyid_to_entityid[resource.resource_id] = master_graph.entityid
-            
             else:
                 new_resource = Resource(resource)
                 new_resource.save(user=self.user, note=load_id, resource_uuid=new_resource.entityid)
+                new_resource = Resource().get(new_resource.entityid)
                 try:
                     new_resource.index()
                 except:
@@ -161,7 +170,6 @@ class ResourceLoader(object):
             else:
                 node_type_to_merge_at = schema[row.attributename]['mergenodeid']
                 master_graph.merge_at(mapping_graph, node_type_to_merge_at)
-
         return master_graph
 
     def pre_save(self, master_graph):
@@ -188,7 +196,7 @@ class ResourceLoader(object):
             notes = relationship['NOTES'],
             relationshiptype = concept_value[0].valueid,
             datestarted = start_date,
-            dateended = end_date,
+            dateended = end_date
             )
 
         related_resource_record.save()

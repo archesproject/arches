@@ -322,7 +322,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
 
 .node_info p {
     margin: 0;
-    font-family: sans-serif;
+    font-family: 'PT Sans', sans-serif;
     font-size: 16px;
     line-height: 20px;
 }
@@ -434,9 +434,9 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
 
 /*Select2 overrides*/
 
-.select2-arrow{
+  .select2-arrow{
     display: none !important; /*removes the down arrow from dropdowns*/
-}
+} 
 
 .resource_search_widget_dropdown .select2-results li:first-child{     
     display:none;
@@ -456,28 +456,28 @@ input.arches-select2 {
 
 input.arches-select2::-webkit-input-placeholder {
     color: #999;
-    font-family: sans-serif;
+    font-family: 'PT Sans', sans-serif;
     font-size: 15px;
     font-weight: 200;
 }
 
 input.arches-select2:-moz-placeholder {
     color: #999;
-    font-family: sans-serif;
+    font-family: 'PT Sans', sans-serif;
     font-size: 15px;
     font-weight: 200;
 }
 
 input.arches-select2::-moz-placeholder {
     color: #999; 
-    font-family: sans-serif;
+    font-family: 'PT Sans', sans-serif;
     font-size: 15px;
     font-weight: 200;
 }
 
 input.arches-select2:-ms-input-placeholder {  
     color: #999;  
-    font-family: sans-serif;
+    font-family: 'PT Sans', sans-serif;
     font-size: 15px;
     font-weight: 200;
 }
@@ -1338,6 +1338,7 @@ input.arches-select2:-ms-input-placeholder {
     background-color: #4C85A1;
     border: 1px solid #31708f;
 }
+
 
 @media (max-width: 1800px) {
   .loading-mask {

@@ -28,8 +28,9 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Match, Query
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.utils.translation import ugettext as _
+from django.utils import translation
 import logging
-
+from arches.app.models import models as archesmodels
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +53,7 @@ class Concept(object):
         self.parentconcepts = []
         self.relatedconcepts = []
         self.hassubconcepts = False
-
+        
         if len(args) != 0:
             if isinstance(args[0], basestring):
                 try:
@@ -92,7 +93,7 @@ class Concept(object):
             self.nodetype = value.nodetype_id
             self.legacyoid = value.legacyoid
 
-    def get(self, id='', legacyoid='', include_subconcepts=False, include_parentconcepts=False, include_relatedconcepts=False, exclude=[], include=[], depth_limit=None, up_depth_limit=None, lang=settings.LANGUAGE_CODE, semantic=True, **kwargs):
+    def get(self, id='', legacyoid='', include_subconcepts=False, include_parentconcepts=False, include_relatedconcepts=False, exclude=[], include=[], depth_limit=None, up_depth_limit=None, lang=translation.get_language(), semantic=True, **kwargs):
         if id != '':
             self.load(models.Concepts.objects.get(pk=id))
         elif legacyoid != '':
@@ -169,9 +170,9 @@ class Concept(object):
         return self
             
     def save(self):
+        
         self.id = self.id if (self.id != '' and self.id != None) else str(uuid.uuid4())
         concept, created = models.Concepts.objects.get_or_create(pk=self.id, defaults={'legacyoid': self.legacyoid if self.legacyoid != '' else self.id, 'nodetype_id': self.nodetype})
-
         for value in self.values:
             if not isinstance(value, ConceptValue): 
                 value = ConceptValue(value)
@@ -263,7 +264,7 @@ class Concept(object):
         return relation
 
     @staticmethod
-    def gather_concepts_to_delete(concept, lang=settings.LANGUAGE_CODE):
+    def gather_concepts_to_delete(concept, lang=translation.get_language()):
         """
         Gets a dictionary of all the concepts ids to delete
         The values of the dictionary keys differ somewhat depending on the node type being deleted
@@ -336,6 +337,18 @@ class Concept(object):
         rows = cursor.fetchall()
         return rows
 
+    @classmethod
+    def get_parent_concept(cls, conceptvalueid):
+        """
+        Given the id of r aconcept value, return the parent category concept to which it belongs
+        e.g. when user has picked 'medium site_location_certainty_type', the value id here is 48555dd5-e4f7-4787-9d51-b7d42486fa59
+        Following the concept relation to its parent gives us the id for the field itself i.e. SITE_LOCATION_CERTAINTY_TYPE.E55
+        """
+        member_relations = models.ConceptRelations.objects.filter(conceptidto=conceptvalueid, relationtype="member")
+        parent_concept = models.Concepts.objects.get(conceptid=member_relations[0].conceptidfrom)
+        
+        return parent_concept
+
     def traverse(self, func, direction='down', scope=None):
         """
         Traverses a concept graph from self to leaf (direction='down') or root (direction='up') calling 
@@ -365,14 +378,14 @@ class Concept(object):
                 if ret != None: 
                     return ret        
 
-    def get_sortkey(self, lang=settings.LANGUAGE_CODE):
+    def get_sortkey(self, lang=translation.get_language()):
         for value in self.values:
             if value.type == 'sortorder':
                 return value.value
                 
         return self.get_preflabel(lang=lang).value
 
-    def get_preflabel(self, lang=settings.LANGUAGE_CODE):
+    def get_preflabel(self, lang=translation.get_language()):
         ret = []
         if self.values == []: 
             concept = Concept().get(id=self.id, include_subconcepts=False, include_parentconcepts=False, include=['label'])
@@ -380,12 +393,12 @@ class Concept(object):
             concept = self
         for value in concept.values:
             if value.type == 'prefLabel':
-                if value.language == lang:
+                if value.language.lower() == lang:
                     return value
-                elif value.language == lang.split('-')[0]:
+                elif value.language.lower() == lang.split('-')[0]:
                     ret.insert(0, value)
             elif value.type == 'altLabel':
-                if value.language == lang:
+                if value.language.lower() == lang:
                     ret.insert(0, value)
             ret.append(value)
         return ret[0] if len(ret) > 0 else ConceptValue()
@@ -449,8 +462,7 @@ class Concept(object):
         for subconcept in self.subconcepts:
             subconcept.index(scheme=subconcept.get_context())
 
-    def delete_index(self, delete_self=False):
-        
+    def delete_index(self, delete_self=False, top_label =False):
         def deleteconcepts(concepts_to_delete):
             for key, concept in concepts_to_delete.iteritems():
                 for conceptvalue in concept.values:
@@ -459,18 +471,15 @@ class Concept(object):
         if delete_self:
             concepts_to_delete = Concept.gather_concepts_to_delete(self)
             deleteconcepts(concepts_to_delete)
-
+        elif len(self.subconcepts) == 0 and len(self.values) == 1: #Introduced to delete index of a top concept label, which was not otherwise getting deleted.
+            label_to_delete = ConceptValue(self.values[0].id)
+            label_to_delete.delete_index()
         else:
             for subconcept in self.subconcepts:
                 concepts_to_delete = Concept.gather_concepts_to_delete(subconcept)
                 deleteconcepts(concepts_to_delete)
 
-            for value in self.values:
-                if not isinstance(value, ConceptValue):
-                    value = ConceptValue(value)
-                value.delete_index()
-
-    def concept_tree(self, top_concept='00000000-0000-0000-0000-000000000001', lang=settings.LANGUAGE_CODE):
+    def concept_tree(self, top_concept='00000000-0000-0000-0000-000000000001', lang=translation.get_language()):
         class concept(object):
             def __init__(self, *args, **kwargs):
                 self.label = ''
@@ -535,7 +544,7 @@ class Concept(object):
 
         return graph
 
-    def get_paths(self, lang=settings.LANGUAGE_CODE):
+    def get_paths(self, lang=translation.get_language()):
         def graph_to_paths(current_concept, path=[], path_list=[]):
             if len(path) == 0:
                 current_path = []
@@ -554,7 +563,7 @@ class Concept(object):
 
         return graph_to_paths(self)
 
-    def get_node_and_links(self, lang=settings.LANGUAGE_CODE):
+    def get_node_and_links(self, lang=translation.get_language()):
         nodes = [{'concept_id': self.id, 'name': self.get_preflabel(lang=lang).value,'type': 'Current'}]
         links = []
 
@@ -596,9 +605,7 @@ class Concept(object):
                 return concept.traverse(get_scheme_id, direction='up')
             else:
                 return self
-        elif self.nodetype == 'EntityType':
-            concept = Concept().get(id = '00000000-0000-0000-0000-000000000004')
-            return concept
+
         else: # like ConceptScheme or EntityType
             return self
 
@@ -630,12 +637,14 @@ class Concept(object):
 
         """
         cursor = connection.cursor()
-
+        language = translation.get_language()
         entitytype = models.EntityTypes.objects.get(pk=entitytypeid)
+        list_of_good_concepts = []
+        list_of_bad_indices = []
 
         sql = """
         WITH RECURSIVE children AS (
-            SELECT d.conceptidfrom, d.conceptidto, c2.value, c2.valueid as valueid, c.value as valueto, c.valueid as valueidto, c.valuetype as vtype, 1 AS depth, array[d.conceptidto] AS conceptpath, array[c.valueid] AS idpath        ---|NonRecursive Part
+            SELECT d.conceptidfrom, d.conceptidto, c2.value, c.languageid, c2.valueid as valueid, c.value as valueto, c.valueid as valueidto, c.valuetype as vtype, 1 AS depth, array[d.conceptidto] AS conceptpath, array[c.valueid] AS idpath        ---|NonRecursive Part
                 FROM concepts.relations d
                 JOIN concepts.values c ON(c.conceptid = d.conceptidto) 
                 JOIN concepts.values c2 ON(c2.conceptid = d.conceptidfrom) 
@@ -644,21 +653,22 @@ class Concept(object):
                 and c.valuetype in ('prefLabel', 'sortorder', 'collector')
                 and (d.relationtype = 'member' or d.relationtype = 'hasTopConcept')
                 UNION
-                SELECT d.conceptidfrom, d.conceptidto, v2.value, v2.valueid as valueid, v.value as valueto, v.valueid as valueidto, v.valuetype as vtype, depth+1, (conceptpath || d.conceptidto), (idpath || v.valueid)   ---|RecursivePart
+                SELECT d.conceptidfrom, d.conceptidto, v2.value, v.languageid, v2.valueid as valueid, v.value as valueto, v.valueid as valueidto, v.valuetype as vtype, depth+1, (conceptpath || d.conceptidto), (idpath || v.valueid)   ---|RecursivePart
                 FROM concepts.relations  d
                 JOIN children b ON(b.conceptidto = d.conceptidfrom) 
                 JOIN concepts.values v ON(v.conceptid = d.conceptidto) 
                 JOIN concepts.values v2 ON(v2.conceptid = d.conceptidfrom) 
-                WHERE  v2.valuetype = 'prefLabel'
+                and v2.valuetype = 'prefLabel'
                 and v.valuetype in ('prefLabel','sortorder', 'collector')
                 and (d.relationtype = 'member' or d.relationtype = 'hasTopConcept')
-            ) SELECT conceptidfrom, conceptidto, value, valueid, valueto, valueidto, depth, idpath, conceptpath, vtype FROM children ORDER BY depth, conceptpath;
+            ) SELECT conceptidfrom, conceptidto, value, languageid, valueid, valueto, valueidto, depth, idpath, conceptpath, vtype FROM children ORDER BY depth, conceptpath;
         """.format(entitytype.conceptid_id)
 
-
-        column_names = ['conceptidfrom', 'conceptidto', 'value', 'valueid', 'valueto', 'valueidto', 'depth', 'idpath', 'conceptpath', 'vtype']
+        column_names = ['conceptidfrom', 'conceptidto', 'value', 'languageid', 'valueid', 'valueto', 'valueidto', 'depth', 'idpath', 'conceptpath', 'vtype']
         cursor.execute(sql)
         rows = cursor.fetchall()
+
+
 
         class Val(object):
             def __init__(self, conceptid):
@@ -699,30 +709,50 @@ class Concept(object):
                             path.pop(0)
                             _findNarrower(child, path, rec)
                 val.children.sort(key=lambda x: (x.sortorder, x.text))
+                
 
-        for row in rows:
+        for row in rows: # Looks for concepts which have a label in the target language
+            rec = dict(zip(column_names, row))
+            if str(rec['languageid']).lower() == language:
+                path = rec['conceptpath'][-37:-1] #Retrieves the bottom conceptid in the conceptpath
+                list_of_good_concepts.append(path)
+                
+        for row in rows: # Looks for concepts which have multiple-language labels, including the target language, and builds an index of those rows
+            rec = dict(zip(column_names, row))
+            if str(rec['languageid']).lower() != language:
+                for concept in list_of_good_concepts:
+                    if rec['conceptpath'][-37:-1] == concept:  #Retrieves the bottom conceptid in the conceptpath
+                        list_of_bad_indices.append(rows.index(row))
+                        
+        removeset = set(list_of_bad_indices)
+        newrows = [v for i, v in enumerate(rows) if i not in removeset] # Builds the new set of rows, having purged the rows which contain concept labels in other languages for concepts that have labels in the target language
+        
+        for row in newrows:
             rec = dict(zip(column_names, row))
             path = rec['conceptpath'][1:-1].split(',')
             _findNarrower(result, path, rec)
 
+
+            
         return JSONSerializer().serializeToPython(result)['children']
 
     @staticmethod
     def get_time_filter_data():
         important_dates = []
-        for date_search_entity_type in settings.DATE_SEARCH_ENTITY_TYPES:
-            important_dates = important_dates + Concept().get_e55_domain(date_search_entity_type)
+        lang = translation.get_language()
+#         for date_search_entity_type in settings.DATE_SEARCH_ENTITY_TYPES:
+#             important_dates = important_dates + Concept().get_e55_domain(date_search_entity_type)
 
         return {
-            'important_dates': {
+            'date_operators': {
                 'branch_lists': [],
                 'domains': {
-                    'important_dates' : important_dates,
+#                     'important_dates' : important_dates,
                     'date_operators' : [{
                         "conceptid": "0",
                         "entitytypeid": "DATE_COMPARISON_OPERATOR.E55",
                         "id": "0",
-                        "languageid": settings.LANGUAGE_CODE,
+                        "languageid": lang,
                         "text": _("Before"),
                         "valuetype": "prefLabel",  
                         "sortorder": "",
@@ -732,7 +762,7 @@ class Concept(object):
                         "conceptid": "1",
                         "entitytypeid": "DATE_COMPARISON_OPERATOR.E55",
                         "id": "1",
-                        "languageid": settings.LANGUAGE_CODE,
+                        "languageid": lang,
                         "text": _("On"),
                         "valuetype": "prefLabel",  
                         "sortorder": "",
@@ -742,7 +772,7 @@ class Concept(object):
                         "conceptid": "2",
                         "entitytypeid": "DATE_COMPARISON_OPERATOR.E55",
                         "id": "2",
-                        "languageid": settings.LANGUAGE_CODE,
+                        "languageid": lang,
                         "text": _("After"),
                         "valuetype": "prefLabel",  
                         "sortorder": "",
@@ -825,11 +855,14 @@ class ConceptValue(object):
 
             se.create_mapping('concept_labels', scheme.id, fieldname='conceptid', fieldtype='string', fieldindex='not_analyzed')
             se.index_data('concept_labels', scheme.id, data, 'id')
+            #Looks up whether the label is actually a dropdown label or an entity label and, if so, excludes them from the term search index.
+            entity_or_dropdown= archesmodels.ConceptRelations.objects.filter(Q(relationtype ='hasCollection') | Q(relationtype ='hasEntity'),conceptidto = scheme.id)
+            is_entity_or_dropdown = False if entity_or_dropdown.count() == 0 else True
             # don't create terms for entity type concepts
-            if not(scheme.id == '00000000-0000-0000-0000-000000000003' or scheme.id == '00000000-0000-0000-0000-000000000004'):
+            if not(scheme.id == '00000000-0000-0000-0000-000000000003' or scheme.id == '00000000-0000-0000-0000-000000000004') and is_entity_or_dropdown ==False:
                 se.index_term(self.value, self.id, scheme.id, {'conceptid': self.conceptid})
-  
-    def delete_index(self):   
+    
+    def delete_index(self):
         se = SearchEngineFactory().create() 
         query = Query(se, start=0, limit=10000)
         phrase = Match(field='id', query=self.id, type='phrase')

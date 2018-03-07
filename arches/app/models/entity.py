@@ -16,10 +16,14 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import datetime
+import re
+from django.conf import settings
 import uuid
 import types
 import copy
 import arches.app.models.models as archesmodels
+from arches.app.models.models import Strings
 from django.contrib.gis.db import models
 from django.contrib.gis.geos import fromstr
 from django.contrib.gis.geos import GEOSGeometry
@@ -28,7 +32,10 @@ from django.db import transaction
 from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
 from arches.app.models.concept import Concept
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-
+from django.core.exceptions import ObjectDoesNotExist
+from arches.app.utils.eamena_utils import validatedates
+import urllib
+import logging
 
 class Entity(object):
     """ 
@@ -78,12 +85,10 @@ class Entity(object):
         If a parent is given, will attempt to lookup the rule used to relate parent to child
 
         """
-
         entity = archesmodels.Entities.objects.get(pk = pk)
         self.entitytypeid = entity.entitytypeid_id
         self.entityid = entity.pk
         self.businesstablename = entity.entitytypeid.businesstablename if entity.entitytypeid.businesstablename else ''
-
         # get the entity value if any
         if entity.entitytypeid.businesstablename != None:
             themodel = self._get_model(entity.entitytypeid.businesstablename)
@@ -96,6 +101,12 @@ class Entity(object):
             elif (isinstance(themodelinstance, archesmodels.Files)): 
                 self.label = themodelinstance.getname()
                 self.value = themodelinstance.geturl() 
+            elif (isinstance(themodelinstance, archesmodels.UniqueIds)):
+                type = themodelinstance.id_type
+                zerosLength = settings.ID_LENGTH if  settings.ID_LENGTH > len(themodelinstance.val) else len(themodelinstance.val)
+                self.value = type +"-"+themodelinstance.val.zfill(zerosLength)
+                self.label = type +"-"+themodelinstance.val.zfill(zerosLength)
+                
             else:
                 self.value = getattr(themodelinstance, columnname, 'Entity %s could not be found in the table %s' % (pk, entity.entitytypeid.businesstablename))                   
                 self.label = self.value
@@ -107,30 +118,75 @@ class Entity(object):
         
         # get the child entities if any
         child_entities = archesmodels.Relations.objects.filter(entityiddomain = pk)
-        for child_entity in child_entities:       
+        for child_entity in child_entities:   
             self.append_child(Entity().get(child_entity.entityidrange_id, entity))
-
         return self
-
+        
+    def create_uniqueids(self, entitytype, is_new_resource = False):  # Method that creates UniqueIDs and its correlated Entity when a new resource is saved, or else only a UniqueId when the entity is already present (this will happen if the entities are created via importer.py
+        if entitytype in settings.EAMENA_RESOURCES:
+          type = 'EAMENA'
+        else:
+          type = re.split("\W+|_", entitytype)[0] if entitytype != "EAMENA_ID.E42" else re.split("\W+|-", self.value)[0]
+          
+        if is_new_resource:
+          entity2 = archesmodels.Entities()
+          entity2.entitytypeid = archesmodels.EntityTypes.objects.get(pk = "EAMENA_ID.E42")
+          entity2.entityid = str(uuid.uuid4())
+          entity2.save()
+          rule = archesmodels.Rules.objects.get(entitytypedomain = self.entitytypeid, entitytyperange = entity2.entitytypeid, propertyid = 'P1')
+          archesmodels.Relations.objects.get_or_create(entityiddomain = archesmodels.Entities.objects.get(pk=self.entityid), entityidrange = entity2, ruleid = rule)
+          
+        
+        uniqueidmodel = self._get_model('uniqueids')
+        uniqueidmodelinstance = uniqueidmodel()
+        uniqueidmodelinstance.entityid = entity2 if is_new_resource else archesmodels.Entities.objects.get(pk=self.entityid)
+        uniqueidmodelinstance.id_type = type
+        
+        try:
+          lastID = archesmodels.UniqueIds.objects.filter(id_type__exact=type).latest()
+          IdInt = int(lastID.val) + 1
+          uniqueidmodelinstance.val = str(IdInt)
+            
+        except ObjectDoesNotExist:
+          uniqueidmodelinstance.val = str(1)
+                
+        uniqueidmodelinstance.order_date = datetime.datetime.now()
+        uniqueidmodelinstance.save()
+        if is_new_resource:
+          return entity2.entityid
+                        
     def _save(self):
         """
         Saves an entity back to the db, returns a DB model instance, not an instance of self
 
         """
-
+        type = ''
         is_new_entity = False
+        is_new_resource = False
         entitytype = archesmodels.EntityTypes.objects.get(pk = self.entitytypeid)
         try:
             uuid.UUID(self.entityid)
         except(ValueError):
             is_new_entity = True
+            if entitytype.isresource:
+                is_new_resource = True
             self.entityid = str(uuid.uuid4())
-
+        
         entity = archesmodels.Entities()
         entity.entitytypeid = entitytype
         entity.entityid = self.entityid
         entity.save()
+        if is_new_resource:
+          newid = self.create_uniqueids(str(entitytype), is_new_resource)
+          self.append_child(Entity().get(newid, archesmodels.Entities.objects.get(pk = entity.entityid)))
+        else:
+          if str(entitytype) == 'EAMENA_ID.E42':
+            try:
+              archesmodels.UniqueIds.objects.get(pk=self.entityid)
+            except ObjectDoesNotExist:
+              self.create_uniqueids(str(entitytype), is_new_resource=False)
 
+                                     
         columnname = entity.entitytypeid.getcolumnname()
         if columnname != None:
             themodel = self._get_model(entity.entitytypeid.businesstablename)
@@ -151,8 +207,20 @@ class Entity(object):
             #                 self.add_child_entity(rule[0].entitytyperange_id, rule[0].propertyid_id, concept.id, '')
             #         elif len(self.child_entities) == 1:
             #             self.child_entities[0].value = concept.id
-            if not (isinstance(themodelinstance, archesmodels.Files)): 
+            if not (isinstance(themodelinstance, archesmodels.Files)) and not (isinstance(themodelinstance, archesmodels.UniqueIds)):
+                # Validating dates
+                if isinstance(themodelinstance, archesmodels.Dates) and is_new_entity ==True:
+                  try:
+                    datetime.datetime.strptime(self.value, '%Y-%m-%d')
+                  except ValueError:
+                    try:
+                      d = datetime.datetime.strptime(self.value,'%d-%m-%Y')
+                      self.value = d.strftime('%Y-%m-%d')
+                    except ValueError:
+                      raise ValueError("The value inserted is not a date")
+                    
                 setattr(themodelinstance, columnname, self.value)
+                
                 themodelinstance.save()
                 self.label = self.value
                 
@@ -169,12 +237,23 @@ class Entity(object):
                     themodelinstance.save()
                     self.value = themodelinstance.geturl()
                     self.label = themodelinstance.getname()
+                else:
+                    try: #Hack to allow for files to be saved from JSON import file. Need to write proper logic here
+                        result = urllib.urlretrieve(self.value)
+                        setattr(themodelinstance, columnname,self.label)
+                        themodelinstance.save()
+                        self.value = themodelinstance.geturl()
+                        self.label = themodelinstance.getname()
+                    except:
+                        pass
+
+
 
         for child_entity in self.child_entities:
             child = child_entity._save()
             rule = archesmodels.Rules.objects.get(entitytypedomain = entity.entitytypeid, entitytyperange = child.entitytypeid, propertyid = child_entity.property)
             archesmodels.Relations.objects.get_or_create(entityiddomain = entity, entityidrange = child, ruleid = rule)
-
+        
         return entity
 
     def _delete(self, delete_root=False):
@@ -186,7 +265,6 @@ class Entity(object):
         if delete_root is False prevent the root node from deleted
 
         """
-
         nodes_to_delete = []
 
         # gather together a list of all entities that includes self and all its children
@@ -267,8 +345,9 @@ class Entity(object):
         Merge an entity graph into this instance at the lowest common node
 
         """        
-
+        
         if self.can_merge(entitytomerge):
+            
             # update self.entityid if it makes sense to do so  
             if self.entityid == '' and entitytomerge.entityid != '':
                 self.entityid = entitytomerge.entityid
@@ -286,7 +365,6 @@ class Entity(object):
                     if child_entity.can_merge(child_entitytomerge):
                         entities_to_merge.append(entities_to_append.pop())
                         break
-
             for entity in entities_to_append:
                 self.append_child(entity)   
 
@@ -309,7 +387,6 @@ class Entity(object):
             # if the value of each node is not blank and they are not equal, then the nodes can't be merged
             if self.value != '' and entitytomerge.value != '' and self.value != entitytomerge.value:
                 return False
-
             return True
         else:
             return False
@@ -374,7 +451,6 @@ class Entity(object):
             else:
                 entity.parentid = None
             ret.append(entity)
-
         copiedself = self.copy()
         copiedself.traverse(gather_entities)
         for item in ret:
@@ -391,10 +467,9 @@ class Entity(object):
         def appendValue(entity):
             if entity.entitytypeid == entitytypeid:
                 ret.append(entity)
-
         self.traverse(appendValue)
-        return ret
-        
+        return list(set(ret)) #return a list of a set to exclude potential duplicates
+
     def traverse(self, func, scope=None):
         """
         Traverses a graph from leaf to root calling the given function on each node
@@ -403,7 +478,6 @@ class Entity(object):
         Return a value from the function to prematurely end the traversal
 
         """
-
         for child_entity in self.child_entities:
             ret = child_entity.traverse(func, scope) 
             if ret != None: 
@@ -446,9 +520,9 @@ class Entity(object):
         """
 
         entities = self.find_entities_by_type_id(entitytypeid)
-
         if append or len(entities) == 0:
             schema = Entity.get_mapping_schema(self.entitytypeid)
+
             entity = Entity()
             entity.create_from_mapping(self.entitytypeid, schema[entitytypeid]['steps'], entitytypeid, value)
             self.merge_at(entity, schema[entitytypeid]['mergenodeid'])
@@ -469,8 +543,8 @@ class Entity(object):
             currentEntity = currentEntity.add_child_entity(step['entitytyperange'], step['propertyid'], value, leafentityid)
         return self
 
-    @classmethod
-    def get_mapping_schema(cls, entitytypeid):
+    @staticmethod
+    def get_mapping_schema(entitytypeid):
         """
         Gets a complete entity schema graph for a single entity type given an entity type id
 
@@ -478,12 +552,27 @@ class Entity(object):
 
         ret = {}
         mappings = archesmodels.Mappings.objects.filter(entitytypeidfrom = entitytypeid)
-
         for mapping in mappings:
             if mapping.entitytypeidto.pk not in ret:
                 ret[mapping.entitytypeidto.pk] = {'steps':[], 'mergenodeid': mapping.mergenodeid}
 
             ret[mapping.entitytypeidto.pk]['steps'] = (Entity._get_mappings(mapping.pk))
+
+        return ret
+
+    @classmethod
+    def get_mapping_schema_to(cls, entitytypeid):
+        """
+        Gets the schema of *incoming* connections to the given entity type id, and their steps
+        """
+        ret = {}
+        mappings = archesmodels.Mappings.objects.filter(entitytypeidto = entitytypeid)
+        
+        for mapping in mappings:
+            if mapping.entitytypeidfrom.pk not in ret:
+                ret[mapping.entitytypeidfrom.pk] = {'steps':[], 'mergenodeid': mapping.mergenodeid}
+
+            ret[mapping.entitytypeidfrom.pk]['steps'] = (Entity._get_mappings(mapping.pk))
 
         return ret
 
@@ -530,7 +619,6 @@ class Entity(object):
             ret.append(rule)
 
         return ret
-
 
     def prune(self, entitytypes, action='disallow'):
         """
@@ -625,31 +713,29 @@ class Entity(object):
         """
         #somelist[:] = [tup for tup in somelist if determine(tup)]
 
-        # def func(entity):
-        #     try:
-        #         parent = entity.get_parent()
-        #         print '-'*10
-        #         print entity
-        #         print len(parent.child_entities)
-        #         if len(entity.child_entities) == 0 and entity.value == '':
-        #             print JSONSerializer().serialize(entity, indent=4)
-        #             parent.child_entities.remove(entity)
-        #             print len(parent.child_entities)
-        #     except:
-        #         pass
-
-        # def func(entity):
-        #     try:
-        #         # http://stackoverflow.com/questions/1207406/remove-items-from-a-list-while-iterating-in-python
-        #         parent = entity.get_parent()
-        #         parent.child_entities[:] = [child_entity for child_entity in parent.child_entities if (len(child_entity.child_entities) != 0 or child_entity.value != '')]
-        #     except:
-        #         pass
-
-        #self.traverse(func)
-
-        self.filter((lambda entity: len(entity.child_entities) != 0 or entity.value != ''))
-
+#         def func(entity):
+#             try:
+#                 parent = entity.get_parent()
+#                 print '-'*10
+#                 print entity
+#                 print len(parent.child_entities)
+#                 if len(entity.child_entities) == 0 and entity.value == '':
+#                     print JSONSerializer().serialize(entity, indent=4)
+#                     parent.child_entities.remove(entity)
+#                     print len(parent.child_entities)
+#             except:
+#                 pass
+        
+#         def func(entity):
+#             try:
+#                 parent = entity.get_parent()
+#                 parent.child_entities[:] = [child_entity for child_entity in parent.child_entities if (len(child_entity.child_entities) != 0 or child_entity.value != '')]
+#             except:
+#                 pass
+# 
+#         self.traverse(func)
+        self.filter((lambda entity: len(entity.child_entities) != 0 or entity.value !=''))
+# (len(entity.child_entities) != 0 and entity.entityid == '') or (len(entity.child_entities) == 0) and entity.value != '')
 
     def trim_again(self,child):
         if child.entityid != '' and child.value =='':
@@ -659,12 +745,13 @@ class Entity(object):
                 for entity in child.child_entities:
                     child.trim_again(entity)
 
+
     def filter(self, lambda_expression):
         """
         Only allows the nodes defined in the lambda_expression to populate the entity graph
         (eg: filters out of the entity graph any entity that doesn't return true from the lambda_expression)
 
-        """
+        """               
 
         def func(entity):
             if hasattr(entity, 'get_parent'):
@@ -673,8 +760,8 @@ class Entity(object):
             else:
                 for child in entity.child_entities:
                     entity.trim_again(child)
-
         self.traverse(func)
+
 
     def clear(self):
         """
@@ -705,6 +792,7 @@ class Entity(object):
 
 
     def dictify(self, keys=['label']):
+
         """
         Takes an entity and turns it into recursive lists nested objects
         Uses an in-built algorithm to derive which sub-branches appear to be grouped, and then flattens them out
@@ -755,7 +843,7 @@ class Entity(object):
             ]
 
         """
-
+        order = settings.ORDER_REPORT_SECTIONS_BY
         data = {}
         for child_entity in self.child_entities:
             if child_entity.businesstablename != '':
@@ -764,7 +852,17 @@ class Entity(object):
                 if child_entity.undotify() not in data:
                     data[child_entity.undotify()] = []
                 data[child_entity.undotify()].append(child_entity.dictify(keys=keys))
-
+                data[child_entity.undotify()][len(data[child_entity.undotify()])-1]['orderby'] = ''
+                for key, values in order.iteritems():
+                   for value in values:
+                        order_value = child_entity.find_entities_by_type_id(value)
+                        if order_value:
+                            if child_entity.entitytypeid == key:
+                                try:
+                                    order_by_value = validatedates(order_value[0].label)
+                                except:
+                                    order_by_value = order_value[0].label
+                                data[child_entity.undotify()][len(data[child_entity.undotify()])-1]['orderby'] = order_by_value
         return data
 
     def get_nodes(self, entitytypeid, keys=[]):
@@ -786,12 +884,14 @@ class Entity(object):
         entities = self.find_entities_by_type_id(entitytypeid)
         for entity in entities:
             data = {}
-
             for entity in entity.flatten():
                 data = dict(data.items() + entity.encode(keys=keys).items())
+                
+                
             ret.append(data)
         return ret
-
+        
+                
     def encode(self, keys=[]):
         """
         Encodes an Entity into a dictionary of keys derived by the entitytypeid of the Entity concatonated wtih property name 
@@ -809,6 +909,7 @@ class Entity(object):
         for key, value in self.__dict__.items():
             if key in keys:
                 ret['%s__%s' % (self.undotify(), key)] = value
+            
         return ret
 
     def undotify(self):
@@ -819,3 +920,4 @@ class Entity(object):
 
     def to_json(self):
         return JSONSerializer().serialize(self)
+    

@@ -6,6 +6,8 @@ from django.contrib.gis.geos import MultiPoint
 from django.contrib.gis.geos import MultiPolygon
 from django.contrib.gis.geos import MultiLineString
 from arches.app.utils.betterJSONSerializer import JSONSerializer
+from arches.app.views.concept import get_preflabel_from_conceptid
+from django.utils import translation
 
 class Writer(object):
 
@@ -85,12 +87,12 @@ class Writer(object):
             else:
                 for domain in domains:
                     if entitytypeid == domain['entitytypeid'] and conceptid == '':
-                        template_record[mapping['field_name']].append(domain['label'])
+                        template_record[mapping['field_name']].append(get_preflabel_from_conceptid(domain['conceptid'], lang=translation.get_language())['value'])
                     elif entitytypeid == domain['entitytypeid'] and conceptid != '':
                         for domain_type in domains:
                             if conceptid == domain_type['conceptid']:
                                 if domain['entityid'] == domain_type['parentid']:
-                                    template_record[mapping['field_name']].append(domain['label'])
+                                    template_record[mapping['field_name']].append(get_preflabel_from_conceptid(domain['conceptid'], lang=translation.get_language())['value'])
                     if alternate_entitytypeid == domain['entitytypeid']:
                         alternate_values.append(entity['value'])
 

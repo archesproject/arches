@@ -25,6 +25,7 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.auth.models import User
 
+
 def index(request):
     return render_to_response('index.htm', {
             'main_script': 'index',
@@ -68,3 +69,6 @@ def auth(request):
 
 def search(request):
     return render_to_response('search.htm', context_instance=RequestContext(request))
+    
+# def test_view(request):
+#     return render_to_response('header.htm', context_instance=RequestContext(request))

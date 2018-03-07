@@ -58,14 +58,11 @@ define([
                 });
                 self.map.addLayer(vectorLayer);
                 var view = self.map.getView();
-                view.fit(vectorSource.getExtent(), (self.map.getSize()));
+                view.fitExtent(vectorSource.getExtent(), (self.map.getSize()));
                 self.trigger('layerDropped', vectorLayer, event.file.name);
             });
 
             this.map = new ol.Map({
-                controls: ol.control.defaults().extend([
-                    new ol.control.FullScreen()
-                ]),
                 layers: layers,
                 interactions: ol.interaction.defaults({
                     altShiftDragRotate: false,
@@ -121,9 +118,9 @@ define([
                 self.trigger('viewChanged', view.getZoom(), extent);
             });
 
+
             this.map.on('click', function(e) {
-                var pixels = [e.originalEvent.layerX,e.originalEvent.layerY];
-                var clickFeature = self.map.forEachFeatureAtPixel(pixels, function (feature, layer) {
+                var clickFeature = self.map.forEachFeatureAtPixel(e.pixel, function (feature, layer) {
                     return feature;
                 });
                 self.trigger('mapClicked', e, clickFeature);
@@ -132,7 +129,16 @@ define([
 
         handleMouseMove: function(e) {
             var self = this;
-            var pixels = [e.originalEvent.layerX,e.originalEvent.layerY];
+            if(e.offsetX === undefined) {
+                // this works in Firefox
+                var xpos = e.pageX-$('#map').offset().left;
+                var ypos = e.pageY-$('#map').offset().top;
+            } else { 
+                // works in Chrome, IE and Safari
+                var xpos = e.offsetX;
+                var ypos = e.offsetY;
+            }
+            var pixels = [xpos, ypos];
             var coords = this.map.getCoordinateFromPixel(pixels);
             var point = new ol.geom.Point(coords);
             var format = ol.coordinate.createStringXY(4);
@@ -147,6 +153,7 @@ define([
                 this.trigger('mousePositionChanged', '');
             }
         },
+
 
         handleMouseOut: function () {
             this.trigger('mousePositionChanged', '');

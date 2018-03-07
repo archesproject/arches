@@ -15,7 +15,7 @@ define([
             var map = new MapView({
                 el: this.$el.find('.map')
             });
-            
+
             var addFeature = function (feature, editing) {
                 var branch = koMapping.fromJS({
                     'editing': ko.observable(editing), 
@@ -26,17 +26,6 @@ define([
                     self.removeEditedBranch();
                 }
                 geom.transform(ol.proj.get('EPSG:3857'), ol.proj.get('EPSG:4326'));
-                if (geom.getLayout() === 'XYZ'){ //Dragged&dropped KMLs have XYZ layouts which are read by default by the ol WKT parser. This routine pops the Z values out and flattens the layout to XY
-                    var FlatCoordinates = [];
-                    FlatCoordinates[0] = [];
-                    _.each(geom.getCoordinates()[0], function(coordinate_set){
-                            if (coordinate_set.length === 3){
-                                coordinate_set.pop();
-                                FlatCoordinates[0].push(coordinate_set);
-                            }
-                    });
-                    geom.setCoordinates(FlatCoordinates, 'XY');
-                }                
                 _.each(branch.nodes(), function(node) {
                     if (node.entitytypeid() === self.dataKey) {
                         node.value(wkt.writeGeometry(geom));
@@ -46,7 +35,7 @@ define([
                 self.trigger('change', 'geometrychange', branch);
                 self.trigger('geometrychange', feature, wkt.writeGeometry(geom));
             };
-                            
+
             var bulkAddFeatures = function (features) {
                 _.each(features, function(feature, i) {
                     addFeature(feature, i===features.length-1);
@@ -109,17 +98,14 @@ define([
                     })
                 })];
             }
-            var features = new ol.Collection();
-            var featureOverlay = new ol.layer.Vector({
-                source: new ol.source.Vector({
-                    features: features
-                }),
+
+            var featureOverlay = new ol.FeatureOverlay({
                 style: style
             });
 
             var zoomToFeatureOverlay = function () {
                 var extent = null;
-                _.each(featureOverlay.getSource().getFeatures(), function(feature) {
+                _.each(featureOverlay.getFeatures().getArray(), function(feature) {
                     var featureExtent = feature.getGeometry().getExtent();
                     if (!extent) {
                         extent = featureExtent;
@@ -129,14 +115,12 @@ define([
                 });
 
                 if (extent) {
-                    map.map.getView().fit(extent, (map.map.getSize()));
+                    map.map.getView().fitExtent(extent, (map.map.getSize()));
                 }
             }
 
             var refreshFreatureOverlay = function () {
-                featureOverlay.getSource().forEachFeature(function(feature) {
-                     featureOverlay.getSource().removeFeature(feature);
-                });
+                featureOverlay.getFeatures().clear();
                 _.each(self.getBranchLists(), function(branch) {
                     var geom = wkt.readGeometry(getGeomNode(branch).value());
                     geom.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
@@ -162,7 +146,7 @@ define([
                         self.trigger('geometrychange', feature, wkt.writeGeometry(geom));
                     });
                     try { 
-                        featureOverlay.getSource().addFeature(feature);
+                        featureOverlay.addFeature(feature);
                         }
                     catch(err) {
                         console.log(err.message);
@@ -186,7 +170,7 @@ define([
                     map.map.removeInteraction(draw);
                 }
                 draw = new ol.interaction.Draw({
-                    features: featureOverlay.getSource().getFeatures(),
+                    features: featureOverlay.getFeatures(),
                     type: geometryType
                 });
                 draw.on('drawend', function(e) {
@@ -255,7 +239,7 @@ define([
                 _.each(map.baseLayers, function(baseLayer){
                     baseLayer.layer.setVisible(baseLayer.id == basemap);
                 });
-                $("#inventory-home").click();                        
+                $("#inventory-home").click()
             });
 
             var formatConstructors = [
@@ -302,7 +286,7 @@ define([
             featureOverlay.setMap(map.map);
 
             var modify = new ol.interaction.Modify({
-              features: features,
+              features: featureOverlay.getFeatures(),
               deleteCondition: function(event) {
                 return ol.events.condition.shiftKeyOnly(event) &&
                     ol.events.condition.singleClick(event);

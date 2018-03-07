@@ -86,14 +86,15 @@ DEFAULT_MAP_Y = 0
 DEFAULT_MAP_ZOOM = 0
 MAP_MIN_ZOOM = 0
 MAP_MAX_ZOOM = 19
-MAP_LAYER_FEATURE_LIMIT = 100000
+MAP_LAYER_FEATURE_LIMIT = 1000000
 MAP_EXTENT = ''
+MAP_MAX_UNLOGGED_ZOOM = 0
 
 RESOURCE_MARKER_ICON_UNICODE = '\uf060'
 RESOURCE_MARKER_ICON_FONT = 'octicons'
 RESOURCE_MARKER_DEFAULT_COLOR = '#C4171D'
 
-BING_KEY = 'Ak-dzM4wZjSqTlzveKz5u0d4IQ4bRzVI309GxmkgSVr1ewS6iPSrOvOKhA-CJlm3'
+BING_KEY = ''
 GOOGLE_ANALYTICS_TRACKING_ID = None
 
 def RESOURCE_TYPE_CONFIGS():
@@ -225,6 +226,7 @@ SECRET_KEY = 'c7ky-mc6vdnv+avp0r@(a)8y^51ex=25nogq@+q5$fnc*mxwdi'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
+
 #     'django.template.loaders.eggs.Loader',
 )
 
@@ -249,7 +251,7 @@ INSTALLED_APPS = (
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
-    #'django.middleware.locale.LocaleMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -291,6 +293,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'arches.app.utils.context_processors.map_info',
     'arches.app.utils.context_processors.app_settings',
     'arches.app.utils.context_processors.user_can_edit',
+    'arches.app.utils.context_processors.header',
 )
 
 

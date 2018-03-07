@@ -16,6 +16,7 @@ import shapefile
 from django.db import connection
 import arches.management.commands.utils as utils
 import codecs
+from django.utils import translation
 
 try:
     from cStringIO import StringIO
@@ -262,7 +263,7 @@ class ShapeReader():
         return conceptid_map  
 
 
-    def get_e55_concept_legacyoids(self, e55_type, lang=settings.LANGUAGE_CODE):
+    def get_e55_concept_legacyoids(self, e55_type, lang=translation.get_language()):
         concept = EntityTypes.objects.get(pk=e55_type).conceptid
         concept_graph = Concept().get(id=concept.pk, include_relatedconcepts=True, include=['label'])
         values_to_legacy = []
@@ -418,12 +419,12 @@ class ShpWriter(Writer):
         
         for geom_type, features in features_by_geom_type.iteritems():
              if len(features) > 0:
-
                 if geom_type == 'point':
                     writer = shapefile.Writer(shapeType=shapefile.MULTIPOINT)
                 elif geom_type == 'line':
                     writer = shapefile.Writer(shapeType=shapefile.POLYLINE)
                 elif geom_type == 'poly':
+                    
                     writer = shapefile.Writer(shapeType=shapefile.POLYGON)
 
                 for field in resource_export_configs["SCHEMA"]:
@@ -431,10 +432,12 @@ class ShpWriter(Writer):
 
                 for r in features:
                     shp_geom = self.convert_geom(r['geometry'])
-                    if geom_type in ['point','line']:
-                        writer.line(parts=shp_geom)
+                    if geom_type == 'point':
+                        writer.poly(parts=shp_geom, shapeType=shapefile.MULTIPOINT)
+                    elif geom_type == 'line':
+                        writer.line(parts=shp_geom, shapeType=shapefile.POLYLINE)
                     elif geom_type == 'poly':
-                        writer.poly(parts=shp_geom)
+                        writer.poly(parts=shp_geom, shapeType=shapefile.POLYGON)
                     writer.record(**r['properties'])
 
                 shp = StringIO()

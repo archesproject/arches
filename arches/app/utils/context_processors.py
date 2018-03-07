@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from django.conf import settings
 from arches.app.models.resource import Resource
 from arches.app.utils.decorators import deprecated
+from arches.app.models.models import DLanguages
 
 def livereload(request):
     return {
@@ -26,14 +27,22 @@ def livereload(request):
     }
 
 def map_info(request):
+    minzoom = settings.MAP_MIN_ZOOM
+    maxzoom = settings.MAP_MAX_ZOOM
+    if not request.user.is_anonymous:
+        if 'edit' not in request.user.user_groups:
+            maxzoom =  settings.MAP_MAX_UNLOGGED_ZOOM
+            if request.path.split('/')[1] == 'reports':
+                minzoom = settings.REPORT_MIN_UNLOGGED_ZOOM
+                maxzoom = settings.MAP_MAX_ZOOM
     return {
         'map_info': {
             'x': settings.DEFAULT_MAP_X,
             'y': settings.DEFAULT_MAP_Y,
             'zoom': settings.DEFAULT_MAP_ZOOM,
             'bing_key': settings.BING_KEY,
-            'map_min_zoom': settings.MAP_MIN_ZOOM,
-            'map_max_zoom': settings.MAP_MAX_ZOOM,
+            'map_min_zoom': minzoom,
+            'map_max_zoom': maxzoom,
             'extent': settings.MAP_EXTENT,
             'resource_marker_icon': settings.RESOURCE_MARKER_ICON_UNICODE,
             'resource_marker_font': settings.RESOURCE_MARKER_ICON_FONT,
@@ -58,5 +67,11 @@ def user_can_edit(request):
     # need to implement proper permissions check here...
     # for now allowing all logged in users to be 'editors'
     return {
-        'user_can_edit': 'edit' in request.user.user_groups
+        'user_can_edit': 'edit' in request.user.user_groups if not request.user.is_anonymous else ''
     }
+
+def header(request):
+    languages = DLanguages.objects.all()
+    return {
+        'language_list': languages
+}

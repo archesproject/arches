@@ -4,9 +4,8 @@ define([
     'underscore',
     'arches',
     'map/layer-model',
-    'utils',
-    'plugins/supercluster/supercluster' 
-], function($, ol, _, arches, LayerModel, utils, supercluster) {
+    'utils'
+], function($, ol, _, arches, LayerModel, utils) {
     return function(config, featureCallback) {
         config = _.extend({
             entitytypeid: 'all',
@@ -17,7 +16,7 @@ define([
             var rgb = utils.hexToRgb(config.vectorColor);
             var zIndex = 0;
             var styleCache = {};
-            var hasData = false;
+
             var style = function(feature, resolution) {
                 var mouseOver = feature.get('mouseover');
                 var text = '1 ' + mouseOver;
@@ -39,7 +38,7 @@ define([
                         offsetX: 5,
                         offsetY: ((iconSize/2)*-1)-5,
                         fill: new ol.style.Fill({
-                            color: 'rgba(126,126,126,0.3)',
+                            color: 'rgba(126,126,126,0)',
                         })
                     }),
                     zIndex: mouseOver ? zIndex*1000000000: zIndex
@@ -66,52 +65,33 @@ define([
             };
 
             var layerConfig = {
-                format: new ol.format.GeoJSON()
+                projection: 'EPSG:3857'
             };
-            
-            var geojson_array;
-            var spatial_index = supercluster({
-                radius: 100,
-                maxZoom: 16
-            });
 
             if (config.entitytypeid !== null) {
                 layerConfig.url = arches.urls.map_markers + config.entitytypeid;
-                //fetch the raw geojson data and act on it
-                $.ajax({
-                    url: layerConfig.url,
-                    success: function (result) {
-                        //load features into supercluster index
-                        spatial_index.load(result.features)
-                        hasData = true;
-                        
-                        //trigger an initial clustering pass
-                        if(initialExtent && initialZoom) {
-                            clusterLayer.updateClusters(initialExtent, initialZoom)
-                        }
-                        
-                        if(typeof(featureCallback) === 'function') {
-                            featureCallback(result.features);
-                            geojson_array = result;
-                        }
-                        $('.map-loading').hide();
-                    },
-                    error: function (jqxhr, status, err) {
-                        console.error('error fetching geojson features', err);
-                    }
-                })
             }
 
+            var source = new ol.source.GeoJSON(layerConfig);
+
             $('.map-loading').show();
+            var loadListener = source.on('change', function(e) {
+                if (source.getState() == 'ready') {
+                    if(typeof(featureCallback) === 'function'){
+                        featureCallback(source.getFeatures());
+                    }
+                    ol.Observable.unByKey(loadListener);
+                    $('.map-loading').hide();
+                }
+            });
+
+            var clusterSource = new ol.source.Cluster({
+                distance: 45,
+                source: source
+            });
 
             var clusterStyle = function(feature, resolution) {
-                if(feature.get('features')) {
-                    var size = feature.get('features').length;
-                } else if (feature.get('point_count')) {
-                    var size = feature.get('point_count');
-                } else {
-                    var size = 1;
-                }                
+                var size = feature.get('features').length;
                 var mouseOver = feature.get('mouseover');
                 var text = size + ' ' + mouseOver;
 
@@ -147,7 +127,7 @@ define([
                             width: radius
                         }),
                         fill: new ol.style.Fill({
-                            color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',0.8)',
+                            color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',0)',
                         })
                     }),
                     text: new ol.style.Text({
@@ -160,43 +140,13 @@ define([
                 styleCache[text] = styles;
                 return styles;
             };
-            var superClusterSource = new ol.source.Vector()
+
             var clusterLayer = new ol.layer.Vector({
-                source: superClusterSource,
+                source: clusterSource,
                 style: clusterStyle
             });
 
-            clusterLayer.geojson_data = geojson_array;
-
-            initialExtent = null;
-            initialZoom = null;
-
-            clusterLayer.updateClusters = function (extentOl, zoom) {
-                var extentLatLng = ol.proj.transformExtent(extentOl, 'EPSG:3857', 'EPSG:4326');
-                if(hasData) {
-                    var clusters = spatial_index.getClusters(extentLatLng, zoom);                    
-                    var clusterFeatures = _.map(clusters, function (cluster) {
-                        //project to map coordinates
-                        var coords = ol.proj.transform(cluster.geometry.coordinates, 'EPSG:4326', 'EPSG:3857');
-                        var f = new ol.Feature(new ol.geom.Point(
-                            coords
-                        ));
-                        f.setProperties(cluster.properties);
-                        if(cluster.id) {
-                            f.setId(cluster.id);
-                        }
-                        return f;
-                    }.bind(this));
-                    
-                    clusterLayer.getSource().clear();
-                    clusterLayer.getSource().addFeatures(clusterFeatures);
-                } else {
-                    // store the zoom and extent to cluster when the data has loaded
-                    initialExtent = extentOl;
-                    initialZoom = zoom;
-                }
-            }
-
+            clusterLayer.vectorSource = source;
             clusterLayer.set('is_arches_layer', true);
 
             return clusterLayer;

@@ -64,8 +64,8 @@ define(['jquery',
                         defaults:{
                             filters: {
                                 date: '',
-                                date_types__value: '',
-                                date_types__label: '',
+//                                 date_types__value: '',
+//                                 date_types__label: '',
                                 date_operators__value: '',
                                 date_operators__label: ''
                             }
@@ -97,9 +97,9 @@ define(['jquery',
                 this.time_filter_branchlist = new BranchList({
                     el: $('#time-filter')[0],
                     data: this.viewModel,
-                    dataKey: 'important_dates',
+                    dataKey: 'date_operators',
                     validateBranch: function (nodes) {
-                        return this.validateHasValues(nodes);;
+                        return this.validateHasValues(nodes);
                     }
                 });
 

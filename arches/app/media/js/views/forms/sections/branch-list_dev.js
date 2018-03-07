@@ -10,12 +10,10 @@ define(['jquery',
             'click [name="discard-edit-link"]': 'undoCurrentEdit'
         },
 
-        initialize: function(options) {
+        initialize: function(options) { // options contains the JSON object passed by forms.py, containing all of the concept labels (in the selected language), values, and conceptids
             var self = this;
             this.singleEdit = false;
-            this.originalItem = null;
             _.extend(this, options);
-
             this.defaults = [];
             this.viewModel = JSON.parse(JSON.stringify(this.data[this.dataKey]));
             //this.viewModel.domains = this.data[this.dataKey].domains;
@@ -103,10 +101,13 @@ define(['jquery',
                 },
                 write: function(value){
                     _.each(this.viewModel.branch_lists(), function(list){
+                        console.log("List LOG: "+JSON.stringify(koMapping.toJS(list)));
                         if(list.editing()){
                             _.each(list.nodes(), function(node){
                                 if (entitytypeid.search(node.entitytypeid()) > -1){
-                                    if(typeof value === 'string'){
+                                    if(typeof node.value() === 'string'){
+                                        var listprova = this.getEditedBranch();
+                                       
                                         node[key](value);
                                     }else{
                                         _.each(value, function(val, k, list){
@@ -182,17 +183,22 @@ define(['jquery',
         },
 
         editItem: function(branch, e) {        
+//             this.iter(branch)
             this.originalItem = koMapping.toJS(branch);
+            branch.editing(false);
             this.removeEditedBranch();
             branch.editing(true);
             
             this.trigger('change', 'edit', branch);
         },
-
         getEditedBranch: function(){
             var editedBranch = null;
+            var unmapped = koMapping.toJS(this.viewModel.branch_lists);
+            console.log(JSON.stringify(unmapped));            
             _.each(this.viewModel.branch_lists(), function(list){
                 if(list.editing()){
+                    console.log("Unmapped list:"+JSON.stringify(koMapping.toJS(list)));
+                    
                     editedBranch = list;
                 }
             }, this);
@@ -247,6 +253,7 @@ define(['jquery',
         undoAllEdits: function(){
             this.viewModel.branch_lists.removeAll();
             _.each(this.data[this.dataKey].branch_lists, function(item){
+                console.log("unoAllEdits LOG:"+JSON.stringify(item));
                 this.viewModel.branch_lists.push(koMapping.fromJS(_.extend({editing: this.singleEdit}, item)));
             }, this); 
 

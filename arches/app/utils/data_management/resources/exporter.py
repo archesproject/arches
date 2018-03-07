@@ -10,6 +10,8 @@ from formats.kmlfile import KmlWriter
 from formats.shpfile import ShpWriter 
 from formats.archesjson import JsonWriter #Writes full resource instances rather than search results
 from django.http import HttpResponse
+from arches.app.models.entity import Entity
+import arches.app.models.models as archesmodels
 
 try:
     from cStringIO import StringIO
@@ -45,7 +47,6 @@ class ResourceExporter(object):
                     configs['RESOURCE_TYPES'][key]['records'] = []
             else:
                 configs = ''
-        
         return configs
 
     def zip_response(self, files_for_export, zip_file_name=None, file_type=None):

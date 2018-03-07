@@ -30,6 +30,7 @@ from django.utils.translation import ugettext as _
 from django.forms.models import model_to_dict
 from django.contrib.gis.geos import GEOSGeometry
 
+
 class Resource(Entity):
     """ 
     Used for managing Resource type entities
@@ -283,6 +284,7 @@ class Resource(Entity):
         pass
 
     def bulk_index(self, resources=[]):
+
         report_documents = []
         search_documents = []
         geojson_documents = []
@@ -354,7 +356,33 @@ class Resource(Entity):
                 else:
                     document.child_entities.append(entity)
 
+        document.nested_entity = self
+        self.add_conceptid_to_nested_entities(document.nested_entity.child_entities)
         return [JSONSerializer().serializeToPython(document)]
+
+    def add_conceptid_to_nested_entities(self, child_entities):
+        """
+        Recursively adds concept id to child entities
+
+        """
+        
+        for entity in child_entities:
+            if entity.businesstablename == 'domains':
+                value = archesmodels.Values.objects.get(pk=entity.value)
+                entity.conceptid = value.conceptid_id
+                
+            entity.flat_child_entities = []
+            for child_entity in entity.flatten():
+                child_entity_copy = child_entity.copy()
+                if child_entity_copy.businesstablename == 'dates':
+                    child_entity_copy.date = child_entity_copy.value
+                    
+                entity.flat_child_entities.append(child_entity_copy)
+                        
+            self.add_conceptid_to_nested_entities(entity.child_entities)
+
+        return
+        
 
     def prepare_documents_for_map_index(self, geom_entities=[]):
         """
@@ -396,7 +424,7 @@ class Resource(Entity):
         def gather_entities(entity):
             if entity.businesstablename == '':
                 pass
-            elif entity.businesstablename == 'strings':
+            elif entity.businesstablename == 'strings' or entity.businesstablename =='uniqueids':
                 if settings.WORDS_PER_SEARCH_TERM == None or (len(entity.value.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
                     entitytype = archesmodels.EntityTypes.objects.get(pk=entity.entitytypeid)
                     terms.append({'term': entity.value, 'entityid': entity.entityid, 'context': entitytype.conceptid_id, 'options': {}})
@@ -409,6 +437,8 @@ class Resource(Entity):
             elif entity.businesstablename == 'numbers':
                 pass
             elif entity.businesstablename == 'files':
+                pass
+            elif entity.businesstablename == 'nested_entity':
                 pass
 
         self.traverse(gather_entities)
@@ -512,12 +542,20 @@ class Resource(Entity):
                                 'property' : {'type' : 'string', 'index' : 'not_analyzed'},
                                 'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
                                 'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
-                                'label' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                'label' : {
+                                    'type' : 'string',
+                                    'index' : 'analyzed',
+                                    'fields' : {
+                                        'raw' : { 'type' : 'string', 'index' : 'not_analyzed'},
+                                        'folded': { 'type': 'string', 'analyzer': 'folding'}
+                                    }
+                                },
                                 'value' : {
                                     'type' : 'string',
                                     'index' : 'analyzed',
                                     'fields' : {
-                                        'raw' : { 'type' : 'string', 'index' : 'not_analyzed'}
+                                        'raw' : { 'type' : 'string', 'index' : 'not_analyzed'},
+                                        'folded': { 'type': 'string', 'analyzer': 'folding'}
                                     }
                                 },
                                 'conceptid' : {'type' : 'string', 'index' : 'not_analyzed'},
@@ -552,7 +590,347 @@ class Resource(Entity):
                                     "type" : "date"
                                 }
                             }
-                        }
+                        },
+                        'nested_entity' : { 
+                            'type' : 'nested', 
+                            'index' : 'analyzed',
+                            'properties' : {
+                                'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                'property' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                'label' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                'value' : {
+                                    'type' : 'string',
+                                    'index' : 'analyzed',
+                                    'fields' : {
+                                        'raw' : { 'type' : 'string', 'index' : 'not_analyzed'},
+                                        'folded': { 'type': 'string', 'analyzer': 'folding'}
+                                    },
+                                },
+                                'child_entities': {
+                                    'type' : 'nested',
+                                    'index' : 'analyzed',
+                                    'properties' : {
+                                        'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                        'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                        'property' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                        'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                        'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                        'label' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                        'value' : {
+                                            'type' : 'string',
+                                            'index' : 'analyzed',
+                                            'fields' : {
+                                                'raw' : { 'type' : 'string', 'index' : 'not_analyzed'},
+                                                'folded': { 'type': 'string', 'analyzer': 'folding'}
+                                            },
+                                        },
+                                        'child_entities': {
+                                            'type' : 'nested',
+                                            'index' : 'analyzed',
+                                            'properties' : {
+                                                'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                'property' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                'label' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                'value' : {
+                                                    'type' : 'string',
+                                                    'index' : 'analyzed',
+                                                    'fields' : {
+                                                        'raw' : { 'type' : 'string', 'index' : 'not_analyzed'},
+                                                        'folded': { 'type': 'string', 'analyzer': 'folding'}
+                                                    },
+                                                },
+                                                'child_entities': {
+                                                    'type' : 'nested',
+                                                    'index' : 'analyzed',
+                                                    'properties' : {
+                                                        'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                        'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                        'property' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                        'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                        'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                        'label' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                        'value' : {
+                                                            'type' : 'string',
+                                                            'index' : 'analyzed',
+                                                            'fields' : {
+                                                                'raw' : { 'type' : 'string', 'index' : 'not_analyzed'},
+                                                                'folded': { 'type': 'string', 'analyzer': 'folding'}
+                                                            },
+                                                        },
+                                                        'child_entities': {
+                                                            'type' : 'nested',
+                                                            'index' : 'analyzed',
+                                                            'properties' : {
+                                                                'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                'property' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                'label' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                'value' : {
+                                                                    'type' : 'string',
+                                                                    'index' : 'analyzed',
+                                                                    'fields' : {
+                                                                        'raw' : { 'type' : 'string', 'index' : 'not_analyzed'},
+                                                                        'folded': { 'type': 'string', 'analyzer': 'folding'}
+                                                                    },
+                                                                },
+                                                                'child_entities': {
+                                                                    'type' : 'nested',
+                                                                    'index' : 'analyzed',
+                                                                        'properties' : {
+                                                                        'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                        'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                        'property' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                        'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                        'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                        'label' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                        'value' : {
+                                                                            'type' : 'string',
+                                                                            'index' : 'analyzed',
+                                                                            'fields' : {
+                                                                                'raw' : { 'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                'folded': { 'type': 'string', 'analyzer': 'folding'}
+                                                                            },
+                                                                        },
+                                                                        'child_entities': {
+                                                                            'type' : 'nested',
+                                                                            'index' : 'analyzed',
+                                                                            'properties' : {
+                                                                                'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                'property' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                'label' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                'value' : {
+                                                                                    'type' : 'string',
+                                                                                    'index' : 'analyzed',
+                                                                                    'fields' : {
+                                                                                        'raw' : { 'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                        'folded': { 'type': 'string', 'analyzer': 'folding'}
+                                                                                    },
+                                                                                },
+                                                                                'child_entities': {
+                                                                                    'type' : 'nested',
+                                                                                    'index' : 'analyzed',
+                                                                                    'properties' : {
+                                                                                        'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                        'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                        'property' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                        'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                        'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                        'label' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                        'value' : {
+                                                                                            'type' : 'string',
+                                                                                            'index' : 'analyzed',
+                                                                                            'fields' : {
+                                                                                                'raw' : { 'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                                'folded': { 'type': 'string', 'analyzer': 'folding'}
+                                                                                            },
+                                                                                        },
+                                                                                        'child_entities': {
+                                                                                            'type' : 'nested',
+                                                                                            'index' : 'analyzed',
+                                                                                        },
+                                                                                        'conceptid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                        'flat_child_entities': {
+                                                                                            'type' : 'nested', 
+                                                                                            'index' : 'analyzed',
+                                                                                            'properties' : {
+                                                                                                'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                                'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                                'property' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                                'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                                'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                                'label' : {
+                                                                                                    'type' : 'string',
+                                                                                                    'index' : 'analyzed',
+                                                                                                    'fields' : {
+                                                                                                        'raw' : { 'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                                        'folded': { 'type': 'string', 'analyzer': 'folding'}
+                                                                                                    }
+                                                                                                },
+                                                                                                'date' : {'type' : 'date'},
+                                                                                                'value' : {'type' : 'string', 'index' : 'not_analyzed'}
+                                                                                            }
+                                                                                        },
+                                                                                    }
+                                                                                },
+                                                                                'conceptid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                'flat_child_entities': {
+                                                                                    'type' : 'nested', 
+                                                                                    'index' : 'analyzed',
+                                                                                    'properties' : {
+                                                                                        'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                        'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                        'property' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                        'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                        'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                        'label' : {
+                                                                                            'type' : 'string',
+                                                                                            'index' : 'analyzed',
+                                                                                            'fields' : {
+                                                                                                'raw' : { 'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                                'folded': { 'type': 'string', 'analyzer': 'folding'}
+                                                                                            }
+                                                                                        },
+                                                                                        'date' : {'type' : 'date'},
+                                                                                        'value' : {'type' : 'string', 'index' : 'not_analyzed'}
+                                                                                    }
+                                                                                },
+                                                                            }
+                                                                        },
+                                                                        'conceptid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                        'flat_child_entities': {
+                                                                            'type' : 'nested', 
+                                                                            'index' : 'analyzed',
+                                                                            'properties' : {
+                                                                                'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                'property' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                'label' : {
+                                                                                    'type' : 'string',
+                                                                                    'index' : 'analyzed',
+                                                                                    'fields' : {
+                                                                                        'raw' : { 'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                        'folded': { 'type': 'string', 'analyzer': 'folding'}
+                                                                                    }
+                                                                                },
+                                                                                'date' : {'type' : 'date'},
+                                                                                'value' : {'type' : 'string', 'index' : 'not_analyzed'}
+                                                                            }
+                                                                        },
+                                                                    }
+                                                                },
+                                                                'conceptid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                'flat_child_entities': {
+                                                                    'type' : 'nested', 
+                                                                    'index' : 'analyzed',
+                                                                    'properties' : {
+                                                                        'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                        'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                        'property' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                        'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                        'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                        'label' : {
+                                                                            'type' : 'string',
+                                                                            'index' : 'analyzed',
+                                                                            'fields' : {
+                                                                                'raw' : { 'type' : 'string', 'index' : 'not_analyzed'},
+                                                                                'folded': { 'type': 'string', 'analyzer': 'folding'}
+                                                                            }
+                                                                        },
+                                                                        'date' : {'type' : 'date'},
+                                                                        'value' : {'type' : 'string', 'index' : 'not_analyzed'}
+                                                                    }
+                                                                },
+                                                            }
+                                                        },
+                                                        'conceptid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                        'flat_child_entities': {
+                                                            'type' : 'nested', 
+                                                            'index' : 'analyzed',
+                                                            'properties' : {
+                                                                'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                'property' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                                'label' : {
+                                                                    'type' : 'string',
+                                                                    'index' : 'analyzed',
+                                                                    'fields' : {
+                                                                        'raw' : { 'type' : 'string', 'index' : 'not_analyzed'},
+                                                                        'folded': { 'type': 'string', 'analyzer': 'folding'}
+                                                                    }
+                                                                },
+                                                                'date' : {'type' : 'date'},
+                                                                'value' : {'type' : 'string', 'index' : 'not_analyzed'}
+                                                            }
+                                                        },
+                                                    }
+                                                },
+                                                'conceptid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                'flat_child_entities': {
+                                                    'type' : 'nested', 
+                                                    'index' : 'analyzed',
+                                                    'properties' : {
+                                                        'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                        'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                        'property' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                        'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                        'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                        'label' : {
+                                                            'type' : 'string',
+                                                            'index' : 'analyzed',
+                                                            'fields' : {
+                                                                'raw' : { 'type' : 'string', 'index' : 'not_analyzed'},
+                                                                'folded': { 'type': 'string', 'analyzer': 'folding'}
+                                                            }
+                                                        },
+                                                        'date' : {'type' : 'date'},
+                                                        'value' : {'type' : 'string', 'index' : 'not_analyzed'}
+                                                    }
+                                                },
+                                            }
+                                        },
+                                        'conceptid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                        'flat_child_entities': {
+                                            'type' : 'nested', 
+                                            'index' : 'analyzed',
+                                            'properties' : {
+                                                'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                'property' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                                'label' : {
+                                                    'type' : 'string',
+                                                    'index' : 'analyzed',
+                                                    'fields' : {
+                                                        'raw' : { 'type' : 'string', 'index' : 'not_analyzed'},
+                                                        'folded': { 'type': 'string', 'analyzer': 'folding'}
+                                                    }
+                                                },
+                                                'date' : {'type' : 'date'},
+                                                'value' : {'type' : 'string', 'index' : 'not_analyzed'}
+                                            }
+                                        },
+                                    }
+                                },
+                                'conceptid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                'flat_child_entities': {
+                                    'type' : 'nested', 
+                                    'index' : 'analyzed',
+                                    'properties' : {
+                                        'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                        'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                        'property' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                        'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                        'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                        'label' : {
+                                            'type' : 'string',
+                                            'index' : 'analyzed',
+                                            'fields' : {
+                                                'raw' : { 'type' : 'string', 'index' : 'not_analyzed'},
+                                                'folded': { 'type': 'string', 'analyzer': 'folding'}
+                                            }
+                                        },
+                                        'date' : {'type' : 'date'},
+                                        'value' : {'type' : 'string', 'index' : 'not_analyzed'}
+                                    }
+                                },
+                            }
+                        },
                     }
                 }
             }

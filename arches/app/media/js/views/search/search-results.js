@@ -71,13 +71,20 @@ define(['jquery',
                 
                 $.each(data.results.hits.hits, function(){
                     var description = resourceTypes[this._source.entitytypeid].defaultDescription;
-                    var descriptionNode = resourceTypes[this._source.entitytypeid].descriptionNode;
+                    var description_array = [];
+                    var descriptionNodeStr = resourceTypes[this._source.entitytypeid].descriptionNode;
+                    var descriptionNode = descriptionNodeStr.split(",");
                     $.each(this._source.child_entities, function(i, entity){
-                        if (entity.entitytypeid === descriptionNode){
-                            description = entity.value;
-                        }
+                        _.each(descriptionNode, function(node){
+                            if (entity.entitytypeid === node){
+                                description_array.push(entity.value);
+                            }
+                        });
+                    
                     })
-
+                    if (description_array.length > 0) {
+                        description = description_array.join();
+                    }
                     self.results.push({
                         primaryname: this._source.primaryname,
                         resourceid: this._source.entityid,

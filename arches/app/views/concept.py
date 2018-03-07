@@ -24,7 +24,7 @@ from django.http import HttpResponse, HttpResponseNotFound, HttpResponseNotAllow
 from django.views.decorators.csrf import csrf_exempt
 from django.template import RequestContext
 from django.shortcuts import render_to_response
-from arches.app.utils.decorators import group_required
+from django.contrib.auth.decorators import permission_required
 from arches.app.models import models
 from arches.app.models.concept import Concept, ConceptValue, CORE_CONCEPTS
 from arches.app.search.search_engine_factory import SearchEngineFactory
@@ -35,20 +35,14 @@ from arches.app.utils.skos import SKOSWriter, SKOSReader
 from django.utils.module_loading import import_by_path
 
 
-def get_sparql_providers(endpoint=None):
-    sparql_providers = {}
-    for provider in settings.SPARQL_ENDPOINT_PROVIDERS:
-        Provider = import_by_path(provider)()
-        sparql_providers[Provider.endpoint] = Provider
-    
-    if endpoint:
-        return sparql_providers[endpoint]
-    else:
-        return sparql_providers
+sparql_providers = {}
+for provider in settings.SPARQL_ENDPOINT_PROVIDERS:
+    Provider = import_by_path(provider)()
+    sparql_providers[Provider.endpoint] = Provider
 
-@group_required('edit')
+@permission_required('edit')
 def rdm(request, conceptid):
-    lang = request.GET.get('lang', settings.LANGUAGE_CODE)    
+    lang = request.GET.get('lang', request.LANGUAGE_CODE)    
     languages = models.DLanguages.objects.all()
 
     concept_schemes = []
@@ -66,12 +60,12 @@ def rdm(request, conceptid):
 
 
 
-@group_required('edit')
+@permission_required('edit')
 @csrf_exempt
 def concept(request, conceptid):
     f = request.GET.get('f', 'json')
     mode = request.GET.get('mode', '')
-    lang = request.GET.get('lang', settings.LANGUAGE_CODE)
+    lang = request.GET.get('lang', request.LANGUAGE_CODE)
     pretty = request.GET.get('pretty', False)
 
     if request.method == 'GET':
@@ -131,7 +125,7 @@ def concept(request, conceptid):
                     'labels': labels,
                     'concept': concept_graph,
                     'languages': languages,
-                    'sparql_providers': get_sparql_providers(),
+                    'sparql_providers': sparql_providers,
                     'valuetype_labels': valuetypes.filter(category='label'),
                     'valuetype_notes': valuetypes.filter(category='note'),
                     'valuetype_related_values': valuetypes.filter(category='undefined'),
@@ -184,7 +178,7 @@ def concept(request, conceptid):
             imagefile = request.FILES.get('file', None)
 
             if imagefile:
-                value = models.FileValues(valueid = str(uuid.uuid4()), value = request.FILES.get('file', None), conceptid_id = conceptid, valuetype_id = 'image',languageid_id = settings.LANGUAGE_CODE)
+                value = models.FileValues(valueid = str(uuid.uuid4()), value = request.FILES.get('file', None), conceptid_id = conceptid, valuetype_id = 'image',languageid_id = request.LANGUAGE_CODE)
                 value.save()
                 return JSONResponse(value)
 
@@ -268,7 +262,7 @@ def manage_parents(request, conceptid):
 
 @csrf_exempt
 def confirm_delete(request, conceptid):
-    lang = request.GET.get('lang', settings.LANGUAGE_CODE) 
+    lang = request.GET.get('lang', request.LANGUAGE_CODE) 
     concept = Concept().get(id=conceptid)
     concepts_to_delete = [concept.get_preflabel(lang=lang).value for key, concept in Concept.gather_concepts_to_delete(concept, lang=lang).iteritems()]
     #return HttpResponse('<div>Showing only 50 of %s concepts</div><ul><li>%s</ul>' % (len(concepts_to_delete), '<li>'.join(concepts_to_delete[:50]) + ''))
@@ -341,7 +335,7 @@ def search(request):
     #             if conceptid in cached_scheme_names:
     #                 result['in_scheme_name'] = cached_scheme_names[conceptid]
     #             else:
-    #                 result['in_scheme_name'] = get_preflabel_from_conceptid(conceptid, lang=settings.LANGUAGE_CODE)['value']             
+    #                 result['in_scheme_name'] = get_preflabel_from_conceptid(conceptid, lang=request.LANGUAGE_CODE)['value']             
     #                 cached_scheme_names[conceptid] = result['in_scheme_name'] 
 
     #         newresults.append(result)
@@ -366,7 +360,7 @@ def add_concepts_from_sparql_endpoint(request, conceptid):
             elif parentconcept.nodetype == 'ConceptScheme':
                 relationshiptype = 'hasTopConcept' 
 
-            provider = get_sparql_providers(data['endpoint'])
+            provider = sparql_providers[data['endpoint']]
             try:
                 parentconcept.subconcepts = provider.get_concepts(data['ids'])
             except Exception as e:
@@ -386,22 +380,25 @@ def add_concepts_from_sparql_endpoint(request, conceptid):
     return HttpResponseNotFound()
 
 def search_sparql_endpoint_for_concepts(request):
-    provider = get_sparql_providers(request.GET.get('endpoint'))
+    provider = sparql_providers[request.GET.get('endpoint')]
     results = provider.search_for_concepts(request.GET.get('terms'))
     return JSONResponse(results)
 
 def concept_tree(request):
-    lang = request.GET.get('lang', settings.LANGUAGE_CODE) 
+    lang = request.GET.get('lang', request.LANGUAGE_CODE) 
     conceptid = request.GET.get('node', None)
     concepts = Concept({'id': conceptid}).concept_tree(lang=lang)
     return JSONResponse(concepts, indent=4)
 
 def get_preflabel_from_valueid(valueid, lang):
+
     se = SearchEngineFactory().create()
     concept_label = se.search(index='concept_labels', id=valueid)
     if concept_label['found']:
+#         print "ConceptID from ValueID: %s" % get_concept_label_from_valueid(valueid)
         return get_preflabel_from_conceptid(get_concept_label_from_valueid(valueid)['conceptid'], lang)
 
+        
 def get_concept_label_from_valueid(valueid):
     se = SearchEngineFactory().create()
     concept_label = se.search(index='concept_labels', id=valueid)
@@ -421,17 +418,23 @@ def get_preflabel_from_conceptid(conceptid, lang):
     se = SearchEngineFactory().create()
     query = Query(se)
     terms = Terms(field='conceptid', terms=[conceptid])
-    match = Match(field='type', query='preflabel', type='phrase')
+    # Uncomment the following line only after having reindexed ElasticSearch cause currently the Arabic labels are indexed as altLabels
+#     match = Match(field='type', query='prefLabel', type='phrase')
     query.add_filter(terms)
-    query.add_query(match)
+    # Uncomment the following line only after having reindexed ElasticSearch cause currently the Arabic labels are indexed as altLabels
+#     query.add_query(match)
+
     preflabels = query.search(index='concept_labels')['hits']['hits'] 
     for preflabel in preflabels:
+#         print 'Language at this point %s and label language %s and ret is %s' % (lang, preflabel['_source']['language'], ret)
         default = preflabel['_source']
         # get the label in the preferred language, otherwise get the label in the default language
         if preflabel['_source']['language'] == lang:
+#             print 'prefLabel from Conceptid: %s' % preflabel['_source']
             return preflabel['_source']
         if preflabel['_source']['language'].split('-')[0] == lang.split('-')[0]:
             ret = preflabel['_source']
-        if preflabel['_source']['language'] == settings.LANGUAGE_CODE and ret == None:
+        if preflabel['_source']['language'] == lang and ret == None:
             ret = preflabel['_source']
     return default if ret == None else ret
+

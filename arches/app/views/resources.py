@@ -20,11 +20,11 @@ import re
 from django.template import RequestContext
 from django.shortcuts import render_to_response, redirect
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import permission_required
 from django.conf import settings
 from django.db import transaction
 from arches.app.models import models
 from arches.app.models.resource import Resource
-from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.search.search_engine_factory import SearchEngineFactory
@@ -38,7 +38,7 @@ from django.db.models import Max, Min
 def report(request, resourceid):
     raise NotImplementedError('Reports are not yet implemented.')
 
-@group_required('edit')
+@permission_required('edit')
 @csrf_exempt
 def resource_manager(request, resourcetypeid='', form_id='default', resourceid=''):
 
@@ -79,7 +79,8 @@ def resource_manager(request, resourcetypeid='', form_id='default', resourceid='
     
     if request.method == 'GET':
         if form != None:
-            lang = request.GET.get('lang', settings.LANGUAGE_CODE)
+            
+            lang = request.GET.get('lang', request.LANGUAGE_CODE)
             form.load(lang)
             return render_to_response('resource-manager.htm', {
                     'form': form,
@@ -105,7 +106,7 @@ def resource_manager(request, resourcetypeid='', form_id='default', resourceid='
 @csrf_exempt
 def related_resources(request, resourceid):
     if request.method == 'GET':
-        lang = request.GET.get('lang', settings.LANGUAGE_CODE)
+        lang = request.GET.get('lang', request.LANGUAGE_CODE)
         start = request.GET.get('start', 0)
         return JSONResponse(get_related_resources(resourceid, lang, start=start, limit=15), indent=4)
     
@@ -174,6 +175,7 @@ def map_layers(request, entitytypeid='all', get_centroids=False):
             geojson_collection['features'].append(se.search(index='maplayers', id=entityid)['_source'])
         return JSONResponse(geojson_collection)
 
+
     if get_centroids:
         # If we are just fetching the centroids, we can do a slightly optimised query by having elasticsearch pull out relevant fields
         args['fields'] = [
@@ -207,8 +209,8 @@ def map_layers(request, entitytypeid='all', get_centroids=False):
                 item['_source']['properties'].pop('centroid', None)
             geojson_collection['features'].append(item['_source'])
 
-
     return JSONResponse(geojson_collection)
+
 
 def edit_history(request, resourceid=''):
     ret = []

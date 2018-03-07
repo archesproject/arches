@@ -222,9 +222,13 @@ class SearchEngine(object):
 
             try:
                 self.es.index(index=index, doc_type=doc_type, body=document, id=id, **kwargs)
-            except Exception as detail:
-                self.logger.warning('%s: WARNING: failed to index document: %s \nException detail: %s\n' % (datetime.now(), document, detail))
-                raise detail
+            except:
+                print "Exception raised"
+                return False    
+ 
+#             except Exception as detail:
+#                 self.logger.warning('%s: WARNING: failed to index document: %s \nException detail: %s\n' % (datetime.now(), document, detail))
+#                 raise detail
 
 
     def bulk_index(self, data):

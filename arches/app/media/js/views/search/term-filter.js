@@ -4,7 +4,6 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
         initialize: function(options) {
             $.extend(this, options);            
             var self = this;
-
             this.query = {
                 filter:  {
                     terms: ko.observableArray()
@@ -46,7 +45,7 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
                         };
                     },
                     results: function (data, page) {
-                        var value = $('div.resource_search_widget').find('.select2-input').val();
+                        var value = $('div.resource_search_widget'+this.index).find('.select2-input').val();
 
                         // this result is being hidden by a style in arches.css 
                         // .select2-results li:first-child{
@@ -73,7 +72,7 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
                             });
                         }, this);
                         return {results: results};
-                    }
+                    }.bind(this)
                 },
                 formatResult:function(result, container, query, escapeMarkup){
                     var markup=[];
@@ -171,8 +170,7 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
 
         updateTerms: function(terms){
             this.searchbox.select2('data', terms);
-
-            $('.resource_search_widget').find('.select2-search-choice').each(function(i, el) {
+            $('.resource_search_widget'+this.index).find('.select2-search-choice').each(function(i, el) {
                 if ($(el).data('select2-data').type === 'filter-flag') {
                     $(el).addClass('filter-flag');
                 }
@@ -201,8 +199,7 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
                 });
 
                 this.searchbox.select2('data', results).trigger('change');
-
-                $('.resource_search_widget').find('.select2-search-choice').each(function(i, el) {
+                $('.resource_search_widget'+this.index).find('.select2-search-choice').each(function(i, el) {
                     if ($(el).data('select2-data').inverted) {
                         $(el).addClass('inverted');
                     }

@@ -34,6 +34,9 @@ from arches.management.commands import utils
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.models import models
 import csv
+import arches.app.utils.backlogids as create_backlog
+from arches.app.utils.FixingMethods import LegacyIdsFixer,IndexConceptFixer
+from arches.app.utils.load_relations import LoadRelations,UnloadRelations
 
 class Command(BaseCommand):
     """
@@ -42,8 +45,8 @@ class Command(BaseCommand):
     """
     
     option_list = BaseCommand.option_list + (
-        make_option('-o', '--operation', action='store', dest='operation', default='',
-            type='choice', choices=['', 'setup', 'install', 'setup_db', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resource_graphs','export_resources'],
+        make_option('-o', '--operation', action='store', dest='operation', default='setup',
+            type='choice', choices=['setup', 'install', 'setup_db', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resource_graphs','export_resources','create_backlog', 'remove_resources_from_csv', 'legacy_fixer', 'load_relations', 'unload_relations', 'delete_indices'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' + 
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' + 
@@ -59,6 +62,8 @@ class Command(BaseCommand):
             help='Text string identifying the resources in the data load you want to delete.'),
         make_option('-d', '--dest_dir', action='store', dest='dest_dir',
             help='Directory where you want to save exported files.'),
+        make_option('-a', '--append', action='store_true', dest='appending',
+            help='Select this option to append data at the end of a resource'),
     )
 
     def handle(self, *args, **options):
@@ -88,10 +93,13 @@ class Command(BaseCommand):
             self.build_permissions()
 
         if options['operation'] == 'load_resources':
-            self.load_resources(package_name, options['source'])
+            self.load_resources(package_name, options['source'], options['appending'])
             
         if options['operation'] == 'remove_resources':     
             self.remove_resources(options['load_id'])
+        
+        if options['operation'] == 'remove_resources_from_csv':     
+            self.remove_resources_from_csv(options['source'])
 
         if options['operation'] == 'load_concept_scheme':
             self.load_concept_scheme(package_name, options['source'])
@@ -104,7 +112,18 @@ class Command(BaseCommand):
 
         if options['operation'] == 'export_resources':
             self.export_resources(package_name, options['dest_dir'])
-
+        
+        if options['operation'] == 'create_backlog':
+            self.create_backlog()
+        if options['operation'] == 'legacy_fixer':
+            self.legacy_fixer(options['source'])
+        if options['operation'] == 'load_relations':
+            self.load_relations(options['source'])
+        if options['operation'] == 'unload_relations':
+            self.unload_relations(options['source'])
+        if options['operation'] == 'delete_indices':
+            self.delete_indices(options['source'])
+            
     def setup(self, package_name):
         """
         Installs Elasticsearch into the package directory and 
@@ -153,7 +172,6 @@ class Command(BaseCommand):
             f.write('# ----------------- FOR TESTING ONLY -----------------')
             f.write('\n# - THESE SETTINGS SHOULD BE REVIEWED FOR PRODUCTION -')
             f.write('\nnode.max_local_storage_nodes: 1')
-            f.write('\nnode.local: true')
             f.write('\nindex.number_of_shards: 1')
             f.write('\nindex.number_of_replicas: 0')
             f.write('\nhttp.port: %s' % port)
@@ -297,7 +315,7 @@ class Command(BaseCommand):
                 Permission.objects.create(codename='read_%s' % entitytype, name='%s - read' % entitytype , content_type=content_type[0])
                 Permission.objects.create(codename='delete_%s' % entitytype, name='%s - delete' % entitytype , content_type=content_type[0])
 
-    def load_resources(self, package_name, data_source=None):
+    def load_resources(self, package_name, data_source=None, appending = False):
         """
         Runs the setup.py file found in the package root
 
@@ -305,14 +323,21 @@ class Command(BaseCommand):
         data_source = None if data_source == '' else data_source
         module = import_module('%s.setup' % package_name)
         load = getattr(module, 'load_resources')
-        load(data_source) 
+        ResourceLoader().load(data_source, appending) 
 
-    def remove_resources(self, load_id):
+    def remove_resources(self, load_id = None):
         """
         Runs the resource_remover command found in package_utils
 
         """
-        resource_remover.delete_resources(load_id)
+        if load_id == None:
+            resource_remover.truncate_resources()
+        else: 
+            resource_remover.delete_resources(load_id)
+          
+    def remove_resources_from_csv(self, data_source):
+      
+        resource_remover.delete_resources_from_csv(data_source)
 
     def load_concept_scheme(self, package_name, data_source=None):
         """
@@ -350,7 +375,19 @@ class Command(BaseCommand):
             csvwriter.writeheader()
             for csv_record in related_resources:
                 csvwriter.writerow({k: str(v).encode('utf8') for k, v in csv_record.items()})
+                
+    def legacy_fixer(self, source):
+        LegacyIdsFixer(source)
 
+    def load_relations(self, source):
+        LoadRelations(source)
+        
+    def unload_relations(self, source):
+        UnloadRelations(source)
+        
+    def delete_indices(self, source):
+        IndexConceptFixer(source)
+        
     def start_livereload(self):
         from livereload import Server
         server = Server()
@@ -359,3 +396,7 @@ class Command(BaseCommand):
         for path in settings.TEMPLATE_DIRS:
             server.watch(path)
         server.serve(port=settings.LIVERELOAD_PORT)
+
+    def create_backlog(self):
+        print "Function called"
+        create_backlog.createBacklogIds()

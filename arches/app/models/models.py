@@ -38,6 +38,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 
+
 # from django.contrib.auth.models import User
 
 # def _func(self):
@@ -333,7 +334,7 @@ class FileValues(models.Model):
     valueid = models.TextField(primary_key=True) # This field type is a guess.
     conceptid = models.ForeignKey('Concepts', db_column='conceptid')
     valuetype = models.ForeignKey('ValueTypes', db_column='valuetype')
-    value = models.FileField(upload_to='concepts')
+    value = models.FileField(upload_to='concepts/')
     languageid = models.ForeignKey('DLanguages', db_column='languageid')
     class Meta:
         db_table = u'values'
@@ -414,6 +415,7 @@ class Strings(models.Model):
     class Meta:
         db_table = u'strings'
 
+
 class Dates(models.Model):
     entityid = models.ForeignKey('Entities', primary_key=True, db_column='entityid')
     val = models.DateTimeField()
@@ -431,7 +433,7 @@ class Numbers(models.Model):
         
 class Files(models.Model):
     entityid = models.ForeignKey('Entities', primary_key=True, db_column='entityid')
-    val = models.FileField(upload_to='files')
+    val = models.FileField(upload_to='files/')
     class Meta:
         db_table = u'files'
 
@@ -456,9 +458,6 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
         try:
             if os.path.isfile(instance.val.path):
                 os.remove(instance.val.path)
-        ## except block added to deal with S3 file deletion
-        ## see comments on 2nd answer below
-        ## http://stackoverflow.com/questions/5372934/how-do-i-get-django-admin-to-delete-files-when-i-remove-an-object-from-the-datab
         except:
             storage, name = instance.val.storage, instance.val.name
             storage.delete(name)
@@ -543,7 +542,7 @@ class Domains(models.Model):
                     # print value, 'attr value'
                     concepts = Concepts.objects.filter(legacyoid = value)
                     if len(concepts) == 1:
-                        value = Values.objects.get(conceptid = concepts[0], valuetype = 'prefLabel')
+                        value = Values.objects.get(conceptid = concepts[0], valuetype = 'prefLabel', languageid=settings.LANGUAGE_CODE)
                     else:
                         # print 'unable to find, or found more then 1 Concept with legacyoid: %s' % (value)
                         value = None
@@ -631,3 +630,13 @@ class Overlays(models.Model):
     objects = models.GeoManager()
     class Meta:
         db_table = u'aux"."overlays'
+
+class UniqueIds(models.Model):
+    entityid = models.ForeignKey('Entities', primary_key=True, db_column='entityid')
+    val = models.TextField()
+    id_type = models.TextField()
+    order_date = models.DateTimeField()
+    
+    class Meta:
+        db_table = u'uniqueids'
+        get_latest_by = "order_date"

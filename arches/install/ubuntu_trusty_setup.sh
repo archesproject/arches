@@ -35,16 +35,16 @@ sudo service postgresql restart
 sudo wget http://download.osgeo.org/geos/geos-3.4.2.tar.bz2
 sudo tar xvfj geos-3.4.2.tar.bz2
 cd geos-3.4.2
-sudo ./configure
-sudo make
+./configure
+make
 sudo make install
 cd ..
 
 sudo wget http://download.osgeo.org/postgis/source/postgis-2.1.3.tar.gz
 sudo tar xfvz postgis-2.1.3.tar.gz
 cd postgis-2.1.3
-sudo ./configure
-sudo make
+./configure
+make
 sudo make install
 sudo ldconfig
 sudo make comments-install

@@ -53,7 +53,7 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
             this.on('change', function(eventtype, item){
                 $('#cancel-workflow').removeClass('disabled');
                 $('#remove-workflow').removeClass('disabled');                    
-            });            
+            });
             this.$el.find('.form-load-mask').hide();
         },
 

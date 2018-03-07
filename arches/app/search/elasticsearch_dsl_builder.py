@@ -53,12 +53,14 @@ class Query(Dsl):
         self.start = kwargs.pop('start', 0)
         self.limit = kwargs.pop('limit', 10)
 
+
         self.dsl = {
             'query': {
                 "match_all": { }
             }
         }
-
+        
+        
     def add_filter(self, dsl=None, operator='and'):
         """
         Wrap the filter in an "and" or "or" clause by specifying an operator value of "and" or "or"
@@ -72,7 +74,9 @@ class Query(Dsl):
 
             if self._filtered:
                 self.dsl['query']['filtered']['filter'].append(dsl)
+
             else:
+                
                 self._filtered = True
                 self.dsl = {
                     'query':{
@@ -97,6 +101,7 @@ class Query(Dsl):
                     self.dsl['query'] = Bool(self.dsl['query']).merge(dsl).dsl
                 else:
                     self.dsl['query'] = dsl
+                    
 
     def search(self, index='', doc_type='', **kwargs):
         self.fields = kwargs.pop('fields', self.fields)
@@ -122,6 +127,7 @@ class Query(Dsl):
 
         if self.fields != None:
             self.dsl['fields'] = self.fields
+            
 
 
 class Bool(Dsl):

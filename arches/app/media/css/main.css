@@ -15,6 +15,11 @@
 @import url(plugins/box-shadows.css);
 
 
+
+body {
+    font-family: 'PT Sans', sans-serif;
+}
+
 /*Arches Topbar
 ------------------------------------*/
 .powered-by-arches { 
@@ -88,6 +93,7 @@
     z-index: 12;
     padding: 8px 0;
     position: relative;
+    min-width: 100px;
 }
 
 .topbar ul.loginbar {
@@ -281,15 +287,15 @@
 /*Brand*/
 .header .navbar-brand { 
     z-index: 1;
-    top: -10px;
+    top: -50px;
     position: relative;
-    padding: 0 10px 10px;
+    padding: 0 10px 0px;
 }
 
 @media (max-width: 992px) {
     .header .navbar-brand { 
         top: 0;
-        height: 40px;
+        height: 80px;
     }
 }
 
@@ -825,7 +831,7 @@
     line-height: 35px;
     font-weight: normal;
     margin-bottom: 12px;
-    font-family: 'Open Sans', sans-serif;   
+    font-family: 'PT Sans', sans-serif;   
 }
 
 .purchase .btn-buy {
@@ -1815,6 +1821,7 @@ ul.labels-demo li {
     border-bottom: solid 1px #eee;
 }
 
+
 .gm-style-iw {
     /*overflow: inherit !important;*/
 }
@@ -2528,7 +2535,7 @@ ul.labels-demo li {
 }
 
 .arches-logo {
-    height: 28px;
+    height: 70px;
     margin-top: 13px;
 }
 
@@ -2857,6 +2864,25 @@ ul.labels-demo li {
     border-width: 1px 1px 1px 1px; 
     border-color: #cfcfcf; 
     border-style: solid;
+}
+
+/*Map to full screen
+------------------------------------*/
+.map:-moz-full-screen {
+height: 100%;
+}
+.map:-webkit-full-screen {
+height: 100%;
+}
+.map:-ms-fullscreen {
+height: 100%;
+}
+.map:fullscreen {
+height: 100%;
+}
+
+.ol-full-screen {
+z-index:900;   
 }
 
 .arches-map-info-panel {

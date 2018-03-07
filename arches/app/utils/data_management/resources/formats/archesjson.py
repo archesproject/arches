@@ -12,6 +12,8 @@ from format import Writer
 import json
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
+
+
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -26,15 +28,18 @@ class JsonWriter(Writer):
         json_resources = []
         json_resources_for_export = []
         iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        json_file_name = os.path.join('{0}_{1}.{2}'.format(settings.PACKAGE_NAME, iso_date, 'json'))
+        json_file_name = os.path.join('{0}_{1}.{2}'.format('EAMENA', iso_date, 'json'))
         f = StringIO()
-        
+
+
         for count, resource in enumerate(resources, 1):
             if count % 1000 == 0:
                 print "%s Resources exported" % count            
-            errors = [] 
+            errors = []
+            
             try:
                 a_resource = Resource().get(resource['_id'])
+                
                 a_resource.form_groups = None
                 json_resources.append(a_resource)
             except Exception as e:
@@ -57,4 +62,5 @@ class JsonReader():
         resources = []
         with open(archesjson, 'r') as f:
             resources = JSONDeserializer().deserialize(f.read())
+        
         return resources['resources']

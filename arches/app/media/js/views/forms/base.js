@@ -113,7 +113,7 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
             validationAlert.show(300);
             setTimeout(function() {
                 validationAlert.fadeOut();
-                }, 6500);
+                }, 60000);
         },
 
         /**
@@ -123,10 +123,10 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
         checkForRequiredBranchlists: function() {
             var isValid = true
             _.each(this.branchLists, function(branchList){
-                if (branchList.rules.required === true && branchList.getData().length === 0 && branchList.singleEdit === false) {
+                if (branchList.rules === true && branchList.getData().length === 0 && branchList.singleEdit === false) {
                     isValid = false;
                     this.showAlert(branchList);
-                } else if (branchList.rules.required === true && branchList.singleEdit === true) {
+                } else if (branchList.rules === true && branchList.singleEdit === true) {
                     if (branchList.getData().length === 0) {
                         isValid = false;
                     } else {
@@ -162,11 +162,12 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
          */
         checkForRules: function(){
             var hasRules = true;
-            _.each(this.branchLists, function(branchList){
-                if (!branchList.rules) {
-                    hasRules = false;
-                }
-            }, this); 
+//             _.each(this.branchLists, function(branchList){
+//                 if (!branchList.rules) {
+//                     hasRules = false;
+//                 }
+// 
+//             }, this); 
             return hasRules;
         },
 
