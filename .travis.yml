@@ -16,7 +16,13 @@ sudo: required
 
 addons:
   postgresql: 9.3
-
+  apt:
+      packages:
+      - libxml2-dev
+      - libpq-dev
+      - openjdk-7-jdk
+      - python-dev
+      - postgresql-9.6-postgis-2.3
       
 services:
   - postgresql
