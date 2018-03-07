@@ -11,7 +11,7 @@ EAMENA’s spatial database, based on a modified Arches platform, will provide t
 
 ## This repo
 
-The EAMENA Github repo contains both the EAMENA app and the Arches app root files. The former is a modified version of the Arches HIP app. The latter is a fork of the Arches Project's repo and contains several changes, most of which project-specific, to the underlying Arches codebase (e.g. inclusion of new database models).
+The EAMENA Github repo contains both the EAMENA app and the Arches app root files. The former is a modified version of the Arches HIP app. The latter is a fork of the Arches Project's repo and contains several changes to the Arches stable v.3 branch, most of which project-specific, to the underlying Arches codebase (e.g. inclusion of new database models).
 
 > **Note:**
 If you are planning to install the EAMENA app only, you may do so by first of all following the Arches installation instructions available [here](http://arches3.readthedocs.io/en/latest/getting-started/#installing-arches), then by installing the Arches HIP package (instructions [here](http://arches-hip.readthedocs.org/en/latest/getting-started/#installating-arches-hip)). Once you have done this, and have created your app, download the codebase from this repo and replace the content of your app folder with that of eamena/eamena.
