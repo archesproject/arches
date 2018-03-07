@@ -77,6 +77,21 @@ class TileData(View):
                     with transaction.atomic():
                         try:
                             tile.save(request=request)
+                            if tile_id == '4345f530-aa90-48cf-b4b3-92d1185ca439':
+                                print 'saving tile'
+                                import couchdb
+                                import json as json_json
+                                couch = couchdb.Server(settings.COUCHDB_URL)
+                                for project in models.MobileSurveyModel.objects.all():
+                                    db = couch['project_' + str(project.id)]
+                                    #tile = models.TileModel.objects.get(pk='4345f530-aa90-48cf-b4b3-92d1185ca439')
+                                    tile_json = json_json.loads(JSONSerializer().serialize(tile))
+                                    tile_json['_id'] = tile_json['tileid']
+                                    for row in db.view('_all_docs', include_docs=True):
+                                        if 'tileid' in row.doc and tile_json['_id'] == row.doc['_id']:
+                                            tile_json['_rev'] = row.doc['_rev']
+                                            db.save(tile_json)
+
                         except ValidationError as e:
                             return JSONResponse({'status':'false','message':e.args}, status=500)
                         tile.after_update_all()

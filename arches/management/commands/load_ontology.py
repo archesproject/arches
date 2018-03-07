@@ -108,7 +108,6 @@ class Command(BaseCommand):
                 print _('You must first define a base ontology (using -s) before loading an extension using the (-x) argument')
             return
 
-
     def run_loader(self, data_source=None, version=None, name=None, id=None, extensions=None, verbosity=1):
         """
         load the given ontology file in xml format into the database
