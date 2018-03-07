@@ -42,7 +42,7 @@ before_install:
 
 install: 
   - python setup.py install
-  - pip install -r arches/install/requirements_dev.txt
+  - pip install -r arches/install/requirements.txt
   
 before_script:
   - sleep 10
