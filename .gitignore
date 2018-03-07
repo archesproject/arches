@@ -1,4 +1,12 @@
 *.pyc
+*.xslx
+arches.egg-info
+eamena/eamena/settings_local.py
+eamena/eamena/source_data
+eamena/eamena/media/js/views/crypto
+eamena/eamena/elasticsearch
+eamena/eamena/logs
+eamena/eamena/uploadedfiles
 virtualenv/ENV
 tests/elasticsearch
 tests/logs
