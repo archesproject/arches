@@ -1,0 +1,31 @@
+{% load i18n %}
+<!-- Modal window for adding a new concept -->
+<form action="" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="labelmodal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header arches-modal-header">
+                <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+                <h4 class="modal-title">{% trans "Export Scheme" %}</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h5 class="arches-modal-section">{% trans "Select scheme to export" %}</h5>
+                        <p> 
+                            <select style="width:100%" class="select2" name="scheme_dd" required>
+                                <option value=""></option>
+                                {% for scheme in concept_schemes %}
+                                    <option value="{{scheme.conceptid}}">{{scheme.value}}</option>
+                                {% endfor %}
+                            </select>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-u btn-u-default" data-dismiss="modal">{% trans "Close" %}</button>
+                <button type="submit" class="btn-u btn-u-primary">{% trans "Export" %}</button>
+            </div>
+        </div>
+    </div>
+</form>

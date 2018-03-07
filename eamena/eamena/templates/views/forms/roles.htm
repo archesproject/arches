@@ -1,0 +1,135 @@
+{% extends "views/forms/base.htm" %}
+{% load i18n %}
+
+{% block form_content %}
+<div class="row" id="role-section">
+    <div class="col-xs-12">
+        <div class="padding-left-10">
+
+            <dl>
+                <!-- Title -->
+                <dt>
+                    <h5 id="arches-names-form" class="section-headline">{% trans "Actor Roles" %}</h5>
+                </dt>
+
+                <!-- Form -->
+                <dd class="arches-RDM-labels form-inline arches-form hidden-xs">
+
+                    <div class="row">
+
+                        <div class="col-xs-12 padding-left-0">
+
+                            <!-- Form for screens > xs -->
+                            <div class="form-group" style="width: 100%">
+
+                                <!-- <input class="actor-roles" id="" name="" style="width:40%;"  value="">&nbsp; -->
+                                <input style="width:40%; display:inline-block;" class="select2 arches-select2-crud-form name-type designation" id="resource-designation-type" data-bind="select2: {value: getEditedNode('ACTOR_TYPE.E55', 'value'),  placeholder: '{% trans "Type" %}', dataKey: 'ACTOR_TYPE.E55'}">&nbsp;
+                                <input style="width:40%; display:inline-block;" class="select2 arches-select2-crud-form name-type designation" id="resource-designation-type" data-bind="select2: {value: getEditedNode('ACTOR_TYPE_CERTAINTY_TYPE.E55', 'value'),  placeholder: '{% trans "Certainty" %}', dataKey: 'ACTOR_TYPE_CERTAINTY_TYPE.E55'}">&nbsp;
+                                <!-- <input class="periods" id="" name="" style="width:40%;"  value="">&nbsp; -->
+
+                                <!-- Add Button -->
+                                {% include 'views/components/add-item-button.htm' %}
+                                <!-- End Add Button -->
+
+                                <!-- Spacer -->
+                                <div class="margin-top-5 hidden-xs"></div>
+
+                                <!-- From/To Dates -->
+                                <div>
+
+                                    <div class="form-group datetimepicker" style="width:40%;">
+                                        <div class="input-group">
+                                            <input type="text" name="mydate" placeholder="{% trans 'From' %}" id='date' class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('FROM_DATE.E49', 'value')} ">
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>&nbsp;
+
+                                    <div class="form-group datetimepicker" style="width:40%;">
+                                        <div class="input-group">
+                                            <input type="text" name="mydate" placeholder="{% trans 'To' %}" id='date' class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('TO_DATE.E49', 'value')} ">
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                    <!-- End  From/To Dates -->
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </dd>
+                <dd class="arches-RDM-labels form-inline arches-form hidden-sm hidden-md hidden-lg">
+                    <div>
+                        <div>
+                            <!-- Form for screens > xs -->
+
+                            <!-- Form for screens = xs -->
+                            <div class="form-group" style="width: 100%">
+
+                            <input style="width:100%; display:inline-block;" class="select2 arches-select2-crud-form name-type designation" id="resource-designation-type" data-bind="select2: {value: getEditedNode('ACTOR_TYPE.E55', 'value'),  placeholder: '{% trans "Type" %}', dataKey: 'ACTOR_TYPE.E55'}">&nbsp;
+                            <input style="width:100%; display:inline-block;" class="select2 arches-select2-crud-form name-type designation" id="resource-designation-type" data-bind="select2: {value: getEditedNode('ACTOR_TYPE_CERTAINTY_TYPE.E55', 'value'),  placeholder: '{% trans "Type" %}', dataKey: 'ACTOR_TYPE_CERTAINTY_TYPE.E55'}">&nbsp;
+                                <!-- Spacer (for xs screens) -->
+                                <div class="margin-top-5 hidden-sm hidden-md hidden-lg"></div>
+
+                                <!-- From/To Dates -->
+                                <div>
+
+                                    <div class="form-group datetimepicker" style="width:100%;">
+                                        <div class="input-group">
+                                            <input type="text" name="mydate" placeholder="From" id='date' class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('FROM_DATE.E49', 'value')} ">
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group datetimepicker" style="width:100%;">
+                                        <div class="input-group">
+                                            <input type="text" name="mydate" placeholder="To" id='date' class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('TO_DATE.E49', 'value')} ">
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                    <!-- End  From/To Dates -->
+
+                                </div>
+
+                                <!-- Add Button -->
+                                {% include 'views/components/add-item-button.htm' %}
+                                <!-- End Add Button -->
+
+                            </div>
+                            <!-- Form for screens = xs -->
+                        </div>
+                    </div>
+                </dd>
+                <!-- End Form -->
+            </dl>
+            <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "The role type value must be populated." %}</div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+
+                <!-- Address -->
+                <div class="arches-crud-child-section">
+                    <dl>
+                        <dd class="arches-CRUD-child-title">
+                            {% trans "This resource has the following roles:" %}
+                        </dd>
+
+                        <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                            <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Roles Defined" %}</div>   
+
+                            <div data-bind='foreach: getBranchLists()'>
+                                <div class="arches-crud-record">
+                                    <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this role" %}"><i data-bind='click: $parent.deleteItem.bind($parent)' class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                    <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind='click: $parent.editItem.bind($parent)' title="{% trans "Edit this role" %}"><span data-bind="{text: nodes.get('ACTOR_TYPE.E55', 'label')}" style="padding-right:2px;"></span><span class="text-muted">({% trans "Type" %})</span><span data-bind="{text: nodes.get('ACTOR_TYPE_CERTAINTY_TYPE.E55', 'label')}" style="padding-right:2px;"></span><span class="text-muted">({% trans "Certainty" %})</span><span data-bind="text: nodes.get('FROM_DATE.E49', 'value')" style="padding-right:2px"></span><span class="text-muted">({% trans "From date" %})</span><span data-bind="text: nodes.get('TO_DATE.E49', 'value')"></span><span class="text-muted">({% trans "To date" %})</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </dd>
+
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock form_content %}

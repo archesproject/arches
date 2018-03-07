@@ -1,0 +1,243 @@
+{% load i18n %}
+		<!-- Catalog ID -->
+		
+		<div class="row">
+		     <div class="col-xs-12">
+		        <dl>
+		            <dt>
+		                <h5 id="" class="arches-report-subsection-title">{% trans "Catalog ID" %}</h5>
+		            </dt>
+		
+		            {% if 'CATALOGUE_ID_E42' not in report_info.source.graph %}
+		                <dd class="arches-report-subsection-item">
+		                    {% trans "No Catalog ID recorded" %}
+		                </dd>
+		            {% else %}
+		                {% for CATALOGUE_ID_E42 in report_info.source.graph.CATALOGUE_ID_E42 %}
+		                    <dd class="arches-report-subsection-item">
+		                        {{ CATALOGUE_ID_E42.CATALOGUE_ID_E42__value }}
+		                    </dd>
+		                {% endfor %}            
+		            {% endif %}
+		
+		        </dl>
+		    </div>
+		</div>
+		<!-- End Catalog ID -->
+		
+		<!-- Source -->
+		
+		<div class="row">
+		     <div class="col-xs-12">
+		        <dl>
+		            <dt>
+		                <h5 id="" class="arches-report-subsection-title">{% trans "Imagery Source" %}</h5>
+		            </dt>
+		
+		            {% if 'PUBLICATION_EVENT_E12' not in report_info.source.graph %}
+		                <dd class="arches-report-subsection-item">
+		                    {% trans "No Source recorded" %}
+		                </dd>
+		            {% else %}
+		                {% for PUBLICATION_EVENT_E12 in report_info.source.graph.PUBLICATION_EVENT_E12 %}
+		                    {% if 'PUBLICATION_ASSIGNMENT_E17' in PUBLICATION_EVENT_E12 %}
+		                	{% for PUBLICATION_ASSIGNMENT_E17 in PUBLICATION_EVENT_E12.PUBLICATION_ASSIGNMENT_E17 %}
+			                	{% if 'IMAGERY_SOURCE_TYPE_E55' in PUBLICATION_ASSIGNMENT_E17 %}
+					                {% for IMAGERY_SOURCE_TYPE_E55 in PUBLICATION_ASSIGNMENT_E17.IMAGERY_SOURCE_TYPE_E55 %}
+					                    <dd class="arches-report-subsection-item">
+					                        {{ IMAGERY_SOURCE_TYPE_E55.IMAGERY_SOURCE_TYPE_E55__value }}
+					                    </dd>
+						         {% endfor %}           
+					         {% endif %}
+				         {% endfor %}
+			             {% endif %}
+		                {% endfor %}            
+		            {% endif %}
+		
+		        </dl>
+		    </div>
+		</div>
+		<!-- End Source -->
+		
+		<!-- Creator -->
+		<div class="row">
+		     <div class="col-xs-12">
+		        <dl>
+		            <dt>
+		                <h5 id="" class="arches-report-subsection-title">{% trans "Imagery Creator/Owner" %}</h5>
+		            </dt>
+		
+		            {% if 'RESOURCE_CREATION_EVENT_E65' not in report_info.source.graph %}
+		                <dd class="arches-report-subsection-item">
+		                    {% trans "No Creator/Owner recorded" %}
+		                </dd>
+		            {% else %}
+		                {% for RESOURCE_CREATION_EVENT_E65 in report_info.source.graph.RESOURCE_CREATION_EVENT_E65 %}
+		                    {% if 'CREATOR_E39' in RESOURCE_CREATION_EVENT_E65 %}
+		                	{% for CREATOR_E39 in RESOURCE_CREATION_EVENT_E65.CREATOR_E39 %}
+			                	{% if 'IMAGERY_CREATOR_APPELLATION_E82' in CREATOR_E39 %}
+					                {% for IMAGERY_CREATOR_APPELLATION_E82 in CREATOR_E39.IMAGERY_CREATOR_APPELLATION_E82 %}
+					                    <dd class="arches-report-subsection-item">
+					                        {{ IMAGERY_CREATOR_APPELLATION_E82.IMAGERY_CREATOR_APPELLATION_E82__value }}
+					                    </dd>
+						         {% endfor %}           
+					         {% endif %}
+				         {% endfor %}
+			             {% endif %}
+		                {% endfor %}            
+		            {% endif %}
+		
+		        </dl>
+		    </div>
+		</div>
+		<!-- End Creator -->
+
+		<!-- Image Details -->
+		<div class="row">
+		     <div class="col-xs-12">
+		        <dl>
+		            <dt>
+		                <h5 id="" class="arches-report-subsection-title">{% trans "Image Details" %}</h5>
+		            </dt>
+		
+		            {% if 'ACQUISITION_ASSIGNMENT_E17' not in report_info.source.graph %}
+		                <dd class="arches-report-subsection-item">
+		                    {% trans "No Image Details recorded" %}
+		                </dd>
+		            {% else %}
+		                {% for ACQUISITION_ASSIGNMENT_E17 in report_info.source.graph.ACQUISITION_ASSIGNMENT_E17 %}
+		                    <dd class="arches-report-subsection-item">
+		                    {% if 'IMAGERY_PLATFORM_TYPE_E55' in ACQUISITION_ASSIGNMENT_E17 %}
+		                	{% for IMAGERY_PLATFORM_TYPE_E55 in ACQUISITION_ASSIGNMENT_E17.IMAGERY_PLATFORM_TYPE_E55 %}
+			                        {{ IMAGERY_PLATFORM_TYPE_E55.IMAGERY_PLATFORM_TYPE_E55__value }}<span class="arches-report-subsection-item-type">{% trans "(Platform)" %}</span>
+			                    
+				         {% endfor %}
+			             {% else %}
+				             {% trans "None" %}
+			             {% endif %}
+			             {% if 'IMAGERY_SENSOR_TYPE_E55' in ACQUISITION_ASSIGNMENT_E17 %}
+				             {% for IMAGERY_SENSOR_TYPE_E55 in ACQUISITION_ASSIGNMENT_E17.IMAGERY_SENSOR_TYPE_E55 %}
+			                        {{ IMAGERY_SENSOR_TYPE_E55.IMAGERY_SENSOR_TYPE_E55__value }}<span class="arches-report-subsection-item-type">{% trans "(Camera Model)" %}</span>					             
+				             {% endfor %}
+			             {% else %}
+				             {% trans "None" %}
+			             {% endif %}
+			             {% if 'IMAGERY_BANDS_TYPE_E55' in ACQUISITION_ASSIGNMENT_E17 %}
+				             {% for IMAGERY_BANDS_TYPE_E55 in ACQUISITION_ASSIGNMENT_E17.IMAGERY_BANDS_TYPE_E55 %}
+			                        {{ IMAGERY_BANDS_TYPE_E55.IMAGERY_BANDS_TYPE_E55__value }}<span class="arches-report-subsection-item-type">{% trans "(Bands)" %}</span>					             
+				             {% endfor %}			             
+			             {% else %}
+				             {% trans "None" %}
+			             {% endif %}
+			             {% if 'IMAGERY_CAMERA_SENSOR_TYPE_E55' in ACQUISITION_ASSIGNMENT_E17 %}
+				             {% for IMAGERY_CAMERA_SENSOR_TYPE_E55 in ACQUISITION_ASSIGNMENT_E17.IMAGERY_CAMERA_SENSOR_TYPE_E55 %}
+			                        {{ IMAGERY_CAMERA_SENSOR_TYPE_E55.IMAGERY_CAMERA_SENSOR_TYPE_E55__value }}<span class="arches-report-subsection-item-type">{% trans "(Camera Type)" %}</span>					             
+				             {% endfor %}			             
+			             {% else %}
+				             {% trans "None" %}
+			             {% endif %}			             			             			             
+			             {% if 'IMAGERY_CAMERA_SENSOR_RESOLUTION_TYPE_E55' in ACQUISITION_ASSIGNMENT_E17 %}
+				             {% for IMAGERY_CAMERA_SENSOR_RESOLUTION_TYPE_E55 in ACQUISITION_ASSIGNMENT_E17.IMAGERY_CAMERA_SENSOR_RESOLUTION_TYPE_E55 %}
+			                        {{ IMAGERY_CAMERA_SENSOR_RESOLUTION_TYPE_E55.IMAGERY_CAMERA_SENSOR_RESOLUTION_TYPE_E55__value }}<span class="arches-report-subsection-item-type">{% trans "(Camera Resolution)" %}</span>					             
+				             {% endfor %}			             
+			             {% else %}
+				             {% trans "None" %}
+			             {% endif %}		
+			             </dd>       
+		                {% endfor %}      
+		            {% endif %}
+					
+		        </dl>
+		    </div>
+		</div>
+		<!-- End Image Details -->
+		
+		<!-- Acquisition date -->
+		<div class="row">
+		     <div class="col-xs-12">
+		        <dl>
+		            <dt>
+		                <h5 id="" class="arches-report-subsection-title">{% trans "Acquisition Date" %}</h5>
+		            </dt>
+		
+		            {% if 'RESOURCE_CREATION_EVENT_E65' not in report_info.source.graph %}
+		                <dd class="arches-report-subsection-item">
+		                    {% trans "No Date recorded" %}
+		                </dd>
+		            {% else %}
+		                {% for RESOURCE_CREATION_EVENT_E65 in report_info.source.graph.RESOURCE_CREATION_EVENT_E65 %}
+		                    {% if 'TIME___SPAN_RESOURCE_ACQUISITION_EVENT_E52' in RESOURCE_CREATION_EVENT_E65 %}
+		                	{% for TIME___SPAN_RESOURCE_ACQUISITION_EVENT_E52 in RESOURCE_CREATION_EVENT_E65.TIME___SPAN_RESOURCE_ACQUISITION_EVENT_E52 %}
+						{% if 'DATE_OF_ACQUISITION_E50' in TIME___SPAN_RESOURCE_ACQUISITION_EVENT_E52 %}
+							{% for DATE_OF_ACQUISITION_E50 in TIME___SPAN_RESOURCE_ACQUISITION_EVENT_E52.DATE_OF_ACQUISITION_E50 %}						
+					                    <dd class="arches-report-subsection-item">
+					                        {{ DATE_OF_ACQUISITION_E50.DATE_OF_ACQUISITION_E50__value|cut:"T00:00:00" }}
+					                    </dd>
+					                 {% endfor %}
+				                 {% endif %}
+				         {% endfor %}
+			             {% endif %}
+		                {% endfor %}            
+		            {% endif %}
+		
+		        </dl>
+		    </div>
+		</div>
+		<!-- End Acquisition date -->
+
+		<!-- File date -->
+		<div class="row">
+		     <div class="col-xs-12">
+		        <dl>
+		            <dt>
+		                <h5 id="" class="arches-report-subsection-title">{% trans "File Date" %}</h5>
+		            </dt>
+		
+		            {% if 'PUBLICATION_EVENT_E12' not in report_info.source.graph %}
+		                <dd class="arches-report-subsection-item">
+		                    {% trans "No Date recorded" %}
+		                </dd>
+		            {% else %}
+		                {% for PUBLICATION_EVENT_E12 in report_info.source.graph.PUBLICATION_EVENT_E12 %}
+			             {% if 'TIME___SPAN_IMAGERY_PUBLICATION_EVENT_E52' in PUBLICATION_EVENT_E12 %}
+		                	{% for TIME___SPAN_IMAGERY_PUBLICATION_EVENT_E52 in PUBLICATION_EVENT_E12.TIME___SPAN_IMAGERY_PUBLICATION_EVENT_E52 %}
+						{% if 'IMAGERY_DATE_OF_PUBLICATION_E50' in TIME___SPAN_IMAGERY_PUBLICATION_EVENT_E52 %}
+							{% for IMAGERY_DATE_OF_PUBLICATION_E50 in TIME___SPAN_IMAGERY_PUBLICATION_EVENT_E52.IMAGERY_DATE_OF_PUBLICATION_E50 %}
+					                    <dd class="arches-report-subsection-item">
+					                        {{ IMAGERY_DATE_OF_PUBLICATION_E50.IMAGERY_DATE_OF_PUBLICATION_E50__value|cut:"T00:00:00" }}
+					                    </dd>
+					                 {% endfor %}
+				                 {% endif %}
+				         {% endfor %}
+			             {% endif %}
+		                {% endfor %}            
+		            {% endif %}
+		
+		        </dl>
+		    </div>
+		</div>
+		<!-- End File date -->		
+
+
+		<!-- Copyright Type -->
+		<div class="row">
+		     <div class="col-xs-12">
+		        <dl>
+		            <dt>
+		                <h5 id="" class="arches-report-subsection-title">{% trans "Copyright Type" %}</h5>
+		            </dt>
+		
+		            {% if 'RIGHT_DESCRIPTION_E30' not in report_info.source.graph %}
+		                <dd class="arches-report-subsection-item">
+		                    {% trans "No Copyright Recorded" %}
+		                </dd>
+		            {% else %}
+		                {% for RIGHT_DESCRIPTION_E30 in report_info.source.graph.RIGHT_DESCRIPTION_E30 %}
+					<dd class="arches-report-subsection-item">{{RIGHT_DESCRIPTION_E30.RIGHT_TYPE_E55__label}}</dd>
+		                {% endfor %}            
+		            {% endif %}
+		
+		        </dl>
+		    </div>
+		</div>
+		<!-- End Copyright Type -->						

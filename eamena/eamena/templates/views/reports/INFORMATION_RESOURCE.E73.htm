@@ -1,0 +1,347 @@
+
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% load staticfiles %}
+{% load i18n %}
+
+{% include 'views/reports/title.htm' %}
+
+<!-- End Fixed Nav for Report -->
+<div id="report-body" class="report-body">
+    
+     {% if geometry != 'null' %}
+        <!--=== Map Block ===-->
+        <div id="map-container">
+
+            <div id="map" class="map map-report-panel" style="display: block;">
+                <div id="olmap" class="fill"></div>
+                <div style="display:none;" id="map-data">
+                    <input type="hidden" id="resource_geometry" value='{{ geometry }}' />
+                </div>
+            </div>
+
+            <!-- Map: Project Info Panel -->
+            <div class="container">
+            <!-- Map: Scaleline--->
+                 <div class="row">
+                    <div class="col-xs-12" style="">
+                        <div id="scale-line" style = "margin-top: -40px;"></div>        
+                    </div>
+                </div>                      
+                <!-- Map Tools Panel -->
+                <div class="row">
+                    <div class="col-xs-12 col-sm-6" style="">
+
+                        <div id="basemaps-panel" class="tools-panel hidden" style="overflow-y: scroll; border-top-left-radius: 5px; border-top-right-radius: 5px; margin-top: -408px; height: 332px; width: 290px; margin-left: 0px;">
+                            <div class="modal-header arches-modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                    ×
+                                </button>
+                                <h4 class="modal-title">
+                                    {% trans "Basemaps" %}
+                                </h4>
+                            </div>
+
+                            <!-- Body Content -->
+                            <div class="modal-body padding-top-0 padding-bottom-0" data-bind='foreach: baseLayers'>
+
+                                <div class="row">
+                                    <hr class="arches-layer-divider" style="border-top: 0px; margin-top: 5px;">
+
+                                    <div class="arches-basemap-entry" style="margin-right: 7px;">
+                                        
+                                        <div class="" style="">
+                                            <a data-bind="attr: { id: id, title: name }" class="basemap info-click" data-rel="" href="javascript:void(0);">
+                                                <span class="">  
+                                                    <img data-bind="attr: { src: icon }" class="arches-basemap-thumbnail" alt="" />
+                                                    <span class="zoom-icon"></span>                   
+                                                </span>                                              
+                                            </a>                    
+                                            <span class="arches-basemap-caption-search">
+                                                <a data-bind="attr: { id: id }, text: name" class="caption-text-search hover-effect basemap info-click" href="javascript:void(0);"> </a>
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!-- End Body Content -->
+
+                        </div>
+                    </div>
+                </div>
+                <!-- End Map Tools Panel -->
+
+                <!-- Map Tools -->
+                <div class="row">
+                    <div class="col-xs-12 col-sm-7 col-md-5 col-lg-4" style="margin-top: -77px;">
+                        <div class="btn-group">
+                            <button id="inventory-basemaps" type="button" class="btn btn-primary arches-map-tools" style="width:290px;"><i class="fa fa-globe"></i> {% trans "Basemaps" %}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Map Tools -->
+            </div>
+        </div>
+        <!--=== End Map Block ===-->
+    {% endif %}
+
+    <!--=== Beginning of Image Block ===-->
+    {% if report_info.has_image != '' %}
+    <div class="block-description" style="padding-top: 30px;">
+        <div class="container">
+            <div class="">
+             {% if geometry != 'null' %}<i class="center-icon rounded-x fa fa-folder-open"></i>{% endif %}
+
+                  <div class="row">
+                        <div class="pagination-centered" style="">
+                                        <img src="{{report_info.filepath.FILE_PATH_E62__value|default:report_info.filepath}}" style="max-width: 1200px !important; top: -20px; " />
+                        </div>
+                  </div>
+              </div>
+        </div>
+    </div>  
+    {% endif %}
+
+    <!--=== End of Image Block ===-->
+
+    <!--=== Resource Description Section ===-->
+    <div class="block-description" style="padding-top: 30px;" id="report">
+        <div class="container">
+
+            <!-- Resource Report Container -->
+            <div>
+
+                <!-- Section Header -->
+                <div class="">
+                         {% if geometry != 'null' or report_info.has_image != ''  %}<i class="center-icon rounded-x fa fa-folder-open"></i>{% endif %}
+                    <div class="">
+                        <h2 class="arches-report-section-header">
+                        {% if 'Imagery' in report_info.subtype %}
+                            {% trans "Resource Description" %}
+                        {% elif 'Cartography' in report_info.subtype %}
+                            {% trans "Cartography Description" %}
+                        {% elif 'Shared' in report_info.subtype %}
+                            {% trans "Shared Dataset Description" %}
+                        {% else %}
+                            {% trans "Resource Description" %}
+                        {% endif %}
+                        </h2>
+                    </div> 
+                </div>
+
+                <!-- Anchor for in=page navigation from "report options" menu -->
+                <a href="overview" id="overview" style="top: 250px;"></a>
+
+
+                <!-- Resource Description Content -->
+                <div class="row">
+                    
+                    <!-- Spacer -->
+                    <div class="hidden-sm hidden-md hidden-lg margin-bottom-20"></div>
+
+                    <!-- Resource Summary Info -->
+                    <div class="col-xs-12">
+                        <div class="right-inner arches-box-grey-border">
+                            
+                            <!-- Resource Summary Info -->
+                            <div class="row">
+
+                                <!-- Section sub-header -->
+                                <div class="col-sm-2">
+                                    <h3 class="arches-report-subsection">{% trans "Resource Summary" %}</h3>
+                                </div>
+                                <!-- End Section sub-header -->
+
+                                <!-- Section Content -->
+                                <div class="col-sm-10">
+
+                                    <!-- Spacer -->
+                                    <div class="arches-report-spacer hidden-xs"></div>
+
+                                    <div class="arches-report-subsection-content">
+
+                                        <!-- Types -->
+                                        <div class="row">
+                                             <div class="col-xs-12">
+                                                <dl>
+                                                    <dt>
+                                                        <h5 id="" class="arches-report-subsection-title">{% trans "Resource type(s)" %}</h5>
+                                                    </dt>
+
+                                                    {% if 'RESOURCE_CREATION_EVENT_E65' not in report_info.source.graph %}
+                                                        <dd class="arches-report-subsection-item">
+                                                            {% trans "No types recorded" %}
+                                                        </dd>
+                                                    {% else %}
+                                                        {% for RESOURCE_CREATION_EVENT_E65 in report_info.source.graph.RESOURCE_CREATION_EVENT_E65 %}
+                                                            {% if 'INFORMATION_RESOURCE_TYPE_ASSIGNMENT_E17'  in RESOURCE_CREATION_EVENT_E65 %}
+                                                                {% for INFORMATION_RESOURCE_TYPE_ASSIGNMENT_E17 in RESOURCE_CREATION_EVENT_E65.INFORMATION_RESOURCE_TYPE_ASSIGNMENT_E17 %}
+                                                                    {% if 'INFORMATION_RESOURCE_TYPE_E55'  in INFORMATION_RESOURCE_TYPE_ASSIGNMENT_E17 %}
+                                                                        {% for INFORMATION_RESOURCE_TYPE_E55 in INFORMATION_RESOURCE_TYPE_ASSIGNMENT_E17.INFORMATION_RESOURCE_TYPE_E55 %}
+
+                                                                            <dd class="arches-report-subsection-item">
+                                                                                {{ INFORMATION_RESOURCE_TYPE_E55.INFORMATION_RESOURCE_TYPE_E55__value }}
+                                                                            </dd>
+                                                                        {% endfor %}
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                                
+                                                            {% endif %}
+                                                        {% endfor %}            
+                                                    {% endif %}
+
+                                                </dl>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Formats -->
+                                        <div class="row">
+                                             <div class="col-xs-12">
+                                                <dl>
+                                                    <dt>
+                                                        <h5 id="" class="arches-report-subsection-title">{% trans "Resource format(s)" %}</h5>
+                                                    </dt>
+
+                                                    {% if 'INFORMATION_CARRIER_E84' not in report_info.source.graph %}
+                                                        <dd class="arches-report-subsection-item">
+                                                            {% trans "No formats recorded" %}
+                                                        </dd>
+                                                    {% else %}
+                                                        {% for INFORMATION_CARRIER_E84 in report_info.source.graph.INFORMATION_CARRIER_E84 %}
+                                                            {% for INFORMATION_CARRIER_FORMAT_TYPE_E55 in INFORMATION_CARRIER_E84.INFORMATION_CARRIER_FORMAT_TYPE_E55 %}
+                                                                <dd class="arches-report-subsection-item">
+                                                                    {{ INFORMATION_CARRIER_FORMAT_TYPE_E55.INFORMATION_CARRIER_FORMAT_TYPE_E55__value }}
+                                                                </dd>
+                                                            {% endfor %}
+                                                        {% endfor %}            
+                                                    {% endif %}
+
+                                                </dl>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Info-Specific sections -->
+                                        {% if 'Imagery' in report_info.subtype %}
+                                            {% include 'views/reports/sections/IMAGERY_REPORT.htm' %}
+                                        {% elif 'Cartography' in report_info.subtype %}
+                                            {% include 'views/reports/sections/CARTOGRAPHY_REPORT.htm' %}
+                                        {% elif 'Shared' in report_info.subtype %}
+                                            {% include 'views/reports/sections/SHARED_REPORT.htm' %}
+                                        {% else %}
+                                            {% include 'views/reports/sections/OTHER_INFO_RES.htm' %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <!-- End Section Content-->
+
+                            </div>
+                            <!-- End Names/Type Section -->
+
+
+                            <hr class="devider margin-top-10" style="margin-bottom: 5px;"></hr>
+
+                            <!-- URLs -->
+                            <div class="row">
+
+                                <!-- Section sub-header -->
+                                <div class="col-sm-2">
+                                    <h3 class="arches-report-subsection">{% trans "URLs" %}</h3>
+                                </div>
+                                <!-- End Section sub-header -->
+
+                                 <!-- Section Content -->
+                                <div class="col-sm-10">
+
+                                    <!-- Spacer -->
+                                    <div class="arches-report-spacer hidden-xs"></div>
+                                    <div class="arches-report-subsection-content">
+                                        <div class="row">
+                                            <div class="col-xs-12">
+                                                <dl>
+                                                    {% if 'URL_E51' not in report_info.source.graph %}
+                                                        <dd class="arches-report-subsection-item">
+                                                            {% trans "No URLs recorded" %}
+                                                        </dd>
+                                                    {% else %}
+                                                        {% for URL_E51 in report_info.source.graph.URL_E51 %}
+                                                           <dd class="arches-report-subsection-item arches-report-spacer"> <a href="{{ URL_E51.URL_E51__value }}" target="_blank">{{URL_E51.URL_E51__value}}</a>
+                                                            {% if URL_E51.URL_ACCESS_DATE_E50__value %}
+                                                                  <span class="arches-report-subsection-item-type">{% trans "Access date: " %}</span> {{ URL_E51.URL_ACCESS_DATE_E50__value|cut:"T00:00:00"}} 
+                                                            {% endif %}
+                                                            </dd>
+                                                        {% endfor %}
+                                                    {% endif %}
+                                                </dl>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- End URLs Section -->
+
+                            {% if report_info.has_image == ''  and report_info.filepath != '' %}
+                            <hr class="devider margin-top-10" style="margin-bottom: 5px;"></hr>
+                            <!-- File Link Section -->
+                            <div class="row">
+
+                                <!-- Section sub-header -->
+                                <div class="col-sm-2">
+                                    <h3 class="arches-report-subsection">{% trans "File link" %}</h3>
+                                </div>
+                                <!-- End Section sub-header -->
+
+                                 <!-- Section Content -->
+                                <div class="col-sm-10">
+                                
+                                    <!-- Spacer -->
+                                    <div class="arches-report-spacer hidden-xs"></div>
+                                    <div class="arches-report-subsection-content">
+                                        <div class="row">
+                                            <div class="col-xs-12">
+                                                <dl>
+                                                           <dd class="arches-report-subsection-item arches-report-spacer"> <a href="{{ report_info.filepath.FILE_PATH_E62__value}}" target="_blank">{{report_info.filepath.FILE_PATH_E62__label|cut:"files/"}}</a>
+                                                            </dd>
+                                                </dl>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- End File Link Section -->
+                        {% endif %}
+
+
+                        </div>
+                    </div>
+                    <!-- End Project Information -->
+                    
+                </div>   
+            </div>
+            <!-- End Project Summary -->
+        </div>
+    </div>
+    <!-- End Resource Description Section -->
+
+    {% include "views/reports/sections/related_resource_section.htm" %}
+
+
+
+</div>

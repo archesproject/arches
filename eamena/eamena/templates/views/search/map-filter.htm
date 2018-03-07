@@ -1,0 +1,215 @@
+{% load i18n %}
+
+<!-- Map -->
+<div id="map-filter" class="" style="display: none; direction: ltr !important;">
+
+    <div class="row" style="margin-left: -19px;">
+        <div class="col-xs-2 col-xs-offset-10" style="z-index: 900;">     
+            <div class="row" style="margin-right: 0px; margin-top: 0px;">
+                <!-- Filter Tools -->
+                <div class="col-sm-5 col-md-4 pull-right hidden-xs" style="padding-right: 0px; ">
+                    <div id="map-tools-btn" class="btn-group pull-right margin-10 margin-right-20" style="margin-top: 15px;margin-right:20px;">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                            {% trans "Map Tools" %}
+                            <i class="fa fa-chevron-down"></i>
+                            <span class="sr-only">{% trans "Toggle Dropdown" %}</span>                            
+                        </button>
+                        <ul id="map-tools-dropdown" class="dropdown-menu" role="menu">
+                            <li><a name="map-tools" id="map-extent-filter" data-tooltype="map-extent" href="#" class="info-link"><i class="fa fa-xxx" data-bind="css: {'fa-check' : geometry.type() == 'bbox'}"></i>{% trans "Limit search results to map extent" %}</a></li>
+                            <li class="divider"></li>
+                            <li><a name="map-tools" id="polygon-filter" data-tooltype="Polygon" href="#" class="info-link polygon-filter"><i class="fa fa-xxx" data-bind="css: {'fa-check' : geometry.type() == 'Polygon'}"></i>{% trans "Draw Polygon to Filter Map" %}</a></li>
+                            <li><a name="map-tools" id="line-filter" data-tooltype="LineString" href="#"><i class="fa fa-xxx" data-bind="css: {'fa-check' : geometry.type() == 'LineString'}"></i>{% trans "Draw Line to Filter Map" %}</a></li>
+                            <li><a name="map-tools" id="point-filter" data-tooltype="Point" href="#"><i class="fa fa-xxx" data-bind="css: {'fa-check' : geometry.type() == 'Point'}"></i>{% trans "Draw Point to Filter Map" %}</a></li>
+                            <li class="divider"></li> 
+                            <li>
+                                <a id="spatial-buffer" href="#" style="padding-left: 13px;"><i class="fa fa-xxx"></i>{% trans "Buffer (m)" %}<input id="map-buffer" type="text" class="" style="width: 30%; margin-left: 5px;" data-bind="textInput: buffer.width" /></a>
+                            </li>
+                        </ul>                        
+                    </div>
+                </div>
+            </div>
+                                <!-- Map: Scaleline--->
+             <div class="row" style="margin-left: -19px;">
+                <div class="col-sm-5 col-md-4 pull-right" style="">
+                    <div id="scale-line" style = "position:absolute; float: right !important;left:-600px;top:300px;"></div>        
+                </div>
+            </div>   
+        </div>
+
+        <!-- Map -->
+        <div class="col-xs-12" style="margin-top: -50px;">
+            
+            <div id="map" class="map arches-map-filter arches-search-map">
+                <div class="tooltip left" role="tooltip" style="display:none;" id="feature_tooltip">
+                      <div class="tooltip-arrow"></div>
+                      <div id="tooltip-text" class="tooltip-inner">
+                  </div>
+                </div>
+            </div>
+            <div id="olmap" class="fill"></div>
+                        <!-- Data loading mask -->
+                        <div class="col-xs-11 col-xs-offset-1 col-sm-4 col-sm-offset-7 col-md-3 spinner" style="position: absolute;left: -100px; top: 150px;">
+                            
+                            <img src="{{ STATIC_URL }}img/spinner.gif" height="50" width="50" style="margin-top: 2px;"></img>
+                           
+                        </div>
+            <!-- Map: Project Info Panel -->
+            <div class="container">
+                
+                <!-- Map Tools Panel -->
+                <div class="row">
+                    <div class="col-xs-12 col-sm-6" style="">
+
+                        <div id="basemaps-panel" class="tools-panel hidden" style="overflow-y: scroll; border-top-left-radius: 5px; border-top-right-radius: 5px; margin-top: -408px; height: 332px; width: 290px; margin-left: 15px;">
+                            <div class="modal-header arches-modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                    ×
+                                </button>
+                                <h4 class="modal-title">
+                                    {% trans "Basemaps" %}
+                                </h4>
+                            </div>
+
+                            <!-- Body Content -->
+                            <div class="modal-body padding-top-0 padding-bottom-10" data-bind='foreach: baseLayers'>
+
+                                <div class="row">
+                                    <hr class="arches-layer-divider" style="border-top: 0px; margin-top: 5px;">
+
+                                    <div class="arches-basemap-entry" style="margin-right: 7px;">
+                                
+                                        <div class="" style="">
+                                            <a data-bind="attr: { id: id, title: name }" class="basemap info-click" data-rel="" href="javascript:void(0);">
+                                                <span class="">  
+                                                    <img data-bind="attr: { src: icon }" class="arches-basemap-thumbnail" alt="" />
+                                                    <span class="zoom-icon"></span>                   
+                                                </span>                                              
+                                            </a>                    
+                                            <span class="arches-basemap-caption-search">
+                                                <a data-bind="attr: { id: id }, text: name" class="caption-text-search hover-effect basemap info-click" href="javascript:void(0);"> </a>
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!-- End Body Content -->
+
+                        </div>
+                    </div>
+                </div>
+                <!-- End Map Tools Panel -->
+                <!-- Info Panel -->
+                <div id="resource-info" class="row" style="display:none;">
+
+                    <!-- Setup display, hide for xs screens -->
+                    <div class="col-xs-11 col-xs-offset-1 col-sm-5 col-sm-offset-7 col-md-5 col-md-offset-7 pull-right">
+
+                        <!-- Using Bootstrap Model CSS classes to get the overall look of the info panel,
+                        but the actual info panel is NOT implemented as a model form -->
+                        <div class="modal-content no-corners arches-map-inventory-panel" style="margin-top: -408px;margin-right: 20px; z-index: 9999;">
+                            <div class="modal-header">
+                                <button type="button" class="close resource-info-closer" aria-hidden="true">
+                                    ×
+                                </button>
+
+                                <h4 class="modal-title">
+                                    <a href="javascript:void(0);" class="text-primary" target="_blank" data-bind="{% if 'edit' in user.user_groups %} attr:{ href: selectedResource() ? selectedResource().reportLink : 'javascript:void(0);'} {% endif %}">
+                                        <i class="fa fa-trophy text-primary" data-bind="attr: { class: selectedResource() ? selectedResource().typeIcon + ' text-primary': '' }"></i> 
+                                        
+                                        <span data-bind="text:selectedResource() ? selectedResource().primaryname : ''"></span>
+                                        
+                                        <!-- Resource Type for larger screens -->
+                                        <span class="hidden-xs">
+                                            <small class="text-primary" data-bind="text: selectedResource() ? selectedResource().typeName: ''"></small>
+                                        </span>
+
+                                        <!-- Resource Type for small screens -->
+                                        <span class="hidden-sm hidden-md hidden-lg">
+                                            </br><small class="text-primary margin-left-30 margin-top-minus-10"  data-bind="text: selectedResource() ? selectedResource().typeName: ''"></small>
+                                        </span>
+
+                                    </a>
+                                </h4>
+
+                            </div>
+
+                            <!-- Body Content -->
+                            <div class="modal-body padding-top-0 padding-bottom-0">
+                                <p> 
+                                    {% include 'map/resource-popup.htm' %}
+                                </p>
+                            </div>
+                            <!-- End Body Content -->
+
+                            <div class="modal-footer" style="padding-top: 10px; padding-bottom: 10px;">
+                                <button type="button" class="btn btn-default resource-info-closer">
+                                    {% trans 'Close' %}
+                                </button>
+                                <a href="javascript:void(0);" class="text-primary" target="_blank" data-bind="attr:{ href: selectedResource() ? selectedResource().reportLink : 'javascript:void(0);'}">
+                                    <button type="button" class="btn btn-primary">
+                                        {% trans 'View Report' %}
+                                    </button>
+                                </a>
+                            </div>
+                        </div><!-- /.modal-content -->
+
+                    </div>
+                </div>
+                
+                <div id="cluster-info" class="row" style="display:none;">
+                    <div class="col-xs-11 col-xs-offset-1 col-sm-5 col-sm-offset-7 col-md-5 col-md-offset-7 pull-right">
+                        <div class="modal-content no-corners arches-map-inventory-panel" style="margin-top: -360px;margin-right: 25px;">
+                            <div class="modal-header">
+                                <button type="button" class="close cluster-info-closer" aria-hidden="true">
+                                    ×
+                                </button>
+
+                                <h4 class="modal-title">
+                                    {% trans 'Clustered Resources' %}
+                                </h4>
+
+                            </div>
+
+                            <!-- Body Content -->
+                            <div class="modal-body padding-top-0 padding-bottom-0" data-bind="if: clusterFeatures().length === 0">
+                                <div class="loading-cluster-info"></div>
+                            </div>
+
+                            <div class="modal-body padding-top-0 padding-bottom-0" data-bind="if: clusterFeatures().length > 0">
+                                <div data-bind='foreach: clusterFeatures' style="margin-top:12px;">
+                                    <div> 
+                                        <a href="javascript:void(0);" data-bind="text: properties.primaryname, attr: {'data-entityid': id}" class='cluster-item-link'></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- End Body Content -->
+
+                            <div class="modal-footer" style="padding-top: 10px; padding-bottom: 10px;">
+                                <button type="button" class="btn btn-default cluster-info-closer">
+                                    {% trans 'Close' %}
+                                </button>
+                            </div>
+                        </div><!-- /.modal-content -->
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Map Tools -->
+            <div class="row">
+                <div class="col-xs-12 col-sm-7 col-md-5 col-lg-4" style="margin-top: -77px; margin-left: 30px;">
+                    <div class="btn-group">
+                        <button id="inventory-basemaps" type="button" class="btn btn-primary arches-map-tools" style="width:290px;"><i class="fa fa-globe"></i> {% trans "Basemaps" %}
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- End Map Tools -->
+        </div>
+        
+    </div>
+</div>
+
+<!-- End Basic Map -->

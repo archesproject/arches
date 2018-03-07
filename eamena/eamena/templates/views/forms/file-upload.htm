@@ -1,0 +1,199 @@
+{% extends "views/forms/wizard-base.htm" %}
+{% load i18n %}
+
+{% block form_content %}
+
+<!-- CRUD Form -->
+<div class="row" id="file-section">            
+
+    <!-- Related Information Objects Container -->
+    <div class="col-xs-12" id="current-items">
+
+        <!-- For Demo, Start with no related resources -->
+        <div class="margin-bottom-10" id="no-files" style="" data-bind="visible: getBranchLists()[0].nodes.get('FILE_PATH.E62', 'value') === ''">
+            <dl> 
+                <dd class="margin-left-10">
+                    <div class="">
+                        <p class="arches-CRUD-child text-primary">{% trans "No file uploaded for this resource yet" %}</p>
+                    </div>
+                </dd>
+            </dl>
+        </div>
+        <!-- End Demo -->
+
+        <!-- Realted Files -->
+        <div class="row" data-bind="with: getBranchLists()[0]">
+            
+            <div data-bind="if: nodes.get('THUMBNAIL.E62', 'value') !== '' && nodes.get('FILE_PATH.E62', 'value') !== ''" >
+                
+                <!-- Image -->
+                <div class="row">
+                    <div class="col-xs-12 shadow-wrapper margin-bottom-0">
+                        <dl>
+                            <dd class="" style="padding-left: 20px; padding-right: 20px;">
+                                <img style="width: 100%;" data-bind="attr: { src: nodes.get('FILE_PATH.E62', 'value')}" class="img-bordered">
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <!-- Delete Image Button -->
+                <div class="row">
+                    <div class="col-xs-12" style="padding-left: 40px; margin-bottom: 10px;">
+
+                        <button class="btn btn-danger" id="" data-bind="click: $parent.confirmDelete.bind($parent)"> 
+                            <i class="fa fa-times"></i>&nbsp; {% trans "Delete Image" %}
+                        </button>
+                    
+                    </div>
+                </div>
+
+            </div>
+
+            <div data-bind="if: nodes.get('THUMBNAIL.E62', 'value') === '' && nodes.get('FILE_PATH.E62', 'value') !== ''" >
+
+                <div class="row">
+                    <div class="col-xs-12" style="padding-left: 40px; margin-bottom: 10px;">
+                        <a title="{% trans "Download this file" %}" data-bind="attr: { href: nodes.get('FILE_PATH.E62', 'value')}" target="_blank"><i class="fa fa-cloud-download"></i></a>
+                        <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this file" %}"><i data-bind="click: $parent.confirmDelete.bind($parent)" class="arches-CRUD-delete fa fa-trash-o"></i></a>
+                        <span href="javascript:void(0);" class="arches-CRUD-child info-link related" data-bind="text: nodes.get('FILE_PATH.E62', 'value').split('/')[nodes.get('FILE_PATH.E62', 'value').split('/').length-1]"></span>&nbsp; <span class="text-muted" data-bind="text: '({% trans "format" %}: ' + nodes.get('FILE_PATH.E62', 'value').split('.')[1] +')'"></span>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    <!-- End Related Information Objects Container -->
+
+    <!-- ++++++++++++  Modal ++++++++++++++++++++++++++++++++++++++++++++++++ -->
+    <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+    <div id="confirm_delete_modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content no-corners">
+              
+                <!-- Modal Header -->
+                <div class="modal-header arches-modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;  </button>
+                    <h4 class="modal-title">{% trans "Delete File" %}</h4>
+                </div>
+                <!-- End Modal Header -->
+
+            
+                <!-- Form -->
+                <div class="modal-body">
+                    <dl>
+                        <dd class="arches-RDM-labels" style="padding-right: 20px;">
+                            <div class="row">
+                                
+                                <!-- Title/Caption Form -->
+                                <div class="col-xs-12">
+
+                                    <div class="" style="width: 100%;">
+                                        {% trans "Are you sure you want to delete the file?" %}
+                                    </div>
+
+                                </div>
+                            </div>
+                        </dd>
+                    </dl>
+
+                </div>
+                <!-- End Modal Body -->
+              
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans "Cancel" %}</button>
+                    <button id="deletebtn" type="button" class="btn btn-success" data-dismiss="modal" data-bind="click: deleteItem">{% trans "Delete" %}</button>
+                </div>
+                <!-- End Modal Footer -->
+
+            </div>
+        </div>
+    </div>
+
+    <div id="one_file_only_modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content no-corners">
+              
+                <!-- Modal Header -->
+                <div class="modal-header arches-modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;  </button>
+                    <h4 class="modal-title">{% trans "Only one file allowed" %}</h4>
+                </div>
+                <!-- End Modal Header -->
+
+            
+                <!-- Form -->
+                <div class="modal-body">
+                    <dl>
+                        <dd class="arches-RDM-labels" style="padding-right: 20px;">
+                            <div class="row">
+                                
+                                <!-- Title/Caption Form -->
+                                <div class="col-xs-12">
+
+                                    <div class="" style="width: 100%;">
+                                        {% trans "Only one file is allowed to be associated with this resource." %}
+                                    </div>
+
+                                </div>
+                            </div>
+                        </dd>
+                    </dl>
+
+                </div>
+                <!-- End Modal Body -->
+              
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans "OK" %}</button>
+                </div>
+                <!-- End Modal Footer -->
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ++++++++++++  End Modal ++++++++++++++++++++++++++++++++++++++++++++ -->
+    <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+
+
+    <!-- Upload Files Wizard Container -->
+    <div id="workflow-container" class="" style="display: none;">     
+        <div class="padding-10" id="crud">
+            <div>
+                
+                <dl>
+                    <dd class="arches-RDM-labels">
+                        <div class="row">
+                            <div class="col-xs-12">
+
+                                <div class="tab-pane active" id="tab1" style="min-height: 330px;">
+                                    
+                                    <dl>   
+                                        <div class="dropzone" id="mydropzone"></div>
+                                    </dl>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </dd>
+                </dl>
+
+            </div>
+        </div>
+        <div class="padding-10">
+            {% trans "DISCLAIMER: Please bear in mind that the database is OPEN-ACCESS and therefore ANY images or files that are uploaded must be Public Domain. It is your responsibility to ensure that you have permission to upload the file into the EAMENA database and that doing so does not violate any copyright or intellectual property laws. Any images or files that are found to violate copyright will be DELETED immediately. If you find any images or files in the database that you know or suspect to be in breach of copyright, please notify a member of the EAMENA team. Furthermore, if you upload any personal files (e.g. personal photographs, survey notes), be aware that these may be downloaded and used by any member of the public. EAMENA are not responsible if files are downloaded and used in ways not approved or anticipated by the uploader." %}
+        </div>
+    </div>
+    <!-- Upload Files Wizard Container --> 
+
+</div>
+<!-- End Content -->
+
+{% endblock form_content %}

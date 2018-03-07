@@ -1,0 +1,89 @@
+{% load staticfiles %}
+{% load i18n %}
+<!-- Content -->              
+<div style="padding-top: 0px;">
+    <div class="row" style="">
+        <div class="col-xs-11 col-xs-offset-1 col-sm-4 col-sm-offset-7 col-md-3 map-loading loading-mask" style="display: none; top:300px;">
+                                
+            <img src="{% static 'img/spinner.gif' %}" height="28" width="28" style="margin-top: 2px;">
+            <p class="map-loading-text" style="direction:ltr;">{% trans "Loading results..." %}</p>
+           
+        </div>
+    </div>
+
+    <!-- Begin Search Results -->
+    <div class="col-xs-12">
+        
+        <div id="search-results-list" data-bind="foreach: results, visible: true" style="display: none;">
+
+            <!-- Begin Search Item  -->
+            <div  class="arches-search-item" data-bind="attr: { 'data-resourceid': resourceid }">
+                
+                <!-- Spacer -->
+                <hr class="margin-10">
+
+                <div class="inner-results padding-left-5">
+
+                    <!-- Item Header -->
+                    <h4>
+                        <a class="arches-search-title" style="" {% if 'edit' in user.user_groups %} data-bind="text: primaryname, attr: { href: 'reports/' + resourceid }" target="_blank"{%else%}data-bind="text: primaryname"{% endif %}></a>                   
+                        &nbsp;
+                        <span class="">
+                            <small class="arches-search-subtitle"><i data-bind="attr: { class: typeIcon }"></i><span data-bind="text: typeName"></span></small>
+                        </span>
+                    </h4>
+
+                    <!-- Sub-header -->
+                    <ul class="list-inline up-ul">
+                    {% if 'edit' in user.user_groups %}
+                        <li>
+                            <i class="arches-search-link fa fa-pencil"></i>&nbsp;
+                            <a href="" data-bind="attr: {'href': 'resources/' +  entitytypeid + '/default/' + resourceid}" target="_blank"><span class="arches-search-link">{% trans "Edit" %}</span></a>
+                        </li>
+                        <li>
+                            <i class="arches-search-link fa fa-sitemap"></i>
+                            <a href="javascript:void(0);" class="info-link related-resources-graph" data-bind="attr: {'data-resourceid': resourceid, 'data-primaryname': primaryname, 'data-entitytypeid': entitytypeid}"><span class="arches-search-link" data-bind="attr: {'data-resourceid': resourceid, 'data-primaryname': primaryname, 'data-entitytypeid': entitytypeid}">{% trans "Related Resources" %}</span></a>
+                        </li>
+                    
+                        <li data-bind="visible: geometries().length > 0" >
+                            <i class="arches-search-link fa fa-map-marker"></i>
+                            <a href="javascript:void(0);" data-bind="attr: { 'data-resourceid': resourceid, 'data-geometries': JSON.stringify(geometries()) }" class="info-link navigate-map"><span class="arches-search-link">{% trans "Map" %}</span></a>
+                        </li>
+                    {% endif %}
+                    </ul>
+                    <!-- End Item Sub-Header -->
+
+                    <!-- Item Description -->
+                    <p  data-bind="html:description" class="arches-search-item-description">
+
+                    </p>
+
+                    <!-- End Item Description -->
+
+                    <!-- Item Creator/Editor -->
+                    <!-- This list is hidden for guests, but shown if user is logged in with editor privileges -->
+                    <!-- End Item Creator/Editor -->
+
+                    <div class="svg arches-related-resource-panel" style="display: none;">
+                        {% include 'views/related-resources-graph.htm' %}
+                    </div>
+
+
+                    <!-- Spacer -->
+                    <hr class="margin-10 margin-top-20">
+
+                </div>
+            </div>
+            <!-- End Search Item -->
+        </div>
+
+        <div class="margin-bottom-30"></div>
+
+        <!-- Pagination -->
+        <div id="paginator" data-bind="html: paginator"></div>
+        <!-- End Pagination -->  
+
+    </div> 
+    <!-- End Search Results -->
+</div>
+<!-- End Content --> 

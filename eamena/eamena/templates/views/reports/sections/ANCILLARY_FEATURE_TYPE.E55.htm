@@ -1,0 +1,37 @@
+{% load i18n %}
+<div class="row">
+    <div class="col-xs-12">
+        <dl>
+            <dt>
+                <h5 id="" class="arches-report-subsection-title">{% trans "Related Features" %}</h5>
+            </dt>
+
+            {% if 'PRODUCTION_E12' not in report_info.source.graph %}
+                <dd class="arches-report-subsection-item">
+                    {% trans "No features recorded" %}
+                </dd>
+            {% else %}
+                {% for PRODUCTION_E12 in report_info.source.graph.PRODUCTION_E12 %}
+                    {% if PHASE_TYPE_ASSIGNMENT_E17 not in PLACE_E53 %}
+                        <dd class="arches-report-subsection-item">
+                            {% trans "No features recorded" %}
+                        </dd>
+                    {% else %}
+                        {% for PHASE_TYPE_ASSIGNMENT_E17 in PRODUCTION_E12.PHASE_TYPE_ASSIGNMENT_E17 %}
+                            {% if 'ANCILLARY_FEATURE_TYPE_E55' not in PHASE_TYPE_ASSIGNMENT_E17 %}
+                                <dd class="arches-report-subsection-item">
+                                    {% trans "No features recorded" %}
+                                </dd>
+                            {% else %}
+                                {% for ANCILLARY_FEATURE_TYPE_E55 in PHASE_TYPE_ASSIGNMENT_E17.ANCILLARY_FEATURE_TYPE_E55 %}
+                                    <dd class="arches-report-subsection-item">{{ANCILLARY_FEATURE_TYPE_E55.ANCILLARY_FEATURE_TYPE_E55__value}}</dd>
+                                {% endfor %}                              
+                            {% endif %}
+                        {% endfor %}                      
+                    {% endif %}
+                {% endfor %}              
+            {% endif %}
+
+        </dl>
+    </div>
+</div>

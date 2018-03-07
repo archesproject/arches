@@ -1,0 +1,185 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "base.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'plugins/layer_slider/css/layerslider.css' %}" type="text/css">
+{{ block.super }}
+{% endblock css %}
+
+{% block content %}
+<!--=== App Header ===-->
+<div class="breadcrumbs arches-app-header sticky" id="appheader" style="padding-top: 0px; padding-bottom: 0px;">
+    <div class="container">
+
+        <div class="row">
+            
+            <!-- App Name for larger screens -->
+            <div class="col-sm-4 col-lg-3 hidden-xs">
+                <h1 class="pull-left arches-breadcrumb-title">{% trans "Resource Data Manager" %}</h1>
+            </div>
+
+            <!-- App Name for xs screens -->
+            <div class="col-xs-12 hidden-sm hidden-md hidden-lg text-center">
+                <h1 class="arches-breadcrumb-title">{% trans "Resource Data Manager" %}</h1>
+            </div>
+
+            <!-- Resource Name/ID -->
+            <div class="col-sm-8 col-lg-9">
+                <div class="row">
+                    
+                    <!-- Header for larger screens -->
+                    <div class="col-md-12 hidden-xs hidden-sm">
+                        <h2 class="margin-top-10 margin-bottom-0 text-primary">
+                            <i class="fa fa-trophy text-primary"></i>
+                            {% if resourceid %}<a href="{% url 'report' resourceid %}" target="_blank">{{ resource_name }}</a>{% else %}{{ resource_name }}{% endif %} <small class="text-primary">{{ resource_type_name }}</small>
+                        </h2>
+                    </div>
+
+                    <!-- Header for small screens -->
+                    <div class="col-sm-12 hidden-xs hidden-md hidden-lg">
+                        <h2 class="margin-bottom-0 text-primary" style="margin-top: 15px;">
+                            <i class="fa fa-trophy text-primary"></i>
+                            {% if resourceid %}<a href="{% url 'report' resourceid %}" target="_blank">{{ resource_name }}</a>{% else %}{{ resource_name }}{% endif %} <small class="text-primary">{{ resource_type_name }}</small>
+                        </h2>
+                    </div>
+
+                    <!-- Header for xtra small screens -->
+                    <div class="col-xs-12 hidden-sm hidden-md hidden-lg">
+                        <h2 class="margin-bottom-10 margin-top-minus-10 text-center text-primary">
+                            <i class="fa fa-trophy text-primary"></i>
+                            {% if resourceid %}<a href="{% url 'report' resourceid %}" target="_blank">{{ resource_name }}</a>{% else %}{{ resource_name }}{% endif %} <small class="text-primary">{{ resource_type_name }}</small>
+                        </h2>
+                    </div> 
+
+                    <div class="col-xs-12 hidden-md hidden-lg margin-bottom-10">
+
+                        <!-- CRUD Form Selector for sm and xs screens -->
+                        <select style="width:100%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form" id="crud_menu" placeholder="type">
+                            {% for form_group in form_groups %}
+                            <optgroup label="{{form_group.name}}">
+                                {% for form in form_group.forms %} 
+                                    <option value="<a href="javascript:void(0); data-formid="{{form.id}}" {% if form.id == form_id %} selected {% endif %} data-formurl="{% url 'resource_manager' resourcetypeid form.id resourceid%}">{{form.name}}</option>
+                                {% endfor %}
+                            </optgroup>
+                            {% endfor %}
+                        </select>
+                        <!-- Address Type -->
+                    </div>  
+                </div> 
+
+                <div class="row">
+                    <div class="hidden-xs hidden-sm col-md-12 margin-left-30 text-left pull-left margin-top-0 margin-bottom-20">
+                        <span class="text-muted">Arches ID: {% if resource.entityid %}{{ resource.entityid }}{% else %}n/a{% endif %}</span> 
+                    </div>
+                </div> 
+            </div>
+            <!-- End Resource Name/ID -->
+
+        </div>
+    </div>
+</div>
+<!--=== End App Header ===-->
+
+
+<!--=== Content Part ===-->
+<div class="block-description arches-secondary-header">
+    <div class="container content padding-top-0">		
+        
+        <!-- Resource Information Themes and CRUD Forms -->
+        <div class="row">
+            
+            <!-- Begin Sidebar Menu 
+            Note that this gets loaded by jQuery on Document Ready -->
+            <div id="" class="col-md-4 col-lg-3 hidden-sm hidden-xs">
+                
+                <ul class="list-group sidebar-nav-v1 arches-sidebar-nav" id="sidebar">
+                                            
+                    {% for form_group in form_groups %}
+                    <li class="list-group-item list-toggle arches-list-group-item active">                   
+                        
+                        <a data-toggle="collapse" data-parent="#sidebar-nav" href="#collapse-{{ form_group.id }}"><i class="fa {{ form_group.icon }}"></i> {{ form_group.name }}</a>
+                        
+                        <ul id="collapse-{{ form_group.id }}" class="collapse in">
+                            {% for form in form_group.forms %}
+                            <li>
+                                <a href="javascript:void(0);" class="arches-list-item{% if form.id == form_id %} arches-selected{% endif %} form-link" style="background-color: #f7f7f7;" data-formid="{{form.id}}" data-formurl="{% url 'resource_manager' resourcetypeid form.id resourceid%}"><i class="fa {{ form.icon }}" data-formid="{{form.id}}" data-formurl="{% url 'resource_manager' resourcetypeid form.id resourceid%}"></i> {{ form.name }}</a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    {% endfor %}
+
+                </ul>
+            </div>
+            <!-- End Sidebar Menu -->
+
+
+            <!-- Spacer for small screens -->
+            <div class="margin-top-10 hidden-md hidden-lg"></div>
+
+            
+            <!-- CRUD Form -->
+            <div class="col-md-8 col-lg-9" style="padding-left: 0px;">
+                <div id="resource-manager-form">{% include form_template %}</div>
+                <div class="clearfix margin-bottom-10"></div>
+
+            </div>
+            <!-- End Content -->
+        </div>          
+    </div><!--/container-->		
+
+</div>
+<!--=== End Content Part ===-->
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="nav-confirm-modal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content no-corners" style="border-radius: 2px;">
+            
+            <!-- Form Header -->
+            <div class="modal-header arches-modal-header">
+                <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+                <h4 id="" class="modal-title">{% trans 'Unsaved edits...' %}</h4>
+            </div>
+            <!-- End Form Header -->
+            
+            <!-- Form -->
+            <div class="modal-body">
+                <div class="alert alert-warning" role="alert">
+                    <strong>{% trans 'Warning!' %}</strong>
+                    {% trans 'You have unsaved edits in your form that will be lost if you leave this form.  Would you like to continue and discard your current edits?' %}
+                </div>
+                
+            </div>
+            <!-- End Form (modal body) -->
+
+            <div class="modal-footer">
+                <button data-dismiss="modal" class="btn-u btn-u-default" type="button">{% trans "Cancel" %}</button>
+                <button class="nav-confirm-btn btn-u" type="button">{% trans "Discard Edits" %}</button>
+            </div>
+          </div>
+    </div>
+</div>
+
+<div style="display:none;" id="form-data">
+    <input type="hidden" id="form-id" value="{{form_id}}">
+    <input type="hidden" id="resourcetypeid" value="{{resourcetypeid}}">
+</div>
+{% endblock %}

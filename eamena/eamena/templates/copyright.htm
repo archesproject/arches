@@ -1,0 +1,19 @@
+{% load staticfiles %}
+{% load i18n %}
+<div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">                     
+                <p>
+                    Arches v3.0  |  HIP (Heritage Inventory Package) v1.0
+                    <a href="http://www.archesproject.org">Arches Community</a>
+                </p>
+            </div>
+            <div class="col-md-6">  
+                <a href="{% url 'home' %}">
+                    <img class="pull-right arches-logo" id="logo-footer" src="{{ STATIC_URL }}img/arches_logo.png" alt="">
+                </a>
+            </div>
+        </div>
+    </div> 
+</div>

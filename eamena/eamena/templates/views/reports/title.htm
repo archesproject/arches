@@ -1,0 +1,70 @@
+
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% load staticfiles %}
+{% load i18n %}
+
+<!--=== Report Title ===-->
+<div class="breadcrumbs report-breadcrumb">
+    <div class="container">
+
+        <div class="row">
+
+            <!-- Project Name (screens small and bigger)-->
+            <div class="hidden-sm hidden-xs col-sm-12">
+                <h1 class="pull-left arches-breadcrumb-title"><i class="fa {{RESOURCE_TYPE_CONFIGS.icon_class}}"></i>{{ report_info.source.primaryname }}</h1>
+                {% if 'edit' in user.user_groups %}                
+                <div class="header-btn-wrapper">
+                    <a href="{% url 'resource_manager' report_info.source.entitytypeid 'default' report_info.source.entityid %}" class="info-link edit-link report-header-link btn btn-primary">
+                        <i class="fa fa-edit"></i><span> {% trans 'Edit' %}</span>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Project Name (screens extra small)-->
+             <div class="hidden-md hidden-lg">
+                <h1 class="arches-breadcrumb-title margin-left-15 margin-bottom-0" style="margin-top: -5px; margin-bottom: 0;"><i class="fa {{RESOURCE_TYPE_CONFIGS.icon_class}}"></i>{{ report_info.source.primaryname  }}</h1>
+                <ul class="list-inline up-ul margin-left-15">
+                    <li>
+                        <i class="arches-search-link fa fa-folder-open"></i>
+                        <a href="#report" class="info-link related-resources-graph"><span class="arches-search-link">{% trans 'Resource Report' %}</span></a>
+                    </li>
+
+                    <li data-bind="visible: geometries().length > 0">
+                        <i class="arches-search-link fa fa-map-marker"></i>
+                        <a href="#map" class="info-link navigate-map"><span class="arches-search-link">{% trans 'Map' %}</span></a>
+                    </li>
+
+                    {% if 'edit' in user.user_groups %}
+                    <li>
+                        <i class="arches-search-link fa fa-edit"></i>
+                        <a href="{% url 'resource_manager' report_info.source.entitytypeid 'default' report_info.source.entityid %}" class="info-link edit-link"><span class="arches-search-link">{% trans 'Edit' %}</span></a>
+                    </li>
+                    {% endif %}
+                    
+                </ul>
+                <hr class="margin-top-minus-10 margin-bottom-10" style="border-width: 0px;">
+            </div>
+            
+        </div>
+
+    </div>
+
+</div>
+<!--=== End Report Title ===-->

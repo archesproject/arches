@@ -1,0 +1,369 @@
+{% extends "views/forms/base.htm" %}
+{% load i18n %}
+
+{% block form_content %}
+
+
+<hr class="divider arches-RDM-divider">
+
+<div id="names-section">
+    <!-- Name CRUD Form -->
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                
+                <dl>
+                    <!-- Title -->
+                    <dt>
+                        <h5 id="arches-names-form" class="section-headline">{% trans "Names" %}</h5>
+                    </dt>
+
+                    <!-- Form -->
+                     <dd class="hidden-xs">
+                        <div class="row">
+
+                            <div class="col-xs-12">
+                                        
+                                <input class="form-control arches-form-input hidden-xs" id="resource-name" style="width: 50%;" placeholder="Name" data-bind='value: getEditedNode("NAME.E41", "value")'>                                    
+
+                                <!-- Spacer (for xs screens) -->
+                                <div class="margin-top-5 hidden-sm hidden-md hidden-lg"></div>
+                                
+                                <input style="width:30%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-name-type" data-bind="select2: {value: getEditedNode('NAME_TYPE.E55', 'value'), placeholder: 'Type', dataKey: 'NAME_TYPE.E55'}"></input>
+
+                                <!-- Spacer (for xs screens) -->
+                                <div class="margin-top-5 hidden-sm hidden-md hidden-lg"></div>
+
+                                {% include 'views/components/add-item-button.htm' %}
+
+                            </div>
+                        </div>
+                    </dd>
+                    <dd class="hidden-sm hidden-md hidden-lg">
+                        <div class="row">
+
+                            <div class="col-xs-12">
+                                        
+                                <input class="form-control arches-form-input" id="resource-name" style="width: 100%;" placeholder="Name" data-bind='value: getEditedNode("NAME.E41", "value")'>                                    
+
+                                <!-- Spacer (for xs screens) -->
+                                <div class="margin-top-5 hidden-sm hidden-md hidden-lg"></div>
+                                
+                                <input style="width:100%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form name-type" id="resource-name-type" data-bind="select2: {value: getEditedNode('NAME_TYPE.E55', 'value'), placeholder: 'Type', dataKey: 'NAME_TYPE.E55'}"></input>
+
+                                <!-- Spacer (for xs screens) -->
+                                <div class="margin-top-5 hidden-sm hidden-md hidden-lg"></div>
+
+                                {% include 'views/components/add-item-button.htm' %}
+
+                            </div>
+                        </div>
+                    </dd>
+                    <!-- End Form -->
+
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "The name value must be populated. A resource can only have one primary name." %}</div>
+                </dl>
+
+            </div>
+        </div>
+    </div>
+    <!-- End Name CRUD Form Container -->
+
+    <!-- Name Records -->
+    <div class="row">
+        <div class="col-xs-12">
+
+            <!-- Address -->
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "This resource has these names:" %}
+                    </dd>
+
+                    <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Names Defined" %}</div>   
+
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="Delete this name"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans "Edit this name" %}"><span data-bind='text: nodes.get("NAME.E41", "value")' style="padding-right:2px;"></span><span class="text-muted arches-crud-type-identifier">(<span data-bind='text: nodes.get("NAME_TYPE.E55", "label")'></span>)</span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+
+                </dl>
+            </div>
+        </div>
+    </div>
+    <!-- End Name Records -->
+</div>
+
+
+<hr class="divider arches-RDM-divider">
+
+<div id="begin-dates-section">
+    <!-- Dates CRUD Form -->
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                
+                <dl>
+                    <!-- Title -->
+                    <dt>
+                        <h5 id="arches-names-form" class="section-headline">Activity Start</h5>
+                    </dt>
+
+                    <!-- Form -->
+                    <dd class="arches-RDM-labels">
+
+                        <div class="row">
+
+                            <div class="col-xs-12" style="padding-top: 2px;">
+
+                                <!-- Spacer (for xs screens) -->
+                                <div class="margin-top-5 hidden-sm hidden-md hidden-lg"></div>
+
+                                <div class="col-sm-6 hidden-xs" style="padding-right: 5px;padding-left: 0px;">
+                                    <input style="height: 36px; width:100%" class="select2 arches-select2-crud-form" id="date-type" placeholder="Date type" data-bind="select2: {value: getEditedNode('BEGINNING_OF_EXISTENCE_TYPE.E55', 'value'), dataKey: 'BEGINNING_OF_EXISTENCE_TYPE.E55'}">
+                                    </input>
+                                </div>
+
+                                <div class="col-sm-4 form-group hidden-xs" style="padding-left: 0px; padding-right: 0px; width: 30%;">
+                                    <div class="input-group datetimepicker" style ="width:100%; height: 34px;" >
+                                        <input type="text" id="date" placeholder="{% trans 'yyyy-mm-dd' %}" class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('START_DATE_OF_EXISTENCE.E49', 'value')} ">
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6  hidden-sm hidden-md hidden-lg" style="padding-right: 0px;padding-left: 0px;">
+                                    <input style="height: 36px; width:100%" class="select2 arches-select2-crud-form" id="date-type" placeholder="Date type" data-bind="select2: {value: getEditedNode('BEGINNING_OF_EXISTENCE_TYPE.E55', 'value'), dataKey: 'BEGINNING_OF_EXISTENCE_TYPE.E55'}">
+                                    </input>
+                                </div>
+
+                                <div class="col-sm-4 form-group  hidden-sm hidden-md hidden-lg" style="padding-left: 0px; padding-right: 0px; width: 100%;">
+                                    <div class="input-group datetimepicker" style ="width:100%; height: 34px;" >
+                                        <input type="text" id="date" placeholder="{% trans 'yyyy-mm-dd' %}" class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('START_DATE_OF_EXISTENCE.E49', 'value')} ">
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+
+                                <!-- Spacer (for xs screens) -->
+                                <div class="margin-top-5 hidden-sm hidden-md hidden-lg"></div>
+
+                                {% include 'views/components/add-item-button.htm' %}
+
+                            </div>
+
+                        </div>
+                    </dd>
+                    <!-- End Form -->
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "The date and type values must be populated." %}</div>
+                </dl>
+
+            </div>
+        </div>
+    </div>
+    <!-- End Dates CRUD -->
+
+    <!-- Dates Records -->
+    <div class="row">
+        <div class="col-xs-12">
+
+            <!-- Address -->
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "These dates are associated with this resource:" %}
+                    </dd>
+
+                    <dd class="margin-left-5" style="display: block;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Dates Defined" %}</div>   
+                        
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="Remove this filter"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="text-muted arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans "Edit this date" %}"><span data-bind='text: nodes.get("BEGINNING_OF_EXISTENCE_TYPE.E55", "label") + " " + nodes.get("START_DATE_OF_EXISTENCE.E49", "value")' style="padding-right:2px;"></span><span class="text-muted arches-crud-type-identifier"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+
+                </dl>
+
+            </div>
+        </div>
+    </div>
+    <!-- End Dates Records -->
+</div>
+
+<hr class="divider arches-RDM-divider">
+
+<div id="end-dates-section">
+    <!-- Dates CRUD Form -->
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                
+                <dl>
+                    <!-- Title -->
+                    <dt>
+                        <h5 id="arches-names-form" class="section-headline">Activity End</h5>
+                    </dt>
+
+                    <!-- Form -->
+                    <dd class="arches-RDM-labels">
+
+                        <div class="row">
+
+                            <div class="col-xs-12" style="padding-top: 2px;">
+
+                                <!-- Spacer (for xs screens) -->
+                                <div class="margin-top-5 hidden-sm hidden-md hidden-lg"></div>
+
+                                <div class="col-sm-6 hidden-xs" style="padding-right: 5px;padding-left: 0px;">
+                                    <input style="height: 36px; width:100%" class="select2 arches-select2-crud-form" id="date-type" placeholder="Date type" data-bind="select2: {value: getEditedNode('END_OF_EXISTENCE_TYPE.E55', 'value'), dataKey: 'END_OF_EXISTENCE_TYPE.E55'}">
+                                    </input>
+                                </div>
+
+                                <div class="col-sm-4 form-group hidden-xs" style="padding-left: 0px; padding-right: 0px; width: 30%;">
+                                    <div class="input-group datetimepicker" style ="width:100%; height: 34px;" >
+                                        <input type="text" id="date" placeholder="{% trans 'yyyy-mm-dd' %}" class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('END_DATE_OF_EXISTENCE.E49', 'value')} ">
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6  hidden-sm hidden-md hidden-lg" style="padding-right: 0px;padding-left: 0px;">
+                                    <input style="height: 36px; width:100%" class="select2 arches-select2-crud-form" id="date-type" placeholder="Date type" data-bind="select2: {value: getEditedNode('END_OF_EXISTENCE_TYPE.E55', 'value'), dataKey: 'END_OF_EXISTENCE_TYPE.E55'}">
+                                    </input>
+                                </div>
+
+                                <div class="col-sm-4 form-group  hidden-sm hidden-md hidden-lg" style="padding-left: 0px; padding-right: 0px; width: 100%;">
+                                    <div class="input-group datetimepicker" style ="width:100%; height: 34px;" >
+                                        <input type="text" id="date" placeholder="{% trans 'yyyy-mm-dd' %}" class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('END_DATE_OF_EXISTENCE.E49', 'value')} ">
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+
+                                <!-- Spacer (for xs screens) -->
+                                <div class="margin-top-5 hidden-sm hidden-md hidden-lg"></div>
+
+                                {% include 'views/components/add-item-button.htm' %}
+
+                            </div>
+                        </div>
+                    </dd>
+                    <!-- End Form -->
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "The date and type values must be populated." %}</div>
+                </dl>
+
+            </div>
+        </div>
+    </div>
+    <!-- End Dates CRUD -->
+
+    <!-- Dates Records -->
+    <div class="row">
+        <div class="col-xs-12">
+
+            <!-- Address -->
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "These dates are associated with this resource:" %}
+                    </dd>
+
+                    <dd class="margin-left-5" style="display: block;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Dates Defined" %}</div>   
+                        
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="Remove this filter"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="text-muted arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans "Edit this date" %}"><span data-bind='text: nodes.get("END_OF_EXISTENCE_TYPE.E55", "label") + " " + nodes.get("END_DATE_OF_EXISTENCE.E49", "value")' style="padding-right:2px;"></span><span class="text-muted arches-crud-type-identifier"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+
+                </dl>
+
+            </div>
+        </div>
+    </div>
+    <!-- End Dates Records -->
+</div>
+
+<hr class="divider arches-RDM-divider">
+
+<div id="keywords-section">
+    <!-- Modifications CRUD Form -->
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                
+                <dl>
+                    <!-- Title -->
+                    <dt>
+                        <h5 id="arches-subjects-form" class="section-headline">{% trans "Keywords" %}</h5>
+                    </dt>
+
+                    <!-- Form -->
+                    <dd>
+                        <div class="row">
+                            <div class="col-xs-12 hidden-xs">
+                                <input style="width:80%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" id="keyword-dropdown" data-bind="select2: {value: getEditedNode('KEYWORD.E55', 'value'), placeholder: 'Keyword', dataKey: 'KEYWORD.E55'}"></input>
+
+                                <!-- Spacer (for xs screens) -->
+                                <div class="margin-top-5 hidden-sm hidden-md hidden-lg"></div>
+
+                                {% include 'views/components/add-item-button.htm' %}
+                            </div>
+                            <div class="col-xs-12 hidden-sm hidden-md hidden-lg">
+                                <input style="width:100%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" id="keyword-dropdown" data-bind="select2: {value: getEditedNode('KEYWORD.E55', 'value'), placeholder: 'Keyword', dataKey: 'KEYWORD.E55'}"></input>
+
+                                <!-- Spacer (for xs screens) -->
+                                <div class="margin-top-5 hidden-sm hidden-md hidden-lg"></div>
+
+                                {% include 'views/components/add-item-button.htm' %}
+                            </div>
+                        </div>
+                    </dd>
+                    <!-- End Form -->
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "The subject must be populated." %}</div>
+                </dl>
+
+            </div>
+        </div>
+    </div>
+    <!-- End Subjet CRUD -->
+
+    <!-- Subject Records -->
+    <div class="row">
+        <div class="col-xs-12">
+
+            <!-- Address -->
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "These subjects are associated with this resource:" %}
+                    </dd>
+                    <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Subjects Defined" %}</div>   
+                        
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="Delete this subject"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans "Edit this subject" %}"><span data-bind='{text: nodes.get("KEYWORD.E55", "label")}' style="padding-right:2px;"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+
+                </dl>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock form_content %}

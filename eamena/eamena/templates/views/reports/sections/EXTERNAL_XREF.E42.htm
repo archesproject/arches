@@ -1,0 +1,27 @@
+{% load i18n %}
+<div class="row">
+    <div class="col-xs-12">
+        <dl>
+            <dt>
+                <h5 id="" class="arches-report-subsection-title hidden">{% trans "External System References" %}</h5>
+            </dt>
+
+            {% if 'EXTERNAL_RESOURCE_E1' not in report_info.source.graph %}
+                <dd class="arches-report-subsection-item">
+                    {% trans "No references recorded" %}
+                </dd>
+            {% else %}
+                {% for EXTERNAL_RESOURCE_E1 in report_info.source.graph.EXTERNAL_RESOURCE_E1 %}
+                    {% for EXTERNAL_XREF_E42 in EXTERNAL_RESOURCE_E1.EXTERNAL_XREF_E42 %}
+                        <dd class="arches-report-subsection-item">
+                            <span class="arches-report-subsection-item-type">{{ EXTERNAL_XREF_E42.EXTERNAL_XREF_TYPE_E55__value }}:</span>
+                            {{ EXTERNAL_XREF_E42.EXTERNAL_XREF_E42__value }}
+                        </dd>
+                    {% endfor %}
+                {% endfor %}            
+            {% endif %}
+
+        </dl>
+
+    </div>
+</div>

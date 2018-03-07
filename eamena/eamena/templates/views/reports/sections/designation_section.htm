@@ -1,0 +1,110 @@
+{% load i18n %}
+<!-- Designation Section -->
+<a id="topSection2" style=""></a>
+<div class="block-level-v2 block-description" style="background: #f9f9f9; border-top: 1px solid #dcdcdc; padding-bottom: 80px;">
+
+    <div class="container">
+
+        <!-- Resource Report Container -->
+        <div>
+
+            <!-- Section Header -->
+            <div class="">
+                <i class="center-icon rounded-x fa fa-list"></i>
+                <div class="">
+                    <h2 class="arches-report-section-header">{% trans "Designations" %}</h2>
+                </div> 
+            </div>
+
+            <!-- Anchor for in=page navigation from "report options" menu -->
+            <a href="evaluation" id="evaluation" style=""></a>
+
+            <!-- Resource Description Content -->
+            <div class="row">
+                
+                <!-- Spacer -->
+                <div class="hidden-sm hidden-md hidden-lg margin-bottom-20"></div>
+
+                <!-- Resource Summary Info -->
+                <div class="col-xs-12">
+                    <div class="right-inner arches-box-grey-border">
+                        
+                        <!-- Descriptions -->
+                        <div class="row">
+
+                            <!-- Section sub-header -->
+                            <div class="col-sm-4">
+                                <h3 class="arches-report-subsection">{% trans "Designation and Protection Status" %}</h3>
+                            </div>
+                            <!-- End Section sub-header -->
+
+                             <!-- Section Content -->
+                            <div class="col-sm-8">
+
+                                <!-- Spacer -->
+                                <div class="arches-report-spacer hidden-xs"></div>
+
+                                <div class="arches-report-subsection-content">
+                                    <!-- Designations -->
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <dl>
+                                                <dt>
+                                                    <h5 id="" class="arches-report-subsection-title"></h5>
+                                                </dt>
+
+                                                {% for RIGHT_E30 in report_info.source.graph.RIGHT_E30 %}
+                                                    {% for PROTECTION_EVENT_E65 in RIGHT_E30.PROTECTION_EVENT_E65 %}
+                                                        <dd class="arches-report-subsection-item">
+                                                            <span class="arches-report-subsection-item-type">
+                                                                {% trans "Type" %}:
+                                                            </span>
+                                                            {% if 'TYPE_OF_DESIGNATION_OR_PROTECTION_E55' in PROTECTION_EVENT_E65 %}
+                                                                {% for TYPE_OF_DESIGNATION_OR_PROTECTION_E55 in PROTECTION_EVENT_E65.TYPE_OF_DESIGNATION_OR_PROTECTION_E55 %}
+                                                                    {{TYPE_OF_DESIGNATION_OR_PROTECTION_E55.TYPE_OF_DESIGNATION_OR_PROTECTION_E55__value}}
+                                                                {% endfor %}  
+                                                            {% else %}
+                                                                {% trans "none defined" %}
+                                                            {% endif %}
+
+
+                                                            {% if 'TIME_SPAN_OF_DESIGNATION_OR_PROTECTION_E52' in PROTECTION_EVENT_E65 %}
+                                                                {% for TIME_SPAN_OF_DESIGNATION_OR_PROTECTION_E52 in PROTECTION_EVENT_E65.TIME_SPAN_OF_DESIGNATION_OR_PROTECTION_E52 %}
+                                                                    {% if  'DESIGNATION_OR_PROTECTION_FROM_DATE_E49' in  TIME_SPAN_OF_DESIGNATION_OR_PROTECTION_E52 %}
+                                                                        {% for DESIGNATION_OR_PROTECTION_FROM_DATE_E49 in TIME_SPAN_OF_DESIGNATION_OR_PROTECTION_E52.DESIGNATION_OR_PROTECTION_FROM_DATE_E49 %}
+                                                                        <span class="arches-report-subsection-item-type"> {% trans "From: " %}</span>
+                                                                    {{DESIGNATION_OR_PROTECTION_FROM_DATE_E49.DESIGNATION_OR_PROTECTION_FROM_DATE_E49__value|cut:"T00:00:00"}}
+                                                                        {% endfor %} 
+                                                                    {% endif %} 
+                                                                    {% if  'DESIGNATION_OR_PROTECTION_FROM_DATE_E49' in  TIME_SPAN_OF_DESIGNATION_OR_PROTECTION_E52 %}
+                                                                        {% for DESIGNATION_OR_PROTECTION_TO_DATE_E49 in TIME_SPAN_OF_DESIGNATION_OR_PROTECTION_E52.DESIGNATION_OR_PROTECTION_TO_DATE_E49 %}
+                                                                            <span class="arches-report-subsection-item-type">- {% trans "To: " %}:</span>{{DESIGNATION_OR_PROTECTION_TO_DATE_E49.DESIGNATION_OR_PROTECTION_TO_DATE_E49__value|cut:"T00:00:00"}}
+                                                                        {% endfor %}
+                                                                    {% endif %} 
+                                                                {% endfor %} 
+                                                            {% else %}
+                                                                {% trans "none defined" %}
+                                                            {% endif %}
+                                                        </dd>
+                                                    {% endfor %}
+                                                {% endfor %}
+
+                                            </dl>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <!-- End Section Content-->
+
+                        </div>
+                        <!-- End Descriptions Section -->
+                    </div>
+                </div>
+                <!-- End Project Information -->
+            </div>  
+        </div>
+        <!-- End Project Summary -->
+    </div>
+</div>
+<!-- End Evaluation Section -->

@@ -1,0 +1,12 @@
+{% load i18n %}
+<!-- use this file for any localized strings (or other data from server) for non resource overlays -->
+
+<script> 
+    define('layers-i18n', [], function () {
+        return {
+            exampleLayerName: "{% trans 'Example Layer' %}",
+            exampleInfoContent: "<div style=\"width:200px;\">{% trans 'visible zoom range: 9-20' %}</div>",
+            exampleCategory: "{% trans 'City Admin Area' %}"
+        };
+    });
+</script>

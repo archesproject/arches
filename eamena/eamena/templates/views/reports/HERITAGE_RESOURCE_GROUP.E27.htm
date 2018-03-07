@@ -1,0 +1,291 @@
+
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% load staticfiles %}
+{% load i18n %}
+
+{% include 'views/reports/title.htm' %}
+
+
+<!-- End Fixed Nav for Report -->
+
+<div id="report-body" class="report-body" >
+    
+     {% if geometry != 'null' %}
+        <!--=== Map Block ===-->
+        <div id="map-container">
+
+            <div id="map" class="map map-report-panel" style="display: block;">
+                <div id="olmap" class="fill"></div>
+                <div style="display:none;" id="map-data">
+                    <input type="hidden" id="resource_geometry" value='{{ geometry }}' />
+                    
+                </div>
+            </div>
+
+            
+            <div class="container">
+            <!-- Map: Date of Bing Imagery-->
+                <div class="row">
+                    <div class="col-xs-12" style="">
+                          <div id ="imagery-date" style="float:right; margin-top: -70px; margin-right:-30px; width:200px; color:#fff;">{% trans "Date of imagery:" %} {% if BingDates.start != None %} <span>{{BingDates.start|cut:"GMT"}}</span> {% endif %}  {% if BingDates.end != None %}<span> {{BingDates.end|cut:"GMT"}}</span> {% endif %} {% if BingDates.start == None and BingDates.end == None  %} {% trans "No dates available" %} {% endif %} </div>
+                    </div>
+                </div>
+            <!-- Map: Scaleline--->
+                 <div class="row">
+                    <div class="col-xs-12" style="">
+                        <div id="scale-line" style = "margin-top: -40px;"></div>        
+                    </div>
+                </div>      
+                <!-- Map Tools Panel -->
+                <div class="row">
+                    <div class="col-xs-12 col-sm-6" style="">
+
+                        <div id="basemaps-panel" class="tools-panel hidden" style="overflow-y: scroll; border-top-left-radius: 5px; border-top-right-radius: 5px; margin-top: -408px; height: 332px; width: 290px; margin-left: 0px;">
+                            <div class="modal-header arches-modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                    ×
+                                </button>
+                                <h4 class="modal-title">
+                                    {% trans "Basemaps" %}
+                                </h4>
+                            </div>
+
+                            <!-- Body Content -->
+                            <div class="modal-body padding-top-0 padding-bottom-0" data-bind='foreach: baseLayers'>
+
+                                <div class="row">
+                                    <hr class="arches-layer-divider" style="border-top: 0px; margin-top: 5px;">
+
+                                    <div class="arches-basemap-entry" style="margin-right: 7px;">
+
+                                        <div class="" style="">
+                                            <a data-bind="attr: { id: id, title: name }" class="basemap info-click" data-rel="" href="javascript:void(0);">
+                                                <span class="">  
+                                                    <img data-bind="attr: { src: icon }" class="arches-basemap-thumbnail" alt="" />
+                                                    <span class="zoom-icon"></span>                   
+                                                </span>                                              
+                                            </a>                    
+                                            <span class="arches-basemap-caption-search">
+                                                <a data-bind="attr: { id: id }, text: name" class="caption-text-search hover-effect basemap info-click" href="javascript:void(0);"> </a>
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!-- End Body Content -->
+
+                        </div>
+                    </div>
+                </div>
+                <!-- End Map Tools Panel -->
+
+                <!-- Map Tools -->
+                <div class="row">
+                    <div class="col-xs-12 col-sm-7 col-md-5 col-lg-4" style="margin-top: -77px;">
+                        <div class="btn-group">
+                            <button id="inventory-basemaps" type="button" class="btn btn-primary arches-map-tools" style="width:290px;"><i class="fa fa-globe"></i> {% trans "Basemaps" %}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Map Tools -->
+            </div>
+        </div>
+        <!--=== End Map Block ===-->
+    {% endif %}
+
+
+    <!--=== Resource Description Section ===-->
+    <div class="block-description" style="padding-top: 30px;" id="report">
+        <div class="container">
+
+            <!-- Resource Report Container -->
+            <div>
+
+                <!-- Section Header -->
+                <div class="">
+                    <i class="center-icon rounded-x fa fa-folder-open"></i>
+                    <div class="">
+                        <h2 class="arches-report-section-header">{% trans "Heritage Resource E27" %}</h2>
+                    </div> 
+                </div>
+
+                <!-- Anchor for in=page navigation from "report options" menu -->
+                <a href="overview" id="overview" style="top: 250px;"></a>
+
+
+                <!-- Resource Description Content -->
+                <div class="row">
+                    
+                    <!-- Spacer -->
+                    <div class="hidden-sm hidden-md hidden-lg margin-bottom-20"></div>
+
+                    <!-- Resource Summary Info -->
+                    <div class="col-xs-12">
+                        <div class="right-inner arches-box-grey-border">
+                            
+                            <!-- Resource Summary Info -->
+                            <div class="row">
+
+                                <!-- Section sub-header -->
+                                <div class="col-sm-4">
+                                    <h3 class="arches-report-subsection">{% trans "Resource Summary" %}</h3>
+                                </div>
+                                <!-- End Section sub-header -->
+
+                                <!-- Section Content -->
+                                <div class="col-sm-8">
+
+                                    <!-- Spacer -->
+                                    <div class="arches-report-spacer hidden-xs"></div>
+
+                                    <div class="arches-report-subsection-content">
+                                       <!-- Arches ID for HR.E27 -->
+                                        {% include 'views/reports/sections/ArchesID_section.htm' %}
+                                        <!-- Resource Names-->
+                                        {% include 'views/reports/sections/NAME.E41.htm' %}
+                                        <!-- Overall Site Certainty -->
+                                        {% include 'views/reports/sections/OVERALL_SITE_CERTAINTY.htm' %}
+                                        <!-- Site Function and related certainties -->
+                                        {% include 'views/reports/sections/SITE_FUNCTION_TYPE.htm' %}
+                                        <!-- Cultural Periods -->
+                                        {% include 'views/reports/sections/CULTURAL_PERIODS.htm' %}
+                                        <!-- Time Spans -->
+<!--                                         {% include 'views/reports/sections/TIME_SPANS.htm' %} -->
+
+                                    </div>
+                                </div>
+                                <!-- End Section Content-->
+
+                            </div>
+                            <!-- End Names/Type Section -->
+
+
+                            <hr class="devider margin-top-10" style="margin-bottom: 5px;"></hr>
+
+
+                            <!-- Classification -->
+                            <div class="row">
+
+                                <!-- Section sub-header -->
+                                <div class="col-sm-4">
+                                    <h3 class="arches-report-subsection">{% trans "Classification" %}</h3>
+                                </div>
+                                <!-- End Section sub-header -->
+
+                                 <!-- Section Content -->
+                                <div class="col-sm-8">
+
+                                    <!-- Spacer -->
+                                    <div class="arches-report-spacer hidden-xs"></div>
+
+                                    <div class="arches-report-subsection-content">
+                                       <!-- Feature forms-->
+                                        {% include 'views/reports/sections/FEATURE_FORMS.htm' %}
+                                    </div>
+                                     <div class="arches-report-subsection-content">
+                                       <!-- Feature interpretations-->
+                                        {% include 'views/reports/sections/FEATURE_INTERPRETATIONS.htm' %}
+                                    </div>
+                                <!-- End Section Content-->
+
+                                </div>
+                            </div>
+                            <!-- End Classification Section -->
+
+
+                            <hr class="devider margin-top-10" style="margin-bottom: 5px;"></hr>
+
+
+                            <!-- Descriptions -->
+                            <div class="row">
+
+                                <!-- Section sub-header -->
+                                <div class="col-sm-4">
+                                    <h3 class="arches-report-subsection">{% trans "Condition" %}</h3>
+                                </div>
+                                <!-- End Section sub-header -->
+
+                                 <!-- Section Content -->
+                                <div class="col-sm-8">
+
+                                    <!-- Spacer -->
+                                    <div class="arches-report-spacer hidden-xs"></div>
+
+                                    <div class="arches-report-subsection-content">
+
+                                        <!-- Condition State -->
+                                        {% include 'views/reports/sections/CONDITION_STATE.htm' %}
+
+                                    </div>
+                                     <div class="arches-report-subsection-content">
+
+                                        <!-- Disturbance extent -->
+                                        {% include 'views/reports/sections/DISTURBANCE_EXTENT.htm' %}
+
+                                    </div>
+                                     <div class="arches-report-subsection-content">
+
+                                        <!-- Disturbance type -->
+                                        {% include 'views/reports/sections/DISTURBANCE_TYPE.htm' %}
+
+                                    </div>  
+                                     <div class="arches-report-subsection-content">
+
+                                        <!-- Threat type-->
+                                        {% include 'views/reports/sections/THREAT_TYPE.htm' %}
+
+                                    </div>                                                                              
+                                </div>
+                                <!-- End Section Content-->
+
+                            </div>
+                            <!-- End Condition Section -->
+
+
+                            <hr class="devider margin-top-10" style="margin-bottom: 5px;"></hr>
+
+
+                        </div>
+                    </div>
+                    <!-- End Project Information -->
+                    
+                </div>   
+            </div>
+            <!-- End Project Summary -->
+        </div>
+    </div>
+    <!-- End Resource Description Section -->
+
+
+
+    {% if 'EVALUATION_CRITERIA_ASSIGNMENT_E13' in report_info.source.graph %}
+        {% include 'views/reports/sections/evaluation_section.htm' %}
+    {% endif %}
+
+    {% if 'RIGHT_E30' in report_info.source.graph %}
+        {% include 'views/reports/sections/designation_section.htm' %}
+    {% endif %}
+
+    {% include "views/reports/sections/related_resource_section.htm" %}
+
+
+</div>

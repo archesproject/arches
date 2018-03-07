@@ -1,0 +1,61 @@
+{% load staticfiles %}
+{% load i18n %}
+
+                                    <!-- Roles content -->
+                                    <div class="arches-report-subsection-content">
+                                        <div class="row">
+                                            <div class="col-xs-12">
+                                                <dl>
+                                                    {% if 'ARCHES_EVENT_PHASE_E4' not in report_info.source.graph %}
+                                                        <dd class="arches-report-subsection-item">
+                                                            {% trans "No roles recorded" %}
+                                                        </dd>
+                                                    {% else %}
+
+                                                        {% for ARCHES_EVENT_PHASE_E4 in report_info.source.graph.ARCHES_EVENT_PHASE_E4 %}
+                                                            {% if 'PHASE_TYPE_ASSIGNMENT_E17' not in ARCHES_EVENT_PHASE_E4 %}
+                                                                <dd class="arches-report-subsection-item">
+                                                                    {% trans "No roles recorded" %}
+                                                                </dd>
+                                                            {% else %}
+                                                                {% for PHASE_TYPE_ASSIGNMENT_E17 in ARCHES_EVENT_PHASE_E4.PHASE_TYPE_ASSIGNMENT_E17 %}
+                                                                    <dd class="arches-report-subsection-item arches-report-spacer">
+
+                                                                        {% if 'ACTOR_TYPE_E55' in PHASE_TYPE_ASSIGNMENT_E17 %}
+                                                                            {% for ACTOR_TYPE_E55 in PHASE_TYPE_ASSIGNMENT_E17.ACTOR_TYPE_E55 %}
+                                                                                {{ACTOR_TYPE_E55.ACTOR_TYPE_E55__value}}  <span class="arches-report-subsection-item-type">({% trans "Role" %})</span>
+                                                                            {% endfor %} 
+                                                                        {% endif %}
+									
+                                                                        {% if 'ACTOR_TYPE_CERTAINTY_TYPE_E55' in PHASE_TYPE_ASSIGNMENT_E17 %}
+                                                                            {% for ACTOR_TYPE_CERTAINTY_TYPE_E55 in PHASE_TYPE_ASSIGNMENT_E17.ACTOR_TYPE_CERTAINTY_TYPE_E55 %}
+                                                                                {{ACTOR_TYPE_CERTAINTY_TYPE_E55.ACTOR_TYPE_CERTAINTY_TYPE_E55__value}} <span class="arches-report-subsection-item-type">({% trans "Certainty" %})</span>
+                                                                            {% endfor %}  
+                                                                        {% endif %}
+
+                                                                        {% if 'TIME___SPAN_PHASE_E52' in PHASE_TYPE_ASSIGNMENT_E17 %}
+                                                                            {% for TIME___SPAN_PHASE_E52 in PHASE_TYPE_ASSIGNMENT_E17.TIME___SPAN_PHASE_E52 %}
+                                                                                {% for FROM_DATE_E49 in TIME___SPAN_PHASE_E52.FROM_DATE_E49 %}
+                                                                                    <span class="arches-report-subsection-item-type">{% trans "From: " %}</span>{{FROM_DATE_E49.FROM_DATE_E49__value|cut:"T00:00:00"}}
+                                                                                {% endfor %} -
+                                                                                {% for TO_DATE_E49 in TIME___SPAN_PHASE_E52.TO_DATE_E49 %}
+                                                                                     <span class="arches-report-subsection-item-type">{% trans "To: " %}</span>{{TO_DATE_E49.TO_DATE_E49__value|cut:"T00:00:00"}}
+                                                                                {% endfor %} 
+                                                                            {% endfor %} 
+                                                                        {% endif %}
+
+                                                                    </dd>
+                                                                {% endfor %}
+                                                            {% endif %}   
+
+                                                        {% endfor %} 
+
+                                                    {% endif %}   
+
+                                                </dl>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <!-- End Section Content-->

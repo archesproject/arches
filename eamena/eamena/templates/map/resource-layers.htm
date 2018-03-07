@@ -1,0 +1,43 @@
+{% load i18n %}
+<script>
+    define('resource-layer-info', [], function () {
+        return {
+            "all": {
+                id: "all",
+                icon: "mega-octicon octicon-location arches-layer-icon",
+                name: "{% trans 'All Resources' %}",
+                description: "{% trans 'Load all the EAMENA resources' %}",
+                categories: [
+                    "{% trans 'resource' %}"
+                ],
+                onMap: false,
+                vectorColor: "{{ map_info.resource_marker_color }}",
+                iconColor: "{{ map_info.resource_marker_color }}",
+                infoContent: "<div style=\"width:200px;\">{% trans 'visible zoom range: all' %}</div>"
+            },
+            {% for type, type_data in resource_types %}
+            {% if type_data.has_layer %}
+            "{{type}}": {
+                id: "{{type_data.resourcetypeid}}",
+                icon: "{{type_data.icon_class}}",
+                name: "{{type_data.name}}",
+                description: "{{type_data.description}}",
+                categories: [
+                    {% for category in type_data.categories %}
+                    "{{category}}"
+                    {% endfor %}
+                ],
+                {% if type_data.on_map %}
+                onMap: true,
+                {% else %}
+                onMap: false,
+                {% endif %}
+                vectorColor: "{{type_data.marker_color}}",
+                iconColor: "{{type_data.marker_color}}",
+                infoContent: "<div style=\"width:200px;\">{% trans 'visible zoom range: all' %}</div>"
+            },
+            {% endif %}
+            {% endfor %}
+        };
+    });
+</script>

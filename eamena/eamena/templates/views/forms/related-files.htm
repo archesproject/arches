@@ -1,0 +1,598 @@
+{% extends "views/forms/wizard-base.htm" %}
+{% load i18n %}
+
+{% block form_content %}
+
+<div>            
+    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "A title, information resource type, and relationship type must be specified." %}</div>
+
+    <!-- CRUD Form Container -->
+    <div id="crud" style="">
+        
+        <!-- Related Information Objects Container -->
+        <div id="current-files-section">
+            
+            <!-- For Demo, Start with no related resources -->
+            <div class="row margin-top-minus-5 margin-bottom-10" data-bind="visible: getBranchLists().length == 0">
+                <div class="col-xs-12">
+
+                    <div class="margin-left-5">
+                        <dl class="margin-bottom-10"> 
+                            
+                            <dd class="margin-left-5">
+                                <div class="">
+                                    <p class="arches-CRUD-child text-primary">{% trans "This resource has no related files yet" %}</p>
+                                </div>
+                            </dd>
+
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <!-- End Demo -->
+
+            <div data-bind="visible: getBranchLists().length > 0">
+
+                <!-- Related Images Title -->
+                <div class="row margin-bottom-10">
+                    <div class="col-xs-12">
+
+                        <!-- Images -->
+                        <div class="padding-left-10">
+                            
+                            <dl style="margin-bottom: 0px;">
+                                <!-- Title -->
+                                <dt>
+                                    <h5 id="arches-names-form" class="section-headline">{% trans "Related Images" %}</h5>
+                                </dt>
+                                
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- The Bootstrap Image Gallery lightbox, should be a child element of the document body -->
+                <div id="blueimp-gallery" class="blueimp-gallery blueimp-gallery-controls">
+                    <!-- The container for the modal slides -->
+                    <div class="slides"></div>
+                    <!-- Controls for the borderless lightbox -->
+                    <h3 class="title"></h3>
+                    <a class="prev">‹</a>
+                    <a class="next">›</a>
+                    <a class="close">×</a>
+                    <a class="play-pause"></a>
+                    <ol class="indicator"></ol>
+                    <!-- The modal dialog, which will be used to wrap the lightbox content -->
+                    <div class="modal fade">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" aria-hidden="true">&times;</button>
+                                    <h4 class="modal-title"></h4>
+                                </div>
+                                <div class="modal-body next"></div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default pull-left prev">
+                                        <i class="glyphicon glyphicon-chevron-left"></i>
+                                        {% trans "Previous" %}
+                                    </button>
+                                    <button type="button" class="btn btn-primary next">
+                                        {% trans "Edit" %}
+                                        <i class="glyphicon glyphicon-chevron-plus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-primary next">
+                                        {% trans "Next" %}
+                                        <i class="glyphicon glyphicon-chevron-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Realted Images -->
+                <div class="row margin-top-minus-5 margin-bottom-10" id="current-items" style="display: none;" data-bind="visible: true">
+                    <div class="row">
+                        <div class="col-xs-12"> 
+
+                            <div style="margin-left: 20px; padding-top: 5px;" id="links">
+                                <div data-bind="foreach: getBranchLists()">
+                                    <div data-bind="if: nodes.get('THUMBNAIL.E62', 'value') !== '' && nodes.get('FILE_PATH.E62', 'value') !== ''" style="position: relative; display: inline-block; margin:1px;">
+                                        <a style="position:absolute; background-color:rgba(0, 0, 0, 0.5); padding-left: 4px; width: 20px;" data-bind="click: $parent.editItem.bind($parent)"><i class="fa fa-edit" style="color:white;"></i></a>
+                                        <a title="" data-gallery="links2" data-bind="attr: { href: nodes.get('FILE_PATH.E62', 'value'), title: nodes.get('CATALOGUE_ID.E42', 'label')}" target="_blank">
+                                            <img alt="" data-bind="attr: { src: nodes.get('THUMBNAIL.E62', 'value')}">
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>  
+                            
+                        </div>
+                    </div>
+                    <!-- End Images -->
+
+                    
+                    <hr class="devider arches-RDM-divider">
+                            
+                    
+                    <!-- Related Files -->
+                    <div class="padding-left-10">
+                        <div class="row margin-bottom-10">
+                            <div class="col-xs-12">
+
+                                <!-- Files -->
+                                <div class="">
+                                    
+                                    <dl style="margin-bottom: 0px;">
+                                        <!-- Title -->
+                                        <dt>
+                                            <h5 id="arches-names-form" class="section-headline" style="margin-left: 10px;">{% trans "Related Files" %}</h5>
+                                        </dt>
+                                        
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Related Files List-->
+                        <div class="row margin-bottom-5">
+                            <div class="col-xs-12">
+                                
+                                <dl data-bind="foreach: getBranchLists()">
+                                    <div data-bind="if: nodes.get('THUMBNAIL.E62', 'value') === '' && nodes.get('FILE_PATH.E62', 'value') !== ''">
+                                        <dd class="margin-left-5">
+                                            <div class="arches-crud-record">
+                                                <a title="{% trans "Download this file" %}" data-bind="attr: { href: nodes.get('FILE_PATH.E62', 'value')}" target="_blank"><i class="fa fa-cloud-download"></i></a>
+                                                <a href="#" id="related-1" class="arches-CRUD-child info-link related" title="{% trans "Edit this file" %}" data-bind="text: nodes.get('FILE_PATH.E62', 'value').split('/')[nodes.get('FILE_PATH.E62', 'value').split('/').length-1], click: $parent.editItem.bind($parent)"></a>&nbsp; <span class="text-muted" data-bind="text: '({% trans "relation" %}: ' + relationshiptypelabel() + ', {% trans "format" %}: ' + nodes.get('FILE_PATH.E62', 'value').split('.')[1] + ')'"></span>
+                                            </div>
+                                        </dd>
+                                    </div>
+                                   
+                                </dl>
+                        
+                            </div>
+                        </div>  
+                    </div>
+                    <!-- End Related Files List -->
+                
+                </div>
+
+
+            </div>
+            <!-- End Related File Container -->
+
+            <!-- ++++++++++++  Modal ++++++++++++++++++++++++++++++++++++++++++++++++ -->
+            <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+            <!-- Edit File Resource Modal -->
+            <div id="edit_file_resource_modal" class="modal fade" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content no-corners">
+                      
+                        <!-- Modal Header -->
+                        <div class="modal-header arches-modal-header">
+                            <button type="button" class="close" data-dismiss="modal" data-bind="click: undoCurrentEdit" aria-hidden="true">&times;  </button>
+                            <h4 class="modal-title">{% trans "Edit Related Resource: " %}</h4><a href="javascript:void(0);" class="text-primary" target="_blank" data-bind="attr:{ href: '/reports/' + getEditedNode('INFORMATION_RESOURCE.E73', 'entityid')()}"><h4 class="modal-title" data-bind="text: getEditedNode('EAMENA_ID.E42', 'value')"></h4></a>
+                        </div>
+                        <!-- End Modal Header -->
+
+                    
+                        <!-- Form -->
+                        <div class="modal-body">
+                            <dl>
+                                <dd id="editform" class="arches-RDM-labels" style="padding-right: 20px;">
+                                    <div class="row">
+                                        
+                                        <!-- Title/Caption Form -->
+                                        <div class="col-xs-12">
+
+                                           
+                                            <h5 class="section-headline" id="title_h5">{% trans "Title" %}</h5><h5 class="section-headline" id="catalogue_h5">{% trans "Catalogue ID" %}</h5>
+
+                                            <div class="row">
+                                                <div class="col-xs-6">   
+                                                    <input class="form-control" style="width:100%;" id = "catalogue_box" placeholder='{% trans "Catalogue ID" %}' data-bind="{value: getEditedNode('CATALOGUE_ID.E42', 'value')}">
+                                                    <input class="form-control" style="width:100%;" id = "title_box" placeholder='{% trans "Title" %}' data-bind="{value: getEditedNode('TITLE.E41', 'value')}">
+                                                </div>
+                                                <div class="col-xs-6"> 
+                                                    <input style="width: 100%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form name-type" id="resource-name-type" data-bind="select2: {value: getEditedNode('INFORMATION_RESOURCE_TYPE.E55', 'value'), placeholder: '{% trans "Title Type" %}', dataKey: 'INFORMATION_RESOURCE_TYPE.E55'}"></input>
+                                                </div>
+                                            </div>
+
+                                            <!-- Spacer (for xs screens) -->
+                                            <div class="margin-top-15"></div>
+
+                                            <h5 class="section-headline">{% trans "Description" %}</h5>
+
+<!--                                             <div class="row">
+                                                <div class="col-xs-12"> 
+                                                    <input style="width:100%; display: inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-unit" data-bind="select2: {value: getEditedNode('DESCRIPTION_TYPE.E55', 'value'), placeholder: '{% trans "Description Type" %}', dataKey: 'DESCRIPTION_TYPE.E55'}"></input>
+                                                </div> 
+                                            </div> -->
+                                            <div class="margin-top-5"></div>
+                                            <div class="row">
+                                                <div class="col-xs-12">    
+                                                    <div class="summernote" data-bind="summernote: {value: getEditedNode('DESCRIPTION.E62', 'value'), options:{height: '100px'}}"></div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Spacer (for xs screens) -->
+                                            <div class="margin-top-15"></div>
+
+                                            <h5 class="section-headline">{% trans "Relationship Type" %}</h5>
+
+                                            <div class="row"> 
+                                                <div class="col-xs-12">  
+                                                    <input style="width: 100%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form name-type" id="resource-name-type" data-bind="select2: {value: getEditedNode('ARCHES_RESOURCE_CROSS-REFERENCE_RELATIONSHIP_TYPES.E55', 'value'), placeholder: '{% trans "Relationship Type" %}', dataKey: 'RELATIONSHIP_TYPES.E32'}"></input>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                </dd>
+                                <dd id="deletewarning" class="arches-RDM-labels" style="padding-right: 20px; display: none;">
+                                    <div class="row">
+                                        
+                                        <!-- Title/Caption Form -->
+                                        <div class="col-xs-12">
+
+                                            <div class="" style="width: 100%;">
+                                                {% trans "Are you sure you want to delete the relationship to this file?" %}
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </dd>
+                            </dl>
+
+                        </div>
+                        <!-- End Modal Body -->
+                      
+                        <!-- Modal Footer -->
+                        <div class="modal-footer">
+                        <a href="javascript:void(0);" class="text-primary" target="_blank" data-bind="attr:{ href: '/reports/' + getEditedNode('INFORMATION_RESOURCE.E73', 'entityid')()}">
+                            <button type="button" class="btn btn-primary">
+                                {% trans 'View Report' %}</button>
+                        </a>
+                            <a class="btn btn-danger pull-left" data-bind="click: confirmDelete" title="{% trans "Remove this relation" %}"><i class="fa fa-trash-o" ></i></a>
+                            <button type="button" class="btn btn-danger" data-dismiss="modal" data-bind="click: undoCurrentEdit">{% trans "Cancel" %}</button>
+                            <button id="savebtn" type="button" class="btn btn-success" data-dismiss="modal" data-bind="click: updateItem">{% trans "Save" %}</button>
+                            <button id="deletebtn" type="button" class="btn btn-success" style="display: none;" data-dismiss="modal" data-bind="click: deleteItem">{% trans "Delete" %}</button>
+
+                                
+                        </div>
+                        <!-- End Modal Footer -->
+
+                    </div>
+                </div>
+            </div>
+            <!-- End Edit File Resource Modal -->
+
+            <!-- ++++++++++++  End Modal ++++++++++++++++++++++++++++++++++++++++++++ -->
+            <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+        </div>
+        <!-- End Related Information Objects Container -->
+
+
+        <!-- Upload Files Wizard Container --> 
+        <div style="display: none;" id="workflow-container">   
+            <div class="padding-10" id="new-files-section">
+                <div>
+                    
+                    <!-- Arches form container -->
+                    <dl>
+                        <dd class="arches-RDM-labels">
+                            <div class="row">
+                                <div class="col-xs-12 padding-left-0">
+                
+                                    <!-- Start Wizard -->
+                                    <form class="margin-top-20" id="wizard-1"   novalidate="novalidate">
+                                        <div id="bootstrap-wizard-1" class="col-sm-12">
+                                            <div class="form-bootstrapWizard">
+                                                <ul class="bootstrapWizard form-wizard">
+                                                    <li class="active" data-target="#step1" style="width: 25%">
+                                                        <a href="#tab1" data-toggle="tab"> <span class="step">1</span> <span class="title">{% trans "Part 1: Upload Files" %}</span> </a>
+                                                    </li>
+                                                    <li data-target="#step2" style="width: 25%">
+                                                        <a href="#tab2" data-toggle="tab"> <span class="step">2</span> <span class="title">{% trans "Part 2: Title" %}</span> </a>
+                                                    </li>
+                                                    <li data-target="#step3" style="width: 25%">
+                                                        <a href="#tab3" data-toggle="tab"> <span class="step">3</span> <span class="title">{% trans "Part 3: Description" %}</span> </a>
+                                                    </li>
+                                                    <li data-target="#step4" style="width: 25%">
+                                                        <a href="#tab4" data-toggle="tab"> <span class="step">4</span> <span class="title">{% trans "Part 4: Relationship" %}</span> </a>
+                                                    </li>
+                                                </ul>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            
+                                            <!-- Wizard Tabs -->
+                                            <div class="tab-content arches-wizard-tab">
+                                                
+                                                <!-- Tab 1: Upload Files -->
+                                                <div class="tab-pane active" id="tab1" style="min-height: 330px;">
+                                                    <br>
+                                                    <h3 class="margin-bottom-5"><strong>{% trans "Part 1" %}</strong> {% trans "Upload Files" %}</h3>
+                                                    
+                                                    <dl>   
+                                                        <div class="dropzone" id="mydropzone">
+
+                                                        </div>
+                                                    </dl>
+                                                </div>
+                                                <!-- End Tab 1: Upload Files -->
+
+
+                                                <!-- Tab 2: File Metadata -->
+                                                <div class="tab-pane" id="tab2" style="min-height: 330px;">
+                                                    <br>
+                                                    <h3 class="margin-bottom-5"><strong>{% trans "Part 2" %}</strong> {% trans "File Information" %}</h3>
+
+                                                    <div class="alert alert-info fade in">
+                                                        <i class="fa-fw fa fa-info"></i>
+                                                        {% trans "Add a name/title and description for each file" %}
+                                                    </div>
+
+                                                    <!-- Form for screens > XS -->
+                                                    <dl class="hidden-xs">  
+
+                                                        <div data-bind="foreach: $data"> 
+                                                            <dd class="arches-file-upload-record">
+                                                                <div class="row">
+
+                                                                    <div class="col-xs-12">
+                                                                        <p class="arches-title">
+                                                                            <span data-bind="text: file.name"></span>
+                                                                            <span class="arches-subtitle pull-right">
+                                                                                <i class="fa-fw fa fa-cloud-upload"></i><span data-bind="text: (file.size/1000000).toFixed(2)"></span> Mb
+                                                                                <i class="fa-fw fa fa-file"></i><span data-bind="text: file.type"></span>
+                                                                            </span>
+                                                                        </p>
+
+                                                                    </div>
+
+                                                                    <div class="col-xs-12">
+
+                                                                        <img style="width: 100px; height: 100px; border: 1px solid #cdcdcd;" data-bind="attr: {'src': thumbnail}">
+
+                                                                        <span class="pull-right" style="width: 80%;">
+
+                                                                            <div class="row">
+                                                                                <div class="col-xs-6">   
+                                                                                    <input class="form-control" style="width:100%;" placeholder="{% trans "Title" %}" data-bind="value: title">
+                                                                                </div>
+                                                                                <div class="col-xs-6"> 
+                                                                                    <input style="width: 100%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-name-type" data-bind="select2: {value: title_type, placeholder: '{% trans "Title Type" %}', dataKey: 'INFORMATION_RESOURCE_TYPE.E55'}"></input>
+                                                                                </div>
+                                                                            </div>
+
+                                                                        </span>
+
+                                                                    </div>    
+                                                                </div>
+                                                            </dd>
+                                                        </div>
+
+                                                    </dl>
+                                                   <!-- Form for XS screens -->
+                                                    <dl class="hidden-sm hidden-md hidden-lg">
+
+                                                        <dd class="arches-file-upload-record">
+                                                            <div class="table-responsive">
+                                                                    
+                                                                <table class="table table-bordered table-striped">
+                                                                    <tbody data-bind="foreach: $data">
+                                                                        <tr>
+                                                                            <th style="width: 100px; height: 100px; border-width: 0px; padding-top: 20px;" rowspan="2">
+                                                                                <img style="width: 100px; height: 100px; border: 1px solid #cdcdcd;" data-bind="attr: {'src': thumbnail}">
+                                                                            </th>
+                                                                            <td style="width: 100%; border-width: 0px; padding-top: 20px;">
+                                                                                <input class="form-control" style="width:100%;" placeholder="{% trans "Title" %}" data-bind="value: title">
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td style="width: 100%; border-width: 0px;">
+                                                                                <input style="width: 100%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form name-type" id="resource-name-type" data-bind="select2: {value: title_type, placeholder: '{% trans "Title Type" %}', dataKey: 'INFORMATION_RESOURCE_TYPE.E55'}"></input>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                                
+                                                            </div>
+                                                        </dd>
+
+                                                    </dl>
+ 
+                                                </div>
+                                                
+                                                <!-- Tab 3: File Metadata -->
+                                                <div class="tab-pane" id="tab3" style="min-height: 330px;">
+                                                    <br>
+                                                    <h3 class="margin-bottom-5"><strong>{% trans "Part 3" %}</strong> {% trans "File Information" %}</h3>
+
+                                                    <div class="alert alert-info fade in">
+                                                        <i class="fa-fw fa fa-info"></i>
+                                                        {% trans "Add description and desctiption type for each file" %}
+                                                    </div>
+
+                                                    <!-- Form for screens > XS -->
+                                                    <dl class="hidden-xs">  
+
+                                                        <div data-bind="foreach: $data"> 
+                                                            <dd class="arches-file-upload-record">
+                                                                <div class="row">
+
+                                                                    <div class="col-xs-12">
+                                                                        <p class="arches-title">
+                                                                            <span data-bind="text: file.name"></span>
+                                                                            <span class="arches-subtitle pull-right">
+                                                                                <i class="fa-fw fa fa-cloud-upload"></i><span data-bind="text: (file.size/1000000).toFixed(2)"></span> Mb
+                                                                                <i class="fa-fw fa fa-file"></i><span data-bind="text: file.type"></span>
+                                                                            </span>
+                                                                        </p>
+
+                                                                    </div>
+
+                                                                    <div class="col-xs-12">
+
+                                                                        <img style="width: 100px; height: 100px; border: 1px solid #cdcdcd;" data-bind="attr: {'src': thumbnail}">
+
+                                                                        <span class="pull-right" style="width: 80%;">
+
+<!--                                                                             <input style="width:100%; display: inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-unit" data-bind="select2: {value: description_type, placeholder: 'Type', dataKey: 'DESCRIPTION_TYPE.E55'}"></input> -->
+
+                                                                            <!-- Simple HTML Editor -->
+                                                                            <div class="arches-html-editor margin-top-5" style="width: 100%;">
+                                                                                <div class="summernote" data-bind="summernote: {value: description, options:{}}"></div>
+                                                                            </div>
+
+                                                                        </span>
+
+                                                                    </div>    
+                                                                </div>
+                                                            </dd>
+                                                        </div>
+
+                                                    </dl>
+
+                                                    <!-- Form for XS screens -->
+                                                    <dl class="hidden-sm hidden-md hidden-lg">
+
+                                                        <dd class="arches-file-upload-record">
+                                                            <div class="table-responsive">
+                                                                    
+                                                                <table class="table table-bordered table-striped">
+                                                                    <tbody data-bind="foreach: $data">
+                                                                        <tr>
+                                                                            <th style="width: 100px; height: 100px; border-width: 0px; padding-top: 20px;" rowspan="2">
+                                                                                <img style="width: 100px; height: 100px; border: 1px solid #cdcdcd;" data-bind="attr: {'src': thumbnail}">
+                                                                            </th>
+<!--                                                                             <td style="width: 100%; border-width: 0px; padding-top: 20px;">
+                                                                                <input style="width:100%; display: inline-block;" class="select2 arches-select2-crud-form name-type" id="resource-measurement-unit" data-bind="select2: {value: description_type, placeholder: 'Type', dataKey: 'DESCRIPTION_TYPE.E55'}"></input>
+                                                                            </td> -->
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td style="width: 100%; border-width: 0px;">
+                                                                                <!-- Simple HTML Editor -->
+                                                                                <div class="arches-html-editor margin-top-5" style="width: 100%;">
+                                                                                    <div class="summernote" data-bind="summernote: {value: description, options:{}}"></div>
+                                                                                </div>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                                
+                                                            </div>
+                                                        </dd>
+                                                    </dl>
+                                                </div>
+
+                                                <!-- Tab 4: Resource Status -->
+                                                <div class="tab-pane" id="tab4" style="min-height: 330px;">
+                                                    <br>
+                                                    <h3 class="margin-bottom-5"><strong>{% trans "Part 4" %}</strong> {% trans "Describe Relationship" %}</h3>
+
+                                                    <div class="alert alert-info fade in">
+                                                        <i class="fa-fw fa fa-info"></i>
+                                                        {% trans "Describe the relationship each file has with the current resource" %}
+                                                    </div>
+
+                                                    <!-- Form for screens > XS -->
+                                                    <dl class="hidden-xs">   
+                                                        <div data-bind="foreach: $data"> 
+                                                            <dd class="arches-file-upload-record ">
+                                                                <div class="row">
+
+                                                                    <div class="col-xs-12">
+                                                                        <p class="arches-title">
+                                                                            <span data-bind="text: file.name"></span>
+                                                                            <span class="arches-subtitle pull-right">
+                                                                                <i class="fa-fw fa fa-cloud-upload"></i><span data-bind="text: (file.size/1000000).toFixed(2)"></span> Mb
+                                                                                <i class="fa-fw fa fa-file"></i><span data-bind="text: file.type"></span>
+                                                                            </span>
+                                                                        </p>
+
+                                                                    </div>
+
+                                                                    <div class="col-xs-12">
+
+                                                                        <img style="width: 100px; height: 100px; border: 1px solid #cdcdcd;" data-bind="attr: {'src': thumbnail}">
+
+                                                                        <span class="pull-right" style="width: 80%;">
+
+                                                                            <p class="arches-file-title" data-bind="text: title"></p>
+                                                                            <p class="arches-file-description" data-bind="html: description"></p>
+
+                                                                            <!-- Relationship -->  
+                                                                            <div class="form-group" style="width: 100%">   
+                                                                                <input style="width: 100%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-name-type" data-bind="select2: {value: relationshiptype, placeholder: '{% trans "Type" %}', dataKey: 'RELATIONSHIP_TYPES.E32'}"></input>
+                                                                            </div>
+
+                                                                        </span>
+
+                                                                    </div>    
+                                                                </div>
+                                                            </dd>
+                                                        </div>
+
+                                                    </dl>
+
+                                                    <!-- Form for XS screens -->
+                                                    <dl class="hidden-sm hidden-md hidden-lg">
+
+                                                        <dd class="arches-file-upload-record">
+                                                            <div class="table-responsive">
+                                                                    
+                                                                <table class="table table-bordered table-striped">
+                                                                    <tbody data-bind="foreach: $data">
+                                                                        <tr style="">
+                                                                            <td style="width: 100px; height: 100px; border-width: 0px; padding-top: 20px; padding-bottom: 20px;">
+                                                                                <img style="width: 100px; height: 100px; border: 1px solid #cdcdcd;" data-bind="attr: {'src': thumbnail}">
+                                                                            </td>
+                                                                            <td style="border-width: 0px; padding-top: 20px; padding-bottom: 20px;">
+                                                                                <p class="arches-file-title" data-bind="text: title"></p>
+                                                                                <p class="arches-file-description" data-bind="html: description"></p>
+
+                                                                                <!-- Relationship -->  
+                                                                                <div class="form-group" style="width: 100%">   
+                                                                                    <input style="width: 100%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form name-type" id="resource-name-type" data-bind="select2: {value: relationshiptype, placeholder: 'Type', dataKey: 'RELATIONSHIP_TYPES.E32'}"></input>
+                                                                                </div>
+                                                                            </td>    
+                                                                        </tr>
+                                                                        
+                                                                    </tbody>
+                                                                </table>
+                                                                
+                                                            </div>
+                                                        </dd>
+
+                                                    </dl>
+
+                                                </div>
+                                            </div>
+                                            <!-- End Wizard Tabs -->
+
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                        </dd>
+                    </dl>
+                    <!-- End Arches form container -->
+
+                </div>
+            </div>
+        </div>
+        <!-- Upload Files Wizard Container --> 
+
+    </div>
+    <!-- End CRUD Container -->
+    
+    <div class="clearfix margin-bottom-10"></div>
+
+</div>
+<!-- End Content -->
+
+{% endblock form_content %}

@@ -1,0 +1,127 @@
+{% extends "views/forms/base.htm" %}
+{% load i18n %}
+
+{% block form_content %}
+
+<div id='activity-actions-section'>
+                    
+        <!-- Activity Start CRUD Form -->
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="padding-left-10">
+                    
+                    <dl>
+                        <!-- Title -->
+                        <dt>
+                            <h5 id="arches-names-form" class="section-headline">Activity Actions</h5>
+                        </dt>
+
+                        <!-- Form -->
+                        <dd class="arches-RDM-labels">
+
+                            <div class="row">
+
+                                <div class="col-xs-12">
+
+                                <!-- Screens greater than xs -->
+                                <form class="form-inline arches-form hidden-xs" role="form">
+                                    <div class="form-group hidden-xs" style="width: 100%;">
+                                        
+                                        <!-- Period and From/To Dates -->
+                                        <div>
+                                            <div style="width:30%;" class="select2 arches-select2-crud-form resource-type" id="period-dropdown" data-bind="select2: {value: getEditedNode('ACTIVITY_TYPE.E55', 'value'), placeholder: '{% trans "activity type" %}', multiple: false, dataKey: 'ACTIVITY_TYPE.E55'}">
+                                            </div>&nbsp;
+                                        
+                                            <div class="form-group" style="padding-left: 0px; padding-right: 0px; width: 25%;">
+                                                <div class="input-group datetimepicker" style ="width:100%;" >
+                                                    <input type="text" id="action_to_date" style="height: 32px;" placeholder="{% trans 'start (yyyy-mm-dd)' %}" class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('TO_DATE.E49', 'value')} ">
+                                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>&nbsp;
+
+                                            <div class="form-group" style="padding-left: 0px; padding-right: 0px; width: 25%;">
+                                                <div class="input-group datetimepicker" style ="width:100%;" >
+                                                    <input type="text" id="action_from_date" style="height: 32px;" placeholder="{% trans 'end (yyyy-mm-dd)' %}" class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('FROM_DATE.E49', 'value')} ">
+                                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>
+
+                                        {% include 'views/components/add-item-button.htm' %}
+                                        </div>
+                                    </div>
+                                </form>
+                                <!-- End Screens greater than xs -->
+                                    <!-- Form for screens > xs -->
+
+                                    <!-- Form for screens = xs -->
+                                    <form class="form-inline arches-form hidden-sm hidden-md hidden-lg" role="form">
+                                        <!-- Period and From/To Dates -->
+                                        <div>
+                                            <div style="margin-bottom: 5px; width:100%;" class="select2 arches-select2-crud-form resource-type" id="period-dropdown" data-bind="select2: {value: getEditedNode('ACTIVITY_TYPE.E55', 'value'), placeholder: '{% trans "start action" %}', multiple: false, dataKey: 'ACTIVITY_TYPE.E55'}">
+                                            </div>
+                                        
+                                            <div class="form-group" style="padding-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 5px; width: 100%;">
+                                                <div class="input-group datetimepicker" style ="width:100%;" >
+                                                    <input type="text" id="action_to_date" style="height: 32px;" placeholder="{% trans 'start date' %}" class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('TO_DATE.E49', 'value')} ">
+                                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group" style="padding-left: 0px; padding-right: 0px; margin-bottom: 5px; width: 100%;">
+                                                <div class="input-group datetimepicker" style ="width:100%;" >
+                                                    <input type="text" id="action_from_date" style="height: 32px;" placeholder="{% trans 'end date' %}" class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('FROM_DATE.E49', 'value')} ">
+                                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>
+
+                                        {% include 'views/components/add-item-button.htm' %}
+                                        </div>
+
+                                    </form>
+                                    <!-- Form for screens = xs -->
+                                </div>
+                            </div>
+                        </dd>
+                        <!-- End Form -->
+                    </dl>
+
+                </div>
+            </div>
+        </div>
+        <!-- End Activity Start CRUD -->
+
+        <!-- Activity Start Records -->
+        <div class="row">
+            <div class="col-xs-12">
+
+                <!--  -->
+                <div class="arches-crud-child-section">
+                    <dl>
+                        <dd class="arches-CRUD-child-title">
+                            This activity includes these start actions:
+                        </dd>
+
+                        <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                            <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Actions Defined" %}</div>   
+
+                            <div data-bind='foreach: getBranchLists()'>
+                                <div class="arches-crud-record">
+                                    <a href="javascript:void(0)" class="arches-CRUD-child" title="Delete this name"><i data-bind='click: $parent.deleteItem.bind($parent)' class="arches-CRUD-delete fa fa-trash-o"></i></a>
+                                    <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind='click: $parent.editItem.bind($parent)' title="Edit this name">
+                                        <span data-bind='text: nodes.get("ACTIVITY_TYPE.E55", "label")' style="padding-right:2px;"></span><span class="text-muted arches-crud-type-identifier"> ({% trans "Activity type" %}),</span>
+                                        <span data-bind='text: nodes.get("FROM_DATE.E49", "value")' style="padding-right:2px;"></span><span class="text-muted arches-crud-type-identifier">({% trans "Start Date" %}),</span>
+                                        <span data-bind='text: nodes.get("TO_DATE.E49", "value")' style="padding-right:2px;"></span><span class="text-muted arches-crud-type-identifier">({% trans "End Date" %})</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </dd>
+
+                    </dl>
+
+                </div>
+            </div>
+        </div>
+        <!-- End Activity Start Records -->
+</div>
+
+{% endblock form_content %}

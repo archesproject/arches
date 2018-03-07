@@ -1,0 +1,33 @@
+{% load i18n %}
+<div class="row">
+    <div class="col-xs-12">
+        <dl class="report-item-list">
+            <dt>
+                <h5 id="" class="arches-report-subsection-title">{% trans "Location Description" %}</h5>
+            </dt>
+
+            <dd class="arches-report-subsection-item empty-message">
+                {% trans "No descriptions recorded" %}
+            </dd>
+
+            {% if 'PLACE_E53' in report_info.source.graph %}
+                {% for PLACE_E53 in report_info.source.graph.PLACE_E53 %}
+                    {% if 'PLACE_SITE_LOCATION_E53' in PLACE_E53 %}
+                        {% for PLACE_SITE_LOCATION_E53 in PLACE_E53.PLACE_SITE_LOCATION_E53 %}
+                            {% if 'DESCRIPTION_OF_LOCATION_E62' in PLACE_SITE_LOCATION_E53 %}
+                                 {% for DESCRIPTION_OF_LOCATION_E62 in PLACE_SITE_LOCATION_E53.DESCRIPTION_OF_LOCATION_E62 %}
+                                    {% if DESCRIPTION_OF_LOCATION_E62.DESCRIPTION_OF_LOCATION_E62__value != '' %}
+                                        <dd class="arches-report-subsection-item report-list-item">
+                                            {{DESCRIPTION_OF_LOCATION_E62.DESCRIPTION_OF_LOCATION_E62__value | safe}}
+                                        </dd>
+                                    {% endif %}
+                                {% endfor %}   
+                            {% endif %}
+                        {% endfor %}                      
+                    {% endif %}
+                {% endfor %}              
+            {% endif %}
+
+        </dl>
+    </div>
+</div>

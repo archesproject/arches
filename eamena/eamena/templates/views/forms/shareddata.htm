@@ -1,0 +1,403 @@
+{% extends "views/forms/base.htm" %}
+{% load i18n %}
+
+{% block form_content %}
+<!-- Resource Type CRUD Form -->
+
+
+
+<div id="shared-appellation-section">
+    <!-- Resource Type CRUD Form -->
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                
+                <dl>
+                    <!-- Title -->
+                    <dt>
+                        <h5 id="arches-names-form" class="section-headline">{% trans "Shared data source" %}</h5>
+                    </dt>
+
+                    <!-- Form -->
+                    <dd class="arches-RDM-labels">
+
+                        <div class="row">
+
+                            <div class="col-xs-12 padding-left-15">
+
+                                <!-- Screens greater than xs -->
+                                <form class="form-inline arches-form hidden-xs" role="form">
+                                    <div class="form-group" style="width: 100%;">
+           
+
+
+                                        <!-- Spacer -->
+                                        <div class="margin-top-5 hidden-xs"></div>
+
+                                        <!-- Creator/Contibutor -->
+                                        <input class="form-control arches-form-input" id="resource-name" style="width: 50%;" placeholder="{% trans "Source" %}" data-bind="value: getEditedNode('SHARED_DATA_SOURCE_APPELLATION.E82', 'value')">
+                                        
+                                        {% include 'views/components/add-item-button.htm' %}
+                                        
+                                        
+                                    </div>
+                                </form>
+                                <!-- End Screens greater than xs -->
+
+
+                                <!-- Form for screens = xs -->
+                                <form class="form-inline arches-form hidden-sm hidden-md hidden-lg" role="form">
+                                    <div class="form-group" style="width: 70%">
+                                        
+
+                                        <!-- Creation Date -->
+
+                                        <input class="form-control arches-form-input" id="resource-name" style="width: 60%;" placeholder="{% trans "Source" %}" data-bind="value: getEditedNode('SHARED_DATA_SOURCE_APPELLATION.E82', 'value')">
+
+                                        <!-- Spacer (for xs screens) -->
+                                        <div class="margin-top-5 hidden-sm hidden-md hidden-lg"></div>
+
+                                        {% include 'views/components/add-item-button.htm' %}
+
+                                    </div>
+                                </form>
+                                <!-- Form for screens = xs -->
+
+                            </div>
+
+                        </div>
+                    </dd>
+                    <!-- End Form -->
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "This value must be populated." %}</div>
+                </dl>
+
+            </div>
+        </div>
+    </div>
+    <!-- End Rsource Type CRUD -->
+
+    <!-- Creation Records -->
+    <div class="row">
+        <div class="col-xs-12">
+
+            <!-- Publisher/Date -->
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "This resource has this shared data source:" %}
+                    </dd>
+
+                    <dd class="margin-left-5">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Source Defined" %}</div>
+                        <div data-bind="foreach: getBranchLists()"> 
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this source" %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans "Edit this source" %}">
+                                    <span data-bind='text: nodes.get("SHARED_DATA_SOURCE_APPELLATION.E82", "value")' style="padding-right:2px;"></span>
+                                    <span class="text-muted arches-crud-type-identifier"> ({% trans "source" %})&nbsp; </span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+
+                </dl>
+            </div>
+        </div>
+    </div>
+    <!-- End Name Records -->
+</div>
+<!-- End Rsource Type CRUD -->
+
+<div id="shared-affiliation-section">
+    <!-- Resource Type CRUD Form -->
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                
+                <dl>
+                    <!-- Title -->
+                    <dt>
+                        <h5 id="arches-names-form" class="section-headline">{% trans "Shared data source affiliation/copyright" %}</h5>
+                    </dt>
+
+                    <!-- Form -->
+                    <dd class="arches-RDM-labels">
+
+                        <div class="row">
+
+                            <div class="col-xs-12, padding-left-15">
+
+                                <!-- Screens greater than xs -->
+                                <form class="form-inline arches-form hidden-xs" role="form">
+                                    <div class="form-group" style="width: 100%;">
+           
+
+
+                                        <!-- Spacer -->
+                                        <div class="margin-top-5 hidden-xs"></div>
+
+                                        <!-- Creator/Contibutor -->
+                                        <input class="form-control arches-form-input" id="resource-name" style="width: 50%;" placeholder="{% trans "Affiliation/copyright" %}" data-bind="value: getEditedNode('SHARED_DATA_SOURCE_AFFILIATION.E82', 'value')">
+                                        
+                                        {% include 'views/components/add-item-button.htm' %}
+                                        
+                                        
+                                    </div>
+                                </form>
+                                <!-- End Screens greater than xs -->
+
+
+                                <!-- Form for screens = xs -->
+                                <form class="form-inline arches-form hidden-sm hidden-md hidden-lg" role="form">
+                                    <div class="form-group" style="width: 70%">
+                                        
+
+                                        <!-- Creation Date -->
+
+                                        <input class="form-control arches-form-input" id="resource-name" style="width: 60%;" placeholder="{% trans "Affiliation/copyright" %}" data-bind="value: getEditedNode('SHARED_DATA_SOURCE_AFFILIATION.E82', 'value')">
+
+                                        <!-- Spacer (for xs screens) -->
+                                        <div class="margin-top-5 hidden-sm hidden-md hidden-lg"></div>
+
+                                        {% include 'views/components/add-item-button.htm' %}
+
+                                    </div>
+                                </form>
+                                <!-- Form for screens = xs -->
+
+                            </div>
+
+                        </div>
+                    </dd>
+                    <!-- End Form -->
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "The affiliation/copyright must be populated." %}</div>
+                </dl>
+
+            </div>
+        </div>
+    </div>
+    <!-- End Rsource Type CRUD -->
+
+    <!-- Creation Records -->
+    <div class="row">
+        <div class="col-xs-12">
+
+            <!-- Publisher/Date -->
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "This resource has this shared data affiliation/copyright:" %}
+                    </dd>
+
+                    <dd class="margin-left-5">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Affiliation/copyright Defined" %}</div>
+                        <div data-bind="foreach: getBranchLists()"> 
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this affiliation/copyright" %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans "Edit this affiliation/copyright" %}">
+                                    <span data-bind='text: nodes.get("SHARED_DATA_SOURCE_AFFILIATION.E82", "value")' style="padding-right:2px;"></span>
+                                    <span class="text-muted arches-crud-type-identifier"> ({% trans "Affiliation/copyright" %})&nbsp; </span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+
+                </dl>
+            </div>
+        </div>
+    </div>
+    <!-- End Name Records -->
+</div>
+<!-- End Rsource Type CRUD -->
+
+
+<div id="shared-project-section">
+    <!-- Resource Type CRUD Form -->
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                
+                <dl>
+                    <!-- Title -->
+                    <dt>
+                        <h5 id="arches-names-form" class="section-headline">{% trans "Shared data source project" %}</h5>
+                    </dt>
+                    
+                    <!-- Form -->
+                    <dd class="arches-RDM-labels">
+                        
+                        <div class="row">
+                            
+                            <div class="col-xs-12, padding-left-15">
+                                
+                                <!-- Screens greater than xs -->
+                                <form class="form-inline arches-form hidden-xs" role="form">
+                                    <div class="form-group" style="width: 100%;">
+                                        
+                                        
+                                        
+                                        <!-- Spacer -->
+                                        <div class="margin-top-5 hidden-xs"></div>
+                                        
+                                        <!-- Creator/Contibutor -->
+                                        <input class="form-control arches-form-input" id="resource-name" style="width: 50%;" placeholder="{% trans "Shared data source project" %}" data-bind="value: getEditedNode('SHARED_DATA_SOURCE_CREATOR_APPELLATION.E82', 'value')">
+                                            
+                                            {% include 'views/components/add-item-button.htm' %}
+                                            
+                                            
+                                            </div>
+                                </form>
+                                <!-- End Screens greater than xs -->
+                                
+                                
+                                <!-- Form for screens = xs -->
+                                <form class="form-inline arches-form hidden-sm hidden-md hidden-lg" role="form">
+                                    <div class="form-group" style="width: 70%">
+                                        
+                                        
+                                        <!-- Creation Date -->
+                                        
+                                        <input class="form-control arches-form-input" id="resource-name" style="width: 60%;" placeholder="{% trans "Data source project" %}" data-bind="value: getEditedNode('SHARED_DATA_SOURCE_CREATOR_APPELLATION.E82', 'value')">
+                                            
+                                            <!-- Spacer (for xs screens) -->
+                                            <div class="margin-top-5 hidden-sm hidden-md hidden-lg"></div>
+                                            
+                                            {% include 'views/components/add-item-button.htm' %}
+                                            
+                                            </div>
+                                </form>
+                                <!-- Form for screens = xs -->
+                                
+                            </div>
+                            
+                        </div>
+                    </dd>
+                    <!-- End Form -->
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "This value must be populated." %}</div>
+                </dl>
+                
+            </div>
+        </div>
+    </div>
+    <!-- End Rsource Type CRUD -->
+    
+    <!-- Creation Records -->
+    <div class="row">
+        <div class="col-xs-12">
+            
+            <!-- Publisher/Date -->
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "This resource has these shared data source projects:" %}
+                    </dd>
+                    
+                    <dd class="margin-left-5">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Shared data source project defined" %}</div>
+                        <div data-bind="foreach: getBranchLists()">
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this shared data source project" %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans "Edit this data source project" %}">
+                                    <span data-bind='text: nodes.get("SHARED_DATA_SOURCE_CREATOR_APPELLATION.E82", "value")' style="padding-right:2px;"></span>
+                                    <span class="text-muted arches-crud-type-identifier"> ({% trans "Shared data source project" %})&nbsp; </span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+                    
+                </dl>
+            </div>
+        </div>
+    </div>
+    <!-- End Name Records -->
+</div>
+<!-- End Rsource Type CRUD -->
+
+<div id="shared-creation-date-section">
+    <!-- Dates CRUD Form -->
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                
+                <dl>
+                    <!-- Title -->
+                    <dt>
+                        <h5 id="arches-names-form" class="section-headline">{% trans "Shared data source date" %}</h5>
+                    </dt>
+
+                    <!-- Form -->
+                    <dd class="arches-RDM-labels">
+
+                        <div class="row">
+
+                            <div class="col-xs-12" style="padding-top: 2px;">
+
+                                <!-- Spacer (for xs screens) -->
+                                <div class="margin-top-5 hidden-sm hidden-md hidden-lg"></div>
+
+
+                                <div class="form-group datetimepicker" style="width: 30%;">
+                                    <div class="input-group" style ="" >
+                                        <input type="text" id="date" placeholder="{% trans 'yyyy-mm-dd' %}" class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('SHARED_DATA_SOURCE_DATE_OF_CREATION.E50', 'value')} ">
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-4 form-group  hidden-sm hidden-md hidden-lg" style="padding-left: 0px; padding-right: 0px; width: 100%;">
+                                    <div class="input-group datetimepicker" style ="width:100%; height: 34px;" >
+                                        <input type="text" id="date" placeholder="{% trans 'yyyy-mm-dd' %}" class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('SHARED_DATA_SOURCE_DATE_OF_CREATION.E50', 'value')} ">
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+
+                                <!-- Spacer (for xs screens) -->
+                                <div class="margin-top-5 hidden-sm hidden-md hidden-lg"></div>
+
+                                {% include 'views/components/add-item-button.htm' %}
+
+                            </div>
+
+                        </div>
+                    </dd>
+                    <!-- End Form -->
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "This value must be populated." %}</div>
+                </dl>
+
+            </div>
+        </div>
+    </div>
+    <!-- End Dates CRUD -->
+
+    <!-- Dates Records -->
+    <div class="row">
+        <div class="col-xs-12">
+
+            <!-- Address -->
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "These dates are associated with this resource:" %}
+                    </dd>
+
+                    <dd class="margin-left-5" style="display: block;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Dates Defined" %}</div>   
+                        
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="Remove this date"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans "Edit this date" %}"><span data-bind='text: nodes.get("SHARED_DATA_SOURCE_DATE_OF_CREATION.E50", "value")' style="padding-right:2px;"></span><span class="text-muted arches-crud-type-identifier"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+
+                </dl>
+
+            </div>
+        </div>
+    </div>
+    <!-- End Dates Records -->
+</div>
+ {% include 'views/forms/sections/SaveEditsFooter.htm' %}
+
+{% endblock form_content %}

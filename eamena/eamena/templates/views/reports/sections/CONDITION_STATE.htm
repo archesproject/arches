@@ -1,0 +1,28 @@
+{% load i18n %}
+<div class="row">
+     <div class="col-xs-12">
+        <dl>
+            <dt>
+                <h5 id="" class="arches-report-subsection-title">{% trans "Overall condition of resource" %}</h5>
+            </dt>
+
+            {% if 'CONDITION_ASSESSMENT_E14'  in report_info.source.graph %}
+            {% for CONDITION_ASSESSMENT_E14 in report_info.source.graph.CONDITION_ASSESSMENT_E14 %}
+            {% if 'CONDITION_STATE_E3' in CONDITION_ASSESSMENT_E14 %}
+            {% for CONDITION_STATE_E3 in CONDITION_ASSESSMENT_E14.CONDITION_STATE_E3 %}
+                {% for CONDITION_TYPE_E55 in CONDITION_STATE_E3.CONDITION_TYPE_E55 %}
+                    <dd class="arches-report-subsection-item">
+                        {{ CONDITION_TYPE_E55.CONDITION_TYPE_E55__value }} 
+                    </dd>
+
+    
+                {% endfor %}            
+
+            {% endfor %}    
+            {% endif %}
+            {% endfor %}    
+            {% endif %}
+
+        </dl>
+    </div>
+</div>

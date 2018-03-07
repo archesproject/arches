@@ -1,0 +1,177 @@
+{% extends "views/forms/base.htm" %}
+{% load i18n %}
+
+{% block form_content %}
+
+
+<hr class="divider arches-RDM-divider">
+
+
+<div id="info-resource-type-section">
+    <!-- Dates CRUD Form -->
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                
+                <dl>
+                    <!-- Title -->
+                    <dt>
+                        <h5 id="arches-names-form" class="section-headline"> {% trans 'Resource Type' %}</h5>
+                    </dt>
+                    
+                    <!-- Form -->
+                    <dd class="arches-RDM-labels">
+                        
+                        <div class="row">
+                            
+                            <div class="col-xs-12 padding-left-15" >
+                                
+                                <!-- Input for screens > xs -->
+                                <form class="form-inline arches-form hidden-xs" role="form">
+                                    <div class="form-group" style="width: 100%">
+                                        
+                                        <input style="width:50%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" id="resource-type-dropdown" data-bind="select2: {value: getEditedNode('INFORMATION_RESOURCE_TYPE.E55', 'value'), placeholder: '{% trans "Type" %}', multiple: false, dataKey: 'INFORMATION_RESOURCE_TYPE.E55'}"></input>
+                                        
+                                        {% include 'views/components/add-item-button.htm' %}
+                                        
+                                    </div>
+                                </form>
+                                <!-- End Input for screens > xs -->
+                                
+                                <!-- Input for screens = xs -->
+                                <form class="form-inline arches-form hidden-sm hidden-md hidden-lg" role="form">
+                                    <div class="form-group" style="width: 100%">
+                                        
+                                        <input style="width:80%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" id="resource-type-dropdown" data-bind="select2: {value: getEditedNode('INFORMATION_RESOURCE_TYPE.E55', 'value'), placeholder: '{% trans "Type" %}', multiple: false, dataKey: 'INFORMATION_RESOURCE_TYPE.E55'}"></input>
+                                        
+                                        <!-- Spacer (for xs screens) -->
+                                        <div class="margin-top-5 hidden-sm hidden-md hidden-lg"></div>
+                                        
+                                        {% include 'views/components/add-item-button.htm' %}
+                                        
+                                    </div>
+                                </form>
+                                <!-- End Input for screens = xs -->
+                                
+                            </div>
+                        </div>
+                    </dd>
+                    <!-- End Form -->
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "A right type must be selected." %}</div>
+                </dl>
+                
+            </div>
+        </div>
+    </div>
+    <!-- End Dates CRUD -->
+    
+    <!-- Dates Records -->
+    <div class="row">
+        <div class="col-xs-12">
+            
+            <!-- Address -->
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "These types are associated with this resource:" %}
+                    </dd>
+                    
+                    <dd class="margin-left-5">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Information Resource Type Defined" %}</div>
+                        <div data-bind="foreach: getBranchLists()">
+                            <div class="arches-crud-record" id="date1-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this right" %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans "Edit this right" %}"><span data-bind='text: nodes.get("INFORMATION_RESOURCE_TYPE.E55", "label")' style="padding-right:2px;"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+                    
+                </dl>
+                
+            </div>
+        </div>
+    </div>
+    <!-- End Dates Records -->
+</div>
+
+
+
+<hr class="divider arches-RDM-divider">
+
+
+<div id="formats-section">
+    <!-- Information Carrier Format CRUD Form -->
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                
+                <dl>
+                    <!-- Title -->
+                    <dt>
+                        <h5 id="arches-formats-form" class="section-headline">{% trans "Formats" %}</h5>
+                    </dt>
+
+                    <!-- Form -->
+                    <dd>
+                        <div class="row">
+                            <div class="col-xs-12 hidden-xs">
+                                <input style="width:80%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" id="keyword-dropdown" data-bind="select2: {value: getEditedNode('INFORMATION_CARRIER_FORMAT_TYPE.E55', 'value'), placeholder: '{% trans "Format Type" %}', dataKey: 'INFORMATION_CARRIER_FORMAT_TYPE.E55'}"></input>
+
+                                <!-- Spacer (for xs screens) -->
+                                <div class="margin-top-5 hidden-sm hidden-md hidden-lg"></div>
+
+                                {% include 'views/components/add-item-button.htm' %}
+                            </div>
+                            <div class="col-xs-12 hidden-sm hidden-md hidden-lg">
+                                <input style="width:100%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" id="keyword-dropdown" data-bind="select2: {value: getEditedNode('INFORMATION_CARRIER_FORMAT_TYPE.E55', 'value'), placeholder: '{% trans "Format Type" %}', dataKey: 'INFORMATION_CARRIER_FORMAT_TYPE.E55'}"></input>
+
+                                <!-- Spacer (for xs screens) -->
+                                <div class="margin-top-5 hidden-sm hidden-md hidden-lg"></div>
+
+                                {% include 'views/components/add-item-button.htm' %}
+                            </div>
+                        </div>
+                    </dd>
+                    <!-- End Form -->
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "The format must be populated." %}</div>
+                </dl>
+
+            </div>
+        </div>
+    </div>
+    <!-- End Subjet CRUD -->
+
+    <!-- Subject Records -->
+    <div class="row">
+        <div class="col-xs-12">
+
+            <!-- Address -->
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "These formats are associated with this resource:" %}
+                    </dd>
+                    <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Formats Defined" %}</div>   
+                        
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this format type" %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans "Edit this format type" %}"><span data-bind='{text: nodes.get("INFORMATION_CARRIER_FORMAT_TYPE.E55", "label")}' style="padding-right:2px;"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+
+                </dl>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="divider arches-RDM-divider">
+
+ {% include 'views/forms/sections/SaveEditsFooter.htm' %}
+{% endblock form_content %}

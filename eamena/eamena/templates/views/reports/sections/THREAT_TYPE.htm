@@ -1,0 +1,42 @@
+{% load i18n %}
+<div class="row">
+     <div class="col-xs-12">
+        <dl>
+            <dt>
+                <h5 id="" class="arches-report-subsection-title">{% trans "Threat(s) to the resource" %}</h5>
+            </dt>
+
+            {% if 'CONDITION_ASSESSMENT_E14'  in report_info.source.graph %}
+                {% for CONDITION_ASSESSMENT_E14 in report_info.source.graph.CONDITION_ASSESSMENT_E14|dictsort:"orderby" %}
+                    {% if 'CONDITION_STATE_E3' in CONDITION_ASSESSMENT_E14 %}
+                        {% for CONDITION_STATE_E3 in CONDITION_ASSESSMENT_E14.CONDITION_STATE_E3 %}
+                            {% if 'THREAT_STATE_E3' in CONDITION_STATE_E3 %}   
+                                {% for THREAT_STATE_E3 in CONDITION_STATE_E3.THREAT_STATE_E3 %}
+                                    {% if 'THREAT_TYPE_STATE_E3' in THREAT_STATE_E3 %}
+                                        {% for THREAT_TYPE_STATE_E3 in THREAT_STATE_E3.THREAT_TYPE_STATE_E3 %}
+                                            {% for THREAT_TYPE_E55 in THREAT_TYPE_STATE_E3.THREAT_TYPE_E55 %}
+                                                <dd class="arches-report-subsection-item">
+                                                    {{ THREAT_TYPE_E55.THREAT_TYPE_E55__value }} 
+                                            {% endfor %}
+                                        {% endfor %} 
+                                    {% endif %}
+                                    {% if 'THREAT_CAUSE_STATE_E3' in THREAT_STATE_E3 %}   
+                                        {% for THREAT_CAUSE_STATE_E3 in THREAT_STATE_E3.THREAT_CAUSE_STATE_E3 %}            
+                                            {% for THREAT_CAUSE_TYPE_E55 in THREAT_CAUSE_STATE_E3.THREAT_CAUSE_TYPE_E55 %}
+                                                
+                                                   <span class="arches-report-subsection-item-type"> - {% trans "Potential cause: " %} </span> {{ THREAT_CAUSE_TYPE_E55.THREAT_CAUSE_TYPE_E55__value }} 
+                                                
+                                            {% endfor %}
+                                            </dd>            
+                                        {% endfor %}    
+                                    {% endif %}            
+            {% endfor %}    
+            {% endif %}
+            {% endfor %}    
+            {% endif %}
+            {% endfor %}    
+            {% endif %}
+
+        </dl>
+    </div>
+</div>

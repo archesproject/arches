@@ -1,0 +1,90 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "base.htm" %}
+{% load staticfiles %}
+{% block content %}
+{% load i18n %}
+ <!--=== Breadcrumbs ===-->
+<div class="breadcrumbs" style="padding-bottom: 0px; border-bottom-width: 0px;">
+    <div class="container">
+
+        <!-- App Name -->
+        <h1 class="pull-left arches-breadcrumb-title">{% trans "Login to EAMENA" %}</h1>
+    </div>
+</div><!--/breadcrumbs-->
+<!--=== End Breadcrumbs ===-->
+
+<!-- row -->
+<div class="block-description padding-top-20" style="background: #f4f4f4;">
+    <div class="container content padding-top-0">
+        <div class="row">
+
+            <div class="col-sm-6 col-sm-offset-3">
+
+                <div class="well">
+
+                    <div class="row">
+                        <div class="col-sm-4 col-sm-offset-4">
+                            <div class="">
+                                <h2 style="text-align: center;">{% trans "Sign In" %}</h2>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <form id="login-form" action="?next={{ next }}" method='POST' {% if auth_failed %} autocomplete="off" {% endif %}>
+                            <div class="col-xs-12 col-md-8 col-md-offset-2">
+
+                                <div class="input-group margin-bottom-20">
+                                    <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                                    <input type="text" class="form-control" placeholder="{% trans 'Username' %}" name='username'>
+                                </div>
+
+                                <div class="input-group margin-bottom-20">
+                                    <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                                    <input type="password" class="form-control" placeholder="{% trans 'Password' %}" name='password'>
+                                </div>
+                  
+                                <div class="row">
+                                    <div class="col-md-10 col-md-offset-1">
+                                        <button type="submit" class="btn-u btn-block margin-bottom-10" id="login-btn">{% trans "Log In" %}</button>
+                                        <!-- Uncomment the below when automated sign up is made available -->
+                                        <!-- <span>Don't Have Account? <a class="color-green margin-top-10 text-center" href="page_registration1.html">Sign Up!</a></span>  -->
+                                    </div>
+                                </div>
+
+                                <div class="row" style="padding-top:10px;">
+                                    <div style="{% if not auth_failed %}display:none;{% endif %}" id="login-failed-alert" class="alert alert-danger fade in" role="alert">
+                                        <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">{% trans "Close" %}</span></button>
+                                        <h4>{% trans "Login failed" %}</h4>
+                                        <span>{% trans "Invalid username and/or password." %}</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- end row -->
+     
+    </div> 
+</div>  
+{% endblock %}

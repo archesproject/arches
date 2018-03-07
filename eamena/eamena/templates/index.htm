@@ -1,0 +1,261 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright © 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "base.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'plugins/layer_slider/css/layerslider.css' %}" type="text/css">
+{{ block.super }}
+{% endblock css %}
+
+{% block content %}
+<!--=== Slider ===-->
+<div class="layer_slider">
+    <div id="layerslider-container-fw">        
+        <div id="layerslider">
+          <!--First Slide-->
+            <div class="ls-layer">
+                
+                <!-- Background -->
+                <img src="{% static 'img/BahlaFort_Oman_2015_JB.jpg' %}" class="ls-s3" style="max-width: 2000px !important; top: -50px; left: -550px; durationin: 0;" alt="Slide background">
+                    
+                    <!-- Text -->
+                    <span class="ls-s-s1" style="line-height: 42px; font-size:42px; font-weight: 200; color:#fff; top:50px; left: -70px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;">
+                        {% trans 'Endangered Archaeology in the Middle East and North Africa' %} </br>
+                     الآثار المهددة في الشرق الأوسط و شمال إفريقيا  
+
+                    </span>
+                    
+                    <!-- Photo Credit -->
+                    <span class="ls-s-1" style="line-height: 16px; font-size:12px; color:#fff; top:670px; left: 750px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;background-color: #585f69;">
+                        {% trans 'Photo: The Bahla fort (Oman) ' %}<a href="javascript:void(0);" style='color:#fff;'>{% trans '© Jennie Bradbury' %}</a>
+                    </span>
+                    
+                    </div>
+            <!--End First Slide-->
+          <!--Second Slide-->
+            <div class="ls-layer" style="">
+                
+                <!-- Background -->
+                <img src="{% static 'img/Libya_Sabratha_Temple_of_Isis.jpg' %}" class="ls-s3" style="max-width: 2000px !important; top: -50px; left: -550px; durationin: 0;" alt="Slide background">
+                    
+                    <!-- Text -->
+                    <span class="ls-s-1" style="line-height: 42px; font-size:42px; font-weight: 200; color:#fff; top:50px; left: -70px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;">
+                        {% trans 'Endangered Archaeology in the Middle East and North Africa' %} </br>
+                     الآثار المهددة في الشرق الأوسط و شمال إفريقيا  
+
+                    </span>
+                    
+                    <!-- Photo Credit -->
+                    <span class="ls-s-1" style="line-height: 16px; font-size:12px; color:#fff; top:670px; left: 750px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;background-color: #585f69;">
+                        {% trans 'Photo: The temple of Isis (Sabratha, Libya) ' %}<a href="javascript:void(0);" style='color:#fff;'>{% trans '© Nichole Sheldrick' %}</a>
+                    </span>
+                    
+                    </div>
+            <!--End Second Slide-->
+            
+          <!--Third Slide-->
+            <div class="ls-layer" style="">
+                
+                <!-- Background -->
+                <img src="{% static 'img/Persepolis_ApadanaPalace_AZ.jpg' %}" class="ls-s3" style="max-width: 2000px !important; top: -50px; left: -550px; durationin: 0;" alt="Slide background">
+                    
+                    <!-- Text -->
+                    <span class="ls-s-1" style="line-height: 42px; font-size:42px; font-weight: 200; color:#fff; top:50px; left: -70px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;">
+                        {% trans 'Endangered Archaeology in the Middle East and North Africa' %} </br>
+                     الآثار المهددة في الشرق الأوسط و شمال إفريقيا  
+
+                    </span>
+                    
+                    <!-- Photo Credit -->
+                    <span class="ls-s-1" style="line-height: 16px; font-size:12px; color:#fff; top:670px; left: 750px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;background-color: #585f69;">
+                        {% trans 'Photo: Reliefs from the Apādana palace (Persepolis, Iran) ' %}<a href="javascript:void(0);" style='color:#fff;'>{% trans '© Andrea Zerbini' %}</a>
+                    </span>
+                    
+                    </div>
+            <!--End Third Slide-->
+            
+          <!--Fourth Slide-->
+            <div class="ls-layer" style="">
+                
+                <!-- Background -->
+                <img src="{% static 'img/TempleofObelisks_Byblos_Lebanon_2016_JB.jpg' %}" class="ls-s3" style="max-width: 2000px !important; top: -50px; left: -550px; durationin: 0;" alt="Slide background">
+                    
+                    <!-- Text -->
+                    <span class="ls-s-1" style="line-height: 42px; font-size:42px; font-weight: 200; color:#fff; top:50px; left: -70px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;">
+                        {% trans 'Endangered Archaeology in the Middle East and North Africa' %} </br>
+                     الآثار المهددة في الشرق الأوسط و شمال إفريقيا  
+
+                    </span>
+                    
+                    <!-- Photo Credit -->
+                    <span class="ls-s-1" style="line-height: 16px; font-size:12px; color:#fff; top:670px; left: 750px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;background-color: #585f69;">
+                        {% trans 'Photo: Temple of the Obelisks (Byblos, Lebanon) ' %}<a href="javascript:void(0);" style='color:#fff;'>{% trans '© Jennie Bradbury' %}</a>
+                    </span>
+                    
+                    </div>
+            <!--End Fourth Slide-->
+
+          <!--Fifth Slide-->
+            <div class="ls-layer" style="">
+                
+                <!-- Background -->
+                <img src="{% static 'img/Tunisia_Dougga_Capitolium_NS.jpg' %}" class="ls-s3" style="max-width: 2000px !important; top: -50px; left: -550px; durationin: 0;" alt="Slide background">
+                    
+                    <!-- Text -->
+                    <span class="ls-s-1" style="line-height: 42px; font-size:42px; font-weight: 200; color:#fff; top:50px; left: -70px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;">
+                        {% trans 'Endangered Archaeology in the Middle East and North Africa' %} </br>
+                     الآثار المهددة في الشرق الأوسط و شمال إفريقيا  
+
+                    </span>
+                    
+                    <!-- Photo Credit -->
+                    <span class="ls-s-1" style="line-height: 16px; font-size:12px; color:#fff; top:670px; left: 750px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;background-color: #585f69;">
+                        {% trans 'Photo: The Capitolium (Dougga, Tunisia) ' %}<a href="javascript:void(0);" style='color:#fff;'>{% trans '© Nichole Sheldrick' %}</a>
+                    </span>
+                    
+                    </div>
+            <!--End Fifth Slide-->
+            
+          <!--Sixth Slide-->
+            <div class="ls-layer" style="">
+                
+                <!-- Background -->
+                <img src="{% static 'img/Petra_AZ.jpg' %}" class="ls-s3" style="max-width: 2000px !important; top: -50px; left: -550px; durationin: 0;" alt="Slide background">
+                    
+                    <!-- Text -->
+                    <span class="ls-s-1" style="line-height: 42px; font-size:42px; font-weight: 200; color:#fff; top:50px; left: -70px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;">
+                        {% trans 'Endangered Archaeology in the Middle East and North Africa' %} </br>
+                     الآثار المهددة في الشرق الأوسط و شمال إفريقيا  
+
+                    </span>
+                    
+                    <!-- Photo Credit -->
+                    <span class="ls-s-1" style="line-height: 16px; font-size:12px; color:#fff; top:670px; left: 750px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;background-color: #585f69;">
+                        {% trans 'Photo: A view of Petra (Jordan) ' %}<a href="javascript:void(0);" style='color:#fff;'>{% trans '© Andrea Zerbini' %}</a>
+                    </span>
+                    
+                    </div>
+            <!--End Sixth Slide-->
+            
+          <!--Seventh Slide-->
+            <div class="ls-layer" style="">
+                
+                <!-- Background -->
+                <img src="{% static 'img/Umm_Qais_Nymphaeum_AZ.jpg' %}" class="ls-s3" style="max-width: 2000px !important; top: -50px; left: -550px; durationin: 0;" alt="Slide background">
+                    
+                    <!-- Text -->
+                    <span class="ls-s-1" style="line-height: 42px; font-size:42px; font-weight: 200; color:#fff; top:50px; left: -70px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;">
+                        {% trans 'Endangered Archaeology in the Middle East and North Africa' %} </br>
+                     الآثار المهددة في الشرق الأوسط و شمال إفريقيا  
+
+                    </span>
+                    
+                    <!-- Photo Credit -->
+                    <span class="ls-s-1" style="line-height: 16px; font-size:12px; color:#fff; top:670px; left: 750px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;background-color: #585f69;">
+                        {% trans 'Photo: Nymphaeum (Gadara/Umm Qais, Jordan) ' %}<a href="javascript:void(0);" style='color:#fff;'>{% trans '© Andrea Zerbini' %}</a>
+                    </span>
+                    
+                    </div>
+            <!--End Seventh Slide-->
+            
+          <!--Eighth Slide-->
+            <div class="ls-layer" style="">
+                
+                <!-- Background -->
+                <img src="{% static 'img/Libya_Wadi Matkhandouch1_JN.jpg' %}" class="ls-s3" style="max-width: 2000px !important; top: -50px; left: -550px; durationin: 0;" alt="Slide background">
+                    
+                    <!-- Text -->
+                    <span class="ls-s-1" style="line-height: 42px; font-size:42px; font-weight: 200; color:#fff; top:50px; left: -70px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;">
+                        {% trans 'Endangered Archaeology in the Middle East and North Africa' %} </br>
+                     الآثار المهددة في الشرق الأوسط و شمال إفريقيا  
+
+                    </span>
+                    
+                    <!-- Photo Credit -->
+                    <span class="ls-s-1" style="line-height: 16px; font-size:12px; color:#fff; top:670px; left: 750px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;background-color: #585f69;">
+                        {% trans 'Photo: Rock art in wadi Matkhandouch (Libya) ' %}<a href="javascript:void(0);" style='color:#fff;'>{% trans '© Julia Nikolaus' %}</a>
+                    </span>
+                    
+                    </div>
+            <!--End Eighth Slide-->
+            
+          <!--Ninth Slide-->
+            <div class="ls-layer" style="">
+                
+                <!-- Background -->
+                <img src="{% static 'img/Morocco_Ksar Bounou_NS_Middle_Draa Project.jpg' %}" class="ls-s3" style="max-width: 2000px !important; top: -50px; left: -550px; durationin: 0;" alt="Slide background">
+                    
+                    <!-- Text -->
+                    <span class="ls-s-1" style="line-height: 42px; font-size:42px; font-weight: 200; color:#fff; top:50px; left: -70px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;">
+                        {% trans 'Endangered Archaeology in the Middle East and North Africa' %} </br>
+                     الآثار المهددة في الشرق الأوسط و شمال إفريقيا  
+
+                    </span>
+                    
+                    <!-- Photo Credit -->
+                    <span class="ls-s-1" style="line-height: 16px; font-size:12px; color:#fff; top:670px; left: 750px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;background-color: #585f69;">
+                        {% trans 'Photo: Qasr Bounou (Morocco) ' %}<a href="javascript:void(0);" style='color:#fff;'>{% trans '© The Middle Draa Project - Nichole Sheldrick' %}</a>
+                    </span>
+                    
+                    </div>
+            <!--End Ninth Slide-->
+            
+          <!--Tenth Slide-->
+            <div class="ls-layer" style="">
+                
+                <!-- Background -->
+                <img src="{% static 'img/Tunisia_Carthage_JN.jpg' %}" class="ls-s3" style="max-width: 2000px !important; top: -50px; left: -550px; durationin: 0;" alt="Slide background">
+                    
+                    <!-- Text -->
+                    <span class="ls-s-1" style="line-height: 42px; font-size:42px; font-weight: 200; color:#fff; top:50px; left: -70px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;">
+                        {% trans 'Endangered Archaeology in the Middle East and North Africa' %} </br>
+                     الآثار المهددة في الشرق الأوسط و شمال إفريقيا  
+
+                    </span>
+                    
+                    <!-- Photo Credit -->
+                    <span class="ls-s-1" style="line-height: 16px; font-size:12px; color:#fff; top:670px; left: 750px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;background-color: #585f69;">
+                        {% trans 'Photo: Carthage (Tunisia) ' %}<a href="javascript:void(0);" style='color:#fff;'>{% trans '© Julia Nikolaus' %}</a>
+                    </span>
+                    
+                    </div>
+            <!--End Ninth Slide-->
+          <!--Eleventh Slide-->
+            <div class="ls-layer" style="">
+                
+                <!-- Background -->
+                <img src="{% static 'img/Libya_Ghadames_JN.jpg' %}" class="ls-s3" style="max-width: 2000px !important; top: -50px; left: -550px; durationin: 0;" alt="Slide background">
+                    
+                    <!-- Text -->
+                    <span class="ls-s-1" style="line-height: 42px; font-size:42px; font-weight: 200; color:#fff; top:50px; left: -70px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;">
+                        {% trans 'Endangered Archaeology in the Middle East and North Africa' %} </br>
+                     الآثار المهددة في الشرق الأوسط و شمال إفريقيا  
+
+                    </span>
+                    
+                    <!-- Photo Credit -->
+                    <span class="ls-s-1" style="line-height: 16px; font-size:12px; color:#fff; top:670px; left: 750px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;background-color: #585f69;">
+                        {% trans 'Photo: Historic buildings in Ghadames (Libya) ' %}<a href="javascript:void(0);" style='color:#fff;'>{% trans '© Julia Nikolaus' %}</a>
+                    </span>
+                    
+                    </div>
+            <!--End Eleventh Slide-->            
+            
+            
+{% endblock %}

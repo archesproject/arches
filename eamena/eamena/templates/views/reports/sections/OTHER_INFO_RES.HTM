@@ -1,0 +1,302 @@
+{% load i18n %}
+
+		<!-- Author -->
+		<div class="row">
+		     <div class="col-xs-12">
+		        <dl>
+		            <dt>
+		                <h5 id="" class="arches-report-subsection-title">{% trans "Author" %}</h5>
+		            </dt>
+		
+		            {% if 'RESOURCE_CREATION_EVENT_E65' not in report_info.source.graph %}
+		                <dd class="arches-report-subsection-item">
+		                    {% trans "No Author recorded" %}
+		                </dd>
+		            {% else %}
+		                {% for RESOURCE_CREATION_EVENT_E65 in report_info.source.graph.RESOURCE_CREATION_EVENT_E65 %}
+		                    {% if 'CREATOR_E39' in RESOURCE_CREATION_EVENT_E65 %}
+		                	{% for CREATOR_E39 in RESOURCE_CREATION_EVENT_E65.CREATOR_E39 %}
+			                	{% if 'CREATOR_APPELLATION_E82' in CREATOR_E39 %}
+					                {% for CREATOR_APPELLATION_E82 in CREATOR_E39.CREATOR_APPELLATION_E82 %}
+					                    <dd class="arches-report-subsection-item">
+					                        {{ CREATOR_APPELLATION_E82.CREATOR_APPELLATION_E82__value }}
+					                    </dd>
+						         {% endfor %}           
+					         {% endif %}
+				         {% endfor %}
+			             {% endif %}
+		                {% endfor %}            
+		            {% endif %}
+		
+		        </dl>
+		    </div>
+		</div>
+		<!-- End Author -->
+
+
+		<!-- Publication date -->
+		<div class="row">
+		     <div class="col-xs-12">
+		        <dl>
+		            <dt>
+		                <h5 id="" class="arches-report-subsection-title">{% trans "Date of Publication" %}</h5>
+		            </dt>
+		
+		            {% if 'PUBLICATION_EVENT_E12' not in report_info.source.graph %}
+		                <dd class="arches-report-subsection-item">
+		                    {% trans "No Date recorded" %}
+		                </dd>
+		            {% else %}
+		                {% for PUBLICATION_EVENT_E12 in report_info.source.graph.PUBLICATION_EVENT_E12 %}
+			             {% if 'TIME___SPAN_PUBLICATION_EVENT_E52' in PUBLICATION_EVENT_E12 %}
+		                	{% for TIME___SPAN_PUBLICATION_EVENT_E52 in PUBLICATION_EVENT_E12.TIME___SPAN_PUBLICATION_EVENT_E52 %}
+						{% if 'DATE_OF_PUBLICATION_E50' in TIME___SPAN_PUBLICATION_EVENT_E52 %}
+							{% for DATE_OF_PUBLICATION_E50 in TIME___SPAN_PUBLICATION_EVENT_E52.DATE_OF_PUBLICATION_E50 %}
+					                    <dd class="arches-report-subsection-item">
+					                        {{ DATE_OF_PUBLICATION_E50.DATE_OF_PUBLICATION_E50__value|slice:"4" }}
+					                    </dd>
+					                 {% endfor %}
+				                 {% endif %}
+				         {% endfor %}
+			             {% endif %}
+		                {% endfor %}            
+		            {% endif %}
+		
+		        </dl>
+		    </div>
+		</div>
+		<!-- End Publication date-->				
+				
+		<!-- Title -->
+		
+		<div class="row">
+		     <div class="col-xs-12">
+		        <dl>
+		            <dt>
+		                <h5 id="" class="arches-report-subsection-title">{% trans "Title" %}</h5>
+		            </dt>
+		
+		            {% if 'TITLE_E41' not in report_info.source.graph %}
+		                <dd class="arches-report-subsection-item">
+		                    {% trans "No Title recorded" %}
+		                </dd>
+		            {% else %}
+		                {% for TITLE_E41 in report_info.source.graph.TITLE_E41 %}
+		                    <dd class="arches-report-subsection-item">
+		                        {{ TITLE_E41.TITLE_E41__value|title }}
+		                    </dd>
+		                {% endfor %}            
+		            {% endif %}
+		
+		        </dl>
+		    </div>
+		</div>
+		<!-- End Title -->
+
+		<!-- Editor  -->
+		<div class="row">
+		     <div class="col-xs-12">
+		        <dl>
+		            <dt>
+		                <h5 id="" class="arches-report-subsection-title">{% trans "Editor" %}</h5>
+		            </dt>
+		
+		            {% if 'PUBLICATION_EVENT_E12' not in report_info.source.graph %}
+		                <dd class="arches-report-subsection-item">
+		                    {% trans "No Editor recorded" %}
+		                </dd>
+		            {% else %}
+		                {% for PUBLICATION_EVENT_E12 in report_info.source.graph.PUBLICATION_EVENT_E12 %}
+			             {% if 'EDITOR_E39' in PUBLICATION_EVENT_E12 %}
+		                	{% for EDITOR_E39 in PUBLICATION_EVENT_E12.EDITOR_E39 %}
+						{% if 'EDITOR_APPELLATION_E82' in EDITOR_E39 %}
+							{% for EDITOR_APPELLATION_E82 in EDITOR_E39.EDITOR_APPELLATION_E82 %}
+					                    <dd class="arches-report-subsection-item">
+					                        {{ EDITOR_APPELLATION_E82.EDITOR_APPELLATION_E82__value }}
+					                    </dd>
+					                 {% endfor %}
+				                 {% endif %}
+				         {% endfor %}
+			             {% endif %}
+		                {% endfor %}            
+		            {% endif %}
+		
+		        </dl>
+		    </div>
+		</div>
+		<!-- End Editor -->				
+		
+		<!-- Source  -->
+		<div class="row">
+		     <div class="col-xs-12">
+		        <dl>
+		            <dt>
+		                <h5 id="" class="arches-report-subsection-title">{% trans "Source (e.g. Journal/Edited Volume Title)" %}</h5>
+		            </dt>
+		
+		            {% if 'PUBLICATION_EVENT_E12' not in report_info.source.graph %}
+		                <dd class="arches-report-subsection-item">
+		                    {% trans "No Source recorded" %}
+		                </dd>
+		            {% else %}
+		                {% for PUBLICATION_EVENT_E12 in report_info.source.graph.PUBLICATION_EVENT_E12 %}
+			             {% if 'SOURCE_E39' in PUBLICATION_EVENT_E12 %}
+		                	{% for SOURCE_E39 in PUBLICATION_EVENT_E12.SOURCE_E39 %}
+						{% if 'SOURCE_APPELLATION_E82' in SOURCE_E39 %}
+							{% for SOURCE_APPELLATION_E82 in SOURCE_E39.SOURCE_APPELLATION_E82 %}
+					                    <dd class="arches-report-subsection-item">
+					                        {{ SOURCE_APPELLATION_E82.SOURCE_APPELLATION_E82__value }}
+					                    </dd>
+					                 {% endfor %}
+				                 {% endif %}
+				         {% endfor %}
+			             {% endif %}
+		                {% endfor %}            
+		            {% endif %}
+		
+		        </dl>
+		    </div>
+		</div>
+		<!-- End Source -->				
+		
+		
+		<!-- Place of Publication  -->
+		<div class="row">
+		     <div class="col-xs-12">
+		        <dl>
+		            <dt>
+		                <h5 id="" class="arches-report-subsection-title">{% trans "Place of Publication" %}</h5>
+		            </dt>
+		
+		            {% if 'PUBLICATION_EVENT_E12' not in report_info.source.graph %}
+		                <dd class="arches-report-subsection-item">
+		                    {% trans "No Place recorded" %}
+		                </dd>
+		            {% else %}
+		                {% for PUBLICATION_EVENT_E12 in report_info.source.graph.PUBLICATION_EVENT_E12 %}
+			             {% if 'PLACE_OF_PUBLICATION_E53' in PUBLICATION_EVENT_E12 %}
+		                	{% for PLACE_OF_PUBLICATION_E53 in PUBLICATION_EVENT_E12.PLACE_OF_PUBLICATION_E53 %}
+						{% if 'BIBLIO_PLACE_APPELLATION_E44' in PLACE_OF_PUBLICATION_E53 %}
+							{% for BIBLIO_PLACE_APPELLATION_E44 in PLACE_OF_PUBLICATION_E53.BIBLIO_PLACE_APPELLATION_E44 %}
+					                    <dd class="arches-report-subsection-item">
+					                        {{ BIBLIO_PLACE_APPELLATION_E44.BIBLIO_PLACE_APPELLATION_E44__value }}
+					                    </dd>
+					                 {% endfor %}
+				                 {% endif %}
+				         {% endfor %}
+			             {% endif %}
+		                {% endfor %}            
+		            {% endif %}
+		
+		        </dl>
+		    </div>
+		</div>
+		<!-- End Place of Publication -->			
+		
+		<!-- Publisher  -->
+		<div class="row">
+		     <div class="col-xs-12">
+		        <dl>
+		            <dt>
+		                <h5 id="" class="arches-report-subsection-title">{% trans "Publisher" %}</h5>
+		            </dt>
+		
+		            {% if 'PUBLICATION_EVENT_E12' not in report_info.source.graph %}
+		                <dd class="arches-report-subsection-item">
+		                    {% trans "No Publisher recorded" %}
+		                </dd>
+		            {% else %}
+		                {% for PUBLICATION_EVENT_E12 in report_info.source.graph.PUBLICATION_EVENT_E12 %}
+			             {% if 'PUBLISHER_E39' in PUBLICATION_EVENT_E12 %}
+		                	{% for PUBLISHER_E39 in PUBLICATION_EVENT_E12.PUBLISHER_E39 %}
+						{% if 'PUBLISHER_APPELLATION_E82' in PUBLISHER_E39 %}
+							{% for PUBLISHER_APPELLATION_E82 in PUBLISHER_E39.PUBLISHER_APPELLATION_E82 %}
+					                    <dd class="arches-report-subsection-item">
+					                        {{ PUBLISHER_APPELLATION_E82.PUBLISHER_APPELLATION_E82__value }}
+					                    </dd>
+					                 {% endfor %}
+				                 {% endif %}
+				         {% endfor %}
+			             {% endif %}
+		                {% endfor %}            
+		            {% endif %}
+		
+		        </dl>
+		    </div>
+		</div>
+		<!-- End Publisher -->			
+		
+		<!-- Volume & Issue -->
+		<div class="row">
+		     <div class="col-xs-12">
+		        <dl>
+		            <dt>
+		                <h5 id="" class="arches-report-subsection-title">{% trans "Volume & Issue" %}</h5>
+		            </dt>
+		
+		            {% if 'PUBLICATION_EVENT_E12' not in report_info.source.graph %}
+		                <dd class="arches-report-subsection-item">
+		                    {% trans "No volume/issue recorded" %}
+		                </dd>
+		            {% else %}
+		            <dd class="arches-report-subsection-item">  
+		                {% for PUBLICATION_EVENT_E12 in report_info.source.graph.PUBLICATION_EVENT_E12 %}
+			             
+		                    {% if 'VOLUME_E62' in PUBLICATION_EVENT_E12 %} 
+					{% for VOLUME_E62 in PUBLICATION_EVENT_E12.VOLUME_E62 %}
+					
+				           {{ VOLUME_E62.VOLUME_E62__value }} <span class="arches-report-subsection-item-type">({% trans "Volume" %})</span>
+			                 {% endfor %} 
+		                     {% endif %}   
+		                {% endfor %} 
+		                {% for PUBLICATION_EVENT_E12 in report_info.source.graph.PUBLICATION_EVENT_E12 %}
+    			             {% if 'ISSUE_E62' in PUBLICATION_EVENT_E12 %}
+					{% for ISSUE_E62 in PUBLICATION_EVENT_E12.ISSUE_E62 %}
+						{{ ISSUE_E62.ISSUE_E62__value }} <span class="arches-report-subsection-item-type">({% trans "Issue" %})</span>
+					{% endfor %}
+		                      {% endif %}                 
+			         {% endfor %} 
+		            {% endif %}
+			</dd>
+		        </dl>
+		    </div>
+		</div>
+		<!-- End Volume & Issue -->		
+		
+
+		<!-- Pages & Figures-->
+		<div class="row">
+		     <div class="col-xs-12">
+		        <dl>
+		            <dt>
+		                <h5 id="" class="arches-report-subsection-title">{% trans "Pages & Figures" %}</h5>
+		            </dt>
+		
+		            {% if 'PUBLICATION_EVENT_E12' not in report_info.source.graph %}
+		                <dd class="arches-report-subsection-item">
+		                    {% trans "No pages/figures recorded" %}
+		                </dd>
+		            {% else %}
+		            <dd class="arches-report-subsection-item">  
+		                {% for PUBLICATION_EVENT_E12 in report_info.source.graph.PUBLICATION_EVENT_E12 %}
+		                    {% if 'PAGES_E62' in PUBLICATION_EVENT_E12 %}
+					{% for PAGES_E62 in PUBLICATION_EVENT_E12.PAGES_E62 %}
+				           {{ PAGES_E62.PAGES_E62__value }} <span class="arches-report-subsection-item-type">({% trans "Pages" %})</span>
+			                 {% endfor %}   
+		                    {% endif %}
+		                {% endfor %}
+		                {% for PUBLICATION_EVENT_E12 in report_info.source.graph.PUBLICATION_EVENT_E12 %}
+    		                     {% if 'FIGURE_E62' in PUBLICATION_EVENT_E12 %}
+					{% for FIGURE_E62 in PUBLICATION_EVENT_E12.FIGURE_E62 %}
+				           {{ FIGURE_E62.FIGURE_E62__value }} <span class="arches-report-subsection-item-type">({% trans "Figures" %})</span>
+			                 {% endfor %}   
+		                    {% endif %}
+		                 {% endfor %}
+	                    </dd>                   
+		            {% endif %}
+		
+		        </dl>
+		    </div>
+		</div>
+		<!-- End Pages & Figures -->		
+		

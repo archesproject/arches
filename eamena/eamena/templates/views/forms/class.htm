@@ -1,0 +1,175 @@
+{% extends "views/forms/base.htm" %}
+{% load i18n %}
+
+{% block form_content %}
+<!-- Resource Measurement CRUD Form -->
+<div id="feature-section">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                
+                <dl>
+                    <!-- Title -->
+                    <dt>
+                        <h5 id="arches-measurement-form" class="section-headline">{% trans "Feature Form " %}</h5>
+                    </dt>
+                    <!-- Form -->
+                    <dd class="arches-RDM-labels">
+                        <div class="row">
+
+                            <div class="col-xs-12">
+                                
+
+                                <!-- Measurement Type -->   
+                                <input style="width:30%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-type" data-bind="select2: {value: getEditedNode('FEATURE_EVIDENCE_TYPE.E55', 'value'),  placeholder: '{% trans "Type" %}', dataKey: 'FEATURE_EVIDENCE_TYPE.E55'}"></input>&nbsp;
+
+                                <!-- Measurement Unit -->     
+                                <input style="width:30%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-unit" data-bind="select2: {value: getEditedNode('FEATURE_EVIDENCE_TYPE_CERTAINTY_TYPE.E55', 'value'), placeholder: '{% trans "Type certainty" %}', dataKey: 'FEATURE_EVIDENCE_TYPE_CERTAINTY_TYPE.E55'}"></input>&nbsp;
+                               
+                                <br>
+                                
+                                <br>
+                                
+                                <!-- Measurement Type -->
+                                <input style="width:30%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-type" data-bind="select2: {value: getEditedNode('FEATURE_EVIDENCE_SHAPE_TYPE.E55', 'value'),  placeholder: '{% trans "Shape" %}', dataKey: 'FEATURE_EVIDENCE_SHAPE_TYPE.E55'}"></input>&nbsp;
+                                
+                                <!-- Measurement Unit -->
+                                <input style="width:30%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-unit" data-bind="select2: {value: getEditedNode('FEATURE_EVIDENCE_ARRANGEMENT_TYPE.E55', 'value'), placeholder: '{% trans "Arrangement" %}', dataKey: 'FEATURE_EVIDENCE_ARRANGEMENT_TYPE.E55'}"></input>&nbsp;
+                                
+                                
+                                <br>
+                                
+                                <br>
+                                
+                                
+                                <!-- Measurement Unit -->
+                                <input style="width:30%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-unit" data-bind="select2: {value: getEditedNode('FEATURE_EVIDENCE_NUMBER_TYPE.E55', 'value'), placeholder: '{% trans "Number" %}', dataKey: 'FEATURE_EVIDENCE_NUMBER_TYPE.E55'}"></input>&nbsp;
+                                
+
+
+                                {% include 'views/components/add-item-button.htm' %}
+
+                        
+
+                    </dd>
+                    <!-- End Form -->
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "All the fields in the Feature Form section must be entered." %}</div>
+                    
+                </dl>
+
+            </div>
+        </div>
+    </div>
+    <!-- Name Records -->
+    <div class="row">
+        <div class="col-xs-12">
+
+            <!-- Address -->
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "Feature form(s) recorded:" %}
+                    </dd>
+
+                    <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Values Defined" %}</div>
+                        
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this measurement" %}"><i data-bind='click: $parent.deleteItem.bind($parent)' class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind='click: $parent.editItem.bind($parent)' title="{% trans "Edit this measurement" %}">
+                                    <span data-bind="{text: nodes.get('FEATURE_EVIDENCE_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted arches-crud-type-identifier"> ({% trans "Feature type" %}),</span><span data-bind="{text: nodes.get('FEATURE_EVIDENCE_TYPE_CERTAINTY_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted arches-crud-type-identifier"> ({% trans " type certainty " %}),</span><span data-bind="{text: nodes.get('FEATURE_EVIDENCE_SHAPE_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted arches-crud-type-identifier"> ({% trans " shape " %}),</span>
+                                    <span data-bind="{text: nodes.get('FEATURE_EVIDENCE_ARRANGEMENT_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted arches-crud-type-identifier"> ({% trans " arrangement " %}),</span>
+                                    <span data-bind="{text: nodes.get('FEATURE_EVIDENCE_NUMBER_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted arches-crud-type-identifier"> ({% trans " number type " %})</span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="interpretation-section">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                
+                <dl>
+                    <!-- Title -->
+                    <dt>
+                        <h5 id="arches-measurement-form" class="section-headline">{% trans "Feature Interpretation " %}</h5>
+                    </dt>
+                    <!-- Form -->
+                    <dd class="arches-RDM-labels">
+                        <div class="row">
+                            
+                            <div class="col-xs-12">
+                                
+                                
+                                
+                                <!-- Measurement Type -->
+                                <input style="width:30%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-type" data-bind="select2: {value: getEditedNode('FEATURE_EVIDENCE_INTERPRETATION_TYPE.E55', 'value'),  placeholder: '{% trans "Interpretation" %}', dataKey: 'FEATURE_EVIDENCE_INTERPRETATION_TYPE.E55'}"></input>&nbsp;
+
+                                
+                                <!-- Measurement Unit -->
+                                <input style="width:30%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-unit" data-bind="select2: {value: getEditedNode('FEATURE_EVIDENCE_INTERPRETATION_CERTAINTY_TYPE.E55', 'value'), placeholder: '{% trans "Interpretation certainty" %}', dataKey: 'FEATURE_EVIDENCE_INTERPRETATION_CERTAINTY_TYPE.E55'}"></input>&nbsp;
+
+
+                                <br>
+
+                                <br>
+
+                                <!-- Measurement Unit -->
+                                <input style="width:30%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-unit" data-bind="select2: {value: getEditedNode('FEATURE_EVIDENCE_INTERPRETATION_NUMBER_TYPE.E55', 'value'), placeholder: '{% trans "Interpretation number" %}', dataKey: 'FEATURE_EVIDENCE_INTERPRETATION_NUMBER_TYPE.E55'}"></input>&nbsp;
+                                
+
+                                
+                                {% include 'views/components/add-item-button.htm' %}
+                                
+                                
+                                </dd>
+                    <!-- End Form -->
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "All the fields in the Feature Interpretation section must be entered." %}</div>                    
+                    
+                </dl>
+                
+            </div>
+        </div>
+    </div>
+    <!-- Name Records -->
+    <div class="row">
+        <div class="col-xs-12">
+            
+            <!-- Address -->
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "Feature interpretation(s) recorded:" %}
+                    </dd>
+                    
+                    <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Values Defined" %}</div>
+                        
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this measurement" %}"><i data-bind='click: $parent.deleteItem.bind($parent)' class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind='click: $parent.editItem.bind($parent)' title="{% trans "Edit this measurement" %}">
+                                    <span data-bind="{text: nodes.get('FEATURE_EVIDENCE_INTERPRETATION_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted arches-crud-type-identifier"> ({% trans " interpretation type " %}),</span>
+                                    <span data-bind="{text: nodes.get('FEATURE_EVIDENCE_INTERPRETATION_CERTAINTY_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted arches-crud-type-identifier"> ({% trans " intepretation certainty " %}),</span>
+                                    <span data-bind="{text: nodes.get('FEATURE_EVIDENCE_INTERPRETATION_NUMBER_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted arches-crud-type-identifier"> ({% trans " interpretation number type " %})</span>
+
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+                    
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+ {% include 'views/forms/sections/SaveEditsFooter.htm' %}
+{% endblock form_content %}

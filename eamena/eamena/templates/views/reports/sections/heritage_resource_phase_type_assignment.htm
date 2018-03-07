@@ -1,0 +1,107 @@
+{% load i18n %}
+<div class="row">
+    <div class="col-xs-12">
+        <dl>
+            <dt>
+                <h5 id="" class="arches-report-subsection-title">{% trans "Classification" %}</h5>
+            </dt>
+
+            {% if 'PRODUCTION_E12' not in report_info.source.graph %}
+                <dd class="arches-report-subsection-item">
+                    {% trans "No classifications recorded" %}
+                </dd>
+            {% else %}
+
+                {% for PRODUCTION_E12 in report_info.source.graph.PRODUCTION_E12 %}
+                    {% if 'PHASE_TYPE_ASSIGNMENT_E17' not in PRODUCTION_E12 %}
+                        <dd class="arches-report-subsection-item">
+                            {% trans "No classifications recorded" %}
+                        </dd>
+                    {% else %}
+
+                        {% for PHASE_TYPE_ASSIGNMENT_E17 in PRODUCTION_E12.PHASE_TYPE_ASSIGNMENT_E17 %}
+                            <dd class="arches-report-subsection-item arches-report-spacer">
+                                
+                                <span class="arches-report-subsection-item-type">
+                                    {% trans "Type" %}:
+                                </span>
+                                {% if 'HERITAGE_RESOURCE_TYPE_E55' in PHASE_TYPE_ASSIGNMENT_E17 %}
+                                    {% for HERITAGE_RESOURCE_TYPE_E55 in PHASE_TYPE_ASSIGNMENT_E17.HERITAGE_RESOURCE_TYPE_E55 %}
+                                        {{HERITAGE_RESOURCE_TYPE_E55.HERITAGE_RESOURCE_TYPE_E55__value}}
+                                    {% endfor %} 
+                                {% else %}
+                                    {% trans "none defined" %}
+                                {% endif %}&nbsp;
+
+                                <span class="arches-report-subsection-item-type">
+                                    {% trans "Use" %}:
+                                </span>
+                                {% if 'HERITAGE_RESOURCE_USE_TYPE_E55' in PHASE_TYPE_ASSIGNMENT_E17 %}
+                                    {% for HERITAGE_RESOURCE_USE_TYPE_E55 in PHASE_TYPE_ASSIGNMENT_E17.HERITAGE_RESOURCE_USE_TYPE_E55 %}
+                                        {{HERITAGE_RESOURCE_USE_TYPE_E55.HERITAGE_RESOURCE_USE_TYPE_E55__value}}
+                                    {% endfor %}
+                                {% else %}
+                                    {% trans "none defined" %}
+                                {% endif %}&nbsp;
+
+                                <span class="arches-report-subsection-item-type">
+                                    {% trans "Period" %}:
+                                </span>
+                                {% if 'CULTURAL_PERIOD_E55' in PHASE_TYPE_ASSIGNMENT_E17 %}
+                                    {% for CULTURAL_PERIOD_E55 in PHASE_TYPE_ASSIGNMENT_E17.CULTURAL_PERIOD_E55 %}
+                                        {{CULTURAL_PERIOD_E55.CULTURAL_PERIOD_E55__value}}
+                                    {% endfor %}  
+                                {% else %}
+                                    {% trans "none defined" %}
+                                {% endif %}&nbsp;
+
+                                <span class="arches-report-subsection-item-type">
+                                    {% trans "Style" %}:
+                                </span>
+                                {% if 'STYLE_E55' in PHASE_TYPE_ASSIGNMENT_E17 %}
+                                    {% for STYLE_E55 in PHASE_TYPE_ASSIGNMENT_E17.STYLE_E55 %}
+                                        {{STYLE_E55.STYLE_E55__value}}
+                                    {% endfor %}  
+                                {% else %}
+                                    {% trans "none defined" %}
+                                {% endif %}&nbsp;
+
+                                <span class="arches-report-subsection-item-type">
+                                    {% trans "Dates (from/to)" %}:
+                                </span>
+                                {% if 'TIME___SPAN_PHASE_E52' in PHASE_TYPE_ASSIGNMENT_E17 %}
+                                    {% for TIME___SPAN_PHASE_E52 in PHASE_TYPE_ASSIGNMENT_E17.TIME___SPAN_PHASE_E52 %}
+                                        {% for FROM_DATE_E49 in TIME___SPAN_PHASE_E52.FROM_DATE_E49 %}
+                                            {{FROM_DATE_E49.FROM_DATE_E49__value}}
+                                        {% endfor %} -
+                                        {% for TO_DATE_E49 in TIME___SPAN_PHASE_E52.TO_DATE_E49 %}
+                                            {{TO_DATE_E49.TO_DATE_E49__value}}
+                                        {% endfor %} 
+                                    {% endfor %} 
+                                {% else %}
+                                    {% trans "none defined" %}
+                                {% endif %}&nbsp;
+
+                                <span class="arches-report-subsection-item-type">
+                                    {% trans "Related Features" %}:
+                                </span>
+                                {% if 'ANCILLARY_FEATURE_TYPE_E55' in PHASE_TYPE_ASSIGNMENT_E17 %}
+                                    {% for ANCILLARY_FEATURE_TYPE_E55 in PHASE_TYPE_ASSIGNMENT_E17.ANCILLARY_FEATURE_TYPE_E55 %}
+                                        {{ANCILLARY_FEATURE_TYPE_E55.ANCILLARY_FEATURE_TYPE_E55__value}}
+                                    {% endfor %}  
+                                {% else %}
+                                    {% trans "none defined" %}                             
+                                {% endif %}
+
+                            </dd>
+                        {% endfor %}
+
+                    {% endif %}   
+
+                {% endfor %} 
+
+            {% endif %}   
+
+        </dl>
+    </div>
+</div>

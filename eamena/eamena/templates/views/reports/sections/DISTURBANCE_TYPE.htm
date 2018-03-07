@@ -1,0 +1,54 @@
+{% load i18n %}
+<div class="row">
+     <div class="col-xs-12">
+        <dl>
+            <dt>
+                <h5 id="" class="arches-report-subsection-title">{% trans "Types of disturbances affecting the resource" %}</h5>
+            </dt>
+
+            {% if 'CONDITION_ASSESSMENT_E14'  in report_info.source.graph %}
+                {% for CONDITION_ASSESSMENT_E14 in report_info.source.graph.CONDITION_ASSESSMENT_E14|dictsort:"orderby" %}
+                    {% if 'CONDITION_STATE_E3' in CONDITION_ASSESSMENT_E14 %}
+                        {% for CONDITION_STATE_E3 in CONDITION_ASSESSMENT_E14.CONDITION_STATE_E3 %}
+                            {% if 'DISTURBANCE_STATE_E3' in CONDITION_STATE_E3 %}   
+                                {% for DISTURBANCE_STATE_E3 in CONDITION_STATE_E3.DISTURBANCE_STATE_E3 %}
+                                    {% if 'DISTURBANCE_TYPE_E55' in DISTURBANCE_STATE_E3 %}
+                                        {% for DISTURBANCE_TYPE_E55 in DISTURBANCE_STATE_E3.DISTURBANCE_TYPE_E55 %}
+                                            <dd class="arches-report-subsection-item">
+                                                {{ DISTURBANCE_TYPE_E55.DISTURBANCE_TYPE_E55__value }}
+                                        {% endfor %}    
+                                    {% endif %}
+                                                                              
+                                    {% if 'DISTURBANCE_CAUSE_STATE_E3' in DISTURBANCE_STATE_E3 %}   
+                                        {% for DISTURBANCE_CAUSE_STATE_E3 in DISTURBANCE_STATE_E3.DISTURBANCE_CAUSE_STATE_E3 %}            
+                                            
+                                                {% for DISTURBANCE_CAUSE_TYPE_E55 in DISTURBANCE_CAUSE_STATE_E3.DISTURBANCE_CAUSE_TYPE_E55 %}
+                                                    <span class="arches-report-subsection-item-type"> - {% trans "Cause: " %} </span>{{ DISTURBANCE_CAUSE_TYPE_E55.DISTURBANCE_CAUSE_TYPE_E55__value }} 
+                                                {% endfor %}            
+            
+                                        {% endfor %}    
+                                    {% endif %} 
+                                    
+                                    {% if 'DISTURBANCE_DATE_START_E49' in DISTURBANCE_STATE_E3 %}
+                                        {% for DISTURBANCE_DATE_START_E49 in DISTURBANCE_STATE_E3.DISTURBANCE_DATE_START_E49 %}
+                                            <span class="arches-report-subsection-item-type"> - {% trans "From: " %} </span>{{ DISTURBANCE_DATE_START_E49.DISTURBANCE_DATE_START_E49__value|cut:"T00:00:00" }}
+                                        {% endfor %}             
+                                    {% endif %}            
+                
+                                    {% if 'DISTURBANCE_DATE_END_E49' in DISTURBANCE_STATE_E3 %}
+                                        {% for DISTURBANCE_DATE_END_E49 in DISTURBANCE_STATE_E3.DISTURBANCE_DATE_END_E49 %}
+                                           <span class="arches-report-subsection-item-type">  - {% trans "To: " %} </span>{{ DISTURBANCE_DATE_END_E49.DISTURBANCE_DATE_END_E49__value|cut:"T00:00:00" }}
+                                        {% endfor %} 
+                                    {% endif %}
+
+                                        </dd>                       
+                                {% endfor %}    
+                            {% endif %}
+                        {% endfor %}    
+                    {% endif %}
+                {% endfor %}    
+            {% endif %}
+
+        </dl>
+    </div>
+</div>

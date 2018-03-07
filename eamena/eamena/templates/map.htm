@@ -1,0 +1,468 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "base.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+{% block content %}
+<div class="map-space" style="background-color: #585f69; height:100%;">
+
+    <!-- Map Side -->
+    <div class="map-space-panel" id="map-panel">
+        
+        <!-- Map -->
+        <div id="map" class="map map-space-panel">
+            <div id="feature_tooltip" class="tooltip left" role="tooltip" style="display:none;">
+                  <div class="tooltip-arrow"></div>
+                  <div id="tooltip-text" class="tooltip-inner">
+                  </div>
+                </div>
+            </div>
+        </div>
+        <div style="display:none;">
+            <div id="popup">
+                <i class="fa fa-dot-circle-o" style="color: #EBFA69; opacity: 0.7; font-size: 41px;-webkit-text-stroke-color: black;-webkit-text-stroke-width: 1px;"></i>
+            </div>
+        </div>
+        
+        
+        
+        <!-- Map Header -->
+        <div class="arches-map-inventory-header">
+
+                <div class="container padding-left-0">
+                    <div class="row">
+
+                        <!-- Map Search Box (Address/APN) Screens greater than XS-->
+                         <div class="col-xs-11 col-sm-offset-1 col-sm-7 col-sm-offset-0 col-md-7"> 
+
+                            <!-- Geocoding Widget -->
+                           <div class="">
+                                <div class="form-group"> 
+
+                                    <!-- Add basemap button for xs-screens -->
+                               <button id="" type="button" class="btn btn-primary hidden-sm hidden-md hidden-lg inventory-basemaps" style="width: 36px; height: 46; margin-top: 10px; margin-left: 40px; background: #F5F7FB; border: 1px solid rgba(206,217,233,.95); padding-top: 8px; padding-bottom: 8px;"><i class="fa fa-globe" style="color: #3A67A6;"></i>
+                                    </button>
+                                <!-- End for xs-screens -->
+                                
+
+                                    <input class="geocodewidget arches-select2 margin-top-10 hidden-xs" id="geocodewidget" name="" style="width:60%; margin-left: 40px;"  placeholder="{% trans 'Find Address/Coordinates (Lat/Long)' %}">
+                                
+                                    <input class="geocodewidget arches-select2 margin-top-10 hidden-sm hidden-md hidden-lg" id="geocodewidget" name="" style="width:60%; margin-left: 40px;"  placeholder="{% trans 'Find Address/Coordinates (Lat/Long)' %}">
+                                </div>
+                            </div> 
+                            <!-- End Geocoding Widget -->
+
+                        </div>
+                        
+                        <!-- Data loading mask -->
+                        <div class="col-xs-11 col-xs-offset-1 col-sm-4 col-sm-offset-7 col-md-3 map-loading" style="">
+                            
+                            <img src="{{ STATIC_URL }}img/spinner.gif" height="28" width="28" style="margin-top: 2px;"></img>
+                            <p class="map-loading-text" style="direction:ltr;">{% trans 'Loading resource data...' %}</p>
+                           
+                        </div>
+                    </div>
+                </div>
+
+        </div>
+        <!-- End Map Header -->
+
+
+        <!--=== Map Footer ===-->
+        <div class="full-w-block padding-15 arches-map-inventory-footer">
+            <div class="container">
+                <div class="row">
+
+                    <!-- Map Metadata -->
+                    <div class="col-xs-12 col-sm-8">
+                        <div class="info-blocks" style="float:right;">
+                            <div class="info-blocks-in margin-bottom-0" >
+                                <p class="margin-top-5">
+                                    <span class="arches-map-inventory-footer-text" >
+                                       {% if 'edit' in user.user_groups %} {% trans 'Cursor' %}: <span data-bind="text:mousePosition"></span> <span class="hidden-xs">({% trans 'long,lat' %})</span>{% endif %}
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Map Metadata -->
+
+                </div>
+                <!-- Map: Scaleline--->
+                 <div class="row">
+                    <div class="col-xs-12" style="">
+                        <div id="scale-line" style = "float: left !important;margin-top:{% if 'edit' in user.user_groups %} -50px;{%else%} -30px;{%endif%}"></div>        
+                    </div>
+                </div>                             
+            </div>   
+        </div>    
+        <!--=== End Map Footer ===--> 
+
+
+        <!-- Map: Project Info Panel -->
+        <div class="container">
+            
+            <!-- Basemap Panel -->
+            <div class="row">
+                <div class="col-xs-4" style="">
+
+                    <div id="basemaps-panel" class="tools-panel hidden" style="overflow-y: scroll; border-top-left-radius: 3px; border-top-right-radius: 3px;">
+                        <div class="modal-header arches-modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                ×
+                            </button>
+                            <h4 class="modal-title">
+                                {% trans 'Basemaps' %}
+                            </h4>
+                        </div>
+
+                        <!-- Body Content -->
+                        <div class="modal-body padding-top-0 padding-bottom-0" data-bind='foreach: baseLayers'>
+
+                            <div class="row">
+                                <hr class="arches-layer-divider" style="border-top: 0px; margin-top: 5px;">
+
+                                <div class="arches-basemap-entry" style="">
+                            
+                                    <div class="">
+                                        <a data-bind="attr: { id: id, title: name }" class="basemap info-click" data-rel="" href="javascript:void(0);">
+                                            <span class="">  
+                                                <img data-bind="attr: { src: icon }" class="arches-basemap-thumbnail" alt="" />
+                                                <span class="zoom-icon"></span>                   
+                                            </span>                                              
+                                        </a>                    
+                                        <span class="arches-basemap-caption">
+                                            <a data-bind="attr: { id: id }, text: name" class="caption-text hover-effect basemap info-click" href="javascript:void(0);"> </a>
+                                        </span>
+                                    </div>
+
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <!-- End Body Content -->
+                    
+                    </div>
+                </div>
+            </div>
+            <!-- End Basemap Panel -->
+
+            <!-- Overlays Panel -->
+            <div class="row">
+                <div class="col-xs-4" style="">
+
+                    <div id="overlay-panel" class="tools-panel hidden" style="border-top-left-radius: 3px; border-top-right-radius: 3px;">
+                        <div class="modal-header arches-modal-header">
+
+                            <button type="button" class="close pull-right" data-dismiss="modal" aria-hidden="true">
+                                ×
+                            </button>
+
+                            <div class="btn-group pull-right" style="margin-top:-10px; margin-right: 10px;">
+                                <button type="button" id="add-layer" class="btn btn-primary arches-RDM-button-xs">
+                                    <i class="fa fa-plus"></i> {% trans 'Add Layer' %}                         
+                                </button>
+                                
+                            </div>
+
+                            <h4 class="modal-title">
+                                {% trans 'Overlays' %}
+                            </h4>
+                        </div>
+            
+                        <!-- Body Content -->
+                        <div class="modal-body padding-top-0 padding-bottom-0" style="overflow-y: scroll; height: 395px;">
+                            
+                            <!-- List overlays -->
+                            <div class="row">
+                                <div class="col-xs-12" data-bind="foreach: layers">
+                                    <!-- Layer Entry -->
+                                    <hr class="arches-layer-divider" style="border-top: 0px; margin-top: 5px;">
+
+                                    <div class="" data-bind="css: {hidden: !onMap()}">
+                                        <div data-bind="css: { 'arches-ll-selected': active() }" class="row arches-overlay-item" style="background-color: #fafafa; border-radius: 3px;">
+
+                                            <!-- Layer Thumbnail -->
+                                            <div class="col-xs-2" style="padding-right: 0px; padding-left: 0px;">
+                                                <div class="arches-thumbnail" data-bind="style: { opacity: active() ? 1 : 0.5 }" style="vertical-align: middle;text-align: center;width: 64px; height: 64px;">
+                                                    <div style="display: table-cell;vertical-align: middle;text-align: center;width: 64px; height: 64px; ">
+                                                        <div data-bind="attr: { class: icon + ' fa-2x layer-thumb', style: 'display: inline-block;text-align: left;color: ' + iconColor + ';' }"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Layer Title and Controls -->
+                                            <div class="col-xs-10">
+                                                
+                                                <!-- Layer Title -->
+                                                <div class="row" style="margin-top: 5px;">
+                                                    <div class="col-xs-12">
+                                                        <a href="javascript:void(0);" class="overlay-entry layer-selector visibility-toggle" style="margin-left: 15px;" id="map-layer-10-button" data-bind="attr: {'data-layerid': id}"><i class="fa" data-bind="css:{'fa-ban':!active()}"></i> <span data-bind="text: name"></span></a>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Layer Controls -->
+                                                <div class="row">
+                                                    <div class="col-xs-12">
+                                                        <div class="knobs-demo" data-bind="css: { 'hidden': !active() }" style="margin-left: 15px; display: block;">
+                                                            
+                                                            <input class="knob" style="font-weight: normal;" data-width="32" data-height="60" data-fgColor="#65a5da" data-angleOffset=-145 data-angleArc=290 value="100" data-thickness=.3 data-bind="attr: {'data-layerid': id}">
+
+                                                            <div style="margin-top: -63px; margin-left: 47px;">
+                                                                <a href="javascript:void(0);" class="zoom layer-zoom" title="zoom to overlay" data-bind="if: isArchesLayer, attr: {'data-layerid': id}"><i class="fa fa-2x fa-search" style="color: #65a5da;"></i></a> &nbsp;
+
+                                                                <a href="javascript:void(0);" data-toggle="popover" data-trigger="hover" data-container="body" data-placement="right" data-bind="if: infoContent, attr: {'data-content': infoContent}" data-html="true" title="Layer info" ><i class="fa fa-2x fa-info-circle" style="color: #65a5da;"></i></a>
+
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- End Layer Entry -->
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Body Content -->
+
+                    </div>
+                </div>
+            </div>
+            <!-- End Overlays Panel -->
+            <!-- Map Tools -->
+            <div class="row hidden-xs">
+                <div class="col-xs-12 col-sm-7 col-md-5 col-lg-4" style="margin-top: -121px;margin-left: -1px;">
+
+                    <div class="btn-group">
+
+                        <button id="inventory-basemaps" type="button" class="btn btn-primary arches-map-tools inventory-basemaps" style=""><i class="fa fa-globe"></i> {% trans 'Basemaps' %}
+                        </button>
+
+                        <button id="inventory-overlays" type="button" class="btn btn-primary arches-map-tools" style=""><i class="fa fa-align-justify"></i> {% trans 'Overlays' %}
+                        </button>
+
+                    </div>
+
+                </div>
+            </div>
+            <!-- End Map Tools -->
+            <!-- Info Panel -->
+            <div id="resource-info" class="row" style="display:none;">
+
+                <!-- Setup display, hide for xs screens -->
+                <div class="col-xs-11 col-xs-offset-1 col-sm-5 col-sm-offset-7 col-md-5 col-md-offset-7 pull-right">
+
+                    <!-- Using Bootstrap Model CSS classes to get the overall look of the info panel,
+                    but the actual info panel is NOT implemented as a model form -->
+                    <div class="modal-content no-corners arches-map-inventory-panel">
+                        <div class="modal-header">
+                            <button type="button" class="close resource-info-closer" aria-hidden="true">
+                                ×
+                            </button>
+
+                            <h4 class="modal-title">
+                                <a href="javascript:void(0);" class="text-primary" target="_blank" data-bind="{% if 'edit' in user.user_groups %}attr:{ href: selectedResource() ? selectedResource().reportLink : 'javascript:void(0);'}{% endif %}">
+                                    <i class="fa fa-trophy text-primary" data-bind="attr: { class: selectedResource() ? selectedResource().typeIcon + ' text-primary': '' }"></i> 
+                                    <span data-bind="text:selectedResource() ? selectedResource().primaryname : ''"></span>
+
+                                    <!-- Resource Type for larger screens -->
+                                    <span class="hidden-xs">
+                                        <small class="text-primary" data-bind="text: selectedResource() ? selectedResource().typeName: ''"></small>
+                                    </span>
+
+                                    <!-- Resource Type for small screens -->
+                                    <span class="hidden-sm hidden-md hidden-lg">
+                                        </br><small class="text-primary margin-left-30 margin-top-minus-10"  data-bind="text: selectedResource() ? selectedResource().typeName: ''"></small>
+                                    </span>
+
+                                </a>
+                            </h4>
+
+                        </div>
+
+                        <!-- Body Content -->
+                        <div class="modal-body padding-top-0 padding-bottom-0">
+                            <p> 
+                                {% include 'map/resource-popup.htm' %}
+                            </p>
+                        </div>
+                        <!-- End Body Content -->
+
+                        <div class="modal-footer" style="padding-top: 10px; padding-bottom: 10px;">
+                            <button type="button" class="btn btn-default resource-info-closer">
+                                {% trans 'Close' %}
+                            </button>
+                            {% if 'edit' in user.user_groups %}
+                            <a href="javascript:void(0);" class="text-primary" target="_blank" data-bind="attr:{ href: selectedResource() ? selectedResource().reportLink : 'javascript:void(0);'}">
+                                <button type="button" class="btn btn-primary">
+                                    {% trans 'View Report' %}
+                                </button>
+                            </a>
+                            
+                            <a href="javascript:void(0);" class="text-primary" target="_blank" data-bind="attr:{ href: selectedResource() ? 'resources/' +  selectedResource().entitytypeid + '/default/' + selectedResource().id : 'javascript:void(0);'}">
+                                <button type="button" class="btn btn-primary">
+                                    {% trans 'Edit' %}
+                                </button>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div><!-- /.modal-content -->
+
+                </div>
+            </div>
+            
+            <div id="cluster-info" class="row" style="display:none;">
+                <div class="col-xs-11 col-xs-offset-1 col-sm-5 col-sm-offset-7 col-md-5 col-md-offset-7 pull-right">
+                    <div class="modal-content no-corners arches-map-inventory-panel">
+                        <div class="modal-header">
+                            <button type="button" class="close cluster-info-closer" aria-hidden="true">
+                                ×
+                            </button>
+
+                            <h4 class="modal-title">
+                                {% trans 'Clustered Resources' %}
+                            </h4>
+
+                        </div>
+
+                        <!-- Body Content -->
+                        <div class="modal-body padding-top-0 padding-bottom-0" data-bind="if: clusterFeatures().length === 0">
+                            <div class="loading-cluster-info"></div>
+                        </div>
+
+                        <div class="modal-body padding-top-0 padding-bottom-0" data-bind="if: clusterFeatures().length > 0">
+                            <div data-bind='foreach: clusterFeatures' style="margin-top:12px;">
+                                <div> 
+                                    <a href="javascript:void(0);" data-bind="text: properties.primaryname, attr: {'data-entityid': id}" class='cluster-item-link'></a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Body Content -->
+
+                        <div class="modal-footer" style="padding-top: 10px; padding-bottom: 10px;">
+                            <button type="button" class="btn btn-default cluster-info-closer">
+                                {% trans 'Close' %}
+                            </button>
+                        </div>
+                    </div><!-- /.modal-content -->
+
+                </div>
+            </div>
+        </div>
+        <!-- End Map Project Info Panel -->
+    
+    </div>
+    <!-- End of Map Side -->
+
+
+    <!-- Layer Library  -->
+    <div class="" id="layer-library" style="display: none; margin-bottom: 35px;">
+
+        <!-- Layer Library Header -->
+        <div class="row" style="background: #f6f6f6; height: 60px;">
+            <div class="container">
+
+                <div class="col-xs-12" style="padding-left: 0px; padding-right: 0px; margin-top: 5px;">
+                    <button type="button" id="back-to-map" class="btn btn-primary arches-RDM-button-xs">
+                        <i class="fa fa-arrow-circle-down"></i> {% trans 'Back to map' %}                         
+                    </button>&nbsp;
+
+                    <span style="color: #585f69; font-size: 18px; font-weight: 200; vertical-align: middle;">
+                        {% trans 'Manage Map Layers' %}
+                    </span>
+                </div>
+
+            </div>
+        </div>
+
+        
+        <!-- Form -->
+        <div class="container" style="margin-top: 30px;">
+
+            <!-- Layer Filter Widget -->
+            <div class="row">
+                <div class="col-xs-12 col-md-8">
+                    <div class="form-group">       
+                        <input class="layerfilter" id="" name="" style="width:100%"  value="">
+                    </div>
+                </div>
+            </div>
+            <!-- End Layer Filter Widget -->
+
+            <div class="row">
+                <div class="col-xs-12">
+
+                    <!-- Form for screens > XS -->
+                    <dl class="" data-bind="foreach: layers">   
+
+                        <dd class="heritage" data-bind="css: {hidden: filtered}">
+                            <div class="row arches-layer-library" data-bind="css: {'arches-ll-selected': onMap()}">
+
+                                <!-- Layer Thumbnail -->
+                                <div class="col-sm-2 col-md-1" style="padding-right: 0px; padding-left: 0px;">
+                                    <div class="arches-thumbnail" data-bind="style: { opacity: onMap() ? 1 : 0.5 }" style="vertical-align: middle;text-align: center;width: 64px; height: 64px;">
+                                        <div style="display: table-cell;vertical-align: middle;text-align: center;width: 64px; height: 64px; ">
+                                            <div data-bind="attr: { class: icon + ' fa-2x layer-thumb', style: 'display: inline-block;text-align: left;color: ' + iconColor + ';' }"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Layer Name/Categories -->
+                                <div class="col-sm-9 col-md-11" style="margin-top: 8px; padding-left: 1px;">
+                                    <a href="javascript:void(0);" class="arches-ll-title layer-selector on-map-toggle" data-bind="css: {'layer-selected-title': onMap()}, attr: {'data-layerid': id}"><i class="fa" data-bind="css:{'fa-ban':!onMap()}"></i> <span data-bind="text: name"></span></a>
+
+                                    <span class="arches-ll-category pull-right hidden-xs" style="margin-top: 5px;">
+                                        <i class="fa-fw fa fa-info-circle"></i>{% trans 'Categories' %}: <span data-bind="text:categories.join(', ')"
+                                    </span>  
+                                </div>
+
+                                <!-- Layer description -->
+                                <div class="col-sm-9 col-md-11" style="padding-left: 1px;">
+                                    <span class="arches-subtitle hidden-xs" data-bind="text:description"></span>  
+                                </div>    
+
+                            </div>
+
+                            <!-- Spacer -->
+                            <hr class="arches-layer-divider" style="border-top: 0px;">
+
+                        </dd>
+
+                    </dl>
+                    
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!-- End Layer Library (Back side) -->
+
+</div>
+{% endblock %}
+{% block pre_require_js %}
+    {% include 'map/resource-layers.htm' %}
+    {% include 'map/layers.htm' %}
+    <script>
+        define('selected-resource-id', [], function () {
+            return '{{resource_id}}';
+        });
+    </script>
+{% endblock pre_require_js %}

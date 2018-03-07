@@ -1,0 +1,264 @@
+{% extends "views/forms/base.htm" %}
+{% load i18n %}
+
+{% block form_content %}
+
+<div id='name-section'>
+
+    <!-- Actor Name -->
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+
+                <dl>
+                    <!-- Title -->
+                    <dt>
+                        <h5 id="arches-names-form" class="section-headline">{% trans "Names" %}</h5>
+                    </dt>
+
+                    <!-- Form -->
+                    <dd class="arches-RDM-labels form-inline arches-form hidden-xs">
+
+                        <div class="row">
+
+                            <div class="col-xs-12 padding-left-0">
+
+                                <!-- Screens greater than xs -->
+                                <div class="form-group" style="width: 100%;">
+
+                                    <input class="form-control arches-form-input" id="resource-name" style="width: 50%;" placeholder='{% trans "Name" %}' data-bind="{value: getEditedNode('ACTOR_APPELLATION.E82', 'value')}">&nbsp;
+
+                                    <!-- Add Button -->
+                                    {% include 'views/components/add-item-button.htm' %}
+                                    <!-- End Add Button -->
+
+                                </div>
+                            </div>
+                        </div>
+                    </dd>
+                    <!-- End Screens greater than xs -->
+                    
+                    <!-- XS Screens -->
+                    <dd class="hidden-sm hidden-md hidden-lg">
+                        
+                        <div class="form-group" style="width: 90%;">
+
+                            <input class="form-control arches-form-input" id="resource-name" style="width: 100%;" placeholder='{% trans "Name" %}' data-bind="{value: getEditedNode('ACTOR_APPELLATION.E82', 'value')}"></input>
+
+                            <!-- Spacer (for xs screens) -->
+                            <div class="margin-top-5 hidden-sm hidden-md hidden-lg"></div>
+
+                            <!-- Add Button -->
+                            {% include 'views/components/add-item-button.htm' %}
+                            <!-- End Add Button -->
+
+                        </div>
+                    </dd>
+                    <!-- End XS Screens -->
+
+                </dl>
+                <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "The name and name type values must be populated." %}</div>
+            </div>
+        </div>
+    </div>
+    <!-- End Name CRUD Form Container -->
+
+    <!-- Name Records -->
+    <div class="row">
+        <div class="col-xs-12">
+
+            <!--  -->
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "This Actor has the following Name(s):" %}
+                    </dd>
+
+                    <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Names Defined" %}</div>   
+
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this name" %}"><i data-bind='click: $parent.deleteItem.bind($parent)' class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind='click: $parent.editItem.bind($parent)' title="Edit this name"><span data-bind="{text: nodes.get('ACTOR_APPELLATION.E82', 'value')}" style="padding-right:2px;"></span><span class="text-muted"> ({% trans "Name" %})</span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+
+                </dl>
+            </div>
+        </div>
+    </div>
+    <!-- End Name Records -->
+</div>
+
+
+<hr class="devider arches-RDM-divider">
+
+<!-- Organisation Type CRUD Form -->
+<div id="organisation-type-section">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+
+                <dl>
+                    <!-- Title -->
+                    <dt>
+                        <h5 id="arches-names-form" class="section-headline">{% trans "Person/Organisation Type" %}</h5>
+                    </dt>
+
+                    <!-- Form -->
+                    <dd class="arches-RDM-labels hidden-xs">
+
+                        <!-- Form for screens > xs -->
+                        <div class="form-group" style="width: 100%">
+
+                            <!-- Birthdate Date -->
+                            <input style="width:80%; display:inline-block;" class="title-type select2 arches-select2-crud-form name-type designation" id="resource-designation-type" data-bind="select2: {value: getEditedNode('ORGANISATION_TYPE.E55', 'value'),  placeholder: '{% trans "Type" %}', dataKey: 'ORGANISATION_TYPE.E55'}">&nbsp;
+
+                            <!-- Add Button -->
+                            {% include 'views/components/add-item-button.htm' %}
+                            <!-- End Add Button -->
+
+                        </div>
+
+                    </dd>
+                    <!-- Form for screens > xs -->
+                    <dd class="hidden-sm hidden-md hidden-lg">
+                        <div>
+                            <div>
+                                <!-- Form for screens = xs -->
+                                <div class="form-group" style="width: 100%">
+
+                                    <!-- Birthdate -->
+                                    <input style="width:90%; display:inline-block;" class="title-type select2 arches-select2-crud-form name-type designation" id="resource-designation-type" data-bind="select2: {value: getEditedNode('ORGANISATION_TYPE.E55', 'value'),  placeholder: '{% trans "Type" %}', dataKey: 'ORGANISATION_TYPE.E55'}">&nbsp;
+
+                                    <div class="margin-top-5 hidden-sm hidden-md hidden-lg"></div>
+
+                                    <!-- Add Button -->
+                                    {% include 'views/components/add-item-button.htm' %}
+                                    <!-- End Add Button -->
+                                </div>
+                                <!-- Form for screens = xs -->
+                            </div>
+                        </div>
+                    </dd>
+                    <!-- End Form -->
+                </dl>
+                <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "A person/organisation type value must be populated." %}</div>
+            </div>
+        </div>
+    </div>
+    <!-- End Keywords CRUD -->
+
+    <!-- Keyword Records -->
+    <div class="row">
+        <div class="col-xs-12">
+
+            <!-- Address -->
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "This actor has the following Type(s):" %}
+                    </dd>
+
+                    <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Types Defined" %}</div>   
+
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this type" %}"><i data-bind='click: $parent.deleteItem.bind($parent)' class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind='click: $parent.editItem.bind($parent)' title="{% trans "Edit this type" %}"><span data-bind="{text: nodes.get('ORGANISATION_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted"> ({% trans "Type" %})</span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+
+                </dl>
+
+            </div>
+        </div>
+    </div>
+    
+</div>
+<!-- End Organisation Type Records -->
+
+<!-- Modern Country CRUD Form -->
+<div id="country-section">
+    <div class="row">
+        <div class="col-xs-12">
+            
+            <!-- Setting -->
+            <div class="padding-left-10">
+                <dl>
+                    
+                    <!-- Title -->
+                    <dt>
+                        <h5 id="arches-names-form" class="section-headline">{% trans "Country" %}</h5>
+                    </dt>
+                    
+                    <!-- Modern Country CRUD -->
+                    <dd class="arches-RDM-labels">
+                                
+                                <!-- form for screens > xs -->
+                                <form class="form-inline arches-form hidden-xs" role="form">
+                                    <div class="form-group margin-top-5" style="width: 100%">
+                                        
+                                        <input data-bind="select2: {value: getEditedNode('MODERN_COUNTRY_TERRITORY.E55', 'value'), placeholder: 'Country', dataKey: 'MODERN_COUNTRY_TERRITORY.E55'}" style="width:50%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form location-setting" placeholder="{% trans 'Country' %}">
+                                            
+                                            {% include 'views/components/add-item-button.htm' %}
+                                    </div>
+                                </form>
+                                <!-- fEn orm for screens > xs -->
+                                
+                                <!-- form for screens = xs -->
+                                <form class="form-inline arches-form hidden-sm hidden-md hidden-lg" role="form">
+                                    <div class="form-group margin-top-5" style="width: 100%">
+                                        
+                                        <input data-bind="select2: {value: getEditedNode('MODERN_COUNTRY_TERRITORY.E55', 'value'), placeholder: 'Country', dataKey: 'MODERN_COUNTRY_TERRITORY.E55'}" style="width:100%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form location-setting" placeholder="{% trans 'Country' %}">
+                                            
+                                            <!-- Spacer (for xs screens) -->
+                                            <div class="margin-top-10 hidden-sm hidden-md hidden-lg"></div>
+                                            
+                                            {% include 'views/components/add-item-button.htm' %}
+                                    </div>
+                                </form>
+                                <!-- End form for screens = xs -->
+                                
+
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <!-- End Modern Country CRUD -->
+    
+    <!-- Modern Country Records -->
+    <div class="row margin-bottom-10">
+        <div class="col-xs-12">
+            
+            <!-- Modern Country -->
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "This actor's country of origin is:" %}
+                    </dd>
+                    <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                    <div data-bind="visible: getBranchLists().length == 0" class="margin-left-5 txt-color-blue">{% trans "No Country Defined" %}</div>
+                    
+                    <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0);" class="arches-CRUD-child" title="{% trans "Delete this country" %}" data-bind="click: $parent.deleteItem.bind($parent)"><i class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0);" class="arches-CRUD-child manage-address" title="{% trans "Edit this item" %}"> <span data-bind="click: $parent.editItem.bind($parent), text: nodes.get('MODERN_COUNTRY_TERRITORY.E55', 'label')"></span><span class="text-muted"> ({% trans "Country" %})</span>
+                                </a>
+                            </div>
+                    </div>
+                    </dd>            
+        </div>
+    </div>
+
+</div>
+<!-- End Modern Country Records -->
+
+{% endblock form_content %}

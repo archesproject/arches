@@ -1,0 +1,23 @@
+{% load i18n %}
+<div class="row">
+     <div class="col-xs-12">
+        <dl>
+            <dt>
+                <h5 id="" class="arches-report-subsection-title">{% trans "Overall Site Certainty" %}</h5>
+            </dt>
+
+            {% if 'SITE_OVERALL_ARCHAEOLOGICAL_CERTAINTY_TYPE_E55' not in report_info.source.graph %}
+                <dd class="arches-report-subsection-item">
+                    {% trans "No site certainty recorded" %}
+                </dd>
+            {% else %}
+                {% for SITE_OVERALL_ARCHAEOLOGICAL_CERTAINTY_TYPE_E55 in report_info.source.graph.SITE_OVERALL_ARCHAEOLOGICAL_CERTAINTY_TYPE_E55 %}
+                    <dd class="arches-report-subsection-item">
+                        {{ SITE_OVERALL_ARCHAEOLOGICAL_CERTAINTY_TYPE_E55.SITE_OVERALL_ARCHAEOLOGICAL_CERTAINTY_TYPE_E55__value }} 
+                    </dd>
+                {% endfor %}            
+            {% endif %}
+
+        </dl>
+    </div>
+</div>

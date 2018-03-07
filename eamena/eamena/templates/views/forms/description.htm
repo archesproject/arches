@@ -1,0 +1,96 @@
+{% extends "views/forms/base.htm" %}
+{% load i18n %}
+
+{% block form_content %}
+<!-- Modifications CRUD Form -->
+<div id="description-section">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                
+                <dl>
+                    <!-- Title -->
+                    <dt>
+                        <h5 class="section-headline">{% trans "Resource Descriptions" %}</h5>
+                    </dt>
+
+                    <!-- Form -->
+                    <dd class="arches-RDM-labels">
+
+                        <div class="row">
+
+                            <div class="col-xs-12">
+
+                                <!-- Form for screens > xs -->
+                                <form class="form-inline hidden-xs" role="form">
+                                    <div class="form-group" style="width: 100%">
+                                        {% if resourcetypeid != 'INFORMATION_RESOURCE.E73' %}
+                                        <input style="width:80%; display: inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-unit" data-bind="select2: {value: getEditedNode('DESCRIPTION_TYPE.E55', 'value'), placeholder: 'Type', dataKey: 'DESCRIPTION_TYPE.E55'}"></input>
+                                       
+                                        <!-- Spacer (for xs screens) -->
+                                        <div class="margin-top-5 hidden-sm hidden-md hidden-lg"></div>                                    
+                                         {% endif %}
+                                        {% include 'views/components/add-item-button.htm' %}
+                                        
+                                        <!-- Simple HTML Editor -->
+                                        <div class="arches-html-editor margin-top-5" style="width: 80%;">
+                                            <div class="summernote" data-bind="summernote: {value: getEditedNode('DESCRIPTION.E62', 'value'), options:{}}"></div>
+                                        </div>
+
+                                    </div>
+                                </form>
+                                <!-- Form for screens > xs -->
+                            </div>
+                        </div>
+                    </dd>
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "All values must be populated." %}</div>
+                    <!-- End Form -->
+                </dl>
+
+            </div>
+        </div>
+    </div>
+    <!-- End Modifications CRUD -->
+
+    <!-- Description Records -->
+    <div class="row">
+        <div class="col-xs-12">
+
+            <!-- Address -->
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "This resource has these descriptions:" %}
+                    </dd>
+
+                    <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Descriptions Defined" %}</div>   
+                        
+                        <div data-bind='foreach: getBranchLists()'>
+                            {% if resourcetypeid != 'INFORMATION_RESOURCE.E73' %}
+                            <dl class="margin-bottom-0"> 
+                            
+                                <dd>
+                                    <div class="">
+                                        <a href="#" title="{% trans "Remove this description" %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                        <a href="#" class="arches-CRUD-child arches-CRUD-edit" title="{% trans "Edit this description" %}" data-bind='text: nodes.get("DESCRIPTION_TYPE.E55", "label"), click: $parent.editItem.bind($parent)'></a>
+                                    </div>
+                                </dd>
+                            </dl>
+                            {% endif %}
+                            <dl> 
+
+                                <dd>
+                                    <div class="note-editable custom-scroll arches-evaluation-content" contenteditable="true" data-bind='{html: nodes.get("DESCRIPTION.E62", "value")}'></div>
+                                </dd>
+                            </dl>
+
+                        </div>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Description Records -->
+{% endblock form_content %}

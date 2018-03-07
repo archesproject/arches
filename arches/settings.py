@@ -94,7 +94,7 @@ RESOURCE_MARKER_ICON_UNICODE = '\uf060'
 RESOURCE_MARKER_ICON_FONT = 'octicons'
 RESOURCE_MARKER_DEFAULT_COLOR = '#C4171D'
 
-BING_KEY = ''
+
 GOOGLE_ANALYTICS_TRACKING_ID = None
 
 def RESOURCE_TYPE_CONFIGS():
@@ -250,6 +250,7 @@ INSTALLED_APPS = (
 )
 
 MIDDLEWARE_CLASSES = (
+
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',

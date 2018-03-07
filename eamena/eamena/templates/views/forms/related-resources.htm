@@ -1,0 +1,399 @@
+                            <!-- Overall Condition CRUD Form -->
+{% extends "views/forms/base.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block form_controls %}
+    <!-- Save/Discard Buttons for small, medium and large screens -->
+    <span class="pull-right margin-top-minus-10 hidden-xs">
+        <button type="button" class="cancel-edits btn btn-danger disabled"> 
+            <i class="fa fa-times"></i>&nbsp; {% trans 'Discard edits' %}
+        </button>
+        <button type="submit" class="save-edits btn btn-success disabled"> 
+            <i class="fa fa-check"></i>&nbsp; {% trans 'Save edits' %}
+        </button>
+        <span class="start-workflow-controls">
+            <button class="btn btn-primary start-workflow-btn" style="display: inline-block;"> 
+                <i class="fa fa-plus"></i>&nbsp; {% trans 'Find Resources' %}
+            </button>
+        </span>
+        <span class="show-relationships-controls" style="display:none;">
+            <button class="btn btn-primary start-workflow-btn" style="display: inline-block;"> 
+                <i class="fa fa-exchange"></i>&nbsp; {% trans 'Show Relationships' %}
+            </button>
+        </span>
+    </span>
+
+    <!-- Save/Discard Buttons for xs screens -->
+    <span class="hidden-sm hidden-md hidden-lg">
+        </br>
+        <button type="button" class="cancel-edits btn btn-danger disabled"> 
+            <i class="fa fa-times"></i>&nbsp; {% trans 'Discard edits' %}
+        </button>
+        <button type="submit" class="save-edits btn btn-success disabled"> 
+            <i class="fa fa-check"></i>&nbsp; {% trans 'Save edits' %}
+        </button>
+        <span class="start-workflow-controls">
+            <button class="btn btn-primary start-workflow-btn" style="display: inline-block;"> 
+                <i class="fa fa-plus"></i>&nbsp; {% trans 'Find Resources' %}
+            </button>
+        </span>
+        <span class="show-relationships-controls" style="display:none;">
+            <button class="btn btn-primary start-workflow-btn" style="display: inline-block;"> 
+                <i class="fa fa-exchange"></i>&nbsp; {% trans 'Show Relationships' %}
+            </button>
+        </span>
+    </span>
+{% endblock form_controls %}
+
+{% block form_content %}                                
+<div class="relation-list">
+    <div class="row margin-bottom-10">
+        <div class="col-xs-12">
+
+            <div class="padding-left-10">
+                
+                <dl style="margin-bottom: 0px;">
+                    <dt>
+                        <h5 id="arches-names-form" class="section-headline">{% trans 'Related Resources' %}</h5>
+                    </dt>
+
+                     <!-- Form -->
+                    <dd class="arches-RDM-labels" data-bind="if: getEditedBranch()">
+
+                        <div class="row" data-bind="visible: true" style="display:none;">
+
+                            <div class="col-xs-12">
+
+                                <!-- Form for screens > xs -->
+                                <form class="form-inline hidden-xs" role="form">
+                                    <div class="form-group" style="width: 100%">
+
+                                        <h4>
+                                            <span class="arches-search-title" data-bind="text: getEditedBranch().relatedresourcename"></span>
+                                            <span>
+                                                <small class="arches-search-subtitle">
+                                                    <i data-bind="attr: { class: getEditedBranchTypeInfo().icon }"></i>
+                                                    <span data-bind="text: getEditedBranchTypeInfo().name"></span>
+                                                </small>
+                                            </span>
+                                        </h4>
+
+                                        <input style="width:80%; display: inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-unit" data-bind="relationshipTypeSelect: true, select2: {value: getEditedBranch().relationship.relationshiptype, placeholder: '{% trans 'Relationship Type' %}', dataKey: 'RELATIONSHIP_TYPES.E32'}"></input>
+
+                                        <!-- Spacer (for xs screens) -->
+                                        <div class="margin-top-5 hidden-sm hidden-md hidden-lg"></div>                                    
+
+                                        {% include 'views/components/add-item-button.htm' %}
+
+                                        <div class="row" style="margin-top: 10px;margin-bottom: 10px;padding-right: 162px;">
+                                            <!-- Classification and dates -->
+                                            <div style="">
+                                            
+                                                <div id="from-date-section" class="col-xs-12 col-sm-6">
+                                                    <div class="input-group datetimepicker" style ="width:100%;" >
+                                                        <input type="text" id="date" style="height: 32px;" placeholder="{% trans 'from (yyyy-mm-dd)' %}" class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedBranch().relationship.datestarted, datePicker: true} ">
+                                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                    </div>
+
+                                                    <div class="hidden-sm hidden-md hidden-lg" style="margin-bottom: 5px;">
+                                                    </div>
+
+                                                </div>
+
+                                                
+
+                                                <div id="to-date-section" class="col-xs-12 col-sm-6">
+                                                    <div class="input-group datetimepicker" style ="width:100%;" >
+                                                        <input type="text" id="date" style="height: 32px;" placeholder="{% trans 'to (yyyy-mm-dd)' %}" class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedBranch().relationship.dateended, datePicker: true} ">
+                                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                        <!-- Simple HTML Editor -->
+                                        <div class="arches-html-editor margin-top-5" style="width: 80%;">
+                                            <div class="summernote" data-bind="summernote: {value: getEditedBranch().relationship.notes, options:{}}"></div>
+                                        </div>
+
+                                    </div>
+                                </form>
+                                <!-- Form for screens > xs -->
+                            </div>
+                        </div>
+                    </dd>
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "All values must be populated." %}</div>
+                    
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <div class="row margin-top-minus-5 margin-bottom-10" id="no-relationships" style="">
+        <div class="col-xs-12">
+
+            <div class="margin-left-5" data-bind="visible: true" style="display:none;">
+                <dl class="margin-bottom-10"> 
+                    
+                    <dd class="margin-left-5">
+                        <div data-bind="visible: viewModel.branch_lists().length == 0">
+                            <p class="arches-CRUD-child text-primary">{% trans 'This resource has no relationships yet' %}</p>
+                        </div>
+
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div data-bind='if: relationship'>
+                                <div class="arches-crud-record">
+                                    <a href="javascript:void(0)" class="arches-CRUD-child" title="Delete this relationship"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                    <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans "Edit this relationship" %}">
+                                        <strong data-bind='text: relationshiptypelabel'></strong>
+                                        <span data-bind='text: relatedresourcename'></span>
+                                    </a>
+                                </div>
+                                <div class="related-resource-details">
+                                    <span data-bind='visible: relationship.datestarted'>
+                                        <strong>From:</strong>
+                                        <span data-bind='text: relationship.datestarted'></span>
+                                    </span>
+                                    <span data-bind='visible: relationship.dateended'>
+                                        <strong>To:</strong>
+                                        <span data-bind='text: relationship.dateended'></span>
+                                    </span>
+                                    <div data-bind='visible: relationship.notes'>
+                                        <strong>Notes:</strong>
+                                    </div>
+                                    <div data-bind='visible: relationship.notes'>
+                                        <span data-bind='text: relationship.notes'></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </dd>
+
+                </dl>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+<div class="relation-form" style="display:none;">
+
+    <!--=== Default Resource Summary ===-->
+    <div class="margin-bottom-50">
+        <div class="row" id="search-results" style="margin-left:0px; margin-right:0px;">
+           <!-- Results Header -->
+                    <h2 id="search-results-count"  class="text-muted margin-left-5" style="margin-bottom: 30px;margin-top:0px"><span data-bind="text: total()"></span> {% trans "Results" %} &nbsp;
+
+                        <span class="hidden-xs" style="margin-top: -5px;">  
+                            <button class="btn btn-success btn-xs" id="map-filter-button" style=""> 
+                                <i class="fa fa-map-marker"></i> {% trans 'Map filter' %}
+                            </button>
+
+                            <button class="btn btn-success btn-xs" id="attribute-filter-button" style=""> 
+                                <i class="fa fa-map-marker"></i> {% trans 'Attribute filter' %}
+                            </button>
+
+                            <button class="btn btn-success btn-xs" id="time-filter-button" style=""> 
+                                <i class="fa fa-clock-o"></i> {% trans 'Time filter' %}
+                            </button>
+                        </span>
+
+                    </h2>
+            <!-- Results Header -->      
+
+             <!-- Attribute  Filter -->
+            <div class="row margin-top-minus-20" style="margin-right: 0px;"> 
+                       
+                <!-- Search Widget -->
+                <div id="attribute" class="arches-time-filter" style="margin-right: 5px; display: none;">
+
+
+                    <!--=== Search Widget Block ===-->
+                    <div class="" style="padding-bottom: 10px; padding-top: 30px; margin-bottom: 10px; margin-right: 20px;">
+                        
+                        <!-- Search Terms -->
+                        <div class="">
+                            <div class="row" style="margin-bottom: 5px;">
+                                  
+                                <!-- Search Widget -->
+                                <div class="col-xs-12">     
+                                    <input class="select2 resource_search_widget arches-select2" name="" style="width:100%" placeholder="{% trans "Search for a resource..." %}" value="">
+                                </div>
+                                <!-- End Search Widget -->
+
+                            </div>
+                        </div>
+                        <!-- End Search Terms -->  
+
+                    </div>    
+                    <!--=== End Search Widget Block ===-->
+
+                </div>
+                <!-- End Search Widget -->
+
+                <!-- spacer -->
+                <div class="" style="margin-bottom: 20px;"></div>
+
+            </div>
+            <!-- Attribute  Filter -->
+
+              
+            <div class="s-results margin-bottom-50">
+                <div class="row" id="map-filter-container" data-filtertext="{% trans "Map Filter Enabled" %}" style="margin-right: 20px;"> 
+                    {% include 'views/search/map-filter.htm' %}
+                </div>
+                <div class="row" id="time-filter-container" data-filtertext="{% trans "Time Filter Enabled" %}"> 
+                    {% include 'views/search/time-filter.htm' %}
+                </div>
+                <div class="row" id="search-results-container"> 
+                    <!-- Content -->              
+                    <div style="padding-top: 0px;">
+                        <div class="row" style="">
+                            <div class="col-xs-11 col-xs-offset-1 col-sm-4 col-sm-offset-7 col-md-3 map-loading loading-mask" style="display: none;">
+                                                    
+                                <img src="{% static 'img/spinner.gif' %}" height="28" width="28" style="margin-top: 2px;">
+                                <p class="map-loading-text" style="direction:ltr;">{% trans "Loading results..." %}</p>
+                               
+                            </div>
+                        </div>
+
+                        <!-- Begin Search Results -->
+                        <div class="col-xs-12">
+                            
+                            <div id="search-results-list" data-bind="foreach: results, visible: true" style="display: none;">
+
+                                <!-- Begin Search Item  -->
+                                <div  class="arches-search-item" data-bind="attr: { 'data-resourceid': resourceid }">
+                                    
+                                    <!-- Spacer -->
+                                    <hr class="margin-10">
+
+                                    <div class="inner-results padding-left-5">
+
+                                        <!-- Item Header -->
+                                        <h4>
+                                                                
+                                            <!-- Title/Sub-title -->
+                                            <span class="arches-search-title" data-bind="text: primaryname"></span> 
+                                            &nbsp;
+                                            <span class="">
+                                                <small class="arches-search-subtitle"><i data-bind="attr: { class: typeIcon }"></i><span data-bind="text: typeName"></span></small>
+                                            </span>
+                                            <!-- End Title/Sub-title -->
+
+                                            <!-- Spacer for XS screens-->
+                                            <div class="hidden-sm hidden-md hidden-lg" style="margin-top: 5px;"></div>
+
+                                            <div class="btn-group pull-right" style="margin-top: 15px;margin-right: 10px;" data-bind="if: !relationBranch.editing()">
+                                                <button type="button" class="btn btn-xs btn-primary arches-RDM-button" data-bind="text: relationBranch.related() ? '{% trans 'Edit Relationship' %}' : '{% trans 'Add Relationship' %}', click: editClick"></button>
+                                            </div>
+                                            
+                                        </h4>
+                                        <div data-bind="if: !editing()">
+                                            <p data-bind="if: relationBranch.related()" class="arches-search-item-description">
+                                                <strong>{% trans 'Relationship:' %}</strong>
+                                                <span data-bind="text: relationBranch.relationshiptypelabel"></span>
+                                            </p>
+
+                                            <!-- Item Description -->
+                                            <p data-bind="html:description" class="arches-search-item-description"></p>
+                                            <!-- End Item Description -->
+
+                                        </div>
+
+                                        <dd class="arches-RDM-labels" data-bind="if: relationBranchList.getEditedBranch() && relationBranchList.getEditedBranch() === relationBranch" style="margin-top:15px;">
+
+                                            <div class="row" data-bind="visible: true" style="display:none;">
+
+                                                <div class="col-xs-12">
+
+                                                    <!-- Form for screens > xs -->
+                                                    <form class="form-inline hidden-xs" role="form">
+                                                        <div class="form-group" style="width: 100%">
+                                                            <h5 id="arches-names-form" class="section-headline">{% trans "Relationship Type" %}</h5>
+                                                            <input style="width:80%; display: inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-unit" data-bind="relationshipTypeSelect: true, select2: {value: relationBranchList.getEditedBranch().relationship.relationshiptype, placeholder: '{% trans 'Relationship Type' %}', dataKey: 'RELATIONSHIP_TYPES.E32'}"></input>
+
+                                                            <!-- Spacer (for xs screens) -->
+                                                            <div class="margin-top-5 hidden-sm hidden-md hidden-lg"></div>                                    
+
+                                                            <div class="btn-group" style="margin-left: 5px;">
+                                                                <button type="button" class="add-button btn btn-primary" style="height: 32px;" data-bind="click: addClick">{% trans "Add" %}</button>
+                                                                <button type="button" class="btn btn-primary dropdown-toggle" style="height: 32px;" data-toggle="dropdown">
+                                                                    <i class="fa fa-chevron-down"></i>
+                                                                    <span class="sr-only">{% trans "Toggle Dropdown" %}</span>                            
+                                                                </button>
+                                                                <ul class="dropdown-menu" role="menu">
+                                                                    <li><a href="#" name="discard-edit-link" data-bind="click: discardClick">{% trans "Discard edits" %}</a></li>
+                                                                </ul>
+                                                            </div>
+
+                                                            <div class="row" style="margin-top: 10px;margin-bottom: 10px;padding-right: 162px;">
+                                                                <!-- Classification and dates -->
+                                                                <div style="">
+                                                                
+                                                                    <div id="from-date-section" class="col-xs-12 col-sm-6">
+                                                                        <div class="input-group datetimepicker" style ="width:100%;" >
+                                                                            <input type="text" id="date" style="height: 32px;" placeholder="{% trans 'from (yyyy-mm-dd)' %}" class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: relationBranchList.getEditedBranch().relationship.datestarted, datePicker: true} ">
+                                                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                                        </div>
+
+                                                                        <div class="hidden-sm hidden-md hidden-lg" style="margin-bottom: 5px;">
+                                                                        </div>
+
+                                                                    </div>
+
+                                                                    
+
+                                                                    <div id="to-date-section" class="col-xs-12 col-sm-6">
+                                                                        <div class="input-group datetimepicker" style ="width:100%;" >
+                                                                            <input type="text" id="date" style="height: 32px;" placeholder="{% trans 'to (yyyy-mm-dd)' %}" class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: relationBranchList.getEditedBranch().relationship.dateended, datePicker: true} ">
+                                                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                                        </div>
+                                                                    </div>
+
+                                                                </div>
+
+                                                            </div>
+
+                                                            <!-- Simple HTML Editor -->
+                                                            <div class="arches-html-editor margin-top-5" style="width: 80%;">
+                                                                <div class="summernote" data-bind="summernote: {value: relationBranchList.getEditedBranch().relationship.notes, options:{}}"></div>
+                                                            </div>
+
+                                                        </div>
+                                                    </form>
+                                                    <!-- Form for screens > xs -->
+                                                </div>
+                                            </div>
+                                        </dd>
+                                        <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "All values must be populated." %}</div>
+
+                                        <!-- Spacer -->
+                                        <hr class="margin-10 margin-top-20">
+
+                                    </div>
+                                </div>
+                                <!-- End Search Item -->
+                            </div>
+
+                            <div class="margin-bottom-30"></div>
+
+                            <!-- Pagination -->
+                            <div id="paginator" data-bind="html: paginator"></div>
+                            <!-- End Pagination -->  
+
+                        </div> 
+                        <!-- End Search Results -->
+                                                   
+                    </div>
+                    <!-- End Content --> 
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock form_content %}

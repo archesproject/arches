@@ -1,0 +1,55 @@
+{% load i18n %}
+<!-- Modal window for adding a new concept -->
+<form action="" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="labelmodal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">{% trans "Add Concept" %}</h4>
+                
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h4>{% trans "Label" %}</h4>
+                        <p><input class="form-control" type="text" name="label" required/></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <h4>{% trans "Note" %}</h4>
+                        <p><textarea class="form-control textarea textarea-resizable" rows="3" type="text" name="note"></textarea></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>{% trans "Language" %}</h4>
+                        <p> 
+                            <select style="width:100%" class="select2" name="language_dd" required>
+                                {% for language in languages %}
+                                  <option value="{{language.languageid}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.languageid}} ({{language.languagename}})</option>
+                                {% endfor %}
+                            </select>
+                        </p>
+                    </div>
+
+                    <div class="col-xs-6">
+                        <h4>{% trans "Relation from Parent" %}</h4>
+                        <div> 
+                            <select style="width:100%;" class="select2" name="relationshiptype_dd" required>
+                                {% for relation in parent_relations %}
+                                  <option value="{{relation.relationtype}}">{{relation.relationtype}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-u btn-u-default" data-dismiss="modal">{% trans "Close" %}</button>
+                <button type="submit" class="btn-u btn-u-primary">{% trans "Save changes" %}</button>
+            </div>
+        </div>
+    </div>
+</form>

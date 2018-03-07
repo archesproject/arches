@@ -1,0 +1,25 @@
+{% load i18n %}
+<div class="row">
+    <div class="col-xs-12">
+        <dl>
+            <dt>
+                <h5 id="" class="arches-report-subsection-title">{% trans "Site function(s)" %}</h5>
+            </dt>
+            {% if 'SITE_FUNCTION_TYPE_E55' not in report_info.source.graph %}
+                <dd class="arches-report-subsection-item">
+                    {% trans "No site functions recorded" %}
+                </dd>
+            {% else %}
+                {% for SITE_FUNCTION_TYPE_E55 in report_info.source.graph.SITE_FUNCTION_TYPE_E55 %}
+                    <dd class="arches-report-subsection-item">
+                     {{ SITE_FUNCTION_TYPE_E55.SITE_FUNCTION_TYPE_E55__value }}<span class="arches-report-subsection-item-type"> ( {% trans "Function" %})</span>
+                     {{ SITE_FUNCTION_TYPE_E55.SITE_FUNCTION_CERTAINTY_TYPE_E55__value }}<span class="arches-report-subsection-item-type"> ( {% trans "Certainty" %})</span>
+                    </dd>
+                    {% empty %}
+                {% endfor %}            
+            {% endif %}
+
+        </dl>
+
+    </div>
+</div>

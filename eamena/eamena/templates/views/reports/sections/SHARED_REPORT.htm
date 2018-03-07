@@ -1,0 +1,159 @@
+{% load i18n %}
+		<!-- Data Source -->
+		<div class="row">
+		     <div class="col-xs-12">
+		        <dl>
+		            <dt>
+		                <h5 id="" class="arches-report-subsection-title">{% trans "Data Source" %}</h5>
+		            </dt>
+		
+		            {% if 'RESOURCE_CREATION_EVENT_E65' not in report_info.source.graph %}
+		                <dd class="arches-report-subsection-item">
+		                    {% trans "No Source recorded" %}
+		                </dd>
+		            {% else %}
+		                {% for RESOURCE_CREATION_EVENT_E65 in report_info.source.graph.RESOURCE_CREATION_EVENT_E65 %}
+		                    {% if 'SHARED_DATA_SOURCE_SHARER_E39' in RESOURCE_CREATION_EVENT_E65 %}
+		                	{% for SHARED_DATA_SOURCE_SHARER_E39 in RESOURCE_CREATION_EVENT_E65.SHARED_DATA_SOURCE_SHARER_E39 %}
+			                	{% if 'SHARED_DATA_SOURCE_APPELLATION_E82' in SHARED_DATA_SOURCE_SHARER_E39 %}
+					                {% for SHARED_DATA_SOURCE_APPELLATION_E82 in SHARED_DATA_SOURCE_SHARER_E39.SHARED_DATA_SOURCE_APPELLATION_E82 %}
+					                    <dd class="arches-report-subsection-item">
+					                        {{ SHARED_DATA_SOURCE_APPELLATION_E82.SHARED_DATA_SOURCE_APPELLATION_E82__value }}
+					                    </dd>
+						         {% endfor %}           
+					         {% endif %}
+				         {% endfor %}
+			             {% endif %}
+		                {% endfor %}            
+		            {% endif %}
+		
+		        </dl>
+		    </div>
+		</div>
+		<!-- End Data Source -->
+		<!-- Data Source Affiliation/Copyright -->
+		<div class="row">
+		     <div class="col-xs-12">
+		        <dl>
+		            <dt>
+		                <h5 id="" class="arches-report-subsection-title">{% trans "Affiliation/Copyright holder" %}</h5>
+		            </dt>
+		
+		            {% if 'RESOURCE_CREATION_EVENT_E65' not in report_info.source.graph %}
+		                <dd class="arches-report-subsection-item">
+		                    {% trans "No Affiliation/Copyright recorded" %}
+		                </dd>
+		            {% else %}
+		                {% for RESOURCE_CREATION_EVENT_E65 in report_info.source.graph.RESOURCE_CREATION_EVENT_E65 %}
+		                    {% if 'SHARED_DATA_SOURCE_SHARER_E39' in RESOURCE_CREATION_EVENT_E65 %}
+		                	{% for SHARED_DATA_SOURCE_SHARER_E39 in RESOURCE_CREATION_EVENT_E65.SHARED_DATA_SOURCE_SHARER_E39 %}
+			                	{% if 'SHARED_DATA_SOURCE_AFFILIATION_E82' in SHARED_DATA_SOURCE_SHARER_E39 %}
+					                {% for SHARED_DATA_SOURCE_AFFILIATION_E82 in SHARED_DATA_SOURCE_SHARER_E39.SHARED_DATA_SOURCE_AFFILIATION_E82 %}
+					                    <dd class="arches-report-subsection-item">
+					                        {{ SHARED_DATA_SOURCE_AFFILIATION_E82.SHARED_DATA_SOURCE_AFFILIATION_E82__value }}
+					                    </dd>
+						         {% endfor %}           
+					         {% endif %}
+				         {% endfor %}
+			             {% endif %}
+		                {% endfor %}            
+		            {% endif %}
+		
+		        </dl>
+		    </div>
+		</div>
+		<!-- End Data Source Affiliation/Copyright  -->
+
+		<!-- Data Source Project -->
+		<div class="row">
+		     <div class="col-xs-12">
+		        <dl>
+		            <dt>
+		                <h5 id="" class="arches-report-subsection-title">{% trans "Data Source Project" %}</h5>
+		            </dt>
+		
+		            {% if 'RESOURCE_CREATION_EVENT_E65' not in report_info.source.graph %}
+		                <dd class="arches-report-subsection-item">
+		                    {% trans "No Project/Affiliation recorded" %}
+		                </dd>
+		            {% else %}
+		                {% for RESOURCE_CREATION_EVENT_E65 in report_info.source.graph.RESOURCE_CREATION_EVENT_E65 %}
+		                    {% if 'CREATOR_E39' in RESOURCE_CREATION_EVENT_E65 %}
+		                	{% for CREATOR_E39 in RESOURCE_CREATION_EVENT_E65.CREATOR_E39 %}
+			                	{% if 'SHARED_DATA_SOURCE_CREATOR_APPELLATION_E82' in CREATOR_E39 %}
+					                {% for SHARED_DATA_SOURCE_CREATOR_APPELLATION_E82 in CREATOR_E39.SHARED_DATA_SOURCE_CREATOR_APPELLATION_E82  %}
+					                    <dd class="arches-report-subsection-item">
+					                        {{ SHARED_DATA_SOURCE_CREATOR_APPELLATION_E82.SHARED_DATA_SOURCE_CREATOR_APPELLATION_E82__value }}
+					                    </dd>
+						         {% endfor %}           
+					         {% endif %}
+				         {% endfor %}
+			             {% endif %}
+		                {% endfor %}            
+		            {% endif %}
+		
+		        </dl>
+		    </div>
+		</div>
+		<!-- End Data Source Project -->
+
+
+		
+		<!-- Dataset Acquisition date -->
+		<div class="row">
+		     <div class="col-xs-12">
+		        <dl>
+		            <dt>
+		                <h5 id="" class="arches-report-subsection-title">{% trans "Dataset Acquisition" %}</h5>
+		            </dt>
+		
+		            {% if 'RESOURCE_CREATION_EVENT_E65' not in report_info.source.graph %}
+		                <dd class="arches-report-subsection-item">
+		                    {% trans "No Date recorded" %}
+		                </dd>
+		            {% else %}
+		                {% for RESOURCE_CREATION_EVENT_E65 in report_info.source.graph.RESOURCE_CREATION_EVENT_E65 %}
+		                    {% if 'TIME___SPAN_SHARED_DATA_SOURCE_CREATION_EVENT_E52' in RESOURCE_CREATION_EVENT_E65 %}
+		                	{% for TIME___SPAN_SHARED_DATA_SOURCE_CREATION_EVENT_E52 in RESOURCE_CREATION_EVENT_E65.TIME___SPAN_SHARED_DATA_SOURCE_CREATION_EVENT_E52 %}
+						{% if 'SHARED_DATA_SOURCE_DATE_OF_CREATION_E50' in TIME___SPAN_SHARED_DATA_SOURCE_CREATION_EVENT_E52 %}
+							{% for SHARED_DATA_SOURCE_DATE_OF_CREATION_E50 in TIME___SPAN_SHARED_DATA_SOURCE_CREATION_EVENT_E52.SHARED_DATA_SOURCE_DATE_OF_CREATION_E50 %}						
+					                    <dd class="arches-report-subsection-item">
+					                        {{ SHARED_DATA_SOURCE_DATE_OF_CREATION_E50.SHARED_DATA_SOURCE_DATE_OF_CREATION_E50__value|cut:"T00:00:00" }}
+					                    </dd>
+					                 {% endfor %}
+				                 {% endif %}
+				         {% endfor %}
+			             {% endif %}
+		                {% endfor %}            
+		            {% endif %}
+		
+		        </dl>
+		    </div>
+		</div>
+		<!-- End Dataset Acquisition date -->
+		
+		
+		<!-- Dataset Description -->
+		<div class="row">
+		     <div class="col-xs-12">
+		        <dl>
+		            <dt>
+		                <h5 id="" class="arches-report-subsection-title">{% trans "Further comments" %}</h5>
+		            </dt>
+		
+		            {% if 'DESCRIPTION_E62' not in report_info.source.graph %}
+		                <dd class="arches-report-subsection-item">
+		                    {% trans "No Comments recorded" %}
+		                </dd>
+		            {% else %}
+		                {% for DESCRIPTION_E62 in report_info.source.graph.DESCRIPTION_E62 %}
+		                    <dd class="arches-report-subsection-item">
+		                        {{ DESCRIPTION_E62.DESCRIPTION_E62__value }}
+		                    </dd>
+		                {% endfor %}            
+		            {% endif %}
+		
+		        </dl>
+		    </div>
+		</div>
+		<!-- End Dataset description -->

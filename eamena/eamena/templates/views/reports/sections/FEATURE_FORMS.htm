@@ -1,0 +1,49 @@
+{% load i18n %}
+<div class="row">
+    <div class="col-xs-12">
+            <dt>
+                <h5 id="" class="arches-report-subsection-title">{% trans "Feature forms within Heritage Resource" %}</h5>
+            </dt>
+     {% for PRODUCTION_E12 in report_info.source.graph.PRODUCTION_E12|dictsort:"orderby" %}
+     {% for PHASE_TYPE_ASSIGNMENT_E17 in PRODUCTION_E12.PHASE_TYPE_ASSIGNMENT_E17%}
+     {% if 'FEATURE_EVIDENCE_ASSIGNMENT_E17' in PHASE_TYPE_ASSIGNMENT_E17 %}
+     {% for FEATURE_EVIDENCE_ASSIGNMENT_E17 in PHASE_TYPE_ASSIGNMENT_E17.FEATURE_EVIDENCE_ASSIGNMENT_E17 %}
+             {% if 'FEATURE_EVIDENCE_TYPE_E55' in FEATURE_EVIDENCE_ASSIGNMENT_E17 %}
+
+                <dd class="arches-report-subsection-item">
+                {% for FEATURE_EVIDENCE_TYPE_E55 in FEATURE_EVIDENCE_ASSIGNMENT_E17.FEATURE_EVIDENCE_TYPE_E55  %}
+
+                            {{ FEATURE_EVIDENCE_TYPE_E55.FEATURE_EVIDENCE_TYPE_E55__value }}  <span class="arches-report-subsection-item-type"> ( {% trans "Form Type" %} )</span>
+             
+                 {% endfor %}
+                 {% if 'FEATURE_EVIDENCE_TYPE_CERTAINTY_TYPE_E55' in FEATURE_EVIDENCE_ASSIGNMENT_E17 %}
+
+                {% for FEATURE_EVIDENCE_TYPE_CERTAINTY_TYPE_E55 in FEATURE_EVIDENCE_ASSIGNMENT_E17.FEATURE_EVIDENCE_TYPE_CERTAINTY_TYPE_E55  %}
+                        
+                       {{ FEATURE_EVIDENCE_TYPE_CERTAINTY_TYPE_E55.FEATURE_EVIDENCE_TYPE_CERTAINTY_TYPE_E55__value }}<span class="arches-report-subsection-item-type"> ( {% trans "Certainty" %} )</span> 
+                {% empty %}
+                {% endfor %} 
+                {% endif %}     
+                {% if 'FEATURE_EVIDENCE_NUMBER_TYPE_E55' in FEATURE_EVIDENCE_ASSIGNMENT_E17 %}
+
+                    {% for FEATURE_EVIDENCE_NUMBER_TYPE_E55 in FEATURE_EVIDENCE_ASSIGNMENT_E17.FEATURE_EVIDENCE_NUMBER_TYPE_E55  %}
+                            
+                           {{ FEATURE_EVIDENCE_NUMBER_TYPE_E55.FEATURE_EVIDENCE_NUMBER_TYPE_E55__value }}  <span class="arches-report-subsection-item-type">( {% trans "Number" %} )</span>
+
+                    {% empty %}
+                    {% endfor %} 
+                {% endif %}    
+
+               </dd>
+              {% else %}
+                 <dd class="arches-report-subsection-item">{% trans "No feature forms recorded" %}</dd>
+              {% endif %} 
+
+    {% endfor %} 
+    {% endif %}
+    {% endfor %}      
+    {% endfor %}  
+        </dl>
+
+    </div>
+</div>

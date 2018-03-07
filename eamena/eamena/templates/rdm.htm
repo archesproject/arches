@@ -1,0 +1,162 @@
+{% extends "base.htm" %}
+{% load i18n %}
+
+{% load staticfiles %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'plugins/jqtree/jqtree.css' %}">
+    {{ block.super }}
+{% endblock css %}
+
+{% block content %}
+
+
+    <!--=== App Header ===-->
+    <div class="breadcrumbs sticky" id="appheader" style="">
+        
+        <!-- Search Terms -->
+        <div class="container">
+            <div class="row">
+
+                <!-- App Name for larger screens -->
+                <div class="col-sm-5 col-lg-4 hidden-xs">
+                    <h1 class="pull-left arches-breadcrumb-title" style="margin-top: -5px;">{% trans "Reference Data Manager (RDM)" %}</h1>
+                </div>
+
+                <!-- App Name for xs screens -->
+                <div class="col-xs-12 hidden-sm hidden-md hidden-lg text-center">
+                    <h1 class="arches-breadcrumb-title margin-top-minus-10">{% trans "Reference Data Manager (RDM)" %}</h1>
+                </div>
+
+                <!-- Concept Search -->
+                <div class="col-xs-12 col-sm-7 col-lg-8" id='rdm-concept-search-container'>
+                    <div class="form-group margin-bottom-20">       
+                        {% include 'views/concept-search.htm' %}
+                    </div>
+                </div>
+                <!-- End Concept Search -->
+
+
+            </div>
+        </div>
+        <!-- End Search Terms -->  
+
+    </div>    
+    <!--=== End App Header ===-->
+
+    <!-- Main Content -->
+    <div class="block-description arches-secondary-header" id="main-container">
+                     
+        <div class="container content arches-forms-container" id="forms-container">      
+            
+            <!-- RDM Tree and CRUD Forms -->
+            <div class="row">
+                
+                <!-- Begin RDM Tree -->
+                <div class="col-md-5 col-lg-4">
+
+
+                    
+                    <div class="left-inner arches-box-grey-border padding-10 hidden-xs hidden-sm" id="sidebar" style="background: #ffffff;">
+                        
+                        <div class="headline arches-RDM-headline"><h3 class="arches-RDM-Concept">{% trans "RDM" %}</h3>
+                            
+                            <!-- Scheme Tools for larger screens -->
+<!--                             <div class="btn-group" data-toggle="buttons">
+                                <label class="btn btn-primary active" id="option1">
+                                    <input type="radio" name="options" autocomplete="off" checked>{% trans "Schemes" %}
+                                </label>
+                                <label class="btn btn-primary" id="option2" >
+                                    <input type="radio" name="options" autocomplete="off">{% trans "Dropdowns" %}
+                                </label>
+                            </div> -->
+
+                            <div class="btn-group pull-right hidden-xs">
+                                <button type="button" class="btn btn-primary dropdown-toggle arches-RDM-button" data-toggle="dropdown">{% trans "Tools" %}
+                                    <i class="fa fa-chevron-down"></i>
+                                    <span class="sr-only">{% trans "Toggle Dropdown" %}</span>                           
+                                </button>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="javascript:void(0);" data-toggle="#add-scheme-form">{% trans "Add Scheme" %}</a></li>
+                                    <li><a href="javascript:void(0);" data-toggle="#import-scheme-form">{% trans "Import Scheme" %}</a></li>
+                                    <li><a href="javascript:void(0);" data-toggle="#export-scheme-form">{% trans "Export Scheme" %}</a></li>
+                                    <li><a href="javascript:void(0);" data-toggle="#delete-scheme-form">{% trans "Delete Scheme" %}</a></li>
+                                    <li class="divider"></li>
+                                    <li><a href="javascript:void(0);">{% trans "Close" %}</a></li>
+                                </ul>
+                            </div>
+
+                        </div>
+
+                        <!-- RDM Tree Container -->
+                        <section style="height: 600px; overflow-y: scroll; overflow-x:hidden;">
+                            
+                            <div class="concept_tree" id="jqtree" style="direction:ltr;">
+                            </div>
+                        
+                        </section>
+                        <!-- End RDM Tree Container -->
+                    
+                    </div>
+                </div>
+                <!-- End RDM Tree -->
+
+
+                <!-- Spacer for small screens -->
+                <div class="margin-top-10 hidden-md hidden-lg"></div>
+
+                
+                <!-- Concept CRUD Form -->
+                <div class="col-md-7 col-lg-8">            
+
+                    <!-- Concept Summary -->
+                    <div class="right-inner arches-box-grey-border padding-10" id="crud" style="background: #ffffff;">        
+                        <div class="row">
+                            
+                            <!-- Concept Managment Tools -->
+                            <div class="col-xs-12">
+
+                                <div class="row margin-bottom-30" id="concept_report">
+                                    <div class="col-xs-12 hidden arches-RDM-loading" id="concept_report_loading">{% trans "Loading..." %}</div>
+                                </div><!--/row-->
+                                
+                            </div>
+                            <!-- End Concept Managment Tools -->
+                            
+                        </div>
+                    </div>
+                    <!-- End Descriptions and Lists -->
+                    
+                    <div class="clearfix"></div>
+
+                </div>
+                <!-- End CRUD Form -->
+
+            </div> 
+            <!-- End RDM Tree and CRUD Forms -->
+
+        </div>
+    </div>     
+    <!--=== End Content Part ===-->
+
+    <div style="display:none;" id="concept-data">
+        <input type="hidden" id="selected-conceptid" value="{{conceptid}}">
+    </div>
+
+<div id="add-scheme-form">
+    {% include "views/rdm/modals/add-scheme-form.htm" %}
+</div>
+
+<div id="export-scheme-form">
+    {% include "views/rdm/modals/export-scheme-form.htm" %}
+</div>
+
+<div id="delete-scheme-form">
+    {% include "views/rdm/modals/delete-scheme-form.htm" %}
+</div>
+
+<div id="import-scheme-form">
+    {% include "views/rdm/modals/import-scheme-form.htm" %}
+</div>
+
+{% endblock content %}

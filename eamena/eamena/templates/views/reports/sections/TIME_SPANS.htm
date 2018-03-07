@@ -1,0 +1,45 @@
+{% load i18n %}
+<div class="row">
+    <div class="col-xs-12">
+        <dl>
+            <dt>
+                <h5 id="" class="arches-report-subsection-title">{% trans "Time span" %}</h5>
+            </dt>
+    {% for PRODUCTION_E12 in report_info.source.graph.PRODUCTION_E12 %}
+    {% for PHASE_TYPE_ASSIGNMENT_E17 in PRODUCTION_E12.PHASE_TYPE_ASSIGNMENT_E17 %}
+    
+            {% if 'TIME___SPAN_PHASE_E52' in PHASE_TYPE_ASSIGNMENT_E17 %}
+
+            <dd class="arches-report-subsection-item">
+   
+                {% for TIME___SPAN_PHASE_E52 in PHASE_TYPE_ASSIGNMENT_E17.TIME___SPAN_PHASE_E52  %}
+                    {% if 'FROM_DATE_E55' in TIME___SPAN_PHASE_E52 %}
+          
+                        {% for FROM_DATE_E55 in TIME___SPAN_PHASE_E52.FROM_DATE_E55  %}
+                            
+                            {% trans "From" %} {{ FROM_DATE_E55.FROM_DATE_E55__value }} 
+
+                         {% empty %}
+                        {% endfor %} 
+        
+                   {% endif %}
+                   {% if 'TO_DATE_E55' in TIME___SPAN_PHASE_E52 %}
+
+                        {% for TO_DATE_E55 in TIME___SPAN_PHASE_E52.TO_DATE_E55  %}
+                            
+                           {% trans "To" %} {{ TO_DATE_E55.TO_DATE_E55__value }}  
+
+                         {% empty %}
+                        {% endfor %} 
+
+                   {% endif %}
+                {% endfor %}         
+        
+            </dd>
+            {% endif %}
+    {% endfor %}  
+    {% endfor %}  
+        </dl>
+
+    </div>
+</div>

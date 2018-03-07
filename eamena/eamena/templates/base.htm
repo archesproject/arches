@@ -1,0 +1,251 @@
+{% load staticfiles %}
+{% load i18n %}
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->  
+<!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->  
+<!--[if !IE]><!--> <html lang="en"> <!--<![endif]-->  
+{% if debug %}
+<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':{{ livereload_port }}/livereload.js?snipver=1"></' + 'script>')</script>
+{% endif %}
+
+<head>
+    <title>{% block title %}{{ APP_NAME }}{% endblock %}</title>
+
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+	{% block css %}
+        <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="{% static 'plugins/line-icons/line-icons.css' %}">
+        <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/octicons/2.1.2/octicons.min.css">
+        <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" type="text/css">
+        <link rel="stylesheet" href="{% static 'css/main.css' %}">
+        <link rel="stylesheet" href="{% static 'css/plugins/smartadmin-production.css' %}" type="text/css" media="screen">
+        <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/3.1.3/css/bootstrap-datetimepicker.min.css" type="text/css" media="screen">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/blueimp-gallery/2.15.2/css/blueimp-gallery.min.css" type="text/css" media="screen">
+        <link rel="stylesheet" href="{% static 'css/plugins/bootstrap-image-gallery.min.css' %}" type="text/css" media="screen">
+        <link rel="stylesheet" href="{% static 'plugins/openlayers/ol.css' %}">
+        <link rel="stylesheet" href="{% static 'css/arches.css' %}">
+        <link rel="stylesheet" href="{% static 'css/package.css' %}">
+    {% endblock css%}
+
+</head> 
+{% get_current_language_bidi as LANGUAGE_BIDI %}
+<body class="scroll-y" style="direction: {% if LANGUAGE_BIDI %} rtl; {% else %} ltr; {% endif %}" > 
+
+    <div class="wrapper">
+    	{% block header %}
+            {% include 'header.htm' %}
+        {% endblock header %} 
+		{% block breadcrumbs %}
+        <!--=== Breadcrumbs ===-->
+<!--         <div class="breadcrumbs">
+            <div class="container">
+
+                <h1 class="pull-left arches-breadcrumb-title">Reference Data Manager (RDM)</h1>
+                <ul class="pull-right breadcrumb">
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                    <li><a href="">Reference Data Manager</a></li>
+                </ul>
+            </div>
+        </div> -->
+        <!--=== End Breadcrumbs ===-->
+        {% endblock breadcrumbs %}
+
+        {% block subheader %}
+        {% endblock subheader %}
+
+        <!--=== Content Part ===-->
+        {% block content %}
+        {% endblock content %}
+        <!--=== End Content Part ===-->
+
+
+
+    </div><!--/wrapper-->
+
+	{% block javascript %}
+    
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js"></script>
+    <script src="{{ STATIC_URL }}js/views/crypto/components/core-min.js"></script>
+    <script src="{{ STATIC_URL }}js/views/crypto/components/cipher-core.js"></script>
+    <script src="{{ STATIC_URL }}js/views/crypto/components/enc-base64.js"></script>
+    <script src="{{ STATIC_URL }}js/views/crypto/components/mode-cfb.js"></script>
+    <script src="{{ STATIC_URL }}js/views/crypto/rollups/aes.js"></script>
+    {% block pre_require_js %}
+    {% endblock pre_require_js %}
+    <script>
+        require.config({
+            baseUrl: '{{ STATIC_URL }}js',
+            paths: {
+                'plugins': '{{ STATIC_URL }}plugins',
+                'async': 'http://cdnjs.cloudflare.com/ajax/libs/requirejs-async/0.1.1/async',
+                'jquery': 'http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min',
+                'select2': 'http://cdnjs.cloudflare.com/ajax/libs/select2/3.5.1/select2.min',
+                'bootstrap': 'http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.0/js/bootstrap.min',
+                'jquery-ui': 'http://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min',
+                'flexslider': 'http://cdnjs.cloudflare.com/ajax/libs/flexslider/2.2.2/jquery.flexslider-min',
+                'openlayers': '{{ STATIC_URL }}plugins/openlayers/ol',
+                'easing': 'http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min',
+                'backbone': 'http://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min',
+                //'underscore': 'http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min',
+                'underscore': 'https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min',
+                'jquery-validate': 'http://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.11.1/jquery.validate.min',
+                'd3': 'http://cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min',
+                'dropzone': 'http://cdnjs.cloudflare.com/ajax/libs/dropzone/3.8.4/dropzone-amd-module.min',
+                'summernote': 'http://cdnjs.cloudflare.com/ajax/libs/summernote/0.5.10/summernote.min',
+                'knockout': 'http://cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-min',
+                //'knockout': 'http://knockoutjs.com/downloads/knockout-3.3.0.debug',
+                'knockout-mapping': 'http://cdnjs.cloudflare.com/ajax/libs/knockout.mapping/2.4.1/knockout.mapping.min',
+                'moment': 'http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min',
+                'bootstrap-datetimepicker': 'http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/3.1.3/js/bootstrap-datetimepicker.min',
+                'shp': 'https://raw.githubusercontent.com/wavded/js-shapefile-to-geojson/master/shapefile',
+                'blueimp-gallery': 'https://cdnjs.cloudflare.com/ajax/libs/blueimp-gallery/2.15.2/js/blueimp-gallery',
+                'blueimp-jquery': 'http://blueimp.github.io/Gallery/js/jquery.blueimp-gallery',
+                'blueimp-helper': 'https://cdnjs.cloudflare.com/ajax/libs/blueimp-gallery/2.15.2/js/blueimp-helper.min',
+                'gmjs': 'https://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyBPUB3B5aiHQDVyIuhDqDp500IUCIEDdtM',
+                'Highcharts': 'https://code.highcharts.com/highcharts.src',
+            },
+            shim: {
+                'openlayers': {
+                    exports: 'ol'
+                },
+                'Highcharts': {
+                    exports: 'Highcharts'
+                }
+            }
+        });
+
+        // application wide require calls
+        require(["jquery"], function($) {
+            var jQuery = $;
+
+            // put values here that should be accessible application wide
+            define('arches', [], function () {
+                return {
+                    urls: {
+                        home: "{% url 'home' %}",
+                        media: "{{ STATIC_URL }}",
+                        uploadedfiles: "{{ MEDIA_URL }}",
+                        concept_tree: "{% url 'concept_tree' %}",
+                        dropzone_files: "{% url 'resource_manager' resourcetypeid form_id resourceid %}",
+                        concept: "{% url 'concept' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
+                        concept_search: "{% url 'concept_search' %}",
+                        concept_manage_parents: "{% url 'concept_manage_parents' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
+                        from_sparql_endpoint: "{% url 'from_sparql_endpoint' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
+                        search_sparql_endpoint: "{% url 'search_sparql_endpoint' %}",
+                        confirm_delete: "{% url 'confirm_delete' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
+                        edit_history: "{% url 'edit_history' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
+                        search_terms: "{% url 'search_terms' %}",
+                        search_results: "{% url 'search_results' %}",
+                        search_results_export: "{% url 'search_results_export' %}",
+                        map_layers: "{% url 'map_layers' '' %}",
+                        map_markers: "{% url 'map_markers' '' %}",
+                        reports: "{% url 'report' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
+                        buffer: "{% url 'buffer'%}",
+                        related_resources: "{% url 'related_resources' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
+                        get_admin_areas: "{% url 'get_admin_areas'%}",
+                        user_activity_data: "{% url 'user_activity_data' userid %}",
+                        group_activity_data: "{% url 'group_activity_data' groupid %}",
+                    },
+                    mapDefaults: {
+                        x: {{ map_info.x }},
+                        y: {{ map_info.y }},
+                        zoom: {{ map_info.zoom }},
+                        minZoom: {{ map_info.map_min_zoom }},
+                        maxZoom: {{ map_info.map_max_zoom }},
+                        extent: '{{ map_info.extent }}'
+                    },
+                    resourceMarker: {
+                        font: '{{ map_info.resource_marker_font }}',
+                        icon: '{{ map_info.resource_marker_icon }}',
+                        defaultColor: '{{ map_info.resource_marker_color }}'
+                    },
+                    bingKey: "{{ map_info.bing_key }}",
+                    bingLayers: [
+                    {
+                        id: 'Aerial',
+                        name: "{% trans 'Bing Imagery' %}",
+                        icon: "{% static 'img/map/Bing_Sat.png' %}"
+                    },
+                    {% if 'edit' in user.user_groups %}{
+                        id: 'Road',
+                        name: "{% trans ' Bing Streets' %}",
+                        icon: "{% static 'img/map/Bing_Streets.png' %}"
+                    }{% endif %}],
+                    editor:  {% if 'edit' in user.user_groups %} true {% else %} false {% endif %},
+                };
+            });
+
+            define('resource-types', [], function () {
+                var resourceTypes = {
+                    {% for type, type_data in resource_types %}
+                    "{{type}}": {
+                        id: "{{type_data.resourcetypeid}}",
+                        icon: "{{type_data.icon_class}}",
+                        name: "{{type_data.name}}",
+                        defaultDescription: "{{type_data.default_description}}",
+                        descriptionNode: "{{type_data.description_node}}",
+                        categories: [
+                            {% for category in type_data.categories %}
+                            "{{category}}"
+                            {% endfor %}
+                        ],
+                        color: "{{type_data.marker_color}}",
+                        strokeColor: "{{type_data.stroke_color}}",
+                        fillColor: "{{type_data.fill_color}}"
+                    },
+                    {% endfor %}
+                };
+
+                return resourceTypes;;
+            });
+
+            require(["plugins/scroll-to-top", "views/simple-search", "bootstrap", "jquery-ui"], function (scrollToTop, SimpleSearch) {
+                var search = new SimpleSearch({ el: $('#simple-search')[0] });                
+                var scrollableElement;
+                {% if active_page == 'ResourceReport' %}
+                    scrollableElement = $('#report-body'); 
+                {% endif %}
+
+                scrollToTop.init(scrollableElement);
+                // include all base_page instances here that page scripts may need access to
+                // NOTE: this module should only ever be required from within main page scripts
+                define('base_page', [], function () {
+                    return {
+                        search: search,
+                        scrollToTop: scrollToTop
+                    };
+                });
+
+                {% if main_script %}
+                    // main page script require
+                    require(["{{ main_script }}"]);
+                {% endif %}
+
+                $('[data-toggle="popover"]').popover();
+            });
+        });
+    </script>
+
+	{% endblock javascript %}
+
+    {% if GOOGLE_ANALYTICS_TRACKING_ID != None %}
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', '{{GOOGLE_ANALYTICS_TRACKING_ID}}', 'auto');
+      ga('send', 'pageview');
+
+    </script>
+    {% endif %}
+</body>
+
+</html> 

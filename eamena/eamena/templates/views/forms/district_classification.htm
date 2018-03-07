@@ -1,0 +1,347 @@
+{% extends "views/forms/wizard-base.htm" %}
+{% load i18n %}
+
+{% block form_content %}
+
+
+<div>
+    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "A type and date must be specified." %}</div>
+    <!-- Related Information Objects Container -->
+    <div id="existing-classifications">
+
+        <!-- Related Images Title -->
+        <div class="row">
+            <div class="col-xs-12">
+
+                <!-- Images -->
+                <div class="padding-left-10">
+                    
+                    <dl style="margin-bottom: 0px;">
+                        <!-- Title -->
+                        <dt style="display: none;" data-bind="visible: true">
+                            <h5 id="arches-names-form" class="section-headline">{% trans "Resource Classification" %}</h5>
+                        </dt>
+
+                        <dt data-bind="visible: false">
+                            <h5 id="arches-names-form" class="section-headline modal-title loading"> {% trans "Loading ...." %}</h5>
+                        </dt>
+                        
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <!--Existing Classifications-->
+        <div id="current-items" style="display: none;" data-bind="foreach: data.data, visible: true">
+            <div class="arches-crud-record">
+            <div  class="row margin-top-minus-5 margin-bottom-10" style="display: block;">
+                <div class="col-xs-12">
+
+                    <div class="margin-left-5">
+                        <dl class="margin-bottom-10"> 
+                            
+                            <dd>
+                                <div class="">
+                                    <h5>
+                                        <a href="#" title="Remove this evaluation" data-bind="click: $root.deleteAssessment"><i class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                        <a href="#" class="" title="Edit this assessment" data-bind="click: $root.editAssessment">{% trans "Classification" %} 
+                                        <span data-bind="if: $data['SITE_MORPHOLOGY_TYPE.E55'].branch_lists.length > 0">
+                                            <span data-bind="text: ': ' + $data['SITE_MORPHOLOGY_TYPE.E55'].branch_lists[0].nodes[0].label"></span>
+                                        </span>
+                                        </a>
+                                    </h5>
+                                </div>
+                            </dd>
+                        </dl>
+
+
+                        <dl>   
+                            <dt class="arches-evaluation-header">{% trans "Resource Type" %}</dt>
+                            <dd class="arches-evaluation-content" data-bind="if: $data['SITE_MORPHOLOGY_TYPE.E55'].branch_lists.length > 0">
+                                <span data-bind="html: $data['SITE_MORPHOLOGY_TYPE.E55'].branch_lists[0].nodes[0].label"></span>
+                            </dd>
+                            <dd class="arches-evaluation-content" data-bind="ifnot: $data['SITE_MORPHOLOGY_TYPE.E55'].branch_lists.length > 0">
+                                <span data-bind="html: 'no entries'"></span>
+                            </dd>
+                        </dl>
+
+
+                        <dl>   
+                            <dt class="arches-evaluation-header">{% trans "Cultural Period" %}</dt>
+                            <dd class="arches-evaluation-content" data-bind="if: $data['CULTURAL_PERIOD.E55'].branch_lists.length > 0">
+                                <span data-bind="html: $data['CULTURAL_PERIOD.E55'].branch_lists[0].nodes[0].label"></span>
+                            </dd>
+                            <dd class="arches-evaluation-content" data-bind="ifnot: $data['CULTURAL_PERIOD.E55'].branch_lists.length > 0">
+                                <span data-bind="html: 'no entries'"></span>
+                            </dd>
+                        </dl>
+
+                        <dl>   
+                            <dt class="arches-evaluation-header">{% trans "From" %}</dt>
+                            <dd class="arches-evaluation-content" data-bind="if: $data['FROM_DATE.E49'].branch_lists.length > 0">
+                                <span data-bind="html: $data['FROM_DATE.E49'].branch_lists[0].nodes[0].label"></span>
+                            </dd>
+                            <dd class="arches-evaluation-content" data-bind="ifnot: $data['FROM_DATE.E49'].branch_lists.length > 0">
+                                <span data-bind="html: 'no entries'"></span>
+                            </dd>
+                        </dl>
+                        <dl>
+                            <dt class="arches-evaluation-header">{% trans "To" %}</dt>
+
+                            <dd class="arches-evaluation-content" data-bind="if: $data['TO_DATE.E49'].branch_lists.length > 0">
+                                <span data-bind="html: $data['TO_DATE.E49'].branch_lists[0].nodes[0].label"></span>
+                            </dd>
+                            <dd class="arches-evaluation-content" data-bind="ifnot: $data['TO_DATE.E49'].branch_lists.length > 0">
+                                <span data-bind="html: 'no entries'"></span>
+                            </dd>
+                        </dl>
+
+                        <dl>   
+                            <dt class="arches-evaluation-header">{% trans "Related Features" %}</dt>
+                            <dd data-bind="foreach: $data['ANCILLARY_FEATURE_TYPE.E55'].branch_lists" class="arches-evaluation-content">
+                                <span data-bind="text: nodes[0].label"></span>
+                            </dd>
+                            <dd class="arches-evaluation-content" data-bind="ifnot: $data['ANCILLARY_FEATURE_TYPE.E55'].branch_lists.length > 0">
+                                <span data-bind="html: 'no entries'"></span>
+                            </dd>
+                        </dl>
+                        
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+        <!-- End Completed Condition Assessements -->
+
+    </div>
+    <!-- End Related Information Objects Container -->
+
+
+    <!-- Condition Assessement Wizard Container --> 
+    <div style="display: none;" id="workflow-container">     
+        <div class="padding-10" id="crud">
+            <div>
+                
+                <!-- Arches form container -->
+                <dl>
+                    <dd class="arches-RDM-labels">
+                        <div class="row">
+                            <div class="col-xs-12 padding-left-0">
+            
+                                <!-- Start Wizard -->
+                                <form class="margin-top-20" id="wizard-1" novalidate="novalidate">
+                                    <div id="bootstrap-wizard-1" class="col-sm-12">
+                                        <div class="form-bootstrapWizard">
+                                            <ul class="bootstrapWizard form-wizard">
+                                                <li class="active" data-target="#step1" style="width: 50%">
+                                                    <a href="#tab1" data-toggle="tab"> <span class="step">1</span> <span class="title">{% trans "Part 1: Summary" %}</span> </a>
+                                                </li>
+                                                <li data-target="#step2" style="width: 50%">
+                                                    <a href="#tab2" data-toggle="tab"> <span class="step">2</span> <span class="title">{% trans "Part 2: Related Features" %}</span> </a>
+                                                </li>
+                                            </ul>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                        
+                                        <!-- Wizard Tabs -->
+                                        <div class="tab-content" style="margin-top: 20px;">
+
+                                            <!-- Tab 1: Summary -->
+                                            <div class="tab-pane active" id="tab1" style="min-height: 330px;">
+                                                <br>
+                                                <h3 class="margin-bottom-5"><strong>{% trans "Part 1" %}</strong> {% trans "Classification Summary" %}</h3>
+
+                                                <div class="alert alert-info fade in">
+                                                    <i class="fa-fw fa fa-info"></i>
+                                                    {% trans "Start your classification by describing it's type, use and cultural period." %}
+                                                </div>
+
+                                                <!-- Overall Condition, Date Observed -->
+                                                <div>
+                                                    <dl class="">   
+
+                                                        <dd class="" style="margin-bottom:5px">
+                                                            <div class="row" style="margin-bottom: 10px;">
+
+                                                                <!-- Classification and dates -->
+                                                                <div id="resource-type-section" class="col-xs-12 col-sm-6">
+                                                                               
+                                                                    <div style="padding-right: 0px; padding-left: 0px;">
+                                                                        <input style="width:100%" class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('SITE_MORPHOLOGY_TYPE.E55', 'value'), placeholder: '{% trans "morphology" %}', dataKey: 'SITE_MORPHOLOGY_TYPE.E55'}">
+                                                                        </input>
+
+                                                                    </div>
+                                                                    <!-- Spacer for xs screens -->
+                                                                    <div class="margin-top-5 hidden-lg hidden-md hidde-sm"></div>
+                                                                </div>
+
+                                                                <div id="resource-use-section" class="col-xs-12 col-sm-6">
+                                                                               
+                                                                    <div style="padding-right: 0px; padding-left: 0px;">
+                                                                            <input style="width:100%" class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('SITE_OVERALL_SHAPE_TYPE.E55', 'value'), placeholder: '{% trans "use" %}',  dataKey: 'SITE_OVERALL_SHAPE_TYPE.E55'}">
+                                                                            </input>
+                                                                        </div>
+                                                                        <!-- Spacer for xs screens -->
+                                                                    <div class="margin-top-5 hidden-lg hidden-md hidde-sm"></div>
+
+                                                                </div>
+
+                                                            </div>
+                                                        </dd>
+
+                                                        <dd class="">
+                                                            <div class="row" style="margin-bottom: 10px;">
+                                                                <!-- Classification and dates -->
+                                                                <div style="">
+                                                                
+                                                                    <div id="from-date-section" class="col-xs-12 col-sm-6">
+                                                                        <div class="input-group datetimepicker" style ="width:100%;" >
+                                                                            <input type="text" id="date" style="height: 32px;" placeholder="{% trans 'from (yyyy-mm-dd)' %}" class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('FROM_DATE.E49', 'value')} ">
+                                                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                                        </div>
+
+                                                                        <div class="hidden-sm hidden-md hidden-lg" style="margin-bottom: 5px;">
+                                                                        </div>
+
+                                                                    </div>
+
+                                                                    
+
+                                                                    <div id="to-date-section" class="col-xs-12 col-sm-6">
+                                                                        <div class="input-group datetimepicker" style ="width:100%;" >
+                                                                            <input type="text" id="date" style="height: 32px;" placeholder="{% trans 'to (yyyy-mm-dd)' %}" class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('TO_DATE.E49', 'value')} ">
+                                                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                                        </div>
+                                                                    </div>
+
+                                                                </div>
+
+                                                            </div>
+                                                        </dd>
+
+                                                        <dd class="">
+                                                            <div class="row">
+                                                                <div class="col-xs-12 col-sm-6">
+
+                                                                    <div id="period-section" class="select2 arches-select2-crud-form resource-type" style="width: 100%" data-bind="select2: {value: getEditedNode('CULTURAL_PERIOD.E55', 'value'), placeholder: '{% trans "period" %}', multiple: false, dataKey: 'CULTURAL_PERIOD.E55'}">
+                                                                    </div>
+
+
+                                                                </div>
+                                                            </div>
+                                                        </dd>
+
+
+                                                    </dl>
+
+                                                </div>  
+                                            </div>
+
+                                            
+                                            <!-- Tab 2: Upload Files -->
+                                            <div class="tab-pane" id="tab2" style="min-height: 330px;">
+                                                <br>
+                                                <h3 class="margin-bottom-5"><strong>{% trans "Part 2" %}</strong> {% trans "Assessment Summary" %}</h3>
+
+                                                <div class="alert alert-info fade in">
+                                                    <i class="fa-fw fa fa-info"></i>
+                                                    {% trans "Select this classification's related features." %}
+                                                </div>
+
+                                                <!-- Overall Condition, Date Observed -->
+                                                <div>
+                                                <!-- Form for screens > XS -->
+                                                <dl id="related-features-section">
+                                                    <!-- Title -->
+                                                    <dt>
+                                                        <h5 id="arches-names-form" class="section-headline">{% trans "Related Features" %}</h5>
+                                                    </dt>
+
+                                                    <!-- Form -->
+                                                    <dd class="arches-RDM-labels">
+
+                                                        <div class="row">
+
+                                                            <div class="col-xs-12">
+
+                                                                <input style="height: 36px; width:80%; padding-top: 2px;" class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('ANCILLARY_FEATURE_TYPE.E55', 'value'), dataKey: 'ANCILLARY_FEATURE_TYPE.E55'}"></input>
+
+                                                                {% include 'views/components/add-item-button.htm' %}
+
+                                                            </div>
+
+                                                            <!-- User's Selected Disturbances -->
+                                                            <div class="row">
+                                                                <div class="col-xs-12">
+
+                                                                    <div class="margin-left-5">
+                                                                        <dl class="margin-bottom-10"> 
+                                                                            
+                                                                            <dd class="margin-left-10 margin-top-5" style="display: none;" data-bind="visible: true">
+                                                                                <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No related features selected" %}</div>   
+
+                                                                                <div data-bind="foreach: getBranchLists()">
+                                                                                    <div class="arches-crud-record">
+                                                                                        <a href="javascript:void(0)" class="arches-CRUD-child" title="Delete this name"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                                                                        <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans "Edit this type" %}"><span data-bind="text: nodes.get('ANCILLARY_FEATURE_TYPE.E55', 'label')" style="padding-right:2px;"></span></a>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </dd>
+
+                                                                        </dl>
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </dd>
+                                                    <!-- End Form -->
+                                                </dl>
+                                                </div>  
+                                            </div>
+                                            <!-- End Tab 2: Upload Files -->
+
+                                        </div>
+                                        <!-- End Wizard Tabs -->
+
+                                    </div>
+                                </form>
+                                <!-- End Wizard -->
+
+                            </div>
+                        </div>
+
+                    </dd>
+                </dl>
+                <!-- End Arches form container -->
+
+            </div>
+        </div>
+    </div>
+    <!-- End Condition Assessement Wizard Container --> 
+
+    <div action="" class="modal fade confirm-delete-modal" tabindex="-1" role="dialog" aria-labelledby="alertmodal" aria-hidden="true">
+        <div class="modal-dialog confirm-delete">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">{% trans "Are you ready to delete this assessment?" %}</h4>
+                </div>
+                <div class="modal-body">
+                    <h5 name="warning-text">{% trans "Classification" %}
+                    </h5>
+                    <div name="additional-info" style="max-height: 300px; overflow-y: scroll;">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-u btn-u-default" data-dismiss="modal">{% trans "No" %}</button>
+                    <button class="btn-u btn-u-red confirm-delete-yes" href="javascript:void(0);" data-id="" data-action="delete">{% trans "Yes" %}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock form_content %}

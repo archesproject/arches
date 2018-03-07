@@ -1,0 +1,123 @@
+{% extends "views/forms/base.htm" %}
+{% load i18n %}
+
+{% block form_content %}
+<!-- Modifications CRUD Form -->
+<div id="designation-section">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                
+                <dl>
+                    <!-- Title -->
+                    <dt>
+                        <h5 id="arches-names-form" class="section-headline">{% trans "Designation" %}</h5>
+                    </dt>
+                    <!-- Form -->
+                    <dd class="arches-RDM-labels hidden-xs">
+                        <div class="row">
+                            <div class="col-xs-12 padding-left-1">
+                                <!-- Screens greater than xs -->
+                                    <div class="form-group" style="width: 100%;">
+                                        
+                                        <!-- Designation and From/To Dates -->
+                                        <div>
+                                            <!-- Designation Type -->
+                                            <!-- <input class="designation" id="" name="" style="width:40%"  value="">&nbsp; -->
+                                             <input style="width:40%; display:inline-block;" class="select2 arches-select2-crud-form name-type designation" id="resource-designation-type" data-bind="select2: {value: getEditedNode('TYPE_OF_DESIGNATION_OR_PROTECTION.E55', 'value'),  placeholder: '{% trans "Type" %}', dataKey: 'TYPE_OF_DESIGNATION_OR_PROTECTION.E55'}">&nbsp;
+                                        
+                                            <!-- From Date -->
+                                            <div class="form-group datetimepicker" style="width:20%;">
+                                                <div class="input-group">
+                                                    <input type="text" name="mydate" id="date" placeholder='{% trans "from (yyyy-mm-dd)" %}' class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('DESIGNATION_OR_PROTECTION_FROM_DATE.E49', 'value')} ">
+                                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>&nbsp;
+                                            <!-- To date -->
+                                            <div class="form-group datetimepicker" style="width:20%;">
+                                                <div class="input-group">
+                                                    <input type="text" name="mydate" id="date" placeholder='{% trans "to (yyyy-mm-dd)" %}' class="form-control datepicker" data-date-format="YYYY-MM-DD"collapse-resource-description data-bind="{value: getEditedNode('DESIGNATION_OR_PROTECTION_TO_DATE.E49', 'value')} ">
+                                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>
+                                            <!-- Add Button -->
+                                            {% include 'views/components/add-item-button.htm' %}
+                                            <!-- End Add Button -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </dd>
+                        <dd class="arches-RDM-labels form-inline arches-form hidden-sm hidden-md hidden-lg">
+                            <div>
+                                <div>
+                                <!-- End Screens greater than xs -->
+                                <!-- XS Screens -->
+                                    <div class="form-group" style="width: 100%;">
+                                        
+                                        <!-- Designation Type -->     
+                                        <input style="width:100%; display:inline-block;" class="select2 arches-select2-crud-form name-type designation" id="resource-designation-type" data-bind="select2: {value: getEditedNode('TYPE_OF_DESIGNATION_OR_PROTECTION.E55', 'value'),  placeholder: '{% trans "Type" %}', dataKey: 'TYPE_OF_DESIGNATION_OR_PROTECTION.E55'}">&nbsp;
+                                        <!-- Spacer (for xs screens) -->
+                                        <div class="margin-top-5 hidden-sm hidden-md hidden-lg"></div>
+                                    
+                                            <div class="form-group datetimepicker" style="width:100%;">
+                                                <div class="input-group">
+                                                    <input type="text" name="mydate" id="date" placeholder="From" class="form-control datepicker" data-dateformat="dd/mm/yy" data-bind="{value: getEditedNode('DESIGNATION_OR_PROTECTION_FROM_DATE.E49', 'value')} ">
+                                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>
+                                            <!-- To date -->
+                                            <div class="form-group datetimepicker" style="width:100%;">
+                                                <div class="input-group">
+                                                    <input type="text" name="mydate" id="date" placeholder="To" class="form-control datepicker" data-dateformat="dd/mm/yy" data-bind="{value: getEditedNode('DESIGNATION_OR_PROTECTION_TO_DATE.E49', 'value')} ">
+                                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>
+                                        <!-- End Period, From/To Dates -->
+                                        <!-- Add Button -->
+                                        {% include 'views/components/add-item-button.htm' %}
+                                        <!-- End Add Button -->
+                                        
+                                    </div>
+                                <!-- End XS Screens -->
+                            </div>
+                        </div>
+                    </dd>
+                    <!-- End Form -->
+                </dl>
+            </div>
+        </div>
+    </div>
+    <!-- End Overall Designation CRUD Form Container -->
+        
+    <!-- Designation Records -->
+    <div class="row">
+        <div class="col-xs-12">
+
+            <!-- Address -->
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "This resource has the following designations:" %}
+                    </dd>
+
+                    <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Designations Defined" %}</div>   
+                        
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this designation" %}"><i data-bind='click: $parent.deleteItem.bind($parent)' class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind='click: $parent.editItem.bind($parent)' title="Edit this designation"><span data-bind="{text: nodes.get('TYPE_OF_DESIGNATION_OR_PROTECTION.E55', 'label')}" style="padding-right:2px;"></span><span class="text-muted"> from </span><span data-bind="{text: nodes.get('DESIGNATION_OR_PROTECTION_FROM_DATE.E49', 'value')}" style="padding-right:2px"></span><span class="text-muted"> to </span><span data-bind="{text: nodes.get('DESIGNATION_OR_PROTECTION_TO_DATE.E49', 'value')}"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+    <!-- End CRUD Container -->
+{% endblock form_content %}

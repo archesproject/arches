@@ -1,0 +1,282 @@
+{% load i18n %}
+<!-- Condition Assessment Section -->
+<a id="topSection2" style=""></a>
+<div class="block-level-v2 block-description" style="background: #f5f5f5; border-top: 1px solid #dcdcdc; padding-bottom: 80px;">
+
+    <div class="container">
+
+        <!-- Resource Report Container -->
+        <div>
+
+            <!-- Section Header -->
+            <div class="">
+                <i class="center-icon rounded-x fa fa-folder-open"></i>
+                <div class="">
+                    <h2 class="arches-report-section-header">{% trans "Resource Condition Assessment" %}</h2>
+                </div> 
+            </div>
+
+            <!-- Anchor for in=page navigation from "report options" menu -->
+            <a href="assessment" id="assessment" style=""></a>
+
+
+            <!-- Resource Description Content -->
+            <div class="row">
+                
+                <!-- Spacer -->
+                <div class="hidden-sm hidden-md hidden-lg margin-bottom-20"></div>
+
+                <!-- Resource Summary Info -->
+                <div class="col-xs-12">
+                    <div class="right-inner arches-box-grey-border">
+                        
+                        {% for CONDITION_ASSESSMENT_E14 in report_info.source.graph.CONDITION_ASSESSMENT_E14 %}
+                            {% for CONDITION_STATE_E3 in CONDITION_ASSESSMENT_E14.CONDITION_STATE_E3 %}
+                                <!-- Resource Summary Info -->
+                                <div class="row">
+
+                                    <!-- Section sub-header -->
+                                    <div class="col-sm-4">
+                                        {% for DATE_CONDITION_ASSESSED_E49 in CONDITION_STATE_E3.DATE_CONDITION_ASSESSED_E49 %}
+                                            <h3 class="arches-report-subsection">{{DATE_CONDITION_ASSESSED_E49.DATE_CONDITION_ASSESSED_E49__value}}</h3>
+                                        {% endfor %}
+                                    </div>
+                                    <!-- End Section sub-header -->
+
+                                    <!-- Section Content -->
+                                    <div class="col-sm-8">
+
+                                        <!-- Spacer -->
+                                        <div class="arches-report-spacer hidden-xs"></div>
+
+                                        <div class="arches-report-subsection-content">
+
+                                            <div class="row">
+                                                 <div class="col-xs-12">
+                                                    <dl>
+                                                        <dt class="">
+                                                            <h3 class="arches-report-subsection-title">{% trans "Condition" %}</h3>
+                                                        </dt>
+
+                                                         {% if 'CONDITION_TYPE_E55' not in CONDITION_STATE_E3 %}
+                                                            <dd class="arches-report-subsection-item">
+                                                                {% trans "No conditions recorded" %}
+                                                            </dd>
+                                                        {% else %}
+                                                            {% for CONDITION_TYPE_E55 in CONDITION_STATE_E3.CONDITION_TYPE_E55 %}
+                                                                <dd class="arches-report-subsection-item">
+                                                                    {{CONDITION_TYPE_E55.CONDITION_TYPE_E55__value}} 
+                                                                </dd>
+                                                            {% endfor %}
+                                                        {% endif %}
+
+                                                    </dl>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Condition Assessment Description -->
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <dl>
+                                                        <dt>
+                                                            <h5 id="" class="arches-report-subsection-title">{% trans "Description" %}</h5>
+                                                        </dt>
+
+                                                        {% if 'CONDITION_DESCRIPTION_E62' not in CONDITION_STATE_E3 %}
+                                                            <dd class="arches-report-subsection-item">
+                                                                {% trans "No descriptions recorded" %}
+                                                            </dd>
+                                                        {% else %}
+                                                            {% for CONDITION_DESCRIPTION_E62 in CONDITION_STATE_E3.CONDITION_DESCRIPTION_E62 %}
+                                                                <dd class="arches-report-subsection-item">
+                                                                    {{CONDITION_DESCRIPTION_E62.CONDITION_DESCRIPTION_E62__value | safe}}
+                                                                </dd> 
+                                                            {% endfor %}
+                                                        {% endif %}
+
+                                                    </dl>
+                                                </div>
+                                            </div>
+
+                                            <!-- Condition Images -->
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <dl>
+                                                        <dt>
+                                                            <h5 id="" class="arches-report-subsection-title">{% trans "Images" %}</h5>
+                                                        </dt>
+
+                                                        <dd class="arches-report-subsection-item">
+
+                                                            <!-- The Bootstrap Image Gallery lightbox, should be a child element of the document body -->
+                                                            <div id="blueimp-gallery" class="blueimp-gallery blueimp-gallery-controls" data-use-bootstrap-modal="false">
+                                                                
+                                                                <!-- The container for the modal slides -->
+                                                                <div class="slides"></div>
+                                                                
+                                                                <!-- Controls for the borderless lightbox -->
+                                                                <h3 class="title"></h3>
+                                                                <a class="prev">‹</a>
+                                                                <a class="next">›</a>
+                                                                <a class="close">×</a>
+                                                                <a class="play-pause"></a>
+                                                                <ol class="indicator"></ol>
+                                                                
+                                                                <!-- The modal dialog, which will be used to wrap the lightbox content 
+                                                                     (to use the model, toggle data-use-bootstrap-modal to "true" in #blueimp-gallery -->
+                                                                <div class="modal fade">
+                                                                    <div class="modal-dialog">
+                                                                        <div class="modal-content">
+                                                                            <div class="modal-header">
+                                                                                <button type="button" class="close" aria-hidden="true">&times;</button>
+                                                                                <h4 class="modal-title"></h4>
+                                                                            </div>
+                                                                            <div class="modal-body next"></div>
+                                                                            <div class="modal-footer">
+                                                                                <button type="button" class="btn btn-default pull-left prev">
+                                                                                    <i class="glyphicon glyphicon-chevron-left"></i>
+                                                                                    {% trans "Previous" %}
+                                                                                </button>
+                                                                                <button type="button" class="btn btn-primary next">
+                                                                                    {% trans "Next" %}
+                                                                                    <i class="glyphicon glyphicon-chevron-right"></i>
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                            </div>
+
+                                                            <!-- Links for Image Gallery Supply Image in the href, thumbnails in the img tags -->
+                                                            <div id="links" style="margin-left: 10px; margin-top: 5px;">
+
+                                                                {% if 'CONDITION_IMAGE_E73' not in CONDITION_STATE_E3 %}
+                                                                    <dd class="arches-report-subsection-item">
+                                                                        {% trans "No images recorded" %}
+                                                                    </dd>
+                                                                {% else %}
+                                                                    {% for CONDITION_IMAGE_E73 in CONDITION_STATE_E3.CONDITION_IMAGE_E73 %}
+                                                                        <a href="{{CONDITION_IMAGE_E73.CONDITION_IMAGE_FILE_PATH_E62.0.CONDITION_IMAGE_FILE_PATH_E62__value}} " title="" data-gallery>
+                                                                            <img src="{{CONDITION_IMAGE_E73.CONDITION_IMAGE_THUMBNAIL_E62.0.CONDITION_IMAGE_THUMBNAIL_E62__value}} " style="width: 25%">
+                                                                        </a>
+                                                                    {% endfor %}
+                                                                {% endif %}
+
+                                                            </div>
+                                                            <!-- End Links for Image Gallery -->
+
+                                                        </dd>
+
+                                                    </dl>
+                                                </div>
+                                            </div>
+
+                                            <!-- Spacer for bottom of images -->
+                                            <div style="margin-bottom: 20px;"></div>
+
+                                            <!-- Disturbances -->
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <dl>
+                                                        <dt>
+                                                            <h5 id="" class="arches-report-subsection-title">{% trans "Disturbances" %}</h5>
+                                                        </dt>
+
+                                                        {% if 'DISTURBANCE_TYPE_E55' not in CONDITION_STATE_E3 %}
+                                                            <dd class="arches-report-subsection-item">
+                                                                {% trans "No disturbances recorded" %}
+                                                            </dd>
+                                                        {% else %}
+                                                            {% for DISTURBANCE_TYPE_E55 in CONDITION_STATE_E3.DISTURBANCE_TYPE_E55 %}
+                                                                <dd class="arches-report-subsection-item">
+                                                                    {{DISTURBANCE_TYPE_E55.DISTURBANCE_TYPE_E55__value}} 
+                                                                </dd> 
+                                                            {% endfor %}
+                                                        {% endif %}
+
+                                                    </dl>
+                                                </div>
+                                            </div>
+
+                                            <!-- Threats -->
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <dl>
+                                                        <dt>
+                                                            <h5 id="" class="arches-report-subsection-title">{% trans "Threats" %}</h5>
+                                                        </dt>
+
+                                                        {% if 'THREAT_TYPE_E55' not in CONDITION_STATE_E3 %}
+                                                            <dd class="arches-report-subsection-item">
+                                                                {% trans "No theats recorded" %}
+                                                            </dd>
+                                                        {% else %}
+                                                            {% for THREAT_TYPE_E55 in CONDITION_STATE_E3.THREAT_TYPE_E55 %}
+                                                                <dd class="arches-report-subsection-item">
+                                                                    {{THREAT_TYPE_E55.THREAT_TYPE_E55__value}} 
+                                                                </dd> 
+                                                            {% endfor %}
+                                                        {% endif %}
+
+                                                    </dl>
+                                                </div>
+                                            </div>
+
+                                            <!-- Recommendatioms -->
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <dl>
+                                                        <dt>
+                                                            <h5 id="" class="arches-report-subsection-title">{% trans "Management Recommendations" %}</h5>
+                                                        </dt>
+
+                                                        {% if 'MANAGEMENT_RECOMMENDATION_E89' not in CONDITION_STATE_E3 %}
+                                                            <dd class="arches-report-subsection-item">
+                                                                {% trans "No recommendations recorded" %}
+                                                            </dd>
+                                                        {% else %}
+                                                            {% for MANAGEMENT_RECOMMENDATION_E89 in CONDITION_STATE_E3.MANAGEMENT_RECOMMENDATION_E89 %}
+                                                                {% if 'RECOMMENDATION_TYPE_E55' not in MANAGEMENT_RECOMMENDATION_E89 %}
+                                                                    <dd class="arches-report-subsection-item">
+                                                                        {% trans "No recommendations recorded" %}
+                                                                    </dd>
+                                                                {% else %}
+                                                                    {% for RECOMMENDATION_TYPE_E55 in MANAGEMENT_RECOMMENDATION_E89.RECOMMENDATION_TYPE_E55 %}
+                                                                        <dd class="arches-report-subsection-item">
+                                                                            {{RECOMMENDATION_TYPE_E55.RECOMMENDATION_TYPE_E55__value}} 
+                                                                        </dd> 
+                                                                    {% endfor %}
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        {% endif %}
+
+                                                    </dl>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <!-- End Section Content-->
+
+                                </div>
+                                <!-- End Names/Type Section -->
+
+                                {% if not forloop.last %}
+                                    <hr class="devider margin-top-10" style="margin-bottom: 5px;"></hr>
+                                {% endif %}
+
+                            {% endfor %}
+                        {% endfor %}
+
+                    </div>
+                </div>
+                <!-- End Project Information -->
+            </div>   
+
+        </div>
+        <!-- End Project Summary -->
+
+    </div>
+</div>
+<!-- End Condition Assessment Section -->

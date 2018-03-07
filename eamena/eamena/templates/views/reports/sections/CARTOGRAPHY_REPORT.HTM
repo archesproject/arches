@@ -1,0 +1,221 @@
+{% load i18n %}
+
+		<!-- Sheet details -->
+		
+		<div class="row">
+		     <div class="col-xs-12">
+			<dl>
+		                <h5 id="" class="arches-report-subsection-title">{% trans "Sheet details" %}</h5>
+
+		            {% if 'PUBLICATION_EVENT_E12' not in report_info.source.graph %}
+		                <span class="arches-report-subsection-item">
+		                    {% trans "No Sheet details recorded" %}
+		                </span>
+		            {% else %}
+		            	<div class="padding-left-10">
+	                	<div class="row">
+	                	<div class="col-xs-6 col-md-3"><span class="arches-report-subsection-item-type">{% trans "Sheet number" %}</span></div><div class="col-xs-6 col-md-3"><span class="arches-report-subsection-item-type">{% trans "Sheet name" %}</span></div><div class="col-xs-0 col-md-6"></div>  </div></div>
+	                	<div class="row">
+		                	<div class="col-xs-6 col-md-3">	            
+			                {% for PUBLICATION_EVENT_E12 in report_info.source.graph.PUBLICATION_EVENT_E12 %}
+			                    {% if 'PUBLICATION_ASSIGNMENT_E17' in PUBLICATION_EVENT_E12 %}	
+			                	{% for PUBLICATION_ASSIGNMENT_E17 in PUBLICATION_EVENT_E12.PUBLICATION_ASSIGNMENT_E17 %}
+	     			                	{% if 'TILE_SQUARE_DETAILS_E44' in PUBLICATION_ASSIGNMENT_E17 %}
+						                {% for TILE_SQUARE_DETAILS_E44 in PUBLICATION_ASSIGNMENT_E17.TILE_SQUARE_DETAILS_E44 %}
+						                        <dd class="arches-report-subsection-item">{{ TILE_SQUARE_DETAILS_E44.TILE_SQUARE_DETAILS_E44__value }}</dd>
+							         {% endfor %}           
+							
+						         {% endif %}					 
+					         {% endfor %}
+				             {% endif %}
+			                {% endfor %}
+			                </div>
+			                <div class="col-xs-6 col-md-3">
+			                {% for PUBLICATION_EVENT_E12 in report_info.source.graph.PUBLICATION_EVENT_E12 %}
+			                    {% if 'PUBLICATION_ASSIGNMENT_E17' in PUBLICATION_EVENT_E12 %}	
+			                	{% for PUBLICATION_ASSIGNMENT_E17 in PUBLICATION_EVENT_E12.PUBLICATION_ASSIGNMENT_E17 %}
+				                	{% if 'TILE_SQUARE_APPELLATION_E44' in PUBLICATION_ASSIGNMENT_E17 %}
+						                {% for TILE_SQUARE_APPELLATION_E44 in PUBLICATION_ASSIGNMENT_E17.TILE_SQUARE_APPELLATION_E44 %}
+						                        <dd class="arches-report-subsection-item">{{ TILE_SQUARE_APPELLATION_E44.TILE_SQUARE_APPELLATION_E44__value }}</dd>
+							         {% endfor %}                
+						         {% endif %}					 
+					         {% endfor %}
+				             {% endif %}
+			                {% endfor %}		                
+			                </div>
+		                        <div class="col-xs-0 col-md-6"></div>              
+			        </div>
+		            {% endif %}
+		
+			</dl>
+		    </div>
+		</div>
+		<!-- End Sheet details -->
+
+		<!-- Scale -->
+		
+		<div class="row">
+		     <div class="col-xs-12">
+		        <dl>
+		            <dt>
+		                <h5 id="" class="arches-report-subsection-title">{% trans "Scale" %}</h5>
+		            </dt>
+		
+		            {% if 'PUBLICATION_EVENT_E12' not in report_info.source.graph %}
+		                <dd class="arches-report-subsection-item">
+		                    {% trans "No Scale recorded" %}
+		                </dd>
+		            {% else %}
+		                {% for PUBLICATION_EVENT_E12 in report_info.source.graph.PUBLICATION_EVENT_E12 %}
+		                    {% if 'PUBLICATION_ASSIGNMENT_E17' in PUBLICATION_EVENT_E12 %}
+		                	{% for PUBLICATION_ASSIGNMENT_E17 in PUBLICATION_EVENT_E12.PUBLICATION_ASSIGNMENT_E17 %}
+			                	{% if 'SCALE_TYPE_E55' in PUBLICATION_ASSIGNMENT_E17 %}
+					                {% for SCALE_TYPE_E55 in PUBLICATION_ASSIGNMENT_E17.SCALE_TYPE_E55 %}
+					                    <dd class="arches-report-subsection-item">
+					                        {{ SCALE_TYPE_E55.SCALE_TYPE_E55__value }}
+					                    </dd>
+						         {% endfor %}           
+					         {% endif %}
+				         {% endfor %}
+			             {% endif %}
+		                {% endfor %}            
+		            {% endif %}
+		
+		        </dl>
+		    </div>
+		</div>
+		<!-- End Scale -->
+
+		<!-- Projection/Grid  -->
+		<div class="row">
+		     <div class="col-xs-12">
+		        <dl>
+		            <dt>
+		                <h5 id="" class="arches-report-subsection-title">{% trans "Projection/Grid" %}</h5>
+		            </dt>
+		
+		            {% if 'RESOURCE_CREATION_EVENT_E65' not in report_info.source.graph %}
+		                <dd class="arches-report-subsection-item">
+		                    {% trans "No Projection/Grid recorded" %}
+		                </dd>
+		            {% else %}
+		                {% for RESOURCE_CREATION_EVENT_E65 in report_info.source.graph.RESOURCE_CREATION_EVENT_E65 %}
+			                {% if 'PROJECTION_TYPE_E55' in RESOURCE_CREATION_EVENT_E65 %}
+				                {% for PROJECTION_TYPE_E55 in RESOURCE_CREATION_EVENT_E65.PROJECTION_TYPE_E55 %}
+					                 <dd class="arches-report-subsection-item">
+					                {{PROJECTION_TYPE_E55.PROJECTION_TYPE_E55__value}}
+					                  </dd>
+				                 {% endfor %}
+			                 {% endif %}
+			         {% endfor %}
+		             {% endif %}
+		        </dl>
+		    </div>
+		</div>
+		<!-- End Projection/Grid -->
+		
+		
+		
+		<!-- Sheet details -->
+		
+		<div class="row">
+		     <div class="col-xs-12">
+		        <dl>
+		                <h5 id="" class="arches-report-subsection-title">{% trans "Publication details" %}</h5>
+	            	<div class="padding-left-10">
+                	<div class="row">
+                	<div class="col-xs-6 col-md-2"><span class="arches-report-subsection-item-type">{% trans "Map Series" %}</span></div><div class="col-xs-6 col-md-4"><span class="arches-report-subsection-item-type">{% trans "Map Source" %}</span></div><div class="col-xs-6 col-md-1"><span class="arches-report-subsection-item-type">{% trans "Edition" %}</span></div> <div class="col-xs-6 col-md-3"><span class="arches-report-subsection-item-type">{% trans "Producer" %}</span></div><div class="col-xs-6 col-md-2"><span class="arches-report-subsection-item-type">{% trans "Production date" %}</span></div> </div></div>
+                	<div class="row">
+		            {% if 'PUBLICATION_EVENT_E12' not in report_info.source.graph %}
+		                <span class="arches-report-subsection-item">
+		                    {% trans "No Sheet details recorded" %}
+		                </span>
+		            {% else %}
+
+		                	<div class="col-xs-6 col-md-2" >	            
+			                {% for PUBLICATION_EVENT_E12 in report_info.source.graph.PUBLICATION_EVENT_E12 %}
+			                    {% if 'PUBLICATION_ASSIGNMENT_E17' in PUBLICATION_EVENT_E12 %}
+			                	{% for PUBLICATION_ASSIGNMENT_E17 in PUBLICATION_EVENT_E12.PUBLICATION_ASSIGNMENT_E17 %}
+	     			                	{% if 'SERIES_TYPE_E55' in PUBLICATION_ASSIGNMENT_E17 %}
+						                {% for SERIES_TYPE_E55 in PUBLICATION_ASSIGNMENT_E17.SERIES_TYPE_E55 %}
+						                    
+						                        <dd class="arches-report-subsection-item">{{ SERIES_TYPE_E55.SERIES_TYPE_E55__value }}</dd>
+						                    
+							         {% endfor %}           
+						         {% endif %}
+					         {% endfor %}
+				             {% endif %}
+			                {% endfor %}
+			                </div>
+			                 <div class="col-xs-6 col-md-4">	                     
+			                {% for PUBLICATION_EVENT_E12 in report_info.source.graph.PUBLICATION_EVENT_E12 %}
+			                    {% if 'PUBLICATION_ASSIGNMENT_E17' in PUBLICATION_EVENT_E12 %}
+			                	{% for PUBLICATION_ASSIGNMENT_E17 in PUBLICATION_EVENT_E12.PUBLICATION_ASSIGNMENT_E17 %}
+				                	{% if 'MAP_SOURCE_TYPE_E55' in PUBLICATION_ASSIGNMENT_E17 %}
+						                {% for MAP_SOURCE_TYPE_E55 in PUBLICATION_ASSIGNMENT_E17.MAP_SOURCE_TYPE_E55 %}
+						                    
+						                       <dd class="arches-report-subsection-item">{{ MAP_SOURCE_TYPE_E55.MAP_SOURCE_TYPE_E55__value }}</dd>
+						                    
+							         {% endfor %}           
+						         {% endif %}
+					         {% endfor %}
+				             {% endif %}
+			                {% endfor %}
+			                </div>
+		                	<div class="col-xs-6 col-md-1">	            
+			                {% for PUBLICATION_EVENT_E12 in report_info.source.graph.PUBLICATION_EVENT_E12 %}
+			                    {% if 'PUBLICATION_ASSIGNMENT_E17' in PUBLICATION_EVENT_E12 %}
+			                	{% for PUBLICATION_ASSIGNMENT_E17 in PUBLICATION_EVENT_E12.PUBLICATION_ASSIGNMENT_E17 %}
+	     			                	{% if 'EDITION_E62' in PUBLICATION_ASSIGNMENT_E17 %}
+						                {% for EDITION_E62 in PUBLICATION_ASSIGNMENT_E17.EDITION_E62 %}
+						                    
+						                        <dd class="arches-report-subsection-item">{{ EDITION_E62.EDITION_E62__value }}</dd>
+						                    
+							         {% endfor %}           
+						         {% endif %}
+					         {% endfor %}
+				             {% endif %}
+			                {% endfor %}
+			                </div>		                	     		                         
+		            {% endif %}
+		                <div class="col-xs-6 col-md-3">	  
+	    		        {% if 'RESOURCE_CREATION_EVENT_E65' in report_info.source.graph %}
+	    		                {% for RESOURCE_CREATION_EVENT_E65 in report_info.source.graph.RESOURCE_CREATION_EVENT_E65 %}
+			                    {% if 'CONTRIBUTOR_E39' in RESOURCE_CREATION_EVENT_E65 %}
+			                	{% for CONTRIBUTOR_E39 in RESOURCE_CREATION_EVENT_E65.CONTRIBUTOR_E39 %}
+				                	{% if 'CONTRIBUTOR_APPELLATION_E82' in CONTRIBUTOR_E39 %}
+						                {% for CONTRIBUTOR_APPELLATION_E82 in CONTRIBUTOR_E39.CONTRIBUTOR_APPELLATION_E82 %}
+						                    <dd class="arches-report-subsection-item">
+						                        {{ CONTRIBUTOR_APPELLATION_E82.CONTRIBUTOR_APPELLATION_E82__value }}
+						                    </dd>
+							         {% endfor %}           
+						         {% endif %}
+					         {% endfor %}
+				             {% endif %}
+			                {% endfor %}
+		                {% endif %}     
+			         </div>
+			         <div class="col-xs-6 col-md-2">	      
+			         {% if 'RESOURCE_CREATION_EVENT_E65' in report_info.source.graph %}
+			                {% for RESOURCE_CREATION_EVENT_E65 in report_info.source.graph.RESOURCE_CREATION_EVENT_E65 %}
+			                    {% if 'TIME___SPAN_RESOURCE_CREATION_EVENT_E52' in RESOURCE_CREATION_EVENT_E65 %}
+			                	{% for TIME___SPAN_RESOURCE_CREATION_EVENT_E52 in RESOURCE_CREATION_EVENT_E65.TIME___SPAN_RESOURCE_CREATION_EVENT_E52 %}
+							{% if 'DATE_OF_CREATION_E50' in TIME___SPAN_RESOURCE_CREATION_EVENT_E52 %}
+								{% for DATE_OF_CREATION_E50 in TIME___SPAN_RESOURCE_CREATION_EVENT_E52.DATE_OF_CREATION_E50 %}						
+						                    <dd class="arches-report-subsection-item">
+						                        {{ DATE_OF_CREATION_E50.DATE_OF_CREATION_E50__value|cut:"T00:00:00" }}
+						                    </dd>
+						                 {% endfor %}
+					                 {% endif %}
+					         {% endfor %}
+				             {% endif %}
+			                {% endfor %}      
+	                	{% endif %}  
+	                	</div>
+			</div>
+		        </dl>
+		    </div>
+		</div>
+		<!-- End Sheet details -->
+
+

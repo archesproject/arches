@@ -1,0 +1,135 @@
+{% load staticfiles %}
+{% load i18n %}
+
+<div class="header">
+
+    <!-- Topbar -->
+    <div class="topbar">
+        <div class="container">
+            
+            <!-- Topbar Message -->
+
+            <!-- Topbar Navigation -->
+            <ul class="loginbar pull-right">
+                
+                
+                 <div class="arches-loginbar pull-left">
+                    
+                    <a href="http://www.archesproject.org" class="">
+                        <img src="{% static 'img/PoweredByArches.png' %}" class="powered-by-arches">&nbsp; 
+                            </a>
+                    
+                </div>
+                
+
+
+
+
+                <li class="loginbar pull-right">
+<!--                     <i class="fa fa-globe"></i>
+                    <a>{% trans "Languages" %}</a> -->
+                    
+                    <form action="{% url 'set_language' %}" method="post" id="languageform">
+                    {% csrf_token %}
+                      <input name="next" type="hidden" value="{{ request.get_full_path }}" />
+                      <select name="language">
+
+<!--                     <ul class="lenguages"> -->
+                    {% for language in language_list %}
+                        <li class="active">
+                            <option value="{{ language.languageid }}"{% if language.languageid == LANGUAGE_CODE %} selected="selected"{% endif %}><a href="javascript:void(0);">{{ language.languagename }}<i class="fa fa-check"></i></a> </option>
+                        </li>
+                    {% endfor %}
+                      </select>&nbsp; 
+                    <input type="submit" value="Change" />
+                    </form>
+<!--                     </ul> -->
+                </li>
+               
+                <li><a href="javascript:void(0);" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="{% trans 'Documentation coming soon.' %}">{% trans "Help" %}</a></li>&nbsp; 
+
+                <li>
+                    <a id="auth-link" href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% if user.username == 'anonymous' %}{% trans "Login" %}{% else %}{% trans "Welcome" %} {{ user.username }} - {% trans "Logout" %}{% endif %}</a>
+                </li>&nbsp; 
+                
+            </ul>
+            <!-- End Topbar Navigation -->
+        </div>
+    </div>
+    <!-- End Topbar -->
+
+    <!-- Navbar -->
+    <div class="navbar navbar-default" role="navigation">
+        <div class="container">
+            
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+                    <span class="sr-only">{% trans "Toggle navigation" %}</span>
+                    <span class="fa fa-bars"></span>
+                </button>
+                <a class="navbar-brand" href="{% url 'home' %}">
+                    <img id="logo-header" class="arches-logo" src="{{ STATIC_URL }}img/eamena_logo.jpg" alt="Logo">
+                </a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse navbar-responsive-collapse">
+                <ul class="nav navbar-nav">
+                    
+                    <!-- Home -->
+                    <li class="{% if active_page = 'Home' %}active{% endif %}">
+                        <a href="{% url 'home' %}">
+                            {% trans "Home" %}
+                        </a>
+                    </li>
+                    <!-- End Home -->
+
+                    <!-- New Search-->
+                    <li class="{% if active_page = 'Search' %}active{% endif %}">
+                        <a href="{% url 'search_home' %}">
+                            {% trans "Search" %}
+                        </a>
+                    </li>
+                    <!-- End Search-->
+
+                    <!-- Map-->
+                    <li class="{% if active_page = 'Map' %}active{% endif %}">
+                        <a href="{% url 'map' %}">
+                            {% trans "Map View" %}
+                        </a>
+                    </li>
+                    <!-- End Map-->
+
+                    {% if 'edit' in user.user_groups %}
+                    <!-- Resource Editor-->
+                    <li class="dropdown {% if active_page = 'ResourceManger' %}active{% endif %}">
+                        <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
+                            {% trans "Resource Manager" %}
+                        </a>
+                        <ul class="dropdown-menu">
+                            {% for type, type_data in resource_types %}
+                                <li><a href="{% url 'resource_manager' type type_data.default_page '' %}"><i class="{{type_data.icon_class}}"></i>{{type_data.name}}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    <!-- End Resource Editor -->
+
+                     <!-- RDM-->
+                    <li class="{% if user.is_anonymous %}{% endif %} {% if active_page = 'RDM' %}active{% endif %}">
+                        <a href="{% url 'rdm' '' %}">
+                            {% trans "RDM" %}
+                        </a>
+                    </li>
+                    <!-- End RDM-->
+                    {% endif %}
+
+
+                </ul>
+            </div><!--/navbar-collapse-->
+        </div>    
+    </div>            
+    <!-- End Navbar -->
+
+</div>
+

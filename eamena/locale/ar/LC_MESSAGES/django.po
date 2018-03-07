@@ -1,0 +1,3749 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-10-18 04:52-0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+
+#: eamena/templates/map.htm:61
+#: eamena/templates/map.htm:63
+msgid "Find an Address"
+msgstr "أوجد عنوان"
+
+
+#: eamena/templates/map.htm:74
+msgid "Loading resource data..."
+msgstr  "تحميل بيانات المورد"
+
+#: eamena/templates/map.htm:95
+msgid "Map Zoom"
+msgstr  "تكبير الخريطة"
+
+#: eamena/templates/map.htm:96
+msgid "Cursor"
+msgstr  "المؤشر"
+
+#: eamena/templates/map.htm:96
+msgid "long,lat"
+msgstr  "خط الطول، خط العرض"
+
+#: eamena/templates/map.htm:171
+msgid "Add Layer"
+msgstr  "أضف طبقة"
+
+#: eamena/templates/map.htm:177
+#: eamena/templates/map.htm:253
+msgid "Overlays"
+msgstr "متراكب"
+
+#: eamena/templates/base.htm:167
+msgid "Streets"
+msgstr  "شوارع"
+
+#: eamena/templates/base.htm:172
+msgid "Satellite"
+msgstr  "قمر صناعي"
+
+#: eamena/templates/base.htm:177
+msgid "Streets & Satellite"
+msgstr  "شوارع وقمر صناعي"
+
+#: eamena/templates/views/search/search-results.htm:9
+#: eamena/templates/views/forms/related-resources.htm:258
+msgid "Loading results..."
+msgstr  "نتيجة التحميل ..."
+
+#: eamena/templates/login.htm:27
+msgid "Login to EAMENA"
+msgstr "الدخول إلى يامينا"
+
+#: eamena/templates/login.htm:44
+msgid "Sign In"
+msgstr  "توقيع للدخول"
+
+#: eamena/templates/login.htm:55
+msgid "Username"
+msgstr  "اسم المستخدم"
+
+#: eamena/templates/login.htm:60
+msgid "Password"
+msgstr  "كلمة السر"
+
+#: eamena/templates/login.htm:65
+msgid "Log In"
+msgstr  "الدخول"
+
+#: eamena/templates/login.htm:74
+msgid "Login failed"
+msgstr  "فشل الدخول"
+
+#: eamena/templates/login.htm:75
+msgid "Invalid username and/or password."
+msgstr  "اسم مستخدم و/أو كلمة سر غير صالح/ة"
+
+#: eamena/models/forms.py:1310
+msgid "Review Edit History"
+msgstr  "مراجعة تاريخخ التعديل"
+
+#: eamena/models/forms.py:1320
+msgid "Delete Resource"
+msgstr  "احذف المورد"
+
+#: eamena/templates/views/forms/location.htm:811
+#: eamena/templates/views/forms/location.htm:827
+msgid "Area Name"
+msgstr  "اسم المنطقة"
+
+#: eamena/templates/views/forms/delete-resource.htm:22
+msgid "You won't be able to undo this operation!"
+msgstr "لن يمكنك عكس هذه العملية"
+
+#: eamena/templates/views/forms/delete-resource.htm:22
+msgid "Are you sure you want to permanently delete this resource from the database?"
+msgstr "هل أنت متأكد أنك تريد حذف هذا المورد بشكل نهائي من قاعدة البيانات؟"
+
+
+#: eamena/settings.py:23
+msgid "English"
+msgstr "انجليزي"
+
+#: eamena/settings.py:24
+msgid "Arabic"
+msgstr "عربي"
+
+#: eamena/settings.py:25
+msgid "Sorani"
+msgstr "سوراني"
+
+#: eamena/settings.py:50
+msgid "Heritage Resource E18 Feature"
+msgstr "مورد تراثي E18 ملمح"
+
+#: eamena/settings.py:53 eamena/settings.py:72
+msgid "No name available"
+msgstr "لا يوجد اسم متاح"
+
+#: eamena/settings.py:54 eamena/settings.py:73
+msgid "NAME.E41"
+msgstr "E41 الاسم"
+
+#: eamena/settings.py:55 eamena/settings.py:74 eamena/settings.py:93
+#: eamena/settings.py:112 eamena/settings.py:131 eamena/settings.py:150
+msgid "Resource"
+msgstr "مورد"
+
+#: eamena/settings.py:69
+#: eamena/templates/views/reports/HERITAGE_RESOURCE_GROUP.E27.htm:114
+msgid "Heritage Resource E27"
+msgstr "مورد ثقافي E27"
+
+#: eamena/settings.py:88
+msgid "Activity"
+msgstr "نشاط"
+
+#: eamena/settings.py:91 eamena/settings.py:110 eamena/settings.py:129
+#: eamena/settings.py:148
+msgid "No description available"
+msgstr "لا يوجد وصف متاح"
+
+#: eamena/settings.py:92 eamena/settings.py:111 eamena/settings.py:130
+#: eamena/settings.py:149
+msgid "INSERT RESOURCE DESCRIPTION NODE HERE"
+msgstr "أدخل علامة وصف المصدر هنا"
+
+#: eamena/settings.py:107
+msgid "Historic Event"
+msgstr "حدث تاريخي"
+
+#: eamena/settings.py:126
+msgid "Person/Organization"
+msgstr "شخص/مؤسسة"
+
+#: eamena/settings.py:145
+msgid "Information Resource"
+msgstr "معلومات المورد"
+
+#: eamena/models/forms.py:49 eamena/models/forms.py:182
+#: eamena/models/forms.py:298
+#: eamena/templates/views/reports/ACTIVITY.E7.htm:136
+#: eamena/templates/views/reports/ACTOR.E39.htm:136
+#: eamena/templates/views/reports/HERITAGE_RESOURCE.E18.htm:136
+#: eamena/templates/views/reports/HERITAGE_RESOURCE_GROUP.E27.htm:137
+#: eamena/templates/views/reports/HISTORICAL_EVENT.E5.htm:136
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:146
+msgid "Resource Summary"
+msgstr "ملخص المورد"
+
+#: eamena/models/forms.py:121
+#: eamena/templates/views/forms/external-reference.htm:14
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:243
+msgid "URLs"
+msgstr "عنوان الموقع على الانترنت"
+
+#: eamena/models/forms.py:156
+msgid "Actions"
+msgstr "أفعال"
+
+#: eamena/models/forms.py:232
+msgid "Components"
+msgstr "مكونات"
+
+#: eamena/models/forms.py:308
+#: eamena/templates/views/forms/district_classification.htm:59
+msgid "Resource Type"
+msgstr "نوع المورد"
+
+#: eamena/models/forms.py:347
+#: eamena/templates/views/forms/measurementvalues.htm:14
+#: eamena/templates/views/reports/HERITAGE_RESOURCE.E18.htm:343
+#: eamena/templates/views/reports/sections/MEASUREMENT_TYPE.E55.htm:6
+msgid "Measurements"
+msgstr "قياسات"
+
+#: eamena/models/forms.py:371
+msgid "Additional Information"
+msgstr "معلومات إضافية"
+
+#: eamena/models/forms.py:402
+msgid "Condition Assessment"
+msgstr "تقييم الحالة"
+
+#: eamena/models/forms.py:469
+msgid "Forms and Interpretations"
+msgstr "أشكال وتدخلات"
+
+#: eamena/models/forms.py:506
+msgid "Location"
+msgstr "الموقع"
+
+#: eamena/models/forms.py:603
+msgid "Geometry Upload"
+msgstr "إدخال الشكل الهندسي"
+
+#: eamena/models/forms.py:638
+msgid "Images and Files"
+msgstr "صور وملفات"
+
+#: eamena/models/forms.py:739
+msgid "Other Upload"
+msgstr "إدخال آخر"
+
+#: eamena/models/forms.py:780 eamena/templates/views/forms/designation.htm:14
+msgid "Designation"
+msgstr "دلالة"
+
+#: eamena/models/forms.py:806
+#: eamena/templates/views/reports/sections/ROLE.htm:26
+msgid "Role"
+msgstr "دور"
+
+#: eamena/models/forms.py:833
+msgid "Actor Summary"
+msgstr "ملخص الفاعل"
+
+#: eamena/models/forms.py:869
+msgid "Phase"
+msgstr "مرحلة"
+
+#: eamena/models/forms.py:898
+#: eamena/templates/views/forms/related-resources.htm:58
+#: eamena/templates/views/reports/sections/related_resource_section.htm:13
+#: eamena/templates/views/search/search-results.htm:51
+msgid "Related Resources"
+msgstr "موارد ذات صلة"
+
+#: eamena/models/forms.py:977
+#: eamena/templates/views/reports/sections/related_resource_section.htm:246
+msgid "Bibliography"
+msgstr "الكتب والمراجع"
+
+#: eamena/models/forms.py:1075
+#: eamena/templates/views/reports/sections/related_resource_section.htm:210
+msgid "Shared Data"
+msgstr "البيانات المشتركة"
+
+#: eamena/models/forms.py:1119
+msgid "Cartography"
+msgstr "رسم الخرائط"
+
+#: eamena/models/forms.py:1215
+#: eamena/templates/views/reports/sections/related_resource_section.htm:316
+msgid "Imagery"
+msgstr "التصوير"
+
+#: eamena/models/resource.py:35
+#: eamena/templates/views/reports/ACTIVITY.E7.htm:113
+#: eamena/templates/views/reports/ACTOR.E39.htm:113
+#: eamena/templates/views/reports/HERITAGE_RESOURCE.E18.htm:113
+#: eamena/templates/views/reports/HISTORICAL_EVENT.E5.htm:113
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:115
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:121
+msgid "Resource Description"
+msgstr "وصف المورد"
+
+#: eamena/models/resource.py:119
+msgid "Manage Resource"
+msgstr "إدارة المورد"
+
+#: eamena/models/resource.py:185
+msgid "None specified"
+msgstr "غير محدد"
+
+#: eamena/templates/header.htm:30
+msgid "Languages"
+msgstr "اللغات"
+
+#: eamena/templates/header.htm:49
+msgid "Documentation coming soon."
+msgstr "إحضار التوثيق قريباً"
+
+#: eamena/templates/header.htm:49
+msgid "Help"
+msgstr "مساعدة"
+
+#: eamena/templates/header.htm:52
+msgid "Login"
+msgstr "دخول"
+
+#: eamena/templates/header.htm:52
+msgid "Welcome"
+msgstr "مرحباً"
+
+#: eamena/templates/header.htm:52
+msgid "Logout"
+msgstr "خروج"
+
+#: eamena/templates/header.htm:68
+msgid "Toggle navigation"
+msgstr "ملاحة مفصلية"
+
+#: eamena/templates/header.htm:83
+msgid "Home"
+msgstr "الصفحة الرئيسية"
+
+#: eamena/templates/header.htm:91
+msgid "Search"
+msgstr "بحث"
+
+#: eamena/templates/header.htm:99
+msgid "Map View"
+msgstr "رؤية الخريطة"
+
+#: eamena/templates/header.htm:108
+msgid "Resource Manager"
+msgstr "مدير المصدر"
+
+#: eamena/templates/rdm.htm:62
+#: eamena/templates/header.htm:121
+msgid "RDM"
+msgstr "نظام التحكم عن بعد"
+
+#: eamena/templates/rdm.htm:23
+#: eamena/templates/rdm.htm:28
+msgid "Reference Data Manager (RDM)"
+msgstr "نظام التحكم عن بعد"
+
+#: eamena/templates/rdm.htm:80
+msgid "Add Scheme"
+msgstr "أضف نظام"
+
+#: eamena/templates/rdm.htm:81
+msgid "Import Scheme"
+msgstr "احضر نظام"
+
+#: eamena/templates/resource-manager.htm:36
+#: eamena/templates/resource-manager.htm:41
+msgid "Resource Data Manager"
+msgstr "نظام التحكم عن بعد"
+
+#: eamena/templates/resource-manager.htm:159
+msgid "Unsaved edits..."
+msgstr "تعديلات لم يتم حفظها"
+
+#: eamena/templates/resource-manager.htm:166
+msgid "Warning!"
+msgstr "تحذير"
+
+#: eamena/templates/resource-manager.htm:167
+msgid ""
+"You have unsaved edits in your form that will be lost if you leave this "
+"form.  Would you like to continue and discard your current edits?"
+msgstr "لديك تعديلات على الاستبيان الخاص بك، فإذا تركت هذا الاستبيان ستفقد التعديلات. هل تود الاستمرار والتخلّص من التعديلات التي أدخلتها؟"
+
+#: eamena/templates/resource-manager.htm:174
+#: eamena/templates/views/forms/file-upload.htm:108
+#: eamena/templates/views/forms/related-files.htm:253
+msgid "Cancel"
+msgstr "إلغاء"
+
+#: eamena/templates/resource-manager.htm:175
+msgid "Discard Edits"
+msgstr "إلغاء التعديلات"
+
+#: eamena/templates/search.htm:20
+#: eamena/templates/views/forms/related-resources.htm:223
+msgid "Search for a resource..."
+msgstr "ابحث عن مورد"
+
+#: eamena/templates/search.htm:30
+msgid "Location Filter"
+msgstr "مرشح المكان"
+
+#: eamena/templates/search.htm:34
+msgid "Time Filter"
+msgstr "مرشح الزمن"
+
+#: eamena/templates/search.htm:40
+#: eamena/templates/rdm.htm:75
+msgid "Tools"
+msgstr "أدوات"
+
+#: eamena/templates/search.htm:42
+#: eamena/templates/rdm.htm:77
+#: eamena/templates/views/forms/related-resources.htm:326
+#: eamena/templates/views/search/map-filter.htm:16
+msgid "Toggle Dropdown"
+msgstr "قائمة يتم إفرادها للتبديل"
+
+#: eamena/templates/search.htm:45
+msgid "View Popular Searches"
+msgstr "أنظر الأبحاث المتواترة"
+
+#: eamena/templates/search.htm:48
+msgid "Export results to .SHP"
+msgstr "أرسل النتائج إلى SHP"
+
+#: eamena/templates/search.htm:49
+msgid "Export results to .CSV"
+msgstr "أرسل النتائج إلى CSV"
+
+#: eamena/templates/search.htm:50
+msgid "Export results to .KML"
+msgstr "أرسل النتائج إلى KML"
+
+#: eamena/templates/search.htm:51
+msgid "Export results to .JSON"
+msgstr "أرسل النتائج إلى JSON"
+
+#: eamena/templates/search.htm:55
+msgid "Clear Search"
+msgstr "امسح البحث"
+
+#: eamena/templates/search.htm:76
+msgid "Popular Searches:"
+msgstr "أبحات متواترة"
+
+#: eamena/templates/search.htm:91
+#: eamena/templates/views/forms/related-resources.htm:188
+msgid "Results"
+msgstr "نتائج"
+
+#: eamena/templates/search.htm:99
+#: eamena/templates/views/forms/related-resources.htm:245
+msgid "Map Filter Enabled"
+msgstr "تم تفعيل مرشح الخريطة"
+
+#: eamena/templates/search.htm:102
+#: eamena/templates/views/forms/related-resources.htm:248
+msgid "Time Filter Enabled"
+msgstr "تم تفعيل مرشح الزمن"
+
+#: eamena/templates/map/layers.htm:7
+msgid "Example Layer"
+msgstr "طبقة مثال"
+
+#: eamena/templates/map/layers.htm:8
+msgid "visible zoom range: 9-20"
+msgstr "المدى المرئي لاقتراب الكاميرا"
+
+#: eamena/templates/map/layers.htm:9
+msgid "City Admin Area"
+msgstr "منطقة إدارية بالمدينة"
+
+#: eamena/templates/map/resource-popup.htm:22
+#: eamena/templates/map/resource-popup.htm:31
+msgid "Archaeological certainty"
+msgstr "مدى التأكد الأثري"
+
+#: eamena/templates/map/resource-popup.htm:24
+#: eamena/templates/map/resource-popup.htm:33
+msgid "Location certainty"
+msgstr "مدى التأكد من الموقع"
+
+#: eamena/templates/map/resource-popup.htm:27
+#: eamena/templates/map/resource-popup.htm:36
+#: eamena/templates/views/reports/sections/SITE_FUNCTION_TYPE.htm:6
+msgid "Site function(s)"
+msgstr "وظيفة (وظائف) الموقع"
+
+#: eamena/templates/map/resource-popup.htm:40
+msgid "Activity Type"
+msgstr "نوع النشاط"
+
+#: eamena/templates/map/resource-popup.htm:43
+#: eamena/templates/map/resource-popup.htm:51
+msgid "Start of Occurrence"
+msgstr "بدء الحدث"
+
+#: eamena/templates/map/resource-popup.htm:46
+#: eamena/templates/map/resource-popup.htm:54
+msgid "End of Occurrence"
+msgstr "نهاية الحدث"
+
+#: eamena/templates/map/resource-popup.htm:58
+msgid "Person/Organization Name"
+msgstr "اسم الشخص/ المؤسسة"
+
+#: eamena/templates/map/resource-popup.htm:61
+msgid "Birth Date/Start of Existence"
+msgstr "تاريخ الميلاد/ بداية الوجود"
+
+#: eamena/templates/map/resource-popup.htm:64
+msgid "Death Date/End of Existence"
+msgstr "تاريخ الوفاة/ نهاية الوجود"
+
+#: eamena/templates/map/resource-popup.htm:68
+msgid "Information Resource Type"
+msgstr "نوع مصدر المعلومات"
+
+#: eamena/templates/map/resource-popup.htm:71
+#: eamena/templates/views/forms/cartography.htm:839
+msgid "Date of Creation"
+msgstr "تاريخ التعيين الإحداث"
+
+#: eamena/templates/map/resource-popup.htm:74
+#: eamena/templates/views/forms/publication.htm:182
+msgid "Date of Publication"
+msgstr "تاريخ النشر"
+
+#: eamena/templates/views/forms/activity-actions.htm:32
+msgid "activity type"
+msgstr "نوع النشاط"
+
+#: eamena/templates/views/forms/activity-actions.htm:37
+msgid "start (yyyy-mm-dd)"
+msgstr "البداية (اليو-الشهر-السنة"
+
+#: eamena/templates/views/forms/activity-actions.htm:44
+msgid "end (yyyy-mm-dd)"
+msgstr "(النهاية (اليوم-الشهر-السنة"
+
+#: eamena/templates/views/forms/activity-actions.htm:60
+msgid "start action"
+msgstr "بداية الفعل"
+
+#: eamena/templates/views/forms/activity-actions.htm:65
+msgid "start date"
+msgstr "تاريخ البداية"
+
+#: eamena/templates/views/forms/activity-actions.htm:72
+msgid "end date"
+msgstr "تاريخ النهاية"
+
+#: eamena/templates/views/forms/activity-actions.htm:105
+msgid "No Actions Defined"
+msgstr "لم يتم تحديد أي فعل"
+
+#: eamena/templates/views/forms/activity-actions.htm:111
+msgid "Activity type"
+msgstr "نوع النشاط"
+
+#: eamena/templates/views/forms/activity-actions.htm:112
+msgid "Start Date"
+msgstr "تاريخ البداية"
+
+#: eamena/templates/views/forms/activity-actions.htm:113
+msgid "End Date"
+msgstr "تاريخ النهاية"
+
+#: eamena/templates/views/forms/activity-summary.htm:18
+#: eamena/templates/views/forms/actor-summary.htm:16
+#: eamena/templates/views/forms/historical-event-summary.htm:18
+#: eamena/templates/views/reports/sections/NAME.E41.htm:6
+msgid "Names"
+msgstr "الاسم"
+
+#: eamena/templates/views/forms/activity-summary.htm:64
+#: eamena/templates/views/forms/externals.htm:53
+#: eamena/templates/views/forms/externals.htm:136
+#: eamena/templates/views/forms/historical-event-summary.htm:64
+#: eamena/templates/views/forms/location.htm:265
+#: eamena/templates/views/forms/summary.htm:134
+msgid ""
+"The name value must be populated. A resource can only have one primary name."
+msgstr "يجب ادخال قيمة الاسم. لا يحمل المصدر إلا اسم أساسي واحد"
+
+#: eamena/templates/views/forms/activity-summary.htm:80
+#: eamena/templates/views/forms/externals.htm:69
+#: eamena/templates/views/forms/externals.htm:152
+#: eamena/templates/views/forms/historical-event-summary.htm:80
+#: eamena/templates/views/forms/summary.htm:150
+msgid "This resource has these names:"
+msgstr "هذا المصدر له هذه الأسماء"
+
+#: eamena/templates/views/forms/activity-summary.htm:84
+#: eamena/templates/views/forms/actor-summary.htm:78
+#: eamena/templates/views/forms/externals.htm:73
+#: eamena/templates/views/forms/externals.htm:156
+#: eamena/templates/views/forms/historical-event-summary.htm:84
+#: eamena/templates/views/forms/summary.htm:154
+msgid "No Names Defined"
+msgstr "لم يتم تحديد أية أسماء"
+
+#: eamena/templates/views/forms/activity-summary.htm:89
+#: eamena/templates/views/forms/externals.htm:78
+#: eamena/templates/views/forms/externals.htm:161
+#: eamena/templates/views/forms/historical-event-summary.htm:89
+#: eamena/templates/views/forms/location.htm:290
+#: eamena/templates/views/forms/summary.htm:76
+#: eamena/templates/views/forms/summary.htm:159
+#: eamena/templates/views/forms/summary.htm:633
+msgid "Edit this name"
+msgstr "تعديل هذا الاسم"
+
+#: eamena/templates/views/forms/activity-summary.htm:134
+#: eamena/templates/views/forms/activity-summary.htm:146
+#: eamena/templates/views/forms/activity-summary.htm:231
+#: eamena/templates/views/forms/activity-summary.htm:243
+#: eamena/templates/views/forms/cartography.htm:855
+#: eamena/templates/views/forms/cartography.htm:862
+#: eamena/templates/views/forms/historical-event-summary.htm:134
+#: eamena/templates/views/forms/historical-event-summary.htm:146
+#: eamena/templates/views/forms/historical-event-summary.htm:231
+#: eamena/templates/views/forms/historical-event-summary.htm:243
+#: eamena/templates/views/forms/imagery.htm:583
+#: eamena/templates/views/forms/imagery.htm:590
+#: eamena/templates/views/forms/imagery.htm:669
+#: eamena/templates/views/forms/imagery.htm:676
+#: eamena/templates/views/forms/publication.htm:135
+#: eamena/templates/views/forms/publication.htm:142
+#: eamena/templates/views/forms/shareddata.htm:238
+#: eamena/templates/views/forms/shareddata.htm:245
+msgid "yyyy-mm-dd"
+msgstr "اليوم-الشهر-السنة"
+
+#: eamena/templates/views/forms/activity-summary.htm:161
+#: eamena/templates/views/forms/activity-summary.htm:257
+#: eamena/templates/views/forms/cartography.htm:877
+#: eamena/templates/views/forms/historical-event-summary.htm:161
+#: eamena/templates/views/forms/historical-event-summary.htm:257
+#: eamena/templates/views/forms/imagery.htm:605
+#: eamena/templates/views/forms/imagery.htm:691
+#: eamena/templates/views/forms/publication.htm:157
+#: eamena/templates/views/forms/shareddata.htm:260
+msgid "The date and type values must be populated."
+msgstr "يجب ادخال قيمة التاريخ والنوع"
+
+#: eamena/templates/views/forms/activity-summary.htm:177
+#: eamena/templates/views/forms/activity-summary.htm:273
+#: eamena/templates/views/forms/cartography.htm:893
+#: eamena/templates/views/forms/historical-event-summary.htm:177
+#: eamena/templates/views/forms/historical-event-summary.htm:273
+#: eamena/templates/views/forms/imagery.htm:621
+#: eamena/templates/views/forms/imagery.htm:707
+#: eamena/templates/views/forms/shareddata.htm:276
+msgid "These dates are associated with this resource:"
+msgstr "هذه التواريخ مرتبطة بهذا المصدر"
+
+#: eamena/templates/views/forms/activity-summary.htm:181
+#: eamena/templates/views/forms/activity-summary.htm:277
+#: eamena/templates/views/forms/cartography.htm:897
+#: eamena/templates/views/forms/historical-event-summary.htm:181
+#: eamena/templates/views/forms/historical-event-summary.htm:277
+#: eamena/templates/views/forms/imagery.htm:625
+#: eamena/templates/views/forms/imagery.htm:711
+#: eamena/templates/views/forms/publication.htm:177
+#: eamena/templates/views/forms/shareddata.htm:280
+msgid "No Dates Defined"
+msgstr "لم يتم تحديد أية تواريخ"
+
+#: eamena/templates/views/forms/activity-summary.htm:186
+#: eamena/templates/views/forms/activity-summary.htm:282
+#: eamena/templates/views/forms/cartography.htm:902
+#: eamena/templates/views/forms/historical-event-summary.htm:186
+#: eamena/templates/views/forms/historical-event-summary.htm:282
+#: eamena/templates/views/forms/imagery.htm:630
+#: eamena/templates/views/forms/imagery.htm:716
+#: eamena/templates/views/forms/publication.htm:182
+#: eamena/templates/views/forms/shareddata.htm:285
+#: eamena/templates/views/search/time-filter.htm:101
+msgid "Edit this date"
+msgstr "تعديل هذا التاريخ"
+
+#: eamena/templates/views/forms/activity-summary.htm:307
+#: eamena/templates/views/forms/externals.htm:185
+#: eamena/templates/views/forms/historical-event-summary.htm:307
+msgid "Keywords"
+msgstr "أسماء مفاتيح"
+
+#: eamena/templates/views/forms/activity-summary.htm:332
+#: eamena/templates/views/forms/historical-event-summary.htm:332
+msgid "The subject must be populated."
+msgstr "يجب ادخال هذا الموضوع"
+
+#: eamena/templates/views/forms/activity-summary.htm:348
+#: eamena/templates/views/forms/historical-event-summary.htm:348
+msgid "These subjects are associated with this resource:"
+msgstr "هذه المواضيع مرتبطة بهذا المصدر"
+
+#: eamena/templates/views/forms/activity-summary.htm:351
+#: eamena/templates/views/forms/historical-event-summary.htm:351
+msgid "No Subjects Defined"
+msgstr "لم يتم تحديد أية مواضيع"
+
+#: eamena/templates/views/forms/activity-summary.htm:356
+#: eamena/templates/views/forms/historical-event-summary.htm:356
+msgid "Edit this subject"
+msgstr "تعديل هذا الموضوع"
+
+#: eamena/templates/views/forms/actor-summary.htm:29
+#: eamena/templates/views/forms/actor-summary.htm:46
+#: eamena/templates/views/forms/actor-summary.htm:83
+#: eamena/templates/views/forms/externals.htm:27
+#: eamena/templates/views/forms/externals.htm:36
+#: eamena/templates/views/forms/externals.htm:110
+#: eamena/templates/views/forms/externals.htm:119
+#: eamena/templates/views/forms/summary.htm:108
+#: eamena/templates/views/forms/summary.htm:117
+msgid "Name"
+msgstr "الاسم"
+
+#: eamena/templates/views/forms/actor-summary.htm:60
+msgid "The name and name type values must be populated."
+msgstr "يجب ملئ قيمة الاسم وقيمة نوع الاسم"
+
+#: eamena/templates/views/forms/actor-summary.htm:74
+msgid "This Actor has the following Name(s):"
+msgstr "هذا الفاعل له الأسم/الاسماء التالية:"
+
+#: eamena/templates/views/forms/actor-summary.htm:82
+#: eamena/templates/views/forms/externals.htm:77
+#: eamena/templates/views/forms/externals.htm:160
+#: eamena/templates/views/forms/location.htm:289
+#: eamena/templates/views/forms/summary.htm:75
+#: eamena/templates/views/forms/summary.htm:158
+#: eamena/templates/views/forms/summary.htm:632
+msgid "Delete this name"
+msgstr "امسح هذا الاسم"
+
+#: eamena/templates/views/forms/actor-summary.htm:108
+msgid "Person/Organisation Type"
+msgstr "نوع الشخص/المؤسسة"
+
+#: eamena/templates/views/forms/actor-summary.htm:118
+#: eamena/templates/views/forms/actor-summary.htm:135
+#: eamena/templates/views/forms/actor-summary.htm:172
+#: eamena/templates/views/forms/class.htm:24
+#: eamena/templates/views/forms/designation.htm:27
+#: eamena/templates/views/forms/designation.htm:59
+#: eamena/templates/views/forms/externals.htm:28
+#: eamena/templates/views/forms/externals.htm:39
+#: eamena/templates/views/forms/externals.htm:111
+#: eamena/templates/views/forms/externals.htm:122
+#: eamena/templates/views/forms/externals.htm:196
+#: eamena/templates/views/forms/externals.htm:205
+#: eamena/templates/views/forms/imagery.htm:489
+#: eamena/templates/views/forms/imagery.htm:501
+#: eamena/templates/views/forms/imagery.htm:754
+#: eamena/templates/views/forms/information-resource-summary.htm:33
+#: eamena/templates/views/forms/information-resource-summary.htm:45
+#: eamena/templates/views/forms/measurement.htm:24
+#: eamena/templates/views/forms/measurement.htm:87
+#: eamena/templates/views/forms/measurement.htm:196
+#: eamena/templates/views/forms/measurement.htm:309
+#: eamena/templates/views/forms/measurementvalues.htm:23
+#: eamena/templates/views/forms/phase.htm:26
+#: eamena/templates/views/forms/related-files.htm:520
+#: eamena/templates/views/forms/roles.htm:26
+#: eamena/templates/views/forms/roles.htm:69
+#: eamena/templates/views/forms/roles.htm:70
+#: eamena/templates/views/forms/roles.htm:123
+#: eamena/templates/views/forms/summary.htm:109
+#: eamena/templates/views/forms/summary.htm:120
+#: eamena/templates/views/forms/summary.htm:189
+#: eamena/templates/views/forms/summary.htm:633
+#: eamena/templates/views/reports/ACTIVITY.E7.htm:248
+#: eamena/templates/views/reports/ACTOR.E39.htm:185
+#: eamena/templates/views/reports/HISTORICAL_EVENT.E5.htm:248
+#: eamena/templates/views/reports/sections/designation_section.htm:60
+#: eamena/templates/views/reports/sections/heritage_resource_phase_type_assignment.htm:26
+#: eamena/templates/views/reports/sections/FEATURE_INTERPRETATIONS.htm:16
+#: eamena/templates/views/forms/location.htm:682
+#: eamena/templates/views/forms/location.htm:700
+msgid "Type"
+msgstr "النوع"
+
+#: eamena/templates/views/forms/actor-summary.htm:149
+msgid "A person/organisation type value must be populated."
+msgstr "شخص/مؤسسة يجب إدخال قيمة"
+
+#: eamena/templates/views/forms/actor-summary.htm:163
+msgid "This actor has the following Type(s):"
+msgstr "هذا الفاعل له هذا النوع/الأنواع"
+
+#: eamena/templates/views/forms/actor-summary.htm:167
+#: eamena/templates/views/forms/externals.htm:228
+msgid "No Types Defined"
+msgstr "لم يتم تحديد نوع"
+
+#: eamena/templates/views/forms/actor-summary.htm:171
+#: eamena/templates/views/forms/externals.htm:232
+msgid "Delete this type"
+msgstr "احذف هذا النوع"
+
+#: eamena/templates/views/forms/actor-summary.htm:172
+#: eamena/templates/views/forms/district_classification.htm:286
+#: eamena/templates/views/forms/externals.htm:233
+msgid "Edit this type"
+msgstr "تعديل هذا النوع"
+
+#: eamena/templates/views/forms/actor-summary.htm:198
+#: eamena/templates/views/forms/actor-summary.htm:253
+#: eamena/templates/views/forms/location.htm:488
+msgid "Country"
+msgstr "الدولة"
+
+#: eamena/templates/views/forms/actor-summary.htm:245
+msgid "This actor's country of origin is:"
+msgstr "البلد الأصلي لهذا الفاعل هو:"
+
+#: eamena/templates/views/forms/actor-summary.htm:248
+#: eamena/templates/views/forms/location.htm:539
+msgid "No Country Defined"
+msgstr "لم يتم تحديد دولة"
+
+#: eamena/templates/views/forms/actor-summary.htm:252
+msgid "Delete this country"
+msgstr "احذف هذا البلد"
+
+#: eamena/templates/views/forms/actor-summary.htm:253
+msgid "Edit this item"
+msgstr "تعديل هذا البند"
+
+#: eamena/templates/views/forms/cartography.htm:16
+msgid "Map Source"
+msgstr "مصدر الخريطة"
+
+#: eamena/templates/views/forms/cartography.htm:30
+#: eamena/templates/views/forms/cartography.htm:42
+#: eamena/templates/views/forms/imagery.htm:119
+#: eamena/templates/views/forms/imagery.htm:133
+#: eamena/templates/views/forms/imagery.htm:145
+#: eamena/templates/views/forms/publication.htm:416
+#: eamena/templates/views/forms/publication.htm:433
+#: eamena/templates/views/forms/shareddata.htm:38
+#: eamena/templates/views/forms/shareddata.htm:55
+msgid "Source"
+msgstr "مصدر"
+
+#: eamena/templates/views/forms/cartography.htm:57
+msgid "A map source must be selected."
+msgstr "يجب اختيار مصدر الخريطة"
+
+#: eamena/templates/views/forms/cartography.htm:73
+msgid "These sources are associated with this resource:"
+msgstr "هذه المصادر مرتبطة بهذا المورد"
+
+#: eamena/templates/views/forms/cartography.htm:77
+msgid "No Map Source defined"
+msgstr "لم يتم تحديد مصدر الخريطة"
+
+#: eamena/templates/views/forms/cartography.htm:80
+#: eamena/templates/views/forms/cartography.htm:169
+#: eamena/templates/views/forms/cartography.htm:257
+#: eamena/templates/views/forms/imagery.htm:183
+#: eamena/templates/views/forms/imagery.htm:539
+#: eamena/templates/views/forms/information-resource-summary.htm:83
+msgid "Delete this right"
+msgstr "احذف هذه الحقوق"
+
+#: eamena/templates/views/forms/cartography.htm:81
+#: eamena/templates/views/forms/cartography.htm:170
+#: eamena/templates/views/forms/cartography.htm:258
+#: eamena/templates/views/forms/imagery.htm:184
+#: eamena/templates/views/forms/imagery.htm:540
+#: eamena/templates/views/forms/information-resource-summary.htm:84
+msgid "Edit this right"
+msgstr "تعديل هذه الحقوق"
+
+#: eamena/templates/views/forms/cartography.htm:105
+#: eamena/templates/views/forms/cartography.htm:119
+#: eamena/templates/views/forms/cartography.htm:131
+msgid "Creator"
+msgstr "المنشئ"
+
+#: eamena/templates/views/forms/cartography.htm:146
+#: eamena/templates/views/forms/cartography.htm:234
+#: eamena/templates/views/forms/imagery.htm:160
+#: eamena/templates/views/forms/imagery.htm:516
+#: eamena/templates/views/forms/imagery.htm:781
+#: eamena/templates/views/forms/information-resource-summary.htm:60
+msgid "A right type must be selected."
+msgstr "يجب اختيار النوع الصحيح"
+
+#: eamena/templates/views/forms/cartography.htm:162
+msgid "This creator is associated with this resource:"
+msgstr "هذا المنشئ هذو صلة بهذا المورد"
+
+#: eamena/templates/views/forms/cartography.htm:166
+msgid "No Creator(s) Defined"
+msgstr "المنشئ غير معرّف"
+
+#: eamena/templates/views/forms/cartography.htm:193
+#: eamena/templates/views/forms/cartography.htm:207
+#: eamena/templates/views/forms/cartography.htm:219
+msgid "Series"
+msgstr "سلسلة"
+
+#: eamena/templates/views/forms/cartography.htm:250
+msgid "This series is associated with this resource:"
+msgstr "هذه السلسلة ذات صلة بهذا المورد"
+
+#: eamena/templates/views/forms/cartography.htm:254
+msgid "No Series Defined"
+msgstr "لم يتم تحديد سلسلة"
+
+#: eamena/templates/views/forms/cartography.htm:281
+msgid "Place of publication"
+msgstr "مكان النشر"
+
+#: eamena/templates/views/forms/cartography.htm:301
+#: eamena/templates/views/forms/cartography.htm:318
+#: eamena/templates/views/forms/publication.htm:498
+#: eamena/templates/views/forms/publication.htm:535
+msgid "Place"
+msgstr "مكان"
+
+#: eamena/templates/views/forms/cartography.htm:334
+#: eamena/templates/views/forms/cartography.htm:584
+#: eamena/templates/views/forms/imagery.htm:69
+#: eamena/templates/views/forms/imagery.htm:261
+#: eamena/templates/views/forms/publication.htm:69
+#: eamena/templates/views/forms/publication.htm:347
+#: eamena/templates/views/forms/publication.htm:449
+#: eamena/templates/views/forms/publication.htm:551
+#: eamena/templates/views/forms/publication.htm:653
+#: eamena/templates/views/forms/publication.htm:755
+#: eamena/templates/views/forms/publication.htm:857
+#: eamena/templates/views/forms/publication.htm:959
+#: eamena/templates/views/forms/publication.htm:1061
+#: eamena/templates/views/forms/shareddata.htm:71
+#: eamena/templates/views/forms/shareddata.htm:173
+msgid "The resource type value must be populated."
+msgstr "يجب ادخال قيمة المورد"
+
+#: eamena/templates/views/forms/cartography.htm:350 
+msgid "This resource is published here:" 
+msgstr "هذا المورد منضور عنه هنا"
+
+#: eamena/templates/views/forms/cartography.htm:354
+msgid "No Place Defined"
+msgstr "لم يتم تحديد مكان"
+
+#: eamena/templates/views/forms/cartography.htm:357
+#: eamena/templates/views/forms/imagery.htm:92
+#: eamena/templates/views/forms/imagery.htm:284
+#: eamena/templates/views/forms/publication.htm:92
+#: eamena/templates/views/forms/publication.htm:370
+#: eamena/templates/views/forms/shareddata.htm:94
+msgid "Delete this publisher/date"
+msgstr "احذف هذا الناشر/التاريخ"
+
+#: eamena/templates/views/forms/cartography.htm:358
+#: eamena/templates/views/forms/imagery.htm:285
+#: eamena/templates/views/forms/publication.htm:93
+#: eamena/templates/views/forms/publication.htm:371
+#: eamena/templates/views/forms/shareddata.htm:95
+#: eamena/templates/views/forms/shareddata.htm:197
+msgid "Edit this publisher/date"
+msgstr "تعديل هذا الناشر/التاريخ"
+
+#: eamena/templates/views/forms/cartography.htm:360
+#: eamena/templates/views/forms/imagery.htm:287
+#: eamena/templates/views/forms/publication.htm:95
+msgid "author"
+msgstr "المؤلف"
+
+#: eamena/templates/views/forms/cartography.htm:383
+#: eamena/templates/views/forms/cartography.htm:390
+msgid "Projection/Grid"
+msgstr "اشعاع/شبكة"
+
+#: eamena/templates/views/forms/cartography.htm:398
+#: eamena/templates/views/forms/cartography.htm:454
+#: eamena/templates/views/forms/cartography.htm:461
+#: eamena/templates/views/forms/cartography.htm:469
+msgid "Scale"
+msgstr "المقياس"
+
+#: eamena/templates/views/forms/cartography.htm:408
+msgid "The Projection/Grid must be populated."
+msgstr "يجب تعبئة الاشعاع/الشبكة"
+
+#: eamena/templates/views/forms/cartography.htm:424
+msgid "This projection/grid is associated with this resource:"
+msgstr "هذا الإشعاع/ هذه الشبكة مرتبط/ة بهذا المورد"
+
+#: eamena/templates/views/forms/cartography.htm:427
+msgid "No Projection/Grid Defined"
+msgstr "لم يتم تحديد اشعاع/شبكة"
+
+#: eamena/templates/views/forms/cartography.htm:431
+msgid "Delete this projection/grid"
+msgstr "امسح هذا الاشعاع/الشبكة"
+
+#: eamena/templates/views/forms/cartography.htm:432
+msgid "Edit this projection/grid"
+msgstr "تعديل هذا الاشعاع/الشبكة"
+
+#: eamena/templates/views/forms/cartography.htm:479
+msgid "The Scale must be populated."
+msgstr "يجب تعبئة المقياس"
+
+#: eamena/templates/views/forms/cartography.htm:495
+msgid "This scale is associated with this resource:"
+msgstr "هذا المقياس ذو صلة بهذا المصدر"
+
+#: eamena/templates/views/forms/cartography.htm:498
+msgid "No Scale Defined"
+msgstr "لم يتم تحديد مقياس"
+
+#: eamena/templates/views/forms/cartography.htm:502
+msgid "Delete this scale"
+msgstr "احذف هذا المقياس"
+
+#: eamena/templates/views/forms/cartography.htm:503
+msgid "Edit this scale "
+msgstr "تعديل هذا المقياس"
+
+#: eamena/templates/views/forms/cartography.htm:531
+#: eamena/templates/views/forms/cartography.htm:551
+#: eamena/templates/views/forms/cartography.htm:568
+#: eamena/templates/views/forms/cartography.htm:610
+msgid "Sheet Number"
+msgstr "رقم الصفحة"
+
+#: eamena/templates/views/forms/cartography.htm:600
+msgid "This resource has these sheet numbers:"
+msgstr "هذا المورد له أرقام الصفحات التالية:"
+
+#: eamena/templates/views/forms/cartography.htm:604
+msgid "No Sheet Number(s) defined"
+msgstr "لم يتم تحديد أرقام صفحات"
+
+#: eamena/templates/views/forms/cartography.htm:607
+msgid "Delete this sheet number"
+msgstr "أحذف رقم الصفحة هذا"
+
+#: eamena/templates/views/forms/cartography.htm:608
+msgid "Edit this sheet number"
+msgstr "تعديل رقم الصفحة هذه"
+
+#: eamena/templates/views/forms/cartography.htm:634
+#: eamena/templates/views/forms/cartography.htm:654
+#: eamena/templates/views/forms/cartography.htm:713
+msgid "Sheet Name"
+msgstr "اسم الصفحة"
+
+#: eamena/templates/views/forms/cartography.htm:671
+msgid "Sheet name"
+msgstr "اسم الصفحة"
+
+#: eamena/templates/views/forms/cartography.htm:687
+msgid "The sheet name must be populated."
+msgstr "يجب تعبئة اسم الصفحة"
+
+#: eamena/templates/views/forms/cartography.htm:703
+msgid "This resource has these Sheet Name(s)"
+msgstr "هذا المورد له أسماء الصفحات هذه"
+
+#: eamena/templates/views/forms/cartography.htm:707
+msgid "No Sheet Name Defined"
+msgstr "لم يتم تحديد رقم صفحة"
+
+#: eamena/templates/views/forms/cartography.htm:710
+msgid "Delete this sheet name"
+msgstr "احذف اسم الصفحة هذا"
+
+#: eamena/templates/views/forms/cartography.htm:711
+msgid "Edit this sheet name"
+msgstr "تعديل اسم الصفحة هذا"
+
+#: eamena/templates/views/forms/cartography.htm:736
+#: eamena/templates/views/forms/cartography.htm:756
+#: eamena/templates/views/forms/cartography.htm:773
+#: eamena/templates/views/forms/cartography.htm:815
+msgid "Edition"
+msgstr "نسخة"
+
+#: eamena/templates/views/forms/cartography.htm:789
+msgid "The edition value must be populated."
+msgstr "يجب تعبئة قيمة النسحة"
+
+#: eamena/templates/views/forms/cartography.htm:805
+msgid "This resource has this Edition(s)"
+msgstr "هذا المورد له هذه النسخة/النسخ"
+
+#: eamena/templates/views/forms/cartography.htm:809
+msgid "No Edition Defined"
+msgstr "لم يتم تحديد نسخة"
+
+#: eamena/templates/views/forms/cartography.htm:812
+msgid "Delete this edition"
+msgstr "امسح هذه النسخة"
+
+#: eamena/templates/views/forms/cartography.htm:813
+msgid "Edit this edition"
+msgstr "تعديل هذه النسخة"
+
+#: eamena/templates/views/forms/class.htm:14
+msgid "Feature Form "
+msgstr "شكل الملمح"
+
+#: eamena/templates/views/forms/class.htm:27
+msgid "Type certainty"
+msgstr "مدى التأكد من النوع"
+
+#: eamena/templates/views/forms/class.htm:34
+#: eamena/templates/views/forms/summary.htm:324
+#: eamena/templates/views/forms/summary.htm:326
+msgid "Shape"
+msgstr "الهيئة"
+
+#: eamena/templates/views/forms/class.htm:37
+msgid "Arrangement"
+msgstr "الترتيب"
+
+#: eamena/templates/views/forms/class.htm:46
+msgid "Number"
+msgstr "العدد"
+
+#: eamena/templates/views/forms/class.htm:71
+msgid "Feature form(s) recorded:"
+msgstr "شكل/أشكال الملمح المسجلة"
+
+#: eamena/templates/views/forms/class.htm:75
+#: eamena/templates/views/forms/class.htm:154
+#: eamena/templates/views/forms/imagery.htm:372
+msgid "No Values Defined"
+msgstr "لم يتم تحديد قيمة"
+
+#: eamena/templates/views/forms/class.htm:79
+#: eamena/templates/views/forms/class.htm:158
+#: eamena/templates/views/forms/imagery.htm:376
+#: eamena/templates/views/forms/measurement.htm:56
+#: eamena/templates/views/forms/measurement.htm:119
+#: eamena/templates/views/forms/measurement.htm:253
+#: eamena/templates/views/forms/measurement.htm:342
+#: eamena/templates/views/forms/measurementvalues.htm:60
+#: eamena/templates/views/forms/summary.htm:224
+#: eamena/templates/views/forms/summary.htm:493
+#: eamena/templates/views/forms/summary.htm:556
+msgid "Delete this measurement"
+msgstr "احذف هذه القياسات"
+
+#: eamena/templates/views/forms/class.htm:80
+#: eamena/templates/views/forms/class.htm:159
+#: eamena/templates/views/forms/measurement.htm:57
+#: eamena/templates/views/forms/measurement.htm:120
+#: eamena/templates/views/forms/measurement.htm:254
+#: eamena/templates/views/forms/measurement.htm:343
+msgid "Edit this measurement"
+msgstr "تعديل هذا القياس"
+
+#: eamena/templates/views/forms/class.htm:81
+msgid "Feature type"
+msgstr "نوع الملمح"
+
+#: eamena/templates/views/forms/class.htm:81
+msgid " type certainty "
+msgstr "مدى التأكد من النوع"
+
+#: eamena/templates/views/forms/class.htm:81
+msgid " shape "
+msgstr "الهيئة"
+
+#: eamena/templates/views/forms/class.htm:82
+msgid " arrangement "
+msgstr "الترتيب"
+
+#: eamena/templates/views/forms/class.htm:83
+msgid " number type "
+msgstr "نوع الرقم"
+
+#: eamena/templates/views/forms/class.htm:103
+msgid "Feature Interpretation "
+msgstr "تفسير الملمح"
+
+#: eamena/templates/views/forms/class.htm:114
+msgid "Interpretation"
+msgstr "التفسير"
+
+#: eamena/templates/views/forms/class.htm:118
+msgid "Interpretation certainty"
+msgstr "مدى التأكد من التفسير"
+
+#: eamena/templates/views/forms/class.htm:126
+msgid "Interpretation number"
+msgstr "رقم التفسير"
+
+#: eamena/templates/views/forms/class.htm:150
+msgid "Feature interpretation(s) recorded:"
+msgstr "التفسير/التفاسير المسجلة للملمح"
+
+#: eamena/templates/views/forms/class.htm:160
+msgid " interpretation type "
+msgstr "نوع التفسير"
+
+#: eamena/templates/views/forms/class.htm:161
+msgid " intepretation certainty "
+msgstr "مدى التأكد من التفصير"
+
+#: eamena/templates/views/forms/class.htm:162
+msgid " interpretation number type "
+msgstr "نوع رقم التفسير"
+
+#: eamena/templates/views/forms/component.htm:35
+#: eamena/templates/views/forms/component.htm:54
+msgid "component"
+msgstr "مكون"
+
+#: eamena/templates/views/forms/component.htm:37
+#: eamena/templates/views/forms/component.htm:56
+msgid "style"
+msgstr "طراز"
+
+#: eamena/templates/views/forms/component.htm:39
+#: eamena/templates/views/forms/component.htm:58
+msgid "material"
+msgstr "مواد"
+
+#: eamena/templates/views/forms/component.htm:88
+msgid "No Components Defined"
+msgstr "لم يتم تحديد مكون"
+
+#: eamena/templates/views/forms/component.htm:94
+#: eamena/templates/views/reports/sections/COMPONENT.E18.htm:26
+msgid "Component"
+msgstr "مكون"
+
+#: eamena/templates/views/forms/component.htm:95
+#: eamena/templates/views/reports/sections/heritage_resource_phase_type_assignment.htm:59
+msgid "Style"
+msgstr "طراز"
+
+#: eamena/templates/views/forms/component.htm:96
+#: eamena/templates/views/reports/sections/COMPONENT.E18.htm:56
+msgid "Material"
+msgstr "مواد"
+
+#: eamena/templates/views/forms/component.htm:188
+msgid "This resource has these modifications:"
+msgstr "هذا المورد به هذه التعديلات"
+
+#: eamena/templates/views/forms/component.htm:192
+msgid "No Modifications Defined"
+msgstr "لم يتم تحديد تعديلات"
+
+#: eamena/templates/views/forms/component.htm:200
+#: eamena/templates/views/forms/description.htm:76
+msgid "Edit this description"
+msgstr "تعديل هذا الوصف"
+
+#: eamena/templates/views/forms/coverage.htm:17
+#: eamena/templates/views/forms/location.htm:20
+msgid "Mapped Locations"
+msgstr "مواقع لها خرائط"
+
+#: eamena/templates/views/forms/coverage.htm:50
+#: eamena/templates/views/forms/coverage.htm:175
+#: eamena/templates/views/forms/location.htm:51
+#: eamena/templates/views/forms/location.htm:176
+#: eamena/templates/views/reports/ACTIVITY.E7.htm:51
+#: eamena/templates/views/reports/ACTIVITY.E7.htm:90
+#: eamena/templates/views/reports/ACTOR.E39.htm:51
+#: eamena/templates/views/reports/ACTOR.E39.htm:90
+#: eamena/templates/views/reports/HERITAGE_RESOURCE.E18.htm:51
+#: eamena/templates/views/reports/HERITAGE_RESOURCE.E18.htm:90
+#: eamena/templates/views/reports/HERITAGE_RESOURCE_GROUP.E27.htm:52
+#: eamena/templates/views/reports/HERITAGE_RESOURCE_GROUP.E27.htm:91
+#: eamena/templates/views/reports/HISTORICAL_EVENT.E5.htm:51
+#: eamena/templates/views/reports/HISTORICAL_EVENT.E5.htm:90
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:51
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:90
+#: eamena/templates/views/search/map-filter.htm:59
+#: eamena/templates/views/search/map-filter.htm:196
+msgid "Basemaps"
+msgstr "خرائط مرجعية"
+
+#: eamena/templates/views/forms/coverage.htm:97
+#: eamena/templates/views/forms/location.htm:98
+msgid "Geometry Tools"
+msgstr "أدوات هندسية"
+
+#: eamena/templates/views/forms/coverage.htm:115
+#: eamena/templates/views/forms/location.htm:116
+msgid "Draw new point"
+msgstr "ارسم نقطة جديدة"
+
+#: eamena/templates/views/forms/coverage.htm:125
+#: eamena/templates/views/forms/location.htm:126
+msgid "Draw new line"
+msgstr "ارسم خط جديد"
+
+#: eamena/templates/views/forms/coverage.htm:135
+#: eamena/templates/views/forms/location.htm:136
+msgid "Draw new polygon"
+msgstr "ارسم مضلع جديد"
+
+#: eamena/templates/views/forms/coverage.htm:145
+#: eamena/templates/views/forms/location.htm:146
+msgid "Add from gpx, kml, or geojson"
+msgstr " geojson أو kml أو gpx أضف من "
+
+#: eamena/templates/views/forms/coverage.htm:152
+#: eamena/templates/views/forms/location.htm:153
+msgid "(or drag and drop the file onto the map)"
+msgstr "أو اسحب الملف واسقطه على الخريطة"
+
+#: eamena/templates/views/forms/coverage.htm:178
+#: eamena/templates/views/forms/location.htm:179
+msgid "Add Geometry"
+msgstr "أضف خصائص هندسية"
+
+#: eamena/templates/views/forms/coverage.htm:197
+#: eamena/templates/views/forms/location.htm:198
+msgid "This resource is represented by the following geometries:"
+msgstr "هذا المورد يتم تمثيله بالخصائص الهندسية التالية"
+
+#: eamena/templates/views/forms/coverage.htm:200
+#: eamena/templates/views/forms/location.htm:201
+msgid "No geometries defined"
+msgstr "لم يتم تحديد خصائص هندسية"
+
+#: eamena/templates/views/forms/description.htm:14
+#: eamena/templates/views/reports/ACTIVITY.E7.htm:297
+#: eamena/templates/views/reports/HERITAGE_RESOURCE.E18.htm:312
+#: eamena/templates/views/reports/HISTORICAL_EVENT.E5.htm:306
+msgid "Resource Descriptions"
+msgstr "وصف المورد"
+
+#: eamena/templates/views/forms/description.htm:46
+#: eamena/templates/views/forms/related-resources.htm:128
+#: eamena/templates/views/forms/related-resources.htm:372
+msgid "All values must be populated."
+msgstr "يجب تعبئة جميع القيم"
+
+#: eamena/templates/views/forms/description.htm:63
+msgid "This resource has these descriptions:"
+msgstr "هذا المورد له هذه الأوصاف"
+
+#: eamena/templates/views/forms/description.htm:67
+msgid "No Descriptions Defined"
+msgstr "لم يتم تحديد وصف"
+
+#: eamena/templates/views/forms/description.htm:75
+msgid "Remove this description"
+msgstr "احذف هذا الوصف"
+
+#: eamena/templates/views/forms/designation.htm:32
+#: eamena/templates/views/forms/district_classification.htm:199
+#: eamena/templates/views/forms/measurement.htm:211
+#: eamena/templates/views/forms/related-resources.htm:95
+#: eamena/templates/views/forms/related-resources.htm:339
+msgid "from (yyyy-mm-dd)"
+msgstr "(من (يوم/شهر/سنة "
+
+#: eamena/templates/views/forms/designation.htm:39
+#: eamena/templates/views/forms/district_classification.htm:212
+#: eamena/templates/views/forms/measurement.htm:218
+#: eamena/templates/views/forms/related-resources.htm:108
+#: eamena/templates/views/forms/related-resources.htm:352
+msgid "to (yyyy-mm-dd)"
+msgstr "(إلى (يوم/شهر/ سنة "
+
+#: eamena/templates/views/forms/designation.htm:101
+msgid "This resource has the following designations:"
+msgstr "هذا المورد له هذه الإسنادات"
+
+#: eamena/templates/views/forms/designation.htm:105
+msgid "No Designations Defined"
+msgstr "لم يتم تحديد اسنادات"
+
+#: eamena/templates/views/forms/designation.htm:109
+msgid "Delete this designation"
+msgstr "احذف هذا الاسناد"
+
+#: eamena/templates/views/forms/district_classification.htm:8
+msgid "A type and date must be specified."
+msgstr "يجب تحديد نوع وتاريخ"
+
+#: eamena/templates/views/forms/district_classification.htm:22
+msgid "Resource Classification"
+msgstr "تصنيف المورد"
+
+#: eamena/templates/views/forms/district_classification.htm:26
+msgid "Loading ...."
+msgstr "تحميل... "
+
+#: eamena/templates/views/forms/district_classification.htm:47
+#: eamena/templates/views/forms/district_classification.htm:332
+#: eamena/templates/views/reports/HERITAGE_RESOURCE_GROUP.E27.htm:178
+#: eamena/templates/views/reports/sections/heritage_resource_phase_type_assignment.htm:6
+msgid "Classification"
+msgstr "تصنيف"
+
+#: eamena/templates/views/forms/district_classification.htm:70
+#: eamena/templates/views/forms/summary.htm:450
+msgid "Cultural Period"
+msgstr "فترة ثقافية"
+
+#: eamena/templates/views/forms/district_classification.htm:80
+#: eamena/templates/views/reports/sections/TIME_SPANS.htm:20
+msgid "From"
+msgstr "هيئة"
+
+#: eamena/templates/views/forms/district_classification.htm:89
+#: eamena/templates/views/reports/sections/TIME_SPANS.htm:30
+msgid "To"
+msgstr "إلى"
+
+#: eamena/templates/views/forms/district_classification.htm:100
+#: eamena/templates/views/forms/district_classification.htm:257
+#: eamena/templates/views/reports/sections/ANCILLARY_FEATURE_TYPE.E55.htm:6
+#: eamena/templates/views/reports/sections/heritage_resource_phase_type_assignment.htm:86
+msgid "Related Features"
+msgstr "ملمح ذو صلة"
+
+#: eamena/templates/views/forms/district_classification.htm:137
+msgid "Part 1: Summary"
+msgstr "الجزء الأول: ملخص"
+
+#: eamena/templates/views/forms/district_classification.htm:140
+msgid "Part 2: Related Features"
+msgstr "الجزء الثاني: ملامح ذات صلة"
+
+#: eamena/templates/views/forms/district_classification.htm:152
+#: eamena/templates/views/forms/related-files.htm:309
+msgid "Part 1"
+msgstr "الجزء الأول"
+
+#: eamena/templates/views/forms/district_classification.htm:152
+msgid "Classification Summary"
+msgstr "ملخص التصنيف"
+
+#: eamena/templates/views/forms/district_classification.htm:156
+msgid ""
+"Start your classification by describing it's type, use and cultural period."
+msgstr "ابدأالتصنيف بوصف النوع والاستخدام والفترة الثقافية"
+
+#: eamena/templates/views/forms/district_classification.htm:170
+msgid "morphology"
+msgstr "المورفولوجي"
+
+#: eamena/templates/views/forms/district_classification.htm:181
+msgid "use"
+msgstr "الاستخدام"
+
+#: eamena/templates/views/forms/district_classification.htm:226
+msgid "period"
+msgstr "العصر"
+
+#: eamena/templates/views/forms/district_classification.htm:244
+#: eamena/templates/views/forms/related-files.htm:321
+msgid "Part 2"
+msgstr "الجزء الثاني"
+
+#: eamena/templates/views/forms/district_classification.htm:244
+msgid "Assessment Summary"
+msgstr "ملخص التقييم"
+
+#: eamena/templates/views/forms/district_classification.htm:248
+msgid "Select this classification's related features."
+msgstr "اختار الملامح ذات الصلة بهذا التصنيف"
+
+#: eamena/templates/views/forms/district_classification.htm:281
+msgid "No related features selected"
+msgstr "لم يتم اختيار ملامح"
+
+#: eamena/templates/views/forms/district_classification.htm:329
+msgid "Are you ready to delete this assessment?"
+msgstr "هل أنت مستعد لحذف هذا التقييم؟"
+
+#: eamena/templates/views/forms/district_classification.htm:338
+#: eamena/templates/views/rdm/concept-report.htm:305
+#: eamena/templates/views/rdm/entitytype-report.htm:244
+msgid "No"
+msgstr "لا"
+
+#: eamena/templates/views/forms/district_classification.htm:339
+#: eamena/templates/views/rdm/concept-report.htm:306
+#: eamena/templates/views/rdm/entitytype-report.htm:245
+msgid "Yes"
+msgstr "نعم"
+
+#: eamena/templates/views/forms/external-reference.htm:30
+#: eamena/templates/views/forms/external-reference.htm:100
+msgid "URL"
+msgstr " عنوان الموقع على الانترنت "
+
+#: eamena/templates/views/forms/external-reference.htm:34
+#: eamena/templates/views/forms/external-reference.htm:55
+msgid "Access date"
+msgstr "تاريخ الدخول"
+
+#: eamena/templates/views/forms/external-reference.htm:89
+msgid "This resource has the following URLs:"
+msgstr "هذا المورد له هذا الموقع على الانترنت"
+
+#: eamena/templates/views/forms/external-reference.htm:93
+msgid "No URLs defined"
+msgstr "لم يتم تحديد موقع على الانترنت"
+
+#: eamena/templates/views/forms/external-reference.htm:97
+msgid "Delete this URL"
+msgstr "احذف موقع على الانترنت"
+
+#: eamena/templates/views/forms/external-reference.htm:98
+msgid "Edit this URL"
+msgstr "تعديل هذا الموقع على الانترنت"
+
+#: eamena/templates/views/forms/external-reference.htm:101
+msgid "Date of access"
+msgstr "تاريخ الدخول"
+
+#: eamena/templates/views/forms/externals.htm:18
+#: eamena/templates/views/forms/externals.htm:101
+#: eamena/templates/views/reports/ACTOR.E39.htm:153
+msgid "Name(s)"
+msgstr "اسم/اسماء"
+
+#: eamena/templates/views/forms/file-upload.htm:17
+msgid "No file uploaded for this resource yet"
+msgstr "لم يتم تحميل ملف لهذا المورد بعد"
+
+#: eamena/templates/views/forms/file-upload.htm:45
+msgid "Delete Image"
+msgstr "احذف الصورة"
+
+#: eamena/templates/views/forms/file-upload.htm:57
+#: eamena/templates/views/forms/related-files.htm:144
+msgid "Download this file"
+msgstr "حمّل هذا الملف"
+
+#: eamena/templates/views/forms/file-upload.htm:58
+msgid "Delete this file"
+msgstr "احذف هذا الملف"
+
+#: eamena/templates/views/forms/file-upload.htm:59
+#: eamena/templates/views/forms/related-files.htm:145
+msgid "format"
+msgstr "تشكيل/ تصميم البنية"
+
+#: eamena/templates/views/forms/file-upload.htm:80
+msgid "Delete File"
+msgstr "احذف الملف"
+
+#: eamena/templates/views/forms/file-upload.htm:95
+msgid "Are you sure you want to delete the file?"
+msgstr "هل أنت متأكد أنك تريد حذف هذاالملف؟"
+
+#: eamena/templates/views/forms/file-upload.htm:109
+#: eamena/templates/views/forms/related-files.htm:255
+msgid "Delete"
+msgstr "حذف"
+
+#: eamena/templates/views/forms/file-upload.htm:124
+msgid "Only one file allowed"
+msgstr "ملف واحد فقط مسموح به"
+
+#: eamena/templates/views/forms/file-upload.htm:139
+msgid "Only one file is allowed to be associated with this resource."
+msgstr "ملف واحد فقط مسموح أن يكون ذا صلة بهذا المورد"
+
+#: eamena/templates/views/forms/file-upload.htm:152
+msgid "OK"
+msgstr "موافق"
+
+#: eamena/templates/views/forms/file-upload.htm:191
+msgid ""
+"DISCLAIMER: Please bear in mind that the database is OPEN-ACCESS and "
+"therefore ANY images or files that are uploaded must be Public Domain. It is "
+"your responsibility to ensure that you have permission to upload the file "
+"into the EAMENA database and that doing so does not violate any copyright or "
+"intellectual property laws. Any images or files that are found to violate "
+"copyright will be DELETED immediately. If you find any images or files in "
+"the database that you know or suspect to be in breach of copyright, please "
+"notify a member of the EAMENA team. Furthermore, if you upload any personal "
+"files (e.g. personal photographs, survey notes), be aware that these may be "
+"downloaded and used by any member of the public. EAMENA are not responsible "
+"if files are downloaded and used in ways not approved or anticipated by the "
+"uploader."
+msgstr " إخلاء المسئولية: الرجا الأخذ في الاعتبار أن قاعدة البيانات هي (مصدر مفتوح) ولذلك يجب أن تكون جميع الصور والملفات التي يتم تحميلها ملكية عامة. وهي مسئوليتك أن تتأكد أن لديك تصريح بتحميل الملف على قاعدة بيانت يامينا وأنك عندما تفعل ذلك لا تتعدى على أية قوانين متعلقة بحقوق ملكية فكرية وحقوق النسخ. وإذا وجد أن أية صورة أو أي ملف يخالف حوق النسخ سيتم حذفه فوراً. وإن وجدت أية صور أو ملفات في قاعدة البيانات تعلم أو تشك أنها تنتهك حقوق النسخ فالرجاء إبلاغ أحد أعضاء فريق يامينا. وكذلك الرجا الأخذ في الاعتبار أن عند تحميلك لأية ملفات أو صور شخصية (مثال: صور شخصية، أو الملاحظات الخاصة بك فيما يخص المساحة) فقد يتم تنزيل هذه الملفات أو الصور واستخدامها بواسطة أي شخص من العامة. وتخلي يامينا مسئوليتها عن أية ملفات يتم تنزيلها واستخدامها بطريقة لا تقرّها أو لم تتوقعها الجهة التي قامت بتحميله."
+
+#: eamena/templates/views/forms/imagery.htm:16
+#: eamena/templates/views/forms/imagery.htm:36
+#: eamena/templates/views/forms/imagery.htm:95
+#: eamena/templates/views/reports/sections/IMAGERY_REPORT.htm:8
+msgid "Catalog ID"
+msgstr "هوية الفهرس"
+
+#: eamena/templates/views/forms/imagery.htm:53
+#: eamena/templates/views/forms/publication.htm:331
+#: eamena/templates/views/forms/shareddata.htm:157
+msgid "Editors"
+msgstr "المحررون"
+
+#: eamena/templates/views/forms/imagery.htm:85 
+msgid "This resource has this Catalog ID:" 
+msgstr "هذا المورد له هويةالكتالوج هذه"
+
+#: eamena/templates/views/forms/imagery.htm:89
+msgid "No Catalog ID Defined"
+msgstr "لم يتم تحديد هوية فهرس"
+
+#: eamena/templates/views/forms/imagery.htm:93
+msgid "Edit this Catalog ID"
+msgstr "تعديل هوية هذا الكتالوج"
+
+#: eamena/templates/views/forms/imagery.htm:176
+#: eamena/templates/views/forms/information-resource-summary.htm:76
+msgid "These types are associated with this resource:"
+msgstr "هذه الأنواع ذات صلة بهذا المورد"
+
+#: eamena/templates/views/forms/imagery.htm:180
+#: eamena/templates/views/forms/publication.htm:469
+#: eamena/templates/views/forms/shareddata.htm:91
+msgid "No Source Defined"
+msgstr "لم يتم تحديد مصدر"
+
+#: eamena/templates/views/forms/imagery.htm:208
+msgid "Creator(s)/Owner(s)"
+msgstr "المنشئ (المنشئون)/ المالك/المالكون"
+
+#: eamena/templates/views/forms/imagery.htm:228
+msgid "Creator(s)"
+msgstr "المنشئ"
+
+#: eamena/templates/views/forms/imagery.htm:245
+msgid "Creators"
+msgstr "المنشئ"
+
+#: eamena/templates/views/forms/imagery.htm:277
+#: eamena/templates/views/forms/publication.htm:85 
+msgid "This resource has these authors:" 
+msgstr "هذاالمورد له هؤلاء المؤلفين"
+
+#: eamena/templates/views/forms/imagery.htm:281
+msgid "No Creators(s) Defined"
+msgstr "لم يتم تعريف منشئ (أو منشئين)"
+
+#: eamena/templates/views/forms/imagery.htm:311
+#: eamena/templates/views/reports/sections/IMAGERY_REPORT.htm:100
+msgid "Image Details"
+msgstr "تفاصيل الصورة"
+
+#: eamena/templates/views/forms/imagery.htm:321
+msgid "Platform/Vehicle"
+msgstr "منصة/آلية"
+
+#: eamena/templates/views/forms/imagery.htm:324
+msgid "Sensor/Camera Model"
+msgstr "موديل أداة الاستشعار/آلة التصوير"
+
+#: eamena/templates/views/forms/imagery.htm:331
+#: eamena/templates/views/forms/imagery.htm:378
+msgid "Bands/Colours/Spectral Resolution"
+msgstr "حرم/ألوان/وضوح صورة خاص"
+
+#: eamena/templates/views/forms/imagery.htm:334
+msgid "Sensor/Camera Type"
+msgstr "نوع أداة الاستشعار/ آلة التصوير"
+
+#: eamena/templates/views/forms/imagery.htm:343
+msgid "Sensor/Camera Resolution"
+msgstr "دقة شاشة جهاز استشعار آلة التصوير"
+
+#: eamena/templates/views/forms/imagery.htm:368
+msgid "Imagery Acquisition details recorded:"
+msgstr "التفاصيل المسجلة لاقتناء الصورة"
+
+#: eamena/templates/views/forms/imagery.htm:378
+msgid "Platform"
+msgstr "المنصة"
+
+#: eamena/templates/views/forms/imagery.htm:378
+msgid " Sensor/Camera Model "
+msgstr "موديل أداة الاستشعار/ آلة التصوير"
+
+#: eamena/templates/views/forms/imagery.htm:379
+msgid " Sensor/Camera Type "
+msgstr "نوع أداة الاستشعار/ آلة التصوير"
+
+#: eamena/templates/views/forms/imagery.htm:380
+msgid " Sensor/Camera Resolution "
+msgstr "درجة وضوح أداة الاستشعار/ آلة التصوير"
+
+#: eamena/templates/views/forms/imagery.htm:404
+#: eamena/templates/views/forms/imagery.htm:411
+msgid "Post-Processing Resolution"
+msgstr "درجة الوضوع بعد المعالجة"
+
+#: eamena/templates/views/forms/imagery.htm:419
+msgid "Resolution"
+msgstr "دقة الشاشة"
+
+#: eamena/templates/views/forms/imagery.htm:429
+msgid "The Keyword must be populated."
+msgstr "يجب ادخال الكلمة المفتاح"
+
+#: eamena/templates/views/forms/imagery.htm:445
+msgid "This resolution is associated with this resource:"
+msgstr "دقة الشاشة هذه ذات صلة بهذا المورد"
+
+#: eamena/templates/views/forms/imagery.htm:448
+msgid "No Resolution Defined"
+msgstr "لم يتم تحديد دقة شاشة"
+
+#: eamena/templates/views/forms/imagery.htm:452
+msgid "Delete this resolution type"
+msgstr "احذف نوع دقة الشاشة هذه"
+
+#: eamena/templates/views/forms/imagery.htm:453
+msgid "Edit this resolution "
+msgstr "تعديل دقةالشاشة هذه"
+
+#: eamena/templates/views/forms/imagery.htm:475
+msgid "Processing Type"
+msgstr "نوع المعالجة"
+
+#: eamena/templates/views/forms/imagery.htm:532
+msgid "This processing type is associated with this resource:"
+msgstr "نوع هذه العملية ذو صلة بهذا المورد"
+
+#: eamena/templates/views/forms/imagery.htm:536
+msgid "No Processing Type Defined"
+msgstr "لم يتم تحديد نوع معالجة"
+
+#: eamena/templates/views/forms/imagery.htm:567
+msgid "Acquisition date"
+msgstr "تاريخ الاستحواذ/ الالتقاط"
+
+#: eamena/templates/views/forms/imagery.htm:653
+msgid "File date"
+msgstr "تاريخ الملف"
+
+#: eamena/templates/views/forms/imagery.htm:740
+#: eamena/templates/views/reports/sections/IMAGERY_REPORT.htm:227
+msgid "Copyright Type"
+msgstr "نوع حقوق النسخ"
+
+#: eamena/templates/views/forms/imagery.htm:766
+msgid "Copyright"
+msgstr "حقوق النشر"
+
+#: eamena/templates/views/forms/imagery.htm:797
+msgid "This copyright is associated with this resource:"
+msgstr "حقوق النشر هذه ذات صلة بهذا المورد"
+
+#: eamena/templates/views/forms/imagery.htm:801
+msgid "No Copyright Defined"
+msgstr "لم يتم تحديد حقوق نشر"
+
+#: eamena/templates/views/forms/imagery.htm:804
+msgid "Delete this copyright"
+msgstr "احذف حقوق النشر هذه"
+
+#: eamena/templates/views/forms/imagery.htm:805
+msgid "Edit this copyright"
+msgstr "تعديل حقوق النشر هذه"
+
+#: eamena/templates/views/forms/information-resource-summary.htm:80
+msgid "No Information Resource Type Defined"
+msgstr "لم يتم تحديد نوع مصدر المعلومات"
+
+#: eamena/templates/views/forms/information-resource-summary.htm:112
+msgid "Formats"
+msgstr "تشكيل"
+
+#: eamena/templates/views/forms/information-resource-summary.htm:119
+#: eamena/templates/views/forms/information-resource-summary.htm:127
+msgid "Format Type"
+msgstr "نوع التشكيل"
+
+#: eamena/templates/views/forms/information-resource-summary.htm:137
+msgid "The format must be populated."
+msgstr "يجب ادخال التشكيل"
+
+#: eamena/templates/views/forms/information-resource-summary.htm:153
+msgid "These formats are associated with this resource:"
+msgstr "هذا التشكيل ذا صلة بهذاالمورد"
+
+#: eamena/templates/views/forms/information-resource-summary.htm:156
+msgid "No Formats Defined"
+msgstr "لم يتم تحديد تشكيل"
+
+#: eamena/templates/views/forms/information-resource-summary.htm:160
+msgid "Delete this format type"
+msgstr "احذف نوع التشكيل هذا"
+
+#: eamena/templates/views/forms/information-resource-summary.htm:161
+msgid "Edit this format type"
+msgstr "تعديل نوع التشكيل هذا"
+
+#: eamena/templates/views/forms/location.htm:205
+msgid "Remove this geometry"
+msgstr "احذف هذه الخصائص الهندسية"
+
+#: eamena/templates/views/forms/location.htm:206
+msgid "Edit this geometry"
+msgstr "تعديل هذه الخصائص الهندسية"
+
+#: eamena/templates/views/forms/location.htm:231
+#: eamena/templates/views/forms/location.htm:249
+msgid "Grid ID"
+msgstr "هوية الشبكة"
+
+#: eamena/templates/views/forms/location.htm:240
+#: eamena/templates/views/forms/summary.htm:17
+#: eamena/templates/views/forms/summary.htm:26
+#: eamena/templates/views/forms/summary.htm:35
+#: eamena/templates/views/reports/sections/ArchesID_section.htm:27
+msgid "Resource ID"
+msgstr "هوية المصدر"
+
+#: eamena/templates/views/forms/location.htm:281
+msgid "This resource has the following Grid ID code:"
+msgstr "لهذا المورد رمز هوية الشبكة التالي"
+
+#: eamena/templates/views/forms/location.htm:285
+msgid "No Grid ID Defined"
+msgstr "لم يتم تحديد هوية الشبكة"
+
+#: eamena/templates/views/forms/location.htm:316
+msgid "Certainty of  Location"
+msgstr "مدى التأكد من الموقع"
+
+#: eamena/templates/views/forms/location.htm:330
+#: eamena/templates/views/forms/location.htm:341 
+msgid "location certainty" 
+msgstr "مدى التأكد من المكان"
+
+#: eamena/templates/views/forms/location.htm:368
+msgid "Certainty of location rank:"
+msgstr "مدى التأكد من رتبة الموقع"
+
+#: eamena/templates/views/forms/location.htm:371
+#: eamena/templates/views/forms/location.htm:457
+#: eamena/templates/views/forms/summary.htm:289
+#: eamena/templates/views/forms/summary.htm:356
+#: eamena/templates/views/forms/summary.htm:423
+msgid "No Certainty Defined"
+msgstr "لم يتم تحديد مدى التأكد"
+
+#: eamena/templates/views/forms/location.htm:376
+#: eamena/templates/views/forms/location.htm:462
+#: eamena/templates/views/forms/location.htm:544
+#: eamena/templates/views/forms/location.htm:629
+#: eamena/templates/views/forms/location.htm:740
+#: eamena/templates/views/forms/location.htm:863
+#: eamena/templates/views/forms/location.htm:953
+msgid "Remove this relationship"
+msgstr "احذف هذه العلاقات"
+
+#: eamena/templates/views/forms/location.htm:377
+#: eamena/templates/views/forms/location.htm:463
+#: eamena/templates/views/forms/location.htm:545
+#: eamena/templates/views/forms/location.htm:630
+msgid "Edit this setting"
+msgstr "تعديل هذا الضبط"
+
+#: eamena/templates/views/forms/location.htm:402
+msgid "Certainty of Geometry Extent"
+msgstr "مدى التأكد من أبعاد الخصائص الهندسية"
+
+#: eamena/templates/views/forms/location.htm:416
+#: eamena/templates/views/forms/location.htm:427 
+msgid "extent certainty" 
+msgstr "مدى التأكد من الأبعاد"
+
+
+#: eamena/templates/views/forms/location.htm:454
+msgid "Certainty of geometry extent rank:"
+msgstr "مدى التأكد من رتبة أبعاد الخصائص الهندسية"
+
+#: eamena/templates/views/forms/location.htm:570
+msgid "Topographic Setting"
+msgstr "الموقع الطبوغرافي"
+
+#: eamena/templates/views/forms/location.htm:583
+#: eamena/templates/views/forms/location.htm:594
+msgid "topography"
+msgstr "الطبوغرافية"
+
+#: eamena/templates/views/forms/location.htm:621
+msgid "Topographic settings:"
+msgstr "المواقع الطبوغرافية"
+
+#: eamena/templates/views/forms/location.htm:624
+msgid "No Settings Defined"
+msgstr "لم يتم تحديد موقع"
+
+#: eamena/templates/views/forms/location.htm:649
+msgid "(More fields)"
+msgstr "حقول أخرى"
+
+#: eamena/templates/views/forms/location.htm:665
+#: eamena/templates/views/reports/sections/PLACE_ADDRESS.E45.htm:7
+msgid "Addresses"
+msgstr "عناوين"
+
+#: eamena/templates/views/forms/location.htm:679
+#: eamena/templates/views/forms/location.htm:694
+msgid "resource address"
+msgstr "عنوان المورد"
+
+#: eamena/templates/views/forms/location.htm:733
+msgid "This resource has the following addresses:"
+msgstr "هذا المورد له هذه العناوين"
+
+#: eamena/templates/views/forms/location.htm:735
+msgid "No Addresses Defined"
+msgstr "لم يتم تحديد عناوين"
+
+#: eamena/templates/views/forms/location.htm:766
+#: eamena/templates/views/reports/sections/DESCRIPTION_OF_LOCATION.E62.htm:6
+msgid "Location Description"
+msgstr "وصف الموقع"
+
+#: eamena/templates/views/forms/location.htm:796
+#: eamena/templates/views/reports/sections/ADMINISTRATIVE_SUBDIVISION.E48.htm:6
+msgid "Administrative Areas"
+msgstr "المناطق الإدارية"
+
+#: eamena/templates/views/forms/location.htm:809
+#: eamena/templates/views/forms/location.htm:822
+msgid "Admin Area Type" 
+msgstr "نوع المنطقة الإدارية"
+
+#: eamena/templates/views/forms/location.htm:855
+msgid "This resource is located in the following Administrative Areas:"
+msgstr "هذا المورد يقع في المناطق الإدارية التالية"
+
+#: eamena/templates/views/forms/location.htm:858
+msgid "No Administrative Areas Defined"
+msgstr "لم يتم تحديد مناطق إدارية"
+
+#: eamena/templates/views/forms/location.htm:891
+msgid "Cadastral References"
+msgstr "مصادر مساحية"
+
+#: eamena/templates/views/forms/location.htm:905 
+#: eamena/templates/views/forms/location.htm:917 
+msgid "Parcel Number" 
+msgstr "رقم قطعة الأرض" 
+
+#: eamena/templates/views/forms/location.htm:945 
+msgid "This resource is related to the following Parcels:" 
+msgstr "هذا المورد يرتبط بقطعة الأرض التالية:"
+
+#: eamena/templates/views/forms/location.htm:948
+msgid "No Parcels Defined"
+msgstr "لم يتم تحديد قطع"
+
+#: eamena/templates/views/forms/measurement.htm:15
+msgid "Condition State"
+msgstr "الحالة"
+
+#: eamena/templates/views/forms/measurement.htm:48
+msgid "Condition type defined:"
+msgstr "تحديد نوع الحالة"
+
+#: eamena/templates/views/forms/measurement.htm:52
+msgid "No type Defined"
+msgstr "لم يتم تحديد نوع"
+
+#: eamena/templates/views/forms/measurement.htm:58
+#: eamena/templates/views/forms/measurement.htm:267
+#: eamena/templates/views/forms/measurement.htm:346
+msgid "type"
+msgstr "نوع"
+
+#: eamena/templates/views/forms/measurement.htm:78
+msgid "Disturbance Extent "
+msgstr "مدى الاضطراب"
+
+#: eamena/templates/views/forms/measurement.htm:111
+msgid "Disturbance extent defined:"
+msgstr "تحديد مدى الاضطراب"
+
+#: eamena/templates/views/forms/measurement.htm:115
+#: eamena/templates/views/forms/measurement.htm:249
+#: eamena/templates/views/forms/measurement.htm:338
+msgid "None Defined"
+msgstr "غير محدد"
+
+#: eamena/templates/views/forms/measurement.htm:121
+msgid "approximate horizontal extent of site disturbed"
+msgstr "الحدود الأفقية التقريبية لموقع به اضطراب"
+
+#: eamena/templates/views/forms/measurement.htm:142
+msgid "Disturbance Assessment "
+msgstr "تقييم الاضطراب"
+
+#: eamena/templates/views/forms/measurement.htm:151
+msgid "Cause "
+msgstr "السبب"
+
+#: eamena/templates/views/forms/measurement.htm:154
+#: eamena/templates/views/forms/measurement.htm:302
+msgid "Cause certainty"
+msgstr "مدى التأكد من السبب"
+
+#: eamena/templates/views/forms/measurement.htm:161
+msgid "Effect 1"
+msgstr "التأثير 1"
+
+#: eamena/templates/views/forms/measurement.htm:164
+msgid "Effect 1 certainty"
+msgstr "مدى التأكد من التأثير 1"
+
+#: eamena/templates/views/forms/measurement.htm:167
+msgid "Effect 2"
+msgstr "التأثير 2"
+
+
+#: eamena/templates/views/forms/measurement.htm:170
+msgid "Effect 2 certainty"
+msgstr "مدى التأكد من التأثير 2"
+
+#: eamena/templates/views/forms/measurement.htm:173
+msgid "Effect 3"
+msgstr "التأثير 3"
+
+#: eamena/templates/views/forms/measurement.htm:176
+msgid "Effect 3 certainty"
+msgstr "مدى التأكد من التأثير 3"
+
+#: eamena/templates/views/forms/measurement.htm:179
+msgid "Effect 4"
+msgstr "التأثير 4"
+
+#: eamena/templates/views/forms/measurement.htm:182
+msgid "Effect 4 certainty"
+msgstr "مدى التأكد من التأثير 4"
+
+#: eamena/templates/views/forms/measurement.htm:185
+msgid "Effect 5"
+msgstr "التأثير 5"
+
+#: eamena/templates/views/forms/measurement.htm:188
+msgid "Effect 5 certainty"
+msgstr "مدى التأكد من التأثير 5"
+
+#: eamena/templates/views/forms/measurement.htm:206
+msgid "Date type"
+msgstr "نوع التاريخ"
+
+#: eamena/templates/views/forms/measurement.htm:245
+msgid "Disturbance state defined records:"
+msgstr "التسجيلات التي تم تحديدها لحالة الاضطراب"
+
+#: eamena/templates/views/forms/measurement.htm:255
+#: eamena/templates/views/forms/measurement.htm:344
+msgid "cause"
+msgstr "السبب"
+
+#: eamena/templates/views/forms/measurement.htm:256
+#: eamena/templates/views/forms/measurement.htm:345
+msgid "cause certainty"
+msgstr "مدى التأكد من السبب"
+
+#: eamena/templates/views/forms/measurement.htm:257
+msgid "effect 1"
+msgstr "التأثير 1"
+
+#: eamena/templates/views/forms/measurement.htm:258
+msgid "effect 1 certainty"
+msgstr "مدى التأكد من التأثير 1"
+
+#: eamena/templates/views/forms/measurement.htm:259
+msgid "effect 2"
+msgstr "التأثير 2"
+
+#: eamena/templates/views/forms/measurement.htm:260
+msgid "effect 2 certainty"
+msgstr "مدى التأكد من التأثير 2"
+
+#: eamena/templates/views/forms/measurement.htm:261
+msgid "effect 3"
+msgstr "التأثير 3"
+
+#: eamena/templates/views/forms/measurement.htm:262
+msgid "effect 3 certainty"
+msgstr "مدى التأكد من التأثير 3"
+
+#: eamena/templates/views/forms/measurement.htm:263
+msgid "effect 4"
+msgstr "التأثير 4"
+
+#: eamena/templates/views/forms/measurement.htm:264
+msgid "effect 4 certainty"
+msgstr "مدى التأكد من التأثير 4"
+
+#: eamena/templates/views/forms/measurement.htm:265
+msgid "effect 5"
+msgstr "التأثير 5"
+
+#: eamena/templates/views/forms/measurement.htm:266
+msgid "effect 5 certainty"
+msgstr "مدى التأكد من التأثير 5"
+
+#: eamena/templates/views/forms/measurement.htm:268
+msgid "date type"
+msgstr "نوع التاريخ"
+
+#: eamena/templates/views/forms/measurement.htm:269
+msgid "start"
+msgstr "البداية"
+
+#: eamena/templates/views/forms/measurement.htm:270
+msgid "end"
+msgstr "النهاية"
+
+#: eamena/templates/views/forms/measurement.htm:290
+msgid "Threat Assessment "
+msgstr "تقييم المخاطر"
+
+#: eamena/templates/views/forms/measurement.htm:299
+msgid "Cause"
+msgstr "السبب"
+
+#: eamena/templates/views/forms/measurement.htm:334
+msgid "Threat state defined records:"
+msgstr "السجلات التي تم تحديدها لحالة المخاطر"
+
+#: eamena/templates/views/forms/measurementvalues.htm:26
+msgid "Unit"
+msgstr "الوحدة"
+
+#: eamena/templates/views/forms/measurementvalues.htm:38
+msgid "Each measurement must have a type, unit, and value."
+msgstr "كل قياس يجب أن يكون له نوع، ووحدة، وقيمة"
+
+#: eamena/templates/views/forms/measurementvalues.htm:52
+msgid "This resource has these measurements:"
+msgstr "هذا المورد له هذه القياسات"
+
+#: eamena/templates/views/forms/measurementvalues.htm:56
+msgid "No Measurements Defined"
+msgstr "لم يتم تحديد قياسات"
+
+#: eamena/templates/views/forms/phase.htm:30
+#: eamena/templates/views/forms/summary.htm:459
+#: eamena/templates/views/reports/HISTORICAL_EVENT.E5.htm:257
+#: eamena/templates/views/reports/sections/heritage_resource_phase_type_assignment.htm:48
+msgid "Period"
+msgstr "العصر"
+
+#: eamena/templates/views/forms/phase.htm:45
+msgid "The phase type value must be populated."
+msgstr "يجب إدخال قيمة نوع المرحلة"
+
+#: eamena/templates/views/forms/phase.htm:54
+msgid "This resource has the following phases:"
+msgstr "هذا المورد له هذه المراحل"
+
+#: eamena/templates/views/forms/phase.htm:58
+#: eamena/templates/views/forms/summary.htm:552
+msgid "No Phases Defined"
+msgstr "لم يتم تحديد مراحل"
+
+#: eamena/templates/views/forms/phase.htm:62
+msgid "Delete this phase"
+msgstr "احذف هذه المرحلة"
+
+#: eamena/templates/views/forms/publication.htm:16
+#: eamena/templates/views/forms/publication.htm:36
+msgid "Author(s)"
+msgstr "مؤلف/مؤلفون"
+
+#: eamena/templates/views/forms/publication.htm:53
+msgid "Authors"
+msgstr "مؤلف/مؤلفون"
+
+#: eamena/templates/views/forms/publication.htm:89
+msgid "No Author(s) Defined"
+msgstr "لم يتم تحديد مؤلف"
+
+#: eamena/templates/views/forms/publication.htm:119
+#: eamena/templates/views/reports/sections/designation_section.htm:71
+#: eamena/templates/views/search/time-filter.htm:68
+msgid "Date"
+msgstr "التاريخ"
+
+#: eamena/templates/views/forms/publication.htm:173
+msgid "This resource was published in this year:"
+msgstr "تم نشر هذا المورد في هذه السنة"
+
+#: eamena/templates/views/forms/publication.htm:207
+#: eamena/templates/views/forms/publication.htm:216
+#: eamena/templates/views/forms/publication.htm:231
+#: eamena/templates/views/forms/related-files.htm:189
+#: eamena/templates/views/forms/related-files.htm:354
+#: eamena/templates/views/forms/related-files.htm:382
+msgid "Title"
+msgstr "عنوان"
+
+#: eamena/templates/views/forms/publication.htm:246
+msgid ""
+"The Type value must be populated. A resource can only have one primary name."
+msgstr "يجب ادخال قيمة النوع. ولا يحمل المورد سوى اسم أساسي واحد"
+
+#: eamena/templates/views/forms/publication.htm:262
+msgid "This resource has this title:"
+msgstr "هذا المورد له هذا العنوان"
+
+#: eamena/templates/views/forms/publication.htm:266
+msgid "No Titles Defined"
+msgstr "لم يتم تحديد عنوان"
+
+#: eamena/templates/views/forms/publication.htm:270
+msgid "Delete this Title"
+msgstr "امسح هذا العنوان"
+
+#: eamena/templates/views/forms/publication.htm:271
+msgid "Edit this title"
+msgstr "تعديل هذا العنوان"
+
+#: eamena/templates/views/forms/publication.htm:294
+#: eamena/templates/views/forms/publication.htm:314
+msgid "Editor(s)"
+msgstr "المحرر"
+
+#: eamena/templates/views/forms/publication.htm:363
+msgid "This resource has these editors:"
+msgstr "هذا المورد له هؤلاء المؤلفين:"
+
+#: eamena/templates/views/forms/publication.htm:367
+msgid "No Editor(s) Defined"
+msgstr "المحرر غير معرّف"
+
+#: eamena/templates/views/forms/publication.htm:373
+msgid "editor"
+msgstr "المحرر"
+
+#: eamena/templates/views/forms/publication.htm:396
+msgid "Source (e.g. Journal/Volume title)"
+msgstr "المصدر (مثال: الدورية/عنوان المجلد)"
+
+#: eamena/templates/views/forms/publication.htm:465
+msgid "This resource has this source:" 
+msgstr "هذا المورد له هذاالمصدر"
+
+#: eamena/templates/views/forms/publication.htm:472
+msgid "Delete this source"
+msgstr "احذف هذا المصدر"
+
+#: eamena/templates/views/forms/publication.htm:473
+msgid "Edit this source"
+msgstr "تعديل هذا المصدر"
+
+#: eamena/templates/views/forms/publication.htm:475
+#: eamena/templates/views/forms/shareddata.htm:97
+msgid "source"
+msgstr "مصدر"
+
+#: eamena/templates/views/forms/publication.htm:518
+#: eamena/templates/views/forms/publication.htm:577
+msgid "place"
+msgstr "مكان"
+
+#: eamena/templates/views/forms/publication.htm:567 
+msgid "This resource was published at this place:" 
+msgstr "هذا المورد كان منشوراً عنه في هذا المكان:"
+
+#: eamena/templates/views/forms/publication.htm:571
+msgid "No Place of Publication Defined"
+msgstr "لم يتم تحديد مكان النشر"
+
+#: eamena/templates/views/forms/publication.htm:574
+msgid "Delete this place"
+msgstr "احذف هذا المكان"
+
+#: eamena/templates/views/forms/publication.htm:575
+msgid "Edit this place"
+msgstr "تعديل هذا المكان"
+
+#: eamena/templates/views/forms/publication.htm:600
+#: eamena/templates/views/forms/publication.htm:620
+#: eamena/templates/views/forms/publication.htm:637
+msgid "Publisher"
+msgstr "الناشر"
+
+#: eamena/templates/views/forms/publication.htm:669
+msgid "This resource has this publisher:" 
+msgstr "هذا المورد له هذا الناشر"
+
+#: eamena/templates/views/forms/publication.htm:673
+msgid "No Publisher Defined"
+msgstr "لم يتم تحديد الناشر"
+
+#: eamena/templates/views/forms/publication.htm:676
+msgid "Delete this publisher"
+msgstr "احذف هذا الناشر"
+
+#: eamena/templates/views/forms/publication.htm:677
+msgid "Edit this publisher"
+msgstr "تعديل هذا الناشر"
+
+#: eamena/templates/views/forms/publication.htm:679
+msgid "publisher"
+msgstr "الناشر"
+
+#: eamena/templates/views/forms/publication.htm:702
+#: eamena/templates/views/forms/publication.htm:722
+#: eamena/templates/views/forms/publication.htm:739
+#: eamena/templates/views/forms/publication.htm:781
+msgid "Volume"
+msgstr "المجلد"
+
+#: eamena/templates/views/forms/publication.htm:771
+msgid "This resource is from this volume:"
+msgstr "هذا المورد من هذا المجلد:"
+
+#: eamena/templates/views/forms/publication.htm:775
+msgid "No Volume Defined"
+msgstr "لم يتم تحديد مجلد"
+
+#: eamena/templates/views/forms/publication.htm:778
+msgid "Delete this Volume"
+msgstr "حذف هذا المجلد"
+
+#: eamena/templates/views/forms/publication.htm:779
+msgid "Edit this Volume"
+msgstr "تعديل"
+
+#: eamena/templates/views/forms/publication.htm:804
+msgid "Issue/Edition"
+msgstr "العدد/النسخة"
+
+#: eamena/templates/views/forms/publication.htm:824
+#: eamena/templates/views/forms/publication.htm:841
+msgid "Issue"
+msgstr "العدد"
+
+#: eamena/templates/views/forms/publication.htm:873
+msgid "This resource is from this issue:"
+msgstr "هذا المورد من هذا الإصدار:"
+
+#: eamena/templates/views/forms/publication.htm:877
+msgid "No Issue Defined"
+msgstr "لم يتم تحديد إصدار"
+
+#: eamena/templates/views/forms/publication.htm:880
+msgid "Delete this issue"
+msgstr "احذف هذا الإصدار"
+
+#: eamena/templates/views/forms/publication.htm:881
+msgid "Edit this issue"
+msgstr "تعديل هذا الإصدار"
+
+#: eamena/templates/views/forms/publication.htm:883
+msgid "issue"
+msgstr "إصدار"
+
+#: eamena/templates/views/forms/publication.htm:906
+msgid "Pages(s)"
+msgstr "الصفحة/ الصفحات"
+
+#: eamena/templates/views/forms/publication.htm:926
+#: eamena/templates/views/forms/publication.htm:943
+msgid "Pages"
+msgstr "الصفحة/ الصفحات"
+
+#: eamena/templates/views/forms/publication.htm:975
+msgid "This resource has the following page numbers:"
+msgstr "هذا المورد له أرقام الصفحات التالية:"
+
+#: eamena/templates/views/forms/publication.htm:979
+msgid "No Pages Defined"
+msgstr "لم يتم تحديد صفحات"
+
+#: eamena/templates/views/forms/publication.htm:982
+msgid "Delete these page numbers"
+msgstr "احذف أرقام الصفحات هذه"
+
+#: eamena/templates/views/forms/publication.htm:983
+msgid "Edit these page numbers"
+msgstr "تعديل أرقام الصفحات هذه"
+
+#: eamena/templates/views/forms/publication.htm:985
+msgid "pages"
+msgstr "الصفحات"
+
+#: eamena/templates/views/forms/publication.htm:1008
+#: eamena/templates/views/forms/publication.htm:1028
+#: eamena/templates/views/forms/publication.htm:1045
+msgid "Figure(s)"
+msgstr "(شكل (أشكال "
+
+#: eamena/templates/views/forms/publication.htm:1077
+msgid "This resource has these figures:"
+msgstr "هذا المورد له هذه الأشكال:"
+
+#: eamena/templates/views/forms/publication.htm:1081
+msgid "No Figure(s) Defined"
+msgstr "لم يتم تحديد أشكال"
+
+#: eamena/templates/views/forms/publication.htm:1084
+msgid "Delete this figure(s)"
+msgstr "احذف هذا الشكل /هذه الأشكال "
+
+#: eamena/templates/views/forms/publication.htm:1085
+msgid "Edit this figure(s)"
+msgstr "تعديل هذا الشكل /هذه الأشكال "
+
+#: eamena/templates/views/forms/publication.htm:1087
+msgid "Figure"
+msgstr "الشكل"
+
+#: eamena/templates/views/forms/related-files.htm:7
+msgid ""
+"A title, title type, and relationship type must be specified.  If specifying "
+"a description, then a description type must be defined as well."
+msgstr "يجب تحديد الوصف، ثم نوع الوصف كذلك"
+
+#: eamena/templates/views/forms/related-files.htm:24
+msgid "This resource has no related files yet"
+msgstr "هذا المورد لاتوجد ملفات خاصة به بعد"
+
+#: eamena/templates/views/forms/related-files.htm:46
+msgid "Related Images"
+msgstr "أشكال ذات صلة"
+
+#: eamena/templates/views/forms/related-files.htm:77
+#: eamena/templates/views/reports/sections/condition_assessment_section.htm:138
+msgid "Previous"
+msgstr "السابق"
+
+#: eamena/templates/views/forms/related-files.htm:80
+#: eamena/templates/views/reports/title.htm:35
+#: eamena/templates/views/reports/title.htm:61
+#: eamena/templates/views/search/search-results.htm:45
+msgid "Edit"
+msgstr "تعديل"
+
+#: eamena/templates/views/forms/related-files.htm:84
+#: eamena/templates/views/reports/sections/condition_assessment_section.htm:141
+msgid "Next"
+msgstr "التالي"
+
+#: eamena/templates/views/forms/related-files.htm:128
+msgid "Related Files"
+msgstr "ملفات ذات صلة"
+
+#: eamena/templates/views/forms/related-files.htm:145
+msgid "Edit this file"
+msgstr "تعديل هذا الملف"
+
+#: eamena/templates/views/forms/related-files.htm:145
+msgid "relation"
+msgstr "علاقة"
+
+#: eamena/templates/views/forms/related-files.htm:174
+msgid "Edit Related File Resource"
+msgstr "تعديل ملف المورد ذو الصلة"
+
+#: eamena/templates/views/forms/related-files.htm:196
+#: eamena/templates/views/forms/related-files.htm:357
+#: eamena/templates/views/forms/related-files.htm:387
+msgid "Title Type"
+msgstr "نوع العنوان"
+
+#: eamena/templates/views/forms/related-files.htm:203
+#: eamena/templates/views/reports/sections/condition_assessment_section.htm:82
+msgid "Description"
+msgstr "الوصف"
+
+#: eamena/templates/views/forms/related-files.htm:207
+msgid "Description Type"
+msgstr "نوع الوصف"
+
+#: eamena/templates/views/forms/related-files.htm:220
+#: eamena/templates/views/forms/related-files.htm:224
+#: eamena/templates/views/forms/related-resources.htm:82
+#: eamena/templates/views/forms/related-resources.htm:316
+#: eamena/templates/views/forms/related-resources.htm:317
+msgid "Relationship Type"
+msgstr "نوع العلاقة"
+
+#: eamena/templates/views/forms/related-files.htm:239
+msgid "Are you sure you want to delete the relationship to this file?"
+msgstr "هل أنت متأكد أنك تريد حذف العلاقة بهذا الملف؟"
+
+#: eamena/templates/views/forms/related-files.htm:252
+msgid "Remove this file"
+msgstr "احذف هذا الملف"
+
+#: eamena/templates/views/forms/related-files.htm:254
+#: eamena/templates/views/rdm/modals/manage-parent-form.htm:60
+#: eamena/templates/views/rdm/modals/related-concept-form.htm:68
+#: eamena/templates/views/rdm/modals/related-member-form.htm:67
+msgid "Save"
+msgstr "احفظ"
+
+#: eamena/templates/views/forms/related-files.htm:288
+msgid "Part 1: Upload Files"
+msgstr "الجزء الأول: إدخال ملفات"
+
+#: eamena/templates/views/forms/related-files.htm:291
+msgid "Part 2: Title"
+msgstr "الجزء الثاني: العنوان"
+
+#: eamena/templates/views/forms/related-files.htm:294
+msgid "Part 3: Description"
+msgstr "الجزء الثالث: الوصف"
+
+#: eamena/templates/views/forms/related-files.htm:297
+msgid "Part 4: Relationship"
+msgstr "الجزء الرابع: العلاقة"
+
+#: eamena/templates/views/forms/related-files.htm:309
+msgid "Upload Files"
+msgstr "إدخال ملفات"
+
+#: eamena/templates/views/forms/related-files.htm:321
+#: eamena/templates/views/forms/related-files.htm:403
+msgid "File Information"
+msgstr "معلومات الملف"
+
+#: eamena/templates/views/forms/related-files.htm:325
+msgid "Add a name/title and description for each file"
+msgstr "أضف اسم/عنوان ووصف لكل ملف"
+
+#: eamena/templates/views/forms/related-files.htm:403
+msgid "Part 3"
+msgstr "الجزء الثالث"
+
+#: eamena/templates/views/forms/related-files.htm:407
+msgid "Add description and desctiption type for each file"
+msgstr "أضف الوصف ونوع الوصف لكل ملف"
+
+#: eamena/templates/views/forms/related-files.htm:485
+msgid "Part 4"
+msgstr "الجزء الرابع"
+
+#: eamena/templates/views/forms/related-files.htm:485
+msgid "Describe Relationship"
+msgstr "وصف العلاقة"
+
+#: eamena/templates/views/forms/related-files.htm:489
+msgid "Describe the relationship each file has with the current resource"
+msgstr "أوصف علاقة كل ملف بالمورد الحالي"
+
+#: eamena/templates/views/forms/related-resources.htm:10
+#: eamena/templates/views/forms/related-resources.htm:31
+#: eamena/templates/views/forms/related-resources.htm:329
+#: eamena/templates/views/forms/sections/SaveEditsFooter.htm:17
+#: eamena/templates/views/forms/sections/SaveEditsFooter.htm:28
+msgid "Discard edits"
+msgstr "إلغاء التعديلات"
+
+#: eamena/templates/views/forms/related-resources.htm:13
+#: eamena/templates/views/forms/related-resources.htm:34
+#: eamena/templates/views/forms/sections/SaveEditsFooter.htm:20
+#: eamena/templates/views/forms/sections/SaveEditsFooter.htm:31
+msgid "Save edits"
+msgstr "حفظ التعديلات"
+
+#: eamena/templates/views/forms/related-resources.htm:17
+#: eamena/templates/views/forms/related-resources.htm:38
+msgid "Find Resources"
+msgstr "ابحث عن المورد"
+
+#: eamena/templates/views/forms/related-resources.htm:22
+#: eamena/templates/views/forms/related-resources.htm:43
+msgid "Show Relationships"
+msgstr "عرض العلاقات"
+
+#: eamena/templates/views/forms/related-resources.htm:143
+msgid "This resource has no relationships yet"
+msgstr "ليس لهذا المورد علاقات بعد"
+
+#: eamena/templates/views/forms/related-resources.htm:150
+msgid "Edit this relationship"
+msgstr "تعديل هذه العلاقة"
+
+#: eamena/templates/views/forms/related-resources.htm:192
+msgid "Map filter"
+msgstr "مرشح الخريطة"
+
+#: eamena/templates/views/forms/related-resources.htm:196
+msgid "Attribute filter"
+msgstr "مرشح الوصف"
+
+#: eamena/templates/views/forms/related-resources.htm:200
+msgid "Time filter"
+msgstr "مرشح الزمن"
+
+#: eamena/templates/views/forms/related-resources.htm:291
+msgid "Edit Relationship"
+msgstr "تعديل العلاقة"
+
+#: eamena/templates/views/forms/related-resources.htm:291
+msgid "Add Relationship"
+msgstr "إضافة علاقة"
+
+#: eamena/templates/views/forms/related-resources.htm:297
+msgid "Relationship:"
+msgstr "علاقة"
+
+#: eamena/templates/views/forms/related-resources.htm:323
+#: eamena/templates/views/search/time-filter.htm:75
+msgid "Add"
+msgstr "أضف"
+
+#: eamena/templates/views/forms/roles.htm:12
+msgid "Actor Roles"
+msgstr "مهام الفاعل"
+
+#: eamena/templates/views/forms/roles.htm:27
+#: eamena/templates/views/forms/roles.htm:123
+#: eamena/templates/views/forms/summary.htm:192
+#: eamena/templates/views/forms/summary.htm:392
+#: eamena/templates/views/forms/summary.htm:394
+#: eamena/templates/views/forms/summary.htm:462
+#: eamena/templates/views/reports/sections/ROLE.htm:32
+#: eamena/templates/views/reports/sections/FEATURE_INTERPRETATIONS.htm:23
+msgid "Certainty"
+msgstr "مدى التأكد"
+
+#: eamena/templates/views/forms/roles.htm:105
+msgid "The role type value must be populated."
+msgstr "يجب إدخال قيمة نوع الدور"
+
+#: eamena/templates/views/forms/roles.htm:114
+msgid "This resource has the following roles:"
+msgstr "هذا المورد له هذه الأدوار"
+
+#: eamena/templates/views/forms/roles.htm:118
+msgid "No Roles Defined"
+msgstr "لم يتم تحديد أية أدوار"
+
+#: eamena/templates/views/forms/roles.htm:122
+msgid "Delete this role"
+msgstr "احذف هذا الدور"
+
+#: eamena/templates/views/forms/roles.htm:123
+msgid "Edit this role"
+msgstr "تعديل هذه المهمة"
+
+#: eamena/templates/views/forms/roles.htm:123
+#: eamena/templates/views/forms/summary.htm:523
+msgid "From date"
+msgstr "من تاريخ"
+
+#: eamena/templates/views/forms/roles.htm:123
+#: eamena/templates/views/forms/summary.htm:526
+msgid "To date"
+msgstr "إلى تاريخ"
+
+#: eamena/templates/views/forms/shareddata.htm:18
+msgid "Shared data source"
+msgstr "مصدر مشاركة البيانات "
+
+#: eamena/templates/views/forms/shareddata.htm:120
+#: eamena/templates/views/forms/shareddata.htm:140
+msgid "Shared data source project"
+msgstr "مشروع مشاركة مصدر البيانات"
+
+#: eamena/templates/views/forms/shareddata.htm:189
+msgid "This resource has these shared data source projects:"
+msgstr "هذا المورد له مشاريع مشاركة مصدر البيانات هذه:"
+
+#: eamena/templates/views/forms/shareddata.htm:87
+msgid "This resource has this shared data source:"
+msgstr "هذا المورد له مشاركة مصدر البيانات هذه:"
+
+#: eamena/templates/views/forms/shareddata.htm:193
+msgid "No Shared data source project defined"
+msgstr "لم يتم تحديد مشروع مشاركة بيانات"
+
+#: eamena/templates/views/forms/shareddata.htm:196
+msgid "Delete this shared data source project"
+msgstr "احذف مشروع مشاركة مصدر البيانات هذا"
+
+#: eamena/templates/views/forms/shareddata.htm:199
+msgid "shared data source project"
+msgstr "مشروع مشاركة مصدر البيانات"
+
+#: eamena/templates/views/forms/shareddata.htm:222
+msgid "Shared data source date"
+msgstr "تاريخ مشاركة مصدر البيانات"
+
+#: eamena/templates/views/forms/summary.htm:67
+msgid "This resource has the following ID code:"
+msgstr "هذاالمورد له رمز الهوية التالي"
+
+#: eamena/templates/views/forms/summary.htm:71
+msgid "No ID Defined"
+msgstr "لم يتم تحديد هوية"
+
+#: eamena/templates/views/forms/summary.htm:99
+msgid "Resource Name(s)"
+msgstr "اسم (أسماء) المورد"
+
+#: eamena/templates/views/forms/summary.htm:180
+msgid "Site Function"
+msgstr "وظيفة الموقع"
+
+#: eamena/templates/views/forms/summary.htm:201
+#: eamena/templates/views/forms/summary.htm:471
+msgid "Certainty required."
+msgstr "مدى التأكد المطلوب"
+
+#: eamena/templates/views/forms/summary.htm:215
+msgid "This resource has these functions:"
+msgstr "هذا المورد له هذه الوظائف"
+
+#: eamena/templates/views/forms/summary.htm:219
+msgid "No Function Defined"
+msgstr "لم يتم تحديد وظيفة"
+
+#: eamena/templates/views/forms/summary.htm:250
+msgid "Overall Site Morphology"
+msgstr "مورفولوجية الموقع العامة"
+
+#: eamena/templates/views/forms/summary.htm:257
+#: eamena/templates/views/forms/summary.htm:259
+msgid "Morphology"
+msgstr "المورفولوجية"
+
+#: eamena/templates/views/forms/summary.htm:269
+#: eamena/templates/views/forms/summary.htm:336
+#: eamena/templates/views/forms/summary.htm:404
+msgid "The keyword must be populated."
+msgstr "يجب إدخال الكلمة المفتاح"
+
+#: eamena/templates/views/forms/summary.htm:286
+#: eamena/templates/views/forms/summary.htm:353
+msgid " "
+msgstr ""
+
+#: eamena/templates/views/forms/summary.htm:293
+#: eamena/templates/views/forms/summary.htm:360
+#: eamena/templates/views/forms/summary.htm:427
+msgid "Delete this keyword"
+msgstr "امسح هذه الكلمة المفتاح"
+
+#: eamena/templates/views/forms/summary.htm:294
+#: eamena/templates/views/forms/summary.htm:361
+#: eamena/templates/views/forms/summary.htm:428
+msgid "Edit this keyword"
+msgstr "تعديل هذه الكلمة المفتاح"
+
+#: eamena/templates/views/forms/summary.htm:317
+msgid "Overall Site Shape"
+msgstr "الشكل العام للموقع"
+
+#: eamena/templates/views/forms/summary.htm:385
+#: eamena/templates/views/reports/sections/OVERALL_SITE_CERTAINTY.htm:6
+msgid "Overall Site Certainty"
+msgstr "مدى التأكد بصورة عامة من الموقع"
+
+#: eamena/templates/views/forms/summary.htm:420
+msgid "Degree of certainty that this is a cultural heritage resource:"
+msgstr "مدى التأكد من أن هذا مورد تراث ثقافي"
+
+#: eamena/templates/views/forms/summary.htm:485
+msgid "This resource has these cultural periods assigned:"
+msgstr "لهذا المورد الفترات الثقافية التالية"
+
+#: eamena/templates/views/forms/summary.htm:489
+msgid "No Cultural Period Defined"
+msgstr "لم يتم تحديد فترات تاريخية"
+
+#: eamena/templates/views/forms/summary.htm:514
+msgid "Time-Span Phase(s) "
+msgstr "الزمن - مدى المرحلة /المراحل"
+
+#: eamena/templates/views/forms/summary.htm:533
+msgid "From and To dates required."
+msgstr "مطلوب تاريخي من وإلى"
+
+#: eamena/templates/views/forms/summary.htm:548
+msgid "Time Span Phase(s):"
+msgstr "الزمن - مدى المرحلة /المراحل"
+
+#: eamena/templates/views/forms/summary.htm:558
+msgid "from date"
+msgstr "تاريخ من"
+
+#: eamena/templates/views/forms/summary.htm:559
+msgid "to date"
+msgstr "تاريخ إلى"
+
+#: eamena/templates/views/forms/summary.htm:582
+msgid "Resource Assessor Name, Assessment Type and Date"
+msgstr "اسم الذي قام بتقييم المورد، ونوع التقييم وتاريخه"
+
+#: eamena/templates/views/forms/summary.htm:591
+msgid "Assessor name"
+msgstr "اسم القائم بالتقييم"
+
+#: eamena/templates/views/forms/summary.htm:592
+msgid "Assessment Type"
+msgstr "نوع التقييم"
+
+#: eamena/templates/views/forms/summary.htm:597
+msgid "Date (yyyy-mm-dd)"
+msgstr "التاريخ (السنة-الشهر-اليوم"
+
+#: eamena/templates/views/forms/summary.htm:610
+msgid "The name type and date fields must all be populated."
+msgstr "يجب إدخال نوع الاسم والتاريخ"
+
+#: eamena/templates/views/forms/summary.htm:624
+msgid "This resource has been assessed by :"
+msgstr "تم تقييم هذا المورد بواسطة "
+
+#: eamena/templates/views/forms/summary.htm:628
+msgid "No Assessment Details Provided"
+msgstr "لم يتم إدخال تفاصيل التقييم"
+
+#: eamena/templates/views/forms/summary.htm:633
+msgid "Assessor"
+msgstr "المقيم"
+
+#: eamena/templates/views/forms/summary.htm:633
+msgid "Date of Assessment"
+msgstr "تاريخ التقييم"
+
+
+#: eamena/templates/views/rdm/concept-report.htm:3
+#: eamena/templates/views/rdm/entitytype-report.htm:3
+msgid "Loading..."
+msgstr "تحميل..."
+#: eamena/templates/views/rdm/concept-report.htm:25
+#: eamena/templates/views/rdm/concept-report.htm:48
+msgid "Manage"
+msgstr "إدارة"
+#: eamena/templates/views/rdm/concept-report.htm:31
+msgid "Add Top Concept"
+msgstr "أضف المفهوم الأعلى"
+#: eamena/templates/views/rdm/concept-report.htm:32
+msgid "Import Top Concept from SPARQL"
+msgstr "احضر المفهوم الأعلى من SPARQL "
+#: eamena/templates/views/rdm/concept-report.htm:35
+#: eamena/templates/views/rdm/concept-report.htm:53
+msgid "Add Child"
+msgstr "أضف طفل"
+#: eamena/templates/views/rdm/concept-report.htm:36
+msgid "Import Child from SPARQL"
+msgstr "أحضر طفل من SPARQL "
+#: eamena/templates/views/rdm/concept-report.htm:37
+#: eamena/templates/views/rdm/concept-report.htm:55
+msgid "Manage Parents"
+msgstr "إدارة الأبوين"
+#: eamena/templates/views/rdm/concept-report.htm:40
+#: eamena/templates/views/rdm/concept-report.htm:57
+#: eamena/templates/views/rdm/modals/add-child-form.htm:50
+#: eamena/templates/views/rdm/modals/add-scheme-form.htm:37
+#: eamena/templates/views/rdm/modals/delete-scheme-form.htm:43
+#: eamena/templates/views/rdm/modals/export-scheme-form.htm:26
+#: eamena/templates/views/search/map-filter.htm:140
+#: eamena/templates/views/search/map-filter.htm:183
+#: eamena/templates/login.htm:73
+#: eamena/templates/rdm.htm:85
+msgid "Close"
+msgstr "أغلق"
+#: eamena/templates/views/rdm/concept-report.htm:54
+msgid "Import Child from AAT"
+msgstr "أحضر طفل من AAT "
+#: eamena/templates/views/rdm/concept-report.htm:68
+#: eamena/templates/views/rdm/entitytype-report.htm:25
+#: eamena/templates/views/rdm/entitytype-report.htm:133
+msgid "Labels"
+msgstr "تسميات"
+#: eamena/templates/views/rdm/concept-report.htm:70
+#: eamena/templates/views/rdm/entitytype-report.htm:27
+#: eamena/templates/views/rdm/entitytype-report.htm:135
+msgid "Add label"
+msgstr "أضف تسمية"
+#: eamena/templates/views/rdm/concept-report.htm:77
+#: eamena/templates/views/rdm/entitytype-report.htm:34
+#: eamena/templates/views/rdm/entitytype-report.htm:142
+msgid "Delete this label?"
+msgstr "أحذف هذه التسمية"
+#: eamena/templates/views/rdm/concept-report.htm:80
+msgid "preferred"
+msgstr "مفضل"
+#: eamena/templates/views/rdm/concept-report.htm:80
+msgid "alternate"
+msgstr "بدّل"
+#: eamena/templates/views/rdm/concept-report.htm:80
+msgid "hidden"
+msgstr "مختبئ"
+#: eamena/templates/views/rdm/concept-report.htm:93
+#: eamena/templates/views/rdm/entitytype-report.htm:158
+msgid "Notes"
+msgstr "ملاحظات"
+#: eamena/templates/views/rdm/concept-report.htm:95
+#: eamena/templates/views/rdm/entitytype-report.htm:160
+msgid "Add note"
+msgstr "أضف ملاحظة"
+#: eamena/templates/views/rdm/concept-report.htm:102
+#: eamena/templates/views/rdm/entitytype-report.htm:167
+msgid "Delete this note?"
+msgstr "أحذف هذه الملاحظة؟"
+#: eamena/templates/views/rdm/concept-report.htm:123
+msgid "Broader/Narrower Concepts"
+msgstr "مفاهيم أعرض/أضيق"
+#: eamena/templates/views/rdm/concept-report.htm:125
+msgid "Show graph"
+msgstr "أظهر الرسم التوضيحي"
+#: eamena/templates/views/rdm/concept-report.htm:126
+msgid "Show tree"
+msgstr "أظهر الشجرة"
+#: eamena/templates/views/rdm/concept-report.htm:141
+#: eamena/templates/views/rdm/concept-report.htm:145
+#: eamena/templates/views/rdm/concept-report.htm:151
+#: eamena/templates/views/rdm/concept-report.htm:192
+msgid "Jump to this concept"
+msgstr "أقفز إلى هذا المفهوم"
+#: eamena/templates/views/rdm/concept-report.htm:150
+msgid "Delete this concept?"
+msgstr "احذف هذا المفهوم"
+#: eamena/templates/views/rdm/concept-report.htm:150
+msgid "By deleting this concept, you will also be deleting the following concepts as well.  This operation cannot be undone."
+msgstr "بحذف هذا المفهوم، فأنت تحذف أيضاً المفاهيم التالية أيضاً. هذه العملية لا يمكن عكسها"
+#: eamena/templates/views/rdm/concept-report.htm:182
+msgid "Related Concepts"
+msgstr "مفاهيم ذات صلة"
+#: eamena/templates/views/rdm/concept-report.htm:184
+msgid "Add related concept"
+msgstr "أضف مفهوم ذو صلة"
+#: eamena/templates/views/rdm/concept-report.htm:191
+msgid "Remove the relationship to this concept?"
+msgstr "احذف الربط بهذا المفهوم"
+#: eamena/templates/views/rdm/concept-report.htm:208
+#: eamena/templates/views/rdm/entitytype-report.htm:187
+msgid "Values"
+msgstr "قيم"
+#: eamena/templates/views/rdm/concept-report.htm:210
+#: eamena/templates/views/rdm/entitytype-report.htm:189
+msgid "Add value"
+msgstr "أضف قيمة"
+#: eamena/templates/views/rdm/concept-report.htm:217
+#: eamena/templates/views/rdm/entitytype-report.htm:196
+msgid "Delete this value?"
+msgstr "احذف هذه القيمة؟"
+#: eamena/templates/views/rdm/concept-report.htm:218
+#: eamena/templates/views/rdm/entitytype-report.htm:197
+msgid "Edit this value"
+msgstr "تعديل هذه القيمة"
+#: eamena/templates/views/rdm/concept-report.htm:235
+#: eamena/templates/views/reports/sections/condition_assessment_section.htm:106
+#: eamena/templates/views/reports/sections/related_resource_section.htm:350
+msgid "Images"
+msgstr "صور"
+#: eamena/templates/views/rdm/concept-report.htm:237
+msgid "Add images"
+msgstr "أضف صور"
+#: eamena/templates/views/rdm/concept-report.htm:276
+#: eamena/templates/views/rdm/entitytype-report.htm:215
+msgid "Identifiers"
+msgstr "محددات"
+#: eamena/templates/views/rdm/concept-report.htm:281
+#: eamena/templates/views/rdm/entitytype-report.htm:220
+msgid "Arches ID:"
+msgstr "هوية آرشز"
+#: eamena/templates/views/rdm/concept-report.htm:296
+#: eamena/templates/views/rdm/entitytype-report.htm:235
+msgid "Are you ready to delete this item?"
+msgstr "هل أنت مستعد لحذف هذا البند"
+#: eamena/templates/views/rdm/concept-report.htm:318
+msgid "Unable to Delete"
+msgstr "غير قابل للحذف"
+#: eamena/templates/views/rdm/concept-report.htm:321
+msgid ""
+"This concept or one of it's subconcepts is already in use by an existing "
+"resource."
+msgstr "هذا المفهوم، أو واحد من المفاهيم الفرعية الخاصة به، يستعمل فعلياً بواسطة مورد آخر"
+#: eamena/templates/views/rdm/concept-report.htm:324
+msgid "Ok"
+msgstr "موافق"
+#: eamena/templates/views/rdm/entitytype-report.htm:50
+msgid "Manage the dropdown values that appear in forms here."
+msgstr "إدارة قائمة القيم التي يتم إفرادها وتظهر في الاستبيان هنا"
+#: eamena/templates/views/rdm/entitytype-report.htm:84
+msgid "Member Hierarchy"
+msgstr "هيكلية العضو"
+#: eamena/templates/views/rdm/entitytype-report.htm:86
+msgid "Add dropdown entry"
+msgstr "أضف مدخل بقائمة يتم إفرادها"
+#: eamena/templates/views/rdm/entitytype-report.htm:101
+#: eamena/templates/views/rdm/entitytype-report.htm:110
+msgid "Expand this entry"
+msgstr "تمديد هذا المدخل"
+#: eamena/templates/views/rdm/entitytype-report.htm:109
+msgid "Remove this entry from the dropdown"
+msgstr "احذف هذا المدخل من القائمة التي يتم إفرادها"
+#: eamena/templates/views/rdm/modals/add-child-form.htm:8
+msgid "Add Concept"
+msgstr "أضف مفهوم"
+#: eamena/templates/views/rdm/modals/add-child-form.htm:14
+msgid "Label"
+msgstr "تسمية"
+#: eamena/templates/views/rdm/modals/add-child-form.htm:20
+msgid "Note"
+msgstr "ملاحظة"
+#: eamena/templates/views/rdm/modals/add-child-form.htm:26
+#: eamena/templates/views/rdm/modals/add-scheme-form.htm:25
+msgid "Language"
+msgstr "لغة"
+#: eamena/templates/views/rdm/modals/add-child-form.htm:37
+msgid "Relation from Parent"
+msgstr "علاقة من الوالد"
+#: eamena/templates/views/rdm/modals/add-child-form.htm:51
+#: eamena/templates/views/rdm/modals/add-scheme-form.htm:38
+msgid "Save changes"
+msgstr "احفظ التغييرات"
+#: eamena/templates/views/rdm/modals/add-scheme-form.htm:8
+msgid "Add Concept Scheme"
+msgstr "أضف نظام مفاهيمي "
+#: eamena/templates/views/rdm/modals/add-scheme-form.htm:13
+msgid "ConceptScheme Name"
+msgstr "اسم نظام مفاهيمي"
+#: eamena/templates/views/rdm/modals/add-scheme-form.htm:19
+msgid "Scope Note"
+msgstr "ملاحظة نطاق"
+#: eamena/templates/views/rdm/modals/delete-scheme-form.htm:8
+#: eamena/templates/rdm.htm:82
+msgid "Delete Scheme"
+msgstr "احذف نظام"
+
+#: eamena/templates/views/rdm/modals/delete-scheme-form.htm:13
+msgid "Select scheme to delete"
+msgstr "اختار نظام لحذفه"
+#: eamena/templates/views/rdm/modals/export-scheme-form.htm:8
+#: eamena/templates/rdm.htm:82
+msgid "Export Scheme"
+msgstr "تصدير نظام"
+#: eamena/templates/views/rdm/modals/export-scheme-form.htm:13
+msgid "Select scheme to export"
+msgstr "اختار نظام لتصديره"
+#: eamena/templates/views/rdm/modals/export-scheme-form.htm:27
+msgid "Export"
+msgstr "تصدير"
+#: eamena/templates/views/rdm/modals/import-concept-form.htm:10
+msgid "Import Concept"
+msgstr "احضر مفهوم"
+#: eamena/templates/views/rdm/modals/import-concept-form.htm:21
+msgid "Search for a concept..."
+msgstr "ابحث عن مفهوم..."
+#: eamena/templates/views/rdm/modals/import-concept-form.htm:24
+msgid "Organization"
+msgstr "تنظيم"
+#: eamena/templates/views/rdm/modals/import-concept-form.htm:33
+msgid "Concept Indentifiers"
+msgstr "محددات المفهوم"
+#: eamena/templates/views/rdm/modals/import-concept-form.htm:40
+msgid "Error"
+msgstr "خطأ"
+#: eamena/templates/views/rdm/modals/import-concept-form.htm:53
+msgid "Import"
+msgstr "أحضر"
+#: eamena/templates/views/rdm/modals/import-scheme-form.htm:10
+msgid "Import New Concept Scheme"
+msgstr "أحضر نظام مفاهيمي جديد"
+#: eamena/templates/views/rdm/modals/import-scheme-form.htm:20
+msgid "SKOS File"
+msgstr " ملف SKOS "
+#: eamena/templates/views/rdm/modals/import-scheme-form.htm:31
+msgid "Upload File"
+msgstr "تحميل ملف"
+#: eamena/templates/views/rdm/modals/manage-parent-form.htm:10
+msgid "New Parent Concept"
+msgstr "مفهوم والد جديد"
+#: eamena/templates/views/rdm/modals/manage-parent-form.htm:24
+msgid "Relation to Parent"
+msgstr "علاقة بوالد"
+#: eamena/templates/views/rdm/modals/manage-parent-form.htm:31
+msgid "Current Parents"
+msgstr "الوالد الحالي"
+#: eamena/templates/views/rdm/modals/manage-parent-form.htm:38
+msgid "Remove the relationship to this parent concept"
+msgstr "انقل العلاقة إلى مفهوم الوالد هذا"
+#: eamena/templates/views/rdm/modals/manage-parent-form.htm:38
+msgid "Remove the relationship to this parent concept."
+msgstr "احذف العلاقة بمفهوم الوالد هذا"
+#: eamena/templates/views/rdm/modals/manage-parent-form.htm:55
+msgid "Deleting reference to parent:"
+msgstr "احذف الإرجاع إلى الوالد"
+#: eamena/templates/views/rdm/modals/related-concept-form.htm:10
+msgid "Manage Related Concepts"
+msgstr "إدارة المفاهيم ذات الصلة"
+#: eamena/templates/views/rdm/modals/related-concept-form.htm:27
+#: eamena/templates/views/rdm/modals/related-member-form.htm:27
+msgid "Select a concept"
+msgstr ""
+#: eamena/templates/views/rdm/modals/related-concept-form.htm:34
+#: eamena/templates/views/rdm/modals/related-member-form.htm:34
+msgid "Relation type"
+msgstr ""
+#: eamena/templates/views/rdm/modals/related-concept-form.htm:35
+#: eamena/templates/views/rdm/modals/related-member-form.htm:35
+msgid "Relation to Concept"
+msgstr ""
+#: eamena/templates/views/rdm/modals/related-concept-form.htm:52
+msgid "Use the search tool to select the concept that you want to relate."
+msgstr ""
+#: eamena/templates/views/rdm/modals/related-member-form.htm:10
+msgid "Select Concept Values for Dropdowns"
+msgstr ""
+#: eamena/templates/views/rdm/modals/related-member-form.htm:51
+msgid "Selecting a concept will select that concept and all it's children."
+msgstr ""
+#: eamena/templates/views/rdm/modals/value-form.htm:10
+msgid "Edit Concept Label"
+msgstr ""
+#: eamena/templates/views/rdm/modals/value-form.htm:10
+msgid "Add Concept Label"
+msgstr ""
+#: eamena/templates/views/rdm/modals/value-form.htm:10
+msgid "Manage Concept Label"
+msgstr ""
+#: eamena/templates/views/rdm/modals/value-form.htm:68
+msgid "Only one preferred label may exist for each language."
+msgstr ""
+#: eamena/templates/views/rdm/modals/value-form.htm:82
+msgid "Add Concept Note"
+msgstr ""
+#: eamena/templates/views/rdm/modals/value-form.htm:147
+msgid "Only one note of each type may exist for each language."
+msgstr ""
+#: eamena/templates/views/rdm/modals/value-form.htm:161
+msgid "Add Concept Value"
+msgstr ""
+#: eamena/templates/views/rdm/modals/value-form.htm:161
+msgid "Manage Concept Values"
+msgstr ""
+#: eamena/templates/views/rdm/modals/value-form.htm:224
+msgid "Only one sort order value can be assigned to a concept."
+msgstr ""
+
+
+
+#: eamena/templates/views/reports/ACTIVITY.E7.htm:173
+#: eamena/templates/views/reports/HERITAGE_RESOURCE.E18.htm:176
+#: eamena/templates/views/reports/HISTORICAL_EVENT.E5.htm:173
+msgid "Location Information"
+msgstr "معلومات الموقع"
+
+#: eamena/templates/views/reports/ACTIVITY.E7.htm:211
+msgid "Activity Details"
+msgstr "تفاصيل النشاط"
+
+#: eamena/templates/views/reports/ACTIVITY.E7.htm:228
+msgid "Tasks"
+msgstr "مهام"
+
+#: eamena/templates/views/reports/ACTIVITY.E7.htm:233
+#: eamena/templates/views/reports/ACTIVITY.E7.htm:240
+#: eamena/templates/views/reports/HISTORICAL_EVENT.E5.htm:233
+#: eamena/templates/views/reports/HISTORICAL_EVENT.E5.htm:240
+#: eamena/templates/views/reports/sections/heritage_resource_phase_type_assignment.htm:11
+#: eamena/templates/views/reports/sections/heritage_resource_phase_type_assignment.htm:18
+msgid "No classifications recorded"
+msgstr "لم يتم تسجيل تصنيفات"
+
+#: eamena/templates/views/reports/ACTIVITY.E7.htm:257
+#: eamena/templates/views/reports/HISTORICAL_EVENT.E5.htm:266
+#: eamena/templates/views/reports/sections/heritage_resource_phase_type_assignment.htm:70
+msgid "Dates (from/to)"
+msgstr "تواريخ (من/إلى  "
+
+#: eamena/templates/views/reports/ACTIVITY.E7.htm:328
+#: eamena/templates/views/reports/HERITAGE_RESOURCE.E18.htm:374
+#: eamena/templates/views/reports/HISTORICAL_EVENT.E5.htm:337
+#: eamena/templates/views/reports/sections/EXTERNAL_XREF.E42.htm:6
+msgid "External System References"
+msgstr "مصادر خارجية للنظام"
+
+#: eamena/templates/views/reports/ACTOR.E39.htm:158
+#: eamena/templates/views/reports/ACTOR.E39.htm:164
+#: eamena/templates/views/reports/sections/NAME.E41.htm:11
+msgid "No names recorded"
+msgstr "لا أسماء لمن قام بالتسجيل"
+
+#: eamena/templates/views/reports/ACTOR.E39.htm:190
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:168
+#: eamena/templates/views/reports/sections/RESOURCE_TYPE_CLASSIFICATION.E55.htm:11
+msgid "No types recorded"
+msgstr "لم يتم تسجيل أنواع"
+
+#: eamena/templates/views/reports/ACTOR.E39.htm:207
+msgid "Country of Origin"
+msgstr "بلد المنشأ"
+
+#: eamena/templates/views/reports/ACTOR.E39.htm:212
+#: eamena/templates/views/reports/ACTOR.E39.htm:218
+msgid "No country recorded"
+msgstr "لم يتم تسجيل بلد"
+
+#: eamena/templates/views/reports/ACTOR.E39.htm:248
+#: eamena/templates/views/reports/ACTOR.E39.htm:269
+msgid "Roles"
+msgstr "الأدوار"
+
+#: eamena/templates/views/reports/ACTOR.E39.htm:284
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:258
+msgid "No URLs recorded"
+msgstr "لم يتم تسجيل موقع على الانترنت"
+
+#: eamena/templates/views/reports/ACTOR.E39.htm:290
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:264
+msgid "Access date: "
+msgstr "تاريخ الدخول"
+
+#: eamena/templates/views/reports/HERITAGE_RESOURCE.E18.htm:199
+msgid "Settings"
+msgstr "الوضعيات"
+
+#: eamena/templates/views/reports/HERITAGE_RESOURCE.E18.htm:203
+msgid "No settings recorded"
+msgstr "لم يتم تسجيل وضعيات"
+
+#: eamena/templates/views/reports/HERITAGE_RESOURCE.E18.htm:251
+msgid "Classification/Components"
+msgstr "تصنيف/ مكونات"
+
+#: eamena/templates/views/reports/HERITAGE_RESOURCE.E18.htm:274
+msgid "Modifications"
+msgstr "تعديلات"
+
+#: eamena/templates/views/reports/HERITAGE_RESOURCE.E18.htm:279
+msgid "No modifications recorded"
+msgstr "لم يتم تسجيل تعديلات"
+
+#: eamena/templates/views/reports/HERITAGE_RESOURCE_GROUP.E27.htm:211
+#: eamena/templates/views/reports/sections/condition_assessment_section.htm:58
+msgid "Condition"
+msgstr "الحالة"
+
+#: eamena/templates/views/reports/HISTORICAL_EVENT.E5.htm:211
+msgid "Event Details"
+msgstr "تفاصيل الفعالية"
+
+#: eamena/templates/views/reports/HISTORICAL_EVENT.E5.htm:228
+msgid "Actions/Activities"
+msgstr "أفعال/ فعاليات"
+
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:117
+msgid "Cartography Description"
+msgstr "وصف الخريطة"
+
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:119
+msgid "Shared Dataset Description"
+msgstr "وصف البيانات المشتركة"
+
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:163
+msgid "Resource type(s)"
+msgstr "نوع (أنواع) المورد"
+
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:197
+msgid "Resource format(s)"
+msgstr "تشكيل المورد"
+
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:202
+msgid "No formats recorded"
+msgstr "لم يتم تسجيل تشكيلات"
+
+#: eamena/templates/views/reports/title.htm:50
+msgid "Resource Report"
+msgstr "تقرير عن المورد"
+
+#: eamena/templates/views/reports/title.htm:55
+#: eamena/templates/views/search/search-results.htm:56
+msgid "Map"
+msgstr "خريطة"
+
+#: eamena/templates/views/reports/sections/ADMINISTRATIVE_SUBDIVISION.E48.htm:10
+msgid "No areas recorded"
+msgstr "لم يتم تسجيل مناطق"
+
+#: eamena/templates/views/reports/sections/ANCILLARY_FEATURE_TYPE.E55.htm:11
+#: eamena/templates/views/reports/sections/ANCILLARY_FEATURE_TYPE.E55.htm:17
+#: eamena/templates/views/reports/sections/ANCILLARY_FEATURE_TYPE.E55.htm:23
+msgid "No features recorded"
+msgstr "لم يتم تسجيل ملامح"
+
+#: eamena/templates/views/reports/sections/ArchesID_section.htm:34
+msgid "Arches ID"
+msgstr "هوية آرشز"
+
+#: eamena/templates/views/reports/sections/COMPONENT.E18.htm:6
+msgid "Features"
+msgstr "ملامح"
+
+#: eamena/templates/views/reports/sections/COMPONENT.E18.htm:11
+#: eamena/templates/views/reports/sections/COMPONENT.E18.htm:18
+msgid "No components recorded"
+msgstr "لم يتم تسجيل مكونات"
+
+#: eamena/templates/views/reports/sections/COMPONENT.E18.htm:33
+#: eamena/templates/views/reports/sections/COMPONENT.E18.htm:52
+#: eamena/templates/views/reports/sections/COMPONENT.E18.htm:63
+#: eamena/templates/views/reports/sections/designation_section.htm:67
+#: eamena/templates/views/reports/sections/designation_section.htm:83
+#: eamena/templates/views/reports/sections/heritage_resource_phase_type_assignment.htm:33
+#: eamena/templates/views/reports/sections/heritage_resource_phase_type_assignment.htm:44
+#: eamena/templates/views/reports/sections/heritage_resource_phase_type_assignment.htm:55
+#: eamena/templates/views/reports/sections/heritage_resource_phase_type_assignment.htm:66
+#: eamena/templates/views/reports/sections/heritage_resource_phase_type_assignment.htm:82
+#: eamena/templates/views/reports/sections/heritage_resource_phase_type_assignment.htm:93
+msgid "none defined"
+msgstr "غير محدد"
+
+#: eamena/templates/views/reports/sections/COMPONENT.E18.htm:37
+msgid "Technique"
+msgstr "التقنية"
+
+#: eamena/templates/views/reports/sections/CONDITION_STATE.htm:6
+msgid "Overall condition of resource"
+msgstr "الحالة العامة للمورد"
+
+#: eamena/templates/views/reports/sections/CULTURAL_PERIODS.htm:6
+msgid "Cultural periods"
+msgstr "الفترات الثقافية"
+
+#: eamena/templates/views/reports/sections/CULTURAL_PERIODS.htm:17
+#: eamena/templates/views/reports/sections/SITE_FUNCTION_TYPE.htm:16
+msgid "(Certainty:"
+msgstr "مدى التأكد"
+
+#: eamena/templates/views/reports/sections/DESCRIPTION.E62.htm:8
+#: eamena/templates/views/reports/sections/DESCRIPTION_OF_LOCATION.E62.htm:10
+#: eamena/templates/views/reports/sections/condition_assessment_section.htm:87
+msgid "No descriptions recorded"
+msgstr "لم يتم تسجيل وصف"
+
+#: eamena/templates/views/reports/sections/DISTURBANCE_EXTENT.htm:6
+msgid "Overall disturbance extent"
+msgstr "المدى العام للاضطرابات"
+
+#: eamena/templates/views/reports/sections/DISTURBANCE_TYPE.htm:6
+msgid "Types of disturbances affecting the resource"
+msgstr "أنوا الاضطرابات التي تؤثر في المورد"
+
+#: eamena/templates/views/reports/sections/DISTURBANCE_TYPE.htm:30
+#: eamena/templates/views/reports/sections/ROLE.htm:39
+msgid "From: "
+msgstr "هيئة"
+
+#: eamena/templates/views/reports/sections/DISTURBANCE_TYPE.htm:36
+#: eamena/templates/views/reports/sections/ROLE.htm:42
+msgid "To: "
+msgstr "إلى"
+
+#: eamena/templates/views/reports/sections/EXTERNAL_XREF.E42.htm:11
+msgid "No references recorded"
+msgstr "لم يتم تسجيل مصادر"
+
+#: eamena/templates/views/reports/sections/FEATURE_FORMS.htm:5
+msgid "Feature forms within Heritage Resource"
+msgstr "أشكال الملمح ضمن المورد التراثي"
+
+#: eamena/templates/views/reports/sections/FEATURE_FORMS.htm:16
+msgid "Form Type"
+msgstr "نوع الشكل"
+
+#: eamena/templates/views/reports/sections/FEATURE_FORMS.htm:23
+msgid " Certainty"
+msgstr "مدى التأكد"
+
+#: eamena/templates/views/reports/sections/FEATURE_FORMS.htm:32
+#: eamena/templates/views/reports/sections/FEATURE_INTERPRETATIONS.htm:32
+msgid "(Number)"
+msgstr "الرقم"
+
+#: eamena/templates/views/reports/sections/FEATURE_FORMS.htm:40
+msgid "No feature forms recorded"
+msgstr "لم يتم تسجيل أنواع الملمح"
+
+#: eamena/templates/views/reports/sections/FEATURE_INTERPRETATIONS.htm:5
+msgid "Feature intepretations within Heritage Resource"
+msgstr "تفسير الملمح ضمن المورد الثقافي"
+
+
+#: eamena/templates/views/reports/sections/FEATURE_INTERPRETATIONS.htm:39
+msgid "No feature interpretations recorded"
+msgstr "لم يتم تسجيل تفسيرات للملمح"
+
+#: eamena/templates/views/reports/sections/IMAGERY_REPORT.htm:13
+msgid "No Catalog ID recorded"
+msgstr "لم يتم تسجيل هوية كتالوج"
+
+#: eamena/templates/views/reports/sections/IMAGERY_REPORT.htm:34
+msgid "Imagery Source"
+msgstr "مصدر الصورة"
+
+#: eamena/templates/views/reports/sections/IMAGERY_REPORT.htm:39
+#: eamena/templates/views/reports/sections/SHARED_REPORT.htm:12
+msgid "No Source recorded"
+msgstr "لم يتم تسجيل مصدر"
+
+#: eamena/templates/views/reports/sections/IMAGERY_REPORT.htm:67
+msgid "Imagery Creator/Owner"
+msgstr "منشئ/مالك الصورة"
+
+#: eamena/templates/views/reports/sections/IMAGERY_REPORT.htm:72
+msgid "No Creator/Owner recorded"
+msgstr "لم يتم تسجيل منشئ/مالك"
+
+#: eamena/templates/views/reports/sections/IMAGERY_REPORT.htm:105
+msgid "No Image Details recorded"
+msgstr "لم يتم تسجيل تفاصيل الصورة"
+
+#: eamena/templates/views/reports/sections/IMAGERY_REPORT.htm:112
+msgid "(Platform)"
+msgstr "المنصة"
+
+#: eamena/templates/views/reports/sections/IMAGERY_REPORT.htm:116
+#: eamena/templates/views/reports/sections/IMAGERY_REPORT.htm:123
+#: eamena/templates/views/reports/sections/IMAGERY_REPORT.htm:130
+#: eamena/templates/views/reports/sections/IMAGERY_REPORT.htm:137
+#: eamena/templates/views/reports/sections/IMAGERY_REPORT.htm:144
+#: eamena/templates/views/reports/sections/related_resource_section.htm:75
+#: eamena/templates/views/reports/sections/related_resource_section.htm:121
+#: eamena/templates/views/reports/sections/related_resource_section.htm:173
+#: eamena/templates/views/reports/sections/related_resource_section.htm:229
+#: eamena/templates/views/reports/sections/related_resource_section.htm:265
+#: eamena/templates/views/reports/sections/related_resource_section.htm:300
+#: eamena/templates/views/reports/sections/related_resource_section.htm:335
+#: eamena/templates/views/reports/sections/related_resource_section.htm:364
+msgid "None"
+msgstr "لا يوجد"
+
+#: eamena/templates/views/reports/sections/IMAGERY_REPORT.htm:120
+msgid "(Camera Model)"
+msgstr "موديل آلة التصوير"
+
+#: eamena/templates/views/reports/sections/IMAGERY_REPORT.htm:127
+msgid "(Bands)"
+msgstr "(الزمر (جمع زمرة"
+
+#: eamena/templates/views/reports/sections/IMAGERY_REPORT.htm:134
+msgid "(Camera Type)"
+msgstr "نوع آلة التصوير"
+
+#: eamena/templates/views/reports/sections/IMAGERY_REPORT.htm:141
+msgid "(Camera Resolution)"
+msgstr "درجة وضوح آلة التصوير"
+
+#: eamena/templates/views/reports/sections/IMAGERY_REPORT.htm:160
+msgid "Acquisition Date"
+msgstr "تاريخ الاستحواذ/الالتقاط"
+
+#: eamena/templates/views/reports/sections/IMAGERY_REPORT.htm:165
+#: eamena/templates/views/reports/sections/IMAGERY_REPORT.htm:198
+#: eamena/templates/views/reports/sections/SHARED_REPORT.htm:80
+msgid "No Date recorded"
+msgstr "لم يتم تسجيل تاريخ"
+
+#: eamena/templates/views/reports/sections/IMAGERY_REPORT.htm:193
+msgid "File Date"
+msgstr "تاريخ الملف"
+
+#: eamena/templates/views/reports/sections/IMAGERY_REPORT.htm:232
+msgid "No Copyright Recorded"
+msgstr "لم يتم تسجيل حقوق نسخ"
+
+#: eamena/templates/views/reports/sections/KEYWORD.E55.htm:11
+msgid "No keywords recorded"
+msgstr "لم يتم تسجيل كلمات مفاتيح"
+
+#: eamena/templates/views/reports/sections/MEASUREMENT_TYPE.E55.htm:11
+msgid "No measurements recorded"
+msgstr "لم يتم تسجيل قياسات"
+
+#: eamena/templates/views/reports/sections/OVERALL_SITE_CERTAINTY.htm:11
+msgid "No site certainty recorded"
+msgstr "لم يتم تسجيل مدى التأكد من الموقع"
+
+#: eamena/templates/views/reports/sections/PLACE_ADDRESS.E45.htm:11
+msgid "No addresses recorded"
+msgstr "لم يتم تسجيل عناوين"
+
+#: eamena/templates/views/reports/sections/PLACE_APPELLATION_CADASTRAL_REFERENCE.E44.htm:6
+msgid "Parcels"
+msgstr "قطع"
+
+#: eamena/templates/views/reports/sections/PLACE_APPELLATION_CADASTRAL_REFERENCE.E44.htm:10
+msgid "No parcels recorded"
+msgstr "لم يتم تسجيل قطع"
+
+#: eamena/templates/views/reports/sections/RESOURCE_TYPE_CLASSIFICATION.E55.htm:6
+msgid "Resource Types"
+msgstr "أنواع الموارد"
+
+#: eamena/templates/views/reports/sections/ROLE.htm:11
+#: eamena/templates/views/reports/sections/ROLE.htm:18
+msgid "No roles recorded"
+msgstr "لم يتم تسجيل أدوار"
+
+#: eamena/templates/views/reports/sections/SHARED_REPORT.htm:7
+msgid "Data Source"
+msgstr "مصدر البيانات"
+
+#: eamena/templates/views/reports/sections/SHARED_REPORT.htm:41
+msgid "Data Source Project/Affiliation"
+msgstr "مشروع/ارتباط مصدر البيانات"
+
+#: eamena/templates/views/reports/sections/SHARED_REPORT.htm:46
+msgid "No Project/Affiliation recorded"
+msgstr "لم يتم تسجيل مشروع/ارتباط"
+
+#: eamena/templates/views/reports/sections/SHARED_REPORT.htm:75
+msgid "Dataset Acquisition"
+msgstr "استحواذ المعلومات"
+
+#: eamena/templates/views/reports/sections/SHARED_REPORT.htm:109
+msgid "Further comments"
+msgstr "تعليقات إضافية"
+
+#: eamena/templates/views/reports/sections/SHARED_REPORT.htm:114
+msgid "No Comments recorded"
+msgstr "لم يتم تسجيل تعليقات"
+
+#: eamena/templates/views/reports/sections/SITE_FUNCTION_TYPE.htm:10
+msgid "No site functions recorded"
+msgstr "لم يتم تسجيل وظائف للموقع"
+
+#: eamena/templates/views/reports/sections/THREAT_TYPE.htm:6
+msgid "Threat(s) to the resource"
+msgstr "مخاطر تهدد المورد"
+
+#: eamena/templates/views/reports/sections/TIME_SPANS.htm:6
+msgid "Time span"
+msgstr "المدى الزمني"
+
+#: eamena/templates/views/reports/sections/condition_assessment_section.htm:15
+msgid "Resource Condition Assessment"
+msgstr "تقييم حالة المورد"
+
+#: eamena/templates/views/reports/sections/condition_assessment_section.htm:63
+msgid "No conditions recorded"
+msgstr "لم يتم تسجيل الحالة"
+
+
+#: eamena/templates/views/reports/sections/condition_assessment_section.htm:156
+msgid "No images recorded"
+msgstr "لم يتم تسجيل صور"
+
+#: eamena/templates/views/reports/sections/condition_assessment_section.htm:183
+msgid "Disturbances"
+msgstr "اضطرابات"
+
+#: eamena/templates/views/reports/sections/condition_assessment_section.htm:188
+msgid "No disturbances recorded"
+msgstr "لم يتم تسجيل اضطرابات"
+
+#: eamena/templates/views/reports/sections/condition_assessment_section.htm:207
+msgid "Threats"
+msgstr "مخاطر"
+
+#: eamena/templates/views/reports/sections/condition_assessment_section.htm:212
+msgid "No theats recorded"
+msgstr "لم يتم تسجيل مخاطر"
+
+#: eamena/templates/views/reports/sections/condition_assessment_section.htm:231
+msgid "Management Recommendations"
+msgstr "توصيات للإدارة"
+
+#: eamena/templates/views/reports/sections/condition_assessment_section.htm:236
+#: eamena/templates/views/reports/sections/condition_assessment_section.htm:242
+msgid "No recommendations recorded"
+msgstr "لم يتم تسجيل توصيات"
+
+#: eamena/templates/views/reports/sections/designation_section.htm:15
+msgid "Designations"
+msgstr "تحديد المكانة"
+
+#: eamena/templates/views/reports/sections/designation_section.htm:37
+msgid "Designation and Protection Status"
+msgstr "حالة المكانة والحماية"
+
+#: eamena/templates/views/reports/sections/evaluation_section.htm:15
+msgid "Resource Significance"
+msgstr "أهمية المورد"
+
+#: eamena/templates/views/reports/sections/evaluation_section.htm:40
+msgid "Evaluation Details"
+msgstr "تفاصيل التقييم"
+
+#: eamena/templates/views/reports/sections/evaluation_section.htm:58
+msgid "Context/Theme"
+msgstr "السياق/ الموضوع"
+
+#: eamena/templates/views/reports/sections/evaluation_section.htm:63
+msgid "No criteria recorded"
+msgstr "لم يتم تسجيل معايير"
+
+#: eamena/templates/views/reports/sections/evaluation_section.htm:82
+msgid "Eligibility Standards"
+msgstr "مقاييس الصلاحية"
+
+#: eamena/templates/views/reports/sections/evaluation_section.htm:87
+#: eamena/templates/views/reports/sections/evaluation_section.htm:109
+msgid "No standards recorded"
+msgstr "لم يتم تسجيل مقاييس"
+
+#: eamena/templates/views/reports/sections/evaluation_section.htm:104
+msgid "Integrity Standards"
+msgstr "مقاييس التكاملية"
+
+#: eamena/templates/views/reports/sections/evaluation_section.htm:126
+msgid "Status Codes"
+msgstr "رمز الحالات"
+
+#: eamena/templates/views/reports/sections/evaluation_section.htm:131
+msgid "No codes recorded"
+msgstr "لم يتم تسجيل رموز"
+
+#: eamena/templates/views/reports/sections/evaluation_section.htm:148
+msgid "Significance Statement"
+msgstr "بيان الأهمية"
+
+#: eamena/templates/views/reports/sections/evaluation_section.htm:153
+msgid "No statement recorded"
+msgstr "لم يتم تسجيل بيان الأهمية"
+
+#: eamena/templates/views/reports/sections/heritage_resource_phase_type_assignment.htm:37
+msgid "Use"
+msgstr "الاستخدام"
+
+#: eamena/templates/views/reports/sections/important_dates.htm:6
+msgid "Important Dates"
+msgstr "تواريخ مهمة"
+
+#: eamena/templates/views/reports/sections/important_dates.htm:11
+msgid "No dates recorded"
+msgstr "لم يتم تسجيل تواريخ"
+
+#: eamena/templates/views/reports/sections/related_resource_section.htm:41
+msgid "Related Heritage Resources E27"
+msgstr "E27 موراد تراثية  ذات صلة"
+
+#: eamena/templates/views/reports/sections/related_resource_section.htm:59
+#: eamena/templates/views/reports/sections/related_resource_section.htm:109
+#: eamena/templates/views/reports/sections/related_resource_section.htm:161
+#: eamena/templates/views/reports/sections/related_resource_section.htm:220
+#: eamena/templates/views/reports/sections/related_resource_section.htm:252
+#: eamena/templates/views/reports/sections/related_resource_section.htm:287
+#: eamena/templates/views/reports/sections/related_resource_section.htm:322
+#: eamena/templates/views/reports/sections/related_resource_section.htm:357
+#: eamena/templates/views/search/map-filter.htm:144
+msgid "View Report"
+msgstr "إطلاع على التقرير"
+
+#: eamena/templates/views/reports/sections/related_resource_section.htm:92
+msgid "Related Heritage Resources E18"
+msgstr "E18 موراد تراثية ذات صلة "
+
+#: eamena/templates/views/reports/sections/related_resource_section.htm:144
+msgid "Related People/Organisations"
+msgstr "أشخاص/ مؤسسات ذوي صلة"
+
+#: eamena/templates/views/reports/sections/related_resource_section.htm:194
+msgid "Related Information Resources"
+msgstr "مصادر معلومات ذات صلة"
+
+#: eamena/templates/views/reports/sections/related_resource_section.htm:217
+msgid "Data contributed by: "
+msgstr "صاحب الاسهام بالبيانات"
+
+#: eamena/templates/views/reports/sections/related_resource_section.htm:281
+msgid "Maps"
+msgstr "خرائط"
+
+#: eamena/templates/views/search/map-filter.htm:14
+msgid "Map Tools"
+msgstr "أدوات الخريطة"
+
+#: eamena/templates/views/search/map-filter.htm:19
+msgid "Limit search results to map extent"
+msgstr "حدد البحث في مجال الخريطة"
+
+#: eamena/templates/views/search/map-filter.htm:21
+msgid "Draw Polygon to Filter Map"
+msgstr "ارسم مضلع لمرشح الخريطة"
+
+#: eamena/templates/views/search/map-filter.htm:22
+msgid "Draw Line to Filter Map"
+msgstr "ارسم خط لمرشح الخريطة"
+
+#: eamena/templates/views/search/map-filter.htm:23
+msgid "Draw Point to Filter Map"
+msgstr "ارسم نقطة لمرشح الخريطة"
+
+#: eamena/templates/views/search/map-filter.htm:26
+msgid "Buffer (m)"
+msgstr "(منطقة الحماية (متر"
+
+
+#: eamena/templates/views/search/map-filter.htm:162
+msgid "Clustered Resources"
+msgstr "موارد مجمعة"
+
+#: eamena/templates/views/search/time-filter.htm:17
+msgid "Range of Years"
+msgstr "مدى من السنوات"
+
+#: eamena/templates/views/search/time-filter.htm:17
+msgid "(show resources with any date that falls between these years)"
+msgstr "عرض موارد بأية تواريخ تقع بين هاتين السنتين"
+
+#: eamena/templates/views/search/time-filter.htm:44
+msgid "Start/End Dates"
+msgstr "تواريخ البداية/النهاية"
+
+#: eamena/templates/views/search/time-filter.htm:44
+msgid "(show resources that meet these date criteria)"
+msgstr "اعرض الموارد حسب المعايير التالية الخاصة بالتاريخ"
+
+#: eamena/templates/views/search/time-filter.htm:56
+msgid "Type of date"
+msgstr "نوع التاريخ"
+
+#: eamena/templates/views/search/time-filter.htm:62
+msgid "Qualifier"
+msgstr "الشخص الذي يعتمد"
+
+#: eamena/templates/views/search/time-filter.htm:92
+msgid "You have selected the following Start/End Date filters:"
+msgstr "لقد اخترت تواريخ البداية والنهاية التالية"
+
+#: eamena/templates/views/search/time-filter.htm:96
+msgid "No Filters Defined"
+msgstr "لم يتم تحديد مرشح"
+
+#: eamena/templates/views/search/time-filter.htm:107
+msgid "The Type of Date, Qualifier, and Date fields must all be populated."
+msgstr "يجب ادخال نوع التاريخ والذي اعتمد والتاريخ"

@@ -1,0 +1,27 @@
+{% load i18n %}
+<div class="row">
+    <div class="col-xs-12">
+        <dl>
+            <dt>
+                <h5 id="" class="arches-report-subsection-title">{% trans "Cultural periods" %}</h5>
+            </dt>
+    {% for PRODUCTION_E12 in report_info.source.graph.PRODUCTION_E12 %}
+    {% for PHASE_TYPE_ASSIGNMENT_E17 in PRODUCTION_E12.PHASE_TYPE_ASSIGNMENT_E17 %}
+
+            {% if 'CULTURAL_PERIOD_E55'  in PHASE_TYPE_ASSIGNMENT_E17%}
+
+
+                {% for CULTURAL_PERIOD_E55 in PHASE_TYPE_ASSIGNMENT_E17.CULTURAL_PERIOD_E55 %}
+                    <dd class="arches-report-subsection-item">
+                         {{CULTURAL_PERIOD_E55.CULTURAL_PERIOD_E55__value}}<span class="arches-report-subsection-item-type"> ( {% trans "Period" %} )</span>
+                      {{ CULTURAL_PERIOD_E55.CULTURAL_PERIOD_CERTAINTY_TYPE_E55__value }} <span class="arches-report-subsection-item-type"> ( {% trans "Certainty" %} )</span>
+                    </dd>
+                    {% empty %}
+                {% endfor %}            
+            {% endif %}
+    {% endfor %}  
+    {% endfor %}  
+        </dl>
+
+    </div>
+</div>

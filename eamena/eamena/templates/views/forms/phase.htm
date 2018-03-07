@@ -1,0 +1,75 @@
+{% extends "views/forms/base.htm" %}
+{% load i18n %}
+
+{% block form_content %}
+<div class="row" id="phase-section">
+    <div class="col-xs-12">
+        <div class="padding-left-10">
+
+            <dl>
+                <!-- Title -->
+                <dt>
+                    <h5 id="arches-names-form" class="section-headline">Phases</h5>
+                </dt>
+
+                <!-- Form -->
+                <dd class="arches-RDM-labels form-inline arches-form hidden-xs">
+
+                    <div class="row">
+
+                        <div class="col-xs-12 padding-left-0">
+
+                            <!-- Form for screens > xs -->
+                            <div class="form-group" style="width: 100%">
+
+                                <!-- <input class="actor-phases" id="" name="" style="width:40%;"  value="">&nbsp; -->
+                                <input style="width:40%; display:inline-block;" class="select2 arches-select2-crud-form name-type designation" id="resource-designation-type" data-bind="select2: {value: getEditedNode('HISTORICAL_EVENT_TYPE.E55', 'value'),  placeholder: '{% trans "Type" %}', dataKey: 'HISTORICAL_EVENT_TYPE.E55'}">&nbsp;
+
+                                <!-- <input class="periods" id="" name="" style="width:40%;"  value="">&nbsp; -->
+
+                                <input style="width:40%; display:inline-block;" class="select2 arches-select2-crud-form name-type designation" id="resource-designation-type" data-bind="select2: {value: getEditedNode('CULTURAL_PERIOD.E55', 'value'),  placeholder: '{% trans "Period" %}', dataKey: 'CULTURAL_PERIOD.E55'}">&nbsp;
+
+                                <!-- Add Button -->
+                                {% include 'views/components/add-item-button.htm' %}
+                                <!-- End Add Button -->
+
+
+
+                            </div>
+                        </div>
+                    </div>
+                </dd>
+
+                <!-- End Form -->
+            </dl>
+            <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "The phase type value must be populated." %}</div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+
+                <!-- Address -->
+                <div class="arches-crud-child-section">
+                    <dl>
+                        <dd class="arches-CRUD-child-title">
+                            {% trans "This resource has the following phases:" %}
+                        </dd>
+
+                        <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                            <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Phases Defined" %}</div>   
+
+                            <div data-bind='foreach: getBranchLists()'>
+                                <div class="arches-crud-record">
+                                    <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this phase" %}"><i data-bind='click: $parent.deleteItem.bind($parent)' class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                    <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind='click: $parent.editItem.bind($parent)' title="Edit this phase"><span data-bind="{text: nodes.get('HISTORICAL_EVENT_TYPE.E55', 'label')}" style="padding-right:2px;"></span><span class="text-muted">(Type) </span><span data-bind="{text: nodes.get('CULTURAL_PERIOD.E55', 'label')}" style="padding-right:2px;"></span><span class="text-muted">(Period) </span></span>
+                                    </a>
+                                </div>
+                            </div>
+                        </dd>
+
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock form_content %}

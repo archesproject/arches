@@ -1,0 +1,45 @@
+{% load i18n %}
+<form method="POST" id="resource_data_management_form" class="form-inline arches-form" role="form" enctype="multipart/form-data">
+
+    <div class="right-inner arches-box-grey-border padding-10" id="crud" style="">
+        <div class="form-load-mask"><i class="fa fa-spinner fa-spin"></i></div>
+        <!-- Theme Title -->
+        <div class="row">
+            <div class="col-xs-12">
+                
+                <div class="headline margin-bottom-10 padding-left-10">
+                    <h3 class="headline text-primary"><i class="fa {{form.icon}} text-primary"></i>{{form.name}}</h3>
+                    
+                    {% block form_controls %}
+                    <!-- Save/Discard Buttons for small, medium and large screens -->
+                    <span class="pull-right margin-top-minus-10 hidden-xs">
+                        <button type="button" class="cancel-edits btn btn-danger disabled"> 
+                            <i class="fa fa-times"></i>&nbsp; {% trans 'Discard edits' %}
+                        </button>
+                        <button type="submit" class="save-edits btn btn-success disabled"> 
+                            <i class="fa fa-check"></i>&nbsp; {% trans 'Save edits' %}
+                        </button>
+                    </span>
+
+                    <!-- Save/Discard Buttons for xs screens -->
+                    <span class="hidden-sm hidden-md hidden-lg">
+                        </br>
+                        <button type="button" class="cancel-edits btn btn-danger disabled"> 
+                            <i class="fa fa-times"></i>&nbsp; {% trans 'Discard edits' %}
+                        </button>
+                        <button type="submit" class="save-edits btn btn-success disabled"> 
+                            <i class="fa fa-check"></i>&nbsp; {% trans 'Save edits' %}
+                        </button>
+                    </span>
+                    {% endblock form_controls %}
+                </div>
+            </div>
+        </div>
+        <!-- End Theme Title -->
+
+        {% block form_content %}
+        {% endblock form_content %}
+
+        <input id="formdata" name="formdata" type="hidden" value="{{formdata}}"/>
+    </div>
+</form>

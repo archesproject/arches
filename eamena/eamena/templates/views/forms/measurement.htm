@@ -1,0 +1,358 @@
+{% extends "views/forms/base.htm" %}
+{% load i18n %}
+
+{% block form_content %}
+<!-- Resource Measurement CRUD Form -->
+
+<div id="condition-type-section">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                
+                <dl>
+                    <!-- Title -->
+                    <dt>
+                        <h5 id="arches-measurement-form" class="section-headline">{% trans "Condition State" %}</h5>
+                    </dt>
+                    <!-- Form -->
+                    <dd class="arches-RDM-labels">
+                        <div class="row">
+                            
+                            <div class="col-xs-12">
+                                
+                                <!-- Measurement Type -->
+                                <input style="width:40%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-type" data-bind="select2: {value: getEditedNode('CONDITION_TYPE.E55', 'value'),  placeholder: '{% trans "Type" %}', dataKey: 'CONDITION_TYPE.E55'}"></input>&nbsp;
+                                
+                                
+                                {% include 'views/components/add-item-button.htm' %}
+                                
+                            </div>
+                            
+                            </dd>
+                    <!-- End Form -->
+                <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "This field must be entered." %}</div>         
+                    
+                </dl>
+                
+            </div>
+        </div>
+    </div>
+    <!-- Name Records -->
+    <div class="row">
+        <div class="col-xs-12">
+            
+            <!-- Address -->
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "Condition type defined:" %}
+                    </dd>
+                    
+                    <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No type Defined" %}</div>
+                        
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this measurement" %}"><i data-bind='click: $parent.deleteItem.bind($parent)' class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind='click: $parent.editItem.bind($parent)' title="{% trans "Edit this measurement" %}" >
+                                    <span data-bind="{text: nodes.get('CONDITION_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted arches-crud-type-identifier"> ({% trans "type" %})</span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+                    
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="disturbance-extent-section">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                
+                <dl>
+                    <!-- Title -->
+                    <dt>
+                        <h5 id="arches-measurement-form" class="section-headline">{% trans "Disturbance Extent " %}</h5>
+                    </dt>
+                    <!-- Form -->
+                    <dd class="arches-RDM-labels">
+                        <div class="row">
+                            
+                            <div class="col-xs-12">
+                                
+                                <!-- Measurement Type -->
+                                <input style="width:40%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-type" data-bind="select2: {value: getEditedNode('DISTURBANCE_EXTENT_TYPE.E55', 'value'),  placeholder: '{% trans "Type" %}', dataKey: 'DISTURBANCE_EXTENT_TYPE.E55'}"></input>&nbsp;
+                                
+                                
+                                {% include 'views/components/add-item-button.htm' %}
+                                
+                            </div>
+                            
+                            </dd>
+                    <!-- End Form -->
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "This field must be entered." %}</div>       
+                    
+                </dl>
+                
+            </div>
+        </div>
+    </div>
+    <!-- Name Records -->
+    <div class="row">
+        <div class="col-xs-12">
+            
+            <!-- Address -->
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "Disturbance extent defined:" %}
+                    </dd>
+                    
+                    <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "None Defined" %}</div>
+                        
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this measurement" %}"><i data-bind='click: $parent.deleteItem.bind($parent)' class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind='click: $parent.editItem.bind($parent)' title="{% trans "Edit this measurement" %}">
+                                    <span data-bind="{text: nodes.get('DISTURBANCE_EXTENT_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted arches-crud-type-identifier"> ({% trans "approximate horizontal extent of site disturbed" %})</span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+                    
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="disturbance-state-section">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                
+                <dl>
+                    <!-- Title -->
+                    <dt>
+                        <h5 id="arches-measurement-form" class="section-headline">{% trans "Disturbance Assessment " %}</h5>
+                    </dt>
+                    <!-- Form -->
+                    <dd class="arches-RDM-labels">
+                        <div class="row">
+                            
+                            <div class="col-xs-12">
+                                
+                                <!-- Measurement Type -->
+                                <input style="width:40%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-type" data-bind="select2: {value: getEditedNode('DISTURBANCE_CAUSE_TYPE.E55', 'value'),  placeholder: '{% trans "Cause " %}', dataKey: 'DISTURBANCE_CAUSE_TYPE.E55'}"></input>&nbsp;
+
+                                <!-- Measurement Unit -->
+                                <input style="width:20%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-unit" data-bind="select2: {value: getEditedNode('DISTURBANCE_CAUSE_CERTAINTY_TYPE.E55', 'value'), placeholder: '{% trans "Cause certainty" %}', dataKey: 'DISTURBANCE_CAUSE_CERTAINTY_TYPE.E55'}"></input>&nbsp;
+                                
+                                <br>
+                                
+                                <br>
+                                
+                                <!-- Measurement Type -->
+                                <input style="width:40%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-type" data-bind="select2: {value: getEditedNode('DISTURBANCE_EFFECT_1_TYPE.E55', 'value'),  placeholder: '{% trans "Effect 1" %}', dataKey: 'DISTURBANCE_EFFECT_1_TYPE.E55'}"></input>&nbsp;
+                                
+                                <!-- Measurement Unit -->
+                                <input style="width:20%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-unit" data-bind="select2: {value: getEditedNode('DISTURBANCE_EFFECT_1_CERTAINTY_TYPE.E55', 'value'), placeholder: '{% trans "Effect 1 certainty" %}', dataKey: 'DISTURBANCE_EFFECT_1_CERTAINTY_TYPE.E55'}"></input>&nbsp;
+                                
+                                <!-- Measurement Type -->
+                                <input style="width:40%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-type" data-bind="select2: {value: getEditedNode('DISTURBANCE_EFFECT_2_TYPE.E55', 'value'),  placeholder: '{% trans "Effect 2" %}', allowClear: true, dataKey: 'DISTURBANCE_EFFECT_2_TYPE.E55'}"></input>&nbsp;
+                                
+                                <!-- Measurement Unit -->
+                                <input style="width:20%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-unit" data-bind="select2: {value: getEditedNode('DISTURBANCE_EFFECT_2_CERTAINTY_TYPE.E55', 'value'), placeholder: '{% trans "Effect 2 certainty" %}', dataKey: 'DISTURBANCE_EFFECT_2_CERTAINTY_TYPE.E55'}"></input>&nbsp;
+                                
+                                <!-- Measurement Type -->
+                                <input style="width:40%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-type" data-bind="select2: {value: getEditedNode('DISTURBANCE_EFFECT_3_TYPE.E55', 'value'),  placeholder: '{% trans "Effect 3" %}', dataKey: 'DISTURBANCE_EFFECT_3_TYPE.E55'}"></input>&nbsp;
+                                
+                                <!-- Measurement Unit -->
+                                <input style="width:20%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-unit" data-bind="select2: {value: getEditedNode('DISTURBANCE_EFFECT_3_CERTAINTY_TYPE.E55', 'value'), placeholder: '{% trans "Effect 3 certainty" %}', dataKey: 'DISTURBANCE_EFFECT_3_CERTAINTY_TYPE.E55'}"></input>&nbsp;
+                                
+                                <!-- Measurement Type -->
+                                <input style="width:40%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-type" data-bind="select2: {value: getEditedNode('DISTURBANCE_EFFECT_4_TYPE.E55', 'value'),  placeholder: '{% trans "Effect 4" %}', dataKey: 'DISTURBANCE_EFFECT_4_TYPE.E55'}"></input>&nbsp;
+                                
+                                <!-- Measurement Unit -->
+                                <input style="width:20%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-unit" data-bind="select2: {value: getEditedNode('DISTURBANCE_EFFECT_4_CERTAINTY_TYPE.E55', 'value'), placeholder: '{% trans "Effect 4 certainty" %}', dataKey: 'DISTURBANCE_EFFECT_4_CERTAINTY_TYPE.E55'}"></input>&nbsp;
+                                
+                                <!-- Measurement Type -->
+                                <input style="width:40%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-type" data-bind="select2: {value: getEditedNode('DISTURBANCE_EFFECT_5_TYPE.E55', 'value'),  placeholder: '{% trans "Effect 5" %}', dataKey: 'DISTURBANCE_EFFECT_5_TYPE.E55'}"></input>&nbsp;
+                                
+                                <!-- Measurement Unit -->
+                                <input style="width:20%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-unit" data-bind="select2: {value: getEditedNode('DISTURBANCE_EFFECT_5_CERTAINTY_TYPE.E55', 'value'), placeholder: '{% trans "Effect 5 certainty" %}', dataKey: 'DISTURBANCE_EFFECT_5_CERTAINTY_TYPE.E55'}"></input>&nbsp;
+                                
+
+                                <br>
+                                
+                                <br>
+                                
+                                <!-- Measurement Unit -->
+                                <input style="width:40%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-unit"  data-bind="select2: {value: getEditedNode('DISTURBANCE_TYPE.E55', 'value'), placeholder: '{% trans "Type" %}', dataKey: 'DISTURBANCE_TYPE.E55'}"></input>&nbsp;
+                                
+                                
+                                <br>
+                                
+                                <br>
+                                
+                                
+                                
+                                <!-- Measurement Unit -->
+                                <input style="width:20%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-unit" data-bind="select2: {value: getEditedNode('DISTURBANCE_DATE_TYPE.E55', 'value'), placeholder: '{% trans "Date type" %}', dataKey: 'DISTURBANCE_DATE_TYPE.E55'}"></input>&nbsp;
+                                
+                                <!-- From Date -->
+                                <div class="form-group datetimepicker" style="width:25%;">
+                                    <div class="input-group">
+                                        <input type="text" name="mydate" id="date" placeholder='{% trans "from (yyyy-mm-dd)" %}' class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('DISTURBANCE_DATE_START.E49', 'value')} ">
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                            </div>
+                                </div>&nbsp;
+                                <!-- To date -->
+                                <div class="form-group datetimepicker" style="width:25%;">
+                                    <div class="input-group">
+                                        <input type="text" name="mydate" id="date" placeholder='{% trans "to (yyyy-mm-dd)" %}' class="form-control datepicker" data-date-format="YYYY-MM-DD"collapse-resource-description data-bind="{value: getEditedNode('DISTURBANCE_DATE_END.E49', 'value')} ">
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                            
+                                            </div>
+                                </div>
+                                
+                                                                {% include 'views/components/add-item-button.htm' %}
+                                
+                            </div>
+                            
+                            </dd>
+                    <!-- End Form -->
+                <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "The following fields must be entered: Disturbance Cause; Disturbance Cause Certainty; Effect 1; Effect 1 Certainty; Disturbance Type; Date Type; Date to" %}</div>          
+                    
+                </dl>
+                
+            </div>
+        </div>
+    </div>
+    <!-- Name Records -->
+    <div class="row">
+        <div class="col-xs-12">
+            
+            <!-- Address -->
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "Disturbance state defined records:" %}
+                    </dd>
+                    
+                    <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "None Defined" %}</div>
+                        
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this measurement" %}"><i data-bind='click: $parent.deleteItem.bind($parent)' class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind='click: $parent.editItem.bind($parent)' title="{% trans "Edit this measurement" %}">
+                                    <span data-bind="{text: nodes.get('DISTURBANCE_CAUSE_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted arches-crud-type-identifier"> ({% trans "cause" %}),</span>
+                                    <span data-bind="{text: nodes.get('DISTURBANCE_CAUSE_CERTAINTY_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted arches-crud-type-identifier"> ( {% trans "cause certainty" %} ),</span>
+                                    <span data-bind="{text: nodes.get('DISTURBANCE_EFFECT_1_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted arches-crud-type-identifier"> ( {% trans "effect 1" %} ),</span>
+                                    <span data-bind="{text: nodes.get('DISTURBANCE_EFFECT_1_CERTAINTY_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted arches-crud-type-identifier"> ( {% trans "effect 1 certainty" %} ),</span>
+                                    <span data-bind="{text: nodes.get('DISTURBANCE_EFFECT_2_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted arches-crud-type-identifier"> ( {% trans "effect 2" %} ),</span>
+                                    <span data-bind="{text: nodes.get('DISTURBANCE_EFFECT_2_CERTAINTY_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted arches-crud-type-identifier"> ( {% trans "effect 2 certainty" %} ),</span>
+                                    <span data-bind="{text: nodes.get('DISTURBANCE_EFFECT_3_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted arches-crud-type-identifier"> ( {% trans "effect 3" %} ),</span>
+                                    <span data-bind="{text: nodes.get('DISTURBANCE_EFFECT_3_CERTAINTY_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted arches-crud-type-identifier"> ( {% trans "effect 3 certainty" %} ),</span>
+                                    <span data-bind="{text: nodes.get('DISTURBANCE_EFFECT_4_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted arches-crud-type-identifier"> ( {% trans "effect 4" %} ),</span>
+                                    <span data-bind="{text: nodes.get('DISTURBANCE_EFFECT_4_CERTAINTY_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted arches-crud-type-identifier"> ( {% trans "effect 4 certainty" %} ),</span>
+                                    <span data-bind="{text: nodes.get('DISTURBANCE_EFFECT_5_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted arches-crud-type-identifier"> ( {% trans "effect 5" %} ),</span>
+                                    <span data-bind="{text: nodes.get('DISTURBANCE_EFFECT_5_CERTAINTY_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted arches-crud-type-identifier"> ( {% trans "effect 5 certainty" %} ),</span>
+                                    <span data-bind="{text: nodes.get('DISTURBANCE_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted arches-crud-type-identifier"> ( {% trans "type" %} )</span>
+                                    <span data-bind="{text: nodes.get('DISTURBANCE_DATE_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted arches-crud-type-identifier"> ( {% trans "date type" %} ),</span>
+                                    <span data-bind='text: nodes.get("DISTURBANCE_DATE_START.E49", "value")' style="padding-right:2px;"></span><span class="text-muted arches-crud-type-identifier">( {% trans "start" %} ),</span>
+                                    <span data-bind='text: nodes.get("DISTURBANCE_DATE_END.E49", "value")' style="padding-right:2px;"></span><span class="text-muted arches-crud-type-identifier">( {% trans "end" %} )</span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+                    
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="threat-state-section">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                
+                <dl>
+                    <!-- Title -->
+                    <dt>
+                        <h5 id="arches-measurement-form" class="section-headline">{% trans "Threat Assessment " %}</h5>
+                    </dt>
+                    <!-- Form -->
+                    <dd class="arches-RDM-labels">
+                        <div class="row">
+                            
+                            <div class="col-xs-12">
+                                
+                                <!-- Measurement Type -->
+                                <input style="width:40%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-type" data-bind="select2: {value: getEditedNode('THREAT_CAUSE_TYPE.E55', 'value'),  placeholder: '{% trans "Cause" %}', dataKey: 'THREAT_CAUSE_TYPE.E55'}"></input>&nbsp;
+                                
+                                <!-- Measurement Unit -->
+                                <input style="width:20%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-unit" data-bind="select2: {value: getEditedNode('THREAT_CAUSE_CERTAINTY_TYPE.E55', 'value'), placeholder: '{% trans "Cause certainty" %}', dataKey: 'THREAT_CAUSE_CERTAINTY_TYPE.E55'}"></input>&nbsp;
+                                
+                                <br>
+                                
+                                <br>
+                                
+                                <!-- Measurement Type -->
+                                <input style="width:40%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-type" data-bind="select2: {value: getEditedNode('THREAT_TYPE.E55', 'value'),  placeholder: '{% trans "Type" %}', dataKey: 'THREAT_TYPE.E55'}"></input>&nbsp;
+                                
+                                
+                                
+                                {% include 'views/components/add-item-button.htm' %}
+
+                            </div>
+                            
+                            </dd>
+                    <!-- End Form -->
+                    
+                <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "The following fields must be entered: Threat Cause; Threat Cause Certainty" %}</div>           
+                </dl>
+                
+            </div>
+        </div>
+    </div>
+    <!-- Name Records -->
+    <div class="row">
+        <div class="col-xs-12">
+            
+            <!-- Address -->
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "Threat state defined records:" %}
+                    </dd>
+                    
+                    <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "None Defined" %}</div>
+                        
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this measurement" %}"><i data-bind='click: $parent.deleteItem.bind($parent)' class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind='click: $parent.editItem.bind($parent)' title="{% trans "Edit this measurement" %}">
+                                   <span data-bind="{text: nodes.get('THREAT_CAUSE_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted arches-crud-type-identifier"> ( {% trans "cause" %} )</span>
+                                    <span data-bind="{text: nodes.get('THREAT_CAUSE_CERTAINTY_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted arches-crud-type-identifier"> ( {% trans "cause certainty" %} )</span>
+                                    <span data-bind="{text: nodes.get('THREAT_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted arches-crud-type-identifier"> ( {% trans "type" %} ),</span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+                    
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+ {% include 'views/forms/sections/SaveEditsFooter.htm' %}
+{% endblock form_content %}

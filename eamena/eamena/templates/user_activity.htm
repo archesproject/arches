@@ -1,0 +1,48 @@
+{% extends "base.htm" %}
+{% load i18n %}
+{% load staticfiles %}
+{% block css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/plugins/bootstrap-slider.min.css' %}">
+{% endblock css%}
+{% block javascript%}
+    <script type="text/javascript" src="//d3js.org/d3.v3.min.js"></script>
+    <script>
+        userid = {{userid}}
+    </script>
+    {{ block.super }}
+{% endblock javascript%}
+{% block content %}
+<div class="container activity-chart">
+    <h3>{{head_text}}</h3>
+    <div class="row" style="">
+        <div class="col-xs-11 col-xs-offset-1 col-sm-4 col-sm-offset-7 col-md-3 map-loading loading-mask" style="display: none;">
+            <img src="{% static 'img/spinner.gif' %}" height="28" width="28" style="margin-top: 2px;">
+            <p class="map-loading-text">{% trans 'Loading results...' %}</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <a href="/admin/auth/user/{{userid}}" class="select-action" data-action="create">
+            <button type="button" class="btn btn-default pull-right">
+                    <i class="fa fa-chevron-left" aria-hidden="true"></i> {% trans 'User administration' %}
+            </button>
+        </a>
+        <button type="button" class="btn btn-primary dropdown-toggle dropdown-actions-button" data-toggle="dropdown">
+            {% trans 'Users Actions' %}
+            <i class="fa fa-chevron-down"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-actions-menu" role="menu">
+            <li><a href="javascript:void(0);" class="select-action" data-action="create">{% trans 'Created resources' %}</a></li>
+            <li><a href="javascript:void(0);" class="select-action" data-action="update">{% trans 'Updated resources' %}</a></li>
+            <li><a href="javascript:void(0);" class="select-action" data-action="insert">{% trans 'Extended resources' %}</a></li>
+            <li><a href="javascript:void(0);" class="select-action" data-action="delete">{% trans 'Shrunken resources' %}</a></li>
+        </ul>
+        <div id="user-chart"></div>
+    </div>
+    <div class="row">
+        </br>
+        <div id="actions-list-container"></div>
+    </div>
+</div>
+{% endblock content %}

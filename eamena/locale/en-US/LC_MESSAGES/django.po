@@ -1,0 +1,3058 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-05-16 11:19-0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: eamena/settings.py:37
+msgid "Heritage Resource E18 Feature"
+msgstr "Heritage Resource E18 Feature"
+
+#: eamena/settings.py:41 eamena/settings.py:60
+msgid "NAME.E41"
+msgstr "NAME.E41"
+
+#: eamena/settings.py:42 eamena/settings.py:61 eamena/settings.py:80
+#: eamena/settings.py:99 eamena/settings.py:118 eamena/settings.py:137
+msgid "Resource"
+msgstr "Resource"
+
+#: eamena/settings.py:56
+#: eamena/templates/views/reports/HERITAGE_RESOURCE_GROUP.E27.htm:114
+msgid "Heritage Resource E27"
+msgstr "Heritage Resource E27"
+
+#: eamena/settings.py:75
+msgid "Activity"
+msgstr "Activity"
+
+#: eamena/settings.py:79 eamena/settings.py:98 eamena/settings.py:117
+#: eamena/settings.py:136
+msgid "INSERT RESOURCE DESCRIPTION NODE HERE"
+msgstr "INSERT RESOURCE DESCRIPTION NODE HERE"
+
+#: eamena/settings.py:94
+msgid "Historic Event"
+msgstr "Historic Event"
+
+#: eamena/settings.py:113
+msgid "Person/Organization"
+msgstr "Person/Organization"
+
+#: eamena/settings.py:132
+msgid "Information Resource"
+msgstr "Information Resource"
+
+#: eamena/models/forms.py:49 eamena/models/forms.py:172
+#: eamena/models/forms.py:288
+#: eamena/templates/views/reports/ACTIVITY.E7.htm:136
+#: eamena/templates/views/reports/ACTOR.E39.htm:136
+#: eamena/templates/views/reports/HERITAGE_RESOURCE.E18.htm:136
+#: eamena/templates/views/reports/HERITAGE_RESOURCE_GROUP.E27.htm:137
+#: eamena/templates/views/reports/HISTORICAL_EVENT.E5.htm:136
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:136
+msgid "Resource Summary"
+msgstr "Resource Summary"
+
+#: eamena/models/forms.py:121
+#: eamena/templates/views/reports/ACTIVITY.E7.htm:328
+#: eamena/templates/views/reports/ACTOR.E39.htm:406
+#: eamena/templates/views/reports/HERITAGE_RESOURCE.E18.htm:374
+#: eamena/templates/views/reports/HISTORICAL_EVENT.E5.htm:337
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:597
+#: eamena/templates/views/reports/sections/EXTERNAL_XREF.E42.htm:6
+msgid "External System References"
+msgstr "External System References"
+
+#: eamena/models/forms.py:146
+msgid "Actions"
+msgstr "Actions"
+
+#: eamena/models/forms.py:222
+msgid "Components"
+msgstr "Components"
+
+#: eamena/models/forms.py:298
+#: eamena/templates/views/forms/district_classification.htm:59
+msgid "Resource Type"
+msgstr "Resource Type"
+
+#: eamena/models/forms.py:344
+#: eamena/templates/views/forms/measurementvalues.htm:14
+#: eamena/templates/views/reports/HERITAGE_RESOURCE.E18.htm:343
+#: eamena/templates/views/reports/sections/MEASUREMENT_TYPE.E55.htm:6
+msgid "Measurements"
+msgstr "Measurements"
+
+#: eamena/models/forms.py:368
+msgid "Additional Information"
+msgstr "Additional Information"
+
+#: eamena/models/forms.py:399
+msgid "Condition Assessment"
+msgstr "Condition Assessment"
+
+#: eamena/models/forms.py:466
+msgid "Forms and Interpretations"
+msgstr "Forms and Interpretations"
+
+#: eamena/models/forms.py:503
+msgid "Location"
+msgstr "Location"
+
+#: eamena/models/forms.py:600
+msgid "Geometry Upload"
+msgstr "Geometry Upload"
+
+#: eamena/models/forms.py:635
+msgid "Images and Files"
+msgstr "Images and Files"
+
+#: eamena/models/forms.py:736
+msgid "Other Upload"
+msgstr "Other Upload"
+
+#: eamena/models/forms.py:777 eamena/templates/views/forms/designation.htm:14
+msgid "Designation"
+msgstr "Designation"
+
+#: eamena/models/forms.py:803 eamena/templates/views/reports/ACTOR.E39.htm:317
+msgid "Role"
+msgstr "Role"
+
+#: eamena/models/forms.py:830
+msgid "Actor Summary"
+msgstr "Actor Summary"
+
+#: eamena/models/forms.py:886
+msgid "Phase"
+msgstr "Phase"
+
+#: eamena/models/forms.py:915
+#: eamena/templates/views/forms/related-resources.htm:58
+#: eamena/templates/views/reports/sections/related_resource_section.htm:13
+#: eamena/templates/views/search/search-results.htm:51
+msgid "Related Resources"
+msgstr "Related Resources"
+
+#: eamena/models/forms.py:994
+msgid "Bibliography"
+msgstr "Bibliography"
+
+#: eamena/models/forms.py:1098
+msgid "Shared Data"
+msgstr "Shared Data"
+
+#: eamena/models/forms.py:1140
+msgid "Imagery"
+msgstr "Imagery"
+
+#: eamena/models/forms.py:1249
+msgid "Cartography"
+msgstr "Cartography"
+
+#: eamena/models/resource.py:35
+#: eamena/templates/views/reports/ACTIVITY.E7.htm:113
+#: eamena/templates/views/reports/ACTOR.E39.htm:113
+#: eamena/templates/views/reports/HERITAGE_RESOURCE.E18.htm:113
+#: eamena/templates/views/reports/HISTORICAL_EVENT.E5.htm:113
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:113
+msgid "Resource Description"
+msgstr "Resource Description"
+
+#: eamena/models/resource.py:112
+msgid "Manage Resource"
+msgstr "Manage Resource"
+
+#: eamena/models/resource.py:178
+msgid "None specified"
+msgstr "None specified"
+
+#: eamena/templates/header.htm:26
+msgid "Languages"
+msgstr "Languages"
+
+#: eamena/templates/header.htm:29
+msgid "English"
+msgstr "English"
+
+#: eamena/templates/header.htm:34
+msgid "Documentation coming soon."
+msgstr "Documentation coming soon."
+
+#: eamena/templates/header.htm:34
+msgid "Help"
+msgstr "Help"
+
+#: eamena/templates/header.htm:37
+msgid "Login"
+msgstr "Login"
+
+#: eamena/templates/header.htm:37
+msgid "Welcome"
+msgstr "Welcome"
+
+#: eamena/templates/header.htm:37
+msgid "Logout"
+msgstr "Logout"
+
+#: eamena/templates/header.htm:53
+msgid "Toggle navigation"
+msgstr "Toggle navigation"
+
+#: eamena/templates/header.htm:68
+msgid "Home"
+msgstr "Home"
+
+#: eamena/templates/header.htm:76
+msgid "Search"
+msgstr "Search"
+
+#: eamena/templates/header.htm:84
+msgid "Map View"
+msgstr "Map View"
+
+#: eamena/templates/header.htm:93
+msgid "Resource Manager"
+msgstr "Resource Manager"
+
+#: eamena/templates/header.htm:106
+msgid "RDM"
+msgstr "RDM"
+
+#: eamena/templates/map/layers.htm:7
+msgid "Example Layer"
+msgstr "Example Layer"
+
+#: eamena/templates/map/layers.htm:8
+msgid "visible zoom range: 9-20"
+msgstr "visible zoom range: 9-20"
+
+#: eamena/templates/map/layers.htm:9
+msgid "City Admin Area"
+msgstr "City Admin Area"
+
+#: eamena/templates/map/resource-popup.htm:22
+#: eamena/templates/map/resource-popup.htm:31
+msgid "Archaeological certainty"
+msgstr "Archaeological certainty"
+
+#: eamena/templates/map/resource-popup.htm:24
+#: eamena/templates/map/resource-popup.htm:33
+msgid "Location certainty"
+msgstr "Location certainty"
+
+#: eamena/templates/map/resource-popup.htm:27
+#: eamena/templates/map/resource-popup.htm:36
+#: eamena/templates/views/reports/sections/SITE_FUNCTION_TYPE.htm:6
+msgid "Site function(s)"
+msgstr "Site function(s)"
+
+#: eamena/templates/map/resource-popup.htm:40
+msgid "Activity Type"
+msgstr "Activity Type"
+
+#: eamena/templates/map/resource-popup.htm:43
+#: eamena/templates/map/resource-popup.htm:51
+msgid "Start of Occurrence"
+msgstr "Start of Occurrence"
+
+#: eamena/templates/map/resource-popup.htm:46
+#: eamena/templates/map/resource-popup.htm:54
+msgid "End of Occurrence"
+msgstr "End of Occurrence"
+
+#: eamena/templates/map/resource-popup.htm:58
+msgid "Person/Organization Name"
+msgstr "Person/Organization Name"
+
+#: eamena/templates/map/resource-popup.htm:61
+msgid "Birth Date/Start of Existence"
+msgstr "Birth Date/Start of Existence"
+
+#: eamena/templates/map/resource-popup.htm:64
+msgid "Death Date/End of Existence"
+msgstr "Death Date/End of Existence"
+
+#: eamena/templates/map/resource-popup.htm:68
+msgid "Information Resource Type"
+msgstr "Information Resource Type"
+
+#: eamena/templates/map/resource-popup.htm:71
+msgid "Date of Creation"
+msgstr "Date of Creation"
+
+#: eamena/templates/map/resource-popup.htm:74
+#: eamena/templates/views/forms/imageryold.htm:395
+msgid "Date of Publication"
+msgstr "Date of Publication"
+
+#: eamena/templates/views/forms/activity-actions.htm:32
+msgid "activity type"
+msgstr "activity type"
+
+#: eamena/templates/views/forms/activity-actions.htm:37
+msgid "start (yyyy-mm-dd)"
+msgstr "start (yyyy-mm-dd)"
+
+#: eamena/templates/views/forms/activity-actions.htm:44
+msgid "end (yyyy-mm-dd)"
+msgstr "end (yyyy-mm-dd)"
+
+#: eamena/templates/views/forms/activity-actions.htm:60
+msgid "start action"
+msgstr "start action"
+
+#: eamena/templates/views/forms/activity-actions.htm:65
+msgid "start date"
+msgstr "start date"
+
+#: eamena/templates/views/forms/activity-actions.htm:72
+msgid "end date"
+msgstr "end date"
+
+#: eamena/templates/views/forms/activity-actions.htm:105
+msgid "No Actions Defined"
+msgstr "No Actions Defined"
+
+#: eamena/templates/views/forms/activity-actions.htm:111
+msgid "Activity type"
+msgstr "Activity type"
+
+#: eamena/templates/views/forms/activity-actions.htm:112
+msgid "Start Date"
+msgstr "Start Date"
+
+#: eamena/templates/views/forms/activity-actions.htm:113
+msgid "End Date"
+msgstr "End Date"
+
+#: eamena/templates/views/forms/activity-summary.htm:18
+#: eamena/templates/views/forms/actor-summary.htm:16
+#: eamena/templates/views/forms/historical-event-summary.htm:18
+#: eamena/templates/views/reports/sections/NAME.E41.htm:6
+msgid "Names"
+msgstr "Names"
+
+#: eamena/templates/views/forms/activity-summary.htm:64
+#: eamena/templates/views/forms/externals.htm:53
+#: eamena/templates/views/forms/externals.htm:136
+#: eamena/templates/views/forms/historical-event-summary.htm:64
+#: eamena/templates/views/forms/location.htm:267
+#: eamena/templates/views/forms/summary.htm:134
+msgid ""
+"The name value must be populated. A resource can only have one primary name."
+msgstr ""
+"The name value must be populated. A resource can only have one primary name."
+
+#: eamena/templates/views/forms/activity-summary.htm:80
+#: eamena/templates/views/forms/externals.htm:69
+#: eamena/templates/views/forms/externals.htm:152
+#: eamena/templates/views/forms/historical-event-summary.htm:80
+#: eamena/templates/views/forms/summary.htm:150
+msgid "This resource has these names:"
+msgstr "This resource has these names:"
+
+#: eamena/templates/views/forms/activity-summary.htm:84
+#: eamena/templates/views/forms/actor-summary.htm:85
+#: eamena/templates/views/forms/externals.htm:73
+#: eamena/templates/views/forms/externals.htm:156
+#: eamena/templates/views/forms/historical-event-summary.htm:84
+#: eamena/templates/views/forms/summary.htm:154
+msgid "No Names Defined"
+msgstr "No Names Defined"
+
+#: eamena/templates/views/forms/activity-summary.htm:89
+#: eamena/templates/views/forms/externals.htm:78
+#: eamena/templates/views/forms/externals.htm:161
+#: eamena/templates/views/forms/historical-event-summary.htm:89
+#: eamena/templates/views/forms/location.htm:292
+#: eamena/templates/views/forms/summary.htm:76
+#: eamena/templates/views/forms/summary.htm:159
+#: eamena/templates/views/forms/summary.htm:632
+msgid "Edit this name"
+msgstr "Edit this name"
+
+#: eamena/templates/views/forms/activity-summary.htm:134
+#: eamena/templates/views/forms/activity-summary.htm:146
+#: eamena/templates/views/forms/activity-summary.htm:231
+#: eamena/templates/views/forms/activity-summary.htm:243
+#: eamena/templates/views/forms/cartography.htm:682
+#: eamena/templates/views/forms/cartography.htm:689
+#: eamena/templates/views/forms/cartography.htm:768
+#: eamena/templates/views/forms/cartography.htm:775
+#: eamena/templates/views/forms/historical-event-summary.htm:134
+#: eamena/templates/views/forms/historical-event-summary.htm:146
+#: eamena/templates/views/forms/historical-event-summary.htm:231
+#: eamena/templates/views/forms/historical-event-summary.htm:243
+#: eamena/templates/views/forms/imagery.htm:685
+#: eamena/templates/views/forms/imagery.htm:692
+#: eamena/templates/views/forms/imagery.htm:771
+#: eamena/templates/views/forms/imagery.htm:778
+#: eamena/templates/views/forms/publication.htm:135
+#: eamena/templates/views/forms/publication.htm:142
+#: eamena/templates/views/forms/shareddata.htm:238
+#: eamena/templates/views/forms/shareddata.htm:245
+msgid "yyyy-mm-dd"
+msgstr "yyyy-mm-dd"
+
+#: eamena/templates/views/forms/activity-summary.htm:161
+#: eamena/templates/views/forms/activity-summary.htm:257
+#: eamena/templates/views/forms/cartography.htm:704
+#: eamena/templates/views/forms/cartography.htm:790
+#: eamena/templates/views/forms/historical-event-summary.htm:161
+#: eamena/templates/views/forms/historical-event-summary.htm:257
+#: eamena/templates/views/forms/imagery.htm:707
+#: eamena/templates/views/forms/imagery.htm:793
+#: eamena/templates/views/forms/publication.htm:157
+#: eamena/templates/views/forms/shareddata.htm:260
+msgid "The date and type values must be populated."
+msgstr "The date and type values must be populated."
+
+#: eamena/templates/views/forms/activity-summary.htm:177
+#: eamena/templates/views/forms/activity-summary.htm:273
+#: eamena/templates/views/forms/cartography.htm:720
+#: eamena/templates/views/forms/cartography.htm:806
+#: eamena/templates/views/forms/historical-event-summary.htm:177
+#: eamena/templates/views/forms/historical-event-summary.htm:273
+#: eamena/templates/views/forms/imagery.htm:723
+#: eamena/templates/views/forms/imagery.htm:809
+#: eamena/templates/views/forms/shareddata.htm:276
+msgid "These dates are associated with this resource:"
+msgstr "These dates are associated with this resource:"
+
+#: eamena/templates/views/forms/activity-summary.htm:181
+#: eamena/templates/views/forms/activity-summary.htm:277
+#: eamena/templates/views/forms/cartography.htm:724
+#: eamena/templates/views/forms/cartography.htm:810
+#: eamena/templates/views/forms/historical-event-summary.htm:181
+#: eamena/templates/views/forms/historical-event-summary.htm:277
+#: eamena/templates/views/forms/imagery.htm:727
+#: eamena/templates/views/forms/imagery.htm:813
+#: eamena/templates/views/forms/publication.htm:177
+#: eamena/templates/views/forms/shareddata.htm:280
+msgid "No Dates Defined"
+msgstr "No Dates Defined"
+
+#: eamena/templates/views/forms/activity-summary.htm:186
+#: eamena/templates/views/forms/activity-summary.htm:282
+#: eamena/templates/views/forms/cartography.htm:729
+#: eamena/templates/views/forms/cartography.htm:815
+#: eamena/templates/views/forms/historical-event-summary.htm:186
+#: eamena/templates/views/forms/historical-event-summary.htm:282
+#: eamena/templates/views/forms/imagery.htm:732
+#: eamena/templates/views/forms/imagery.htm:818
+#: eamena/templates/views/forms/publication.htm:182
+#: eamena/templates/views/forms/shareddata.htm:285
+#: eamena/templates/views/search/time-filter.htm:101
+msgid "Edit this date"
+msgstr "Edit this date"
+
+#: eamena/templates/views/forms/activity-summary.htm:307
+#: eamena/templates/views/forms/actor-summary.htm:418
+#: eamena/templates/views/forms/externals.htm:185
+#: eamena/templates/views/forms/historical-event-summary.htm:307
+#: eamena/templates/views/forms/imageryold.htm:475
+#: eamena/templates/views/forms/publication.htm:1110
+msgid "Keywords"
+msgstr "Keywords"
+
+#: eamena/templates/views/forms/activity-summary.htm:332
+#: eamena/templates/views/forms/historical-event-summary.htm:332
+msgid "The subject must be populated."
+msgstr "The subject must be populated."
+
+#: eamena/templates/views/forms/activity-summary.htm:348
+#: eamena/templates/views/forms/historical-event-summary.htm:348
+msgid "These subjects are associated with this resource:"
+msgstr "These subjects are associated with this resource:"
+
+#: eamena/templates/views/forms/activity-summary.htm:351
+#: eamena/templates/views/forms/historical-event-summary.htm:351
+msgid "No Subjects Defined"
+msgstr "No Subjects Defined"
+
+#: eamena/templates/views/forms/activity-summary.htm:356
+#: eamena/templates/views/forms/historical-event-summary.htm:356
+msgid "Edit this subject"
+msgstr "Edit this subject"
+
+#: eamena/templates/views/forms/actor-summary.htm:29
+#: eamena/templates/views/forms/actor-summary.htm:48
+#: eamena/templates/views/forms/externals.htm:27
+#: eamena/templates/views/forms/externals.htm:36
+#: eamena/templates/views/forms/externals.htm:110
+#: eamena/templates/views/forms/externals.htm:119
+#: eamena/templates/views/forms/summary.htm:108
+#: eamena/templates/views/forms/summary.htm:117
+msgid "Name"
+msgstr "Name"
+
+#: eamena/templates/views/forms/actor-summary.htm:31
+#: eamena/templates/views/forms/actor-summary.htm:53
+#: eamena/templates/views/forms/actor-summary.htm:143
+#: eamena/templates/views/forms/actor-summary.htm:225
+#: eamena/templates/views/forms/actor-summary.htm:248
+#: eamena/templates/views/forms/actor-summary.htm:331
+#: eamena/templates/views/forms/actor-summary.htm:355
+#: eamena/templates/views/forms/class.htm:24
+#: eamena/templates/views/forms/designation.htm:27
+#: eamena/templates/views/forms/designation.htm:59
+#: eamena/templates/views/forms/externals.htm:28
+#: eamena/templates/views/forms/externals.htm:39
+#: eamena/templates/views/forms/externals.htm:111
+#: eamena/templates/views/forms/externals.htm:122
+#: eamena/templates/views/forms/externals.htm:196
+#: eamena/templates/views/forms/externals.htm:205
+#: eamena/templates/views/forms/imagery.htm:591
+#: eamena/templates/views/forms/imagery.htm:603
+#: eamena/templates/views/forms/imagery.htm:856
+#: eamena/templates/views/forms/imageryold.htm:30
+#: eamena/templates/views/forms/imageryold.htm:42
+#: eamena/templates/views/forms/imageryold.htm:560
+#: eamena/templates/views/forms/imageryold.htm:572
+#: eamena/templates/views/forms/information-resource-summary.htm:33
+#: eamena/templates/views/forms/information-resource-summary.htm:45
+#: eamena/templates/views/forms/measurement.htm:24
+#: eamena/templates/views/forms/measurement.htm:87
+#: eamena/templates/views/forms/measurement.htm:196
+#: eamena/templates/views/forms/measurement.htm:309
+#: eamena/templates/views/forms/measurementvalues.htm:23
+#: eamena/templates/views/forms/phase.htm:26
+#: eamena/templates/views/forms/related-files.htm:520
+#: eamena/templates/views/forms/roles.htm:26
+#: eamena/templates/views/forms/roles.htm:71
+#: eamena/templates/views/forms/summary.htm:109
+#: eamena/templates/views/forms/summary.htm:120
+#: eamena/templates/views/forms/summary.htm:189
+#: eamena/templates/views/reports/ACTIVITY.E7.htm:248
+#: eamena/templates/views/reports/HISTORICAL_EVENT.E5.htm:248
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:422
+#: eamena/templates/views/reports/sections/designation_section.htm:60
+#: eamena/templates/views/reports/sections/heritage_resource_phase_type_assignment.htm:26
+msgid "Type"
+msgstr "Type"
+
+#: eamena/templates/views/forms/actor-summary.htm:67
+msgid "The name and name type values must be populated."
+msgstr "The name and name type values must be populated."
+
+#: eamena/templates/views/forms/actor-summary.htm:81
+msgid "This resource has the following names:"
+msgstr "This resource has the following names:"
+
+#: eamena/templates/views/forms/actor-summary.htm:89
+#: eamena/templates/views/forms/externals.htm:77
+#: eamena/templates/views/forms/externals.htm:160
+#: eamena/templates/views/forms/location.htm:291
+#: eamena/templates/views/forms/summary.htm:75
+#: eamena/templates/views/forms/summary.htm:158
+#: eamena/templates/views/forms/summary.htm:631
+msgid "Delete this name"
+msgstr "Delete this name"
+
+#: eamena/templates/views/forms/actor-summary.htm:116
+msgid "Epithets"
+msgstr "Epithets"
+
+#: eamena/templates/views/forms/actor-summary.htm:127
+#: eamena/templates/views/reports/ACTOR.E39.htm:175
+msgid "Epithet"
+msgstr "Epithet"
+
+#: eamena/templates/views/forms/actor-summary.htm:158
+msgid "An epithet value must be populated."
+msgstr "An epithet value must be populated."
+
+#: eamena/templates/views/forms/actor-summary.htm:172
+msgid "This actor has the following epithets:"
+msgstr "This actor has the following epithets:"
+
+#: eamena/templates/views/forms/actor-summary.htm:176
+msgid "No Epithets Recorded"
+msgstr "No Epithets Recorded"
+
+#: eamena/templates/views/forms/actor-summary.htm:180
+msgid "Delete this epithet"
+msgstr "Delete this epithet"
+
+#: eamena/templates/views/forms/actor-summary.htm:181
+msgid "Edit this epithet"
+msgstr "Edit this epithet"
+
+#: eamena/templates/views/forms/actor-summary.htm:208
+msgid "Significant Beginning Dates"
+msgstr "Significant Beginning Dates"
+
+#: eamena/templates/views/forms/actor-summary.htm:220
+#: eamena/templates/views/forms/actor-summary.htm:242
+#: eamena/templates/views/forms/actor-summary.htm:326
+#: eamena/templates/views/forms/actor-summary.htm:349
+#: eamena/templates/views/forms/summary.htm:596
+msgid "Date (yyyy-mm-dd)"
+msgstr "Date (yyyy-mm-dd)"
+
+#: eamena/templates/views/forms/actor-summary.htm:263
+msgid "The begin and begin type values must be populated."
+msgstr "The begin and begin type values must be populated."
+
+#: eamena/templates/views/forms/actor-summary.htm:277
+msgid "This actor has the following beginning dates:"
+msgstr "This actor has the following beginning dates:"
+
+#: eamena/templates/views/forms/actor-summary.htm:281
+msgid "No Beginning Dates Defined"
+msgstr "No Beginning Dates Defined"
+
+#: eamena/templates/views/forms/actor-summary.htm:285
+msgid "Delete this beginning date"
+msgstr "Delete this beginning date"
+
+#: eamena/templates/views/forms/actor-summary.htm:286
+msgid "Edit this begin date"
+msgstr "Edit this begin date"
+
+#: eamena/templates/views/forms/actor-summary.htm:314
+msgid "Significant Ending Dates"
+msgstr "Significant Ending Dates"
+
+#: eamena/templates/views/forms/actor-summary.htm:368
+msgid "The end and end type values must be populated."
+msgstr "The end and end type values must be populated."
+
+#: eamena/templates/views/forms/actor-summary.htm:382
+msgid "This actor has the following ending dates:"
+msgstr "This actor has the following ending dates:"
+
+#: eamena/templates/views/forms/actor-summary.htm:386
+msgid "No Ending Dates Defined"
+msgstr "No Ending Dates Defined"
+
+#: eamena/templates/views/forms/actor-summary.htm:390
+msgid "Delete this ending date"
+msgstr "Delete this ending date"
+
+#: eamena/templates/views/forms/actor-summary.htm:391
+msgid "Edit this ending date"
+msgstr "Edit this ending date"
+
+#: eamena/templates/views/forms/actor-summary.htm:428
+#: eamena/templates/views/forms/actor-summary.htm:445
+#: eamena/templates/views/forms/imageryold.htm:482
+#: eamena/templates/views/forms/imageryold.htm:490
+#: eamena/templates/views/forms/publication.htm:1117
+#: eamena/templates/views/forms/publication.htm:1125
+msgid "Keyword"
+msgstr "Keyword"
+
+#: eamena/templates/views/forms/actor-summary.htm:459
+msgid "A keyword value must be populated."
+msgstr "A keyword value must be populated."
+
+#: eamena/templates/views/forms/actor-summary.htm:473
+msgid "This actor has the following keywords:"
+msgstr "This actor has the following keywords:"
+
+#: eamena/templates/views/forms/actor-summary.htm:477
+#: eamena/templates/views/forms/imageryold.htm:519
+#: eamena/templates/views/forms/publication.htm:1154
+msgid "No Keywords Defined"
+msgstr "No Keywords Defined"
+
+#: eamena/templates/views/forms/actor-summary.htm:481
+#: eamena/templates/views/forms/imageryold.htm:523
+#: eamena/templates/views/forms/publication.htm:1158
+#: eamena/templates/views/forms/summary.htm:292
+#: eamena/templates/views/forms/summary.htm:359
+#: eamena/templates/views/forms/summary.htm:426
+msgid "Delete this keyword"
+msgstr "Delete this keyword"
+
+#: eamena/templates/views/forms/actor-summary.htm:482
+#: eamena/templates/views/forms/imageryold.htm:524
+#: eamena/templates/views/forms/publication.htm:1159
+#: eamena/templates/views/forms/summary.htm:293
+#: eamena/templates/views/forms/summary.htm:360
+#: eamena/templates/views/forms/summary.htm:427
+msgid "Edit this keyword"
+msgstr "Edit this keyword"
+
+#: eamena/templates/views/forms/cartography.htm:30
+#: eamena/templates/views/forms/cartography.htm:42
+#: eamena/templates/views/forms/imagery.htm:133
+#: eamena/templates/views/forms/imagery.htm:145
+#: eamena/templates/views/forms/publication.htm:416
+#: eamena/templates/views/forms/publication.htm:433
+#: eamena/templates/views/forms/shareddata.htm:38
+#: eamena/templates/views/forms/shareddata.htm:55
+msgid "Source"
+msgstr "Source"
+
+#: eamena/templates/views/forms/cartography.htm:57
+#: eamena/templates/views/forms/cartography.htm:146
+#: eamena/templates/views/forms/cartography.htm:234
+#: eamena/templates/views/forms/imagery.htm:160
+#: eamena/templates/views/forms/imagery.htm:618
+#: eamena/templates/views/forms/imagery.htm:883
+#: eamena/templates/views/forms/imageryold.htm:57
+#: eamena/templates/views/forms/imageryold.htm:587
+#: eamena/templates/views/forms/information-resource-summary.htm:60
+msgid "A right type must be selected."
+msgstr "A right type must be selected."
+
+#: eamena/templates/views/forms/cartography.htm:73
+#: eamena/templates/views/forms/imagery.htm:176
+#: eamena/templates/views/forms/imageryold.htm:73
+#: eamena/templates/views/forms/information-resource-summary.htm:76
+msgid "These types are associated with this resource:"
+msgstr "These types are associated with this resource:"
+
+#: eamena/templates/views/forms/cartography.htm:77
+#: eamena/templates/views/forms/cartography.htm:166
+#: eamena/templates/views/forms/cartography.htm:254
+#: eamena/templates/views/forms/imagery.htm:180
+#: eamena/templates/views/forms/imagery.htm:638
+#: eamena/templates/views/forms/imageryold.htm:77
+#: eamena/templates/views/forms/imageryold.htm:607
+#: eamena/templates/views/forms/information-resource-summary.htm:80
+msgid "No Rights Defined"
+msgstr "No Rights Defined"
+
+#: eamena/templates/views/forms/cartography.htm:80
+#: eamena/templates/views/forms/cartography.htm:169
+#: eamena/templates/views/forms/cartography.htm:257
+#: eamena/templates/views/forms/imagery.htm:183
+#: eamena/templates/views/forms/imagery.htm:641
+#: eamena/templates/views/forms/imageryold.htm:80
+#: eamena/templates/views/forms/imageryold.htm:610
+#: eamena/templates/views/forms/information-resource-summary.htm:83
+msgid "Delete this right"
+msgstr "Delete this right"
+
+#: eamena/templates/views/forms/cartography.htm:81
+#: eamena/templates/views/forms/cartography.htm:170
+#: eamena/templates/views/forms/cartography.htm:258
+#: eamena/templates/views/forms/imagery.htm:184
+#: eamena/templates/views/forms/imagery.htm:642
+#: eamena/templates/views/forms/imageryold.htm:81
+#: eamena/templates/views/forms/imageryold.htm:611
+#: eamena/templates/views/forms/information-resource-summary.htm:84
+msgid "Edit this right"
+msgstr "Edit this right"
+
+#: eamena/templates/views/forms/cartography.htm:119
+#: eamena/templates/views/forms/cartography.htm:131
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:448
+msgid "Creator"
+msgstr "Creator"
+
+#: eamena/templates/views/forms/cartography.htm:162
+msgid "This creator is associated with this resource:"
+msgstr "This creator is associated with this resource:"
+
+#: eamena/templates/views/forms/cartography.htm:207
+#: eamena/templates/views/forms/cartography.htm:219
+msgid "Series"
+msgstr "Series"
+
+#: eamena/templates/views/forms/cartography.htm:250
+msgid "This series is associated with this resource:"
+msgstr "This series is associated with this resource:"
+
+#: eamena/templates/views/forms/cartography.htm:301
+#: eamena/templates/views/forms/cartography.htm:318
+#: eamena/templates/views/forms/imagery.htm:332
+#: eamena/templates/views/forms/imagery.htm:349
+#: eamena/templates/views/forms/publication.htm:535
+msgid "Place"
+msgstr "Place"
+
+#: eamena/templates/views/forms/cartography.htm:334
+#: eamena/templates/views/forms/cartography.htm:514
+#: eamena/templates/views/forms/cartography.htm:617
+#: eamena/templates/views/forms/imagery.htm:69
+#: eamena/templates/views/forms/imagery.htm:261
+#: eamena/templates/views/forms/imagery.htm:365
+#: eamena/templates/views/forms/imagery.htm:983
+#: eamena/templates/views/forms/imageryold.htm:246
+#: eamena/templates/views/forms/publication.htm:69
+#: eamena/templates/views/forms/publication.htm:347
+#: eamena/templates/views/forms/publication.htm:449
+#: eamena/templates/views/forms/publication.htm:551
+#: eamena/templates/views/forms/publication.htm:653
+#: eamena/templates/views/forms/publication.htm:755
+#: eamena/templates/views/forms/publication.htm:857
+#: eamena/templates/views/forms/publication.htm:959
+#: eamena/templates/views/forms/publication.htm:1061
+#: eamena/templates/views/forms/shareddata.htm:71
+#: eamena/templates/views/forms/shareddata.htm:173
+msgid "The resource type value must be populated."
+msgstr "The resource type value must be populated."
+
+#: eamena/templates/views/forms/cartography.htm:354
+#: eamena/templates/views/forms/cartography.htm:534
+#: eamena/templates/views/forms/imagery.htm:281
+msgid "No Creators(s) Defined"
+msgstr "No Creators(s) Defined"
+
+#: eamena/templates/views/forms/cartography.htm:357
+#: eamena/templates/views/forms/cartography.htm:537
+#: eamena/templates/views/forms/imagery.htm:92
+#: eamena/templates/views/forms/imagery.htm:284
+#: eamena/templates/views/forms/imageryold.htm:269
+#: eamena/templates/views/forms/imageryold.htm:438
+#: eamena/templates/views/forms/publication.htm:92
+#: eamena/templates/views/forms/publication.htm:370
+#: eamena/templates/views/forms/publication.htm:778
+#: eamena/templates/views/forms/shareddata.htm:94
+msgid "Delete this publisher/date"
+msgstr "Delete this publisher/date"
+
+#: eamena/templates/views/forms/cartography.htm:358
+#: eamena/templates/views/forms/cartography.htm:641
+#: eamena/templates/views/forms/imagery.htm:93
+#: eamena/templates/views/forms/imagery.htm:285
+#: eamena/templates/views/forms/imageryold.htm:270
+#: eamena/templates/views/forms/imageryold.htm:439
+#: eamena/templates/views/forms/publication.htm:93
+#: eamena/templates/views/forms/publication.htm:371
+#: eamena/templates/views/forms/publication.htm:779
+#: eamena/templates/views/forms/shareddata.htm:95
+#: eamena/templates/views/forms/shareddata.htm:197
+msgid "Edit this publisher/date"
+msgstr "Edit this publisher/date"
+
+#: eamena/templates/views/forms/cartography.htm:360
+#: eamena/templates/views/forms/imagery.htm:287
+#: eamena/templates/views/forms/publication.htm:95
+msgid "author"
+msgstr "author"
+
+#: eamena/templates/views/forms/cartography.htm:384
+#: eamena/templates/views/forms/cartography.htm:391
+#: eamena/templates/views/forms/cartography.htm:399
+msgid "Scale"
+msgstr "Scale"
+
+#: eamena/templates/views/forms/cartography.htm:409
+#: eamena/templates/views/forms/imagery.htm:531
+#: eamena/templates/views/forms/imageryold.htm:500
+#: eamena/templates/views/forms/publication.htm:1135
+msgid "The Keyword must be populated."
+msgstr "The Keyword must be populated."
+
+#: eamena/templates/views/forms/cartography.htm:425
+msgid "This scale is associated with this resource:"
+msgstr "This scale is associated with this resource:"
+
+#: eamena/templates/views/forms/cartography.htm:428
+msgid "No Scale Defined"
+msgstr "No Scale Defined"
+
+#: eamena/templates/views/forms/cartography.htm:432
+msgid "Delete this scale"
+msgstr "Delete this scale"
+
+#: eamena/templates/views/forms/cartography.htm:433
+msgid "Edit this scale "
+msgstr "Edit this scale "
+
+#: eamena/templates/views/forms/cartography.htm:481
+#: eamena/templates/views/forms/cartography.htm:498
+msgid "Tile square details"
+msgstr "Tile square details"
+
+#: eamena/templates/views/forms/cartography.htm:538
+msgid "Edit this tile square"
+msgstr "Edit this tile square"
+
+#: eamena/templates/views/forms/cartography.htm:540
+msgid "tile square details"
+msgstr "tile square details"
+
+#: eamena/templates/views/forms/cartography.htm:584
+msgid "Tile square name"
+msgstr "Tile square name"
+
+#: eamena/templates/views/forms/cartography.htm:601
+#: eamena/templates/views/forms/imagery.htm:53
+#: eamena/templates/views/forms/publication.htm:331
+#: eamena/templates/views/forms/shareddata.htm:157
+msgid "Editors"
+msgstr "Editors"
+
+#: eamena/templates/views/forms/cartography.htm:637
+msgid "No Tile Square Defined"
+msgstr "No Tile Square Defined"
+
+#: eamena/templates/views/forms/cartography.htm:640
+msgid "Delete this tile square"
+msgstr "Delete this tile square"
+
+#: eamena/templates/views/forms/cartography.htm:643
+msgid "tile square"
+msgstr "tile square"
+
+#: eamena/templates/views/forms/class.htm:14
+msgid "Feature Form "
+msgstr "Feature Form "
+
+#: eamena/templates/views/forms/class.htm:27
+msgid "Type certainty"
+msgstr "Type certainty"
+
+#: eamena/templates/views/forms/class.htm:34
+#: eamena/templates/views/forms/summary.htm:323
+#: eamena/templates/views/forms/summary.htm:325
+msgid "Shape"
+msgstr "Shape"
+
+#: eamena/templates/views/forms/class.htm:37
+msgid "Arrangement"
+msgstr "Arrangement"
+
+#: eamena/templates/views/forms/class.htm:46
+msgid "Number"
+msgstr "Number"
+
+#: eamena/templates/views/forms/class.htm:71
+msgid "Feature form(s) recorded:"
+msgstr "Feature form(s) recorded:"
+
+#: eamena/templates/views/forms/class.htm:75
+#: eamena/templates/views/forms/class.htm:154
+#: eamena/templates/views/forms/imagery.htm:474
+msgid "No Values Defined"
+msgstr "No Values Defined"
+
+#: eamena/templates/views/forms/class.htm:79
+#: eamena/templates/views/forms/class.htm:158
+#: eamena/templates/views/forms/imagery.htm:478
+#: eamena/templates/views/forms/measurement.htm:56
+#: eamena/templates/views/forms/measurement.htm:119
+#: eamena/templates/views/forms/measurement.htm:253
+#: eamena/templates/views/forms/measurement.htm:342
+#: eamena/templates/views/forms/measurementvalues.htm:60
+#: eamena/templates/views/forms/summary.htm:223
+#: eamena/templates/views/forms/summary.htm:492
+#: eamena/templates/views/forms/summary.htm:555
+msgid "Delete this measurement"
+msgstr "Delete this measurement"
+
+#: eamena/templates/views/forms/class.htm:81
+msgid "Feature type"
+msgstr "Feature type"
+
+#: eamena/templates/views/forms/class.htm:81
+msgid " type certainty "
+msgstr " type certainty "
+
+#: eamena/templates/views/forms/class.htm:81
+msgid " shape "
+msgstr " shape "
+
+#: eamena/templates/views/forms/class.htm:82
+msgid " arrangement "
+msgstr " arrangement "
+
+#: eamena/templates/views/forms/class.htm:83
+msgid " number type "
+msgstr " number type "
+
+#: eamena/templates/views/forms/class.htm:103
+msgid "Feature Interpretation "
+msgstr "Feature Interpretation "
+
+#: eamena/templates/views/forms/class.htm:114
+msgid "Interpretation"
+msgstr "Interpretation"
+
+#: eamena/templates/views/forms/class.htm:118
+msgid "Interpretation certainty"
+msgstr "Interpretation certainty"
+
+#: eamena/templates/views/forms/class.htm:126
+msgid "Interpretation number"
+msgstr "Interpretation number"
+
+#: eamena/templates/views/forms/class.htm:150
+msgid "Feature interpretation(s) recorded:"
+msgstr "Feature interpretation(s) recorded:"
+
+#: eamena/templates/views/forms/class.htm:160
+msgid " interpretation type "
+msgstr " interpretation type "
+
+#: eamena/templates/views/forms/class.htm:161
+msgid " intepretation certainty "
+msgstr " intepretation certainty "
+
+#: eamena/templates/views/forms/class.htm:162
+msgid " interpretation number type "
+msgstr " interpretation number type "
+
+#: eamena/templates/views/forms/component.htm:35
+#: eamena/templates/views/forms/component.htm:54
+msgid "component"
+msgstr "component"
+
+#: eamena/templates/views/forms/component.htm:37
+#: eamena/templates/views/forms/component.htm:56
+msgid "style"
+msgstr "style"
+
+#: eamena/templates/views/forms/component.htm:39
+#: eamena/templates/views/forms/component.htm:58
+msgid "material"
+msgstr "material"
+
+#: eamena/templates/views/forms/component.htm:88
+msgid "No Components Defined"
+msgstr "No Components Defined"
+
+#: eamena/templates/views/forms/component.htm:94
+#: eamena/templates/views/reports/sections/COMPONENT.E18.htm:26
+msgid "Component"
+msgstr "Component"
+
+#: eamena/templates/views/forms/component.htm:95
+#: eamena/templates/views/reports/sections/heritage_resource_phase_type_assignment.htm:59
+msgid "Style"
+msgstr "Style"
+
+#: eamena/templates/views/forms/component.htm:96
+#: eamena/templates/views/reports/sections/COMPONENT.E18.htm:56
+msgid "Material"
+msgstr "Material"
+
+#: eamena/templates/views/forms/component.htm:188
+msgid "This resource has these modifications:"
+msgstr "This resource has these modifications:"
+
+#: eamena/templates/views/forms/component.htm:192
+msgid "No Modifications Defined"
+msgstr "No Modifications Defined"
+
+#: eamena/templates/views/forms/component.htm:200
+msgid "Edit this description"
+msgstr "Edit this description"
+
+#: eamena/templates/views/forms/coverage.htm:17
+#: eamena/templates/views/forms/location.htm:20
+msgid "Mapped Locations"
+msgstr "Mapped Locations"
+
+#: eamena/templates/views/forms/coverage.htm:50
+#: eamena/templates/views/forms/coverage.htm:175
+#: eamena/templates/views/forms/location.htm:53
+#: eamena/templates/views/forms/location.htm:178
+#: eamena/templates/views/reports/ACTIVITY.E7.htm:51
+#: eamena/templates/views/reports/ACTIVITY.E7.htm:90
+#: eamena/templates/views/reports/ACTOR.E39.htm:51
+#: eamena/templates/views/reports/ACTOR.E39.htm:90
+#: eamena/templates/views/reports/HERITAGE_RESOURCE.E18.htm:51
+#: eamena/templates/views/reports/HERITAGE_RESOURCE.E18.htm:90
+#: eamena/templates/views/reports/HERITAGE_RESOURCE_GROUP.E27.htm:52
+#: eamena/templates/views/reports/HERITAGE_RESOURCE_GROUP.E27.htm:91
+#: eamena/templates/views/reports/HISTORICAL_EVENT.E5.htm:51
+#: eamena/templates/views/reports/HISTORICAL_EVENT.E5.htm:90
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:51
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:90
+#: eamena/templates/views/search/map-filter.htm:59
+#: eamena/templates/views/search/map-filter.htm:196
+msgid "Basemaps"
+msgstr "Basemaps"
+
+#: eamena/templates/views/forms/coverage.htm:97
+#: eamena/templates/views/forms/location.htm:100
+msgid "Geometry Tools"
+msgstr "Geometry Tools"
+
+#: eamena/templates/views/forms/coverage.htm:115
+#: eamena/templates/views/forms/location.htm:118
+msgid "Draw new point"
+msgstr "Draw new point"
+
+#: eamena/templates/views/forms/coverage.htm:125
+#: eamena/templates/views/forms/location.htm:128
+msgid "Draw new line"
+msgstr "Draw new line"
+
+#: eamena/templates/views/forms/coverage.htm:135
+#: eamena/templates/views/forms/location.htm:138
+msgid "Draw new polygon"
+msgstr "Draw new polygon"
+
+#: eamena/templates/views/forms/coverage.htm:145
+#: eamena/templates/views/forms/location.htm:148
+msgid "Add from gpx, kml, or geojson"
+msgstr "Add from gpx, kml, or geojson"
+
+#: eamena/templates/views/forms/coverage.htm:152
+#: eamena/templates/views/forms/location.htm:155
+msgid "(or drag and drop the file onto the map)"
+msgstr "(or drag and drop the file onto the map)"
+
+#: eamena/templates/views/forms/coverage.htm:178
+#: eamena/templates/views/forms/location.htm:181
+msgid "Add Geometry"
+msgstr "Add Geometry"
+
+#: eamena/templates/views/forms/coverage.htm:197
+#: eamena/templates/views/forms/location.htm:200
+msgid "This resource is represented by the following geometries:"
+msgstr "This resource is represented by the following geometries:"
+
+#: eamena/templates/views/forms/coverage.htm:200
+#: eamena/templates/views/forms/location.htm:203
+msgid "No geometries defined"
+msgstr "No geometries defined"
+
+#: eamena/templates/views/forms/designation.htm:32
+#: eamena/templates/views/forms/district_classification.htm:199
+#: eamena/templates/views/forms/measurement.htm:211
+#: eamena/templates/views/forms/related-resources.htm:95
+#: eamena/templates/views/forms/related-resources.htm:338
+msgid "from (yyyy-mm-dd)"
+msgstr "from (yyyy-mm-dd)"
+
+#: eamena/templates/views/forms/designation.htm:39
+#: eamena/templates/views/forms/district_classification.htm:212
+#: eamena/templates/views/forms/measurement.htm:218
+#: eamena/templates/views/forms/related-resources.htm:108
+#: eamena/templates/views/forms/related-resources.htm:351
+msgid "to (yyyy-mm-dd)"
+msgstr "to (yyyy-mm-dd)"
+
+#: eamena/templates/views/forms/designation.htm:101
+msgid "This resource has the following designations:"
+msgstr "This resource has the following designations:"
+
+#: eamena/templates/views/forms/designation.htm:105
+msgid "No Designations Defined"
+msgstr "No Designations Defined"
+
+#: eamena/templates/views/forms/designation.htm:109
+msgid "Delete this designation"
+msgstr "Delete this designation"
+
+#: eamena/templates/views/forms/district_classification.htm:8
+msgid "A type and date must be specified."
+msgstr "A type and date must be specified."
+
+#: eamena/templates/views/forms/district_classification.htm:22
+msgid "Resource Classification"
+msgstr "Resource Classification"
+
+#: eamena/templates/views/forms/district_classification.htm:26
+msgid "Loading ...."
+msgstr "Loading ...."
+
+#: eamena/templates/views/forms/district_classification.htm:47
+#: eamena/templates/views/forms/district_classification.htm:332
+#: eamena/templates/views/reports/ACTOR.E39.htm:280
+#: eamena/templates/views/reports/ACTOR.E39.htm:297
+#: eamena/templates/views/reports/HERITAGE_RESOURCE_GROUP.E27.htm:178
+#: eamena/templates/views/reports/sections/heritage_resource_phase_type_assignment.htm:6
+msgid "Classification"
+msgstr "Classification"
+
+#: eamena/templates/views/forms/district_classification.htm:70
+#: eamena/templates/views/forms/summary.htm:449
+msgid "Cultural Period"
+msgstr "Cultural Period"
+
+#: eamena/templates/views/forms/district_classification.htm:80
+#: eamena/templates/views/reports/sections/TIME_SPANS.htm:20
+msgid "From"
+msgstr "From"
+
+#: eamena/templates/views/forms/district_classification.htm:89
+#: eamena/templates/views/reports/sections/TIME_SPANS.htm:30
+msgid "To"
+msgstr "To"
+
+#: eamena/templates/views/forms/district_classification.htm:100
+#: eamena/templates/views/forms/district_classification.htm:257
+#: eamena/templates/views/reports/sections/ANCILLARY_FEATURE_TYPE.E55.htm:6
+#: eamena/templates/views/reports/sections/heritage_resource_phase_type_assignment.htm:86
+msgid "Related Features"
+msgstr "Related Features"
+
+#: eamena/templates/views/forms/district_classification.htm:137
+msgid "Part 1: Summary"
+msgstr "Part 1: Summary"
+
+#: eamena/templates/views/forms/district_classification.htm:140
+msgid "Part 2: Related Features"
+msgstr "Part 2: Related Features"
+
+#: eamena/templates/views/forms/district_classification.htm:152
+#: eamena/templates/views/forms/related-files.htm:309
+msgid "Part 1"
+msgstr "Part 1"
+
+#: eamena/templates/views/forms/district_classification.htm:152
+msgid "Classification Summary"
+msgstr "Classification Summary"
+
+#: eamena/templates/views/forms/district_classification.htm:156
+msgid ""
+"Start your classification by describing it's type, use and cultural period."
+msgstr ""
+"Start your classification by describing it's type, use and cultural period."
+
+#: eamena/templates/views/forms/district_classification.htm:170
+msgid "morphology"
+msgstr "morphology"
+
+#: eamena/templates/views/forms/district_classification.htm:181
+msgid "use"
+msgstr "use"
+
+#: eamena/templates/views/forms/district_classification.htm:226
+msgid "period"
+msgstr "period"
+
+#: eamena/templates/views/forms/district_classification.htm:244
+#: eamena/templates/views/forms/related-files.htm:321
+msgid "Part 2"
+msgstr "Part 2"
+
+#: eamena/templates/views/forms/district_classification.htm:244
+msgid "Assessment Summary"
+msgstr "Assessment Summary"
+
+#: eamena/templates/views/forms/district_classification.htm:248
+msgid "Select this classification's related features."
+msgstr "Select this classification's related features."
+
+#: eamena/templates/views/forms/district_classification.htm:281
+msgid "No related features selected"
+msgstr "No related features selected"
+
+#: eamena/templates/views/forms/district_classification.htm:286
+#: eamena/templates/views/forms/externals.htm:233
+msgid "Edit this type"
+msgstr "Edit this type"
+
+#: eamena/templates/views/forms/district_classification.htm:329
+msgid "Are you ready to delete this assessment?"
+msgstr "Are you ready to delete this assessment?"
+
+#: eamena/templates/views/forms/district_classification.htm:338
+msgid "No"
+msgstr "No"
+
+#: eamena/templates/views/forms/district_classification.htm:339
+msgid "Yes"
+msgstr "Yes"
+
+#: eamena/templates/views/forms/external-reference.htm:14
+msgid "References"
+msgstr "References"
+
+#: eamena/templates/views/forms/external-reference.htm:29
+#: eamena/templates/views/forms/external-reference.htm:44
+msgid "reference type"
+msgstr "reference type"
+
+#: eamena/templates/views/forms/external-reference.htm:77
+msgid "This resource has the following external system references:"
+msgstr "This resource has the following external system references:"
+
+#: eamena/templates/views/forms/external-reference.htm:81
+msgid "No External System References Defined"
+msgstr "No External System References Defined"
+
+#: eamena/templates/views/forms/external-reference.htm:86
+msgid "Edit this value"
+msgstr "Edit this value"
+
+#: eamena/templates/views/forms/externals.htm:18
+#: eamena/templates/views/forms/externals.htm:101
+msgid "Name(s)"
+msgstr "Name(s)"
+
+#: eamena/templates/views/forms/externals.htm:228
+msgid "No Types Defined"
+msgstr "No Types Defined"
+
+#: eamena/templates/views/forms/externals.htm:232
+msgid "Delete this type"
+msgstr "Delete this type"
+
+#: eamena/templates/views/forms/file-upload.htm:17
+msgid "No file uploaded for this resource yet"
+msgstr "No file uploaded for this resource yet"
+
+#: eamena/templates/views/forms/file-upload.htm:45
+msgid "Delete Image"
+msgstr "Delete Image"
+
+#: eamena/templates/views/forms/file-upload.htm:57
+#: eamena/templates/views/forms/related-files.htm:144
+msgid "Download this file"
+msgstr "Download this file"
+
+#: eamena/templates/views/forms/file-upload.htm:58
+msgid "Delete this file"
+msgstr "Delete this file"
+
+#: eamena/templates/views/forms/file-upload.htm:59
+#: eamena/templates/views/forms/related-files.htm:145
+msgid "format"
+msgstr "format"
+
+#: eamena/templates/views/forms/file-upload.htm:80
+msgid "Delete File"
+msgstr "Delete File"
+
+#: eamena/templates/views/forms/file-upload.htm:95
+msgid "Are you sure you want to delete the file?"
+msgstr "Are you sure you want to delete the file?"
+
+#: eamena/templates/views/forms/file-upload.htm:108
+#: eamena/templates/views/forms/related-files.htm:253
+msgid "Cancel"
+msgstr "Cancel"
+
+#: eamena/templates/views/forms/file-upload.htm:109
+#: eamena/templates/views/forms/related-files.htm:255
+msgid "Delete"
+msgstr "Delete"
+
+#: eamena/templates/views/forms/file-upload.htm:124
+msgid "Only one file allowed"
+msgstr "Only one file allowed"
+
+#: eamena/templates/views/forms/file-upload.htm:139
+msgid "Only one file is allowed to be associated with this resource."
+msgstr "Only one file is allowed to be associated with this resource."
+
+#: eamena/templates/views/forms/file-upload.htm:152
+msgid "OK"
+msgstr "OK"
+
+#: eamena/templates/views/forms/imagery.htm:36
+msgid "Catalog ID"
+msgstr "Catalog ID"
+
+#: eamena/templates/views/forms/imagery.htm:89
+#: eamena/templates/views/forms/imagery.htm:1003
+msgid "No Catalog ID Defined"
+msgstr "No Catalog ID Defined"
+
+#: eamena/templates/views/forms/imagery.htm:95
+#: eamena/templates/views/forms/publication.htm:373
+#: eamena/templates/views/forms/publication.htm:781
+#: eamena/templates/views/forms/publication.htm:1087
+msgid "editor"
+msgstr "editor"
+
+#: eamena/templates/views/forms/imagery.htm:228
+msgid "Creator(s)"
+msgstr "Creator(s)"
+
+#: eamena/templates/views/forms/imagery.htm:245
+msgid "Creators"
+msgstr "Creators"
+
+#: eamena/templates/views/forms/imagery.htm:385
+msgid "No Place Defined"
+msgstr "No Place Defined"
+
+#: eamena/templates/views/forms/imagery.htm:388
+#: eamena/templates/views/forms/publication.htm:574
+msgid "Delete this place"
+msgstr "Delete this place"
+
+#: eamena/templates/views/forms/imagery.htm:389
+#: eamena/templates/views/forms/publication.htm:575
+msgid "Edit this place"
+msgstr "Edit this place"
+
+#: eamena/templates/views/forms/imagery.htm:391
+#: eamena/templates/views/forms/publication.htm:518
+#: eamena/templates/views/forms/publication.htm:577
+msgid "place"
+msgstr "place"
+
+#: eamena/templates/views/forms/imagery.htm:413
+msgid "Imagery Acquisition Details "
+msgstr "Imagery Acquisition Details "
+
+#: eamena/templates/views/forms/imagery.htm:423
+msgid "Platform"
+msgstr "Platform"
+
+#: eamena/templates/views/forms/imagery.htm:426
+msgid "Sensor"
+msgstr "Sensor"
+
+#: eamena/templates/views/forms/imagery.htm:433
+msgid "Bands"
+msgstr "Bands"
+
+#: eamena/templates/views/forms/imagery.htm:436
+msgid "Camera sensor"
+msgstr "Camera sensor"
+
+#: eamena/templates/views/forms/imagery.htm:445
+msgid "Camera sensor resolution"
+msgstr "Camera sensor resolution"
+
+#: eamena/templates/views/forms/imagery.htm:470
+msgid "Imagery Acquisition details recorded:"
+msgstr "Imagery Acquisition details recorded:"
+
+#: eamena/templates/views/forms/imagery.htm:480
+msgid "platform"
+msgstr "platform"
+
+#: eamena/templates/views/forms/imagery.htm:480
+msgid " sensor "
+msgstr " sensor "
+
+#: eamena/templates/views/forms/imagery.htm:480
+msgid "bands"
+msgstr "bands"
+
+#: eamena/templates/views/forms/imagery.htm:481
+msgid " camera sensor "
+msgstr " camera sensor "
+
+#: eamena/templates/views/forms/imagery.htm:482
+msgid " camera sensor resolution "
+msgstr " camera sensor resolution "
+
+#: eamena/templates/views/forms/imagery.htm:506
+#: eamena/templates/views/forms/imagery.htm:513
+#: eamena/templates/views/forms/imagery.htm:521
+msgid "Resolution"
+msgstr "Resolution"
+
+#: eamena/templates/views/forms/imagery.htm:547
+msgid "This resolution is associated with this resource:"
+msgstr "This resolution is associated with this resource:"
+
+#: eamena/templates/views/forms/imagery.htm:550
+msgid "No Resolution Defined"
+msgstr "No Resolution Defined"
+
+#: eamena/templates/views/forms/imagery.htm:554
+msgid "Delete this resolution type"
+msgstr "Delete this resolution type"
+
+#: eamena/templates/views/forms/imagery.htm:555
+msgid "Edit this resolution "
+msgstr "Edit this resolution "
+
+#: eamena/templates/views/forms/imagery.htm:634
+msgid "This processing type is associated with this resource:"
+msgstr "This processing type is associated with this resource:"
+
+#: eamena/templates/views/forms/imagery.htm:868
+msgid "Copyright"
+msgstr "Copyright"
+
+#: eamena/templates/views/forms/imagery.htm:899
+msgid "This copyright is associated with this resource:"
+msgstr "This copyright is associated with this resource:"
+
+#: eamena/templates/views/forms/imagery.htm:903
+msgid "No Copyright Defined"
+msgstr "No Copyright Defined"
+
+#: eamena/templates/views/forms/imagery.htm:906
+msgid "Delete this copyright"
+msgstr "Delete this copyright"
+
+#: eamena/templates/views/forms/imagery.htm:907
+msgid "Edit this copyright"
+msgstr "Edit this copyright"
+
+#: eamena/templates/views/forms/imagery.htm:950
+#: eamena/templates/views/forms/imagery.htm:967
+msgid "Copyright details "
+msgstr "Copyright details "
+
+#: eamena/templates/views/forms/imagery.htm:1006
+#: eamena/templates/views/forms/imagery.htm:1009
+msgid "details"
+msgstr "details"
+
+#: eamena/templates/views/forms/imagery.htm:1007
+msgid "Details"
+msgstr "Details"
+
+#: eamena/templates/views/forms/imageryold.htm:107
+msgid "Resource title"
+msgstr "Resource title"
+
+#: eamena/templates/views/forms/imageryold.htm:116
+#: eamena/templates/views/forms/imageryold.htm:131
+#: eamena/templates/views/forms/publication.htm:207
+#: eamena/templates/views/forms/publication.htm:216
+#: eamena/templates/views/forms/publication.htm:231
+#: eamena/templates/views/forms/related-files.htm:189
+#: eamena/templates/views/forms/related-files.htm:354
+#: eamena/templates/views/forms/related-files.htm:382
+msgid "Title"
+msgstr "Title"
+
+#: eamena/templates/views/forms/imageryold.htm:146
+#: eamena/templates/views/forms/publication.htm:246
+msgid ""
+"The Type value must be populated. A resource can only have one primary name."
+msgstr ""
+"The Type value must be populated. A resource can only have one primary name."
+
+#: eamena/templates/views/forms/imageryold.htm:162
+msgid "This resource has these titles:"
+msgstr "This resource has these titles:"
+
+#: eamena/templates/views/forms/imageryold.htm:166
+#: eamena/templates/views/forms/publication.htm:266
+msgid "No Titles Defined"
+msgstr "No Titles Defined"
+
+#: eamena/templates/views/forms/imageryold.htm:170
+#: eamena/templates/views/forms/publication.htm:270
+msgid "Delete this Title"
+msgstr "Delete this Title"
+
+#: eamena/templates/views/forms/imageryold.htm:171
+#: eamena/templates/views/forms/publication.htm:271
+msgid "Edit this title"
+msgstr "Edit this title"
+
+#: eamena/templates/views/forms/imageryold.htm:213
+#: eamena/templates/views/forms/publication.htm:36
+msgid "Author(s)"
+msgstr "Author(s)"
+
+#: eamena/templates/views/forms/imageryold.htm:230
+#: eamena/templates/views/forms/publication.htm:53
+msgid "Authors"
+msgstr "Authors"
+
+#: eamena/templates/views/forms/imageryold.htm:266
+#: eamena/templates/views/forms/publication.htm:89
+msgid "No Author(s) Defined"
+msgstr "No Author(s) Defined"
+
+#: eamena/templates/views/forms/imageryold.htm:272
+msgid "creator"
+msgstr "creator"
+
+#: eamena/templates/views/forms/imageryold.htm:313
+msgid "Journal/Volume name"
+msgstr "Journal/Volume name"
+
+#: eamena/templates/views/forms/imageryold.htm:318
+msgid "Journal/Volume title"
+msgstr "Journal/Volume title"
+
+#: eamena/templates/views/forms/imageryold.htm:323
+#: eamena/templates/views/forms/imageryold.htm:328
+msgid "Place of publication"
+msgstr "Place of publication"
+
+#: eamena/templates/views/forms/imageryold.htm:334
+#: eamena/templates/views/forms/imageryold.htm:339
+#: eamena/templates/views/forms/imageryold.htm:448
+#: eamena/templates/views/forms/imageryold.htm:449
+#: eamena/templates/views/forms/publication.htm:620
+#: eamena/templates/views/forms/publication.htm:637
+msgid "Publisher"
+msgstr "Publisher"
+
+#: eamena/templates/views/forms/imageryold.htm:345
+#: eamena/templates/views/forms/imageryold.htm:350
+#: eamena/templates/views/forms/imageryold.htm:444
+#: eamena/templates/views/forms/publication.htm:722
+#: eamena/templates/views/forms/publication.htm:739
+msgid "Volume"
+msgstr "Volume"
+
+#: eamena/templates/views/forms/imageryold.htm:357
+#: eamena/templates/views/forms/imageryold.htm:362
+#: eamena/templates/views/forms/imageryold.htm:445
+#: eamena/templates/views/forms/publication.htm:824
+#: eamena/templates/views/forms/publication.htm:841
+msgid "Issue"
+msgstr "Issue"
+
+#: eamena/templates/views/forms/imageryold.htm:369
+#: eamena/templates/views/forms/imageryold.htm:446
+#: eamena/templates/views/forms/publication.htm:926
+#: eamena/templates/views/forms/publication.htm:943
+msgid "Pages"
+msgstr "Pages"
+
+#: eamena/templates/views/forms/imageryold.htm:374
+msgid "Page"
+msgstr "Page"
+
+#: eamena/templates/views/forms/imageryold.htm:381
+#: eamena/templates/views/forms/imageryold.htm:386
+#: eamena/templates/views/forms/imageryold.htm:447
+msgid "Figure/Plate"
+msgstr "Figure/Plate"
+
+#: eamena/templates/views/forms/imageryold.htm:402
+msgid "Creation Date"
+msgstr "Creation Date"
+
+#: eamena/templates/views/forms/imageryold.htm:415
+msgid "The publisher and date values must be populated."
+msgstr "The publisher and date values must be populated."
+
+#: eamena/templates/views/forms/imageryold.htm:431
+msgid "This resource has these publicartion details:"
+msgstr "This resource has these publicartion details:"
+
+#: eamena/templates/views/forms/imageryold.htm:435
+msgid "No Publishers Defined"
+msgstr "No Publishers Defined"
+
+#: eamena/templates/views/forms/imageryold.htm:441
+msgid "Journal/volume"
+msgstr "Journal/volume"
+
+#: eamena/templates/views/forms/imageryold.htm:443
+#: eamena/templates/views/reports/sections/designation_section.htm:71
+#: eamena/templates/views/search/time-filter.htm:68
+msgid "Date"
+msgstr "Date"
+
+#: eamena/templates/views/forms/imageryold.htm:516
+#: eamena/templates/views/forms/publication.htm:1151
+msgid "These keywords are associated with this resource:"
+msgstr "These keywords are associated with this resource:"
+
+#: eamena/templates/views/forms/imageryold.htm:603
+msgid "These rights are associated with this resource:"
+msgstr "These rights are associated with this resource:"
+
+#: eamena/templates/views/forms/information-resource-summary.htm:111
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:177
+msgid "Identifiers"
+msgstr "Identifiers"
+
+#: eamena/templates/views/forms/information-resource-summary.htm:118
+#: eamena/templates/views/forms/information-resource-summary.htm:126
+msgid "Identifier Type"
+msgstr "Identifier Type"
+
+#: eamena/templates/views/forms/information-resource-summary.htm:136
+msgid "The identifier must be populated."
+msgstr "The identifier must be populated."
+
+#: eamena/templates/views/forms/information-resource-summary.htm:152
+msgid "These identifiers are associated with this resource:"
+msgstr "These identifiers are associated with this resource:"
+
+#: eamena/templates/views/forms/information-resource-summary.htm:155
+msgid "No Identifiers Defined"
+msgstr "No Identifiers Defined"
+
+#: eamena/templates/views/forms/information-resource-summary.htm:159
+msgid "Delete this Identifier"
+msgstr "Delete this Identifier"
+
+#: eamena/templates/views/forms/information-resource-summary.htm:160
+msgid "Edit this Indentifier"
+msgstr "Edit this Indentifier"
+
+#: eamena/templates/views/forms/information-resource-summary.htm:184
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:201
+msgid "Formats"
+msgstr "Formats"
+
+#: eamena/templates/views/forms/information-resource-summary.htm:191
+#: eamena/templates/views/forms/information-resource-summary.htm:199
+msgid "Format Type"
+msgstr "Format Type"
+
+#: eamena/templates/views/forms/information-resource-summary.htm:209
+msgid "The format must be populated."
+msgstr "The format must be populated."
+
+#: eamena/templates/views/forms/information-resource-summary.htm:225
+msgid "These formats are associated with this resource:"
+msgstr "These formats are associated with this resource:"
+
+#: eamena/templates/views/forms/information-resource-summary.htm:228
+msgid "No Formats Defined"
+msgstr "No Formats Defined"
+
+#: eamena/templates/views/forms/information-resource-summary.htm:232
+msgid "Delete this format type"
+msgstr "Delete this format type"
+
+#: eamena/templates/views/forms/information-resource-summary.htm:233
+msgid "Edit this format type"
+msgstr "Edit this format type"
+
+#: eamena/templates/views/forms/location.htm:233
+#: eamena/templates/views/forms/location.htm:251
+msgid "Grid ID"
+msgstr "Grid ID"
+
+#: eamena/templates/views/forms/location.htm:242
+#: eamena/templates/views/forms/summary.htm:17
+#: eamena/templates/views/forms/summary.htm:26
+#: eamena/templates/views/forms/summary.htm:35
+#: eamena/templates/views/reports/sections/ArchesID_section.htm:27
+msgid "Resource ID"
+msgstr "Resource ID"
+
+#: eamena/templates/views/forms/location.htm:283
+msgid "This resource has the following Grid ID code:"
+msgstr "This resource has the following Grid ID code:"
+
+#: eamena/templates/views/forms/location.htm:287
+msgid "No Grid ID Defined"
+msgstr "No Grid ID Defined"
+
+#: eamena/templates/views/forms/location.htm:318
+msgid "Certainty of  Location"
+msgstr "Certainty of  Location"
+
+#: eamena/templates/views/forms/location.htm:370
+msgid "Certainty of location rank:"
+msgstr "Certainty of location rank:"
+
+#: eamena/templates/views/forms/location.htm:373
+#: eamena/templates/views/forms/location.htm:459
+#: eamena/templates/views/forms/summary.htm:288
+#: eamena/templates/views/forms/summary.htm:355
+#: eamena/templates/views/forms/summary.htm:422
+msgid "No Certainty Defined"
+msgstr "No Certainty Defined"
+
+#: eamena/templates/views/forms/location.htm:404
+msgid "Certainty of Geometry Extent"
+msgstr "Certainty of Geometry Extent"
+
+#: eamena/templates/views/forms/location.htm:456
+msgid "Certainty of geometry extent rank:"
+msgstr "Certainty of geometry extent rank:"
+
+#: eamena/templates/views/forms/location.htm:490
+msgid "Country"
+msgstr "Country"
+
+#: eamena/templates/views/forms/location.htm:542
+msgid "No Country Defined"
+msgstr "No Country Defined"
+
+#: eamena/templates/views/forms/location.htm:573
+msgid "Topographic Setting"
+msgstr "Topographic Setting"
+
+#: eamena/templates/views/forms/location.htm:624
+msgid "Topographic settings:"
+msgstr "Topographic settings:"
+
+#: eamena/templates/views/forms/location.htm:627
+msgid "No Settings Defined"
+msgstr "No Settings Defined"
+
+#: eamena/templates/views/forms/location.htm:652
+msgid "(More fields)"
+msgstr "(More fields)"
+
+#: eamena/templates/views/forms/location.htm:668
+#: eamena/templates/views/reports/sections/PLACE_ADDRESS.E45.htm:7
+msgid "Addresses"
+msgstr "Addresses"
+
+#: eamena/templates/views/forms/location.htm:736
+msgid "This resource has the following addresses:"
+msgstr "This resource has the following addresses:"
+
+#: eamena/templates/views/forms/location.htm:738
+msgid "No Addresses Defined"
+msgstr "No Addresses Defined"
+
+#: eamena/templates/views/forms/location.htm:769
+#: eamena/templates/views/reports/sections/DESCRIPTION_OF_LOCATION.E62.htm:6
+msgid "Location Description"
+msgstr "Location Description"
+
+#: eamena/templates/views/forms/location.htm:799
+#: eamena/templates/views/reports/sections/ADMINISTRATIVE_SUBDIVISION.E48.htm:6
+msgid "Administrative Areas"
+msgstr "Administrative Areas"
+
+#: eamena/templates/views/forms/location.htm:858
+msgid "This resource is located in the following Administrative Areas:"
+msgstr "This resource is located in the following Administrative Areas:"
+
+#: eamena/templates/views/forms/location.htm:861
+msgid "No Administrative Areas Defined"
+msgstr "No Administrative Areas Defined"
+
+#: eamena/templates/views/forms/location.htm:894
+msgid "Cadastral References"
+msgstr "Cadastral References"
+
+#: eamena/templates/views/forms/location.htm:951
+msgid "No Parcels Defined"
+msgstr "No Parcels Defined"
+
+#: eamena/templates/views/forms/measurement.htm:15
+msgid "Condition State"
+msgstr "Condition State"
+
+#: eamena/templates/views/forms/measurement.htm:48
+msgid "Condition type defined:"
+msgstr "Condition type defined:"
+
+#: eamena/templates/views/forms/measurement.htm:52
+msgid "No type Defined"
+msgstr "No type Defined"
+
+#: eamena/templates/views/forms/measurement.htm:58
+#: eamena/templates/views/forms/measurement.htm:267
+#: eamena/templates/views/forms/measurement.htm:346
+msgid "type"
+msgstr "type"
+
+#: eamena/templates/views/forms/measurement.htm:78
+msgid "Disturbance Extent "
+msgstr "Disturbance Extent "
+
+#: eamena/templates/views/forms/measurement.htm:111
+msgid "Disturbance extent defined:"
+msgstr "Disturbance extent defined:"
+
+#: eamena/templates/views/forms/measurement.htm:115
+#: eamena/templates/views/forms/measurement.htm:249
+#: eamena/templates/views/forms/measurement.htm:338
+msgid "None Defined"
+msgstr "None Defined"
+
+#: eamena/templates/views/forms/measurement.htm:121
+msgid "approximate horizontal extent of site disturbed"
+msgstr "approximate horizontal extent of site disturbed"
+
+#: eamena/templates/views/forms/measurement.htm:142
+msgid "Disturbance Assessment "
+msgstr "Disturbance Assessment "
+
+#: eamena/templates/views/forms/measurement.htm:151
+msgid "Cause "
+msgstr "Cause "
+
+#: eamena/templates/views/forms/measurement.htm:154
+#: eamena/templates/views/forms/measurement.htm:302
+msgid "Cause certainty"
+msgstr "Cause certainty"
+
+#: eamena/templates/views/forms/measurement.htm:161
+msgid "Effect 1"
+msgstr "Effect 1"
+
+#: eamena/templates/views/forms/measurement.htm:164
+msgid "Effect 1 certainty"
+msgstr "Effect 1 certainty"
+
+#: eamena/templates/views/forms/measurement.htm:167
+msgid "Effect 2"
+msgstr "Effect 2"
+
+#: eamena/templates/views/forms/measurement.htm:170
+msgid "Effect 2 certainty"
+msgstr "Effect 2 certainty"
+
+#: eamena/templates/views/forms/measurement.htm:173
+msgid "Effect 3"
+msgstr "Effect 3"
+
+#: eamena/templates/views/forms/measurement.htm:176
+msgid "Effect 3 certainty"
+msgstr "Effect 3 certainty"
+
+#: eamena/templates/views/forms/measurement.htm:179
+msgid "Effect 4"
+msgstr "Effect 4"
+
+#: eamena/templates/views/forms/measurement.htm:182
+msgid "Effect 4 certainty"
+msgstr "Effect 4 certainty"
+
+#: eamena/templates/views/forms/measurement.htm:185
+msgid "Effect 5"
+msgstr "Effect 5"
+
+#: eamena/templates/views/forms/measurement.htm:188
+msgid "Effect 5 certainty"
+msgstr "Effect 5 certainty"
+
+#: eamena/templates/views/forms/measurement.htm:206
+msgid "Date type"
+msgstr "Date type"
+
+#: eamena/templates/views/forms/measurement.htm:245
+msgid "Disturbance state defined records:"
+msgstr "Disturbance state defined records:"
+
+#: eamena/templates/views/forms/measurement.htm:255
+#: eamena/templates/views/forms/measurement.htm:344
+msgid "cause"
+msgstr "cause"
+
+#: eamena/templates/views/forms/measurement.htm:256
+#: eamena/templates/views/forms/measurement.htm:345
+msgid "cause certainty"
+msgstr "cause certainty"
+
+#: eamena/templates/views/forms/measurement.htm:257
+msgid "effect 1"
+msgstr "effect 1"
+
+#: eamena/templates/views/forms/measurement.htm:258
+msgid "effect 1 certainty"
+msgstr "effect 1 certainty"
+
+#: eamena/templates/views/forms/measurement.htm:259
+msgid "effect 2"
+msgstr "effect 2"
+
+#: eamena/templates/views/forms/measurement.htm:260
+msgid "effect 2 certainty"
+msgstr "effect 2 certainty"
+
+#: eamena/templates/views/forms/measurement.htm:261
+msgid "effect 3"
+msgstr "effect 3"
+
+#: eamena/templates/views/forms/measurement.htm:262
+msgid "effect 3 certainty"
+msgstr "effect 3 certainty"
+
+#: eamena/templates/views/forms/measurement.htm:263
+msgid "effect 4"
+msgstr "effect 4"
+
+#: eamena/templates/views/forms/measurement.htm:264
+msgid "effect 4 certainty"
+msgstr "effect 4 certainty"
+
+#: eamena/templates/views/forms/measurement.htm:265
+msgid "effect 5"
+msgstr "effect 5"
+
+#: eamena/templates/views/forms/measurement.htm:266
+msgid "effect 5 certainty"
+msgstr "effect 5 certainty"
+
+#: eamena/templates/views/forms/measurement.htm:268
+msgid "date type"
+msgstr "date type"
+
+#: eamena/templates/views/forms/measurement.htm:269
+msgid "start"
+msgstr "start"
+
+#: eamena/templates/views/forms/measurement.htm:270
+msgid "end"
+msgstr "end"
+
+#: eamena/templates/views/forms/measurement.htm:290
+msgid "Threat Assessment "
+msgstr "Threat Assessment "
+
+#: eamena/templates/views/forms/measurement.htm:299
+msgid "Cause"
+msgstr "Cause"
+
+#: eamena/templates/views/forms/measurement.htm:334
+msgid "Threat state defined records:"
+msgstr "Threat state defined records:"
+
+#: eamena/templates/views/forms/measurementvalues.htm:26
+msgid "Unit"
+msgstr "Unit"
+
+#: eamena/templates/views/forms/measurementvalues.htm:38
+msgid "Each measurement must have a type, unit, and value."
+msgstr "Each measurement must have a type, unit, and value."
+
+#: eamena/templates/views/forms/measurementvalues.htm:52
+msgid "This resource has these measurements:"
+msgstr "This resource has these measurements:"
+
+#: eamena/templates/views/forms/measurementvalues.htm:56
+msgid "No Measurements Defined"
+msgstr "No Measurements Defined"
+
+#: eamena/templates/views/forms/phase.htm:30
+#: eamena/templates/views/forms/roles.htm:30
+#: eamena/templates/views/forms/roles.htm:73
+#: eamena/templates/views/forms/summary.htm:458
+#: eamena/templates/views/reports/ACTOR.E39.htm:326
+#: eamena/templates/views/reports/HISTORICAL_EVENT.E5.htm:257
+#: eamena/templates/views/reports/sections/heritage_resource_phase_type_assignment.htm:48
+msgid "Period"
+msgstr "Period"
+
+#: eamena/templates/views/forms/phase.htm:45
+msgid "The phase type value must be populated."
+msgstr "The phase type value must be populated."
+
+#: eamena/templates/views/forms/phase.htm:54
+msgid "This resource has the following phases:"
+msgstr "This resource has the following phases:"
+
+#: eamena/templates/views/forms/phase.htm:58
+#: eamena/templates/views/forms/summary.htm:551
+msgid "No Phases Defined"
+msgstr "No Phases Defined"
+
+#: eamena/templates/views/forms/phase.htm:62
+msgid "Delete this phase"
+msgstr "Delete this phase"
+
+#: eamena/templates/views/forms/publication.htm:173
+msgid "This resource was published in this year:"
+msgstr "This resource was published in this year:"
+
+#: eamena/templates/views/forms/publication.htm:262
+msgid "This resource has this title:"
+msgstr "This resource has this title:"
+
+#: eamena/templates/views/forms/publication.htm:314
+msgid "Editor(s)"
+msgstr "Editor(s)"
+
+#: eamena/templates/views/forms/publication.htm:367
+msgid "No Editor(s) Defined"
+msgstr "No Editor(s) Defined"
+
+#: eamena/templates/views/forms/publication.htm:469
+#: eamena/templates/views/forms/shareddata.htm:91
+msgid "No Source Defined"
+msgstr "No Source Defined"
+
+#: eamena/templates/views/forms/publication.htm:472
+msgid "Delete this source"
+msgstr "Delete this source"
+
+#: eamena/templates/views/forms/publication.htm:473
+msgid "Edit this source"
+msgstr "Edit this source"
+
+#: eamena/templates/views/forms/publication.htm:475
+#: eamena/templates/views/forms/shareddata.htm:97
+msgid "source"
+msgstr "source"
+
+#: eamena/templates/views/forms/publication.htm:571
+msgid "No Place of Publication Defined"
+msgstr "No Place of Publication Defined"
+
+#: eamena/templates/views/forms/publication.htm:673
+msgid "No Publisher Defined"
+msgstr "No Publisher Defined"
+
+#: eamena/templates/views/forms/publication.htm:676
+msgid "Delete this publisher"
+msgstr "Delete this publisher"
+
+#: eamena/templates/views/forms/publication.htm:677
+msgid "Edit this publisher"
+msgstr "Edit this publisher"
+
+#: eamena/templates/views/forms/publication.htm:679
+msgid "publisher"
+msgstr "publisher"
+
+#: eamena/templates/views/forms/publication.htm:775
+msgid "No Volume Defined"
+msgstr "No Volume Defined"
+
+#: eamena/templates/views/forms/publication.htm:877
+msgid "No Issue Defined"
+msgstr "No Issue Defined"
+
+#: eamena/templates/views/forms/publication.htm:880
+msgid "Delete this issue"
+msgstr "Delete this issue"
+
+#: eamena/templates/views/forms/publication.htm:881
+msgid "Edit this issue"
+msgstr "Edit this issue"
+
+#: eamena/templates/views/forms/publication.htm:883
+msgid "issue"
+msgstr "issue"
+
+#: eamena/templates/views/forms/publication.htm:979
+msgid "No Pages Defined"
+msgstr "No Pages Defined"
+
+#: eamena/templates/views/forms/publication.htm:982
+msgid "Delete these page numbers"
+msgstr "Delete these page numbers"
+
+#: eamena/templates/views/forms/publication.htm:983
+msgid "Edit these page numbers"
+msgstr "Edit these page numbers"
+
+#: eamena/templates/views/forms/publication.htm:985
+msgid "pages"
+msgstr "pages"
+
+#: eamena/templates/views/forms/publication.htm:1028
+#: eamena/templates/views/forms/publication.htm:1045
+msgid "Figure(s)"
+msgstr "Figure(s)"
+
+#: eamena/templates/views/forms/publication.htm:1081
+msgid "No Figure(s) Defined"
+msgstr "No Figure(s) Defined"
+
+#: eamena/templates/views/forms/publication.htm:1084
+msgid "Delete this figure(s)"
+msgstr "Delete this figure(s)"
+
+#: eamena/templates/views/forms/publication.htm:1085
+msgid "Edit this figure(s)"
+msgstr "Edit this figure(s)"
+
+#: eamena/templates/views/forms/related-files.htm:7
+msgid ""
+"A title, title type, and relationship type must be specified.  If specifying "
+"a description, then a description type must be defined as well."
+msgstr ""
+"A title, title type, and relationship type must be specified.  If specifying "
+"a description, then a description type must be defined as well."
+
+#: eamena/templates/views/forms/related-files.htm:24
+msgid "This resource has no related files yet"
+msgstr "This resource has no related files yet"
+
+#: eamena/templates/views/forms/related-files.htm:46
+msgid "Related Images"
+msgstr "Related Images"
+
+#: eamena/templates/views/forms/related-files.htm:77
+#: eamena/templates/views/reports/sections/condition_assessment_section.htm:138
+msgid "Previous"
+msgstr "Previous"
+
+#: eamena/templates/views/forms/related-files.htm:80
+#: eamena/templates/views/reports/title.htm:35
+#: eamena/templates/views/reports/title.htm:61
+#: eamena/templates/views/search/search-results.htm:45
+msgid "Edit"
+msgstr "Edit"
+
+#: eamena/templates/views/forms/related-files.htm:84
+#: eamena/templates/views/reports/sections/condition_assessment_section.htm:141
+msgid "Next"
+msgstr "Next"
+
+#: eamena/templates/views/forms/related-files.htm:128
+msgid "Related Files"
+msgstr "Related Files"
+
+#: eamena/templates/views/forms/related-files.htm:145
+msgid "Edit this file"
+msgstr "Edit this file"
+
+#: eamena/templates/views/forms/related-files.htm:145
+msgid "relation"
+msgstr "relation"
+
+#: eamena/templates/views/forms/related-files.htm:174
+msgid "Edit Related File Resource"
+msgstr "Edit Related File Resource"
+
+#: eamena/templates/views/forms/related-files.htm:196
+#: eamena/templates/views/forms/related-files.htm:357
+#: eamena/templates/views/forms/related-files.htm:387
+msgid "Title Type"
+msgstr "Title Type"
+
+#: eamena/templates/views/forms/related-files.htm:203
+#: eamena/templates/views/reports/sections/condition_assessment_section.htm:82
+msgid "Description"
+msgstr "Description"
+
+#: eamena/templates/views/forms/related-files.htm:207
+msgid "Description Type"
+msgstr "Description Type"
+
+#: eamena/templates/views/forms/related-files.htm:220
+#: eamena/templates/views/forms/related-files.htm:224
+msgid "Relationship Type"
+msgstr "Relationship Type"
+
+#: eamena/templates/views/forms/related-files.htm:239
+msgid "Are you sure you want to delete the relationship to this file?"
+msgstr "Are you sure you want to delete the relationship to this file?"
+
+#: eamena/templates/views/forms/related-files.htm:252
+msgid "Remove this file"
+msgstr "Remove this file"
+
+#: eamena/templates/views/forms/related-files.htm:254
+msgid "Save"
+msgstr "Save"
+
+#: eamena/templates/views/forms/related-files.htm:288
+msgid "Part 1: Upload Files"
+msgstr "Part 1: Upload Files"
+
+#: eamena/templates/views/forms/related-files.htm:291
+msgid "Part 2: Title"
+msgstr "Part 2: Title"
+
+#: eamena/templates/views/forms/related-files.htm:294
+msgid "Part 3: Description"
+msgstr "Part 3: Description"
+
+#: eamena/templates/views/forms/related-files.htm:297
+msgid "Part 4: Relationship"
+msgstr "Part 4: Relationship"
+
+#: eamena/templates/views/forms/related-files.htm:309
+msgid "Upload Files"
+msgstr "Upload Files"
+
+#: eamena/templates/views/forms/related-files.htm:321
+#: eamena/templates/views/forms/related-files.htm:403
+msgid "File Information"
+msgstr "File Information"
+
+#: eamena/templates/views/forms/related-files.htm:325
+msgid "Add a name/title and description for each file"
+msgstr "Add a name/title and description for each file"
+
+#: eamena/templates/views/forms/related-files.htm:403
+msgid "Part 3"
+msgstr "Part 3"
+
+#: eamena/templates/views/forms/related-files.htm:407
+msgid "Add description and desctiption type for each file"
+msgstr "Add description and desctiption type for each file"
+
+#: eamena/templates/views/forms/related-files.htm:485
+msgid "Part 4"
+msgstr "Part 4"
+
+#: eamena/templates/views/forms/related-files.htm:485
+msgid "Describe Relationship"
+msgstr "Describe Relationship"
+
+#: eamena/templates/views/forms/related-files.htm:489
+msgid "Describe the relationship each file has with the current resource"
+msgstr "Describe the relationship each file has with the current resource"
+
+#: eamena/templates/views/forms/related-resources.htm:10
+#: eamena/templates/views/forms/related-resources.htm:31
+#: eamena/templates/views/forms/related-resources.htm:328
+#: eamena/templates/views/forms/sections/SaveEditsFooter.htm:17
+#: eamena/templates/views/forms/sections/SaveEditsFooter.htm:28
+msgid "Discard edits"
+msgstr "Discard edits"
+
+#: eamena/templates/views/forms/related-resources.htm:13
+#: eamena/templates/views/forms/related-resources.htm:34
+#: eamena/templates/views/forms/sections/SaveEditsFooter.htm:20
+#: eamena/templates/views/forms/sections/SaveEditsFooter.htm:31
+msgid "Save edits"
+msgstr "Save edits"
+
+#: eamena/templates/views/forms/related-resources.htm:17
+#: eamena/templates/views/forms/related-resources.htm:38
+msgid "Find Resources"
+msgstr "Find Resources"
+
+#: eamena/templates/views/forms/related-resources.htm:22
+#: eamena/templates/views/forms/related-resources.htm:43
+msgid "Show Relationships"
+msgstr "Show Relationships"
+
+#: eamena/templates/views/forms/related-resources.htm:128
+#: eamena/templates/views/forms/related-resources.htm:371
+msgid "All values must be populated."
+msgstr "All values must be populated."
+
+#: eamena/templates/views/forms/related-resources.htm:143
+msgid "This resource has no relationships yet"
+msgstr "This resource has no relationships yet"
+
+#: eamena/templates/views/forms/related-resources.htm:150
+msgid "Edit this relationship"
+msgstr "Edit this relationship"
+
+#: eamena/templates/views/forms/related-resources.htm:192
+msgid "Map filter"
+msgstr "Map filter"
+
+#: eamena/templates/views/forms/related-resources.htm:196
+msgid "Attribute filter"
+msgstr "Attribute filter"
+
+#: eamena/templates/views/forms/related-resources.htm:200
+msgid "Time filter"
+msgstr "Time filter"
+
+#: eamena/templates/views/forms/related-resources.htm:223
+msgid "Search for a resource..."
+msgstr "Search for a resource..."
+
+#: eamena/templates/views/forms/related-resources.htm:245
+msgid "Map Filter Enabled"
+msgstr "Map Filter Enabled"
+
+#: eamena/templates/views/forms/related-resources.htm:248
+msgid "Time Filter Enabled"
+msgstr "Time Filter Enabled"
+
+#: eamena/templates/views/forms/related-resources.htm:291
+msgid "Edit Relationship"
+msgstr "Edit Relationship"
+
+#: eamena/templates/views/forms/related-resources.htm:291
+msgid "Add Relationship"
+msgstr "Add Relationship"
+
+#: eamena/templates/views/forms/related-resources.htm:297
+msgid "Relationship:"
+msgstr "Relationship:"
+
+#: eamena/templates/views/forms/related-resources.htm:322
+#: eamena/templates/views/search/time-filter.htm:75
+msgid "Add"
+msgstr "Add"
+
+#: eamena/templates/views/forms/related-resources.htm:325
+#: eamena/templates/views/search/map-filter.htm:16
+msgid "Toggle Dropdown"
+msgstr "Toggle Dropdown"
+
+#: eamena/templates/views/forms/roles.htm:109
+msgid "The role type value must be populated."
+msgstr "The role type value must be populated."
+
+#: eamena/templates/views/forms/roles.htm:118
+msgid "This resource has the following roles:"
+msgstr "This resource has the following roles:"
+
+#: eamena/templates/views/forms/roles.htm:122
+msgid "No Roles Defined"
+msgstr "No Roles Defined"
+
+#: eamena/templates/views/forms/roles.htm:126
+msgid "Delete this role"
+msgstr "Delete this role"
+
+#: eamena/templates/views/forms/shareddata.htm:140
+msgid "Shared data source project"
+msgstr "Shared data source project"
+
+#: eamena/templates/views/forms/shareddata.htm:193
+msgid "No Shared data source project defined"
+msgstr "No Shared data source project defined"
+
+#: eamena/templates/views/forms/shareddata.htm:196
+msgid "Delete this shared data source project"
+msgstr "Delete this shared data source project"
+
+#: eamena/templates/views/forms/shareddata.htm:199
+msgid "shared data source project"
+msgstr "shared data source project"
+
+#: eamena/templates/views/forms/summary.htm:67
+msgid "This resource has the following ID code:"
+msgstr "This resource has the following ID code:"
+
+#: eamena/templates/views/forms/summary.htm:71
+msgid "No ID Defined"
+msgstr "No ID Defined"
+
+#: eamena/templates/views/forms/summary.htm:99
+msgid "Resource Name(s)"
+msgstr "Resource Name(s)"
+
+#: eamena/templates/views/forms/summary.htm:180
+msgid "Site Function"
+msgstr "Site Function"
+
+#: eamena/templates/views/forms/summary.htm:192
+#: eamena/templates/views/forms/summary.htm:391
+#: eamena/templates/views/forms/summary.htm:393
+#: eamena/templates/views/forms/summary.htm:461
+msgid "Certainty"
+msgstr "Certainty"
+
+#: eamena/templates/views/forms/summary.htm:201
+#: eamena/templates/views/forms/summary.htm:470
+msgid "Certainty required."
+msgstr "Certainty required."
+
+#: eamena/templates/views/forms/summary.htm:215
+msgid "This resource has these functions:"
+msgstr "This resource has these functions:"
+
+#: eamena/templates/views/forms/summary.htm:219
+msgid "No Function Defined"
+msgstr "No Function Defined"
+
+#: eamena/templates/views/forms/summary.htm:249
+msgid "Overall Site Morphology"
+msgstr "Overall Site Morphology"
+
+#: eamena/templates/views/forms/summary.htm:256
+#: eamena/templates/views/forms/summary.htm:258
+msgid "Morphology"
+msgstr "Morphology"
+
+#: eamena/templates/views/forms/summary.htm:268
+#: eamena/templates/views/forms/summary.htm:335
+#: eamena/templates/views/forms/summary.htm:403
+msgid "The keyword must be populated."
+msgstr "The keyword must be populated."
+
+#: eamena/templates/views/forms/summary.htm:285
+#: eamena/templates/views/forms/summary.htm:352
+msgid " "
+msgstr " "
+
+#: eamena/templates/views/forms/summary.htm:316
+msgid "Overall Site Shape"
+msgstr "Overall Site Shape"
+
+#: eamena/templates/views/forms/summary.htm:384
+#: eamena/templates/views/reports/sections/OVERALL_SITE_CERTAINTY.htm:6
+msgid "Overall Site Certainty"
+msgstr "Overall Site Certainty"
+
+#: eamena/templates/views/forms/summary.htm:419
+msgid "Degree of certainty that this is a cultural heritage resource:"
+msgstr "Degree of certainty that this is a cultural heritage resource:"
+
+#: eamena/templates/views/forms/summary.htm:484
+msgid "This resource has these cultural periods assigned:"
+msgstr "This resource has these cultural periods assigned:"
+
+#: eamena/templates/views/forms/summary.htm:488
+msgid "No Cultural Period Defined"
+msgstr "No Cultural Period Defined"
+
+#: eamena/templates/views/forms/summary.htm:513
+msgid "Time-Span Phase(s) "
+msgstr "Time-Span Phase(s) "
+
+#: eamena/templates/views/forms/summary.htm:522
+msgid "From date"
+msgstr "From date"
+
+#: eamena/templates/views/forms/summary.htm:525
+msgid "To date"
+msgstr "To date"
+
+#: eamena/templates/views/forms/summary.htm:532
+msgid "From and To dates required."
+msgstr "From and To dates required."
+
+#: eamena/templates/views/forms/summary.htm:547
+msgid "Time Span Phase(s):"
+msgstr "Time Span Phase(s):"
+
+#: eamena/templates/views/forms/summary.htm:557
+msgid "from date"
+msgstr "from date"
+
+#: eamena/templates/views/forms/summary.htm:558
+msgid "to date"
+msgstr "to date"
+
+#: eamena/templates/views/forms/summary.htm:581
+msgid "Resource Assessor Name, Assessment Type and Date"
+msgstr "Resource Assessor Name, Assessment Type and Date"
+
+#: eamena/templates/views/forms/summary.htm:590
+msgid "Assessor name"
+msgstr "Assessor name"
+
+#: eamena/templates/views/forms/summary.htm:591
+msgid "Assessment Type"
+msgstr "Assessment Type"
+
+#: eamena/templates/views/forms/summary.htm:609
+msgid "The name type and date fields must all be populated."
+msgstr "The name type and date fields must all be populated."
+
+#: eamena/templates/views/forms/summary.htm:623
+msgid "This resource has been assessed by :"
+msgstr "This resource has been assessed by :"
+
+#: eamena/templates/views/forms/summary.htm:627
+msgid "No Assessment Details Provided"
+msgstr "No Assessment Details Provided"
+
+#: eamena/templates/views/reports/ACTIVITY.E7.htm:173
+#: eamena/templates/views/reports/ACTOR.E39.htm:246
+#: eamena/templates/views/reports/HERITAGE_RESOURCE.E18.htm:176
+#: eamena/templates/views/reports/HISTORICAL_EVENT.E5.htm:173
+msgid "Location Information"
+msgstr "Location Information"
+
+#: eamena/templates/views/reports/ACTIVITY.E7.htm:211
+msgid "Activity Details"
+msgstr "Activity Details"
+
+#: eamena/templates/views/reports/ACTIVITY.E7.htm:228
+msgid "Tasks"
+msgstr "Tasks"
+
+#: eamena/templates/views/reports/ACTIVITY.E7.htm:233
+#: eamena/templates/views/reports/ACTIVITY.E7.htm:240
+#: eamena/templates/views/reports/ACTOR.E39.htm:302
+#: eamena/templates/views/reports/ACTOR.E39.htm:309
+#: eamena/templates/views/reports/HISTORICAL_EVENT.E5.htm:233
+#: eamena/templates/views/reports/HISTORICAL_EVENT.E5.htm:240
+#: eamena/templates/views/reports/sections/heritage_resource_phase_type_assignment.htm:11
+#: eamena/templates/views/reports/sections/heritage_resource_phase_type_assignment.htm:18
+msgid "No classifications recorded"
+msgstr "No classifications recorded"
+
+#: eamena/templates/views/reports/ACTIVITY.E7.htm:257
+#: eamena/templates/views/reports/ACTOR.E39.htm:335
+#: eamena/templates/views/reports/HISTORICAL_EVENT.E5.htm:266
+#: eamena/templates/views/reports/sections/heritage_resource_phase_type_assignment.htm:70
+msgid "Dates (from/to)"
+msgstr "Dates (from/to)"
+
+#: eamena/templates/views/reports/ACTIVITY.E7.htm:297
+#: eamena/templates/views/reports/ACTOR.E39.htm:375
+#: eamena/templates/views/reports/HERITAGE_RESOURCE.E18.htm:312
+#: eamena/templates/views/reports/HISTORICAL_EVENT.E5.htm:306
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:566
+msgid "Resource Descriptions"
+msgstr "Resource Descriptions"
+
+#: eamena/templates/views/reports/ACTOR.E39.htm:153
+msgid "Names/Epithets"
+msgstr "Names/Epithets"
+
+#: eamena/templates/views/reports/ACTOR.E39.htm:158
+#: eamena/templates/views/reports/ACTOR.E39.htm:164
+#: eamena/templates/views/reports/sections/NAME.E41.htm:11
+msgid "No names recorded"
+msgstr "No names recorded"
+
+#: eamena/templates/views/reports/ACTOR.E39.htm:191
+#: eamena/templates/views/reports/sections/RESOURCE_TYPE_CLASSIFICATION.E55.htm:6
+msgid "Resource Types"
+msgstr "Resource Types"
+
+#: eamena/templates/views/reports/ACTOR.E39.htm:196
+#: eamena/templates/views/reports/ACTOR.E39.htm:202
+#: eamena/templates/views/reports/ACTOR.E39.htm:208
+#: eamena/templates/views/reports/sections/RESOURCE_TYPE_CLASSIFICATION.E55.htm:11
+msgid "No types recorded"
+msgstr "No types recorded"
+
+#: eamena/templates/views/reports/HERITAGE_RESOURCE.E18.htm:199
+msgid "Settings"
+msgstr "Settings"
+
+#: eamena/templates/views/reports/HERITAGE_RESOURCE.E18.htm:203
+msgid "No settings recorded"
+msgstr "No settings recorded"
+
+#: eamena/templates/views/reports/HERITAGE_RESOURCE.E18.htm:251
+msgid "Classification/Components"
+msgstr "Classification/Components"
+
+#: eamena/templates/views/reports/HERITAGE_RESOURCE.E18.htm:274
+msgid "Modifications"
+msgstr "Modifications"
+
+#: eamena/templates/views/reports/HERITAGE_RESOURCE.E18.htm:279
+msgid "No modifications recorded"
+msgstr "No modifications recorded"
+
+#: eamena/templates/views/reports/HERITAGE_RESOURCE_GROUP.E27.htm:211
+#: eamena/templates/views/reports/sections/condition_assessment_section.htm:58
+msgid "Condition"
+msgstr "Condition"
+
+#: eamena/templates/views/reports/HISTORICAL_EVENT.E5.htm:211
+msgid "Event Details"
+msgstr "Event Details"
+
+#: eamena/templates/views/reports/HISTORICAL_EVENT.E5.htm:228
+msgid "Actions/Activities"
+msgstr "Actions/Activities"
+
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:153
+msgid "Titles"
+msgstr "Titles"
+
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:158
+msgid "No titles recorded"
+msgstr "No titles recorded"
+
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:182
+msgid "No identifiers recorded"
+msgstr "No identifiers recorded"
+
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:206
+msgid "No formats recorded"
+msgstr "No formats recorded"
+
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:232
+msgid "No languages recorded"
+msgstr "No languages recorded"
+
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:265
+msgid "Digital Representation"
+msgstr "Digital Representation"
+
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:297
+msgid "View document"
+msgstr "View document"
+
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:298
+msgid "Link to document"
+msgstr "Link to document"
+
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:307
+#: eamena/templates/views/reports/sections/related_resource_section.htm:75
+#: eamena/templates/views/reports/sections/related_resource_section.htm:121
+#: eamena/templates/views/reports/sections/related_resource_section.htm:173
+#: eamena/templates/views/reports/sections/related_resource_section.htm:224
+#: eamena/templates/views/reports/sections/related_resource_section.htm:257
+msgid "None"
+msgstr "None"
+
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:330
+msgid "Coverage"
+msgstr "Coverage"
+
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:350
+msgid "Temporal Coverage"
+msgstr "Temporal Coverage"
+
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:355
+msgid "No coverage recorded"
+msgstr "No coverage recorded"
+
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:388
+msgid "Creation and Publication"
+msgstr "Creation and Publication"
+
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:405
+msgid "Resource Creation"
+msgstr "Resource Creation"
+
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:410
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:488
+msgid "No creation information recorded"
+msgstr "No creation information recorded"
+
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:435
+msgid "Created on"
+msgstr "Created on"
+
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:461
+msgid "Contributor"
+msgstr "Contributor"
+
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:483
+msgid "Publishers"
+msgstr "Publishers"
+
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:510
+msgid "Publication date"
+msgstr "Publication date"
+
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:533
+msgid "Copy Rights"
+msgstr "Copy Rights"
+
+#: eamena/templates/views/reports/INFORMATION_RESOURCE.E73.htm:538
+msgid "No rights recorded"
+msgstr "No rights recorded"
+
+#: eamena/templates/views/reports/title.htm:50
+msgid "Resource Report"
+msgstr "Resource Report"
+
+#: eamena/templates/views/reports/title.htm:55
+#: eamena/templates/views/search/search-results.htm:56
+msgid "Map"
+msgstr "Map"
+
+#: eamena/templates/views/reports/sections/ADMINISTRATIVE_SUBDIVISION.E48.htm:10
+msgid "No areas recorded"
+msgstr "No areas recorded"
+
+#: eamena/templates/views/reports/sections/ANCILLARY_FEATURE_TYPE.E55.htm:11
+#: eamena/templates/views/reports/sections/ANCILLARY_FEATURE_TYPE.E55.htm:17
+#: eamena/templates/views/reports/sections/ANCILLARY_FEATURE_TYPE.E55.htm:23
+msgid "No features recorded"
+msgstr "No features recorded"
+
+#: eamena/templates/views/reports/sections/ArchesID_section.htm:34
+msgid "Arches ID"
+msgstr "Arches ID"
+
+#: eamena/templates/views/reports/sections/COMPONENT.E18.htm:6
+msgid "Features"
+msgstr "Features"
+
+#: eamena/templates/views/reports/sections/COMPONENT.E18.htm:11
+#: eamena/templates/views/reports/sections/COMPONENT.E18.htm:18
+msgid "No components recorded"
+msgstr "No components recorded"
+
+#: eamena/templates/views/reports/sections/COMPONENT.E18.htm:33
+#: eamena/templates/views/reports/sections/COMPONENT.E18.htm:52
+#: eamena/templates/views/reports/sections/COMPONENT.E18.htm:63
+#: eamena/templates/views/reports/sections/designation_section.htm:67
+#: eamena/templates/views/reports/sections/designation_section.htm:83
+#: eamena/templates/views/reports/sections/heritage_resource_phase_type_assignment.htm:33
+#: eamena/templates/views/reports/sections/heritage_resource_phase_type_assignment.htm:44
+#: eamena/templates/views/reports/sections/heritage_resource_phase_type_assignment.htm:55
+#: eamena/templates/views/reports/sections/heritage_resource_phase_type_assignment.htm:66
+#: eamena/templates/views/reports/sections/heritage_resource_phase_type_assignment.htm:82
+#: eamena/templates/views/reports/sections/heritage_resource_phase_type_assignment.htm:93
+msgid "none defined"
+msgstr "none defined"
+
+#: eamena/templates/views/reports/sections/COMPONENT.E18.htm:37
+msgid "Technique"
+msgstr "Technique"
+
+#: eamena/templates/views/reports/sections/CONDITION_STATE.htm:6
+msgid "Overall condition of resource"
+msgstr "Overall condition of resource"
+
+#: eamena/templates/views/reports/sections/CULTURAL_PERIODS.htm:6
+msgid "Cultural periods"
+msgstr "Cultural periods"
+
+#: eamena/templates/views/reports/sections/CULTURAL_PERIODS.htm:17
+#: eamena/templates/views/reports/sections/SITE_FUNCTION_TYPE.htm:17
+msgid "(Certainty:"
+msgstr "(Certainty:"
+
+#: eamena/templates/views/reports/sections/DESCRIPTION.E62.htm:8
+#: eamena/templates/views/reports/sections/DESCRIPTION_OF_LOCATION.E62.htm:10
+#: eamena/templates/views/reports/sections/condition_assessment_section.htm:87
+msgid "No descriptions recorded"
+msgstr "No descriptions recorded"
+
+#: eamena/templates/views/reports/sections/DISTURBANCE_EXTENT.htm:6
+msgid "Overall disturbance extent"
+msgstr "Overall disturbance extent"
+
+#: eamena/templates/views/reports/sections/DISTURBANCE_TYPE.htm:6
+msgid "Types of disturbances affecting the resource"
+msgstr "Types of disturbances affecting the resource"
+
+#: eamena/templates/views/reports/sections/EXTERNAL_XREF.E42.htm:11
+msgid "No references recorded"
+msgstr "No references recorded"
+
+#: eamena/templates/views/reports/sections/FEATURE_FORMS.htm:5
+msgid "Feature forms within Heritage Resource"
+msgstr "Feature forms within Heritage Resource"
+
+#: eamena/templates/views/reports/sections/FEATURE_FORMS.htm:16
+msgid "(Form Type)"
+msgstr "(Form Type)"
+
+#: eamena/templates/views/reports/sections/FEATURE_FORMS.htm:23
+msgid "(Number)"
+msgstr "(Number)"
+
+#: eamena/templates/views/reports/sections/FEATURE_FORMS.htm:31
+msgid "No feature forms recorded"
+msgstr "No feature forms recorded"
+
+#: eamena/templates/views/reports/sections/FEATURE_INTERPRETATIONS.htm:5
+msgid "Feature intepretations within Heritage Resource"
+msgstr "Feature intepretations within Heritage Resource"
+
+#: eamena/templates/views/reports/sections/FEATURE_INTERPRETATIONS.htm:16
+msgid "(Interpretation Type)"
+msgstr "(Interpretation Type)"
+
+#: eamena/templates/views/reports/sections/FEATURE_INTERPRETATIONS.htm:23
+msgid "(Interpreation Certainty)"
+msgstr "(Interpreation Certainty)"
+
+#: eamena/templates/views/reports/sections/FEATURE_INTERPRETATIONS.htm:32
+msgid "(Interpretation Number)"
+msgstr "(Interpretation Number)"
+
+#: eamena/templates/views/reports/sections/FEATURE_INTERPRETATIONS.htm:39
+msgid "No feature interpretations recorded"
+msgstr "No feature interpretations recorded"
+
+#: eamena/templates/views/reports/sections/KEYWORD.E55.htm:11
+msgid "No keywords recorded"
+msgstr "No keywords recorded"
+
+#: eamena/templates/views/reports/sections/MEASUREMENT_TYPE.E55.htm:11
+msgid "No measurements recorded"
+msgstr "No measurements recorded"
+
+#: eamena/templates/views/reports/sections/OVERALL_SITE_CERTAINTY.htm:11
+msgid "No site certainty recorded"
+msgstr "No site certainty recorded"
+
+#: eamena/templates/views/reports/sections/PLACE_ADDRESS.E45.htm:11
+msgid "No addresses recorded"
+msgstr "No addresses recorded"
+
+#: eamena/templates/views/reports/sections/PLACE_APPELLATION_CADASTRAL_REFERENCE.E44.htm:6
+msgid "Parcels"
+msgstr "Parcels"
+
+#: eamena/templates/views/reports/sections/PLACE_APPELLATION_CADASTRAL_REFERENCE.E44.htm:10
+msgid "No parcels recorded"
+msgstr "No parcels recorded"
+
+#: eamena/templates/views/reports/sections/SITE_FUNCTION_TYPE.htm:11
+msgid "No site functions recorded"
+msgstr "No site functions recorded"
+
+#: eamena/templates/views/reports/sections/THREAT_TYPE.htm:6
+msgid "Threat(s) to the resource"
+msgstr "Threat(s) to the resource"
+
+#: eamena/templates/views/reports/sections/TIME_SPANS.htm:6
+msgid "Time span"
+msgstr "Time span"
+
+#: eamena/templates/views/reports/sections/condition_assessment_section.htm:15
+msgid "Resource Condition Assessment"
+msgstr "Resource Condition Assessment"
+
+#: eamena/templates/views/reports/sections/condition_assessment_section.htm:63
+msgid "No conditions recorded"
+msgstr "No conditions recorded"
+
+#: eamena/templates/views/reports/sections/condition_assessment_section.htm:106
+#: eamena/templates/views/reports/sections/related_resource_section.htm:210
+msgid "Images"
+msgstr "Images"
+
+#: eamena/templates/views/reports/sections/condition_assessment_section.htm:156
+msgid "No images recorded"
+msgstr "No images recorded"
+
+#: eamena/templates/views/reports/sections/condition_assessment_section.htm:183
+msgid "Disturbances"
+msgstr "Disturbances"
+
+#: eamena/templates/views/reports/sections/condition_assessment_section.htm:188
+msgid "No disturbances recorded"
+msgstr "No disturbances recorded"
+
+#: eamena/templates/views/reports/sections/condition_assessment_section.htm:207
+msgid "Threats"
+msgstr "Threats"
+
+#: eamena/templates/views/reports/sections/condition_assessment_section.htm:212
+msgid "No theats recorded"
+msgstr "No theats recorded"
+
+#: eamena/templates/views/reports/sections/condition_assessment_section.htm:231
+msgid "Management Recommendations"
+msgstr "Management Recommendations"
+
+#: eamena/templates/views/reports/sections/condition_assessment_section.htm:236
+#: eamena/templates/views/reports/sections/condition_assessment_section.htm:242
+msgid "No recommendations recorded"
+msgstr "No recommendations recorded"
+
+#: eamena/templates/views/reports/sections/designation_section.htm:15
+msgid "Designations"
+msgstr "Designations"
+
+#: eamena/templates/views/reports/sections/designation_section.htm:37
+msgid "Designation and Protection Status"
+msgstr "Designation and Protection Status"
+
+#: eamena/templates/views/reports/sections/evaluation_section.htm:15
+msgid "Resource Significance"
+msgstr "Resource Significance"
+
+#: eamena/templates/views/reports/sections/evaluation_section.htm:40
+msgid "Evaluation Details"
+msgstr "Evaluation Details"
+
+#: eamena/templates/views/reports/sections/evaluation_section.htm:58
+msgid "Context/Theme"
+msgstr "Context/Theme"
+
+#: eamena/templates/views/reports/sections/evaluation_section.htm:63
+msgid "No criteria recorded"
+msgstr "No criteria recorded"
+
+#: eamena/templates/views/reports/sections/evaluation_section.htm:82
+msgid "Eligibility Standards"
+msgstr "Eligibility Standards"
+
+#: eamena/templates/views/reports/sections/evaluation_section.htm:87
+#: eamena/templates/views/reports/sections/evaluation_section.htm:109
+msgid "No standards recorded"
+msgstr "No standards recorded"
+
+#: eamena/templates/views/reports/sections/evaluation_section.htm:104
+msgid "Integrity Standards"
+msgstr "Integrity Standards"
+
+#: eamena/templates/views/reports/sections/evaluation_section.htm:126
+msgid "Status Codes"
+msgstr "Status Codes"
+
+#: eamena/templates/views/reports/sections/evaluation_section.htm:131
+msgid "No codes recorded"
+msgstr "No codes recorded"
+
+#: eamena/templates/views/reports/sections/evaluation_section.htm:148
+msgid "Significance Statement"
+msgstr "Significance Statement"
+
+#: eamena/templates/views/reports/sections/evaluation_section.htm:153
+msgid "No statement recorded"
+msgstr "No statement recorded"
+
+#: eamena/templates/views/reports/sections/heritage_resource_phase_type_assignment.htm:37
+msgid "Use"
+msgstr "Use"
+
+#: eamena/templates/views/reports/sections/important_dates.htm:6
+msgid "Important Dates"
+msgstr "Important Dates"
+
+#: eamena/templates/views/reports/sections/important_dates.htm:11
+msgid "No dates recorded"
+msgstr "No dates recorded"
+
+#: eamena/templates/views/reports/sections/related_resource_section.htm:41
+msgid "Related Heritage Resources E27"
+msgstr "Related Heritage Resources E27"
+
+#: eamena/templates/views/reports/sections/related_resource_section.htm:59
+#: eamena/templates/views/reports/sections/related_resource_section.htm:109
+#: eamena/templates/views/reports/sections/related_resource_section.htm:161
+#: eamena/templates/views/reports/sections/related_resource_section.htm:217
+#: eamena/templates/views/reports/sections/related_resource_section.htm:244
+#: eamena/templates/views/search/map-filter.htm:144
+msgid "View Report"
+msgstr "View Report"
+
+#: eamena/templates/views/reports/sections/related_resource_section.htm:92
+msgid "Related Heritage Resources E18"
+msgstr "Related Heritage Resources E18"
+
+#: eamena/templates/views/reports/sections/related_resource_section.htm:144
+msgid "Related People/Organisations"
+msgstr "Related People/Organisations"
+
+#: eamena/templates/views/reports/sections/related_resource_section.htm:194
+msgid "Related Information Resources"
+msgstr "Related Information Resources"
+
+#: eamena/templates/views/reports/sections/related_resource_section.htm:238
+msgid "Documents"
+msgstr "Documents"
+
+#: eamena/templates/views/search/map-filter.htm:14
+msgid "Map Tools"
+msgstr "Map Tools"
+
+#: eamena/templates/views/search/map-filter.htm:19
+msgid "Limit search results to map extent"
+msgstr "Limit search results to map extent"
+
+#: eamena/templates/views/search/map-filter.htm:21
+msgid "Draw Polygon to Filter Map"
+msgstr "Draw Polygon to Filter Map"
+
+#: eamena/templates/views/search/map-filter.htm:22
+msgid "Draw Line to Filter Map"
+msgstr "Draw Line to Filter Map"
+
+#: eamena/templates/views/search/map-filter.htm:23
+msgid "Draw Point to Filter Map"
+msgstr "Draw Point to Filter Map"
+
+#: eamena/templates/views/search/map-filter.htm:26
+msgid "Buffer (ft)"
+msgstr "Buffer (ft)"
+
+#: eamena/templates/views/search/map-filter.htm:140
+#: eamena/templates/views/search/map-filter.htm:183
+msgid "Close"
+msgstr "Close"
+
+#: eamena/templates/views/search/map-filter.htm:162
+msgid "Clustered Resources"
+msgstr "Clustered Resources"
+
+#: eamena/templates/views/search/time-filter.htm:17
+msgid "Range of Years"
+msgstr "Range of Years"
+
+#: eamena/templates/views/search/time-filter.htm:17
+msgid "(show resources with any date that falls between these years)"
+msgstr "(show resources with any date that falls between these years)"
+
+#: eamena/templates/views/search/time-filter.htm:44
+msgid "Start/End Dates"
+msgstr "Start/End Dates"
+
+#: eamena/templates/views/search/time-filter.htm:44
+msgid "(show resources that meet these date criteria)"
+msgstr "(show resources that meet these date criteria)"
+
+#: eamena/templates/views/search/time-filter.htm:56
+msgid "Type of date"
+msgstr "Type of date"
+
+#: eamena/templates/views/search/time-filter.htm:62
+msgid "Qualifier"
+msgstr "Qualifier"
+
+#: eamena/templates/views/search/time-filter.htm:92
+msgid "You have selected the following Start/End Date filters:"
+msgstr "You have selected the following Start/End Date filters:"
+
+#: eamena/templates/views/search/time-filter.htm:96
+msgid "No Filters Defined"
+msgstr "No Filters Defined"
+
+#: eamena/templates/views/search/time-filter.htm:107
+msgid "The Type of Date, Qualifier, and Date fields must all be populated."
+msgstr "The Type of Date, Qualifier, and Date fields must all be populated."

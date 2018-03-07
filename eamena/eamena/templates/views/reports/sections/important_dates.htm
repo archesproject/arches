@@ -1,0 +1,43 @@
+{% load i18n %}
+<div class="row">
+    <div class="col-xs-12">
+        <dl>
+            <dt>
+                <h5 id="" class="arches-report-subsection-title">{% trans "Important Dates" %}</h5>
+            </dt>
+
+            {% if 'BEGINNING_OF_EXISTENCE_E63' not in report_info.source.graph and 'END_OF_EXISTENCE_E64' not in report_info.source.graph %}
+                <dd class="arches-report-subsection-item">
+                    {% trans "No dates recorded" %}
+                </dd>
+            {% else %}
+                <dd class="arches-report-subsection-item">
+                {% for BEGINNING_OF_EXISTENCE_E63 in report_info.source.graph.BEGINNING_OF_EXISTENCE_E63 %}
+                    {% for BEGINNING_OF_EXISTENCE_TIME___SPAN_E52 in BEGINNING_OF_EXISTENCE_E63.BEGINNING_OF_EXISTENCE_TIME___SPAN_E52 %}
+                        {% for START_DATE_OF_EXISTENCE_E49 in BEGINNING_OF_EXISTENCE_TIME___SPAN_E52.START_DATE_OF_EXISTENCE_E49 %}
+                            {{START_DATE_OF_EXISTENCE_E49.START_DATE_OF_EXISTENCE_E49__value}}
+                        {% endfor %}  
+                    {% endfor %}  
+                    {% for BEGINNING_OF_EXISTENCE_TYPE_E55 in BEGINNING_OF_EXISTENCE_E63.BEGINNING_OF_EXISTENCE_TYPE_E55 %}
+                        <span class="arches-report-subsection-item-type">({{BEGINNING_OF_EXISTENCE_TYPE_E55.BEGINNING_OF_EXISTENCE_TYPE_E55__value}})</span> 
+                    {% endfor %}  
+                {% endfor %}  
+                </dd>
+
+                <dd class="arches-report-subsection-item">
+                {% for END_OF_EXISTENCE_E64 in report_info.source.graph.END_OF_EXISTENCE_E64 %}
+                    {% for END_OF_EXISTENCE_TIME___SPAN_E52 in END_OF_EXISTENCE_E64.END_OF_EXISTENCE_TIME___SPAN_E52 %}
+                        {% for END_DATE_OF_EXISTENCE_E49 in END_OF_EXISTENCE_TIME___SPAN_E52.END_DATE_OF_EXISTENCE_E49 %}
+                            {{END_DATE_OF_EXISTENCE_E49.END_DATE_OF_EXISTENCE_E49__value}}
+                        {% endfor %}  
+                    {% endfor %}  
+                    {% for END_OF_EXISTENCE_TYPE_E55 in END_OF_EXISTENCE_E64.END_OF_EXISTENCE_TYPE_E55 %}
+                        <span class="arches-report-subsection-item-type">({{END_OF_EXISTENCE_TYPE_E55.END_OF_EXISTENCE_TYPE_E55__value}})</span> 
+                    {% endfor %}  
+                {% endfor %}  
+                </dd>            
+            {% endif %}
+
+        </dl>
+    </div>
+</div>
