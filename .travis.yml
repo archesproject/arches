@@ -31,9 +31,6 @@ services:
   - postgresql
   - elasticsearch
   
-addons:
-  postgresql: "9.3"
-  
 before_install:
   - psql -d postgres -c "ALTER USER postgres with encrypted password 'postgis';"
   - echo "*:*:*:postgres:postgis" >> ~/.pgpass
