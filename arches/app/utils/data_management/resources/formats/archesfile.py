@@ -144,7 +144,7 @@ class ArchesFileReader(Reader):
                                     errors = tile.validate(self.errors)
                                     reporter.update_tiles_saved()
 
-    def get_blank_tile(self, sourcetilegroup, blanktilecache, tiles):
+    def get_blank_tile(self, sourcetilegroup, blanktilecache, tiles, resourceinstanceid):
         if len(sourcetilegroup[0]['data']) > 0:
             if sourcetilegroup[0]['data'][0] != {}:
                 if sourcetilegroup[0]['data'][0].keys()[0] not in blanktilecache:
@@ -209,7 +209,7 @@ class ArchesFileReader(Reader):
                             tiles = get_tiles(tile)
                             if tiles is not None:
                                 mapped_tiles = self.replace_source_nodeid(tiles, mapping)
-                                blank_tile = self.get_blank_tile(tiles, blanktilecache, tiles)
+                                blank_tile = self.get_blank_tile(tiles, blanktilecache, tiles, resourceinstanceid)
 
                                 def populate_tile(sourcetilegroup, target_tile):
                                     need_new_tile = False
@@ -279,8 +279,8 @@ class ArchesFileReader(Reader):
                                                         need_new_tile = True
 
                                         if need_new_tile:
-                                            if self.get_blank_tile(sourcetilegroup, blanktilecache, tiles) != None:
-                                                populate_tile(sourcetilegroup, self.get_blank_tile(sourcetilegroup, blanktilecache, tiles))
+                                            if self.get_blank_tile(sourcetilegroup, blanktilecache, tiles, resourceinstanceid) != None:
+                                                populate_tile(sourcetilegroup, self.get_blank_tile(sourcetilegroup, blanktilecache, tiles, resourceinstanceid))
 
                                         if target_tile_cardinality == '1':
                                             populated_nodegroups.append(str(target_tile.nodegroup_id))
