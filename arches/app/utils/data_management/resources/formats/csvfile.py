@@ -128,23 +128,23 @@ class CsvWriter(Writer):
                 other_group_record['ResourceID'] = resourceinstanceid
                 if tile.data != {}:
                     for k in tile.data.keys():
-                            if tile.data[k] != '' and k in mapping and tile.data[k] != None:
-                                if mapping[k] not in csv_record and tile.nodegroup_id not in csv_record['populated_node_groups']:
-                                    concept_export_value_type = None
-                                    if k in concept_export_value_lookup:
-                                        concept_export_value_type = concept_export_value_lookup[k]
-                                    if tile.data[k] != None:
-                                        value = self.transform_value_for_export(self.node_datatypes[k], tile.data[k], concept_export_value_type, k)
-                                        csv_record[mapping[k]] = value
-                                    del tile.data[k]
-                                else:
-                                    concept_export_value_type = None
-                                    if k in concept_export_value_lookup:
-                                        concept_export_value_type = concept_export_value_lookup[k]
+                        if tile.data[k] != '' and k in mapping and tile.data[k] != None:
+                            if mapping[k] not in csv_record and tile.nodegroup_id not in csv_record['populated_node_groups']:
+                                concept_export_value_type = None
+                                if k in concept_export_value_lookup:
+                                    concept_export_value_type = concept_export_value_lookup[k]
+                                if tile.data[k] != None:
                                     value = self.transform_value_for_export(self.node_datatypes[k], tile.data[k], concept_export_value_type, k)
-                                    other_group_record[mapping[k]] = value
-                            else:
+                                    csv_record[mapping[k]] = value
                                 del tile.data[k]
+                            else:
+                                concept_export_value_type = None
+                                if k in concept_export_value_lookup:
+                                    concept_export_value_type = concept_export_value_lookup[k]
+                                value = self.transform_value_for_export(self.node_datatypes[k], tile.data[k], concept_export_value_type, k)
+                                other_group_record[mapping[k]] = value
+                        else:
+                            del tile.data[k]
 
                     csv_record['populated_node_groups'].append(tile.nodegroup_id)
 
@@ -249,16 +249,15 @@ class CsvReader(Reader):
                     errors.append({'type': 'WARNING', 'message': msg})
                     newresourceinstance.delete()
                     save_count=save_count-1
-                
+
         else:
             errors.append({'type': 'WARNING', 'message': 'No resource created for legacyid: {0}. Make sure there is data to be imported for this resource and it is mapped properly in your mapping file.'.format(legacyid)})
-            
+
         if len(errors) > 0:
             self.errors += errors
-         
+
         if save_count % (settings.BULK_IMPORT_BATCH_SIZE/4) == 0:
             print '%s resources processed' % str(save_count)
-
 
     def import_business_data(self, business_data=None, mapping=None, overwrite='append', bulk=False, create_concepts=False, create_collections=False):
         # errors = businessDataValidator(self.business_data)
@@ -514,7 +513,9 @@ class CsvReader(Reader):
                         except Exception as e:
                             errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(datatype_instance.datatype_model.classname, value, source, str(e) + ' or is not a prefLabel in the given collection.')})
                         if len(errors) > 0:
-                            value = None
+                            error_types = [error['type'] for error in errors]
+                            if 'ERROR' in error_types:
+                                value = None
                             self.errors += errors
                     else:
                         print _('No datatype detected for {0}'.format(value))
