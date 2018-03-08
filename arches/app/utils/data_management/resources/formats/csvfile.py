@@ -259,7 +259,6 @@ class CsvReader(Reader):
         if save_count % (settings.BULK_IMPORT_BATCH_SIZE/4) == 0:
             print '%s resources processed' % str(save_count)
 
-
     def import_business_data(self, business_data=None, mapping=None, overwrite='append', bulk=False, create_concepts=False, create_collections=False):
         # errors = businessDataValidator(self.business_data)
 
@@ -514,7 +513,9 @@ class CsvReader(Reader):
                         except Exception as e:
                             errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(datatype_instance.datatype_model.classname, value, source, str(e) + ' or is not a prefLabel in the given collection.')})
                         if len(errors) > 0:
-                            value = None
+                            error_types = [error['type'] for error in errors]
+                            if 'ERROR' in error_types:
+                                value = None
                             self.errors += errors
                     else:
                         print _('No datatype detected for {0}'.format(value))

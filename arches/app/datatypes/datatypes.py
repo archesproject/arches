@@ -1194,7 +1194,7 @@ class ResourceInstanceDataType(BaseDataType):
             try:
                 models.ResourceInstance.objects.get(pk=resourceid)
             except:
-                errors.append({'type': 'ERROR', 'message': 'The resource id: {0} does not exist in the system. The data for this card will be available in the system once resource {0} is loaded.'.format(resourceid)})
+                errors.append({'type': 'WARNING', 'message': 'The resource id: {0} does not exist in the system. The data for this card will be available in the system once resource {0} is loaded.'.format(resourceid)})
         return errors
 
     def get_display_value(self, tile, node):
@@ -1207,6 +1207,19 @@ class ResourceInstanceDataType(BaseDataType):
         for value in resource_names:
             if value not in document['strings']:
                 document['strings'].append({'string': value, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
+
+    def transform_import_values(self, value, nodeid):
+        return [v.strip() for v in value.split(',')]
+
+    def transform_export_values(self, value, *args, **kwargs):
+        result = value
+        try:
+            if not isinstance(value, basestring): #change basestring to str in python3
+                result = ",".join(value)
+        except:
+            pass
+
+        return result
 
     def append_search_filters(self, value, node, query, request):
         try:
