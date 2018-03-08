@@ -9,12 +9,15 @@ import arches.app.utils.data_management.resources.remover as resource_remover
 from arches.management.commands.package_utils import resource_graphs
 from arches.management.commands.package_utils import authority_files
 from arches.app.models.resource import Resource
+from arches.db.utils import execute_sql_file
 
 def setup():
     get_version(path_to_file=os.path.abspath(os.path.dirname(__file__)))
 
 def install(path_to_source_data_dir=None):
     truncate_db()
+    
+    load_eamena_extra_sql()
     
     delete_index(index='concept_labels')
     delete_index(index='term') 
@@ -82,7 +85,17 @@ def load_resources(external_file=None):
     else:
         for f in settings.BUSISNESS_DATA_FILES:
             rl.load(f)
-            
+
+def load_eamena_extra_sql():
+
+    print "loading custom SQL"
+    sql_dir = os.path.join(settings.PACKAGE_ROOT,"install","prepackage_sql")
+    for f in os.listdir(sql_dir):
+        if not f.endswith(".sql"):
+            continue
+        sql = os.path.join(sql_dir,f)
+        print "executing",sql
+        execute_sql_file(sql)
 
 if __name__ == "__main__":
     install()
