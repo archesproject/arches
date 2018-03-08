@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from django.views.decorators.cache import cache_page
 from django.conf.urls import include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from arches.app.views import concept, main, map, search, graph, tileserver, pouch_demo
+from arches.app.views import concept, main, map, search, graph, tileserver, api
 from arches.app.views.admin import ReIndexResources
 from arches.app.views.graph import GraphManagerView, GraphSettingsView, GraphDataView, DatatypeTemplateView, CardManagerView, CardView, FormManagerView, FormView, ReportManagerView, ReportEditorView, FunctionManagerView, PermissionManagerView, PermissionDataView
 from arches.app.views.resource import ResourceEditorView, ResourceListView, ResourceData, ResourceCards, ResourceReportView, RelatedResourcesView, ResourceDescriptors, ResourceEditLogView, ResourceTiles
@@ -128,10 +128,8 @@ urlpatterns = [
     url(r'^user/get_user_names$', UserManagerView.as_view(action='get_user_names'), name="get_user_names"),
     url(r'^mobile_survey_resources/(?P<surveyid>%s)/resources$' % uuid_regex, MobileSurveyResources.as_view(), name='mobile_survey_resources'),
     url(r'^mobile_survey_manager/*', MobileSurveyManagerView.as_view(), name="mobile_survey_manager"),
-    url(r'^pouch_demo/*', pouch_demo.index, name="pouch_demo"),
-    url(r'^push_edits_to_db/*', pouch_demo.push_edits_to_db, name="push_edits_to_db"),
-    url(r'^couchdb/(?P<path>.*)$', pouch_demo.CouchdbProxy.as_view()),
-    url(r'^myProjects$', pouch_demo.myProjects),
+    url(r'^couchdb/(?P<path>.*)$', api.CouchdbProxy.as_view()),
+    url(r'^surveys$', api.Surveys.as_view(), name='surveys'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

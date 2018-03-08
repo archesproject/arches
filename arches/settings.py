@@ -40,7 +40,7 @@ DATABASES = {
     }
 }
 
-COUCHDB_URL = 'http://postgres:postgis@localhost:5984' # defaults to localhost:5984
+COUCHDB_URL = 'http://admin:admin@localhost:5984' # defaults to localhost:5984
 
 # from http://django-guardian.readthedocs.io/en/stable/configuration.html#anonymous-user-name
 ANONYMOUS_USER_NAME = None
@@ -287,11 +287,11 @@ INSTALLED_APPS = (
     'guardian',
     'captcha',
     'revproxy',
-    'debug_toolbar'
+    #'debug_toolbar'
 )
 
 MIDDLEWARE = [
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    #'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'arches.app.utils.middleware.TokenMiddleware',

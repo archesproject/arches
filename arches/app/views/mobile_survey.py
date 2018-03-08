@@ -205,20 +205,13 @@ class MobileSurveyManagerView(BaseManagerView):
         with transaction.atomic():
             mobile_survey.save()
             
+            # try and create a couchdb for the project
             couch = couchdb.Server(settings.COUCHDB_URL)
-            serializer = JSONSerializer()
-            serializer.geom_format = 'geojson'
-            mobile_survey_dict = serializer.handle_model(mobile_survey)
-            mobile_survey_dict['_id'] = str(mobile_survey.id)
             try:
                 db = couch['project_' + str(mobile_survey.id)]
             except couchdb.ResourceNotFound:
                 db = couch.create('project_' + str(mobile_survey.id))
-                # tile = models.TileModel.objects.get(pk='4345f530-aa90-48cf-b4b3-92d1185ca439')
-                # tile = json.loads(JSONSerializer().serialize(tile))
-                # tile['_id'] = tile['tileid']
-                # db.save(tile)
-                #db.save(mobile_survey_dict)
+
 
         ordered_cards = models.MobileSurveyXCard.objects.filter(mobile_survey=mobile_survey).order_by('sortorder')
         ordered_ids = [unicode(mpc.card.cardid) for mpc in ordered_cards]
