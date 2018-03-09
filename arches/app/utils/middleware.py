@@ -17,8 +17,6 @@ class SetAnonymousUser(MiddlewareMixin):
                 request.user = User.objects.get(username='anonymous')
             except:
                 pass
-            
-        request.user.user_groups = [group.name for group in request.user.groups.all()]
 
 
 class JWTAuthenticationMiddleware(MiddlewareMixin):

@@ -226,6 +226,5 @@ class GetTokenView(View):
             response = HttpResponse(token, content_type='text/plain')
         else:
             response = Http401Response(www_auth_header='Bearer')
-
-        response['Access-Control-Allow-Origin'] = '*'
+            
         return response

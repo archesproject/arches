@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.views.generic import View
+from django.db.models import Q
 from revproxy.views import ProxyView
 
 from arches.app.models import models
@@ -13,7 +14,7 @@ class CouchdbProxy(ProxyView):
 
 class Surveys(View):
     def get(self, request):
-        projects = models.MobileSurveyModel.objects.all()
+        group_ids = list(request.user.groups.values_list('id', flat=True))
+        projects = models.MobileSurveyModel.objects.filter(Q(users__in=[request.user]) | Q(groups__in=group_ids), active=True)
         response = JSONResponse(projects, indent=4)
-        response['Access-Control-Allow-Origin'] = '*'
         return response
