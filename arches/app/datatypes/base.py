@@ -90,143 +90,145 @@ class BaseDataType(object):
             "type": "vector",
             "tiles": ["%s/%s/{z}/{x}/{y}.pbf" % (tileserver_url, node.nodeid)]
         }
-        count = models.TileModel.objects.filter(data__has_key=str(node.nodeid)).count()
-        if preview and count == 0:
-            source_config = {
-                "type": "geojson",
-                "data": {
-                    "type": "FeatureCollection",
-                    "features": [
-                        {
-                            "type": "Feature",
-                            "properties": {
-                                "total": 1
-                            },
-                            "geometry": {
-                                "type": "Point",
-                                "coordinates": [
-                                    -122.4810791015625,
-                                    37.93553306183642
-                                ]
-                            }
-                        },
-                        {
-                            "type": "Feature",
-                            "properties": {
-                                "total": 100
-                            },
-                            "geometry": {
-                                "type": "Point",
-                                "coordinates": [
-                                    -58.30078125,
-                                    -18.075412438417395
-                                ]
-                            }
-                        },
-                        {
-                            "type": "Feature",
-                            "properties": {
-                                "total": 1
-                            },
-                            "geometry": {
-                                "type": "LineString",
-                                "coordinates": [
-                                    [
-                                        -179.82421875,
-                                        44.213709909702054
-                                    ],
-                                    [
-                                        -154.16015625,
-                                        32.69486597787505
-                                    ],
-                                    [
-                                        -171.5625,
-                                        18.812717856407776
-                                    ],
-                                    [
-                                        -145.72265625,
-                                        2.986927393334876
-                                    ],
-                                    [
-                                        -158.37890625,
-                                        -30.145127183376115
+        count = None
+        if preview == True:
+            count = models.TileModel.objects.filter(data__has_key=str(node.nodeid)).count()
+            if count == 0:
+                source_config = {
+                    "type": "geojson",
+                    "data": {
+                        "type": "FeatureCollection",
+                        "features": [
+                            {
+                                "type": "Feature",
+                                "properties": {
+                                    "total": 1
+                                },
+                                "geometry": {
+                                    "type": "Point",
+                                    "coordinates": [
+                                        -122.4810791015625,
+                                        37.93553306183642
                                     ]
-                                ]
-                            }
-                        },
-                        {
-                            "type": "Feature",
-                            "properties": {
-                                "total": 1
+                                }
                             },
-                            "geometry": {
-                                "type": "Polygon",
-                                "coordinates": [
-                                    [
+                            {
+                                "type": "Feature",
+                                "properties": {
+                                    "total": 100
+                                },
+                                "geometry": {
+                                    "type": "Point",
+                                    "coordinates": [
+                                        -58.30078125,
+                                        -18.075412438417395
+                                    ]
+                                }
+                            },
+                            {
+                                "type": "Feature",
+                                "properties": {
+                                    "total": 1
+                                },
+                                "geometry": {
+                                    "type": "LineString",
+                                    "coordinates": [
                                         [
-                                            -50.9765625,
-                                            22.59372606392931
+                                            -179.82421875,
+                                            44.213709909702054
                                         ],
                                         [
-                                            -23.37890625,
-                                            22.59372606392931
+                                            -154.16015625,
+                                            32.69486597787505
                                         ],
                                         [
-                                            -23.37890625,
-                                            42.94033923363181
+                                            -171.5625,
+                                            18.812717856407776
                                         ],
                                         [
-                                            -50.9765625,
-                                            42.94033923363181
+                                            -145.72265625,
+                                            2.986927393334876
                                         ],
                                         [
-                                            -50.9765625,
-                                            22.59372606392931
+                                            -158.37890625,
+                                            -30.145127183376115
                                         ]
                                     ]
-                                ]
-                            }
-                        },
-                        {
-                            "type": "Feature",
-                            "properties": {
-                                "total": 1
+                                }
                             },
-                            "geometry": {
-                                "type": "Polygon",
-                                "coordinates": [
-                                    [
+                            {
+                                "type": "Feature",
+                                "properties": {
+                                    "total": 1
+                                },
+                                "geometry": {
+                                    "type": "Polygon",
+                                    "coordinates": [
                                         [
-                                            -27.59765625,
-                                            -14.434680215297268
-                                        ],
-                                        [
-                                            -24.43359375,
-                                            -32.10118973232094
-                                        ],
-                                        [
-                                            0.87890625,
-                                            -31.653381399663985
-                                        ],
-                                        [
-                                            2.28515625,
-                                            -12.554563528593656
-                                        ],
-                                        [
-                                            -14.23828125,
-                                            -0.3515602939922709
-                                        ],
-                                        [
-                                            -27.59765625,
-                                            -14.434680215297268
+                                            [
+                                                -50.9765625,
+                                                22.59372606392931
+                                            ],
+                                            [
+                                                -23.37890625,
+                                                22.59372606392931
+                                            ],
+                                            [
+                                                -23.37890625,
+                                                42.94033923363181
+                                            ],
+                                            [
+                                                -50.9765625,
+                                                42.94033923363181
+                                            ],
+                                            [
+                                                -50.9765625,
+                                                22.59372606392931
+                                            ]
                                         ]
                                     ]
-                                ]
+                                }
+                            },
+                            {
+                                "type": "Feature",
+                                "properties": {
+                                    "total": 1
+                                },
+                                "geometry": {
+                                    "type": "Polygon",
+                                    "coordinates": [
+                                        [
+                                            [
+                                                -27.59765625,
+                                                -14.434680215297268
+                                            ],
+                                            [
+                                                -24.43359375,
+                                                -32.10118973232094
+                                            ],
+                                            [
+                                                0.87890625,
+                                                -31.653381399663985
+                                            ],
+                                            [
+                                                2.28515625,
+                                                -12.554563528593656
+                                            ],
+                                            [
+                                                -14.23828125,
+                                                -0.3515602939922709
+                                            ],
+                                            [
+                                                -27.59765625,
+                                                -14.434680215297268
+                                            ]
+                                        ]
+                                    ]
+                                }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
-            }
         return {
             "nodeid": node.nodeid,
             "name": "resources-%s" % node.nodeid,

@@ -112,7 +112,7 @@ class ResourceEditorView(MapBaseManagerView):
             required_widgets = []
 
             for form_x_card in forms_x_cards:
-                if request.user.has_perm('read_nodegroup', form_x_card.card.nodegroup):
+                if request.user.has_perm('read_nodegroup', form_x_card.card.nodegroup_id):
                     forms_w_cards.append(form_x_card.form)
 
             widget_datatypes = [v.datatype for k, v in graph.nodes.iteritems()]
@@ -248,7 +248,7 @@ class ResourceEditLogView(BaseManagerView):
             for edit in edits:
                 if edit.nodegroupid != None:
                     nodegroup = models.NodeGroup.objects.get(pk=edit.nodegroupid)
-                    if request.user.has_perm('read_nodegroup', nodegroup):
+                    if request.user.has_perm('read_nodegroup', nodegroup_id):
                         if edit.newvalue != None:
                             self.getEditConceptValue(edit.newvalue)
                         if edit.oldvalue != None:
@@ -309,7 +309,7 @@ class ResourceTiles(View):
             tiles = tiles.filter(nodegroup=node.nodegroup)
 
         for tile in tiles:
-            if request.user.has_perm(perm, tile.nodegroup):
+            if request.user.has_perm(perm, tile.nodegroup_id):
                 tile = Tile.objects.get(pk=tile.tileid)
                 tile.filter_by_perm(request.user, perm)
                 tile_dict = model_to_dict(tile)
@@ -395,13 +395,13 @@ class ResourceReportView(MapBaseManagerView):
         perm = 'read_nodegroup'
 
         for card in cards:
-            if request.user.has_perm(perm, card.nodegroup):
+            if request.user.has_perm(perm, card.nodegroup_id):
                 matching_forms_x_card = filter(lambda forms_x_card: card.nodegroup_id == forms_x_card.card.nodegroup_id, forms_x_cards)
                 card.filter_by_perm(request.user, perm)
                 permitted_cards.append(card)
 
         for tile in tiles:
-            if request.user.has_perm(perm, tile.nodegroup):
+            if request.user.has_perm(perm, tile.nodegroup_id):
                 tile.filter_by_perm(request.user, perm)
                 permitted_tiles.append(tile)
 
@@ -414,6 +414,7 @@ class ResourceReportView(MapBaseManagerView):
             map_sources = models.MapSource.objects.all()
             geocoding_providers = models.Geocoder.objects.all()
         else:
+            map_markers=None
             map_layers = []
             map_sources = []
             geocoding_providers = []
