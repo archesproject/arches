@@ -41,7 +41,7 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.data_management.resource_graphs.exporter import get_graphs_for_export, create_mapping_configuration_file
 from arches.app.utils.data_management.resource_graphs import importer as GraphImporter
 from arches.app.utils.system_metadata import system_metadata
-from arches.app.views.base import BaseManagerView
+from arches.app.views.base import BaseManagerView, MapBaseManagerView
 from tempfile import NamedTemporaryFile
 from guardian.shortcuts import get_perms_for_model, assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
 from rdflib import Graph as RDFGraph, RDF, RDFS
@@ -65,6 +65,18 @@ def get_ontology_namespaces():
 class GraphBaseView(BaseManagerView):
     def get_context_data(self, **kwargs):
         context = super(GraphBaseView, self).get_context_data(**kwargs)
+        try:
+            context['graphid'] = self.graph.graphid
+            context['graph'] = JSONSerializer().serializeToPython(self.graph)
+            context['graph_json'] = JSONSerializer().serialize(self.graph)
+            context['root_node'] = self.graph.node_set.get(istopnode=True)
+        except:
+            pass
+        return context
+
+class MapGraphBaseView(MapBaseManagerView):
+    def get_context_data(self, **kwargs):
+        context = super(MapGraphBaseView, self).get_context_data(**kwargs)
         try:
             context['graphid'] = self.graph.graphid
             context['graph'] = JSONSerializer().serializeToPython(self.graph)
@@ -345,7 +357,7 @@ class CardManagerView(GraphBaseView):
 
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
-class CardView(GraphBaseView):
+class CardView(MapGraphBaseView):
     def get(self, request, cardid):
         try:
             card = Card.objects.get(cardid=cardid)
@@ -562,7 +574,7 @@ class ReportManagerView(GraphBaseView):
 
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
-class ReportEditorView(GraphBaseView):
+class ReportEditorView(MapGraphBaseView):
     def get(self, request, reportid):
         try:
             report = models.Report.objects.get(reportid=reportid)

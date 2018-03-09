@@ -41,7 +41,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.response import JSONResponse
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Terms
-from arches.app.views.base import BaseManagerView
+from arches.app.views.base import BaseManagerView, MapBaseManagerView
 from arches.app.views.concept import Concept
 from arches.app.datatypes.datatypes import DataTypeFactory
 from elasticsearch import Elasticsearch
@@ -72,7 +72,7 @@ def get_resource_relationship_types():
     return relationship_type_values
 
 @method_decorator(can_edit_resource_instance(), name='dispatch')
-class ResourceEditorView(BaseManagerView):
+class ResourceEditorView(MapBaseManagerView):
     action = None
     def get(self, request, graphid=None, resourceid=None, view_template='views/resource/editor.htm', main_script='views/resource/editor', nav_menu=True):
         if self.action == 'copy':
@@ -355,7 +355,7 @@ class ResourceDescriptors(View):
 
         return HttpResponseNotFound()
 
-class ResourceReportView(BaseManagerView):
+class ResourceReportView(MapBaseManagerView):
     def get(self, request, resourceid=None):
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         resource = Resource.objects.get(pk=resourceid)

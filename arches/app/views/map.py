@@ -22,7 +22,7 @@ from django.utils.decorators import method_decorator
 from guardian.shortcuts import get_users_with_perms, get_groups_with_perms
 from arches.app.models import models
 from arches.app.models.card import Card
-from arches.app.views.base import BaseManagerView
+from arches.app.views.base import BaseManagerView, MapBaseManagerView
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.decorators import group_required
@@ -32,7 +32,7 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, GeoBoundsAgg
 
 @method_decorator(group_required('Application Administrator'), name='dispatch')
-class MapLayerManagerView(BaseManagerView):
+class MapLayerManagerView(MapBaseManagerView):
     def get(self, request):
         se = SearchEngineFactory().create()
         datatype_factory = DataTypeFactory()
