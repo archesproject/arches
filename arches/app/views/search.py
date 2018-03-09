@@ -68,13 +68,13 @@ class SearchView(MapBaseManagerView):
         # only allow cards that the user has permission to read
         searchable_cards = []
         for card in resource_cards:
-            if request.user.has_perm('read_nodegroup', card.nodegroup):
+            if request.user.has_perm('read_nodegroup', card.nodegroup_id):
                 searchable_cards.append(card)
 
         # only allow date nodes that the user has permission to read
         searchable_date_nodes = []
         for node in date_nodes:
-            if request.user.has_perm('read_nodegroup', node.nodegroup):
+            if request.user.has_perm('read_nodegroup', node.nodegroup_id):
                 searchable_date_nodes.append(node)
 
         context = self.get_context_data(
@@ -497,7 +497,7 @@ def build_search_results_dsl(request):
             for key, val in advanced_filter.iteritems():
                 if key != 'op':
                     node = models.Node.objects.get(pk=key)
-                    if request.user.has_perm('read_nodegroup', node.nodegroup):
+                    if request.user.has_perm('read_nodegroup', node.nodegroup_id):
                         datatype = datatype_factory.get_instance(node.datatype)
                         datatype.append_search_filters(val, node, tile_query, request)
             nested_query = Nested(path='tiles', query=tile_query)
@@ -521,7 +521,7 @@ def get_permitted_nodegroups(user):
 def get_nodegroups_by_datatype_and_perm(request, datatype, permission):
     nodes = []
     for node in models.Node.objects.filter(datatype=datatype):
-        if request.user.has_perm(permission, node.nodegroup):
+        if request.user.has_perm(permission, node.nodegroup_id):
             nodes.append(str(node.nodegroup_id))
     return nodes
 

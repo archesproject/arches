@@ -22,7 +22,7 @@ def get_tileserver_config(layer_id, request=None):
     try:
         node = models.Node.objects.get(pk=layer_id)
         datatype = datatype_factory.get_instance(node.datatype)
-        if request == None or request.user.has_perm('read_nodegroup', node.nodegroup):
+        if request == None or request.user.has_perm('read_nodegroup', node.nodegroup_id):
             layer_config = datatype.get_layer_config(node)
         else:
             layer_config = datatype.get_layer_config(None)
