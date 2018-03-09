@@ -30,7 +30,6 @@ class BaseManagerView(TemplateView):
     template_name = ''
 
     def get_context_data(self, **kwargs):
-        datatype_factory = DataTypeFactory()
         context = super(BaseManagerView, self).get_context_data(**kwargs)
         context['system_settings_graphid'] = settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
         context['graph_models'] = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
@@ -47,6 +46,16 @@ class BaseManagerView(TemplateView):
             'print':False,
         }
 
+        context['app_name'] = settings.APP_NAME
+        context['iiif_manifests'] = models.IIIFManifest.objects.all()
+
+        return context
+
+class MapBaseManagerView(BaseManagerView):
+
+    def get_context_data(self, **kwargs):
+        context = super(MapBaseManagerView, self).get_context_data(**kwargs)
+        datatype_factory = DataTypeFactory()
         geom_datatypes = [d.pk for d in models.DDataType.objects.filter(isgeometric=True)]
         geom_nodes = models.Node.objects.filter(graph__isresource=True, graph__isactive=True, datatype__in=geom_datatypes).exclude(graph__graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         resource_layers = []
@@ -57,14 +66,12 @@ class BaseManagerView(TemplateView):
                 map_source = datatype.get_map_source(node)
                 if map_source is not None:
                     resource_sources.append(map_source)
-                map_layer = datatype.get_map_layer(node)
-                if map_layer is not None:
-                    resource_layers.append(map_layer)
+                    map_layer = datatype.get_map_layer(node)
+                    if map_layer is not None:
+                        resource_layers.append(map_layer)
 
-        context['app_name'] = settings.APP_NAME
         context['geom_nodes'] = geom_nodes
         context['resource_map_layers'] = resource_layers
         context['resource_map_sources'] = resource_sources
-        context['iiif_manifests'] = models.IIIFManifest.objects.all()
 
         return context

@@ -40,11 +40,10 @@ from arches.app.models import models
 from arches.app.models.card import Card
 from arches.app.models.mobile_survey import MobileSurvey
 from arches.app.models.system_settings import settings
-from arches.app.views.base import BaseManagerView
+from arches.app.views.base import MapBaseManagerView
 
 @method_decorator(group_required('Application Administrator'), name='dispatch')
-class MobileSurveyManagerView(BaseManagerView):
-
+class MobileSurveyManagerView(MapBaseManagerView):
 
     def get(self, request):
 
@@ -204,7 +203,7 @@ class MobileSurveyManagerView(BaseManagerView):
 
         with transaction.atomic():
             mobile_survey.save()
-            
+
             # try and create a couchdb for the project
             couch = couchdb.Server(settings.COUCHDB_URL)
             try:

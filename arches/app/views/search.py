@@ -39,7 +39,7 @@ from arches.app.utils.date_utils import ExtendedDateFormat
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Term, Terms, GeoShape, Range, MinAgg, MaxAgg, RangeAgg, Aggregation, GeoHashGridAgg, GeoBoundsAgg, FiltersAgg, NestedAgg
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
-from arches.app.views.base import BaseManagerView
+from arches.app.views.base import BaseManagerView, MapBaseManagerView
 from arches.app.views.concept import get_preflabel_from_conceptid
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
@@ -50,7 +50,7 @@ try:
 except ImportError:
     from StringIO import StringIO
 
-class SearchView(BaseManagerView):
+class SearchView(MapBaseManagerView):
 
     def get(self, request):
         saved_searches = JSONSerializer().serialize(settings.SAVED_SEARCHES)
