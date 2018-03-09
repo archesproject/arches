@@ -40,6 +40,8 @@ DATABASES = {
     }
 }
 
+COUCHDB_URL = 'http://admin:admin@localhost:5984' # defaults to localhost:5984
+
 # from http://django-guardian.readthedocs.io/en/stable/configuration.html#anonymous-user-name
 ANONYMOUS_USER_NAME = None
 
@@ -283,10 +285,13 @@ INSTALLED_APPS = (
     'arches.app.models',
     'arches.management',
     'guardian',
-    'captcha'
+    'captcha',
+    'revproxy',
+    #'debug_toolbar'
 )
 
 MIDDLEWARE = [
+    #'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'arches.app.utils.middleware.TokenMiddleware',
@@ -367,6 +372,13 @@ NOCAPTCHA = True
 
 # group to assign users who self sign up via the web ui
 USER_SIGNUP_GROUP = 'Crowdsource Editor'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}
 
 #######################################
 ###       END STATIC SETTINGS       ###
