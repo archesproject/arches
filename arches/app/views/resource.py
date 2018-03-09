@@ -414,6 +414,7 @@ class ResourceReportView(MapBaseManagerView):
             map_sources = models.MapSource.objects.all()
             geocoding_providers = models.Geocoder.objects.all()
         else:
+            map_markers=None
             map_layers = []
             map_sources = []
             geocoding_providers = []
