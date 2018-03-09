@@ -287,11 +287,13 @@ INSTALLED_APPS = (
     'guardian',
     'captcha',
     'revproxy',
+    'corsheaders',
     #'debug_toolbar'
 )
 
 MIDDLEWARE = [
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'arches.app.utils.middleware.TokenMiddleware',
@@ -308,6 +310,8 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'arches.urls'
 
 WSGI_APPLICATION = 'arches.wsgi.application'
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 LOGGING = {
     'version': 1,
