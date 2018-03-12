@@ -137,10 +137,12 @@ RESOURCE_GRAPH_LOCATIONS = (
 #     # Put strings here, like "/home/data/resource_graphs" or "C:/data/resource_graphs".
 #     # Always use forward slashes, even on Windows.
 #     # Don't forget to use absolute paths, not relative paths.
-     os.path.join(PACKAGE_ROOT, 'source_data', 'resource_graphs'),
+     os.path.join(PACKAGE_ROOT, 'resource_graphs'),
 )
 
-
+ADDITIONAL_RESOURCE_GRAPH_LOCATIONS = (
+     os.path.join(PACKAGE_ROOT, 'additional_resource_graphs'),
+)
 
 CONCEPT_SCHEME_LOCATIONS = (
     # Put strings here, like "/home/data/authority_files" or "C:/data/authority_files".
@@ -157,6 +159,20 @@ BUSISNESS_DATA_FILES = (
     # Don't forget to use absolute paths, not relative paths.
     os.path.normpath(os.path.join(PACKAGE_ROOT, 'source_data', 'business_data', 'sample.arches')),
 )
+
+EXTEND_ONTOLOGY_SQL = (
+    os.path.join(ROOT_DIR, 'management', 'commands', 'package_utils', 'add_classes.sql')
+)
+
+ADD_ACTOR_TO = {
+    'FUNCTION_AND_INTERPRETATION.I5': 'FUNCTION_AND_INTERPRETATION_ACTOR.E39',    
+}
+# Map new actor nodes to the pre-existing nodes to search for edits to the affected resource
+# ( actor node entityid, parent node entityid of actor node, node entityid to check in edit log )
+ACTOR_NODES = [
+    ('FUNCTION_AND_INTERPRETATION_ACTOR.E39', 'FUNCTION_AND_INTERPRETATION.I5', 'FEATURE_EVIDENCE_INTERPRETATION_TYPE.E55')
+]
+
 
 APP_NAME = 'eamena'
 
