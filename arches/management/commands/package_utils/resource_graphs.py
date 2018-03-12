@@ -135,7 +135,7 @@ def validate_graph(node_list, edge_list):
 
     for node in node_list:
         # validate business table name
-        if node['BUSINESSTABLE'] != u'' and node['BUSINESSTABLE'] not in [u'strings', u'dates', u'domains', u'files', u'geometries', u'numbers']:
+        if node['BUSINESSTABLE'] != u'' and node['BUSINESSTABLE'] not in [u'strings', u'dates', u'domains', u'files', u'geometries', u'numbers', u'uniqueids']:
             append_error('Incorrect business table', node)
 
         # validate node uniqueness

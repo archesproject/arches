@@ -34,6 +34,7 @@ from arches.app.models.concept import Concept
 from django.http import HttpResponseNotFound
 from django.contrib.gis.geos import GEOSGeometry
 from django.db.models import Max, Min
+from django.contrib.auth.decorators import user_passes_test
 
 def report(request, resourceid):
     raise NotImplementedError('Reports are not yet implemented.')
@@ -64,6 +65,7 @@ def resource_manager(request, resourcetypeid='', form_id='default', resourceid='
 
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.POST.get('formdata', {}))
+        form.set_user(request.user)
         form.update(data, request.FILES)
 
         with transaction.atomic():
@@ -240,3 +242,14 @@ def get_admin_areas(request):
     geom = GEOSGeometry(geomString)
     intersection = models.Overlays.objects.filter(geometry__intersects=geom)
     return JSONResponse({'results': intersection}, indent=4)
+
+@user_passes_test(lambda u: u.is_superuser)
+def debug_view(request, resourceid=''):
+    ret = []
+    resource = Resource()
+    resource.get(resourceid)
+    
+    resource_dict = resource.dictify()
+    
+    return JSONResponse(resource_dict, indent=4)
+    

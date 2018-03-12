@@ -53,15 +53,21 @@ class Resource(ArchesResource):
 
         elif self.entitytypeid == 'HERITAGE_RESOURCE_GROUP.E27':
             description_group['forms'][:0] = [
+                forms.AssessmentSummaryForm.get_info(),
                 forms.SummaryForm.get_info(),
-                forms.LocationForm.get_info(),
+                forms.LocationResForm.get_info(),
                 forms.MeasurementvaluesForm.get_info(),
-                forms.Classification1Form.get_info(),
-                forms.MeasurementForm.get_info(),
+                forms.ArchaeologicalAssessmentForm.get_info(),
+                forms.ConditionAssessmentForm.get_info(),
+                # forms.Classification1Form.get_info(),
+                # forms.MeasurementForm.get_info( ),
                 forms.RelatedFilesForm.get_info(),
-                forms.DesignationForm.get_info(),
+                # forms.DesignationForm.get_info(),
+                forms.ManMadeForm.get_info(),
                 forms.RelatedResourcesForm.get_info(),
-                forms.DescriptionForm.get_info(),
+                # forms.DescriptionForm.get_info(),
+                # forms.TestWizForm.get_info(),
+        
             ]
 
 
@@ -172,7 +178,7 @@ class Resource(ArchesResource):
         document_data = {}
         
 #         if self.entitytypeid == 'HERITAGE_RESOURCE.E18':
-#             document_data['certainty_type'] = get_entity_data('SITE_OVERALL_ARCHAEOLOGICAL_CERTAINTY_TYPE.E55', get_label=True)
+#             document_data['certainty_type'] = get_entity_data('ARCHAEOLOGY_CERTAINTY_VALUE.I6', get_label=True)
 
 #             document_data['address'] = _('None specified')
 #             address_nodes = self.find_entities_by_type_id('PLACE_ADDRESS.E45')
@@ -181,7 +187,7 @@ class Resource(ArchesResource):
 #                     document_data['address'] = node.value
 
 #         if self.entitytypeid == 'HERITAGE_RESOURCE_GROUP.E27':
-#             document_data['certainty_type'] = get_entity_data('SITE_OVERALL_ARCHAEOLOGICAL_CERTAINTY_TYPE.E55', get_label=True)
+#             document_data['certainty_type'] = get_entity_data('ARCHAEOLOGY_CERTAINTY_VALUE.I6', get_label=True)
                     
         if self.entitytypeid == 'ACTIVITY.E7':
             document_data['resource_type'] = get_entity_data('ACTIVITY_TYPE.E55', get_label=True)
@@ -204,7 +210,7 @@ class Resource(ArchesResource):
             document_data['end_date'] = get_entity_data('END_OF_EXISTENCE.E64')
 
         if self.entitytypeid == 'HERITAGE_RESOURCE.E18' or self.entitytypeid == 'HERITAGE_RESOURCE_GROUP.E27':
-            document_data['certainty_type'] = get_entity_data('SITE_OVERALL_ARCHAEOLOGICAL_CERTAINTY_TYPE.E55', get_label=True)
+            document_data['certainty_type'] = get_entity_data('ARCHAEOLOGY_CERTAINTY_VALUE.I6', get_label=True)
             document_data['site_function'] = get_entity_data('SITE_FUNCTION_TYPE.E55', get_label=True)
             document_data['disturbance_type'] = get_entity_data('DISTURBANCE_TYPE.E55', get_label=True)
 

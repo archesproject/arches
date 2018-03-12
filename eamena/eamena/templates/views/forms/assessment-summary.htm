@@ -1,0 +1,74 @@
+{% extends "views/forms/base.htm" %}
+{% load i18n %}
+
+{% block form_content %}
+
+<div id="investigator-name-section">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                <dl>
+                    <dt>
+                        <h5 id="arches-investigator-names-form" class="section-headline">{% trans "Assessment Summary" %}</h5>
+                    </dt>
+                    <dd>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <!-- Investigator Name -->
+                                <input class="form-control arches-form-input" style="width: 33%;" placeholder='{% trans "Investigator Name" %}' data-bind='value: getEditedNode("INVESTIGATOR_NAME.E41", "value")'>
+                                <!-- Investigator Role -->
+                                <input style="width:18%; padding-top: 2px;" style="width: 33%;" class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('INVESTIGATOR_ROLE_TYPE.E55', 'value'), placeholder: '{% trans "Investigator Role" %}', dataKey: 'INVESTIGATOR_ROLE_TYPE.E55'}"></input>
+                                <br>
+                                <!-- Type of Activity -->
+                                <input style="width:18%; padding-top: 2px;" style="width: 33%;" class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('ASSESSMENT_ACTIVITY_TYPE.E55', 'value'), placeholder: '{% trans "Type of Activity" %}', dataKey: 'ASSESSMENT_ACTIVITY_TYPE.E55'}"></input>
+                                <!-- Date of Activity -->
+                                <div class="form-group datetimepicker" style="width:20%;">
+                                    <div class="input-group">
+                                        <input type="text" name="mydate" id="date-from" placeholder='{% trans "date (yyyy-mm-dd)" %}' class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('ASSESSMENT_ACTIVITY_DATE.E49', 'value')} ">
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </div>&nbsp;
+
+                                {% include 'views/components/add-item-button.htm' %}
+                            </div>
+                        </div>
+                    </dd>
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "All values must be populated." %}</div>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "Assessment Summaries:" %}
+                    </dd>
+                    <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Summaries Defined" %}</div>   
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this Summary" %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans "Edit this Summary" %}">
+                                    <span data-bind='text: nodes.get("INVESTIGATOR_NAME.E41", "value")' style="padding-right:2px;"></span>
+                                    <span class="text-muted arches-crud-type-identifier">
+                                        (<span data-bind='text: nodes.get("INVESTIGATOR_ROLE_TYPE.E55", "label")'></span>)
+                                    </span>
+                                    <span data-bind='{text: nodes.get("ASSESSMENT_ACTIVITY_TYPE.E55", "label")}' style="padding-right:2px;"></span>
+                                    <span class="text-muted"> (type) </span>
+                                    <span data-bind="{text: nodes.get('ASSESSMENT_ACTIVITY_DATE.E49', 'value')}" style="padding-right:2px"></span>
+                                    <span class="text-muted"> (Date of Assessment) </span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include 'views/forms/sections/SaveEditsFooter.htm' %}
+
+{% endblock form_content %}

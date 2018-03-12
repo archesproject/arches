@@ -1,0 +1,372 @@
+{% extends "views/forms/base.htm" %}
+{% load i18n %}
+
+{% block form_content %}
+
+<!-- Modifications CRUD Form -->
+<div id="overall-archaeological-certainty">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                <dl>
+                    <dt>
+                        <h5 id="arches-subjects-form" class="section-headline">{% trans "Overall Archaeological Certainty" %}</h5>
+                    </dt>
+                    <dd>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <input style="width:33%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" id="overall-archaeological-certainty-value" placeholder="{% trans 'Certainty' %}" data-bind="select2: {value: getEditedNode('OVERALL_ARCHAEOLOGICAL_CERTAINTY_VALUE.I6', 'value'), dataKey: 'OVERALL_ARCHAEOLOGICAL_CERTAINTY_VALUE.I6'}"></input>
+                                {% include 'views/components/add-item-button.htm' %}
+                            </div>
+                        </div>
+                    </dd>
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "Certainty required." %}</div>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "Degree of certainty that this is a cultural heritage resource:" %}
+                    </dd>
+                    <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Certainty Defined" %}</div>
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this keyword" %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans "Edit this keyword" %}">
+                                    <span data-bind='{text: nodes.get("OVERALL_ARCHAEOLOGICAL_CERTAINTY_VALUE.I6", "label")}' style="padding-right:2px;"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="divider arches-RDM-divider">
+
+<div id="date-inference-making">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                <dl>
+                    <dt>
+                        <h5 id="arches-measurement-form" class="section-headline">{% trans "Cultural Period" %}</h5>
+                    </dt>
+                    <dd>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <!-- Cultural Period type-->
+                                <input style="width:33%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="cultural-period-type" data-bind="select2: {value: getEditedNode('CULTURAL_PERIOD_TYPE.I4', 'value'), placeholder: '{% trans "Cultural Period" %}', dataKey: 'CULTURAL_PERIOD_TYPE.I4'}"></input>&nbsp;
+                                <!-- Cultural Period Certainty  -->
+                                <input style="width:18%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="cultural-period-certainty" data-bind="select2: {value: getEditedNode('CULTURAL_PERIOD_CERTAINTY.I6', 'value'), placeholder: '{% trans "Certainty" %}', dataKey: 'CULTURAL_PERIOD_CERTAINTY.I6'}"></input>&nbsp;
+                                <br>
+                                <!-- Cultural Period Detail Type-->
+                                <input style="width:50%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="cultural-period-detail" data-bind="select2: {value: getEditedNode('CULTURAL_PERIOD_DETAIL_TYPE.E55', 'value'), placeholder: '{% trans "Cultural Period Detail" %}', dataKey: 'CULTURAL_PERIOD_DETAIL_TYPE.E55'}"></input>&nbsp;
+                                <div id="arches-names-form" class="section-headline">
+                                    {% trans "On behalf of" %}
+                                    <i class="fa fa-pencil edit-actor show-box inference" data-actor="inference" aria-hidden="true"></i>
+                                    <i class="fa fa-pencil-square edit-actor hide-box inference hidden" data-actor="inference" aria-hidden="true"></i>
+                                </div>
+                                <div class="row edit-actors-row inference hidden">
+                                    <input class="form-control arches-form-input" id="actor-name" style="width: 18%;" placeholder='{% trans "Name" %}' data-bind='value: getEditedNode("DATE_INFERENCE_MAKING_ACTOR_NAME.E41", "value")'>
+                                </div>
+                                {% include 'views/components/add-item-button.htm' %}
+                            </div>
+                        </div>
+                    </dd>
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "Cultural Period required." %}</div>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "This resource has these Cultural Periods:" %}
+                    </dd>
+                    <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Cultural Period Defined" %}</div>
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this measurement" %}"><i data-bind='click: $parent.deleteItem.bind($parent)' class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind='click: $parent.editItem.bind($parent)' title="Edit this measurement">
+                                    <span data-bind="{text: nodes.get('CULTURAL_PERIOD_TYPE.I4', 'label')}" style="padding-right:2px"></span>
+                                    <span data-bind="{text: nodes.get('CULTURAL_PERIOD_CERTAINTY.I6', 'label')}" style="padding-right:2px"></span>
+                                    <span data-bind="{text: nodes.get('CULTURAL_PERIOD_DETAIL_TYPE.E55', 'label')}" style="padding-right:2px"></span>
+                                    <span class="text-muted" data-bind="{visible: nodes.get('DATE_INFERENCE_MAKING_ACTOR_NAME.E41', 'value').length > 0}"> by: </span>
+                                    <span data-bind='text: nodes.get("DATE_INFERENCE_MAKING_ACTOR_NAME.E41", "value")' style="padding-right:2px;"></span><span class="text-muted arches-crud-type-identifier"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="period-of-occupation">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                <dl>
+                    <dt>
+                        <h5 id="arches-names-form" class="section-headline">{% trans "Period of occupation" %}</h5>
+                    </dt>
+                    <dd class="arches-RDM-labels">
+                        <div class="row">
+                            <div class="col-xs-12 padding-left-1">
+                                <div class="form-group" style="width: 100%;">
+                                    <div>
+                                         <div class="form-group datetimepicker" style="width:20%;">
+                                             <div class="input-group">
+                                                 <input type="text" name="mydate" id="date" placeholder='{% trans "from (yyyy-mm-dd)" %}' class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('ARCHAEOLOGICAL_FROM_DATE.E61', 'value')} ">
+                                                 <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                             </div>
+                                         </div>&nbsp;
+                                         <div class="form-group datetimepicker" style="width:20%;">
+                                             <div class="input-group">
+                                                 <input type="text" name="mydate" id="date" placeholder='{% trans "to (yyyy-mm-dd)" %}' class="form-control datepicker" data-date-format="YYYY-MM-DD"collapse-resource-description data-bind="{value: getEditedNode('ARCHAEOLOGICAL_TO_DATE.E61', 'value')} ">
+                                                 <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                             </div>
+                                         </div>
+                                        {% include 'views/components/add-item-button.htm' %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </dd>
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "Period of occupation required." %}</div>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "This resource has the following Periods of occupation:" %}
+                    </dd>
+                    <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Periods of occupation Defined" %}</div>   
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this Period of occupation" %}"><i data-bind='click: $parent.deleteItem.bind($parent)' class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind='click: $parent.editItem.bind($parent)' title="Edit this Periods of occupation">
+                                    <span class="text-muted"> from </span>
+                                    <span data-bind="{text: nodes.get('ARCHAEOLOGICAL_FROM_DATE.E61', 'value')}" style="padding-right:2px"></span>
+                                    <span class="text-muted"> to </span>
+                                    <span data-bind="{text: nodes.get('ARCHAEOLOGICAL_TO_DATE.E61', 'value')}"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Overall morphology -->
+
+<div id="overall-morphology">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                <dl>
+                    <dt>
+                        <h5 id="arches-subjects-form" class="section-headline">{% trans "Overall Morphology" %}</h5>
+                    </dt>
+                    <dd>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <input style="width:33%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" placeholder="{% trans 'Morphology' %}" data-bind="select2: {value: getEditedNode('FEATURE_MORPHOLOGY_TYPE.E55', 'value'), dataKey: 'FEATURE_MORPHOLOGY_TYPE.E55'}"></input>
+                                {% include 'views/components/add-item-button.htm' %}
+                            </div>
+                        </div>
+                    </dd>
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "Morphology required." %}</div>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "Overall morphology of the cultural heritage resource:" %}
+                    </dd>
+                    <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Morphology Defined" %}</div>
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this keyword" %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans "Edit this keyword" %}">
+                                    <span data-bind='{text: nodes.get("FEATURE_MORPHOLOGY_TYPE.E55", "label")}' style="padding-right:2px;"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Feature morphology -->
+<div id="feature-morphology">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                <dl>
+                    <dt>
+                        <h5 id="arches-measurement-form" class="section-headline">{% trans "Feature morphology" %}</h5>
+                    </dt>
+                    <dd>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <!-- Form -->
+                                <input style="width:33%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" data-bind="select2: {value: getEditedNode('FEATURE_FORM_TYPE.I4', 'value'), placeholder: '{% trans "Form" %}', dataKey: 'FEATURE_FORM_TYPE.I4'}"></input>&nbsp;
+                                <!-- Form Certainty  -->
+                                <input style="width:33%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" data-bind="select2: {value: getEditedNode('FEATURE_FORM_TYPE_CERTAINTY.I6', 'value'), placeholder: '{% trans "Form Certainty" %}', dataKey: 'FEATURE_FORM_TYPE_CERTAINTY.I6'}"></input>&nbsp;
+                                <!-- Form Shape -->
+                                <input style="width:33%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" data-bind="select2: {value: getEditedNode('FEATURE_SHAPE_TYPE.E55', 'value'), placeholder: '{% trans "Form Shape" %}', dataKey: 'FEATURE_SHAPE_TYPE.E55'}"></input>&nbsp;
+                                <!-- Arrangement -->
+                                <input style="width:33%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" data-bind="select2: {value: getEditedNode('FEATURE_ARRANGEMENT_TYPE.E55', 'value'), placeholder: '{% trans "Arrangement" %}', dataKey: 'FEATURE_ARRANGEMENT_TYPE.E55'}"></input>&nbsp;
+                                <!-- Number -->
+                                <input style="width:33%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" data-bind="select2: {value: getEditedNode('FEATURE_NUMBER_TYPE.E55', 'value'), placeholder: '{% trans "Number" %}', dataKey: 'FEATURE_NUMBER_TYPE.E55'}"></input>&nbsp;
+                                <div id="arches-names-form" class="section-headline">
+                                    {% trans "On behalf of" %}
+                                    <i class="fa fa-pencil edit-actor show-box morphology"  data-actor="morphology" aria-hidden="true"></i>
+                                    <i class="fa fa-pencil-square edit-actor hide-box morphology hidden" data-actor="morphology" aria-hidden="true"></i>
+                                </div>
+                                <div class="row edit-actors-row morphology hidden">
+                                    <input class="form-control arches-form-input" id="actor-name" style="width: 18%;" placeholder='{% trans "Name" %}' data-bind='value: getEditedNode("FEATURE_ASSIGNMENT_INVESTIGATOR_NAME.E41", "value")'>
+                                </div>
+                                {% include 'views/components/add-item-button.htm' %}
+                            </div>
+                        </div>
+                    </dd>
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "All values must be populated." %}</div>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "This resource has these functions:" %}
+                    </dd>
+                    <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Feature morphology Defined" %}</div>
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this Feature morphology" %}"><i data-bind='click: $parent.deleteItem.bind($parent)' class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind='click: $parent.editItem.bind($parent)' title="Edit this Feature morphology">
+                                    <span data-bind="{text: nodes.get('FEATURE_FORM_TYPE.I4', 'label')}" style="padding-right:2px"></span>
+                                    <span data-bind="{text: nodes.get('FEATURE_FORM_TYPE_CERTAINTY.I6', 'label')}" style="padding-right:2px"></span>
+                                    <span data-bind="{text: nodes.get('FEATURE_SHAPE_TYPE.E55', 'label')}" style="padding-right:2px"></span>
+                                    <span data-bind="{text: nodes.get('FEATURE_ARRANGEMENT_TYPE.E55', 'label')}" style="padding-right:2px"></span>
+                                    <span data-bind="{text: nodes.get('FEATURE_NUMBER_TYPE.E55', 'label')}" style="padding-right:2px"></span>
+                                    <span class="text-muted" data-bind="{visible: nodes.get('FEATURE_ASSIGNMENT_INVESTIGATOR_NAME.E41', 'value').length > 0}"> by: </span>
+                                    <span data-bind='text: nodes.get("FEATURE_ASSIGNMENT_INVESTIGATOR_NAME.E41", "value")' style="padding-right:2px;"></span><span class="text-muted arches-crud-type-identifier"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Feature Interpretation -->
+<div id="feature-interpretation">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                <dl>
+                    <dt>
+                        <h5 id="arches-measurement-form" class="section-headline">{% trans "Feature Interpretation" %}</h5>
+                    </dt>
+                    <dd>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <!-- function Type -->   
+                                <input style="width:33%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="function-type" type="text" data-placeholder= "{% trans 'Type' %}" data-bind="select2: {value: getEditedNode('FUNCTION_TYPE.I4', 'value'),   allowClear: true, dataKey: 'FUNCTION_TYPE.I4'}"></input>&nbsp;
+                                <!-- function certainty -->     
+                                <input style="width:18%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="function-certainty" data-bind="select2: {value: getEditedNode('FUNCTION_CERTAINTY.I6', 'value'), placeholder: '{% trans "Certainty" %}', dataKey: 'FUNCTION_CERTAINTY.I6'}"></input>&nbsp;
+                                <!-- interpretation -->     
+                                <input style="width:18%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="interpretation" data-bind="select2: {value: getEditedNode('INTERPRETATION_TYPE.I4', 'value'), placeholder: '{% trans "Interpretation" %}', dataKey: 'INTERPRETATION_TYPE.I4'}"></input>&nbsp;
+                                <!-- interpretation certainty -->     
+                                <input style="width:18%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="interpretation-certainty" data-bind="select2: {value: getEditedNode('INTERPRETATION_CERTAINTY.I6', 'value'), placeholder: '{% trans "Interpretation certainty" %}', dataKey: 'INTERPRETATION_CERTAINTY.I6'}"></input>&nbsp;
+                                <!-- interpretation number -->     
+                                <input style="width:18%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="interpretation-number" data-bind="select2: {value: getEditedNode('INTERPRETATION_NUMBER_TYPE.E55', 'value'), placeholder: '{% trans "Number" %}', dataKey: 'INTERPRETATION_NUMBER_TYPE.E55'}"></input>&nbsp;
+                                <div id="arches-names-form" class="section-headline">
+                                    {% trans "On behalf of" %}
+                                    <i class="fa fa-pencil edit-actor show-box interpretation" data-actor="interpretation" aria-hidden="true"></i>
+                                    <i class="fa fa-pencil-square edit-actor hide-box interpretation hidden" data-actor="interpretation" aria-hidden="true"></i>
+                                </div>
+                                <div class="row edit-actors-row interpretation hidden">
+                                    <input class="form-control arches-form-input" id="actor-name" style="width: 18%;" placeholder='{% trans "Name" %}' data-bind='value: getEditedNode("FUNCTION_INTERPRETATION_INFERENCE_MAKING_ACTOR_NAME.E41", "value")'>
+                                </div>
+                                {% include 'views/components/add-item-button.htm' %}
+                            </div>
+                        </div>
+                    </dd>
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "All values must be populated." %}</div>
+                </dl>
+
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "This resource has these Feature Interpretations:" %}
+                    </dd>
+                    <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Feature Interpretation Defined" %}</div>
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this Feature Interpretation" %}"><i data-bind='click: $parent.deleteItem.bind($parent)' class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind='click: $parent.editItem.bind($parent)' title="Edit this Feature Interpretation">
+                                    <span data-bind="{text: nodes.get('INTERPRETATION_TYPE.I4', 'label')}" style="padding-right:2px"></span>
+                                    <span data-bind="{text: nodes.get('INTERPRETATION_CERTAINTY.I6', 'label')}" style="padding-right:2px"></span>
+                                    <span data-bind="{text: nodes.get('INTERPRETATION_NUMBER_TYPE.E55', 'label')}" style="padding-right:2px"></span>
+                                    <span data-bind="{text: nodes.get('FUNCTION_TYPE.I4', 'label')}" style="padding-right:2px"></span>
+                                    <span class="text-muted arches-crud-type-identifier">
+                                        (<span data-bind="{text: nodes.get('FUNCTION_CERTAINTY.I6', 'label')}"></span>)
+                                    </span>
+                                    <span class="text-muted" data-bind="{visible: nodes.get('FUNCTION_INTERPRETATION_INFERENCE_MAKING_ACTOR_NAME.E41', 'value').length > 0}"> by: </span>
+                                    <span data-bind='text: nodes.get("FUNCTION_INTERPRETATION_INFERENCE_MAKING_ACTOR_NAME.E41", "value")' style="padding-right:2px;"></span><span class="text-muted arches-crud-type-identifier"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% include 'views/forms/sections/SaveEditsFooter.htm' %}
+
+{% endblock form_content %}

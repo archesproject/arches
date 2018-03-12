@@ -33,8 +33,8 @@ from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUpload
 from arches.app.models.concept import Concept
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.core.exceptions import ObjectDoesNotExist
-from arches.app.utils.eamena_utils import validatedates
-import urllib
+
+import __builtin__
 import logging
 
 class Entity(object):
@@ -123,11 +123,12 @@ class Entity(object):
         return self
         
     def create_uniqueids(self, entitytype, is_new_resource = False):  # Method that creates UniqueIDs and its correlated Entity when a new resource is saved, or else only a UniqueId when the entity is already present (this will happen if the entities are created via importer.py
+
         if entitytype in settings.EAMENA_RESOURCES:
           type = 'EAMENA'
         else:
-          type = re.split("\W+|_", entitytype)[0] if entitytype != "EAMENA_ID.E42" else re.split("\W+|-", self.value)[0]
-          
+          type = re.split("\W+|_", entitytype)[0]
+            
         if is_new_resource:
           entity2 = archesmodels.Entities()
           entity2.entitytypeid = archesmodels.EntityTypes.objects.get(pk = "EAMENA_ID.E42")
@@ -210,14 +211,16 @@ class Entity(object):
             if not (isinstance(themodelinstance, archesmodels.Files)) and not (isinstance(themodelinstance, archesmodels.UniqueIds)):
                 # Validating dates
                 if isinstance(themodelinstance, archesmodels.Dates) and is_new_entity ==True:
-                  try:
-                    datetime.datetime.strptime(self.value, '%Y-%m-%d')
-                  except ValueError:
-                    try:
-                      d = datetime.datetime.strptime(self.value,'%d-%m-%Y')
-                      self.value = d.strftime('%Y-%m-%d')
-                    except ValueError:
-                      raise ValueError("The value inserted is not a date")
+                  # don't attempt to parse string if this is already a datetime
+                  if __builtin__.type(self.value) != datetime.datetime:
+                      try:
+                        datetime.datetime.strptime(self.value, '%Y-%m-%d')
+                      except ValueError:
+                        try:
+                          d = datetime.datetime.strptime(self.value,'%d-%m-%Y')
+                          self.value = d.strftime('%Y-%m-%d')
+                        except ValueError:
+                          raise ValueError("The value inserted is not a date")
                     
                 setattr(themodelinstance, columnname, self.value)
                 
@@ -237,17 +240,6 @@ class Entity(object):
                     themodelinstance.save()
                     self.value = themodelinstance.geturl()
                     self.label = themodelinstance.getname()
-                else:
-                    try: #Hack to allow for files to be saved from JSON import file. Need to write proper logic here
-                        result = urllib.urlretrieve(self.value)
-                        setattr(themodelinstance, columnname,self.label)
-                        themodelinstance.save()
-                        self.value = themodelinstance.geturl()
-                        self.label = themodelinstance.getname()
-                    except:
-                        pass
-
-
 
         for child_entity in self.child_entities:
             child = child_entity._save()
@@ -468,7 +460,8 @@ class Entity(object):
             if entity.entitytypeid == entitytypeid:
                 ret.append(entity)
         self.traverse(appendValue)
-        return list(set(ret)) #return a list of a set to exclude potential duplicates
+
+        return ret
 
     def traverse(self, func, scope=None):
         """
@@ -858,11 +851,7 @@ class Entity(object):
                         order_value = child_entity.find_entities_by_type_id(value)
                         if order_value:
                             if child_entity.entitytypeid == key:
-                                try:
-                                    order_by_value = validatedates(order_value[0].label)
-                                except:
-                                    order_by_value = order_value[0].label
-                                data[child_entity.undotify()][len(data[child_entity.undotify()])-1]['orderby'] = order_by_value
+                                data[child_entity.undotify()][len(data[child_entity.undotify()])-1]['orderby'] = order_value[0].label
         return data
 
     def get_nodes(self, entitytypeid, keys=[]):

@@ -1,0 +1,698 @@
+{% extends "views/forms/base.htm" %}
+{% load i18n %}
+
+{% block form_content %}
+
+{% if resourcetypeid != 'ACTOR.E39' %}
+    
+    
+    <div id="geom-list-section">
+
+        <!-- Map -->
+        <div class="row margin-bottom-10">
+            <div class="col-xs-12" >
+
+                <!-- Resource Mapped Locations -->
+                <div class="margin-bottom-10 padding-left-10">
+                    <dl>
+
+                        <!-- Title -->
+                        <dt>
+                            <h5 id="arches-names-form" class="section-headline">{% trans 'Mapped Locations' %}</h5>
+                        </dt>
+
+                        <!-- Map -->
+                        
+                        <div id="map" class="map arches-report-map margin-left-0 margin-top-10"><div id="tooltip" style="z-index: 1000 !important; font-weight:700;"></div></div>
+                        
+                        <!-- Geometry Type -->
+                        <div id="geometry-type" class="geometry-type" style="margin-top: -490px; margin-bottom: 500px; padding-right: 10px; ">
+
+                            <div class="row">
+                                <div class="col-xs-6 col-xs-offset-6" data-bind="attr: { 'style': getEditedNode('GEOMETRIC_PLACE_EXPRESSION.SP5', 'value')() === '' ? 'opacity:0;' : '' }">
+<!--                                 <div class="form-group" style="width:100%;">       
+                                    <input class="geometry-selection" id="geometry-selection" name="" style="width:100%" data-bind="select2: {value: getEditedNode('GEOMETRY_QUALIFIER.E55', 'value'), placeholder: 'Type', dataKey: 'GEOMETRY_QUALIFIER.E55'}"> 
+                                </div> -->  <!-- Currently disabled, but to be reintroduced once graph changes have been implemented (AZ 4/03/17) -->
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <!-- End Geometry Type -->
+                          
+                    </dl>
+                </div>
+                <!-- Map: Date of Bing Imagery--->
+                <div class="row">
+                    <div class="col-xs-12" style="margin-left:-10px;">
+                        <div id = "datescontainer" style= "float: right; margin-top: -470px;  z-index: 900 !important;color:#fff; display:hidden;"> <span id="imagery-tag">{% trans "Date of imagery: " %}</span><div id="imagery-date" ></div></div>
+                        
+                    </div>
+                </div>
+                <!-- Map: Scaleline--->
+                 <div class="row">
+                    <div class="col-xs-12" style="">
+                        <div id="scale-line" style = "margin-top: -430px;"></div>        
+                    </div>
+                </div>               
+                
+                <!-- Map Tools Panel -->
+                <div class="row" >
+                    <div class="col-xs-4 {% if LANGUAGE_BIDI %}col-xs-offset-7{%else %} col-xs-offset-1{% endif %}" style="">
+
+                        <div id="basemaps-panel" class="tools-panel hidden" style="margin-top: -490px; overflow-y: scroll; height: 435px;">
+                            <div class="modal-header arches-modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                    ×
+                                </button>
+                                <h4 class="modal-title">
+                                    {% trans 'Basemaps' %}
+                                </h4>
+                            </div>
+
+                            <!-- Body Content -->
+                            <div class="modal-body padding-top-0 padding-bottom-0" data-bind='foreach: baseLayers'>
+
+                                <div class="row">
+                                    <hr class="arches-layer-divider" style="border-top: 0px; margin-top: 5px;" />
+
+                                    <div class="arches-basemap-entry" style="margin-right: 7px;">
+                                
+                                        <div>
+                                            <a data-bind="attr: { id: id, title: name }" class="basemap info-click" data-rel="" href="javascript:void(0);">
+                                                <span class="">  
+                                                    <img data-bind="attr: { src: icon }" class="arches-basemap-thumbnail" alt="" />
+                                                    <span class="zoom-icon"></span>                   
+                                                </span>                                              
+                                            </a>                    
+                                            <span class="arches-basemap-caption-search" style="width: 240px;">
+                                                <a data-bind="attr: { id: id }, text: name" class="caption-text-search hover-effect basemap info-click" href="javascript:void(0);"> </a>
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!-- End Body Content -->
+
+                        </div>
+                    </div>
+                </div>
+                <!-- End Map Tools Panel -->
+
+                <!-- Overlays Panel -->
+                <div class="row">
+                    <div class="col-xs-4 {% if LANGUAGE_BIDI %}col-xs-offset-7{%else %} col-xs-offset-1{% endif %}" style="">
+
+                        <div id="overlay-panel" class="tools-panel hidden" style="margin-top: -490px; overflow-y: scroll; overflow-x: hidden; height: 435px;">
+                            <div class="modal-header arches-modal-header">
+
+                                <button type="button" class="close pull-right" data-dismiss="modal" aria-hidden="true">
+                                    ×
+                                </button>
+
+                                <h4 class="modal-title">
+                                    {% trans 'Geometry Tools' %}
+                                </h4>
+                            </div>
+                
+                            <!-- Body Content -->
+                            <div class="modal-body padding-top-10 padding-bottom-0" style="padding-left: 5px; padding-right: 5px;">
+                                
+                                <!-- List overlays -->
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        
+                                        <dl>
+                                            
+                                            <dd class="">
+                                                <div class="arches-tool-item">
+                                                    
+                                                    <a href="javascript:void(0);" data-geometrytype="Point" class="arches-tool-text geometry-btn info-link" title="">
+                                                        <i class="fa fa-dot-circle-o"></i>
+                                                        {% trans 'Draw new point' %}
+                                                    </a>
+                                                </div>
+                                            </dd>
+
+                                            <dd class="">
+                                                <div class="arches-tool-item">
+                                                    
+                                                    <a href="javascript:void(0);" data-geometrytype="LineString" class="arches-tool-text geometry-btn info-link" title="">
+                                                        <i class="fa fa-minus"></i>
+                                                        {% trans 'Draw new line' %}
+                                                    </a>
+                                                </div>
+                                            </dd>
+
+                                            <dd class="">
+                                                <div class="arches-tool-item">
+                                                    
+                                                    <a href="javascript:void(0);" data-geometrytype="Polygon" class="arches-tool-text geometry-btn info-link" title="">
+                                                        <i class="fa fa-square-o"></i>
+                                                        {% trans 'Draw new polygon' %}
+                                                    </a>
+                                                </div>
+                                            </dd>
+
+                                            <dd class="">
+                                                <div class="arches-tool-item file-upload">
+                                                    
+                                                    <a href="javascript:void(0);" data-geometrytype="Polygon" class="arches-tool-text geometry-btn info-link" title="">
+                                                        <i class="fa fa-upload"></i>
+                                                        {% trans 'Add from gpx, kml, or geojson' %}
+                                                    </a>
+                                                    <input type="file" class="upload geom-upload" accept=".gpx, .kml, .geojson, .json"/>
+                                                </div>
+                                            </dd>
+
+                                            <dd class="geom-file-instructions">
+                                                {% trans '(or drag and drop the file onto the map)' %}
+                                            </dd>
+                                            
+                                        </dl>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- End Body Content -->
+
+                        </div>
+                    </div>
+                </div>
+                <!-- End Overlays Panel -->
+
+                <!-- Map Tools -->
+                <div class="row" style="height:0px;">
+
+                    <div class="btn-group" style="top:-80px;left:{% if LANGUAGE_BIDI %}-{% endif %}86px;">
+
+                        <button id="inventory-home" type="button" class="btn btn-primary arches-map-tools-pressed hidden" style="width: 50px; border: 1px solid rgba(206,217,233,.95);"><i class="fa fa-caret-down"></i>
+                        </button>
+
+                        <button id="inventory-basemaps" type="button" class="btn btn-primary arches-map-tools"><i class="fa fa-globe"></i> {% trans 'Basemaps' %}
+                        </button>
+
+                        <button id="inventory-overlays" type="button" class="btn btn-primary arches-map-tools"><i class="fa fa-plus"></i> {% trans 'Add Geometry' %}
+                        </button>
+
+                    </div>
+
+                </div>
+                <!-- End Map Tools -->
+
+            </div>
+        </div>
+
+        <!-- Geometry Records -->
+        <div class="row margin-bottom-10">
+            <div class="col-xs-12">
+
+                <!-- Geometries -->
+                <div class="arches-crud-child-section">
+                    <dl>
+                        <dd class="arches-CRUD-child-title">
+                            {% trans 'This resource is represented by the following geometries:' %}
+                        </dd>
+
+                        <div data-bind="visible: getBranchLists().length == 0" class="margin-left-5 txt-color-blue">{% trans "No geometries defined" %}</div>   
+
+                        <dd class="margin-left-5" data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="#" class="arches-CRUD-child" title="{% trans "Remove this geometry" %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="#" class="arches-CRUD-child" data-bind="click: $parent.editItem.bind($parent), text: nodes.get('GEOMETRIC_PLACE_EXPRESSION.SP5', 'value').split('(')[0].toLowerCase(), attr: { 'style': editing() ? 'font-weight:bold;' : '' }" title="{% trans "Edit this geometry" %}"></a>
+                                <!--                             <span class="text-muted arches-crud-type-identifier" data-bind="text: nodes.get('GEOMETRY_QUALIFIER.E55', 'label')"></span> --> <!-- Currently disabled, but to be reintroduced once graph changes have been implemented (AZ 4/03/17) -->
+                            </div>
+                        </dd>
+
+                    </dl>
+                </div>
+            </div>
+        </div>
+        <!-- End Geometry Records -->
+    </div>
+    
+    
+    
+    <hr class="devider arches-RDM-divider">
+    
+    
+{% endif %}
+
+<div id="spatial-coordinates-ref-system">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                <dl>
+                    <dt>
+                        <h5 id="arches-subjects-form" class="section-headline">{% trans "Spatial coordinate reference system" %}</h5>
+                    </dt>
+                    <dd>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <input style="width:33%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" placeholder="{% trans 'System' %}" data-bind="select2: {value: getEditedNode('SPATIAL_COORDINATES_REF_SYSTEM.SP4', 'value'), dataKey: 'SPATIAL_COORDINATES_REF_SYSTEM.SP4'}"></input>
+                                {% include 'views/components/add-item-button.htm' %}
+                            </div>
+                        </div>
+                    </dd>
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "System required." %}</div>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "Spatial coordinate reference system for this heritage resource:" %}
+                    </dd>
+                    <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No System Defined" %}</div>
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this System" %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans "Edit this System" %}">
+                                    <span data-bind='{text: nodes.get("SPATIAL_COORDINATES_REF_SYSTEM.SP4", "label")}' style="padding-right:2px;"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div id="certainty-of-location">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                <dl>
+                    <dt>
+                        <h5 id="arches-subjects-form" class="section-headline">{% trans "Certainty of Location" %}</h5>
+                    </dt>
+                    <dd>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <input style="width:33%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" placeholder="{% trans 'Certainty' %}" data-bind="select2: {value: getEditedNode('LOCATION_CERTAINTY.I6', 'value'), dataKey: 'LOCATION_CERTAINTY.I6'}"></input>
+                                {% include 'views/components/add-item-button.htm' %}
+                            </div>
+                        </div>
+                    </dd>
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "Certainty required." %}</div>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "Certainty of Location of this heritage resource:" %}
+                    </dd>
+                    <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Certainty Defined" %}</div>
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this Certainty" %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans "Edit this Certainty" %}">
+                                    <span data-bind='{text: nodes.get("LOCATION_CERTAINTY.I6", "label")}' style="padding-right:2px;"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="certainty-of-geometry">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                <dl>
+                    <dt>
+                        <h5 id="arches-subjects-form" class="section-headline">{% trans "Certainty of Geometric Extent" %}</h5>
+                    </dt>
+                    <dd>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <input style="width:33%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" placeholder="{% trans 'Geometry' %}" data-bind="select2: {value: getEditedNode('GEOMETRY_EXTENT_CERTAINTY.I6', 'value'), dataKey: 'GEOMETRY_EXTENT_CERTAINTY.I6'}"></input>
+                                {% include 'views/components/add-item-button.htm' %}
+                            </div>
+                        </div>
+                    </dd>
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "Geometry required." %}</div>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "Certainty of Geometry of this heritage resource:" %}
+                    </dd>
+                    <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Geometry Defined" %}</div>
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this Geometry" %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans "Edit this Geometry" %}">
+                                    <span data-bind='{text: nodes.get("GEOMETRY_EXTENT_CERTAINTY.I6", "label")}' style="padding-right:2px;"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="grid_ID-section">
+    <!-- Name CRUD Form -->
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                
+                <dl>
+                    <!-- Title -->
+                    <dt>
+                        <h5 id="arches-names-form" class="section-headline">{% trans "Grid ID" %}</h5>
+                    </dt>
+                    
+                    <!-- Form -->
+                    <dd>
+                        <div class="row">
+                            
+                            <div class="col-xs-12 hidden-xs">
+                                
+                                <input class="form-control arches-form-input" id="resource-name" style="width: 50%;" placeholder='{% trans "Resource ID" %}' data-bind='value: getEditedNode("GRID_ID.E42", "value")'>
+                                    
+                                    
+                                    {% include 'views/components/add-item-button.htm' %}
+                                    
+                                    </div>
+                            
+                            <div class="col-xs-12 hidden-sm hidden-md hidden-lg">
+                                
+                                <input class="form-control arches-form-input" id="resource-name" style="width: 100%;" placeholder='{% trans "Grid ID" %}' data-bind='value: getEditedNode("GRID_ID.E42", "value")'>
+                                    <div class="margin-top-5"></div>
+                                    >
+                                    
+                                    <!-- Spacer (for xs screens) -->
+                                    <div class="margin-top-5"></div>
+                                    
+                                    {% include 'views/components/add-item-button.htm' %}
+                                    
+                                    </div>
+                            
+                            
+                        </div>
+                    </dd>
+                    <!-- End Form -->
+                    
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "This value must be populated." %}</div>
+                </dl>
+                
+            </div>
+        </div>
+    </div>
+    <!-- End Name CRUD Form Container -->
+    
+    <!-- Name Records -->
+    <div class="row">
+        <div class="col-xs-12">
+            
+            <!--  -->
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "This resource has the following Grid ID code:" %}
+                    </dd>
+                    
+                    <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Grid ID Defined" %}</div>
+                        
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this name" %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans "Edit this name" %}"><span data-bind='text: nodes.get("GRID_ID.E42", "value")' style="padding-right:2px;"></span><span class="text-muted arches-crud-type-identifier"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+                    
+                </dl>
+            </div>
+        </div>
+    </div>
+    <!-- End Name Records -->
+
+</div>
+
+<div id="topography">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                <dl>
+                    <dt>
+                        <h5 id="arches-subjects-form" class="section-headline">{% trans "Topography" %}</h5>
+                    </dt>
+                    <dd>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <input style="width:33%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" placeholder="{% trans 'Topography' %}" data-bind="select2: {value: getEditedNode('TOPOGRAPHY_TYPE.E55', 'value'), dataKey: 'TOPOGRAPHY_TYPE.E55'}"></input>
+                                {% include 'views/components/add-item-button.htm' %}
+                            </div>
+                        </div>
+                    </dd>
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "Topography required." %}</div>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "Certainty of Geometry of this heritage resource:" %}
+                    </dd>
+                    <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Topography Defined" %}</div>
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this Topography" %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans "Edit this Topography" %}">
+                                    <span data-bind='{text: nodes.get("TOPOGRAPHY_TYPE.E55", "label")}' style="padding-right:2px;"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div id="country">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                <dl>
+                    <dt>
+                        <h5 id="arches-subjects-form" class="section-headline">{% trans "Country" %}</h5>
+                    </dt>
+                    <dd>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <input style="width:33%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" placeholder="{% trans 'Country' %}" data-bind="select2: {value: getEditedNode('COUNTRY_TYPE.E55', 'value'), dataKey: 'COUNTRY_TYPE.E55'}"></input>
+                                {% include 'views/components/add-item-button.htm' %}
+                            </div>
+                        </div>
+                    </dd>
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "Country required." %}</div>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "Certainty of Geometry of this heritage resource:" %}
+                    </dd>
+                    <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Country Defined" %}</div>
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this Country" %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans "Edit this Country" %}">
+                                    <span data-bind='{text: nodes.get("COUNTRY_TYPE.E55", "label")}' style="padding-right:2px;"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div id="administrative-area">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                <dl>
+                    <dt>
+                        <h5 id="arches-subjects-form" class="section-headline">{% trans "Administrative Area" %}</h5>
+                    </dt>
+                    <dd>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <input class="form-control arches-form-input" style="width: 33%;" placeholder='{% trans "Administrative Area" %}' data-bind='value: getEditedNode("ADMINISTRATIVE_DIVISION_NAME.E44", "value")'>
+                                <input style="width:33%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" placeholder="{% trans 'Administrative Area Type' %}" data-bind="select2: {value: getEditedNode('ADMINISTRATIVE_DIVISION_TYPE.E55', 'value'), dataKey: 'ADMINISTRATIVE_DIVISION_TYPE.E55'}"></input>
+                                {% include 'views/components/add-item-button.htm' %}
+                            </div>
+                        </div>
+                    </dd>
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "Administrative Area required." %}</div>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "Administrative Area of this heritage resource:" %}
+                    </dd>
+                    <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Administrative Area Defined" %}</div>
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this Administrative Area" %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans "Edit this Administrative Area" %}">
+                                    <span data-bind='text: nodes.get("ADMINISTRATIVE_DIVISION_NAME.E44", "value")' style="padding-right:2px;"></span>
+                                    <span data-bind='{text: nodes.get("ADMINISTRATIVE_DIVISION_TYPE.E55", "label")}' style="padding-right:2px;"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="address">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                <dl>
+                    <dt>
+                        <h5 id="arches-subjects-form" class="section-headline">{% trans "Address" %}</h5>
+                    </dt>
+                    <dd>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <input class="form-control arches-form-input" style="width: 33%;" placeholder='{% trans "Address" %}' data-bind='value: getEditedNode("ADDRESS.E45", "value")'>
+                                <input style="width:33%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" placeholder="{% trans 'Address Type' %}" data-bind="select2: {value: getEditedNode('ADDRESS_TYPE.E55', 'value'), dataKey: 'ADDRESS_TYPE.E55'}"></input>
+                                {% include 'views/components/add-item-button.htm' %}
+                            </div>
+                        </div>
+                    </dd>
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "Address required." %}</div>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "Address of this heritage resource:" %}
+                    </dd>
+                    <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Address Defined" %}</div>
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this Address" %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans "Edit this Address" %}">
+                                    <span data-bind='text: nodes.get("ADDRESS.E45", "value")' style="padding-right:2px;"></span>
+                                    <span data-bind='{text: nodes.get("ADDRESS_TYPE.E55", "label")}' style="padding-right:2px;"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="cadastral-reference">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                <dl>
+                    <dt>
+                        <h5 id="arches-subjects-form" class="section-headline">{% trans "Cadastral Reference" %}</h5>
+                    </dt>
+                    <dd>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <input style="width:33%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" placeholder="{% trans 'Cadastral Reference' %}" data-bind="select2: {value: getEditedNode('CADASTRAL_REFERENCE.E44', 'value'), dataKey: 'CADASTRAL_REFERENCE.E44'}"></input>
+                                {% include 'views/components/add-item-button.htm' %}
+                            </div>
+                        </div>
+                    </dd>
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "Cadastral Reference required." %}</div>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans "Cadastral Reference of this heritage resource:" %}
+                    </dd>
+                    <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Cadastral Reference Defined" %}</div>
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this Cadastral Reference" %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans "Edit this Cadastral Reference" %}">
+                                    <span data-bind='{text: nodes.get("CADASTRAL_REFERENCE.E44", "label")}' style="padding-right:2px;"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% include 'views/forms/sections/SaveEditsFooter.htm' %}
+{% endblock form_content %}

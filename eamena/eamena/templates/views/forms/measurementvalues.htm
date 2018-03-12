@@ -19,14 +19,14 @@
 
                             <div class="col-xs-12">
 
-                                <!-- Measurement Type -->   
-                                <input style="width:30%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-type" data-bind="select2: {value: getEditedNode('MEASUREMENT_TYPE.E55', 'value'),  placeholder: '{% trans "Type" %}', dataKey: 'MEASUREMENT_TYPE.E55'}"></input>&nbsp;
-
-                                <!-- Measurement Unit -->     
-                                <input style="width:30%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-unit" data-bind="select2: {value: getEditedNode('UNIT_OF_MEASUREMENT.E55', 'value'), placeholder: '{% trans "Unit" %}', dataKey: 'UNIT_OF_MEASUREMENT.E55'}"></input>&nbsp;
-
                                 <!-- Measurement Value -->
-                                <input class="form-control arches-form-input" id="measurement-value" style="width: 20%;" placeholder="value" data-bind="{value: getEditedNode('VALUE_OF_MEASUREMENT.E60', 'value')}">
+                                <input class="form-control arches-form-input" id="measurement-value" style="width: 20%;" placeholder="value" data-bind="{value: getEditedNode('MEASUREMENT_NUMBER.E60', 'value')}">
+                                <!-- Measurement Unit -->     
+                                <input style="width:30%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-unit" data-bind="select2: {value: getEditedNode('MEASUREMENT_UNIT.E58', 'value'), placeholder: '{% trans "Unit" %}', dataKey: 'MEASUREMENT_UNIT.E58'}"></input>&nbsp;
+                                <!-- Dimension Type -->   
+                                <input style="width:30%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-type" data-bind="select2: {value: getEditedNode('DIMENSION_TYPE.E55', 'value'),  placeholder: '{% trans "Type" %}', dataKey: 'DIMENSION_TYPE.E55'}"></input>&nbsp;
+                                <!-- Measurement Source -->   
+                                <input style="width:30%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-measurement-type" data-bind="select2: {value: getEditedNode('MEASUREMENT_SOURCE_TYPE.E55', 'value'),  placeholder: '{% trans "Source" %}', dataKey: 'MEASUREMENT_SOURCE_TYPE.E55'}"></input>&nbsp;
                             
                                 {% include 'views/components/add-item-button.htm' %}
 
@@ -35,7 +35,7 @@
                     </dd>
                     <!-- End Form -->
 
-                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "Each measurement must have a type, unit, and value." %}</div>
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "Each measurement must have a type, unit, value and source." %}</div>
                 </dl>
 
             </div>
@@ -58,7 +58,14 @@
                         <div data-bind='foreach: getBranchLists()'>
                             <div class="arches-crud-record">
                                 <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this measurement" %}"><i data-bind='click: $parent.deleteItem.bind($parent)' class="arches-CRUD-delete fa fa-times-circle"></i></a>
-                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind='click: $parent.editItem.bind($parent)' title="Edit this measurement"><span data-bind="{text: nodes.get('VALUE_OF_MEASUREMENT.E60', 'value')}" style="padding-right:2px;"></span><span data-bind="{text: nodes.get('UNIT_OF_MEASUREMENT.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted arches-crud-type-identifier">(<span data-bind="{text: nodes.get('MEASUREMENT_TYPE.E55', 'label')}"></span>)</span>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind='click: $parent.editItem.bind($parent)' title="Edit this measurement">
+                                    <span data-bind="{text: nodes.get('MEASUREMENT_SOURCE_TYPE.E55', 'label')}" style="padding-right:2px"></span>
+                                    <span data-bind="{text: nodes.get('MEASUREMENT_NUMBER.E60', 'value')}" style="padding-right:2px;"></span>
+                                    <span data-bind="{text: nodes.get('MEASUREMENT_UNIT.E58', 'label')}" style="padding-right:2px"></span>
+                                    <span class="text-muted arches-crud-type-identifier">
+                                        (<span data-bind="{text: nodes.get('DIMENSION_TYPE.E55', 'label')}"></span>)
+                                    </span>
+                                    
                                 </a>
                             </div>
                         </div>

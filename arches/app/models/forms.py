@@ -106,6 +106,9 @@ class ResourceForm(object):
 
         self.resource.trim()
 
+    def set_user(self, user):
+        self.user = user
+
 
 class DeleteResourceForm(ResourceForm):
     @staticmethod
