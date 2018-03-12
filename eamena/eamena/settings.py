@@ -63,6 +63,25 @@ def RESOURCE_TYPE_CONFIGS():
             },
             'sort_order': 1
         },
+        'HERITAGE_FEATURE.E24': {
+            'resourcetypeid': 'HERITAGE_FEATURE.E27',
+            'name': _('Heritage Feature E24'),
+            'icon_class': 'fa fa-university',
+            'default_page': 'summary',
+            'default_description': _('No name available'),
+            'description_node': _('NAME.E41'),
+            'categories': [_('Resource')],
+            'has_layer': True,
+            'on_map': True,
+            'marker_color': '#FFC53D',
+            'stroke_color': '#d9b562',
+            'fill_color': '#eedbad',
+            'primary_name_lookup': {
+                'entity_type': 'EAMENA_ID.E42',
+                'lookup_value': 'Primary'
+            },
+            'sort_order': 1
+        },
         'ACTOR.E39': {
             'resourcetypeid': 'ACTOR.E39',
             'name': _('Person/Organization'),
