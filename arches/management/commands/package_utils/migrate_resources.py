@@ -70,8 +70,12 @@ def migrate(settings=None):
                             #get full resource graph for the root entity
                             group_root_entity = Entity(group_root_entity_model.pk)
                             
-                            # create a node for the new group root
-                            new_group_root_entity = Entity().create_from_mapping(resource_entity_type, mapping_schema[new_group_root_node_id]['steps'], new_group_root_node_id, '')
+                            if group_migrations_list[0]['NEWENTITYTYPEID'] != new_group_root_node_id:
+                                # create a node for the new group root
+                                new_group_root_entity = Entity().create_from_mapping(resource_entity_type, mapping_schema[new_group_root_node_id]['steps'], new_group_root_node_id, '')
+                                group_root_is_new_data_node = False
+                            else:
+                                group_root_is_new_data_node = True
                             
                             # get the root resource graph for this entity
                             resource_model = get_resource_for_entity(group_root_entity, resource_entity_type)
@@ -84,7 +88,6 @@ def migrate(settings=None):
                                 
                                 # get individual entities to be migrated in the source group
                                 old_entities = group_root_entity.find_entities_by_type_id(group_migration['OLDENTITYTYPEID'])
-                                
                                 for old_entity in old_entities:
                                     # Create the corresponding entity in the new schema
                                     new_entity = Entity()
@@ -99,32 +102,42 @@ def migrate(settings=None):
                                     
                                     new_entity.create_from_mapping(resource_entity_type, mapping_schema[new_entity_type_id]['steps'], new_entity_type_id, old_value)
                                     
-                                    # If there is a node to be inserted, do it here
-                                    if 'INSERT_NODE_RULE' in group_migration:
-                                        entityttypeid_to_insert = group_migration['INSERT_NODE_RULE'][1][1]
-                                        value_to_insert = group_migration['INSERT_NODE_RULE'][1][2]
-                                        
-                                        inserted_entity = Entity()
-                                        inserted_entity.create_from_mapping(resource_entity_type, mapping_schema[entityttypeid_to_insert]['steps'], entityttypeid_to_insert, value_to_insert)
-                                        
-                                        new_entity.merge(inserted_entity)
-                                        
+                                    # In some cases a newly created data node is the new group root. In this case we should discard the previously created new group root and use this one instead.
+                                    if new_group_root_node_id == new_entity_type_id:
+                                        new_group_root_entity = new_entity
+                                        group_root_is_new_data_node = True
+                                    
+                                    # UNUSED 
+                                    # # If there is a node to be inserted, do it here
+                                    # # if 'INSERT_NODE_RULE' in group_migration:
+                                    # #     entityttypeid_to_insert = group_migration['INSERT_NODE_RULE'][1][1]
+                                    # #     value_to_insert = group_migration['INSERT_NODE_RULE'][1][2]
+                                    # # 
+                                    # #     inserted_entity = Entity()
+                                    # #     inserted_entity.create_from_mapping(resource_entity_type, mapping_schema[entityttypeid_to_insert]['steps'], entityttypeid_to_insert, value_to_insert)
+                                    # # 
+                                    # #     new_entity.merge(inserted_entity)
+
+
                                     # If there is a node in common with the existing node further down the chain than the group root node, merge there
                                     # follow links back from the parent
                     
-                                    has_merged = False
+                                    shouldnt_merge_with_group_root = group_root_is_new_data_node and new_group_root_node_id == new_entity_type_id
                                     
-                                    reversed_steps = mapping_schema[new_entity_type_id]['steps'][::-1]
-                                    for step in reversed_steps:
-                                        # find the entitytypedomain in the new_group_root_entity
+                                    if not shouldnt_merge_with_group_root:
+                                        has_merged = False
+                                        
+                                        reversed_steps = mapping_schema[new_entity_type_id]['steps'][::-1]
+                                        for step in reversed_steps:
+                                            # find the entitytypedomain in the new_group_root_entity
+                                            if not has_merged:
+                                                mergeable_nodes = new_group_root_entity.find_entities_by_type_id(step['entitytypedomain'])
+                                                if len(mergeable_nodes) > 0:
+                                                    new_group_root_entity.merge_at(new_entity, step['entitytypedomain'])
+                                                    has_merged = True
+                                        
                                         if not has_merged:
-                                            mergeable_nodes = new_group_root_entity.find_entities_by_type_id(step['entitytypedomain'])
-                                            if len(mergeable_nodes) > 0:
-                                                new_group_root_entity.merge_at(new_entity, step['entitytypedomain'])
-                                                has_merged = True
-                                    
-                                    if not has_merged:
-                                        logging.warning("Unable to merge newly created entity")
+                                            logging.warning("Unable to merge newly created entity")
                                     
                                     
                                 # merge the new group root entity into the resource
