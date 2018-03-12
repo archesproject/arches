@@ -13,10 +13,10 @@ define(['jquery',
             var self = this;
             var date_picker = $('.datetimepicker').datetimepicker({pickTime: false});            
             var currentEdited = this.getBlankFormData();
-
-            date_picker.on('dp.change', function(evt){
-                $(this).find('input').trigger('change'); 
-            });
+            console.log("this.data", this.data);
+            // date_picker.on('dp.change', function(evt){
+            //     $(this).find('input').trigger('change'); 
+            // });
 
             // this.editAssessment = function(branchlist){
             //     self.switchBranchForEdit(branchlist);
@@ -26,38 +26,49 @@ define(['jquery',
             //     self.deleteClicked(branchlist);
             // }
 
-            ko.applyBindings(this, this.$el.find('#existing')[0]);
+            // ko.applyBindings(this, this.$el.find('#existing')[0]);
 
-            this.addBranchList(new BranchList({
-                el: this.$el.find('#resource-morphology')[0],
+        
+            var relationBranchList = new BranchList({
+                el: this.$el.find('.relation-list')[0],
                 data: this.data,
-                dataKey: 'SITE_MORPHOLOGY_TYPE.E55',
+                dataKey: 'related-resources',
+                validateBranch: function (nodes) {
+                    return this.validateHasValues(nodes);
+                },
+                addBlankEditBranch: function(){
+                    return null;
+                },
+                // getData: function(){
+                //     var data = koMapping.toJS(this.viewModel.branch_lists());
+                //     _.each(data, function(item){
+                //         var i = item;
+                //         delete item.editing;
+                //     }, this); 
+                //     return data;
+                // },
+                getEditedBranchTypeInfo: function() {
+                    if (!this.getEditedBranch()) {
+                        return {};
+                    }
+                    return resourceTypes[this.getEditedBranch().relatedresourcetype()];
+                }
+            });
+
+            this.addBranchList(relationBranchList);
+        
+            this.addBranchList(new BranchList({
+                el: this.$el.find('#heritage-classification')[0],
+                data: this.data,
+                dataKey: 'NAME.E41',
                 singleEdit: true
             }));
             this.addBranchList(new BranchList({
-                el: this.$el.find('#resource-shape')[0],
+                el: this.$el.find('#assessment-summary')[0],
                 data: this.data,
-                dataKey: 'SITE_OVERALL_SHAPE_TYPE.E55'
+                dataKey: 'INVESTIGATION_ASSESSMENT_ACTIVITY.E7',
+                singleEdit: true
             }));
-            this.addBranchList(new BranchList({
-                el: this.$el.find('#to-date-section')[0],
-                data: currentEdited,
-                dataKey: 'TO_DATE.E49',
-                singleEdit: true,
-                validateBranch: function (nodes) {
-                    return this.validateHasValues(nodes);
-                }
-            }));   
-            this.addBranchList(new BranchList({
-                el: this.$el.find('#from-date-section')[0],
-                data: currentEdited,
-                dataKey: 'FROM_DATE.E49',
-                singleEdit: true,
-                validateBranch: function (nodes) {
-                    return this.validateHasValues(nodes);
-                }
-            })); 
-            
             
             $('#end-workflow').removeClass('disabled');      
         },
@@ -86,18 +97,21 @@ define(['jquery',
 
         getBlankFormData: function(){
             return this.prepareData({
-                'SITE_MORPHOLOGY_TYPE.E55': {
-                    'branch_lists':[]
-                },
-                'SITE_OVERALL_SHAPE_TYPE.E55': {
-                    'branch_lists':[]
-                },
-                'FROM_DATE.E49': {
+                // 'SITE_MORPHOLOGY_TYPE.E55': {
+                //     'branch_lists':[]
+                // },
+                'NAME.E41': {
                     'branch_lists': []
                 },
-                'TO_DATE.E49': {
-                    'branch_lists': []
-                },        
+                'INVESTIGATION_ASSESSMENT_ACTIVITY.E7': {
+                    'branch_lists':[]
+                },
+                'related-resources': {
+                    'branch_lists':[]
+                },
+                // 'TO_DATE.E49': {
+                //     'branch_lists': []
+                // },        
             })
         },
 

@@ -305,102 +305,70 @@ class ManMadeForm(ResourceForm):
         return {
             'id': 'man-made',
             'icon': 'fa-file-text-o',
-            'name': _('Man-made resource (E24)'),
+            'name': _('Heritage features'),
             'class': ManMadeForm
 
         }
     def update(self, data, files):
-        logging.warning('------> ManMadeForm update1: %s', JSONResponse(data['SITE_MORPHOLOGY_TYPE.E55'][0]['nodes'][0]['value'], indent=4))
-        # filedict = {}
         se = SearchEngineFactory().create()
-        # for name in files:
-        #     for f in files.getlist(name):
-        #         filedict[f.name] = f
 
-    # for newfile in data.get('new-files', []):
         resource = Resource()
-        # resource.entitytypeid = 'MAN_MADE_RESOURCE.E24'
-        
-        resource.entitytypeid = 'HERITAGE_RESOURCE_GROUP.E27'
-        resource.set_entity_value('NAME.E41', 'test name')
-        resource.set_entity_value('SITE_MORPHOLOGY_TYPE.E55', data['SITE_MORPHOLOGY_TYPE.E55'][0]['nodes'][0]['value'])
-        
-        # if 'image' in filedict[newfile['id']].content_type:
-        #     resource.set_entity_value('CATALOGUE_ID.E42', newfile['title'])
-        # else:
-        #     resource.set_entity_value('TITLE.E41', newfile['title'])
-        # if newfile.get('description') and len(newfile.get('description')) > 0:
-        #     #  resource.set_entity_value('INFORMATION_RESOURCE_TYPE.E55', newfile['description_type']['value'])
-        #     resource.set_entity_value('DESCRIPTION.E62', newfile.get('description'))
-        # resource.set_entity_value('FILE_PATH.E62', filedict[newfile['id']])            
-        # thumbnail = generate_thumbnail(filedict[newfile['id']])
-        # if thumbnail != None:
-        #     resource.set_entity_value('THUMBNAIL.E62', thumbnail)
+        resource.entitytypeid = 'HERITAGE_FEATURE.E24'
+        for node in data['NAME.E41'][0]['nodes']:
+            if node['entitytypeid'] == "NAME.E41":
+                resource.set_entity_value('NAME.E41', node['value'])
+            if node['entitytypeid'] == "NAME_TYPE.E55":
+                resource.set_entity_value('NAME_TYPE.E55', node['value'])
+                
+        for node in data['INVESTIGATION_ASSESSMENT_ACTIVITY.E7'][0]['nodes']:
+            if node['entitytypeid'] == "INVESTIGATOR_ROLE_TYPE.E55":
+                resource.set_entity_value('INVESTIGATOR_ROLE_TYPE.E55', node['value'])
+            if node['entitytypeid'] == "ASSESSMENT_ACTIVITY_TYPE.E55":
+                resource.set_entity_value('ASSESSMENT_ACTIVITY_TYPE.E55', node['value'])
+            
         resource.save()
         resource.index()
-        # if self.resource.entityid == '':
-        #     self.resource.save()
-        # relationship = self.resource.create_resource_relationship(resource.entityid, relationship_type_id=newfile['relationshiptype']['value'])
-        # se.index_data(index='resource_relations', doc_type='all', body=model_to_dict(relationship), idfield='resourcexid')
-
-
-        # edited_file = data.get('current-files', None)
-        # if edited_file:
-        #     title = ''
-        #     title_type = ''
-        #     description = ''
-        #     description_type = ''
-        #     is_image = False
-        #     for node in edited_file.get('nodes'):
-        #         if node['entitytypeid'] == 'TITLE.E41' and node.get('value') != '':
-        #             title = node.get('value')
-        #         if node['entitytypeid'] == 'CATALOGUE_ID.E42' and node.get('value') != '':
-        #             title = node.get('value')
-        #             is_image = True
-        #         elif node['entitytypeid'] == 'INFORMATION_RESOURCE_TYPE.E55':
-        #             title_type = node.get('value')
-        #         elif node['entitytypeid'] == 'DESCRIPTION.E62':
-        #             description = node.get('value')
-        #         elif node['entitytypeid'] == 'ARCHES_RESOURCE_CROSS-REFERENCE_RELATIONSHIP_TYPES.E55':
-        #             resourcexid = node.get('resourcexid')            
-        #             entityid1 = node.get('entityid1')
-        #             entityid2 = node.get('entityid2')
-        #             relationship = RelatedResource.objects.get(pk=resourcexid)
-        #             relationship.relationshiptype = node.get('value')
-        #             relationship.save()
-        #             se.delete(index='resource_relations', doc_type='all', id=resourcexid)
-        #             se.index_data(index='resource_relations', doc_type='all', body=model_to_dict(relationship), idfield='resourcexid')
-        # 
-        #     relatedresourceid = entityid2 if self.resource.entityid == entityid1 else entityid1
-        #     relatedresource = Resource().get(relatedresourceid)
-        #     relatedresource.set_entity_value('INFORMATION_RESOURCE_TYPE.E55', title_type)
-        #     relatedresource.set_entity_value('CATALOGUE_ID.E42', title) if is_image == True else relatedresource.set_entity_value('TITLE.E41', title)
-        #     if description != '':
-        #         # relatedresource.set_entity_value('INFORMATION_RESOURCE_TYPE.E55', description_type)
-        #         relatedresource.set_entity_value('DESCRIPTION.E62', description)
-        #     relatedresource.save()
-        #     relatedresource.index()
+        relationships = Concept().get_e55_domain('ARCHES_RESOURCE_CROSS-REFERENCE_RELATIONSHIP_TYPES.E55')
+        
+        for r in relationships:
+            if r["text"] == "Heritage Resource - Heritage Feature":
+                relationshiptypeid = r["id"]
+        relationship = self.resource.create_resource_relationship(resource.entityid, relationship_type_id=relationshiptypeid)
+        se.index_data(index='resource_relations', doc_type='all', body=model_to_dict(relationship), idfield='resourcexid')
 
         return
 
     def load(self, lang):
         data = []
-        # for relatedentity in self.resource.get_related_resources(entitytypeid='INFORMATION_RESOURCE.E73'):
-        #     nodes = relatedentity['related_entity'].flatten()
-        #     dummy_relationship_entity = model_to_dict(relatedentity['relationship'])
-        #     dummy_relationship_entity['entitytypeid'] = 'ARCHES_RESOURCE_CROSS-REFERENCE_RELATIONSHIP_TYPES.E55'
-        #     dummy_relationship_entity['value'] = dummy_relationship_entity['relationshiptype']
-        #     dummy_relationship_entity['label'] = ''
-        #     nodes.append(dummy_relationship_entity)
-        #     data.append({'nodes': nodes, 'relationshiptypelabel': get_preflabel_from_valueid(relatedentity['relationship'].relationshiptype, lang)['value']})
-        
-        self.data['SITE_MORPHOLOGY_TYPE.E55'] = {
-            'branch_lists': self.get_nodes('SITE_MORPHOLOGY_TYPE.E55'),
-            'domains': {'SITE_MORPHOLOGY_TYPE.E55' : Concept().get_e55_domain('SITE_MORPHOLOGY_TYPE.E55')}
+        for relatedentity in self.resource.get_related_resources(entitytypeid='HERITAGE_FEATURE.E24'):
+            nodes = relatedentity['related_entity'].flatten()
+            data.append({
+                'nodes': nodes, 
+                'relationship': relatedentity['relationship'], 
+                'relatedresourcename':relatedentity['related_entity'].get_primary_name(),
+                'relatedresourceidlink': '/resources/HERITAGE_FEATURE.E24/default/' + relatedentity['related_entity'].entityid,
+                'related': True,
+            })
+
+        relationship_types = Concept().get_e55_domain('ARCHES_RESOURCE_CROSS-REFERENCE_RELATIONSHIP_TYPES.E55')
+
+        self.data['related-resources'] = {
+            'branch_lists': data,
+            'domains': {
+                'RELATIONSHIP_TYPES.E32': relationship_types
+            },
         }
-        self.data['SITE_OVERALL_SHAPE_TYPE.E55'] = {
-            'branch_lists': self.get_nodes('SITE_OVERALL_SHAPE_TYPE.E55'),
-            'domains': {'SITE_OVERALL_SHAPE_TYPE.E55' : Concept().get_e55_domain('SITE_OVERALL_SHAPE_TYPE.E55')}
+
+        self.data['NAME.E41'] = {
+            'branch_lists': self.get_nodes('NAME.E41'),
+            'domains': {'NAME_TYPE.E55' : Concept().get_e55_domain('NAME_TYPE.E55')}
+        }
+        self.data['INVESTIGATION_ASSESSMENT_ACTIVITY.E7'] = {
+            'branch_lists': self.get_nodes('INVESTIGATION_ASSESSMENT_ACTIVITY.E7'),
+            'domains': {
+                'ASSESSMENT_ACTIVITY_TYPE.E55' : Concept().get_e55_domain('ASSESSMENT_ACTIVITY_TYPE.E55'),
+                'INVESTIGATOR_ROLE_TYPE.E55' : Concept().get_e55_domain('INVESTIGATOR_ROLE_TYPE.E55'),
+            }
         }
 
         return
@@ -1316,6 +1284,7 @@ class RelatedResourcesForm(ResourceForm):
         }
 
     def update(self, data, files):
+        logging.warning('------> RelatedResourcesForm update1: %s', JSONResponse(data, indent=4))
         se = SearchEngineFactory().create()
         related_resources_data = data.get('related-resources', [])
         original_relations = self.resource.get_related_resources()
