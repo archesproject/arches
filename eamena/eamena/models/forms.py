@@ -61,7 +61,16 @@ def datetime_nodes_to_dates(branch_list):
             if hasattr(node, 'value') and isinstance(node.value, datetime):
                 node.value = node.value.date()
                 node.label = node.value
+            
     return branch_list
+
+def exclude_empty_branches(branch_list, required_node):
+    branch_list_filled =[]
+    for branch in branch_list:
+        for node in branch['nodes']:
+            if node.entitytypeid == required_node:
+                branch_list_filled.append(branch)
+    return branch_list_filled
 
 # --- Resource Summary -> SummaryForm ------------------------------------------
 class SummaryForm(ResourceForm):
@@ -206,7 +215,7 @@ class ArchaeologicalAssessmentForm(ResourceForm):
             }
             
             self.data['FEATURE_ASSIGNMENT.E13'] = {
-                'branch_lists': self.get_nodes('FEATURE_ASSIGNMENT.E13'),
+                'branch_lists': exclude_empty_branches(self.get_nodes('FEATURE_ASSIGNMENT.E13'),'FEATURE_FORM_TYPE.I4'),
                 'domains': {
                     'FEATURE_FORM_TYPE.I4' : Concept().get_e55_domain('FEATURE_FORM_TYPE.I4'),
                     'FEATURE_FORM_TYPE_CERTAINTY.I6' : Concept().get_e55_domain('FEATURE_FORM_TYPE_CERTAINTY.I6'),
