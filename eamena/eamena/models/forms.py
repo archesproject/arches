@@ -91,8 +91,10 @@ class SummaryForm(ResourceForm):
                 'domains': {'DESIGNATION_TYPE.E55' : Concept().get_e55_domain('DESIGNATION_TYPE.E55')}
             }
             self.data['DESCRIPTION_ASSIGNMENT.E13'] = {
-                'branch_lists': datetime_nodes_to_dates(self.get_nodes('DESCRIPTION_ASSIGNMENT.E13')),
-                'domains': {'GENERAL_DESCRIPTION_TYPE.E55' : Concept().get_e55_domain('GENERAL_DESCRIPTION_TYPE.E55')}
+                'branch_lists': self.get_nodes('DESCRIPTION_ASSIGNMENT.E13'),
+                'domains': {
+                    'GENERAL_DESCRIPTION_TYPE.E55' : Concept().get_e55_domain('GENERAL_DESCRIPTION_TYPE.E55')
+                }
             }
 
 
@@ -272,7 +274,7 @@ class ConditionAssessmentForm(ResourceForm):
             }
 
             self.data['DAMAGE_STATE.E3'] = {
-                'branch_lists': self.get_nodes('DAMAGE_STATE.E3'),
+                'branch_lists': datetime_nodes_to_dates(self.get_nodes('DAMAGE_STATE.E3')),
                 'domains': {
                     'DISTURBANCE_CAUSE_CATEGORY_TYPE.E55' : Concept().get_e55_domain('DISTURBANCE_CAUSE_CATEGORY_TYPE.E55'),
                     'DISTURBANCE_CAUSE_TYPE.I4' : Concept().get_e55_domain('DISTURBANCE_CAUSE_TYPE.I4'),
