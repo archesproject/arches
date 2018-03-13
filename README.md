@@ -33,9 +33,9 @@ Minimum system requirements:
 These instructions will provide some guidance on installing
 the required dependencies and getting Arches up and running quickly:
 
-http://arches3.readthedocs.org/en/latest/installing-dependencies-linux/
+http://arches.readthedocs.org/en/3.1.2/installing-dependencies-linux/
 
-http://arches3.readthedocs.org/en/latest/installing-dependencies-windows/
+http://arches.readthedocs.org/en/3.1.2/installing-dependencies-windows/
 
 ## Installing Arches
 
