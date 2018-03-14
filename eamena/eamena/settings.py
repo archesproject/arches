@@ -46,7 +46,7 @@ def RESOURCE_TYPE_CONFIGS():
     return {
         'HERITAGE_RESOURCE_GROUP.E27': {
             'resourcetypeid': 'HERITAGE_RESOURCE_GROUP.E27',
-            'name': _('Heritage Resource E27'),
+            'name': _('Heritage Place'),
             'icon_class': 'fa fa-university',
             'default_page': 'summary',
             'default_description': _('No name available'),
@@ -130,7 +130,6 @@ MAPLAYERS_INDEX_RESOURCE_TYPES = [
 ]
 #Limit number of items per Search page
 SEARCH_ITEMS_PER_PAGE= 20
-
 #GEOCODING_PROVIDER = ''
 
 RESOURCE_GRAPH_LOCATIONS = (
