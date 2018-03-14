@@ -165,11 +165,9 @@
                             <div class="arches-crud-record">
                                 <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this designation" %}"><i data-bind='click: $parent.deleteItem.bind($parent)' class="arches-CRUD-delete fa fa-times-circle"></i></a>
                                 <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind='click: $parent.editItem.bind($parent)' title="Edit this designation">
-                                    <span data-bind="{text: nodes.get('DESIGNATION_TYPE.E55', 'label')}" style="padding-right:2px;"></span>
-                                    <span class="text-muted"> from </span>
-                                    <span data-bind="{text: nodes.get('DESIGNATION_FROM_DATE.E61', 'value')}" style="padding-right:2px"></span>
-                                    <span class="text-muted"> to </span>
-                                    <span data-bind="{text: nodes.get('DESIGNATION_TO_DATE.E61', 'value')}"></span>
+                                    <span data-bind="{text: nodes.get('DESIGNATION_TYPE.E55', 'label')}" style="padding-right:2px;"></span><span class="text-muted">{% trans '( Designation Type )' %}</span>
+                                    <span class="text-muted" data-bind="visible: nodes.get('DESIGNATION_FROM_DATE.E61', 'value').length > 0">{% trans 'From: ' %}</span><span data-bind="{text: nodes.get('DESIGNATION_FROM_DATE.E61', 'value')}" style="padding-right:2px"></span>
+                                    <span class="text-muted" data-bind="visible: nodes.get('DESIGNATION_TO_DATE.E61', 'value').length > 0">{% trans 'To: ' %}</span><span data-bind="{text: nodes.get('DESIGNATION_TO_DATE.E61', 'value')}"></span>
                                 </a>
                             </div>
                         </div>
