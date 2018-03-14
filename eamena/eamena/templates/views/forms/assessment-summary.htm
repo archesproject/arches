@@ -55,10 +55,8 @@
                                     <span class="text-muted arches-crud-type-identifier">
                                         (<span data-bind='text: nodes.get("INVESTIGATOR_ROLE_TYPE.E55", "label")'></span>)
                                     </span>
-                                    <span data-bind='{text: nodes.get("ASSESSMENT_ACTIVITY_TYPE.E55", "label")}' style="padding-right:2px;"></span>
-                                    <span class="text-muted"> (type) </span>
-                                    <span data-bind="{text: nodes.get('ASSESSMENT_ACTIVITY_DATE.E49', 'value')}" style="padding-right:2px"></span>
-                                    <span class="text-muted"> (Date of Assessment) </span>
+                                    <span data-bind='{text: nodes.get("ASSESSMENT_ACTIVITY_TYPE.E55", "label")}' style="padding-right:2px;"></span><span class="text-muted">{% trans '( Assessment Type )' %}</span>                                  
+                                    <span data-bind="{text: nodes.get('ASSESSMENT_ACTIVITY_DATE.E49', 'value')}" style="padding-right:2px"></span><span class="text-muted">{% trans '( Date of Assessment )' %}</span>
                                 </a>
                             </div>
                         </div>
