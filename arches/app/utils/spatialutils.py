@@ -16,7 +16,10 @@ def getdates(geometry):
         try: 
             geom = GEOSGeometry(geometry)
         except:
-            geom = GEOSGeometry(geometry[1:-1]) # This is to account for the different formats of coordinates as present in the search index and in forms.py. The former is in GeoJSON, the latter in WKT.
+            try:
+                geom = GEOSGeometry(geometry[1:-1]) # This is to account for the different formats of coordinates as present in the search index and in forms.py. The former is in GeoJSON, the latter in WKT.
+            except: # If geometry is not legit, return null.
+                return 'null'
         centroid = geom.centroid
         url = 'http://dev.virtualearth.net/REST/v1/Imagery/Metadata/Aerial/' + str(centroid.coords[1]) + ',' + str(centroid.coords[0]) + '?zl=19&key=' + settings.BING_KEY
         response = urllib.urlopen(url)
