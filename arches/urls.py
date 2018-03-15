@@ -67,7 +67,7 @@ urlpatterns = [
     url(r'^search/time_wheel_config$', search.time_wheel_config, name="time_wheel_config"),
     url(r'^buffer/$', search.buffer, name="buffer"),
     url(r'^settings/', ResourceEditorView.as_view(), { 'resourceid': settings.RESOURCE_INSTANCE_ID, 'view_template':'views/system-settings.htm', 'main_script':'views/system-settings', 'nav_menu':False}, name='config'),
-    url(r'^graph/(?P<graphid>%s|())$' % uuid_regex, cache_page(60 * 1)(GraphManagerView.as_view()), name='graph'),
+    url(r'^graph/(?P<graphid>%s|())$' % uuid_regex, GraphManagerView.as_view(), name='graph'),
     url(r'^graph/(?P<graphid>%s)/settings$' % uuid_regex, GraphSettingsView.as_view(), name='graph_settings'),
     url(r'^graph/(?P<graphid>%s)/card_manager$' % uuid_regex, CardManagerView.as_view(), name='card_manager'),
     url(r'^graph/(?P<graphid>%s)/append_branch$' % uuid_regex, GraphDataView.as_view(action='append_branch'), name='append_branch'),

@@ -64,7 +64,7 @@ class TileData(View):
                 except ObjectDoesNotExist:
                     resource = Resource()
                     resource.resourceinstanceid = data['resourceinstance_id']
-                    graphid = models.Node.objects.filter(nodegroup=data['nodegroup_id'])[0].graph.graphid
+                    graphid = models.Node.objects.filter(nodegroup=data['nodegroup_id'])[0].graph_id
                     resource.graph_id = graphid
                     resource.save(user=request.user)
                     resource.index()

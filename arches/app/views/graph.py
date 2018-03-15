@@ -391,7 +391,7 @@ class CardView(MapGraphBaseView):
 
         context = self.get_context_data(
             main_script='views/graph/card-configuration-manager',
-            graph_id=self.graph.pk,
+            graph_id=self.graph.graphid,
             card=JSONSerializer().serialize(card),
             datatypes_json=JSONSerializer().serialize(datatypes),
             geocoding_providers=geocoding_providers,
@@ -472,13 +472,13 @@ class FormView(GraphBaseView):
 
         try:
             form = models.Form.objects.get(formid=formid)
-            self.graph = Graph.objects.get(graphid=form.graph.pk)
+            self.graph = Graph.objects.get(graphid=form.graph_id)
             icons = models.Icon.objects.order_by('name')
             cards = models.CardModel.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
 
             context = self.get_context_data(
                 main_script='views/graph/form-configuration',
-                graph_id=self.graph.pk,
+                graph_id=self.graph.graphid,
                 icons=JSONSerializer().serialize(icons),
                 form=JSONSerializer().serialize(form),
                 forms=JSONSerializer().serialize(self.graph.form_set.all()),
@@ -578,14 +578,14 @@ class ReportEditorView(MapGraphBaseView):
     def get(self, request, reportid):
         try:
             report = models.Report.objects.get(reportid=reportid)
-            self.graph = Graph.objects.get(graphid=report.graph.pk)
+            self.graph = Graph.objects.get(graphid=report.graph_id)
             forms = models.Form.objects.filter(graph=self.graph, visible=True)
             forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
             cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
             map_layers = models.MapLayer.objects.all()
             map_markers = models.MapMarker.objects.all()
             map_sources = models.MapSource.objects.all()
-            resource_graphs = Graph.objects.exclude(pk=report.graph.pk).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
+            resource_graphs = Graph.objects.exclude(pk=report.graph_id).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
             datatypes = models.DDataType.objects.all()
             widgets = models.Widget.objects.all()
             geocoding_providers = models.Geocoder.objects.all()
@@ -608,7 +608,7 @@ class ReportEditorView(MapGraphBaseView):
                 geocoding_providers=geocoding_providers,
                 resource_graphs=resource_graphs,
                 widgets=widgets,
-                graph_id=self.graph.pk,
+                graph_id=self.graph.graphid,
              )
 
             context['nav']['title'] = self.graph.name
@@ -630,7 +630,7 @@ class ReportEditorView(MapGraphBaseView):
     def post(self, request, reportid):
         data = JSONDeserializer().deserialize(request.body)
         report = models.Report.objects.get(reportid=reportid)
-        graph = Graph.objects.get(graphid=report.graph.pk)
+        graph = Graph.objects.get(graphid=report.graph_id)
         report.name = data['name']
         report.config = data['config']
         report.formsconfig = data['formsconfig']

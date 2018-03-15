@@ -58,7 +58,7 @@ class MapLayerManagerView(MapBaseManagerView):
             search_query = Bool()
             query.add_query(search_query)
             query.add_aggregation(GeoBoundsAgg(field='points.point', name='bounds'))
-            results = query.search(index='resource', doc_type=[str(node.graph.pk)])
+            results = query.search(index='resource', doc_type=[str(node.graph_id)])
             bounds = results['aggregations']['bounds']['bounds'] if 'bounds' in results['aggregations']['bounds'] else None
             return bounds
 

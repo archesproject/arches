@@ -547,16 +547,16 @@ class RelatedResourcesView(BaseManagerView):
             """
             nodes = models.Node.objects.filter(graph_id=graphid)
             top_node = [node for node in nodes if node.istopnode==True][0]
-            relatable_resources = [str(node.graph.graphid) for node in top_node.get_relatable_resources()]
+            relatable_resources = [str(node.graph_id) for node in top_node.get_relatable_resources()]
             return relatable_resources
 
         def confirm_relationship_permitted(to_id, from_id):
             resource_instance_to = models.ResourceInstance.objects.filter(resourceinstanceid=to_id)[0]
             resource_instance_from = models.ResourceInstance.objects.filter(resourceinstanceid=from_id)[0]
-            relatable_to = get_relatable_resources(resource_instance_to.graph.graphid)
-            relatable_from = get_relatable_resources(resource_instance_from.graph.graphid)
-            relatable_to_is_valid = str(resource_instance_to.graph.graphid) in relatable_from
-            relatable_from_is_valid = str(resource_instance_from.graph.graphid) in relatable_to
+            relatable_to = get_relatable_resources(resource_instance_to.graph_id)
+            relatable_from = get_relatable_resources(resource_instance_from.graph_id)
+            relatable_to_is_valid = str(resource_instance_to.graph_id) in relatable_from
+            relatable_from_is_valid = str(resource_instance_from.graph_id) in relatable_to
             return (relatable_to_is_valid == True and relatable_from_is_valid == True)
 
         for instanceid in instances_to_relate:

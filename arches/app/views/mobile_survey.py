@@ -213,7 +213,7 @@ class MobileSurveyManagerView(MapBaseManagerView):
 
 
         ordered_cards = models.MobileSurveyXCard.objects.filter(mobile_survey=mobile_survey).order_by('sortorder')
-        ordered_ids = [unicode(mpc.card.cardid) for mpc in ordered_cards]
+        ordered_ids = [unicode(mpc.card_id) for mpc in ordered_cards]
         mobile_survey_dict = mobile_survey.__dict__
         mobile_survey_dict['cards'] = ordered_ids
         mobile_survey_dict['users'] = [u.id for u in mobile_survey.users.all()]
