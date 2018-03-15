@@ -389,7 +389,7 @@ class Graph(models.GraphModel):
 
         def find_child_edges(tree):
             for edge_id, edge in self.edges.iteritems():
-                if edge.domainnode_id == tree['node'].nodeid:
+                if edge.domainnode == tree['node']:
                     tree['children'].append(find_child_edges({
                         'node': edge.rangenode,
                         'children':[],
