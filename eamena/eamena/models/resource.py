@@ -55,7 +55,7 @@ class Resource(ArchesResource):
             description_group['forms'][:0] = [
                 forms.AssessmentSummaryForm.get_info(),
                 forms.SummaryForm.get_info(),
-                forms.LocationResForm.get_info(),
+                forms.LocationForm.get_info(),
                 forms.MeasurementvaluesForm.get_info(),
                 forms.ArchaeologicalAssessmentForm.get_info(),
                 forms.ConditionAssessmentForm.get_info(),
