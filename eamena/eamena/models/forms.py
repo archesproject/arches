@@ -316,7 +316,7 @@ class ManMadeForm(ResourceForm):
         return {
             'id': 'man-made',
             'icon': 'fa-file-text-o',
-            'name': _('Heritage features'),
+            'name': _('Related Heritage Features'),
             'class': ManMadeForm
 
         }
