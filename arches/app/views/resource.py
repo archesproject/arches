@@ -154,6 +154,7 @@ class ResourceEditorView(MapBaseManagerView):
                 saved_searches=JSONSerializer().serialize(settings.SAVED_SEARCHES),
                 resource_instance_exists=resource_instance_exists,
                 user_is_reviewer=json.dumps(request.user.groups.filter(name='Resource Reviewer').exists()),
+                active_report_count = models.Report.objects.filter(graph_id=resource_instance.graph_id, active=True).count(),
                 userid=request.user.id
             )
 
