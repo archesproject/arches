@@ -156,7 +156,7 @@ class Concept(object):
                             include_relatedconcepts=include_relatedconcepts, exclude=exclude, include=include,
                             depth_limit=depth_limit, up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel,
                             nodetype=nodetype, semantic=semantic, pathway_filter=pathway_filter, _cache=_cache.copy(), lang=lang)
-                        subconcept.relationshiptype = relation.relationtype.pk
+                        subconcept.relationshiptype = relation.relationtype_id
                         self.subconcepts.append(subconcept)
 
                     self.subconcepts = sorted(self.subconcepts, key=methodcaller('get_sortkey', lang=lang), reverse=False)
@@ -172,7 +172,8 @@ class Concept(object):
                             include_relatedconcepts=include_relatedconcepts,exclude=exclude, include=include,
                             depth_limit=depth_limit, up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel,
                             nodetype=nodetype, semantic=semantic, pathway_filter=pathway_filter, _cache=_cache.copy(), lang=lang)
-                        parentconcept.relationshiptype = relation.relationtype.pk
+                        parentconcept.relationshiptype = relation.relationtype_id
+
                         self.parentconcepts.append(parentconcept)
 
             if include_relatedconcepts:
@@ -182,12 +183,14 @@ class Concept(object):
                     if str(relation.conceptto_id) != self.id and str(relation.relationid) not in relations:
                         relations.append(str(relation.relationid))
                         relatedconcept = self.__class__().get(relation.conceptto_id, include=['label'], lang=lang)
-                        relatedconcept.relationshiptype = relation.relationtype.pk
+                        relatedconcept.relationshiptype = relation.relationtype_id
+
                         self.relatedconcepts.append(relatedconcept)
                     if str(relation.conceptfrom_id) != self.id and str(relation.relationid) not in relations:
                         relations.append(str(relation.relationid))
                         relatedconcept = self.__class__().get(relation.conceptfrom_id, include=['label'], lang=lang)
-                        relatedconcept.relationshiptype = relation.relationtype.pk
+                        relatedconcept.relationshiptype = relation.relationtype_id
+
                         self.relatedconcepts.append(relatedconcept)
 
         return self
@@ -1124,8 +1127,8 @@ class ConceptValue(object):
     def load(self, value):
         if isinstance(value, models.Value):
             self.id = str(value.pk)
-            self.conceptid = str(value.concept.pk)
-            self.type = value.valuetype.pk
+            self.conceptid = str(value.concept_id)
+            self.type = value.valuetype_id
             self.category = value.valuetype.category
             self.value = value.value
             self.language = value.language_id
