@@ -840,7 +840,7 @@ class Graph(models.GraphModel):
         ret = []
         for edge in self.get_out_edges(nodeid):
             ret.append(edge.rangenode)
-            ret.extend(self.get_child_nodes(edge.rangenode.nodeid))
+            ret.extend(self.get_child_nodes(edge.rangenode_id))
         return ret
 
     def get_out_edges(self, nodeid):
