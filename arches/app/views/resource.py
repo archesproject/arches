@@ -21,6 +21,7 @@ import json
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseNotFound
 from django.http import HttpResponse
+from django.http import Http404
 from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
@@ -45,7 +46,6 @@ from arches.app.views.base import BaseManagerView, MapBaseManagerView
 from arches.app.views.concept import Concept
 from arches.app.datatypes.datatypes import DataTypeFactory
 from elasticsearch import Elasticsearch
-
 
 @method_decorator(can_edit_resource_instance(), name='dispatch')
 class ResourceListView(BaseManagerView):
@@ -155,6 +155,7 @@ class ResourceEditorView(MapBaseManagerView):
                 saved_searches=JSONSerializer().serialize(settings.SAVED_SEARCHES),
                 resource_instance_exists=resource_instance_exists,
                 user_is_reviewer=json.dumps(request.user.groups.filter(name='Resource Reviewer').exists()),
+                active_report_count = models.Report.objects.filter(graph_id=resource_instance.graph_id, active=True).count(),
                 userid=request.user.id
             )
 
@@ -249,7 +250,7 @@ class ResourceEditLogView(BaseManagerView):
             for edit in edits:
                 if edit.nodegroupid != None:
                     nodegroup = models.NodeGroup.objects.get(pk=edit.nodegroupid)
-                    if request.user.has_perm('read_nodegroup', nodegroup_id):
+                    if request.user.has_perm('read_nodegroup', edit.nodegroupid):
                         if edit.newvalue != None:
                             self.getEditConceptValue(edit.newvalue)
                         if edit.oldvalue != None:
@@ -263,14 +264,13 @@ class ResourceEditLogView(BaseManagerView):
             displaydescription = resource.displaydescription
             cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=resource_instance.graph)
             graph_name = resource_instance.graph.name
-
             if displayname == 'undefined':
                 displayname = _('Unnamed Resource')
 
             context = self.get_context_data(
                 main_script='views/resource/edit-log',
                 cards=JSONSerializer().serialize(cards),
-                resource_type=resource_instance.graph.name,
+                resource_type=graph_name,
                 resource_description=displaydescription,
                 iconclass=resource_instance.graph.iconclass,
                 edits=JSONSerializer().serialize(permitted_edits),
@@ -280,7 +280,7 @@ class ResourceEditLogView(BaseManagerView):
 
             context['nav']['res_edit'] = True
             context['nav']['icon'] = resource_instance.graph.iconclass
-            context['nav']['title'] = resource_instance.graph.name
+            context['nav']['title'] = graph_name
 
             return render(request, view_template, context)
 
@@ -338,6 +338,16 @@ class ResourceCards(View):
             cards = [Card.objects.get(pk=card.cardid) for card in models.CardModel.objects.filter(graph=graph)]
         return JSONResponse({'success':True, 'cards': cards})
 
+class ResourceReportData(View):
+    def get(self, request, resourceid=None):
+        resource_instance_id = request.GET.get('resourceid', None)
+        resource_instance = models.ResourceInstance.objects.get(pk = resource_instance_id)
+        active_report_count = models.Report.objects.filter(graph_id=resource_instance.graph_id, active=True).count()
+        if active_report_count > 0:
+            res = JSONResponse({'success': True})
+        else:
+            res = JSONResponse({'status':'false','message': _('A report template has not been activated for this resource type'),'title':_('No Report Available')}, status=500)
+        return res
 
 class ResourceDescriptors(View):
     def get(self, request, resourceid=None):
@@ -409,16 +419,19 @@ class ResourceReportView(MapBaseManagerView):
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
 
-        if str(report.template_id) == '50000000-0000-0000-0000-000000000002':
-            map_layers = models.MapLayer.objects.all()
-            map_markers = models.MapMarker.objects.all()
-            map_sources = models.MapSource.objects.all()
-            geocoding_providers = models.Geocoder.objects.all()
-        else:
-            map_markers=None
-            map_layers = []
-            map_sources = []
-            geocoding_providers = []
+        try:
+            if str(report.template_id) == '50000000-0000-0000-0000-000000000002':
+                map_layers = models.MapLayer.objects.all()
+                map_markers = models.MapMarker.objects.all()
+                map_sources = models.MapSource.objects.all()
+                geocoding_providers = models.Geocoder.objects.all()
+            else:
+                map_markers=None
+                map_layers = []
+                map_sources = []
+                geocoding_providers = []
+        except AttributeError:
+            raise Http404(_("No active report template is available for this resource."))
 
         templates = models.ReportTemplate.objects.all()
 
