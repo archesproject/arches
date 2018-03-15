@@ -7,9 +7,10 @@ define(['jquery',
     'knockout',
     'knockout-mapping',
     'view-data',
+    'viewmodels/alert',
     'bootstrap-datetimepicker',
     'plugins/knockout-select2'],
-    function($, _, Backbone, bootstrap, arches, select2, ko, koMapping, viewdata) {
+    function($, _, Backbone, bootstrap, arches, select2, ko, koMapping, viewdata, AlertViewModel) {
         return Backbone.View.extend({
 
             events: {
@@ -169,7 +170,20 @@ define(['jquery',
             },
 
             viewReport: function(resourceinstance){
-                window.open(arches.urls.resource_report + resourceinstance.resourceinstanceid);
+                    var self = this;
+                    var missingReportAlert = function(data){
+                        return function(data){
+                             var response = data.responseJSON;
+                             self.viewModel.alert(new AlertViewModel('ep-alert-red', response.title, response.message));
+                        }
+                    }
+                    $.ajax({
+                        type: "GET",
+                        url: arches.urls.report_data,
+                        data: {resourceid: resourceinstance.resourceinstanceid}
+                    }).done(function(data){
+                        window.open(arches.urls.resource_report + resourceinstance.resourceinstanceid);
+                    }).fail(missingReportAlert());
             },
 
             editResource: function(resourceinstance){
