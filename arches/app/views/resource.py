@@ -21,6 +21,7 @@ import json
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseNotFound
 from django.http import HttpResponse
+from django.http import Http404
 from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
@@ -45,7 +46,6 @@ from arches.app.views.base import BaseManagerView, MapBaseManagerView
 from arches.app.views.concept import Concept
 from arches.app.datatypes.datatypes import DataTypeFactory
 from elasticsearch import Elasticsearch
-
 
 @method_decorator(can_edit_resource_instance(), name='dispatch')
 class ResourceListView(BaseManagerView):
@@ -344,7 +344,7 @@ class ResourceReportData(View):
         if active_report_count > 0:
             res = JSONResponse({'success': True})
         else:
-            res = JSONResponse({'status':'false','message': _('A report template has not been activated for this resource type'),'title':_('No Report Available')}, status=404)
+            res = JSONResponse({'status':'false','message': _('A report template has not been activated for this resource type'),'title':_('No Report Available')}, status=500)
         return res
 
 class ResourceDescriptors(View):
@@ -417,16 +417,19 @@ class ResourceReportView(MapBaseManagerView):
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
 
-        if str(report.template.templateid) == '50000000-0000-0000-0000-000000000002':
-            map_layers = models.MapLayer.objects.all()
-            map_markers = models.MapMarker.objects.all()
-            map_sources = models.MapSource.objects.all()
-            geocoding_providers = models.Geocoder.objects.all()
-        else:
-            map_markers=None
-            map_layers = []
-            map_sources = []
-            geocoding_providers = []
+        try:
+            if str(report.template.templateid) == '50000000-0000-0000-0000-000000000002':
+                map_layers = models.MapLayer.objects.all()
+                map_markers = models.MapMarker.objects.all()
+                map_sources = models.MapSource.objects.all()
+                geocoding_providers = models.Geocoder.objects.all()
+            else:
+                map_markers=None
+                map_layers = []
+                map_sources = []
+                geocoding_providers = []
+        except AttributeError:
+            raise Http404(_("No active report template is available for this resource."))
 
         templates = models.ReportTemplate.objects.all()
 
