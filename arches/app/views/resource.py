@@ -83,7 +83,7 @@ class ResourceEditorView(MapBaseManagerView):
         try:
             resource_instance = Resource.objects.get(pk=resourceid)
             resource_instance_exists = True
-            graphid = resource_instance.graph.graphid
+            graphid = resource_instance.graph_id
 
         except ObjectDoesNotExist:
             resource_instance = Resource()
@@ -125,6 +125,7 @@ class ResourceEditorView(MapBaseManagerView):
             else:
                 displayname = 'Unnamed Resource'
 
+
             date_nodes = models.Node.objects.filter(datatype='date', graph__isresource=True, graph__isactive=True)
             searchable_datatypes = [d.pk for d in models.DDataType.objects.filter(issearchable=True)]
             searchable_nodes = models.Node.objects.filter(graph__isresource=True, graph__isactive=True, datatype__in=searchable_datatypes, issearchable=True)
@@ -147,7 +148,7 @@ class ResourceEditorView(MapBaseManagerView):
                 widgets_json=JSONSerializer().serialize(widgets),
                 resourceid=resourceid,
                 resource_graphs=resource_graphs,
-                graph_json=JSONSerializer().serialize(graph, exclude=['iconclass', 'functions', 'name', 'description', 'deploymentfile', 'author', 'deploymentdate', 'version', 'isresource', 'isactive', 'iconclass', 'ontology']),
+                graph_json=JSONSerializer().serialize(graph, exclude=['iconclass', 'functions', 'functions_x_graphs', 'name', 'description', 'deploymentfile', 'author', 'deploymentdate', 'version', 'isresource', 'isactive', 'iconclass', 'ontology']),
                 displayname=displayname,
                 resource_cards=JSONSerializer().serialize(resource_cards, exclude=['description','instructions','active','isvisible']),
                 searchable_nodes=JSONSerializer().serialize(searchable_nodes, exclude=['description', 'ontologyclass','isrequired', 'issearchable', 'istopnode']),
@@ -383,10 +384,10 @@ class ResourceReportView(MapBaseManagerView):
         except models.Report.DoesNotExist:
            report = None
 
-        graph = Graph.objects.get(graphid=resource.graph.pk)
-        forms = resource.graph.form_set.filter(visible=True)
+        graph = Graph.objects.get(graphid=resource.graph_id)
+        forms = graph.form_set.filter(visible=True)
         forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
-        cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=resource.graph)
+        cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=graph)
         permitted_cards = []
         permitted_forms_x_cards = []
         permitted_forms = []
@@ -408,7 +409,7 @@ class ResourceReportView(MapBaseManagerView):
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
 
-        if str(report.template.templateid) == '50000000-0000-0000-0000-000000000002':
+        if str(report.template_id) == '50000000-0000-0000-0000-000000000002':
             map_layers = models.MapLayer.objects.all()
             map_markers = models.MapMarker.objects.all()
             map_sources = models.MapSource.objects.all()
@@ -425,7 +426,7 @@ class ResourceReportView(MapBaseManagerView):
             main_script='views/resource/report',
             report=JSONSerializer().serialize(report),
             report_templates=templates,
-            templates_json=JSONSerializer().serialize(templates, sort_keys=False),
+            templates_json=JSONSerializer().serialize(templates, sort_keys=False, exclude=['name', 'description']),
             forms=JSONSerializer().serialize(forms, sort_keys=False, exclude=['iconclass', 'subtitle']),
             tiles=JSONSerializer().serialize(permitted_tiles, sort_keys=False),
             forms_x_cards=JSONSerializer().serialize(forms_x_cards, sort_keys=False),
@@ -437,8 +438,8 @@ class ResourceReportView(MapBaseManagerView):
             map_layers=map_layers,
             map_markers=map_markers,
             map_sources=map_sources,
-            graph_id=resource.graph.pk,
-            graph_name=resource.graph.name,
+            graph_id=graph.graphid,
+            graph_name=graph.name,
             graph_json = JSONSerializer().serialize(graph, sort_keys=False, exclude=['functions', 'relatable_resource_model_ids', 'domain_connections', 'edges', 'is_editable', 'description', 'iconclass', 'subtitle', 'author']),
             resourceid=resourceid,
             displayname=displayname,
