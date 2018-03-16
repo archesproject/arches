@@ -159,7 +159,8 @@ class GraphManagerView(GraphBaseView):
                 main_script='views/graph',
                 root_nodes=JSONSerializer().serialize(root_nodes),
             )
-
+            context['graph_models'] = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+            context['graphs'] = JSONSerializer().serialize(context['graph_models'], exclude = ['functions'])
             context['nav']['title'] = 'Arches Designer'
             context['nav']['icon'] = 'fa-bookmark'
             context['nav']['help'] = (_('About the Arches Designer'),'help/base-help.htm')

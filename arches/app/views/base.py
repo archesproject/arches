@@ -32,8 +32,8 @@ class BaseManagerView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(BaseManagerView, self).get_context_data(**kwargs)
         context['system_settings_graphid'] = settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
-        context['graph_models'] = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-        context['graphs'] = JSONSerializer().serialize(context['graph_models'], exclude = ['functions'])
+        context['graph_models'] = []
+        context['graphs'] = '[]'
         context['createable_resources'] = JSONSerializer().serialize(get_createable_resource_types(self.request.user))
         context['nav'] = {
             'icon':'fa fa-chevron-circle-right',
