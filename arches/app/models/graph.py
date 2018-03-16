@@ -719,9 +719,9 @@ class Graph(models.GraphModel):
             nodegroups = []
 
             tree = self.get_tree(root=node)
-            tiles = models.TileModel.objects.filter(nodegroup=node.nodegroup)
+            tile_count = models.TileModel.objects.filter(nodegroup=node.nodegroup).count()
 
-            if self.is_editable() == False and len(tiles) > 0:
+            if self.is_editable() == False and tile_count > 0:
                 raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot delete nodes from a Resource Model with instances.".format(self.name)), 1006)
 
             def traverse_tree(tree):
