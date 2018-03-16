@@ -729,32 +729,26 @@ class Command(BaseCommand):
         try:
             resource_exporter = ResourceExporter(file_format, configs=config_file, single_file=single_file)
         except KeyError as e:
-            print '*'*80
-            print '{0} is not a valid export file format.'.format(file_format)
-            print '*'*80
+            utils.print_message('{0} is not a valid export file format.'.format(file_format))
             sys.exit()
         except MissingConfigException as e:
-            print '*'*80
-            print 'No mapping file specified. Please rerun this command with the \'-c\' parameter populated.'
-            print '*'*80
+            utils.print_message('No mapping file specified. Please rerun this command with the \'-c\' parameter populated.')
             sys.exit()
 
         if data_dest != '':
             try:
                 data = resource_exporter.export(graph_id=graph)
             except MissingGraphException as e:
-                print '*'*80
-                print 'No resource graph specified. Please rerun this command with the \'-g\' parameter populated.'
-                print '*'*80
+
+                print utils.print_message('No resource graph specified. Please rerun this command with the \'-g\' parameter populated.')
+
                 sys.exit()
 
             for file in data:
                 with open(os.path.join(data_dest, file['name']), 'wb') as f:
                     f.write(file['outputfile'].getvalue())
         else:
-            print '*'*80
-            print 'No destination directory specified. Please rerun this command with the \'-d\' parameter populated.'
-            print '*'*80
+            utils.print_message('No destination directory specified. Please rerun this command with the \'-d\' parameter populated.')
             sys.exit()
 
     def import_reference_data(self, data_source, overwrite='ignore', stage='stage'):
@@ -767,12 +761,11 @@ class Command(BaseCommand):
 
     def import_business_data(self, data_source, config_file=None, overwrite=None, bulk_load=False, create_concepts=False):
         """
-        Imports business data from all formats
+        Imports business data from all formats. A config file (mapping file) is required for .csv format.
         """
+
         if overwrite == '':
-            print '*'*80
-            print 'No overwrite option indicated. Please rerun command with \'-ow\' parameter.'
-            print '*'*80
+            utils.print_message('No overwrite option indicated. Please rerun command with \'-ow\' parameter.')
             sys.exit()
 
         if data_source == '':
@@ -791,25 +784,16 @@ class Command(BaseCommand):
                 print 'Appending to existing collections . . .'
             create_concepts = True
 
-        if data_source != ():
-            for path in data_source:
-                if os.path.isabs(path):
-                    if os.path.isfile(os.path.join(path)):
-                        BusinessDataImporter(path, config_file).import_business_data(overwrite=overwrite, bulk=bulk_load, create_concepts=create_concepts, create_collections=create_collections)
-                    else:
-                        print '*'*80
-                        print 'No file found at indicated location: {0}'.format(path)
-                        print '*'*80
-                        sys.exit()
+        if len(data_source) > 0:
+            for source in data_source:
+                path = utils.get_valid_path(source)
+                if path is not None:
+                    BusinessDataImporter(path, config_file).import_business_data(overwrite=overwrite, bulk=bulk_load, create_concepts=create_concepts, create_collections=create_collections)
                 else:
-                    print '*'*80
-                    print 'ERROR: The specified file path appears to be relative. Please rerun command with an absolute file path.'
-                    print '*'*80
+                    utils.print_message('No file found at indicated location: {0}'.format(source))
                     sys.exit()
         else:
-            print '*'*80
-            print 'No BUSINESS_DATA_FILES locations specified in your settings file. Please rerun this command with BUSINESS_DATA_FILES locations specified or pass the locations in manually with the \'-s\' parameter.'
-            print '*'*80
+            utils.print_message('No BUSINESS_DATA_FILES locations specified in your settings file. Please rerun this command with BUSINESS_DATA_FILES locations specified or pass the locations in manually with the \'-s\' parameter.')
             sys.exit()
 
     def import_business_data_relations(self, data_source):
@@ -825,14 +809,10 @@ class Command(BaseCommand):
                     relations = csv.DictReader(open(path, 'rU'))
                     RelationImporter().import_relations(relations)
                 else:
-                    print '*'*80
-                    print 'No file found at indicated location: {0}'.format(path)
-                    print '*'*80
+                    utils.print_message('No file found at indicated location: {0}'.format(path))
                     sys.exit()
             else:
-                print '*'*80
-                print 'ERROR: The specified file path appears to be relative. Please rerun command with an absolute file path.'
-                print '*'*80
+                utils.print_message('ERROR: The specified file path appears to be relative. Please rerun command with an absolute file path.')
                 sys.exit()
 
 
@@ -872,9 +852,7 @@ class Command(BaseCommand):
                 with open(os.path.join(data_dest, graph_name + '.json'), 'wb') as f:
                     f.write(JSONSerializer().serialize({'graph': [graph]}, indent=4))
         else:
-            print '*'*80
-            print 'No destination directory specified. Please rerun this command with the \'-d\' parameter populated.'
-            print '*'*80
+            utils.print_message('No destination directory specified. Please rerun this command with the \'-d\' parameter populated.')
             sys.exit()
 
     def save_system_settings(self, data_dest=settings.SYSTEM_SETTINGS_LOCAL_PATH, file_format='json', config_file=None, graph=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID, single_file=False):
@@ -887,9 +865,7 @@ class Command(BaseCommand):
                 with open(os.path.join(data_dest, file['name']), 'wb') as f:
                     f.write(file['outputfile'].getvalue())
         else:
-            print '*'*80
-            print 'No destination directory specified. Please rerun this command with the \'-d\' parameter populated.'
-            print '*'*80
+            utils.print_message('No destination directory specified. Please rerun this command with the \'-d\' parameter populated.')
             sys.exit()
 
     def add_tileserver_layer(self, layer_name=False, mapnik_xml_path=False, layer_icon='fa fa-globe', is_basemap=False, tile_config_path=False):
@@ -995,9 +971,7 @@ class Command(BaseCommand):
         Imports export mapping files for resource models.
         """
         if source == '':
-            print '*'*80
-            print 'No data source indicated. Please rerun command with \'-s\' parameter.'
-            print '*'*80
+            utils.print_message('No data source indicated. Please rerun command with \'-s\' parameter.')
 
         if isinstance(source, basestring):
             source = [source]

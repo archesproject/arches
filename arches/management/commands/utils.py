@@ -2,13 +2,15 @@ import os
 import codecs
 
 def get_yn_input(msg="are you sure you want to continue?",default="Y"):
-    '''function can be passed a custom message and will use that prompt to get
+    '''
+    function can be passed a custom message and will use that prompt to get
     a y/n response. default defines what will happen if enter is hit with no
-    input.'''
-    
+    input.
+    '''
+
     if not default in ["Y", "N"]:
         raise Exception("function must be called with default = 'Y' or 'N'")
-        
+
     if default == "Y":
         o = raw_input(msg+" [Y/n] ")
         if o.lower().startswith("y") or o == "":
@@ -24,7 +26,7 @@ def get_yn_input(msg="are you sure you want to continue?",default="Y"):
             ret = False
         else:
             ret = True
-            
+
     return ret
 
 def write_to_file(fileName, contents, mode='w', encoding='utf-8', **kwargs):
@@ -37,3 +39,19 @@ def ensure_dir(f):
     d = os.path.dirname(f)
     if not os.path.exists(d):
         os.makedirs(d)
+
+def get_valid_path(path):
+    '''
+    Takes a relative or absolute path and returns either an absolute path or
+    None if the path is invalid.
+    '''
+    result = None
+    if os.path.exists(path) and os.path.isabs(path):
+        result = path
+    elif os.path.exists(os.path.join(os.getcwd(), path)):
+        result = os.path.join(os.getcwd(), path)
+    return result
+
+def print_message(message):
+    border = '*'*80
+    print '{1}\n{0}\n{1}'.format(message, border)
