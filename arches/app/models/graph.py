@@ -719,9 +719,9 @@ class Graph(models.GraphModel):
             nodegroups = []
 
             tree = self.get_tree(root=node)
-            tiles = models.TileModel.objects.filter(nodegroup=node.nodegroup)
+            tile_count = models.TileModel.objects.filter(nodegroup=node.nodegroup).count()
 
-            if self.is_editable() == False and len(tiles) > 0:
+            if self.is_editable() == False and tile_count > 0:
                 raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot delete nodes from a Resource Model with instances.".format(self.name)), 1006)
 
             def traverse_tree(tree):
@@ -822,6 +822,7 @@ class Graph(models.GraphModel):
         """
 
         if str(self.root.nodeid) == str(nodeid):
+
             return None
         for edge_id, edge in self.edges.iteritems():
             if str(edge.rangenode_id) == str(nodeid):
@@ -840,7 +841,7 @@ class Graph(models.GraphModel):
         ret = []
         for edge in self.get_out_edges(nodeid):
             ret.append(edge.rangenode)
-            ret.extend(self.get_child_nodes(edge.rangenode.nodeid))
+            ret.extend(self.get_child_nodes(edge.rangenode_id))
         return ret
 
     def get_out_edges(self, nodeid):
@@ -1086,9 +1087,9 @@ class Graph(models.GraphModel):
             is_editable = True
             if self.isresource:
                 if not card.name:
-                    card.name = self.nodes[card.nodegroup.pk].name
+                    card.name = self.nodes[card.nodegroup_id].name
                 if not card.description:
-                    card.description = self.nodes[card.nodegroup.pk].description
+                    card.description = self.nodes[card.nodegroup_id].description
                 is_editable = card.is_editable()
             else:
                 if card.nodegroup.parentnodegroup is None:
@@ -1096,9 +1097,9 @@ class Graph(models.GraphModel):
                     card.description = self.description
                 else:
                     if not card.name:
-                        card.name = self.nodes[card.nodegroup.pk].name
+                        card.name = self.nodes[card.nodegroup_id].name
                     if not card.description:
-                        card.description = self.nodes[card.nodegroup.pk].description
+                        card.description = self.nodes[card.nodegroup_id].description
             card_dict = JSONSerializer().serializeToPython(card)
             card_dict['is_editable'] = is_editable
             cards.append(card_dict)
@@ -1119,7 +1120,7 @@ class Graph(models.GraphModel):
         ret['root'] = self.root
 
         if 'relatable_resource_model_ids' not in exclude:
-            ret['relatable_resource_model_ids'] = [str(relatable_node.graph.graphid) for relatable_node in self.root.get_relatable_resources()]
+            ret['relatable_resource_model_ids'] = [str(relatable_node.graph_id) for relatable_node in self.root.get_relatable_resources()]
         else:
             ret.pop('relatable_resource_model_ids', None)
 

@@ -69,5 +69,5 @@ class MobileSurvey(models.MobileSurveyModel):
 
     def get_ordered_cards(self):
         ordered_cards = models.MobileSurveyXCard.objects.filter(mobile_survey=self).order_by('sortorder')
-        ordered_card_ids = [unicode(mpc.card.cardid) for mpc in ordered_cards]
+        ordered_card_ids = [unicode(mpc.card_id) for mpc in ordered_cards]
         return ordered_card_ids
