@@ -64,8 +64,8 @@ def RESOURCE_TYPE_CONFIGS():
             'sort_order': 1
         },
         'HERITAGE_FEATURE.E24': {
-            'resourcetypeid': 'HERITAGE_FEATURE.E27',
-            'name': _('Heritage Feature E24'),
+            'resourcetypeid': 'HERITAGE_FEATURE.E24',
+            'name': _('Heritage Feature'),
             'icon_class': 'fa fa-university',
             'default_page': 'summary',
             'default_description': _('No name available'),
