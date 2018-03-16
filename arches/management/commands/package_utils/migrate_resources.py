@@ -69,10 +69,10 @@ def migrate(settings=None):
                             
                             #get full resource graph for the root entity
                             group_root_entity = Entity(group_root_entity_model.pk)
+                            new_group_root_entity = Entity().create_from_mapping(resource_entity_type, mapping_schema[new_group_root_node_id]['steps'], new_group_root_node_id, '')
                             
                             if group_migrations_list[0]['NEWENTITYTYPEID'] != new_group_root_node_id:
                                 # create a node for the new group root
-                                new_group_root_entity = Entity().create_from_mapping(resource_entity_type, mapping_schema[new_group_root_node_id]['steps'], new_group_root_node_id, '')
                                 group_root_is_new_data_node = False
                             else:
                                 group_root_is_new_data_node = True
