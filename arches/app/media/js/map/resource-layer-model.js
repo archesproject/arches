@@ -4,8 +4,9 @@ define([
     'underscore',
     'arches',
     'map/layer-model',
-    'utils'
-], function($, ol, _, arches, LayerModel, utils) {
+    'utils',
+    'plugins/supercluster/supercluster' 
+], function($, ol, _, arches, LayerModel, utils, supercluster) {
     return function(config, featureCallback) {
         config = _.extend({
             entitytypeid: 'all',
@@ -16,7 +17,7 @@ define([
             var rgb = utils.hexToRgb(config.vectorColor);
             var zIndex = 0;
             var styleCache = {};
-
+            var hasData = false;
             var style = function(feature, resolution) {
                 var mouseOver = feature.get('mouseover');
                 var text = '1 ' + mouseOver;
@@ -65,33 +66,52 @@ define([
             };
 
             var layerConfig = {
-                projection: 'EPSG:3857'
+                format: new ol.format.GeoJSON()
             };
+            
+            var geojson_array;
+            var spatial_index = supercluster({
+                radius: 100,
+                maxZoom: 16
+            });
 
             if (config.entitytypeid !== null) {
                 layerConfig.url = arches.urls.map_markers + config.entitytypeid;
+                //fetch the raw geojson data and act on it
+                $.ajax({
+                    url: layerConfig.url,
+                    success: function (result) {
+                        //load features into supercluster index
+                        spatial_index.load(result.features)
+                        hasData = true;
+                        
+                        //trigger an initial clustering pass
+                        if(initialExtent && initialZoom) {
+                            clusterLayer.updateClusters(initialExtent, initialZoom)
+                        }
+                        
+                        if(typeof(featureCallback) === 'function') {
+                            featureCallback(result.features);
+                            geojson_array = result;
+                        }
+                        $('.map-loading').hide();
+                    },
+                    error: function (jqxhr, status, err) {
+                        console.error('error fetching geojson features', err);
+                    }
+                })
             }
 
-            var source = new ol.source.GeoJSON(layerConfig);
-
             $('.map-loading').show();
-            var loadListener = source.on('change', function(e) {
-                if (source.getState() == 'ready') {
-                    if(typeof(featureCallback) === 'function'){
-                        featureCallback(source.getFeatures());
-                    }
-                    ol.Observable.unByKey(loadListener);
-                    $('.map-loading').hide();
-                }
-            });
-
-            var clusterSource = new ol.source.Cluster({
-                distance: 45,
-                source: source
-            });
 
             var clusterStyle = function(feature, resolution) {
-                var size = feature.get('features').length;
+                if(feature.get('features')) {
+                    var size = feature.get('features').length;
+                } else if (feature.get('point_count')) {
+                    var size = feature.get('point_count');
+                } else {
+                    var size = 1;
+                }                
                 var mouseOver = feature.get('mouseover');
                 var text = size + ' ' + mouseOver;
 
@@ -140,13 +160,43 @@ define([
                 styleCache[text] = styles;
                 return styles;
             };
-
+            var superClusterSource = new ol.source.Vector()
             var clusterLayer = new ol.layer.Vector({
-                source: clusterSource,
+                source: superClusterSource,
                 style: clusterStyle
             });
 
-            clusterLayer.vectorSource = source;
+            clusterLayer.geojson_data = geojson_array;
+
+            initialExtent = null;
+            initialZoom = null;
+
+            clusterLayer.updateClusters = function (extentOl, zoom) {
+                var extentLatLng = ol.proj.transformExtent(extentOl, 'EPSG:3857', 'EPSG:4326');
+                if(hasData) {
+                    var clusters = spatial_index.getClusters(extentLatLng, zoom);                    
+                    var clusterFeatures = _.map(clusters, function (cluster) {
+                        //project to map coordinates
+                        var coords = ol.proj.transform(cluster.geometry.coordinates, 'EPSG:4326', 'EPSG:3857');
+                        var f = new ol.Feature(new ol.geom.Point(
+                            coords
+                        ));
+                        f.setProperties(cluster.properties);
+                        if(cluster.id) {
+                            f.setId(cluster.id);
+                        }
+                        return f;
+                    }.bind(this));
+                    
+                    clusterLayer.getSource().clear();
+                    clusterLayer.getSource().addFeatures(clusterFeatures);
+                } else {
+                    // store the zoom and extent to cluster when the data has loaded
+                    initialExtent = extentOl;
+                    initialZoom = zoom;
+                }
+            }
+
             clusterLayer.set('is_arches_layer', true);
 
             return clusterLayer;

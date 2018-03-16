@@ -58,11 +58,14 @@ define([
                 });
                 self.map.addLayer(vectorLayer);
                 var view = self.map.getView();
-                view.fitExtent(vectorSource.getExtent(), (self.map.getSize()));
+                view.fit(vectorSource.getExtent(), (self.map.getSize()));
                 self.trigger('layerDropped', vectorLayer, event.file.name);
             });
 
             this.map = new ol.Map({
+                controls: ol.control.defaults().extend([
+                    new ol.control.FullScreen()
+                ]),
                 layers: layers,
                 interactions: ol.interaction.defaults({
                     altShiftDragRotate: false,

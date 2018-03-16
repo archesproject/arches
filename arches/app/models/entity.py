@@ -1,4 +1,4 @@
-﻿'''
+'''
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -394,7 +394,7 @@ class Entity(object):
 
         self.traverse(appendValue)
         return ret
-
+        
     def traverse(self, func, scope=None):
         """
         Traverses a graph from leaf to root calling the given function on each node
@@ -651,6 +651,13 @@ class Entity(object):
         self.filter((lambda entity: len(entity.child_entities) != 0 or entity.value != ''))
 
 
+    def trim_again(self,child):
+        if child.entityid != '' and child.value =='':
+            if len(child.child_entities) == 0:
+                self.child_entities.remove(child)
+            else:     
+                for entity in child.child_entities:
+                    child.trim_again(entity)
 
     def filter(self, lambda_expression):
         """
@@ -663,8 +670,9 @@ class Entity(object):
             if hasattr(entity, 'get_parent'):
                 parent = entity.get_parent()
                 parent.child_entities[:] = filter(lambda_expression, parent.child_entities)
-            # else:
-            #     entity.child_entities[:] = filter(lambda_expression, entity.child_entities)
+            else:
+                for child in entity.child_entities:
+                    entity.trim_again(child)
 
         self.traverse(func)
 

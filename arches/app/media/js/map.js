@@ -23,7 +23,8 @@ require([
             'click .visibility-toggle': 'visibilityToggle',
             'click .on-map-toggle': 'onMapToggle',
             'click .layer-zoom': 'layerZoom',
-            'click .cluster-item-link': 'clusterItemClick'
+            'click .cluster-item-link': 'clusterItemClick',
+            'change:resolution': 'ZoomChange'
         },
         initialize: function(options) {
             var self = this;
@@ -67,7 +68,10 @@ require([
                 overlays: mapLayers.reverse()
             });
 
-            var selectFeatureOverlay = new ol.FeatureOverlay({
+            var selectFeatureOverlay = new ol.layer.Vector({
+                source: new ol.source.Vector({
+                    features: new ol.Collection()
+                }),
                 style: function(feature, resolution) {
                     var isSelectFeature = _.contains(feature.getKeys(), 'select_feature');
                     var fillOpacity = isSelectFeature ? 0.3 : 0;
@@ -116,9 +120,9 @@ require([
                 if (feature) {
                     var geom = geoJSON.readGeometry(feature.get('geometry_collection'));
                     geom.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
-                    map.map.getView().fitExtent(geom.getExtent(), map.map.getSize());
-                    selectFeatureOverlay.getFeatures().clear();
-                    selectFeatureOverlay.getFeatures().push(feature);
+                    map.map.getView().fit(geom.getExtent(), map.map.getSize());
+                    selectFeatureOverlay.getSource().clear();
+                    selectFeatureOverlay.getSource().addFeature(feature);
                     selectedResourceId = null;
                 }
             };
@@ -187,6 +191,22 @@ require([
             });
 
             map.on('viewChanged', function (zoom, extent) {
+                
+                //pass it on to the resource layer models
+                _.each(layers, function (layer) {
+                    // olLayer = layer_model.get('layer')
+                    if(typeof (layer.layer !== 'function')) {
+                        //wait for code elsewhere to invoke this and replace with the resultant layer object
+                        if(layer.layer.updateClusters) {
+                            layer.layer.updateClusters(extent, zoom)
+                        }
+                    }
+                });
+                                
+                _.each(map.overlays, function (layer) {
+                    layer.setExtent(extent); //On zoom and panning, filter overlays by map extent.
+                    
+                });
                 self.viewModel.zoom(zoom);
             });
 
@@ -221,7 +241,8 @@ require([
                     mouseoverFeatureTooltip.show();
                 }
             };
-
+            
+            
             map.on('mousePositionChanged', function (mousePosition, pixels, feature) {
                 var cursorStyle = "";
                 currentMousePx = pixels;
@@ -229,27 +250,29 @@ require([
 
                 if (feature && (feature.get('arches_marker') || feature.get('arches_cluster'))) {
                     cursorStyle = "pointer";
-                    if (feature.get('arches_marker') || feature.get('features').length === 1) {
-                        feature = feature.get('features')[0];
-                        var fullFeature = archesFeaturesCache[feature.getId()];
-                        if (fullFeature && fullFeature != 'loading') {
-                            showMouseoverFeatureTooltip(fullFeature);
-                        } else if (fullFeature != 'loading') {
-                            archesFeaturesCache[feature.getId()] = 'loading';
-                            $.ajax({
-                                url: arches.urls.map_markers + 'all?entityid=' + feature.getId(),
-                                success: function(response) {
-                                    fullFeature = geoJSON.readFeature(response.features[0]);
-                                    var geom = fullFeature.getGeometry();
-                                    geom.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
-
-                                    fullFeature.set('select_feature', true);
-                                    fullFeature.set('entityid', fullFeature.getId());
-
-                                    archesFeaturesCache[feature.getId()] = fullFeature;
-                                    showMouseoverFeatureTooltip(fullFeature);
-                                }
-                            });
+                    if (feature.get('features')) {
+                        if (feature.get('arches_marker') || feature.get('features').length === 1) {
+                            feature = feature.get('features')[0];
+                            var fullFeature = archesFeaturesCache[feature.getId()];
+                            if (fullFeature && fullFeature != 'loading') {
+                                showMouseoverFeatureTooltip(fullFeature);
+                            } else if (fullFeature != 'loading') {
+                                archesFeaturesCache[feature.getId()] = 'loading';
+                                $.ajax({
+                                    url: arches.urls.map_markers + 'all?entityid=' + feature.getId(),
+                                    success: function(response) {
+                                        fullFeature = geoJSON.readFeature(response.features[0]);
+                                        var geom = fullFeature.getGeometry();
+                                        geom.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
+    
+                                        fullFeature.set('select_feature', true);
+                                        fullFeature.set('entityid', fullFeature.getId());
+    
+                                        archesFeaturesCache[feature.getId()] = fullFeature;
+                                        showMouseoverFeatureTooltip(fullFeature);
+                                    }
+                                });
+                            }
                         }
                     }
                 } else {
@@ -260,7 +283,7 @@ require([
 
             $('.resource-info-closer').click(function() {
                 $('#resource-info').hide();
-                selectFeatureOverlay.getFeatures().clear();
+                selectFeatureOverlay.getSource().clear();
                 $('.resource-info-closer')[0].blur();
             });
 
@@ -284,8 +307,8 @@ require([
                     resourceData[key] = feature.get(key);
                 });
                 
-                selectFeatureOverlay.getFeatures().clear();
-                selectFeatureOverlay.getFeatures().push(feature);
+                selectFeatureOverlay.getSource().clear();
+                selectFeatureOverlay.getSource().addFeature(feature);
                 self.viewModel.selectedResource(resourceData);
                 $('#resource-info').show();
             };
@@ -318,13 +341,14 @@ require([
             };
 
             map.on('mapClicked', function(e, clickFeature) {
-                selectFeatureOverlay.getFeatures().clear();
+                selectFeatureOverlay.getSource().clear();
                 $('#resource-info').hide();
                 if (clickFeature) {
                     var keys = clickFeature.getKeys();
-                    var isCluster = _.contains(keys, "features");
+                    var isCluster = _.contains(keys, "features") || _.contains(keys, "cluster");
                     var isArchesFeature = (_.contains(keys, 'arches_cluster') || _.contains(keys, 'arches_marker'));
-                    if (isCluster && clickFeature.get('features').length > 1) {
+                    if (isCluster && clickFeature.get('features') && clickFeature.get('features').length > 1) {
+                        // ol cluster
                         if (self.viewModel.zoom() !== arches.mapDefaults.maxZoom) {
                             var extent = clickFeature.getGeometry().getExtent();
                             _.each(clickFeature.get("features"), function (feature) {
@@ -335,16 +359,33 @@ require([
                                 }
                                 extent = ol.extent.extend(extent, featureExtent);
                             });
-                            map.map.getView().fitExtent(extent, (map.map.getSize()));
+                            map.map.getView().fit(extent, (map.map.getSize()));
                         } else {
                             showClusterPopup(clickFeature);
                         }
+                    } else if (isCluster && clickFeature.get('point_count') > 1) {
+                        // supercluster
+                         // rather than zooming to the extent of all sub-features as in the ol case above tries to, just get the desired zoom from supercluster
+                        clusterId = clickFeature.get('cluster_id');
+                        
+                        var view = map.map.getView();
+                        var zoom = Math.ceil(view.getZoom());
+                        
+                        var newZoom = zoom + 2;
+                        if(clusterId) {
+                            // newZoom
+                        }
+                        
+                        view.setZoom(newZoom);
+                        view.setCenter(clickFeature.getGeometry().getCoordinates())                        
                     } else {
                         if (isCluster) {
+                            // an ol cluster of 1. N.B. Supercluster should never yield a cluster of 1. If it did, the code here would fail.
                             clickFeature = clickFeature.get('features')[0];
                             keys = clickFeature.getKeys();
                         }
                         if (!_.contains(keys, 'select_feature')) {
+                            // an individual resource, whether at the leaf of a supercluster tree, or as an ol cluster
                             if (isArchesFeature) {
                                 if (archesFeaturesCache[clickFeature.getId()] && archesFeaturesCache[clickFeature.getId()] !== 'loading'){
                                     showFeaturePopup(archesFeaturesCache[clickFeature.getId()]);
@@ -527,7 +568,7 @@ require([
             $('.geocodewidget').on("select2-selecting", function(e) {
                 var geom = geoJSON.readGeometry(e.object.geometry);
                 geom.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
-                self.map.map.getView().fitExtent(geom.getExtent(), self.map.map.getSize());
+                self.map.map.getView().fit(geom.getExtent(), self.map.map.getSize());
                 self.viewModel.selectedAddress(e.object.text);
                 overlay.setPosition(ol.extent.getCenter(geom.getExtent()));
                 overlay.setPositioning('center-center');
@@ -565,7 +606,7 @@ require([
                 layer = layer.getLayers().getArray()[0];
             }
             if (layer.getSource) {
-                this.map.map.getView().fitExtent(layer.getSource().getExtent(), this.map.map.getSize());
+                this.map.map.getView().fit(layer.getSource().getExtent(), this.map.map.getSize());
             }
         },
         clusterItemClick: function (e) {
