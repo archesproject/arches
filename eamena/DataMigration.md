@@ -47,10 +47,10 @@ python manage.py packages -o extend_ontology
 nodes declared in the added_nodes.csv file will be taken to represent the nodes in the existing graph if they share the same name. There will typically be at least the root HERITAGE_RESOURCE_ROOT.E27 represented in the schema.
 
 #### Adding brand new resource types
-For importing schemas for new resource types, e.g. E24/E25, the existing arches workflow should be used. There is a shortcut to loading graphs post-installation which may be accessed via the following command (loading graphs in the path specified in settings.py for RESOURCE_GRAPH_LOCATIONS):
-```
-python manage.py packages -o load_graphs
-```
+For importing schemas for new resource types, e.g. E24/E25, the existing arches workflow should be used.There is a shortcut to loading graphs post-installation which may be accessed via the following command (loading graphs in the path specified in settings.py for RESOURCE_GRAPH_LOCATIONS): 
+
+``` python manage.py packages -o load_graphs ```
+
 #### Reference Data and drop downs
 After this process, the new fields point at the correct reference data (according to the altered_nodes file).
 N.B. the RDM will still show the old value as the title of the dropdown set, since the reference data is shared by both the old and new entitytypes. After pruning the ontology, this will appear correctly.
@@ -73,6 +73,7 @@ This file has the following columns:
      - GroupRootNodeNew = FEATUREFUNCTION_AND_INTERPRETATION.I5
   - Without these group nodes specified, the data would gain the new nodes and values, but the graph structure would not associate them together. For a resource with multiple interpretation types and certainties, there would be no way to know which certainty applies to which interpretation.
 
+Resources are reindexed after being updated.
 
 To run the migration invoke the following command
 ```
@@ -141,6 +142,15 @@ python manage.py packages -o convert_resources -s path/to/config_file.csv
 Affected resources and relationships are reindexed during the conversion process
 
 
+# Rename entity_types
+Should it be necessary to rename an entity type, a command line function has been added to do so:
+```
+python manage.py packages -o rename_entity_type --oldtype OLD_NAME.E55 --newtype NEW_NAME.E55
+```
+This will update the entitytype record and any references to it from the ontology rules/mappings, and business entities table. This may be useful to work around issues with migrations, e.g. avoiding a name clash between old and new schemas by using a temporary node name in the new schema, then renaming once the old node type has been pruned.
+
+N.B. This will update all instances of the node and any resource graphs in the ontology. Use with caution.
+
 # Data validation utilities
 2 utilities have been added to diagnose schema/data issues, which can be fixed with the above tools:
  - validate_values
@@ -161,3 +171,4 @@ python manage.py packages -o find_unused_entity_types
 ```
 
 This identifies any entity types for which there are no entities in the database. The results are written to logs/unused_entity_types.txt
+
