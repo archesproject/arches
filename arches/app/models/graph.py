@@ -604,8 +604,8 @@ class Graph(models.GraphModel):
         for edge_id, edge in copy_of_self.edges.iteritems():
             edge.pk = uuid.uuid1()
             edge.graph = copy_of_self
-            edge.domainnode_id = edge.domainnode_id
-            edge.rangenode_id = edge.rangenode_id
+            edge.domainnode_id = edge.domainnode.pk
+            edge.rangenode_id = edge.rangenode.pk
 
         copy_of_self.edges = {edge.pk:edge for edge_id, edge in copy_of_self.edges.iteritems()}
 
