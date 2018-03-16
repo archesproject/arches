@@ -105,7 +105,7 @@ define([
             this.addBranchList(new BranchList({
                 el: this.$el.find('#siteshape-section')[0],
                 data: this.data,
-                dataKey: 'SITE_OVERALL_SHAPE_TYPE.E55',
+                dataKey: 'SITE_OVERALL_SHAPE_TYPE_NEW.E55',
                 rules: true,
                 validateBranch: function (nodes) {
                     return this.validateHasValues(nodes);

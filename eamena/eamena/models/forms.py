@@ -664,7 +664,7 @@ class LocationForm(ResourceForm):
         self.update_nodes('GEOMETRIC_PLACE_EXPRESSION.SP5', data)
         self.update_nodes('GEOMETRY_EXTENT_CERTAINTY.I6', data)
         self.update_nodes('GRID_ID.E42', data)
-        self.update_nodes('SITE_OVERALL_SHAPE_TYPE.E55', data)
+        self.update_nodes('SITE_OVERALL_SHAPE_TYPE_NEW.E55', data)
         self.update_nodes('TOPOGRAPHY_TYPE.E55', data)
         self.update_nodes('COUNTRY_TYPE.E55', data)
         self.update_nodes('ADMINISTRATIVE_DIVISION.E53', data)
@@ -698,10 +698,10 @@ class LocationForm(ResourceForm):
                 'domains': {}
             }
         
-        self.data['SITE_OVERALL_SHAPE_TYPE.E55'] = {
-            'branch_lists': self.get_nodes('SITE_OVERALL_SHAPE_TYPE.E55'),
+        self.data['SITE_OVERALL_SHAPE_TYPE_NEW.E55'] = {
+            'branch_lists': self.get_nodes('SITE_OVERALL_SHAPE_TYPE_NEW.E55'),
             'domains': {
-                'SITE_OVERALL_SHAPE_TYPE.E55': Concept().get_e55_domain('SITE_OVERALL_SHAPE_TYPE.E55')
+                'SITE_OVERALL_SHAPE_TYPE_NEW.E55': Concept().get_e55_domain('SITE_OVERALL_SHAPE_TYPE_NEW.E55')
             }
         }
         
