@@ -93,6 +93,8 @@ class SearchView(MapBaseManagerView):
             user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
         )
 
+        graphs = JSONSerializer().serialize(context['resource_graphs'], exclude=['functions','author','deploymentdate', 'deploymentfile','isactive','isresource','version', 'iconclass','subtitle','description','disable_instance_creation','ontology_id'])
+        context['graphs'] = graphs
         context['nav']['title'] = _('Search')
         context['nav']['icon'] = 'fa-search'
         context['nav']['search'] = False

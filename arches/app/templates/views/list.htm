@@ -3,7 +3,7 @@
 {% block header %}
 
 <!-- Title -->
-<span class="title-block-fixed">
+<span>
     <h4 class="title-block-title">{% block title %}{% endblock %}</h4>
     {% endblock %}
 
@@ -26,6 +26,7 @@
 </span>
 
 {% block list_wrapper %}
+<div class="list-wrapper">
 <div class="grid" class="grid-list">
 
     <!-- Card -->
@@ -36,5 +37,6 @@
     <!-- /ko -->
 
 
+</div>
 </div>
 {% endblock list_wrapper %}

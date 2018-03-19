@@ -670,6 +670,11 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     overflow: scroll;
 }
 
+.list-wrapper {
+    overflow-y: auto;
+    height: 100%;
+}
+
 .grid {
     background: #DDD;
     max-width: 1200px;

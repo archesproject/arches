@@ -71,6 +71,8 @@ define([
                 searchBuffer: this.searchBuffer
             });
 
+            this.viewModel.resources = this.viewModel.allGraphs();
+
             _.extend(this.viewModel, this.filters);
             this.viewModel.savedSearches = new SavedSearches();
             this.viewModel.searchResults = new SearchResults({
