@@ -670,6 +670,11 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     overflow: scroll;
 }
 
+.list-wrapper {
+    overflow-y: auto;
+    height: 100%;
+}
+
 .grid {
     background: #DDD;
     max-width: 1200px;
@@ -5176,6 +5181,14 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     overflow-x: hidden;
 }
 
+.left-column-container.permissions-identity-list {
+  overflow-y: hidden;
+}
+
+.middle-column-container.permissions-identity-list {
+  overflow-y: hidden;
+}
+
 .form-list {
     padding-top: 0px;
     background: #f0f0f0;
@@ -5401,10 +5414,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     position: absolute;
     top: 42px;
     width: 200px;
-}
-
-.perm-nodes-list {
-    margin-top: 72px;
 }
 
 .library-card-wide {
