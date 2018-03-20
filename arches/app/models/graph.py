@@ -350,27 +350,31 @@ class Graph(models.GraphModel):
         return self
 
     def delete(self):
-        if self.is_editable() == True:
-            with transaction.atomic():
-                for nodegroup in self.get_nodegroups():
-                    nodegroup.delete()
 
-                for edge in self.edges.itervalues():
-                    edge.delete()
+        if str(self.graphid) not in settings.PROTECTED_GRAPHS:
+            if self.is_editable() == True:
+                with transaction.atomic():
+                    for nodegroup in self.get_nodegroups():
+                        nodegroup.delete()
 
-                for node in self.nodes.itervalues():
-                    node.delete()
+                    for edge in self.edges.itervalues():
+                        edge.delete()
 
-                for card in self.cards.itervalues():
-                    card.delete()
+                    for node in self.nodes.itervalues():
+                        node.delete()
 
-                for widget in self.widgets.itervalues():
-                    widget.delete()
+                    for card in self.cards.itervalues():
+                        card.delete()
 
-                # if self.isresource:
-                #     delete_search_index(self.graphid)
+                    for widget in self.widgets.itervalues():
+                        widget.delete()
 
-                super(Graph, self).delete()
+                    # if self.isresource:
+                    #     delete_search_index(self.graphid)
+
+                    super(Graph, self).delete()
+        else:
+            raise GraphValidationError(_('This graph is essential to Arches and cannot be deleted'))
 
     def get_tree(self, root=None):
         """
