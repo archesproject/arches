@@ -86,7 +86,7 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(len(graph.cards), 1)
         self.assertEqual(len(graph.get_nodegroups()), 1)
 
-    def test_graph_doesnt_polute_db(self):
+    def test_graph_doesnt_pollute_db(self):
         """
         test that the mere act of creating a Graph instance doesn't save anything to the database
 
