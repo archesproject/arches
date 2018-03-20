@@ -32,12 +32,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block content %}
 <div class="flex">
     <!--Users and Groups listing -->
-    <div class="left-column-container" data-bind="with:identityList">
+    <div class="left-column-container permissions-identity-list" data-bind="with:identityList">
         {% include 'views/graph/permission-manager/identity-list.htm' %}
     </div>
 
     <!-- Node list -->
-    <div id="node-crud" class="middle-column-container" class="ep-node-card" data-bind="with:groupedNodeList">
+    <div id="node-crud" class="middle-column-container permissions-identity-list" class="ep-node-card" data-bind="with:groupedNodeList">
         {% include 'views/graph/permission-manager/grouped-node-list.htm' %}
     </div>
 
