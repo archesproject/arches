@@ -5,7 +5,6 @@
 # yes | sudo ./ubuntu_xenial_setup.sh
 
 function install_postgres {
-
     sudo add-apt-repository "deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main"
     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
     sudo apt-get update
@@ -33,6 +32,12 @@ function install_postgres {
     sudo -u postgres psql -d template_postgis_20 -c "GRANT ALL ON geography_columns TO PUBLIC;"
     sudo -u postgres psql -d template_postgis_20 -c "GRANT ALL ON spatial_ref_sys TO PUBLIC;"
     sudo -u postgres createdb training -T template_postgis_20
+}
+
+function install_couchdb {
+    sudo add-apt-repository "deb https://apache.bintray.com/couchdb-deb xenial main"
+    sudo apt-get update
+    sudo apt-get install couchdb
 }
 
 function install_yarn {
@@ -80,6 +85,15 @@ function main {
       install_postgres
   else
       echo Skipping postgres/postgis installation
+  fi
+
+  echo -n "Would you like to install and configure couchdb? (y/n)? "
+  read answer
+  if echo "$answer" | grep -iq "^y" ;then
+      echo Yes, Installing couchdb
+      install_couchdb
+  else
+      echo Skipping couch installation
   fi
 
   echo -n "Would you like to install and nodejs/npm/and yarn (y/n)? "

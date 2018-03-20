@@ -20,6 +20,10 @@ services:
         - PGDBNAME=arches
         - PGHOST=db
         - PGPORT=5432
+        - COUCHDB_HOST=couchdb
+        - COUCHDB_PORT=5984
+        - COUCHDB_USER=admin
+        - COUCHDB_PASS=password
         - ESHOST=elasticsearch
         - ESPORT=9200
         # - ELASTICSEARCH_PREFIX=insert_project_name
@@ -68,6 +72,18 @@ services:
         - POSTGRES_PASSWORD=postgres
         - TZ=PST
 
+    couchdb:
+      container_name: couchdb
+      image: couchdb:2.1.1
+      ports:
+        - "5984:5984"
+      environment:
+        COUCHDB_USER: admin
+        COUCHDB_PASSWORD: password
+      volumes:
+        - couchdb-data:/usr/local/var/lib/couchdb
+        - couchdb-log:/usr/local/var/log/couchdb
+
     elasticsearch:
       container_name: elasticsearch
       image: elasticsearch:5.2
@@ -99,6 +115,8 @@ volumes:
     arches-log:
     arches-static:
     arches-bowercomponents:
+    couchdb-data:
+    couchdb-log:
     postgres-data:
     postgres-log:
     elasticsearch-data:
