@@ -2,7 +2,12 @@
 {% load staticfiles %}
 {% load i18n %}
 
-{% block title %}{% trans "Click on the Resources you want to add to your mobile survey" %}{% endblock %}
+{% block header %}
+
+<!-- Title -->
+<span class="title-block-fixed">
+    <h4 class="title-block-title">{% block title %}{% trans "Click on the Resources you want to add to your mobile survey" %}{% endblock %}</h4>
+{% endblock %}
 
 {% block search_placeholder %}{% trans "Find resource" %}{% endblock %}
 
