@@ -14,6 +14,10 @@ services:
         - PGPORT=5432
         - ESHOST=elasticsearch
         - ESPORT=9200
+        - COUCHDB_HOST=couchdb
+        - COUCHDB_PORT=5984
+        - COUCHDB_USER=admin
+        - COUCHDB_PASS=password
         - DJANGO_MODE=PROD
         - DJANGO_DEBUG=False
         - DOMAIN_NAMES=localhost
