@@ -133,8 +133,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </li>
                             <li><a href="#" data-bind="click:clone">{% trans "Clone" %}</a>
                             </li>
+                            <!-- ko if: _.contains($parent.protectedGraphs, graphid) === false  -->
                             <li><a href="#" data-bind="click:deleteGraph">{% trans "Delete" %}</a>
                             </li>
+                            <!--/ko-->
                         </ul>
                     </div>
                     <div>
@@ -156,7 +158,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <script>{% autoescape off %}
 define('graph-manager-data', [], function () {
     return {
-        root_nodes: {{ root_nodes }}
+        root_nodes: {{ root_nodes }},
+        protected_graphs: {{ protected_graphs }}
     };
 });
 {% endautoescape %}</script>
