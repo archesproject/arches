@@ -204,6 +204,7 @@ class MobileSurveyManagerView(MapBaseManagerView):
 
         try:
             couch = couchdb.Server(settings.COUCHDB_URL)
+            connection_error = JSONResponse({'success':False,'message': _('Connection to CouchDB failed. Please confirm your CouchDB service is running on: ' + settings.COUCHDB_URL),'title':_('CouchDB Service Unavailable')}, status=500)
             with transaction.atomic():
                 mobile_survey.save()
                 # try and create a couchdb for the project
@@ -211,8 +212,11 @@ class MobileSurveyManagerView(MapBaseManagerView):
                     db = couch['project_' + str(mobile_survey.id)]
                 except couchdb.ResourceNotFound:
                     db = couch.create('project_' + str(mobile_survey.id))
+                except Exception as e:
+                    print e
+                    return connection_error
         except Exception as e:
-            return JSONResponse({'success':False,'message': _('Connection to CouchDB failed. Please confirm your CouchDB service is running on: ' + settings.COUCHDB_URL),'title':_('CouchDB Service Unavailable')}, status=500)
+            return connection_error
 
 
 
