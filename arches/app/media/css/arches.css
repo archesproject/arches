@@ -5308,6 +5308,11 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     overflow-x: hidden;
 }
 
+.left-column-container.permissions-identity-list {
+  overflow-y: hidden;
+  overflow-x: hidden;
+}
+
 .form-list {
     padding-top: 0px;
     background: #f0f0f0;
