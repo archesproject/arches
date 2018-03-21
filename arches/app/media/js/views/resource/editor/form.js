@@ -374,7 +374,9 @@ define([
                         }
                     }
                     this.trigger('after-update', response, tile);
-                    this.resourceexists(true);
+                    if (this.resourceexists) {
+                        this.resourceexists(true);
+                    }
                 }, this, tile.formData);
             }
         },
