@@ -964,9 +964,9 @@ bit-twiddle@^1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/bit-twiddle/-/bit-twiddle-1.0.2.tgz#0c6c1fabe2b23d17173d9a61b7b7093eb9e1769e"
 
-blueimp-gallery@2.15.2:
-  version "2.15.2"
-  resolved "https://registry.yarnpkg.com/blueimp-gallery/-/blueimp-gallery-2.15.2.tgz#9a02c1d0ba450b0e8ba70d804f745d9ec9e66004"
+blueimp-gallery@2.31.0:
+  version "2.31.0"
+  resolved "https://registry.yarnpkg.com/blueimp-gallery/-/blueimp-gallery-2.31.0.tgz#6d00c6c0f818e3ca793b908f17b065fea73ca576"
 
 bootstrap-colorpicker@^2.3.6:
   version "2.5.2"
