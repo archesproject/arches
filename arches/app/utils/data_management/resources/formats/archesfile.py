@@ -128,7 +128,7 @@ class ArchesFileReader(Reader):
 
                         if resource['tiles'] != []:
                             reporter.update_tiles(len(resource['tiles']))
-                            for tile in resource['tiles']:
+                            for tile in sorted(resource['tiles'], key=lambda k: k['parenttile_id']):
                                 tile['parenttile_id'] = uuid.UUID(str(tile['parenttile_id'])) if tile['parenttile_id'] else None
 
                                 tile, created = Tile.objects.update_or_create(
