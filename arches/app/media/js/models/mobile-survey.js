@@ -328,7 +328,7 @@ define([
                     self.datadownloadconfig.resources(request.responseJSON.mobile_survey.datadownloadconfig.resources);
                     self.datadownloadconfig.custom(request.responseJSON.mobile_survey.datadownloadconfig.custom);
                     this._mobilesurvey(this.json());
-                };
+                }
             };
             this._doRequest({
                 type: method,

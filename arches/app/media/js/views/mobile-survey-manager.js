@@ -9,20 +9,24 @@ define([
     'arches',
     'bindings/datepicker'
 ], function(_, ko, BaseManagerView, MobileSurveyManagerViewModel, AlertViewModel, MobileSurveyModel, data, arches) {
-    
+
     var viewModel = new MobileSurveyManagerViewModel(data);
 
     viewModel.saveMobileSurvey = function() {
         var self = this;
         this.loading(true);
         var addMobileSurvey = !this.selectedMobileSurvey().get('id');
-        this.selectedMobileSurvey().save(function() {
-            if (addMobileSurvey) {
-                self.mobilesurveys.push(self.selectedMobileSurvey());
+        this.selectedMobileSurvey().save(function(data) {
+            if (data.responseJSON.success) {
+                if (addMobileSurvey) {
+                    self.mobilesurveys.push(self.selectedMobileSurvey());
+                }
+            } else {
+                pageView.viewModel.alert(new AlertViewModel('ep-alert-red', data.responseJSON.title, data.responseJSON.message));
             }
             self.loading(false);
-        });
-    }
+        })
+        };
 
     viewModel.discardEdits = function() {
         if (!this.selectedMobileSurvey().get('id')) {

@@ -201,15 +201,20 @@ class MobileSurveyManagerView(MapBaseManagerView):
         mobile_survey.bounds = MultiPolygon(polygons)
         mobile_survey.lasteditedby = self.request.user
 
-        with transaction.atomic():
-            mobile_survey.save()
 
-            # try and create a couchdb for the project
+        try:
             couch = couchdb.Server(settings.COUCHDB_URL)
-            try:
-                db = couch['project_' + str(mobile_survey.id)]
-            except couchdb.ResourceNotFound:
-                db = couch.create('project_' + str(mobile_survey.id))
+            with transaction.atomic():
+                mobile_survey.save()
+                # try and create a couchdb for the project
+                try:
+                    db = couch['project_' + str(mobile_survey.id)]
+                except couchdb.ResourceNotFound:
+                    db = couch.create('project_' + str(mobile_survey.id))
+        except Exception as e:
+            return JSONResponse({'success':False,'message': _('Connection to CouchDB failed. Please confirm your CouchDB service is running on: ' + settings.COUCHDB_URL),'title':_('CouchDB Service Unavailable')}, status=500)
+
+
 
 
         ordered_cards = models.MobileSurveyXCard.objects.filter(mobile_survey=mobile_survey).order_by('sortorder')
