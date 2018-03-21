@@ -92,7 +92,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <!-- Add Project -->
                     <div class="library-panel-search-bar">
                         <!--ko if: selectedMobileSurvey()-->
-                        <button id="" class="btn btn-lg btn-danger btn-active-dark btn-labeled ion-minus-round" data-bind="click: deleteSelectedMobileSurvey">{% trans "Delete Survey" %}</button>
+                        <button id="" class="btn btn-lg btn-danger btn-active-dark btn-labeled ion-minus-round" data-bind="click: deleteSelectedMobileSurvey, attr: {disabled: selectedMobileSurvey().active() === true}">{% trans "Delete Survey" %}</button>
                         <!--/ko-->
                     </div>
                 </div>
