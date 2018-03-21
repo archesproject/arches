@@ -20,7 +20,7 @@
         "datatables.net-bs": "~1.10.12",
         "datatables.net-responsive": "~2.1.0",
         "datatables.net-responsive-bs": "~2.1.0",
-        "dropzone": "3.8.4",
+        "dropzone": "5.3.0",
         "eonasdan-bootstrap-datetimepicker": "~4.17.43",
         "flexslider": "~2.6.3",
         "font-awesome": "~4.6.3",
