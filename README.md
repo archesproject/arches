@@ -1,10 +1,6 @@
 # Arches [![Build Status](https://travis-ci.org/archesproject/arches.svg?branch=master)](https://travis-ci.org/archesproject/arches) [![Coverage Status](https://coveralls.io/repos/github/archesproject/arches/badge.svg?branch=master)](https://coveralls.io/github/archesproject/arches?branch=master)
 
-Arches is a web-based, geospatial information system for cultural heritage inventory and management.
-
-Arches is purpose-built for the international cultural heritage field, and designed to record all types of immovable heritage, including archaeological sites, buildings and other historic structures, landscapes, and heritage ensembles or districts.
-
-For more information and background on the Arches project, please visit [archesproject.org](http://archesproject.org/).
+Arches is a web-based, geospatial information system for cultural heritage inventory and management. Arches is purpose-built for the international cultural heritage field, and designed to record all types of immovable heritage, including archaeological sites, buildings and other historic structures, landscapes, and heritage ensembles or districts. For more information and background on the Arches project, please visit [archesproject.org](http://archesproject.org/).
 
 For general inquiries and to get technical support from the wider Arches community, visit our [Google groups forum](https://groups.google.com/forum/#!forum/archesproject).
 
@@ -12,7 +8,9 @@ For general user installation and app documentation, visit [arches4.readthedocs.
 
 For developers interested in installing Arches or in more technical, visit [this repo's wiki](https://github.com/archesproject/arches/wiki). You will also find info on how to contribute to the repo.
 
-Issue reports are encouraged.  [Please read this article](http://polite.technology/reportabug.html) before reporting issues.
+Issue reports are encouraged! [Please read this article](http://polite.technology/reportabug.html) before reporting issues.
+*   [Report a Bug](https://github.com/archesproject/arches/issues/new?template=bug.md)
+*   [File a Feature Ticket](https://github.com/archesproject/arches/issues/new?template=feature.md)
 
 [Version 4.1.0 release notes](https://github.com/archesproject/arches/blob/stable/4.1.x/docs/releases/4.1.0.md)
 
@@ -41,11 +39,11 @@ If you run into problems, please review the full installation documentation [her
 
 #### Release Cycle
 
-Our general release cycle will typically be a functional release (either major if there are backward incompatible changes or minor, if there are not) followed in 6-12 weeks by a bug release (patch).  See [semvar.org](https://semver.org/) for version numbering.
+Our general release cycle will typically be a functional release (either major if there are backward incompatible changes or minor, if there are not) followed in 6-12 weeks by a bug release (patch). See [semvar.org](https://semver.org/) for version numbering.
 
-- Functional releases will usually introduce new functionality to the application but could also include styling updates, enhancements to the UX, bug fixes, and general improvements.
-- Bug releases are really only concerned with fixing any bugs related to the previous release or any other issues not yet addressed
+-   Functional releases will usually introduce new functionality to the application but could also include styling updates, enhancements to the UX, bug fixes, and general improvements.
+-   Bug releases are really only concerned with fixing any bugs related to the previous release or any other issues not yet addressed
 
 ##### Support for previous releases
 
-Functional releases will be supported until the next functional release.  After that users are expected to upgrade to the latest release on [pypi.python.org](https://pypi.python.org/pypi/arches)
+Functional releases will be supported until the next functional release. After that users are expected to upgrade to the latest release on [pypi.python.org](https://pypi.python.org/pypi/arches)
