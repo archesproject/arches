@@ -5,7 +5,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 class JSONResponse(HttpResponse):
 
     def __init__(self, content=b'', *args, **kwargs):
-    	kwargs['content_type'] = 'text/json'
+    	kwargs['content_type'] = 'application/json'
 
     	ensure_ascii = kwargs.pop("ensure_ascii", True)
         stream = kwargs.pop("stream", None)
