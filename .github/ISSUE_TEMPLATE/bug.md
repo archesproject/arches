@@ -1,7 +1,7 @@
 <!--- Provide a general summary of the issue in the Title above -->
 
 <!--- Your issue may already be reported!  -->
-<!--- Please search on the [issue track](../) before creating one.  -->
+<!--- Please search before creating one: https://github.com/archesproject/arches/issues  -->
 
 <!--- By fully explaining what you are encountering, you can help us understand and reproduce the issue.  -->
 <!--- Often times, a screenshot or animated GIF can help show what you are encountering.   -->
