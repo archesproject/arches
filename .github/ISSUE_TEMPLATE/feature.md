@@ -11,6 +11,3 @@
 -   [ ] Documentation
 
 #### Definition of Done
-
-<!--- By fully explaining what you are encountering, you can help us understand and reproduce the issue.  -->
-<!--- Often times, a screenshot or animated GIF can help show what you are encountering.   -->
