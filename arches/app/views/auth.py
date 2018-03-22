@@ -223,7 +223,7 @@ class GetTokenView(View):
             expiration = int(time.time()) + timedelta(days=settings.JWT_TOKEN_EXPIRATION).total_seconds()
             token = jws.sign({'username': user.username, 'expiration':expiration}, settings.JWT_KEY, algorithm=settings.JWT_ALGORITHM)
 
-            response = HttpResponse(token+'\n', content_type='text/plain')
+            response = HttpResponse(token, content_type='text/plain')
         else:
             response = Http401Response(www_auth_header='Bearer')
             
