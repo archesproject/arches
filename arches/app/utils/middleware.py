@@ -1,12 +1,14 @@
 import time
+from django.http import HttpResponse
 from django.contrib.auth.models import User, AnonymousUser
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import SimpleLazyObject
 from django.utils.six import text_type
 from django.utils.translation import ugettext as _
 from arches.app.models.system_settings import settings
+from arches.app.utils.response import Http401Response
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from jose import jwt, jws
+from jose import jwt, jws, JWSError
 
 HTTP_HEADER_ENCODING = 'iso-8859-1'
 
@@ -35,14 +37,13 @@ class JWTAuthenticationMiddleware(MiddlewareMixin):
         user = None
         try:
             user = User.objects.get(username=username)
+            if not user.is_active:
+                raise Exception()
         except:
-            raise AuthenticationFailed(_('Invalid token.'))
-
-        if not user.is_active:
-            raise AuthenticationFailed(_('User inactive or deleted.'))
+            raise AuthenticationFailed(_('User inactive or deleted.\n\n'))
 
         if int(expiration) < int(time.time()):
-            raise AuthenticationFailed(_('Token Expired.'))
+            raise AuthenticationFailed(_('Token Expired.\n\n'))
 
         return user or AnonymousUser()
 
@@ -57,7 +58,15 @@ class JWTAuthenticationMiddleware(MiddlewareMixin):
         # if there is a session and the user isn't anonymous then don't modify request.user
         if request.user.is_anonymous() and request.token is not '':
             # try to get the user info from the token if it exists
-            request.user = SimpleLazyObject(lambda: self.get_user_from_token(request.token))
+            try:
+                user = self.get_user_from_token(request.token)
+                request.user = SimpleLazyObject(lambda: user)
+            except AuthenticationFailed as err:
+                response = Http401Response(err.message, www_auth_header='Bearer', content_type='text/plain')
+                return response
+            except JWSError as err:
+                response = Http401Response(err.message, www_auth_header='Bearer', content_type='text/plain')
+                return response
 
 
 class TokenMiddleware(MiddlewareMixin):
