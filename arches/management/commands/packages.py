@@ -384,7 +384,7 @@ class Command(BaseCommand):
             for path in business_data:
                 if path.endswith('csv'):
                     config_file = path.replace('.csv', '.mapping')
-                    self.import_business_data(path, overwrite=True, bulk_load=True)
+                    self.import_business_data(path, overwrite=True, bulk_load=True, config_file=config_file)
                 else:
                     self.import_business_data(path, overwrite=True)
 
