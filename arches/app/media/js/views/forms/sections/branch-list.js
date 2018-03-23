@@ -7,7 +7,8 @@ define(['jquery',
 
         events: {
             'click .add-button': 'addItem',
-            'click [name="discard-edit-link"]': 'undoCurrentEdit'
+            'click [name="discard-edit-link"]': 'undoCurrentEdit',
+            'change #relation-type':'addRelation'
         },
 
         initialize: function(options) {
@@ -15,7 +16,6 @@ define(['jquery',
             this.singleEdit = false;
             this.originalItem = null;
             _.extend(this, options);
-
             this.defaults = [];
             this.viewModel = JSON.parse(JSON.stringify(this.data[this.dataKey]));
             //this.viewModel.domains = this.data[this.dataKey].domains;
@@ -129,6 +129,7 @@ define(['jquery',
                     branch_lists.push(list);
                 }
             }, this);
+    
             return branch_lists;
         },
 
@@ -166,7 +167,6 @@ define(['jquery',
                 branch.editing(false);
                 this.addBlankEditBranch();
                 this.originalItem = null;
-
                 this.trigger('change', 'add', branch);
             } else {
                 validationAlert.show(300);
@@ -175,7 +175,21 @@ define(['jquery',
                 }, 5000);
             }
         },
-
+        
+        addRelation: function() {
+            var branch = this.getEditedBranch();
+            if (this.getBranchLists().length===1) {
+                var branch_to_delete = this.getBranchLists()[0];
+                this.viewModel.branch_lists.remove(branch_to_delete);
+                this.trigger('change', 'delete', branch_to_delete);
+            }
+            branch.editing(false);
+            this.addBlankEditBranch();
+            this.originalItem = null;
+            this.trigger('change', 'add', branch);                
+        
+            
+        },
         deleteItem: function(branch, e) {
             this.viewModel.branch_lists.remove(branch);
             this.trigger('change', 'delete', branch);   
@@ -240,7 +254,7 @@ define(['jquery',
             _.each(data, function(item){
                 var i = item;
                 delete item.editing;
-            }, this); 
+            }, this);
             return data
         },
 
