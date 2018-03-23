@@ -39,7 +39,10 @@ class ResourceForm(object):
         except AttributeError:
             self._schema = Entity.get_mapping_schema(self.resource.entitytypeid)
             return self._schema
-    
+            
+    @schema.setter
+    def schema(self, value):
+        self._schema = value
     @staticmethod
     def get_info():
         return {
