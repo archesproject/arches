@@ -133,3 +133,4 @@ class SystemSettings(LazySettings):
 
 
 settings = SystemSettings()
+settings.update_from_db()
