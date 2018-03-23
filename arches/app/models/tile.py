@@ -112,13 +112,18 @@ class Tile(models.TileModel):
         edit.save()
 
     def validate(self, errors=None):
+
         for nodeid, value in self.data.iteritems():
             datatype_factory = DataTypeFactory()
             node = models.Node.objects.get(nodeid=nodeid)
             datatype = datatype_factory.get_instance(node.datatype)
-            error = datatype.validate(value)
-            if errors != None:
-                errors += error
+            try:
+                error = datatype.validate(value)
+                if errors != None:
+                    errors += error
+            except Exception as e:
+                print "Failed to validate tile:{0} at node:{1} with datatype: {2} and value: {3}".format(self.tileid, nodeid, datatype, value)
+
         return errors
 
     def save(self, *args, **kwargs):
