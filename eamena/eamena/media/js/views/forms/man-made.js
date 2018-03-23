@@ -3,34 +3,30 @@ define(['jquery',
     'knockout',
     'views/forms/wizard-base', 
     'views/forms/sections/branch-list',
+    'views/forms/sections/location-branch-list',
     'bootstrap-datetimepicker',
-    'summernote'], function ($, _, ko, WizardBase, BranchList, datetimepicker, summernote) {
+    'summernote'], function ($, _, ko, WizardBase, BranchList, LocationBranchList, datetimepicker, summernote) {
 
     return WizardBase.extend({
         initialize: function() {
             WizardBase.prototype.initialize.apply(this);
 
             var self = this;
-            var date_picker = $('.datetimepicker').datetimepicker({pickTime: false});            
+            var date_picker = $('.datetimepicker').datetimepicker({pickTime: false});
+            date_picker.on('dp.change', function(evt){
+                $(this).find('input').trigger('change'); 
+            });            
             var currentEdited = this.getBlankFormData();
-            console.log("this.data", this.data);
-            // date_picker.on('dp.change', function(evt){
-            //     $(this).find('input').trigger('change'); 
-            // });
-
-            // this.editAssessment = function(branchlist){
-            //     self.switchBranchForEdit(branchlist);
-            // }
-
-            // this.deleteAssessment = function(branchlist){
-            //     self.deleteClicked(branchlist);
-            // }
-
-            // ko.applyBindings(this, this.$el.find('#existing')[0]);
+            var locationBranchList = new LocationBranchList({
+                el: this.$el.find('#heritage-location')[0],
+                data: this.data,
+                dataKey: 'GEOMETRIC_PLACE_EXPRESSION.SP5'
+            });
+            this.addBranchList(locationBranchList);
 
         
             var relationBranchList = new BranchList({
-                el: this.$el.find('.relation-list')[0],
+                el: this.$el.find('#relation-list')[0],
                 data: this.data,
                 dataKey: 'related-resources',
                 validateBranch: function (nodes) {
@@ -39,14 +35,6 @@ define(['jquery',
                 addBlankEditBranch: function(){
                     return null;
                 },
-                // getData: function(){
-                //     var data = koMapping.toJS(this.viewModel.branch_lists());
-                //     _.each(data, function(item){
-                //         var i = item;
-                //         delete item.editing;
-                //     }, this); 
-                //     return data;
-                // },
                 getEditedBranchTypeInfo: function() {
                     if (!this.getEditedBranch()) {
                         return {};
@@ -58,19 +46,46 @@ define(['jquery',
             this.addBranchList(relationBranchList);
         
             this.addBranchList(new BranchList({
-                el: this.$el.find('#heritage-classification')[0],
+                el: this.$el.find('#feature-names')[0],
                 data: this.data,
-                dataKey: 'NAME.E41',
-                singleEdit: true
+                dataKey: 'NAME.E41'
             }));
+            this.addBranchList(new BranchList({
+                el: this.$el.find('#feature-classification')[0],
+                data: this.data,
+                dataKey: 'HERITAGE_CLASSIFICATION_TYPE.E55'
+            }));            
+            this.addBranchList(new BranchList({
+                el: this.$el.find('#feature-use')[0],
+                data: this.data,
+                dataKey: 'HERITAGE_FEATURE_USE_TYPE.E55'
+            }));            
+            
             this.addBranchList(new BranchList({
                 el: this.$el.find('#assessment-summary')[0],
                 data: this.data,
-                dataKey: 'INVESTIGATION_ASSESSMENT_ACTIVITY.E7',
-                singleEdit: true
+                dataKey: 'INVESTIGATION_ASSESSMENT_ACTIVITY.E7'
             }));
-            
-            $('#end-workflow').removeClass('disabled');      
+            this.addBranchList(new BranchList({
+                el: this.$el.find('#remarks-assignment')[0],
+                data: this.data,
+                dataKey: 'CONDITION_REMARKS_ASSIGNMENT.E13'
+            }));
+            this.addBranchList(new BranchList({
+                el: this.$el.find('#priority-assignment')[0],
+                data: this.data,
+                dataKey: 'OVERALL_PRIORITY_ASSIGNMENT.E13'
+            }));
+            this.addBranchList(new BranchList({
+                el: this.$el.find('#overall-condition')[0],
+                data: this.data,
+                dataKey: 'OVERALL_CONDITION_TYPE.E55'
+            }));
+            this.addBranchList(new BranchList({
+                el: this.$el.find('#relationship-assignment')[0],
+                data: this.data,
+                dataKey: 'related-resources'
+            }));
         },
 
         startWorkflow: function() { 
@@ -97,36 +112,40 @@ define(['jquery',
 
         getBlankFormData: function(){
             return this.prepareData({
-                // 'SITE_MORPHOLOGY_TYPE.E55': {
-                //     'branch_lists':[]
-                // },
+                'GEOMETRIC_PLACE_EXPRESSION.SP5': {
+                     'branch_lists':[]
+                },
                 'NAME.E41': {
                     'branch_lists': []
                 },
+                'HERITAGE_CLASSIFICATION_TYPE.E55': {
+                    'branch_lists': []
+                },                
+                'HERITAGE_FEATURE_USE_TYPE.E55': {
+                    'branch_lists': []
+                },                                
                 'INVESTIGATION_ASSESSMENT_ACTIVITY.E7': {
                     'branch_lists':[]
                 },
                 'related-resources': {
                     'branch_lists':[]
                 },
-                // 'TO_DATE.E49': {
-                //     'branch_lists': []
-                // },        
+                'CONDITION_REMARKS_ASSIGNMENT.E13': {
+                     'branch_lists': []
+                },        
+                'OVERALL_PRIORITY_ASSIGNMENT.E13': {
+                     'branch_lists': []
+                },            
+                'OVERALL_CONDITION_TYPE.E55': {
+                     'branch_lists': []
+                }                  
             })
-        },
-
-        // deleteClicked: function(branchlist) {
-        //     var warningtext = '';
-        // 
-        //     this.deleted_assessment = branchlist;
-        //     this.confirm_delete_modal = this.$el.find('.confirm-delete-modal');
-        //     this.confirm_delete_modal_yes = this.confirm_delete_modal.find('.confirm-delete-yes');
-        //     this.confirm_delete_modal_yes.removeAttr('disabled');
-        // 
-        //     warningtext = this.confirm_delete_modal.find('.modal-body [name="warning-text"]').text();
-        //     this.confirm_delete_modal.find('.modal-body [name="warning-text"]').text(warningtext + ' ' + branchlist['SITE_MORPHOLOGY_TYPE.E55'].branch_lists[0].nodes[0].label);           
-        //     this.confirm_delete_modal.modal('show');
-        // }
+        }
 
     });
+});
+$(function($) {
+    $('#relation-type').on('change', function() {
+        $('#end-workflow').removeClass('disabled');
+    });   
 });
