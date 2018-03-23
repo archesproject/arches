@@ -672,7 +672,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 
 .list-wrapper {
     overflow-y: auto;
-    height: 100%;
+    height: calc(100% - 60px); /*60px accounts for header so list scrolls to bottom*/
 }
 
 .grid {
@@ -5187,6 +5187,14 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .middle-column-container.permissions-identity-list {
   overflow-y: hidden;
+}
+
+.left-column-container.graph-designer{
+  overflow-y: hidden;
+}
+
+.middle-column-container.graph-designer{
+  height: fit-content;
 }
 
 .form-list {
