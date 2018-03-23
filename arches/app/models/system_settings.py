@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from django.conf import LazySettings
+from django.db import ProgrammingError
 from django.utils.functional import empty
 from arches.app.models import models
 
@@ -133,4 +134,7 @@ class SystemSettings(LazySettings):
 
 
 settings = SystemSettings()
-settings.update_from_db()
+try:
+    settings.update_from_db()
+except ProgrammingError:
+    print "Skipping system settings update"
