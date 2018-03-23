@@ -97,68 +97,81 @@ class ArchesFileReader(Reader):
         """
         conceptImporter(self.reference_data)
 
-    def import_business_data(self, business_data, mapping=None):
-        reporter = ResourceImportReporter(business_data)
-        try:
-            if mapping == None or mapping == '':
-                for resource in business_data['resources']:
-                    if resource['resourceinstance'] != None:
-                        if models.GraphModel.objects.filter(graphid=str(resource['resourceinstance']['graph_id'])).count() > 0:
-                            resourceinstance, created = ResourceInstance.objects.update_or_create(
-                                resourceinstanceid = uuid.UUID(str(resource['resourceinstance']['resourceinstanceid'])),
+
+    def replace_source_nodeid(self, tiles, mapping):
+        for tile in tiles:
+            new_data = []
+            for sourcekey in tile['data'].keys():
+                for row in mapping['nodes']:
+                    if row['file_field_name'] == sourcekey:
+                        d = {}
+                        d[row['arches_nodeid']] =  tile['data'][sourcekey]
+                        new_data.append(d)
+            tile['data'] = new_data
+        return tiles
+
+    def import_business_data_without_mapping(self, business_data, reporter):
+        errors = []
+        for resource in business_data['resources']:
+            if resource['resourceinstance'] != None:
+                if models.GraphModel.objects.filter(graphid=str(resource['resourceinstance']['graph_id'])).count() > 0:
+                    resourceinstance, created = ResourceInstance.objects.update_or_create(
+                    resourceinstanceid = uuid.UUID(str(resource['resourceinstance']['resourceinstanceid'])),
+                    defaults = {
+                    'graph_id': uuid.UUID(str(resource['resourceinstance']['graph_id'])),
+                    'legacyid': resource['resourceinstance']['legacyid']
+                    }
+                    )
+
+                    if len(ResourceInstance.objects.filter(resourceinstanceid=resource['resourceinstance']['resourceinstanceid'])) == 1:
+                        reporter.update_resources_saved()
+
+                        if resource['tiles'] != []:
+                            reporter.update_tiles(len(resource['tiles']))
+                            for tile in resource['tiles']:
+                                tile['parenttile_id'] = uuid.UUID(str(tile['parenttile_id'])) if tile['parenttile_id'] else None
+
+                                tile, created = Tile.objects.update_or_create(
+                                tileid = uuid.UUID(str(tile['tileid'])),
                                 defaults = {
-                                    'graph_id': uuid.UUID(str(resource['resourceinstance']['graph_id'])),
-                                    'legacyid': resource['resourceinstance']['legacyid']
+                                'resourceinstance': resourceinstance,
+                                'parenttile': Tile(uuid.UUID(str(tile['parenttile_id']))) if tile['parenttile_id'] else None,
+                                'nodegroup': NodeGroup(uuid.UUID(str(tile['nodegroup_id']))) if tile['nodegroup_id'] else None,
+                                'data': tile['data']
                                 }
-                            )
-                            if len(ResourceInstance.objects.filter(resourceinstanceid=resource['resourceinstance']['resourceinstanceid'])) == 1:
-                                reporter.update_resources_saved()
+                                )
+                                if len(Tile.objects.filter(tileid=tile.tileid)) == 1:
+                                    errors = tile.validate(self.errors)
+                                    reporter.update_tiles_saved()
 
-                            if resource['tiles'] != []:
-                                reporter.update_tiles(len(resource['tiles']))
-                                for tile in resource['tiles']:
-                                    tile['parenttile_id'] = uuid.UUID(str(tile['parenttile_id'])) if tile['parenttile_id'] else None
-
-                                    tile, created = Tile.objects.update_or_create(
-                                        tileid = uuid.UUID(str(tile['tileid'])),
-                                        defaults = {
-                                            'resourceinstance': resourceinstance,
-                                            'parenttile': Tile(uuid.UUID(str(tile['parenttile_id']))) if tile['parenttile_id'] else None,
-                                            'nodegroup': NodeGroup(uuid.UUID(str(tile['nodegroup_id']))) if tile['nodegroup_id'] else None,
-                                            'data': tile['data']
-                                        }
-                                    )
-                                    if len(Tile.objects.filter(tileid=tile.tileid)) == 1:
-                                        reporter.update_tiles_saved()
-            else:
-
-                blanktilecache = {}
-                target_nodegroup_cardinalities = {}
-                for nodegroup in JSONSerializer().serializeToPython(NodeGroup.objects.all()):
-                    target_nodegroup_cardinalities[nodegroup['nodegroupid']] = nodegroup['cardinality']
-
-                def replace_source_nodeid(tiles, mapping):
-                    for tile in tiles:
-                        new_data = []
-                        for sourcekey in tile['data'].keys():
-                            for row in mapping['nodes']:
-                                if row['file_field_name'] == sourcekey:
-                                    d = {}
-                                    d[row['arches_nodeid']] =  tile['data'][sourcekey]
-                                    new_data.append(d)
-                                    # tile['data'][row['targetnodeid']] = tile['data'][sourcekey]
-                                    # del tile['data'][sourcekey]
-                        tile['data'] = new_data
-                    return tiles
-
-                def cache(blank_tile):
+    def get_blank_tile(self, sourcetilegroup, blanktilecache, tiles, resourceinstanceid):
+        if len(sourcetilegroup[0]['data']) > 0:
+            if sourcetilegroup[0]['data'][0] != {}:
+                if sourcetilegroup[0]['data'][0].keys()[0] not in blanktilecache:
+                    blank_tile = Tile.get_blank_tile(tiles[0]['data'][0].keys()[0], resourceid=resourceinstanceid)
                     if blank_tile.data != {}:
                         for tile in blank_tile.tiles.values():
                             if isinstance(tile, Tile):
                                 for key in tile.data.keys():
                                     blanktilecache[key] = blank_tile
-                    # else:
-                    #     print blank_tile
+                else:
+                    blank_tile = blanktilecache[tiles[0]['data'][0].keys()[0]]
+            else:
+                blank_tile = None
+        else:
+            blank_tile = None
+        return blank_tile
+
+    def import_business_data(self, business_data, mapping=None):
+        reporter = ResourceImportReporter(business_data)
+        try:
+            if mapping == None or mapping == '':
+                self.import_business_data_without_mapping(business_data, reporter)
+            else:
+                blanktilecache = {}
+                target_nodegroup_cardinalities = {}
+                for nodegroup in JSONSerializer().serializeToPython(NodeGroup.objects.all()):
+                    target_nodegroup_cardinalities[nodegroup['nodegroupid']] = nodegroup['cardinality']
 
                 for resource in business_data['resources']:
                     reporter.update_tiles(len(resource['tiles']))
@@ -193,24 +206,10 @@ class ArchesFileReader(Reader):
                                                 del tile['data'][key]
                                 return ret
 
-                            def get_blank_tile(sourcetilegroup):
-                                if len(sourcetilegroup[0]['data']) > 0:
-                                    if sourcetilegroup[0]['data'][0] != {}:
-                                        if sourcetilegroup[0]['data'][0].keys()[0] not in blanktilecache:
-                                            blank_tile = Tile.get_blank_tile(tiles[0]['data'][0].keys()[0], resourceid=resourceinstanceid)
-                                            cache(blank_tile)
-                                        else:
-                                            blank_tile = blanktilecache[tiles[0]['data'][0].keys()[0]]
-                                    else:
-                                        blank_tile = None
-                                else:
-                                    blank_tile = None
-                                return blank_tile
-
                             tiles = get_tiles(tile)
                             if tiles is not None:
-                                mapped_tiles = replace_source_nodeid(tiles, mapping)
-                                blank_tile = get_blank_tile(tiles)
+                                mapped_tiles = self.replace_source_nodeid(tiles, mapping)
+                                blank_tile = self.get_blank_tile(tiles, blanktilecache, tiles, resourceinstanceid)
 
                                 def populate_tile(sourcetilegroup, target_tile):
                                     need_new_tile = False
@@ -280,8 +279,8 @@ class ArchesFileReader(Reader):
                                                         need_new_tile = True
 
                                         if need_new_tile:
-                                            if get_blank_tile(sourcetilegroup) != None:
-                                                populate_tile(sourcetilegroup, get_blank_tile(sourcetilegroup))
+                                            if self.get_blank_tile(sourcetilegroup, blanktilecache, tiles, resourceinstanceid) != None:
+                                                populate_tile(sourcetilegroup, self.get_blank_tile(sourcetilegroup, blanktilecache, tiles, resourceinstanceid))
 
                                         if target_tile_cardinality == '1':
                                             populated_nodegroups.append(str(target_tile.nodegroup_id))
