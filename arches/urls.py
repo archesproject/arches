@@ -132,8 +132,6 @@ urlpatterns = [
 
     # Uncomment the next line to enable the admin:
     url(r'^admin/', admin.site.urls),
-    # url(r'^reset/(?P<token>[\w:-]+)/$', password_reset_views.reset, name='password_reset_reset', kwargs={"reset_password_form":ArchesPasswordResetForm}),
-    # url(r'^', include('password_reset.urls')),
 
     url(r'^password_reset/$', auth_views.password_reset, name='password_reset', kwargs={"password_reset_form":ArchesPasswordResetForm}),
     url(r'^password_reset/done/$', auth_views.password_reset_done, name='password_reset_done'),
