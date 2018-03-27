@@ -1,3 +1,4 @@
+import json
 from arches.app.utils.permission_backend import get_editable_resource_types
 from arches.app.utils.permission_backend import get_createable_resource_types
 from arches.app.utils.permission_backend import get_resource_types_by_perm
