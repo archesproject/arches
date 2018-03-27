@@ -109,19 +109,39 @@
                         <div class="row">
                             <div class="col-xs-12">
                                 <!-- Cause Category -->
-                                <input style="width:33%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" placeholder="{% trans 'Category' %}" data-bind="select2: {value: getEditedNode('DISTURBANCE_CAUSE_CATEGORY_TYPE.E55', 'value'), dataKey: 'DISTURBANCE_CAUSE_CATEGORY_TYPE.E55'}"></input>
+                                <input style="width:40%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" placeholder="{% trans 'Category' %}" data-bind="select2: {value: getEditedNode('DISTURBANCE_CAUSE_CATEGORY_TYPE.E55', 'value'), dataKey: 'DISTURBANCE_CAUSE_CATEGORY_TYPE.E55'}"></input>
+                                <!-- Damage Trend -->
+                                <input style="width:40%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" placeholder="{% trans 'Damage Trend' %}" data-bind="select2: {value: getEditedNode('DAMAGE_TREND_TYPE.E55', 'value'), dataKey: 'DAMAGE_TREND_TYPE.E55'}"></input>
+                                <br>
                                 <!-- Cause -->
-                                <input style="width:33%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" placeholder="{% trans 'Cause' %}" data-bind="select2: {value: getEditedNode('DISTURBANCE_CAUSE_TYPE.I4', 'value'), dataKey: 'DISTURBANCE_CAUSE_TYPE.I4'}"></input>
+                                <input style="width:40%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" placeholder="{% trans 'Cause' %}" data-bind="select2: {value: getEditedNode('DISTURBANCE_CAUSE_TYPE.I4', 'value'), dataKey: 'DISTURBANCE_CAUSE_TYPE.I4'}"></input>
                                 <!-- Cause Certainty -->
-                                <input style="width:33%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" placeholder="{% trans 'Cause Certainty' %}" data-bind="select2: {value: getEditedNode('DISTURBANCE_CAUSE_CERTAINTY.I6', 'value'), dataKey: 'DISTURBANCE_CAUSE_CERTAINTY.I6'}"></input>
-                                <!-- Effect -->
+                                <input style="width:40%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" placeholder="{% trans 'Cause Certainty' %}" data-bind="select2: {value: getEditedNode('DISTURBANCE_CAUSE_CERTAINTY.I6', 'value'), dataKey: 'DISTURBANCE_CAUSE_CERTAINTY.I6'}"></input>
                                 <br>
-                                <input style="width:33%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" placeholder="{% trans 'Effect' %}" data-bind="select2: {value: getEditedNode('EFFECT_TYPE.I4', 'value'), dataKey: 'EFFECT_TYPE.I4'}"></input>
-                                <!-- Effect Certainty -->
-                                <input style="width:33%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" placeholder="{% trans 'Effect Certainty' %}" data-bind="select2: {value: getEditedNode('EFFECT_CERTAINTY.I6', 'value'), dataKey: 'EFFECT_CERTAINTY.I6'}"></input>
+                                <!-- Effect 1 -->
+                                <input style="width:40%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" placeholder="{% trans 'Effect 1' %}" id="resource-measurement-type-0" data-bind="select2: {value: getEditedNodeGroup('EFFECT_TYPE.I4', 'value', 0), allowClear: true, dataKey: 'EFFECT_TYPE.I4'}"></input>
+                                <!-- Effect Certainty 1 -->
+                                <input style="width:40%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" placeholder="{% trans 'Effect 1 Certainty' %}" id="resource-measurement-unit-0" data-bind="select2: {value: getEditedNodeGroup('EFFECT_CERTAINTY.I6', 'value', 0), allowClear: true, dataKey: 'EFFECT_CERTAINTY.I6'}"></input>
                                 <br>
-                                <!-- Effect Trend -->
-                                <input style="width:33%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" placeholder="{% trans 'Effect Trend' %}" data-bind="select2: {value: getEditedNode('DAMAGE_TREND_TYPE.E55', 'value'), dataKey: 'DAMAGE_TREND_TYPE.E55'}"></input>
+                                <!-- Effect 2 -->
+                                <input style="width:40%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" placeholder="{% trans 'Effect 2' %}" id="resource-measurement-type-1" data-bind="select2: {value: getEditedNodeGroup('EFFECT_TYPE.I4', 'value', 1), allowClear: true, dataKey: 'EFFECT_TYPE.I4'}"></input>
+                                <!-- Effect Certainty 2 -->
+                                <input style="width:40%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" placeholder="{% trans 'Effect 2 Certainty' %}" id="resource-measurement-unit-1" data-bind="select2: {value: getEditedNodeGroup('EFFECT_CERTAINTY.I6', 'value', 1), allowClear: true, dataKey: 'EFFECT_CERTAINTY.I6'}"></input>
+                                <br>
+                                <!-- Effect 3 -->
+                                <input style="width:40%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" placeholder="{% trans 'Effect 3' %}" id="resource-measurement-type-2" data-bind="select2: {value: getEditedNodeGroup('EFFECT_TYPE.I4', 'value', 2), allowClear: true, dataKey: 'EFFECT_TYPE.I4'}"></input>
+                                <!-- Effect Certainty 3 -->
+                                <input style="width:40%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" placeholder="{% trans 'Effect 3 Certainty' %}" id="resource-measurement-unit-2" data-bind="select2: {value: getEditedNodeGroup('EFFECT_CERTAINTY.I6', 'value', 2), allowClear: true, dataKey: 'EFFECT_CERTAINTY.I6'}"></input>
+                                <br>
+                                <!-- Effect 4 -->
+                                <input style="width:40%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" placeholder="{% trans 'Effect 4' %}" id="resource-measurement-type-3" data-bind="select2: {value: getEditedNodeGroup('EFFECT_TYPE.I4', 'value', 3), allowClear: true, dataKey: 'EFFECT_TYPE.I4'}"></input>
+                                <!-- Effect Certainty 4 -->
+                                <input style="width:40%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" placeholder="{% trans 'Effect 4 Certainty' %}" id="resource-measurement-unit-3" data-bind="select2: {value: getEditedNodeGroup('EFFECT_CERTAINTY.I6', 'value', 3), allowClear: true, dataKey: 'EFFECT_CERTAINTY.I6'}"></input>
+                                <br>
+                                <!-- Effect 5 -->
+                                <input style="width:40%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" placeholder="{% trans 'Effect 5' %}" id="resource-measurement-type-4" data-bind="select2: {value: getEditedNodeGroup('EFFECT_TYPE.I4', 'value', 4), allowClear: true, dataKey: 'EFFECT_TYPE.I4'}"></input>
+                                <!-- Effect Certainty 5 -->
+                                <input style="width:40%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" placeholder="{% trans 'Effect 5 Certainty' %}" id="resource-measurement-unit-4" data-bind="select2: {value: getEditedNodeGroup('EFFECT_CERTAINTY.I6', 'value', 4), allowClear: true, dataKey: 'EFFECT_CERTAINTY.I6'}"></input>
                                 <br>
                                 <span class="dropdown pull-left disturbance-date">
                                     <button class="btn btn-default dropdown-toggle select-disturbance-date" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
@@ -198,12 +218,15 @@
                                 <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this Disturbance" %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
                                 <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit disturbance-date-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans "Edit this Disturbance" %}">
                                     <span data-bind='{text: nodes.get("DISTURBANCE_CAUSE_CATEGORY_TYPE.E55", "label")}' style="padding-right:2px;"></span><span class="text-muted">{% trans '( Category )' %}</span>
+                                    <span class="text-muted" data-bind="visible: nodes.get('DAMAGE_TREND_TYPE.E55', 'value').length > 0"><span data-bind='{text: nodes.get("DAMAGE_TREND_TYPE.E55", "label")}' style="padding-right:2px;"></span><span class="text-muted">{% trans '( Trend )' %}</span></span>
                                     <span data-bind='{text: nodes.get("DISTURBANCE_CAUSE_TYPE.I4", "label")}' style="padding-right:2px;"></span><span class="text-muted">{% trans '( Cause )' %}</span>
                                     <span data-bind='{text: nodes.get("DISTURBANCE_CAUSE_CERTAINTY.I6", "label")}' style="padding-right:2px;"></span><span class="text-muted">{% trans '( Cause Certainty )' %}</span>
-                                    <span data-bind='{text: nodes.get("EFFECT_TYPE.I4", "label")}' style="padding-right:2px;"></span><span class="text-muted">{% trans '( Effect )' %}</span>
-                                    <span data-bind='{text: nodes.get("EFFECT_CERTAINTY.I6", "label")}' style="padding-right:2px;"></span><span class="text-muted">{% trans '( Effect Certainty )' %}</span>
-                                    <span data-bind='{text: nodes.get("DAMAGE_TREND_TYPE.E55", "label")}' style="padding-right:2px;"></span><span class="text-muted">{% trans '( Trend )' %}</span>
-                                    <span class="text-muted" data-bind="visible: nodes.get('DISTURBANCE_DATE_FROM.E61', 'value').length > 0">{% trans ' From ' %}</span><span data-bind="{text: nodes.get('DISTURBANCE_DATE_FROM.E61', 'value')}" style="padding-right:2px"></span>
+                                    
+                                    <span data-bind="foreach: $data.nodes">
+                                            <span data-bind="visible: $data.entitytypeid() ==='EFFECT_TYPE.I4' "><span data-bind="{text: $data.label}"></span><span class="text-muted">{% trans '( Effect )' %}</span></span>
+                                            <span data-bind="visible: $data.entitytypeid() ==='EFFECT_CERTAINTY.I6' "><span data-bind="{text: $data.label}"></span><span class="text-muted">{% trans '( Effect Certainty )' %}</span></span>
+                                    </span>
+                                    <span class="text-muted" data-bind="visible: nodes.get('DISTURBANCE_DATE_FROM.E61', 'value').length > 0">{% trans ' From ' %}</span><span data-bind="{text:nodes.get('DISTURBANCE_DATE_FROM.E61', 'value')}" style="padding-right:2px"></span>
                                     <span class="text-muted" data-bind="visible: nodes.get('DISTURBANCE_DATE_TO.E61', 'value').length > 0">{% trans ' To ' %}</span><span data-bind="{text: nodes.get('DISTURBANCE_DATE_TO.E61', 'value')}"></span>
                                     <span class="text-muted" data-bind="visible: nodes.get('DISTURBANCE_DATE_OCCURRED_BEFORE.E61', 'value').length > 0">{% trans ' Before ' %}</span><span data-bind="{text: nodes.get('DISTURBANCE_DATE_OCCURRED_BEFORE.E61', 'value')}"></span>
                                     <span class="text-muted" data-bind="visible: nodes.get('DISTURBANCE_CAUSE_ASSIGNMENT_ASSESSOR_NAME.E41', 'value').length > 0">{% trans ' By: ' %}</span><span data-bind='{text: nodes.get("DISTURBANCE_CAUSE_ASSIGNMENT_ASSESSOR_NAME.E41", "value")}' style="padding-right:2px;"></span><span class="text-muted arches-crud-type-identifier"></span>
