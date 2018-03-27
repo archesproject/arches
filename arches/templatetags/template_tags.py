@@ -24,8 +24,3 @@ def can_read_resource_instance(user):
 @register.filter(name='can_create_resource_instance')
 def can_create_resource_instance(user):
     return len(get_createable_resource_types(user)) > 0
-
-# @register.filter(name='addattrs')
-# def addattrs(field, attrs):
-#     attrs = json.loads(attrs)
-#     return field.as_widget(attrs=attrs)
