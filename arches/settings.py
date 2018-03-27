@@ -286,13 +286,9 @@ INSTALLED_APPS = (
     'arches.management',
     'guardian',
     'captcha',
-<<<<<<< HEAD
     'revproxy',
     'corsheaders',
     #'debug_toolbar'
-=======
-    'password_reset',
->>>>>>> ef5bf96... Implements django-password-reset. re #3119
 )
 
 MIDDLEWARE = [

@@ -15,7 +15,11 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
+<<<<<<< HEAD
 from django.views.decorators.cache import cache_page
+=======
+from django.contrib.auth import views as auth_views
+>>>>>>> 4f808ce... Uses the django admin app to handle password reset, re #3119
 from django.conf.urls import include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from arches.app.views import concept, main, map, search, graph, tileserver, api
@@ -29,7 +33,9 @@ from arches.app.views.map import MapLayerManagerView
 from arches.app.views.mobile_survey import MobileSurveyManagerView, MobileSurveyResources
 from arches.app.views.auth import LoginView, SignupView, ConfirmSignupView, ChangePasswordView, GetTokenView
 from arches.app.models.system_settings import settings
-
+from arches.app.utils.forms import ArchesPasswordResetForm
+from arches.app.utils.forms import ArchesSetPasswordForm
+# from password_reset import views as password_reset_views
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
@@ -138,10 +144,20 @@ urlpatterns = [
     # Uncomment the next line to enable the admin:
     url(r'^admin/', admin.site.urls),
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
     url(r'^', include('password_reset.urls')),
 >>>>>>> ef5bf96... Implements django-password-reset. re #3119
+=======
+    # url(r'^reset/(?P<token>[\w:-]+)/$', password_reset_views.reset, name='password_reset_reset', kwargs={"reset_password_form":ArchesPasswordResetForm}),
+    # url(r'^', include('password_reset.urls')),
+
+    url(r'^password_reset/$', auth_views.password_reset, name='password_reset', kwargs={"password_reset_form":ArchesPasswordResetForm}),
+    url(r'^password_reset/done/$', auth_views.password_reset_done, name='password_reset_done'),
+    url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', auth_views.password_reset_confirm, name='password_reset_confirm', kwargs={"set_password_form":ArchesSetPasswordForm}),
+    url(r'^reset/done/$', auth_views.password_reset_complete, name='password_reset_complete'),
+>>>>>>> 4f808ce... Uses the django admin app to handle password reset, re #3119
 ]
 
 if settings.DEBUG:
