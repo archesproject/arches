@@ -137,7 +137,11 @@ urlpatterns = [
 
     # Uncomment the next line to enable the admin:
     url(r'^admin/', admin.site.urls),
+<<<<<<< HEAD
 
+=======
+    url(r'^', include('password_reset.urls')),
+>>>>>>> ef5bf96... Implements django-password-reset. re #3119
 ]
 
 if settings.DEBUG:
