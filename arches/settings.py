@@ -284,7 +284,7 @@ INSTALLED_APPS = (
     'arches.management',
     'guardian',
     'captcha',
-    'password_reset',
+    # 'password_reset',
 )
 
 MIDDLEWARE = [
