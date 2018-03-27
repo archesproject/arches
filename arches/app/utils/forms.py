@@ -17,9 +17,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from django import forms
-from django.db import transaction
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, PasswordResetForm, SetPasswordForm
 from django.contrib.auth.models import User
+from django.db import transaction
+from django.forms.widgets import PasswordInput, TextInput
 from django.utils.translation import ugettext as _
 from arches.app.models import models
 from captcha.fields import ReCaptchaField
@@ -90,3 +91,10 @@ class ArchesUserProfileForm(ArchesUserCreationForm):
             user.userprofile.save()
             user.save()
         return user
+
+class ArchesPasswordResetForm(PasswordResetForm):
+    email = forms.CharField(widget=forms.EmailInput(attrs={'placeholder': 'Email', 'class': 'form-control input-lg'}))
+
+class ArchesSetPasswordForm(SetPasswordForm):
+    new_password1 = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': _('New password'), 'class': 'form-control input-lg'}))
+    new_password2 = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder':_('Re-enter new password'), 'class': 'form-control input-lg'}))
