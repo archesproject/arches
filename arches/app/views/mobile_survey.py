@@ -141,6 +141,24 @@ class MobileSurveyManagerView(MapBaseManagerView):
             else:
                 xmodel.objects.filter(group=identity_model.objects.get(id=identity), mobile_survey=mobile_survey).delete()
 
+    def load_tiles_into_couch(self, mobile_survey, db):
+        cards = mobile_survey.cards.all()
+        for card in cards:
+            tiles = models.TileModel.objects.filter(nodegroup=card.nodegroup_id)
+            tiles_serialized = json.loads(JSONSerializer().serialize(tiles))
+            for tile in tiles_serialized:
+                try:
+                    tile['type'] = 'tile'
+                    couch_record = db.get(tile['tileid'])
+                    if couch_record == None:
+                        db[tile['tileid']] = tile
+                    else:
+                        if couch_record['data'] != tile['data']:
+                            couch_record['data'] = tile['data']
+                            db[tile['tileid']] = couch_record
+                except Exception as e:
+                    print e, tile
+
     def post(self, request):
         data = JSONDeserializer().deserialize(request.body)
 
@@ -215,6 +233,7 @@ class MobileSurveyManagerView(MapBaseManagerView):
                 except Exception as e:
                     print e
                     return connection_error
+                self.load_tiles_into_couch(mobile_survey, db)
         except Exception as e:
             return connection_error
 
