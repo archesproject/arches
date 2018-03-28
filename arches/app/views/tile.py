@@ -78,7 +78,6 @@ class TileData(View):
                         try:
                             tile.save(request=request)
                             if tile_id == '4345f530-aa90-48cf-b4b3-92d1185ca439':
-                                print 'saving tile'
                                 import couchdb
                                 import json as json_json
                                 couch = couchdb.Server(settings.COUCHDB_URL)
