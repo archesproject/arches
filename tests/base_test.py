@@ -16,10 +16,16 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import os
 from django.test import TestCase
 from arches.app.models.graph import Graph
 from arches.app.search.search import SearchEngine
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.models.system_settings import settings
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
+from arches.app.utils.data_management.resources.importer import BusinessDataImporter
+from django.core import management
 
 # these tests can be run from the command line via
 # python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
@@ -31,9 +37,19 @@ def tearDownModule():
     se = SearchEngineFactory().create()
     se.delete_index(index='strings')
     se.delete_index(index='resource')
-    
+
 
 class ArchesTestCase(TestCase):
+
+    def __init__(self, *args, **kwargs):
+        super(ArchesTestCase, self).__init__(*args, **kwargs)
+        if settings.DEFAULT_BOUNDS == None:
+            management.call_command('migrate')
+            with open(os.path.join('tests/fixtures/system_settings/Arches_System_Settings_Model.json'), 'rU') as f:
+                archesfile = JSONDeserializer().deserialize(f)
+            ResourceGraphImporter(archesfile['graph'], True)
+            BusinessDataImporter('tests/fixtures/system_settings/Arches_System_Settings_Local.json').import_business_data()
+            settings.update_from_db()
 
     @classmethod
     def setUpClass(cls):
