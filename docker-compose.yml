@@ -114,7 +114,6 @@ services:
 volumes:
     arches-log:
     arches-static:
-    arches-bowercomponents:
     couchdb-data:
     couchdb-log:
     postgres-data:
