@@ -134,7 +134,7 @@ class SystemSettings(LazySettings):
 
 
 settings = SystemSettings()
-try:
-    settings.update_from_db()
-except OperationalError, ProgrammingError:
-    print "Skipping system settings update"
+# try:
+#     settings.update_from_db()
+# except OperationalError, ProgrammingError:
+#     print "Skipping system settings update"
