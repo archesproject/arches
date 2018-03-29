@@ -201,7 +201,6 @@ class MobileSurveyManagerView(MapBaseManagerView):
         mobile_survey.bounds = MultiPolygon(polygons)
         mobile_survey.lasteditedby = self.request.user
 
-
         try:
             couch = couchdb.Server(settings.COUCHDB_URL)
             connection_error = JSONResponse({'success':False,'message': _('Connection to CouchDB failed. Please confirm your CouchDB service is running on: ' + settings.COUCHDB_URL),'title':_('CouchDB Service Unavailable')}, status=500)
@@ -215,6 +214,12 @@ class MobileSurveyManagerView(MapBaseManagerView):
                 except Exception as e:
                     print e
                     return connection_error
+                finally:
+                    if db:
+                        for tile in models.TileModel.objects.filter(nodegroup__cardmodel__mobilesurveyxcard__mobile_survey=mobile_survey)[:10]:
+                            tile = json.loads(JSONSerializer().serialize(tile))
+                            tile['_id'] = tile['tileid']
+                            db.save(tile)
         except Exception as e:
             return connection_error
 
