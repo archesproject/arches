@@ -26,7 +26,7 @@ from django.contrib.gis.geos import MultiPolygon
 from django.contrib.gis.geos import Polygon
 from django.core.urlresolvers import reverse
 from django.core.mail import EmailMultiAlternatives
-from django.http import HttpResponseNotFound
+from django.http import HttpRequest, HttpResponseNotFound
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.utils.translation import ugettext as _
@@ -41,6 +41,8 @@ from arches.app.models.card import Card
 from arches.app.models.mobile_survey import MobileSurvey
 from arches.app.models.system_settings import settings
 from arches.app.views.base import MapBaseManagerView
+import arches.app.views.search as search
+import urlparse
 
 @method_decorator(group_required('Application Administrator'), name='dispatch')
 class MobileSurveyManagerView(MapBaseManagerView):
@@ -141,6 +143,81 @@ class MobileSurveyManagerView(MapBaseManagerView):
             else:
                 xmodel.objects.filter(group=identity_model.objects.get(id=identity), mobile_survey=mobile_survey).delete()
 
+    def collect_resource_instances_for_couch(self, mobile_survey, user):
+        """
+        Uses the data definition configs of a mobile survey object to search for
+        resource instances relevant to a mobile survey. Takes a user object which
+        is required for search.
+        """
+
+        query = mobile_survey.datadownloadconfig['custom']
+        parsed = urlparse.urlparse(query)
+        urlparams = urlparse.parse_qs(parsed.query)
+        request = HttpRequest()
+        request.user = user
+        for k, v in urlparams.iteritems():
+            request.GET[k] = v[0]
+        search_res_json = search.search_results(request)
+        search_res = JSONDeserializer().deserialize(search_res_json.content)
+        instances = {}
+        try:
+            instances = {hit['_source']['resourceinstanceid']: hit['_source'] for hit in search_res['results']['hits']['hits']}
+        except KeyError:
+            print 'no instances found in', search_res
+        return instances
+
+    def load_tiles_into_couch(self, mobile_survey, db, instances):
+        """
+        Takes a mobile survey object, a couch database instance, and a dictionary
+        of resource instances to identify eligible tiles and load them into the
+        database instance
+        """
+        cards = mobile_survey.cards.all()
+        for card in cards:
+            tiles = models.TileModel.objects.filter(nodegroup=card.nodegroup_id)
+            tiles_serialized = json.loads(JSONSerializer().serialize(tiles))
+            for tile in tiles_serialized:
+                if tile['resourceinstance_id'] in instances:
+                    try:
+                        tile['type'] = 'tile'
+                        couch_record = db.get(tile['tileid'])
+                        if couch_record == None:
+                            db[tile['tileid']] = tile
+                        else:
+                            if couch_record['data'] != tile['data']:
+                                couch_record['data'] = tile['data']
+                                db[tile['tileid']] = couch_record
+                    except Exception as e:
+                        print e, tile
+
+    def load_instances_into_couch(self, mobile_survey, db, instances):
+        """
+        Takes a mobile survey object, a couch database instance, and a dictionary
+        of resource instances and loads them into the database instance.
+        """
+        for instanceid, instance in instances.iteritems():
+            try:
+                instance['type'] = 'resource'
+                couch_record = db.get(instanceid)
+                if couch_record == None:
+                    db[instanceid] = instance
+                else:
+                    print "resource already exists in couchdb"
+            except Exception as e:
+                print e, instance
+
+    def load_data_into_couch(self, mobile_survey, db, user):
+        """
+        Takes a mobile survey, a couch database intance and a django user and loads
+        tile and resource instance data into the couch instance.
+        """
+        if mobile_survey.datadownloadconfig['custom'] not in ('', None):
+            instances = self.collect_resource_instances_for_couch(mobile_survey, user)
+            self.load_tiles_into_couch(mobile_survey, db, instances)
+            self.load_instances_into_couch(mobile_survey, db, instances)
+        else:
+            print 'please provide a search url in the mobile survey data tab'
+
     def post(self, request):
         data = JSONDeserializer().deserialize(request.body)
 
@@ -213,13 +290,10 @@ class MobileSurveyManagerView(MapBaseManagerView):
                 except couchdb.ResourceNotFound:
                     db = couch.create('project_' + str(mobile_survey.id))
                 except Exception as e:
-                    print e
                     return connection_error
+                self.load_data_into_couch(mobile_survey, db, request.user)
         except Exception as e:
             return connection_error
-
-
-
 
         ordered_cards = models.MobileSurveyXCard.objects.filter(mobile_survey=mobile_survey).order_by('sortorder')
         ordered_ids = [unicode(mpc.card_id) for mpc in ordered_cards]
