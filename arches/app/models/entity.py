@@ -134,7 +134,7 @@ class Entity(object):
           entity2.entitytypeid = archesmodels.EntityTypes.objects.get(pk = "EAMENA_ID.E42")
           entity2.entityid = str(uuid.uuid4())
           entity2.save()
-          rule = archesmodels.Rules.objects.get(entitytypedomain = self.entitytypeid, entitytyperange = entity2.entitytypeid, propertyid = 'P48')
+          rule = archesmodels.Rules.objects.get(entitytypedomain = self.entitytypeid, entitytyperange = entity2.entitytypeid)
           archesmodels.Relations.objects.get_or_create(entityiddomain = archesmodels.Entities.objects.get(pk=self.entityid), entityidrange = entity2, ruleid = rule)
           
         
