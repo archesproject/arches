@@ -675,6 +675,10 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     height: calc(100% - 60px); /*60px accounts for header so list scrolls to bottom*/
 }
 
+.msm-resource-panel .list-wrapper {
+    overflow: hidden;
+}
+
 .grid {
     background: #DDD;
     max-width: 1200px;
