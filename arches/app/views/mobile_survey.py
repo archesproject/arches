@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import json
 import couchdb
+import urlparse
 from datetime import datetime
 from django.db import transaction
 from django.shortcuts import render
@@ -42,7 +43,6 @@ from arches.app.models.mobile_survey import MobileSurvey
 from arches.app.models.system_settings import settings
 from arches.app.views.base import MapBaseManagerView
 import arches.app.views.search as search
-import urlparse
 
 @method_decorator(group_required('Application Administrator'), name='dispatch')
 class MobileSurveyManagerView(MapBaseManagerView):
