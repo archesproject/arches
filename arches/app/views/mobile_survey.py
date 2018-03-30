@@ -177,7 +177,7 @@ class MobileSurveyManagerView(MapBaseManagerView):
             tiles = models.TileModel.objects.filter(nodegroup=card.nodegroup_id)
             tiles_serialized = json.loads(JSONSerializer().serialize(tiles))
             for tile in tiles_serialized:
-                if tile['resourceinstance_id'] in instances:
+                if str(tile['resourceinstance_id']) in instances:
                     try:
                         tile['type'] = 'tile'
                         couch_record = db.get(tile['tileid'])
@@ -201,8 +201,6 @@ class MobileSurveyManagerView(MapBaseManagerView):
                 couch_record = db.get(instanceid)
                 if couch_record == None:
                     db[instanceid] = instance
-                else:
-                    print "resource already exists in couchdb"
             except Exception as e:
                 print e, instance
 
@@ -278,21 +276,18 @@ class MobileSurveyManagerView(MapBaseManagerView):
         mobile_survey.bounds = MultiPolygon(polygons)
         mobile_survey.lasteditedby = self.request.user
 
-
         try:
             couch = couchdb.Server(settings.COUCHDB_URL)
             connection_error = JSONResponse({'success':False,'message': _('Connection to CouchDB failed. Please confirm your CouchDB service is running on: ' + settings.COUCHDB_URL),'title':_('CouchDB Service Unavailable')}, status=500)
             with transaction.atomic():
                 mobile_survey.save()
-                # try and create a couchdb for the project
-                try:
-                    db = couch['project_' + str(mobile_survey.id)]
-                except couchdb.ResourceNotFound:
+                if 'project_' + str(mobile_survey.id) not in couch:
                     db = couch.create('project_' + str(mobile_survey.id))
-                except Exception as e:
-                    return connection_error
+                else:
+                    db = couch['project_' + str(mobile_survey.id)]
                 self.load_data_into_couch(mobile_survey, db, request.user)
         except Exception as e:
+            print e
             return connection_error
 
         ordered_cards = models.MobileSurveyXCard.objects.filter(mobile_survey=mobile_survey).order_by('sortorder')
