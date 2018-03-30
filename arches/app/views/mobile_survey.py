@@ -100,6 +100,7 @@ class MobileSurveyManagerView(MapBaseManagerView):
             mobile_surveys=serializer.serialize(mobile_surveys, sort_keys=False),
             identities=serializer.serialize(identities, sort_keys=False),
             resources=serializer.serialize(resources, sort_keys=False),
+            resource_download_limit=settings.MOBILE_DOWNLOAD_RESOURCE_LIMIT,
             main_script='views/mobile-survey-manager',
         )
 
@@ -158,6 +159,7 @@ class MobileSurveyManagerView(MapBaseManagerView):
         else:
             request = HttpRequest()
             request.user = user
+            request.GET['mobiledownload'] = True
             if query in ('', None):
                 if len(mobile_survey.bounds.coords) == 0:
                     default_bounds = settings.DEFAULT_BOUNDS

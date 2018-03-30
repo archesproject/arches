@@ -449,7 +449,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                 <!-- Standard Download -->
                                                                 <div id="standard-download-panel" class="msm-download-panel" data-bind="visible: selectedMobileSurvey().showCustomDataDownload() === false">
                                                                     <p class="text-muted">
-                                                                        {% trans 'Allow users to download the' %} <strong> {% trans 'first 1000 records in the project extent' %} </strong> {% trans "for the resource models you've associated with this project." %}
+                                                                        {% trans 'Allow users to download the' %} <strong> {% trans 'first' %} {{ resource_download_limit }} {% trans 'records in the project extent' %} </strong> {% trans "for the resource models you've associated with this project." %}
                                                                     </p>
 
                                                                     <div class="form-group pad-ver msm-data-selection">
