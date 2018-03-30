@@ -151,19 +151,32 @@ class MobileSurveyManagerView(MapBaseManagerView):
         """
 
         query = mobile_survey.datadownloadconfig['custom']
-        parsed = urlparse.urlparse(query)
-        urlparams = urlparse.parse_qs(parsed.query)
-        request = HttpRequest()
-        request.user = user
-        for k, v in urlparams.iteritems():
-            request.GET[k] = v[0]
-        search_res_json = search.search_results(request)
-        search_res = JSONDeserializer().deserialize(search_res_json.content)
+        resource_types = mobile_survey.datadownloadconfig['resources']
         instances = {}
-        try:
-            instances = {hit['_source']['resourceinstanceid']: hit['_source'] for hit in search_res['results']['hits']['hits']}
-        except KeyError:
-            print 'no instances found in', search_res
+        if query in ('', None) and len(resource_types) == 0:
+            print "No resources or data query defined"
+        else:
+            request = HttpRequest()
+            request.user = user
+            if query in ('', None):
+                if len(mobile_survey.bounds.coords) == 0:
+                    default_bounds = settings.DEFAULT_BOUNDS
+                    default_bounds['features'][0]['properties']['inverted'] = False
+                    request.GET['mapFilter'] = json.dumps(default_bounds)
+                else:
+                    request.GET['mapFilter'] = json.dumps({u'type': u'FeatureCollection', 'features':[{'geometry': json.loads(mobile_survey.bounds.json)}]})
+                request.GET['typeFilter'] = json.dumps([{'graphid': resourceid, 'inverted': False } for resourceid in mobile_survey.datadownloadconfig['resources']])
+            else:
+                parsed = urlparse.urlparse(query)
+                urlparams = urlparse.parse_qs(parsed.query)
+                for k, v in urlparams.iteritems():
+                    request.GET[k] = v[0]
+            search_res_json = search.search_results(request)
+            search_res = JSONDeserializer().deserialize(search_res_json.content)
+            try:
+                instances = {hit['_source']['resourceinstanceid']: hit['_source'] for hit in search_res['results']['hits']['hits']}
+            except KeyError:
+                print 'no instances found in', search_res
         return instances
 
     def load_tiles_into_couch(self, mobile_survey, db, instances):
@@ -209,12 +222,10 @@ class MobileSurveyManagerView(MapBaseManagerView):
         Takes a mobile survey, a couch database intance and a django user and loads
         tile and resource instance data into the couch instance.
         """
-        if mobile_survey.datadownloadconfig['custom'] not in ('', None):
-            instances = self.collect_resource_instances_for_couch(mobile_survey, user)
-            self.load_tiles_into_couch(mobile_survey, db, instances)
-            self.load_instances_into_couch(mobile_survey, db, instances)
-        else:
-            print 'please provide a search url in the mobile survey data tab'
+
+        instances = self.collect_resource_instances_for_couch(mobile_survey, user)
+        self.load_tiles_into_couch(mobile_survey, db, instances)
+        self.load_instances_into_couch(mobile_survey, db, instances)
 
     def post(self, request):
         data = JSONDeserializer().deserialize(request.body)
