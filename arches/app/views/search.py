@@ -295,6 +295,7 @@ def build_search_results_dsl(request):
     include_provisional = get_provisional_type(request)
 
     export = request.GET.get('export', None)
+    mobile_download = request.GET.get('mobiledownload', None)
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
     temporal_filter = JSONDeserializer().deserialize(request.GET.get('temporalFilter', '{}'))
     advanced_filters = JSONDeserializer().deserialize(request.GET.get('advanced', '[]'))
@@ -303,6 +304,8 @@ def build_search_results_dsl(request):
 
     if export != None:
         limit = settings.SEARCH_EXPORT_ITEMS_PER_PAGE
+    elif mobile_download != None:
+        limit = settings.MOBILE_DOWNLOAD_RESOURCE_LIMIT
     else:
         limit = settings.SEARCH_ITEMS_PER_PAGE
 

@@ -10409,6 +10409,7 @@ a.search-facet-item.disabled {
     margin-bottom: 10px;
     display: flex;
     flex-direction: column;
+    margin-top: 1px;
 }
 
 .project-panel.expired {
