@@ -1662,9 +1662,9 @@ moment-timezone@^0.4.0:
   dependencies:
     moment ">= 2.6.0"
 
-"moment@>= 2.6.0", moment@>=2.10.5, moment@^2.10:
-  version "2.20.1"
-  resolved "https://registry.yarnpkg.com/moment/-/moment-2.20.1.tgz#d6eb1a46cbcc14a2b2f9434112c1ff8907f313fd"
+"moment@>= 2.6.0", moment@>=2.22.0, moment@^2.10:
+  version "2.22.0"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.22.0.tgz#7921ade01017dd45186e7fee5f424f0b8663a730"
 
 monotone-convex-hull-2d@^1.0.1:
   version "1.0.1"
