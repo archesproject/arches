@@ -37,7 +37,7 @@ before_install:
 
 
 before_script:
-  - setup_couch.sh
+  - arches/install/ci_install/setup_couch.sh
 
 install:
   - python setup.py install
