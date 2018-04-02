@@ -25,6 +25,7 @@ Replace this with more appropriate tests for your application.
 import os
 import json
 import couchdb
+from couchdb.design import ViewDefinition
 from tests import test_settings as settings
 from django.contrib.auth.models import User, Group, AnonymousUser
 from django.core.urlresolvers import reverse
@@ -127,15 +128,27 @@ class MobileSurveyTests(ArchesTestCase):
         response_json = self.post_mobile_survey(post_data)
         couch = couchdb.Server(settings.COUCHDB_URL)
 
+        resources = 0
+        tiles = 0
+
         if 'project_' + str(self.mobile_survey.id) in couch:
             db = couch['project_' + str(self.mobile_survey.id)]
-            tile_count = len(db.find({'selector': {'type': 'tile'}}))
-            resource_count = len(db.find({'selector': {'type': 'resource'}}))
+            view = ViewDefinition('tests', 'all', '''function(doc) {emit(doc._id, null);}''')
+            view.get_doc(db)
+            view.sync(db)
+            for item in db.view('_design/tests/_view/all', include_docs=True):
+                if item.doc['type'] == 'tile':
+                    tiles += 1
+                if item.doc['type'] == 'resource':
+                    resources += 1
+
+            # tile_count = len(db.find({'selector': {'type': 'tile'}}))
+            # resource_count = len(db.find({'selector': {'type': 'resource'}}))
         else:
             print '{0} is not in couch'.format('project_' + str(self.mobile_survey.id))
 
-        self.assertTrue(tile_count==2)
-        self.assertTrue(resource_count==1)
+        self.assertTrue(tiles==2)
+        self.assertTrue(resources==1)
 
     def test_delete_mobile_survey(self):
         """
