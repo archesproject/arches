@@ -27,12 +27,16 @@ addons:
 services:
   - postgresql
   - elasticsearch
+  - couchdb
 
 before_install:
   - psql -d postgres -c "ALTER USER postgres with encrypted password 'postgis';"
   - echo "*:*:*:postgres:postgis" >> ~/.pgpass
   - psql -d postgres -c "SET standard_conforming_strings = off;"
   - psql -d postgres -c "CREATE EXTENSION postgis;"
+
+
+before_script: ./arches/install/ci_install/setup_couch.sh
 
 install:
   - python setup.py install
