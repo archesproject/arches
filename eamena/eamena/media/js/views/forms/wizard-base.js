@@ -88,8 +88,9 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
         getData: function(includeDomains){
             var data = {};
             _.each(this.branchLists, function(branchList){
+                
                 data[branchList.dataKey] = branchList.getData();
-            }, this);  
+            }, this);
             return ko.toJSON(data);
         },
 

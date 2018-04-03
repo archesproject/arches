@@ -14,9 +14,39 @@
                     <dd class="arches-report-subsection-item">
                      {{ SITE_FUNCTION_TYPE_E55.SITE_FUNCTION_TYPE_E55__value }}<span class="arches-report-subsection-item-type"> ( {% trans "Function" %})</span>
                      {{ SITE_FUNCTION_TYPE_E55.SITE_FUNCTION_CERTAINTY_TYPE_E55__value }}<span class="arches-report-subsection-item-type"> ( {% trans "Certainty" %})</span>
-                    </dd>
+                    </dd> 
                     {% empty %}
-                {% endfor %}            
+                {% endfor %}
+                {% if 'FEATURE_COLLECTION_E24' in report_info.source.graph %}
+                {% for FEATURE_COLLECTION_E24 in report_info.source.graph.FEATURE_COLLECTION_E24 %}
+                    <br /><br />
+                    {% if 'PRODUCTION_NEW_E12' in FEATURE_COLLECTION_E24 %}
+                    {% for PRODUCTION_NEW_E12 in FEATURE_COLLECTION_E24.PRODUCTION_NEW_E12 %}
+                        {% if 'FUNCTION_AND_INTERPRETATION_I5' in PRODUCTION_NEW_E12 %}
+                        {% for FUNCTION_AND_INTERPRETATION_I5 in PRODUCTION_NEW_E12.FUNCTION_AND_INTERPRETATION_I5 %}
+                            {% if 'FUNCTION_BELIEF_I2' in FUNCTION_AND_INTERPRETATION_I5 %}
+                            {% for FUNCTION_BELIEF_I2 in FUNCTION_AND_INTERPRETATION_I5.FUNCTION_BELIEF_I2 %}
+                                <dd class="arches-report-subsection-item">
+                                {% if 'FUNCTION_TYPE_I4' in FUNCTION_BELIEF_I2 %}
+                                    {% for FUNCTION_TYPE_I4 in FUNCTION_BELIEF_I2.FUNCTION_TYPE_I4 %}
+                                        {{ FUNCTION_TYPE_I4.FUNCTION_TYPE_I4__value }}<span class="arches-report-subsection-item-type"> ( {% trans "Function (NEW)" %})</span>
+                                    {% endfor %}
+                                {% endif %}
+                                {% if 'FUNCTION_CERTAINTY_I6' in FUNCTION_BELIEF_I2 %}
+                                    {% for FUNCTION_CERTAINTY_I6 in FUNCTION_BELIEF_I2.FUNCTION_CERTAINTY_I6 %}
+                                        {{ FUNCTION_CERTAINTY_I6.FUNCTION_CERTAINTY_I6__value }}<span class="arches-report-subsection-item-type"> ( {% trans "Certainty (NEW)" %})</span>
+                                    {% endfor %}
+                                {% endif %}
+                                </dd>
+                            {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                    {% endif %}
+                {% endfor %}
+                {% endif %}
+                
             {% endif %}
 
         </dl>

@@ -37,6 +37,10 @@ import csv
 import arches.app.utils.backlogids as create_backlog
 from arches.app.utils.FixingMethods import LegacyIdsFixer,IndexConceptFixer
 from arches.app.utils.load_relations import LoadRelations,UnloadRelations
+import arches.management.commands.package_utils.update_schema as update_schema
+import arches.management.commands.package_utils.migrate_resources as migrate_resources
+from arches.management.commands.package_utils.resource_graphs import load_graphs
+from arches.management.commands.package_utils.validate_values import validate_values, find_unused_entity_types
 
 class Command(BaseCommand):
     """
@@ -46,7 +50,7 @@ class Command(BaseCommand):
     
     option_list = BaseCommand.option_list + (
         make_option('-o', '--operation', action='store', dest='operation', default='setup',
-            type='choice', choices=['setup', 'install', 'setup_db', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resource_graphs','export_resources','create_backlog', 'remove_resources_from_csv', 'legacy_fixer', 'load_relations', 'unload_relations', 'delete_indices'],
+            type='choice', choices=['setup', 'install', 'setup_db', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resource_graphs','export_resources','create_backlog', 'remove_resources_from_csv', 'legacy_fixer', 'load_relations', 'unload_relations', 'delete_indices', 'extend_ontology', 'migrate_resources', 'insert_actors', 'prune_ontology', 'load_graphs', 'convert_resources', 'validate_values', 'find_unused_entity_types'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' + 
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' + 
@@ -123,6 +127,23 @@ class Command(BaseCommand):
             self.unload_relations(options['source'])
         if options['operation'] == 'delete_indices':
             self.delete_indices(options['source'])
+        if options['operation'] == 'extend_ontology':
+            self.extend_ontology()
+        if options['operation'] == 'migrate_resources':
+            self.migrate_resources()
+        if options['operation'] == 'insert_actors':
+            self.insert_actors()
+        if options['operation'] == 'prune_ontology':
+            self.prune_ontology()
+        if options['operation'] == 'load_graphs':
+            self.load_graphs()
+        if options['operation'] == 'convert_resources':
+            self.convert_resources(options['source'])
+        if options['operation'] == 'validate_values':
+            self.validate_values()
+        if options['operation'] == 'find_unused_entity_types':
+            self.find_unused_entity_types()
+            
             
     def setup(self, package_name):
         """
@@ -310,10 +331,10 @@ class Command(BaseCommand):
         for resourcetype in resourcetypes:
             for entitytype in resourcetypes[resourcetype]:
                 content_type = ContentType.objects.get_or_create(name='Arches', app_label=resourcetype, model=entitytype)
-                Permission.objects.create(codename='add_%s' % entitytype, name='%s - add' % entitytype , content_type=content_type[0])
-                Permission.objects.create(codename='update_%s' % entitytype, name='%s - update' % entitytype , content_type=content_type[0])
-                Permission.objects.create(codename='read_%s' % entitytype, name='%s - read' % entitytype , content_type=content_type[0])
-                Permission.objects.create(codename='delete_%s' % entitytype, name='%s - delete' % entitytype , content_type=content_type[0])
+                Permission.objects.get_or_create(codename='add_%s' % entitytype, name='%s - add' % entitytype , content_type=content_type[0])
+                Permission.objects.get_or_create(codename='update_%s' % entitytype, name='%s - update' % entitytype , content_type=content_type[0])
+                Permission.objects.get_or_create(codename='read_%s' % entitytype, name='%s - read' % entitytype , content_type=content_type[0])
+                Permission.objects.get_or_create(codename='delete_%s' % entitytype, name='%s - delete' % entitytype , content_type=content_type[0])
 
     def load_resources(self, package_name, data_source=None, appending = False):
         """
@@ -400,3 +421,34 @@ class Command(BaseCommand):
     def create_backlog(self):
         print "Function called"
         create_backlog.createBacklogIds()
+
+    def extend_ontology(self):
+        db_settings = settings.DATABASES['default']
+        add_classes_path = settings.EXTEND_ONTOLOGY_SQL
+        db_settings['add_classes_path'] = add_classes_path
+        os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d %(NAME)s -f "%(add_classes_path)s"' % db_settings)
+
+        update_schema.load_graphs()
+        
+        print "extend_ontology END"
+        
+    def migrate_resources(self):
+        migrate_resources.migrate()
+
+    def insert_actors(self):
+        migrate_resources.insert_actors()
+        
+    def prune_ontology(self):
+        migrate_resources.prune_ontology()
+        
+    def load_graphs(self):
+        load_graphs()
+        
+    def convert_resources(self, config_file):
+        migrate_resources.convert_resources(config_file)
+        
+    def validate_values(self):
+        validate_values()
+        
+    def find_unused_entity_types(self):
+        find_unused_entity_types()

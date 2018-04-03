@@ -588,7 +588,7 @@ class Relations(models.Model):
         return ('%s is the parent of %s') % (self.entityiddomain, self.entityidrange)
 
     def save(self, *args, **kwargs):
-        if Relations.objects.filter(entityiddomain = self.entityiddomain, entityidrange = self.entityidrange).exists():
+        if Relations.objects.filter(entityiddomain = self.entityiddomain, entityidrange = self.entityidrange).exclude(pk=self.pk).exists():
             return # can't insert duplicate values
         else:
             super(Relations, self).save(*args, **kwargs) # Call the "real" save() method.

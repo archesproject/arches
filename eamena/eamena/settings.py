@@ -1,6 +1,6 @@
 import os
 import inspect
-from arches_hip.settings import *
+from arches.settings import *
 from django.utils.translation import ugettext as _
 
 
@@ -29,79 +29,12 @@ RESOURCE_MODEL = {'default': 'eamena.models.resource.Resource'}
 
 
 
-
-
-
-
-
-
-
-
 EAMENA_RESOURCES = ['HERITAGE_RESOURCE_GROUP.E27'] #Specify which resource types should take on the identifier EAMENA-. All other resource types will take on an identifier beginning with their truncated EntityType, e.g. ACTOR for ACTOR.E39, INFORMATION for INFORMATION_RESOURCE.E73
 ID_LENGTH = 7 #Indicates the length of the Unique Resource IDs after the set tag, e.g. 7 -> EAMENA-0000001. MUST BE GIVEN, AND BE 2 OR OVER.
 
 # DATE_SEARCH_ENTITY_TYPES = ['BEGINNING_OF_EXISTENCE_TYPE.E55', 'END_OF_EXISTENCE_TYPE.E55', 'DISTURBANCE_DATE_TYPE.E55']
 
-def RESOURCE_TYPE_CONFIGS():
-    return {
-        'HERITAGE_RESOURCE_GROUP.E27': {
-            'resourcetypeid': 'HERITAGE_RESOURCE_GROUP.E27',
-            'name': _('Heritage Resource E27'),
-            'icon_class': 'fa fa-university',
-            'default_page': 'summary',
-            'default_description': _('No name available'),
-            'description_node': _('NAME.E41'),
-            'categories': [_('Resource')],
-            'has_layer': True,
-            'on_map': True,
-            'marker_color': '#a44b0f',
-            'stroke_color': '#d9b562',
-            'fill_color': '#eedbad',
-            'primary_name_lookup': {
-                'entity_type': 'EAMENA_ID.E42',
-                'lookup_value': 'Primary'
-            },
-            'sort_order': 1
-        },
-        'ACTOR.E39': {
-            'resourcetypeid': 'ACTOR.E39',
-            'name': _('Person/Organization'),
-            'icon_class': 'fa fa-group',
-            'default_page': 'actor-summary',
-            'default_description': _('No description available'),
-            'description_node': _('ACTOR_APPELLATION.E82'),
-            'categories': [_('Resource')],
-            'has_layer': True,
-            'on_map': False,
-            'marker_color': '#a44b0f',
-            'stroke_color': '#a7673d',
-            'fill_color': '#c8b2a3',
-            'primary_name_lookup': {
-                'entity_type': 'EAMENA_ID.E42',
-                'lookup_value': 'Primary'
-            },
-            'sort_order': 5
-        },
-        'INFORMATION_RESOURCE.E73': {
-            'resourcetypeid': 'INFORMATION_RESOURCE.E73',
-            'name': _('Information Resource'),
-            'icon_class': 'fa fa-file-text-o',
-            'default_page': 'information-resource-summary',
-            'default_description': _('No description available'),
-            'description_node': _('TITLE.E41,CATALOGUE_ID.E42,IMAGERY_CREATOR_APPELLATION.E82,TILE_SQUARE_DETAILS.E44,CONTRIBUTOR_APPELLATION.E82,SHARED_DATA_SOURCE_APPELLATION.E82,SHARED_DATA_SOURCE_AFFILIATION.E82,SHARED_DATA_SOURCE_CREATOR_APPELLATION.E82'),
-            'categories': [_('Resource')],
-            'has_layer': True,
-            'on_map': True,
-            'marker_color': '#8D45F8',
-            'stroke_color': '#9367d5',
-            'fill_color': '#c3b5d8',
-            'primary_name_lookup': {
-                'entity_type': 'EAMENA_ID.E42',
-                'lookup_value': 'Primary'
-            },
-            'sort_order': 6
-        }
-    }
+
 
 
 #The list of resource types which should have their geometries indexed into the maplayers index for restriction by geo area.
@@ -111,17 +44,18 @@ MAPLAYERS_INDEX_RESOURCE_TYPES = [
 ]
 #Limit number of items per Search page
 SEARCH_ITEMS_PER_PAGE= 20
-
 #GEOCODING_PROVIDER = ''
 
 RESOURCE_GRAPH_LOCATIONS = (
 #     # Put strings here, like "/home/data/resource_graphs" or "C:/data/resource_graphs".
 #     # Always use forward slashes, even on Windows.
 #     # Don't forget to use absolute paths, not relative paths.
-     os.path.join(PACKAGE_ROOT, 'source_data', 'resource_graphs'),
+     os.path.join(PACKAGE_ROOT, 'resource_graphs'),
 )
 
-
+ADDITIONAL_RESOURCE_GRAPH_LOCATIONS = (
+     os.path.join(PACKAGE_ROOT, 'additional_resource_graphs'),
+)
 
 CONCEPT_SCHEME_LOCATIONS = (
     # Put strings here, like "/home/data/authority_files" or "C:/data/authority_files".
@@ -138,6 +72,20 @@ BUSISNESS_DATA_FILES = (
     # Don't forget to use absolute paths, not relative paths.
     os.path.normpath(os.path.join(PACKAGE_ROOT, 'source_data', 'business_data', 'sample.arches')),
 )
+
+EXTEND_ONTOLOGY_SQL = (
+    os.path.join(ROOT_DIR, 'management', 'commands', 'package_utils', 'add_classes.sql')
+)
+
+ADD_ACTOR_TO = {
+    'FUNCTION_AND_INTERPRETATION.I5': 'FUNCTION_AND_INTERPRETATION_ACTOR.E39',    
+}
+# Map new actor nodes to the pre-existing nodes to search for edits to the affected resource
+# ( actor node entityid, parent node entityid of actor node, node entityid to check in edit log )
+ACTOR_NODES = [
+    ('FUNCTION_AND_INTERPRETATION_ACTOR.E39', 'FUNCTION_AND_INTERPRETATION.I5', 'FEATURE_EVIDENCE_INTERPRETATION_TYPE.E55')
+]
+
 
 APP_NAME = 'eamena'
 

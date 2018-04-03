@@ -66,8 +66,8 @@ define([
             };
             var object = JSON.parse($('#formdata').val());
             var datesall =[];
-            datesall.push(object['SPATIAL_COORDINATES_GEOMETRY.E47']['BingDates']['start']);
-            datesall.push(object['SPATIAL_COORDINATES_GEOMETRY.E47']['BingDates']['end']);
+            datesall.push(object['GEOMETRIC_PLACE_EXPRESSION.SP5']['BingDates']['start']);
+            datesall.push(object['GEOMETRIC_PLACE_EXPRESSION.SP5']['BingDates']['end']);
             var nonull = _.reject(datesall, function(date) {
                 return date ==null;
             });

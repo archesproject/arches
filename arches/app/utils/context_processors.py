@@ -18,8 +18,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from django.conf import settings
 from arches.app.models.resource import Resource
-from arches.app.utils.decorators import deprecated
 from arches.app.models.models import DLanguages
+from arches.app.utils.decorators import deprecated
 
 def livereload(request):
     return {
@@ -29,12 +29,11 @@ def livereload(request):
 def map_info(request):
     minzoom = settings.MAP_MIN_ZOOM
     maxzoom = settings.MAP_MAX_ZOOM
-    if not request.user.is_anonymous:
-        if 'edit' not in request.user.user_groups:
-            maxzoom =  settings.MAP_MAX_UNLOGGED_ZOOM
-            if request.path.split('/')[1] == 'reports':
-                minzoom = settings.REPORT_MIN_UNLOGGED_ZOOM
-                maxzoom = settings.MAP_MAX_ZOOM
+    if 'edit' not in request.user.user_groups:
+      maxzoom =  settings.MAP_MAX_UNLOGGED_ZOOM
+      if request.path.split('/')[1] == 'reports':
+        minzoom = settings.REPORT_MIN_UNLOGGED_ZOOM
+        maxzoom = settings.MAP_MAX_ZOOM
     return {
         'map_info': {
             'x': settings.DEFAULT_MAP_X,
@@ -67,11 +66,11 @@ def user_can_edit(request):
     # need to implement proper permissions check here...
     # for now allowing all logged in users to be 'editors'
     return {
-        'user_can_edit': 'edit' in request.user.user_groups if not request.user.is_anonymous else ''
+        'user_can_edit': 'edit' in request.user.user_groups
     }
 
 def header(request):
     languages = DLanguages.objects.all()
     return {
         'language_list': languages
-}
+    }

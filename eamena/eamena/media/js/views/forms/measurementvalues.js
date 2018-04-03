@@ -6,7 +6,7 @@ define(['jquery', 'underscore', 'knockout-mapping', 'views/forms/base', 'views/f
             this.addBranchList(new BranchList({
                 el: this.$el.find('#measurement-section')[0],
                 data: this.data,
-                dataKey: 'MEASUREMENT_TYPE.E55',
+                dataKey: 'MEASUREMENTS.E16',
                 validateBranch: function (nodes) {
                     return this.validateHasValues(nodes);
                 }
