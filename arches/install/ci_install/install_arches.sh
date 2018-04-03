@@ -15,17 +15,7 @@ virtualenv /home/ubuntu/ENV
 source /home/ubuntu/ENV/bin/activate
 
 cd /home/ubuntu/qa
-python setup.py install
-bower install
-
-python manage.py packages -o setup
-
-cp /home/ubuntu/settings_local.py /home/ubuntu/qa/qa
-
-sudo chown ubuntu:ubuntu /home/ubuntu/qa/qa/arches.log
 
 python manage.py migrate
 
-python manage.py collectstatic --noinput
-sudo chown www-data:www-data /home/ubuntu/qa/qa/arches.log
 sudo service apache2 restart
