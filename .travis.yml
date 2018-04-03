@@ -89,7 +89,7 @@ deploy:
   access_key_id: AKIAIPJSP4QJ5VLPBKIQ
   secret_access_key: *3
   bucket: arches-codedeploy
-  key: arches-$TRAVIS_BRANCH-$TRAVIS_BUILD_NUMBER-$TRAVIS_COMMIT.zip
+  key: arches-stable-4.1.x-$TRAVIS_BUILD_NUMBER-$TRAVIS_COMMIT.zip
   bundle_type: zip
   application: arches
   deployment_group: arches_qa
@@ -98,4 +98,4 @@ deploy:
 before_deploy:
 - zip codedeploy.zip -r  --exclude=*__pycache__* appspec.yml arches/install/ci_install/*.sh
 - mkdir -p dpl_cd_upload
-- mv codedeploy.zip dpl_cd_upload/arches-$TRAVIS_BRANCH-$TRAVIS_BUILD_NUMBER-$TRAVIS_COMMIT.zip
+- mv codedeploy.zip dpl_cd_upload/arches-stable-4.1.x-$TRAVIS_BUILD_NUMBER-$TRAVIS_COMMIT.zip
