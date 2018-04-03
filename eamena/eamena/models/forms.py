@@ -62,7 +62,7 @@ def datetime_nodes_to_dates(branch_list):
             if hasattr(node, 'value') and isinstance(node.value, datetime):
                 node.value = node.value.date()
                 node.label = node.value
-            
+        
     return branch_list
 
 def exclude_empty_branches(branch_list, required_node):
@@ -1465,6 +1465,62 @@ class ImageryForm(ResourceForm):
 
         return
         
+class RoleForm(ResourceForm):
+    @staticmethod
+    def get_info():
+        return {
+            'id': 'roles',
+            'icon': 'fa-flash',
+            'name': _('Role'),
+            'class': RoleForm
+        }
+
+    def update(self, data, files):
+        self.update_nodes('PHASE_TYPE_ASSIGNMENT.E17', data)
+        return
+
+
+    def load(self, lang):
+        if self.resource:
+            self.data['PHASE_TYPE_ASSIGNMENT.E17'] = {
+                'branch_lists': datetime_nodes_to_dates(self.get_nodes('PHASE_TYPE_ASSIGNMENT.E17')),
+                'domains': {
+                    'ACTOR_TYPE.E55' : Concept().get_e55_domain('ACTOR_TYPE.E55'),
+                    'ACTOR_TYPE_CERTAINTY_TYPE.E55': Concept().get_e55_domain('ACTOR_TYPE_CERTAINTY_TYPE.E55'),
+            }
+          }
+
+        return
+        
+class DescriptionForm(ResourceForm):
+    @staticmethod
+    def get_info():
+        return {
+            'id': 'description',
+            'icon': 'fa-picture-o',
+            'name': _('Additional Information'),
+            'class': DescriptionForm
+        }
+
+    def update(self, data, files):
+        self.update_nodes('DESCRIPTION.E62', data)
+
+    def load(self, lang):
+        description_types = Concept().get_e55_domain('DESCRIPTION_TYPE.E55')
+        try:
+            default_description_type = description_types[2]
+            if self.resource:
+                self.data['DESCRIPTION.E62'] = {
+                    'branch_lists': self.get_nodes('DESCRIPTION.E62'),
+                    'domains': {'DESCRIPTION_TYPE.E55' : description_types},
+                    'defaults': {
+                        'DESCRIPTION_TYPE.E55': default_description_type['id'],
+                    }
+                }
+        except IndexError:
+            pass
+
+      
 class EditHistory(ResourceForm):
     @staticmethod
     def get_info():
