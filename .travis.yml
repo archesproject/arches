@@ -82,7 +82,7 @@ deploy:
   skip_cleanup: true
   on: &4
     repo: archesproject/arches
-    branch: 3195_qa_machine_codedeploy
+    branch: stable/4.1.x
   bucket: arches-codedeploy
   #  upload_dir: latest
 - provider: codedeploy

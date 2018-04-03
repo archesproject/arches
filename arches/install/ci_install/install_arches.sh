@@ -14,25 +14,18 @@ git clone -b stable/4.1.x https://github.com/archesproject/arches.git /home/ubun
 virtualenv /home/ubuntu/ENV
 source /home/ubuntu/ENV/bin/activate
 
-cd /home/ubuntu/arches
+cd /home/ubuntu/qa
 python setup.py install
 bower install
 
 python manage.py packages -o setup
 
-cp /home/ubuntu/settings_local.py /home/ubuntu/arches/arches
+cp /home/ubuntu/settings_local.py /home/ubuntu/qa/qa
 
-sudo chown ubuntu:ubuntu /home/ubuntu/arches/arches/arches.log
+sudo chown ubuntu:ubuntu /home/ubuntu/qa/qa/arches.log
 
-python manage.py packages -o setup_db
-python manage.py packages -o import_reference_data -s arches/db/schemes/arches_concept_scheme.rdf -ow overwrite -st keep
-python manage.py packages -o import_reference_data -s arches/db/schemes/arches_concept_collections.rdf -ow overwrite -st keep
-python manage.py packages -o import_graphs
-python manage.py packages -o import_business_data -s /home/ubuntu/arches/tests/fixtures/data/csv/heritage_resource_model.csv -ow overwrite
-python manage.py packages -o import_business_data_relations -s /home/ubuntu/arches/tests/fixtures/data/csv/heritage_resource_model.relations
-python manage.py packages -o add_tileserver_layer -m arches/tileserver/hillshade.xml -n hillshade
-python manage.py packages -o add_tileserver_layer -m arches/tileserver/world.xml -n world
+python manage.py migrate
 
 python manage.py collectstatic --noinput
-sudo chown www-data:www-data /home/ubuntu/arches/arches/arches.log
+sudo chown www-data:www-data /home/ubuntu/qa/qa/arches.log
 sudo service apache2 restart
