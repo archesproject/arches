@@ -1175,18 +1175,22 @@ class ResourceInstanceDataType(BaseDataType):
 class NodeValueDataType(BaseDataType):
     def validate(self, value, source=''):
         errors = []
-        try:
-            models.TileModel.objects.get(tileid=value)
-        except:
-            errors.append({'type': 'ERROR', 'message': '{0} is not a valid tile id. This data was not imported.'.format(v)})
+        if value:
+            try:
+                models.TileModel.objects.get(tileid=value)
+            except:
+                errors.append({'type': 'ERROR', 'message': '{0} is not a valid tile id. This data was not imported.'.format(v)})
         return errors
 
     def get_display_value(self, tile, node):
         datatype_factory = DataTypeFactory()
         value_node = models.Node.objects.get(nodeid=node.config['nodeid'])
-        value_tile = models.TileModel.objects.get(tileid=tile.data[str(node.pk)])
-        datatype = datatype_factory.get_instance(value_node.datatype)
-        return datatype.get_display_value(value_tile, value_node)
+        tileid = tile.data[str(node.pk)]
+        if tileid:
+            value_tile = models.TileModel.objects.get(tileid=tileid)
+            datatype = datatype_factory.get_instance(value_node.datatype)
+            return datatype.get_display_value(value_tile, value_node)
+        return ''
 
     def append_to_document(self, document, nodevalue, nodeid, tile):
         pass
