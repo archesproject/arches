@@ -20,6 +20,7 @@ from copy import copy, deepcopy
 from django.db import transaction
 from arches.app.models import models
 from arches.app.models.tile import Tile
+from arches.app.models.graph import Graph
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.utils.translation import ugettext as _
@@ -77,10 +78,19 @@ class MobileSurvey(models.MobileSurveyModel):
         ordered_cards = self.get_ordered_cards()
         ret = JSONSerializer().serializeToPython(obj)
         graphs = []
+        graphids = []
         for card in self.cards.all():
-            if card.graph not in graphs:
-                graphs.append(card.graph)
-        ret['graphs'] = JSONSerializer().serializeToPython(graphs)
+            if card.graph_id not in graphids:
+                graphids.append(card.graph_id)
+                #we may want the full proxy model at some point, but for now just the root node color
+                # graphs.append(Graph.objects.get(pk=card.graph_id))
+                proxy_graph = Graph.objects.get(pk=card.graph_id)
+                color = proxy_graph.root.config['fillColor']
+                graph = card.graph
+                graph = JSONSerializer().serializeToPython(graph, exclude=['functions','disable_instance_creation','deploymentdate','deploymentfile'])
+                graph['color'] = color
+                graphs.append(graph)
+        ret['graphs'] = graphs
         ret['cards'] = ordered_cards
         return ret
 
