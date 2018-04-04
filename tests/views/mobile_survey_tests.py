@@ -55,16 +55,21 @@ class MobileSurveyTests(ArchesTestCase):
         mobile_survey.iconclass = "fa fa-building"
         mobile_survey.nodegroups = []
         mobile_survey.datadownloadconfig='{"download":false, "count":10, "resources":[], "custom":''}'
+        mobile_survey.id = '08960fb5-385b-11e8-add6-c4b301baab9f'
         mobile_survey.save()
         mobile_survey = MobileSurvey.objects.get(pk=mobile_survey.id)
         mobile_survey.save()
         self.mobile_survey = mobile_survey
         self.client = Client()
-
         with open(os.path.join('tests/fixtures/resource_graphs/Mobile Survey Test.json'), 'rU') as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile['graph'])
         BusinessDataImporter('tests/fixtures/data/mobile_survey_test_data.json').import_business_data()
+
+    def tearDown(self):
+        couch = couchdb.Server(settings.COUCHDB_URL)
+        if 'project_08960fb5-385b-11e8-add6-c4b301baab9f' in couch:
+            del couch['project_08960fb5-385b-11e8-add6-c4b301baab9f']
 
     def post_mobile_survey(self, post_data):
         self.client.login(username='admin', password='admin')

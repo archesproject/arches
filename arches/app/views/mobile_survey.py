@@ -300,16 +300,26 @@ class MobileSurveyManagerView(MapBaseManagerView):
 
         try:
             couch = couchdb.Server(settings.COUCHDB_URL)
-            connection_error = JSONResponse({'success':False,'message': _('Connection to CouchDB failed. Please confirm your CouchDB service is running on: ' + settings.COUCHDB_URL),'title':_('CouchDB Service Unavailable')}, status=500)
+            connection_error = False
             with transaction.atomic():
                 mobile_survey.save()
-                if 'project_' + str(mobile_survey.id) not in couch:
-                    db = couch.create('project_' + str(mobile_survey.id))
-                else:
-                    db = couch['project_' + str(mobile_survey.id)]
-                self.load_data_into_couch(mobile_survey, db, request.user)
+                try:
+                    if 'project_' + str(mobile_survey.id) not in couch:
+                        db = couch.create('project_' + str(mobile_survey.id))
+                    else:
+                        db = couch['project_' + str(mobile_survey.id)]
+                    self.load_data_into_couch(mobile_survey, db, request.user)
+                except Exception as e:
+                    error_title = _('CouchDB Service Unavailable')
+                    error_message =  _('Connection to CouchDB failed. Please confirm your CouchDB service is running on: ' + settings.COUCHDB_URL)
+                    connection_error = True
         except Exception as e:
-            print e
+            if 'project_' + str(mobile_survey.id) in couch:
+                del couch['project_' + str(mobile_survey.id)]
+            if connection_error == False:
+                error_title = _('Unable to save survey')
+                error_message = e
+                connection_error = JSONResponse({'success':False,'message': error_message,'title': error_title}, status=500)
             return connection_error
 
         ordered_cards = models.MobileSurveyXCard.objects.filter(mobile_survey=mobile_survey).order_by('sortorder')
