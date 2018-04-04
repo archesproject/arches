@@ -53,18 +53,14 @@ class MobileSurvey(models.MobileSurveyModel):
         self.couch = couchdb.Server(settings.COUCHDB_URL)
 
     def save(self):
-
         super(MobileSurvey, self).save()
         if 'project_' + str(self.id) in self.couch:
             db = self.couch['project_' + str(self.id)]
         else:
             db = self.couch.create('project_' + str(self.id))
-            tile = models.TileModel.objects.get(pk='4345f530-aa90-48cf-b4b3-92d1185ca439')
-            tile = json.loads(JSONSerializer().serialize(tile))
-            tile['_id'] = tile['tileid']
-            db.save(tile)
-
-        db.save(self.serialize())
+        survey = self.serialize()
+        survey['type'] = 'metadata'
+        db.save(survey)
 
     def serialize(self, fields=None, exclude=None):
         """
