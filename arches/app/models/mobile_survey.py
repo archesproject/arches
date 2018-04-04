@@ -15,13 +15,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid
 import json
+import couchdb
+from copy import copy, deepcopy
 from django.db import transaction
 from arches.app.models import models
 from arches.app.models.tile import Tile
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.utils.translation import ugettext as _
-
 
 class MobileSurvey(models.MobileSurveyModel):
     """
@@ -48,12 +49,23 @@ class MobileSurvey(models.MobileSurveyModel):
         # self.tilecache = models.TextField(null=True)
         # self.datadownloadconfig = JSONField(blank=True, null=True, default='{"download":false, "count":1000, "resources":[]}')
         # end from models.MobileSurvey
+        self.couch = couchdb.Server(settings.COUCHDB_URL)
 
     def save(self):
-        #with transaction.atomic():
-        super(MobileSurvey, self).save()
 
-    def serialize(self):
+        super(MobileSurvey, self).save()
+        if 'project_' + str(self.id) in self.couch:
+            db = self.couch['project_' + str(self.id)]
+        else:
+            db = self.couch.create('project_' + str(self.id))
+            tile = models.TileModel.objects.get(pk='4345f530-aa90-48cf-b4b3-92d1185ca439')
+            tile = json.loads(JSONSerializer().serialize(tile))
+            tile['_id'] = tile['tileid']
+            db.save(tile)
+
+        db.save(self.serialize())
+
+    def serialize(self, fields=None, exclude=None):
         """
         serialize to a different form then used by the internal class structure
         used to append additional values (like parent ontology properties) that
@@ -64,6 +76,11 @@ class MobileSurvey(models.MobileSurveyModel):
         obj = serializer.handle_model(self)
         ordered_cards = self.get_ordered_cards()
         ret = JSONSerializer().serializeToPython(obj)
+        graphs = []
+        for card in self.cards.all():
+            if card.graph not in graphs:
+                graphs.append(card.graph)
+        ret['graphs'] = JSONSerializer().serializeToPython(graphs)
         ret['cards'] = ordered_cards
         return ret
 
@@ -71,3 +88,18 @@ class MobileSurvey(models.MobileSurveyModel):
         ordered_cards = models.MobileSurveyXCard.objects.filter(mobile_survey=self).order_by('sortorder')
         ordered_card_ids = [unicode(mpc.card_id) for mpc in ordered_cards]
         return ordered_card_ids
+
+    def push_edits_to_db(self):
+        # read all docs that have changes
+        # save back to postgres db
+        db = self.couch['project_' + str(self.id)]
+        ret = []
+        for row in db.view('_all_docs', include_docs=True):
+            ret.append(row)
+            if 'tileid' in row.doc:
+                tile = Tile(row.doc)
+                #if tile.filter_by_perm(request.user, 'write_nodegroup'):
+                with transaction.atomic():
+                    tile.save()
+                #tile = models.TileModel.objects.get(pk=row.doc.tileid).update(**row.doc)
+        return ret
