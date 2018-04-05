@@ -297,7 +297,6 @@ class MobileSurveyManagerView(MapBaseManagerView):
 
         mobile_survey.bounds = MultiPolygon(polygons)
         mobile_survey.lasteditedby = self.request.user
-
         try:
             couch = couchdb.Server(settings.COUCHDB_URL)
             connection_error = False
@@ -308,11 +307,17 @@ class MobileSurveyManagerView(MapBaseManagerView):
                         db = couch.create('project_' + str(mobile_survey.id))
                     else:
                         db = couch['project_' + str(mobile_survey.id)]
+                    survey = JSONSerializer().serializeToPython(mobile_survey, exclude='cards')
+                    survey['type'] = 'metadata'
+                    db.save(survey)
                     self.load_data_into_couch(mobile_survey, db, request.user)
                 except Exception as e:
                     error_title = _('CouchDB Service Unavailable')
                     error_message =  _('Connection to CouchDB failed. Please confirm your CouchDB service is running on: ' + settings.COUCHDB_URL)
-                    connection_error = True
+                    reason = str(e)
+                    connection_error = JSONResponse({'success':False,'message': error_message + reason,'title': error_title}, status=500)
+                    return connection_error
+
         except Exception as e:
             if 'project_' + str(mobile_survey.id) in couch:
                 del couch['project_' + str(mobile_survey.id)]
