@@ -61,7 +61,7 @@ class MapBaseManagerView(BaseManagerView):
         resource_layers = []
         resource_sources = []
         for node in geom_nodes:
-            if self.request.user.has_perm('read_nodegroup', node.nodegroup_id):
+            if self.request.user.has_perm('read_nodegroup', node.nodegroup):
                 datatype = datatype_factory.get_instance(node.datatype)
                 map_source = datatype.get_map_source(node)
                 if map_source is not None:
