@@ -212,7 +212,7 @@ class GraphDataView(View):
             response['Content-Disposition'] = 'attachment; filename="%s.json"' %(graph_name)
             return response
         elif self.action == 'export_mapping_file':
-            files_for_export = create_mapping_configuration_file(graphid)
+            files_for_export = create_mapping_configuration_file(graphid, True)
             file_name = Graph.objects.get(graphid=graphid).name
 
             buffer = StringIO()
