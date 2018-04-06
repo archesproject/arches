@@ -120,7 +120,7 @@ def get_graphs_for_export(graphids=None):
         graphs['graph'].append(resource_graph)
     return graphs
 
-def create_mapping_configuration_file(graphid, data_dir=None):
+def create_mapping_configuration_file(graphid, include_concepts=True, data_dir=None):
     files_for_export = []
     graphid = uuid.UUID(graphid)
     nodes = []
@@ -135,6 +135,8 @@ def create_mapping_configuration_file(graphid, data_dir=None):
         export_json['resource_model_id'] = str(node_query[0].graph_id)
         export_json['resource_model_name'] = JSONSerializer().serializeToPython(Graph.objects.filter(graphid=export_json['resource_model_id']))[0]['name']
         export_json['nodes'] = []
+        file_name_prefix = export_json['resource_model_name']
+
         for node in node_query:
             export_node = OrderedDict()
             export_node['arches_nodeid'] = str(node.nodeid)
@@ -149,17 +151,18 @@ def create_mapping_configuration_file(graphid, data_dir=None):
 
             export_json['nodes'].append(export_node)
 
-            concept_export={}
+            if include_concepts == True:
+                concept_export={}
 
-            def get_values(concept, values):
-                for subconcept in concept.subconcepts:
-                    for value in subconcept.values:
-                        if value.type == 'prefLabel':
-                            values[value.id] = value.value
-                    get_values(subconcept, values)
-                return values
+                def get_values(concept, values):
+                    for subconcept in concept.subconcepts:
+                        for value in subconcept.values:
+                            if value.type == 'prefLabel':
+                                values[value.id] = value.value
+                        get_values(subconcept, values)
+                    return values
 
-            if node.datatype in ['concept', 'concept-list', 'domain-value', 'domain-value-list']:
+                if node.datatype in ['concept', 'concept-list', 'domain-value', 'domain-value-list']:
                     if node.datatype in ['concept', 'concept-list']:
                         if node.config['rdmCollection'] != None:
                             rdmCollection = node.config['rdmCollection']
@@ -179,19 +182,20 @@ def create_mapping_configuration_file(graphid, data_dir=None):
 
                         values[node.name] = OrderedDict(sorted(concepts.items(), key=itemgetter(1)))
 
-        try:
-            relation_concepts = OrderedDict(sorted(get_values(Concept().get('00000000-0000-0000-0000-000000000005', include_subconcepts=True, semantic=False), {}).items(), key=itemgetter(1)))
-        except:
-            relations_concepts = 'You do not appear to have values for resource to resource relationships in your rdm.'
-        values['Resource to Resource Relationship Types'] = relation_concepts
+        if include_concepts == True:
+            try:
+                relation_concepts = OrderedDict(sorted(get_values(Concept().get('00000000-0000-0000-0000-000000000005', include_subconcepts=True, semantic=False), {}).items(), key=itemgetter(1)))
+            except:
+                relations_concepts = 'You do not appear to have values for resource to resource relationships in your rdm.'
+            values['Resource to Resource Relationship Types'] = relation_concepts
 
-    file_name_prefix = export_json['resource_model_name']
 
     # Concept lookup file
-    file_name = os.path.join('{0}_{1}.{2}'.format(file_name_prefix, 'concepts', 'json'))
-    dest = StringIO()
-    dest.write(json.dumps(values, indent=4))
-    files_for_export.append({'name':file_name, 'outputfile': dest})
+    if include_concepts == True:
+        file_name = os.path.join('{0}_{1}.{2}'.format(file_name_prefix, 'concepts', 'json'))
+        dest = StringIO()
+        dest.write(json.dumps(values, indent=4))
+        files_for_export.append({'name':file_name, 'outputfile': dest})
 
     # Import/Export mapping file
     file_name = os.path.join('{0}.{1}'.format(file_name_prefix, 'mapping'))
