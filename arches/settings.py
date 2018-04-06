@@ -64,6 +64,7 @@ RESOURCE_IMPORT_LOG = 'arches/logs/resource_import.log'
 RESOURCE_FORMATERS = {
     'csv': 'arches.app.utils.data_management.resources.formats.csvfile.CsvWriter',
     'json': 'arches.app.utils.data_management.resources.formats.archesjson.JsonWriter',
+    'tilecsv': 'arches.app.utils.data_management.resources.formats.csvfile.TileCsvWriter',
     'xml': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter',
     'pretty-xml': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter',
     'json-ld': 'arches.app.utils.data_management.resources.formats.rdffile.JsonLdWriter',

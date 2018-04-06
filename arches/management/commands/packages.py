@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 """This module contains commands for building Arches."""
-import os, sys, subprocess, shutil, csv, json
+import os, sys, subprocess, shutil, csv, json, unicodecsv
 import urllib, uuid, glob
 from datetime import datetime
 from django.core import management
@@ -36,7 +36,7 @@ from arches.app.utils.data_management.resources.importer import ResourceLoader
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.format import Reader as RelationImporter
 from arches.app.utils.data_management.resources.formats.format import MissingGraphException
-from arches.app.utils.data_management.resources.formats.csvfile import MissingConfigException
+from arches.app.utils.data_management.resources.formats.csvfile import MissingConfigException, TileCsvReader
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
 from arches.app.utils.data_management.resource_graphs import exporter as ResourceGraphExporter
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
@@ -56,7 +56,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
             choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'load_concept_scheme', 'export_business_data', 'export_graphs', 'add_tileserver_layer', 'delete_tileserver_layer',
-            'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data','import_business_data_relations', 'import_mapping_file', 'save_system_settings', 'add_mapbox_layer', 'seed_resource_tile_cache', 'update_project_templates','load_package','create_package', 'export_package_configs'],
+            'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data','import_business_data_relations', 'import_mapping_file', 'save_system_settings', 'add_mapbox_layer', 'seed_resource_tile_cache', 'update_project_templates','load_package','create_package', 'export_package_configs', 'import_node_value_data'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' +
@@ -170,6 +170,9 @@ class Command(BaseCommand):
 
         if options['operation'] == 'import_business_data':
             self.import_business_data(options['source'], options['config_file'], options['overwrite'], options['bulk_load'], options['create_concepts'])
+
+        if options['operation'] == 'import_node_value_data':
+            self.import_node_value_data(options['source'], options['overwrite'])
 
         if options['operation'] == 'import_business_data_relations':
             self.import_business_data_relations(options['source'])
@@ -797,6 +800,33 @@ class Command(BaseCommand):
             utils.print_message('No BUSINESS_DATA_FILES locations specified in your settings file. Please rerun this command with BUSINESS_DATA_FILES locations specified or pass the locations in manually with the \'-s\' parameter.')
             sys.exit()
 
+    def import_node_value_data(self, data_source, overwrite=None):
+        """
+        Imports node-value datatype business data only.
+        """
+
+        if overwrite == '':
+            utils.print_message('No overwrite option indicated. Please rerun command with \'-ow\' parameter.')
+            sys.exit()
+
+        if isinstance(data_source, basestring):
+            data_source = [data_source]
+
+        if len(data_source) > 0:
+            for source in data_source:
+                path = utils.get_valid_path(source)
+                if path is not None:
+                    data = unicodecsv.DictReader(open(path, 'rU'), encoding='utf-8-sig', restkey='ADDITIONAL', restval='MISSING')
+                    business_data = list(data)
+                    TileCsvReader(business_data).import_business_data(overwrite=None)
+                else:
+                    utils.print_message('No file found at indicated location: {0}'.format(source))
+                    sys.exit()
+        else:
+            utils.print_message('No BUSINESS_DATA_FILES locations specified in your settings file. Please rerun this command with BUSINESS_DATA_FILES locations specified or pass the locations in manually with the \'-s\' parameter.')
+            sys.exit()
+
+
     def import_business_data_relations(self, data_source):
         """
         Imports business data relations
@@ -964,8 +994,9 @@ class Command(BaseCommand):
     def create_mapping_file(self, dest_dir=None, graphs=None):
         if graphs != False:
             graph = [x.strip(' ') for x in graphs.split(",")]
+        include_concepts = True
 
-        graph_exporter.create_mapping_configuration_file(graphs, dest_dir)
+        graph_exporter.create_mapping_configuration_file(graphs, include_concepts, dest_dir)
 
     def import_mapping_file(self, source=None):
         """
