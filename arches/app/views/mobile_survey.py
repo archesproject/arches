@@ -314,8 +314,7 @@ class MobileSurveyManagerView(MapBaseManagerView):
                 except Exception as e:
                     error_title = _('CouchDB Service Unavailable')
                     error_message =  _('Connection to CouchDB failed. Please confirm your CouchDB service is running on: ' + settings.COUCHDB_URL)
-                    reason = str(e)
-                    connection_error = JSONResponse({'success':False,'message': error_message + reason,'title': error_title}, status=500)
+                    connection_error = JSONResponse({'success':False,'message': '{0}: {1}'.format(error_message, str(e)),'title': error_title}, status=500)
                     return connection_error
 
         except Exception as e:
