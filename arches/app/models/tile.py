@@ -161,13 +161,10 @@ class Tile(models.TileModel):
         is allowed to edit and delete their provisional data.
 
         """
-        result = False
-        if self.provisionaledits is not None:
-            provisionaledits = JSONDeserializer().deserialize(self.provisionaledits)
-            if str(user.id) in provisionaledits:
-                edit = provisionaledits[str(user.id)]
-                result = True
-        return result
+        if self.provisionaledits is None:
+            return False
+        else:
+            return str(user.id) in JSONDeserializer().deserialize(self.provisionaledits)
 
     def get_provisional_edit(self, tile, user):
         edit = None
