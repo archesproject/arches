@@ -44,7 +44,15 @@ define(['jquery',
                         return valid;
                     }
                 }));
-
+                this.addBranchList(new BranchList({
+                    el: this.$el.find('#classification-section')[0],
+                    data: this.data,
+                    dataKey: 'HERITAGE_RESOURCE_GROUP_TYPE.E55', 
+                    rules: true,
+                    validateBranch: function (nodes) {
+                        return this.validateHasValues(nodes);
+                    }
+                }));
                 this.addBranchList(new BranchList({
                     el: this.$el.find('#designation-section')[0],
                     data: this.data,

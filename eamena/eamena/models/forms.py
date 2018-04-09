@@ -88,6 +88,7 @@ class SummaryForm(ResourceForm):
 
     def update(self, data, files):
         self.update_nodes('NAME.E41', data)
+        self.update_nodes('HERITAGE_RESOURCE_GROUP_TYPE.E55', data)
         self.update_nodes('RIGHT_NEW.E30', data)
         self.update_nodes('DESCRIPTION_ASSIGNMENT.E13', data)
         return
@@ -98,6 +99,11 @@ class SummaryForm(ResourceForm):
                 'branch_lists': self.get_nodes('NAME.E41'),
                 'domains': {'NAME_TYPE.E55' : Concept().get_e55_domain('NAME_TYPE.E55')}
             }
+            self.data['HERITAGE_RESOURCE_GROUP_TYPE.E55'] = {
+                'branch_lists': self.get_nodes('HERITAGE_RESOURCE_GROUP_TYPE.E55'),
+                'domains': {'HERITAGE_RESOURCE_GROUP_TYPE.E55' : Concept().get_e55_domain('HERITAGE_RESOURCE_GROUP_TYPE.E55')}
+            }            
+            
             self.data['RIGHT_NEW.E30'] = {
                 'branch_lists': datetime_nodes_to_dates(self.get_nodes('RIGHT_NEW.E30')),
                 'domains': {'DESIGNATION_TYPE.E55' : Concept().get_e55_domain('DESIGNATION_TYPE.E55')}
