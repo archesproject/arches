@@ -64,7 +64,6 @@ class SearchView(MapBaseManagerView):
         resource_cards = models.CardModel.objects.filter(graph__isresource=True, graph__isactive=True)
         datatypes = models.DDataType.objects.all()
         geocoding_providers = models.Geocoder.objects.all()
-
         # only allow cards that the user has permission to read
         searchable_cards = []
         for card in resource_cards:
@@ -93,8 +92,9 @@ class SearchView(MapBaseManagerView):
             user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
         )
 
-        graphs = JSONSerializer().serialize(context['resource_graphs'], exclude=['functions','author','deploymentdate', 'deploymentfile','isactive','isresource','version', 'iconclass','subtitle','description','disable_instance_creation','ontology_id'])
+        graphs = JSONSerializer().serialize(context['resource_graphs'], exclude=['functions','author','deploymentdate', 'deploymentfile','version', 'subtitle','description','disable_instance_creation','ontology_id'])
         context['graphs'] = graphs
+        context['graph_models'] = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         context['nav']['title'] = _('Search')
         context['nav']['icon'] = 'fa-search'
         context['nav']['search'] = False
