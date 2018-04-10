@@ -390,19 +390,15 @@ define([
          */
         saveTileGroup: function(parentTile, e){
             var model = new TileModel(koMapping.toJS(parentTile));
-            var appendFormData = function() {
-                var parent = parentTile;
-                return function(tile) {
-                    if (tile().length > 0) {
-                        var childFormData = tile()[0].formData
-                        for (var entry of childFormData.entries()) {
-                            parent.formData.append(entry[0], entry[1])
-                            }
-                        }
-                    }
-                }
 
-            _.each(parentTile.tiles, appendFormData());
+            _.each(parentTile.tiles, function(tile) {
+                if (tile().length > 0) {
+                    var entries = tile()[0].formData.entries();
+                    _.each(entries, function(entry) {
+                        parentTile.formData.append(entry[0], entry[1]);
+                    });
+                }
+            });
 
             this.trigger('before-update');
             model.save(function(response, status, model){
