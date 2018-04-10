@@ -4446,6 +4446,7 @@ ul.jqtree_common li.jqtree-folder {
 
 .profile-sections {
     padding: 0px 0px;
+    min-height: 650px;
 }
 
 .profile-projects {
