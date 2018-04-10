@@ -313,9 +313,9 @@ define([
             _.each(parentTile.tiles, function(tile) {
                 if (tile().length > 0) {
                     var entries = tile()[0].formData.entries();
-                    for (var entry of entries) {
+                    _.each(entries, function(entry) {
                         parentTile.formData.append(entry[0], entry[1]);
-                    }
+                    });
                 }
             });
 
