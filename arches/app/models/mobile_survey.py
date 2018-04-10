@@ -88,6 +88,7 @@ class MobileSurvey(models.MobileSurveyModel):
                 graphs.append(graph)
         ret['graphs'] = graphs
         ret['cards'] = ordered_cards
+        ret['bounds'] = json.loads(ret['bounds'])
         return ret
 
     def get_ordered_cards(self):
