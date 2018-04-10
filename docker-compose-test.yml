@@ -25,6 +25,7 @@ services:
       depends_on:
         - db
         - elasticsearch
+        - couchdb
 
     db:
       container_name: db
