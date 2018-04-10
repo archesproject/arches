@@ -33,7 +33,7 @@ class GeoUtils(object):
     def convert_multipart_to_singlepart(self, geom, format="geojson"):
         result = None
         if geom != None:
-            multipart = json.loads(geom)
+            multipart = geom
             fc = {"type": "FeatureCollection", "features": []}
             for coords in multipart['coordinates']:
                 geom = { "type": "Feature",
