@@ -176,16 +176,35 @@ class DateDataType(BaseDataType):
                 except:
                     valid = False
         if valid == False:
-            errors.append({'type': 'ERROR', 'message': '{0} is not in the correct format, should be formatted YYYY-MM-DD, YYYY-MM-DD HH:MM:SS or MM-DD. This data was not imported.'.format(value)})
+            if hasattr(settings, 'DATE_IMPORT_EXPORT_FORMAT'):
+                date_format = settings.DATE_IMPORT_EXPORT_FORMAT
+            else:
+                date_format = date_formats
+
+            errors.append({'type': 'ERROR', 'message': '{0} is not in the correct format, make sure it is in this format: {1} or set the date format in settings.DATE_IMPORT_EXPORT_FORMAT. This data was not imported.'.format(value, date_format)})
+
 
         return errors
 
     def transform_import_values(self, value, nodeid):
         if type(value) == list:
-            try:
-                value = str(datetime(*value).date())
-            except:
-                pass
+            value = value[0]
+
+        try:
+            if hasattr(settings, 'DATE_IMPORT_EXPORT_FORMAT'):
+                v = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
+                value = str(datetime.strftime(v, '%Y-%m-%d'))
+            else:
+                value = str(datetime(value).date())
+        except:
+            pass
+
+        return value
+
+    def transform_export_values(self, value, *args, **kwargs):
+        if hasattr(settings, 'DATE_IMPORT_EXPORT_FORMAT'):
+            v = datetime.strptime(value, '%Y-%m-%d')
+            value = datetime.strftime(v, settings.DATE_IMPORT_EXPORT_FORMAT)
         return value
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
