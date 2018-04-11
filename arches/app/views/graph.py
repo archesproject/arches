@@ -215,6 +215,7 @@ class GraphDesignerView(GraphBaseView):
         context = self.get_context_data(
             main_script='views/graph-designer',
         )
+        context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
         context['graph_models'] = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         context['graphs'] = JSONSerializer().serialize(context['graph_models'], exclude = ['functions'])
