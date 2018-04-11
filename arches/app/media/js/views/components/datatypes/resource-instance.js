@@ -1,10 +1,9 @@
 define([
     'knockout',
     'underscore',
-    'arches',
     'view-data',
     'views/components/widgets/resource-instance-select'
-], function (ko, _, arches, data) {
+], function (ko, _, data) {
     var name = 'resource-instance-datatype-config';
     ko.components.register(name, {
         viewModel: function(params) {
