@@ -54,6 +54,9 @@ class ExtendedDateFormat(SortableDateRange):
         self.result_set = None
         self.error = None
 
+        import ipdb
+        ipdb.set_trace()
+
         try: 
             # handle for incorrectly formatted year only dates 
             # (eg: 290 => 0290, 11909 => y11909)

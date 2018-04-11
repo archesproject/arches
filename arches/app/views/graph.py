@@ -208,6 +208,18 @@ class GraphManagerView(GraphBaseView):
         graph.delete()
         return JSONResponse({'succces':True})
 
+@method_decorator(group_required('Graph Editor'), name='dispatch')
+class GraphDesignerView(GraphBaseView):
+    def get(self, request, graphid):
+        self.graph = Graph.objects.get(graphid=graphid)
+        context = self.get_context_data(
+            main_script='views/graph-designer',
+        )
+        context['nav']['menu'] = True
+        context['graph_models'] = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+        context['graphs'] = JSONSerializer().serialize(context['graph_models'], exclude = ['functions'])
+        return render(request, 'views/graph-designer.htm', context)
+
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
 class GraphDataView(View):
