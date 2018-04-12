@@ -17,7 +17,17 @@ require([
                         "next": '<i class="fa fa-angle-right"></i>'
                     }
                 },
-                "order": [[ 3, "desc" ]]
+                "order": [[ 3, "desc" ]],
+                "columns": [
+                    null,
+                    null,
+                    null,
+                    { "orderData": 7 },
+                    null,
+                    null,
+                    null,
+                    { "visible": false }
+                ]
             };
             BaseManagerView.prototype.initialize.call(this, options)
         }
