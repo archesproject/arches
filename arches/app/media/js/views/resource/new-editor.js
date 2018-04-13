@@ -1,15 +1,16 @@
-require([
-    'jquery',
+define([
+    'underscore',
     'knockout',
     'views/base-manager',
-    'bindings/resizable-sidebar'
-], function($, ko, BaseManagerView) {
-    var self = this;
-    var loading = ko.observable(false);
+    'resource-editor-data',
+    'bindings/resizable-sidepanel'
+], function(_, ko, BaseManagerView, data) {
+    var currentWidth, start;
+    var viewModel = {
+        graphid: ko.observable(data.graphid)
+    }
 
-    var pageView = new BaseManagerView({
-        viewModel:{
-            loading: loading
-        }
+    return new BaseManagerView({
+        viewModel: viewModel
     });
 });

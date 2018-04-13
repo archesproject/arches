@@ -60,8 +60,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <div class="flex">
 
         <!-- Left Panel -->
-        <div id="left-panel" style="flex:0 0 270px" data-bind="style:{flex: leftPanelFlex()}">
-            
+        <div class="left-panel" data-bind="resizableSidepanel:true">
+
             <!--Nav Tabs-->
             <ul class="nav nav-tabs">
                 <li data-bind="css: { active: activeTab() === 'graph' }, click: function(){activeTab('graph');}">
@@ -83,16 +83,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }">card</div>
             </div>
         </div>
-
-        <div id="draggable" class="" style="background-color: #ffffff; border-left: solid 1px gainsboro; border-right: solid 1px gainsboro;">
-            <div id="handle" style="height:100%;">
-                <!--< a class="ion-record" style="cursor:pointer; position: relative;top: 50%; transform: translateY(-50%);"></a>
-                <a class="ion-record" style="cursor:pointer; position: relative;top: 50%; transform: translateY(-50%);"></a>
-                <a class="ion-record" style="cursor:pointer; position: relative;top: 50%; transform: translateY(-50%);"></a> -->
-                <img src="/media/img/grab-handle.png" style="cursor:pointer; position: relative;top: 50%; transform: translateY(-50%); margin: 1px;">
-            </div>
-        </div>
-
 
         <!-- Main Content Panel -->
         <div style="background-color: #ffffff; flex: 1" >

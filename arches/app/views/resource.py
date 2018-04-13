@@ -75,9 +75,12 @@ def get_resource_relationship_types():
 @method_decorator(can_edit_resource_instance(), name='dispatch')
 class NewResourceEditorView(MapBaseManagerView):
     def get(self, request, resourceid=None, view_template='views/resource/new-editor.htm', main_script='views/resource/new-editor', nav_menu=True):
+        resource_instance = Resource.objects.get(pk=resourceid)
+
         context = self.get_context_data(
             main_script=main_script,
             resourceid=resourceid,
+            graphid=resource_instance.graph_id
         )
 
         context['nav']['title'] = ''
