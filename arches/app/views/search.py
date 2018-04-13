@@ -385,7 +385,9 @@ def build_search_results_dsl(request):
 
         if len(spatial_filter['features']) > 0:
             feature_geom = spatial_filter['features'][0]['geometry']
-            feature_properties = spatial_filter['features'][0]['properties']
+            feature_properties = {}
+            if 'properties' in spatial_filter['features'][0]:
+                feature_properties = spatial_filter['features'][0]['properties']
             buffer = {'width':0,'unit':'ft'}
             if 'buffer' in feature_properties:
                 buffer = feature_properties['buffer']
@@ -488,9 +490,7 @@ def build_search_results_dsl(request):
                 temporal_query.should(Nested(path='date_ranges', query=date_ranges_query))
             temporal_query.should(Nested(path='dates', query=date_query))
 
-
         search_query.filter(temporal_query)
-        #print search_query.dsl
 
     datatype_factory = DataTypeFactory()
     if len(advanced_filters) > 0:

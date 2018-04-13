@@ -570,7 +570,8 @@ class Command(BaseCommand):
             'EMAIL_HOST_USER',
             'EMAIL_HOST_PASSWORD',
             'EMAIL_PORT',
-            'PROTECTED_GRAPHS'
+            'PROTECTED_GRAPHS',
+            'DATE_IMPORT_EXPORT_FORMAT'
             ]
 
         with open('arches/install/arches-templates/project_name/settings_local.py-tpl', 'w') as f:
@@ -792,6 +793,7 @@ class Command(BaseCommand):
             for source in data_source:
                 path = utils.get_valid_path(source)
                 if path is not None:
+                    print 'Importing {0}. . .'.format(path)
                     BusinessDataImporter(path, config_file).import_business_data(overwrite=overwrite, bulk=bulk_load, create_concepts=create_concepts, create_collections=create_collections)
                 else:
                     utils.print_message('No file found at indicated location: {0}'.format(source))

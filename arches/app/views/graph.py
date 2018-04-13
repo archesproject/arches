@@ -74,19 +74,6 @@ class GraphBaseView(BaseManagerView):
             pass
         return context
 
-class MapGraphBaseView(MapBaseManagerView):
-    def get_context_data(self, **kwargs):
-        context = super(MapGraphBaseView, self).get_context_data(**kwargs)
-        try:
-            context['graphid'] = self.graph.graphid
-            context['graph'] = JSONSerializer().serializeToPython(self.graph)
-            context['graph_json'] = JSONSerializer().serialize(self.graph)
-            context['root_node'] = self.graph.node_set.get(istopnode=True)
-        except:
-            pass
-        return context
-
-
 @method_decorator(group_required('Graph Editor'), name='dispatch')
 class GraphSettingsView(GraphBaseView):
     def get(self, request, graphid):
@@ -207,6 +194,19 @@ class GraphManagerView(GraphBaseView):
         graph = Graph.objects.get(graphid=graphid)
         graph.delete()
         return JSONResponse({'succces':True})
+
+@method_decorator(group_required('Graph Editor'), name='dispatch')
+class GraphDesignerView(GraphBaseView):
+    def get(self, request, graphid):
+        self.graph = Graph.objects.get(graphid=graphid)
+        context = self.get_context_data(
+            main_script='views/graph-designer',
+        )
+        context['nav']['title'] = self.graph.name
+        context['nav']['menu'] = True
+        context['graph_models'] = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+        context['graphs'] = JSONSerializer().serialize(context['graph_models'], exclude = ['functions'])
+        return render(request, 'views/graph-designer.htm', context)
 
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
@@ -358,7 +358,7 @@ class CardManagerView(GraphBaseView):
 
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
-class CardView(MapGraphBaseView):
+class CardView(GraphBaseView):
     def get(self, request, cardid):
         try:
             card = Card.objects.get(cardid=cardid)
@@ -406,6 +406,11 @@ class CardView(MapGraphBaseView):
             concept_collections=concept_collections,
             ontology_properties=JSONSerializer().serialize(ontology_properties),
         )
+
+        context['graphid'] = self.graph.graphid
+        context['graph'] = JSONSerializer().serializeToPython(self.graph)
+        context['graph_json'] = json.dumps(context['graph'])
+        context['root_node'] = self.graph.node_set.get(istopnode=True)
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
@@ -575,7 +580,7 @@ class ReportManagerView(GraphBaseView):
 
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
-class ReportEditorView(MapGraphBaseView):
+class ReportEditorView(GraphBaseView):
     def get(self, request, reportid):
         try:
             report = models.Report.objects.get(reportid=reportid)
@@ -611,6 +616,11 @@ class ReportEditorView(MapGraphBaseView):
                 widgets=widgets,
                 graph_id=self.graph.graphid,
              )
+
+            context['graphid'] = self.graph.graphid
+            context['graph'] = JSONSerializer().serializeToPython(self.graph)
+            context['graph_json'] = JSONSerializer().serialize(self.graph)
+            context['root_node'] = self.graph.node_set.get(istopnode=True)
 
             context['nav']['title'] = self.graph.name
             context['nav']['menu'] = True

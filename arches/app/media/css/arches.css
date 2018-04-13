@@ -9780,6 +9780,18 @@ a.search-facet-item.disabled {
     margin-top: 10px;
 }
 
+.nav-tabs li a.graph-designer-tab {
+    padding: 15px 25px 15px 25px;
+}
+
+.viewstate-btn {
+    width: 100px;
+}
+
+.viewstate-btn.active {
+    background-color: white;
+}
+
 #identities-card .library-card:not(.selected-card) {
     border-left: 1px solid transparent;
 }

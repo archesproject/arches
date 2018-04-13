@@ -1,7 +1,9 @@
 require([
+    'jquery',
     'knockout',
-    'views/base-manager'
-], function(ko, BaseManagerView) {
+    'views/base-manager',
+    'bindings/resizable-sidebar'
+], function($, ko, BaseManagerView) {
     var self = this;
     var loading = ko.observable(false);
 

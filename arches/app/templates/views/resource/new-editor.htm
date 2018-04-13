@@ -24,7 +24,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock graph_header_title %}
 
 {% block content %}
-<div class="flex relative" data-bind="visible: !loading()" style="display:none;">
-    Hello world
+<div class="flex relative resource-editor-wrapper" data-bind="visible: !loading()" style="display:none;">
+    <div class="resource-editor-sidebar">
+        Hello sidebar
+    </div>
+    <div class="resource-editor-main">
+        Hello main
+    </div>
 </div>
 {% endblock content %}
