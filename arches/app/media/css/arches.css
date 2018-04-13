@@ -10656,6 +10656,34 @@ ul.select2-choices:after {
     border-right: 5px solid transparent;
 }
 
+.sidepanel-draggable {
+    background-color: #ffffff;
+    border-left: solid 1px gainsboro;
+    border-right: solid 1px gainsboro;
+    height:100%;
+}
+
+.sidepanel-handle {
+    cursor:pointer;
+    position: relative;top: 50%;
+    transform: translateY(-50%);
+    margin: 1px;
+}
+
+.sidepanel-handle i {
+    display: block;
+    color: rgb(190, 190, 190);
+}
+
+.left-panel {
+    width: 270px;
+}
+
+.main-panel{
+    background-color: #ffffff;
+    flex: 1
+}
+
 @keyframes loader {
     0% {
         background: #ddd;
