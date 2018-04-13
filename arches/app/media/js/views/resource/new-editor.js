@@ -5,7 +5,6 @@ define([
     'resource-editor-data',
     'bindings/resizable-sidepanel'
 ], function(_, ko, BaseManagerView, data) {
-    var currentWidth, start;
     var viewModel = {
         graphid: ko.observable(data.graphid)
     }
