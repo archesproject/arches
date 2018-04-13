@@ -35,7 +35,7 @@ define([
                 var dragX = e.pageX;
                 var dragY = e.pageY;
                 var width = dragStart - dragX;
-                $el.css('flex', '0 0 ' + (currentWidth - width + 15) + 'px');
+                $el.css('flex', '0 0 ' + (currentWidth - width) + 'px');
             }, false);
         }
     }
