@@ -10664,7 +10664,7 @@ ul.select2-choices:after {
 }
 
 .sidepanel-handle {
-    cursor:pointer;
+    cursor: col-resize;
     position: relative;top: 50%;
     transform: translateY(-50%);
     margin: 1px;
