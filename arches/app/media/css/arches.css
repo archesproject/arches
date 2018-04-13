@@ -10660,17 +10660,19 @@ ul.select2-choices:after {
     background-color: #ffffff;
     border-left: solid 1px gainsboro;
     border-right: solid 1px gainsboro;
-}
-
-.sidepanel-handle {
     height:100%;
 }
 
-.sidepanel-handle img {
+.sidepanel-handle {
     cursor:pointer;
     position: relative;top: 50%;
     transform: translateY(-50%);
     margin: 1px;
+}
+
+.sidepanel-handle i {
+    display: block;
+    color: rgb(190, 190, 190);
 }
 
 .left-panel {

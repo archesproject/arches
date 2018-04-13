@@ -4,29 +4,32 @@ define([
 ], function($, ko) {
     ko.bindingHandlers.resizableSidepanel = {
         init: function(element, valueAccessor, allBindings, viewModel) {
+            var $el = $(element);
+            var dragStart;
+            var currentWidth;
+            var handle = $(document.createElement('div'))
+                .addClass('sidepanel-handle')
+                .attr('draggable', 'true');
             var draggable = $(document.createElement('div'))
                 .addClass('sidepanel-draggable')
-                .append(
-                    $(document.createElement('div'))
-                        .addClass('sidepanel-handle')
-                        .append(
-                            $(document.createElement('img'))
-                                .attr('src', '/media/img/grab-handle.png')
-                        )
-                );
-            var $el = $(element);
+                .append(handle);
+
+            for (var i = 0; i < 3; i++) {
+                handle.append(
+                    $(document.createElement('i'))
+                    .addClass('fa fa-circle')
+                )
+            }
 
             $el.after(draggable);
-
-            var dragStart = 0;
-            var currentWidth = $el.width();
+            $el.css('flex', '0 0 ' + $el.width() + 'px');
             $el.css('width', 'auto');
-            $el.css('flex', '0 0 ' + currentWidth + 'px');
 
             draggable.on('dragstart', function(e) {
                 dragStart = e.pageX;
                 currentWidth = $el.width();
             });
+
             document.addEventListener('dragover', function(e){
                 e = e || window.event;
                 var dragX = e.pageX;
