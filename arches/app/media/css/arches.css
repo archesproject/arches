@@ -10663,14 +10663,14 @@ ul.select2-choices:after {
     height:100%;
 }
 
-.sidepanel-handle {
+.sidepanel-draggable div {
     cursor: col-resize;
     position: relative;top: 50%;
     transform: translateY(-50%);
     margin: 1px;
 }
 
-.sidepanel-handle i {
+.sidepanel-draggable div i {
     display: block;
     color: rgb(190, 190, 190);
 }
