@@ -13,7 +13,15 @@ define([
                 .attr('draggable', 'true');
             var draggable = $(document.createElement('div'))
                 .addClass('sidepanel-draggable')
-                .append(handle);
+                .append(handle)
+                .on('dragstart', function(e) {
+                    dragging = true;
+                    dragStart = e.pageX;
+                    currentWidth = $el.width();
+                })
+                .on('dragend', function(e) {
+                    dragging = false;
+                });
 
             for (var i = 0; i < 3; i++) {
                 handle.append(
@@ -25,16 +33,6 @@ define([
             $el.after(draggable);
             $el.css('flex', '0 0 ' + $el.width() + 'px');
             $el.css('width', 'auto');
-
-            draggable.on('dragstart', function(e) {
-                dragging = true;
-                dragStart = e.pageX;
-                currentWidth = $el.width();
-            });
-
-            draggable.on('dragend', function(e) {
-                dragging = false;
-            });
 
             document.addEventListener('dragover', function(e){
                 if (dragging) {
