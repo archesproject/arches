@@ -343,13 +343,17 @@ class CsvReader(Reader):
                 for k,v in f.iteritems():
                     v['node_ids'] = []
                     v['string_template'] = v['string_template'].replace('<', '').replace('>', '').split(', ')
-                    nodes = Node.objects.filter(nodegroup_id=v['nodegroup_id'])
-                    for node in nodes:
-                        if node.name in v['string_template']:
-                            display_nodeids.append(str(node.nodeid))
+                    if v['nodegroup_id'] != '':
+                        nodes = Node.objects.filter(nodegroup_id=v['nodegroup_id'])
+                        for node in nodes:
+                            if node.name in v['string_template']:
+                                display_nodeids.append(str(node.nodeid))
 
                 for k,v in f.iteritems():
-                    print 'The {0} {1} in the {2} display function.'.format(', '.join(v['string_template']), 'nodes participate' if len(v['string_template']) > 1 else 'node participates', k)
+                    if v['string_template'] != ['']:
+                        print 'The {0} {1} in the {2} display function.'.format(', '.join(v['string_template']), 'nodes participate' if len(v['string_template']) > 1 else 'node participates', k)
+                    else:
+                        print 'No nodes participate in the {0} display function.'.format(k)
 
             return display_nodeids
 
