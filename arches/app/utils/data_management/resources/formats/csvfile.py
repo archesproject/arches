@@ -12,7 +12,7 @@ from format import Reader
 from elasticsearch import TransportError
 from arches.app.models.tile import Tile
 from arches.app.models.concept import Concept
-from arches.app.models.models import Node, NodeGroup, ResourceXResource, ResourceInstance
+from arches.app.models.models import Node, NodeGroup, ResourceXResource, ResourceInstance, FunctionXGraph
 from arches.app.utils.data_management.resource_graphs import exporter as GraphExporter
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
@@ -333,6 +333,26 @@ class CsvReader(Reader):
     def import_business_data(self, business_data=None, mapping=None, overwrite='append', bulk=False, create_concepts=False, create_collections=False):
         # errors = businessDataValidator(self.business_data)
 
+        def get_display_nodes(graphid):
+            display_nodeids = []
+            functions = FunctionXGraph.objects.filter(function_id='60000000-0000-0000-0000-000000000001', graph_id=graphid)
+            for function in functions:
+                f = function.config
+                del f['triggering_nodegroups']
+
+                for k,v in f.iteritems():
+                    v['node_ids'] = []
+                    v['string_template'] = v['string_template'].replace('<', '').replace('>', '').split(', ')
+                    nodes = Node.objects.filter(nodegroup_id=v['nodegroup_id'])
+                    for node in nodes:
+                        if node.name in v['string_template']:
+                            display_nodeids.append(str(node.nodeid))
+
+                for k,v in f.iteritems():
+                    print 'The {0} {1} in the {2} display function.'.format(', '.join(v['string_template']), 'nodes participate' if len(v['string_template']) > 1 else 'node participates', k)
+
+            return display_nodeids
+
         def process_resourceid(resourceid, overwrite):
             # Test if resourceid is a UUID.
             try:
@@ -382,6 +402,7 @@ class CsvReader(Reader):
                 target_resource_model = None
                 single_cardinality_nodegroups = [str(nodegroupid) for nodegroupid in NodeGroup.objects.values_list('nodegroupid', flat=True).filter(cardinality = '1')]
                 node_datatypes = {str(nodeid): datatype for nodeid, datatype in  Node.objects.values_list('nodeid', 'datatype').filter(~Q(datatype='semantic'), graph__isresource=True)}
+                display_nodes = get_display_nodes(mapping['resource_model_id'])
                 all_nodes = Node.objects.all()
                 datatype_factory = DataTypeFactory()
                 concepts_to_create = {}
@@ -580,7 +601,7 @@ class CsvReader(Reader):
                                     value = concept_lookup.lookup_labelid_from_label(value, collection_id)
                         try:
                             value = datatype_instance.transform_import_values(value, nodeid)
-                            errors = datatype_instance.validate(value, source)
+                            errors = datatype_instance.validate(value, row_number, source)
                         except Exception as e:
                             errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(datatype_instance.datatype_model.classname, value, source, str(e) + ' or is not a prefLabel in the given collection.')})
                         if len(errors) > 0:
@@ -641,6 +662,15 @@ class CsvReader(Reader):
                         populated_nodegroups[resourceinstanceid] = []
 
                     source_data = column_names_to_targetids(row, mapping, row_number)
+
+                    missing_display_nodes = [n for n in display_nodes if n not in [list(b) for b in zip(*[a.keys() for a in source_data])][0]]
+                    if len(missing_display_nodes) > 0:
+                        errors = []
+                        for mdn in missing_display_nodes:
+                            mdn_name = all_nodes.filter(nodeid=mdn).values_list('name', flat=True)[0]
+                            errors.append({'type': 'WARNING', 'message': '{0} {1} is null or not mapped and participates in a {2} display value function.'.format(mdn_name, row_number, mapping['resource_model_name'])})
+                        if len(errors) > 0:
+                            self.errors += errors
 
                     if len(source_data) > 0:
                         if source_data[0].keys():
