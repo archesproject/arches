@@ -61,7 +61,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
         <!-- Left Panel -->
         <div id="left-panel" style="flex:0 0 270px" data-bind="style:{flex: leftPanelFlex()}">
-            
+
             <!--Nav Tabs-->
             <ul class="nav nav-tabs">
                 <li data-bind="css: { active: activeTab() === 'graph' }, click: function(){activeTab('graph');}">
@@ -98,7 +98,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <div style="background-color: #ffffff; flex: 1" >
             <div class="tab-content" >
                 <!-- Summary Card -->
-                <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'graph' }">graph content</div>
+                <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'graph' }">
+                    <div class="graph-designer-graph-content">
+                    {% block graph_content %}
+                    <p>Here are some graph settings!!</p>
+                    {% endblock graph_content %}
+                    </div>
+                </div>
                 <!-- Summary Card -->
                 <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }">card content</div>
             </div>
