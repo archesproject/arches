@@ -18,13 +18,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load staticfiles %}
 {% load i18n %}
 
-{% block graph_header_buttons %}
-<!-- ko if: dirty() -->
-<button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click:reset">{% trans "Discard Edits" %}</button>
-<button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click:save">{% trans "Save Edits" %}</button>
-<!-- /ko -->
-{% endblock graph_header_buttons %}
-
 <div style="overflow-y: auto">
     <div id="external-page-content">
         <div style="padding: 12px;">

@@ -79,17 +79,20 @@ define([
             });
         }),
         self.save = function () {
+            self.contentLoading(true);
             $.ajax({
                 type: "POST",
                 url: arches.urls.new_graph_settings(self.graph.graphid()),
-                data: jsonData(),
-                success: function(response) {
+                data: jsonData()})
+                .done(function(response) {
                     jsonCache(jsonData());
-                },
-                error: function(response) {
+                })
+                .fail(function(response) {
                     console.log('there was an error saving the settings', response)
-                }
-            });
+                })
+                .always(function(){
+                    self.contentLoading(false);
+                })
         },
         self.reset = function () {
             _.each(JSON.parse(srcJSON), function(value, key) {
