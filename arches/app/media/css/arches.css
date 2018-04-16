@@ -393,6 +393,13 @@ input[type="checkbox"] {
     padding: 5px 0 10px 10px;
 }
 
+.graph-settings-header {
+    color: #777;
+    font-size: 17px;
+    border-bottom: solid 1px #ccc;
+
+}
+
 .summary-panel {
     background: #f9f9f9;
     margin-top: -30px;
