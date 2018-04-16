@@ -30,11 +30,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <div style="padding: 12px;">
             <div>
                 <div class="panel-heading">
-                    <div>
-                        <h3 class="panel-title card-main-title">{% trans "Settings" %}</h3>
-                    </div>
+                    <div style="display: flex; flex-direction:row; align-items: center"><i data-bind='css: graph.iconclass'></i><div class="panel-title card-main-title" data-bind='text: graph.name'></div></span></div>
                 </div>
-
 
                 <!-- Alert Panel -->
                 <div id="basemap-delete-alert" class="panel wizard-data-card-alert"></div>
@@ -48,14 +45,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div class="tab-content card-content-tab" style="margin-left: 0px;">
 
                             <div class="card-content">
-
-                                <!-- Card Level Alert -->
-                                <div id="summary-card-alert" class="panel install-card-alert"></div>
-
-                                <!-- Card Instruction -->
-                                <p id="install-instructions" class="content-instructions">
-                                    <span data-bind="text: graph.isresource() ? '{% trans "Set the defaults for your resource model" %}' : '{% trans "Set the defaults for your branch" %}'"></span>
-                                </p>
 
                                 <!-- Form -->
                                 <div class="col-xs-12">
@@ -175,7 +164,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </div>
 
                             <!-- Card -->
-                            <div id="map-style-card" class="tab-pane fade">
+                            <div id="map-style-card">
                                 <div class="panel-body card-panel-body">
                                     <div class="card-content">
 
@@ -213,7 +202,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </div>
 
                             <!-- Card -->
-                            <div id="meta-card" class="tab-pane fade">
+                            <div id="meta-card">
                                 <div class="panel-body card-panel-body">
                                     <div class="card-content">
 
@@ -277,7 +266,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
                             <!-- Card -->
-                            <div id="desc-card" class="tab-pane fade">
+                            <div id="desc-card">
                                 <div class="panel-body card-panel-body">
                                     <div class="card-content">
 

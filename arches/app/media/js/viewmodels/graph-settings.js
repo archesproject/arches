@@ -5,9 +5,12 @@ define([
     'knockout-mapping',
     'bindings/color-picker',
     'models/node',
+    'arches',
     'bindings/chosen'
-], function ($, _, ko, koMapping, colorPicker, NodeModel) {
+], function ($, _, ko, koMapping, colorPicker, NodeModel, arches) {
     var GraphSettingsViewModel = function(params) {
+
+        var self = this;
 
         var resourceJSON = JSON.stringify(params.resources);
         params.resources.forEach(function(resource) {
@@ -15,18 +18,18 @@ define([
         });
         var srcJSON = JSON.stringify(params.graph);
 
-        var graph = koMapping.fromJS(params.graph);
+        self.graph = koMapping.fromJS(params.graph);
         var iconFilter = ko.observable('');
         var rootNode = new NodeModel({
             source: params.node,
             datatypelookup: [],
-            graph: graph,
+            graph: self.graph,
             ontology_namespaces: params.ontology_namespaces
         });
 
         var rootNodeConfig = ko.observable(rootNode.config)
         var ontologyClass = ko.observable(params.node.ontologyclass);
-        var topNode = _.filter(graph.nodes(), function(node) {
+        var topNode = _.filter(self.graph.nodes(), function(node) {
                         if (node.istopnode() === true) {
                             return node
                         }
@@ -44,11 +47,11 @@ define([
             }).map(function(resource){
                 return resource.id
             });
-            if (graph.ontology_id() === undefined) {
-                graph.ontology_id(null);
+            if (self.graph.ontology_id() === undefined) {
+                self.graph.ontology_id(null);
             }
             return JSON.stringify({
-                graph: koMapping.toJS(graph),
+                graph: koMapping.toJS(self.graph),
                 relatable_resource_ids: relatableResourceIds,
                 ontology_class: ontologyClass()
             });
@@ -58,7 +61,6 @@ define([
             return jsonData() !== jsonCache();
         });
 
-        var self = this;
         self.rootNodeColor = rootNodeColor,
         self.dirty = dirty,
         self.iconFilter = iconFilter,
@@ -67,20 +69,19 @@ define([
                 return icon.name.indexOf(iconFilter()) >= 0;
             });
         }),
-        self.graph = graph,
         self.relatable_resources = params.resources,
         self.ontologies = params.ontologies,
         self.ontologyClass = ontologyClass,
         self.ontologyClasses = ko.computed(function () {
             return _.filter(params.ontologyClasses, function (ontologyClass) {
                 ontologyClass.display = rootNode.getFriendlyOntolgyName(ontologyClass.source);
-                return ontologyClass.ontology_id === graph.ontology_id();
+                return ontologyClass.ontology_id === self.graph.ontology_id();
             });
         }),
         self.save = function () {
             $.ajax({
                 type: "POST",
-                url: '',
+                url: arches.urls.new_graph_settings(self.graph.graphid()),
                 data: jsonData(),
                 success: function(response) {
                     jsonCache(jsonData());
