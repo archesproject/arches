@@ -18,6 +18,7 @@
 @import url(../packages/nvd3/build/nv.d3.min.css);
 @import url(../packages/leaflet/dist/leaflet.css);
 @import url(../packages/leaflet-draw/dist/leaflet.draw.css);
+@import url(../css/tree/tree.css);
 .regular-link {
     color: #337ab7;
     text-decoration: none;

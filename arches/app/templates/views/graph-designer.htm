@@ -19,7 +19,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load staticfiles %}
 {% load i18n %}
 
-
 {% block title %}
 {{ block.super }}
 {% trans "Graph Designer" %}
@@ -78,7 +77,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             <div class="tab-content" >
                 <!-- Summary Card -->
-                <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'graph' }">graph</div>
+                <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'graph' }">
+                    <div data-bind="click: open_all">expand all</div>
+                    <!-- <div data-bind="treeViewer: {'data': graphModel.get('nodes')(), 'pluginref': 'treePlugin'}"></div> -->
+                    <div class="" id="node-listing" data-bind="with: graphTree.tree">
+                        {% include 'views/graph/graph-manager/graph-tree.htm' %}
+                    </div>
+                </div>
                 <!-- Summary Card -->
                 <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }">card</div>
             </div>
@@ -103,10 +108,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block pre_require_js %}
 {{block.super}}
     <script>
-        {% autoescape off %}define('graph-designer-data', [], function() {
+        {% autoescape off %}
+        define('graph-designer-data', [], function() {
             return {
+                graph: {{graph_json}},
                 graphid: '{{graphid}}',
+                datatypes: {{datatypes}},
+                ontology_namespaces: {{ontology_namespaces}}
             };
-        });{% endautoescape %}
+        });
+        {% endautoescape %}
     </script>
 {% endblock pre_require_js %}

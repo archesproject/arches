@@ -162,7 +162,7 @@ class GraphManagerView(GraphBaseView):
             branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         concept_collections = Concept().concept_tree(mode='collections', lang=lang)
-        datatypes_json = JSONSerializer().serialize(datatypes, exclude=['iconclass','modulename','isgeometric'])
+        datatypes_json = JSONSerializer().serialize(datatypes, exclude=['modulename','isgeometric'])
         context = self.get_context_data(
             main_script='views/graph/graph-manager',
             branches=JSONSerializer().serialize(branch_graphs, exclude=['cards','domain_connections', 'functions', 'cards', 'deploymentfile', 'deploymentdate']),
@@ -195,15 +195,22 @@ class GraphManagerView(GraphBaseView):
         graph.delete()
         return JSONResponse({'succces':True})
 
+
 @method_decorator(group_required('Graph Editor'), name='dispatch')
 class GraphDesignerView(GraphBaseView):
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
+                
+        datatypes = models.DDataType.objects.all()
+        datatypes_json = JSONSerializer().serialize(datatypes, exclude=['modulename','isgeometric'])
+
         context = self.get_context_data(
             main_script='views/graph-designer',
+            datatypes=datatypes_json,
+            ontology_namespaces = get_ontology_namespaces()
         )
         context['nav']['title'] = self.graph.name
-        context['nav']['menu'] = True
+        #context['nav']['menu'] = True
         context['graph_models'] = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         context['graphs'] = JSONSerializer().serialize(context['graph_models'], exclude = ['functions'])
         return render(request, 'views/graph-designer.htm', context)

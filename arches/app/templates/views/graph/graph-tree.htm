@@ -1,0 +1,32 @@
+{% load i18n %}
+<!-- TOC Cards/Widgets -->
+<div class="jstree jstree-default">
+    <!-- <div data-bind="sortable: $data"> -->
+    <ul class="jstree-container-ul jstree-children" aria-expanded="true">
+        <div data-bind="template: {
+            name: 'graph-tree',
+            foreach: $data,
+            as: 'node'
+        }"></div>
+    </ul>
+    <!-- </div> -->
+</div>
+
+<template id="graph-tree">
+    <li role="treeitem" aria-selected="false" aria-level="2" aria-labelledby="ab74af9e-fa0e-11e6-9e3e-026d961c88e6_anchor" aria-expanded="true" id="ab74af9e-fa0e-11e6-9e3e-026d961c88e6" class="jstree-node" data-bind="css: {'jstree-open': (node.children.length > 0 && node.expanded), 'jstree-closed' : (node.children.length > 0 && !node.expanded()), 'jstree-leaf': node.children.length === 0}">
+        <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){node.expanded(!node.expanded())}"></i>
+        <a class="jstree-anchor" href="#" tabindex="-1">
+            <i data-bind="css: node.iconclass" role="presentation"></i>
+            <span data-bind="text: node.name"></span>
+            <i class="jstree-delete-node fa fa-trash" role="presentation"></i>
+            <i class="jstree-delete-node fa fa-plus-circle" role="presentation"></i>
+        </a>
+        <ul class="jstree-children" aria-expanded="true" data-bind="if: node.children.length > 0">
+            <div data-bind="template: {
+                name: 'graph-tree',
+                foreach: node.children,
+                as: 'node'
+            }"></div>
+        </ul>
+    </li>
+</template>
