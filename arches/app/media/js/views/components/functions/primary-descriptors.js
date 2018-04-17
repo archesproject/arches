@@ -11,21 +11,8 @@ function ($, arches, ko, koMapping, FunctionViewModel, chosen) {
             var nodegroups = {};
             this.cards = ko.observableArray();
             this.loading = ko.observable(false);
-
             this.cards.unshift({
-                // 'active': true,
-                // 'cardid': null,
-                // 'description': "",
-                // 'graph_id': null,
-                // 'helpenabled': false,
-                // 'helptext': null,
-                // 'helptitle': null,
-                // 'instructions': "",
-                // 'is_editable': true,
                 'name': null,
-                // 'nodegroup_id': null
-                // 'sortorder': null,
-                // 'visible': true
             });
 
             this.graph.cards.forEach(function(card){
