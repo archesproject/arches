@@ -566,7 +566,8 @@ class Command(BaseCommand):
             'EMAIL_HOST',
             'EMAIL_HOST_USER',
             'EMAIL_HOST_PASSWORD',
-            'EMAIL_PORT'
+            'EMAIL_PORT',
+            'ANALYSIS_COORDINATE_SYSTEM_SRID'
             ]
 
         with open('arches/install/arches-templates/project_name/settings_local.py-tpl', 'w') as f:

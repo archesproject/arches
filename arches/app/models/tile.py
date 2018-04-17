@@ -160,7 +160,7 @@ class Tile(models.TileModel):
         super(Tile, self).save(*args, **kwargs)
         self.save_edit(user=user, edit_type=edit_type, old_value=old_data, new_value=self.data)
 
-        if index and unicode(self.resourceinstance.graph_id) != unicode(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
+        if index:
             self.index()
         for tiles in self.tiles.itervalues():
             for tile in tiles:
