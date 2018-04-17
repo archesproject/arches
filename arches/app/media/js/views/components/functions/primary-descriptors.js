@@ -12,6 +12,22 @@ function ($, arches, ko, koMapping, FunctionViewModel, chosen) {
             this.cards = ko.observableArray();
             this.loading = ko.observable(false);
 
+            this.cards.unshift({
+                // 'active': true,
+                // 'cardid': null,
+                // 'description': "",
+                // 'graph_id': null,
+                // 'helpenabled': false,
+                // 'helptext': null,
+                // 'helptitle': null,
+                // 'instructions': "",
+                // 'is_editable': true,
+                'name': null,
+                // 'nodegroup_id': null
+                // 'sortorder': null,
+                // 'visible': true
+            });
+
             this.graph.cards.forEach(function(card){
                 var found = !!_.find(this.graph.nodegroups, function(nodegroup){
                     return nodegroup.parentnodegroup_id === card.nodegroup_id
@@ -23,6 +39,7 @@ function ($, arches, ko, koMapping, FunctionViewModel, chosen) {
             }, this);
 
             this.name = params.config.name;
+
             this.description = params.config.description;
             this.map_popup = params.config.map_popup;
 
@@ -57,7 +74,8 @@ function ($, arches, ko, koMapping, FunctionViewModel, chosen) {
                     }
                 });
             }
-
+            console.log(this.cards());
+            console.log(this.name.nodegroup_id());
             window.setTimeout(function(){$("select[data-bind^=chosen]").trigger("chosen:updated")}, 300);
         },
         template: {
