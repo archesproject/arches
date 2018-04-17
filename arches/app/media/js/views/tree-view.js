@@ -66,6 +66,9 @@ define([
                 if (!item.selected) {
                     item.selected = ko.observable(false);
                 }
+                if (!item.expanded) {
+                    item.expanded = ko.observable(false);
+                }
             }
 
             this.items.subscribe(function (items) {
@@ -144,7 +147,27 @@ define([
         */
         clearSearch: function(){
             this.filter('');
-        }
+        },
+
+        /**
+        * Reset the search string to blank
+        * @memberof TreeView.prototype
+        */
+        expandAll: function(){
+            this.items().forEach(function(item){
+                item.expanded(true);
+            }, this);
+        },
+
+        /**
+        * Reset the search string to blank
+        * @memberof TreeView.prototype
+        */
+        collapseAll: function(){
+            this.items().forEach(function(item){
+                item.expanded(false);
+            }, this);
+        },
     });
 
     return TreeView;

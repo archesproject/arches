@@ -39,7 +39,6 @@ define([
 
             this.items().forEach(function(node){
                 node.children = [];
-                node.expanded = ko.observable(false);
                 node.parent = edge_map[node.id] ? edge_map[node.id] : '#';
             });
 

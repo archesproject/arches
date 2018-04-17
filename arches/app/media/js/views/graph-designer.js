@@ -5,8 +5,7 @@ define([
     'models/graph',
     'views/graph/graph-tree',
     'graph-designer-data',
-    'bindings/resizable-sidepanel',
-    'bindings/tree-viewer'
+    'bindings/resizable-sidepanel'
 ], function(_, ko, BaseManagerView, GraphModel, GraphTree, data) {
     var viewModel = {
         dataFilter: ko.observable(''),
@@ -14,10 +13,12 @@ define([
         graphid: ko.observable(data.graphid),
         activeTab: ko.observable('graph'),
         viewState: ko.observable('design'),
-        treePlugin: {},
-        open_all: function(){
-            viewModel.treePlugin.open_all();
-        }
+        expandAll: function(){
+            viewModel.graphTree.expandAll();
+        },
+        collapseAll: function(){
+            viewModel.graphTree.collapseAll();
+        },
     }
 
     viewModel.graphModel = new GraphModel({
@@ -29,7 +30,7 @@ define([
     viewModel.graphTree = new GraphTree({
         graphModel: viewModel.graphModel
     });
-    console.log(viewModel.graphTree.tree);
+
 
     if (viewModel.activeTab() === 'graph') {
         // here we might load data/views asyncronously
