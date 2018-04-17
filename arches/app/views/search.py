@@ -418,7 +418,7 @@ def _buffer(geojson, width=0, unit='ft'):
         if unit == 'ft':
             width = width/3.28084
 
-        geom.transform(3857)
+        geom.transform(settings.ANALYSIS_COORDINATE_SYSTEM_SRID)
         geom = geom.buffer(width)
         geom.transform(4326)
 

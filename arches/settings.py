@@ -138,6 +138,8 @@ PREFERRED_COORDINATE_SYSTEMS = (
     {"name": "Geographic", "srid": "4326", "proj4": "+proj=longlat +datum=WGS84 +no_defs", "default": True}, #Required
 )
 
+ANALYSIS_COORDINATE_SYSTEM_SRID = 3857 #Coord sys units must be meters
+
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
