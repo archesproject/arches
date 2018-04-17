@@ -62,7 +62,7 @@ class BaseConceptDataType(BaseDataType):
 
 class ConceptDataType(BaseConceptDataType):
 
-    def validate(self, value, source=''):
+    def validate(self, value, row_number=None, source=''):
         errors = []
 
         ## first check to see if the validator has been passed a valid UUID,
@@ -71,7 +71,7 @@ class ConceptDataType(BaseConceptDataType):
             uuid.UUID(str(value))
         except ValueError:
             message = "This is an invalid concept prefLabel, or an incomplete UUID"
-            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, message, 'This data was not imported.')})
+            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} {3} - {4}. {5}'.format(self.datatype_model.datatype, value, source, row_number, message, 'This data was not imported.')})
             return errors
 
         ## if good UUID, test whether it corresponds to an actual Value object
@@ -79,7 +79,7 @@ class ConceptDataType(BaseConceptDataType):
             models.Value.objects.get(pk=value)
         except ObjectDoesNotExist:
             message = "This UUID does not correspond to a valid domain value"
-            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, message, 'This data was not imported.')})
+            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} {3} - {4}. {5}'.format(self.datatype_model.datatype, value, source, row_number, message, 'This data was not imported.')})
         return errors
 
     def transform_import_values(self, value, nodeid):
@@ -114,14 +114,14 @@ class ConceptDataType(BaseConceptDataType):
 
 
 class ConceptListDataType(BaseConceptDataType):
-    def validate(self, value, source=''):
+    def validate(self, value, row_number=None, source=''):
         errors = []
 
         ## iterate list of values and use the concept validation on each one
         validate_concept = DataTypeFactory().get_instance('concept')
         for v in value:
             val = v.strip()
-            errors += validate_concept.validate(val)
+            errors += validate_concept.validate(val, row_number)
         return errors
 
     def transform_import_values(self, value, nodeid):
@@ -140,9 +140,10 @@ class ConceptListDataType(BaseConceptDataType):
 
     def get_display_value(self, tile, node):
         new_values = []
-        for val in tile.data[str(node.nodeid)]:
-            new_val = self.get_value(uuid.UUID(val))
-            new_values.append(new_val.value)
+        if tile.data[str(node.nodeid)]:
+            for val in tile.data[str(node.nodeid)]:
+                new_val = self.get_value(uuid.UUID(val))
+                new_values.append(new_val.value)
         return ','.join(new_values)
 
     def append_search_filters(self, value, node, query, request):
