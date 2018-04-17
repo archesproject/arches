@@ -24,6 +24,7 @@ from arches.app.views import concept, main, map, search, graph, tileserver, api
 from arches.app.views.admin import ReIndexResources
 from arches.app.views.graph import GraphDesignerView, GraphManagerView, GraphSettingsView, NewGraphSettingsView, GraphDataView, DatatypeTemplateView, CardManagerView, CardView, FormManagerView, FormView, ReportManagerView, ReportEditorView, FunctionManagerView, PermissionManagerView, PermissionDataView
 from arches.app.views.resource import ResourceEditorView, ResourceListView, ResourceData, ResourceCards, ResourceReportView, ResourceReportData, RelatedResourcesView, ResourceDescriptors, ResourceEditLogView, ResourceTiles
+from arches.app.views.resource import NewResourceEditorView
 from arches.app.views.concept import RDMView
 from arches.app.views.user import UserManagerView
 from arches.app.views.tile import TileData
@@ -101,6 +102,7 @@ urlpatterns = [
     url(r'^resource$', ResourceListView.as_view(), name='resource'),
     url(r'^resource/(?P<resourceid>%s)/(?P<graphid>%s)/add_resource$' % (uuid_regex, uuid_regex), ResourceEditorView.as_view(), name='add_resource'),
     url(r'^resource/(?P<resourceid>%s)$' % uuid_regex, ResourceEditorView.as_view(), name='resource_editor'),
+    url(r'^resource-new/(?P<resourceid>%s)$' % uuid_regex, NewResourceEditorView.as_view(), name='new_resource_editor'),
     url(r'^resource/(?P<resourceid>%s)/copy$' % uuid_regex, ResourceEditorView.as_view(action='copy'), name='resource_copy'),
     url(r'^resource/(?P<resourceid>%s)/history$' % uuid_regex, ResourceEditLogView.as_view(), name='resource_edit_log'),
     url(r'^resource/(?P<resourceid>%s)/data/(?P<formid>%s)$' % (uuid_regex, uuid_regex), ResourceData.as_view(), name='resource_data'),

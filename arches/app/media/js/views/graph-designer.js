@@ -5,17 +5,16 @@ define([
     'views/base-manager',
     'graph-designer-data',
     'arches',
-    'viewmodels/graph-settings'
+    'viewmodels/graph-settings',
+    'bindings/resizable-sidepanel'
 ], function($, _, ko, BaseManagerView, data, arches, GraphSettingsViewModel) {
 
-    var currentWidth, start;
     var viewModel = {
         dataFilter: ko.observable(''),
         placeholder: ko.observable(''),
         graphid: ko.observable(data.graphid),
         activeTab: ko.observable('graph'),
         viewState: ko.observable('design'),
-        leftPanelFlex: ko.observable('0 0 270'),
         graphSettingsVisible: ko.observable(false),
         contentLoading: ko.observable(false)
     }
@@ -53,18 +52,6 @@ define([
     }else{
 
     }
-
-    document.getElementById('draggable').ondragstart = function(e) {
-        start = e.pageX;
-        currentWidth = $('#left-panel').width();
-    };
-    document.addEventListener('dragover', function(e){
-        e = e || window.event;
-        var dragX = e.pageX, dragY = e.pageY;
-        var width = start - dragX;
-
-        viewModel.leftPanelFlex('0 0 ' + (currentWidth - width + 15) + 'px');
-    }, false);
 
     return new BaseManagerView({
         viewModel: viewModel
