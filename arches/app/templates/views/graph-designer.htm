@@ -78,10 +78,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="tab-content" >
                 <!-- Summary Card -->
                 <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'graph' }">
-                    <div data-bind="click: open_all">expand all</div>
+                    <div data-bind="click: open_all" style="height: 32px">expand all</div>
                     <!-- <div data-bind="treeViewer: {'data': graphModel.get('nodes')(), 'pluginref': 'treePlugin'}"></div> -->
-                    <div class="" id="node-listing" data-bind="with: graphTree.tree">
-                        {% include 'views/graph/graph-manager/graph-tree.htm' %}
+                    <div class="" data-bind="with: graphTree">
+                        {% include 'views/graph/graph-tree.htm' %}
                     </div>
                 </div>
                 <!-- Summary Card -->

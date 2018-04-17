@@ -3,7 +3,7 @@ define([
     'knockout',
     'views/base-manager',
     'models/graph',
-    'views/graph/graph-manager/graph-tree',
+    'views/graph/graph-tree',
     'graph-designer-data',
     'bindings/resizable-sidepanel',
     'bindings/tree-viewer'
@@ -27,7 +27,6 @@ define([
     });
 
     viewModel.graphTree = new GraphTree({
-        el: $('#node-listing'),
         graphModel: viewModel.graphModel
     });
     console.log(viewModel.graphTree.tree);
