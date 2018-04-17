@@ -247,7 +247,7 @@ class Tile(models.TileModel):
             else:
                 self.save_edit(user=user, edit_type=edit_type, old_value=existing_model.data, new_value=self.data, newprovisionalvalue=newprovisionalvalue, oldprovisionalvalue=oldprovisionalvalue)
 
-        if index and unicode(self.resourceinstance.graph_id) != unicode(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
+        if index:
             self.index()
         for tiles in self.tiles.itervalues():
             for tile in tiles:
