@@ -18,6 +18,7 @@
 @import url(../packages/nvd3/build/nv.d3.min.css);
 @import url(../packages/leaflet/dist/leaflet.css);
 @import url(../packages/leaflet-draw/dist/leaflet.draw.css);
+@import url(../css/tree/tree.css);
 .regular-link {
     color: #337ab7;
     text-decoration: none;
@@ -391,6 +392,18 @@ input[type="checkbox"] {
 .wizard-buttons {
     direction: rtl;
     padding: 5px 0 10px 10px;
+}
+
+.graph-settings-header {
+    color: #777;
+    font-size: 17px;
+    border-bottom: solid 1px #ccc;
+}
+
+.graph-settings-crud {
+    margin-right: 0px;
+    position: absolute;
+    right: 10px;
 }
 
 .summary-panel {
@@ -2579,6 +2592,37 @@ div.dropdown-menu.open {
     transform: translate(0, 0);
     z-index: 100000001;
 }
+
+.graph-designer-loading-mask {
+    position: relative;
+    opacity: .5;
+    background-color: gray;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100000000;
+}
+
+.graph-designer-loading-mask:after {
+    position: fixed;
+    opacity: .5;
+    color: #000;
+    content: '\f110';
+    -webkit-animation: fa-spin 2s infinite linear;
+    animation: fa-spin 2s infinite linear;
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: 14vw;
+    margin-top: 42vh;
+    margin-left: 32vw;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transform: translate(0, 0);
+    z-index: 100000001;
+}
+
 
 .card-form-preview-container.loading-mask {
     position: relative;
@@ -9780,6 +9824,18 @@ a.search-facet-item.disabled {
     margin-top: 10px;
 }
 
+.nav-tabs li a.graph-designer-tab {
+    padding: 15px 25px 15px 25px;
+}
+
+.viewstate-btn {
+    width: 100px;
+}
+
+.viewstate-btn.active {
+    background-color: white;
+}
+
 #identities-card .library-card:not(.selected-card) {
     border-left: 1px solid transparent;
 }
@@ -10642,6 +10698,34 @@ ul.select2-choices:after {
     border-top: 5px solid #333;
     border-left: 5px solid transparent;
     border-right: 5px solid transparent;
+}
+
+.sidepanel-draggable {
+    background-color: #ffffff;
+    border-left: solid 1px gainsboro;
+    border-right: solid 1px gainsboro;
+    height:100%;
+}
+
+.sidepanel-draggable div {
+    cursor: col-resize;
+    position: relative;top: 50%;
+    transform: translateY(-50%);
+    margin: 1px;
+}
+
+.sidepanel-draggable div i {
+    display: block;
+    color: rgb(190, 190, 190);
+}
+
+.left-panel {
+    width: 270px;
+}
+
+.main-panel{
+    background-color: #ffffff;
+    flex: 1
 }
 
 @keyframes loader {

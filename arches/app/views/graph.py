@@ -30,6 +30,7 @@ from django.http import HttpResponseNotFound, QueryDict, HttpResponse
 from django.views.generic import View, TemplateView
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
+from django.template.loader import render_to_string
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.response import JSONResponse
@@ -113,6 +114,7 @@ class GraphSettingsView(GraphBaseView):
 
         return render(request, 'views/graph/graph-settings.htm', context)
 
+
     def post(self, request, graphid):
         graph = Graph.objects.get(graphid=graphid)
         data = JSONDeserializer().deserialize(request.body)
@@ -136,6 +138,80 @@ class GraphSettingsView(GraphBaseView):
             'graph': graph,
             'relatable_resource_ids': [res.nodeid for res in node.get_relatable_resources()]
         })
+
+
+@method_decorator(group_required('Graph Editor'), name='dispatch')
+class NewGraphSettingsView(GraphBaseView):
+    def get(self, request, graphid):
+        self.graph = Graph.objects.get(graphid=graphid)
+        icons = models.Icon.objects.order_by('name')
+        resource_graphs = models.GraphModel.objects.filter(Q(isresource=True)).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+        resource_data = []
+        node = models.Node.objects.get(graph_id=graphid, istopnode=True)
+        relatable_resources = node.get_relatable_resources()
+        for res in resource_graphs:
+            if models.Node.objects.filter(graph=res, istopnode=True).count() > 0:
+                node_model = models.Node.objects.get(graph=res, istopnode=True)
+                resource_data.append({
+                    'id': node_model.nodeid,
+                    'graph': res,
+                    'is_relatable': (node_model in relatable_resources)
+                })
+
+        ontologies = models.Ontology.objects.filter(parentontology=None)
+        ontology_classes = models.OntologyClass.objects.values('source', 'ontology_id')
+        node_count=models.Node.objects.filter(graph=self.graph).count()
+        # context = self.get_context_data(
+        #     node_count=models.Node.objects.filter(graph=self.graph).count()
+        # )
+
+        data = {
+            'icons': JSONSerializer().serializeToPython(icons),
+            'node': JSONSerializer().serializeToPython(node),
+            'ontologies': JSONSerializer().serializeToPython(ontologies),
+            'ontologyClasses': JSONSerializer().serializeToPython(ontology_classes),
+            'resources': JSONSerializer().serializeToPython(resource_data),
+            'ontology_namespaces': get_ontology_namespaces()
+        }
+        #
+        # context = self.get_context_data(
+        #     node_count=models.Node.objects.filter(graph=self.graph).count(),
+        # )
+        #
+        # context['nav']['title'] = self.graph.name
+        # context['nav']['menu'] = True
+        # context['nav']['help'] = (_('Defining Settings'),'help/base-help.htm')
+        # context['help'] = 'settings-help'
+
+        # html = render_to_string('views/new-graph-settings.htm', context, request)
+        return JSONResponse(data)
+
+
+    def post(self, request, graphid):
+        graph = Graph.objects.get(graphid=graphid)
+        data = JSONDeserializer().deserialize(request.body)
+        for key, value in data.get('graph').iteritems():
+            if key in ['iconclass', 'name', 'author', 'description', 'isresource',
+                'ontology_id', 'version',  'subtitle', 'isactive']:
+                setattr(graph, key, value)
+
+        node = models.Node.objects.get(graph_id=graphid, istopnode=True)
+        root_node_config = [graph_node['config'] for graph_node in data.get('graph').get('nodes') if graph_node['istopnode']==True][0]
+        node.config = root_node_config
+        node.set_relatable_resources(data.get('relatable_resource_ids'))
+        node.ontologyclass = data.get('ontology_class') if data.get('graph').get('ontology_id') is not None else None
+
+        with transaction.atomic():
+            graph.save()
+            node.save()
+
+        return JSONResponse({
+            'success': True,
+            'graph': graph,
+            'relatable_resource_ids': [res.nodeid for res in node.get_relatable_resources()]
+        })
+
+
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
 class GraphManagerView(GraphBaseView):
@@ -162,7 +238,7 @@ class GraphManagerView(GraphBaseView):
             branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         concept_collections = Concept().concept_tree(mode='collections', lang=lang)
-        datatypes_json = JSONSerializer().serialize(datatypes, exclude=['iconclass','modulename','isgeometric'])
+        datatypes_json = JSONSerializer().serialize(datatypes, exclude=['modulename','isgeometric'])
         context = self.get_context_data(
             main_script='views/graph/graph-manager',
             branches=JSONSerializer().serialize(branch_graphs, exclude=['cards','domain_connections', 'functions', 'cards', 'deploymentfile', 'deploymentdate']),
@@ -194,6 +270,29 @@ class GraphManagerView(GraphBaseView):
         graph = Graph.objects.get(graphid=graphid)
         graph.delete()
         return JSONResponse({'succces':True})
+
+
+@method_decorator(group_required('Graph Editor'), name='dispatch')
+class GraphDesignerView(GraphBaseView):
+    def get(self, request, graphid):
+        self.graph = Graph.objects.get(graphid=graphid)
+        ontologies = models.Ontology.objects.filter(parentontology=None)
+        ontology_classes = models.OntologyClass.objects.values('source', 'ontology_id')
+        datatypes = models.DDataType.objects.all()
+        datatypes_json = JSONSerializer().serialize(datatypes, exclude=['modulename','isgeometric'])
+        context = self.get_context_data(
+            main_script='views/graph-designer',
+            datatypes=datatypes_json,
+            ontology_namespaces = get_ontology_namespaces()
+        )
+        context['ontologies'] = JSONSerializer().serialize(ontologies)
+        context['ontology_classes'] = JSONSerializer().serialize(ontology_classes)
+        context['nav']['title'] = self.graph.name
+        #context['nav']['menu'] = True
+        context['graph_models'] = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+        context['graphs'] = JSONSerializer().serialize(context['graph_models'], exclude = ['functions'])
+        context['graph'] = JSONSerializer().serialize(self.graph, exclude = ['functions'])
+        return render(request, 'views/graph-designer.htm', context)
 
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
