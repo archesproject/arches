@@ -27,7 +27,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <!-- Card Filter Widget -->
 <div id="card-grid-tools" style="display: none;" data-bind="visible: forms">
     <div class="ep-card-search">
-        <select data-placeholder="{% trans "Select a form..." %}" class="design" data-bind="value: selectedFormId, options: formOptions, optionsText: 'title', optionsValue: 'formid', chosen: {width: '100%'}">
+        <select data-placeholder="{% trans "Edit an existing Menu..." %}" class="design" data-bind="value: selectedFormId, options: formOptions, optionsText: 'title', optionsValue: 'formid', chosen: {width: '100%'}">
 
         </select>
     </div>
@@ -77,12 +77,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <!-- Form Tools -->
                             <div class="panel-footer" style="height: 40px;">
                                 <span data-bind="if:visible">
-                                    <i class="fa fa-check-circle"></i> Active
+                                    <i class="fa fa-check-circle"></i> {% trans "Active" %}
                                 </span>
                                 <span data-bind="if:!visible">
-                                    <i class="fa fa-minus-circle"></i> Inactive
+                                    <i class="fa fa-minus-circle"></i> {% trans "Inactive" %}
                                 </span>
-                                <a href="#" class="pull-right" data-bind="click: $root.deleteForm, clickBubble: false"><i class="ion-minus-circled"></i> Delete Menu</a>
+                                <a href="#" class="pull-right" data-bind="click: $root.deleteForm, clickBubble: false"><i class="ion-minus-circled"></i> {% trans "Delete Menu" %}</a>
                             </div>
                         </div>
                     </div>

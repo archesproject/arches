@@ -25,12 +25,6 @@ Encoding Rules:
    For instance "O3_sampled_from (was_sample_by)" is represented as:
    "O3_sampled_from" for the domain to range direction and "O3i_was_sample_by" for the range to domain direction.
 
-
-
-EDITS FOR ARCHES:
-Change any references in subProperties or domains/ranges from external reference literals to 
-CRM literal classes (E62_String, etc..).
-
 -->
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
         xml:base="http://www.ics.forth.gr/isl/CRMsci/" xml:lang="en">
@@ -40,10 +34,10 @@ CRM literal classes (E62_String, etc..).
             This class comprises the activities that result in an instance of S10 Material Substantial being decreased by the removal of an amount of matter.
 Typical scenarios include the removal of a component or piece of a physical object, removal of an archaeological or geological layer, taking a tissue sample from a body or a sample of fluid from a body of water. The removed matter may acquire a persistent identity of different nature beyond the act of its removal, such as becoming a physical object in the narrower sense. Such cases should be modeled by using multiple instantiation with adequate concepts of creating the respective items.
         </rdfs:comment>
-        <rdfs:subClassOf rdf:resource="E7_Activity"/>
+        <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E7_Activity"/>
     </rdfs:Class>
 
-    <rdfs:Class  rdf:about="E80_Part_Removal">
+    <rdfs:Class  rdf:about="http://www.cidoc-crm.org/cidoc-crm/E80_Part_Removal">
         <rdfs:subClassOf rdf:resource="S1_Matter_Removal"/>
     </rdfs:Class>
 
@@ -66,14 +60,14 @@ Typical scenarios include the removal of a component or piece of a physical obje
         <rdfs:comment>
             This class comprises the activity of gaining scientific knowledge about particular states of physical reality gained by empirical evidence, experiments and by measurements. We define observation in the sense of natural sciences, as a kind of human activity: at some Place and within some Time-Span, certain Physical Things and their behavior and interactions are observed, either directly by human sensory impression, or enhanced with tools and measurement devices. The output of the internal processes of measurement devices that do not require additional human interaction are in general regarded as part of the observation and not as additional inference. Manual recordings may serve as additional evidence. Measurements and witnessing of events are special cases of observations. Observations result in a belief about certain propositions. In this model, the degree of confidence in the observed properties is regarded to be “true” per default, but could be described differently by adding a property P3 has note to an instance of S4 Observation, or by reification of the property O16 observed value. Primary data from measurement devices are regarded in this model to be results of observation and can be interpreted as propositions believed to be true within the (known) tolerances and degree of reliability of the device. Observations represent the transition between reality and propositions in the form of instances of a formal ontology, and can be subject to data evaluation from this point on.
         </rdfs:comment>
-        <rdfs:subClassOf rdf:resource="E13_Attribute_Assignment"/>
+        <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E13_Attribute_Assignment"/>
     </rdfs:Class>
 
     <rdfs:Class rdf:about="S5_Inference_Making">
         <rdfs:comment>
             This class comprises the action of concluding propositions on a respective reality from observational data by making evaluations based on mathematical inference rules and calculations using established hypotheses, such as the calculation of an earthquake epicenter. S6 Data Evaluation is not defined as S21/E16 Measurement; Secondary derivations of dimensions of an object from data measured by different processes are regarded as S6 Data Evaluation and not determining instances of Measurement in its own right. For instance, the volume of a statue concluded from a 3D model is an instance of S6 Data Evaluation and not of Measurement.
         </rdfs:comment>
-        <rdfs:subClassOf rdf:resource="E13_Attribute_Assignment"/>
+        <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E13_Attribute_Assignment"/>
     </rdfs:Class>
 
     <rdfs:Class rdf:about="S6_Data_Evaluation">
@@ -101,17 +95,17 @@ Typical scenarios include the removal of a component or piece of a physical obje
         <rdfs:comment>
             This class comprises types of properties. Typically, instances of S9 Property Type would be taken from an ontology or terminological system. In particular, instances of this class can be used to describe in a parametric way what kind of properties the values in scientific data sets are about. By virtue of such descriptions, numeric data can be interpreted as sets of propositions in terms of a formal ontology, such as “concentration of nitrate”, observed in the ground water from a certain borehole.
         </rdfs:comment>
-        <rdfs:subClassOf rdf:resource="E55_Type"/>
+        <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E55_Type"/>
     </rdfs:Class>
 
     <rdfs:Class rdf:about="S10_Material_Substantial">
         <rdfs:comment>
             This class comprises constellations of matter with a relative stability of any form sufficient to associate them with a persistent identity, such as being confined to certain extent, having a relative stability of form or structure, or containing a fixed amount of matter. In particular, it comprises physical things in the narrower sense and fluid bodies. It is an abstraction of physical substance for solid and non-solid things of matter.
         </rdfs:comment>
-        <rdfs:subClassOf rdf:resource="E70_Thing"/>
+        <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E70_Thing"/>
     </rdfs:Class>
 
-    <rdfs:Class  rdf:about="E18_Physical_Thing">
+    <rdfs:Class  rdf:about="http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing">
         <rdfs:subClassOf rdf:resource="S10_Material_Substantial"/>
     </rdfs:Class>
 
@@ -151,14 +145,14 @@ Typical scenarios include the removal of a component or piece of a physical obje
 Conceptual objects can be present in events by their carriers such as books, digital media, or even human memory. By virtue of this presence, properties of conceptual objects, such as number of words can be observed on their carriers. If the respective properties between carriers differ, either they carry different instances of conceptual objects or the difference can be attributed to accidental deficiencies in one of the carriers. In that sense even immaterial objects are observable. By this model we give credit to the fact that frequently, the actually observed carriers of conceptual objects are not explicitly identified in documentation, i.e., the actual carrier is assumed having existed but is unknown as an individual.
 
         </rdfs:comment>
-        <rdfs:subClassOf rdf:resource="E1_CRM_Entity"/>
+        <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"/>
     </rdfs:Class>
 
-    <rdfs:Class  rdf:about="E2_Temporal_Entity">
+    <rdfs:Class  rdf:about="http://www.cidoc-crm.org/cidoc-crm/E2_Temporal_Entity">
         <rdfs:subClassOf rdf:resource="S15_Observable_Entity"/>
     </rdfs:Class>
 
-    <rdfs:Class  rdf:about="E77_Persistent_Item">
+    <rdfs:Class  rdf:about="http://www.cidoc-crm.org/cidoc-crm/E77_Persistent_Item">
         <rdfs:subClassOf rdf:resource="S15_Observable_Entity"/>
     </rdfs:Class>
 
@@ -167,10 +161,10 @@ Conceptual objects can be present in events by their carriers such as books, dig
             This class comprises the persistence of a particular value range of the properties of a particular thing or things over a time-span.
 
         </rdfs:comment>
-        <rdfs:subClassOf rdf:resource="E2_Temporal_Entity"/>
+        <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E2_Temporal_Entity"/>
     </rdfs:Class>
 
-    <rdfs:Class  rdf:about="E3_Condition_State">
+    <rdfs:Class  rdf:about="http://www.cidoc-crm.org/cidoc-crm/E3_Condition_State">
         <rdfs:subClassOf rdf:resource="S16_State"/>
     </rdfs:Class>
 
@@ -178,11 +172,11 @@ Conceptual objects can be present in events by their carriers such as books, dig
         <rdfs:comment>
             This class comprises events or processes that result in (generate) physical things, man-made or natural, coming into being in the form by which they are later identified. The creation of a new physical item, at the same time, can be a result of an alteration (modification) – it can become a new thing due to an alteration activity.
         </rdfs:comment>
-        <rdfs:subClassOf rdf:resource="E63_Beginning_of_Existence"/>
+        <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E63_Beginning_of_Existence"/>
         <rdfs:subClassOf rdf:resource="S18_Alteration"/>
     </rdfs:Class>
 
-    <rdfs:Class  rdf:about="E12_Production">
+    <rdfs:Class  rdf:about="http://www.cidoc-crm.org/cidoc-crm/E12_Production">
         <rdfs:subClassOf rdf:resource="S17_Physical_Genesis"/>
     </rdfs:Class>
 
@@ -190,10 +184,10 @@ Conceptual objects can be present in events by their carriers such as books, dig
         <rdfs:comment>
             This class comprises natural events or man-made processes that create, alter or change physical things, by affecting permanently their form or consistency without changing their identity. Examples include alterations on depositional features-layers by natural factors or disturbance by roots or insects, organic alterations, petrification, etc.
         </rdfs:comment>
-        <rdfs:subClassOf rdf:resource="E5_Event"/>
+        <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E5_Event"/>
     </rdfs:Class>
 
-    <rdfs:Class  rdf:about="E11_Modification">
+    <rdfs:Class  rdf:about="http://www.cidoc-crm.org/cidoc-crm/E11_Modification">
         <rdfs:subClassOf rdf:resource="S18_Alteration"/>
     </rdfs:Class>
 
@@ -214,15 +208,15 @@ Instances of E26 Physical Feature share many of the attributes of instances of E
 Instances of E26 Physical Feature can be features in a narrower sense, such as scratches, holes, reliefs, surface colors, reflection zones in an opal crystal or a density change in a piece of wood. In the wider sense, they are portions of particular objects with partially imaginary borders, such as the core of the Earth, an area of property on the surface of the Earth, a landscape or the head of a contiguous marble statue. They can be measured and dated, and it is sometimes possible to state who or what is or was responsible for them. They cannot be separated from the carrier object, but a segment of the carrier object may be identified (or sometimes removed) carrying the complete feature.
 This definition coincides with the definition of "fiat objects" (Smith and Varzi, 2000, pp.401-420), with the exception of aggregates of “bona fide objects”.
         </rdfs:comment>
-        <rdfs:subClassOf rdf:resource="E18_Physical_Thing"/>
-        <rdfs:subClassOf rdf:resource="E53_Place"/>
+        <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing"/>
+        <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
     </rdfs:Class>
 
-    <rdfs:Class  rdf:about="E27_Site">
+    <rdfs:Class  rdf:about="http://www.cidoc-crm.org/cidoc-crm/E27_Site">
         <rdfs:subClassOf rdf:resource="S20_Physical_Feature"/>
     </rdfs:Class>
 
-    <rdfs:Class  rdf:about="E25_Man-Made_Feature">
+    <rdfs:Class  rdf:about="http://www.cidoc-crm.org/cidoc-crm/E25_Man-Made_Feature">
         <rdfs:subClassOf rdf:resource="S20_Physical_Feature"/>
     </rdfs:Class>
 
@@ -231,7 +225,7 @@ This definition coincides with the definition of "fiat objects" (Smith and Varzi
             This class comprises actions measuring instances of E2 Temporal Entity or E77 Persistent Items, properties of physical things, or phenomena, states and interactions or events, that can be determined by a systematic procedure. Primary data from measurement devices are regarded to be results of an observation process.
         </rdfs:comment>
         <rdfs:subClassOf rdf:resource="S4_Observation"/>
-        <rdfs:subClassOf rdf:resource="E16_Measurement"/>
+        <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E16_Measurement"/>
     </rdfs:Class>
 
     <rdfs:Class rdf:about="S22_Segment_of_Matter">
@@ -275,11 +269,11 @@ This definition coincides with the definition of "fiat objects" (Smith and Varzi
 
     <rdf:Property rdf:about="O4_sampled_at">
         <rdfs:domain rdf:resource="S2_Sample_Taking"/>
-        <rdfs:range rdf:resource="E53_Place"/>
+        <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
     </rdf:Property>
 
     <rdf:Property rdf:about="O4i_was_sampling_location_of">
-        <rdfs:domain rdf:resource="E53_Place"/>
+        <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
         <rdfs:range rdf:resource="S2_Sample_Taking"/>
     </rdf:Property>
 
@@ -306,25 +300,25 @@ This definition coincides with the definition of "fiat objects" (Smith and Varzi
     </rdf:Property>
 
     <rdf:Property rdf:about="O7_contains_or_confines">
-        <rdfs:domain rdf:resource="E53_Place"/>
-        <rdfs:range rdf:resource="E53_Place"/>
+        <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
+        <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
     </rdf:Property>
 
     <rdf:Property rdf:about="O7i_is_contained_or_confined">
-        <rdfs:domain rdf:resource="E53_Place"/>
-        <rdfs:range rdf:resource="E53_Place"/>
+        <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
+        <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
     </rdf:Property>
 
     <rdf:Property rdf:about="O8_observed">
         <rdfs:domain rdf:resource="S4_Observation"/>
         <rdfs:range rdf:resource="S15_Observable_Entity"/>
-        <rdfs:subPropertyOf rdf:resource="P140_assigned_attribute_to"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P140_assigned_attribute_to"/>
     </rdf:Property>
 
     <rdf:Property rdf:about="O8i_was_observed_by">
         <rdfs:domain rdf:resource="S15_Observable_Entity"/>
         <rdfs:range rdf:resource="S4_Observation"/>
-        <rdfs:subPropertyOf rdf:resource="P140i_was_attributed_by"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P140i_was_attributed_by"/>
     </rdf:Property>
 
     <rdf:Property rdf:about="O9_observed_property_type">
@@ -339,11 +333,11 @@ This definition coincides with the definition of "fiat objects" (Smith and Varzi
 
     <rdf:Property rdf:about="O10_assigned_dimension">
         <rdfs:domain rdf:resource="S6_Data_Evaluation"/>
-        <rdfs:range rdf:resource="E54_Dimension"/>
+        <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E54_Dimension"/>
     </rdf:Property>
 
     <rdf:Property rdf:about="O10i_dimension_was_assigned_by">
-        <rdfs:domain rdf:resource="E54_Dimension"/>
+        <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E54_Dimension"/>
         <rdfs:range rdf:resource="S6_Data_Evaluation"/>
     </rdf:Property>
 
@@ -359,119 +353,119 @@ This definition coincides with the definition of "fiat objects" (Smith and Varzi
 
     <rdf:Property rdf:about="O12_has_dimension">
         <rdfs:domain rdf:resource="S15_Observable_Entity"/>
-        <rdfs:range rdf:resource="E54_Dimension"/>
+        <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E54_Dimension"/>
     </rdf:Property>
 
     <rdf:Property rdf:about="O12i_is_dimension_of">
-        <rdfs:domain rdf:resource="E54_Dimension"/>
+        <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E54_Dimension"/>
         <rdfs:range rdf:resource="S15_Observable_Entity"/>
     </rdf:Property>
 
     <rdf:Property rdf:about="O13_triggers">
-        <rdfs:domain rdf:resource="E5_Event"/>
-        <rdfs:range rdf:resource="E5_Event"/>
+        <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E5_Event"/>
+        <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E5_Event"/>
     </rdf:Property>
 
     <rdf:Property rdf:about="O13i_is_triggered_by">
-        <rdfs:domain rdf:resource="E5_Event"/>
-        <rdfs:range rdf:resource="E5_Event"/>
+        <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E5_Event"/>
+        <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E5_Event"/>
     </rdf:Property>
 
     <rdf:Property rdf:about="O14_initializes">
-        <rdfs:domain rdf:resource="E5_Event"/>
+        <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E5_Event"/>
         <rdfs:range rdf:resource="S16_State"/>
     </rdf:Property>
 
     <rdf:Property rdf:about="O14i_is_initialized_by">
         <rdfs:domain rdf:resource="S16_State"/>
-        <rdfs:range rdf:resource="E5_Event"/>
+        <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E5_Event"/>
     </rdf:Property>
 
     <rdf:Property rdf:about="O15_occupied">
         <rdfs:domain rdf:resource="S10_Material_Substantial"/>
-        <rdfs:range rdf:resource="E53_Place"/>
+        <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
     </rdf:Property>
 
     <rdf:Property rdf:about="O15i_was_occupied_by">
-        <rdfs:domain rdf:resource="E53_Place"/>
+        <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
         <rdfs:range rdf:resource="S10_Material_Substantial"/>
     </rdf:Property>
 
     <rdf:Property rdf:about="O16_observed_value">
         <rdfs:domain rdf:resource="S4_Observation"/>
-        <rdfs:range rdf:resource="E1_CRM_Entity"/>
-        <rdfs:subPropertyOf rdf:resource="P141_assigned"/>
+        <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P141_assigned"/>
     </rdf:Property>
 
     <rdf:Property rdf:about="O16i_value_was_observed_by">
-        <rdfs:domain rdf:resource="E1_CRM_Entity"/>
+        <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"/>
         <rdfs:range rdf:resource="S4_Observation"/>
-        <rdfs:subPropertyOf rdf:resource="P141i_was_assigned_by"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P141i_was_assigned_by"/>
     </rdf:Property>
 
     <rdf:Property rdf:about="O17_generated">
         <rdfs:domain rdf:resource="S17_Physical_Genesis"/>
-        <rdfs:range rdf:resource="E18_Physical_Thing"/>
+        <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing"/>
     </rdf:Property>
 
     <rdf:Property rdf:about="O17i_was_generated_by">
-        <rdfs:domain rdf:resource="E18_Physical_Thing"/>
+        <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing"/>
         <rdfs:range rdf:resource="S17_Physical_Genesis"/>
     </rdf:Property>
 
-    <rdf:Property rdf:about="P108_has_produced">
+    <rdf:Property rdf:about="http://www.cidoc-crm.org/cidoc-crm/P108_has_produced">
         <rdfs:subPropertyOf rdf:resource="O17_generated"/>
     </rdf:Property>
 
-    <rdf:Property rdf:about="P108i_was_produced_by">
+    <rdf:Property rdf:about="http://www.cidoc-crm.org/cidoc-crm/P108i_was_produced_by">
         <rdfs:subPropertyOf rdf:resource="O17i_was_generated_by"/>
     </rdf:Property>
 
     <rdf:Property rdf:about="O18_altered">
         <rdfs:domain rdf:resource="S18_Alteration"/>
-        <rdfs:range rdf:resource="E18_Physical_Thing"/>
+        <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing"/>
     </rdf:Property>
 
     <rdf:Property rdf:about="O18i_was_altered_by">
-        <rdfs:domain rdf:resource="E18_Physical_Thing"/>
+        <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing"/>
         <rdfs:range rdf:resource="S18_Alteration"/>
     </rdf:Property>
 
-    <rdf:Property rdf:about="P31_has_modified">
+    <rdf:Property rdf:about="http://www.cidoc-crm.org/cidoc-crm/P31_has_modified">
         <rdfs:subPropertyOf rdf:resource="O18_altered"/>
     </rdf:Property>
 
-    <rdf:Property rdf:about="P31i_was_modified_by">
+    <rdf:Property rdf:about="http://www.cidoc-crm.org/cidoc-crm/P31i_was_modified_by">
         <rdfs:subPropertyOf rdf:resource="O18i_was_altered_by"/>
     </rdf:Property>
 
     <rdf:Property rdf:about="O19_has_found_object">
         <rdfs:domain rdf:resource="S19_Encounter_Event"/>
-        <rdfs:range rdf:resource="E18_Physical_Thing"/>
+        <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing"/>
     </rdf:Property>
 
     <rdf:Property rdf:about="O19i_was_object_found_by">
-        <rdfs:domain rdf:resource="E18_Physical_Thing"/>
+        <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing"/>
         <rdfs:range rdf:resource="S19_Encounter_Event"/>
     </rdf:Property>
 
     <rdf:Property rdf:about="O20_sampled_from_type_of_part">
         <rdfs:domain rdf:resource="S2_Sample_Taking"/>
-        <rdfs:range rdf:resource="E55_Type"/>
+        <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E55_Type"/>
     </rdf:Property>
 
     <rdf:Property rdf:about="O20i_type_of_part_was_sampled_by">
-        <rdfs:domain rdf:resource="E55_Type"/>
+        <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E55_Type"/>
         <rdfs:range rdf:resource="S2_Sample_Taking"/>
     </rdf:Property>
 
     <rdf:Property rdf:about="O21_has_found_at">
         <rdfs:domain rdf:resource="S19_Encounter_Event"/>
-        <rdfs:range rdf:resource="E53_Place"/>
+        <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
     </rdf:Property>
 
     <rdf:Property rdf:about="O21i_witnessed">
-        <rdfs:domain rdf:resource="E53_Place"/>
+        <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
         <rdfs:range rdf:resource="S19_Encounter_Event"/>
     </rdf:Property>
 
@@ -486,11 +480,11 @@ This definition coincides with the definition of "fiat objects" (Smith and Varzi
     </rdf:Property>
     <rdf:Property rdf:about="O23_is_defined_by">
         <rdfs:domain rdf:resource="S22_Segment_of_Matter"/>
-        <rdfs:range rdf:resource="E92_Spacetime_Volume"/>
+        <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E92_Spacetime_Volume"/>
     </rdf:Property>
 
     <rdf:Property rdf:about="O23i_defines">
-        <rdfs:domain rdf:resource="E92_Spacetime_Volume"/>
+        <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E92_Spacetime_Volume"/>
         <rdfs:range rdf:resource="S22_Segment_of_Matter"/>
     </rdf:Property>
     <rdf:Property rdf:about="O24_measured">

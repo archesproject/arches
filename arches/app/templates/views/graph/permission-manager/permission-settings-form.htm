@@ -1,0 +1,137 @@
+{% load i18n %}
+<div id="card-preview" class="pad-all" style="">
+
+    <div class="permission-manager" class="project-panel">
+        <div class="permissions-form permission-manager header">
+            <div class="">
+                <h3 id="cc-title" class="panel-title card-main-title">{% trans "Permissions" %}</h3>
+            </div>
+            <div class="selected-group-user-permissions">
+                <ul class="permissions-selected" data-bind="visible: selectedIdentities().length === 0">
+                    <li class="permissions-default">
+                        <i class="confirmation permissions-title"></i> <span class="permissions-account-warning">{% trans "No Groups/Accounts selected" %}</span>
+                    </li>
+                </ul>
+                <ul class="permissions-selected" style="display:none;" data-bind="foreach: selectedIdentities, visible: selectedIdentities().length !== 0">
+                    <li>
+                        <div class="library-icon-permissions" style="">
+                            <span class="icon-wrap icon-wrap-sm icon-circle" data-bind="css: $data.type === 'group' ? 'bg-purple' : 'bg-mint'">
+                                <i data-bind="attr: {class: 'fa fa-' + $data.type}" class="fa fa-group"></i>
+                            </span>
+                            <div class="permissions-title-panel">
+                                <span class="permissions-title" data-bind="text: $data.name"></span>
+                                <div class="confirmation-permissions">{% trans "Default Permissions" %}
+                                    <span data-bind="text: $data.permsLiteral"></span>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Alert Panel -->
+        <div id="basemap-delete-alert" class="panel wizard-data-card-alert" style=""></div>
+
+
+        <!-- Data Entry -->
+        <div class="fade in">
+            <div class="tab-base card-content-container pad-top">
+                <div>
+                    <p class="mpm-instruction">
+                        To set permissions: <strong> Click on the card(s) </strong>you want from the list on the left, then select the permission levels from the form on the right.
+                    </p>
+                </div>
+                <div class="" style="margin-left: 0px;">
+                    <!-- Card -->
+                    <div class="row">
+                        <!-- Available Cards -->
+                        <div class="col-xs-6">
+                                <div class="permission-manager" data-bind="with:groupedNodeList">
+                                    {% include 'views/graph/permission-manager/grouped-node-list.htm' %}
+                                </div>
+                        </div>
+
+                        <!-- Available Cards -->
+                        <div class="col-xs-6">
+                            <div class="mpm-selector-header">
+                                <div class="mpm-selector-header-txt">
+                                    <strong>Set Permissions</strong>
+
+                                    <!-- remove all switch -->
+                                    <!-- <span class="mpm-select-switch-label">
+                                        <a class="pad-lft" href="" data-bind="click: function(){selectedCards([])}">{% trans 'Clear' %}</a>
+                                    </span> -->
+                                </div>
+                            </div>
+
+                            <!-- Selection Summary -->
+                            <div>
+                            <div class="control-panel">
+
+                                <!-- Groups/Users -->
+                                <div class="permissions-list">
+
+                                    <!-- Nodes -->
+                                    <div class="node-list-panel">
+                                        <span class="permissions-title">{% trans "Selected Cards" %}</span>
+                                        <ul class="permissions-selected" data-bind="visible: selectedCards().length === 0">
+                                            <li>
+                                                <i class="confirmation ion-information-circled"></i> <span>{% trans "No cards selected" %}</span>
+                                            </li>
+                                        </ul>
+                                        <ul class="permissions-selected" style="display:none;" data-bind="foreach: selectedCards, visible: selectedCards().length !== 0">
+                                            <li class="permissions-node-row">
+                                                <span class="permissions-node" data-bind="text: $data.name"></span>
+                                                <span class="permissions-readout" data-bind="text: $data.permsLiteral()"></span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Permissions Selector -->
+                            <div id="" class="permission-selector" style="">
+                                <div class="row widget-container" style="">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <div class="col-xs-12">
+                                                <div>
+                                                <div>{% trans 'Permissions' %}</div>
+                                                <ul class="permissions-options" style="list-style: none; margin-left: -5px;" data-bind="foreach: nodegroupPermissions">
+                                                    <li>
+                                                    <label class="form-checkbox form-normal form-primary form-text permission-option"
+                                                        data-bind="css: {
+                                                            'active': $data.selected
+                                                        },
+                                                        click: $data.selected.bind($data, !$data.selected())">
+                                                        <input type="checkbox" data-bind="checked: $data.selected">
+                                                        <i data-bind="css: $data.icon"></i> <span data-bind="text: $data.name"></span>
+                                                    </label>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Buttons -->
+                            <div class="permission-buttons pull-right mar-btm">
+                                <button id="cc-delete-btn" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt disabled" data-bind="click: revert, css: {'disabled': selectedCards().length === 0 || selectedIdentities().length === 0}">{% trans "Revert Permissions" %}
+                                </button>
+                                <button id="cc-save-btn" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-check disabled" data-bind="click: save, css: {'disabled': selectedCards().length === 0 || selectedIdentities().length === 0}">{% trans "Apply Permissions" %}</button>
+                            </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

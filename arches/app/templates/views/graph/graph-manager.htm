@@ -53,12 +53,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block content %}
 <div class="flex">
 	<!--Node Listing -->
-	<div class="left-column-container" id="node-listing" data-bind="with: nodeList">
+	<div class="left-column-container graph-designer" id="node-listing" data-bind="with: nodeList">
         {% include 'views/graph/graph-manager/node-list.htm' %}
 	</div>
 
 	<!-- Node Editor -->
-	<div id="node-crud" class="middle-column-container" data-bind="visible: graphModel.get('selectedNode'), with: nodeForm" style="display: none;" class="ep-node-card">
+	<div id="node-crud" class="middle-column-container graph-designer" data-bind="visible: graphModel.get('selectedNode'), with: nodeForm" style="display: none;" class="ep-node-card">
         {% include 'views/graph/graph-manager/node-form.htm' %}
 	</div>
 
@@ -80,7 +80,8 @@ define('graph-manager-data', [], function () {
     return {
         graph: {{graph_json}},
         datatypes: {{datatypes_json}},
-        branches: {{branches}}
+        branches: {{branches}},
+        ontology_namespaces: {{ontology_namespaces}}
     };
 });
 {% endautoescape %}</script>

@@ -19,34 +19,48 @@ from django.db import transaction
 from django.shortcuts import render
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
-from guardian.shortcuts import get_users_with_perms
+from guardian.shortcuts import get_users_with_perms, get_groups_with_perms
 from arches.app.models import models
 from arches.app.models.card import Card
-from arches.app.views.base import BaseManagerView
+from arches.app.views.base import BaseManagerView, MapBaseManagerView
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.decorators import group_required
-from arches.app.utils.JSONResponse import JSONResponse
-
+from arches.app.utils.response import JSONResponse
+from arches.app.utils.permission_backend import get_users_for_object, get_groups_for_object
+from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.elasticsearch_dsl_builder import Query, Bool, GeoBoundsAgg
 
 @method_decorator(group_required('Application Administrator'), name='dispatch')
-class MapLayerManagerView(BaseManagerView):
+class MapLayerManagerView(MapBaseManagerView):
     def get(self, request):
+        se = SearchEngineFactory().create()
         datatype_factory = DataTypeFactory()
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
-        map_layers = models.MapLayers.objects.all()
-        map_sources = models.MapSources.objects.all()
+        map_layers = models.MapLayer.objects.all()
+        map_markers = models.MapMarker.objects.all()
+        map_sources = models.MapSource.objects.all()
         icons = models.Icon.objects.order_by('name')
         context = self.get_context_data(
             icons=JSONSerializer().serialize(icons),
             datatypes=datatypes,
             widgets=widgets,
             map_layers=map_layers,
+            map_markers=map_markers,
             map_sources=map_sources,
             datatypes_json=JSONSerializer().serialize(datatypes),
             main_script='views/map-layer-manager',
         )
+
+        def get_resource_bounds(node):
+            query = Query(se, start=0, limit=0)
+            search_query = Bool()
+            query.add_query(search_query)
+            query.add_aggregation(GeoBoundsAgg(field='points.point', name='bounds'))
+            results = query.search(index='resource', doc_type=[str(node.graph_id)])
+            bounds = results['aggregations']['bounds']['bounds'] if 'bounds' in results['aggregations']['bounds'] else None
+            return bounds
 
         context['geom_nodes_json'] = JSONSerializer().serialize(context['geom_nodes'])
         resource_layers = []
@@ -56,14 +70,18 @@ class MapLayerManagerView(BaseManagerView):
             datatype = datatype_factory.get_instance(node.datatype)
             map_layer = datatype.get_map_layer(node=node, preview=True)
             if map_layer is not None:
+                count = models.TileModel.objects.filter(data__has_key=str(node.nodeid)).count()
+                if count > 0:
+                    map_layer['bounds'] = get_resource_bounds(node)
+                else:
+                    map_layer['bounds'] = None
                 resource_layers.append(map_layer)
             map_source = datatype.get_map_source(node=node, preview=True)
             if map_source is not None:
                 resource_sources.append(map_source)
-            card = Card.objects.get(nodegroup_id=node.nodegroup_id)
             permissions[str(node.pk)] = {
-                "users": card.users,
-                "groups": card.groups,
+                "users": sorted([user.email or user.username for user in get_users_for_object('read_nodegroup', node.nodegroup)]),
+                "groups": sorted([group.name for group in get_groups_for_object('read_nodegroup', node.nodegroup)])
             }
         context['resource_map_layers_json'] = JSONSerializer().serialize(resource_layers)
         context['resource_map_sources_json'] = JSONSerializer().serialize(resource_sources)
@@ -71,29 +89,33 @@ class MapLayerManagerView(BaseManagerView):
 
         context['nav']['title'] = _('Map Layer Manager')
         context['nav']['icon'] = 'fa-server'
-        context['nav']['help'] = (_('Map Layer Manager'),'')
+        context['nav']['help'] = (_('Map Layer Manager'),'help/base-help.htm')
+        context['help'] = 'map-manager-help'
 
         return render(request, 'views/map-layer-manager.htm', context)
 
     def post(self, request, maplayerid):
-        map_layer = models.MapLayers.objects.get(pk=maplayerid)
+        map_layer = models.MapLayer.objects.get(pk=maplayerid)
         data = JSONDeserializer().deserialize(request.body)
         map_layer.name = data['name']
         map_layer.icon = data['icon']
         map_layer.activated = data['activated']
         map_layer.addtomap = data['addtomap']
         map_layer.layerdefinitions = data['layer_definitions']
+        map_layer.centerx = data['centerx']
+        map_layer.centery = data['centery']
+        map_layer.zoom = data['zoom']
         with transaction.atomic():
             map_layer.save()
             if not map_layer.isoverlay and map_layer.addtomap:
-                models.MapLayers.objects.filter(isoverlay=False).exclude(pk=map_layer.pk).update(addtomap=False)
-        return JSONResponse({'succces':True, 'map_layer': map_layer})
+                models.MapLayer.objects.filter(isoverlay=False).exclude(pk=map_layer.pk).update(addtomap=False)
+        return JSONResponse({'success':True, 'map_layer': map_layer})
 
     def delete(self, request, maplayerid):
-        map_layer = models.MapLayers.objects.get(pk=maplayerid)
+        map_layer = models.MapLayer.objects.get(pk=maplayerid)
         try:
-           tileserver_layer = models.TileserverLayers.objects.get(map_layer=map_layer)
-        except models.TileserverLayers.DoesNotExist:
+           tileserver_layer = models.TileserverLayer.objects.get(map_layer=map_layer)
+        except models.TileserverLayer.DoesNotExist:
            tileserver_layer = None
         with transaction.atomic():
             if tileserver_layer is not None:

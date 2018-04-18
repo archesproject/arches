@@ -21,7 +21,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import os
 from arches.management.commands import utils
 from arches.app.models import models
-from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
 
@@ -42,7 +41,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if options['operation'] == 'register':
-            self.register(source_dir=options['dt_source'])
+            self.register(source=options['dt_source'])
 
         if options['operation'] == 'unregister':
             self.unregister(datatype=options['datatype'])
@@ -50,19 +49,20 @@ class Command(BaseCommand):
         if options['operation'] == 'list':
             self.list()
 
-    def register(self, source_dir):
+    def register(self, source):
         """
         Inserts a datatype into the arches db
 
         """
 
         import imp
-        fn_config = imp.load_source('', source_dir)
+        fn_config = imp.load_source('', source)
         details = fn_config.details
+
         dt = models.DDataType(
             datatype = details['datatype'],
             iconclass = details['iconclass'],
-            modulename = os.path.basename(source_dir),
+            modulename = os.path.basename(source),
             classname = details['classname'],
             defaultwidget = details['defaultwidget'],
             defaultconfig = details['defaultconfig'],
@@ -71,7 +71,11 @@ class Command(BaseCommand):
             isgeometric = details['isgeometric']
             )
 
-        dt.save()
+
+        if len(models.DDataType.objects.filter(datatype=dt.datatype)) == 0:
+            dt.save()
+        else:
+            print "{0} already exists".format(dt.datatype)
 
     def unregister(self, datatype):
         """

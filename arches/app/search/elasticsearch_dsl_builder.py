@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from arches.app.utils.betterJSONSerializer import JSONSerializer
+from django.utils.translation import ugettext as _
 
 class Dsl(object):
     def __init__(self, dsl=None):
@@ -47,15 +48,21 @@ class Query(Dsl):
 
     def __init__(self, se, **kwargs):
         self.se = se
-        self.fields = kwargs.pop('fields', None)
         self.start = kwargs.pop('start', 0)
         self.limit = kwargs.pop('limit', 10)
 
         self.dsl = {
             'query': {
                 "match_all": { }
+            },
+            '_source': {
+                'includes': [],
+                'excludes': []
             }
         }
+
+        for key, value in kwargs.iteritems():
+            self.dsl[key]  = value
 
     def add_query(self, dsl=None):
         if dsl is not None:
@@ -73,8 +80,16 @@ class Query(Dsl):
 
             self.dsl['aggs'][agg.name] = agg.agg[agg.name]
 
+    def include(self, include):
+        self.dsl['_source']['includes'].append(include)
+
+    def exclude(self, exclude):
+        self.dsl['_source']['excludes'].append(exclude)
+
+    def min_score(self, min_score):
+        self.dsl['min_score'] = min_score
+
     def search(self, index='', doc_type='', **kwargs):
-        self.fields = kwargs.pop('fields', self.fields)
         self.start = kwargs.pop('start', self.start)
         self.limit = kwargs.pop('limit', self.limit)
 
@@ -88,9 +103,6 @@ class Query(Dsl):
     def prepare(self):
         self.dsl['from'] = self.start
         self.dsl['size'] = self.limit
-
-        if self.fields != None:
-            self.dsl['fields'] = self.fields
 
 
 class Bool(Dsl):
@@ -175,7 +187,7 @@ class Match(Dsl):
             }
         }
 
-        if self.fuzziness and self.type != 'phrase_prefix':
+        if self.fuzziness:
             self.dsl['match'][self.field]['fuzziness'] = self.fuzziness
 
 class Nested(Dsl):
@@ -284,6 +296,7 @@ class Range(Dsl):
         self.lte = kwargs.pop('lte', None)
         self.lt = kwargs.pop('lt', None)
         self.boost = kwargs.pop('boost', None)
+        self.relation = kwargs.pop('relation', None)
 
         if self.boost:
             boost = {
@@ -299,11 +312,11 @@ class Range(Dsl):
         }
 
         if self.gte is None and self.gt is None and self.lte is None and self.lt is None:
-            raise Exception('You need at least one of the following: gte, gt, lte, or lt')
+            raise RangeDSLException(_('You need at least one of the following operators in a Range expression: gte, gt, lte, or lt'))
         if self.gte is not None and self.gt is not None:
-            raise Exception('You can only use one of either: gte or gt')
+            raise RangeDSLException(_('You can only use one of either: gte or gt'))
         if self.lte is not None and self.lt is not None:
-            raise Exception('You can only use one of either: lte or lt')
+            raise RangeDSLException(_('You can only use one of either: lte or lt'))
 
         if self.gte is not None:
             self.dsl['range'][self.field]['gte'] = self.gte
@@ -313,6 +326,11 @@ class Range(Dsl):
             self.dsl['range'][self.field]['lte'] = self.lte
         if self.lt is not None:
             self.dsl['range'][self.field]['lt'] = self.lt
+        if self.relation is not None:
+            self.dsl['range'][self.field]['relation'] = self.relation
+
+class RangeDSLException(Exception):
+    pass
 
 class SimpleQueryString(Dsl):
     """
@@ -344,6 +362,19 @@ class SimpleQueryString(Dsl):
             "prefix" : { self.field : self.query }
         }
 
+
+class Exists(Dsl):
+    """
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-exists-query.html
+
+    """
+
+    def __init__(self, **kwargs):
+        self.field = kwargs.pop("field", "")
+        self.dsl = {
+            "exists" : { "field": self.field }
+        }
+
 class Aggregation(Dsl):
     """
     https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html
@@ -359,13 +390,11 @@ class Aggregation(Dsl):
         self.size = kwargs.pop('size', None)
 
         if self.field is not None and self.script is not None:
-            raise Exception('You need to specify either a "field" or a "script"')
-        if self.field is None and self.script is None:
-            raise Exception('You need to specify either a "field" or a "script"')
+            raise AggregationDSLException(_('You need to specify either a "field" or a "script"'))
         if self.name is None:
-            raise Exception('You need to specify a name for your aggregation')
+            raise AggregationDSLException(_('You need to specify a name for your aggregation'))
         if self.type is None:
-            raise Exception('You need to specify an aggregation type')
+            raise AggregationDSLException(_('You need to specify an aggregation type'))
 
         self.agg = {
             self.name: {
@@ -393,6 +422,10 @@ class Aggregation(Dsl):
     def set_size(self, size):
         if size is not None and size > 0:
             self.agg[self.name][self.type]['size'] = size
+
+
+class AggregationDSLException(Exception):
+    pass
 
 
 class GeoHashGridAgg(Aggregation):
@@ -439,7 +472,7 @@ class CoreDateAgg(Aggregation):
 
 class MinAgg(CoreDateAgg):
     """
-    https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-min-aggregation.html
 
     """
 
@@ -449,7 +482,7 @@ class MinAgg(CoreDateAgg):
 
 class MaxAgg(CoreDateAgg):
     """
-    https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-max-aggregation.html
 
     """
 
@@ -459,7 +492,7 @@ class MaxAgg(CoreDateAgg):
 
 class DateRangeAgg(CoreDateAgg):
     """
-    https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-daterange-aggregation.html
 
     """
 
@@ -489,3 +522,79 @@ class DateRangeAgg(CoreDateAgg):
 
         if min_date is not None or max_date is not None:
             self.agg[self.name][self.type]['ranges'].append(date_range)
+
+class RangeAgg(Aggregation):
+    """
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-range-aggregation.html
+
+    """
+
+    def __init__(self, **kwargs):
+        min_val = kwargs.pop('min', None)
+        max_val = kwargs.pop('max', None)
+        key = kwargs.pop('key', None)
+        super(RangeAgg, self).__init__(type='range', **kwargs)
+
+        self.add(min=min_val, max=max_val, key=key, **kwargs)
+
+    def add(self, **kwargs):
+        date_range = {}
+        min_val = kwargs.pop('min', None)
+        max_val = kwargs.pop('max', None)
+        key = kwargs.pop('key', None)
+
+        if 'ranges' not in self.agg[self.name][self.type]:
+            self.agg[self.name][self.type]['ranges'] = []
+
+        if min_val is not None:
+            date_range['from'] = min_val
+        if max_val is not None:
+            date_range['to'] = max_val
+        if key is not None:
+            date_range['key'] = key
+
+        if min_val is not None or max_val is not None:
+            self.agg[self.name][self.type]['ranges'].append(date_range)
+
+
+class FiltersAgg(Aggregation):
+    """
+    http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html
+
+    """
+
+    def __init__(self, **kwargs):
+        self.name = kwargs.pop('name', None)
+
+        self.agg = {
+            self.name: {
+                "filters": {
+                    "filters": []
+                }
+            }
+        }
+
+    def add_filter(self, filter=None):
+        if filter is not None:
+            self.agg[self.name]['filters']['filters'].append(filter.dsl)
+
+
+class NestedAgg(Aggregation):
+    """
+    http://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-nested-aggregation.html
+
+    """
+
+    def __init__(self, **kwargs):
+        self.aggregation = kwargs.pop('agg', {})
+        self.path = kwargs.pop('path', None)
+        if self.path is None:
+            raise NestedAggDSLException(_('You need to specify a path for your nested aggregation'))
+        super(NestedAgg, self).__init__(type='nested', path=self.path, **kwargs)
+
+        if self.name:
+            self.agg[self.name]['aggs'] = self.aggregation
+
+
+class NestedAggDSLException(Exception):
+    pass

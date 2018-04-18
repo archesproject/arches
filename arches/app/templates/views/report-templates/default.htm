@@ -6,11 +6,11 @@
 
     <!-- Title Block -->
     <div class="report-toolbar-preview ep-form-toolbar">
-        <h4 class="report-toolbar-title" data-bind="text: report.get('name')"></h4>
+        <h4 class="report-toolbar-title"><span data-bind="text: report.get('name')"></span> - <span data-bind="text: report.get('displayname') "></span></h4>
 
         <!-- Tools -->
         <div class="ep-form-toolbar-tools mar-no flex">
-            <p class="report-print-date">Report Date: <span data-bind="text: reportDate"></span></p>
+            <p class="report-print-date">{% trans "Report Date:" %} <span data-bind="text: reportDate"></span></p>
         </div>
     </div>
 </div>
@@ -60,7 +60,7 @@
         <!-- ko if: !card.isContainer() -->
             <!-- ko foreach: { data: tiles, as: 'tile' } -->
                 <!-- ko if: tile.nodegroup_id() === card.get('nodegroup_id') -->
-                <div class="rp-report-tile">
+                <div class="rp-report-tile" data-bind="attr: { id: tile.tileid }">
                     <dl class="dl-horizontal">
                     <!-- ko foreach: { data: card.get('widgets'), as: 'widget' } -->
                         <!-- ko component: {
@@ -83,25 +83,56 @@
 
         <!-- ko if: tiles.length === 0 -->
         <div class="row rp-report-tile rp-no-data">
+        <!-- ko ifnot: card.get('cardid') -->
+            {% trans "Sorry, you don't have access to this information" %}
+        <!-- /ko -->
+        <!-- ko if: card.get('cardid') -->
             {% trans "No data added yet for" %} "<span data-bind="text: card.get('name')"></span>"
+        <!-- /ko -->
         </div>
         <!-- /ko -->
     </template>
+
+
     {% endblock body %}
+
+    <div class="rp-report-section relative">
+    <div class="rp-report-section-title">
+        <h4 class="rp-section-title">{% trans 'Related Resources' %}</h4>
+    </div>
+    <!-- ko foreach: { data: report.related_resources, as: 'rr' } -->
+    <div class="rp-card-section">
+        <h5 class="rp-tile-title">
+            <span class="rp-tile-title-float" data-bind="text:rr.graph_name"></span>
+        </h5>
+        <!--ko if: rr.related.length > 0 -->
+        <div class="rp-report-container-tile">
+        <div class="row rp-report-tile">
+            <!-- ko foreach: { data: rr.related } -->
+                <dl class="dl-horizontal">
+                    <dt><a data-bind="text: $data.displayname, attr: {href: $data.link}"></a></dt>
+                    <dd data-bind="text: '( ' + $data.relationship + ' )'"></dd>
+                </dl>
+            <!-- /ko -->
+        </div>
+        </div>
+        <!-- /ko -->
+        <!--ko if: rr.related.length === 0 -->
+        <div class="rp-report-container-tile">
+            <div class="row rp-report-tile rp-no-data">{% trans 'No relationships added' %}</div>
+        </div>
+        <!--/ko-->
+    </div>
+    <!-- /ko -->
+    </div>
 </div>
 
-{% block footer %}
-{% endblock footer %}
 
 {% endblock report %}
 <!-- /ko -->
 
+
 <!-- ko if: configForm && (configType === 'header') -->
 {% block header_form %}
 {% endblock header_form %}
-<!-- /ko -->
-
-<!-- ko if: configForm && (configType === 'footer') -->
-{% block footer_form %}
-{% endblock footer_form %}
 <!-- /ko -->

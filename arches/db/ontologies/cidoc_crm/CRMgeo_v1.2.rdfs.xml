@@ -14,12 +14,6 @@ Encoding Rules:
    For instance "Q2 occupied (is occupied by)" is represented as:
    "Q2_occupied" for the domain to range direction and "Q2i_is_occupied_by" for the range to domain direction.
 
-
-
-EDITS FOR ARCHES:
-Change any references in subProperties or domains/ranges from external reference literals to 
-CRM literal classes (E62_String, etc..).
-
 -->
 
 
@@ -28,13 +22,13 @@ CRM literal classes (E62_String, etc..).
 		xml:base="http://www.ics.forth.gr/isl/CRMgeo/" 
 		xml:lang="en">
 	
- <rdfs:Class rdf:about="E16_Measurement">
+ <rdfs:Class rdf:about="http://www.cidoc-crm.org/cidoc-crm/E16_Measurement">
 	<rdfs:subClassOf rdf:resource="S4_Observation"/>
 </rdfs:Class>
 
 
-  <rdfs:Class rdf:about="E92_Spacetime_Volume">
-    <rdfs:subClassOf rdf:resource="E1_CRM_Entity"/>
+  <rdfs:Class rdf:about="http://www.cidoc-crm.org/cidoc-crm/E92_Spacetime_Volume">
+    <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"/>
     <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Scope note:This class comprises 4 dimensional possibly fuzzy point sets (volumes) in physical spacetime regardless its true geometric form (S). They may derive their identity from being the extent of a material phenomenon or from being the interpretation of an expression (I) defining an extent in Space Time. The duration of existence of an instance of a spacetime volume is trivially its projection on time (E).
 Examples:
 •	the spacetime Volume of the Event of Ceasars murdering
@@ -54,11 +48,11 @@ Examples:
 • The Space Time Volume where and when the carbon 14 dating of the "Schoeninger Speer II" in 1996 took place
 • The spatio-temporal trajectory of the H.M.S. Victory from its building to its actual location
 • The Space Time Volume of the temple in Abu Simbel before its removal</rdfs:comment>
-    <rdfs:subClassOf rdf:resource="E92_Spacetime_Volume"/>
+    <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E92_Spacetime_Volume"/>
   </rdfs:Class>
   
   <rdfs:Class rdf:about="SP2_Phenomenal_Place">
-    <rdfs:subClassOf rdf:resource="E53_Place"/>
+    <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
     <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
     >Scope note: This class comprises instances of E53 Place (S) whose extent (U) and position is defined by the spatial projection of the spatiotemporal extent of a real world phenomenon that can be observed or measured. The spatial projection depends on the instance of S3 Reference Space onto which the extent of the phenomenon is projected. In general, there are no limitations to the number of Reference Spaces one could regard, but only few choices are relevant for the cultural-historical discourse. Typical for the archaeological discourse is to choose a reference space with respect to which the remains of some events would stay at the same place, for instance, relative to the bedrock of a continental plate. On the other side, for the citizenship of babies born in aeroplanes, the space in which the boundaries of the overflown state are defined may be relevant (I). Instances of SP2 Phenomenal Place exist as long as the respective reference space is defined. Note that we can talk in particular about what was at a place in a country before a city was built there, i.e., before the time the event occurred by which the place is defined, but we cannot talk about the place of earth before it came into existence due to lack of a reasonable reference space (E).
 Examples:
@@ -72,7 +66,7 @@ Examples:
   </rdfs:Class>
   
   <rdfs:Class rdf:about="SP3_Reference_Space">
-    <rdfs:subClassOf rdf:resource="E1_CRM_Entity"/>
+    <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"/>
     <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
     >Scope note:	This class comprises the (typically Euclidian) Space (S) that is at rest (I) in relation to an instance of E18 Physical Thing and extends (U) infinitely beyond it. It is the space in which we typically expect things to stay in place if no particular natural or human distortion processes occur. This definition requires that at least essential parts of the respective physical thing have a stability of form. The degree of this stability (e.g., elastic deformation of a ship on sea, landslides, geological deformations) limits the precision to which an instance of SP3 Reference Space is defined. It is possible to construct types of (non Euclidian) reference spaces which adapt to elastic deformations or have other geometric and dynamic properties to adapt to changes of form of the reference object, but they are of rare utility in the cultural-historical discourse. [ØE11]
 An instance of SP3 Reference Space begins to exist with the largest thing that is at rest in it and ceases to exist with its E6 Destruction[ØE12]. If other things are at rest in the same space and their time-span of existence falls within the one of the reference object, they share the same reference space (I). It has therefore the same temporal extent (time-span of existence) as the whole of the E18 Physical Things it is at rest with (E). 
@@ -84,7 +78,7 @@ Examples:
   </rdfs:Class>
   
   <rdfs:Class rdf:about="SP4_Spatial_Coordinate_Reference_System">
-    <rdfs:subClassOf rdf:resource="E29_Design_or_Procedure"/>
+    <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E29_Design_or_Procedure"/>
     <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
     >Scope note:	This class compromises systems that are used to describe locations in a SP3 Reference Space (S). An instance of SP4 Spatial Coordinate Reference System is composed of two parts: The first is a Coordinate System which is a set of coordinate axes with specified units of measurement and axis directions. The second part is a set of reference features at rest in the Reference Space it describes in the real world that relate the Coordinate System to real world locations (U) and fix it with respect to the reference object of its Reference Space .
 In surveying and geodesy, instance of SP4 Spatial Coordinate Reference System are called a datum. In the case of spatial coordinate reference systems for the earth the datum consists of the reference points and an ellipsoid that approximates the shape of the earth. National systems often use ellipsoids that approximate their territory best and shift them in an appropriate position relative to the earth while WGS84 is an ellipsoid for the whole earth and used in GPS receivers. In engineering a datum is a reference feature of an object used to create a reference system for measurement.The set of reference features in the real world are subset of E26 Physical Feature that are within the described reference space at rest and pertain to the E18 Physical Thing the reference space is at rest with.
@@ -107,14 +101,14 @@ Examples:
 • Coordinate Information in GML like &lt;gml:Point gml:id="p21" srsName="http://www.opengis.net/def/crs/EPSG/0/4326"&gt; &lt;gml:coordinates&gt;45.67, 88.56&lt;/gml:coordinates&gt; &lt;/gml:Point&gt;
 • a polygon defining the extent of France</rdfs:comment>
     <rdfs:subClassOf rdf:resource="http://www.opengis.net/ont/geosparql#Geometry"/>
-    <rdfs:subClassOf rdf:resource="E73_Information_Object"/>
-    <rdfs:subClassOf rdf:resource="E47_Spatial_Coordinates"/>
+    <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E73_Information_Object"/>
+    <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E47_Spatial_Coordinates"/>
   </rdfs:Class>
   
   <rdfs:Class rdf:about="SP6_Declarative_Place">
-    <rdfs:subClassOf rdf:resource="E53_Place"/>
+    <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
 	<rdfs:subClassOf rdf:resource="http://www.opengis.net/ont/geosparql#Geometry"/>
-	<rdfs:subClassOf rdf:resource="E89_Propositional_Object"/>
+	<rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E89_Propositional_Object"/>
     <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Scope note: This class comprises instances of E53 Place (S) whose extent (U) and position is defined by a SP5 Geometric Place Expression (S). There is one implicit or explicit SP3 Reference Space in which the SP5 Place Expression describes the intended place. Even though SP5 Geometric Place Expressions have an unlimited precision, measurement devices and the precision of the position of reference features relating the SP4 Spatial Coordinate Reference System to a SP3 Reference Space impose limitations to the determination of an SP6 Declarative Place in the real world (U).
 Several SP5 Geometric Place Expressions may denote the same SP6 Declarative Place if their precision falls within the same range (I).
 Instances of SP6 Declarative Places may be used to approximate instances of E53 Places or parts of them. They may as well be used to define the location and spatial extent of property rights or national borders.
@@ -139,11 +133,11 @@ Examples:
 •	the spacetime volume defined by a polygon approximating the Danube river flood in Austria between 6th and 9th of August 2002 
 •	the spacetime volume of the Orinoco river in 1529 defined in the map of Diego Ribeiro in 1529
 •	the spacetime volume representing the boundaries of the UK from 1900-1950</rdfs:comment>
-    <rdfs:subClassOf rdf:resource="E92_Spacetime_Volume"/>
+    <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E92_Spacetime_Volume"/>
   </rdfs:Class>
   
   <rdfs:Class rdf:about="SP10_Declarative_Time-Span">
-    <rdfs:subClassOf rdf:resource="E52_Time-Span"/>
+    <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span"/>
     <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
     >Scope note:     	This class comprises instances of SP9 Time Intervalls that represent the Time Span defined by a SP 14 Time Expression. Thus they derive their identity through an expression defining an extent in time. Even though SP10 Declarative Time Spans have an unlimited precision, measurement devices and the possible precision within the SP11 Temporal Reference System impose limitations to the determination of a SP10 Declarative Time Span. The accuracy of a SP10 Declarative Time Spans depends upon the documentation and measurement method. 
 SP10 Declarative Time Spans may be used to approximate actual (phenomenal) Time-Spans of temporal entities.  
@@ -155,7 +149,7 @@ Examples:
   </rdfs:Class>
   
   <rdfs:Class rdf:about="SP11_Temporal_Reference_System">
-    <rdfs:subClassOf rdf:resource="E29_Design_or_Procedure"/>
+    <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E29_Design_or_Procedure"/>
     <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
     >Scope note:	This class compromises systems(S) that are used to describe positions and extents in a Reference Time. If relativistic effects are negligible in the wider spacetime area of interest and the speeds of associated things, then there is only one unique global reference time. The typical way to measure time is to count the cycles of a periodic process for which we have a hypothesis of constant frequency, such as oscillations of a crystal, molecular arrangement, rotation of earth around itself or around the sun. The origin for a Temporal Reference System is fixed on a reference event. As long as the number of cycles passed from that reference event until now are known, the temporal reference system exists (E) and expressions in this Reference System can be interpreted with respect to the Reference Time. 
 A temporal reference system represents time as a continuous linear interpolation over the infinit series of cycles extended from the reference event to he past and the future, regardless of the temporal position of the mathematical point zero of an instance of E61 Time Primitive, such for instance the gregorian calender begins with the event an arbitrary positiong the point zero as beeing the date of the „Birth of Christ“. The actual date of birth of christ is regarded to be unknown and therefor is not the reference event. 
@@ -178,11 +172,11 @@ Examples:
       
     &lt;/p&gt;</rdfs:comment>
     <rdfs:subClassOf rdf:resource="http://www.opengis.net/ont/geosparql#Geometry"/>
-    <rdfs:subClassOf rdf:resource="E73_Information_Object"/>
+    <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E73_Information_Object"/>
   </rdfs:Class>
   
   <rdfs:Class rdf:about="SP13_Phenomenal_Time-Span">
-    <rdfs:subClassOf rdf:resource="E52_Time-Span"/>
+    <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span"/>
     <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
     >Scope note:     	This class comprises instances of SP9 Time Intervalls whose extent (U) and position is defined by the temporal projection of the spatiotemporal extent that can be observed or measured. Thus they derive their identity through the extent in time of a real world phenomenon (I). 
 
@@ -194,8 +188,8 @@ Examples:
   
   <rdfs:Class rdf:about="SP14_Time_Expression">
     <rdfs:subClassOf rdf:resource="http://www.opengis.net/ont/geosparql#Geometry"/>
-    <rdfs:subClassOf rdf:resource="E73_Information_Object"/>
-    <rdfs:subClassOf rdf:resource="E49_Time_Appellation"/>
+    <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E73_Information_Object"/>
+    <rdfs:subClassOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E49_Time_Appellation"/>
     <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
     >Scope note: 	This class comprises definitions of temporal extents by quantitative expressions(S). An instance of SP14 Time Expression defines a declarative temporal interval using a temporal reference system. The identity of a SP14 Time Expression is based on its script or symbolic form (I). Several SP14 Time Expressions can denote the same SP10 Declarative Time Interval. 
 Instances of SP14 Time Expression that exist in one SP11 Temporal Reference System can be transformed to time expressions in other SP11 Temporal Reference Systems if there is a known and valid transformation.
@@ -244,7 +238,7 @@ Examples:
  </rdf:Property>
   
   <rdf:Property rdf:about="Q1_occupied">
-    <rdfs:domain rdf:resource="E4_Period"/>
+    <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E4_Period"/>
 	<rdfs:range rdf:resource="SP1_Phenomenal_Spacetime_Volume"/>
     <rdfs:subClassOf rdf:resource="http://www.opengis.net/ont/geosparql#Feature"/>
    
@@ -254,12 +248,12 @@ Examples:
  
 <rdf:Property rdf:about="Q1i_is_occupied_by">
     <rdfs:domain rdf:resource="SP1_Phenomenal_Spacetime_Volume"/>
-	<rdfs:range rdf:resource="E4_Period"/>
+	<rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E4_Period"/>
     <rdfs:subClassOf rdf:resource="http://www.opengis.net/ont/geosparql#Feature"/>
   </rdf:Property> 
 
   <rdf:Property rdf:about="Q2_occupied">
-    <rdfs:domain rdf:resource="E18_Physical_Thing"/>
+    <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing"/>
     <rdfs:range rdf:resource="SP1_Phenomenal_Spacetime_Volume"/>
 	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
     >Scope note:	This property describes the 4 dimensional point sets (volumes) in spacetime that the trajectory of an instance of E18 Physical Thing occupies in spacetime in the course of its existence. We include in the occupied space the space filled by the matter of the physical thing and all inner spaces not accessible in regular function.</rdfs:comment>
@@ -267,7 +261,7 @@ Examples:
   
 <rdf:Property rdf:about="Q2i_is_occupied_by">
     <rdfs:domain rdf:resource="SP1_Phenomenal_Spacetime_Volume"/>
-    <rdfs:range rdf:resource="E18_Physical_Thing"/>
+    <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing"/>
   </rdf:Property>  
   
   <rdf:Property rdf:about="Q3_has_temporal_projection">
@@ -298,7 +292,7 @@ The property P7 took place at is a shortcut of the more fully developed path fro
   </rdf:Property>
   
   <rdf:Property rdf:about="Q5_defined_in">
-    <rdfs:domain rdf:resource="E53_Place"/>
+    <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
     <rdfs:range rdf:resource="SP3_Reference_Space"/>
 	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
     >Scope note:	This property associates an instance of  E53 Place with the instance of  SP3 Reference Space it is defined in.</rdfs:comment>
@@ -306,29 +300,29 @@ The property P7 took place at is a shortcut of the more fully developed path fro
   
   <rdf:Property rdf:about="Q5i_defined_in">
     <rdfs:domain rdf:resource="SP3_Reference_Space"/>
-    <rdfs:range rdf:resource="E53_Place"/>
+    <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
   </rdf:Property>
   
   <rdf:Property rdf:about="Q6_is_at_rest_in_relation_to"> 
     <rdfs:domain rdf:resource="SP3_Reference_Space"/>
-    <rdfs:range rdf:resource="E18_Physical_Thing"/>
+    <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing"/>
 	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
     >Scope note:	This property associates an instance of SP3 Reference Space with the instance of E18 Physical Thing that is at rest in it. For all instances of E18 Physical Thing exist at least one reference space it is at rest with because of their relative stability of form. Larger constellations of matter may comprise many physical features that are at rest with them.</rdfs:comment>
   </rdf:Property>
   
   <rdf:Property rdf:about="Q6i_rests_in_relation_to">
     <rdfs:range rdf:resource="SP3_Reference_Space"/>
-    <rdfs:domain rdf:resource="E18_Physical_Thing"/>
+    <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing"/>
   </rdf:Property>
   
   <rdf:Property rdf:about="Q6_is_at_rest_in_relation_to">
     <rdfs:domain rdf:resource="SP3_Reference_Space"/>
-	<rdfs:range rdf:resource="E18_Physical_Thing"/>
+	<rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing"/>
 	<rdfs:subClassOf rdf:resource="http://www.opengis.net/ont/geosparql#Feature"/>
   </rdf:Property>
   
   <rdf:Property rdf:about="Q6i_rests_in_relation_to">
-    <rdfs:domain rdf:resource="E18_Physical_Thing"/>
+    <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing"/>
 	<rdfs:range rdf:resource="SP3_Reference_Space"/>
 	<rdfs:subClassOf rdf:resource="http://www.opengis.net/ont/geosparql#Feature"/>
   </rdf:Property>
@@ -347,14 +341,14 @@ The property P7 took place at is a shortcut of the more fully developed path fro
   
   <rdf:Property rdf:about="Q8_is_fixed_on">
     <rdfs:domain rdf:resource="SP4_Spatial_Coordinate_Reference_System"/>
-    <rdfs:range rdf:resource="E26_Physical_Feature"/>
+    <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E26_Physical_Feature"/>
     <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
     >Scope note:	This property defines the physical reference features that ground a spatial coordinate reference system in the real world. 
 In surveying and geodesy this is part of the datum definition and is often a point identified by a physical feature on earth (sometimes monuments) where the earth approximation ellipsoid touches the earth and one axis of the ellipsoid runs through.</rdfs:comment>
   </rdf:Property>
   
   <rdf:Property rdf:about="Q8i_fixes">
-    <rdfs:domain rdf:resource="E26_Physical_Feature"/>
+    <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E26_Physical_Feature"/>
     <rdfs:range rdf:resource="SP4_Spatial_Coordinate_Reference_System"/>
   </rdf:Property>
   
@@ -373,7 +367,7 @@ In surveying and geodesy this is part of the datum definition and is often a poi
   <rdf:Property rdf:about="Q10_defines_place">
     <rdfs:domain rdf:resource="SP5_Geometric_Place_Expression"/>
     <rdfs:range rdf:resource="SP6_Declarative_Place"/>
-	<rdfs:subPropertyOf rdf:resource="P87i_identifies"/>
+	<rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P87i_identifies"/>
 	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
     >Scope note:	This property associates an instance of SP5 Geometric Place Expression with the instance of SP6 Declarative Place it defines. Syntactic variants or use of different scripts may result in multiple instances of SP5 Geometric Place Expression defining exactly the same place. Transformations between different reference systems in general result in new definitions of places approximating each other.</rdfs:comment>
   </rdf:Property>
@@ -385,39 +379,39 @@ In surveying and geodesy this is part of the datum definition and is often a poi
   
   <rdf:Property rdf:about="Q11_approximates">
     <rdfs:domain rdf:resource="SP6_Declarative_Place"/>
-    <rdfs:range rdf:resource="E53_Place"/>
-    <rdfs:subPropertyOf rdf:resource="P121_overlaps_with"/>
+    <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
+    <rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P121_overlaps_with"/>
 	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
     >Scope note:	This property approximates a phenomenal place which is defined in the same reference space. The property does not state the quality or accuracy of the approximation, but an overlap in area is the minimal requirement.</rdfs:comment>
   </rdf:Property>
   
   <rdf:Property rdf:about="Q11i_is_approximated_by">
-    <rdfs:domain rdf:resource="E53_Place"/>
+    <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E53_Place"/>
     <rdfs:range rdf:resource="SP6_Declarative_Place"/>
-    <rdfs:subPropertyOf rdf:resource="P121_overlaps_with"/>
+    <rdfs:subPropertyOf rdf:resource="http://www.cidoc-crm.org/cidoc-crm/P121_overlaps_with"/>
   </rdf:Property>
   
   <rdf:Property rdf:about="Q12_approximates">
     <rdfs:domain rdf:resource="SP7_Declarative_Spacetime_Volume"/>
-    <rdfs:range rdf:resource="E92_Spacetime_Volume"/>
+    <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E92_Spacetime_Volume"/>
 	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
     >Scope note:	This property approximates a SP8 Spacetime Volume. The property does not state the quality or accuracy of the approximation, but an overlap of the spacetime volume is the minimal requirement.</rdfs:comment>
   </rdf:Property>
   
   <rdf:Property rdf:about="Q12i_approximates">
-    <rdfs:domain rdf:resource="E92_Spacetime_Volume"/>
+    <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E92_Spacetime_Volume"/>
     <rdfs:range rdf:resource="SP7_Declarative_Spacetime_Volume"/>
   </rdf:Property>
   
   <rdf:Property rdf:about="Q13_approximates">
     <rdfs:domain rdf:resource="SP10_Declarative_Time-Span"/>
-    <rdfs:range rdf:resource="E52_Time-Span"/>
+    <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span"/>
     <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
     >Scope note:	This property approximates a SP9 Time Intervall. The property does not state the quality or accuracy of the approximation, but an overlap in time is the minimal requirement.</rdfs:comment>
   </rdf:Property>
   
   <rdf:Property rdf:about="Q13i_approximates">
-    <rdfs:domain rdf:resource="E52_Time-Span"/>
+    <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span"/>
     <rdfs:range rdf:resource="SP10_Declarative_Time-Span"/>
   </rdf:Property>
   
@@ -483,11 +477,11 @@ In surveying and geodesy this is part of the datum definition and is often a poi
   
   <rdf:Property rdf:about="Q19_has_reference_event">
     <rdfs:domain rdf:resource="SP11_Temporal_Reference_System"/>
-    <rdfs:range rdf:resource="E5_Event"/>
+    <rdfs:range rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E5_Event"/>
   </rdf:Property>
   
   <rdf:Property rdf:about="Q19i_has_reference_event">
-    <rdfs:domain rdf:resource="E5_Event"/>
+    <rdfs:domain rdf:resource="http://www.cidoc-crm.org/cidoc-crm/E5_Event"/>
     <rdfs:range rdf:resource="SP11_Temporal_Reference_System"/>
   </rdf:Property>
   

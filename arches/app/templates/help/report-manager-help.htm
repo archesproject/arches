@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+{% load i18n %}
+<!-- this html is included in help-panel-base.htm -->
+<div class="ep-help-content">
+    <div>
+      {% blocktrans %}
+        <p>To begin, choose a template from the left panel. The differing templates respectively prioritize display of tabular attributes, a map showing location of the resource, or an image associated with the resource.</p>
+		<p>You will notice that by default, a new Report is set as <em>Inactive</em>. This allows the Report to remain hidden from users until you have finished configuring it. To configure a Report, click on it and you'll be brought to the Report Designer.</p>
+      {% endblocktrans %}
+		<p>
+			<a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "add report - click to view" %}</a>
+			<span class="ep-help-img-link">
+				<a href="{{ STATIC_URL }}img/help/add-report-to-resource-model.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+				</a>
+			</span>
+			<img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/add-report-to-resource-model.gif"></img>
+		</p>
+    </div>
+</div>

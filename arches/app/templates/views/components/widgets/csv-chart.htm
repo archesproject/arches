@@ -1,0 +1,205 @@
+{% extends "views/components/widgets/base.htm" %} {% load i18n %} {% block form %}
+<div class="row widget-wrapper">
+    <div class="form-group">
+        <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+        <!-- ko if: node -->
+        <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
+        <!-- /ko -->
+        <div class="col-xs-12">
+
+            <div class="csv-chart-menubar">
+                <ul class="list-inline">
+                    <li data-bind="click: function(){viewChart(false)}"><a class="csv-chart-menubar-item" data-bind="attr: {'href': '#file-upload-' + uniqueidClass()}, css: {'active': viewChart() == false}">{% trans "Upload Files" %}</a></li>
+                    <li data-bind="click: function(){if (uploadedFiles().length > 0){ resize(); viewChart(true);};}"><a class="csv-chart-menubar-item" data-bind="attr: {'href': '#visualize-data-' + uniqueidClass()}, css:{'disabled-link': uploadedFiles().length === 0, 'active': viewChart() == true}">{% trans "Visualize Data" %}</a></li>
+                </ul>
+            </div>
+            <div>
+                <!--CONTENT CONTAINER-->
+                <div class="csv-chart-panel" style="margin-bottom: 20px;">
+                    <!-- Upload Dataset -->
+
+                    <div class="dropzone csv-chart-panel" data-bind="dropzone: dropzoneOptions, attr: {'id': 'file-upload-' + uniqueidClass()}, visible: viewChart() == false">
+                        <div class="panel">
+                            <div>
+                                <div class="pad-ver csv-chart-panel">
+                                    <span class="btn btn-success fileinput-button dz-clickable" data-bind="css: uniqueidClass">
+                                    <i class="fa fa-plus"></i>
+                                    <span>{% trans "Add files" %}...</span>
+                                    </span>
+
+                                    <div class="btn-group pull-right">
+                                        <button id="dz-remove-btn" class="btn btn-danger cancel" type="reset" data-bind="click: reset">
+                                        <i class="ion ion-close"></i>
+                                    </button>
+                                    </div>
+                                </div>
+
+                                <div class="dz-previews" data-bind="css: uniqueidClass">
+                                    <!-- ko foreach: filesJSON -->
+                                    <div class="media pad-top bord-top">
+                                        <div class="media-body">
+                                            <div class="media-block">
+                                                <div class="media-left">
+                                                    <!-- ko if: ko.unwrap(type).indexOf('image') >= 0 -->
+                                                    <img class="dz-img" width="50" height="50" data-bind="attr: {src: ko.unwrap(url) ? url : content }">
+                                                    <!-- /ko -->
+                                                </div>
+                                                <div class="media-body">
+                                                    <p class="text-main text-bold mar-no text-overflow" data-bind="text: name"></p>
+                                                    <!-- ko if: $data.error -->
+                                                    <span class="dz-error text-danger text-sm" data-bind="text: error"></span>
+                                                    <!-- /ko -->
+                                                    <p class="text-sm" data-bind="html: $parent.formatSize($data)"></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="media-right" data-bind="click: $parent.removeFile">
+                                            <button class="btn btn-xs btn-danger dz-cancel"><i class="ion ion-close"></i></button>
+                                        </div>
+                                    </div>
+                                    <!-- /ko -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Visualize Dataset -->
+                    <div class="csv-chart-panel" data-bind="attr: {'id': 'visualize-data-' + uniqueidClass()}, visible: viewChart() == true">
+                        <div id="card-container" class="csv-chart-container">
+                            <div class="panel-heading">
+                                <div class="" style="">
+                                    <h3 id="cc-title" class="panel-title csv-chart-title" data-bind="text: selectionDisplayValues().file_name"></h3>
+                                </div>
+                            </div>
+
+                            <!-- Data Entry -->
+                            <div id="add-basemap-wizard" class="panel-body card-body fade in" style="padding-top: 0px;">
+                                <div id="cards" class="tab-base card-content-container outline" style="margin-bottom: 10px; margin-top: -2px;">
+
+                                    <div id="db-arches-app-alert" class="panel data-card-alert" style=""></div>
+
+                                    <div class="panel-body card-panel-body" style="">
+                                        <div id="" class="card-content" style="padding-top: 0px; margin-bottom: 0px; padding-bottom: 0px;">
+
+                                            <!-- Card Level Alert -->
+                                            <div id="summary-card-alert" class="panel install-card-alert" style="margin-bottom: 0px;"></div>
+
+                                            <!-- File Chart -->
+                                            <div style="">
+                                                <div class="csv-chart" data-bind="nvd3Line: {data: chartData}, css: uniqueidClass"></div>
+
+                                                <!--Chart information-->
+                                                <div class="panel-body">
+                                                    <div class="row">
+
+
+                                                        <!-- Upload Date -->
+                                                        <div class="hidden-xs col-sm-6 col-lg-3">
+                                                            <!-- Upload stat -->
+                                                            <div class="pad-ver media">
+                                                                <div class="media-left">
+                                                                    <span class="icon-wrap icon-wrap-xs">
+                                                                        <i class="fa fa-cloud-upload fa-2x"></i>
+                                                                    </span>
+                                                                </div>
+
+                                                                <div class="media-body">
+                                                                    <p class="h3 text-thin media-heading" data-bind="text: selectionDisplayValues().upload_time"></p>
+                                                                    <small class="text-uppercase">{% trans "Upload date" %}</small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Sample ID -->
+                                                        <div class="hidden-xs col-sm-6 col-lg-3">
+                                                            <!-- Label -->
+                                                            <div class="pad-ver media">
+                                                                <div class="media-right">
+                                                                    <span class="icon-wrap icon-wrap-xs">
+                                                                                    <i class="fa fa-file-code-o fa-2x"></i>
+                                                                                </span>
+                                                                </div>
+
+                                                                <div class="media-body">
+                                                                    <p class="h3 text-thin media-heading" data-bind="text: selectionDisplayValues().records"></p>
+                                                                    <small class="text-uppercase">{% trans "Records" %}</small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- File Selector -->
+                                                        <div class="col-lg-6">
+                                                            <div class="csv-chart-file-selector">
+                                                                <select data-bind="options: uploadedFiles, optionsText:'name', optionsValue:'url', value: selectedUrl, chosen: {width: '100%'}"></select>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!--END CONTENT CONTAINER-->
+    </div>
+</div>
+
+<template id="file-widget-dz-preview"><span></span></template>
+{% endblock form %}
+
+{% block config_form %}
+<div class="control-label">
+    {% trans "Accepted Files" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="" placeholder="{% trans " Accepted Files " %}" id="" class="form-control input-md widget-input" data-bind="value: acceptedFiles, valueUpdate: 'keyup'">
+</div>
+
+<div class="control-label">
+    {% trans "Max File Size (mb)" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="number" placeholder="{% trans " Max File Size (mb) " %}" id="" class="form-control input-md widget-input" data-bind="value: maxFilesize">
+</div>
+{% endblock config_form %} {% block report %}
+<dt data-bind="text: label"></dt>
+
+<!-- ko if: uploadedFiles().length === 0 -->
+<dd>{% trans "None" %}</dd>
+<!-- /ko -->
+
+<!-- ko foreach: reportFiles() -->
+<dd>
+    <a class="" data-bind="attr: {href: url}">
+        <i class="ion ion-forward"></i>
+        <span data-bind="text: name"></span>
+    </a>
+</dd>
+<!-- /ko -->
+
+<!-- ko if: reportImages().length > 0 -->
+<dd>
+    <div id="report-image-grid" class="report-image-grid">
+        <!-- ko foreach: reportImages() -->
+        <div class="rp-image-grid-item">
+            <a id="" class="" target="_blank" data-bind="attr: {href: url}">
+                <img class="img-responsive" data-bind="attr: {src: url, alt: name}">
+            </a>
+        </div>
+        <!-- /ko -->
+    </div>
+</dd>
+<!-- /ko -->
+{% endblock report %}
+{% block display_value %}
+<span data-bind="text: displayValue() + ' {% trans " files uploaded " %}'">Test</span>
+{% endblock display_value %}

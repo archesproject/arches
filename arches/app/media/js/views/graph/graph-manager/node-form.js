@@ -29,30 +29,48 @@ define([
             this.node = this.graphModel.get('selectedNode');
             this.closeClicked = ko.observable(false);
             this.loading = options.loading || ko.observable(false);
-            this.failed = ko.observable(false);
-            this.functions = ko.computed(function () {
-                var functionIDs = [];
-                if (self.node()) {
-                    var datatypes = self.graphModel.get('datatypelookup')
-                    var datatype = datatypes[self.node().datatype()];
-                    functionIDs = datatype.functions;
-                }
-                return _.filter(options.functions, function(fn) {
-                    return (_.contains(functionIDs, fn.functionid) && fn.functiontype !== 'user_selectable');
-                })
-            });
+
             this.isResourceTopNode = ko.computed(function() {
                 var node = self.node();
                 return self.graphModel.get('isresource') && node && node.istopnode;
             });
+
+            /**
+            * Checks if a node's card is editable and returns a boolean useful
+            * in disabling node properties not to be changed in cards/nodegroups with data saved against them.
+            * @memberof NodeFormView.prototype
+            * @return {boolean}
+            */
+            this.checkIfImmutable = function() {
+                var isImmutable = false;
+                var node = self.node();
+                if (node) {
+                    var cards = _.filter(node.graph.get('cards')(), function(card){return card.nodegroup_id === node.nodeGroupId()})
+                    if (cards.length) {
+                        isImmutable = !cards[0].is_editable
+                    }
+                }
+                return isImmutable;
+            }
+
+            this.toggleRequired = function() {
+                var isImmutable = self.checkIfImmutable();
+                if (isImmutable === false) {
+                    self.node().isrequired(!self.node().isrequired());
+                }
+            };
+
             this.disableDatatype = ko.computed(function () {
+                var isImmutable = false;
                 var node = self.node();
                 var isInParentGroup = false;
                 if (node) {
                     isInParentGroup = self.graphModel.isNodeInParentGroup(node);
+                    isImmutable = self.checkIfImmutable();
                 }
-                return self.isResourceTopNode() || isInParentGroup;
+                return self.isResourceTopNode() || isInParentGroup || isImmutable;
             });
+
             this.disableIsCollector = ko.computed(function () {
                 var node = self.node();
                 var isCollector = false;
@@ -111,7 +129,6 @@ define([
          * @memberof NodeFormView.prototype
          */
         close: function() {
-            this.failed(false);
             this.closeClicked(true);
             if (this.node() && !this.node().dirty()) {
                 this.node().selected(false);
@@ -139,12 +156,9 @@ define([
         callAsync: function (methodName) {
             var self = this
             this.loading(true);
-            this.failed(false);
             this.graphModel[methodName](this.node(), function(response, status){
-                var success = (status === 'success');
                 self.loading(false);
                 self.closeClicked(false);
-                self.failed(!success);
             });
         },
 

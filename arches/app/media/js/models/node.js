@@ -29,20 +29,10 @@ define([
             self.icons = options.icons || [];
             self.mapSource = options.mapSource;
             self.loading = options.loading;
-            self.permissions = {};
-            var canRead = function (entity) {
-                var perms = entity.perms.default.concat(entity.perms.local).map(function(perm) {
-                    return perm.name;
-                });
-                if (_.contains(perms, 'No Access')) {
-                    return false;
-                } else {
-                    return _.contains(perms, 'Read')
-                }
-            }
-            if (options.permissions) {
-                self.permissions.users = _.filter(options.permissions.users, canRead)
-                self.permissions.groups = _.filter(options.permissions.groups, canRead)
+            self.permissions = options.permissions;
+            self.ontology_namespaces = options.ontology_namespaces || {};
+            if (options.url) {
+                self.url = options.url;
             }
 
             self._node = ko.observable('');
@@ -56,14 +46,24 @@ define([
                     return datatype();
                 },
                 write: function(value) {
-                    var datatypeRecord = self.datatypelookup[value];
-                    if (datatypeRecord) {
-                        var defaultConfig = datatypeRecord.defaultconfig;
-                        self.setupConfig(defaultConfig);
+                    if (datatype() !== value) {
+                        var datatypeRecord = self.datatypelookup[value];
+                        if (datatypeRecord) {
+                            var defaultConfig = datatypeRecord.defaultconfig;
+                            self.setupConfig(defaultConfig);
+                        }
+                        datatype(value);
                     }
-                    datatype(value);
                 },
                 owner: this
+            });
+            self.datatypeIsSearchable = ko.computed(function () {
+                var searchable = false;
+                var datatype = self.datatypelookup[self.datatype()];
+                if (datatype && datatype.configname) {
+                    searchable = datatype.issearchable;
+                }
+                return searchable;
             });
             self.datatypeConfigComponent = ko.computed(function() {
                 var component = null;
@@ -80,7 +80,8 @@ define([
             });
             self.configKeys = ko.observableArray();
             self.config = {};
-
+            self.issearchable = ko.observable(true);
+            self.isrequired = ko.observable(true);
 
             self.parse(options.source);
 
@@ -157,7 +158,9 @@ define([
                     nodegroup_id: self.nodeGroupId,
                     ontologyclass: self.ontologyclass,
                     parentproperty: self.parentproperty,
-                    config: config
+                    config: config,
+                    issearchable: self.issearchable,
+                    isrequired: self.isrequired
                 })
                 return JSON.stringify(_.extend(JSON.parse(self._node()), jsObj))
             });
@@ -175,6 +178,44 @@ define([
                     self.getValidNodesEdges();
                 }
             })
+
+            self.ontologyclass_friendlyname = ko.computed(function() {
+                return self.getFriendlyOntolgyName(self.ontologyclass());
+            });
+            self.parentproperty_friendlyname = ko.computed(function() {
+                return self.getFriendlyOntolgyName(self.parentproperty());
+            });
+        },
+
+        /**
+         * Gets the name for an ontology uri that is more user friendly
+         * by using a namespace if possible
+         * "http://www.cidoc-crm.org/cidoc-crm/E1_Entity" could become "E1_Entity"
+         * @memberof NodeModel.prototype
+         * @param {string} ontologyname - the ontology URI to get the friendly name for
+         */
+        getFriendlyOntolgyName: function(ontologyname){
+            if(!!ontologyname){
+                var uri = _.chain(this.ontology_namespaces)
+                .keys()
+                .find(function(namespace){
+                    return ontologyname.indexOf(namespace) !== -1;
+                })
+                .value();
+
+                if(!!uri){
+                    namespace = this.ontology_namespaces[uri];
+                    if(!!namespace){
+                        return ontologyname.replace(uri, namespace + ":")
+                    }else{
+                        return ontologyname.replace(uri, '');
+                    }
+                }else{
+                    return ontologyname
+                }
+            }else{
+                return '';
+            }
         },
 
         /**
@@ -190,6 +231,8 @@ define([
             self.datatype(source.datatype);
             self.ontologyclass(source.ontologyclass);
             self.parentproperty(source.parentproperty);
+            self.issearchable(source.issearchable);
+            self.isrequired(source.isrequired);
 
             if (source.config) {
                 self.setupConfig(source.config);
@@ -204,7 +247,16 @@ define([
 
         setupConfig: function(config) {
             var self = this;
-            self.configKeys.removeAll();
+            var keys = [];
+            var datatypeRecord = this.datatypelookup[this.datatype()];
+            if (datatypeRecord && datatypeRecord.defaultconfig && config) {
+                var defaultConfig = datatypeRecord.defaultconfig;
+                _.each(defaultConfig, function (value, key) {
+                    if (!config.hasOwnProperty(key)) {
+                        config[key] = value;
+                    }
+                });
+            }
             _.each(config, function(configVal, configKey) {
                 if (!ko.isObservable(self.config[configKey])) {
                     self.config[configKey] = Array.isArray(configVal) ?
@@ -213,8 +265,9 @@ define([
                 } else {
                     self.config[configKey](configVal);
                 }
-                self.configKeys.push(configKey);
+                keys.push(configKey);
             });
+            self.configKeys(keys);
         },
 
         /**

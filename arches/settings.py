@@ -18,15 +18,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import inspect
-# Django settings for Arches project.
+
+
+#########################################
+###          STATIC SETTINGS          ###
+#########################################
 
 MODE = 'PROD' #options are either "PROD" or "DEV" (installing with Dev mode set, gets you extra dependencies)
 DEBUG = True
 INTERNAL_IPS = ('127.0.0.1',)
-
-#########################################
-###  START PACKAGE SPECIFIC SETTINGS  ###
-#########################################
 
 DATABASES = {
     'default': {
@@ -40,13 +40,10 @@ DATABASES = {
     }
 }
 
-RESOURCE_MODEL = {
-    # override this setting in your packages settings.py file
-    # to set the default model for the system to use
-    # Your model needs to inherit from 'arches.app.models.resource.Resource' to work
-    'default': 'arches.app.models.resource.Resource'
-}
+COUCHDB_URL = 'http://admin:admin@localhost:5984' # defaults to localhost:5984
 
+# from http://django-guardian.readthedocs.io/en/stable/configuration.html#anonymous-user-name
+ANONYMOUS_USER_NAME = None
 
 ELASTICSEARCH_HTTP_PORT = 9200 # this should be in increments of 200, eg: 9400, 9600, 9800
 SEARCH_BACKEND = 'arches.app.search.search.SearchEngine'
@@ -55,83 +52,27 @@ ELASTICSEARCH_HOSTS = [
     {'host': 'localhost', 'port': ELASTICSEARCH_HTTP_PORT}
 ]
 ELASTICSEARCH_CONNECTION_OPTIONS = {'timeout': 30}
+# a prefix to append to all elasticsearch indexes, note: must be lower case
+ELASTICSEARCH_PREFIX = ''
 
-
-SEARCH_ITEMS_PER_PAGE = 5
-SEARCH_EXPORT_ITEMS_PER_PAGE = 100000
-SEARCH_DROPDOWN_LENGTH = 100
-WORDS_PER_SEARCH_TERM = 10 # set to None for unlimited number of words allowed for search terms
-
-DISPLAY_NAME_FOR_UNNAMED_ENTITIES = 'Unnamed Resource' # override this setting in your packages settings.py file
-
-# override this setting in your packages settings.py file
-# entity type that holds the spatial coordinates of resources
-ENTITY_TYPE_FOR_MAP_DISPLAY = ''
-
-LIMIT_ENTITY_TYPES_TO_LOAD = None #(
-    # override this setting in your packages settings.py file
-#    'ARCHAEOLOGICAL HERITAGE (ARTIFACT).E18',
-#)
-
-DATA_CONCEPT_SCHEME = ''
-
-ETL_USERNAME = 'ETL' # override this setting in your packages settings.py file
-
-LIVERELOAD_PORT = 35729 # usually only used in development, 35729 is default for livereload browser extensions
-
-
-GOOGLE_ANALYTICS_TRACKING_ID = None
-
-# from http://django-guardian.readthedocs.io/en/stable/configuration.html#anonymous-user-name
-ANONYMOUS_USER_NAME = None
-
-def RESOURCE_TYPE_CONFIGS():
-    return {
-        # override this setting in your packages settings.py file
-        #
-        # 'HERITAGE_RESOURCE.E18': {
-        #     'resourcetypeid': 'HERITAGE_RESOURCE.E18',
-        #     'name': _('Heritage Resource'),
-        #     'icon_class': 'fa fa-trophy',
-        #     'default_page': 'summary',
-        #     'description': _('INSERT RESOURCE DESCRIPTION HERE'),
-        #     'categories': [_('Resource')],
-        #     'has_layer': True,
-        #     'on_map': True,
-        #     'marker_color': '#3366FF',
-        #     'stroke_color': '#3366FF',
-        #     'fill_color': '#3366FF',
-        #     'primary_name_lookups': {
-        #         'entity_type': 'NAME.E41',
-        #         'lookup_value': 'Primary'
-        #     },
-        #     'sort_order': 1
-        # },
-    }
-
-GEOCODING_PROVIDERS = [
-    {'name': 'MapZen', 'api_key':'', 'id':'MapzenGeocoder'},
-    {'name': 'Bing', 'api_key':'', 'id':'BingGeocoder'},
-    ]
-
-
-EXPORT_CONFIG = ''
-
-DATE_SEARCH_ENTITY_TYPES = []
-
-SPARQL_ENDPOINT_PROVIDERS = (
-    'arches.app.utils.data_management.sparql_providers.aat_provider.AAT_Provider',
-)
-
-APP_NAME = 'Arches'
-
-#######################################
-###  END PACKAGE SPECIFIC SETTINGS  ###
-#######################################
-
+USE_SEMANTIC_RESOURCE_RELATIONSHIPS = True
 ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 PACKAGE_ROOT = ROOT_DIR
 PACKAGE_NAME = PACKAGE_ROOT.split(os.sep)[-1]
+RESOURCE_IMPORT_LOG = 'arches/logs/resource_import.log'
+
+RESOURCE_FORMATERS = {
+    'csv': 'arches.app.utils.data_management.resources.formats.csvfile.CsvWriter',
+    'json': 'arches.app.utils.data_management.resources.formats.archesjson.JsonWriter',
+    'tilecsv': 'arches.app.utils.data_management.resources.formats.csvfile.TileCsvWriter',
+    'xml': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter',
+    'pretty-xml': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter',
+    'json-ld': 'arches.app.utils.data_management.resources.formats.rdffile.JsonLdWriter',
+    'n3': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter',
+    'nt': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter',
+    'trix': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter',
+    'rdfa': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter'
+}
 
 ONTOLOGY_PATH = os.path.join(ROOT_DIR, 'db', 'ontologies', 'cidoc_crm')
 ONTOLOGY_BASE = 'cidoc_crm_v6.2.xml'
@@ -143,18 +84,77 @@ ONTOLOGY_EXT = [
     'CRMarchaeo_v1.4.rdfs.xml',
     'CRMgeo_v1.2.rdfs.xml',
     'CRMdig_v3.2.1.rdfs.xml',
-    'CRMinf_v0.7.rdfs.xml'
+    'CRMinf_v0.7.rdfs.xml',
+    'arches_crm_enhancements.xml'
 ]
 
+# Set the ontolgoy namespace prefixes to use in the UI, set the namespace to '' omit a prefix
+# Users can also override existing namespaces as well if you like
+ONTOLOGY_NAMESPACES = {
+    #'http://my_namespace_here/': 'some_ns',
+    #'http://www.w3.org/1999/02/22-rdf-syntax-ns#': 'RDF' <-- note the all caps
+    'http://www.cidoc-crm.org/cidoc-crm/': '',
+    'http://www.ics.forth.gr/isl/CRMarchaeo/': '',
+    'http://www.ics.forth.gr/isl/CRMdig/': '',
+    'http://www.ics.forth.gr/isl/CRMgeo/': '',
+    'http://www.ics.forth.gr/isl/CRMinf/': '',
+    'http://www.ics.forth.gr/isl/CRMsci/': '',
+}
+
+# A context to supply for use in export of resource instances in JSON-LD format
+JSON_LD_CONTEXT = {
+    # "crm": "http://www.cidoc-crm.org/cidoc-crm/",
+    # "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    # "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    # "dc": "http://purl.org/dc/elements/1.1/",
+    # "dcterms": "http://purl.org/dc/terms/",
+    # "schema": "http://schema.org/",
+    # "skos": "http://www.w3.org/2004/02/skos/core#",
+    # "foaf": "http://xmlns.com/foaf/0.1/",
+    # "xsd": "http://www.w3.org/2001/XMLSchema#",
+    # "pi": "http://linked.art/ns/prov/",
+    # "aat": "http://vocab.getty.edu/aat/",
+    # "ulan": "http://vocab.getty.edu/ulan/",
+    # "tgn": "http://vocab.getty.edu/tgn/",
+    # "id": "@id",
+    # "type": "@type",
+    # "Period": "crm:E4_Period",
+    # "Event": "crm:E5_Event",
+    # "Activity": "crm:E7_Activity",
+    # "identified_by": {
+    #     "@id": "crm:P1_is_identified_by",
+    #     "@type": "@id",
+    #     "@container": "@set"
+    # },
+    # "identifies": {
+    #     "@id": "crm:P1i_identifies",
+    #     "@type": "@id"
+    # }
+}
+
+# This is the namespace to use for export of data (for RDF/XML for example)
+# Ideally this should point to the url where you host your site
+ARCHES_NAMESPACE_FOR_DATA_EXPORT = 'http://localhost/'
+
+PREFERRED_COORDINATE_SYSTEMS = (
+    {"name": "Geographic", "srid": "4326", "proj4": "+proj=longlat +datum=WGS84 +no_defs", "default": True}, #Required
+)
+
+ANALYSIS_COORDINATE_SYSTEM_SRID = 3857 #Coord sys units must be meters
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
 MANAGERS = ADMINS
 
-POSTGIS_VERSION = (2, 0, 0)
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  #<-- Only need to uncomment this for testing without an actual email server
+# EMAIL_USE_TLS = True
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_HOST_USER = 'xxxx@xxx.com'
+# EMAIL_HOST_PASSWORD = 'xxxxxxx'
+# EMAIL_PORT = 587
 
-SITE_ID = 1
+POSTGIS_VERSION = (2, 0, 0)
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
@@ -237,6 +237,9 @@ STATICFILES_FINDERS = (
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'c7ky-mc6vdnv+avp0r@(a)8y^51ex=25nogq@+q5$fnc*mxwdi'
+JWT_KEY = SECRET_KEY
+JWT_TOKEN_EXPIRATION = 50 #days before the token becomes stale
+JWT_ALGORITHM = 'HS256'
 
 TEMPLATES = [
     {
@@ -259,7 +262,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.messages.context_processors.messages',
                 'arches.app.utils.context_processors.livereload',
-                'arches.app.utils.context_processors.resource_types',
                 'arches.app.utils.context_processors.map_info',
                 'arches.app.utils.context_processors.app_settings',
             ],
@@ -271,6 +273,7 @@ TEMPLATES = [
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend', # this is default
     'guardian.backends.ObjectPermissionBackend',
+    'arches.app.utils.permission_backend.PermissionBackend',
 )
 
 INSTALLED_APPS = (
@@ -285,24 +288,33 @@ INSTALLED_APPS = (
     'arches.app.models',
     'arches.management',
     'guardian',
+    'captcha',
+    'revproxy',
+    'corsheaders',
+    #'debug_toolbar'
 )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = [
+    #'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'arches.app.utils.middleware.TokenMiddleware',
     #'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    'arches.app.utils.middleware.JWTAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'arches.app.utils.set_anonymous_user.SetAnonymousUser',
-    # 'arches.app.utils.bing_geocoder'
-)
+    'arches.app.utils.middleware.SetAnonymousUser',
+]
 
 ROOT_URLCONF = 'arches.urls'
 
 WSGI_APPLICATION = 'arches.wsgi.application'
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 LOGGING = {
     'version': 1,
@@ -325,9 +337,92 @@ LOGGING = {
 
 LOGIN_URL = 'auth'
 
-# Package specific validation.
-# Should be over-written in the package settings file.
-PACKAGE_VALIDATOR = 'arches.app.utils.mock_package_validator'
+PROFILE_LOG_BASE = os.path.join(ROOT_DIR, 'logs')
+
+BULK_IMPORT_BATCH_SIZE = 2000
+
+SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Local.json')
+
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'arches.app.utils.password_validation.NumericPasswordValidator', #Passwords cannot be entirely numeric
+    },
+    {
+        'NAME': 'arches.app.utils.password_validation.SpecialCharacterValidator', #Passwords must contain special characters
+        'OPTIONS': {
+            'special_characters': ('!','@','#',')','(','*','&','^','%','$'),
+        }
+    },
+    {
+        'NAME': 'arches.app.utils.password_validation.HasNumericCharacterValidator', #Passwords must contain 1 or more numbers
+    },
+    {
+        'NAME': 'arches.app.utils.password_validation.HasUpperAndLowerCaseValidator', #Passwords must contain upper and lower characters
+    },
+    {
+        'NAME': 'arches.app.utils.password_validation.MinLengthValidator', #Passwords must meet minimum length requirement
+        'OPTIONS': {
+            'min_length': 9,
+        }
+    },
+]
+
+USE_LIVERELOAD = False
+LIVERELOAD_PORT = 35729 # usually only used in development, 35729 is default for livereload browser extensions
+
+ENABLE_CAPTCHA = True
+# RECAPTCHA_PUBLIC_KEY = ''
+# RECAPTCHA_PRIVATE_KEY = ''
+# RECAPTCHA_USE_SSL = False
+NOCAPTCHA = True
+# RECAPTCHA_PROXY = 'http://127.0.0.1:8000'
+
+# group to assign users who self sign up via the web ui
+USER_SIGNUP_GROUP = 'Crowdsource Editor'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}
+
+DATE_IMPORT_EXPORT_FORMAT = '%Y-%m-%d'
+
+#######################################
+###       END STATIC SETTINGS       ###
+#######################################
+
+
+
+##########################################
+###   RUN TIME CONFIGURABLE SETTINGS   ###
+##########################################
+
+PHONE_REGEX = r'^\+\d{8,15}$'
+SEARCH_ITEMS_PER_PAGE = 5
+SEARCH_EXPORT_ITEMS_PER_PAGE = 100000
+MOBILE_DOWNLOAD_RESOURCE_LIMIT = 50
+RELATED_RESOURCES_PER_PAGE = 15
+RELATED_RESOURCES_EXPORT_LIMIT = 10000
+SEARCH_DROPDOWN_LENGTH = 100
+WORDS_PER_SEARCH_TERM = 10 # set to None for unlimited number of words allowed for search terms
+
+ETL_USERNAME = 'ETL' # override this setting in your packages settings.py file
+
+GOOGLE_ANALYTICS_TRACKING_ID = None
+
+DEFAULT_GEOCODER = "10000000-0000-0000-0000-010000000000"
+
+SPARQL_ENDPOINT_PROVIDERS = (
+    {'SPARQL_ENDPOINT_PROVIDER':'arches.app.utils.data_management.sparql_providers.aat_provider.AAT_Provider'},
+)
+
+APP_NAME = 'Arches'
+
+APP_TITLE = 'Arches | Heritage Data Management'
+COPYRIGHT_TEXT = 'All Rights Reserved.'
+COPYRIGHT_YEAR = '2016'
 
 # Bounding box for geometry data validation. By default set to coordinate system bounding box.
 # NOTE: This is not used by the front end of the application.
@@ -341,21 +436,16 @@ RESOURCE_GRAPH_LOCATIONS = (
     os.path.join(ROOT_DIR, 'db', 'graphs', 'resource_models'),
 )
 
-CONCEPT_SCHEME_LOCATIONS = (
-    # Put strings here, like "/home/data/authority_files" or "C:/data/authority_files".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
+PROTECTED_GRAPHS = ('22000000-0000-0000-0000-000000000000', '22000000-0000-0000-0000-000000000001',)
 
-    # 'absolute/path/to/authority_files',
-    # os.path.join(PACKAGE_ROOT, 'source_data', 'sample_data', 'concepts', 'sample_authority_files'),
-)
-
-BUSISNESS_DATA_FILES = (
+BUSINESS_DATA_FILES = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
 )
 
+DATATYPE_LOCATIONS = ['arches.app.datatypes',]
+FUNCTION_LOCATIONS = ['arches.app.functions',]
 # If you are manually managing your resource tile cache, you may want to "seed"
 # the cache (or prerender some tiles) for low zoom levels.  You can do this by
 # running:
@@ -364,7 +454,7 @@ BUSISNESS_DATA_FILES = (
 # The following settings control the extent and max zoom level to which tiles
 # will be seeded.  Be aware, seeding tiles at high zoom levels (more zoomed in)
 # will take a long time
-CACHE_SEED_BOUNDS = (-89.99, 179.99, 89.99, -179.99)
+CACHE_SEED_BOUNDS = (-122.0, -52.0, 128.0, 69.0)
 CACHE_SEED_MAX_ZOOM = 5
 
 # configure where the tileserver should store its cache
@@ -387,16 +477,39 @@ MAPBOX_API_KEY = '' # Put your Mapbox key here!
 MAPBOX_SPRITES = "mapbox://sprites/mapbox/basic-v9"
 MAPBOX_GLYPHS = "mapbox://fonts/mapbox/{fontstack}/{range}.pbf"
 
-# Default map settings for search and map layer manager pages
-DEFAULT_MAP_X = 0
-DEFAULT_MAP_Y = 0
 DEFAULT_MAP_ZOOM = 0
 MAP_MIN_ZOOM = 0
 MAP_MAX_ZOOM = 20
 
-# bounds for search results hex binning fabric
+# If True, users can make edits to graphs that are locked
+# (generally because they have resource intances saved against them)
+# Changing this setting to True and making graph modifications may result in
+# disagreement between your Resource Models and Resource Instances potentially
+# causing your application to break.
+OVERRIDE_RESOURCE_MODEL_LOCK = False
+
+# bounds for search results hex binning fabric (search grid).
 # a smaller bbox will give you less distortion in hexes and better performance
-HEX_BIN_BOUNDS = (-122, -52, 128, 69)
+DEFAULT_BOUNDS = {
+    "type": "FeatureCollection",
+    "features": [{
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [
+                [
+                    [-122, -52],
+                    [128, -52],
+                    [128, 69],
+                    [-122, 69],
+                    [-122, -52]
+                ]
+            ]
+        },
+        "type": "Feature",
+        "properties": {}
+    }]
+}
+
 # size to use for hex binning search results on map (in km)
 HEX_BIN_SIZE = 100
 # binning uses elasticsearch GeoHash grid aggregation.
@@ -405,7 +518,11 @@ HEX_BIN_SIZE = 100
 # high precision binning may result in performance issues.
 HEX_BIN_PRECISION = 4
 
-BULK_IMPORT_BATCH_SIZE = 2000
+ALLOWED_POPUP_HOSTS = []
+##########################################
+### END RUN TIME CONFIGURABLE SETTINGS ###
+##########################################
+
 
 try:
     from settings_local import *

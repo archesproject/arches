@@ -20,9 +20,9 @@ import os, json, uuid
 from django.core import management
 from tests import test_settings
 from tests.base_test import ArchesTestCase
-from arches.management.commands.package_utils import resource_graphs
 from arches.app.models import models
-from arches.app.models.graph import Graph, ValidationError
+from arches.app.models.graph import Graph, GraphValidationError
+from arches.app.models.card import Card
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 # these tests can be run from the command line via
@@ -32,17 +32,14 @@ class GraphTests(ArchesTestCase):
 
     @classmethod
     def setUpClass(cls):
-        management.call_command('packages', operation='import_graphs', data_source=os.path.join(test_settings.RESOURCE_GRAPH_LOCATIONS))
+        management.call_command('packages', operation='import_graphs', source=os.path.join(test_settings.RESOURCE_GRAPH_LOCATIONS))
 
         cls.NODE_NODETYPE_GRAPHID = '22000000-0000-0000-0000-000000000001'
         cls.SINGLE_NODE_GRAPHID = '22000000-0000-0000-0000-000000000000'
-        cls.HERITAGE_RESOURCE_FIXTURE_GRAPH_ID = "11111111-0000-0000-0000-191919191919"
-        cls.HERITAGE_RESOURCE_FIXTURE = 'd8f4db21-343e-4af3-8857-f7322dc9eb4b'
 
     @classmethod
     def tearDownClass(cls):
         cls.deleteGraph("2f7f8e40-adbc-11e6-ac7f-14109fd34195")
-        cls.deleteGraph(cls.HERITAGE_RESOURCE_FIXTURE_GRAPH_ID)
 
     def setUp(self):
         graph = Graph.new()
@@ -59,7 +56,7 @@ class GraphTests(ArchesTestCase):
 
         graph.root.name = 'ROOT NODE'
         graph.root.description = 'Test Root Node'
-        graph.root.ontologyclass = 'E1_CRM_Entity'
+        graph.root.ontologyclass = 'http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity'
         graph.root.datatype = 'semantic'
         graph.root.save()
 
@@ -89,7 +86,7 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(len(graph.cards), 1)
         self.assertEqual(len(graph.get_nodegroups()), 1)
 
-    def test_graph_doesnt_polute_db(self):
+    def test_graph_doesnt_pollute_db(self):
         """
         test that the mere act of creating a Graph instance doesn't save anything to the database
 
@@ -169,8 +166,10 @@ class GraphTests(ArchesTestCase):
         the nodes as opposed to a node with the same attribute values
 
         """
-        root = models.Node.objects.get(pk=self.HERITAGE_RESOURCE_FIXTURE)
-        graph = Graph.objects.get(graphid=root.graph.graphid)
+
+        graph = Graph.objects.get(graphid=self.rootNode.graph_id)
+        graph.append_branch('http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID)
+        graph.save()
 
         node_mapping = {nodeid:id(node) for nodeid, node in graph.nodes.iteritems()}
 
@@ -196,8 +195,8 @@ class GraphTests(ArchesTestCase):
         """
 
         graph = Graph.new(name='TEST RESOURCE')
-        graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
-        graph_copy = graph.copy()
+        graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
+        graph_copy = graph.copy()['copy']
 
         self.assertEqual(len(graph_copy.nodes), 3)
         self.assertEqual(len(graph_copy.edges), 2)
@@ -298,7 +297,7 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(len(graph.cards), 1)
         self.assertEqual(len(graph.get_nodegroups()), 1)
 
-        appended_graph = graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
+        appended_graph = graph.append_branch('http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID)
         graph.save()
 
         self.assertEqual(len(graph.nodes), 3)
@@ -325,7 +324,7 @@ class GraphTests(ArchesTestCase):
 
 
         # confirm that a non-grouped node takes on the parent group when appended
-        appended_branch = graph.append_branch('P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
+        appended_branch = graph.append_branch('http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', graphid=self.SINGLE_NODE_GRAPHID)
         self.assertEqual(len(graph.nodes), 4)
         self.assertEqual(len(graph.edges), 3)
         self.assertEqual(len(graph.cards), 2)
@@ -346,60 +345,61 @@ class GraphTests(ArchesTestCase):
 
         graph = Graph.objects.get(node=self.rootNode)
         graph.isresource = True
-        self.assertIsNotNone(graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID))
+        self.assertIsNotNone(graph.append_branch('http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID))
 
         # try to append to any other node that is not the root
         for node in graph.nodes.itervalues():
             if node is not graph.root:
-                with self.assertRaises(ValidationError):
-                    graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID, nodeid=node.nodeid)
+                with self.assertRaises(GraphValidationError):
+                    graph.append_branch('http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID, nodeid=node.nodeid)
 
         # try to append a non-grouped graph
-        with self.assertRaises(ValidationError):
-            graph.append_branch('P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
+        with self.assertRaises(GraphValidationError):
+            graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
 
 
         graph = Graph.objects.get(graphid=self.SINGLE_NODE_GRAPHID)
         # test that we can't append a single non-grouped node to a graph that is a single non grouped node
-        with self.assertRaises(ValidationError):
-            graph.append_branch('P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
+        with self.assertRaises(GraphValidationError):
+            graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
 
         graph = Graph.new()
         graph.root.datatype = 'string'
         graph.update_node(JSONSerializer().serializeToPython(graph.root))
 
         # test that we can't append a card to a graph that is a card that at it's root is not semantic
-        with self.assertRaises(ValidationError):
-            graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
+        with self.assertRaises(GraphValidationError):
+            graph.append_branch('http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID)
 
         # test that we can't append a card as a child to another card
-        graph.append_branch('P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
+        graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
         for node in graph.nodes.itervalues():
             if node != graph.root:
-                with self.assertRaises(ValidationError):
-                    graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID, nodeid=node.nodeid)
+                with self.assertRaises(GraphValidationError):
+                    graph.append_branch('http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID, nodeid=node.nodeid)
 
 
         # create card collector graph to use for appending on to other graphs
         collector_graph = Graph.new()
-        collector_graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
+        collector_graph.append_branch('http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID)
         collector_graph.save()
 
         # test that we can't append a card collector on to a graph that is a card
         graph = Graph.new()
-        with self.assertRaises(ValidationError):
-            graph.append_branch('P1_is_identified_by', graphid=collector_graph.graphid)
+        with self.assertRaises(GraphValidationError):
+            graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=collector_graph.graphid)
 
         # test that we can't append a card collector to another card collector
-        collector_copy = collector_graph.copy()
-        with self.assertRaises(ValidationError):
-            collector_copy.append_branch('P1_is_identified_by', graphid=collector_graph.graphid)
+
+        collector_copy = collector_graph.copy()['copy']
+        with self.assertRaises(GraphValidationError):
+            collector_copy.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=collector_graph.graphid)
 
         # test that we can't append a card to a node in a child card within a card collector
         for node in collector_graph.nodes.itervalues():
             if node != collector_graph.root:
-                with self.assertRaises(ValidationError):
-                    collector_graph.append_branch('P1_is_identified_by', graphid=graph.graphid, nodeid=node.nodeid)
+                with self.assertRaises(GraphValidationError):
+                    collector_graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=graph.graphid, nodeid=node.nodeid)
 
     def test_node_update(self):
         """
@@ -413,7 +413,7 @@ class GraphTests(ArchesTestCase):
         # the proper number of groups are properly relfected in the graph
 
         graph = Graph.objects.get(pk=self.rootNode.graph.graphid)
-        graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
+        graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
 
         node_to_update = None
         for node_id, node in graph.nodes.iteritems():
@@ -430,7 +430,7 @@ class GraphTests(ArchesTestCase):
         for node in graph.nodes.itervalues():
             self.assertEqual(graph.root.nodegroup, node.nodegroup)
 
-        graph.append_branch('P1_is_identified_by', nodeid=node_type_node['nodeid'], graphid=self.SINGLE_NODE_GRAPHID)
+        graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', nodeid=node_type_node['nodeid'], graphid=self.SINGLE_NODE_GRAPHID)
         for edge in graph.edges.itervalues():
             if str(edge.domainnode_id) == str(node_type_node['nodeid']):
                 child_nodegroup_node = JSONDeserializer().deserialize(JSONSerializer().serialize(edge.rangenode))
@@ -474,26 +474,26 @@ class GraphTests(ArchesTestCase):
         # test moving a single node to another branch
         # this node should be grouped with it's new parent nodegroup
         graph = Graph.objects.get(pk=self.rootNode.graph.graphid)
-        branch_one = graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
+        branch_one = graph.append_branch('http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID)
         for node in branch_one.nodes.itervalues():
             if node is branch_one.root:
                 node.name = 'branch_one_root'
             else:
                 node.name = 'branch_one_child'
-        branch_two = graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
+        branch_two = graph.append_branch('http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID)
         for node in branch_two.nodes.itervalues():
             if node is branch_two.root:
                 node.name = 'branch_two_root'
             else:
                 node.name = 'branch_two_child'
-        branch_three = graph.append_branch('P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
+        branch_three = graph.append_branch('http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', graphid=self.SINGLE_NODE_GRAPHID)
         branch_three.root.name = 'branch_three_root'
         self.assertEqual(len(graph.edges), 5)
         self.assertEqual(len(graph.nodes), 6)
 
         branch_three_nodeid = branch_three.nodes.iterkeys().next()
         branch_one_rootnodeid = branch_one.root.nodeid
-        graph.move_node(branch_three_nodeid, 'P1_is_identified_by', branch_one_rootnodeid)
+        graph.move_node(branch_three_nodeid, 'http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', branch_one_rootnodeid)
         self.assertEqual(len(graph.edges), 5)
         self.assertEqual(len(graph.nodes), 6)
 
@@ -513,9 +513,9 @@ class GraphTests(ArchesTestCase):
         # test moving a branch to another branch
         # this branch should NOT be grouped with it's new parent nodegroup
         branch_two_rootnodeid = branch_two.root.nodeid
-        with self.assertRaises(ValidationError):
-            graph.move_node(branch_one_rootnodeid, 'P1_is_identified_by', branch_two_rootnodeid)
-        graph.move_node(branch_one_rootnodeid, 'P1_is_identified_by', branch_two_rootnodeid, skip_validation=True)
+        with self.assertRaises(GraphValidationError):
+            graph.move_node(branch_one_rootnodeid, 'http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', branch_two_rootnodeid)
+        graph.move_node(branch_one_rootnodeid, 'http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', branch_two_rootnodeid, skip_validation=True)
         self.assertEqual(len(graph.edges), 5)
         self.assertEqual(len(graph.nodes), 6)
 
@@ -542,7 +542,7 @@ class GraphTests(ArchesTestCase):
         # save and retrieve the graph from the database and confirm that
         # the graph shape has been saved properly
         # have to set the parentnodegroup nodes to semantic datatype to pass validation
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(GraphValidationError):
             graph.save()
         for node in branch_two.nodes.itervalues():
             node.datatype = 'semantic'
@@ -612,7 +612,7 @@ class GraphTests(ArchesTestCase):
 
         graph = Graph.objects.get(pk=self.rootNode.graph.graphid)
         graph.clear_ontology_references()
-        graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
+        graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
         for node_id, node in graph.nodes.iteritems():
             self.assertTrue(node.ontologyclass is None)
         for edge_id, edge in graph.edges.iteritems():
@@ -644,7 +644,7 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(card_count_after-card_count_before, 1)
 
         # test that data is persisited propertly during an append opertation
-        graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
+        graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
         graph.save()
 
         nodes_count_after = models.Node.objects.count()
@@ -724,7 +724,7 @@ class GraphTests(ArchesTestCase):
 
         """
         graph = Graph.new(name='TEST',is_resource=False,author='TEST')
-        graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
+        graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
         graph.save()
         node = models.Node.objects.get(graph=graph,name="Node")
 
@@ -751,7 +751,7 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(len(graph.cards), 1)
         self.assertEqual(len(graph.get_nodegroups()), 1)
 
-        graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
+        graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
         graph.save()
         node = models.Node.objects.get(graph=graph,name="Node Type")
         graph.delete_node(node)
@@ -773,17 +773,18 @@ class GraphTests(ArchesTestCase):
 
         self.assertEqual(len(graph.cards), 1)
         for card in graph.get_cards():
-            self.assertEqual(card.name, graph.name)
-            self.assertEqual(card.description, graph.description)
+            self.assertEqual(card['name'], graph.name)
+            self.assertEqual(card['description'], graph.description)
+            card = Card.objects.get(pk=card['cardid'])
             card.name = 'TEST card name'
             card.description = 'TEST card description'
             card.save()
 
         for card in graph.get_cards():
-            self.assertEqual(card.name, 'TEST')
-            self.assertEqual(card.description, 'A test description')
+            self.assertEqual(card['name'], 'TEST')
+            self.assertEqual(card['description'], 'A test description')
 
-        graph.append_branch('P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
+        graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
         graph.save()
 
         for node in graph.nodes.itervalues():
@@ -796,67 +797,55 @@ class GraphTests(ArchesTestCase):
 
         self.assertEqual(len(graph.get_cards()), 2)
         for card in graph.get_cards():
-            if str(card.nodegroup_id) == str(graph.root.nodegroup_id):
-                self.assertEqual(card.name, graph.name)
-                self.assertEqual(card.description, graph.description)
+            if str(card['nodegroup_id']) == str(graph.root.nodegroup_id):
+                self.assertEqual(card['name'], graph.name)
+                self.assertEqual(card['description'], graph.description)
             else:
-                self.assertTrue(len(graph.nodes[card.nodegroup.pk].name) > 0)
-                self.assertTrue(len(graph.nodes[card.nodegroup.pk].description) > 0)
-                self.assertEqual(card.name, graph.nodes[card.nodegroup.pk].name)
-                self.assertEqual(card.description, graph.nodes[card.nodegroup.pk].description)
+                self.assertTrue(len(graph.nodes[card['nodegroup_id']].name) > 0)
+                self.assertTrue(len(graph.nodes[card['nodegroup_id']].description) > 0)
+                self.assertEqual(card['name'], graph.nodes[card['nodegroup_id']].name)
+                self.assertEqual(card['description'], graph.nodes[card['nodegroup_id']].description)
 
 
         # TESTING A RESOURCE
         resource_graph = Graph.new(name='TEST RESOURCE',is_resource=True,author='TEST')
         resource_graph.description = 'A test resource description'
-        resource_graph.append_branch('P1_is_identified_by', graphid=graph.graphid)
+        resource_graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=graph.graphid)
         resource_graph.save()
 
         self.assertEqual(len(resource_graph.get_cards()), 2)
-        for card in resource_graph.get_cards():
-            if card.nodegroup.parentnodegroup is None:
-                self.assertEqual(card.name, graph.name)
-                self.assertEqual(card.description, graph.description)
-                card.name = 'altered root card name'
-                card.description = 'altered root card description'
-            else:
-                self.assertTrue(len(resource_graph.nodes[card.nodegroup.pk].name) > 0)
-                self.assertTrue(len(resource_graph.nodes[card.nodegroup.pk].description) > 0)
-                self.assertEqual(card.name, resource_graph.nodes[card.nodegroup.pk].name)
-                self.assertEqual(card.description, resource_graph.nodes[card.nodegroup.pk].description)
-                card.name = 'altered child card name'
-                card.description = 'altered child card description'
 
-        # loop through the cards again now looking for the updated desctiptions
         for card in resource_graph.get_cards():
-            if card.nodegroup.parentnodegroup is None:
-                self.assertEqual(card.name, 'altered root card name')
-                self.assertEqual(card.description, 'altered root card description')
+            cardobj = Card.objects.get(pk=card['cardid'])
+            if cardobj.nodegroup.parentnodegroup is None:
+                self.assertEqual(card['name'], graph.name)
+                self.assertEqual(card['description'], graph.description)
             else:
-                self.assertEqual(card.name, 'altered child card name')
-                self.assertEqual(card.description, 'altered child card description')
+                self.assertEqual(card['name'], resource_graph.nodes[card['nodegroup_id']].name)
+                self.assertEqual(card['description'], resource_graph.nodes[card['nodegroup_id']].description)
+                self.assertTrue(len(resource_graph.nodes[card['nodegroup_id']].name) > 0)
+                self.assertTrue(len(resource_graph.nodes[card['nodegroup_id']].description) > 0)
 
         resource_graph.delete()
-
 
         # TESTING A RESOURCE
         resource_graph = Graph.new(name='TEST',is_resource=True,author='TEST')
         resource_graph.description = 'A test description'
-        resource_graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
+        resource_graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
         resource_graph.save()
 
         self.assertEqual(len(resource_graph.cards), 1)
         the_card = resource_graph.cards.itervalues().next()
         for card in resource_graph.get_cards():
-            self.assertEqual(card.name, the_card.name)
-            self.assertEqual(card.description, the_card.description)
+            self.assertEqual(card['name'], the_card.name)
+            self.assertEqual(card['description'], the_card.description)
 
         # after removing the card name and description, the cards should take on the node name and description
         the_card.name = ''
         the_card.description = ''
         for card in resource_graph.get_cards():
-            self.assertEqual(card.name, resource_graph.nodes[card.nodegroup.pk].name)
-            self.assertEqual(card.description, resource_graph.nodes[card.nodegroup.pk].description)
+            self.assertEqual(card['name'], resource_graph.nodes[card['nodegroup_id']].name)
+            self.assertEqual(card['description'], resource_graph.nodes[card['nodegroup_id']].description)
 
     def test_get_root_nodegroup(self):
         """
@@ -865,7 +854,7 @@ class GraphTests(ArchesTestCase):
         """
 
         graph = Graph.new(name='TEST',is_resource=False,author='TEST')
-        graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
+        graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
 
         for node in graph.nodes.itervalues():
             if node.is_collector:
@@ -879,8 +868,87 @@ class GraphTests(ArchesTestCase):
         """
 
         graph = Graph.new(name='TEST',is_resource=False,author='TEST')
-        graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
+        graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
 
         for card in graph.cards.itervalues():
             if card.nodegroup.parentnodegroup is None:
                 self.assertEqual(graph.get_root_card(), card)
+
+    def test_graph_validation_of_invalid_ontology_class(self):
+        """
+        test to make sure invalid ontology classes aren't allowed
+
+        """
+
+        graph = Graph.objects.get(graphid=self.rootNode.graph_id)
+        new_node = graph.add_node({'nodeid':uuid.uuid1()}) # A blank node with no ontology class is specified
+        graph.add_edge({'domainnode_id':self.rootNode.pk, 'rangenode_id':new_node.pk, 'ontologyproperty':None})
+
+        with self.assertRaises(GraphValidationError) as cm:
+            graph.save()
+        the_exception = cm.exception
+        self.assertEqual(the_exception.code, 1001)
+
+    def test_graph_validation_of_null_ontology_property(self):
+        """
+        test to make sure null ontology properties aren't allowed
+
+        """
+
+        graph = Graph.objects.get(graphid=self.rootNode.graph_id)
+        graph.append_branch(None, graphid=self.NODE_NODETYPE_GRAPHID)
+
+        with self.assertRaises(GraphValidationError) as cm:
+            graph.save()
+        the_exception = cm.exception
+        self.assertEqual(the_exception.code, 1002)
+
+    def test_graph_validation_of_incorrect_ontology_property(self):
+        """
+        test to make sure a valid ontology property but incorrect use of the property fails
+
+        """
+
+        graph = Graph.objects.get(graphid=self.rootNode.graph_id)
+        graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
+
+        with self.assertRaises(GraphValidationError) as cm:
+            graph.save()
+        the_exception = cm.exception
+        self.assertEqual(the_exception.code, 1003)
+
+    def test_graph_validation_of_invalid_ontology_property(self):
+        """
+        test to make sure we use a valid ontology property value
+
+        """
+
+        graph = Graph.objects.get(graphid=self.rootNode.graph_id)
+        graph.append_branch('some invalid property', graphid=self.NODE_NODETYPE_GRAPHID)
+
+        with self.assertRaises(GraphValidationError) as cm:
+            graph.save()
+        the_exception = cm.exception
+        self.assertEqual(the_exception.code, 1004)
+
+    def test_graph_validation_of_branch_with_ontology_appended_to_graph_with_no_ontology(self):
+        """
+        test to make sure we can't append a branch with ontology defined to a graph with no ontology defined
+
+        """
+
+        graph = Graph.new()
+        graph.name = "TEST GRAPH"
+        graph.ontology = None
+        graph.save()
+
+        graph.root.name = 'ROOT NODE'
+        graph.root.description = 'Test Root Node'
+        graph.root.ontologyclass = 'http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity'
+        graph.root.datatype = 'semantic'
+        graph.root.save()
+
+        with self.assertRaises(GraphValidationError) as cm:
+            graph.save()
+        the_exception = cm.exception
+        self.assertEqual(the_exception.code, 1005)

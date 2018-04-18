@@ -6,6 +6,7 @@
       name: 'map-widget',
       params: {
         searchAggregations: aggregations,
+        searchBuffer: searchBuffer,
         resizeOnChange: resizeOnChange,
         type: 'search-filter',
         configForm: false,
@@ -13,6 +14,7 @@
         value: filter.feature_collection,
         results: results,
         query: query,
+        clearSearch: clearSearch,
         state: 'form',
         config: {
             basemap: defaultBasemap.name,
@@ -24,7 +26,7 @@
             featureLineWidth: 2,
             featurePointSize: 6,
             geocodePlaceholder: "Locate a Place or Address",
-            geocodeProvider: "MapzenGeocoder",
+            geocodeProvider: geocoderDefault,
             geocoderVisible: true,
             geometryTypes: [{'id':'Point','text':'Point'},{'id':'Line','text':'Line'},{'id':'Polygon','text':'Polygon'}],
             mapControlsHidden: false,

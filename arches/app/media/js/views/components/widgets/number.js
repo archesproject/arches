@@ -10,9 +10,29 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
     */
     return ko.components.register('number-widget', {
         viewModel: function(params) {
-            params.configKeys = ['placeholder', 'width', 'min', 'max'];
+            params.configKeys = ['placeholder', 'width', 'min', 'max', 'step', 'precision', 'prefix', 'suffix', 'defaultValue'];
 
             WidgetViewModel.apply(this, [params]);
+
+            var self = this;
+
+            updateVal = ko.computed(function(){
+                if (self.value()){
+                    var val = self.value();
+                    if (self.precision()) {
+                        val = Number(val).toFixed(self.precision())
+                    }
+                    self.value(Number(val));
+                }
+            }, self).extend({ throttle: 600 });
+
+            if (ko.isObservable(this.precision)) {
+                this.precision.subscribe(function(val){
+                    if (self.value() && val){
+                        self.value(Number(self.value()).toFixed(val))
+                    }
+                }, self);
+            };
         },
         template: { require: 'text!widget-templates/number' }
     });

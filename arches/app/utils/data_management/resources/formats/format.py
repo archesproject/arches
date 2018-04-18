@@ -1,10 +1,13 @@
+import os
 import uuid
+import shutil
+import datetime
 from arches.app.models.concept import Concept
+from arches.app.models import models
 from arches.app.models.models import ResourceXResource
 from arches.app.models.resource import Resource
-from arches.app.models.models import Value
+from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer
-from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import MultiPoint
@@ -12,6 +15,14 @@ from django.contrib.gis.geos import MultiPolygon
 from django.contrib.gis.geos import MultiLineString
 from django.db import connection, transaction
 from django.utils.translation import ugettext as _
+
+
+class MissingGraphException(Exception):
+     def __init__(self, value=None):
+         self.value = value
+     def __str__(self):
+         return repr(self.value)
+
 
 class ResourceImportReporter:
     def __init__(self, business_data):
@@ -40,7 +51,7 @@ class ResourceImportReporter:
 
     def update_relations_saved(self, count=1):
         self.relations_saved += count
-        print self.tiles_saved
+        print _('{0} of {1} relations saved'.format(self.relations_saved, self.relations))
 
     def report_results(self):
         if self.resources > 0:
@@ -65,7 +76,7 @@ class Reader(object):
     def import_business_data(self):
         pass
 
-    def import_relations(self, relation_configs=None, relations=None):
+    def import_relations(self, relations=None):
 
         def get_resourceid_from_legacyid(legacyid):
             ret = Resource.objects.filter(legacyid=legacyid)
@@ -75,7 +86,11 @@ class Reader(object):
             else:
                 return ret[0].resourceinstanceid
 
-        for relation in relations:
+        for relation_count, relation in enumerate(relations):
+            relation_count = relation_count + 2
+            if relation_count % 500 == 0:
+                print '{0} relations saved'.format(str(relation_count))
+
 
             def validate_resourceinstanceid(resourceinstanceid, key):
                 # Test if resourceinstancefrom is a uuid it is for a resource or if it is not a uuid that get_resourceid_from_legacyid found a resourceid.
@@ -96,40 +111,67 @@ class Reader(object):
                 # 1.) a legacyid was passed in and get_resourceid_from_legacyid could not find a resource or found multiple resources with the indicated legacyid or
                 # 2.) a uuid was passed in and it is not associated with a resource instance
                 if newresourceinstanceid == None:
-                    self.errors.append({'datatype':'legacyid', 'value':relation[key], 'source':'', 'message':'either multiple resources or no resource have this legacyid\n'})
+                    errors = []
+                    # self.errors.append({'datatype':'legacyid', 'value':relation[key], 'source':'', 'message':'either multiple resources or no resource have this legacyid\n'})
+                    errors.append({'type':'ERROR', 'message': 'Relation not created, either zero or multiple resources found with legacyid: {0}'.format(relation[key])})
+                    if len(errors) > 0:
+                        self.errors += errors
 
                 return newresourceinstanceid
 
             resourceinstancefrom = validate_resourceinstanceid(relation['resourceinstanceidfrom'], 'resourceinstanceidfrom')
             resourceinstanceto = validate_resourceinstanceid(relation['resourceinstanceidto'], 'resourceinstanceidto')
+            if relation['datestarted'] == '' or relation['datestarted'] == 'None':
+                relation['datestarted'] = None
+            if relation['dateended'] == '' or relation['dateended'] == 'None':
+                relation['dateended'] = None
 
             if resourceinstancefrom != None and resourceinstanceto != None:
                 relation = ResourceXResource(
                     resourceinstanceidfrom = Resource(resourceinstancefrom),
                     resourceinstanceidto = Resource(resourceinstanceto),
-                    relationshiptype = Value(uuid.UUID(str(relation['relationshiptype']))),
+                    relationshiptype = unicode(relation['relationshiptype']),
                     datestarted = relation['datestarted'],
                     dateended = relation['dateended'],
                     notes = relation['notes']
                 )
                 relation.save()
 
+        self.report_errors()
+
     def report_errors(self):
         if len(self.errors) == 0:
             print _("No import errors")
         else:
-            print _("***** Errors occured during import. For more information, check resource import error log: arches/arches/logs/resource_import.log")
-            with open('arches/logs/resource_import.log', 'w') as f:
-                for error in self.errors:
-                    try:
-                        f.write(_('ERROR, datatype: {0} value: {1} {2} - {3}'.format(error['datatype'], error['value'], error['source'], error['message'])))
-                    except TypeError as e:
-                        f.write(e + unicode(error))
+            print _("***** Errors occured during import. Some data may not have been imported. For more information, check resource import error log: ") + settings.RESOURCE_IMPORT_LOG
+            log_nums = [0]
+            if os.path.isfile(settings.RESOURCE_IMPORT_LOG):
+                if os.path.getsize(settings.RESOURCE_IMPORT_LOG)/1000000 > 5:
+                    for file in os.listdir('arches/logs',):
+                        try:
+                            log_nums.append(int(file.split('.')[-1]))
+                        except:
+                            pass
+
+                    archive_log_num = str(max(log_nums) + 1)
+                    shutil.copy2(settings.RESOURCE_IMPORT_LOG, settings.RESOURCE_IMPORT_LOG + '.' + archive_log_num)
+                    f = open(settings.RESOURCE_IMPORT_LOG, 'w')
+                else:
+                    f = open(settings.RESOURCE_IMPORT_LOG, 'a')
+            else:
+                f = open(settings.RESOURCE_IMPORT_LOG, 'w')
+
+            for error in self.errors:
+                timestamp = (datetime.datetime.now() - datetime.timedelta(hours=2)).strftime('%a %b %d %H:%M:%S %Y')
+                try:
+                    f.write(_(timestamp + ' ' + '{0}: {1}\n'.format(error['type'], error['message'])))
+                except TypeError as e:
+                    f.write(timestamp + ' ' + e + unicode(error))
+
 
 class Writer(object):
 
-    def __init__(self):
-        self.resource_type_configs = settings.RESOURCE_TYPE_CONFIGS()
+    def __init__(self, **kwargs):
         self.default_mapping = {
             "NAME": "ArchesResourceExport",
             "SCHEMA": [
@@ -140,31 +182,59 @@ class Writer(object):
             "RESOURCE_TYPES" : {},
             "RECORDS":[]
         }
+        self.resourceinstances = {}
+        self.file_prefix = ''
+        self.tiles = []
+        self.graph_id = None
 
-    def create_template_record(self, schema, resource, resource_type):
+    def write_resources(self, graph_id=None, resourceinstanceids=None):
         """
-        Creates an empty record from the export mapping schema and populates its values
-        with resource data that does not require the export field mapping - these include
-        entityid, primaryname and entitytypeid.
+        Returns a list of dictionaries with the following format:
+
+        {'name':file name, 'outputfile': a SringIO buffer of resource instance data in the specified format}
+
         """
-        record = {}
-        for column in schema:
-            if column['source'] == 'resource_name':
-                if resource_type != None:
-                    record[column['field_name']] = self.resource_type_configs[resource_type]['name']
-                else:
-                    record[column['field_name']] = resource['_source']['entitytypeid']
-            elif column['source'] in ('primaryname', 'entitytypeid', 'entityid'):
-                record[column['field_name']] = resource['_source'][column['source']]
-            elif column['source'] == 'alternatename':
-                record[column['field_name']] = []
-                for entity in resource['_source']['child_entities']:
-                    primaryname_type = self.resource_type_configs[resource_type]['primary_name_lookup']['entity_type']
-                    if entity['entitytypeid'] == primaryname_type and entity['label'] != resource['_source']['primaryname']:
-                        record[column['field_name']].append(entity['label'])
-            else:
-                record[column['field_name']] = []
-        return record
+
+        self.get_tiles(graph_id=graph_id, resourceinstanceids=resourceinstanceids)
+
+    def write_resource_relations(self):
+        """
+        Returns a list of dictionaries with the following format:
+
+        {'name':file name, 'outputfile': a SringIO buffer of resource relations data in the specified format}
+
+        """
+
+        pass
+
+    def get_tiles(self, graph_id=None, resourceinstanceids=None):
+        """
+        Returns a dictionary of tiles keyed by their resourceinstanceid
+
+        {
+            'resourcs instance UUID': [tile list],
+            ...
+        }
+
+        """
+
+        if (graph_id is None or graph_id is False) and resourceinstanceids is None:
+            raise MissingGraphException(_("Must supply either a graph id or a list of resource instance ids to export"))
+        self.graph_id = graph_id
+        if graph_id:
+            self.file_prefix = models.GraphModel.objects.get(graphid=graph_id).name.replace(' ', '_')
+            self.tiles = models.TileModel.objects.filter(resourceinstance__graph_id=graph_id)
+        else:
+            self.tiles = models.TileModel.objects.filter(resourceinstance_id__in=resourceinstanceids)
+
+        for tile in self.tiles:
+            try:
+                self.resourceinstances[tile.resourceinstance_id].append(tile)
+            except:
+                self.resourceinstances[tile.resourceinstance_id] = []
+                self.resourceinstances[tile.resourceinstance_id].append(tile)
+
+        return self.resourceinstances
 
     def get_field_map_values(self, resource, template_record, field_map):
         """

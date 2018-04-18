@@ -25,7 +25,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% trans "Map Layer Manager" %}
 {% endblock title %}
 
-{% block login_header %}{% endblock login_header %}
 
 {% block main_content %}
 <div class="content-panel" data-bind="click:function() { menuActive(false); }">
@@ -91,7 +90,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
                 <div class="ep-card-crud-container">
                     <div class="panel">
-                        <!-- ko if: selection().nodeid -->
+                        <!-- ko if: selection()  && selection().nodeid -->
                         <div class="panel-heading">
                             <h3 class="panel-title"><i data-bind="css: selection().config.layerIcon() || selection().layer.icon"></i> <span data-bind="text: selection().config.layerName() || selection().layer.name"></span></h3>
                         </div>
@@ -104,28 +103,28 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </div>
                         <!-- /ko -->
 
-                        <!-- ko if: !selection().nodeid -->
+                        <!-- ko if: selection()  && !selection().nodeid -->
                         <div class="panel-heading relative">
                             <h3 class="panel-title"><i data-bind="css: selection().icon"></i> <span data-bind="text: selection().name"></span></h3>
 
                             <!-- Service management buttons (for convenience) -->
                             <div class="service-buttons-heading">
-                                <button class="btn btn-danger btn-labeled btn-active-dark fa fa-trash pull-right mar-top" data-bind="click: function () { selection().delete() }">Delete Layer</button>
+                                <button class="btn btn-danger btn-labeled btn-active-dark fa fa-trash pull-right mar-top" data-bind="click: function () { selection().delete() }">{% trans "Delete Layer" %}</button>
 
                                 <!-- ko if: selection().dirty() -->
-                                <button class="btn btn-primary btn-labeled btn-active-dark fa fa-check pull-right mar-top" data-bind="click: function () { selection().save() }">Save Edits</button>
-                                <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo pull-right mar-top" data-bind="click: function () { selection().reset() }">Discard Edits</button>
+                                <button class="btn btn-primary btn-labeled btn-active-dark fa fa-check pull-right mar-top" data-bind="click: function () { selection().save() }">{% trans "Save Edits" %}</button>
+                                <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo pull-right mar-top" data-bind="click: function () { selection().reset() }">{% trans "Discard Edits" %}</button>
                                 <!-- /ko -->
                             </div>
                         </div>
 
                         <div class="panel-body basemap-preview-panel">
                             <div class="row map-service-container relative">
-                                <h3 class="config-title" style="margin-top: -10px; margin-bottom: 0px;"><i class="fa fa-binoculars"></i> Layer Preview</h3>
+                                <h3 class="config-title" style="margin-top: -10px; margin-bottom: 0px;"><i class="fa fa-binoculars"></i> {% trans "Layer Preview" %}</h3>
 
                                 <div class="map-service-manage-buttons">
                                     <div class="form-group">
-                                        <label class="control-label">Activated:</label>
+                                        <label class="control-label">{% trans "Activated:" %}</label>
                                         <span class="switch switch-small" data-bind="css: {
                                                 'on': selection().activated()
                                             }, click: function () {
@@ -171,26 +170,21 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <!-- Resource Styling Tabs -->
                                         <ul class="nav nav-tabs map-service-nav-tabs">
                                             <li class="active">
-                                                <a class="config-title-tab mar-no" data-toggle="tab" href="#styling-panel" aria-expanded="false"><i class="ion-image"></i> Service Styling</a>
+                                                <a class="config-title-tab mar-no" data-toggle="tab" href="#settings-panel" aria-expanded="false"><i class="ion-ios-settings-strong"></i> {% trans "Settings" %}</a>
                                             </li>
                                             <li class="">
-                                                <a class="config-title-tab mar-no" data-toggle="tab" href="#settings-panel" aria-expanded="false"><i class="ion-ios-settings-strong"></i> Settings</a>
+                                                <a class="config-title-tab mar-no" data-toggle="tab" href="#styling-panel" aria-expanded="false"><i class="ion-image"></i> {% trans "Service Styling" %}</a>
                                             </li>
                                         </ul>
 
                                         <div class="tab-content">
-                                            <div id="styling-panel" class="tab-pane fade active in">
-                                                <div class="row" style="margin-top: -5px; margin-left: -5px; margin-right: -5px; margin-bottom: 10px;">
-                                                    <div class="" data-bind="codemirror: { value: selectedLayerJSON, mode: { name: 'javascript', json: true }, theme: 'monokai' }"></div>
-                                                </div>
-                                            </div>
 
-                                            <div id="settings-panel" class="tab-pane fade">
+                                            <div id="settings-panel" class="tab-pane fade active in">
                                                 <div class="row service-widget-container">
                                                     <div class="form-horizontal">
                                                         <div class="panel-body" style="padding-top: 10px;">
                                                             <div class="form-group">
-                                                                <label class="control-label">Layer Name:</label>
+                                                                <label class="control-label">{% trans "Layer Name:" %}</label>
                                                                 <div class="">
                                                                     <input type="text" class="form-control" data-bind="valueUpdate: 'keyup', value: selection().name">
                                                                 </div>
@@ -246,17 +240,24 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            <div id="styling-panel" class="tab-pane fade">
+                                                <div class="row" style="margin-top: -5px; margin-left: -5px; margin-right: -5px; margin-bottom: 10px;">
+                                                    <div class="" data-bind="codemirror: { value: selectedLayerJSON, mode: { name: 'javascript', json: true }, theme: 'monokai' }"></div>
+                                                </div>
+                                            </div>
+
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
                             <div>
-                                <button class="btn btn-danger btn-labeled btn-active-dark fa fa-trash pull-right mar-top" data-bind="click: function () { selection().delete() }">Delete Layer</button>
+                                <button class="btn btn-danger btn-labeled btn-active-dark fa fa-trash pull-right mar-top" data-bind="click: function () { selection().delete() }">{% trans "Delete Layer" %}</button>
 
                                 <!-- ko if: selection().dirty() -->
-                                <button class="btn btn-primary btn-labeled btn-active-dark fa fa-check pull-right mar-top" data-bind="click: function () { selection().save() }">Save Edits</button>
-                                <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo pull-right mar-top" data-bind="click: function () { selection().reset() }">Discard Edits</button>
+                                <button class="btn btn-primary btn-labeled btn-active-dark fa fa-check pull-right mar-top" data-bind="click: function () { selection().save() }">{% trans "Save Edits" %}</button>
+                                <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo pull-right mar-top" data-bind="click: function () { selection().reset() }">{% trans "Discard Edits" %}</button>
                                 <!-- /ko -->
                             </div>
 

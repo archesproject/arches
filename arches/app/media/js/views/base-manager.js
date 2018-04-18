@@ -4,7 +4,9 @@ define([
     'knockout',
     'backbone',
     'views/page-view',
-    'view-data'
+    'view-data',
+    'bindings/datatable',
+    'uuid'
 ], function($, _, ko, Backbone, PageView, data) {
 
     var BaseManager = PageView.extend({
@@ -41,6 +43,7 @@ define([
                     return graph.isresource;
                 });
             });
+            options.viewModel.createableResources = ko.observableArray(data.createableResources);
 
             options.viewModel.setResourceOptionDisable = function(option, item) {
               if (item) {

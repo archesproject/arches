@@ -2,11 +2,11 @@ require([
     'jquery',
     'underscore',
     'knockout',
+    'uuid',
     'arches',
     'views/base-manager',
     'bindings/chosen',
-    'bindings/datatable'
-], function($, _, ko, arches, BaseManagerView) {
+], function($, _, ko, uuid, arches, BaseManagerView) {
     /**
     * a BaseManagerView representing the resource listing and recent edits pages
     */
@@ -15,27 +15,14 @@ require([
             var self = this;
 
             _.defaults(this.viewModel, {
-                showResources: ko.observable(true),
                 showFind: ko.observable(false),
                 graphId: ko.observable(null),
-                editResource: function(url, vm, e){
-                    e.stopPropagation();
-                    this.navigate(url)
-                },
-                tableConfig: {
-                    "responsive": true,
-                    "language": {
-                        "paginate": {
-                            "previous": '<i class="fa fa-angle-left"></i>',
-                            "next": '<i class="fa fa-angle-right"></i>'
-                        }
-                    }
-                }
+                arches: arches
             });
 
             this.viewModel.graphId.subscribe(function (graphid) {
                 if(graphid && graphid !== ""){
-                    self.viewModel.navigate(arches.urls.graph + graphid + '/add_resource');
+                    self.viewModel.navigate(arches.urls.add_resource(uuid.UUID.generate(), graphid));
                 }
             });
 

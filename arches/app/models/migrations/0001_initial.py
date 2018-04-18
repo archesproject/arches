@@ -6,11 +6,11 @@ import uuid
 import codecs
 import django.contrib.gis.db.models.fields
 from django.core import management
-from django.conf import settings
-from django.db import migrations, models
 from django.contrib.postgres.fields import JSONField
-from arches.app.models.models import get_ontology_storage_system
+from django.db import migrations, models
 from arches.db.migration_operations.extras import CreateExtension, CreateAutoPopulateUUIDField, CreateFunction
+from arches.app.models.models import get_ontology_storage_system
+from arches.app.models.system_settings import settings
 
 def get_sql_string_from_file(pathtofile):
     ret = []
@@ -28,7 +28,7 @@ def forwards_func(apps, schema_editor):
 
     extensions = [os.path.join(settings.ONTOLOGY_PATH, x) for x in settings.ONTOLOGY_EXT]
     management.call_command('load_ontology', source=os.path.join(settings.ONTOLOGY_PATH, settings.ONTOLOGY_BASE),
-        version=settings.ONTOLOGY_BASE_VERSION, ontology_name=settings.ONTOLOGY_BASE_NAME, id=settings.ONTOLOGY_BASE_ID, extensions=','.join(extensions))
+        version=settings.ONTOLOGY_BASE_VERSION, ontology_name=settings.ONTOLOGY_BASE_NAME, id=settings.ONTOLOGY_BASE_ID, extensions=','.join(extensions), verbosity=0)
 
 def reverse_func(apps, schema_editor):
     Ontology = apps.get_model("models", "Ontology")
@@ -42,7 +42,7 @@ def make_permissions(apps, schema_editor, with_create_permissions=True):
     User = apps.get_model("auth", "User")
     Permission = apps.get_model("auth", "Permission")
     try:
-        read_nodegroup = Permission.objects.get(codename='read_nodegroup', content_type__app_label='models', content_type__model='nodegroup')
+        read_nodegroup = Permission.objects.using(db_alias).get(codename='read_nodegroup', content_type__app_label='models', content_type__model='nodegroup')
         write_nodegroup = Permission.objects.using(db_alias).get(codename='write_nodegroup', content_type__app_label='models', content_type__model='nodegroup')
         delete_nodegroup = Permission.objects.using(db_alias).get(codename='delete_nodegroup', content_type__app_label='models', content_type__model='nodegroup')
     except Permission.DoesNotExist:
@@ -50,18 +50,18 @@ def make_permissions(apps, schema_editor, with_create_permissions=True):
             # Manually run create_permissions
             from django.contrib.auth.management import create_permissions
             assert not getattr(apps, 'models_module', None)
-            apps.models_module = True
-            create_permissions(apps, verbosity=0)
-            apps.models_module = None
+            model_app = apps.get_app_config('models')
+            model_app.models_module = True
+            create_permissions(model_app, verbosity=0)
+            model_app.models_module = None
             return make_permissions(
                 apps, schema_editor, with_create_permissions=False)
         else:
             raise
 
-
     graph_editor_group = Group.objects.using(db_alias).create(name='Graph Editor')
     graph_editor_group.permissions.add(read_nodegroup, write_nodegroup, delete_nodegroup)
-    
+
     resource_editor_group = Group.objects.using(db_alias).create(name='Resource Editor')
     rdm_admin_group = Group.objects.using(db_alias).create(name='RDM Administrator')
     app_admin_group = Group.objects.using(db_alias).create(name='Application Administrator')
@@ -73,6 +73,16 @@ def make_permissions(apps, schema_editor, with_create_permissions=True):
     anonymous_user = User.objects.using(db_alias).get(username='anonymous')
     anonymous_user.groups.add(guest_group)
 
+    admin_user = User.objects.using(db_alias).get(username='admin')
+    admin_user.groups.add(graph_editor_group)
+    admin_user.groups.add(resource_editor_group)
+    admin_user.groups.add(rdm_admin_group)
+    admin_user.groups.add(app_admin_group)
+    admin_user.groups.add(sys_admin_group)
+    admin_user.groups.add(mobile_project_admin_group)
+    admin_user.groups.add(crowdsource_editor_group)
+    admin_user.groups.add(guest_group)
+
 
 class Migration(migrations.Migration):
 
@@ -82,8 +92,6 @@ class Migration(migrations.Migration):
 
     operations = [
         CreateExtension(name='uuid-ossp'),
-
-        migrations.RunSQL(get_sql_string_from_file(os.path.join(settings.ROOT_DIR, 'db', 'install', 'dependencies', 'postgis_backward_compatibility.sql')), ''),
 
         CreateFunction(
            name='insert_relation',
@@ -218,7 +226,6 @@ class Migration(migrations.Migration):
                 ('active', models.BooleanField(default=True)),
                 ('visible', models.BooleanField(default=True)),
                 ('sortorder', models.IntegerField(blank=True, null=True, default=None)),
-                ('itemtext', models.TextField(null=True, blank=True)),
             ],
             options={
                 'db_table': 'cards',
@@ -268,7 +275,6 @@ class Migration(migrations.Migration):
                 ('classname', models.TextField(blank=True, null=True)),
                 ('configcomponent', models.TextField(blank=True, null=True)),
                 ('defaultconfig', JSONField(blank=True, db_column='defaultconfig', null=True)),
-                ('configcomponent', models.TextField(blank=True, null=True)),
                 ('configname', models.TextField(blank=True, null=True)),
                 ('isgeometric', models.BooleanField(default=False)),
             ],
@@ -570,6 +576,7 @@ class Migration(migrations.Migration):
                 ('resourceinstanceid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('legacyid', models.TextField(blank=True, unique=True, null=True)),
                 ('graph', models.ForeignKey(db_column='graphid', to='models.GraphModel')),
+                ('createdtime', models.DateTimeField(auto_now_add=True)),
             ],
             options={
                 'db_table': 'resource_instances',
@@ -634,7 +641,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='MapLayers',
+            name='MapLayer',
             fields=[
                 ('maplayerid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('name', models.TextField(unique=True)),
@@ -650,7 +657,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='MapSources',
+            name='MapSource',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.TextField(unique=True)),
@@ -662,13 +669,13 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='TileserverLayers',
+            name='TileserverLayer',
             fields=[
                 ('name', models.TextField(unique=True)),
                 ('path', models.TextField()),
                 ('config', JSONField(db_column='config')),
-                ('map_layer', models.ForeignKey(db_column='map_layerid', to='models.MapLayers')),
-                ('map_source', models.ForeignKey(db_column='map_sourceid', to='models.MapSources')),
+                ('map_layer', models.ForeignKey(db_column='map_layerid', to='models.MapLayer')),
+                ('map_source', models.ForeignKey(db_column='map_sourceid', to='models.MapSource')),
             ],
             options={
                 'db_table': 'tileserver_layers',
@@ -687,21 +694,6 @@ class Migration(migrations.Migration):
                 'managed': True,
             },
         ),
-        # migrations.AlterField(
-        #     model_name='edge',
-        #     name='graph',
-        #     field=models.ForeignKey(blank=True, db_column='graphid', null=True, on_delete=django.db.models.deletion.CASCADE, to='models.GraphModel'),
-        # ),
-        # migrations.AlterField(
-        #     model_name='form',
-        #     name='graph',
-        #     field=models.ForeignKey(db_column='graphid', on_delete=django.db.models.deletion.CASCADE, to='models.GraphModel'),
-        # ),
-        # migrations.AlterField(
-        #     model_name='node',
-        #     name='graph',
-        #     field=models.ForeignKey(blank=True, db_column='graphid', null=True, on_delete=django.db.models.deletion.CASCADE, to='models.GraphModel'),
-        # ),
         migrations.AddField(
             model_name='ddatatype',
             name='defaultwidget',

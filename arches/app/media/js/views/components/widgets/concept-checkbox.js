@@ -15,6 +15,7 @@ define([
      */
     return ko.components.register('concept-checkbox-widget', {
         viewModel: function(params) {
+            params.configKeys = ['defaultValue'];
             ConceptWidgetViewModel.apply(this, [params]);
 
             this.multiple = true;

@@ -2,17 +2,17 @@ define([
     'underscore',
     'knockout',
     'viewmodels/report',
-    'plugins/knockstrap',
+    'arches',
+    'knockstrap',
     'bindings/chosen'
-], function(_, ko, ReportViewModel) {
+], function(_, ko, ReportViewModel, arches) {
     return ko.components.register('image-report', {
         viewModel: function(params) {
             var self = this;
             params.configKeys = ['nodes'];
-
             ReportViewModel.apply(this, [params]);
             self.imgs = ko.observableArray([{
-                src: '/media/img/photo_missing.png',
+                src: arches.urls.media + 'img/photo_missing.png',
                 alt: ''
             }]);
 

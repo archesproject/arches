@@ -167,7 +167,8 @@ define(['arches',
                         self.get('nodes').push(new NodeModel({
                             source: node,
                             datatypelookup: self.get('datatypelookup'),
-                            graph: self
+                            graph: self,
+                            ontology_namespaces: self.get('root').ontology_namespaces
                         }));
                     }, this);
                     response.responseJSON.edges.forEach(function(edge){
@@ -415,7 +416,8 @@ define(['arches',
                             var nodeModel = new NodeModel({
                                 source: node,
                                 datatypelookup: datatypelookup,
-                                graph: self
+                                graph: self,
+                                ontology_namespaces: attributes.ontology_namespaces
                             });
                             if(node.istopnode){
                                 this.set('root', nodeModel);
@@ -607,10 +609,8 @@ define(['arches',
                     if (typeof callback === 'function') {
                         callback.call(scope, request, status, self);
                     }
-                    if (status === 'success' &&  request.responseJSON) {
-                        if(eventname || eventname !== ''){
-                            self.trigger(eventname, self);
-                        }
+                    if(!!eventname){
+                        self.trigger(eventname, self, request);
                     }
                 }
             }, config));

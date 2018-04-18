@@ -16,6 +16,8 @@ define([
 
         WidgetViewModel.apply(this, [params]);
 
+        var value = self.configForm ? self.defaultValue : self.value;
+
         if (this.node.config.options) {
             this.options = this.node.config.options;
             this.options().forEach(function(option) {
@@ -45,21 +47,28 @@ define([
         };
 
         this.setOptionSelection = function (opt, selected) {
-            if (self.multiple) {
-                var val = self.value();
-                self.value(
-                    selected ?
-                    _.union([opt.id], val) :
-                    _.without(val ? val : [], opt.id)
-                );
-            } else if (selected) {
-                self.value(opt.id);
+            if (ko.unwrap(self.disabled) === false) {
+                if (self.multiple) {
+                    var val = value();
+                    value(
+                        selected ?
+                        _.union([opt.id], val) :
+                        _.without(val ? val : [], opt.id)
+                    );
+                } else if (selected) {
+                  if (value() === opt.id) {
+                      value(null)
+                    }
+                  else {
+                      value(opt.id);
+                  }
+                }
             }
         };
 
         this.isOptionSelected = function (opt) {
             var selected = false;
-            var val = self.value();
+            var val = value();
             if (val && val.indexOf) {
                 selected = val.indexOf(opt.id) >= 0;
             }

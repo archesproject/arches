@@ -1,5 +1,6 @@
 from arches.app.models import models
 from arches.app.models.resource import Resource
+from arches.app.models.system_settings import settings
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query
 from django.db.models import Q
@@ -29,11 +30,11 @@ def clear_resources():
     match_all_query.delete(index='resource')
     match_all_query.delete(index='resource_relations')
 
-    print 'deleting', Resource.objects.count(), 'resources'
-    cursor = connection.cursor()
-    cursor.execute("TRUNCATE public.resource_instances CASCADE;" )
-    print Resource.objects.count(), 'resources remaining'
+    print 'deleting', Resource.objects.exclude(resourceinstanceid=settings.RESOURCE_INSTANCE_ID).count(), 'resources'
+    Resource.objects.exclude(resourceinstanceid=settings.RESOURCE_INSTANCE_ID).delete()
+    print Resource.objects.exclude(resourceinstanceid=settings.RESOURCE_INSTANCE_ID).count(), 'resources remaining'
 
     print 'deleting', models.ResourceXResource.objects.count(), 'resource relationships'
+    cursor = connection.cursor()
     cursor.execute("TRUNCATE public.resource_x_resource CASCADE;" )
     print models.ResourceXResource.objects.count(), 'resource relationships remaining'

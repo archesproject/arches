@@ -23,7 +23,6 @@ require([
         */
         initialize: function (options) {
             var self = this;
-
             /**
             * creates a request to add a new graph; redirects to the graph settings
             * page for the new graph on success
@@ -39,7 +38,7 @@ require([
                     url: url,
                     data: JSON.stringify(data),
                     success: function(response) {
-                        window.location = response.graphid + '/settings';
+                        window.location = arches.urls.graph_settings(response.graphid);
                     },
                     error: function(response) {
                         self.viewModel.loading(false);
@@ -47,6 +46,7 @@ require([
                 });
             };
 
+            this.viewModel.protectedGraphs = graphManagerData.protected_graphs;
             this.viewModel.leaveDropdown = function(e){
               $('.dropdown').dropdown('toggle')
             };
@@ -65,13 +65,13 @@ require([
 
                 graph.hover = ko.observable(false);
                 graph.clone = function() {
-                    newGraph(graph.graphid + '/clone');
+                    newGraph(arches.urls.clone_graph(graph.graphid));
                 };
                 graph.exportGraph = function(model) {
-                    window.open(graph.graphid + '/export', '_blank');
+                    window.open(arches.urls.export_graph(graph.graphid), '_blank');
                 };
                 graph.exportMappingFile = function(model) {
-                    window.open(graph.graphid + '/export_mapping_file', '_blank');
+                    window.open(arches.urls.export_mapping_file(graph.graphid), '_blank');
                 };
                 graph.deleteGraph = function () {
                     self.viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmGraphDelete.title, arches.confirmGraphDelete.text, function() {
@@ -95,6 +95,7 @@ require([
             this.viewModel.showResources = ko.observable(window.location.hash!=='#branches');
 
             _.defaults(this.viewModel, {
+                arches: arches,
                 groupedGraphs: ko.observable({
                     groups: [
                         { name: 'Resource Models', items: self.viewModel.resources() },
@@ -132,7 +133,7 @@ require([
                             if (typeof(response[0])) {
                               response = response[0].join('<br />')
                             }
-                              self.viewModel.alert(new AlertViewModel('ep-alert-red', arches.graphImportFailed.title, response[0]));
+                              self.viewModel.alert(new AlertViewModel('ep-alert-red', arches.graphImportFailed.title, response));
                             }
                             else {
                               window.location.reload(true);
@@ -152,7 +153,7 @@ require([
 
             this.viewModel.graphId.subscribe(function (graphid) {
                 if(graphid && graphid !== ""){
-                    self.viewModel.navigate(arches.urls.graph + graphid + '/settings');
+                    self.viewModel.navigate(arches.urls.graph_settings(graphid));
                 }
             });
 

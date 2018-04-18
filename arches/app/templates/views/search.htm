@@ -4,7 +4,6 @@
 
 {% block title %} {{ block.super }} {% trans "Search" %} {% endblock title %}
 
-{% block login_header %}{% endblock login_header %}
 
 {% block main_content %}
     {% include 'views/search/search-base-manager.htm' %}
@@ -15,8 +14,13 @@
 {% block pre_require_js %}
 {{block.super}}
     <script>
-        {% autoescape off %}define('search-data', [], function() {
-            return {};
-        });{% endautoescape %}
+        define('search-data', [], function() {
+            return {{% autoescape off %}
+                searchable_nodes: {{ searchable_nodes }},
+                resource_cards: {{ resource_cards }},
+                datatypes: {{ datatypes_json }},
+                saved_searches: {{ saved_searches }}
+            {% endautoescape %}};
+        });
     </script>
 {% endblock pre_require_js %}

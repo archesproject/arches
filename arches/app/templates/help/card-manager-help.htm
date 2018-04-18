@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+{% load i18n %}
+<!-- this html is included in help-panel-base.htm -->
+<div class="ep-help-content">
+    <div>
+        <p>
+          {% blocktrans %}
+          On this page you will see all of the Cards that are associated with this Resource Model. Because each Card represents a specific Branch, this is also a list of all the Branches in the model. You can add new Branches to the Resource Model directly from this page: just click "Add Card" and drag a Card from the left pane to associate it with your Resource Model. Note that some complex Branches will actually have multiple Cards, which are aggregated into a Card Container. This will become apparent when you enter the Card Designer.
+          {% endblocktrans %}
+        </p>
+		<div>
+			<p>
+				<a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "add card demonstration - click to view" %}</a>
+				<span class="ep-help-img-link">
+					<a href="{{ STATIC_URL }}img/help/add-card-to-resource-model.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+					</a>
+				</span>
+				<img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/add-card-to-resource-model.gif"></img>
+			</p>
+		</div>
+        <p>
+          {% blocktrans %}
+          When a Card is added, it comes with its initial configurations, as defined in its Branch. However, you may further customize it to meet special needs for this particular Resource Model. For example, you may want to change the label of a "Name" widget to "Building Name", or modify a Card's help text. To do so, click on the Card and you will be brought to the Card Designer.
+          {% endblocktrans %}
+        </p>
+        <p>
+          {% blocktrans %}
+          If you would like to delete a card, simply click the Remove Card button at the bottom of the card on this page. The button will be disabled if a user has already saved resource instances using this card.
+          {% endblocktrans %}
+        </p>
+    </div>
+</div>

@@ -1,0 +1,49 @@
+{% load i18n %}
+<!-- Geocode Panel -->
+    <!-- ko if: options().length > 0 -->
+    <a href="#" data-bind="click: function () {
+        query('');
+    }">
+        <i class="fa fa-close geocode-clear"></i>
+    </a>
+    <!--/ko-->
+
+    <input type="text" class="form-control input-md widget-input" data-bind="
+        attr: {
+            placeholder: placeholder
+        },
+        value: query,
+        valueUpdate: 'keyup',
+        hasFocus: isFocused,
+        event: {
+            'keydown': handleKeys
+        }
+    ">
+
+    <!-- ko if: isFocused -->
+        <!-- ko if: loading -->
+        <div class="geocoder-results panel">
+            <div class="geocoder-result-item">
+                <i class="fa fa-spinner fa-spin"></i>
+                {% trans "searching...." %}
+            </div>
+        </div>
+        <!--/ko-->
+
+        <!-- ko if: options().length > 0 -->
+        <div class="geocoder-results panel" data-bind="foreach: options">
+            <div class="geocoder-result-item" data-bind="
+                click:$parent.selection,
+                event: {
+                    'mouseover': $parent.focusItem
+                },
+                css: {
+                    'selected-geocoder-result': $data === $parent.selection(),
+                    'focused-geocoder-result': $data === $parent.focusItem()
+                }
+            ">
+                <span data-bind="text: text"></span>
+            </div>
+        </div>
+        <!--/ko-->
+    <!--/ko-->

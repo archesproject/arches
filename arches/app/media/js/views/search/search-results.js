@@ -7,9 +7,10 @@ define(['jquery',
     'knockout',
     'knockout-mapping',
     'view-data',
+    'viewmodels/alert',
     'bootstrap-datetimepicker',
     'plugins/knockout-select2'],
-    function($, _, Backbone, bootstrap, arches, select2, ko, koMapping, viewdata) {
+    function($, _, Backbone, bootstrap, arches, select2, ko, koMapping, viewdata, AlertViewModel) {
         return Backbone.View.extend({
 
             events: {
@@ -32,7 +33,12 @@ define(['jquery',
                 this.mouseoverInstanceId = ko.observable();
                 this.relationshipCandidates = ko.observableArray();
                 this.userRequestedNewPage = ko.observable(false);
-                this.mapLinkPoint = ko.observable(null);
+                this.mapLinkData = ko.observable(null);
+                this.selectedResourceId = ko.observable(null);
+
+                this.showRelationships.subscribe(function (res) {
+                    self.selectedResourceId(res.resourceinstanceid);
+                });
             },
 
             mouseoverInstance: function(resourceinstance) {
@@ -43,16 +49,19 @@ define(['jquery',
                 }
             },
 
-            newPage: function(page, e){
-                if(page){
-                    this.page(page);
-                }
-            },
-
-            showRelatedResources: function(resourceinstanceid) {
+            showRelatedResources: function(resourceinstance) {
                 var self = this;
-                return function(resourceinstanceid){
-                    self.showRelationships(resourceinstanceid)
+                return function(resourceinstance){
+                    if (resourceinstance === undefined) {
+                        resourceinstance = self.viewModel.relatedResourcesManager.currentResource();
+                        if (self.viewModel.relatedResourcesManager.showGraph() === true) {
+                            self.viewModel.relatedResourcesManager.showGraph(false)
+                        }
+                    }
+                    self.showRelationships(resourceinstance)
+                    if (self.viewModel.selectedTab() !== self.viewModel.relatedResourcesManager) {
+                        self.viewModel.selectedTab(self.viewModel.relatedResourcesManager)
+                    }
                 }
             },
 
@@ -75,6 +84,17 @@ define(['jquery',
                 }
             },
 
+            isResourceRelatable: function (graphId) {
+                var relatable = false;
+                graphdata = _.find(viewdata.graphs, function(graphdata){
+                    return graphId === graphdata.graphid;
+                })
+                if (this.viewModel.graph) {
+                    relatable = _.contains(this.viewModel.graph.relatable_resource_model_ids, graphId);
+                }
+                return relatable;
+            },
+
             updateResults: function(response){
                 var self = this;
                 koMapping.fromJS(response.paginator, this.paginator);
@@ -84,15 +104,17 @@ define(['jquery',
                 this.total(response.results.hits.total);
                 this.results.removeAll();
                 this.userRequestedNewPage(false);
+                response.results.aggregations.geo_aggs = response.results.aggregations.geo_aggs.inner.buckets[0]
                 this.aggregations(
                     _.extend(response.results.aggregations, {
                         results: response.results.hits.hits
                     })
                 );
+                this.searchBuffer(response.search_buffer);
+                this.selectedResourceId(null);
 
                 response.results.hits.hits.forEach(function(result){
-                    var relatable;
-                    graphdata = _.find(viewdata.graphs, function(graphdata){
+                    var graphdata = _.find(viewdata.graphs, function(graphdata){
                         return result._source.graph_id === graphdata.graphid;
                     })
                     if (this.viewModel.graph) {
@@ -100,23 +122,41 @@ define(['jquery',
                     }
                     var point = null;
                     if (result._source.points.length > 0) {
-                        point = result._source.points[0]
+                        point = result._source.points[0].point
                     }
+                    var mapData = result._source.geometries.reduce(function (fc1, fc2) {
+                        fc1.geom.features = fc1.geom.features.concat(fc2.geom.features);
+                        return fc1;
+                    }, {
+                        "geom": {
+                            "type": "FeatureCollection",
+                            "features": []
+                        }
+                    });
                     this.results.push({
                         displayname: result._source.displayname,
                         resourceinstanceid: result._source.resourceinstanceid,
                         displaydescription: result._source.displaydescription,
                         map_popup: result._source.map_popup,
+                        provisional: result._source.provisional,
                         geometries: ko.observableArray(result._source.geometries),
                         iconclass: graphdata ? graphdata.iconclass : '',
                         showrelated: this.showRelatedResources(result._source.resourceinstanceid),
                         mouseoverInstance: this.mouseoverInstance(result._source.resourceinstanceid),
                         relationshipcandidacy: this.toggleRelationshipCandidacy(result._source.resourceinstanceid),
-                        relatable: relatable,
+                        ontologyclass: result._source.root_ontology_class,
+                        relatable: this.isResourceRelatable(result._source.graph_id),
                         point: point,
                         mapLinkClicked: function () {
-                            self.mapLinkPoint(point);
-                        }
+                            self.selectedResourceId(result._source.resourceinstanceid);
+                            if (self.viewModel.selectedTab() !== self.viewModel.mapFilter) {
+                                self.viewModel.selectedTab(self.viewModel.mapFilter)
+                            }
+                            self.mapLinkData(mapData.geom);
+                        },
+                        selected: ko.computed(function () {
+                            return result._source.resourceinstanceid === ko.unwrap(self.selectedResourceId);
+                        })
                     });
                 }, this);
 
@@ -130,7 +170,20 @@ define(['jquery',
             },
 
             viewReport: function(resourceinstance){
-                window.open(arches.urls.resource_report + resourceinstance.resourceinstanceid);
+                    var self = this;
+                    var missingReportAlert = function(data){
+                        return function(data){
+                             var response = data.responseJSON;
+                             self.viewModel.alert(new AlertViewModel('ep-alert-red', response.title, response.message));
+                        }
+                    }
+                    $.ajax({
+                        type: "GET",
+                        url: arches.urls.report_data,
+                        data: {resourceid: resourceinstance.resourceinstanceid}
+                    }).done(function(data){
+                        window.open(arches.urls.resource_report + resourceinstance.resourceinstanceid);
+                    }).fail(missingReportAlert());
             },
 
             editResource: function(resourceinstance){

@@ -5,13 +5,15 @@
 <div class="row widget-wrapper">
     <div class="form-group">
         <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
-
+        <!-- ko if: node -->
+        <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
+        <!-- /ko -->
         <div class="col-xs-12 dropzone" data-bind="dropzone: dropzoneOptions">
             <div class="bord-top pad-ver">
-                <span class="btn btn-success fileinput-button dz-clickable" data-bind="css: uniqueidClass">
+                <button type="button" class="btn btn-success fileinput-button dz-clickable" data-bind="css: uniqueidClass, disable: disabled">
                     <i class="fa fa-plus"></i>
-                    <span>Add files...</span>
-                </span>
+                    <span>{% trans "Add files..." %}</span>
+                </button>
 
                 <div class="btn-group pull-right">
                     <button id="dz-remove-btn" class="btn btn-danger cancel" type="reset" data-bind="click: reset">
@@ -32,7 +34,7 @@
                                 <div class="media-body">
                                     <p class="text-main text-bold mar-no text-overflow" data-bind="text: name"></p>
                                     <!-- ko if: $data.error -->
-                                    <span class="dz-error text-danger text-sm" data-bind="text: error"></span>
+                                    <span class="dz-error text-danger text-sm" data-bind="text: '{% trans "error" %}'"></span>
                                     <!-- /ko -->
                                     <p class="text-sm" data-bind="html: $parent.formatSize($data)"></p>
                                 </div>

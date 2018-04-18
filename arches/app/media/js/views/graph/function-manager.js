@@ -4,6 +4,7 @@ require([
     'knockout',
     'arches',
     'views/graph/graph-page-view',
+    'viewmodels/alert',
     'views/graph/function-manager/function-list',
     'views/graph/function-manager/applied-function-list',
     'models/function',
@@ -12,7 +13,7 @@ require([
     'graph-functions-data',
     'function-templates',
     'component-templates'
-], function($, _, ko, arches, GraphPageView, FunctionList, AppliedFunctionList, FunctionModel, FunctionXGraphModel, baseData, data) {
+], function($, _, ko, arches, GraphPageView, AlertViewModel, FunctionList, AppliedFunctionList, FunctionModel, FunctionXGraphModel, baseData, data) {
     /**
     * set up the page view model with the graph model and related sub views
     */
@@ -43,7 +44,6 @@ require([
         viewModel.appliedFunctionList.items.push(newAppliedFunction);
         viewModel.appliedFunctionList.selectItem(newAppliedFunction);
     });
-
 
     viewModel.appliedFunctionList = new AppliedFunctionList({
         functions: ko.observableArray()
@@ -80,6 +80,10 @@ require([
         }));
     });
 
+    var alertFailure = function (responseJSON) {
+        graphPageView.viewModel.alert(new AlertViewModel('ep-alert-red', responseJSON.title, responseJSON.message));
+    };
+
     viewModel.save = function(){
         var functionsToSave = [];
         viewModel.loading(true);
@@ -104,6 +108,7 @@ require([
             },
             error: function(response) {
                 viewModel.loading(false);
+                alertFailure(response.responseJSON)
             }
         });
     }
@@ -124,6 +129,7 @@ require([
                 },
                 error: function(response) {
                     viewModel.loading(false);
+                    alertFailure(response.responseJSON);
                 }
             });
         }

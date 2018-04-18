@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+{% load i18n %}
+<!-- this html is included in help-panel-base.htm -->
+<div class="ep-help-content">
+    <div>
+        <div class="">
+          {% blocktrans %}
+            <p>The Resource Editor is used to create new or edit existing Resources. On the left-hand side of the page you are presented with the list of Menus associated with this Resource Model, each holding one or more data-entry cards. Cards may be further divided, with tabs appearing across the top.</p>
+          {% endblocktrans %}
+            <div>
+				<p>
+					<a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "switching menus - click to view" %}</a>
+					<span class="ep-help-img-link">
+						<a href="{{ STATIC_URL }}img/help/switch_menus.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+						</a>
+					</span>
+					<img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/switch_menus.gif"></img>
+				</p>
+            </div>
+            {% blocktrans %}
+            <p>The procedure for entering data depends on the widget: sometimes you'll enter text, sometimes select from a dropdown menu, or sometimes record a location by drawing geometry on a map. One thing to keep in mind generally is that certain attributes are allowed to have multiple values recorded, while some will only allow one value.</p>
+            {% endblocktrans %}
+            <div>
+				<p>
+					<a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "data entry - click to view" %}</a>
+					<span class="ep-help-img-link">
+						<a href="{{ STATIC_URL }}img/help/data-entry1.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+						</a>
+					</span>
+					<img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/data-entry1.gif"></img>
+				</p>
+            </div>
+            {% blocktrans %}
+              <p>As an example, Name/Name Type pairs tend to allow multiple values. Above, two new Name/Name Type pairs are added. Note the manner in which saved values are summarized above the data entry widget. You may directly edit these existing values where they appear in this summary.</p>
+            {% endblocktrans %}
+        </div>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Related Resources" %}</h4></a>
+        <div class="ep-help-topic-content">
+          {% blocktrans %}
+            <p>In the Resource Editor you can also access the <strong>Related Resources</strong> page. Creating a resource relation is a three-step process.</p>
+            <p><strong>1 - Find a Resource</strong></p>
+          {% endblocktrans %}
+            <div>
+				<p>
+					<a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "click to view demonstration" %}</a>
+					<span class="ep-help-img-link">
+						<a href="{{ STATIC_URL }}img/help/rr-step1.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+						</a>
+					</span>
+					<img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/rr-step1.gif"></img>
+				</p>
+            </div>
+            {% blocktrans %}
+              <p>Using one (or more) of the available search methods, find the resource to which you would like to create a relation. As you apply more filters, the search results will be updated.</p>
+              <p><strong>2 - Create the Relation</strong></p>
+            {% endblocktrans %}
+            <div>
+				<p>
+					<a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "click to view demonstration" %}</a>
+					<span class="ep-help-img-link">
+						<a href="{{ STATIC_URL }}img/help/rr-step2.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+						</a>
+					</span>
+					<img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/rr-step2.gif"></img>
+				</p>
+            </div>
+            {% blocktrans %}
+              <p>Once the resource you would like to relate to appears in the search results, click "Relate Resource" to create the relation. You will see the new relation visualized on the right. You can view existing relations as a grid (table) or as a graph (connected nodes).</p>
+              <p>If you see "Cannot Be Related" next to a resource in the search results, this means that relationships have not been enabled between these two Resource Models. A user with access to the Arches Designer can change this by editing the settings for either Resource Model.</p>
+              <p><strong>3 - Edit Relation Properties</strong></p>
+            {% endblocktrans %}
+            <div>
+				<p>
+					<a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "click to view demonstration" %}</a>
+					<span class="ep-help-img-link">
+						<a href="{{ STATIC_URL }}img/help/rr-step3.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+						</a>
+					</span>
+					<img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/rr-step3.gif"></img>
+				</p>
+            </div>
+            {% blocktrans %}
+            <p>After a relation has been created, you can further refine its properties, such as what type of relation it is, how long it lasted, etc. While viewing the relation in grid mode, begin by selecting the relation in the table. You will see the "Delete Selected" button appear. Next click "relation properties", enter the information, and don't forget to "Save" when finished.</p>
+            {% endblocktrans %}
+        </div>
+    </div>
+</div>

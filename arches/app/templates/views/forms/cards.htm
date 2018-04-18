@@ -18,26 +18,26 @@
     <!--Tabs Content-->
     <div class="tab-content" style="">
         {% for card in cardgroup.cards %}
-        
-        
-        <div id="{{card.nodegroup_id}}" data-bind="attr: {id: 'abc{{card.nodegroup_id}}' + $data.tileid() }"  class="tab-pane fade in {% if forloop.first %}active{% endif %}"> 
+
+
+        <div class="" id="{{card.nodegroup_id}}" data-bind="attr: {id: 'abc{{card.nodegroup_id}}' + $data.tileid() }"  class="tab-pane fade in {% if forloop.first %}active{% endif %}">
             <div class="panel-body card-panel-body" style="">
-                
+
                 <!-- Card Level Alert -->
                 <div class="panel install-card-alert" style=""></div>
 
                 <!-- Card Instruction -->
                 <div class="content-instructions">
-                    <span> 
+                    <span>
                         {{ card.description }}
                     </span>
-                    <span>  
-                        <a id="add-basemap-wizard-help-link" href="" class="pull-right card-help help editable-help" style=""> Help <i class="fa fa-question-circle"></i></a>
+                    <span>
+                        <a id="add-basemap-wizard-help-link" href="" class="pull-right card-help help editable-help" style=""> {% trans "Help" %} <i class="fa fa-question-circle"></i></a>
                     </span>
                 </div>
 
                 <!-- Actual Card HTML goes here -->
-                
+
                 {% if card.cardinality != 'n' %}
                     <div data-bind="with: ($data.tiles['{{card.nodegroup_id}}']().length > 0 ? $data.tiles['{{card.nodegroup_id}}']()[0] : $root.form.blanks['{{card.nodegroup_id}}'])" >
                 {% endif %}
@@ -67,18 +67,18 @@
 
 
                 <div class="list-group" style="margin-top: 20px;" data-bind="visible: ($data.tiles['{{card.nodegroup_id}}']().length > 0), foreach: $data.tiles['{{card.nodegroup_id}}']">
-                    
+
                     <!-- ko if: nodegroup_id() == '{{card.nodegroup_id}}' -->
 
                     <div class="list-group-item" style="background: rgb(250, 250, 250);">
-                        <h5 style="cursor: pointer; padding: 5px 0px 5px 0px; margin: 0px;" class="list-group-item-heading text-thin" data-bind="click: $root.form.toggleTile">Key of first node in card:<span class="text-semibold"> Value of first node in card</span></h5>
-                        
+                        <h5 style="cursor: pointer; padding: 5px 0px 5px 0px; margin: 0px;" class="list-group-item-heading text-thin" data-bind="click: $root.form.toggleTile">{% trans "Key of first node in card:" %}<span class="text-semibold"> {% trans "Value of first node in card" %}</span></h5>
+
                         <div class="effect" style="display:none;" data-bind="attr: {id: 'abc' + $data.tileid()}">
                             <a id="record-1-delete" href="#" class="record-delete" style="display: block;" data-bind="click: $root.form.deleteTile.bind($root.form, $parent.tiles['{{card.nodegroup_id}}'])">
                                 <span class="icon-wrap icon-circle bg-gray-dark"><i class="fa fa-trash"></i>
                                 </span>
                             </a>
-                            
+
                             <!-- Card Level Alert -->
                             <div id="db-connection-alert" class="panel install-card-alert" style=""></div>
 
@@ -117,10 +117,10 @@
             <div id="arches-server-help-content" class="" style="">
                 <div class="" style="">
                     <div class="panel-heading">
-                        <h3 class="panel-title" style="padding: 0 10px 0 10px;"><span class="help-text-small"> Help</span> Database Connection</h3>
+                        <h3 class="panel-title" style="padding: 0 10px 0 10px;"><span class="help-text-small">{% trans "Help" %}</span> {% trans "Database Connection" %}</h3>
                     </div>
                     <div class="panel-body" style="padding: 10px 10px 15px 10px;">
-                        <p>Put Card-Specific help text here.  When panel is initiated from a controlled vocabulary, put thesaurus listing here instead.</p>
+                        <p>{% trans "Put Card-Specific help text here.  When panel is initiated from a controlled vocabulary, put thesaurus listing here instead." %}</p>
                     </div>
                 </div>
             </div>
@@ -131,4 +131,3 @@
     </div>
 
 </div>
-

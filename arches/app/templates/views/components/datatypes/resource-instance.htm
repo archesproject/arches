@@ -1,0 +1,46 @@
+{% load i18n %}
+<!-- ko ifnot: $data.search -->
+<div class="node-widget-label concept-label">
+    <div class="control-label">
+        {% trans "Resource Model" %}
+    </div>
+    <div>
+        <select multiple data-bind="
+            disabled: isEditable === false || disabled,
+            placeholder: '{% trans "Select a resource model" %}',
+            selectedOptions: config.graphid,
+            options: resourceModels ,
+            optionsText: 'name',
+            optionsValue: 'graphid',
+            chosen: {
+                width: '100%'
+            }
+        "></select>
+    </div>
+</div>
+<!-- /ko -->
+
+<!-- ko if: $data.search -->
+<div class="col-md-4 col-lg-3">
+    <select class="resources" data-bind="value: op, chosen: {width: '100%', disable_search_threshold: 15}">
+        <option value="">{% trans "References" %}</option>
+        <option value="!">{% trans "Does not reference" %}</option>
+    </select>
+</div>
+<div class="col-md-8 col-lg-9 resource-instance-search">
+    <!-- ko component: {
+        name: 'resource-instance-select-widget',
+        params: {
+            config: {
+                placeholder: '{% trans "Select a resource" %}'
+            },
+            label: '',
+            value: searchValue,
+            node: node,
+            disabled: false,
+            type: "resource-editor",
+            state: "form"
+        }
+    } --><!-- /ko -->
+</div>
+<!-- /ko -->

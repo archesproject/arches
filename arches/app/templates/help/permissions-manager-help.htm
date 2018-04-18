@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+{% load i18n %}
+<!-- this html is included in help-panel-base.htm -->
+<div class="ep-help-content">
+    <div>
+        <p>{% trans "Arches allows you to define user and user group permissions on a per-nodegroup basis. For example, you may want to hide the coordinates of a Resource from the public, or allow a certain group of users to only update the condition assessment section of a Resource Model. Rules like these are all enforced using permissions." %}</p>
+        <h4>{% trans "Permission Levels" %}</h4>
+        <p>
+            {% trans "<strong>Read</strong> - Allows users to see this node group's card. If disallowed, the card/node group will be hidden from the map and resource reports." %}<br>
+            {% trans "<strong>Create/Update</strong> - Allows users to create or edit instances of this node group. This provides the ability to let users edit some information about a resource, while be restricted from editing other information." %}<br>
+            {% trans "<strong>Delete</strong> - Allows users to delete instances of this node group. Note, this is not the same as being allowed to delete an entire resource, permissions for which are not handled here." %}
+        </p>
+        <h4>{% trans "Non-Authenticated Users" %}</h4>
+        <p>{% trans "You may notice that by default Arches comes with a 'Guest' group, as well as user named 'anonymous' who is a member of that group. <em>Any non-authenticated user is treated as the 'anonymous' user.</em> This means that all permissions applied to the Guest group will be given to anyone who views the website without logging in." %}</p>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Permissions Manager Interface" %}</h4></a>
+        <div class="ep-help-topic-content">
+            <span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/permissions-manager-sections.jpg" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span>
+            <p><img src="{{ STATIC_URL }}img/help/permissions-manager-sections.jpg"></img></p>
+            <p>
+                {% trans "<strong>1 - Groups/Accounts List</strong> This panel lists all of the groups and user accounts you have in your database. By default, Arches comes with a number of pre-made groups, but all of them have the same set of permissions. It is up to you define what permissions are attached to each group. As you can see, user accounts can be members of a group, and will inherit all of the permissions attached to that group. If desired, you can further define permissions for each user." %}<br>
+                <em>{% trans "To make new groups and user accounts you must use the Django admin interface, accessed at <a href='/admin' target='_blank'>your_arches_site.com/admin</a>." %}</em><br>
+                {% trans "<strong>2 - Cards and Card Containers</strong> This panel lists all the node groups in this Resource Model organized by Cards and Card Containers. Clicking on a Card or Card Container will select all of its constituent nodes. Note that a symbolic representation is shown when a node is selected." %}<br>
+                {% trans "<strong>3 - Permissions</strong> This panel summarizes all permissions that selected group or user account has for the selected node groups. Permissions are changed in the bottom portion of the panel (read 'Modifying Permissions' below for more)." %}
+            </p>
+        </div>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Modifying Permissions" %}</h4></a>
+        <div class="ep-help-topic-content">
+            <p>
+                {% trans "<strong>1 - Select a Group or User</strong> Begin by selecting the group or user account whose permissions you wish to modify. Note that symbols are added to the listed Card and Card Containers showing the existing permissions for that group." %}<br>
+                {% trans "<strong>2 - Select one or more Cards or Card Containers</strong> In the middle panel, find the Card or Card Container that represents the node group you would like to modify. You will see a summary of all the nodes and permissions appear in the right-hand panel." %}<br>
+                {% trans "<strong>3 - Use the checkboxes to define the changes you want to make</strong> These changes will be applied to <em>all</em> of the currently selected nodes." %}<br>
+                {% trans "<strong>4 - Apply Permissions/Revert Permissions buttons</strong> Select 'Apply Permissions' to apply the selected permissions to the selected nodes.  Select 'Revert Permissions' to restore the permissions that are defined on the user/group by default." %}<br>
+            </p>
+        </div>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Example - Hiding Location Information" %}</h4></a>
+        <div class="ep-help-topic-content">
+          {% blocktrans %}
+            <p>Below, the "Guest" group (please read the Non-Authenticated Users section above) has "read" permissions revoked for the Location card. This means that the general public would not be able to view any location information for resources made with this resource model.</p>
+          {% endblocktrans %}
+			<p>
+				<a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "click to view demonstration" %}</a>
+				<span class="ep-help-img-link">
+					<a href="{{ STATIC_URL }}img/help/permissions-example1.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+					</a>
+				</span>
+				<img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/permissions-example1.gif"></img>
+			</p>
+        </div>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Example - Allowing Crowdsourced Keywords" %}</h4></a>
+        <div class="ep-help-topic-content">
+            <p>
+                {% blocktrans %} 
+                Below, the "Crowdsource Editor" group is given permission to create or edit the <em>Keyword</em> nodegroup. This means that users who are Crowdsource Editor members will be able to edit {{nav.title}} resources, but only the Keyword card will be visible to them.
+                {% endblocktrans %}
+            </p>
+            <p>
+				<a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "click to view demonstration" %}</a>
+				<span class="ep-help-img-link">
+					<a href="{{ STATIC_URL }}img/help/permissions-example2.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+					</a>
+				</span>
+				<img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/permissions-example2.gif"></img>
+			</p>
+        </div>
+    </div>
+</div>

@@ -17,12 +17,7 @@
     </li>
     <li>
         <a href="#branch-library" class="nav-library-tab-link" data-toggle="tab" data-bind="visible: node() && !node().dirty()">
-            <i class="ion-ios-plus add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Add Child Nodes" %}"></i>
-        </a>
-    </li>
-     <li>
-        <a href="#" class="nav-library-tab-link" data-toggle="tab">
-            <i class="ion-ios-glasses add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Preview Card" %}"></i>
+            <i class="ion-ios-plus add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% if graph.isresource %}{% trans "Add Branch" %}{% else %}{% trans "Add Child Node" %}{% endif %}"></i>
         </a>
     </li>
     <li data-bind="visible: node() && !node().istopnode">
@@ -59,7 +54,7 @@
                         {% trans "CRM Class" %}
                     </div>
                     <div>
-                        <select class="design" data-bind="value: node().ontologyclass, options: node().validclasses, valueAllowUnset: true, optionsCaption: '{% trans "Choose a class" %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                        <select class="design" data-bind="value: node().ontologyclass, options: node().validclasses, optionsText: node().getFriendlyOntolgyName.bind(node()), valueAllowUnset: true, optionsCaption: '{% trans "Choose a class" %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
                     </div>
                 </div>
 
@@ -69,14 +64,20 @@
                         {% trans "Relationship from" %} <span data-bind="text: graphModel.getParentNode(node()).name"></span>
                     </div>
                     <div>
-                        <select class="design" data-bind="value: node().parentproperty, options: node().validproperties, valueAllowUnset: true, optionsCaption: '{% trans "Choose a property" %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                        <select class="design" data-bind="value: node().parentproperty, options: node().validproperties, optionsText: node().getFriendlyOntolgyName.bind(node()), valueAllowUnset: true, optionsCaption: '{% trans "Choose a property" %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
                     </div>
                 </div>
 
                 <div style="margin-bottom:10px;">
-                    (<strong data-bind="text: graphModel.getParentNode(node()).name"></strong>
-                    <em data-bind="text: node().parentproperty"></em>
-                    <strong data-bind="text: node().name"></strong>)
+                    <div class="">
+                        (<strong data-bind="text: graphModel.getParentNode(node()).name"></strong>
+                    </div>
+                    <div class="">
+                        <em data-bind="text: node().parentproperty_friendlyname"></em>
+                    </DIV>
+                    <div class="">
+                        <strong data-bind="text: node().name"></strong>)
+                    </div>
                 </div>
 
                 <!-- /ko -->
@@ -91,6 +92,19 @@
                     </div>
                 </div>
 
+                <!-- ko if: node().datatypeIsSearchable() -->
+                <div class="node-widget-label">
+                    <span class="switch switch-small arches-switch" data-bind="css: {'on': node().issearchable()}, click: function () { node().issearchable(!node().issearchable()); }"><small></small></span>
+
+                    <p class="control-label" style="margin-left: 40px; margin-top: -17px; margin-bottom: 0px;">
+                        {% trans "Expose to Advanced Search" %}
+                    </p>
+                    <span style="margin-left: 40px; display: inline-block; color: #8ba2b9; font-size: 10px;">
+                        {% trans "Activate to use this node in Advanced Search." %}
+                    </span>
+                </div>
+                <!-- /ko -->
+
                 <!-- ko if: node().datatypeConfigComponent -->
                 <div data-bind='component: {
                     name: node().datatypeConfigComponent,
@@ -104,6 +118,19 @@
 
         <hr class="section-division-dark node-section-division">
 
+        <!-- ko if: node().datatypeIsSearchable() -->
+        <div class="node-section switch-panel" data-bind="css: {'disabled': checkIfImmutable()}">
+            <span class="switch switch-small arches-switch" data-bind="css: {'on': node().isrequired(), 'disabled': checkIfImmutable()}, click: toggleRequired"><small></small></span>
+
+            <p class="control-label" style="margin-left: 40px; margin-top: -17px; margin-bottom: 0px;">
+                {% trans "Required" %}
+            </p>
+            <span style="margin-left: 40px; display: inline-block; color: #8ba2b9; font-size: 10px;">
+                {% trans "Activate to require that data be collected for this node when a card value is edited" %}
+            </span>
+        </div>
+        <!-- /ko -->
+
         <!-- ko if: node() && !isResourceTopNode() -->
         <div class="node-section switch-section" data-bind="css: {'disabled': disableIsCollector()}">
 
@@ -112,7 +139,7 @@
                 <span class="switch switch-small arches-switch" data-bind="css: {'on': node().isCollector()}, click: toggleIsCollector"><small></small></span>
 
                 <p class="control-label" style="margin-left: 40px; margin-top: -17px; margin-bottom: 0px;">
-                    <span data-bind="text: (node().nodeGroupId() && !node().isCollector() || graphModel.isNodeInChildGroup(node())) ? '{% trans "Make sub-card" %}' : '{% trans "Make card" %}'"></span>
+                    <span data-bind="text: (node().nodeGroupId() && !node().isCollector() || graphModel.isNodeInChildGroup(node())) ? '{% trans "Place node(s) in a separate card" %}' : '{% trans "Make card" %}'"></span>
                 </p>
                 <span style="margin-left: 40px; display: inline-block; color: #8ba2b9; font-size: 10px;">
                     <!-- ko if: node().istopnode -->
@@ -127,6 +154,7 @@
 
         </div>
         <!-- /ko -->
+
 
         <!-- /ko -->
     </div>

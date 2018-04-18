@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+{% load i18n %}
+<!-- this html is included in help-panel-base.htm -->
+<div class="ep-help-content">
+    <div>
+      {% blocktrans %}
+        <p>The Menu Designer helps you configure the data entry Menus for your Resource Model. You will need to define some settings for the Menu, and then add some Cards to it. When you have saved your edits, click "Back to Menus" to return to the Menu Manager, or find a new Menu to edit in the dropdown.</p>
+      {% endblocktrans %}
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Menu Settings" %}</h4></a>
+        <div class="ep-help-topic-content">
+            <p>{% trans "In the right-hand panel, you will define some basic settings for the Menu." %}</p>
+            <p><h4>{% trans "Identifiers" %}</h4></p>
+            <p>
+                {% trans "<strong>Name</strong>: add a name to this menu" %}<br>
+                {% trans "<strong>Subtitle</strong>: add a subtitle to this menu" %}
+            </p>
+            <p><h4>{% trans "Icon" %}</h4></p>
+            <p>
+                {% trans "<strong>Icon</strong>: select an icon for this menu" %}
+            </p>
+            <p><h4>{% trans "Status" %}</h4></p>
+            <p>
+                {% trans "<strong>Default Visibility</strong>: set whether or not this menu should be visible by default" %}<br>
+            </p>
+        </div>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Adding Cards to the Menu" %}</h4></a>
+        <div class="ep-help-topic-content">
+          {% blocktrans %}
+            <p>To add a Card to this Menu, you must first find it in the Data Card Library. This is a listing of all the Cards associated with your Resource Model, so if you don't see a Card that you are wanting to use, you'll need to head to the Graph Manager or Card Manager to add that Card's Branch. When you've found the Card you want, just drag it into the center panel.</p>
+            <p>In the example below, two Cards--Description and Appellation--are added to a Menu named "Summary".</p>
+          {% endblocktrans %}
+			<p>
+				<a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "add card to menu - click to view" %}</a>
+				<span class="ep-help-img-link">
+					<a href="{{ STATIC_URL }}img/help/add-card-to-menu.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+					</a>
+				</span>
+				<img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/add-card-to-menu.gif"></img>
+			</p>
+        </div>
+    </div>
+</div>

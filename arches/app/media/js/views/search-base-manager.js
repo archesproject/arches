@@ -8,11 +8,17 @@ define([
     'views/search/time-filter',
     'views/search/term-filter',
     'views/search/map-filter',
+    'views/search/provisional-filter',
+    'views/search/advanced-search',
     'views/search/resource-type-filter',
     'views/resource/related-resources-manager',
     'views/search/search-results',
-    'views/base-manager'
-], function($, _, ko, arches, AlertViewModel, BaseFilter, TimeFilter, TermFilter, MapFilter, ResourceTypeFilter, RelatedResourcesManager, SearchResults, BaseManagerView) {
+    'views/search/saved-searches',
+    'views/base-manager',
+    'view-data',
+    'search-data',
+    'views/components/simple-switch'
+], function($, _, ko, arches, AlertViewModel, BaseFilter, TimeFilter, TermFilter, MapFilter, ProvisionalFilter, AdvancedSearch, ResourceTypeFilter, RelatedResourcesManager, SearchResults, SavedSearches, BaseManagerView, viewData, searchData) {
     // a method to track the old and new values of a subscribable
     // from https://github.com/knockout/knockout/issues/914
     //
@@ -38,27 +44,40 @@ define([
             this.viewModel.resultsExpanded = ko.observable(true);
 
             this.aggregations = ko.observable();
+            this.searchBuffer = ko.observable();
             this.filters = {};
             this.filters.termFilter = new TermFilter();
             this.filters.timeFilter = new TimeFilter({
+                termFilter: this.filters.termFilter
+            });
+            this.filters.provisionalFilter = new ProvisionalFilter({
                 termFilter: this.filters.termFilter
             });
             this.filters.resourceTypeFilter = new ResourceTypeFilter({
                 termFilter: this.filters.termFilter
             });
             this.filters.savedSearches = new BaseFilter();
-            this.filters.advancedFilter = new BaseFilter();
-            this.filters.searchRelatedResources = new BaseFilter()
+            this.filters.advancedFilter = new AdvancedSearch({
+                graphs: viewData.graphs,
+                nodes: searchData.searchable_nodes,
+                cards: searchData.resource_cards,
+                datatypes: searchData.datatypes
+            });
+            this.filters.searchRelatedResources = new BaseFilter();
             this.filters.mapFilter = new MapFilter({
                 aggregations: this.aggregations,
                 resizeOnChange: this.viewModel.resultsExpanded,
-                termFilter: this.filters.termFilter
+                termFilter: this.filters.termFilter,
+                searchBuffer: this.searchBuffer
             });
 
-            _.extend(this.viewModel, this.filters);
+            this.viewModel.resources = this.viewModel.allGraphs();
 
+            _.extend(this.viewModel, this.filters);
+            this.viewModel.savedSearches = new SavedSearches();
             this.viewModel.searchResults = new SearchResults({
                 aggregations: this.aggregations,
+                searchBuffer: this.searchBuffer,
                 viewModel: this.viewModel
             });
 
@@ -68,17 +87,26 @@ define([
                 searchResults: this.viewModel.searchResults,
                 resourceEditorContext: this.viewModel.resourceEditorContext,
                 editing_instance_id: this.viewModel.editingInstanceId,
-                relationship_types: this.viewModel.relationship_types
+                relationship_types: this.viewModel.relationship_types,
+                graph: this.viewModel.graph
             })
 
+            var resizeFilter = function(duration){
+                var duration = duration;
+                return function(){
+                    var resize = function(){
+                        $(window).trigger("resize");
+                    }
+                    setTimeout(resize, duration);
+                }
+            }
+
             this.viewModel.selectedTab = this.viewModel.resourceEditorContext === true ? ko.observable(this.viewModel.relatedResourcesManager) : ko.observable(this.filters.mapFilter);
+            this.viewModel.selectedTab.subscribe(resizeFilter(100));
             if (this.viewModel.resourceEditorContext === true) {
                 this.viewModel.openRelatedResources.subscribe(function(val) {
                     if (val === true) {
-                        var resize = function(){
-                            $(window).trigger("resize");
-                        }
-                        setTimeout(resize, 200);
+                        resizeFilter(200)
                     }
                 })
             }
@@ -94,6 +122,8 @@ define([
                 this.filters.timeFilter.appendFilters(params);
                 this.filters.resourceTypeFilter.appendFilters(params);
                 this.filters.mapFilter.appendFilters(params);
+                this.filters.advancedFilter.appendFilters(params);
+                this.filters.provisionalFilter.appendFilters(params);
 
                 params.no_filters = !Object.keys(params).length;
                 return params;
@@ -152,6 +182,7 @@ define([
                 context: this,
                 success: function(response) {
                     var data = this.viewModel.searchResults.updateResults(response);
+                    this.viewModel.alert(false);
                 },
                 error: function(response, status, error) {
                     if(this.updateRequest.statusText !== 'abort'){

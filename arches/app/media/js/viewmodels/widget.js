@@ -1,4 +1,4 @@
-define(['knockout', 'underscore'], function (ko, _) {
+define(['knockout', 'underscore', 'uuid'], function (ko, _, uuid) {
     /**
     * A viewmodel used for generic widgets
     *
@@ -10,14 +10,27 @@ define(['knockout', 'underscore'], function (ko, _) {
     var WidgetViewModel = function(params) {
         var self = this;
         this.state = params.state || 'form';
-        this.expanded = params.expanded || ko.observable(false);
+        var expanded = params.expanded || ko.observable(false);
+        var nodeid = params.node ? params.node.nodeid : uuid.generate();
+        this.expanded = ko.computed({
+            read: function() {
+                return nodeid === expanded();
+            },
+            write: function(val) {
+                if (val) {
+                    expanded(nodeid);
+                } else {
+                    expanded(false);
+                }
+            }
+        });
         this.value = params.value || ko.observable(null);
         this.formData = params.formData || new FormData();
         this.form = params.form || null;
         this.tile = params.tile || null;
+        this.results = params.results || null;
         this.displayValue = ko.computed(function() {
-            var val = ko.isObservable() ? self.value() : self.value;
-            return val;
+            return ko.unwrap(self.value);
         });
         this.disabled = params.disabled || ko.observable(false);
         this.node = params.node || null;
@@ -26,6 +39,10 @@ define(['knockout', 'underscore'], function (ko, _) {
         this.configObservables = params.configObservables || {};
         this.configKeys = params.configKeys || [];
         this.configKeys.push('label');
+        this.configKeys.push('required');
+        if (this.node) {
+            this.required = this.node.isrequired;
+        }
         if (typeof this.config !== 'function') {
             this.config = ko.observable(this.config);
         }
@@ -50,6 +67,28 @@ define(['knockout', 'underscore'], function (ko, _) {
             var obs = ko.observable(self.config()[key]);
             subscribeConfigObservable(obs, key);
         });
+
+        if (ko.isObservable(this.defaultValue)) {
+            var defaultValue = this.defaultValue();
+            if (this.tile && this.tile.tileid() == "" && defaultValue != null && defaultValue != "") {
+                this.value(defaultValue);
+            }
+
+            if (!self.form) {
+                if (ko.isObservable(self.value)) {
+                    self.value.subscribe(function(val){
+                        if (self.defaultValue() != val) {
+                            self.defaultValue(val)
+                        };
+                    });
+                    self.defaultValue.subscribe(function(val){
+                        if (self.value() != val) {
+                            self.value(val)
+                        };
+                    });
+                }
+            };
+        };
     };
     return WidgetViewModel;
 });

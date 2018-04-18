@@ -1,5 +1,6 @@
 dist: trusty
 language: python
+filter_secrets: false
 
 python:
   - 2.7
@@ -11,7 +12,6 @@ cache:
   - pip
 
 addons:
-  sauce_connect: false
   postgresql: 9.6
   apt:
     sources:
@@ -22,10 +22,12 @@ addons:
       - libpq-dev
       - openjdk-7-jdk
       - python-dev
+      - postgresql-9.6-postgis-2.3
 
 services:
   - postgresql
   - elasticsearch
+  - couchdb
 
 before_install:
   - psql -d postgres -c "ALTER USER postgres with encrypted password 'postgis';"
@@ -33,12 +35,15 @@ before_install:
   - psql -d postgres -c "SET standard_conforming_strings = off;"
   - psql -d postgres -c "CREATE EXTENSION postgis;"
 
+
+before_script: ./arches/install/ci_install/setup_couch.sh
+
 install:
   - python setup.py install
   - pip install -r arches/install/requirements_dev.txt
   - pip install coveralls
-  # - npm install -g bower
-  # - bower install
+  # - npm install -g yarn
+  # - yarn install
 
 script:
   - python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
@@ -74,6 +79,6 @@ deploy:
   region: us-west-1
   on: *2
 before_deploy:
-- zip codedeploy.zip -r  --exclude=*__pycache__* appspec.yml arches/install/*.sh
+- zip codedeploy.zip -r  --exclude=*__pycache__* appspec.yml arches/install/ci_install/*.sh
 - mkdir -p dpl_cd_upload
 - mv codedeploy.zip dpl_cd_upload/arches-$TRAVIS_BRANCH-$TRAVIS_BUILD_NUMBER-$TRAVIS_COMMIT.zip

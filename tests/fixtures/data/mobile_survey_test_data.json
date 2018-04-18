@@ -1,0 +1,75 @@
+{
+    "business_data": {
+        "resources": [
+            {
+                "tiles": [
+                    {
+                        "data": {
+                            "4215e68a-369c-11e8-8e98-c4b301baab9f": {
+                                "type": "FeatureCollection", 
+                                "features": [
+                                    {
+                                        "geometry": {
+                                            "type": "Point", 
+                                            "coordinates": [
+                                                -0.25517651075060144, 
+                                                53.16624482938349
+                                            ]
+                                        }, 
+                                        "type": "Feature", 
+                                        "id": "4d0469f5a4257c8b1c0b0514d108b244", 
+                                        "properties": {}
+                                    }
+                                ]
+                            }
+                        }, 
+                        "provisionaledits": null, 
+                        "parenttile_id": null, 
+                        "nodegroup_id": "4215e68a-369c-11e8-8e98-c4b301baab9f", 
+                        "sortorder": 0, 
+                        "resourceinstance_id": "4aac4846-696c-407a-ad77-95e67f3cafa9", 
+                        "tileid": "73aa7e7c-eee4-40b9-82a2-f5bc366d8bf0"
+                    }, 
+                    {
+                        "data": {
+                            "fe0353f3-368b-11e8-a184-c4b301baab9f": 1.0, 
+                            "fe03460c-368b-11e8-8b4a-c4b301baab9f": "Test Name"
+                        }, 
+                        "provisionaledits": null, 
+                        "parenttile_id": null, 
+                        "nodegroup_id": "fe03460c-368b-11e8-8b4a-c4b301baab9f", 
+                        "sortorder": 0, 
+                        "resourceinstance_id": "4aac4846-696c-407a-ad77-95e67f3cafa9", 
+                        "tileid": "952400a0-c02f-4c9a-afea-9d9bda4fe4e4"
+                    }
+                ], 
+                "resourceinstance": {
+                    "graph_id": "d84a098c-368b-11e8-bafc-c4b301baab9f", 
+                    "resourceinstanceid": "4aac4846-696c-407a-ad77-95e67f3cafa9", 
+                    "legacyid": null
+                }
+            }, 
+            {
+                "tiles": [
+                    {
+                        "data": {
+                            "fe0353f3-368b-11e8-a184-c4b301baab9f": 101.0, 
+                            "fe03460c-368b-11e8-8b4a-c4b301baab9f": "test name"
+                        }, 
+                        "provisionaledits": null, 
+                        "parenttile_id": null, 
+                        "nodegroup_id": "fe03460c-368b-11e8-8b4a-c4b301baab9f", 
+                        "sortorder": 0, 
+                        "resourceinstance_id": "8526e9b5-ae45-4c60-a600-d9835e57fea5", 
+                        "tileid": "f6b90299-4fe1-4a73-af8f-acf4d9105415"
+                    }
+                ], 
+                "resourceinstance": {
+                    "graph_id": "d84a098c-368b-11e8-bafc-c4b301baab9f", 
+                    "resourceinstanceid": "8526e9b5-ae45-4c60-a600-d9835e57fea5", 
+                    "legacyid": null
+                }
+            }
+        ]
+    }
+}

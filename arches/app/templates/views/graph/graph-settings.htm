@@ -79,7 +79,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     {% trans "Appearance" %}
                                 </a>
                             </li>
-                            <!--/ko-->
+                           <!--/ko-->
                             <li id="xx-desc-group">
                                 <a id="xx-desc-tab" data-toggle="tab" href="#desc-card" class="card-tab-title" aria-expanded="true">
                                     {% trans "Description" %}
@@ -125,7 +125,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             <label class="col-xs-12 control-label widget-input-label">
                                                                 {% trans "Name" %}
                                                                 <i class="ion-ios-checkmark-outline"></i>
-                                                                <i class="ion-ios-book add-tooltip pull-right" data-placement="top" data-toggle="tooltip" data-original-title="Show Vocabulary"></i>
+                                                                <i class="ion-ios-book add-tooltip pull-right" data-placement="top" data-toggle="tooltip" data-original-title='{% trans "Show Vocabulary" %}'></i>
                                                             </label>
                                                         </div>
 
@@ -166,7 +166,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                         </div>
 
                                                         <div class="col-xs-12">
-                                                            <select class="design" {% if node_count > 1 %}disabled{% endif %} data-bind="value: ontologyClass, valueAllowUnset: false, options: ontologyClasses, optionsText: 'source', optionsValue:'source', chosen: {disable_search_threshold: 10, width: '100%', search_contains: true}"></select>
+                                                            <select class="design" {% if node_count > 1 %}disabled{% endif %} data-bind="value: ontologyClass, valueAllowUnset: false, options: ontologyClasses, optionsText: 'display', optionsValue:'source', chosen: {disable_search_threshold: 10, width: '100%', search_contains: true}"></select>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -202,7 +202,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 <div class="row widget-container">
                                                     <div class="form-group">
                                                         <div>
-                                                            <label class="col-xs-12 control-label widget-input-label"> {% trans "Form Icon" %} <i class="ion-ios-checkmark-outline"></i></label>
+                                                            <label class="col-xs-12 control-label widget-input-label"> {% trans "Icon" %} <i class="ion-ios-checkmark-outline"></i></label>
                                                         </div>
 
                                                         <!-- Icon search -->
@@ -245,7 +245,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 </div>
                             </div>
 
-
                             <!-- Card -->
                             <div id="map-style-card" class="tab-pane fade">
                                 <div class="panel-body card-panel-body">
@@ -257,10 +256,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <!-- Card Instruction -->
                                         <p id="install-instructions" class="content-instructions">
                                             <span data-bind="if: graph.isresource()">
-                                                {% trans "Define this resource's default color when displayed on a map" %}
+                                                {% trans "Define this resource's color when displayed in the search results chart" %}
                                             </span>
                                             <span data-bind="if: !graph.isresource()">
-                                              {% trans "Define this resource's default color when displayed on a map" %}
+                                              {% trans "Define this resource's color when displayed in the search results chart" %}
                                             </span>
                                         </p>
 
@@ -273,38 +272,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                       <label class="col-xs-12 control-label widget-input-label"> {% trans "Color" %} <i class="ion-ios-checkmark-outline"></i></label>
                                                   </div>
                                                   <div class="colorpicker-component input-group">
-                                                    <input placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: graph.mapfeaturecolor, format:'rgba'}">
-                                                    <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: graph.mapfeaturecolor}"></i></span>
+                                                    <input placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: rootNodeColor, format:'rgba'}">
+                                                    <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: rootNodeColor}"></i></span>
                                                   </div>
                                                 </div>
                                             </div>
 
-                                            <div class="row widget-container">
-                                                <div class="form-group">
-                                                  <div class="relative">
-                                                      <label class="col-xs-12 control-label widget-input-label"> {% trans "Point Size" %} <i class="ion-ios-checkmark-outline"></i></label>
-                                                  </div>
-                                                  <div class="col-xs-12">
-                                                      <input type="number" placeholder="{% trans "Map Feature Color" %}" class="form-control input-lg widget-input" data-bind="value:graph.mappointsize, valueUpdate: 'keyup'">
-                                                  </div>
-                                                </div>
-                                            </div>
-                                          <div class="row widget-container">
-                                              <div class="form-group">
-                                                  <div class="relative">
-                                                      <label class="col-xs-12 control-label widget-input-label"> {% trans "Line Width" %} <i class="ion-ios-checkmark-outline"></i></label>
-                                                  </div>
-                                                  <div class="col-xs-12">
-                                                      <input type="number" placeholder="{% trans "Map Feature Color" %}" class="form-control input-lg widget-input" data-bind="value:graph.maplinewidth, valueUpdate: 'keyup'">
-                                                  </div>
-
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
 
                             <!-- Card -->
                             <div id="meta-card" class="tab-pane fade">
@@ -336,10 +313,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     <div class="col-xs-12">
                                                         <div class="pad-hor">
                                                             <label data-bind="css: { 'active': graph.isactive() }, click: function () { graph.isactive(true) }" class="form-radio form-normal form-text">
-                                                                <input type="radio" name="stat-w-label" data-bind="checked: graph.isactive" value="true"> {% trans "Editable" %}
+                                                                <input type="radio" name="stat-w-label" data-bind="checked: graph.isactive" value="true"> {% trans "Active" %}
                                                             </label>
                                                             <label data-bind="css: { 'active': !graph.isactive() }, click: function () { graph.isactive(false) }" class="form-radio form-normal form-text">
-                                                                <input type="radio" name="stat-w-label" data-bind="checked: graph.isactive" value="false"> {% trans "Non-Editable" %}
+                                                                <input type="radio" name="stat-w-label" data-bind="checked: graph.isactive" value="false"> {% trans "Inactive" %}
                                                             </label>
                                                         </div>
                                                     </div>
@@ -355,7 +332,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     <div class="col-xs-12">
                                                         <div class="pad-hor columns">
                                                             <!-- ko foreach: relatable_resources -->
-                                                            <label class="form-checkbox form-normal form-primary form-text" data-bind="css: {'active': isRelatable()}, click: function () {$data.isRelatable(!$data.isRelatable())}">
+                                                            <label class="form-checkbox form-normal form-primary" data-bind="css: {'form-text': true,  'active': isRelatable()}, click: function () {$data.isRelatable(!$data.isRelatable())}">
                                                                 <input type="checkbox" data-bind="checked:isRelatable">
                                                                 <span data-bind="text:graph.name"></span>
                                                             </label>
@@ -434,7 +411,8 @@ define('graph-settings-data', [], function () {
         node: {{node_json}},
         ontologies: {{ontologies}},
         ontologyClasses: {{ontology_classes}},
-        resources: {{resource_data}}
+        resources: {{resource_data}},
+        ontology_namespaces: {{ontology_namespaces}}
     };
 });
 {% endautoescape %}</script>

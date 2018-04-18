@@ -9,6 +9,7 @@ function(ko, BaseFilter, arches) {
         initialize: function(options) {
             BaseFilter.prototype.initialize.call(this, options);
             this.aggregations = options.aggregations;
+            this.searchBuffer = options.searchBuffer;
             this.name = "Map Filter";
             this.resizeOnChange = ko.computed(function() {
                 return ko.unwrap(options.resizeOnChange);
@@ -21,12 +22,18 @@ function(ko, BaseFilter, arches) {
             var basemaps = _.filter(arches.mapLayers, function(layer) {
                 return !layer.isoverlay;
             });
-            this.defaultBasemap = _.find(basemaps, function (basemap) {
-                return basemap.addtomap;
-            });
+
             if (!this.defaultBasemap) {
-                this.defaultBasemap = vm.basemaps()[0];
+                this.defaultBasemap = _.find(basemaps, function (basemap) {
+                    return basemap.addtomap;
+                });
             }
+            if (!this.defaultBasemap) {
+                this.defaultBasemap = basemaps[0];
+            }
+
+            this.geocoderDefault = arches.geocoderDefault;
+
             this.overlays = _.filter(arches.mapLayers, function(layer) {
                 return layer.isoverlay && layer.addtomap;
             }).map(function(layer) {
@@ -41,6 +48,13 @@ function(ko, BaseFilter, arches) {
             this.minZoom = arches.mapDefaultMinZoom;
             this.maxZoom = arches.mapDefaultMaxZoom;
             this.defaultCenter = [arches.mapDefaultX, arches.mapDefaultY];
+
+            this.clearSearch = ko.observable()
+            this.clearSearch.subscribe(function(val){
+                if (!val) {
+                    this.clear(false)
+                }
+            }, this)
         },
 
         restoreState: function(query) {
@@ -61,11 +75,15 @@ function(ko, BaseFilter, arches) {
             return doQuery;
         },
 
-        clear: function() {
-            this.filter.feature_collection({
-              "type": "FeatureCollection",
-              "features": []
-            });
+        clear: function(reset_features) {
+            if (reset_features !== false){
+                if (this.filter.feature_collection().features.length > 0) {
+                    this.filter.feature_collection({
+                      "type": "FeatureCollection",
+                      "features": []
+                    });
+                }
+            }
             this.termFilter.removeTag('Map Filter Enabled');
         },
 

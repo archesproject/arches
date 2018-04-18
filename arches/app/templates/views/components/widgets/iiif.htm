@@ -1,0 +1,247 @@
+{% extends "views/components/widgets/base.htm" %}
+{% load i18n %}
+
+{% block form %}
+<div class="row widget-wrapper iiif-widget">
+    <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+    <!-- ko if: node -->
+    <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
+    <!-- /ko -->
+    <div class="iiif-wrapper" data-bind="css: {'expanded-iiif': expanded()}">
+        <div class="relative" style="z-index:5000">
+
+            <div class="text-center map-widget-container" data-bind="css : {'map-widget-container-expanded' : expandControls(), 'hide-maptools': expandControls()}">
+                <a id="map-tools" href="" class="" style="display: inline;" data-bind="click: function () { expandControls(true); }"><i class="ion-ios-gear add-tooltip" data-bind="tooltip: { title: '{% trans "Map Controls" %}', placement: 'bottom' }"></i></a>
+            </div>
+
+
+            <div id="map-widget-toolbar" class="map-widget-toolbar iiif-toolbar relative" data-bind="fadeVisible: expandControls(), delay:200, fade:400">
+                <ul class="map-widget-toolbar-list" style="">
+                    <li class="map-widget-toolbar-item text-center basemaps-map-tools" >
+                        <a id="" href="" class="map-widget-icon">{% trans "Select an image" %}</a>
+                    </li>
+                    <li class="map-widget-toolbar-item text-center">
+                        <a class="map-widget-icon" href="#" data-bind="click: function () { expanded(!expanded()); }">
+                            <i class="ion-arrow-expand add-tooltip" data-bind="tooltip: { title: expanded() ? '{% trans "Small Screen" %}' : '{% trans "Full Screen" %}', placement: 'bottom' }"></i>
+                        </a>
+                    </li>
+                    <li class="map-widget-toolbar-item text-center close-map-tools" data-bind="click: function () { expandControls(false); }, css : {'map-widget-tool-expanded' : expandControls()}">
+                        <a id="close-map-tools" href="#" class="map-widget-icon">{%trans "Hide" %}</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div id="map-widget-basemaps" class="panel map-widget-panel iiif-widget-panel" data-bind="fadeVisible: expandControls(), delay:200, fade:400">
+                <!-- ko foreach: { data: [$data], as: 'self' } -->
+
+                    <!-- ko if: !selectedManifest() -->
+                        <!-- ko foreach: { data: manifests, as: 'manifest' } -->
+                            <!-- ko if: manifest.data() -->
+                            <div class="map-widget-overlay-item iiif-widget-panel-title relative" data-bind="click: self.selectedManifest, css:{'selected': manifest === self.selectedManifest()}">
+                                <div class="map-overlay-vis-toogle text-center">
+                                    <img data-bind="attr: {'src': manifest.data().thumbnail }" style="max-height: 30px; max-width: 30px;">
+                                </div>
+                                <div class="map-overlay-name">
+                                    <a href="#"><span data-bind="text: manifest.data().label, css:{'basemap-unselected': manifest !== self.selectedManifest()}"><span></a>
+                                </div>
+                            </div>
+                            <!-- /ko -->
+                        <!-- /ko -->
+                    <!-- /ko -->
+
+                    <!-- ko if: selectedManifest() -->
+                        <div class="map-widget-panel-title">
+                            <a href="#" class="pull-left" data-bind="click: function() {
+                                self.selectedManifest(null);
+                            }" style="padding: 8px;">
+                                <i class="fa fa-arrow-left"></i>
+                            </a>
+                            <h4 class="">{% trans "Select an image:" %}</h4>
+                        </div>
+                        <!-- ko foreach: { data: selectedManifest().data().sequences, as: 'sequence' } -->
+                            <!-- ko foreach: { data: sequence.canvases, as: 'canvas' } -->
+                            <div class="map-widget-overlay-item relative" data-bind="click: self.selectedCanvas, css:{'selected': canvas === self.selectedCanvas()}">
+                                <div class="map-overlay-vis-toogle text-center">
+                                    <img data-bind="attr: {'src': canvas.thumbnail }" style="max-height: 30px; max-width: 30px;">
+                                </div>
+                                <div class="map-overlay-name">
+                                    <a href="#"><span data-bind="text: canvas.label, css:{'basemap-unselected': canvas !== self.selectedCanvas()}"><span></a>
+                                </div>
+                            </div>
+                            <!-- /ko -->
+                        <!-- /ko -->
+                    <!-- /ko -->
+
+                <!-- /ko -->
+            </div>
+        </div>
+
+        <!-- ko if: popupData() !== null -->
+        <div class="hover-feature-info">
+            <div class="hover-feature-title-bar">
+                <div class="hover-feature-title">
+                    {% trans "Drawing Details" %}
+                </div>
+                <i class="ion-ios-close pull-right add-tooltip hover-panel-dismiss"
+                style="cursor: pointer;"
+                data-placement="left"
+                data-toggle="tooltip"
+                data-original-title="add overlay"
+                data-bind="visible: popupData() === clickData(), click: function () { clickData(null); }"
+                ></i>
+            </div>
+            <div class="hover-feature-body">
+                <div>
+                    <label data-bind="text: nameLabel() + ':'"></label>
+                    <!-- ko if: popupData() !== clickData() -->
+                    <span data-bind="text: popupData().name || '{% trans "Unnamed" %}'"></span>
+                    <!-- /ko -->
+                    <!-- ko if: popupData() === clickData() -->
+                    <input type="text" data-bind="value: clickName, valueUpdate: 'keyup'" class="form-control input-lg widget-input">
+                    <!-- /ko -->
+                </div>
+                <div class="pad-top">
+                    <label data-bind="text: typeLabel() + ':'"></label>
+                    <!-- ko if: popupData() !== clickData() -->
+                    <div style='display: inline;' data-bind='component: {
+                        name: "concept-select-widget",
+                        params: {
+                            formData: formData,
+                            tile: tile,
+                            form: form,
+                            config: config,
+                            label: typeLabel,
+                            value: hoverType,
+                            node: node,
+                            expanded: expanded,
+                            disabled: false,
+                            type: "resource-editor",
+                            state: "display_value"
+                        }
+                    }'></div>
+                    <!-- /ko -->
+                    <!-- ko if: popupData() === clickData() -->
+                    <div style="margin-top: -5px;" data-bind='component: {
+                        name: "concept-select-widget",
+                        params: {
+                            formData: formData,
+                            tile: tile,
+                            form: form,
+                            config: config,
+                            label: typeLabel,
+                            value: clickType,
+                            node: node,
+                            expanded: expanded,
+                            disabled: false,
+                            type: "resource-editor"
+                        }
+                    }'></div>
+                    <!-- /ko -->
+                </div>
+                <div data-bind="if: popupData() !== clickData()">
+                    {% trans "(Click to edit details)" %}
+                </div>
+            </div>
+        </div>
+        <!--/ko-->
+
+        <div class="relative leaflet-iiif" data-bind="leaflet: mapConfig"></div>
+    </div>
+</div>
+{% endblock form %}
+
+{% block config_form %}
+<div>
+    <div class="control-label">
+        {% trans "Name Label" %}
+    </div>
+    <div class="col-xs-12 pad-no crud-widget-container">
+        <input placeholder="{% trans "Name Label" %}"
+            class="form-control input-md widget-input"
+            data-bind="value: nameLabel, valueUpdate: 'keyup'">
+    </div>
+</div>
+<div>
+    <div class="control-label">
+        {% trans "Type Label" %}
+    </div>
+    <div class="col-xs-12 pad-no crud-widget-container">
+        <input placeholder="{% trans "Type Label" %}"
+            class="form-control input-md widget-input"
+            data-bind="value: typeLabel, valueUpdate: 'keyup'">
+    </div>
+</div>
+{% endblock config_form %}
+
+{% block report %}
+<dt data-bind="text: label"></dt>
+<dd class="relative iiif-widget">
+    <!-- ko if: popupData() !== null -->
+    <div class="hover-feature-info">
+        <div class="hover-feature-title-bar">
+            <div class="hover-feature-title">
+                {% trans "Drawing Details" %}
+            </div>
+            <i class="ion-ios-close pull-right add-tooltip hover-panel-dismiss"
+            style="cursor: pointer;"
+            data-placement="left"
+            data-toggle="tooltip"
+            data-original-title="add overlay"
+            data-bind="visible: popupData() === clickData(), click: function () { clickData(null); }"
+            ></i>
+        </div>
+        <div class="hover-feature-body">
+            <div>
+                <label data-bind="text: nameLabel() + ':'"></label>
+                <!-- ko if: popupData() !== clickData() -->
+                <span data-bind="text: popupData().name || '{% trans "Unnamed" %}'"></span>
+                <!-- /ko -->
+                <!-- ko if: popupData() === clickData() -->
+                <span data-bind="text: clickName() || '{% trans "Unnamed" %}'"></span>
+                <!-- /ko -->
+            </div>
+            <div>
+                <label data-bind="text: typeLabel() + ':'"></label>
+                <!-- ko if: popupData() !== clickData() -->
+                <div style='display: inline;' data-bind='component: {
+                    name: "concept-select-widget",
+                    params: {
+                        formData: formData,
+                        tile: tile,
+                        form: form,
+                        config: config,
+                        label: typeLabel,
+                        value: hoverType,
+                        node: node,
+                        expanded: expanded,
+                        disabled: false,
+                        type: "resource-editor",
+                        state: "display_value"
+                    }
+                }'></div>
+                <!-- /ko -->
+                <!-- ko if: popupData() === clickData() -->
+                <div style='display: inline;' data-bind='component: {
+                    name: "concept-select-widget",
+                    params: {
+                        formData: formData,
+                        tile: tile,
+                        form: form,
+                        config: config,
+                        label: typeLabel,
+                        value: clickType,
+                        node: node,
+                        expanded: expanded,
+                        disabled: false,
+                        type: "resource-editor",
+                        state: "display_value"
+                    }
+                }'></div>
+                <!-- /ko -->
+            </div>
+        </div>
+    </div>
+    <!--/ko-->
+    <div class="relative" data-bind="leaflet: mapConfig" style="height: 300px; margin-right: 15px;"></div>
+</dd>
+{% endblock report %}

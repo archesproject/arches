@@ -2,12 +2,12 @@ define([
     'underscore',
     'backbone',
     'knockout',
-    'views/graph/card-configuration/component-forms/permissions-list',
     'widgets',
     'card-configuration-data',
-    'bindings/summernote',
-    'plugins/knockstrap'
-], function(_, Backbone,  ko, PermissionsList, widgets, data) {
+    'bindings/ckeditor',
+    'knockstrap',
+    'component-templates'
+], function(_, Backbone,  ko, widgets, data) {
     var CardComponentForm = Backbone.View.extend({
         /**
         * A backbone view representing a card component form
@@ -45,6 +45,23 @@ define([
                 }
             };
 
+            this.checkIfImmutable = function() {
+                var isImmutable = false;
+                var card = self.card();
+                if (card) {
+                    isImmutable = !card.get('is_editable');
+                }
+                return isImmutable;
+            }
+
+            this.toggleRequired = function() {
+                    var nodeRequired = this.widget().node.isrequired;
+                    var cardEditable = this.card().get('is_editable');
+                    if (cardEditable === true) {
+                        nodeRequired(!nodeRequired());
+                    }
+            };
+
             this.updateSelection = function(selection) {
                 if('isContainer' in selection){
                     this.card(selection);
@@ -60,11 +77,6 @@ define([
             }, this);
 
             this.updateSelection(this.selection());
-
-            this.permissionsList = new PermissionsList({
-                card: this.card,
-                permissions: options.permissions
-            });
         }
     });
     return CardComponentForm;

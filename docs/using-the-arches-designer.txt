@@ -2,73 +2,199 @@
 Using the Arches Designer
 #########################
 
-Introduction
-============
-
-The Arches Designer is a set of tools that give you full control over the creation of new Resource Models. This section serves as a reference manual for the various components of the Arches designer. 
+The Arches Designer is a set of tools that give you full control over the creation of new Branches and Resource Models. This section serves as a reference manual for the various components of the Arches designer. 
 
 .. note:: Most of this section's content can be found directly within the Arches app. Just click |q-help| in the upper right corner of any page.
 
-+ `Branch/Resource Model Settings`_
++ `Settings Manager`_
+    `Branches and Resource Models` - General metadata configuration.
 + `Graph Designer`_
+    `Branches and Resource Models` - Graphs are made of nodegroups that define what information can be collected.
 + `Card Designer`_
-+ `Form Designer`_
+    `Branches and Resource Models` - Cards are used to define the UI behavior for a nodegroup.
++ `Menu Designer`_
+    `Resource Models only` - Menus aggregate Cards to create thematic data collection.
 + `Report Designer`_
-+ `Function Designer`_
+    `Resource Models only` - Reports determine how an existing resource is displayed to the public.
++ `Function Manager`_
+    `Resource Models only` - Configure Functions for this Resource Model.
++ `Permissions Manager`_
+    `Resource Models only` - Nodegroup-level management of how users and groups can interact with your database.
 
-Overview
-========
+Settings Manager
+================
 
-(old content, may be more appropriate elsewhere. image text needs updating)
-
-Resources in an Arches database are separated into distinct resource "classes," and in v4 the way a user creates and manages these classes has been completely redesigned. Arches now handles all of these operations in the Resource Manager (which you must be logged in to access), and resource classes are made of modular components that can be re-used throughout the system.
-
-The basic components of a resource class are a graph, a series of data entry forms, and a report. In the Arches interface, each of these components comprise various sub-components, as illustrated below.
-
-.. image:: images/resource-class-full.png
-
-All of these UI components work together to facilitate data input and display:
-
-The graph is made of node groups that define what information will be gathered for a given resource class.
-The forms are made of cards that are tied to specific node groups and define what input widget will be used to gather a value for each node.
-Behind the scenes, these components are defined using many Python classes that are stored as Django models. Instances of these classes are stored in separate database tables, in order to support and enforce relationships. For example, the following the following illustrates a very basic example of the interaction between node groups and cards.
-
-.. image:: images/graph-forms.png
-
-Once values have been entered into the widgets in a card, the business data is saved as a "tile". These tiles are stored as JSON objects in the Postgres database, and are the only format in which resource data exist.
-
-In the example, two very simple node groups are shown. Note that a node group may in fact be very complex, and hold many more than two nodes. As you can see, these node groups are used as the basis for "cards", which are used in the data entry forms. Each card is associated with one or more node groups, and assigns a widget (e.g. a dropdown selection list or calendar date picker) to each node. A card can also record other properties like validation functions.
-
-Branch/Resource Model Settings
-==============================
-
-<pull contents from the html help templates>
+*Please utilize the in-app help for this content... it has not be transferred here yet.*
 
 Graph Designer
 ==============
 
-<pull contents from the html help templates>
+The Graph Designer allows you to create, modify, and view the graph for a Resource Model or Branch. Please note that the Graph Designer functions a little differently depending on which one of these two is being edited.
 
-.. note:: One should refer to CIDOC CRM (http://www.cidoc-crm.org/) to make an informed decision about what class or property to assign to nodes and edges respectively.
+The Graph Designer interface is split into three sections, as shown in the image below.
+
+.. image:: ../arches/app/media/img/help/graph-manager-panes.png
+    
+The **Node List** displays all of the nodes present in this graph. You can select a node in the Node List to open the Node Manager.
+
+The **Graph** panel displays all nodes and their connections (called "properties"), showing the full branching structure. Every Graph will have a "top node" in the center, to which all other nodes will be connected. You can select a node in the Graph to open the Node Manager.
+
+The **Node Manager** is where the action takes place. Within this panel you will be able to build the graph by adding new Branches (if you are working with a Resource Model), or refine it by modifying nodes that already exists. Once you have selected a node, the Node Manager settings tab will look something like this:
+
+.. image:: ../arches/app/media/img/help/node-manager.png
+
+* Node Name
+    Used to identify this node within the graph interface. In other parts of app, custom labels can be used in place of this name. Node names need not be unique across a graph, but it will make everything easier if they are.
+* CRM Class (only present for Resource Models that use an ontology)
+    This setting defines what ontological class of data will be collected by this node. To learn more, read Ontologies in Arches.
+* Relationship from ... (only present for Resource Models that use an ontology)
+    Define what relationship this node has with its parent node (the one directly above it in the graph branch). A verbalization of your choice is shown below this setting.
+* Searchable
+    If true users will be able to search on this node's value.
+* Required
+    If true a value must be entered for this node in order to save its tile. Important: Once data is collected for this node, this setting cannot be changed
+* Data type
+    Choose what type of data will be collected in this node. See `About Data Types`_ below.
+* Make Card/Place node(s) in a separate card
+    Depending on the location of the node within the Graph, you may be given the option to "make a card" from the node and its descendants, or "place it into a separate card". Doing the latter will turn the upstream Card into a Card Container, and will make this nodegroup display as a tab within that Card Container.
+              
+Editing a Branch's Graph
+------------------------
+
+To build the graph of a Branch, your main course of action will be adding nodes, naming them, and defining their data type. If your Branch uses an ontology, you'll also need to define the CRM class and property of each new node. When choosing classes and properties, the interface will automatically enforce preloaded ontological rules.
+
+.. image:: ../arches/app/media/img/help/add-node-to-branch.gif
+        
+Editing a Resouce Model's Graph
+-------------------------------
+
+When editing a Resource Model's graph, you will be adding entire Branch's to the top node of the graph (the one in the middle). By adding Branches (instead of individual nodes) This encourages consistency between Resource Models by allowing you to reuse a single Branch many times.
+
+As shown below, you must select the top node and then use  to add a Branch. Once you have added a Branch, you may fine-tune the settings of its descendant nodes if desired. Note that any changes you make here will not be applied back to the original Branch.
+
+Once data is saved to a nodegroup, nodes belonging to that nodegroup cannot be deleted.
+            
+.. image:: ../arches/app/media/img/help/add-graph-branch.gif
+
+About Data Types
+----------------
+
+Choosing a node's Data Type is the first step toward defining how that information will be collected. A few data types are intuitive (string, number, date), but here's an explanation of the less familiar types.
+
+* ``geojson-feature-collection``
+    Stores geographic coordinates, and is used to show a resource on the map.
+* ``concept``
+    Constrains the node to store one of a series of choices provided by the Reference Data Manager. This data functionally operates like a dropdown list or pick list. You'll further be prompted to choose a Concept Collection, where you'll choose which series of concepts to use.
+* ``concept-list``
+    Same as above, but the user will be able to select multiple concepts.
+* ``domain-value``
+    Like 'concept', choose this to present the user with a dropdown menu. Unlike 'concept' this dropdown menu will not come from your system-wide controlled vocubulary, but from a list of values that you define here.
+* ``domain-value-list``
+    Same as above, but the user will be able to select multiple domain-values.
+* ``boolean``
+    Use this to record a simple 'yes or no' or 'true or false' value.
+* ``file-list``
+    Allows this node to store one or mores files. Use this to upload images, documents, etc.
+* ``semantic``
+    A 'semantic' node does not store data. Semantic nodes are used where necessary to make symbolic connections between nodes, generally in order to follow ontoligical rules. Note that the top node of every graph is a semantic node.
+    
+.. note:: Once a user saves data belonging to a node, the datatype and the datatype configs for that node cannot be modified
 
 Card Designer
 =============
 
-<pull contents from the html help templates>
+In the Card Designer you will be able to edit one of the Cards (or Card Containers) associated with your Resource Model or Branch. Click 'Return to Cards' to go back and choose a new Card to edit.
 
-Form Designer
+The Card Designer interface is split into three sections, as shown in the image below.
+
+.. image:: ../arches/app/media/img/help/card-designer-panes.png
+
+The **Contents** panel show all Widgets within this Card. In some cases, a third, over-arching tier is added to this heirarchy, called a "Card Container". This happens when multiple Cards are used to organize complex Branches.
+
+The **Manager** panel is where you will make changes to a Card Container, Card, or Widget. Select an item in the contents panel, or in the preview, and you will see the manager panel update based on your selection.
+
+The **Preview** panel allows you to see the Card just as a user would encounter it while creating a new resource. As you make changes in the contents or manager panels, you'll see the preview update accordingly.
+
+Using the Contents Panel
+------------------------
+
+This panel displays all of the components present in this Card. Note that there are two forms this heirarchy may take.
+
+* Example 1: Card with Widgets
+    
+    A Card will have one or more Widgets in it. You can reorder these widgets by moving them in the contents panel, or in the card preview. Note that different icons are used for different types of Widgets.
+    
+    .. image:: ../arches/app/media/img/help/reorganize-contents-card.gif
+    
+* Example 2: Card Container with Cards
+
+    In some cases, a complex Branch will have a Card Container, which aggregates multiple Cards (and their Widgets) in order to thematically organize data entry. These Cards will appear as 'tabs' in the preview. You can reorder these tabs just as you would Widgets. Note that different icons are used for different types of Widgets.
+    
+    .. image:: ../arches/app/media/img/help/reorganize-contents-card-container.gif
+    
+Managing Card Containers and Cards
+----------------------------------
+
+* Settings (Card Containers and Cards)
+    
+    Whether it is a Card Container or a Card, the top-level item of your contents panel will have important configuration settings.
+    
+    * Make Card Visible - allows designers to define when a card may be accessed and used for editing
+    * Allow multiple values - define whether multiple instances of this card may be saved in the database. Note that this setting is available for descendant Cards as well.
+
+* Help Text (Cards only)
+ 
+     To aid data entry users when using the Widgets in this Card, you may want to add some extra guidance. Use the Enable Card-Level Help setting to do so, and design the content of this guidance with the Card-Level Help menu. 
+
+About Widgets
+-------------
+
+Widgets are data entry helpers for each node that collects information; it's often easier to pick a date from a calendar than to type it in, for example. Generally, the datatype of the node will determine which Widget template is used. However, in the case of a concept that will be picked from a list, you can choose a dropdown menu or a set of radio buttons, and for free text you can choose a basic text box or a rich text editor.
+
+In the Widget Manager, you can further refine how a user will interact with a Widget. Note that in every case you can enter a custom label, but other settings depend on the Widget template. Many of these settings are optional, and all come with acceptable defaults.
+
+* Text Widgets
+    * Placeholder - create a default text prompt
+    * Max Length - set the maximum number of characters allowed
+    * Template - choose between a simple input box or a right text editor
+    * Required - If true a value must be entered for this widget in order to save its card. Important: Once data is collected for this widget, this setting cannot be changed
+* Concept Widgets
+    * Placeholder - create a default text prompt
+    * Concept Collection - choose which set of concepts the user will pick from (also defined in the Graph Designer)
+    * Template - choose between a dropdown menu or a radio button selection
+    * Required - If true a value must be entered for this widget in order to save its card. Important: Once data is collected for this widget, this setting cannot be changed
+* Date Widget
+    * Minimum Date - set the minimum for a range of allowed dates
+    * Maximum Date - set the maximum for a range of allowed dates
+    * View Mode - set how the date calendar should appear when first opened
+    * Date Format - set the way this date is displayed in reports and forms (note that all dates are stored as YYYY-MM-DD:TT00:00:00 in the database)
+    * Required - If true a value must be entered for this widget in order to save its card. Important: Once data is collected for this widget, this setting cannot be changed
+* Map Widget
+    * Position - set the default map center
+    * Zoom - set the default zoom level
+    * Geocoder - choose which geocoding engine to use, or disable if desired
+    * Resource Properties - set the color of the drawing tools, and choose which geometry types are allowed
+    * Required - If true a value must be entered for this widget in order to save its card. Important: Once data is collected for this widget, this setting cannot be changed
+
+Menu Designer
 =============
+
+*Please utilize the in-app help for this content... it has not be transferred here yet.*
 
 Report Designer
 ===============
 
-<pull contents from the html help templates>
+*Please utilize the in-app help for this content... it has not be transferred here yet.*
 
-Function Designer
-==================
+Function Manager
+================
 
-<pull contents from the html help templates>
+*Please utilize the in-app help for this content... it has not be transferred here yet.*
 
+Permissions Manager
+===================
 
-.. |q-help| image:: images/in-app-help-icon.png
+*Please utilize the in-app help for this content, it has not be transferred here yet.*
+
+.. |q-help| image:: ../arches/app/media/img/help/rtd/in-app-help-icon.png
   :align: middle

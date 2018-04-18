@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+{% load i18n %}
+<!-- this html is included in help-panel-base.htm -->
+<div class="ep-help-content">
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Card Designer Overview" %}</h4></a>
+        <div class="ep-help-topic-content">
+            <p>{% if not graph.isresource %}{% trans "Use the Card Designer to edit this Branch's Card." %} {% else %} {% trans "Here in the Card Designer you will be able to edit one of the Cards (or Card Containers) associated with your Resource Model. Click 'Return to Cards' to go back and choose a new Card to edit." %}{% endif %}</p>
+            <p>{% trans "The Card Designer interface is split into three sections, as shown in the image below." %}</p>
+            <span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/card-designer-panes.png" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span>
+            <p><a href="{{ STATIC_URL }}img/help/card-designer-panes.png" target="_blank"><img src="{{ STATIC_URL }}img/help/card-designer-panes.png"></img></a></p>
+            <p>{% blocktrans %}The <strong>Contents</strong> panel show all Widgets within this Card. In some cases, a third, over-arching tier is added to this heirarchy, called a "Card Container". This happens when multiple Cards are used to organize complex Branches.{% endblocktrans %}</p>
+            <p>{% blocktrans %}The <strong>Manager</strong> panel is where you will make changes to a Card Container, Card, or Widget. Select an item in the contents panel, or in the preview, and you will see the manager panel update based on your selection.{% endblocktrans %}</p>
+            <p>{% blocktrans %}The <strong>Preview</strong> allows you to see the Card just as a user would encounter it while creating a new resource. As you make changes in the contents or manager panels, you'll see the the preview update accordingly.{% endblocktrans %}</p>
+        </div>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Using the Contents Panel" %}</h4></a>
+        <div class="ep-help-topic-content">
+            <p>{% trans "This panel displays all of the components present in this Card. Note that there are two forms this heirarchy may take." %}</p>
+            <div class="col-xs-12">
+                <h5>{% trans "Example 1: Card with Widgets" %}</h5>
+            </div>
+            <div class="col-xs-6">
+                <p>{% trans "A Card will have one or more Widgets in it. You can reorder these widgets by moving them in the contents panel, or in the card preview." %}</p>
+                <p>{% trans "Note that different icons are used for different types of Widgets." %}</p>
+            </div>
+            <div class="col-xs-6">
+                <p><img class="reloadable-img" src="{{ STATIC_URL }}img/help/reorganize-contents-card.gif" style="border: 2px solid #eee"></img></p>
+            </div>
+            <div class="col-xs-12">
+                <h5>{% trans "Example 2: Card Container with Cards" %}</h5>
+            </div>
+            <div class="col-xs-6">
+                <p>{% trans "In some cases, a complex Branch will have a Card Container, which aggregates multiple Cards (and their Widgets) in order to thematically organize data entry. These Cards will appear as 'tabs' in the preview. You can reorder these tabs just as you would Widgets." %}</p>
+                <p>{% trans "Note that different icons are used for different types of Widgets." %}</p>
+            </div>
+            <div class="col-xs-6">
+                <p><img class="reloadable-img"src="{{ STATIC_URL }}img/help/reorganize-contents-card-container.gif" style="border: 2px solid #eee"></img></p>
+            </div>
+        </div>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Managing Card Containers and Cards" %}</h4></a>
+        <div class="ep-help-topic-content">
+            <h4>{% trans "Settings (Card Containers and Cards)" %}</h4>
+            <p>{% trans "Whether it is a Card Container or a Card, the top-level item of your contents panel will have important configuration settings." %}</p>
+            <p>
+                {% blocktrans %}
+                <strong>Make Card Visible</strong> - allows designers to define when a card may be accessed and used for editing<br>
+                <strong>Allow multiple values</strong> - define whether multiple instances of this card may be saved in the database. Note that this setting is available for descendant Cards as well.<br>
+                {% endblocktrans %}
+            </p>
+            <h4>{% trans "Help Text (Cards only)" %}</h4>
+            <p>{% blocktrans %} To aid data entry users when using the Widgets in this Card, you may want to add some extra guidance. Use the <strong>Enable Card-Level Help</strong> setting to do so, and design the content of this guidance with the Card-Level Help menu. {% endblocktrans %}</p>
+        </div>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Widgets</h4></a>
+        <div class="ep-help-topic-content">
+          {% blocktrans %}
+            <p>Widgets are data entry helpers for each node that collects information; it's often easier to pick a date from a calendar than to type it in, for example. Generally, the datatype of the node will determine which Widget template is used. However, in the case of a concept that will be picked from a list, you can choose a dropdown menu or a set of radio buttons, and for free text you can choose a basic text box or a rich text editor.</p>
+            <p>In the Widget Manager, you can further refine how a user will interact with a Widget. Note that in every case you can enter a custom label, but other settings depend on the Widget template. Many of these settings are optional, and all come with acceptable defaults.</p>
+            {% endblocktrans %}
+            <h4>{% trans "Text Widgets" %}</h4>
+            <p>
+                {% blocktrans %}<strong>Placeholder</strong> - create a default text prompt<br>{% endblocktrans %}
+                {% blocktrans %}<strong>Max Length</strong> - set the maximum number of characters allowed<br>{% endblocktrans %}
+                {% blocktrans %}<strong>Template</strong> - choose between a simple input box or a right text editor<br>{% endblocktrans %}
+                {% blocktrans %}<strong>Required</strong> - If true a value must be entered for this widget in order to save its card. <em>Important:</em> Once data is collected for this widget, this setting cannot be changed<br>{% endblocktrans %}
+
+            </p>
+            <h4>{% trans "Concept Widgets" %}</h4>
+            <p>
+                {% blocktrans %}<strong>Placeholder</strong> - create a default text prompt<br>{% endblocktrans %}
+                {% blocktrans %}<strong>Concept Collection</strong> - choose which set of concepts the user will pick from (also defined in the Graph Designer)<br>{% endblocktrans %}
+                {% blocktrans %}<strong>Template</strong> - choose between a dropdown menu or a radio button selection<br>{% endblocktrans %}
+                {% blocktrans %}<strong>Required</strong> - If true a value must be entered for this widget in order to save its card. <em>Important:</em> Once data is collected for this widget, this setting cannot be changed<br>{% endblocktrans %}
+            </p>
+            <h4>{% trans "Date Widget" %}</h4>
+            <p>
+                {% blocktrans %}<strong>Minimum Date</strong> - set the minimum for a range of allowed dates<br>{% endblocktrans %}
+                {% blocktrans %}<strong>Maximum Date</strong> - set the maximum for a range of allowed dates<br>{% endblocktrans %}
+                {% blocktrans %}<strong>View Mode</strong> - set how the date calendar should appear when first opened<br>{% endblocktrans %}
+                {% blocktrans %}<strong>Date Format</strong> - set the way this date is displayed in reports and forms (note that all dates are stored as YYYY-MM-DD:TT00:00:00 in the database)<br>{% endblocktrans %}
+                {% blocktrans %}<strong>Required</strong> - If true a value must be entered for this widget in order to save its card. <em>Important:</em> Once data is collected for this widget, this setting cannot be changed<br>{% endblocktrans %}
+            </p>
+            <h4>{% trans "Map Widget" %}</h4>
+            <p>
+                {% blocktrans %}<strong>Position</strong> - set the default map center<br>{% endblocktrans %}
+                {% blocktrans %}<strong>Zoom</strong> - set the default zoom level<br>{% endblocktrans %}
+                {% blocktrans %}<strong>Geocoder</strong> - choose which geocoding engine to use, or disable if desired<br>{% endblocktrans %}
+                {% blocktrans %}<strong>Resource Properties</strong> - set the color of the drawing tools, and choose which geometry types are allowed<br>{% endblocktrans %}
+                {% blocktrans %}<strong>Required</strong> - If true a value must be entered for this widget in order to save its card. <em>Important:</em> Once data is collected for this widget, this setting cannot be changed<br>{% endblocktrans %}
+            </p>
+        </div>
+    </div>
+</div>

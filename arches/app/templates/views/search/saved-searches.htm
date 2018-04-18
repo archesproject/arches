@@ -1,0 +1,25 @@
+<div class="search-container saved-search-container relative" style="overflow-y: scroll;">
+
+    <div id="" class="saved-search-grid" style="position: relative;">
+        <div class="saved-search-grid" data-bind="smartresize: {childclass: '.ss-grid-item'}, foreach: items">
+            <!-- Saved Search Query -->
+            <div class="ss-grid-item relative">
+                    <div class="search-caption-activeWrap">
+                        <div class="search-caption-alignCenter">
+                            <div class="search-caption-body">
+                                <div class="search-query">
+                                    <a class="search-query-link-captions" data-bind="click: function(){window.location.href = searchUrl; }"><i class="rounded-x fa fa-search"></i><span data-bind="text: title"></span></a>
+                                    <div class="search-query-desc">
+                                        <span data-bind="html: subtitle"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <!-- ko if: image -->    
+                <img class="img-responsive" alt="Image" data-bind="attr: {src: image}">
+                <!-- /ko -->
+            </div>
+        </div>
+    </div>
+</div>

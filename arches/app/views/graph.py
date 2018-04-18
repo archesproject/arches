@@ -19,33 +19,48 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import itertools
 import zipfile
 import json
-from django.conf import settings as app_settings
+import uuid
 from django.db import transaction
-from django.shortcuts import render
+from django.core.urlresolvers import reverse
+from django.shortcuts import redirect, render
 from django.db.models import Q
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator, classonlymethod
 from django.http import HttpResponseNotFound, QueryDict, HttpResponse
 from django.views.generic import View, TemplateView
+from django.contrib.auth.models import User, Group, Permission
+from django.contrib.contenttypes.models import ContentType
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.JSONResponse import JSONResponse
-from arches.app.models.graph import Graph
+from arches.app.utils.response import JSONResponse
+from arches.app.models import models
+from arches.app.models.graph import Graph, GraphValidationError
 from arches.app.models.card import Card
 from arches.app.models.concept import Concept
-from arches.app.models import models
-from arches.app.utils.data_management.resources.exporter import ResourceExporter
+from arches.app.models.system_settings import settings
 from arches.app.utils.data_management.resource_graphs.exporter import get_graphs_for_export, create_mapping_configuration_file
 from arches.app.utils.data_management.resource_graphs import importer as GraphImporter
-from arches.app.utils.data_management.arches_file_exporter import ArchesFileExporter
-from arches.app.views.base import BaseManagerView
+from arches.app.utils.system_metadata import system_metadata
+from arches.app.views.base import BaseManagerView, MapBaseManagerView
 from tempfile import NamedTemporaryFile
-from guardian.shortcuts import get_perms_for_model
+from guardian.shortcuts import get_perms_for_model, assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
+from rdflib import Graph as RDFGraph, RDF, RDFS
 
 try:
     from cStringIO import StringIO
 except ImportError:
     from StringIO import StringIO
+
+def get_ontology_namespaces():
+    ontology_namespaces = settings.ONTOLOGY_NAMESPACES
+    g = RDFGraph()
+    for ontology in models.Ontology.objects.all():
+        g.parse(ontology.path.path)
+    for namespace in g.namespaces():
+        if str(namespace[1]) not in ontology_namespaces:
+            ontology_namespaces[str(namespace[1])] = str(namespace[0])
+    return ontology_namespaces
+
 
 class GraphBaseView(BaseManagerView):
     def get_context_data(self, **kwargs):
@@ -59,13 +74,12 @@ class GraphBaseView(BaseManagerView):
             pass
         return context
 
-
 @method_decorator(group_required('Graph Editor'), name='dispatch')
 class GraphSettingsView(GraphBaseView):
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
         icons = models.Icon.objects.order_by('name')
-        resource_graphs = models.GraphModel.objects.filter(Q(isresource=True))
+        resource_graphs = models.GraphModel.objects.filter(Q(isresource=True)).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         resource_data = []
         node = models.Node.objects.get(graph_id=graphid, istopnode=True)
         relatable_resources = node.get_relatable_resources()
@@ -89,11 +103,13 @@ class GraphSettingsView(GraphBaseView):
             ontology_classes=JSONSerializer().serialize(ontology_classes),
             resource_data=JSONSerializer().serialize(resource_data),
             node_count=models.Node.objects.filter(graph=self.graph).count(),
+            ontology_namespaces = get_ontology_namespaces()
         )
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Defining Settings','help/settings-help.htm')
+        context['nav']['help'] = (_('Defining Settings'),'help/base-help.htm')
+        context['help'] = 'settings-help'
 
         return render(request, 'views/graph/graph-settings.htm', context)
 
@@ -102,10 +118,12 @@ class GraphSettingsView(GraphBaseView):
         data = JSONDeserializer().deserialize(request.body)
         for key, value in data.get('graph').iteritems():
             if key in ['iconclass', 'name', 'author', 'description', 'isresource',
-                'ontology_id', 'version',  'subtitle', 'isactive', 'mapfeaturecolor', 'mappointsize', 'maplinewidth']:
+                'ontology_id', 'version',  'subtitle', 'isactive']:
                 setattr(graph, key, value)
 
         node = models.Node.objects.get(graph_id=graphid, istopnode=True)
+        root_node_config = [graph_node['config'] for graph_node in data.get('graph').get('nodes') if graph_node['istopnode']==True][0]
+        node.config = root_node_config
         node.set_relatable_resources(data.get('relatable_resource_ids'))
         node.ontologyclass = data.get('ontology_class') if data.get('graph').get('ontology_id') is not None else None
 
@@ -128,26 +146,28 @@ class GraphManagerView(GraphBaseView):
                 main_script='views/graph',
                 root_nodes=JSONSerializer().serialize(root_nodes),
             )
-
+            context['graph_models'] = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+            context['graphs'] = JSONSerializer().serialize(context['graph_models'], exclude = ['functions'])
             context['nav']['title'] = 'Arches Designer'
             context['nav']['icon'] = 'fa-bookmark'
-            context['nav']['help'] = ('About the Arches Designer','')
-
+            context['nav']['help'] = (_('About the Arches Designer'),'help/base-help.htm')
+            context['help'] = 'arches-designer-help'
+            context['protected_graphs'] = json.dumps(settings.PROTECTED_GRAPHS)
             return render(request, 'views/graph.htm', context)
 
         self.graph = Graph.objects.get(graphid=graphid)
         datatypes = models.DDataType.objects.all()
-        branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True).exclude(isactive=False)
+        branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True)
         if self.graph.ontology is not None:
             branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
-        lang = request.GET.get('lang', app_settings.LANGUAGE_CODE)
+        lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         concept_collections = Concept().concept_tree(mode='collections', lang=lang)
-
+        datatypes_json = JSONSerializer().serialize(datatypes, exclude=['iconclass','modulename','isgeometric'])
         context = self.get_context_data(
             main_script='views/graph/graph-manager',
-            branches=JSONSerializer().serialize(branch_graphs),
-            datatypes_json=JSONSerializer().serialize(datatypes),
-            datatypes=datatypes,
+            branches=JSONSerializer().serialize(branch_graphs, exclude=['cards','domain_connections', 'functions', 'cards', 'deploymentfile', 'deploymentdate']),
+            datatypes_json=datatypes_json,
+            datatypes=json.loads(datatypes_json),
             concept_collections=concept_collections,
             node_list={
                 'title': _('Node List'),
@@ -161,11 +181,12 @@ class GraphManagerView(GraphBaseView):
                 'title': _('Branch Library'),
                 'search_placeholder': _('Find a graph branch')
             },
+            ontology_namespaces = get_ontology_namespaces()
         )
-
         context['nav']['title'] = self.graph.name
-        context['nav']['help'] = ('Using the Graph Manager','help/graph-designer-help.htm')
+        context['nav']['help'] = (_('Using the Graph Manager'),'help/base-help.htm')
         context['nav']['menu'] = True
+        context['help'] = 'graph-designer-help'
 
         return render(request, 'views/graph/graph-manager.htm', context)
 
@@ -183,7 +204,7 @@ class GraphDataView(View):
     def get(self, request, graphid, nodeid=None):
         if self.action == 'export_graph':
             graph = get_graphs_for_export([graphid])
-            graph['metadata'] = ArchesFileExporter().export_metadata()
+            graph['metadata'] = system_metadata()
             f = JSONSerializer().serialize(graph, indent=4)
             graph_name = JSONDeserializer().deserialize(f)['graph'][0]['name']
 
@@ -191,7 +212,7 @@ class GraphDataView(View):
             response['Content-Disposition'] = 'attachment; filename="%s.json"' %(graph_name)
             return response
         elif self.action == 'export_mapping_file':
-            files_for_export = create_mapping_configuration_file(graphid)
+            files_for_export = create_mapping_configuration_file(graphid, True)
             file_name = Graph.objects.get(graphid=graphid).name
 
             buffer = StringIO()
@@ -213,10 +234,20 @@ class GraphDataView(View):
             response.write(zip_stream)
             return response
 
+        elif self.action == 'get_domain_connections':
+            res = []
+            graph = Graph.objects.get(graphid=graphid)
+            ontology_class = request.GET.get('ontology_class', None)
+            ret = graph.get_valid_domain_ontology_classes()
+            for r in ret:
+                res.append({'ontology_property': r['ontology_property'], 'ontology_classes':[c for c in r['ontology_classes'] if c == ontology_class]})
+            return JSONResponse(res)
+
         else:
             graph = Graph.objects.get(graphid=graphid)
             if self.action == 'get_related_nodes':
-                ret = graph.get_valid_ontology_classes(nodeid=nodeid)
+                parent_nodeid = request.GET.get('parent_nodeid', None)
+                ret = graph.get_valid_ontology_classes(nodeid=nodeid, parent_nodeid=parent_nodeid)
 
             elif self.action == 'get_valid_domain_nodes':
                 ret = graph.get_valid_domain_ontology_classes(nodeid=nodeid)
@@ -227,46 +258,64 @@ class GraphDataView(View):
 
     def post(self, request, graphid=None):
         ret = {}
-        if self.action == 'import_graph':
-            graph_file = request.FILES.get('importedGraph').read()
-            graphs = JSONDeserializer().deserialize(graph_file)['graph']
-            ret = GraphImporter.import_graph(graphs)
-        else:
-            if graphid is not None:
-                graph = Graph.objects.get(graphid=graphid)
-            data = JSONDeserializer().deserialize(request.body)
 
-            if self.action == 'new_graph':
-                isresource = data['isresource'] if 'isresource' in data else False
-                name = _('New Resource Model') if isresource else _('New Branch')
-                author = request.user.first_name + ' ' + request.user.last_name
-                ret = Graph.new(name=name,is_resource=isresource,author=author)
+        try:
+            if self.action == 'import_graph':
+                graph_file = request.FILES.get('importedGraph').read()
+                graphs = JSONDeserializer().deserialize(graph_file)['graph']
+                ret = GraphImporter.import_graph(graphs)
+            else:
+                if graphid is not None:
+                    graph = Graph.objects.get(graphid=graphid)
+                data = JSONDeserializer().deserialize(request.body)
 
-            elif self.action == 'update_node':
-                graph.update_node(data)
-                ret = graph
-                graph.save()
+                if self.action == 'new_graph':
+                    isresource = data['isresource'] if 'isresource' in data else False
+                    name = _('New Resource Model') if isresource else _('New Branch')
+                    author = request.user.first_name + ' ' + request.user.last_name
+                    ret = Graph.new(name=name,is_resource=isresource,author=author)
 
-            elif self.action == 'append_branch':
-                ret = graph.append_branch(data['property'], nodeid=data['nodeid'], graphid=data['graphid'])
-                graph.save()
+                elif self.action == 'update_node':
+                    graph.update_node(data)
+                    ret = graph
+                    graph.save()
 
-            elif self.action == 'move_node':
-                ret = graph.move_node(data['nodeid'], data['property'], data['newparentnodeid'])
-                graph.save()
+                elif self.action == 'update_node_layer':
+                    nodeid = uuid.UUID(str(data.get('nodeid')))
+                    node = graph.nodes[nodeid]
+                    node.config = data['config']
+                    ret = graph
+                    node.save()
 
-            elif self.action == 'clone_graph':
-                ret = graph.copy()
-                ret.save()
+                elif self.action == 'append_branch':
+                    ret = graph.append_branch(data['property'], nodeid=data['nodeid'], graphid=data['graphid'])
+                    graph.save()
 
-        return JSONResponse(ret)
+                elif self.action == 'move_node':
+                    ret = graph.move_node(data['nodeid'], data['property'], data['newparentnodeid'])
+                    graph.save()
+
+                elif self.action == 'clone_graph':
+                    clone_data = graph.copy()
+                    ret = clone_data['copy']
+                    ret.save()
+                    ret.copy_functions(graph, [clone_data['nodes'], clone_data['nodegroups']])
+                    form_map = ret.copy_forms(graph, clone_data['cards'])
+                    ret.copy_reports(graph, [form_map, clone_data['cards'], clone_data['nodes']])
+
+            return JSONResponse(ret)
+        except GraphValidationError as e:
+            return JSONResponse({'status':'false','message':e.message, 'title':e.title}, status=500)
 
     def delete(self, request, graphid):
         data = JSONDeserializer().deserialize(request.body)
         if data and self.action == 'delete_node':
-            graph = Graph.objects.get(graphid=graphid)
-            graph.delete_node(node=data.get('nodeid', None))
-            return JSONResponse({})
+            try:
+                graph = Graph.objects.get(graphid=graphid)
+                graph.delete_node(node=data.get('nodeid', None))
+                return JSONResponse({})
+            except GraphValidationError as e:
+                return JSONResponse({'status':'false','message':e.message, 'title':e.title}, status=500)
 
         return HttpResponseNotFound()
 
@@ -275,19 +324,23 @@ class GraphDataView(View):
 class CardManagerView(GraphBaseView):
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
-        branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True).exclude(isactive=False)
+        if self.graph.isresource == False:
+            card = Card.objects.get(cardid=Graph.objects.get(graphid=graphid).get_root_card().cardid)
+            cardid = card.cardid
+            return redirect('card', cardid=cardid)
+
+        branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True)
         if self.graph.ontology is not None:
             branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
 
         context = self.get_context_data(
             main_script='views/graph/card-manager',
-            branches=JSONSerializer().serialize(branch_graphs),
+            branches=JSONSerializer().serialize(branch_graphs, exclude=['functions', 'relatable_resource_model_ids', 'edges']),
         )
-
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Managing Cards','')
-
+        context['nav']['help'] = (_('Managing Cards'),'help/base-help.htm')
+        context['help'] = 'card-manager-help'
         return render(request, 'views/graph/card-manager.htm', context)
 
 
@@ -296,53 +349,60 @@ class CardView(GraphBaseView):
     def get(self, request, cardid):
         try:
             card = Card.objects.get(cardid=cardid)
+            self.graph = Graph.objects.get(graphid=card.graph_id)
         except(Card.DoesNotExist):
-            # assume this is a graph id
+            # assume the cardid is actually a graph id
             card = Card.objects.get(cardid=Graph.objects.get(graphid=cardid).get_root_card().cardid)
-        self.graph = Graph.objects.get(graphid=card.graph_id)
+            self.graph = Graph.objects.get(graphid=card.graph_id)
+            if self.graph.isresource == True:
+                return redirect('card_manager', graphid=cardid)
 
-        def get_edge_to_parent():
-            for edge in self.graph.edges.itervalues():
-                if str(edge.rangenode_id) == str(card.nodegroup_id):
-                    return edge
-
-        ontologyproperty = None
-        ontology_properties = []
-
-        if self.graph.isresource:
-            parent_edge = get_edge_to_parent()
-            if parent_edge:
-                ontologyproperty = parent_edge.ontologyproperty
-                ontology_properties = [item['ontology_property'] for item in self.graph.get_valid_domain_ontology_classes(nodeid=card.nodegroup_id)]
+        card.confirm_enabled_state(request.user, card.nodegroup)
+        for c in card.cards:
+            c.confirm_enabled_state(request.user, c.nodegroup)
 
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
-        map_layers = models.MapLayers.objects.all()
-        map_sources = models.MapSources.objects.all()
-        resource_graphs = Graph.objects.exclude(pk=card.graph_id).exclude(pk='22000000-0000-0000-0000-000000000002').exclude(isresource=False).exclude(isactive=False)
-        lang = request.GET.get('lang', app_settings.LANGUAGE_CODE)
+        geocoding_providers = models.Geocoder.objects.all()
+        map_layers = models.MapLayer.objects.all()
+        map_markers = models.MapMarker.objects.all()
+        map_sources = models.MapSource.objects.all()
+        resource_graphs = Graph.objects.exclude(pk=card.graph_id).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
+        lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         concept_collections = Concept().concept_tree(mode='collections', lang=lang)
+        ontology_properties = []
+        card_root_node = models.Node.objects.get(nodeid=card.nodegroup_id)
+        for item in self.graph.get_valid_ontology_classes(nodeid=card.nodegroup_id):
+            if card_root_node.ontologyclass in item['ontology_classes']:
+                ontology_properties.append(item['ontology_property'])
+        ontology_properties = sorted(ontology_properties, key=lambda item: item)
 
         context = self.get_context_data(
             main_script='views/graph/card-configuration-manager',
-            graph_id=self.graph.pk,
+            graph_id=self.graph.graphid,
             card=JSONSerializer().serialize(card),
-            permissions=JSONSerializer().serialize([{'codename': permission.codename, 'name': permission.name} for permission in get_perms_for_model(card.nodegroup)]),
             datatypes_json=JSONSerializer().serialize(datatypes),
+            geocoding_providers=geocoding_providers,
             datatypes=datatypes,
             widgets=widgets,
             widgets_json=JSONSerializer().serialize(widgets),
             map_layers=map_layers,
+            map_markers=map_markers,
             map_sources=map_sources,
             resource_graphs=resource_graphs,
             concept_collections=concept_collections,
             ontology_properties=JSONSerializer().serialize(ontology_properties),
-            ontologyproperty=ontologyproperty,
         )
+
+        context['graphid'] = self.graph.graphid
+        context['graph'] = JSONSerializer().serializeToPython(self.graph)
+        context['graph_json'] = json.dumps(context['graph'])
+        context['root_node'] = self.graph.node_set.get(istopnode=True)
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Configuring Cards and Widgets','')
+        context['nav']['help'] = (_('Configuring Cards and Widgets'),'help/base-help.htm')
+        context['help'] = 'card-designer-help'
 
         return render(request, 'views/graph/card-configuration-manager.htm', context)
 
@@ -362,18 +422,23 @@ class FormManagerView(GraphBaseView):
 
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
-        context = self.get_context_data(
-            main_script='views/graph/form-manager',
-            forms=JSONSerializer().serialize(self.graph.form_set.all().order_by('sortorder')),
-			cards=JSONSerializer().serialize(models.CardModel.objects.filter(graph=self.graph)),
-            forms_x_cards=JSONSerializer().serialize(models.FormXCard.objects.filter(form__in=self.graph.form_set.all()).order_by('sortorder')),
-        )
 
-        context['nav']['title'] = self.graph.name
-        context['nav']['menu'] = True
-        context['nav']['help'] = ('Using the Form Manager','')
+        if self.graph.isresource == True:
+            context = self.get_context_data(
+                main_script='views/graph/form-manager',
+                forms=JSONSerializer().serialize(self.graph.form_set.all().order_by('sortorder')),
+    			cards=JSONSerializer().serialize(models.CardModel.objects.filter(graph=self.graph)),
+                forms_x_cards=JSONSerializer().serialize(models.FormXCard.objects.filter(form__in=self.graph.form_set.all()).order_by('sortorder')),
+            )
 
-        return render(request, 'views/graph/form-manager.htm', context)
+            context['nav']['title'] = self.graph.name
+            context['nav']['menu'] = True
+            context['nav']['help'] = (_('Using the Menu Manager'),'help/base-help.htm')
+            context['help'] = 'menu-manager-help'
+
+            return render(request, 'views/graph/form-manager.htm', context)
+        else:
+            return redirect('graph_settings', graphid=graphid)
 
     def post(self, request, graphid):
         graph = models.GraphModel.objects.get(graphid=graphid)
@@ -388,33 +453,47 @@ class FormManagerView(GraphBaseView):
                 ret = data['forms']
             if self.action == 'add_form':
                 form = models.Form(title=_('New Menu'), graph=graph)
+                form.sortorder = len(graph.form_set.all())
                 form.save()
                 ret = form
+
         return JSONResponse(ret)
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
 class FormView(GraphBaseView):
     def get(self, request, formid):
-        form = models.Form.objects.get(formid=formid)
-        self.graph = Graph.objects.get(graphid=form.graph.pk)
-        icons = models.Icon.objects.order_by('name')
-        cards = models.CardModel.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
 
-        context = self.get_context_data(
-            main_script='views/graph/form-configuration',
-            graph_id=self.graph.pk,
-            icons=JSONSerializer().serialize(icons),
-            form=JSONSerializer().serialize(form),
-            forms=JSONSerializer().serialize(self.graph.form_set.all()),
-            cards=JSONSerializer().serialize(cards),
-            forms_x_cards=JSONSerializer().serialize(models.FormXCard.objects.filter(form=form).order_by('sortorder')),
-        )
+        try:
+            form = models.Form.objects.get(formid=formid)
+            self.graph = Graph.objects.get(graphid=form.graph_id)
+            icons = models.Icon.objects.order_by('name')
+            cards = models.CardModel.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
 
-        context['nav']['title'] = self.graph.name
-        context['nav']['menu'] = True
-        context['nav']['help'] = ('Configuring Forms','')
+            context = self.get_context_data(
+                main_script='views/graph/form-configuration',
+                graph_id=self.graph.graphid,
+                icons=JSONSerializer().serialize(icons),
+                form=JSONSerializer().serialize(form),
+                forms=JSONSerializer().serialize(self.graph.form_set.all()),
+                cards=JSONSerializer().serialize(cards),
+                forms_x_cards=JSONSerializer().serialize(models.FormXCard.objects.filter(form=form).order_by('sortorder')),
+            )
 
-        return render(request, 'views/graph/form-configuration.htm', context)
+            context['nav']['title'] = self.graph.name
+            context['nav']['menu'] = True
+            context['nav']['help'] = (_('Configuring Menus'),'help/base-help.htm')
+            context['help'] = 'menu-designer-help'
+
+            return render(request, 'views/graph/form-configuration.htm', context)
+
+        except(models.Form.DoesNotExist):
+            # assume the formid is a graph id
+            graph = Graph.objects.get(graphid=formid)
+            if graph.isresource == False:
+                return redirect('graph_settings', graphid=graph.graphid)
+            else:
+                return redirect('form_manager', graphid=graph.graphid)
+
 
     def post(self, request, formid):
         data = JSONDeserializer().deserialize(request.body)
@@ -441,35 +520,42 @@ class FormView(GraphBaseView):
         form.delete()
         return JSONResponse({'succces':True})
 
+
 class DatatypeTemplateView(TemplateView):
     def get(sefl, request, template='text'):
-        return render(request, 'views/graph/datatypes/%s.htm' % template)
+        return render(request, 'views/components/datatypes/%s.htm' % template)
+
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
 class ReportManagerView(GraphBaseView):
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
-        forms = models.Form.objects.filter(graph=self.graph, visible=True)
-        forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
-        cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
-        datatypes = models.DDataType.objects.all()
-        widgets = models.Widget.objects.all()
-        context = self.get_context_data(
-            main_script='views/graph/report-manager',
-            reports=JSONSerializer().serialize(self.graph.report_set.all()),
-            templates_json=JSONSerializer().serialize(models.ReportTemplate.objects.all()),
-            forms=JSONSerializer().serialize(forms),
-            forms_x_cards=JSONSerializer().serialize(forms_x_cards),
-            cards=JSONSerializer().serialize(cards),
-            datatypes_json=JSONSerializer().serialize(datatypes),
-            widgets=widgets,
-         )
+        if self.graph.isresource:
+            forms = models.Form.objects.filter(graph=self.graph, visible=True)
+            forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
+            cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
+            datatypes = models.DDataType.objects.all()
+            widgets = models.Widget.objects.all()
+            context = self.get_context_data(
+                main_script='views/graph/report-manager',
+                reports=JSONSerializer().serialize(self.graph.report_set.all()),
+                templates_json=JSONSerializer().serialize(models.ReportTemplate.objects.all()),
+                forms=JSONSerializer().serialize(forms),
+                forms_x_cards=JSONSerializer().serialize(forms_x_cards),
+                cards=JSONSerializer().serialize(cards),
+                datatypes_json=JSONSerializer().serialize(datatypes),
+                widgets=widgets,
+             )
 
-        context['nav']['title'] = self.graph.name
-        context['nav']['menu'] = True
-        context['nav']['help'] = ('Managing Reports','')
+            context['nav']['title'] = self.graph.name
+            context['nav']['menu'] = True
+            context['nav']['help'] = (_('Managing Reports'),'help/base-help.htm')
+            context['help'] = 'report-manager-help'
 
-        return render(request, 'views/graph/report-manager.htm', context)
+            return render(request, 'views/graph/report-manager.htm', context)
+
+        else:
+            return redirect('graph_settings', graphid=graphid)
 
     def post(self, request, graphid):
         data = JSONDeserializer().deserialize(request.body)
@@ -479,48 +565,70 @@ class ReportManagerView(GraphBaseView):
         report.save()
         return JSONResponse(report)
 
+
 @method_decorator(group_required('Graph Editor'), name='dispatch')
 class ReportEditorView(GraphBaseView):
     def get(self, request, reportid):
-        report = models.Report.objects.get(reportid=reportid)
-        self.graph = Graph.objects.get(graphid=report.graph.pk)
-        forms = models.Form.objects.filter(graph=self.graph, visible=True)
-        forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
-        cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
-        resource_graphs = Graph.objects.exclude(pk=report.graph.pk).exclude(pk='22000000-0000-0000-0000-000000000002').exclude(isresource=False).exclude(isactive=False)
-        datatypes = models.DDataType.objects.all()
-        widgets = models.Widget.objects.all()
-        templates = models.ReportTemplate.objects.all()
-        map_layers = models.MapLayers.objects.all()
-        map_sources = models.MapSources.objects.all()
+        try:
+            report = models.Report.objects.get(reportid=reportid)
+            self.graph = Graph.objects.get(graphid=report.graph_id)
+            forms = models.Form.objects.filter(graph=self.graph, visible=True)
+            forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
+            cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
+            map_layers = models.MapLayer.objects.all()
+            map_markers = models.MapMarker.objects.all()
+            map_sources = models.MapSource.objects.all()
+            resource_graphs = Graph.objects.exclude(pk=report.graph_id).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
+            datatypes = models.DDataType.objects.all()
+            widgets = models.Widget.objects.all()
+            geocoding_providers = models.Geocoder.objects.all()
+            templates = models.ReportTemplate.objects.all()
+            map_sources = models.MapSource.objects.all()
 
-        context = self.get_context_data(
-            main_script='views/graph/report-editor',
-            report=JSONSerializer().serialize(report),
-            reports=JSONSerializer().serialize(self.graph.report_set.all()),
-            report_templates=templates,
-            templates_json=JSONSerializer().serialize(templates),
-            forms=JSONSerializer().serialize(forms),
-            forms_x_cards=JSONSerializer().serialize(forms_x_cards),
-            cards=JSONSerializer().serialize(cards),
-            datatypes_json=JSONSerializer().serialize(datatypes),
-            resource_graphs=resource_graphs,
-            widgets=widgets,
-            graph_id=self.graph.pk,
-            map_layers=map_layers,
-            map_sources=map_sources,
-         )
+            context = self.get_context_data(
+                main_script='views/graph/report-editor',
+                report=JSONSerializer().serialize(report),
+                reports=JSONSerializer().serialize(self.graph.report_set.all()),
+                report_templates=templates,
+                templates_json=JSONSerializer().serialize(templates),
+                forms=JSONSerializer().serialize(forms),
+                forms_x_cards=JSONSerializer().serialize(forms_x_cards),
+                cards=JSONSerializer().serialize(cards),
+                datatypes_json=JSONSerializer().serialize(datatypes),
+                map_layers=map_layers,
+                map_markers=map_markers,
+                map_sources=map_sources,
+                geocoding_providers=geocoding_providers,
+                resource_graphs=resource_graphs,
+                widgets=widgets,
+                graph_id=self.graph.graphid,
+             )
 
-        context['nav']['title'] = self.graph.name
-        context['nav']['menu'] = True
-        context['nav']['help'] = ('Editing Reports','')
+            context['graphid'] = self.graph.graphid
+            context['graph'] = JSONSerializer().serializeToPython(self.graph)
+            context['graph_json'] = JSONSerializer().serialize(self.graph)
+            context['root_node'] = self.graph.node_set.get(istopnode=True)
 
-        return render(request, 'views/graph/report-editor.htm', context)
+            context['nav']['title'] = self.graph.name
+            context['nav']['menu'] = True
+            context['nav']['help'] = (_('Designing Reports'),'help/base-help.htm')
+            context['help'] = 'report-designer-help'
+
+            return render(request, 'views/graph/report-editor.htm', context)
+
+        except(models.Report.DoesNotExist):
+            # assume the reportid is a graph id
+            graph = Graph.objects.get(graphid=reportid)
+            if graph.isresource == False:
+                return redirect('graph_settings', graphid=graph.graphid)
+            else:
+                return redirect('report_manager', graphid=graph.graphid)
+
 
     def post(self, request, reportid):
         data = JSONDeserializer().deserialize(request.body)
         report = models.Report.objects.get(reportid=reportid)
-        graph = Graph.objects.get(graphid=report.graph.pk)
+        graph = Graph.objects.get(graphid=report.graph_id)
         report.name = data['name']
         report.config = data['config']
         report.formsconfig = data['formsconfig']
@@ -544,22 +652,26 @@ class FunctionManagerView(GraphBaseView):
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
 
-        context = self.get_context_data(
-            main_script='views/graph/function-manager',
-            functions=JSONSerializer().serialize(models.Function.objects.all()),
-            applied_functions=JSONSerializer().serialize(models.FunctionXGraph.objects.filter(graph=self.graph)),
-            function_templates=models.Function.objects.exclude(component__isnull=True),
-        )
+        if self.graph.isresource:
+            context = self.get_context_data(
+                main_script='views/graph/function-manager',
+                functions=JSONSerializer().serialize(models.Function.objects.all()),
+                applied_functions=JSONSerializer().serialize(models.FunctionXGraph.objects.filter(graph=self.graph)),
+                function_templates=models.Function.objects.exclude(component__isnull=True),
+            )
 
-        context['nav']['title'] = self.graph.name
-        context['nav']['menu'] = True
-        context['nav']['help'] = ('Managing Functions','')
+            context['nav']['title'] = self.graph.name
+            context['nav']['menu'] = True
+            context['nav']['help'] = (_('Managing Functions'),'help/base-help.htm')
+            context['help'] = 'function-help'
 
-        return render(request, 'views/graph/function-manager.htm', context)
+            return render(request, 'views/graph/function-manager.htm', context)
+        else:
+            return redirect('graph_settings', graphid=graphid)
 
     def post(self, request, graphid):
         data = JSONDeserializer().deserialize(request.body)
-
+        self.graph = Graph.objects.get(graphid=graphid)
         with transaction.atomic():
             for item in data:
                 functionXgraph, created = models.FunctionXGraph.objects.update_or_create(
@@ -572,14 +684,155 @@ class FunctionManagerView(GraphBaseView):
                 )
                 item['id'] = functionXgraph.pk
 
+                # run post function save hook
+                func = functionXgraph.function.get_class_module()()
+                try:
+                    func.after_function_save(functionXgraph, request)
+                except NotImplementedError:
+                    pass
+
         return JSONResponse(data)
+
 
     def delete(self, request, graphid):
         data = JSONDeserializer().deserialize(request.body)
-
+        self.graph = Graph.objects.get(graphid=graphid)
         with transaction.atomic():
             for item in data:
                 functionXgraph = models.FunctionXGraph.objects.get(pk=item['id'])
                 functionXgraph.delete()
 
         return JSONResponse(data)
+
+
+@method_decorator(group_required('Graph Editor'), name='dispatch')
+class PermissionManagerView(GraphBaseView):
+    action = ''
+
+    def get(self, request, graphid):
+        self.graph = Graph.objects.get(graphid=graphid)
+
+        if self.graph.isresource:
+            identities = []
+            for group in Group.objects.all():
+                identities.append({'name': group.name, 'type': 'group', 'id': group.pk, 'default_permissions': group.permissions.all()})
+            for user in User.objects.filter(is_superuser=False):
+                groups = []
+                default_perms = []
+                for group in user.groups.all():
+                    groups.append(group.name)
+                    default_perms = default_perms + list(group.permissions.all())
+                identities.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions': set(default_perms)})
+
+            cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
+
+            root = {'children': []}
+            def extract_card_info(cards, root):
+                for card in cards:
+                    d = {
+                        'name': card.name,
+                        'nodegroup': card.nodegroup_id,
+                        'children': [],
+                        'type': 'card_container' if len(card.cards) > 0 else 'card',
+                        'type_label': _('Card Container') if len(card.cards) > 0 else _('Card')
+                    }
+                    if len(card.cards) > 0:
+                        extract_card_info(card.cards, d)
+                    else:
+                        for node in card.nodegroup.node_set.all():
+                            if node.datatype != 'semantic':
+                                d['children'].append({'name': node.name, 'datatype': node.datatype, 'children': [], 'type_label': _('Node'), 'type': 'node'})
+                    root['children'].append(d)
+
+            extract_card_info(cards, root)
+            #return JSONResponse(root)
+
+            content_type = ContentType.objects.get_for_model(models.NodeGroup)
+            nodegroupPermissions = Permission.objects.filter(content_type=content_type)
+
+            context = self.get_context_data(
+                main_script='views/graph/permission-manager',
+                identities=JSONSerializer().serialize(identities),
+                cards=JSONSerializer().serialize(root),
+                datatypes=JSONSerializer().serialize(models.DDataType.objects.all()),
+                nodegroupPermissions=JSONSerializer().serialize(nodegroupPermissions) #JSONSerializer().serialize([{'codename': permission.codename, 'name': permission.name} for permission in get_perms_for_model(card.nodegroup)])
+            )
+
+            context['nav']['title'] = self.graph.name
+            context['nav']['menu'] = True
+            context['nav']['help'] = (_('Managing Permissions'),'help/base-help.htm')
+            context['help'] = 'permissions-manager-help'
+
+            return render(request, 'views/graph/permission-manager.htm', context)
+        else:
+            return redirect('graph_settings', graphid=graphid)
+
+
+@method_decorator(group_required('Graph Editor'), name='dispatch')
+class PermissionDataView(View):
+    perm_cache = {}
+
+    def get_perm_name(self, codename):
+        if codename not in self.perm_cache:
+            try:
+                self.perm_cache[codename] = Permission.objects.get(codename=codename, content_type__app_label='models', content_type__model='nodegroup')
+                return self.perm_cache[codename]
+            except:
+                return None
+                # codename for nodegroup probably doesn't exist
+        return self.perm_cache[codename]
+
+    def get(self, request):
+        nodegroup_ids = JSONDeserializer().deserialize(request.GET.get('nodegroupIds'))
+        identityId = request.GET.get('identityId')
+        identityType = request.GET.get('identityType')
+
+        ret = []
+        if identityType == 'group':
+            identity = Group.objects.get(pk=identityId)
+            for nodegroup_id in nodegroup_ids:
+                nodegroup = models.NodeGroup.objects.get(pk=nodegroup_id)
+                perms = [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_group_perms(identity, nodegroup)]
+                ret.append({'perms': perms, 'nodegroup_id': nodegroup_id})
+        else:
+            identity = User.objects.get(pk=identityId)
+            for nodegroup_id in nodegroup_ids:
+                nodegroup = models.NodeGroup.objects.get(pk=nodegroup_id)
+                perms = [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_user_perms(identity, nodegroup)]
+
+                # only get the group perms ("defaults") if no user defined object settings have been saved
+                if len(perms) == 0:
+                    perms = [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in set(get_group_perms(identity, nodegroup))]
+                ret.append({'perms': perms, 'nodegroup_id': nodegroup_id})
+
+        return JSONResponse(ret)
+
+    def post(self, request):
+        data = JSONDeserializer().deserialize(request.body)
+        self.apply_permissions(data)
+        return JSONResponse(data)
+
+    def delete(self, request):
+        data = JSONDeserializer().deserialize(request.body)
+        self.apply_permissions(data, revert=True)
+        return JSONResponse(data)
+
+    def apply_permissions(self, data, revert=False):
+        with transaction.atomic():
+            for identity in data['selectedIdentities']:
+                if identity['type'] == 'group':
+                    identityModel = Group.objects.get(pk=identity['id'])
+                else:
+                    identityModel = User.objects.get(pk=identity['id'])
+
+                for card in data['selectedCards']:
+                    nodegroup = models.NodeGroup.objects.get(pk=card['nodegroup'])
+
+                    # first remove all the current permissions
+                    for perm in get_perms(identityModel, nodegroup):
+                        remove_perm(perm, identityModel, nodegroup)
+
+                    if not revert:
+                        # then add the new permissions
+                        for perm in data['selectedPermissions']:
+                            assign_perm(perm['codename'], identityModel, nodegroup)

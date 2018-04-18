@@ -22,12 +22,12 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function($, ko, _) {
                 });
             }
 
-            var placeholder = select2Config.placeholder
+            var placeholder = typeof select2Config.placeholder === 'function' ? select2Config.placeholder : ko.observable(select2Config.placeholder);
             placeholder.subscribe(function(newItems) {
                 select2Config.placeholder = newItems;
                 $(el).select2("destroy").select2(select2Config);
             });
-            select2Config.placeholder = select2Config.placeholder();
+            select2Config.placeholder = placeholder();
 
             var data = select2Config.data.extend({
                 rateLimit: 500
@@ -101,8 +101,16 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function($, ko, _) {
             $(el).select2(select2Config);
             $(el).select2("val", value());
             $(el).on("change", function(val) {
+                if (val.val === "") {
+                  val.val = null
+                }
                 return value(val.val);
             });
+
+            if (ko.unwrap(select2Config.disabled)) {
+                $(el).select2("disable");
+            };
+
             $(el).on("select2-opening", function(val) {
                 if (select2Config.clickBubble) {
                     $(el).parent().trigger('click');

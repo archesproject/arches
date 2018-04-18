@@ -30,8 +30,6 @@ SEARCH_BACKEND = 'tests.base_test.TestSearchEngine'
 
 RESOURCE_GRAPH_LOCATIONS = (os.path.join(TEST_ROOT, 'fixtures', 'resource_graphs'),)
 
-CONCEPT_SCHEME_LOCATIONS = (os.path.join(TEST_ROOT, 'fixtures', 'authority_files'),)
-
 ONTOLOGY_FIXTURES = os.path.join(TEST_ROOT, 'fixtures', 'ontologies')
 
 BUSISNESS_DATA_FILES = (
@@ -39,6 +37,8 @@ BUSISNESS_DATA_FILES = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
 )
+
+PROTECTED_GRAPHS = []
 
 # Use nose to run all tests
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
@@ -66,6 +66,8 @@ REMOTE_BROWSERS = [
     #  "browserName": "firefox",
     #  "version": "45"}
 ]
+
+OVERRIDE_RESOURCE_MODEL_LOCK = True
 
 # Tell nose to measure coverage on the 'foo' and 'bar' apps
 NOSE_ARGS = [

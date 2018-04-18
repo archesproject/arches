@@ -17,10 +17,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import os
+import uuid
 from arches.management.commands import utils
 from arches.app.models import models
-from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
+from django.db.utils import IntegrityError
 
 
 class Command(BaseCommand):
@@ -40,7 +41,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if options['operation'] == 'register':
-            self.register(source_dir=options['fn_source'])
+            self.register(source=options['fn_source'])
 
         if options['operation'] == 'unregister':
             self.unregister(fn_name=options['fn_name'])
@@ -55,21 +56,29 @@ class Command(BaseCommand):
 
         """
 
-    def register(self, source_dir):
+    def register(self, source):
         """
         Inserts a function into the arches db
 
         """
 
         import imp
-        fn_config = imp.load_source('', source_dir)
+        fn_config = imp.load_source('', source)
         details = fn_config.details
+
+        try:
+            uuid.UUID(details['functionid'])
+        except:
+            details['functionid'] = unicode(uuid.uuid4())
+            print "Registering function with functionid:", details['functionid']
+
         fn = models.Function(
+            functionid = details['functionid'],
             name = details['name'],
             functiontype = details['type'],
             description = details['description'],
             defaultconfig = details['defaultconfig'],
-            modulename = os.path.basename(source_dir),
+            modulename = os.path.basename(source),
             classname = details['classname'],
             component = details['component']
         )

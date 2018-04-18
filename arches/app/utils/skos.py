@@ -24,8 +24,9 @@ from rdflib import Literal, Namespace, RDF, URIRef
 from rdflib.namespace import SKOS, DCTERMS
 from rdflib.graph import Graph
 from time import time
-from arches.app.models.concept import Concept
 from arches.app.models import models
+from arches.app.models.concept import Concept
+from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 # define the ARCHES namespace
@@ -67,15 +68,14 @@ class SKOSReader(object):
 
         baseuuid = uuid.uuid4()
         allowed_languages = models.DLanguage.objects.values_list('pk', flat=True)
+        default_lang = settings.LANGUAGE_CODE
 
         value_types = models.DValueType.objects.all()
         skos_value_types = value_types.filter(Q(namespace = 'skos') | Q(namespace = 'arches'))
         skos_value_types_list = list(skos_value_types.values_list('valuetype', flat=True))
         skos_value_types = {valuetype.valuetype: valuetype for valuetype in skos_value_types}
         dcterms_value_types = value_types.filter(namespace = 'dcterms')
-
-        # relation_types = models.DRelationType.objects.all()
-        # skos_relation_types = relation_types.filter(namespace = 'skos')
+        dcterms_identifier_type = dcterms_value_types.get(valuetype=str(DCTERMS.identifier).replace(str(DCTERMS), ''))
 
 
         # if the graph is of the type rdflib.graph.Graph
@@ -83,6 +83,7 @@ class SKOSReader(object):
 
             # Search for ConceptSchemes first
             for scheme, v, o in graph.triples((None, RDF.type , SKOS.ConceptScheme)):
+                identifier = self.unwrapJsonLiteral(str(scheme))
                 scheme_id = self.generate_uuid_from_subject(baseuuid, scheme)
                 concept_scheme = Concept({
                     'id': scheme_id,
@@ -92,12 +93,7 @@ class SKOSReader(object):
 
                 for predicate, object in graph.predicate_objects(subject = scheme):
                     if str(DCTERMS) in predicate and predicate.replace(DCTERMS, '') in dcterms_value_types.values_list('valuetype', flat=True):
-                        if hasattr(object, 'language') and object.language not in allowed_languages:
-                            newlang = models.DLanguage()
-                            newlang.pk = object.language
-                            newlang.languagename = object.language
-                            newlang.isdefault = False
-                            newlang.save()
+                        if not self.language_exists(object, allowed_languages):
                             allowed_languages = models.DLanguage.objects.values_list('pk', flat=True)
 
                         try:
@@ -105,11 +101,13 @@ class SKOSReader(object):
                             value_type = dcterms_value_types.get(valuetype=predicate.replace(DCTERMS, '')) # predicate.replace(SKOS, '') should yield something like 'prefLabel' or 'scopeNote', etc..
                             val = self.unwrapJsonLiteral(object)
                             if predicate == DCTERMS.title:
-                                concept_scheme.addvalue({'id': val['value_id'], 'value':val['value'], 'language': object.language, 'type': 'prefLabel', 'category': value_type.category})
+                                concept_scheme.addvalue({'id': val['value_id'], 'value':val['value'], 'language': object.language or default_lang, 'type': 'prefLabel', 'category': value_type.category})
                                 print 'Casting dcterms:title to skos:prefLabel'
                             elif predicate == DCTERMS.description:
-                                concept_scheme.addvalue({'id': val['value_id'], 'value':val['value'], 'language': object.language, 'type': 'scopeNote', 'category': value_type.category})
+                                concept_scheme.addvalue({'id': val['value_id'], 'value':val['value'], 'language': object.language or default_lang, 'type': 'scopeNote', 'category': value_type.category})
                                 print 'Casting dcterms:description to skos:scopeNote'
+                            elif predicate == DCTERMS.identifier:
+                                identifier = self.unwrapJsonLiteral(str(object))
                         except:
                             pass
 
@@ -119,14 +117,12 @@ class SKOSReader(object):
                             top_concept_id = self.generate_uuid_from_subject(baseuuid, object)
                             self.relations.append({'source': scheme_id, 'type': 'hasTopConcept', 'target': top_concept_id})
 
-
+                concept_scheme.addvalue({'id': identifier['value_id'], 'value':identifier['value'], 'language': default_lang, 'type': dcterms_identifier_type.valuetype, 'category': dcterms_identifier_type.category})
                 self.nodes.append(concept_scheme)
-
-                if len(self.nodes) == 0:
-                    raise Exception('No ConceptScheme found in file.')
 
                 # Search for Concepts
                 for s, v, o in graph.triples((None, SKOS.inScheme , scheme)):
+                    identifier = self.unwrapJsonLiteral(str(s))
                     concept = Concept({
                         'id': self.generate_uuid_from_subject(baseuuid, s),
                         'legacyoid': str(s),
@@ -137,12 +133,7 @@ class SKOSReader(object):
                     # loop through all the elements within a <skos:Concept> element
                     for predicate, object in graph.predicate_objects(subject = s):
                         if str(SKOS) in predicate or str(ARCHES) in predicate:
-                            if hasattr(object, 'language') and object.language not in allowed_languages:
-                                newlang = models.DLanguage()
-                                newlang.pk = object.language
-                                newlang.languagename = object.language
-                                newlang.isdefault = False
-                                newlang.save()
+                            if not self.language_exists(object, allowed_languages):
                                 allowed_languages = models.DLanguage.objects.values_list('pk', flat=True)
 
                             relation_or_value_type = predicate.replace(SKOS, '').replace(ARCHES, '')  # this is essentially the skos element type within a <skos:Concept> element (eg: prefLabel, broader, etc...)
@@ -150,7 +141,7 @@ class SKOSReader(object):
                             if relation_or_value_type in skos_value_types_list:
                                 value_type = skos_value_types[relation_or_value_type]
                                 val = self.unwrapJsonLiteral(object)
-                                concept.addvalue({'id': val['value_id'], 'value':val['value'], 'language': object.language, 'type': value_type.valuetype, 'category': value_type.category})
+                                concept.addvalue({'id': val['value_id'], 'value':val['value'], 'language': object.language or default_lang, 'type': value_type.valuetype, 'category': value_type.category})
                             elif predicate == SKOS.broader:
                                 self.relations.append({'source': self.generate_uuid_from_subject(baseuuid, object), 'type': 'narrower', 'target': self.generate_uuid_from_subject(baseuuid, s)})
                             elif predicate == SKOS.narrower:
@@ -158,6 +149,10 @@ class SKOSReader(object):
                             elif predicate == SKOS.related:
                                 self.relations.append({'source': self.generate_uuid_from_subject(baseuuid, s), 'type': relation_or_value_type, 'target': self.generate_uuid_from_subject(baseuuid, object)})
 
+                        elif predicate == DCTERMS.identifier:
+                            identifier = self.unwrapJsonLiteral(str(object))
+
+                    concept.addvalue({'id': identifier['value_id'], 'value':identifier['value'], 'language': default_lang, 'type': dcterms_identifier_type.valuetype, 'category': dcterms_identifier_type.category})
                     self.nodes.append(concept)
 
 
@@ -172,12 +167,7 @@ class SKOSReader(object):
                 # loop through all the elements within a <skos:Concept> element
                 for predicate, object in graph.predicate_objects(subject = s):
                     if str(SKOS) in predicate or str(ARCHES) in predicate:
-                        if hasattr(object, 'language') and object.language not in allowed_languages:
-                            newlang = models.DLanguage()
-                            newlang.pk = object.language
-                            newlang.languagename = object.language
-                            newlang.isdefault = False
-                            newlang.save()
+                        if not self.language_exists(object, allowed_languages):
                             allowed_languages = models.DLanguage.objects.values_list('pk', flat=True)
 
                         relation_or_value_type = predicate.replace(SKOS, '').replace(ARCHES, '')  # this is essentially the skos element type within a <skos:Concept> element (eg: prefLabel, broader, etc...)
@@ -185,7 +175,7 @@ class SKOSReader(object):
                         if relation_or_value_type in skos_value_types_list:
                             value_type = skos_value_types[relation_or_value_type]
                             val = self.unwrapJsonLiteral(object)
-                            concept.addvalue({'id': val['value_id'], 'value':val['value'], 'language': object.language, 'type': value_type.valuetype, 'category': value_type.category})
+                            concept.addvalue({'id': val['value_id'], 'value':val['value'], 'language': object.language or default_lang, 'type': value_type.valuetype, 'category': value_type.category})
                 
                 self.nodes.append(concept)
             
@@ -194,8 +184,11 @@ class SKOSReader(object):
                 self.relations.append({'source': self.generate_uuid_from_subject(baseuuid, s), 'type': 'member', 'target': self.generate_uuid_from_subject(baseuuid, o)})
 
             # insert and index the concpets
+            scheme_node = None
             with transaction.atomic():
                 for node in self.nodes:
+                    if node.nodetype == 'ConceptScheme':
+                        scheme_node = node
                     if staging_options == 'stage':
                         try:
                             models.Concept.objects.get(pk=node.id)
@@ -224,10 +217,11 @@ class SKOSReader(object):
 
                 # need to index after the concepts and relations have been entered into the db
                 # so that the proper context gets indexed with the concept
-                for node in self.nodes:
-                    node.index()
+                if scheme_node:
+                    scheme_node.bulk_index()
 
-            return self
+
+            return scheme_node
         else:
             raise Exception('graph argument should be of type rdflib.graph.Graph')
 
@@ -253,6 +247,17 @@ class SKOSReader(object):
             return matches.group(0)
         else:
             return str(uuid.uuid3(baseuuid, str(subject)))
+
+
+    def language_exists(self, rdf_tag, allowed_languages):
+        if hasattr(rdf_tag, 'language') and rdf_tag.language not in allowed_languages and rdf_tag.language is not None and rdf_tag.language.strip() != '':
+            newlang = models.DLanguage()
+            newlang.pk = rdf_tag.language
+            newlang.languagename = rdf_tag.language
+            newlang.isdefault = False
+            newlang.save()
+            return False
+        return True
 
 
 class SKOSWriter(object):
@@ -304,6 +309,8 @@ class SKOSWriter(object):
                                     rdf_graph.add((ARCHES[node.id], DCTERMS.description, Literal(jsonLiteralValue, lang = value.language)))
                             else:
                                 rdf_graph.add((ARCHES[node.id], SKOS[value.type], Literal(jsonLiteralValue, lang = value.language)))
+                        elif value.type == 'identifier':
+                            rdf_graph.add((ARCHES[node.id], DCTERMS.identifier, Literal(jsonLiteralValue, lang = value.language)))
                         else:
                             rdf_graph.add((ARCHES[node.id], ARCHES[value.type.replace(' ', '_')], Literal(jsonLiteralValue, lang = value.language)))
 

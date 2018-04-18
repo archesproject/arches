@@ -1,13 +1,19 @@
-define(['knockout',
+define(['jquery',
+        'arches',
+        'knockout',
         'knockout-mapping',
         'viewmodels/function',
         'bindings/chosen'],
-function (ko, koMapping, FunctionViewModel, chosen) {
+function ($, arches, ko, koMapping, FunctionViewModel, chosen) {
     return ko.components.register('views/components/functions/primary-descriptors', {
         viewModel: function(params) {
             FunctionViewModel.apply(this, arguments);
             var nodegroups = {};
             this.cards = ko.observableArray();
+            this.loading = ko.observable(false);
+            this.cards.unshift({
+                'name': null,
+            });
 
             this.graph.cards.forEach(function(card){
                 var found = !!_.find(this.graph.nodegroups, function(nodegroup){
@@ -20,6 +26,7 @@ function (ko, koMapping, FunctionViewModel, chosen) {
             }, this);
 
             this.name = params.config.name;
+
             this.description = params.config.description;
             this.map_popup = params.config.map_popup;
 
@@ -39,6 +46,23 @@ function (ko, koMapping, FunctionViewModel, chosen) {
                 }, this);
             }, this)
 
+            this.reindexdb = function(){
+                this.loading(true);
+                $.ajax({
+                    type: "POST",
+                    url: arches.urls.reindex,
+                    context: this,
+                    data: JSON.stringify({'graphids': [this.graph.graphid]}),
+                    error: function(response) {
+                        console.log('error');
+                    },
+                    complete: function(){
+                        this.loading(false);
+                    }
+                });
+            }
+            console.log(this.cards());
+            console.log(this.name.nodegroup_id());
             window.setTimeout(function(){$("select[data-bind^=chosen]").trigger("chosen:updated")}, 300);
         },
         template: {

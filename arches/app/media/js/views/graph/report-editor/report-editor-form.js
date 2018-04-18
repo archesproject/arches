@@ -1,7 +1,8 @@
 define([
     'backbone',
     'report-templates',
-    'widgets'
+    'widgets',
+    'component-templates'
 ], function(Backbone, reportLookup) {
     var ReportEditorForm = Backbone.View.extend({
         /**

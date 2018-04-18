@@ -17,11 +17,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 import uuid
 from django.db import transaction
-from django.contrib.auth.models import User, Group,Permission
 from arches.app.models import models
-from arches.app.models.graph import Graph
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
 from django.forms import ModelForm
 
 class Card(models.CardModel):
@@ -73,21 +70,17 @@ class Card(models.CardModel):
         # self.active
         # self.visible
         # self.sortorder
-        # self.itemtext
         # end from models.CardModel
+        self.disabled = False
         self.cardinality = ''
         self.cards = []
         self.widgets = []
         self.nodes = []
         self.ontologyproperty = None
-        self.groups = []
-        self.users = []
-        self.perm_cache = {}
-
         if args:
             if isinstance(args[0], dict):
                 for key, value in args[0].iteritems():
-                    if not (key == 'cards' or key == 'widgets' or key == 'nodes'):
+                    if key not in ('cards', 'widgets', 'nodes', 'is_editable'):
                         setattr(self, key, value)
 
                 for card in args[0]["cards"]:
@@ -111,6 +104,7 @@ class Card(models.CardModel):
                     if nodeid is not None:
                         node_model = models.Node.objects.get(nodeid=nodeid)
                         node_model.config = node.get('config', None)
+                        node_model.isrequired = node.get('isrequired', node_model.isrequired)
                         self.nodes.append(node_model)
 
             else:
@@ -121,85 +115,12 @@ class Card(models.CardModel):
                     self.cards.extend(Card.objects.filter(nodegroup=sub_group))
 
                 self.cardinality = self.nodegroup.cardinality
-                self.groups = self.get_group_permissions(self.nodegroup)
-                self.users = self.get_user_permissions(self.nodegroup)
-
-    def get_group_permissions(self, nodegroup=None):
-        """
-        get's a list of object level permissions allowed for a all groups
-
-        returns an object of the form:
-        .. code-block:: python
-            {
-                'local':  {'codename': permssion codename, 'name': permission name} # A list of object level permissions
-                'default': {'codename': permssion codename, 'name': permission name} # A list of model level permissions
-            }
-
-        Keyword Arguments:
-        nodegroup -- the NodeGroup object instance to use to check for permissions on that particular object
-
-        """
-
-        ret = []
-        for group in Group.objects.all():
-            perms = {
-                'local': [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_group_perms(group, nodegroup)],
-                'default': [{'codename': item.codename, 'name': item.name} for item in group.permissions.all()]
-            }
-            if len(perms['default']) > 0:
-                ret.append({'name': group.name, 'perms': perms, 'type': 'group', 'id': group.pk})
-        return ret
-
-    def get_user_permissions(self, nodegroup=None):
-        """
-        get's a list of object level permissions allowed for a all users
-
-        returns an object of the form:
-        .. code-block:: python
-            {
-                'local':  {'codename': permssion codename, 'name': permission name} # A list of object level permissions
-                'default': {'codename': permssion codename, 'name': permission name} # A list of group based object level permissions or model level permissions
-            }
-
-        Keyword Arguments:
-        nodegroup -- the NodeGroup object instance to use to check for permissions on that particular object
-
-        """
-
-        ret = []
-        for user in User.objects.all():
-            perms = {
-                'local': [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_user_perms(user, nodegroup)],
-                'default': set()
-            }
-            for group in user.groups.all():
-                codenames = set(get_group_perms(group, nodegroup))
-                if len(codenames) == 0:
-                    codenames = set([item.codename for item in group.permissions.all()])
-                perms['default'].update(codenames)
-            perms['default'] = [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in perms['default']]
-
-            if len(perms['default']) > 0:
-                ret.append({'username': user.email or user.username, 'email': user.email, 'perms': perms, 'type': 'user', 'id': user.pk})
-        return ret
-
-    def get_perm_name(self, codename):
-        if codename not in self.perm_cache:
-            try:
-                self.perm_cache[codename] = Permission.objects.get(codename=codename, content_type__app_label='models', content_type__model='nodegroup')
-                return self.perm_cache[codename]
-            except:
-                return None
-                # codename for nodegroup probably doesn't exist
-        return self.perm_cache[codename]
 
     def save(self):
         """
         Saves an a card and it's parent ontology property back to the db
 
         """
-        self.graph = Graph.objects.get(graphid=self.graph_id)
-
         with transaction.atomic():
             if self.graph.ontology and self.graph.isresource:
                 edge = self.get_edge_to_parent()
@@ -217,72 +138,84 @@ class Card(models.CardModel):
             for card in self.cards:
                 card.save()
 
-            for group in self.groups:
-                groupModel = Group.objects.get(pk=group['id'])
-                # first remove all the current permissions
-                for perm in get_perms(groupModel, self.nodegroup):
-                    remove_perm(perm, groupModel, self.nodegroup)
-                # then add the new permissions
-                for perm in group['perms']['local']:
-                    assign_perm(perm['codename'], groupModel, self.nodegroup)
-
-            for user in self.users:
-                userModel = User.objects.get(pk=user['id'])
-                # first remove all the current permissions
-                for perm in get_perms(userModel, self.nodegroup):
-                    remove_perm(perm, userModel, self.nodegroup)
-                # then add the new permissions
-                for perm in user['perms']['local']:
-                    assign_perm(perm['codename'], userModel, self.nodegroup)
-
-            # permissions for a user can vary based on the groups the user belongs to without
-            # ever having changed the users permissions directly, which is why the users
-            # permissions status needs to be updated after groups are updated
-            self.users = self.get_user_permissions(self.nodegroup)
         return self
+
+    def confirm_enabled_state(self, user, nodegroup):
+        if user.has_perms(['write_nodegroup'], self.nodegroup) == False:
+            self.disabled = True
 
     def get_edge_to_parent(self):
         """
         Finds the edge model that relates this card to it's parent node
 
         """
+        return models.Edge.objects.get(rangenode_id=self.nodegroup_id)
 
-        for edge in self.graph.edges.itervalues():
-            if str(edge.rangenode_id) == str(self.nodegroup_id):
-                return edge
+    def filter_by_perm(self, user, perm):
+        """
+        Filters out any cards that don't have the permission for the user
 
-    def serialize(self):
+        Arguments:
+        user -- the user object to check permsission against
+        perm -- the permission string to check (eg: 'read_nodegroup')
+
+        """
+        if user:
+            if user.has_perm(perm, self.nodegroup):
+                self.confirm_enabled_state(user, self.nodegroup)
+                cards = []
+                for card in self.cards:
+                    if user.has_perm(perm, card.nodegroup):
+                        card.confirm_enabled_state(user, card.nodegroup)
+                        cards.append(card)
+                self.cards = cards
+            else:
+                return None
+        return self
+
+    def serialize(self, fields=None, exclude=None):
         """
         serialize to a different form then used by the internal class structure
 
         """
 
-        ret = JSONSerializer().handle_model(self)
-        ret['cardinality'] = self.cardinality
-        ret['cards'] = self.cards
-        ret['nodes'] = list(self.nodegroup.node_set.all())
-        ret['visible'] = self.visible
-        ret['active'] = self.active
-        ret['widgets'] = self.widgets
-        ret['groups'] = self.groups
-        ret['users'] = self.users
+        exclude = [] if exclude == None else exclude
+        ret = JSONSerializer().handle_model(self, fields, exclude)
+
+        ret['cardinality'] = self.cardinality if 'cardinality' not in exclude else ret.pop('cardinality', None)
+        ret['cards'] = self.cards if 'cards' not in exclude else ret.pop('cards', None)
+        ret['nodes'] = list(self.nodegroup.node_set.all()) if 'nodes' not in exclude else ret.pop('nodes', None)
+        ret['visible'] = self.visible if 'visible' not in exclude else ret.pop('visible', None)
+        ret['active'] = self.active if 'active' not in exclude else ret.pop('active', None)
+        ret['is_editable'] = self.is_editable() if 'is_editable' not in exclude else ret.pop('is_editable', None)
+        ret['ontologyproperty'] = self.ontologyproperty if 'ontologyproperty' not in exclude else ret.pop('ontologyproperty', None)
+        ret['disabled'] = self.disabled if 'disabled' not in exclude else ret.pop('disabled', None)
+
+        if self.graph and self.graph.ontology and self.graph.isresource:
+            edge = self.get_edge_to_parent()
+            ret['ontologyproperty'] = edge.ontologyproperty
+
         # provide a models.CardXNodeXWidget model for every node
         # even if a widget hasn't been configured
-        for node in ret['nodes']:
-            found = False
-            for widget in ret['widgets']:
-                if node.nodeid == widget.node_id:
-                    found = True
-            if not found:
-                widget = models.DDataType.objects.get(pk=node.datatype).defaultwidget
-                if widget:
-                    widget_model = models.CardXNodeXWidget()
-                    widget_model.node_id = node.nodeid
-                    widget_model.card_id = self.cardid
-                    widget_model.widget_id = widget.pk
-                    widget_model.config = JSONSerializer().serialize(widget.defaultconfig)
-                    widget_model.label = node.name
-                    ret['widgets'].append(widget_model)
+        ret['widgets'] = self.widgets
+        if 'widgets' not in exclude:
+            for node in ret['nodes']:
+                found = False
+                for widget in ret['widgets']:
+                    if node.nodeid == widget.node_id:
+                        found = True
+                if not found:
+                    widget = models.DDataType.objects.get(pk=node.datatype).defaultwidget
+                    if widget:
+                        widget_model = models.CardXNodeXWidget()
+                        widget_model.node_id = node.nodeid
+                        widget_model.card_id = self.cardid
+                        widget_model.widget_id = widget.pk
+                        widget_model.config = JSONSerializer().serialize(widget.defaultconfig)
+                        widget_model.label = node.name
+                        ret['widgets'].append(widget_model)
+        else:
+            ret.pop('widgets', None)
 
         return ret
 

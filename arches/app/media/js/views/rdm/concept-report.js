@@ -12,8 +12,9 @@ define([
     'views/rdm/modals/import-concept-form',
     'views/rdm/modals/add-child-form',
     'views/rdm/modals/add-image-form',
-    'views/concept-graph'
-], function($, Backbone, arches, ConceptModel, ValueModel, ConceptParentModel, ValueEditor, RelatedConcept, RelatedMember, ManageParentForm, ImportConcept, AddChildForm, AddImageForm, ConceptGraph) {
+    'views/concept-graph',
+    'viewmodels/alert',
+], function($, Backbone, arches, ConceptModel, ValueModel, ConceptParentModel, ValueEditor, RelatedConcept, RelatedMember, ManageParentForm, ImportConcept, AddChildForm, AddImageForm, ConceptGraph, AlertViewModel) {
     return Backbone.View.extend({
         events: {
             'click .concept-report-content *[data-action="viewconcept"]': 'conceptSelected',
@@ -30,9 +31,11 @@ define([
             'click a[data-toggle="#add-top-concept-form"]': 'addChildConcept',
             'click a[data-toggle="#manage-parent-form"]': 'manageParentConcepts',
             'click a[data-toggle="#import-concept-form"]': 'importConcept',
+            'click a[data-toggle="#make-collection"]': 'makeCollection',
         },
 
         initialize: function(options) {
+            this.viewModel = options.viewModel;
             this.render();
         },
 
@@ -40,12 +43,7 @@ define([
             var self = this;
             var conceptid = this.model.get('id');
             var showGraph = self.$el.find(".concept-graph").is(":visible");
-            
-            if (this.model.get('in_use')) {
-                self.in_use = true;
-            }
 
-            self.inuse = false;
             self.$el.find('.concept-report-loading').removeClass('hidden');
             self.$el.find('.concept-report-content').addClass('hidden');
 
@@ -53,16 +51,7 @@ define([
                 this.xhr.abort();
             }
 
-            self.displayInUse = function() {
-                if (self.in_use === true) {
-                    self.cannot_delete_modal = self.$el.find('.cannot-delete-modal');
-                    self.cannot_delete_modal.modal('show');
-                    self.in_use = false;
-                }
-            }
-
             this.xhr = $.ajax({
-                in_use: self.inuse,
                 url: arches.urls.concept.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', conceptid),
                 data: {
                     'f': 'html',
@@ -93,8 +82,7 @@ define([
                             }
                         }
                     }
-                },
-                complete: self.displayInUse
+                }
             });
         },
 
@@ -184,6 +172,17 @@ define([
             });
         },    
 
+        makeCollection: function(e){
+            this.model.makeCollection(function(response, status){
+                if(status === 'success'){
+                    this.viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.message.title, response.responseJSON.message.text));   
+                }
+                if(status === 'error'){
+                    this.viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.message.title, response.responseJSON.message.text));   
+                }
+            }, this);
+        },    
+
         importConcept: function(e){
             var self = this;
             this.model.reset();
@@ -241,11 +240,14 @@ define([
                 model = new ConceptModel(data)
                 self.model.set('subconcepts', [model]);
 
-                self.model.delete(function(){
+                self.model.delete(function(response, status){
                     modal.find('h4').text(title);
                     modal.find('.modal-title').removeClass('loading');
                     modal.modal('hide');
                     $('.modal-backdrop.fade.in').remove();  // a hack for now
+                    if(!!response.responseJSON.in_use){
+                        self.viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.message.title, response.responseJSON.message.text));   
+                    }
                 }, self);
             }else{
                 modal.on('hidden.bs.modal', function () {
@@ -253,8 +255,7 @@ define([
 
                     if (data.action === 'delete-value') {
                         model = new ValueModel(data);
-                        model.delete();
-                        self.render();
+                        model.delete(self.render, self);
                     }
                     if (data.action === 'delete-relationship') {
                         model = new ConceptModel(data);

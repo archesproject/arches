@@ -1,19 +1,23 @@
-Django==1.9.2
+Django==1.11.10
+psycopg2-binary==2.7.4
 elasticsearch>=5.0.0,<6.0.0
-xlrd==0.9.4
-Pillow==3.1.0
-rdflib
-unicodecsv
-pyyaml
-pyshp==1.2.3
-networkx
-django-guardian
-tilestache
-shapely
-python-memcached
-mapbox-vector-tile==0.5.0
-mapnik
-python-dateutil
+rdflib==4.2.2
+rdflib-jsonld==0.4.0
+unicodecsv==0.14.1
+PyYAML==3.12
+pycrypto==2.6.1
+django-guardian==1.4.9
+TileStache==1.51.6
+python-memcached==1.59
+mapbox-vector-tile==1.2.0
+mapnik==0.1
+SPARQLWrapper==1.8.0
+django-recaptcha==1.4.0
+python-jose==2.0.2
+edtf==2.7.0
+couchdb==1.2
+django-revproxy==0.9.14
+django-cors-headers==2.2.0
 
 # Leave the following line commented so that pip install will ignore this
 # The installer uses the following line to download the proper version of ES

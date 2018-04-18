@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+{% load i18n %}
+<!-- this html is included in help-panel-base.htm -->
+<div class="ep-help-content">
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Introduction to Search" %}</h4></a>
+        <div class="ep-help-topic-content">
+            <span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/search-page-labeled.jpg" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span>
+            <p><img class="reloadable-img" src="{{ STATIC_URL }}img/help/search-page-labeled.jpg"></img></p>
+            <p>
+                {% blocktrans %}<strong>Search Bar</strong> The quickest way to search the database is to begin typing in the search bar. You'll be presented with database terminology which you can use to create one or more simple filters. The search bar also acts as an aggregator of <em>all</em> currently enabled filters.{% endblocktrans %}<br>
+                {% blocktrans %}<strong>Search Tools</strong> There are a number tools you can use to explore the database, which are described in detail below.{% endblocktrans %}<br>
+                {% blocktrans %}<strong>Search Results</strong> Whenever you change any search filters, the updated search results will be listed here. You can link to a resource's report, zoom to it on the map, or view its related resources.{% endblocktrans %}<br>
+                {% blocktrans %}<strong>Search Panel</strong> The contents of this panel will change depending on what search tool you are using. Typically, the map will be activated by default.{% endblocktrans %}
+            </p>
+        </div>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Search Tools" %}</h4></a>
+        <div class="ep-help-topic-content">
+            <div>
+                <a href="javascript:void(0)" class="ep-help-topic-toggle"><h5>{% trans "Map" %}</h5></a>
+                <div class="ep-help-topic-content">
+                    <p>{% blocktrans %}Search results can be represented on the map in two ways: <strong>markers</strong> show the first set of resources in the search results, and <strong>cells</strong> are used to give a general spatial representation of <em>all</em> resources in the search results.{% endblocktrans %}</p>
+                    <p>{% blocktrans %}In addition to displaying search results, the map can show resource layers (showing all resources), or custom overlays, if any have been added. You control the visibility of all layers and basemaps with the tool panel on the right.{% endblocktrans %}</p>
+                    <p>{% blocktrans %}Finally, you can add a spatial filter to your query by using the map drawing tools to draw a shape and apply a buffer distance if desired.{% endblocktrans %}</p>
+                    <p>
+                        <a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "change basemap - click to view" %}</a>
+                        <span class="ep-help-img-link">
+                            <a href="{{ STATIC_URL }}img/help/map-switch-basemap.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+                            </a>
+                        </span>
+                        <img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/map-switch-basemap.gif"></img>
+                    </p>
+                    <div>
+                    <p>
+                        <a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "toggle search results layer - click to view" %}</a>
+                        <span class="ep-help-img-link">
+                            <a href="{{ STATIC_URL }}img/help/map-toggle-search-results-layer.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+                            </a>
+                        </span>
+                        <img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/map-toggle-search-results-layer.gif"></img>
+                    </p>
+                    </div>
+                    <div>
+                    <p>
+                        <a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "search with spatial query - click to view" %}</a>
+                        <span class="ep-help-img-link">
+                            <a href="{{ STATIC_URL }}img/help/map-buffer-search.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+                            </a>
+                        </span>
+                        <img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/map-buffer-search.gif"></img>
+                    </p>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <a href="javascript:void(0)" class="ep-help-topic-toggle"><h5>{% trans "Time" %}</h5></a>
+                <div class="ep-help-topic-content">
+                    <p>{% blocktrans %}You can apply a temporal criterion to your query by using the Time Filter. You have the option of creating the filter by hand, or you can use the time wheel. The time wheel is a graphic representation of all the resources in the database, organized chronologically.{% endblocktrans %}<p>
+                    <div>
+                    <p>
+                        <a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "apply time filter with time wheel - click to view" %}</a>
+                        <span class="ep-help-img-link">
+                            <a href="{{ STATIC_URL }}img/help/time-wheel-example.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+                            </a>
+                        </span>
+                        <img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/time-wheel-example.gif"></img>
+                    </p>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <a href="javascript:void(0)" class="ep-help-topic-toggle"><h5>{% trans "Saved" %}</h5></a>
+                <div class="ep-help-topic-content">
+                    <p>{% blocktrans %}Saved searches allow you to view pre-made queries. Saved searches are created by database administrators, so the number of saved searches shown here will vary from one database to the next.{% endblocktrans %}</p>
+                </div>
+            </div>
+            <div>
+                <a href="javascript:void(0)" class="ep-help-topic-toggle"><h5>{% trans "Advanced" %}</h5></a>
+                <div class="ep-help-topic-content">
+                    <p>{% blocktrans %}You can use the advanced search to make more complex queries based on data attributes, or "facets". While the basic search filter allows you to combine multiple filters, advanced search is the only way to combine filters with an <strong>or</strong> operator, and also gives you access to more comparison operators.{% endblocktrans %}</p>
+                    <p>{% blocktrans %}In the example below, a search is made within a single resource type for any name <strong>like</strong> "church" <strong>or</strong> any name <strong>like</strong> "gate".{% endblocktrans %}</p>
+                    <div>
+                    <p>
+                        <a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "search for multiple words in names - click to view" %}</a>
+                        <span class="ep-help-img-link">
+                            <a href="{{ STATIC_URL }}img/help/advanced-search-example.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+                            </a>
+                        </span>
+                        <img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/advanced-search-example.gif"></img>
+                    </p>
+                    </div>
+                </div>
+            </div>
+                <div>
+                <a href="javascript:void(0)" class="ep-help-topic-toggle"><h5>{% trans "Related" %}</h5></a>
+                <div class="ep-help-topic-content">
+                    <p>{% blocktrans %}For each resource listed in the search results you can view its related resources with the "Related Resources" link under the description. By viewing Related Resources, you get a new view of the database: not how resources are related geographically nor chronologically, but qualitatively.{% endblocktrans %}</p>
+                    <p>{% blocktrans %}There two methods for viewing Related Resources: in a table where each related resource is a row, or in a graph where resources are shown as nodes in a graph, with relationships connecting them.{% endblocktrans %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

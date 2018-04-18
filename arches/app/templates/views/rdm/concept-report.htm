@@ -24,7 +24,7 @@
                 <button type="button" class="btn btn-primary dropdown-toggle arches-RDM-button" data-toggle="dropdown">
                     {% trans "Manage" %}
                     <i class="fa fa-chevron-down"></i>
-                    <span class="sr-only">{% trans "Toggle Dropdown" %}</span>                            
+                    <span class="sr-only">{% trans "Toggle Dropdown" %}</span>
                 </button>
                 <ul class="dropdown-menu" role="menu">
                     {% if concept.nodetype == 'ConceptScheme'%}
@@ -34,8 +34,9 @@
                     {% if concept.nodetype == 'Concept'%}
                     <li><a href="javascript:void(0);" data-toggle="#add-concept-form">{% trans "Add Child" %}</a></li>
                     <li><a href="javascript:void(0);" data-toggle="#import-concept-form">{% trans "Import Child from SPARQL" %}</a></li>
-                    <li><a href="javascript:void(0);" data-toggle="#manage-parent-form">{% trans "Manage Parents" %}</a></li>
                     {% endif %}
+                    <li><a href="javascript:void(0);" data-toggle="#manage-parent-form">{% trans "Manage Parents" %}</a></li>
+                    <li><a href="javascript:void(0);" data-toggle="#make-collection">{% trans "Make Collection" %}</a></li>
                     <li class="divider"></li>
                     <li><a href="javascript:void(0);">{% trans "Close" %}</a></li>
                 </ul>
@@ -47,7 +48,7 @@
                 <button type="button" class="btn btn-primary dropdown-toggle arches-RDM-button-xs" data-toggle="dropdown">
                     {% trans "Manage" %}
                     <i class="fa fa-chevron-down"></i>
-                    <span class="sr-only">{% trans "Toggle Dropdown" %}</span>                            
+                    <span class="sr-only">{% trans "Toggle Dropdown" %}</span>
                 </button>
                 <ul class="dropdown-menu" role="menu">
                     <li><a href="javascript:void(0);" data-toggle="#add-concept-form">{% trans "Add Child" %}</a></li>
@@ -76,7 +77,7 @@
                         {% if labels|length > 1 %}
                             <a href="javascript:void(0);"><i class="arches-CRUD-delete fa fa-times-circle" title="{% trans "Delete this label?" %}" data-id="{{value.id}}" data-action="delete-value" data-message="{{value.value}}" data-category="{{value.category}}"></i></a>
                         {% endif %}
-                        <a href="javascript:void(0);" class="arches-CRUD-child edit-value" title="Edit this label" data-action="edit" data-target="#labelmodal" data-id="{{value.id}}" data-datatype="{{value.datatype}}" data-type="{{value.type}}" data-category="{{value.category}}" data-value="{{value.value}}" data-language="{{value.language}}">{{value.value}} </a> 
+                        <a href="javascript:void(0);" class="arches-CRUD-child edit-value" title="Edit this label" data-action="edit" data-target="#labelmodal" data-id="{{value.id}}" data-datatype="{{value.datatype}}" data-type="{{value.type}}" data-category="{{value.category}}" data-value="{{value.value}}" data-language="{{value.language}}">{{value.value}} </a>
                         <span class="text-muted"> ({% if value.type == 'prefLabel' %}{% trans "preferred" %}, {% endif %}{% if value.type == 'altLabel' %}{% trans "alternate" %}, {% endif %}{% if value.type == 'hiddenLabel' %}{% trans "hidden" %}, {% endif %}{{value.language}})</span>
                     </dd>
                 {% endfor %}
@@ -100,7 +101,7 @@
                     {% if value.category == 'note' %}
                     <dd class="arches-RDM-label">
                         <a href="javascript:void(0);"><i class="arches-CRUD-delete fa fa-times-circle" title="{% trans "Delete this note?" %}" data-id="{{value.id}}" data-action="delete-value" data-message="{{value.value}}" data-category="{{value.category}}"></i></a>
-                        <a href="javascript:void(0);" class="arches-CRUD-child edit-value" title="Edit this note" data-action="edit" data-target="#notemodal" data-id="{{value.id}}" data-datatype="{{value.datatype}}" data-type="{{value.type}}" data-category="{{value.category}}" data-value="{{value.value}}" data-language="{{value.language}}">{{value.type}}</a> 
+                        <a href="javascript:void(0);" class="arches-CRUD-child edit-value" title="Edit this note" data-action="edit" data-target="#notemodal" data-id="{{value.id}}" data-datatype="{{value.datatype}}" data-type="{{value.type}}" data-category="{{value.category}}" data-value="{{value.value}}" data-language="{{value.language}}">{{value.type}}</a>
                         <span class="text-muted"> ({{value.language}})</span>
                     </dd>
 
@@ -139,10 +140,9 @@
                                 <span class="text-muted" style="padding-left:13px;">{% for i in range %}...{% endfor %}</span>
                                 {% endwith %}
                                 <a href="javascript:void(0);" class="arches-CRUD-child" title="{% trans "Jump to this concept" %}" data-action="viewconcept" data-conceptid="{{parent_concept.id}}"> {{parent_concept.label}}</a>
-                               
+
                             </dd>
                         {% if forloop.last %}{% with ''|center:forloop.counter as range %}
-                                <!-- <a href="javascript:void(0);" class="arches-CRUD-child" title="{% trans "Jump to this concept" %}">{{prefLabel}}</a> -->
                             {% if show_children%}
                                 {% for subconcept in concept.subconcepts %}
                                 <dd class="arches-concept-heirarchy">
@@ -164,7 +164,7 @@
                 <div style="display: none; margin-top: 10px;" class="concept-graph">
 
                    {% include "views/concept-graph.htm" %}
-                    
+
                 </div>
                 <!-- End Broader/Narrower as Graph (for multi-parent concepts) -->
 
@@ -173,7 +173,7 @@
         <!-- End Broader/Narrower Concepts -->
 
         <hr class="devider arches-RDM-divider">
-        
+
 
         <!-- Associative Concepts-->
         <div class="margin-bottom-10 padding-left-10">
@@ -193,12 +193,12 @@
                         <span class="text-muted"> (preferred, {{concept.prefLabel.language}})</span>
                     </dd>
                 {% endfor %}
-                
+
             </dl>
         </div>
         <!-- End Associative Concepts -->
 
-        
+
         <hr class="devider arches-RDM-divider">
 
         <!-- Related Values -->
@@ -259,7 +259,7 @@
                     {% endif %}
                 {% endfor %}
                 <!-- End Images -->
-                    
+
 
                 </dd>
             </dl>
@@ -273,14 +273,20 @@
         <dl>
             <dt>
                 <h5 id="arches-names-form" class="section-headline">
-                    {% trans "Identifiers" %}  
+                    {% trans "Identifiers" %}
                 </h5>
             </dt>
-            
-            <dd class="arches-RDM-note">
-                {% trans "Arches ID:" %} {{concept.id}} </br>
-                <!-- URI: http://purl.org/heritagedataschemes/560/concepts/142513 -->
+
+            <dd class="arches-concept-heirarchy">
+                {% trans "Arches ID:" %} {{concept.id}}
             </dd>
+            {% for value in concept.values %}
+                {% if value.category == 'identifiers' %}
+                    <dd class="arches-concept-heirarchy">
+                        <a href="{{value.value}}" target="_blank">{{value.value}}</a>
+                    </dd>
+                {% endif %}
+            {% endfor %}
 
             </dl>
         </div>
@@ -304,24 +310,6 @@
                 <div class="modal-footer">
                     <button type="button" class="btn-u btn-u-default" data-dismiss="modal">{% trans "No" %}</button>
                     <button class="btn-u btn-u-red confirm-delete-yes" href="javascript:void(0);" data-id="" data-action="delete">{% trans "Yes" %}</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <div action="" class="modal fade cannot-delete-modal" tabindex="-1" role="dialog" aria-labelledby="alertmodal" aria-hidden="true">
-        <div class="modal-dialog cannot-delete">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title">{% trans "Unable to Delete" %}</h4>
-                </div>
-                <div class="modal-body">
-                    <h4 class="modal-title">{% trans "This concept or one of it's subconcepts is already in use by an existing resource." %}</h4>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn-u btn-u-default" data-dismiss="modal">{% trans "Ok" %}</button>
                 </div>
             </div>
         </div>
@@ -355,14 +343,14 @@
 {% else %}
     <div class="col-xs-12 concept-report-content">
         <div class="headline arches-RDM-headline"><h3 class="arches-RDM-Concept">Arches Reference Data Manager</h3></div>
-     
+
         <div class="row margin-bottom-40">
             <div class="counters col-md-3 col-sm-3">
                 <span class="counter">{{collection_count}}</span>
                 <h4>Collections</h4>
             </div>
             <div class="counters col-md-3 col-sm-3">
-                <span class="counter">{{scheme_count}}</span> 
+                <span class="counter">{{scheme_count}}</span>
                 <h4>Schemes</h4>
             </div>
             <div class="counters col-md-3 col-sm-3">

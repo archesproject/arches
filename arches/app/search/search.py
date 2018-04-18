@@ -19,15 +19,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import urllib
 import uuid
 import logging
-from django.conf import settings
 from datetime import datetime
 from elasticsearch import Elasticsearch, helpers
+from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 
 class SearchEngine(object):
 
-    def __init__(self):
+    def __init__(self, prefix=settings.ELASTICSEARCH_PREFIX):
         #
         serializer = JSONSerializer()
         serializer.mimetype = 'application/json'
@@ -35,6 +35,22 @@ class SearchEngine(object):
         serializer.loads = JSONDeserializer().deserialize
         self.es = Elasticsearch(hosts=settings.ELASTICSEARCH_HOSTS, serializer=serializer, **settings.ELASTICSEARCH_CONNECTION_OPTIONS)
         self.logger = logging.getLogger(__name__)
+        self.prefix = prefix.lower()
+
+    def _add_prefix(self, *args, **kwargs):
+        if args:
+            index = args[0].strip()
+        else:
+            index = kwargs.get('index', '').strip()
+        if index is None or index == '':
+            raise NotImplementedError("Elasticsearch index not specified.")
+
+        prefix = '%s_' % self.prefix.strip() if self.prefix and self.prefix.strip() != '' else ''
+        index = '%s%s' % (prefix, index)
+        if args:
+            return index
+        else:
+            return dict(kwargs, index=index)
 
     def delete(self, **kwargs):
         """
@@ -44,6 +60,7 @@ class SearchEngine(object):
 
         """
 
+        kwargs = self._add_prefix(**kwargs)
         body = kwargs.pop('body', None)
         if body != None:
             try:
@@ -55,8 +72,13 @@ class SearchEngine(object):
 
                 return helpers.bulk(self.es, data, refresh=refresh, **kwargs)
             except Exception as detail:
-                self.logger.warning('%s: WARNING: failed to delete document by query: %s \nException detail: %s\n' % (datetime.now(), body, detail))
-                raise detail
+                try:
+                    # ignore 404 errors (index_not_found_exception)
+                    if detail.status_code == 404:
+                        pass
+                except:
+                    self.logger.warning('%s: WARNING: failed to delete document by query: %s \nException detail: %s\n' % (datetime.now(), body, detail))
+                    raise detail
         else:
             try:
                 return self.es.delete(ignore=[404], **kwargs)
@@ -70,9 +92,9 @@ class SearchEngine(object):
 
         """
 
-        index = kwargs.get('index', '').strip()
-        print 'deleting index : %s' % index
-        return self.es.indices.delete(index=index, ignore=[400, 404])
+        kwargs = self._add_prefix(**kwargs)
+        print 'deleting index : %s' % kwargs.get('index')
+        return self.es.indices.delete(ignore=[400, 404], **kwargs)
 
     def search(self, **kwargs):
         """
@@ -82,13 +104,10 @@ class SearchEngine(object):
 
         """
 
+        kwargs = self._add_prefix(**kwargs)
         body = kwargs.get('body', None)
-        index = kwargs.get('index', None)
         id = kwargs.get('id', None)
-
-        if index is None:
-            raise NotImplementedError("You must specify an 'index' in your call to search")
-
+        
         if id:
             if isinstance(id, list):
                 kwargs.setdefault('body', {'ids': kwargs.pop('id')})
@@ -111,6 +130,7 @@ class SearchEngine(object):
 
         """
 
+        index = self._add_prefix(index)
         if not body:
             if fieldtype == 'geo_shape':
                 body =  {
@@ -137,6 +157,7 @@ class SearchEngine(object):
         print 'creating index : %s/%s' % (index, doc_type)
 
     def create_index(self, **kwargs):
+        kwargs = self._add_prefix(**kwargs)
         self.es.indices.create(**kwargs)
         print 'creating index : %s' % kwargs.get('index', '')
 
@@ -151,6 +172,7 @@ class SearchEngine(object):
 
         """
 
+        index = self._add_prefix(index)
         if not isinstance(body, list):
             body = [body]
 
@@ -168,21 +190,55 @@ class SearchEngine(object):
                 raise detail
 
 
-    def bulk_index(self, data):
-        return helpers.bulk(self.es, data, chunk_size=500, raise_on_error=True)
+    def bulk_index(self, data, **kwargs):
+        return helpers.bulk(self.es, data, **kwargs)
 
     def create_bulk_item(self, op_type='index', index=None, doc_type=None, id=None, data=None):
         return {
             '_op_type': op_type,
-            '_index': index,
+            '_index': self._add_prefix(index),
             '_type': doc_type,
             '_id': id,
             '_source': data
         }
 
     def count(self, **kwargs):
+        kwargs = self._add_prefix(**kwargs)
         count = self.es.count(**kwargs)
         if count is not None:
             return count['count']
         else:
             return None
+
+    def BulkIndexer(outer_self, batch_size=500, **kwargs):
+
+        class _BulkIndexer(object):
+            def __init__(self, **kwargs):
+                self.queue = []
+                self.batch_size = kwargs.pop('batch_size', 500)
+                self.kwargs = kwargs
+
+            def add(self, op_type='index', index=None, doc_type=None, id=None, data=None):
+                doc = {
+                    '_op_type': op_type,
+                    '_index': outer_self._add_prefix(index),
+                    '_type': doc_type,
+                    '_id': id,
+                    '_source': data
+                }
+                self.queue.append(doc)
+
+                if len(self.queue) >= self.batch_size:
+                    outer_self.bulk_index(self.queue, **self.kwargs)
+                    del self.queue[:]  #clear out the array
+            
+            def close(self):
+                outer_self.bulk_index(self.queue, **self.kwargs)
+
+            def __enter__(self, **kwargs):
+                return self
+
+            def __exit__(self, type, value, traceback):
+                return self.close()
+
+        return _BulkIndexer(batch_size=batch_size, **kwargs)

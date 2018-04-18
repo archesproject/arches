@@ -30,7 +30,9 @@ define([
             options.viewModel.graphid = ko.observable(data.graphid);
             BaseManager.apply(this, arguments);
             options.viewModel.graphid.subscribe(function (graphid) {
-                self.viewModel.navigate(arches.urls.graph + graphid + '/settings');
+                var re = /\b[a-f\d-]{36}\b/
+                var newPath = window.location.pathname.replace(re, graphid);
+                self.viewModel.navigate(newPath);
             });
             return this;
         }

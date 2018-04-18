@@ -14,16 +14,17 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                 'widget_id': '',
                 'config': {},
                 'label': '',
-                'sortorder': null
+                'sortorder': null,
+                'disabled': false
             };
             this.widgetLookup = widgets;
             options || (options = {});
             attributes || (attributes = {});
             options.parse = true;
-            this.expanded = (options.expanded || ko.observable(false));
             this.node = (options.node || null);
             this.card = (options.card || null);
             this.datatype = (options.datatype || null);
+            this.disabled = (options.disabled || false);
             this.icon = 'ion-ios-paper';
             if (this.datatype) {
                 this.icon = this.datatype.iconclass;
@@ -81,8 +82,10 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
             var self = this;
 
             _.each(attributes, function(value, key){
-                if (key === 'config' && typeof value === 'string') {
-                    value = JSON.parse(value);
+                if (key === 'config') {
+                    if (typeof value === 'string') {
+                        value = JSON.parse(value);
+                    }
                     var configKeys = [];
                     _.each(value, function(configVal, configKey) {
                         value[configKey] = ko.observable(configVal);
@@ -127,7 +130,7 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                 if (key !== 'config') {
                     ret[key] = this.attributes[key]();
                 } else {
-                    ret[key] = JSON.stringify(this.configJSON())
+                    ret[key] = this.configJSON()
                 }
             }
             return ret;

@@ -1,0 +1,61 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "views/resource/resource-base.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block graph_header_title %}
+{% trans "System Settings" %}
+{% endblock graph_header_title %}
+
+{% block content %}
+<div class="flex relative">
+
+    <!--Form Listing -->
+    <div class="left-column-crud-container form-list" data-bind="with: formList">
+        {% include 'views/resource/editor/form-list.htm' %}
+    </div>
+
+    <!-- Card Container -->
+    <div class="card-form-preview-container" data-bind="let: {'form': formView}, css: {'loading-mask': cardLoading()}">
+        {% include 'views/resource/editor/form.htm' %}
+    </div>
+
+</div>
+
+{% endblock content %}
+
+{% block pre_require_js %}
+{{block.super}}
+<script>
+    {% autoescape off %}
+    define('resource-editor-data', [], function () {
+        return {
+            forms: {{forms}},
+            form: {{form}},
+            datatypes: {{ datatypes_json }},
+            widgets: {{ widgets_json }},
+            resourceid: '{{resourceid}}',
+            graph: {{graph_json}},
+            relationship_types: {{ relationship_types }},
+            displayname: '{{displayname | escapejs}}'
+        };
+    });
+    {% endautoescape %}
+</script>
+{% endblock pre_require_js %}
