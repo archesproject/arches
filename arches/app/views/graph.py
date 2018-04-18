@@ -114,45 +114,6 @@ class GraphSettingsView(GraphBaseView):
 
         return render(request, 'views/graph/graph-settings.htm', context)
 
-@method_decorator(group_required('Graph Editor'), name='dispatch')
-class GraphSettingsView(GraphBaseView):
-    def get(self, request, graphid):
-        self.graph = Graph.objects.get(graphid=graphid)
-        icons = models.Icon.objects.order_by('name')
-        resource_graphs = models.GraphModel.objects.filter(Q(isresource=True)).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-        resource_data = []
-        node = models.Node.objects.get(graph_id=graphid, istopnode=True)
-        relatable_resources = node.get_relatable_resources()
-        for res in resource_graphs:
-            if models.Node.objects.filter(graph=res, istopnode=True).count() > 0:
-                node_model = models.Node.objects.get(graph=res, istopnode=True)
-                resource_data.append({
-                    'id': node_model.nodeid,
-                    'graph': res,
-                    'is_relatable': (node_model in relatable_resources)
-                })
-
-        ontologies = models.Ontology.objects.filter(parentontology=None)
-        ontology_classes = models.OntologyClass.objects.values('source', 'ontology_id')
-
-        context = self.get_context_data(
-            main_script='views/graph/graph-settings',
-            icons=JSONSerializer().serialize(icons),
-            node_json=JSONSerializer().serialize(node),
-            ontologies=JSONSerializer().serialize(ontologies),
-            ontology_classes=JSONSerializer().serialize(ontology_classes),
-            resource_data=JSONSerializer().serialize(resource_data),
-            node_count=models.Node.objects.filter(graph=self.graph).count(),
-            ontology_namespaces = get_ontology_namespaces()
-        )
-
-        context['nav']['title'] = self.graph.name
-        context['nav']['menu'] = True
-        context['nav']['help'] = (_('Defining Settings'),'help/base-help.htm')
-        context['help'] = 'settings-help'
-
-        return render(request, 'views/graph/graph-settings.htm', context)
-
 
     def post(self, request, graphid):
         graph = Graph.objects.get(graphid=graphid)
