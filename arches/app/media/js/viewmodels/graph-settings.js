@@ -11,14 +11,16 @@ define([
     var GraphSettingsViewModel = function(params) {
 
         var self = this;
+        var resourceJSON;
+
         self.resource_data = ko.observableArray([]);
         self.relatable_resources = ko.computed(function () {
+            resourceJSON = JSON.stringify(self.resource_data());
             return _.each(self.resource_data(), function (resource) {
                 resource.isRelatable = ko.observable(resource.is_relatable);
             });
         })
 
-        var resourceJSON = JSON.stringify(self.relatable_resources);
         var srcJSON = JSON.stringify(koMapping.toJS(params.graph));
 
         self.graph = params.graph;
@@ -40,6 +42,8 @@ define([
         } else {
             topNode.config = ko.observable({fillColor:rootNodeColor});
         }
+        var srcRootNodeColor = rootNodeColor();
+
         self.jsonData = ko.computed(function() {
             var relatableResourceIds = _.filter(self.resource_data(), function(resource){
                 return resource.isRelatable();
@@ -60,6 +64,10 @@ define([
         var dirty = ko.computed(function () {
             return self.jsonData() !== self.jsonCache();
         });
+
+        rootNodeColor.subscribe(function(val){
+            console.log(val);
+        })
 
         self.rootNodeColor = rootNodeColor;
         self.dirty = dirty;
@@ -104,8 +112,9 @@ define([
                     graph[key](value);
                 };
             });
+            console.log(srcRootNodeColor);
             JSON.parse(resourceJSON).forEach(function(jsonResource) {
-                var resource = _.find(self.resource_data, function (resource) {
+                var resource = _.find(self.resource_data(), function (resource) {
                     return resource.id === jsonResource.id;
                 });
                 resource.isRelatable(jsonResource.is_relatable);
