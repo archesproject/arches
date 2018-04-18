@@ -19,12 +19,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load staticfiles %}
 {% load i18n %}
 
-
 {% block title %}
 {{ block.super }}
 {% trans "Graph Designer" %}
 {% endblock title %}
-
 
 {% block main_content %}
 <div class="content-panel">
@@ -34,10 +32,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <h4 class="ep-form-toolbar-title">
             <!-- Layer Filter -->
             <div class="list-filter" data-bind="" style="margin-right: 10px;">
-                <input type="text" class="form-control" style="width: 250px;" placeholder="{% trans 'Find a node, datatype, card...' %}" data-bind="textInput: dataFilter">
+                <input type="text" class="form-control" style="width: 250px;" placeholder="{% trans 'Find a node, datatype, card...' %}" data-bind="textInput: graphTree.filter">
 
                 <!-- Clear Search -->
-                <span class="clear-node-search" data-bind="visible: dataFilter().length > 0, click: function() { dataFilter(''); }" style="top: 8px;"><i class="fa fa-times-circle"></i></span>
+                <span class="clear-node-search" data-bind="visible: graphTree.filter().length > 0, click: graphTree.clearSearch.bind(graphTree)" style="top: 8px;"><i class="fa fa-times-circle"></i></span>
             </div>
 
             </h4>
@@ -78,7 +76,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             <div class="tab-content" >
                 <!-- Summary Card -->
-                <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'graph' }">graph</div>
+                <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'graph' }">
+                    <div class="" data-bind="with: graphTree">
+                        {% include 'views/graph/graph-tree.htm' %}
+                    </div>
+                </div>
                 <!-- Summary Card -->
                 <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }">card</div>
             </div>
@@ -103,10 +105,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block pre_require_js %}
 {{block.super}}
     <script>
-        {% autoescape off %}define('graph-designer-data', [], function() {
+        {% autoescape off %}
+        define('graph-designer-data', [], function() {
             return {
+                graph: {{graph_json}},
                 graphid: '{{graphid}}',
+                datatypes: {{datatypes}},
+                ontology_namespaces: {{ontology_namespaces}}
             };
-        });{% endautoescape %}
+        });
+        {% endautoescape %}
     </script>
 {% endblock pre_require_js %}
