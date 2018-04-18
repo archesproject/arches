@@ -1,4 +1,20 @@
 /* jsTree default theme */
+.jstree>.header {
+    height: 35px;
+    padding-left: 13px;
+    background-color: #f8f8f8;
+    padding-top: 10px;
+    font-size: 11px;
+}
+.jstree>.header>a:hover {
+    cursor: pointer;
+    color: #337A89;
+}
+
+.filtered {
+    font-weight: bold;
+    color: brown;
+}
 
 .jstree-node,
 .jstree-children,
@@ -8,6 +24,10 @@
     padding: 0;
     list-style-type: none;
     list-style-image: none;
+}
+
+.jstree-container-ul {
+    margin: 10px 0;
 }
 
 .jstree-node {
