@@ -36,6 +36,10 @@
     color: inherit;
 }
 
+.jstree-anchor:hover {
+    background-color: #f8f8f8;
+}
+
 .jstree-icon {
     display: inline-block;
     text-decoration: none;
