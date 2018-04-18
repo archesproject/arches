@@ -12,13 +12,7 @@ define([
         placeholder: ko.observable(''),
         graphid: ko.observable(data.graphid),
         activeTab: ko.observable('graph'),
-        viewState: ko.observable('design'),
-        expandAll: function(){
-            viewModel.graphTree.expandAll();
-        },
-        collapseAll: function(){
-            viewModel.graphTree.collapseAll();
-        },
+        viewState: ko.observable('design')
     }
 
     viewModel.graphModel = new GraphModel({
