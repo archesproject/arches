@@ -160,32 +160,31 @@ class NewGraphSettingsView(GraphBaseView):
 
         ontologies = models.Ontology.objects.filter(parentontology=None)
         ontology_classes = models.OntologyClass.objects.values('source', 'ontology_id')
-
-        context = self.get_context_data(
-            node_count=models.Node.objects.filter(graph=self.graph).count()
-        )
+        node_count=models.Node.objects.filter(graph=self.graph).count()
+        # context = self.get_context_data(
+        #     node_count=models.Node.objects.filter(graph=self.graph).count()
+        # )
 
         data = {
             'icons': JSONSerializer().serializeToPython(icons),
-            'graph': json.loads(context['graph_json']),
             'node': JSONSerializer().serializeToPython(node),
             'ontologies': JSONSerializer().serializeToPython(ontologies),
             'ontologyClasses': JSONSerializer().serializeToPython(ontology_classes),
             'resources': JSONSerializer().serializeToPython(resource_data),
             'ontology_namespaces': get_ontology_namespaces()
         }
+        #
+        # context = self.get_context_data(
+        #     node_count=models.Node.objects.filter(graph=self.graph).count(),
+        # )
+        #
+        # context['nav']['title'] = self.graph.name
+        # context['nav']['menu'] = True
+        # context['nav']['help'] = (_('Defining Settings'),'help/base-help.htm')
+        # context['help'] = 'settings-help'
 
-        context = self.get_context_data(
-            node_count=models.Node.objects.filter(graph=self.graph).count(),
-        )
-
-        context['nav']['title'] = self.graph.name
-        context['nav']['menu'] = True
-        context['nav']['help'] = (_('Defining Settings'),'help/base-help.htm')
-        context['help'] = 'settings-help'
-
-        html = render_to_string('views/new-graph-settings.htm', context, request)
-        return JSONResponse({'html':html, 'data': data})
+        # html = render_to_string('views/new-graph-settings.htm', context, request)
+        return JSONResponse(data)
 
 
     def post(self, request, graphid):
@@ -287,6 +286,7 @@ class GraphDesignerView(GraphBaseView):
         context['nav']['menu'] = True
         context['graph_models'] = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         context['graphs'] = JSONSerializer().serialize(context['graph_models'], exclude = ['functions'])
+        context['graph'] = JSONSerializer().serialize(self.graph, exclude = ['functions'])
         return render(request, 'views/graph-designer.htm', context)
 
 

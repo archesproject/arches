@@ -2,12 +2,13 @@ define([
     'jquery',
     'underscore',
     'knockout',
+    'knockout-mapping',
     'views/base-manager',
     'graph-designer-data',
     'arches',
     'viewmodels/graph-settings',
     'bindings/resizable-sidepanel'
-], function($, _, ko, BaseManagerView, data, arches, GraphSettingsViewModel) {
+], function($, _, ko, koMapping, BaseManagerView, data, arches, GraphSettingsViewModel) {
 
     var viewModel = {
         dataFilter: ko.observable(''),
@@ -16,11 +17,25 @@ define([
         activeTab: ko.observable('graph'),
         viewState: ko.observable('design'),
         graphSettingsVisible: ko.observable(false),
-        contentLoading: ko.observable(false)
+        contentLoading: ko.observable(false),
+        graph: koMapping.fromJS(data['graph']),
+        ontologies: ko.observableArray([]),
+        ontologyClasses: ko.observable(data['ontologyClasses']),
     }
 
+    viewModel.graphSettingsViewModel = new GraphSettingsViewModel(
+        {
+            graph: viewModel.graph,
+            ontologyClasses: viewModel.ontologyClasses,
+            ontologies: viewModel.ontologies,
+            ontologyClass: ko.observable(''),
+            iconFilter: ko.observable(''),
+            node: viewModel.graph.root,
+            rootNodeColor: ko.observable(''),
+            ontology_namespaces: []
+        });
+
     viewModel.loadGraphSettings = function(){
-        var el = $('.graph-designer-graph-content');
         var self = this;
         self.contentLoading(true);
         $.ajax({
@@ -28,10 +43,10 @@ define([
             url: arches.urls.new_graph_settings(data.graphid),
             data: {'search': true, 'csrfmiddlewaretoken': '{{ csrf_token }}'}})
         .done(function(data){
-            el.html(data['html']);
-            self.graphSettingsViewModel = new GraphSettingsViewModel(data['data']);
+            self.graphSettingsViewModel.resource_data(data.resources);
+            self.graphSettingsViewModel.icon_data(data.icons);
+            self.graphSettingsViewModel.jsonCache(self.graphSettingsViewModel.jsonData());
             self.graphSettingsViewModel.contentLoading = self.contentLoading;
-            ko.applyBindings(self.graphSettingsViewModel, el[0]);
             self.graphSettingsVisible(true);
             self.contentLoading(false);
         })

@@ -101,6 +101,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'graph' }">
                     <div class="graph-designer-graph-content">
                     {% block graph_content %}
+                    {% include 'views/new-graph-settings.htm' %}
                     {% endblock graph_content %}
                     </div>
                 </div>
@@ -121,6 +122,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         {% autoescape off %}define('graph-designer-data', [], function() {
             return {
                 graphid: '{{graphid}}',
+                ontologyClasses: {{ontology_classes}},
+                graph: {{graph}}
             };
         });{% endautoescape %}
     </script>

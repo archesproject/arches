@@ -11,24 +11,23 @@ define([
     var GraphSettingsViewModel = function(params) {
 
         var self = this;
+        self.resource_data = ko.observableArray([]);
+        self.relatable_resources = ko.computed(function () {
+            return _.each(self.resource_data(), function (resource) {
+                resource.isRelatable = ko.observable(resource.is_relatable);
+            });
+        })
 
-        var resourceJSON = JSON.stringify(params.resources);
-        params.resources.forEach(function(resource) {
-            resource.isRelatable = ko.observable(resource.is_relatable);
-        });
-        var srcJSON = JSON.stringify(params.graph);
+        var resourceJSON = JSON.stringify(self.relatable_resources);
+        var srcJSON = JSON.stringify(koMapping.toJS(params.graph));
 
-        self.graph = koMapping.fromJS(params.graph);
-        var iconFilter = ko.observable('');
-        var rootNode = new NodeModel({
-            source: params.node,
-            datatypelookup: [],
-            graph: self.graph,
-            ontology_namespaces: params.ontology_namespaces
-        });
+        self.graph = params.graph;
 
-        var rootNodeConfig = ko.observable(rootNode.config)
-        var ontologyClass = ko.observable(params.node.ontologyclass);
+        self.graph.ontology_id.subscribe(function(val){
+            console.log(val);
+        })
+
+        var ontologyClass = params.node.ontologyclass;
         var topNode = _.filter(self.graph.nodes(), function(node) {
                         if (node.istopnode() === true) {
                             return node
@@ -41,8 +40,8 @@ define([
         } else {
             topNode.config = ko.observable({fillColor:rootNodeColor});
         }
-        var jsonData = ko.computed(function() {
-            var relatableResourceIds = _.filter(params.resources, function(resource){
+        self.jsonData = ko.computed(function() {
+            var relatableResourceIds = _.filter(self.resource_data(), function(resource){
                 return resource.isRelatable();
             }).map(function(resource){
                 return resource.id
@@ -56,36 +55,39 @@ define([
                 ontology_class: ontologyClass()
             });
         });
-        var jsonCache = ko.observable(jsonData());
+        self.jsonCache = ko.observable(self.jsonData());
+
         var dirty = ko.computed(function () {
-            return jsonData() !== jsonCache();
+            return self.jsonData() !== self.jsonCache();
         });
 
-        self.rootNodeColor = rootNodeColor,
-        self.dirty = dirty,
-        self.iconFilter = iconFilter,
+        self.rootNodeColor = rootNodeColor;
+        self.dirty = dirty;
+        self.icon_data = ko.observableArray([]);
+        self.iconFilter = params.iconFilter;
         self.icons = ko.computed(function () {
-            return _.filter(params.icons, function (icon) {
-                return icon.name.indexOf(iconFilter()) >= 0;
+            return _.filter(self.icon_data(), function (icon) {
+                return icon.name.indexOf(self.iconFilter()) >= 0;
             });
-        }),
-        self.relatable_resources = params.resources,
-        self.ontologies = params.ontologies,
-        self.ontologyClass = ontologyClass,
+        });
+
+        self.ontologies = params.ontologies;
+        self.ontologyClass = ontologyClass;
         self.ontologyClasses = ko.computed(function () {
-            return _.filter(params.ontologyClasses, function (ontologyClass) {
-                ontologyClass.display = rootNode.getFriendlyOntolgyName(ontologyClass.source);
+            return _.filter(params.ontologyClasses(), function (ontologyClass) {
+                ontologyClass.display = ontologyClass.source;
                 return ontologyClass.ontology_id === self.graph.ontology_id();
             });
-        }),
+        });
+
         self.save = function () {
             self.contentLoading(true);
             $.ajax({
                 type: "POST",
                 url: arches.urls.new_graph_settings(self.graph.graphid()),
-                data: jsonData()})
+                data: self.jsonData()})
                 .done(function(response) {
-                    jsonCache(jsonData());
+                    self.jsonCache(self.jsonData());
                 })
                 .fail(function(response) {
                     console.log('there was an error saving the settings', response)
@@ -93,19 +95,24 @@ define([
                 .always(function(){
                     self.contentLoading(false);
                 })
-        },
+        };
+
         self.reset = function () {
+            var graph = self.graph;
             _.each(JSON.parse(srcJSON), function(value, key) {
-                graph[key](value);
+                if (ko.isObservable(graph[key])) {
+                    graph[key](value);
+                };
             });
             JSON.parse(resourceJSON).forEach(function(jsonResource) {
-                var resource = _.find(params.resources, function (resource) {
+                var resource = _.find(self.resource_data, function (resource) {
                     return resource.id === jsonResource.id;
                 });
                 resource.isRelatable(jsonResource.is_relatable);
             });
-            jsonCache(jsonData());
-        }
+            self.jsonCache(self.jsonData());
+        };
+
     };
     return GraphSettingsViewModel;
 });
