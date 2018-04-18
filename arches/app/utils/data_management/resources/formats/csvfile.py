@@ -288,7 +288,7 @@ class TileCsvWriter(Writer):
 
 class CsvReader(Reader):
 
-    def save_resource(self, populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count):
+    def save_resource(self, populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number):
         # create a resource instance only if there are populated_tiles
         errors = []
         if len(populated_tiles) > 0:
@@ -311,12 +311,14 @@ class CsvReader(Reader):
                     newresourceinstance.save()
                 except TransportError as e:
                     cause = json.dumps(e.info['error']['caused_by'],indent=1)
-                    msg = '%s: WARNING: failed to index document in resource: %s. Exception detail:\n%s\n' % (datetime.datetime.now(), resourceinstanceid, cause)
+                    import ipdb
+                    ipdb.set_trace()
+                    msg = '%s: WARNING: failed to index document in resource: %s %s. Exception detail:\n%s\n' % (datetime.datetime.now(), resourceinstanceid, row_number, cause)
                     errors.append({'type': 'WARNING', 'message': msg})
                     newresourceinstance.delete()
                     save_count=save_count-1
                 except Exception as e:
-                    msg = '%s: WARNING: failed to index document in resource: %s. Exception detail:\n%s\n' % (datetime.datetime.now(), resourceinstanceid, e)
+                    msg = '%s: WARNING: failed to index document in resource: %s %s. Exception detail:\n%s\n' % (datetime.datetime.now(), resourceinstanceid, row_number, e)
                     errors.append({'type': 'WARNING', 'message': msg})
                     newresourceinstance.delete()
                     save_count=save_count-1
@@ -343,14 +345,14 @@ class CsvReader(Reader):
                 for k,v in f.iteritems():
                     v['node_ids'] = []
                     v['string_template'] = v['string_template'].replace('<', '').replace('>', '').split(', ')
-                    if v['nodegroup_id'] != '':
+                    if 'nodegroup_id' in v and v['nodegroup_id'] != '':
                         nodes = Node.objects.filter(nodegroup_id=v['nodegroup_id'])
                         for node in nodes:
                             if node.name in v['string_template']:
                                 display_nodeids.append(str(node.nodeid))
 
                 for k,v in f.iteritems():
-                    if v['string_template'] != ['']:
+                    if 'string_template' in v and v['string_template'] != ['']:
                         print 'The {0} {1} in the {2} display function.'.format(', '.join(v['string_template']), 'nodes participate' if len(v['string_template']) > 1 else 'node participates', k)
                     else:
                         print 'No nodes participate in the {0} display function.'.format(k)
@@ -658,7 +660,7 @@ class CsvReader(Reader):
                     if row['ResourceID'] != previous_row_resourceid and previous_row_resourceid is not None:
 
                         save_count = save_count + 1
-                        self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count)
+                        self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number)
 
                         # reset values for next resource instance
                         populated_tiles = []
@@ -713,6 +715,7 @@ class CsvReader(Reader):
                                 target_tile_cardinality = 'n'
 
                             if str(target_tile.nodegroup_id) not in populated_nodegroups[resourceinstanceid]:
+                                target_tile.nodegroup_id = str(target_tile.nodegroup_id)
                                 # Check if we are populating a parent tile by inspecting the target_tile.data array.
                                 if target_tile.data != {}:
                                     # Iterate through the target_tile nodes and begin populating by iterating througth source_data array.
@@ -752,6 +755,7 @@ class CsvReader(Reader):
                                                 prototype_tile_copy.parenttile.tileid = parenttileid
                                             prototype_tile_copy.resourceinstance_id = resourceinstanceid
                                             if str(prototype_tile_copy.nodegroup_id) not in populated_child_nodegroups:
+                                                prototype_tile_copy.nodegroup_id = str(prototype_tile_copy.nodegroup_id)
                                                 for target_key in prototype_tile_copy.data.keys():
                                                     for source_column in source_data:
                                                         for source_key in source_column.keys():
@@ -805,7 +809,7 @@ class CsvReader(Reader):
                     legacyid = row['ResourceID']
 
                 if 'legacyid' in locals():
-                    self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count)
+                    self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number)
 
                 if bulk:
                     Resource.bulk_save(resources=resources)
