@@ -87,8 +87,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             <div class="tab-content" >
                 <!-- Summary Card -->
-                <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'graph' }">graph</div>
-                <!-- Summary Card -->
+                <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'graph' }">
+                    <div class="" data-bind="with: graphTree">
+                         {% include 'views/graph/graph-tree.htm' %}
+                     </div></div>
                 <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }">card</div>
             </div>
         </div>

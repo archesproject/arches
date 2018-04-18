@@ -4,11 +4,13 @@ define([
     'knockout',
     'knockout-mapping',
     'views/base-manager',
+    'models/graph',
+    'views/graph/graph-tree',
     'graph-designer-data',
     'arches',
     'viewmodels/graph-settings',
     'bindings/resizable-sidepanel'
-], function($, _, ko, koMapping, BaseManagerView, data, arches, GraphSettingsViewModel) {
+], function($, _, ko, koMapping, BaseManagerView, GraphModel, GraphTree, data, arches, GraphSettingsViewModel) {
 
     var viewModel = {
         dataFilter: ko.observable(''),
@@ -16,12 +18,28 @@ define([
         graphid: ko.observable(data.graphid),
         activeTab: ko.observable('graph'),
         viewState: ko.observable('design'),
+        expandAll: function(){
+            viewModel.graphTree.expandAll();
+        },
+        collapseAll: function(){
+            viewModel.graphTree.collapseAll();
+        },
         graphSettingsVisible: ko.observable(false),
         contentLoading: ko.observable(false),
         graph: koMapping.fromJS(data['graph']),
         ontologies: ko.observableArray([]),
         ontologyClasses: ko.observable(data['ontologyClasses']),
     }
+
+    viewModel.graphModel = new GraphModel({
+        data: data.graph,
+        datatypes: data.datatypes,
+        ontology_namespaces: data.ontology_namespaces
+    });
+
+    viewModel.graphTree = new GraphTree({
+        graphModel: viewModel.graphModel
+    });
 
     viewModel.graphSettingsViewModel = new GraphSettingsViewModel(
         {
