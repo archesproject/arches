@@ -4,13 +4,14 @@ define([
     'knockout',
     'knockout-mapping',
     'views/base-manager',
+    'viewmodels/alert',
     'models/graph',
     'views/graph/graph-tree',
     'graph-designer-data',
     'arches',
     'viewmodels/graph-settings',
     'bindings/resizable-sidepanel'
-], function($, _, ko, koMapping, BaseManagerView, GraphModel, GraphTree, data, arches, GraphSettingsViewModel) {
+], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, GraphModel, GraphTree, data, arches, GraphSettingsViewModel) {
 
     var viewModel = {
         dataFilter: ko.observable(''),
@@ -18,12 +19,6 @@ define([
         graphid: ko.observable(data.graphid),
         activeTab: ko.observable('graph'),
         viewState: ko.observable('design'),
-        expandAll: function(){
-            viewModel.graphTree.expandAll();
-        },
-        collapseAll: function(){
-            viewModel.graphTree.collapseAll();
-        },
         graphSettingsVisible: ko.observable(false),
         contentLoading: ko.observable(false),
         graph: koMapping.fromJS(data['graph']),
@@ -41,17 +36,20 @@ define([
         graphModel: viewModel.graphModel
     });
 
-    viewModel.graphSettingsViewModel = new GraphSettingsViewModel(
-        {
-            graph: viewModel.graph,
-            ontologyClasses: viewModel.ontologyClasses,
-            ontologies: viewModel.ontologies,
-            ontologyClass: ko.observable(''),
-            iconFilter: ko.observable(''),
-            node: viewModel.graph.root,
-            rootNodeColor: ko.observable(''),
-            ontology_namespaces: []
-        });
+    viewModel.graphTree.on('error', function(response){
+        viewModel.alert(new AlertViewModel('ep-alert-red', response.title, response.message));
+    });
+
+    viewModel.graphSettingsViewModel = new GraphSettingsViewModel({
+        graph: viewModel.graph,
+        ontologyClasses: viewModel.ontologyClasses,
+        ontologies: viewModel.ontologies,
+        ontologyClass: ko.observable(''),
+        iconFilter: ko.observable(''),
+        node: viewModel.graph.root,
+        rootNodeColor: ko.observable(''),
+        ontology_namespaces: []
+    });
 
     viewModel.loadGraphSettings = function(){
         var self = this;
