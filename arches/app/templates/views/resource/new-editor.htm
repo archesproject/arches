@@ -49,6 +49,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         {% autoescape off %}define('resource-editor-data', [], function() {
             return {
                 graphid: '{{graphid}}',
+                displayname: '{{displayname}}',
+                tiles: {{tiles}},
+                cards: {{cards}},
+                nodegroups: {{nodegroups}}
             };
         });{% endautoescape %}
     </script>
