@@ -19,10 +19,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load staticfiles %}
 {% load i18n %}
 
+
 {% block title %}
 {{ block.super }}
 {% trans "Graph Designer" %}
 {% endblock title %}
+
 
 {% block main_content %}
 <div class="content-panel">
@@ -32,10 +34,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <h4 class="ep-form-toolbar-title">
             <!-- Layer Filter -->
             <div class="list-filter" data-bind="" style="margin-right: 10px;">
-                <input type="text" class="form-control" style="width: 250px;" placeholder="{% trans 'Find a node, datatype, card...' %}" data-bind="textInput: graphTree.filter">
+                <input type="text" class="form-control" style="width: 250px;" placeholder="{% trans 'Find a node, datatype, card...' %}" data-bind="textInput: dataFilter">
 
                 <!-- Clear Search -->
-                <span class="clear-node-search" data-bind="visible: graphTree.filter().length > 0, click: graphTree.clearSearch.bind(graphTree)" style="top: 8px;"><i class="fa fa-times-circle"></i></span>
+                <span class="clear-node-search" data-bind="visible: dataFilter().length > 0, click: function() { dataFilter(''); }" style="top: 8px;"><i class="fa fa-times-circle"></i></span>
             </div>
 
             </h4>
@@ -45,6 +47,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <button class="btn btn-md viewstate-btn" data-bind="css: { active: viewState() === 'design' }, click: function(){viewState('design');}">{% trans "Design" %}</button>
             <button class="btn btn-md viewstate-btn" data-bind="css: { active: viewState() === 'preview' }, click: function(){viewState('preview');}">{% trans "Preview" %}</button>
         </div>
+
+        <!-- ko if: graphSettingsVisible() -->
+            <!-- ko if: graphSettingsViewModel.dirty() -->
+            <div class="graph-settings-crud">
+                <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: graphSettingsViewModel.reset">{% trans "Discard Edits" %}</button>
+                <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: graphSettingsViewModel.save">{% trans "Save Edits" %}</button>
+            </div>
+            <!-- /ko -->
+        <!-- /ko -->
 
         <!-- Tools -->
         <div class="ep-form-toolbar-tools">
@@ -78,19 +89,24 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- Summary Card -->
                 <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'graph' }">
                     <div class="" data-bind="with: graphTree">
-                        {% include 'views/graph/graph-tree.htm' %}
-                    </div>
-                </div>
-                <!-- Summary Card -->
+                         {% include 'views/graph/graph-tree.htm' %}
+                     </div></div>
                 <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }">card</div>
             </div>
         </div>
 
         <!-- Main Content Panel -->
-        <div style="background-color: #ffffff; flex: 1" >
-            <div class="tab-content" >
+        <div style="background-color: #ffffff; flex: 1; overflow-y: auto" >
+            <div class="tab-content" data-bind="css: {'graph-designer-loading-mask': contentLoading }"></div>
+            <div class="tab-content">
                 <!-- Summary Card -->
-                <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'graph' }">graph content</div>
+                <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'graph' }">
+                    <div class="graph-designer-graph-content">
+                    {% block graph_content %}
+                    {% include 'views/new-graph-settings.htm' %}
+                    {% endblock graph_content %}
+                    </div>
+                </div>
                 <!-- Summary Card -->
                 <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }">card content</div>
             </div>
@@ -105,15 +121,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block pre_require_js %}
 {{block.super}}
     <script>
-        {% autoescape off %}
-        define('graph-designer-data', [], function() {
+        {% autoescape off %}define('graph-designer-data', [], function() {
             return {
-                graph: {{graph_json}},
                 graphid: '{{graphid}}',
-                datatypes: {{datatypes}},
-                ontology_namespaces: {{ontology_namespaces}}
+                ontologyClasses: {{ontology_classes}},
+                graph: {{graph_json}}
             };
-        });
-        {% endautoescape %}
+        });{% endautoescape %}
     </script>
 {% endblock pre_require_js %}
