@@ -52,7 +52,7 @@ define(['arches',
                 type: "DELETE",
                 url: this.url + this.get('graphid') + '/delete_node',
                 data: JSON.stringify({nodeid:node.nodeid})
-            }, function(response, status, self){
+            }, function(response, status){
                 if (status === 'success' &&  response.responseJSON) {
                     var parentNode = this.getParentNode(node);
                     var getEdges = function (node) {
@@ -99,10 +99,10 @@ define(['arches',
 
 
                 if (typeof callback === 'function') {
-                    scope = scope || self;
+                    scope = scope || this;
                     callback.call(scope, response, status);
                 }
-            }, scope, 'changed');
+            }, this, 'changed');
         },
 
         /**
@@ -161,29 +161,29 @@ define(['arches',
                 type: "POST",
                 url: this.url + this.get('graphid') + '/append_branch',
                 data: JSON.stringify({nodeid:nodeid, property: property, graphid: branch_graph.get('graphid')})
-            }, function(response, status, self){
+            }, function(response, status){
                 if (status === 'success' &&  response.responseJSON) {
                     var branchroot = response.responseJSON.root;
                     response.responseJSON.nodes.forEach(function(node){
-                        self.get('nodes').push(new NodeModel({
+                        this.get('nodes').push(new NodeModel({
                             source: node,
-                            datatypelookup: self.get('datatypelookup'),
-                            graph: self,
-                            ontology_namespaces: self.get('root').ontology_namespaces
+                            datatypelookup: this.get('datatypelookup'),
+                            graph: this,
+                            ontology_namespaces: this.get('root').ontology_namespaces
                         }));
                     }, this);
                     response.responseJSON.edges.forEach(function(edge){
-                        self.get('edges').push(edge);
+                        this.get('edges').push(edge);
                     }, this);
                     response.responseJSON.nodegroups.forEach(function(nodegroup){
-                        self.get('nodegroups').push(nodegroup);
+                        this.get('nodegroups').push(nodegroup);
                     }, this);
                     response.responseJSON.cards.forEach(function(card){
-                        self.get('cards').push(card);
+                        this.get('cards').push(card);
                     }, this);
 
-                    if(!self.get('isresource')){
-                        self.get('nodes')().forEach(function (node) {
+                    if(!this.get('isresource')){
+                        this.get('nodes')().forEach(function (node) {
                             node.selected(false);
                             if (node.nodeid === branchroot.nodeid){
                                 node.selected(true);
@@ -193,10 +193,10 @@ define(['arches',
                 }
 
                 if (typeof callback === 'function') {
-                    scope = scope || self;
+                    scope = scope || this;
                     callback.call(scope, response, status);
                 }
-            }, scope, 'changed');
+            }, this, 'changed');
         },
 
         /**
@@ -213,16 +213,16 @@ define(['arches',
                 type: "POST",
                 url: this.url + this.get('graphid') + '/move_node',
                 data: JSON.stringify({nodeid:node.nodeid, property: property, newparentnodeid: newParentNode.nodeid})
-            }, function(response, status, self){
+            }, function(response, status){
                 if (status === 'success' &&  response.responseJSON) {
-                    self.get('edges')().find(function (edge) {
+                    this.get('edges')().find(function (edge) {
                         if(edge.edgeid === response.responseJSON.edges[0].edgeid){
                             edge.domainnode_id = response.responseJSON.edges[0].domainnode_id;
                             return true;
                         }
                         return false;
                     });
-                    self.get('nodes')().forEach(function (node) {
+                    this.get('nodes')().forEach(function (node) {
                         found_node = response.responseJSON.nodes.find(function(response_node){
                             return response_node.nodeid === node.nodeid;
                         });
@@ -232,10 +232,10 @@ define(['arches',
                     });
                 }
                 if (typeof callback === 'function') {
-                    scope = scope || self;
+                    scope = scope || this;
                     callback.call(scope, response, status);
                 }
-            }, scope, 'changed');
+            }, this, 'changed');
         },
 
         /**
@@ -250,9 +250,9 @@ define(['arches',
                 type: "POST",
                 url: this.url + this.get('graphid') + '/update_node',
                 data: JSON.stringify(node.toJSON())
-            }, function(response, status, self){
+            }, function(response, status){
                 if (status === 'success' &&  response.responseJSON) {
-                    _.each(self.get('nodes')(), function(node){
+                    _.each(this.get('nodes')(), function(node){
                         var nodeJSON = _.find(response.responseJSON.nodes, function (returned_node) {
                             return node.nodeid === returned_node.nodeid;
                         });
@@ -260,10 +260,10 @@ define(['arches',
                     }, this);
                 }
                 if (typeof callback === 'function') {
-                    scope = scope || self;
+                    scope = scope || this;
                     callback.call(scope, response, status);
                 }
-            }, scope, 'changed');
+            }, this, 'changed');
         },
 
         /**
@@ -278,7 +278,7 @@ define(['arches',
             this._doRequest({
                 type: "GET",
                 url: this.url + this.get('graphid') + '/get_related_nodes/' + nodeid,
-            }, function(response, status, self){
+            }, function(response, status){
                 callback.call(scope, response.responseJSON);
             }, this);
         },
@@ -295,7 +295,7 @@ define(['arches',
             this._doRequest({
                 type: "GET",
                 url: this.url + this.get('graphid') + '/get_valid_domain_nodes/' + nodeid,
-            }, function(response, status, self){
+            }, function(response, status){
                 callback.call(scope, response.responseJSON);
             }, this);
         },
@@ -646,13 +646,10 @@ define(['arches',
          */
         _doRequest: function (config, callback, scope, eventname) {
             var self = this;
-            if (! scope){
-                scope = self;
-            }
             $.ajax($.extend({
                 complete: function (request, status) {
                     if (typeof callback === 'function') {
-                        callback.call(scope, request, status, self);
+                        callback.call(scope || self, request, status);
                     }
                     if(!!eventname){
                         self.trigger(eventname, self, request);
