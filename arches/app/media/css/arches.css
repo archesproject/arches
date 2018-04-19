@@ -10721,6 +10721,7 @@ ul.select2-choices:after {
 
 .left-panel {
     width: 270px;
+    overflow-y: auto;
 }
 
 .main-panel{
