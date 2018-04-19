@@ -64,18 +64,17 @@
                             <div class="col-xs-12">
                                 <!-- Cultural Period type-->
                                 <input style="width:33%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="cultural-period-type" data-bind="select2: {value: getEditedNode('CULTURAL_PERIOD_TYPE.I4', 'value'), placeholder: '{% trans "Cultural Period" %}', dataKey: 'CULTURAL_PERIOD_TYPE.I4'}"></input>&nbsp;
-                                <!-- Cultural Period Certainty  -->
-                                <input style="width:18%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="cultural-period-certainty" data-bind="select2: {value: getEditedNode('CULTURAL_PERIOD_CERTAINTY.I6', 'value'), placeholder: '{% trans "Certainty" %}', dataKey: 'CULTURAL_PERIOD_CERTAINTY.I6'}"></input>&nbsp;
-                                <br>
                                 <!-- Cultural Period Detail Type-->
-                                <input style="width:50%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="cultural-period-detail" data-bind="select2: {value: getEditedNode('CULTURAL_PERIOD_DETAIL_TYPE.E55', 'value'), placeholder: '{% trans "Cultural Period Detail" %}', dataKey: 'CULTURAL_PERIOD_DETAIL_TYPE.E55'}"></input>&nbsp;
+                                <input style="width:33%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="cultural-period-detail" data-bind="select2: {value: getEditedNode('CULTURAL_PERIOD_DETAIL_TYPE.E55', 'value'), placeholder: '{% trans "Sub-Period" %}', dataKey: 'CULTURAL_PERIOD_DETAIL_TYPE.E55'}"></input>
+                                <!-- Cultural Period Certainty  -->
+                                <input style="width:20%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="cultural-period-certainty" data-bind="select2: {value: getEditedNode('CULTURAL_PERIOD_CERTAINTY.I6', 'value'), placeholder: '{% trans "Certainty" %}', dataKey: 'CULTURAL_PERIOD_CERTAINTY.I6'}"></input>
                                 <div id="arches-names-form" class="section-headline">
                                     {% trans "On behalf of" %}
                                     <i class="fa fa-pencil edit-actor show-box inference" data-actor="inference" aria-hidden="true"></i>
                                     <i class="fa fa-pencil-square edit-actor hide-box inference hidden" data-actor="inference" aria-hidden="true"></i>
                                 </div>
-                                <div class="row edit-actors-row inference hidden">
-                                    <input class="form-control arches-form-input" id="actor-name" style="width: 18%;" placeholder='{% trans "Name" %}' data-bind='value: getEditedNode("DATE_INFERENCE_MAKING_ACTOR_NAME.E41", "value")'>
+                                <div class="edit-actors-row inference hidden">
+                                    <input class="form-control arches-form-input" id="actor-name" style="width: 33%;" placeholder='{% trans "Name" %}' data-bind='value: getEditedNode("DATE_INFERENCE_MAKING_ACTOR_NAME.E41", "value")'>
                                 </div>
                                 {% include 'views/components/add-item-button.htm' %}
                             </div>
@@ -99,10 +98,10 @@
                             <div class="arches-crud-record">
                                 <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this measurement" %}"><i data-bind='click: $parent.deleteItem.bind($parent)' class="arches-CRUD-delete fa fa-times-circle"></i></a>
                                 <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind='click: $parent.editItem.bind($parent)' title="Edit this measurement">
-                                    <span data-bind="{text: nodes.get('CULTURAL_PERIOD_TYPE.I4', 'label')}" style="padding-right:2px"></span>
-                                    <span data-bind="{text: nodes.get('CULTURAL_PERIOD_CERTAINTY.I6', 'label')}" style="padding-right:2px"></span>
-                                    <span data-bind="{text: nodes.get('CULTURAL_PERIOD_DETAIL_TYPE.E55', 'label')}" style="padding-right:2px"></span>
-                                    <span class="text-muted" data-bind="{visible: nodes.get('DATE_INFERENCE_MAKING_ACTOR_NAME.E41', 'value').length > 0}"> by: </span>
+                                    <span data-bind="{text: nodes.get('CULTURAL_PERIOD_TYPE.I4', 'label')}" style="padding-right:2px"></span><span class="text-muted">{% trans '( Main Period )' %}</span>
+                                    <span class="text-muted" data-bind="visible: nodes.get('CULTURAL_PERIOD_DETAIL_TYPE.E55', 'value').length > 0"><span data-bind="{text: nodes.get('CULTURAL_PERIOD_DETAIL_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted">{% trans '( Sub-Period )' %}</span></span>
+                                    <span data-bind="{text: nodes.get('CULTURAL_PERIOD_CERTAINTY.I6', 'label')}" style="padding-right:2px"></span><span class="text-muted">{% trans '( Certainty )' %}</span>
+                                    <span class="text-muted" data-bind="{visible: nodes.get('DATE_INFERENCE_MAKING_ACTOR_NAME.E41', 'value').length > 0}">{% trans 'by:' %} </span>
                                     <span data-bind='text: nodes.get("DATE_INFERENCE_MAKING_ACTOR_NAME.E41", "value")' style="padding-right:2px;"></span><span class="text-muted arches-crud-type-identifier"></span>
                                 </a>
                             </div>
@@ -232,28 +231,29 @@
             <div class="padding-left-10">
                 <dl>
                     <dt>
-                        <h5 id="arches-measurement-form" class="section-headline">{% trans "Feature morphology" %}</h5>
+                        <h5 id="arches-measurement-form" class="section-headline">{% trans "Feature Morphology" %}</h5>
                     </dt>
                     <dd>
                         <div class="row">
                             <div class="col-xs-12">
                                 <!-- Form -->
-                                <input style="width:33%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" data-bind="select2: {value: getEditedNode('FEATURE_FORM_TYPE.I4', 'value'), placeholder: '{% trans "Form" %}', dataKey: 'FEATURE_FORM_TYPE.I4'}"></input>&nbsp;
+                                <input style="width:30%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" data-bind="select2: {value: getEditedNode('FEATURE_FORM_TYPE.I4', 'value'), placeholder: '{% trans "Form Type" %}', dataKey: 'FEATURE_FORM_TYPE.I4'}"></input>&nbsp;
                                 <!-- Form Certainty  -->
-                                <input style="width:33%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" data-bind="select2: {value: getEditedNode('FEATURE_FORM_TYPE_CERTAINTY.I6', 'value'), placeholder: '{% trans "Form Certainty" %}', dataKey: 'FEATURE_FORM_TYPE_CERTAINTY.I6'}"></input>&nbsp;
+                                <input style="width:30%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" data-bind="select2: {value: getEditedNode('FEATURE_FORM_TYPE_CERTAINTY.I6', 'value'), placeholder: '{% trans "Form Certainty" %}', dataKey: 'FEATURE_FORM_TYPE_CERTAINTY.I6'}"></input>
+                                <br>
                                 <!-- Form Shape -->
-                                <input style="width:33%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" data-bind="select2: {value: getEditedNode('FEATURE_SHAPE_TYPE.E55', 'value'), placeholder: '{% trans "Form Shape" %}', dataKey: 'FEATURE_SHAPE_TYPE.E55'}"></input>&nbsp;
+                                <input style="width:20%; display:inline-block;padding-top:2px;" class="select2 arches-select2-crud-form name-type hidden-xs" data-bind="select2: {value: getEditedNode('FEATURE_SHAPE_TYPE.E55', 'value'), placeholder: '{% trans "Form Shape" %}', dataKey: 'FEATURE_SHAPE_TYPE.E55'}"></input>
                                 <!-- Arrangement -->
-                                <input style="width:33%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" data-bind="select2: {value: getEditedNode('FEATURE_ARRANGEMENT_TYPE.E55', 'value'), placeholder: '{% trans "Arrangement" %}', dataKey: 'FEATURE_ARRANGEMENT_TYPE.E55'}"></input>&nbsp;
+                                <input style="width:20%; display:inline-block;padding-top:2px;" class="select2 arches-select2-crud-form name-type hidden-xs" data-bind="select2: {value: getEditedNode('FEATURE_ARRANGEMENT_TYPE.E55', 'value'), placeholder: '{% trans "Arrangement" %}', dataKey: 'FEATURE_ARRANGEMENT_TYPE.E55'}"></input>
                                 <!-- Number -->
-                                <input style="width:33%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" data-bind="select2: {value: getEditedNode('FEATURE_NUMBER_TYPE.E55', 'value'), placeholder: '{% trans "Number" %}', dataKey: 'FEATURE_NUMBER_TYPE.E55'}"></input>&nbsp;
+                                <input style="width:20%; display:inline-block;padding-top:2px;" class="select2 arches-select2-crud-form name-type hidden-xs" data-bind="select2: {value: getEditedNode('FEATURE_NUMBER_TYPE.E55', 'value'), placeholder: '{% trans "Number" %}', dataKey: 'FEATURE_NUMBER_TYPE.E55'}"></input>
                                 <div id="arches-names-form" class="section-headline">
                                     {% trans "On behalf of" %}
                                     <i class="fa fa-pencil edit-actor show-box morphology"  data-actor="morphology" aria-hidden="true"></i>
                                     <i class="fa fa-pencil-square edit-actor hide-box morphology hidden" data-actor="morphology" aria-hidden="true"></i>
                                 </div>
-                                <div class="row edit-actors-row morphology hidden">
-                                    <input class="form-control arches-form-input" id="actor-name" style="width: 18%;" placeholder='{% trans "Name" %}' data-bind='value: getEditedNode("FEATURE_ASSIGNMENT_INVESTIGATOR_NAME.E41", "value")'>
+                                <div class="edit-actors-row morphology hidden">
+                                    <input class="form-control arches-form-input" id="actor-name" style="width: 33%;" placeholder='{% trans "Name" %}' data-bind='value: getEditedNode("FEATURE_ASSIGNMENT_INVESTIGATOR_NAME.E41", "value")'>
                                 </div>
                                 {% include 'views/components/add-item-button.htm' %}
                             </div>
@@ -277,12 +277,12 @@
                             <div class="arches-crud-record">
                                 <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this Feature morphology" %}"><i data-bind='click: $parent.deleteItem.bind($parent)' class="arches-CRUD-delete fa fa-times-circle"></i></a>
                                 <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind='click: $parent.editItem.bind($parent)' title="Edit this Feature morphology">
-                                    <span data-bind="{text: nodes.get('FEATURE_FORM_TYPE.I4', 'label')}" style="padding-right:2px"></span>
-                                    <span data-bind="{text: nodes.get('FEATURE_FORM_TYPE_CERTAINTY.I6', 'label')}" style="padding-right:2px"></span>
-                                    <span data-bind="{text: nodes.get('FEATURE_SHAPE_TYPE.E55', 'label')}" style="padding-right:2px"></span>
-                                    <span data-bind="{text: nodes.get('FEATURE_ARRANGEMENT_TYPE.E55', 'label')}" style="padding-right:2px"></span>
-                                    <span data-bind="{text: nodes.get('FEATURE_NUMBER_TYPE.E55', 'label')}" style="padding-right:2px"></span>
-                                    <span class="text-muted" data-bind="{visible: nodes.get('FEATURE_ASSIGNMENT_INVESTIGATOR_NAME.E41', 'value').length > 0}"> by: </span>
+                                    <span data-bind="{text: nodes.get('FEATURE_FORM_TYPE.I4', 'label')}" style="padding-right:2px"></span><span class="text-muted">{% trans '( Form Type )' %}</span>
+                                    <span data-bind="{text: nodes.get('FEATURE_FORM_TYPE_CERTAINTY.I6', 'label')}" style="padding-right:2px"></span><span class="text-muted">{% trans '( Form Certainty )' %}</span>
+                                    <span data-bind="{text: nodes.get('FEATURE_SHAPE_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted">{% trans '( Form Shape )' %}</span>
+                                    <span data-bind="{text: nodes.get('FEATURE_ARRANGEMENT_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted">{% trans '( Form Arrangement )' %}</span>
+                                    <span data-bind="{text: nodes.get('FEATURE_NUMBER_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted">{% trans '( Form Number )' %}</span>
+                                    <span class="text-muted" data-bind="{visible: nodes.get('FEATURE_ASSIGNMENT_INVESTIGATOR_NAME.E41', 'value').length > 0}"> {% trans 'by:' %} </span>
                                     <span data-bind='text: nodes.get("FEATURE_ASSIGNMENT_INVESTIGATOR_NAME.E41", "value")' style="padding-right:2px;"></span><span class="text-muted arches-crud-type-identifier"></span>
                                 </a>
                             </div>
@@ -306,23 +306,29 @@
                     <dd>
                         <div class="row">
                             <div class="col-xs-12">
-                                <!-- function Type -->   
-                                <input style="width:33%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="function-type" type="text" data-placeholder= "{% trans 'Type' %}" data-bind="select2: {value: getEditedNode('FUNCTION_TYPE.I4', 'value'),   allowClear: true, dataKey: 'FUNCTION_TYPE.I4'}"></input>&nbsp;
-                                <!-- function certainty -->     
-                                <input style="width:18%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="function-certainty" data-bind="select2: {value: getEditedNode('FUNCTION_CERTAINTY.I6', 'value'), placeholder: '{% trans "Certainty" %}', dataKey: 'FUNCTION_CERTAINTY.I6'}"></input>&nbsp;
                                 <!-- interpretation -->     
-                                <input style="width:18%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="interpretation" data-bind="select2: {value: getEditedNode('INTERPRETATION_TYPE.I4', 'value'), placeholder: '{% trans "Interpretation" %}', dataKey: 'INTERPRETATION_TYPE.I4'}"></input>&nbsp;
+                                <input style="width:30%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="interpretation" data-bind="select2: {value: getEditedNode('INTERPRETATION_TYPE.I4', 'value'), placeholder: '{% trans "Interpretation Type" %}', dataKey: 'INTERPRETATION_TYPE.I4'}"></input>
                                 <!-- interpretation certainty -->     
-                                <input style="width:18%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="interpretation-certainty" data-bind="select2: {value: getEditedNode('INTERPRETATION_CERTAINTY.I6', 'value'), placeholder: '{% trans "Interpretation certainty" %}', dataKey: 'INTERPRETATION_CERTAINTY.I6'}"></input>&nbsp;
+                                <input style="width:20%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="interpretation-certainty" data-bind="select2: {value: getEditedNode('INTERPRETATION_CERTAINTY.I6', 'value'), placeholder: '{% trans "Type Certainty" %}', dataKey: 'INTERPRETATION_CERTAINTY.I6'}"></input>
                                 <!-- interpretation number -->     
-                                <input style="width:18%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="interpretation-number" data-bind="select2: {value: getEditedNode('INTERPRETATION_NUMBER_TYPE.E55', 'value'), placeholder: '{% trans "Number" %}', dataKey: 'INTERPRETATION_NUMBER_TYPE.E55'}"></input>&nbsp;
+                                <input style="width:20%; display:inline-block;" class="select2 arches-select2-crud-form name-type hidden-xs" id="interpretation-number" data-bind="select2: {value: getEditedNode('INTERPRETATION_NUMBER_TYPE.E55', 'value'), placeholder: '{% trans "Number" %}', dataKey: 'INTERPRETATION_NUMBER_TYPE.E55'}"></input>
+                                <br>
+                                <!-- function Type  1 -->   
+                                <input style="width:35%; display:inline-block;padding-top:2px;" class="select2 arches-select2-crud-form name-type hidden-xs" id="function-type-0" type="text" data-placeholder= "{% trans 'Function 1 Type' %}" data-bind="select2: {value: getEditedNode('FUNCTION_TYPE.I4', 'value'),   allowClear: true, dataKey: 'FUNCTION_TYPE.I4'}"></input>&nbsp;
+                                <!-- function certainty 1 -->     
+                                <input style="width:35%; display:inline-block;padding-top:2px;" class="select2 arches-select2-crud-form name-type hidden-xs" id="function-certainty-0" data-bind="select2: {value: getEditedNode('FUNCTION_CERTAINTY.I6', 'value'), placeholder: '{% trans "Function 1 Certainty" %}', dataKey: 'FUNCTION_CERTAINTY.I6'}"></input>
+                                <br>
+                                <!-- function Type  2 -->   
+                                <input style="width:35%; display:inline-block;padding-top:2px;" class="select2 arches-select2-crud-form name-type hidden-xs" id="function-type-1" type="text" data-placeholder= "{% trans 'Function 2 Type' %}" data-bind="select2: {value: getEditedNode('FUNCTION_TYPE.I4', 'value'),   allowClear: true, dataKey: 'FUNCTION_TYPE.I4'}"></input>&nbsp;
+                                <!-- function certainty 2 -->     
+                                <input style="width:35%; display:inline-block;padding-top:2px;" class="select2 arches-select2-crud-form name-type hidden-xs" id="function-certainty-1" data-bind="select2: {value: getEditedNode('FUNCTION_CERTAINTY.I6', 'value'), placeholder: '{% trans "Function 2 Certainty" %}', dataKey: 'FUNCTION_CERTAINTY.I6'}"></input>&nbsp;
                                 <div id="arches-names-form" class="section-headline">
                                     {% trans "On behalf of" %}
                                     <i class="fa fa-pencil edit-actor show-box interpretation" data-actor="interpretation" aria-hidden="true"></i>
                                     <i class="fa fa-pencil-square edit-actor hide-box interpretation hidden" data-actor="interpretation" aria-hidden="true"></i>
                                 </div>
-                                <div class="row edit-actors-row interpretation hidden">
-                                    <input class="form-control arches-form-input" id="actor-name" style="width: 18%;" placeholder='{% trans "Name" %}' data-bind='value: getEditedNode("FUNCTION_INTERPRETATION_INFERENCE_MAKING_ACTOR_NAME.E41", "value")'>
+                                <div class="edit-actors-row interpretation hidden">
+                                    <input class="form-control arches-form-input" id="actor-name" style="width: 33%;" placeholder='{% trans "Name" %}' data-bind='value: getEditedNode("FUNCTION_INTERPRETATION_INFERENCE_MAKING_ACTOR_NAME.E41", "value")'>
                                 </div>
                                 {% include 'views/components/add-item-button.htm' %}
                             </div>
@@ -347,12 +353,12 @@
                             <div class="arches-crud-record">
                                 <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this Feature Interpretation" %}"><i data-bind='click: $parent.deleteItem.bind($parent)' class="arches-CRUD-delete fa fa-times-circle"></i></a>
                                 <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind='click: $parent.editItem.bind($parent)' title="Edit this Feature Interpretation">
-                                    <span data-bind="{text: nodes.get('INTERPRETATION_TYPE.I4', 'label')}" style="padding-right:2px"></span>
-                                    <span data-bind="{text: nodes.get('INTERPRETATION_CERTAINTY.I6', 'label')}" style="padding-right:2px"></span>
-                                    <span data-bind="{text: nodes.get('INTERPRETATION_NUMBER_TYPE.E55', 'label')}" style="padding-right:2px"></span>
-                                    <span data-bind="{text: nodes.get('FUNCTION_TYPE.I4', 'label')}" style="padding-right:2px"></span>
-                                    <span class="text-muted arches-crud-type-identifier">
-                                        (<span data-bind="{text: nodes.get('FUNCTION_CERTAINTY.I6', 'label')}"></span>)
+                                    <span data-bind="{text: nodes.get('INTERPRETATION_TYPE.I4', 'label')}" style="padding-right:2px"></span><span class="text-muted">{% trans '( Interpretation Type )' %}</span>
+                                    <span data-bind="{text: nodes.get('INTERPRETATION_CERTAINTY.I6', 'label')}" style="padding-right:2px"></span><span class="text-muted">{% trans '( Interpretation Certainty )' %}</span>
+                                    <span data-bind="{text: nodes.get('INTERPRETATION_NUMBER_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted">{% trans '( Number )' %}</span>
+                                    <span data-bind="foreach: $data.nodes">
+                                            <span data-bind="visible: $data.entitytypeid() ==='FUNCTION_TYPE.I4' "><span data-bind="{text: $data.label}"></span><span class="text-muted">{% trans '( Function Type )' %}</span></span>
+                                            <span data-bind="visible: $data.entitytypeid() ==='FUNCTION_CERTAINTY.I6' "><span data-bind="{text: $data.label}"></span><span class="text-muted">{% trans '( Function Certainty )' %}</span></span>
                                     </span>
                                     <span class="text-muted" data-bind="{visible: nodes.get('FUNCTION_INTERPRETATION_INFERENCE_MAKING_ACTOR_NAME.E41', 'value').length > 0}"> by: </span>
                                     <span data-bind='text: nodes.get("FUNCTION_INTERPRETATION_INFERENCE_MAKING_ACTOR_NAME.E41", "value")' style="padding-right:2px;"></span><span class="text-muted arches-crud-type-identifier"></span>

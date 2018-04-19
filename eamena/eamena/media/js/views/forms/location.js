@@ -163,18 +163,18 @@ define([
 
 $(function($) {
     PlusMinus = true;	
-  $('#plusminus').click(function() {
+    $('#plusminus').click(function() {
 
-    var wasPlay = $(this).hasClass('fa-plus-square');
-    $(this).removeClass('fa-plus-square fa-minus-square');
-    var klass = wasPlay ? 'fa-minus-square' : 'fa-plus-square';
-    $(this).addClass(klass)
-    if (PlusMinus == true) {
-        $('#tobehidden').show();
-    } else {
-        $('#tobehidden').hide();
-    }
-    PlusMinus = !PlusMinus;
+        var wasPlay = $(this).hasClass('fa-plus-square');
+        $(this).removeClass('fa-plus-square fa-minus-square');
+        var klass = wasPlay ? 'fa-minus-square' : 'fa-plus-square';
+        $(this).addClass(klass)
+        if (PlusMinus == true) {
+            $('#tobehidden').show();
+        } else {
+            $('#tobehidden').hide();
+        }
+        PlusMinus = !PlusMinus;
     }); 
     
-  });
+});

@@ -10,7 +10,6 @@ define(['jquery',
             initialize: function() {
                 BaseForm.prototype.initialize.apply(this);                
                 var self = this;
-                console.log("self.data", self.data);
                 var date_picker = $('.datetimepicker').datetimepicker({pickTime: false});
                 date_picker.on('dp.change', function(evt){
                     $(this).find('input').trigger('change'); 

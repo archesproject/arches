@@ -17,12 +17,12 @@
                                 <!-- Investigator Name -->
                                 <input class="form-control arches-form-input" style="width: 33%;" placeholder='{% trans "Investigator Name" %}' data-bind='value: getEditedNode("INVESTIGATOR_NAME.E41", "value")'>
                                 <!-- Investigator Role -->
-                                <input style="width:18%; padding-top: 2px;" style="width: 33%;" class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('INVESTIGATOR_ROLE_TYPE.E55', 'value'), placeholder: '{% trans "Investigator Role" %}', dataKey: 'INVESTIGATOR_ROLE_TYPE.E55'}"></input>
+                                <input style="width:33%; padding-top: 2px;" class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('INVESTIGATOR_ROLE_TYPE.E55', 'value'), placeholder: '{% trans "Investigator Role" %}', dataKey: 'INVESTIGATOR_ROLE_TYPE.E55'}"></input>
                                 <br>
                                 <!-- Type of Activity -->
-                                <input style="width:18%; padding-top: 2px;" style="width: 33%;" class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('ASSESSMENT_ACTIVITY_TYPE.E55', 'value'), placeholder: '{% trans "Type of Activity" %}', dataKey: 'ASSESSMENT_ACTIVITY_TYPE.E55'}"></input>
+                                <input style="width:33%; padding-top: 2px;" class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('ASSESSMENT_ACTIVITY_TYPE.E55', 'value'), placeholder: '{% trans "Type of Activity" %}', dataKey: 'ASSESSMENT_ACTIVITY_TYPE.E55'}"></input>
                                 <!-- Date of Activity -->
-                                <div class="form-group datetimepicker" style="width:20%;">
+                                <div class="form-group datetimepicker" style="width:33%;padding-top: 2px;">
                                     <div class="input-group">
                                         <input type="text" name="mydate" id="date-from" placeholder='{% trans "date (yyyy-mm-dd)" %}' class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('ASSESSMENT_ACTIVITY_DATE.E49', 'value')} ">
                                         <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
