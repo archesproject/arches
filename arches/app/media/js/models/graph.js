@@ -97,6 +97,7 @@ define(['arches',
                     parentNode.selected(true);
                 }
 
+
                 if (typeof callback === 'function') {
                     scope = scope || self;
                     callback.call(scope, response, status);
@@ -433,6 +434,8 @@ define(['arches',
                 }
             }, this)
 
+            this.tree = this.constructTree();
+
             this.set('selectedNode', ko.computed(function() {
                 var selectedNode = _.find(self.get('nodes')(), function(node){
                     return node.selected();
@@ -459,6 +462,48 @@ define(['arches',
                 }
                 return parentCards;
             }, this);
+        },
+
+        /**
+         * constructTree - created a hierarchical node listing from the nodes and edges
+         * @memberof GraphModel.prototype
+         * @return {object} a hierchical node listing 
+         */
+        constructTree: function(){
+            var lut = {};
+            var sorted = [];
+            var edge_map = {};
+            var nodes = this.get('nodes')();
+            var edges = this.get('edges')();
+
+            function sort(a){
+                var len = a.length;
+                var fix = -1;
+                for (var i = 0; i < len; i++ ){
+                    while (!!~(fix = a.findIndex(e => a[i].parent == e.id)) && fix > i)
+                        [a[i],a[fix]] = [a[fix],a[i]]; // ES6 swap
+                    lut[a[i].id]=i;
+                }
+                //console.log(lut); //check LUT on the console.
+                return a;
+            }
+
+            edges.forEach(function(edge){
+                edge_map[edge.rangenode_id] = edge.domainnode_id;
+            })
+
+            nodes.forEach(function(node){
+                node.children = ko.observableArray([]);
+                node.parent = edge_map[node.id] ? edge_map[node.id] : '#';
+            });
+
+            sorted = sort(nodes.slice(0)); // don't modify things that don't belong to you :)
+            for (var i = sorted.length-1; i >= 0; i--){
+                if (sorted[i].parent != "#") {
+                    sorted[lut[sorted[i].parent]].children.push(sorted.splice(i,1)[0]);
+                }
+            }
+          return sorted;
         },
 
         /**

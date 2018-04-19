@@ -2,11 +2,12 @@ define([
     'underscore',
     'knockout',
     'views/base-manager',
+    'viewmodels/alert',
     'models/graph',
     'views/graph/graph-tree',
     'graph-designer-data',
     'bindings/resizable-sidepanel'
-], function(_, ko, BaseManagerView, GraphModel, GraphTree, data) {
+], function(_, ko, BaseManagerView, AlertViewModel, GraphModel, GraphTree, data) {
     var viewModel = {
         dataFilter: ko.observable(''),
         placeholder: ko.observable(''),
@@ -24,6 +25,11 @@ define([
     viewModel.graphTree = new GraphTree({
         graphModel: viewModel.graphModel
     });
+
+    viewModel.graphTree.on('error', function(response){
+        viewModel.alert(new AlertViewModel('ep-alert-red', response.title, response.message));
+    })
+
 
 
     if (viewModel.activeTab() === 'graph') {

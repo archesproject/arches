@@ -14,9 +14,9 @@ define([
             var filter = this.filter().toLowerCase();
             this.items().forEach(function(item){
                 item.filtered(true);
-                if(item.name().toLowerCase().indexOf(filter) !== -1 ||
+                if (item.name().toLowerCase().indexOf(filter) !== -1 ||
                     item.datatype().toLowerCase().indexOf(filter) !== -1 ||
-                    item.ontologyclass().toLowerCase().indexOf(filter) !== -1){
+                    (!!(item.ontologyclass()) ? item.ontologyclass().toLowerCase().indexOf(filter) !== -1 : false)){
                     item.filtered(false);
                 }
             }, this);
@@ -31,17 +31,6 @@ define([
         initialize: function(options) {
             this.graphModel = options.graphModel;
             this.items = this.graphModel.get('nodes');
-
-            var edge_map = {};
-            this.graphModel.get('edges')().forEach(function(edge){
-                edge_map[edge.rangenode_id] = edge.domainnode_id;
-            })
-
-            this.items().forEach(function(node){
-                node.children = [];
-                node.parent = edge_map[node.id] ? edge_map[node.id] : '#';
-            });
-
             TreeView.prototype.initialize.apply(this, arguments);
         },
 
@@ -63,7 +52,14 @@ define([
 
         deleteNode: function(item, e) {
             e.stopImmediatePropagation();
-            console.log(item);
+            var parentNode = this.graphModel.getParentNode(item);
+            this.graphModel.deleteNode(item, function(response, status){
+                if(status === 'success') {
+                    parentNode.children.remove(item);
+                }else{
+                    this.trigger('error', response.responseJSON);
+                }
+            }, this);
         }
 
     });
