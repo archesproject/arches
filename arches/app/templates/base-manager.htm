@@ -48,7 +48,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             {% endblock navheader %}
 
             <div class="boxed">
-                <div id="content-container" style="{% block content_container_style %}padding-bottom: 20px; padding-top: 0px;{% endblock content_container_style %}">
+                <div id="content-container" style="{% block content_container_style %}padding-bottom: 0px; padding-top: 0px;{% endblock content_container_style %}">
 
                     <!-- ko if: alert() -->
                     <div data-bind="visible: alert().active" style="display: none;" class="relative">
