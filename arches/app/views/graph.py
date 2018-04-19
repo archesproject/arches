@@ -120,12 +120,10 @@ class GraphSettingsView(GraphBaseView):
         data = JSONDeserializer().deserialize(request.body)
         for key, value in data.get('graph').iteritems():
             if key in ['iconclass', 'name', 'author', 'description', 'isresource',
-                'ontology_id', 'version',  'subtitle', 'isactive']:
+                'ontology_id', 'version',  'subtitle', 'isactive', 'color']:
                 setattr(graph, key, value)
 
         node = models.Node.objects.get(graph_id=graphid, istopnode=True)
-        root_node_config = [graph_node['config'] for graph_node in data.get('graph').get('nodes') if graph_node['istopnode']==True][0]
-        node.config = root_node_config
         node.set_relatable_resources(data.get('relatable_resource_ids'))
         node.ontologyclass = data.get('ontology_class') if data.get('graph').get('ontology_id') is not None else None
 
@@ -192,12 +190,10 @@ class NewGraphSettingsView(GraphBaseView):
         data = JSONDeserializer().deserialize(request.body)
         for key, value in data.get('graph').iteritems():
             if key in ['iconclass', 'name', 'author', 'description', 'isresource',
-                'ontology_id', 'version',  'subtitle', 'isactive']:
+                'ontology_id', 'version',  'subtitle', 'isactive', 'color']:
                 setattr(graph, key, value)
 
         node = models.Node.objects.get(graph_id=graphid, istopnode=True)
-        root_node_config = [graph_node['config'] for graph_node in data.get('graph').get('nodes') if graph_node['istopnode']==True][0]
-        node.config = root_node_config
         node.set_relatable_resources(data.get('relatable_resource_ids'))
         node.ontologyclass = data.get('ontology_class') if data.get('graph').get('ontology_id') is not None else None
 

@@ -4,10 +4,9 @@ define([
     'knockout',
     'knockout-mapping',
     'bindings/color-picker',
-    'models/node',
     'arches',
     'bindings/chosen'
-], function ($, _, ko, koMapping, colorPicker, NodeModel, arches) {
+], function ($, _, ko, koMapping, colorPicker, arches) {
     var GraphSettingsViewModel = function(params) {
 
         var self = this;
@@ -30,19 +29,6 @@ define([
         })
 
         var ontologyClass = params.node.ontologyclass;
-        var topNode = _.filter(self.graph.nodes(), function(node) {
-                        if (node.istopnode() === true) {
-                            return node
-                        }
-                        })[0];
-
-        var rootNodeColor = ko.observable('rgba(233,112,111,0.8)')
-        if (_.has(ko.unwrap(topNode.config),'fillColor')) {
-            rootNodeColor = ko.unwrap(topNode.config).fillColor
-        } else {
-            topNode.config = ko.observable({fillColor:rootNodeColor});
-        }
-        var srcRootNodeColor = rootNodeColor();
 
         self.jsonData = ko.computed(function() {
             var relatableResourceIds = _.filter(self.resource_data(), function(resource){
@@ -65,11 +51,6 @@ define([
             return self.jsonData() !== self.jsonCache();
         });
 
-        rootNodeColor.subscribe(function(val){
-            console.log(val);
-        })
-
-        self.rootNodeColor = rootNodeColor;
         self.dirty = dirty;
         self.icon_data = ko.observableArray([]);
         self.iconFilter = params.iconFilter;
@@ -112,7 +93,6 @@ define([
                     graph[key](value);
                 };
             });
-            console.log(srcRootNodeColor);
             JSON.parse(resourceJSON).forEach(function(jsonResource) {
                 var resource = _.find(self.resource_data(), function (resource) {
                     return resource.id === jsonResource.id;

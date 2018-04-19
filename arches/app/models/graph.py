@@ -49,6 +49,7 @@ class Graph(models.GraphModel):
         # self.isresource = False
         # self.isactive = False
         # self.iconclass = ''
+        # self.color = ''
         # self.subtitle = ''
         # self.ontology = None
         # self.functions = []
@@ -1184,7 +1185,7 @@ class Graph(models.GraphModel):
                     if unpermitted_node_edits != None:
                         unpermitted_edits.append(unpermitted_node_edits)
                 db_graph = Graph.objects.get(pk=self.graphid)
-                unpermitted_graph_edits = find_unpermitted_edits(self, db_graph, ['name','ontology_id','subtitle','iconclass','author','description','isactive'])
+                unpermitted_graph_edits = find_unpermitted_edits(self, db_graph, ['name','ontology_id','subtitle','iconclass','author','description','isactive','color'])
                 if unpermitted_graph_edits != None:
                     unpermitted_edits.append(unpermitted_graph_edits)
 
