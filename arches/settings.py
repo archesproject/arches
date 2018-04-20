@@ -89,6 +89,10 @@ MAP_MAX_ZOOM = 19
 MAP_LAYER_FEATURE_LIMIT = 100000
 MAP_EXTENT = ''
 
+## specify the EPSG/SRID to be used for buffer operations on the map.
+## this must be a project coordinate system using meters for units.
+ANALYSIS_COORDINATE_SYSTEM_SRID = 3857
+
 RESOURCE_MARKER_ICON_UNICODE = '\uf060'
 RESOURCE_MARKER_ICON_FONT = 'octicons'
 RESOURCE_MARKER_DEFAULT_COLOR = '#C4171D'

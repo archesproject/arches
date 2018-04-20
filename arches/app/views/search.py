@@ -206,7 +206,7 @@ def _buffer(geojson, width=0, unit='ft'):
 
     if width > 0:
         geom = GEOSGeometry(geojson, srid=4326)
-        geom.transform(3857)
+        geom.transform(settings.ANALYSIS_COORDINATE_SYSTEM_SRID)
 
         if unit == 'ft':
             width = width/3.28084
