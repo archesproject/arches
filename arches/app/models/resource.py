@@ -86,7 +86,6 @@ class Resource(models.ResourceInstance):
         Saves and indexes a single resource
 
         """
-
         request = kwargs.pop('request', '')
         user = kwargs.pop('user', '')
         super(Resource, self).save(*args, **kwargs)
@@ -164,16 +163,16 @@ class Resource(models.ResourceInstance):
         Indexes all the nessesary items values of a resource to support search
 
         """
+        if unicode(self.graph_id) != unicode(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
+            se = SearchEngineFactory().create()
+            datatype_factory = DataTypeFactory()
+            node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list('nodeid', 'datatype')}
+            document, terms = self.get_documents_to_index(datatype_factory=datatype_factory, node_datatypes=node_datatypes)
+            document['root_ontology_class'] = self.get_root_ontology()
+            se.index_data('resource', self.graph_id, JSONSerializer().serializeToPython(document), id=self.pk)
 
-        se = SearchEngineFactory().create()
-        datatype_factory = DataTypeFactory()
-        node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list('nodeid', 'datatype')}
-        document, terms = self.get_documents_to_index(datatype_factory=datatype_factory, node_datatypes=node_datatypes)
-        document['root_ontology_class'] = self.get_root_ontology()
-        se.index_data('resource', self.graph_id, JSONSerializer().serializeToPython(document), id=self.pk)
-
-        for term in terms:
-            se.index_data('strings', 'term', term['_source'], id=term['_id'])
+            for term in terms:
+                se.index_data('strings', 'term', term['_source'], id=term['_id'])
 
     def get_documents_to_index(self, fetchTiles=True, datatype_factory=None, node_datatypes=None):
         """
