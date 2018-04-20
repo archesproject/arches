@@ -51,7 +51,7 @@
         <div class="calendar">
             <h3 class="search-label">{% trans "From" %}</h3>
             <div id="search-from-c">
-                <input class="form-control input-lg" data-bind="value: filter.fromDate, datepicker: {format: format}, disable: dateRangeType() !== 'custom'">
+                <input placeholder="" class="form-control input-lg" data-bind="value: filter.fromDate, datepicker: {format: format, keepInvalid: true}, attr:{'placeholder': format}, disable: dateRangeType() !== 'custom'">
             </div>
         </div>
 
@@ -59,7 +59,7 @@
         <div class="calendar">
             <h3 class="search-label">{% trans "To" %}</h3>
             <div id="search-from-b">
-                <input class="form-control input-lg" data-bind="value: filter.toDate, datepicker: {format: format}, disable: dateRangeType() !== 'custom'">
+                <input placeholder="" class="form-control input-lg" data-bind="value: filter.toDate, datepicker: {format: format, keepInvalid: true}, attr:{'placeholder': format}, disable: dateRangeType() !== 'custom'">
             </div>
         </div>
 

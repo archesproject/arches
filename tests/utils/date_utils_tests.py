@@ -188,6 +188,19 @@ EDTF_DATES = (
     ('y17101e4p3', '1710000000101', '1719999991231'),
 )
 
+NEGATIVE_DATES = (
+    # ******************************* LEVEL 1 *********************************
+    # Uncertain/Approximate
+    # uncertain: possibly the year 1984, but not definitely
+    #('-1984?', '-19839899', '-19838769', '-19849899', '-19828769'),
+    ('-2004-06-11?', '-20039389', '-20039389', '-20039390', '-20039388'),
+    #('-2004-06?', '-20039399', '-20039370', '-20039499', '-20039269'),
+
+    # ('-1295~', '-12949899', '-12948769', '-12959899', '-12938769'),
+    # ('-1295?~', '-12949899', '-12948769', '-12969899', '-12928769'),
+    # ('-0095?~', '-949899', '-948769', '-969899', '-928769'),
+)
+
 NON_EDTF_DATES = (
     # test long year
     ('975845000', '9758450000101', '9758450001231'),
@@ -242,14 +255,18 @@ class SortableDateTests(ArchesTestCase):
         else:
             raise Exception('')
 
+    # def test_edtf_parsing(self):
+    #     for test_case in EDTF_DATES:
+    #         self.parse(test_case)
+
     def test_edtf_parsing(self):
-        for test_case in EDTF_DATES:
-            self.parse(test_case)
+        for test_case in NEGATIVE_DATES:
+            self.parse(test_case)\
 
-    def test_non_edtf_parsing(self):
-        for test_case in NON_EDTF_DATES:
-            self.parse(test_case)
+    # def test_non_edtf_parsing(self):
+    #     for test_case in NON_EDTF_DATES:
+    #         self.parse(test_case)
 
-    def test_invalid_edtf_parsing(self):
-        for test_case in INVALID_EDTF_DATES:
-            self.parse(test_case)
+    # def test_invalid_edtf_parsing(self):
+    #     for test_case in INVALID_EDTF_DATES:
+    #         self.parse(test_case)
