@@ -11,6 +11,9 @@ function ($, arches, ko, koMapping, FunctionViewModel, chosen) {
             var nodegroups = {};
             this.cards = ko.observableArray();
             this.loading = ko.observable(false);
+            this.cards.unshift({
+                'name': null,
+            });
 
             this.graph.cards.forEach(function(card){
                 var found = !!_.find(this.graph.nodegroups, function(nodegroup){
@@ -23,6 +26,7 @@ function ($, arches, ko, koMapping, FunctionViewModel, chosen) {
             }, this);
 
             this.name = params.config.name;
+
             this.description = params.config.description;
             this.map_popup = params.config.map_popup;
 
@@ -57,7 +61,8 @@ function ($, arches, ko, koMapping, FunctionViewModel, chosen) {
                     }
                 });
             }
-
+            console.log(this.cards());
+            console.log(this.name.nodegroup_id());
             window.setTimeout(function(){$("select[data-bind^=chosen]").trigger("chosen:updated")}, 300);
         },
         template: {

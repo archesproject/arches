@@ -58,12 +58,12 @@ class DataTypeFactory(object):
 
 class StringDataType(BaseDataType):
 
-    def validate(self, value, source=None):
+    def validate(self, value, row_number=None, source=None):
         errors = []
         try:
             value.upper()
         except:
-            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, 'this is not a string', 'This data was not imported.')})
+            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} {3} - {4}. {5}'.format(self.datatype_model.datatype, value, source, row_number, 'this is not a string', 'This data was not imported.')})
         return errors
 
     def clean(self, tile, nodeid):
@@ -101,13 +101,13 @@ class StringDataType(BaseDataType):
 
 class NumberDataType(BaseDataType):
 
-    def validate(self, value, source=''):
+    def validate(self, value, row_number=None, source=''):
         errors = []
 
         try:
             decimal.Decimal(value)
         except:
-            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, 'not a properly formatted number', 'This data was not imported.')})
+            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} {3}- {4}. {5}'.format(self.datatype_model.datatype, value, source, row_number, 'not a properly formatted number', 'This data was not imported.')})
         return errors
 
     def transform_import_values(self, value, nodeid):
@@ -139,7 +139,7 @@ class NumberDataType(BaseDataType):
 
 class BooleanDataType(BaseDataType):
 
-    def validate(self, value, source=''):
+    def validate(self, value, row_number=None, source=''):
         errors = []
 
         try:
@@ -163,7 +163,7 @@ class BooleanDataType(BaseDataType):
 
 class DateDataType(BaseDataType):
 
-    def validate(self, value, source=''):
+    def validate(self, value, row_number=None, source=''):
         errors = []
 
         date_formats = ['-%Y','%Y','%Y-%m-%d','%B-%m-%d','%Y-%m-%d %H:%M:%S']
@@ -181,7 +181,7 @@ class DateDataType(BaseDataType):
             else:
                 date_format = date_formats
 
-            errors.append({'type': 'ERROR', 'message': '{0} is not in the correct format, make sure it is in this format: {1} or set the date format in settings.DATE_IMPORT_EXPORT_FORMAT. This data was not imported.'.format(value, date_format)})
+            errors.append({'type': 'ERROR', 'message': '{0} {1} is not in the correct format, make sure it is in this format: {2} or set the date format in settings.DATE_IMPORT_EXPORT_FORMAT. This data was not imported.'.format(value, row_number, date_format)})
 
 
         return errors
@@ -227,10 +227,10 @@ class DateDataType(BaseDataType):
 
 class EDTFDataType(BaseDataType):
 
-    def validate(self, value, source=''):
+    def validate(self, value, row_number=None, source=''):
         errors = []
         if not ExtendedDateFormat(value).is_valid():
-            errors.append({'type': 'ERROR', 'message': '{0} is not in the correct Extended Date Time Format, see http://www.loc.gov/standards/datetime/ for supported formats. This data was not imported.'.format(value)})
+            errors.append({'type': 'ERROR', 'message': '{0} {1} is not in the correct Extended Date Time Format, see http://www.loc.gov/standards/datetime/ for supported formats. This data was not imported.'.format(value, row_number)})
 
         return errors
 
@@ -298,7 +298,7 @@ class EDTFDataType(BaseDataType):
 
 class GeojsonFeatureCollectionDataType(BaseDataType):
 
-    def validate(self, value, source=None):
+    def validate(self, value, row_number=None, source=None):
         errors = []
         coord_limit = 1500
         coordinate_count = 0
@@ -1049,10 +1049,10 @@ class BaseDomainDataType(BaseDataType):
 
 class DomainDataType(BaseDomainDataType):
 
-    def validate(self, value, source=''):
+    def validate(self, value, row_number=None, source=''):
         errors = []
         if len(models.Node.objects.filter(config__options__contains=[{"id": value}])) < 1:
-            errors.append({'type': 'ERROR', 'message': '{0} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(value)})
+            errors.append({'type': 'ERROR', 'message': '{0} {1} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(value, row_number)})
         return errors
 
     def get_search_terms(self, nodevalue, nodeid=None):
@@ -1104,12 +1104,12 @@ class DomainDataType(BaseDomainDataType):
 
 
 class DomainListDataType(BaseDomainDataType):
-    def validate(self, value, source=''):
+    def validate(self, value, row_number=None, source=''):
         errors = []
 
         for v in value:
             if len(models.Node.objects.filter(config__options__contains=[{"id": v}])) < 1:
-                errors.append({'type': 'ERROR', 'message': '{0} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(v)})
+                errors.append({'type': 'ERROR', 'message': '{0} {1} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(v, row_number)})
         return errors
 
     def transform_import_values(self, value, nodeid):
@@ -1205,7 +1205,7 @@ class ResourceInstanceDataType(BaseDataType):
             print 'resource not avalable'
         return resource_names
 
-    def validate(self, value, source=''):
+    def validate(self, value, row_number=None, source=''):
         errors = []
         id_list = self.get_id_list(value)
 
@@ -1255,13 +1255,13 @@ class ResourceInstanceDataType(BaseDataType):
 
 
 class NodeValueDataType(BaseDataType):
-    def validate(self, value, source=''):
+    def validate(self, value, row_number=None, source=''):
         errors = []
         if value:
             try:
                 models.TileModel.objects.get(tileid=value)
             except:
-                errors.append({'type': 'ERROR', 'message': '{0} is not a valid tile id. This data was not imported.'.format(v)})
+                errors.append({'type': 'ERROR', 'message': '{0} {1} is not a valid tile id. This data was not imported.'.format(v, row_number)})
         return errors
 
     def get_display_value(self, tile, node):
