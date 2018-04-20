@@ -23,6 +23,7 @@ class Migration(migrations.Migration):
             from nodes as n
             where n.graphid = g.graphid and g.isresource = true and n.istopnode = true and n.config is not NULL;
             update graphs set color = replace(color, '"', '');
+            update nodes set config = config - 'fillColor' where istopnode = true and config is not NULL;
             """,
             """
             update nodes as n
