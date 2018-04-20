@@ -24,6 +24,7 @@ define([
         graph: koMapping.fromJS(data['graph']),
         ontologies: ko.observable(data['ontologies']),
         ontologyClasses: ko.observable(data['ontologyClasses']),
+        selectedNode: ko.observable(data.graph.root),
     }
 
     viewModel.graphModel = new GraphModel({
@@ -49,6 +50,10 @@ define([
         node: viewModel.graph.root,
         rootNodeColor: ko.observable(''),
         ontology_namespaces: []
+    });
+
+    viewModel.graphTree.on('node-selected', function(response){
+        viewModel.selectedNode(response);
     });
 
     viewModel.loadGraphSettings = function(){
