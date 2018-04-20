@@ -22,7 +22,7 @@ define([
         graphSettingsVisible: ko.observable(false),
         contentLoading: ko.observable(false),
         graph: koMapping.fromJS(data['graph']),
-        ontologies: ko.observableArray([]),
+        ontologies: ko.observable(data['ontologies']),
         ontologyClasses: ko.observable(data['ontologyClasses']),
     }
 

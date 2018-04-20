@@ -102,9 +102,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- Summary Card -->
                 <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'graph' }">
                     <div class="graph-designer-graph-content">
-                    {% block graph_content %}
                     {% include 'views/new-graph-settings.htm' %}
-                    {% endblock graph_content %}
                     </div>
                 </div>
                 <!-- Summary Card -->
@@ -125,7 +123,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             return {
                 graphid: '{{graphid}}',
                 ontologyClasses: {{ontology_classes}},
-                graph: {{graph_json}}
+                ontologies: {{ontologies}},
+                graph: {{graph}}
             };
         });{% endautoescape %}
     </script>

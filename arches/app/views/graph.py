@@ -120,12 +120,10 @@ class GraphSettingsView(GraphBaseView):
         data = JSONDeserializer().deserialize(request.body)
         for key, value in data.get('graph').iteritems():
             if key in ['iconclass', 'name', 'author', 'description', 'isresource',
-                'ontology_id', 'version',  'subtitle', 'isactive']:
+                'ontology_id', 'version',  'subtitle', 'isactive', 'color']:
                 setattr(graph, key, value)
 
         node = models.Node.objects.get(graph_id=graphid, istopnode=True)
-        root_node_config = [graph_node['config'] for graph_node in data.get('graph').get('nodes') if graph_node['istopnode']==True][0]
-        node.config = root_node_config
         node.set_relatable_resources(data.get('relatable_resource_ids'))
         node.ontologyclass = data.get('ontology_class') if data.get('graph').get('ontology_id') is not None else None
 
@@ -143,7 +141,7 @@ class GraphSettingsView(GraphBaseView):
 @method_decorator(group_required('Graph Editor'), name='dispatch')
 class NewGraphSettingsView(GraphBaseView):
     def get(self, request, graphid):
-        self.graph = Graph.objects.get(graphid=graphid)
+        self.graph = models.GraphModel.objects.get(graphid=graphid)
         icons = models.Icon.objects.order_by('name')
         resource_graphs = models.GraphModel.objects.filter(Q(isresource=True)).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         resource_data = []
@@ -157,33 +155,13 @@ class NewGraphSettingsView(GraphBaseView):
                     'graph': res,
                     'is_relatable': (node_model in relatable_resources)
                 })
-
-        ontologies = models.Ontology.objects.filter(parentontology=None)
-        ontology_classes = models.OntologyClass.objects.values('source', 'ontology_id')
+        # ontology_classes = models.OntologyClass.objects.values('source', 'ontology_id')
         node_count=models.Node.objects.filter(graph=self.graph).count()
-        # context = self.get_context_data(
-        #     node_count=models.Node.objects.filter(graph=self.graph).count()
-        # )
-
         data = {
             'icons': JSONSerializer().serializeToPython(icons),
-            'node': JSONSerializer().serializeToPython(node),
-            'ontologies': JSONSerializer().serializeToPython(ontologies),
-            'ontologyClasses': JSONSerializer().serializeToPython(ontology_classes),
-            'resources': JSONSerializer().serializeToPython(resource_data),
-            'ontology_namespaces': get_ontology_namespaces()
+            'node_count': models.Node.objects.filter(graph=self.graph).count(),
+            'resources': JSONSerializer().serializeToPython(resource_data)
         }
-        #
-        # context = self.get_context_data(
-        #     node_count=models.Node.objects.filter(graph=self.graph).count(),
-        # )
-        #
-        # context['nav']['title'] = self.graph.name
-        # context['nav']['menu'] = True
-        # context['nav']['help'] = (_('Defining Settings'),'help/base-help.htm')
-        # context['help'] = 'settings-help'
-
-        # html = render_to_string('views/new-graph-settings.htm', context, request)
         return JSONResponse(data)
 
 
@@ -192,12 +170,10 @@ class NewGraphSettingsView(GraphBaseView):
         data = JSONDeserializer().deserialize(request.body)
         for key, value in data.get('graph').iteritems():
             if key in ['iconclass', 'name', 'author', 'description', 'isresource',
-                'ontology_id', 'version',  'subtitle', 'isactive']:
+                'ontology_id', 'version',  'subtitle', 'isactive', 'color']:
                 setattr(graph, key, value)
 
         node = models.Node.objects.get(graph_id=graphid, istopnode=True)
-        root_node_config = [graph_node['config'] for graph_node in data.get('graph').get('nodes') if graph_node['istopnode']==True][0]
-        node.config = root_node_config
         node.set_relatable_resources(data.get('relatable_resource_ids'))
         node.ontologyclass = data.get('ontology_class') if data.get('graph').get('ontology_id') is not None else None
 
@@ -210,7 +186,6 @@ class NewGraphSettingsView(GraphBaseView):
             'graph': graph,
             'relatable_resource_ids': [res.nodeid for res in node.get_relatable_resources()]
         })
-
 
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
