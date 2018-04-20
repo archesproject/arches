@@ -76,11 +76,21 @@ def get_resource_relationship_types():
 class NewResourceEditorView(MapBaseManagerView):
     def get(self, request, resourceid=None, view_template='views/resource/new-editor.htm', main_script='views/resource/new-editor', nav_menu=True):
         resource_instance = Resource.objects.get(pk=resourceid)
+        cards = resource_instance.graph.cardmodel_set.select_related('nodegroup').all()
+        nodegroups = [card.nodegroup for card in cards]
+
+        displayname = resource_instance.displayname
+        if displayname == 'undefined':
+            displayname = 'Unnamed Resource'
 
         context = self.get_context_data(
             main_script=main_script,
             resourceid=resourceid,
-            graphid=resource_instance.graph_id
+            displayname=displayname,
+            graphid=resource_instance.graph_id,
+            tiles=JSONSerializer().serialize(resource_instance.tilemodel_set.all()),
+            cards=JSONSerializer().serialize(cards),
+            nodegroups=JSONSerializer().serialize(nodegroups),
         )
 
         context['nav']['title'] = ''

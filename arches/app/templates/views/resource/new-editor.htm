@@ -26,16 +26,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block main_content %}
 <div class="content-panel">
     <div class="ep-form-toolbar">
-        top bar
+        <!-- top bar -->
     </div>
 
     <div class="flex">
         <div class="left-panel" data-bind="resizableSidepanel:true">
-            side panel
+            <!-- side panel -->
         </div>
 
         <div class="main-panel">
-            main
+            <!-- main -->
         </div>
     </div>
 </div>
@@ -49,6 +49,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         {% autoescape off %}define('resource-editor-data', [], function() {
             return {
                 graphid: '{{graphid}}',
+                displayname: '{{displayname}}',
+                tiles: {{tiles}},
+                cards: {{cards}},
+                nodegroups: {{nodegroups}}
             };
         });{% endautoescape %}
     </script>
