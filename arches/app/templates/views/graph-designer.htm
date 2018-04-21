@@ -102,11 +102,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- Summary Card -->
                 <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'graph' }">
                     <div class="graph-designer-graph-content" data-bind="visible: selectedNode().nodeid == graph.root.nodeid()">
-                    {% include 'views/new-graph-settings.htm' %}
+                        {% include 'views/new-graph-settings.htm' %}
                     </div>
 
-                    <div class="graph-designer-graph-content" data-bind="visible: selectedNode().nodeid != graph.root.nodeid()">
-                     <div data-bind='text: selectedNode().name'>Node Stuff</div>
+                    <div class="graph-designer-graph-content" data-bind="visible: selectedNode().nodeid != graph.root.nodeid(), with: nodeForm">
+                        {% include 'views/new-node-form.htm' %}
                     </div>
                 </div>
                 <!-- Summary Card -->

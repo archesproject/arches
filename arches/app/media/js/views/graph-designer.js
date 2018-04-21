@@ -7,11 +7,12 @@ define([
     'viewmodels/alert',
     'models/graph',
     'views/graph/graph-tree',
+    'views/graph/graph-manager/new-node-form',
     'graph-designer-data',
     'arches',
     'viewmodels/graph-settings',
     'bindings/resizable-sidepanel'
-], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, GraphModel, GraphTree, data, arches, GraphSettingsViewModel) {
+], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, GraphModel, GraphTree, NodeFormView, data, arches, GraphSettingsViewModel) {
 
     var viewModel = {
         dataFilter: ko.observable(''),
@@ -31,6 +32,15 @@ define([
         data: data.graph,
         datatypes: data.datatypes,
         ontology_namespaces: data.ontology_namespaces
+    });
+
+
+    viewModel.selectedNode(viewModel.graphModel.get('root'));
+
+    viewModel.nodeForm = new NodeFormView({
+        graphModel: viewModel.graphModel,
+        loading: viewModel.contentLoading,
+        node: viewModel.selectedNode
     });
 
     viewModel.graphTree = new GraphTree({
