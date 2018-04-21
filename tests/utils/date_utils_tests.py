@@ -203,8 +203,11 @@ NEGATIVE_DATES = (
 LEAP_YEARS = (
     # ******************************* LEVEL 1 *********************************
     # Uncertain/Approximate
+    # known year, uncertain month
     ('2000-01?', '20000101', '20000131', '19991201', '20000229'),
     ('2001-01?', '20010101', '20010131', '20001201', '20010228'),
+    # uncertain month, year and day known
+    ('2000-(01)?-30', '20000130', '20000130', '19991230', '20000229'),
 )
 
 NON_EDTF_DATES = (
@@ -265,11 +268,11 @@ class SortableDateTests(ArchesTestCase):
         for test_case in EDTF_DATES:
             self.parse(test_case)
 
-    def test_edtf_parsing(self):
+    def test_negative_date_parsing(self):
         for test_case in NEGATIVE_DATES:
             self.parse(test_case)
 
-    def test_edtf_parsing(self):
+    def test_leap_year_parsing(self):
         for test_case in LEAP_YEARS:
             self.parse(test_case)
 
