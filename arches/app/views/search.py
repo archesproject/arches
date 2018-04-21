@@ -24,7 +24,7 @@ from django.shortcuts import render
 from django.apps import apps
 from django.contrib.gis.geos import GEOSGeometry, Polygon
 from django.db import connection
-from django.db.models import Max, Min
+from django.db.models import Q, Max, Min
 from django.http import HttpResponseNotFound
 from django.utils.module_loading import import_string
 from django.utils.translation import ugettext as _
@@ -57,7 +57,7 @@ class SearchView(MapBaseManagerView):
         map_layers = models.MapLayer.objects.all()
         map_markers = models.MapMarker.objects.all()
         map_sources = models.MapSource.objects.all()
-        date_nodes = models.Node.objects.filter(datatype='date', graph__isresource=True, graph__isactive=True)
+        date_nodes = models.Node.objects.filter(Q(datatype='date') | Q(datatype='edtf'), graph__isresource=True, graph__isactive=True)
         resource_graphs = models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
         searchable_datatypes = [d.pk for d in models.DDataType.objects.filter(issearchable=True)]
         searchable_nodes = models.Node.objects.filter(graph__isresource=True, graph__isactive=True, datatype__in=searchable_datatypes, issearchable=True)

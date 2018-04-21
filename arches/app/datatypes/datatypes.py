@@ -243,8 +243,10 @@ class EDTFDataType(BaseDataType):
                 dr = {}
                 if edtf.lower_fuzzy is not None:
                     dr['gte'] = edtf.lower_fuzzy
+                    document['dates'].append({'date': edtf.lower_fuzzy, 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid, 'provisional': provisional})
                 if edtf.upper_fuzzy is not None:
                     dr['lte'] = edtf.upper_fuzzy
+                    document['dates'].append({'date': edtf.upper_fuzzy, 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid, 'provisional': provisional})
                 document['date_ranges'].append({'date_range': dr, 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid, 'provisional': provisional})
 
         # update the indexed tile value to support adv. search

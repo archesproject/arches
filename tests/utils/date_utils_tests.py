@@ -57,7 +57,7 @@ EDTF_DATES = (
     # uncertain: possibly the year 1984, but not definitely
     ('1984?', '19840101', '19841231', '19830101', '19851231'),
     ('2004-06-11?', '20040611', '20040611', '20040610', '20040612'),
-    ('2004-06?', '20040601', '20040630', '20040501', '20040730'),
+    ('2004-06?', '20040601', '20040630', '20040501', '20040731'),
     # "approximately" the year 1984
     ('1984~', '19840101', '19841231', '19830101', '19851231'),
     # the year is approximately 1984 and even that is uncertain
@@ -85,7 +85,7 @@ EDTF_DATES = (
     # interval beginning approximately 1984 and ending June 2004
     ('1984~/2004-06', '19840101', '20040630', '19830101', '20040630'),
     # interval beginning 1984 and ending approximately June 2004
-    ('1984/2004-06~', '19840101', '20040630', '19840101', '20040730'),
+    ('1984/2004-06~', '19840101', '20040630', '19840101', '20040731'),
     ('1984?/2004?~', '19840101', '20041231', '19830101', '20061231'),
     ('1984~/2004~', '19840101', '20041231', '19830101', '20051231'),
     # interval whose beginning is uncertain but thought to be 1984, and whose end is uncertain and approximate but thought to be 2004
@@ -120,15 +120,15 @@ EDTF_DATES = (
     # day is approximate; year, month known
     ('2004-06-(11)~', '20040611', '20040610', '20040612'),
     # Year known, month within year is approximate and uncertain
-    ('2004-(06)?~', '20040601', '20040630', '20040401', '20040830'),
+    ('2004-(06)?~', '20040601', '20040630', '20040401', '20040831'),
     # Year known, month and day uncertain
     ('2004-(06-11)?', '20040611', '20040510', '20040712'),
     # Year uncertain, month known, day approximate
     ('2004?-06-(11)~', '20040611', '20030610', '20050612'),
     # Year uncertain and month is both uncertain and approximate
-    ('(2004-(06)~)?', '20040601', '20040630', '20030401', '20050830'),
+    ('(2004-(06)~)?', '20040601', '20040630', '20030401', '20050831'),
     # This has the same meaning as the previous example.
-    ('2004?-(06)?~', '20040601', '20040630', '20030401', '20050830'),
+    ('2004?-(06)?~', '20040601', '20040630', '20030401', '20050831'),
     # Year uncertain, month and day approximate.
     (('(2004)?-06-04~', '2004?-06-04~'), '20040604', '20030503', '20050705'),
     # Year known, month and day approximate. Note that this has the same meaning as the following.
@@ -188,6 +188,28 @@ EDTF_DATES = (
     ('y17101e4p3', '1710000000101', '1719999991231'),
 )
 
+NEGATIVE_DATES = (
+    # ******************************* LEVEL 1 *********************************
+    # Uncertain/Approximate
+    ('-1984?', '-19839899', '-19838769', '-19849899', '-19828769'),
+    ('-2004-06-11?', '-20039389', '-20039389', '-20039390', '-20039388'),
+    ('-2004-06?', '-20039399', '-20039370', '-20039499', '-20039269'),
+
+    ('-1295~', '-12949899', '-12948769', '-12959899', '-12938769'),
+    ('-1295?~', '-12949899', '-12948769', '-12969899', '-12928769'),
+    ('-0095?~', '-949899', '-948769', '-969899', '-928769'),
+)
+
+LEAP_YEARS = (
+    # ******************************* LEVEL 1 *********************************
+    # Uncertain/Approximate
+    # known year, uncertain month
+    ('2000-01?', '20000101', '20000131', '19991201', '20000229'),
+    ('2001-01?', '20010101', '20010131', '20001201', '20010228'),
+    # uncertain month, year and day known
+    ('2000-(01)?-30', '20000130', '20000130', '19991230', '20000229'),
+)
+
 NON_EDTF_DATES = (
     # test long year
     ('975845000', '9758450000101', '9758450001231'),
@@ -244,6 +266,14 @@ class SortableDateTests(ArchesTestCase):
 
     def test_edtf_parsing(self):
         for test_case in EDTF_DATES:
+            self.parse(test_case)
+
+    def test_negative_date_parsing(self):
+        for test_case in NEGATIVE_DATES:
+            self.parse(test_case)
+
+    def test_leap_year_parsing(self):
+        for test_case in LEAP_YEARS:
             self.parse(test_case)
 
     def test_non_edtf_parsing(self):
