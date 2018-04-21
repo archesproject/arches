@@ -149,59 +149,43 @@ class ExtendedDateFormat(SortableDateRange):
             year_diff = transposed_year - lower_fuzzy.year
             dr.lower_fuzzy = self.to_sortable_date(year=(year - year_diff), month=lower_fuzzy.month, day=lower_fuzzy.day)
 
-        # import ipdb
-        # ipdb.set_trace()
         year = date._precise_year(LATEST)
         month = date._precise_month(LATEST)
         try:
             day = date._precise_day(LATEST)
         except ValueError:
-            day = self.calculate_day(year, month)
-
+            day = self.calculate_upper_day(year, month)
         dr.upper = dr.upper_fuzzy = self.to_sortable_date(year=year, month=month, day=day)
 
         if fuzzy_padding:
-
-            # pseudocode
-
-            # try:
-            #     day = date._precise_day(LATEST)
-            #     if year or month is fuzzy:
-            #         calculate upper_fuzzy
-            #     if day is fuzzy:
-            #         calculate the upper_fuzzy 
-            # except ValueError:
-            #     # day is unknown or not given
-            #     if year or month is fuzzy:
-            #         calculate upper_fuzzy
-            #         caculate the day based on upper_fuzzy
-
-            #     day = self.calculate_day(year, month)
-
             transposed_year = (year % 400) + 400
             upper_fuzzy = datetime.date(year=transposed_year, month=month, day=day) + fuzzy_padding
             year_diff = upper_fuzzy.year - transposed_year
             fuzzy_year = year + year_diff
+            day = upper_fuzzy.day
 
-            try:
-                fuzzy_day = date._precise_day(LATEST)
-            except ValueError:
-                fuzzy_day = self.calculate_day(fuzzy_year, upper_fuzzy.month)
+            # we need to recaculate the day under special circumstances
+            if date.day == None and not self.is_season(date) and (date.precision == PRECISION_YEAR or date.precision == PRECISION_MONTH):
+                day = self.calculate_upper_day(fuzzy_year, upper_fuzzy.month)
+            if date.day >= 29 and upper_fuzzy.month == 2:
+                day = self.calculate_upper_day(fuzzy_year, upper_fuzzy.month)
 
-
-            dr.upper_fuzzy = self.to_sortable_date(year=fuzzy_year, month=upper_fuzzy.month, day=fuzzy_day)
+            dr.upper_fuzzy = self.to_sortable_date(year=fuzzy_year, month=upper_fuzzy.month, day=day)
 
         return dr
 
-    def calculate_day(self, year, month):
+    def calculate_upper_day(self, year, month):
         if month != 2:
             day = calendar.monthrange(1, month)[1]
-        elif is_leap_year(year):
+        elif self.is_leap_year(year):
             day = 29
         else:
             day = 28
 
         return day
+
+    def is_season(self, date):
+        return hasattr(date, 'season') and date.season != None
 
     def handle_set(self, l):
         """Called to handle a list of dates"""
