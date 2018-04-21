@@ -669,7 +669,9 @@ class CsvReader(Reader):
 
                     source_data = column_names_to_targetids(row, mapping, row_number)
 
-                    missing_display_nodes = [n for n in display_nodes if n not in [list(b) for b in zip(*[a.keys() for a in source_data])][0]]
+                    row_keys = [list(b) for b in zip(*[a.keys() for a in source_data])]
+                    if len(row_keys) > 0:
+                        missing_display_nodes = [n for n in display_nodes if n not in row_keys]
                     if len(missing_display_nodes) > 0:
                         errors = []
                         for mdn in missing_display_nodes:
