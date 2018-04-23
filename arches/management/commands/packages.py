@@ -938,10 +938,10 @@ class Command(BaseCommand):
                     extension = "pbf"
                     tile_size = 512
             if config is not None:
-                try:
-                    config['provider']['kwargs']['dbinfo']['database'] = settings.DATABASES['default']['NAME']
-                except:
-                    pass
+                # try:
+                #     config['provider']['kwargs']['dbinfo']['database'] = settings.DATABASES['default']['NAME']
+                # except:
+                #     pass
 
                 with transaction.atomic():
                     tileserver_layer = models.TileserverLayer(
