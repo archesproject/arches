@@ -18,6 +18,7 @@ define(['jquery',
             _.extend(this, options);
             this.defaults = [];
             this.viewModel = JSON.parse(JSON.stringify(this.data[this.dataKey]));
+            
             //this.viewModel.domains = this.data[this.dataKey].domains;
             this.viewModel.branch_lists = koMapping.fromJS(this.data[this.dataKey].branch_lists);
 
@@ -31,7 +32,7 @@ define(['jquery',
                     this.addDefaultNode(entitytypeid, 'value', value);
                 }, this);   
             }
-
+            
             if (this.singleEdit) {
                 _.each(this.viewModel.branch_lists(), function (branch) {
                     if (branch) {
@@ -121,7 +122,77 @@ define(['jquery',
                 owner: this
             }).extend({rateLimit: 50});
         },
-
+        getEditedNodeGroup: function(entitytypeid, key, index){
+            this.addDefaultNode(entitytypeid, key, '', index);
+            return ko.pureComputed({
+                read: function() {
+                    var ret = null;
+                    var list = this.getEditedBranch();
+                    var node_array = [];
+                    _.each(list.nodes(), function(node){
+                        if (node.entitytypeid() === entitytypeid) {
+                            node_array.push(node);
+                        }
+                    }, this);
+                    
+                    if (node_array.length >= index) {
+                        ret = node_array[index-1][key]();
+                    }else{                
+                        ret =""
+                    }
+                    if(ret === null){
+                        _.each(this.defaults, function(defaultNode){
+                            if (defaultNode.entitytypeid === entitytypeid){
+                                var node = koMapping.fromJS(defaultNode);
+                                if(this.singleEdit){
+                                    node.value.subscribe(function() {
+                                        this.trigger('change', 'edit', list);
+                                        this.validate();
+                                    }, this);
+                                } 
+                                list.nodes.push(node); 
+                            }
+                        }, this);
+                    }
+                    return ret
+                },
+                write: function(value){
+                    
+                    _.each(this.viewModel.branch_lists(), function(list){
+                        if(list.editing()){
+                            var grouped_nodes = _.filter(list.nodes(), function(node) {
+                                return node.entitytypeid() === entitytypeid;
+                            });
+                            if (!grouped_nodes || grouped_nodes.length < index) {
+                                var def = {
+                                    property: '',
+                                    entitytypeid: entitytypeid,
+                                    entityid: '',
+                                    value: '',
+                                    label: '',
+                                    businesstablename: '',
+                                    child_entities: []
+                                };
+                                list.nodes.push(koMapping.fromJS(def));
+                            }
+                            console.log("WRITE", index, value, list.nodes().length, koMapping.toJS(list));
+                            var group_length = 0;
+                            _.each(list.nodes(), function(node){
+                                if (node.entitytypeid()=== entitytypeid) {
+                                        group_length++;
+                                        if (group_length === index) {
+                                            _.each(value, function(val, k, list){
+                                                node[k](val);
+                                            }, this);
+                                        }
+                                }
+                            }, this);
+                        }
+                    }, this);
+                },
+                owner: this
+            }).extend({rateLimit: 50});
+        },
         getBranchLists: function() {
             var branch_lists = [];
             _.each(this.viewModel.branch_lists(), function(list){
@@ -150,14 +221,13 @@ define(['jquery',
                     alreadyHasDefault = true;
                 }
             }, this);
-
+            
             if (!alreadyHasDefault){
-                this.defaults.push(def); 
+                this.defaults.push(def);
             }
-
+            
             return def
         },
-
         addItem: function() {
             var branch = this.getEditedBranch();
             var validationAlert = this.$el.find('.branch-invalid-alert');

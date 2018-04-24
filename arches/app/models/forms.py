@@ -82,10 +82,10 @@ class ResourceForm(object):
                 flattened.append(flattenedvalue)
             
             ret.append({'nodes': flattened})
-
         return ret
 
     def update_nodes(self, entitytypeid, data, dataKey=None):
+        
         if dataKey == None:
             dataKey = entitytypeid
 
@@ -96,14 +96,32 @@ class ResourceForm(object):
         for value in data[entitytypeid]:
             baseentity = None
             for newentity in value['nodes']:
-                entity = Entity()
-                if newentity['entitytypeid'] in self.schema:
-                    entity.create_from_mapping(self.resource.entitytypeid, self.schema[newentity['entitytypeid']]['steps'], newentity['entitytypeid'], newentity['value'], newentity['entityid'])
+                if type(newentity) is list:
+                    for newentityitem in newentity:
+                        baseentitygroup = None
+                        for newsubentity in newentityitem:
+                            entity = Entity()
+                            if newsubentity['entitytypeid'] in self.schema:
+                                entity.create_from_mapping(self.resource.entitytypeid, self.schema[newsubentity['entitytypeid']]['steps'], newsubentity['entitytypeid'], newsubentity['value'], '')
+                                if baseentitygroup == None:
+                                    baseentitygroup = entity
+                                else:
+                                    baseentitygroup.merge(entity)
+                        
+                        if baseentity == None:
+                            baseentity = baseentitygroup
+                        else:
+                            baseentity.merge_at(baseentitygroup, entitytypeid)
+                            
 
-                    if baseentity == None:
-                        baseentity = entity
-                    else:
-                        baseentity.merge(entity)
+                else:
+                    entity = Entity()
+                    if newentity['entitytypeid'] in self.schema:
+                        entity.create_from_mapping(self.resource.entitytypeid, self.schema[newentity['entitytypeid']]['steps'], newentity['entitytypeid'], newentity['value'], '')
+                        if baseentity == None:
+                            baseentity = entity
+                        else:
+                            baseentity.merge(entity)
             
             self.resource.merge_at(baseentity, self.resource.entitytypeid)
 
