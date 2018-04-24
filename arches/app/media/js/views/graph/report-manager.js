@@ -68,7 +68,7 @@ require([
         this.loading(true);
         $.ajax({
             type: "DELETE",
-            url: arches.urls.report_editor + report.get('reportid')() + '/delete',
+            url: arches.urls.report_editor + report.get('reportid')(),
             success: function(response) {
                 pageView.viewModel.loading(false);
                 viewModel.reports.remove(report);
