@@ -23,7 +23,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from arches.app.views import concept, main, map, search, graph, tileserver, api
 from arches.app.views.admin import ReIndexResources
 from arches.app.views.graph import GraphManagerView, GraphSettingsView, GraphDataView, DatatypeTemplateView, CardManagerView, CardView, FormManagerView, FormView, ReportManagerView, ReportEditorView, FunctionManagerView, PermissionManagerView, PermissionDataView
-from arches.app.views.resource import ResourceEditorView, ResourceListView, ResourceData, ResourceCards, ResourceReportView, ResourceReportData, RelatedResourcesView, ResourceDescriptors, ResourceEditLogView, ResourceTiles
+from arches.app.views.resource import ResourceEditorView, ResourceListView, ResourceData, ResourceNodeData, ResourceCards, ResourceReportView, ResourceReportData, RelatedResourcesView, ResourceDescriptors, ResourceEditLogView, ResourceTiles
 from arches.app.views.concept import RDMView
 from arches.app.views.user import UserManagerView
 from arches.app.views.tile import TileData
@@ -103,6 +103,7 @@ urlpatterns = [
     url(r'^resource/(?P<resourceid>%s)/history$' % uuid_regex, ResourceEditLogView.as_view(), name='resource_edit_log'),
     url(r'^resource/(?P<resourceid>%s)/data/(?P<formid>%s)$' % (uuid_regex, uuid_regex), ResourceData.as_view(), name='resource_data'),
     url(r'^resource/(?P<resourceid>%s)/cards$' % uuid_regex, ResourceCards.as_view(), name='resource_cards'),
+    url(r'^resource/(?P<resourceid>%s)/node_data/(?P<nodename>.*)$' % uuid_regex, ResourceNodeData.as_view(), name='resource_node_data'),
     url(r'^resource/history$', ResourceEditLogView.as_view(), name="edit_history"),
     url(r'^resource/related/(?P<resourceid>%s|())$' % uuid_regex, RelatedResourcesView.as_view(), name="related_resources"),
     url(r'^resource/descriptors/(?P<resourceid>%s|())$' % uuid_regex, ResourceDescriptors.as_view(), name="resource_descriptors"),
