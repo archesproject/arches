@@ -318,6 +318,9 @@ class Command(BaseCommand):
                 print e
                 print 'Could not connect to db'
 
+        def load_datatypes(package_dir):
+            load_extensions(package_dir, 'datatypes', 'datatype')
+
         def load_graphs(package_dir):
             branches = glob.glob(os.path.join(package_dir, 'graphs', 'branches'))[0]
             resource_models = glob.glob(os.path.join(package_dir, 'graphs', 'resource_models'))[0]
@@ -437,8 +440,6 @@ class Command(BaseCommand):
         def load_functions(package_dir):
             load_extensions(package_dir, 'functions', 'fn')
 
-        def load_datatypes(package_dir):
-            load_extensions(package_dir, 'datatypes', 'datatype')
 
         def handle_source(source):
             if os.path.isdir(source):
