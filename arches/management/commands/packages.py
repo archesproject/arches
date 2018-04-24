@@ -434,6 +434,9 @@ class Command(BaseCommand):
         def load_widgets(package_dir):
             load_extensions(package_dir, 'widgets', 'widget')
 
+        def load_reports(package_dir):
+            load_extensions(package_dir, 'reports', 'report')
+
         def load_functions(package_dir):
             load_extensions(package_dir, 'functions', 'fn')
 
@@ -483,6 +486,8 @@ class Command(BaseCommand):
         load_system_settings(package_location)
         print 'loading widgets'
         load_widgets(package_location)
+        print 'loading reports'
+        load_reports(package_location)
         print 'loading functions'
         load_functions(package_location)
         print 'loading datatypes'
