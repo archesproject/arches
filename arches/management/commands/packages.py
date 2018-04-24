@@ -390,6 +390,8 @@ class Command(BaseCommand):
             business_data += glob.glob(os.path.join(package_dir, 'business_data','*.csv'))
             relations = glob.glob(os.path.join(package_dir, 'business_data', 'relations', '*.relations'))
 
+            business_data.sort()
+
             for path in business_data:
                 if path.endswith('csv'):
                     config_file = path.replace('.csv', '.mapping')
