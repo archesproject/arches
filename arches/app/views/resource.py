@@ -297,6 +297,17 @@ class ResourceData(View):
         return HttpResponseNotFound()
 
 
+@method_decorator(can_edit_resource_instance(), name='dispatch')
+class ResourceNodeData(View):
+    def get(self, request, resourceid=None, nodename=None):
+        if resourceid is not None and nodename is not None:
+            resource_instance = Resource.objects.get(pk=resourceid)
+            ret = resource_instance.get_node_values(nodename)
+            return JSONResponse(ret)
+
+        return HttpResponseNotFound()
+
+
 @method_decorator(can_read_resource_instance(), name='dispatch')
 class ResourceTiles(View):
     def get(self, request, resourceid=None, include_display_values=True):
