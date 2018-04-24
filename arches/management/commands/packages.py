@@ -418,12 +418,13 @@ class Command(BaseCommand):
                 templates = glob.glob(os.path.join(extension, '*.htm'))
                 components = glob.glob(os.path.join(extension, '*.js'))
 
-                if len(templates) == 1 and len(components) == 1:
+                if len(templates) == 1:
                     if os.path.exists(template_dir) == False:
                         os.mkdir(template_dir)
+                    shutil.copy(templates[0], template_dir)
+                if len(components) == 1:
                     if os.path.exists(component_dir) == False:
                         os.mkdir(component_dir)
-                    shutil.copy(templates[0], template_dir)
                     shutil.copy(components[0], component_dir)
 
                 modules = glob.glob(os.path.join(extension, '*.json'))

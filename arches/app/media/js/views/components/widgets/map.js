@@ -1762,7 +1762,7 @@ define([
 
          this.editURL = arches.urls.resource_editor;
     };
-    return ko.components.register('map-widget', {
+    ko.components.register('map-widget', {
         viewModel: viewModel,
         template: {
             require: 'text!widget-templates/map'
