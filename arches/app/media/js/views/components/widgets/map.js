@@ -1624,6 +1624,9 @@ define([
                     this.loadDefaultValue(self.defaultValueType(), true);
                 };
 
+                if (typeof self.onInit === 'function') {
+                    self.onInit(self.map);
+                }
             }; //end setup map
 
             // preprocess relative paths for app tileserver
