@@ -89,6 +89,11 @@ define(['knockout', 'underscore', 'uuid'], function (ko, _, uuid) {
                 }
             };
         };
+
+        this.onInit = params.onInit;
+        if (typeof this.onInit === 'function') {
+            this.onInit();
+        }
     };
     return WidgetViewModel;
 });

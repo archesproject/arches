@@ -175,6 +175,7 @@ class Tile(models.TileModel):
         return edit
 
     def check_for_missing_nodes(self, request):
+        missing_nodes = []
         for nodeid, value in self.data.iteritems():
             datatype_factory = DataTypeFactory()
             node = models.Node.objects.get(nodeid=nodeid)

@@ -431,16 +431,10 @@ class ResourceReportView(MapBaseManagerView):
         widgets = models.Widget.objects.all()
 
         try:
-            if str(report.template_id) == '50000000-0000-0000-0000-000000000002':
-                map_layers = models.MapLayer.objects.all()
-                map_markers = models.MapMarker.objects.all()
-                map_sources = models.MapSource.objects.all()
-                geocoding_providers = models.Geocoder.objects.all()
-            else:
-                map_markers=None
-                map_layers = []
-                map_sources = []
-                geocoding_providers = []
+            map_layers = models.MapLayer.objects.all()
+            map_markers = models.MapMarker.objects.all()
+            map_sources = models.MapSource.objects.all()
+            geocoding_providers = models.Geocoder.objects.all()
         except AttributeError:
             raise Http404(_("No active report template is available for this resource."))
 
