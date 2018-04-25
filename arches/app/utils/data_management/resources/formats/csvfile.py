@@ -641,7 +641,8 @@ class CsvReader(Reader):
                         if bool(tile.data):
                             for target_k, target_v in tile.data.iteritems():
                                 if target_k in required_nodes.keys() and target_v is None:
-                                    populated_tiles.pop(populated_tiles.index(parent_tile))
+                                    if parent_tile in populated_tiles:
+                                        populated_tiles.pop(populated_tiles.index(parent_tile))
                                     errors.append({'type': 'WARNING', 'message': 'The {0} node is required and must be populated in order to populate the {1} nodes. This data was not imported.'.format(required_nodes[target_k],  ', '.join(all_nodes.filter(nodegroup_id=str(target_tile.nodegroup_id)).values_list('name', flat=True)))})
                         elif bool(tile.tiles):
                             for tile_k, tile_v in tile.tiles.iteritems():
