@@ -115,7 +115,30 @@ class SummaryForm(ResourceForm):
                 }
             }
 
+class ModificationForm(ResourceForm):
+    @staticmethod
+    def get_info():
+        return {
+            'id': 'modification',
+            'icon': 'fa-plus',
+            'name': _('Modifications'),
+            'class': ModificationForm
+        }
 
+    def update(self, data, files):
+        self.update_nodes('MODIFACATION.E11', data)
+        return
+
+    def load(self, lang):
+        if self.resource:
+            self.data['MODIFACATION.E11'] = {
+                'branch_lists': self.get_nodes('MODIFACATION.E11'),
+                'domains': {
+                    'CONSTRUCTION_TECHNIQUE_TYPE.E55' : Concept().get_e55_domain('CONSTRUCTION_TECHNIQUE_TYPE.E55'),
+                    'MODIFICATION_TYPE.E55' : Concept().get_e55_domain('MODIFICATION_TYPE.E55'),
+                    'CONSTRUCTION_MATERIAL.E57' : Concept().get_e55_domain('CONSTRUCTION_MATERIAL.E57')
+                }
+            }
 
 # --- Assessment  Summary -> AssessmentSummaryForm ------------------------------------------
 class AssessmentSummaryForm(ResourceForm):

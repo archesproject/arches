@@ -1,0 +1,89 @@
+/* Input Form */
+.form-full-content {
+    margin: 10px;
+}
+
+.form-full-content dl {
+    margin-bottom: 10px !important;
+}
+
+.form-section-header {
+    width: 100%;
+    text-align:left;
+    border-bottom: 1px solid #eee; 
+    line-height: 0.1em;
+    margin: 20px 0px 15px; 
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.form-section-header span {
+    background: #fff;
+    padding-right: 10px;
+}
+
+.form-section-subheader {
+    width: 100%;
+    text-align:center;
+    border-bottom: 1px solid #eee; 
+    line-height: 0.1em;
+    margin: 20px 0px 15px; 
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.form-section-subheader span {
+    background: #fff;
+    padding-right: 10px;
+    padding-left: 10px;
+}
+
+.form-group {
+    width: 100%;
+    margin-bottom: 0px !important;
+}
+
+.form-section-input {
+    padding-left:0px !important;
+    padding-right:0px !important;
+}
+
+.filler-text-inline {
+    height: 21px;
+}
+
+.filler-text-block {
+    height: 24px;
+}
+
+.arches-crud-child-section-new {
+    margin-top: 5px;
+}
+
+@media screen and (min-width: 768px) {
+    .add-padding-right {
+        padding-right: 5px !important;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .add-button-column {
+        padding-left: 0px !important;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .add-margin-top {
+        margin-top: 5px !important;
+    }
+}
+
+.arches-select2-crud-form  {
+    width: 100%;
+}
+
+.arches-form-input {
+    width: 100% !important;
+}
+
+/* Input Form end */

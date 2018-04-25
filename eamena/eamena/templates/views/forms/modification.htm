@@ -1,0 +1,92 @@
+{% extends "views/forms/base.htm" %}
+{% load i18n %}
+
+
+
+{% block form_content %}
+<div class="form-full-content">
+    <div class="row">
+        <div class="col-xs-12 margin-bottom-10">
+            <div class="form-section-header"><span>{% trans "Modifications" %}</span></div>
+        </div>
+    </div>
+    <div id="modification-section">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9">
+                <div class="col-xs-6 form-section-input add-padding-right">
+                    <div class="form-group">
+                        <input class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('MODIFICATION_TYPE.E55', 'value'), placeholder: '{% trans 'Modification Type' %}', dataKey: 'MODIFICATION_TYPE.E55'}"></input>
+                    </div>
+                </div>
+                <div class="col-xs-6 form-section-input">
+                    <div class="form-group datetimepicker">
+                        <div class="input-group">
+                            <input type="text" name="mydate" id="date-from" placeholder='{% trans "date (yyyy-mm-dd)" %}' class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('MODIFICATION_DATE.E49', 'value')} ">
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 form-section-subheader">
+                    <span>{% trans "Description of Modification" %}</span>
+                </div>
+                <div class="col-xs-12 form-section-input margin-top-5">
+                    <div class="form-group">
+                        <div class="summernote" data-bind="summernote: {value: getEditedNode('MODIFICATION_DESCRIPTION.E62', 'value'), options:{}}"></div>
+                    </div>
+                </div>
+                <div class="col-xs-12 form-section-subheader">
+                    <span>{% trans "Construction" %}</span>
+                </div>
+                <div class="col-xs-6 form-section-input margin-top-5 add-padding-right">
+                    <div class="form-group">
+                        <input class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('CONSTRUCTION_TECHNIQUE_TYPE.E55', 'value'), placeholder: '{% trans 'Construction Technique Type' %}', dataKey: 'CONSTRUCTION_TECHNIQUE_TYPE.E55'}"></input>
+                    </div>
+                </div>
+                <div class="col-xs-6 form-section-input margin-top-5">
+                    <div class="form-group">
+                        <input class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('CONSTRUCTION_MATERIAL.E57', 'value'), placeholder: '{% trans 'Construction Material' %}', dataKey: 'CONSTRUCTION_MATERIAL.E57'}"></input>
+                    </div>
+                </div>
+                <div class="col-xs-12 form-section-input margin-top-5">
+                    <input class="form-control arches-form-input" placeholder='{% trans "Construction Note" %}' data-bind='value: getEditedNode("CONSTRUCTION_NOTE.E62", "value")'></input>
+                </div>
+                
+            </div>
+            <div class="col-xs-12 col-sm-3 add-button-column add-margin-top">
+                {% include 'views/components/add-item-button.htm' %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-9">
+                <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "All values must be populated, and dates must be valid (YYYY-MM-DD)." %}</div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="arches-crud-child-section-new">
+                    <dl>
+                        <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                            <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue filler-text-block nr"></div>
+                            <div data-bind='foreach: getBranchLists()'>
+                                <div class="arches-crud-record" style="display:block;">
+                                    <a href="javascript:void(0)" title="remove"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                    <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" title="{% trans 'edit' %}" data-bind='click: $parent.editItem.bind($parent)'>
+                                        <span data-bind="text: nodes.get('MODIFICATION_TYPE.E55', 'label')"></span>
+                                    </a><span class="text-muted" data-bind="html: nodes.get('MODIFICATION_DATE.E49', 'label').slice(0,10)"></span><br>
+                                    <span data-bind="html: nodes.get('MODIFICATION_DESCRIPTION.E62', 'value')"></span><br>
+                                    <span data-bind="html: nodes.get('CONSTRUCTION_TECHNIQUE_TYPE.E55', 'label')"></span><span class="text-muted">&nbsp;({% trans "Construction Technique" %})</span><br>
+                                    <span data-bind="html: nodes.get('CONSTRUCTION_MATERIAL.E57', 'label')"></span><span class="text-muted">&nbsp;({% trans "Construction Material" %})</span><br>
+                                    <span data-bind="html: nodes.get('CONSTRUCTION_NOTE.E62', 'value')"></span><span class="text-muted">&nbsp;({% trans "Construction Note" %})</span>
+                                </div>
+                            </div>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+{% include 'views/forms/sections/SaveEditsFooter.htm' %}
+{% endblock form_content %}
