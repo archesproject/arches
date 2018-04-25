@@ -114,6 +114,45 @@ class SummaryForm(ResourceForm):
                     'GENERAL_DESCRIPTION_TYPE.E55' : Concept().get_e55_domain('GENERAL_DESCRIPTION_TYPE.E55')
                 }
             }
+            
+class FeatureSummaryForm(ResourceForm):
+    @staticmethod
+    def get_info():
+        return {
+            'id': 'summary-feature',
+            'icon': 'fa-align-center',
+            'name': _('Resource Summary'),
+            'class': FeatureSummaryForm
+        }
+
+    def update(self, data, files):
+        self.update_nodes('NAME.E41', data)
+        self.update_nodes('HERITAGE_CLASSIFICATION_TYPE.E55', data)
+        self.update_nodes('RIGHT.E30', data)
+        self.update_nodes('DESCRIPTION_ASSIGNMENT.E13', data)
+        return
+
+    def load(self, lang):
+        if self.resource:
+            self.data['NAME.E41'] = {
+                'branch_lists': self.get_nodes('NAME.E41'),
+                'domains': {'NAME_TYPE.E55' : Concept().get_e55_domain('NAME_TYPE.E55')}
+            }
+            self.data['HERITAGE_CLASSIFICATION_TYPE.E55'] = {
+                'branch_lists': self.get_nodes('HERITAGE_CLASSIFICATION_TYPE.E55'),
+                'domains': {'HERITAGE_CLASSIFICATION_TYPE.E55' : Concept().get_e55_domain('HERITAGE_CLASSIFICATION_TYPE.E55')}
+            }            
+            
+            self.data['RIGHT.E30'] = {
+                'branch_lists': datetime_nodes_to_dates(self.get_nodes('RIGHT.E30')),
+                'domains': {'DESIGNATION_TYPE.E55' : Concept().get_e55_domain('DESIGNATION_TYPE.E55')}
+            }
+            self.data['DESCRIPTION_ASSIGNMENT.E13'] = {
+                'branch_lists': self.get_nodes('DESCRIPTION_ASSIGNMENT.E13'),
+                'domains': {
+                    'GENERAL_DESCRIPTION_TYPE.E55' : Concept().get_e55_domain('GENERAL_DESCRIPTION_TYPE.E55')
+                }
+            }
 
 
 
@@ -854,11 +893,16 @@ class LocationForm(ResourceForm):
 
     def update(self, data, files):
 
-        #if self.resource.entitytypeid not in ['ACTOR.E39']:
         self.update_nodes('GEOMETRIC_PLACE_EXPRESSION.SP5', data)
         self.update_nodes('GEOMETRY_EXTENT_CERTAINTY.I6', data)
         self.update_nodes('GRID_ID.E42', data)
-        self.update_nodes('SITE_OVERALL_SHAPE_TYPE_NEW.E55', data)
+        
+        if self.resource.entitytypeid == 'HERITAGE_FEATURE.E24':
+            siteshape_node = 'SITE_OVERALL_SHAPE_TYPE.E55'
+        else:
+            siteshape_node = 'SITE_OVERALL_SHAPE_TYPE_NEW.E55'
+        self.update_nodes(siteshape_node, data)
+        
         self.update_nodes('TOPOGRAPHY_TYPE.E55', data)
         self.update_nodes('COUNTRY_TYPE.E55', data)
         self.update_nodes('ADMINISTRATIVE_DIVISION.E53', data)
@@ -868,6 +912,7 @@ class LocationForm(ResourceForm):
         return
 
     def load(self, lang):
+    
         geom = self.get_nodes('GEOMETRIC_PLACE_EXPRESSION.SP5')[0]['nodes'][0] if self.get_nodes('GEOMETRIC_PLACE_EXPRESSION.SP5') else ''
         self.data['GEOMETRIC_PLACE_EXPRESSION.SP5'] = {
             'branch_lists': self.get_nodes('GEOMETRIC_PLACE_EXPRESSION.SP5'),
@@ -892,10 +937,15 @@ class LocationForm(ResourceForm):
                 'domains': {}
             }
         
-        self.data['SITE_OVERALL_SHAPE_TYPE_NEW.E55'] = {
-            'branch_lists': self.get_nodes('SITE_OVERALL_SHAPE_TYPE_NEW.E55'),
+        if self.resource.entitytypeid == 'HERITAGE_FEATURE.E24':
+            siteshape_node = 'SITE_OVERALL_SHAPE_TYPE.E55'
+        else:
+            siteshape_node = 'SITE_OVERALL_SHAPE_TYPE_NEW.E55'
+            
+        self.data[siteshape_node] = {
+            'branch_lists': self.get_nodes(siteshape_node),
             'domains': {
-                'SITE_OVERALL_SHAPE_TYPE_NEW.E55': Concept().get_e55_domain('SITE_OVERALL_SHAPE_TYPE_NEW.E55')
+                siteshape_node: Concept().get_e55_domain(siteshape_node)
             }
         }
         
