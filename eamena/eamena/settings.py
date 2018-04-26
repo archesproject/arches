@@ -39,7 +39,7 @@ def RESOURCE_TYPE_CONFIGS():
         'HERITAGE_RESOURCE_GROUP.E27': {
             'resourcetypeid': 'HERITAGE_RESOURCE_GROUP.E27',
             'name': _('Heritage Place'),
-            'icon_class': 'fa fa-map-marker',
+            'icon_class': 'fa fa-stop',
             'default_page': 'summary',
             'default_description': _('No name available'),
             'description_node': _('NAME.E41'),
@@ -58,8 +58,8 @@ def RESOURCE_TYPE_CONFIGS():
         'HERITAGE_FEATURE.E24': {
             'resourcetypeid': 'HERITAGE_FEATURE.E24',
             'name': _('Heritage Feature'),
-            'icon_class': 'fa fa-university',
-            'default_page': 'summary',
+            'icon_class': 'fa fa-th-large',
+            'default_page': 'summary-feature',
             'default_description': _('No name available'),
             'description_node': _('NAME.E41'),
             'categories': [_('Resource')],
@@ -73,6 +73,25 @@ def RESOURCE_TYPE_CONFIGS():
                 'lookup_value': 'Primary'
             },
             'sort_order': 2
+        },
+        'HERITAGE_COMPONENT.B2': {
+            'resourcetypeid': 'HERITAGE_COMPONENT.B2',
+            'name': _('Heritage Component'),
+            'icon_class': 'fa fa-th',
+            'default_page': 'summary-component',
+            'default_description': _('No name available'),
+            'description_node': _('NAME.E41'),
+            'categories': [_('Resource')],
+            'has_layer': True,
+            'on_map': True,
+            'marker_color': '#FFC53D',
+            'stroke_color': '#d9b562',
+            'fill_color': '#eedbad',
+            'primary_name_lookup': {
+                'entity_type': 'HERITAGE_COMPONENT_ID.E42',
+                'lookup_value': 'Primary'
+            },
+            'sort_order': 3
         },
         'ACTOR.E39': {
             'resourcetypeid': 'ACTOR.E39',
@@ -91,7 +110,7 @@ def RESOURCE_TYPE_CONFIGS():
                 'entity_type': 'EAMENA_ID.E42',
                 'lookup_value': 'Primary'
             },
-            'sort_order': 3
+            'sort_order': 4
         },
         'INFORMATION_RESOURCE.E73': {
             'resourcetypeid': 'INFORMATION_RESOURCE.E73',
@@ -110,7 +129,7 @@ def RESOURCE_TYPE_CONFIGS():
                 'entity_type': 'EAMENA_ID.E42',
                 'lookup_value': 'Primary'
             },
-            'sort_order': 4
+            'sort_order': 5
         }
     }
 
