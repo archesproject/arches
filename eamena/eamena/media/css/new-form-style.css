@@ -82,8 +82,14 @@
     width: 100%;
 }
 
-.arches-form-input {
+.arches-form-input-100 {
     width: 100% !important;
+}
+.arches-form-input-40 {
+    width: 40% !important;
+}
+.arches-form-input-33 {
+    width: 33% !important;
 }
 
 /* Input Form end */
