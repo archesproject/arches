@@ -382,9 +382,18 @@ class Command(BaseCommand):
             load_tile_server_layers(tile_server_overlays, False)
 
         def load_business_data(package_dir):
+            config_paths = glob.glob(os.path.join(package_dir, 'package_config.json'))
+            if len(config_paths) > 0:
+                configs = json.load(open(config_paths[0]))
+
             business_data = []
-            business_data += glob.glob(os.path.join(package_dir, 'business_data','*.json'))
-            business_data += glob.glob(os.path.join(package_dir, 'business_data','*.csv'))
+            if 'business_data_files' in configs and len(configs['business_data_files']) > 0:
+                for f in configs['business_data_files']:
+                    business_data.append(os.path.join(package_dir, 'business_data', f))
+            else:
+                business_data += glob.glob(os.path.join(package_dir, 'business_data','*.json'))
+                business_data += glob.glob(os.path.join(package_dir, 'business_data','*.csv'))
+
             relations = glob.glob(os.path.join(package_dir, 'business_data', 'relations', '*.relations'))
 
             for path in business_data:
