@@ -69,8 +69,12 @@ class Resource(ArchesResource):
                 # forms.TestWizForm.get_info(),
         
             ]
-
-
+            
+        elif self.entitytypeid == 'HERITAGE_FEATURE.E24':
+            description_group['forms'][:0] = [
+                forms.ModificationForm.get_info(),
+            ]
+            
         elif self.entitytypeid == 'ACTIVITY.E7':
             description_group['forms'][:0] = [
                 forms.ActivitySummaryForm.get_info(),
