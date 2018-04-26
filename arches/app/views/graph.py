@@ -260,13 +260,11 @@ class GraphDesignerView(GraphBaseView):
             datatypes=datatypes_json,
             ontology_namespaces = get_ontology_namespaces()
         )
-        context['ontologies'] = JSONSerializer().serialize(ontologies)
+        context['ontologies'] = JSONSerializer().serialize(ontologies, exclude=['version', 'path'])
         context['ontology_classes'] = JSONSerializer().serialize(ontology_classes)
         context['nav']['title'] = self.graph.name
         #context['nav']['menu'] = True
-        context['graph_models'] = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-        context['graphs'] = JSONSerializer().serialize(context['graph_models'], exclude = ['functions'])
-        context['graph'] = JSONSerializer().serialize(self.graph, exclude = ['functions'])
+        context['graph'] = JSONSerializer().serialize(self.graph, exclude = ['functions', 'cards', 'widgets', 'deploymentfile', 'deploymentdate', '_nodegroups_to_delete', '_functions'])
         return render(request, 'views/graph-designer.htm', context)
 
 
