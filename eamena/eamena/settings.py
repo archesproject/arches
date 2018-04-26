@@ -91,7 +91,7 @@ def RESOURCE_TYPE_CONFIGS():
                 'entity_type': 'HERITAGE_COMPONENT_ID.E42',
                 'lookup_value': 'Primary'
             },
-            'sort_order': 2
+            'sort_order': 3
         },
         'ACTOR.E39': {
             'resourcetypeid': 'ACTOR.E39',
@@ -110,7 +110,7 @@ def RESOURCE_TYPE_CONFIGS():
                 'entity_type': 'EAMENA_ID.E42',
                 'lookup_value': 'Primary'
             },
-            'sort_order': 3
+            'sort_order': 4
         },
         'INFORMATION_RESOURCE.E73': {
             'resourcetypeid': 'INFORMATION_RESOURCE.E73',
@@ -129,7 +129,7 @@ def RESOURCE_TYPE_CONFIGS():
                 'entity_type': 'EAMENA_ID.E42',
                 'lookup_value': 'Primary'
             },
-            'sort_order': 4
+            'sort_order': 5
         }
     }
 
