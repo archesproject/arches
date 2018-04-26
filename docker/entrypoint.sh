@@ -132,6 +132,15 @@ wait_for_db() {
 		sleep 1
 	done
 	echo "Database server is up"
+
+    echo "Testing if Elasticsearch is up..."
+    while [[ ! ${return_code} == 0 ]]
+    do
+        curl -s "http://${ESHOST}:${ESPORT}" >&/dev/null
+        return_code=$?
+        sleep 1
+    done
+    echo "Elasticsearch is up"
 }
 
 db_exists() {
