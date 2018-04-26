@@ -122,12 +122,11 @@ setup_arches() {
 	run_migrations
 }
 
-
 wait_for_db() {
 	echo "Testing if database server is up..."
 	while [[ ! ${return_code} == 0 ]]
 	do
-		psql -h ${PGHOST} -p ${PGPORT} -U postgres -c "select 1" >&/dev/null
+		psql -h ${PGHOST} -p ${PGPORT} -U ${PGUSERNAME} -c "select 1" >&/dev/null
 		return_code=$?
 		sleep 1
 	done
