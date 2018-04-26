@@ -1,5 +1,48 @@
 /*App wide CSS*/
 
+
+/* The Modal (background) */
+#Disclaimer {
+	display: none; /* Hidden by default */
+	position: fixed; /* Stay in place */
+	
+	left: 0;
+	top: 0;
+	width: 100%; /* Full width */
+	height: 100%; /* Full height */
+	overflow: auto; /* Enable scroll if needed */
+	background-color: rgb(0,0,0); /* Fallback color */
+	background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+#Disclaimer .modal-content {
+	z-index: 1; /* Sit on top */
+	overflow: auto; /* Enable scroll if needed */
+	background-color: #fefefe;
+	margin: 15% auto; /* 15% from the top and centered */
+	padding: 20px;
+	border: 1px solid #888;
+	width: 40%; /* Could be more or less, depending on screen size */
+	height: 300px;
+
+}
+#Disclaimer .modal-content h3 {
+	font-size: 22px;
+}
+#Disclaimer .modal-content h5 {
+	font-size: 18px;
+}
+
+/* Buttons */
+#Disclaimer .disclaimer-button {
+	text-align: center;
+}
+
+
+
+/* The Modal (background) END */
+
 #scale-line {
 	  float: right;
 	  z-index: 900 !important;
