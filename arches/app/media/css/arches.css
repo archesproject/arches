@@ -394,12 +394,6 @@ input[type="checkbox"] {
     padding: 5px 0 10px 10px;
 }
 
-.graph-settings-header {
-    color: #777;
-    font-size: 17px;
-    border-bottom: solid 1px #ccc;
-}
-
 .graph-settings-crud {
     margin-right: 0px;
     position: absolute;
@@ -2080,6 +2074,29 @@ ul.nav.nav-tabs.nav-justified {
     color: #666;
     padding: 15px 0 5px 5px;
 }
+
+.graph-designer-graph-content .graph-designer-title {
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: 0;
+    margin-bottom: 5px;
+    color: #555;
+    padding: 15px 0 5px 0px;
+    display: flex;
+    flex-direction:row;
+    align-items: center;
+}
+
+.graph-designer-title .name {
+    padding-left: 10px;
+}
+
+.graph-designer-header {
+    color: #777;
+    font-size: 15px;
+    border-bottom: solid 1px #ccc;
+}
+
 
 .node-subtitle {
     font-size: 12px;

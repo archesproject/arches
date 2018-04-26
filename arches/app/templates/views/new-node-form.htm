@@ -1,22 +1,17 @@
 {% load i18n %}
-<h4 class="title-block-title">
-    <span class="node-title" data-bind="text: (node() && node().name()) ? node().name() : '{% trans "Unnamed node" %}'"></span>
-</h4>
+<div style="overflow-y: auto">
+    <div id="external-page-content">
+        <div style="padding: 12px;">
 
-<div class="relative">
-    <a id="node-crud-close" href="javascript:void(0)" class="library-close-btn" data-bind="click: close" style="margin-top:-5px;"><i class="ion-ios-close"></i></a>
-</div>
+        <div class="panel-heading">
+            <div class="graph-designer-title"><div data-bind="text: (node() && node().name()) ? node().name() : '{% trans "Unnamed node" %}'"></div></div>
+        </div>
 
-<!-- Tabs Content -->
-<div class="tab-content listing-container">
+    <div class="graph-designer-header">{% trans 'Node Identifiers' %}</div>
 
-    <!--Node Listing tab -->
-
-    <div id="node-form" class="tab-pane fade in active">
+    <div class="panel-body card-body fade in">
         <!-- ko if: node() -->
         <div class="node-section">
-
-            <div>
 
                 <div class="node-widget-label">
                     <div class="control-label">
@@ -61,6 +56,7 @@
 
                 <!-- /ko -->
                 <!-- /ko -->
+                <div class="graph-designer-header">{% trans 'Node Data Type' %}</div>
 
                 <div class="node-widget-label">
                     <div class="control-label">
@@ -90,8 +86,6 @@
                     params: node()
                 }'></div>
                 <!-- /ko -->
-
-            </div>
 
         </div>
 
@@ -138,4 +132,6 @@
         <!-- /ko -->
     </div>
 
+</div>
+</div>
 </div>

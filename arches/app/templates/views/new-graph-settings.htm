@@ -5,10 +5,10 @@
         <div style="padding: 12px;">
             <div>
                 <div class="panel-heading">
-                    <div style="display: flex; flex-direction:row; align-items: center"><i data-bind='css: graph.iconclass'></i><div class="panel-title card-main-title" data-bind='text: graph.name'></div></span></div>
+                    <div class="graph-designer-title"><i data-bind='css: graph.iconclass'></i><div class="name" data-bind='text: graph.name'></div></div>
                 </div>
 
-                <div class="graph-settings-header">{% trans 'Resource Model Identifiers' %}</div>
+                <div class="graph-designer-header">{% trans 'Resource Model Identifiers' %}</div>
 
                 <!-- Data Entry -->
                 <div class="panel-body card-body fade in">
@@ -70,7 +70,7 @@
             </div>
 
 
-            <div class="graph-settings-header">{% trans 'Configuration' %}</div>
+            <div class="graph-designer-header">{% trans 'Configuration' %}</div>
             <div class="panel-body card-body fade in">
 
                 <div id="meta-card">
@@ -123,7 +123,7 @@
                 </div>
 
 
-                <div class="graph-settings-header">{% trans 'Appearance' %}</div>
+                <div class="graph-designer-header">{% trans 'Appearance' %}</div>
                 <div class="panel-body fade in">
                 <div class="card-content">
 
@@ -213,7 +213,7 @@
 
 
             <!-- Card -->
-            <div class="graph-settings-header">{% trans 'Description' %}</div>
+            <div class="graph-designer-header">{% trans 'Description' %}</div>
             <div id="desc-card">
                 <div class="panel-body card-panel-body">
                     <div class="card-content">
