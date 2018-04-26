@@ -48,7 +48,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <!-- Header for larger screens -->
                     <div class="col-md-12 hidden-xs hidden-sm">
                         <h2 class="margin-top-10 margin-bottom-0 text-primary">
-                            <i class="fa fa-trophy text-primary"></i>
+                            <i class="{{ resource_icon }} text-primary"></i>
                             {% if resourceid %}<a href="{% url 'report' resourceid %}" target="_blank">{{ resource_name }}</a>{% else %}{{ resource_name }}{% endif %} <small class="text-primary">{{ resource_type_name }}</small>
                         </h2>
                     </div>
@@ -56,7 +56,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <!-- Header for small screens -->
                     <div class="col-sm-12 hidden-xs hidden-md hidden-lg">
                         <h2 class="margin-bottom-0 text-primary" style="margin-top: 15px;">
-                            <i class="fa fa-trophy text-primary"></i>
+                            <i class="{{ resource_icon }} text-primary"></i>
                             {% if resourceid %}<a href="{% url 'report' resourceid %}" target="_blank">{{ resource_name }}</a>{% else %}{{ resource_name }}{% endif %} <small class="text-primary">{{ resource_type_name }}</small>
                         </h2>
                     </div>
@@ -64,7 +64,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <!-- Header for xtra small screens -->
                     <div class="col-xs-12 hidden-sm hidden-md hidden-lg">
                         <h2 class="margin-bottom-10 margin-top-minus-10 text-center text-primary">
-                            <i class="fa fa-trophy text-primary"></i>
+                            <i class="{{ resource_icon }} text-primary"></i>
                             {% if resourceid %}<a href="{% url 'report' resourceid %}" target="_blank">{{ resource_name }}</a>{% else %}{{ resource_name }}{% endif %} <small class="text-primary">{{ resource_type_name }}</small>
                         </h2>
                     </div> 

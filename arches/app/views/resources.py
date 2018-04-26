@@ -47,7 +47,7 @@ def resource_manager(request, resourcetypeid='', form_id='default', resourceid='
         resource = Resource(resourceid)
     elif resourcetypeid != '':
         resource = Resource({'entitytypeid': resourcetypeid})
-
+ 
     if form_id == 'default':
         form_id = resource.form_groups[0]['forms'][0]['id']
 
@@ -100,6 +100,7 @@ def resource_manager(request, resourcetypeid='', form_id='default', resourceid='
                     'min_date': min_max_dates['val__min'].year if min_max_dates['val__min'] != None else 0,
                     'max_date': min_max_dates['val__max'].year if min_max_dates['val__min'] != None else 1,
                     'timefilterdata': JSONSerializer().serialize(Concept.get_time_filter_data()),
+                    'resource_icon': settings.RESOURCE_TYPE_CONFIGS()[resourcetypeid]['icon_class']
                 },
                 context_instance=RequestContext(request))
         else:
