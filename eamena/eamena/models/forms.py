@@ -126,13 +126,13 @@ class ModificationForm(ResourceForm):
         }
 
     def update(self, data, files):
-        self.update_nodes('MODIFACATION.E11', data)
+        self.update_nodes('MODIFICATION.E11', data)
         return
 
     def load(self, lang):
         if self.resource:
-            self.data['MODIFACATION.E11'] = {
-                'branch_lists': self.get_nodes('MODIFACATION.E11'),
+            self.data['MODIFICATION.E11'] = {
+                'branch_lists': self.get_nodes('MODIFICATION.E11'),
                 'domains': {
                     'CONSTRUCTION_TECHNIQUE_TYPE.E55' : Concept().get_e55_domain('CONSTRUCTION_TECHNIQUE_TYPE.E55'),
                     'MODIFICATION_TYPE.E55' : Concept().get_e55_domain('MODIFICATION_TYPE.E55'),
