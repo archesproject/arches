@@ -25,6 +25,7 @@ else
 fi
 
 DJANGO_PORT=${DJANGO_PORT:-8000}
+COUCHDB_URL="http://$COUCHDB_USER:$COUCHDB_PASS@$COUCHDB_HOST:$COUCHDB_PORT"
 
 cd_web_root() {
 	cd ${WEB_ROOT}
@@ -83,6 +84,10 @@ setup_arches() {
 	echo "Running: python manage.py packages -o setup_db"
 	python manage.py packages -o setup_db
 
+    echo "Running: Creating couchdb system databaess"
+    curl -X PUT ${COUCHDB_URL}/_users
+    curl -X PUT ${COUCHDB_URL}/_global_changes
+    curl -X PUT ${COUCHDB_URL}/_replicator
 
 	if [[ "${INSTALL_DEFAULT_GRAPHS}" == "True" ]]; then
 		# Import graphs
@@ -168,8 +173,6 @@ install_yarn_components() {
 	cd_yarn_folder
 	yarn install
 }
-
-
 
 
 #### Misc
