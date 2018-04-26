@@ -387,8 +387,8 @@ class Command(BaseCommand):
                 configs = json.load(open(config_paths[0]))
 
             business_data = []
-            if 'business_data_files' in configs and len(configs['business_data_files']) > 0:
-                for f in configs['business_data_files']:
+            if 'business_data_load_order' in configs and len(configs['business_data_load_order']) > 0:
+                for f in configs['business_data_load_order']:
                     business_data.append(os.path.join(package_dir, 'business_data', f))
             else:
                 business_data += glob.glob(os.path.join(package_dir, 'business_data','*.json'))
