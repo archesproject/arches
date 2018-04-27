@@ -28,7 +28,7 @@ define([
             console.log(val);
         })
 
-        var ontologyClass = params.node.ontologyclass;
+        var ontologyClass = params.node().ontologyclass;
 
         self.jsonData = ko.computed(function() {
             var relatableResourceIds = _.filter(self.resource_data(), function(resource){

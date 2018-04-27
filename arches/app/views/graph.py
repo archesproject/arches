@@ -257,7 +257,8 @@ class GraphDesignerView(GraphBaseView):
         datatypes_json = JSONSerializer().serialize(datatypes, exclude=['modulename','isgeometric'])
         context = self.get_context_data(
             main_script='views/graph-designer',
-            datatypes=datatypes_json,
+            datatypes_json=datatypes_json,
+            datatypes=datatypes,
             ontology_namespaces = get_ontology_namespaces()
         )
         context['ontologies'] = JSONSerializer().serialize(ontologies, exclude=['version', 'path'])
