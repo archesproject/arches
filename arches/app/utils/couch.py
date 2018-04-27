@@ -106,7 +106,6 @@ def delete_survey(mobile_survey_id):
         print "trying to delete survey"
         with transaction.atomic():
             if 'project_' + mobile_survey_id in couch:
-                print "deleting"
                 del couch['project_' + str(mobile_survey_id)]
     except Exception as e:
         print e

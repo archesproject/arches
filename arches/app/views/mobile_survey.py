@@ -206,15 +206,13 @@ class MobileSurveyManagerView(MapBaseManagerView):
         mobile_survey.bounds = MultiPolygon(polygons)
         mobile_survey.lasteditedby = self.request.user
         try:
-            couch = couchdb.Server(settings.COUCHDB_URL)
             connection_error = False
             with transaction.atomic():
                 mobile_survey.save()
                 create_survey(mobile_survey, request.user)
 
         except Exception as e:
-            if 'project_' + str(mobile_survey.id) in couch:
-                del couch['project_' + str(mobile_survey.id)]
+            delete_survey(str(mobile_survey.id))
             if connection_error == False:
                 error_title = _('Unable to save survey')
                 error_message = e
