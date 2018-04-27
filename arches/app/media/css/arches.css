@@ -5815,6 +5815,13 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     color: #1E6FB7;
 }
 
+.node-form.node-name {
+    font-size: 13px;
+    color: grey;
+    margin-top: 0;
+    display: inline;
+}
+
 .node-name-report {
     margin-top: -32px;
 }

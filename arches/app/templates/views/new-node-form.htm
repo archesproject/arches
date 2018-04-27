@@ -35,7 +35,7 @@
                 <!-- ko if: !node().istopnode -->
                 <div class="node-widget-label">
                     <div class="control-label">
-                        {% trans "Relationship from" %} <span data-bind="text: graphModel.getParentNode(node()).name"></span>
+                        <span style="display:flex"><div>{% trans "Relationship to" %}</div><div class="node-form node-name" data-bind="text: graphModel.getParentNode(node()).name"></div><div>({% trans "parent" %})</div></span>
                     </div>
                     <div>
                         <select class="design" data-bind="value: node().parentproperty, options: node().validproperties, optionsText: node().getFriendlyOntolgyName.bind(node()), valueAllowUnset: true, optionsCaption: '{% trans "Choose a property" %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
