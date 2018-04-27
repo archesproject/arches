@@ -274,6 +274,11 @@ def export_collections(request):
     skos = SKOSWriter()
     return HttpResponse(skos.write(concept_graphs, format="pretty-xml"), content_type="application/xml")
 
+def get_concept_collections(request):
+    lang = request.GET.get('lang', settings.LANGUAGE_CODE)
+    concept_collections = Concept().concept_tree(mode='collections', lang=lang)
+    return JSONResponse(concept_collections)
+
 @group_required('RDM Administrator')
 def make_collection(request, conceptid):
     concept = Concept().get(id=conceptid, values=[])
