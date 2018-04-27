@@ -255,17 +255,19 @@ class GraphDesignerView(GraphBaseView):
         ontology_classes = models.OntologyClass.objects.values('source', 'ontology_id')
         datatypes = models.DDataType.objects.all()
         datatypes_json = JSONSerializer().serialize(datatypes, exclude=['modulename','isgeometric'])
+        lang = request.GET.get('lang', settings.LANGUAGE_CODE)
+        concept_collections = Concept().concept_tree(mode='collections', lang=lang)
         context = self.get_context_data(
             main_script='views/graph-designer',
             datatypes_json=datatypes_json,
             datatypes=datatypes,
-            ontology_namespaces = get_ontology_namespaces()
+            ontology_namespaces = get_ontology_namespaces(),
         )
         context['ontologies'] = JSONSerializer().serialize(ontologies, exclude=['version', 'path'])
         context['ontology_classes'] = JSONSerializer().serialize(ontology_classes)
         context['nav']['title'] = self.graph.name
         #context['nav']['menu'] = True
-        context['graph'] = JSONSerializer().serialize(self.graph, exclude = ['functions', 'cards', 'widgets', 'deploymentfile', 'deploymentdate', '_nodegroups_to_delete', '_functions'])
+        context['graph'] = JSONSerializer().serialize(self.graph, exclude = ['functions', 'cards', 'deploymentfile', 'deploymentdate', '_nodegroups_to_delete', '_functions'])
         return render(request, 'views/graph-designer.htm', context)
 
 

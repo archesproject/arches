@@ -28,6 +28,7 @@ define(['arches', 'knockout', 'viewmodels/concept-select'], function (arches, ko
                     params.filterValue(val);
                 });
             } else {
+                this.conceptCollections = ko.observableArray([]);
                 this.isEditable = true;
                 if (params.graph) {
                     var cards = _.filter(params.graph.get('cards')(), function(card){return card.nodegroup_id === params.nodeGroupId()})
@@ -37,12 +38,31 @@ define(['arches', 'knockout', 'viewmodels/concept-select'], function (arches, ko
                 } else if (params.widget) {
                     this.isEditable = params.widget.card.get('is_editable')
                 }
-                this.topConcept = params.config.rdmCollection;
-                this.conceptCollections = arches.conceptCollections;
-                this.conceptCollections.unshift({
-                  'label': null,
-                  'id': null
-                })
+                this.topConcept = params.config.rdmCollection();
+                if (arches.conceptCollections.length === 0) {
+                    var self = this;
+                    $.ajax({
+                        url: arches.urls.get_concept_collections,
+                        type: 'json'
+                    }).done(function(data){
+                        arches.conceptCollections = data;
+                        self.conceptCollections(data);
+                        self.conceptCollections.unshift({
+                            'label': null,
+                            'id': null
+                        })
+                    }).fail(function(error){
+                        console.log(error)
+                    })
+                } else {
+                    this.conceptCollections(arches.conceptCollections);
+                    if (this.conceptCollections()[0].label != null) {
+                        this.conceptCollections.unshift({
+                            'label': null,
+                            'id': null
+                        });
+                    }
+                }
             }
         },
         template: { require: 'text!datatype-config-templates/concept' }
