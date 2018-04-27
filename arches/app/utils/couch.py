@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import json
 import couchdb
+from django.db import transaction
 from urlparse import urlparse, urljoin
 from arches.app.models import models
 from arches.app.models.mobile_survey import MobileSurvey
@@ -27,7 +28,6 @@ from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.http import HttpRequest, HttpResponseNotFound
 import arches.app.views.search as search
-
 
 def clear_associated_surveys():
     surveys = [str(msm['id']) for msm in models.MobileSurveyModel.objects.values("id")]
@@ -65,7 +65,7 @@ def create_associated_surveys():
         print "Creating", mobile_survey
         create_survey(mobile_survey)
 
-def create_survey(mobile_survey):
+def create_survey(mobile_survey, user=None):
     try:
         couch = couchdb.Server(settings.COUCHDB_URL)
         connection_error = False
@@ -79,6 +79,7 @@ def create_survey(mobile_survey):
             survey = JSONSerializer().serializeToPython(mobile_survey, exclude='cards')
             survey['type'] = 'metadata'
             db.save(survey)
+            ## if None, use lasteditedby. ADD
             load_data_into_couch(mobile_survey, db, mobile_survey.lasteditedby)
 
         except Exception as e:
@@ -96,6 +97,19 @@ def create_survey(mobile_survey):
             error_message = e
             connection_error = JSONResponse({'success':False,'message': error_message,'title': error_title}, status=500)
         print connection_error
+        return connection_error
+
+def delete_survey(mobile_survey_id):
+    try:
+        couch = couchdb.Server(settings.COUCHDB_URL)
+        connection_error = JSONResponse({'success':False,'message': _('Connection to CouchDB failed. Please confirm your CouchDB service is running on: ' + settings.COUCHDB_URL),'title':_('CouchDB Service Unavailable')}, status=500)
+        print "trying to delete survey"
+        with transaction.atomic():
+            if 'project_' + mobile_survey_id in couch:
+                print "deleting"
+                del couch['project_' + str(mobile_survey_id)]
+    except Exception as e:
+        print e
         return connection_error
 
 def collect_resource_instances_for_couch(mobile_survey, user):

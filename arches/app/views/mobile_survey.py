@@ -37,6 +37,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.decorators import group_required
 from arches.app.utils.geo_utils import GeoUtils
+from arches.app.utils.couch import create_survey, delete_survey
 from arches.app.models import models
 from arches.app.models.card import Card
 from arches.app.models.mobile_survey import MobileSurvey
@@ -123,15 +124,7 @@ class MobileSurveyManagerView(MapBaseManagerView):
         if mobile_survey_id is not None:
             ret = models.MobileSurveyModel.objects.get(pk=mobile_survey_id)
             ret.delete()
-            try:
-                couch = couchdb.Server(settings.COUCHDB_URL)
-                connection_error = JSONResponse({'success':False,'message': _('Connection to CouchDB failed. Please confirm your CouchDB service is running on: ' + settings.COUCHDB_URL),'title':_('CouchDB Service Unavailable')}, status=500)
-                with transaction.atomic():
-                    if 'project_' + mobile_survey_id in couch:
-                        del couch['project_' + str(mobile_survey_id)]
-            except Exception as e:
-                print e
-                return connection_error
+            delete_survey(mobile_survey_id)
             return JSONResponse(ret)
 
         return HttpResponseNotFound()
@@ -152,91 +145,6 @@ class MobileSurveyManagerView(MapBaseManagerView):
                 xmodel.objects.filter(user=identity_model.objects.get(id=identity), mobile_survey=mobile_survey).delete()
             else:
                 xmodel.objects.filter(group=identity_model.objects.get(id=identity), mobile_survey=mobile_survey).delete()
-
-    def collect_resource_instances_for_couch(self, mobile_survey, user):
-        """
-        Uses the data definition configs of a mobile survey object to search for
-        resource instances relevant to a mobile survey. Takes a user object which
-        is required for search.
-        """
-
-        query = mobile_survey.datadownloadconfig['custom']
-        resource_types = mobile_survey.datadownloadconfig['resources']
-        instances = {}
-        if query in ('', None) and len(resource_types) == 0:
-            print "No resources or data query defined"
-        else:
-            request = HttpRequest()
-            request.user = user
-            request.GET['mobiledownload'] = True
-            if query in ('', None):
-                if len(mobile_survey.bounds.coords) == 0:
-                    default_bounds = settings.DEFAULT_BOUNDS
-                    default_bounds['features'][0]['properties']['inverted'] = False
-                    request.GET['mapFilter'] = json.dumps(default_bounds)
-                else:
-                    request.GET['mapFilter'] = json.dumps({u'type': u'FeatureCollection', 'features':[{'geometry': json.loads(mobile_survey.bounds.json)}]})
-                request.GET['typeFilter'] = json.dumps([{'graphid': resourceid, 'inverted': False } for resourceid in mobile_survey.datadownloadconfig['resources']])
-            else:
-                parsed = urlparse.urlparse(query)
-                urlparams = urlparse.parse_qs(parsed.query)
-                for k, v in urlparams.iteritems():
-                    request.GET[k] = v[0]
-            search_res_json = search.search_results(request)
-            search_res = JSONDeserializer().deserialize(search_res_json.content)
-            try:
-                instances = {hit['_source']['resourceinstanceid']: hit['_source'] for hit in search_res['results']['hits']['hits']}
-            except KeyError:
-                print 'no instances found in', search_res
-        return instances
-
-    def load_tiles_into_couch(self, mobile_survey, db, instances):
-        """
-        Takes a mobile survey object, a couch database instance, and a dictionary
-        of resource instances to identify eligible tiles and load them into the
-        database instance
-        """
-        cards = mobile_survey.cards.all()
-        for card in cards:
-            tiles = models.TileModel.objects.filter(nodegroup=card.nodegroup_id)
-            tiles_serialized = json.loads(JSONSerializer().serialize(tiles))
-            for tile in tiles_serialized:
-                if str(tile['resourceinstance_id']) in instances:
-                    try:
-                        tile['type'] = 'tile'
-                        couch_record = db.get(tile['tileid'])
-                        if couch_record == None:
-                            db[tile['tileid']] = tile
-                        else:
-                            if couch_record['data'] != tile['data']:
-                                couch_record['data'] = tile['data']
-                                db[tile['tileid']] = couch_record
-                    except Exception as e:
-                        print e, tile
-
-    def load_instances_into_couch(self, mobile_survey, db, instances):
-        """
-        Takes a mobile survey object, a couch database instance, and a dictionary
-        of resource instances and loads them into the database instance.
-        """
-        for instanceid, instance in instances.iteritems():
-            try:
-                instance['type'] = 'resource'
-                couch_record = db.get(instanceid)
-                if couch_record == None:
-                    db[instanceid] = instance
-            except Exception as e:
-                print e, instance
-
-    def load_data_into_couch(self, mobile_survey, db, user):
-        """
-        Takes a mobile survey, a couch database intance and a django user and loads
-        tile and resource instance data into the couch instance.
-        """
-
-        instances = self.collect_resource_instances_for_couch(mobile_survey, user)
-        self.load_tiles_into_couch(mobile_survey, db, instances)
-        self.load_instances_into_couch(mobile_survey, db, instances)
 
     def post(self, request):
         data = JSONDeserializer().deserialize(request.body)
@@ -302,20 +210,7 @@ class MobileSurveyManagerView(MapBaseManagerView):
             connection_error = False
             with transaction.atomic():
                 mobile_survey.save()
-                try:
-                    if 'project_' + str(mobile_survey.id) not in couch:
-                        db = couch.create('project_' + str(mobile_survey.id))
-                    else:
-                        db = couch['project_' + str(mobile_survey.id)]
-                    survey = JSONSerializer().serializeToPython(mobile_survey, exclude='cards')
-                    survey['type'] = 'metadata'
-                    db.save(survey)
-                    self.load_data_into_couch(mobile_survey, db, request.user)
-                except Exception as e:
-                    error_title = _('CouchDB Service Unavailable')
-                    error_message =  _('Connection to CouchDB failed. Please confirm your CouchDB service is running on: ' + settings.COUCHDB_URL)
-                    connection_error = JSONResponse({'success':False,'message': '{0}: {1}'.format(error_message, str(e)),'title': error_title}, status=500)
-                    return connection_error
+                create_survey(mobile_survey, request.user)
 
         except Exception as e:
             if 'project_' + str(mobile_survey.id) in couch:

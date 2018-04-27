@@ -36,11 +36,12 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('operation', nargs='?',
-            choices=['clear_surveys', 'rebuild_surveys', 'delete_indexes', 'index_database', 'index_concepts', 'index_resources', 'index_resource_relations',],
+            choices=['clear_surveys', 'clear_unassociated_surveys', 'rebuild_surveys',],
             help='Operation Type; ' +
             # '\'install\'=Install\'s Elasticsearch in the provided location with the provided port' +
             # '\'setup_indexes\'=Creates the indexes in Elastic Search needed by the system' +
-            '\'clear_surveys\' deletes all couch databases that belong to the current survey' +
+            '\'clear_surveys\' deletes all surveys that belong to the current arches install' +
+            '\'clear_unassociated_surveys\' deletes all surveys that belong to the current arches install' +
             # '\'index_database\'=Indexes all the data (resources, concepts, and resource relations) found in the database' +
             # '\'index_concepts\'=Indxes all concepts from the database'+
             # '\'index_resources\'=Indexes all resources from the database'+
@@ -53,10 +54,13 @@ class Command(BaseCommand):
         if options['operation'] == 'rebuild_surveys':
             self.rebuild_couch_surveys()
 
+        if options['operation'] == 'clear_unassociated_surveys':
+            self.clear_unassociated_surveys()
+
     def delete_couch_surveys(self):
         clear_associated_surveys()
 
-    def delete_couch_external_surveys(self):
+    def clear_unassociated_surveys(self):
         clear_unassociated_surveys()
 
     def rebuild_couch_surveys(self):
