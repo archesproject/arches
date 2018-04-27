@@ -467,7 +467,7 @@ define(['arches',
         /**
          * constructTree - created a hierarchical node listing from the nodes and edges
          * @memberof GraphModel.prototype
-         * @return {object} a hierchical node listing 
+         * @return {object} a hierchical node listing
          */
         constructTree: function(){
             var lut = {};
