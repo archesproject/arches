@@ -1,0 +1,37 @@
+{% load i18n %}
+<!-- ko foreach: { data: [$data], as: 'graphTree' } -->
+<div class="jstree jstree-default">
+    <div class="header">
+        <a data-bind="click: expandAll">Expand all</a>
+        <a data-bind="click: collapseAll" style="padding-left:5px;">Collapse all</a>
+    </div>
+    <!-- <div data-bind="sortable: $data"> -->
+    <ul class="jstree-container-ul jstree-children" aria-expanded="true">
+        <div class="" data-bind="template: {
+            name: 'graph-tree',
+            foreach: graphTree.graphModel.tree,
+            as: 'node'
+        }"></div>
+    </ul>
+    <!-- </div> -->
+</div>
+<!-- /ko -->
+
+<template id="graph-tree">
+    <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (node.children().length > 0 && node.expanded), 'jstree-closed' : (node.children().length > 0 && !node.expanded()), 'jstree-leaf': node.children().length === 0}">
+        <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){node.expanded(!node.expanded())}"></i>
+        <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: graphTree.selectItem.bind(graphTree), css:{'jstree-clicked': node.selected}">
+            <i data-bind="css: node.iconclass" role="presentation"></i>
+            <span style="padding-right: 10px;" data-bind="text: node.name, css:{filtered: graphTree.filter().length > 0 && !node.filtered()}"></span>
+            <i class="jstree-delete-node fa fa-trash" role="presentation" data-bind="click: graphTree.deleteNode.bind(graphTree)"></i>
+            <i class="jstree-delete-node fa fa-plus-circle" role="presentation" data-bind="click: graphTree.addChildNode.bind(graphTree)"></i>
+        </a>
+        <ul class="jstree-children" aria-expanded="true" data-bind="if: node.children().length > 0">
+            <div data-bind="template: {
+                name: 'graph-tree',
+                foreach: node.children(),
+                as: 'node'
+            }"></div>
+        </ul>
+    </li>
+</template>

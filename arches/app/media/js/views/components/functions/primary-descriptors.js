@@ -61,8 +61,6 @@ function ($, arches, ko, koMapping, FunctionViewModel, chosen) {
                     }
                 });
             }
-            console.log(this.cards());
-            console.log(this.name.nodegroup_id());
             window.setTimeout(function(){$("select[data-bind^=chosen]").trigger("chosen:updated")}, 300);
         },
         template: {

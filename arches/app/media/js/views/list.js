@@ -56,19 +56,8 @@ define([
             if (options.items) {
                 this.groups = options.groups;
             }
-            var initializeItem = function(item){
-                if (!item.filtered) {
-                    item.filtered = ko.observable(false);
-                }
-                if (!('selectable' in item)){
-                    item.selectable = true;
-                }
-                if (!item.selected) {
-                    item.selected = ko.observable(false);
-                }
-            }
             this.items.subscribe(function (items) {
-                items.forEach(initializeItem, this);
+                items.forEach(this._initializeItem, this);
             }, this);
             if(this.filter_function){
                 this.filter = ko.observable('');
@@ -78,10 +67,27 @@ define([
 
             this.selectedItems = ko.computed(function(){
                 return this.items().filter(function(item){
-                    initializeItem(item);
+                    this._initializeItem(item);
                     return item.selected();
                 }, this);
             }, this);
+        },
+
+        /**
+        * Used internally to add observable parameters to list items
+        * @memberof ListView.prototype
+        * @param {object} item - a list item
+        */
+        _initializeItem: function(item){
+            if (!item.filtered) {
+                item.filtered = ko.observable(false);
+            }
+            if (!('selectable' in item)){
+                item.selectable = true;
+            }
+            if (!item.selected) {
+                item.selected = ko.observable(false);
+            }
         },
 
         /**
