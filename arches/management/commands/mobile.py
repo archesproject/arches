@@ -25,6 +25,7 @@ from arches.management.commands import utils
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from django.core.management.base import BaseCommand, CommandError
+from arches.app.utils.couch import clear_associated_surveys, clear_unassociated_surveys, create_associated_surveys
 
 
 class Command(BaseCommand):
@@ -35,22 +36,29 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('operation', nargs='?',
-        help='operation \'clearcouch\' deletes all couch databases that do not belong to the current project')
+            choices=['clear_surveys', 'rebuild_surveys', 'delete_indexes', 'index_database', 'index_concepts', 'index_resources', 'index_resource_relations',],
+            help='Operation Type; ' +
+            # '\'install\'=Install\'s Elasticsearch in the provided location with the provided port' +
+            # '\'setup_indexes\'=Creates the indexes in Elastic Search needed by the system' +
+            '\'clear_surveys\' deletes all couch databases that belong to the current survey' +
+            # '\'index_database\'=Indexes all the data (resources, concepts, and resource relations) found in the database' +
+            # '\'index_concepts\'=Indxes all concepts from the database'+
+            # '\'index_resources\'=Indexes all resources from the database'+
+            '\'rebuild_surveys\' rebuilds all couch databases that belong to a current survey')
 
     def handle(self, *args, **options):
-        if options['operation'] == 'clearcouch':
-            self.clear_couch()
+        if options['operation'] == 'clear_surveys':
+            self.delete_couch_surveys()
 
-    def clear_couch(self):
-        surveys = [str(msm['id']) for msm in models.MobileSurveyModel.objects.values("id")]
-        uri=urlparse(settings.COUCHDB_URL)
-        couchserver = couchdb.Server(settings.COUCHDB_URL)
-        couchdbs = [dbname for dbname in couchserver]
-        for db in couchdbs:
-            survey_id = db[-36:]
-            print db
-            if survey_id not in surveys:
-                print 'deleting', db
-                del couchserver[db]
-            else:
-                print 'keeping', db
+        if options['operation'] == 'rebuild_surveys':
+            self.rebuild_couch_surveys()
+
+    def delete_couch_surveys(self):
+        clear_associated_surveys()
+
+    def delete_couch_external_surveys(self):
+        clear_unassociated_surveys()
+
+    def rebuild_couch_surveys(self):
+        clear_associated_surveys()
+        create_associated_surveys()
