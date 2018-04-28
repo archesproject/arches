@@ -41,11 +41,11 @@ class Command(BaseCommand):
             # '\'install\'=Install\'s Elasticsearch in the provided location with the provided port' +
             # '\'setup_indexes\'=Creates the indexes in Elastic Search needed by the system' +
             '\'clear_surveys\' deletes all surveys that belong to the current arches install' +
-            '\'clear_unassociated_surveys\' deletes all surveys that belong to the current arches install' +
+            '\'clear_unassociated_surveys\' deletes all surveys that do not belong to the current arches install' +
             # '\'index_database\'=Indexes all the data (resources, concepts, and resource relations) found in the database' +
             # '\'index_concepts\'=Indxes all concepts from the database'+
             # '\'index_resources\'=Indexes all resources from the database'+
-            '\'rebuild_surveys\' rebuilds all couch databases that belong to a current survey')
+            '\'rebuild_surveys\' rebuilds all surveys that belong to the current arches install')
 
     def handle(self, *args, **options):
         if options['operation'] == 'clear_surveys':
