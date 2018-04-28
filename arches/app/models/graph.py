@@ -522,6 +522,11 @@ class Graph(models.GraphModel):
 
             self.populate_null_nodegroups()
 
+            ontology_classes = self.get_valid_ontology_classes(newNode.nodeid, nodeToAppendTo.nodeid)
+            ontology_classes[0]
+            newEdge.ontologyproperty = ontology_classes[0]['ontology_property']
+            newNode.ontologyclass = ontology_classes[0]['ontology_classes'][0]
+
             # if self.ontology is None:
             #     branch_copy.clear_ontology_references()
 
