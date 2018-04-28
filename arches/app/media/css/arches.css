@@ -5815,6 +5815,24 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     color: #1E6FB7;
 }
 
+.node-form.node-name {
+    font-size: 13px;
+    color: grey;
+    margin-top: 0;
+    display: inline;
+    padding: 0 5px;
+}
+
+.node-semantic-description {
+    display: flex;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ccc;
+    background-color: #fcfcfc;
+}
+
 .node-name-report {
     margin-top: -32px;
 }

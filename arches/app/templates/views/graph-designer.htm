@@ -48,14 +48,22 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <button class="btn btn-md viewstate-btn" data-bind="css: { active: viewState() === 'preview' }, click: function(){viewState('preview');}">{% trans "Preview" %}</button>
         </div>
 
-        <!-- ko if: graphSettingsVisible() -->
-            <!-- ko if: graphSettingsViewModel.dirty() -->
             <div class="graph-settings-crud">
+                <!-- ko if: graphSettingsVisible() -->
+                <!-- ko if: graphSettingsViewModel.dirty() -->
                 <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: graphSettingsViewModel.reset">{% trans "Discard Edits" %}</button>
                 <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: graphSettingsViewModel.save">{% trans "Save Edits" %}</button>
+                <!-- /ko -->
+                <!-- /ko -->
+
+
+                <!-- ko if: selectedNode() -->
+                <!-- ko if: selectedNode().dirty() -->
+                <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: function(){graphModel.get('selectedNode')().reset()}">{% trans "Discard Edits" %}</button>
+                <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: function(){graphModel.get('selectedNode')().save()}">{% trans "Save Edits" %}</button>
+                <!-- /ko -->
+                <!-- /ko -->
             </div>
-            <!-- /ko -->
-        <!-- /ko -->
 
         <!-- Tools -->
         <div class="ep-form-toolbar-tools">
