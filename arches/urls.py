@@ -62,6 +62,7 @@ urlpatterns = [
     url(r'^concepts/paged_dropdown', concept.paged_dropdown, name="paged_dropdown"),
     url(r'^concepts/export/(?P<conceptid>%s)$' % uuid_regex , concept.export, name="export_concept"),
     url(r'^concepts/export/collections', concept.export_collections, name="export_concept_collections"),
+    url(r'^concepts/collections', concept.get_concept_collections, name="get_concept_collections"),
     url(r'^concepts/get_pref_label', concept.get_pref_label, name="get_pref_label"),
     url(r'^conceptvalue/', concept.concept_value, name="concept_value"),
     url(r'^search$', search.SearchView.as_view(), name="search_home"),
