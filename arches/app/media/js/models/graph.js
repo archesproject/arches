@@ -200,6 +200,73 @@ define(['arches',
         },
 
         /**
+         * appendNode - appends a graph onto a specific node within this graph
+         * @memberof GraphModel.prototype
+         * @param  {string} nodeid - the node id of the node within this graph that we're connecting the branch to
+         * @param  {string} property - the ontology property to use to connect the branch, leave null to use the first available property
+         * @param  {function} callback - the function to call after the response returns from the server
+         * @param  {object} scope - the value of "this" in the callback function
+         */
+        appendNode: function(node, property, callback, scope){
+            var self = this;
+            property = property ? property : null;
+            // if(property === null){
+            //     if(this.get('selectedNode')().ontologyclass()){
+            //         var ontology_connection = _.find(branch_graph.get('domain_connections'), function(domain_connection){
+            //             return _.find(domain_connection.ontology_classes, function(ontology_class){
+            //                 return ontology_class === this.get('selectedNode')().ontologyclass();
+            //             }, this)
+            //         }, this);
+            //         if(ontology_connection){
+            //             property = ontology_connection.ontology_property;
+            //         }else{
+            //             if (typeof callback === 'function') {
+            //                 scope = scope || self;
+            //                 callback.call(scope, null, 'failed');
+            //             }
+            //             return;
+            //         }
+            //     }
+            // }
+
+            this._doRequest({
+                type: "POST",
+                url: this.url + this.get('graphid') + '/append_node',
+                data: JSON.stringify({nodeid:node.nodeid, property: property})
+            }, function(response, status){
+                if (status === 'success' &&  response.responseJSON) {
+                    var newNode = new NodeModel({
+                        source: response.responseJSON.node,
+                        datatypelookup: this.get('datatypelookup'),
+                        graph: this,
+                        ontology_namespaces: this.get('root').ontology_namespaces
+                    })
+                    newNode.children = ko.observableArray([]);
+
+                    this.get('nodes').push(newNode);
+                    this.get('edges').push(response.responseJSON.edge);
+                    node.expanded = ko.observable(true);
+                    node.children.unshift(newNode)
+                    // setTimeout(function(){
+                    // },500)
+
+                    // response.responseJSON.nodegroups.forEach(function(nodegroup){
+                    //     this.get('nodegroups').push(nodegroup);
+                    // }, this);
+
+                    if(!this.get('isresource')){
+                        this.selectNode(newNode);
+                    }
+                }
+
+                if (typeof callback === 'function') {
+                    scope = scope || this;
+                    callback.call(scope, response, status);
+                }
+            }, this, 'changed');
+        },
+
+        /**
          * moveNode - moves a node from one part of the graph to another
          * @memberof GraphModel.prototype
          * @param  {NodeModel} node - the node within this graph that we're moving
@@ -420,6 +487,7 @@ define(['arches',
                                 graph: self,
                                 ontology_namespaces: attributes.ontology_namespaces
                             });
+                            nodeModel.children = ko.observableArray([]);
                             if(node.istopnode){
                                 this.set('root', nodeModel);
                             }
@@ -434,7 +502,7 @@ define(['arches',
                 }
             }, this)
 
-            this.tree = this.constructTree();
+            this.tree = this.constructTree(); //ko.pureComputed(this.constructTree, this);
 
             this.set('selectedNode', ko.computed(function() {
                 var selectedNode = _.find(self.get('nodes')(), function(node){
@@ -493,7 +561,11 @@ define(['arches',
             })
 
             nodes.forEach(function(node){
-                node.children = ko.observableArray([]);
+                if(!ko.isObservable(node.children)){
+                    node.children = ko.observableArray([]);
+                }else{
+                    node.children.removeAll();
+                }
                 node.parent = edge_map[node.id] ? edge_map[node.id] : '#';
             });
 

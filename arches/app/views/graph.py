@@ -364,6 +364,10 @@ class GraphDataView(View):
                     ret = graph.append_branch(data['property'], nodeid=data['nodeid'], graphid=data['graphid'])
                     graph.save()
 
+                elif self.action == 'append_node':
+                    ret = graph.append_node(data['property'], nodeid=data['nodeid'])
+                    graph.save()
+
                 elif self.action == 'move_node':
                     ret = graph.move_node(data['nodeid'], data['property'], data['newparentnodeid'])
                     graph.save()

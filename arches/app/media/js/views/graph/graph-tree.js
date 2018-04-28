@@ -47,7 +47,7 @@ define([
 
         addChildNode: function(item, e) {
             e.stopImmediatePropagation();
-            console.log(item);
+            this.graphModel.appendNode(item);
         },
 
         deleteNode: function(item, e) {

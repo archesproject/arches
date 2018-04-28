@@ -477,6 +477,60 @@ class Graph(models.GraphModel):
 
             return branch_copy
 
+    def append_node(self, property=None, nodeid=None, skip_validation=True):
+        """
+        Appends a single node onto this graph
+
+        Arguments:
+        property -- the property to use when appending the node
+
+        Keyword Arguments:
+        nodeid -- if given will append the node to this node, if not supplied will
+        append the node to the root of this graph
+
+        skip_validation -- don't validate the resultant graph (post append), defaults to True
+
+        """
+
+        nodeToAppendTo = self.nodes[uuid.UUID(str(nodeid))] if nodeid else self.root
+
+        if skip_validation: # or self.can_append(branch_graph, nodeToAppendTo):
+
+            newNode = models.Node()
+            newNode.nodeid = uuid.uuid1()
+            newNode.name = 'New Node'
+            newNode.istopnode = False
+            newNode.ontologyclass = ''
+            newNode.datatype = 'semantic'
+            newNode.graph = self
+            #newNode.nodegroup_id = nodeobj.get('nodegroup_id','')
+            newNode.config = None
+            # newNode.issearchable = nodeobj.get('issearchable', True)
+            # newNode.isrequired = nodeobj.get('isrequired', False)
+
+            newEdge = models.Edge(
+                domainnode = nodeToAppendTo,
+                rangenode = newNode,
+                ontologyproperty = property,
+                graph = self
+            )
+
+            self.add_node(newNode)
+            self.add_edge(newEdge)
+            # for widget in branch_copy.widgets.itervalues():
+            #     self.widgets[widget.pk] = widget
+
+            self.populate_null_nodegroups()
+
+            # if self.ontology is None:
+            #     branch_copy.clear_ontology_references()
+
+            # newGraph = Graph()
+            # self.edges[newEdge.pk] = newEdge
+            # self.nodes[newNode.pk] = newNode
+
+            return {'node': newNode, 'edge': newEdge}
+
     def clear_ontology_references(self):
         """
         removes any references to ontolgoy classes and properties in a graph

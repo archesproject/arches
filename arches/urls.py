@@ -78,6 +78,7 @@ urlpatterns = [
     url(r'^graph/(?P<graphid>%s)/settings$' % uuid_regex, GraphSettingsView.as_view(), name='graph_settings'),
     url(r'^graph/(?P<graphid>%s)/card_manager$' % uuid_regex, CardManagerView.as_view(), name='card_manager'),
     url(r'^graph/(?P<graphid>%s)/append_branch$' % uuid_regex, GraphDataView.as_view(action='append_branch'), name='append_branch'),
+    url(r'^graph/(?P<graphid>%s)/append_node$' % uuid_regex, GraphDataView.as_view(action='append_node'), name='append_node'),
     url(r'^graph/(?P<graphid>%s)/move_node$' % uuid_regex, GraphDataView.as_view(action='move_node'), name='move_node'),
     url(r'^graph/(?P<graphid>%s)/update_node$' % uuid_regex, GraphDataView.as_view(action='update_node'), name='update_node'),
     url(r'^graph/(?P<graphid>%s)/delete_node$' % uuid_regex, GraphDataView.as_view(action='delete_node'), name='delete_node'),
