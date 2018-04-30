@@ -36,36 +36,31 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('operation', nargs='?',
-            choices=['clear_surveys', 'clear_unassociated_surveys', 'rebuild_surveys',],
+            choices=['delete_surveys', 'delete_unassociated_surveys', 'rebuild_surveys',],
             help='Operation Type; ' +
-            # '\'install\'=Install\'s Elasticsearch in the provided location with the provided port' +
-            # '\'setup_indexes\'=Creates the indexes in Elastic Search needed by the system' +
-            '\'clear_surveys\' deletes all surveys that belong to the current arches install' +
-            '\'clear_unassociated_surveys\' deletes all surveys that do not belong to the current arches install' +
-            # '\'index_database\'=Indexes all the data (resources, concepts, and resource relations) found in the database' +
-            # '\'index_concepts\'=Indxes all concepts from the database'+
-            # '\'index_resources\'=Indexes all resources from the database'+
+            '\'delete_surveys\' deletes all surveys that belong to the current arches install' +
+            '\'delete_unassociated_surveys\' deletes all surveys that do not belong to the current arches install' +
             '\'rebuild_surveys\' rebuilds all surveys that belong to the current arches install')
 
     def handle(self, *args, **options):
-        if options['operation'] == 'clear_surveys':
+        if options['operation'] == 'delete_surveys':
             self.delete_couch_surveys()
 
         if options['operation'] == 'rebuild_surveys':
             self.rebuild_couch_surveys()
 
-        if options['operation'] == 'clear_unassociated_surveys':
-            self.clear_unassociated_surveys()
+        if options['operation'] == 'delete_unassociated_surveys':
+            self.delete_unassociated_surveys()
 
     def delete_couch_surveys(self):
         couch = Couch()
-        couch.clear_associated_surveys()
+        couch.delete_associated_surveys()
 
-    def clear_unassociated_surveys(self):
+    def delete_unassociated_surveys(self):
         couch = Couch()
-        couch.clear_unassociated_surveys()
+        couch.delete_unassociated_surveys()
 
     def rebuild_couch_surveys(self):
         couch = Couch()
-        couch.clear_associated_surveys()
+        couch.delete_associated_surveys()
         couch.create_associated_surveys()

@@ -18,12 +18,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import json
 import couchdb
-from django.db import transaction
 from urlparse import urlparse, urljoin
 from arches.app.models import models
 from arches.app.models.mobile_survey import MobileSurvey
 from arches.app.models.system_settings import settings
-from django.utils.translation import ugettext as _
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.http import HttpRequest, HttpResponseNotFound
@@ -32,7 +30,6 @@ import arches.app.views.search as search
 class Couch(object):
     def __init__(self):
         self.couch = couchdb.Server(settings.COUCHDB_URL)
-        # self.logger = logging.getLogger(__name__)
 
     def create_survey(self, mobile_survey, user=None):
         print 'Creating Couch DB: project_', str(mobile_survey.id)
@@ -50,8 +47,7 @@ class Couch(object):
             print e
             return connection_error
 
-
-    def clear_associated_surveys(self):
+    def delete_associated_surveys(self):
         surveys = [str(msm['id']) for msm in models.MobileSurveyModel.objects.values("id")]
         couchdbs = [dbname for dbname in self.couch]
         for db in couchdbs:
@@ -59,7 +55,7 @@ class Couch(object):
             if survey_id in surveys:
                 self.delete_survey(survey_id)
 
-    def clear_unassociated_surveys(self):
+    def delete_unassociated_surveys(self):
         surveys = [str(msm['id']) for msm in models.MobileSurveyModel.objects.values("id")]
         couchdbs = [dbname for dbname in couchserver]
         for db in couchdbs:
