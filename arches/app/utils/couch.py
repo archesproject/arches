@@ -73,6 +73,7 @@ class Couch(object):
             print "Creating", mobile_survey
             self.create_survey(mobile_survey)
             print "Populating"
+            db = couch['project_' + str(mobile_survey.id)]
             self.load_data_into_couch(mobile_survey, db, mobile_survey.lasteditedby)
 
     def collect_resource_instances_for_couch(self, mobile_survey, user):
