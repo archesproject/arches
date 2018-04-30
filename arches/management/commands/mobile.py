@@ -58,11 +58,14 @@ class Command(BaseCommand):
             self.clear_unassociated_surveys()
 
     def delete_couch_surveys(self):
-        clear_associated_surveys()
+        couch = Couch()
+        couch.clear_associated_surveys()
 
     def clear_unassociated_surveys(self):
-        clear_unassociated_surveys()
+        couch = Couch()
+        couch.clear_unassociated_surveys()
 
     def rebuild_couch_surveys(self):
-        clear_associated_surveys()
-        create_associated_surveys()
+        couch = Couch()
+        couch.clear_associated_surveys()
+        couch.create_associated_surveys()

@@ -32,7 +32,7 @@ import arches.app.views.search as search
 class Couch(object):
     def __init__(self):
         self.couch = couchdb.Server(settings.COUCHDB_URL)
-        self.logger = logging.getLogger(__name__)
+        # self.logger = logging.getLogger(__name__)
 
     def create_survey(self, mobile_survey, user=None):
         print 'Creating Couch DB: project_', str(mobile_survey.id)
@@ -43,8 +43,13 @@ class Couch(object):
         db.save(survey)
 
     def delete_survey(self, mobile_survey_id):
-        print 'Deleting Couch DB: project_', str(mobile_survey_id)
-        return self.couch.delete('project_' + str(mobile_survey_id))
+        try:
+            print 'Deleting Couch DB: project_', str(mobile_survey_id)
+            return self.couch.delete('project_' + str(mobile_survey_id))
+        except Exception as e:
+            print e
+            return connection_error
+
 
     def clear_associated_surveys(self):
         surveys = [str(msm['id']) for msm in models.MobileSurveyModel.objects.values("id")]

@@ -37,7 +37,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.decorators import group_required
 from arches.app.utils.geo_utils import GeoUtils
-from arches.app.utils.couch import create_survey, delete_survey
+from arches.app.utils.couch import Couch
 from arches.app.models import models
 from arches.app.models.card import Card
 from arches.app.models.mobile_survey import MobileSurvey
