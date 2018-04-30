@@ -38,7 +38,8 @@ define(['arches', 'knockout', 'viewmodels/concept-select'], function (arches, ko
                 } else if (params.widget) {
                     this.isEditable = params.widget.card.get('is_editable')
                 }
-                this.topConcept = params.config.rdmCollection();
+                this.topConcept = params.config.rdmCollection;
+                this.initialTopConcept = this.topConcept()
                 if (arches.conceptCollections.length === 0) {
                     var self = this;
                     $.ajax({
@@ -50,7 +51,8 @@ define(['arches', 'knockout', 'viewmodels/concept-select'], function (arches, ko
                         self.conceptCollections.unshift({
                             'label': null,
                             'id': null
-                        })
+                        });
+                        self.topConcept(self.initialTopConcept);
                     }).fail(function(error){
                         console.log(error)
                     })
