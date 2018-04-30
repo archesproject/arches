@@ -94,9 +94,11 @@ define(['arches',
                     this.get('nodes').remove(function (node) {
                         return _.contains(nodes, node);
                     });
+                    parentNode.children.remove(item);
                     parentNode.selected(true);
+                }else{
+                    this.trigger('error', response, 'deleteNode');
                 }
-
 
                 if (typeof callback === 'function') {
                     scope = scope || this;
@@ -190,6 +192,8 @@ define(['arches',
                             }
                         });
                     }
+                }else{
+                    this.trigger('error', response, 'appendBranch');
                 }
 
                 if (typeof callback === 'function') {
@@ -245,7 +249,6 @@ define(['arches',
 
                     this.get('nodes').push(newNode);
                     this.get('edges').push(response.responseJSON.edge);
-                    node.expanded = ko.observable(true);
                     node.children.unshift(newNode)
                     // setTimeout(function(){
                     // },500)
@@ -257,6 +260,8 @@ define(['arches',
                     if(!this.get('isresource')){
                         this.selectNode(newNode);
                     }
+                }else{
+                    this.trigger('error', response, 'appendNode');
                 }
 
                 if (typeof callback === 'function') {
@@ -297,7 +302,10 @@ define(['arches',
                             node.parse(found_node);
                         }
                     });
+                }else{
+                    this.trigger('error', response, 'moveNode');
                 }
+
                 if (typeof callback === 'function') {
                     scope = scope || this;
                     callback.call(scope, response, status);
@@ -325,7 +333,10 @@ define(['arches',
                         });
                         node.parse(nodeJSON);
                     }, this);
+                }else{
+                    this.trigger('error', response, 'updateNode');
                 }
+
                 if (typeof callback === 'function') {
                     scope = scope || this;
                     callback.call(scope, response, status);

@@ -47,19 +47,17 @@ define([
 
         addChildNode: function(item, e) {
             e.stopImmediatePropagation();
-            this.graphModel.appendNode(item);
+            this.graphModel.appendNode(item, null ,function(response, status){
+                if(status === 'success') {
+                    item.expanded = ko.observable(true);
+                }
+            }, this);
         },
 
         deleteNode: function(item, e) {
             e.stopImmediatePropagation();
             var parentNode = this.graphModel.getParentNode(item);
-            this.graphModel.deleteNode(item, function(response, status){
-                if(status === 'success') {
-                    parentNode.children.remove(item);
-                }else{
-                    this.trigger('error', response.responseJSON);
-                }
-            }, this);
+            this.graphModel.deleteNode(item);
         }
 
     });
