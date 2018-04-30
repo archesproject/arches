@@ -15,7 +15,6 @@ define([
     'datatype-config-components'
 ], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, GraphModel, GraphTree, NodeFormView, data, arches, GraphSettingsViewModel) {
     var viewModel = {
-        dataFilter: ko.observable(''),
         placeholder: ko.observable(''),
         graphid: ko.observable(data.graphid),
         activeTab: ko.observable('graph'),
