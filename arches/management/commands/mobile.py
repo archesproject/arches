@@ -25,7 +25,7 @@ from arches.management.commands import utils
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from django.core.management.base import BaseCommand, CommandError
-from arches.app.utils.couch import clear_associated_surveys, clear_unassociated_surveys, create_associated_surveys
+from arches.app.utils.couch import Couch
 
 
 class Command(BaseCommand):

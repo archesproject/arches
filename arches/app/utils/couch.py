@@ -30,26 +30,21 @@ from django.http import HttpRequest, HttpResponseNotFound
 import arches.app.views.search as search
 
 class Couch(object):
-    def __init__(self, prefix=settings.ELASTICSEARCH_PREFIX):
-        #
+    def __init__(self):
         self.couch = couchdb.Server(settings.COUCHDB_URL)
         self.logger = logging.getLogger(__name__)
 
     def create_survey(self, mobile_survey, user=None):
-        if 'project_' + str(mobile_survey.id) not in couch:
-            print 'Creating Couch DB: project_', str(mobile_survey.id)
-            db = self.couch.create('project_' + str(mobile_survey.id))
-        else:
-            print 'Found Couch DB: project_', str(mobile_survey.id)
-            db = self.couch['project_' + str(mobile_survey.id)]
+        print 'Creating Couch DB: project_', str(mobile_survey.id)
+        db = self.couch.create('project_' + str(mobile_survey.id))
+
         survey = JSONSerializer().serializeToPython(mobile_survey, exclude='cards')
         survey['type'] = 'metadata'
         db.save(survey)
 
     def delete_survey(self, mobile_survey_id):
         print 'Deleting Couch DB: project_', str(mobile_survey_id)
-        return del self.couch['project_' + str(mobile_survey_id)]
-
+        return self.couch.delete('project_' + str(mobile_survey_id))
 
     def clear_associated_surveys(self):
         surveys = [str(msm['id']) for msm in models.MobileSurveyModel.objects.values("id")]
@@ -73,7 +68,7 @@ class Couch(object):
             print "Creating", mobile_survey
             self.create_survey(mobile_survey)
             print "Populating"
-            load_data_into_couch(mobile_survey, db, mobile_survey.lasteditedby)
+            self.load_data_into_couch(mobile_survey, db, mobile_survey.lasteditedby)
 
     def collect_resource_instances_for_couch(self, mobile_survey, user):
         """
@@ -155,6 +150,6 @@ class Couch(object):
         tile and resource instance data into the couch instance.
         """
 
-        instances = collect_resource_instances_for_couch(mobile_survey, user)
-        load_tiles_into_couch(mobile_survey, db, instances)
-        load_instances_into_couch(mobile_survey, db, instances)
+        instances = self.collect_resource_instances_for_couch(mobile_survey, user)
+        self.load_tiles_into_couch(mobile_survey, db, instances)
+        self.load_instances_into_couch(mobile_survey, db, instances)
