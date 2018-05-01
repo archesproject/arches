@@ -30,7 +30,7 @@ define([
                 minimumInputLength: 2,
                 ajax: {
                     url: arches.urls.search_terms,
-                    dataType: 'json',adcompu
+                    dataType: 'json',
                     data: function(term, page) {
                         return {
                             q: term, // search term
