@@ -3,8 +3,10 @@ define(['jquery',
     'knockout-mapping', 
     'views/forms/base', 
     'views/forms/sections/branch-list',
+    'views/forms/sections/validation',
     'bootstrap-datetimepicker',], 
-    function ($, _, koMapping, BaseForm, BranchList) {
+    function ($, _, koMapping, BaseForm, BranchList, ValidationTools) {
+        var vt = new ValidationTools;
         return BaseForm.extend({
             initialize: function() {
                 BaseForm.prototype.initialize.apply(this);                
@@ -16,34 +18,18 @@ define(['jquery',
                 });
 
                 this.addBranchList(new BranchList({
-                    el: this.$el.find('#cultural-period-section')[0],
-                    data: this.data,
-                    dataKey: 'CULTURAL_PERIOD_BELIEF.I2',
-                    rules: true,
-                    validateBranch: function (nodes) {
-                        return true;
-                    }
-                }));
-                
-                this.addBranchList(new BranchList({
-                    el: this.$el.find('#function-interpretation-section')[0],
+                    el: this.$el.find('#assessment-section')[0],
                     data: this.data,
                     dataKey: 'DATE_INTERPRETATION_INFERENCE_MAKING.I5',
                     rules: true,
                     validateBranch: function (nodes) {
-                        return true;
+                        var ck0 = this.validateHasValues(nodes);
+                        var ck1 = vt.isValidDate(nodes,'ARCHAEOLOGICAL_FROM_DATE.E61');
+                        var ck2 = vt.isValidDate(nodes,'ARCHAEOLOGICAL_TO_DATE.E61');
+                        return ck0 && ck1 && ck2;
                     }
                 }));
                 
-                this.addBranchList(new BranchList({
-                    el: this.$el.find('#timespan-section')[0],
-                    data: this.data,
-                    dataKey: 'ARCHAEOLOGICAL_TIMESPAN.E52',
-                    rules: true,
-                    validateBranch: function (nodes) {
-                        return true;
-                    }
-                }));
                 
             },
             

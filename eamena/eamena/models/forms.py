@@ -318,42 +318,27 @@ class FeatureArchaeologicalAssessmentForm(ResourceForm):
 
     def update(self, data, files):
         data = add_actor('DATE_INTERPRETATION_INFERENCE_MAKING.I5', 'DATE_INTERPRETATION_INFERENCE_MAKING_ACTOR_NAME.E41', data, self.user)
-
-        self.update_nodes('CULTURAL_PERIOD_BELIEF.I2', data)
+        
         self.update_nodes('DATE_INTERPRETATION_INFERENCE_MAKING.I5', data)
-        self.update_nodes('ARCHAEOLOGICAL_TIMESPAN.E52', data)
 
         return
-    
     
     def load(self, lang):
         print self.resource
         if self.resource:
 
-            self.data['CULTURAL_PERIOD_BELIEF.I2'] = {
-                'branch_lists': self.get_nodes('CULTURAL_PERIOD_BELIEF.I2'),
-                'domains': {
-                    'CULTURAL_PERIOD_TYPE.I4' : Concept().get_e55_domain('CULTURAL_PERIOD_TYPE.I4'),
-                    'CULTURAL_PERIOD_CERTAINTY.I6' : Concept().get_e55_domain('CULTURAL_PERIOD_CERTAINTY.I6'),
-                    'CULTURAL_PERIOD_DETAIL_TYPE.E55' : Concept().get_e55_domain('CULTURAL_PERIOD_DETAIL_TYPE.E55'),
-                }
-            }
-            
             self.data['DATE_INTERPRETATION_INFERENCE_MAKING.I5'] = {
                 'branch_lists': self.get_nodes('DATE_INTERPRETATION_INFERENCE_MAKING.I5'),
                 'domains': {
                     'FUNCTION_CERTAINTY.I6' : Concept().get_e55_domain('FUNCTION_CERTAINTY.I6'),
                     'FUNCTION_TYPE.I4' : Concept().get_e55_domain('FUNCTION_TYPE.I4'),
                     'INTERPRETATION_CERTAINTY.I6' : Concept().get_e55_domain('INTERPRETATION_CERTAINTY.I6'),
-                    'INTERPRETATION_TYPE.I4' : Concept().get_e55_domain('INTERPRETATION_TYPE.I4')
+                    'INTERPRETATION_TYPE.I4' : Concept().get_e55_domain('INTERPRETATION_TYPE.I4'),
+                    'CULTURAL_PERIOD_TYPE.I4' : Concept().get_e55_domain('CULTURAL_PERIOD_TYPE.I4'),
+                    'CULTURAL_PERIOD_CERTAINTY.I6' : Concept().get_e55_domain('CULTURAL_PERIOD_CERTAINTY.I6'),
+                    'CULTURAL_PERIOD_DETAIL_TYPE.E55' : Concept().get_e55_domain('CULTURAL_PERIOD_DETAIL_TYPE.E55')
                 }
             }
-            
-            self.data['ARCHAEOLOGICAL_TIMESPAN.E52'] = {
-                'branch_lists': self.get_nodes('ARCHAEOLOGICAL_TIMESPAN.E52'),
-                'domains': {}
-            }
-
 
 # --- Condition Assessment -> ConditionAssessmentForm ------------------------------------------
 class ConditionAssessmentForm(ResourceForm):
