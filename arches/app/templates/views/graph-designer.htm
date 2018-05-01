@@ -58,7 +58,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
                 <!-- ko if: selectedNode() -->
-                <!-- ko if: selectedNode().dirty() -->
+                <!-- ko if: selectedNode().dirty() && selectedNode().istopnode == false -->
                 <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: function(){graphModel.get('selectedNode')().reset()}">{% trans "Discard Edits" %}</button>
                 <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: function(){graphModel.get('selectedNode')().save()}">{% trans "Save Edits" %}</button>
                 <!-- /ko -->
