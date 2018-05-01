@@ -94,7 +94,7 @@ define(['arches',
                     this.get('nodes').remove(function (node) {
                         return _.contains(nodes, node);
                     });
-                    parentNode.children.remove(item);
+                    parentNode.children.remove(node);
                     parentNode.selected(true);
                 }else{
                     this.trigger('error', response, 'deleteNode');

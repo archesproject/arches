@@ -49,7 +49,7 @@ define([
             e.stopImmediatePropagation();
             this.graphModel.appendNode(item, null ,function(response, status){
                 if(status === 'success') {
-                    item.expanded = ko.observable(true);
+                    item.expanded(true);
                 }
             }, this);
         },
