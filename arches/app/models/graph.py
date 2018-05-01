@@ -414,12 +414,13 @@ class Graph(models.GraphModel):
         tree = self.get_tree()
 
         def traverse_tree(tree, current_nodegroup=None):
-            if tree['node'].is_collector:
-                nodegroup = self.get_or_create_nodegroup(nodegroupid=tree['node'].nodegroup_id)
-                nodegroup.parentnodegroup = current_nodegroup
-                current_nodegroup = nodegroup
+            if tree['node']:
+                if tree['node'].is_collector:
+                    nodegroup = self.get_or_create_nodegroup(nodegroupid=tree['node'].nodegroup_id)
+                    nodegroup.parentnodegroup = current_nodegroup
+                    current_nodegroup = nodegroup
 
-            tree['node'].nodegroup = current_nodegroup
+                tree['node'].nodegroup = current_nodegroup
 
             for child in tree['children']:
                 traverse_tree(child, current_nodegroup)
@@ -496,17 +497,14 @@ class Graph(models.GraphModel):
 
         if skip_validation: # or self.can_append(branch_graph, nodeToAppendTo):
 
-            newNode = models.Node()
-            newNode.nodeid = uuid.uuid1()
-            newNode.name = 'New Node'
-            newNode.istopnode = False
-            newNode.ontologyclass = ''
-            newNode.datatype = 'semantic'
-            newNode.graph = self
-            #newNode.nodegroup_id = nodeobj.get('nodegroup_id','')
-            newNode.config = None
-            # newNode.issearchable = nodeobj.get('issearchable', True)
-            # newNode.isrequired = nodeobj.get('isrequired', False)
+            newNode = models.Node(
+                nodeid = uuid.uuid1(),
+                name = 'New Node',
+                istopnode = False,
+                ontologyclass = None,
+                datatype = 'semantic',
+                graph = self
+            )
 
             newEdge = models.Edge(
                 domainnode = nodeToAppendTo,
@@ -517,22 +515,13 @@ class Graph(models.GraphModel):
 
             self.add_node(newNode)
             self.add_edge(newEdge)
-            # for widget in branch_copy.widgets.itervalues():
-            #     self.widgets[widget.pk] = widget
-
             self.populate_null_nodegroups()
 
-            ontology_classes = self.get_valid_ontology_classes(newNode.nodeid, nodeToAppendTo.nodeid)
-            ontology_classes[0]
-            newEdge.ontologyproperty = ontology_classes[0]['ontology_property']
-            newNode.ontologyclass = ontology_classes[0]['ontology_classes'][0]
-
-            # if self.ontology is None:
-            #     branch_copy.clear_ontology_references()
-
-            # newGraph = Graph()
-            # self.edges[newEdge.pk] = newEdge
-            # self.nodes[newNode.pk] = newNode
+            # assign the first class and property found
+            if self.ontology:
+                ontology_classes = self.get_valid_ontology_classes(newNode.nodeid, nodeToAppendTo.nodeid)
+                newEdge.ontologyproperty = ontology_classes[0]['ontology_property']
+                newNode.ontologyclass = ontology_classes[0]['ontology_classes'][0]
 
             return {'node': newNode, 'edge': newEdge}
 
