@@ -124,7 +124,8 @@ class MobileSurveyManagerView(MapBaseManagerView):
         if mobile_survey_id is not None:
             ret = models.MobileSurveyModel.objects.get(pk=mobile_survey_id)
             ret.delete()
-            delete_survey(mobile_survey_id)
+            couch = Couch()
+            couch.delete_survey(mobile_survey_id)
             return JSONResponse(ret)
 
         return HttpResponseNotFound()
@@ -212,7 +213,8 @@ class MobileSurveyManagerView(MapBaseManagerView):
                 create_survey(mobile_survey, request.user)
 
         except Exception as e:
-            delete_survey(str(mobile_survey.id))
+            couch = Couch()
+            couch.delete_survey(str(mobile_survey.id))
             if connection_error == False:
                 error_title = _('Unable to save survey')
                 error_message = e
