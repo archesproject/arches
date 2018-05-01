@@ -191,9 +191,12 @@ class GraphManagerView(GraphBaseView):
         return render(request, 'views/graph/graph-manager.htm', context)
 
     def delete(self, request, graphid):
-        graph = Graph.objects.get(graphid=graphid)
-        graph.delete()
-        return JSONResponse({'succces':True})
+        try:
+            graph = Graph.objects.get(graphid=graphid)
+            graph.delete()
+            return JSONResponse({'success':True})
+        except GraphValidationError as e:
+            return JSONResponse({'status':'false','message':e.message, 'title':e.title}, status=500)
 
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')

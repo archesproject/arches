@@ -366,11 +366,11 @@ class Graph(models.GraphModel):
 
                 for widget in self.widgets.itervalues():
                     widget.delete()
-
                 # if self.isresource:
                 #     delete_search_index(self.graphid)
-
                 super(Graph, self).delete()
+        else:
+            raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot delete a Resource Model with instances.".format(self.name)), 1006)
 
     def get_tree(self, root=None):
         """
