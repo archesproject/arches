@@ -210,7 +210,8 @@ class MobileSurveyManagerView(MapBaseManagerView):
             connection_error = False
             with transaction.atomic():
                 mobile_survey.save()
-                create_survey(mobile_survey, request.user)
+                couch = Couch()
+                couch.create_survey(mobile_survey, request.user)
 
         except Exception as e:
             couch = Couch()
@@ -219,6 +220,7 @@ class MobileSurveyManagerView(MapBaseManagerView):
                 error_title = _('Unable to save survey')
                 error_message = e
                 connection_error = JSONResponse({'success':False,'message': error_message,'title': error_title}, status=500)
+            print connection_error
             return connection_error
 
         ordered_cards = models.MobileSurveyXCard.objects.filter(mobile_survey=mobile_survey).order_by('sortorder')

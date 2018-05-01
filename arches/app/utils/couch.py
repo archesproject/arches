@@ -32,7 +32,7 @@ class Couch(object):
         self.couch = couchdb.Server(settings.COUCHDB_URL)
 
     def create_survey(self, mobile_survey, user=None):
-        print 'Creating Couch DB: project_', str(mobile_survey.id)
+        print 'Creating Couch DB: project_' + str(mobile_survey.id)
         db = self.couch.create('project_' + str(mobile_survey.id))
 
         survey = JSONSerializer().serializeToPython(mobile_survey, exclude='cards')
@@ -41,7 +41,7 @@ class Couch(object):
 
     def delete_survey(self, mobile_survey_id):
         try:
-            print 'Deleting Couch DB: project_', str(mobile_survey_id)
+            print 'Deleting Couch DB: project_' + str(mobile_survey_id)
             return self.couch.delete('project_' + str(mobile_survey_id))
         except Exception as e:
             print e
