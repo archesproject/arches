@@ -61,6 +61,7 @@ class MobileSurvey(models.MobileSurveyModel):
         survey = self.serialize()
         survey['type'] = 'metadata'
         db.save(survey)
+        return db
 
     def serialize(self, fields=None, exclude=None):
         """
