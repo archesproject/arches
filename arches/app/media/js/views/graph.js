@@ -79,10 +79,12 @@ require([
                     }, function(){
                         self.viewModel.loading(true);
                         $.ajax({
-                            complete: function (request, status) {
+                            complete: function (response, status) {
                                 self.viewModel.loading(false);
                                 if (status === 'success') {
-                                    self.viewModel.allGraphs.remove(graph);
+                                  self.viewModel.allGraphs.remove(graph);
+                                } else {
+                                  self.viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.title, response.responseJSON.message));
                                 }
                             },
                             type: "DELETE",
