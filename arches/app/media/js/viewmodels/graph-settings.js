@@ -24,8 +24,10 @@ define([
 
         self.graph = params.graph;
 
-        self.graph.ontology_id.subscribe(function(val){
-            console.log(val);
+        self.node = params.node
+        self.graph.name.subscribe(function(val){
+            self.node().name(val);
+            self.node()._node(JSON.stringify(self.node()))
         })
 
         var ontologyClass = params.node().ontologyclass;
