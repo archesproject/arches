@@ -32,12 +32,16 @@ class Couch(object):
         self.couch = couchdb.Server(settings.COUCHDB_URL)
 
     def create_survey(self, mobile_survey, user=None):
-        print 'Creating Couch DB: project_' + str(mobile_survey.id)
-        db = self.couch.create('project_' + str(mobile_survey.id))
+        try:
+            print 'Creating Couch DB: project_' + str(mobile_survey.id)
+            db = self.couch.create('project_' + str(mobile_survey.id))
 
-        survey = JSONSerializer().serializeToPython(mobile_survey, exclude='cards')
-        survey['type'] = 'metadata'
-        db.save(survey)
+            survey = JSONSerializer().serializeToPython(mobile_survey, exclude='cards')
+            survey['type'] = 'metadata'
+            db.save(survey)
+        except Exception as e:
+            print e
+            return connection_error
 
     def delete_survey(self, mobile_survey_id):
         try:

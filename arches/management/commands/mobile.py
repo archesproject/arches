@@ -17,7 +17,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import os
-import couchdb
 import urllib2
 import json
 from urlparse import urlparse, urljoin

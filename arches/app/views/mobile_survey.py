@@ -210,8 +210,8 @@ class MobileSurveyManagerView(MapBaseManagerView):
             connection_error = False
             with transaction.atomic():
                 mobile_survey.save()
-                couch = Couch()
-                couch.create_survey(mobile_survey, request.user)
+                # couch = Couch()
+                # couch.create_survey(mobile_survey, request.user)
 
         except Exception as e:
             couch = Couch()
