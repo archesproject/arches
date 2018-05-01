@@ -373,8 +373,12 @@ class Graph(models.GraphModel):
                     #     delete_search_index(self.graphid)
 
                     super(Graph, self).delete()
+            else:
+                raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot delete a Resource Model with instances.".format(self.name)))
         else:
             raise GraphValidationError(_('This graph is essential to Arches and cannot be deleted'))
+
+
 
     def get_tree(self, root=None):
         """
