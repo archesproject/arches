@@ -318,6 +318,9 @@ class Command(BaseCommand):
                 print e
                 print 'Could not connect to db'
 
+        def load_datatypes(package_dir):
+            load_extensions(package_dir, 'datatypes', 'datatype')
+
         def load_graphs(package_dir):
             branches = glob.glob(os.path.join(package_dir, 'graphs', 'branches'))[0]
             resource_models = glob.glob(os.path.join(package_dir, 'graphs', 'resource_models'))[0]
@@ -424,12 +427,13 @@ class Command(BaseCommand):
                 templates = glob.glob(os.path.join(extension, '*.htm'))
                 components = glob.glob(os.path.join(extension, '*.js'))
 
-                if len(templates) == 1 and len(components) == 1:
+                if len(templates) == 1:
                     if os.path.exists(template_dir) == False:
                         os.mkdir(template_dir)
+                    shutil.copy(templates[0], template_dir)
+                if len(components) == 1:
                     if os.path.exists(component_dir) == False:
                         os.mkdir(component_dir)
-                    shutil.copy(templates[0], template_dir)
                     shutil.copy(components[0], component_dir)
 
                 modules = glob.glob(os.path.join(extension, '*.json'))
@@ -443,11 +447,12 @@ class Command(BaseCommand):
         def load_widgets(package_dir):
             load_extensions(package_dir, 'widgets', 'widget')
 
+        def load_reports(package_dir):
+            load_extensions(package_dir, 'reports', 'report')
+
         def load_functions(package_dir):
             load_extensions(package_dir, 'functions', 'fn')
 
-        def load_datatypes(package_dir):
-            load_extensions(package_dir, 'datatypes', 'datatype')
 
         def handle_source(source):
             if os.path.isdir(source):
@@ -492,6 +497,8 @@ class Command(BaseCommand):
         load_system_settings(package_location)
         print 'loading widgets'
         load_widgets(package_location)
+        print 'loading reports'
+        load_reports(package_location)
         print 'loading functions'
         load_functions(package_location)
         print 'loading datatypes'

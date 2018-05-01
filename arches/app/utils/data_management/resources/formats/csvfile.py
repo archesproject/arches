@@ -414,7 +414,7 @@ class CsvReader(Reader):
                 concepts_to_create = {}
                 new_concepts = {}
                 required_nodes = {}
-                for node in Node.objects.filter(isrequired=True, graph_id=mapping['resource_model_id']).values_list('nodeid', 'name'):
+                for node in Node.objects.filter(~Q(datatype='semantic'), isrequired=True, graph_id=mapping['resource_model_id']).values_list('nodeid', 'name'):
                     required_nodes[str(node[0])] = node[1]
 
                 # This code can probably be moved into it's own module.
@@ -643,7 +643,8 @@ class CsvReader(Reader):
                         if bool(tile.data):
                             for target_k, target_v in tile.data.iteritems():
                                 if target_k in required_nodes.keys() and target_v is None:
-                                    populated_tiles.pop(populated_tiles.index(parent_tile))
+                                    if parent_tile in populated_tiles:
+                                        populated_tiles.pop(populated_tiles.index(parent_tile))
                                     errors.append({'type': 'WARNING', 'message': 'The {0} node is required and must be populated in order to populate the {1} nodes. This data was not imported.'.format(required_nodes[target_k],  ', '.join(all_nodes.filter(nodegroup_id=str(target_tile.nodegroup_id)).values_list('name', flat=True)))})
                         elif bool(tile.tiles):
                             for tile_k, tile_v in tile.tiles.iteritems():
