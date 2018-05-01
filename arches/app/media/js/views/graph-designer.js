@@ -15,7 +15,6 @@ define([
     'datatype-config-components'
 ], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, GraphModel, GraphTree, NodeFormView, data, arches, GraphSettingsViewModel) {
     var viewModel = {
-        dataFilter: ko.observable(''),
         placeholder: ko.observable(''),
         graphid: ko.observable(data.graphid),
         activeTab: ko.observable('graph'),
@@ -33,6 +32,10 @@ define([
         ontology_namespaces: data.ontology_namespaces
     });
 
+    viewModel.graphModel.on('error', function(response){
+        viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.title, response.responseJSON.message));
+    });
+
     viewModel.selectedNode = viewModel.graphModel.get('selectedNode');
 
     viewModel.nodeForm = new NodeFormView({
@@ -43,10 +46,6 @@ define([
 
     viewModel.graphTree = new GraphTree({
         graphModel: viewModel.graphModel
-    });
-
-    viewModel.graphTree.on('error', function(response){
-        viewModel.alert(new AlertViewModel('ep-alert-red', response.title, response.message));
     });
 
     viewModel.graphSettingsViewModel = new GraphSettingsViewModel({
