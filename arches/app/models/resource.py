@@ -348,40 +348,6 @@ class Resource(models.ResourceInstance):
 
         return new_resource
 
-    def get_node_values(self, node_name):
-        """
-        Take a node_name (string) as an argument and return a list of values.
-        If an invalid node_name is used, or if multiple nodes with the same
-        name are found, the method returns False.
-        """
-
-        nodes = models.Node.objects.filter(
-            name=node_name, graph_id=self.graph_id)
-
-        if len(nodes) != 1:
-            print("invalid node name or multiple nodes with the same name")
-            return False
-
-        tiles = self.tilemodel_set.filter(
-            nodegroup_id=nodes[0].nodegroup_id)
-
-        values = []
-        for tile in tiles:
-            for node_id, value in tile.data.iteritems():
-                if node_id == str(nodes[0].nodeid):
-                    if type(value) is list:
-                        for v in value:
-                            values.append(v)
-                    else:
-                        values.append(value)
-
-        try:        
-            return [
-                models.Value.objects.get(
-                    pk=value).value for value in values]
-        except:
-            return values
-
     def serialize(self, fields=None, exclude=None):
         """
         Serialize to a different form then used by the internal class structure
