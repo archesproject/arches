@@ -701,7 +701,7 @@ define([
                                      aggBounds.top_left.lat
                                  ]
                              ];
-                             map.fitBounds(bounds);
+                             map.fitBounds(bounds, {padding: 30});
                          }
                      }
 
