@@ -49,6 +49,7 @@ class Graph(models.GraphModel):
         # self.isresource = False
         # self.isactive = False
         # self.iconclass = ''
+        # self.color = ''
         # self.subtitle = ''
         # self.ontology = None
         # self.functions = []
@@ -417,12 +418,13 @@ class Graph(models.GraphModel):
         tree = self.get_tree()
 
         def traverse_tree(tree, current_nodegroup=None):
-            if tree['node'].is_collector:
-                nodegroup = self.get_or_create_nodegroup(nodegroupid=tree['node'].nodegroup_id)
-                nodegroup.parentnodegroup = current_nodegroup
-                current_nodegroup = nodegroup
+            if tree['node']:
+                if tree['node'].is_collector:
+                    nodegroup = self.get_or_create_nodegroup(nodegroupid=tree['node'].nodegroup_id)
+                    nodegroup.parentnodegroup = current_nodegroup
+                    current_nodegroup = nodegroup
 
-            tree['node'].nodegroup = current_nodegroup
+                tree['node'].nodegroup = current_nodegroup
 
             for child in tree['children']:
                 traverse_tree(child, current_nodegroup)
@@ -479,6 +481,53 @@ class Graph(models.GraphModel):
                 branch_copy.clear_ontology_references()
 
             return branch_copy
+
+    def append_node(self, property=None, nodeid=None, skip_validation=True):
+        """
+        Appends a single node onto this graph
+
+        Arguments:
+        property -- the property to use when appending the node
+
+        Keyword Arguments:
+        nodeid -- if given will append the node to this node, if not supplied will
+        append the node to the root of this graph
+
+        skip_validation -- don't validate the resultant graph (post append), defaults to True
+
+        """
+
+        nodeToAppendTo = self.nodes[uuid.UUID(str(nodeid))] if nodeid else self.root
+
+        if skip_validation: # or self.can_append(branch_graph, nodeToAppendTo):
+
+            newNode = models.Node(
+                nodeid = uuid.uuid1(),
+                name = 'New Node',
+                istopnode = False,
+                ontologyclass = None,
+                datatype = 'semantic',
+                graph = self
+            )
+
+            newEdge = models.Edge(
+                domainnode = nodeToAppendTo,
+                rangenode = newNode,
+                ontologyproperty = property,
+                graph = self
+            )
+
+            self.add_node(newNode)
+            self.add_edge(newEdge)
+            self.populate_null_nodegroups()
+
+            # assign the first class and property found
+            if self.ontology:
+                ontology_classes = self.get_valid_ontology_classes(newNode.nodeid, nodeToAppendTo.nodeid)
+                newEdge.ontologyproperty = ontology_classes[0]['ontology_property']
+                newNode.ontologyclass = ontology_classes[0]['ontology_classes'][0]
+
+            return {'node': newNode, 'edge': newEdge}
 
     def clear_ontology_references(self):
         """
@@ -1188,7 +1237,7 @@ class Graph(models.GraphModel):
                     if unpermitted_node_edits != None:
                         unpermitted_edits.append(unpermitted_node_edits)
                 db_graph = Graph.objects.get(pk=self.graphid)
-                unpermitted_graph_edits = find_unpermitted_edits(self, db_graph, ['name','ontology_id','subtitle','iconclass','author','description','isactive'])
+                unpermitted_graph_edits = find_unpermitted_edits(self, db_graph, ['name','ontology_id','subtitle','iconclass','author','description','isactive','color'])
                 if unpermitted_graph_edits != None:
                     unpermitted_edits.append(unpermitted_graph_edits)
 

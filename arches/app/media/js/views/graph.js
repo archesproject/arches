@@ -38,7 +38,7 @@ require([
                     url: url,
                     data: JSON.stringify(data),
                     success: function(response) {
-                        window.location = arches.urls.graph_settings(response.graphid);
+                        window.location = arches.urls.graph_designer(response.graphid);
                     },
                     error: function(response) {
                         self.viewModel.loading(false);

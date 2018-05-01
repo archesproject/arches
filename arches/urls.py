@@ -22,8 +22,9 @@ from django.conf.urls import include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from arches.app.views import concept, main, map, search, graph, tileserver, api
 from arches.app.views.admin import ReIndexResources
-from arches.app.views.graph import GraphManagerView, GraphSettingsView, GraphDataView, DatatypeTemplateView, CardManagerView, CardView, FormManagerView, FormView, ReportManagerView, ReportEditorView, FunctionManagerView, PermissionManagerView, PermissionDataView
+from arches.app.views.graph import GraphDesignerView, GraphManagerView, GraphSettingsView, NewGraphSettingsView, GraphDataView, DatatypeTemplateView, CardManagerView, CardView, FormManagerView, FormView, ReportManagerView, ReportEditorView, FunctionManagerView, PermissionManagerView, PermissionDataView
 from arches.app.views.resource import ResourceEditorView, ResourceListView, ResourceData, ResourceCards, ResourceReportView, ResourceReportData, RelatedResourcesView, ResourceDescriptors, ResourceEditLogView, ResourceTiles
+from arches.app.views.resource import NewResourceEditorView
 from arches.app.views.concept import RDMView
 from arches.app.views.user import UserManagerView
 from arches.app.views.tile import TileData
@@ -61,6 +62,7 @@ urlpatterns = [
     url(r'^concepts/paged_dropdown', concept.paged_dropdown, name="paged_dropdown"),
     url(r'^concepts/export/(?P<conceptid>%s)$' % uuid_regex , concept.export, name="export_concept"),
     url(r'^concepts/export/collections', concept.export_collections, name="export_concept_collections"),
+    url(r'^concepts/collections', concept.get_concept_collections, name="get_concept_collections"),
     url(r'^concepts/get_pref_label', concept.get_pref_label, name="get_pref_label"),
     url(r'^conceptvalue/', concept.concept_value, name="concept_value"),
     url(r'^search$', search.SearchView.as_view(), name="search_home"),
@@ -70,19 +72,20 @@ urlpatterns = [
     url(r'^search/time_wheel_config$', search.time_wheel_config, name="time_wheel_config"),
     url(r'^buffer/$', search.buffer, name="buffer"),
     url(r'^settings/', ResourceEditorView.as_view(), { 'resourceid': settings.RESOURCE_INSTANCE_ID, 'view_template':'views/system-settings.htm', 'main_script':'views/system-settings', 'nav_menu':False}, name='config'),
+    url(r'^graph/new$', GraphDataView.as_view(action='new_graph'), name='new_graph'),
+    url(r'^graph/import/', GraphDataView.as_view(action='import_graph'), name='import_graph'),
+    url(r'^graph/permissions$', PermissionDataView.as_view(), name='permission_data'),
     url(r'^graph/(?P<graphid>%s|())$' % uuid_regex, GraphManagerView.as_view(), name='graph'),
     url(r'^graph/(?P<graphid>%s)/settings$' % uuid_regex, GraphSettingsView.as_view(), name='graph_settings'),
     url(r'^graph/(?P<graphid>%s)/card_manager$' % uuid_regex, CardManagerView.as_view(), name='card_manager'),
     url(r'^graph/(?P<graphid>%s)/append_branch$' % uuid_regex, GraphDataView.as_view(action='append_branch'), name='append_branch'),
+    url(r'^graph/(?P<graphid>%s)/append_node$' % uuid_regex, GraphDataView.as_view(action='append_node'), name='append_node'),
     url(r'^graph/(?P<graphid>%s)/move_node$' % uuid_regex, GraphDataView.as_view(action='move_node'), name='move_node'),
     url(r'^graph/(?P<graphid>%s)/update_node$' % uuid_regex, GraphDataView.as_view(action='update_node'), name='update_node'),
     url(r'^graph/(?P<graphid>%s)/delete_node$' % uuid_regex, GraphDataView.as_view(action='delete_node'), name='delete_node'),
     url(r'^graph/(?P<graphid>%s)/clone$' % uuid_regex, GraphDataView.as_view(action='clone_graph'), name='clone_graph'),
     url(r'^graph/(?P<graphid>%s)/export$' % uuid_regex, GraphDataView.as_view(action='export_graph'), name='export_graph'),
     url(r'^graph/(?P<graphid>%s)/export_mapping_file$' % uuid_regex, GraphDataView.as_view(action='export_mapping_file'), name='export_mapping_file'),
-    url(r'^graph/import/', GraphDataView.as_view(action='import_graph'), name='import_graph'),
-    url(r'^components/datatypes/(?P<template>[a-zA-Z_-]*)', DatatypeTemplateView.as_view(), name='datatype_template'),
-    url(r'^graph/new$', GraphDataView.as_view(action='new_graph'), name='new_graph'),
     url(r'^graph/(?P<graphid>%s)/get_related_nodes/(?P<nodeid>%s)$' % (uuid_regex, uuid_regex), GraphDataView.as_view(action='get_related_nodes'), name='get_related_nodes'),
     url(r'^graph/(?P<graphid>%s)/get_valid_domain_nodes/(?P<nodeid>%s)$' % (uuid_regex, uuid_regex), GraphDataView.as_view(action='get_valid_domain_nodes'), name='get_valid_domain_nodes'),
     url(r'^graph/(?P<graphid>%s)/get_domain_connections$' % uuid_regex, GraphDataView.as_view(action='get_domain_connections'), name='get_domain_connections'),
@@ -95,10 +98,13 @@ urlpatterns = [
     url(r'^graph/(?P<graphid>%s)/apply_functions$' % uuid_regex, FunctionManagerView.as_view(), name='apply_functions'),
     url(r'^graph/(?P<graphid>%s)/remove_functions$' % uuid_regex, FunctionManagerView.as_view(), name='remove_functions'),
     url(r'^graph/(?P<graphid>%s)/permissions$' % uuid_regex, PermissionManagerView.as_view(), name='permission_manager'),
-    url(r'^graph/permissions$', PermissionDataView.as_view(), name='permission_data'),
+    url(r'^graph_designer/(?P<graphid>%s)$' % uuid_regex, GraphDesignerView.as_view(), name='graph_designer'),
+    url(r'^graph_settings/(?P<graphid>%s)$' % uuid_regex, NewGraphSettingsView.as_view(), name='new_graph_settings'),
+    url(r'^components/datatypes/(?P<template>[a-zA-Z_-]*)', DatatypeTemplateView.as_view(), name='datatype_template'),
     url(r'^resource$', ResourceListView.as_view(), name='resource'),
     url(r'^resource/(?P<resourceid>%s)/(?P<graphid>%s)/add_resource$' % (uuid_regex, uuid_regex), ResourceEditorView.as_view(), name='add_resource'),
     url(r'^resource/(?P<resourceid>%s)$' % uuid_regex, ResourceEditorView.as_view(), name='resource_editor'),
+    url(r'^resource-new/(?P<resourceid>%s)$' % uuid_regex, NewResourceEditorView.as_view(), name='new_resource_editor'),
     url(r'^resource/(?P<resourceid>%s)/copy$' % uuid_regex, ResourceEditorView.as_view(action='copy'), name='resource_copy'),
     url(r'^resource/(?P<resourceid>%s)/history$' % uuid_regex, ResourceEditLogView.as_view(), name='resource_edit_log'),
     url(r'^resource/(?P<resourceid>%s)/data/(?P<formid>%s)$' % (uuid_regex, uuid_regex), ResourceData.as_view(), name='resource_data'),

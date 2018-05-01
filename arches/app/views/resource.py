@@ -71,6 +71,36 @@ def get_resource_relationship_types():
     relationship_type_values = {'values':[{'id':str(c[2]), 'text':str(c[1])} for c in resource_relationship_types], 'default': str(default_relationshiptype_valueid)}
     return relationship_type_values
 
+
+@method_decorator(can_edit_resource_instance(), name='dispatch')
+class NewResourceEditorView(MapBaseManagerView):
+    def get(self, request, resourceid=None, view_template='views/resource/new-editor.htm', main_script='views/resource/new-editor', nav_menu=True):
+        resource_instance = Resource.objects.get(pk=resourceid)
+        cards = resource_instance.graph.cardmodel_set.select_related('nodegroup').all()
+        nodegroups = [card.nodegroup for card in cards]
+
+        displayname = resource_instance.displayname
+        if displayname == 'undefined':
+            displayname = 'Unnamed Resource'
+
+        context = self.get_context_data(
+            main_script=main_script,
+            resourceid=resourceid,
+            displayname=displayname,
+            graphid=resource_instance.graph_id,
+            tiles=JSONSerializer().serialize(resource_instance.tilemodel_set.all()),
+            cards=JSONSerializer().serialize(cards),
+            nodegroups=JSONSerializer().serialize(nodegroups),
+        )
+
+        context['nav']['title'] = ''
+        context['nav']['menu'] = nav_menu
+        context['nav']['help'] = (_('Using the Resource Editor'),'help/base-help.htm')
+        context['help'] = 'resource-editor-help'
+
+        return render(request, view_template, context)
+
+
 @method_decorator(can_edit_resource_instance(), name='dispatch')
 class ResourceEditorView(MapBaseManagerView):
     action = None

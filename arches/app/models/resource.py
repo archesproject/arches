@@ -256,22 +256,13 @@ class Resource(models.ResourceInstance):
         Returns an object that lists the related resources, the relationship types, and a reference to the current resource
 
         """
-        root_nodes = models.Node.objects.filter(istopnode=True)
-        node_config_lookup = {}
         graphs = models.GraphModel.objects.all().exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False)
-        graph_lookup = {str(graph.graphid): {'name':graph.name, 'iconclass': graph.iconclass} for graph in graphs}
-        for node in root_nodes:
-            graph_id = unicode(node.graph_id)
-            if node.config != None and graph_id in graph_lookup:
-                node_config_lookup[graph_id] = node.config
-                node_config_lookup[graph_id]['iconclass'] = graph_lookup[graph_id]['iconclass']
-                node_config_lookup[graph_id]['name'] = graph_lookup[graph_id]['name']
-
+        graph_lookup = {str(graph.graphid): {'name':graph.name, 'iconclass': graph.iconclass, 'fillColor': graph.color} for graph in graphs}
         ret = {
             'resource_instance': self,
             'resource_relationships': [],
             'related_resources': [],
-            'node_config_lookup': node_config_lookup
+            'node_config_lookup': graph_lookup
         }
         se = SearchEngineFactory().create()
 
