@@ -27,16 +27,16 @@ define(['arches',
         */
         selectNode: function(newly_selected_node){
             this.trigger('select-node', newly_selected_node);
-            var currentlySelectedNode = this.get('selectedNode');
-            if (currentlySelectedNode() && currentlySelectedNode().dirty()) {
+            var currentlySelectedNode = this.get('selectedNode')();
+            if (currentlySelectedNode && currentlySelectedNode.dirty()) {
                 return false;
             }else{
-                newly_selected_node.selected(true);
                 this.get('nodes')().forEach(function (node) {
                     if(node !== newly_selected_node){
                         node.selected(false);
                     }
                 });
+                newly_selected_node.selected(true);
                 return true;
             }
         },
