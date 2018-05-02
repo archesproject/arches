@@ -78,7 +78,7 @@ def RESOURCE_TYPE_CONFIGS():
             'resourcetypeid': 'HERITAGE_COMPONENT.B2',
             'name': _('Heritage Component'),
             'icon_class': 'fa fa-th',
-            'default_page': 'summary-component',
+            'default_page': 'component-classification',
             'default_description': _('No name available'),
             'description_node': _('NAME.E41'),
             'categories': [_('Resource')],

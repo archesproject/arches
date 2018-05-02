@@ -153,6 +153,30 @@ class FeatureSummaryForm(ResourceForm):
                     'GENERAL_DESCRIPTION_TYPE.E55' : Concept().get_e55_domain('GENERAL_DESCRIPTION_TYPE.E55')
                 }
             }
+            
+class ComponentClassification(ResourceForm):
+    @staticmethod
+    def get_info():
+        return {
+            'id': 'component-classification',
+            'icon': 'fa-tag',
+            'name': _('Component Classification'),
+            'class': ComponentClassification
+        }
+
+    def update(self, data, files):
+        self.update_nodes('COMPONENT_CLASSIFICATION.E17', data)
+        return
+
+    def load(self, lang):
+        if self.resource:
+            self.data['COMPONENT_CLASSIFICATION.E17'] = {
+                'branch_lists': self.get_nodes('COMPONENT_CLASSIFICATION.E17'),
+                'domains': {
+                    'COMPONENT_TYPE.E55' : Concept().get_e55_domain('COMPONENT_TYPE.E55'),
+                    'COMPONENT_ORIENTATION.E55' : Concept().get_e55_domain('COMPONENT_ORIENTATION.E55')
+                }
+            }
 
 class ModificationForm(ResourceForm):
     @staticmethod

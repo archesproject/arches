@@ -1,0 +1,57 @@
+{% extends "views/forms/base.htm" %}
+{% load i18n %}
+
+
+
+{% block form_content %}
+<div class="form-full-content">
+    <div id="classification-section">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9">
+                <div class="col-xs-6 form-section-input add-padding-right">
+                    <div class="form-group">
+                        <input class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('COMPONENT_TYPE.E55', 'value'), placeholder: '{% trans 'Component Type' %}', dataKey: 'COMPONENT_TYPE.E55'}"></input>
+                    </div>
+                </div>
+                <div class="col-xs-6 form-section-input add-margin-top">
+                    <div class="form-group">
+                        <input class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('COMPONENT_ORIENTATION.E55', 'value'), placeholder: '{% trans 'Component Orientation' %}', dataKey: 'COMPONENT_ORIENTATION.E55'}"></input>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-3 add-button-column add-margin-top">
+                {% include 'views/components/add-item-button.htm' %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-9">
+                <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "You must select a component type." %}</div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="arches-crud-child-section-new">
+                    <dl>
+                        <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                            <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue filler-text-block nr"></div>
+                            <div data-bind='foreach: getBranchLists()'>
+                                <div class="arches-crud-record" style="display:block;">
+                                    <a href="javascript:void(0)" title="remove"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                    <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" title="{% trans 'edit' %}" data-bind='click: $parent.editItem.bind($parent)'>
+                                    
+                                        <span data-bind="text: nodes.get('COMPONENT_TYPE.E55', 'label')"></span>
+                                        <span data-bind="text: nodes.get('COMPONENT_ORIENTATION.E55', 'label')"></span>
+                                    </a>
+                                </div>
+                            </div>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+{% include 'views/forms/sections/SaveEditsFooter.htm' %}
+{% endblock form_content %}
