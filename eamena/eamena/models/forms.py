@@ -177,7 +177,7 @@ class ComponentClassification(ResourceForm):
                     'COMPONENT_ORIENTATION.E55' : Concept().get_e55_domain('COMPONENT_ORIENTATION.E55')
                 }
             }
-
+            
 class ModificationForm(ResourceForm):
     @staticmethod
     def get_info():
@@ -225,6 +225,31 @@ class AssessmentSummaryForm(ResourceForm):
                 'domains': {
                     'INVESTIGATOR_ROLE_TYPE.E55' : Concept().get_e55_domain('INVESTIGATOR_ROLE_TYPE.E55'),
                     'ASSESSMENT_ACTIVITY_TYPE.E55' : Concept().get_e55_domain('ASSESSMENT_ACTIVITY_TYPE.E55'),
+                }
+            }
+            
+
+class ComponentAssessmentForm(ResourceForm):
+    @staticmethod
+    def get_info():
+        return {
+            'id': 'component-assessment',
+            'icon': 'fa-tag',
+            'name': _('Assessment Summary'),
+            'class': ComponentAssessmentForm
+        }
+
+    def update(self, data, files):
+        self.update_nodes('INVESTIGATION_ACTIVITY.E7', data)
+        return
+
+    def load(self, lang):
+        if self.resource:
+            self.data['INVESTIGATION_ACTIVITY.E7'] = {
+                'branch_lists': datetime_nodes_to_dates(self.get_nodes('INVESTIGATION_ACTIVITY.E7')),
+                'domains': {
+                    'INVESTIGATION_ACTIVITY_TYPE.E55' : Concept().get_e55_domain('INVESTIGATION_ACTIVITY_TYPE.E55'),
+                    'INVESTIGATOR_ROLE_TYPE.E55' : Concept().get_e55_domain('INVESTIGATOR_ROLE_TYPE.E55')
                 }
             }
 
