@@ -1043,6 +1043,32 @@ class LocationForm(ResourceForm):
 
         return
 
+class ComponentLocationForm(ResourceForm):
+    @staticmethod
+    def get_info():
+        return {
+            'id': 'location-component',
+            'icon': 'fa-map-marker',
+            'name': _('Location'),
+            'class': ComponentLocationForm
+        }
+
+    def update(self, data, files):
+
+        self.update_nodes('SPATIAL_COORDINATES.E47', data)
+        
+        return
+
+    def load(self, lang):
+    
+        geom = self.get_nodes('SPATIAL_COORDINATES.E47')[0]['nodes'][0] if self.get_nodes('SPATIAL_COORDINATES.E47') else ''
+        self.data['SPATIAL_COORDINATES.E47'] = {
+            'branch_lists': self.get_nodes('SPATIAL_COORDINATES.E47'),
+            'domains': {
+                'GEOMETRY_TYPE.E55': Concept().get_e55_domain('GEOMETRY_TYPE.E55'),
+            },
+            'BingDates': getdates(geom.value) if geom else ''
+        }
 
 class CoverageForm(ResourceForm):
     @staticmethod

@@ -86,6 +86,7 @@ class Resource(ArchesResource):
         elif self.entitytypeid == 'HERITAGE_COMPONENT.B2':
             description_group['forms'][:0] = [
                 forms.ComponentClassification.get_info(),
+                forms.ComponentLocationForm.get_info(),
             ]
             
         elif self.entitytypeid == 'ACTIVITY.E7':

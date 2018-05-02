@@ -64,10 +64,16 @@ define([
                 self.trigger('geometrychange', feature, wkt.writeGeometry(geom));
                 
             };
+            var resourcetypeid = $('#resourcetypeid').val();
+            if (resourcetypeid == 'HERITAGE_COMPONENT.B2') {
+                var geom_node = 'SPATIAL_COORDINATES.E47';
+            } else {
+                var geom_node = 'GEOMETRIC_PLACE_EXPRESSION.SP5';
+            }
             var object = JSON.parse($('#formdata').val());
             var datesall =[];
-            datesall.push(object['GEOMETRIC_PLACE_EXPRESSION.SP5']['BingDates']['start']);
-            datesall.push(object['GEOMETRIC_PLACE_EXPRESSION.SP5']['BingDates']['end']);
+            datesall.push(object[geom_node]['BingDates']['start']);
+            datesall.push(object[geom_node]['BingDates']['end']);
             var nonull = _.reject(datesall, function(date) {
                 return date ==null;
             });
