@@ -35,7 +35,7 @@
                 <!-- ko if: !node().istopnode -->
                 <div class="node-widget-label">
                     <div class="control-label">
-                        <span style="display:flex"><div>{% trans "Relationship to" %}</div><div class="node-form node-name" data-bind="text: graphModel.getParentNode(node()).name"></div><div>({% trans "parent" %})</div></span>
+                        <span style="display:flex"><div class="node-form ontology">{% trans "Relationship to" %}</div><div class="node-form node-name" data-bind="text: graphModel.getParentNode(node()).name"></div><div>({% trans "parent" %})</div></span>
                     </div>
                     <div>
                         <select class="design" data-bind="value: node().parentproperty, options: node().validproperties, optionsText: node().getFriendlyOntolgyName.bind(node()), valueAllowUnset: true, optionsCaption: '{% trans "Choose a property" %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
@@ -47,7 +47,13 @@
                         {% trans "Semantics" %}
                     </div>
                     <div>
-                        <span class="node-semantic-description"><div data-bind="text: graphModel.getParentNode(node()).name"></div><div class="node-form node-name" data-bind="text: node().parentproperty_friendlyname"></div><div data-bind="text: node().ontologyclass_friendlyname"></div></span>
+                        <span class="node-semantic-description">
+                            <div class="node-form node-name" data-bind="text: graphModel.getParentNode(node()).name"></div>
+                            <div class="node-form ontology" data-bind="text: '(' + graphModel.getParentNode(node()).ontologyclass_friendlyname() + '; parent)'"></div>
+                            <div class="node-form ontology" data-bind="text: node().parentproperty_friendlyname"></div>
+                            <div class="node-form node-name" data-bind="text: node().name"></div>
+                            <div class="node-form ontology" data-bind="text: '(' + node().ontologyclass_friendlyname()  + ')'"></div>
+                        </span>
                     </div>
                 </div>
 

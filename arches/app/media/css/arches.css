@@ -5817,10 +5817,15 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .node-form.node-name {
     font-size: 13px;
-    color: grey;
+    color: #333;
+    font-weight: 600;
     margin-top: 0;
     display: inline;
-    padding: 0 5px;
+    padding-right: 5px;
+}
+
+.node-form.ontology {
+    padding-right: 5px;
 }
 
 .node-semantic-description {
