@@ -24,8 +24,9 @@ define([
 
         self.graph = params.graph;
 
-        self.graph.ontology_id.subscribe(function(val){
-            console.log(val);
+        self.node = params.node
+        self.graph.name.subscribe(function(val){
+            self.node().name(val);
         })
 
         var ontologyClass = params.node().ontologyclass;
@@ -48,10 +49,12 @@ define([
         self.jsonCache = ko.observable(self.jsonData());
 
         var dirty = ko.computed(function () {
-            return self.jsonData() !== self.jsonCache();
+            var dirty = self.jsonData() !== self.jsonCache();
+            return dirty
         });
 
         self.dirty = dirty;
+
         self.icon_data = ko.observableArray([]);
         self.iconFilter = params.iconFilter;
         self.icons = ko.computed(function () {
@@ -77,6 +80,7 @@ define([
                 data: self.jsonData()})
                 .done(function(response) {
                     self.jsonCache(self.jsonData());
+                    self.node()._node(JSON.stringify(self.node()))
                 })
                 .fail(function(response) {
                     console.log('there was an error saving the settings', response)
@@ -100,6 +104,7 @@ define([
                 resource.isRelatable(jsonResource.is_relatable);
             });
             self.jsonCache(self.jsonData());
+            self.node()._node(JSON.stringify(self.node()))
         };
 
     };

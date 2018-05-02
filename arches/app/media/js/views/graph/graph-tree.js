@@ -30,6 +30,7 @@ define([
         */
         initialize: function(options) {
             this.graphModel = options.graphModel;
+            this.graphSettings = options.graphSettings;
             this.items = this.graphModel.get('nodes');
             TreeView.prototype.initialize.apply(this, arguments);
         },
@@ -41,8 +42,10 @@ define([
         * @param {object} e - click event object
         */
         selectItem: function(item, e){
-            this.graphModel.selectNode(item);
-            this.trigger('node-selected', item);
+            if (!this.graphSettings.dirty()) {
+                this.graphModel.selectNode(item);
+                this.trigger('node-selected', item);
+            }
         },
 
         addChildNode: function(item, e) {

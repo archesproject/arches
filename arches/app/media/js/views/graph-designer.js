@@ -44,9 +44,6 @@ define([
         node: viewModel.selectedNode
     });
 
-    viewModel.graphTree = new GraphTree({
-        graphModel: viewModel.graphModel
-    });
 
     viewModel.graphSettingsViewModel = new GraphSettingsViewModel({
         graph: viewModel.graph,
@@ -59,6 +56,11 @@ define([
         ontology_namespaces: data.ontology_namespaces
     });
 
+    viewModel.graphTree = new GraphTree({
+        graphModel: viewModel.graphModel,
+        graphSettings: viewModel.graphSettingsViewModel
+    });
+    
     viewModel.loadGraphSettings = function(){
         var self = this;
         self.contentLoading(true);
