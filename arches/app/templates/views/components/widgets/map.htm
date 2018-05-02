@@ -276,7 +276,7 @@
             </div>
             <!--/ko-->
 
-            <!--ko if: popupData().arches_description-->
+            <!--ko if: popupData().feature_info_content-->
             <div class="hover-feature-metadata">
                 <i class="ion-ios-close pull-right add-tooltip hover-panel-dismiss"
                 style="cursor: pointer;"
@@ -285,7 +285,7 @@
                 data-original-title="add overlay"
                 data-bind="visible: popupData() === clickData(), click: function () { clickData(null); }"
                 ></i>
-                <div class="hover-feature-body" data-bind="html: popupData().arches_description"></div>
+                <div class="hover-feature-body" data-bind="html: popupData().feature_info_content"></div>
             </div>
             <!--/ko-->
 
