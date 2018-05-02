@@ -91,6 +91,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             {% endif %}
                         {% endif %}
 
+
+                        {% block graph_title %}
                         <!-- Page Title and Icon -->
                         <div class="ep-tools-title">
                             <h1 class="page-header text-overflow ep-graph-title">
@@ -98,6 +100,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <span>{% trans nav.title %}</span>
                             </h1>
                         </div>
+                        {% endblock graph_title %}
 
                         <!-- Login -->
                         {% if nav.login %}
