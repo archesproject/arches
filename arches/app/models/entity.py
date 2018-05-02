@@ -124,6 +124,7 @@ class Entity(object):
         
     def create_uniqueids(self, entitytype, is_new_resource = False):  # Method that creates UniqueIDs and its correlated Entity when a new resource is saved, or else only a UniqueId when the entity is already present (this will happen if the entities are created via importer.py
 
+        uniqueid_node = settings.RESOURCE_TYPE_CONFIGS()[self.entitytypeid]['primary_name_lookup']['entity_type']
         if entitytype in settings.EAMENA_RESOURCES:
           type = 'EAMENA'
         else:
@@ -131,7 +132,7 @@ class Entity(object):
             
         if is_new_resource:
           entity2 = archesmodels.Entities()
-          entity2.entitytypeid = archesmodels.EntityTypes.objects.get(pk = "EAMENA_ID.E42")
+          entity2.entitytypeid = archesmodels.EntityTypes.objects.get(pk=uniqueid_node)
           entity2.entityid = str(uuid.uuid4())
           entity2.save()
           rule = archesmodels.Rules.objects.get(entitytypedomain = self.entitytypeid, entitytyperange = entity2.entitytypeid)
