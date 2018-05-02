@@ -80,6 +80,7 @@ class Resource(ArchesResource):
                 forms.MeasurementvaluesForm.get_info(),
                 forms.RelatedResourcesForm.get_info(),
                 forms.ModificationForm.get_info(),
+                forms.RelatedFilesForm.get_info(),
 
             ]
             
@@ -89,6 +90,8 @@ class Resource(ArchesResource):
                 forms.ComponentClassification.get_info(),
                 forms.ComponentLocationForm.get_info(),
                 forms.MeasurementvaluesForm.get_info(),
+                forms.RelatedFilesForm.get_info(),
+                forms.RelatedResourcesForm.get_info(),
             ]
             
         elif self.entitytypeid == 'ACTIVITY.E7':
