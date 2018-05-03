@@ -160,21 +160,34 @@ class ModificationForm(ResourceForm):
         return {
             'id': 'modification',
             'icon': 'fa-plus',
-            'name': _('Modifications'),
+            'name': _('Modification and Construction'),
             'class': ModificationForm
         }
 
     def update(self, data, files):
-        self.update_nodes('MODIFICATION.E11', data)
+        self.update_nodes('MODIFICATION_TYPE.E55', data)
+        self.update_nodes('MODIFICATION_DESCRIPTION.E62', data)
+        self.update_nodes('CONSTRUCTION_TECHNIQUE_TYPE.E55', data)
         return
 
     def load(self, lang):
         if self.resource:
-            self.data['MODIFICATION.E11'] = {
-                'branch_lists': self.get_nodes('MODIFICATION.E11'),
+            self.data['MODIFICATION_TYPE.E55'] = {
+                'branch_lists': datetime_nodes_to_dates(exclude_empty_branches(self.get_nodes('MODIFACATION.E11'),'MODIFICATION_TYPE.E55')),
+                'domains': {
+                    'MODIFICATION_TYPE.E55' : Concept().get_e55_domain('MODIFICATION_TYPE.E55'),
+                }
+            }
+            
+            self.data['MODIFICATION_DESCRIPTION.E62'] = {
+                'branch_lists': datetime_nodes_to_dates(exclude_empty_branches(self.get_nodes('MODIFACATION.E11'),'MODIFICATION_DESCRIPTION.E62')),
+                'domains': {}
+            }
+            
+            self.data['CONSTRUCTION_TECHNIQUE_TYPE.E55'] = {
+                'branch_lists': datetime_nodes_to_dates(exclude_empty_branches(self.get_nodes('MODIFACATION.E11'),'CONSTRUCTION_TECHNIQUE_TYPE.E55')),
                 'domains': {
                     'CONSTRUCTION_TECHNIQUE_TYPE.E55' : Concept().get_e55_domain('CONSTRUCTION_TECHNIQUE_TYPE.E55'),
-                    'MODIFICATION_TYPE.E55' : Concept().get_e55_domain('MODIFICATION_TYPE.E55'),
                     'CONSTRUCTION_MATERIAL.E57' : Concept().get_e55_domain('CONSTRUCTION_MATERIAL.E57')
                 }
             }
