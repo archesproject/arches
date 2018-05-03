@@ -501,9 +501,17 @@ class Graph(models.GraphModel):
 
         if skip_validation: # or self.can_append(branch_graph, nodeToAppendTo):
 
+            temp_node_name = 'New Node'
+            if models.Node.objects.filter(name=temp_node_name).count() != 0:
+                i = 1
+                temp_node_name = 'New Node_%s' % i
+                while models.Node.objects.filter(name=temp_node_name).count() > 0:
+                    i += 1
+                    temp_node_name = 'New Node_%s' % i
+
             newNode = models.Node(
                 nodeid = uuid.uuid1(),
-                name = 'New Node',
+                name = temp_node_name,
                 istopnode = False,
                 ontologyclass = None,
                 datatype = 'semantic',
