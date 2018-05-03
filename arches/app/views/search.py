@@ -18,7 +18,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
 import csv
-import math
 from datetime import datetime
 from django.shortcuts import render
 from django.apps import apps
@@ -38,6 +37,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.date_utils import ExtendedDateFormat
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Term, Terms, GeoShape, Range, MinAgg, MaxAgg, RangeAgg, Aggregation, GeoHashGridAgg, GeoBoundsAgg, FiltersAgg, NestedAgg
+from arches.app.search.time_wheel import TimeWheel
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.views.base import BaseManagerView, MapBaseManagerView
 from arches.app.views.concept import get_preflabel_from_conceptid
@@ -584,121 +584,6 @@ def export_results(request):
     return zipped_results
 
 def time_wheel_config(request):
-    se = SearchEngineFactory().create()
-    query = Query(se, limit=0)
-    nested_agg = NestedAgg(path='dates', name='min_max_agg')
-    nested_agg.add_aggregation(MinAgg(field='dates.date'))
-    nested_agg.add_aggregation(MaxAgg(field='dates.date'))
-    query.add_aggregation(nested_agg)
-    results = query.search(index='resource')
-
-    if results is not None and results['aggregations']['min_max_agg']['min_dates.date']['value'] is not None and results['aggregations']['min_max_agg']['max_dates.date']['value'] is not None:
-        min_date = int(results['aggregations']['min_max_agg']['min_dates.date']['value'])/10000
-        max_date = int(results['aggregations']['min_max_agg']['max_dates.date']['value'])/10000
-        # round min and max date to the nearest 1000 years
-        min_date = math.ceil(math.fabs(min_date)/1000)*-1000 if min_date < 0 else math.floor(min_date/1000)*1000
-        max_date = math.floor(math.fabs(max_date)/1000)*-1000 if max_date < 0 else math.ceil(max_date/1000)*1000
-        query = Query(se, limit=0)
-        range_lookup = {}
-
-        def gen_range_agg(gte=None, lte=None, permitted_nodegroups=None):
-            date_query = Bool()
-            date_query.filter(Range(field='dates.date', gte=gte, lte=lte, relation='intersects'))
-            if permitted_nodegroups:
-                date_query.filter(Terms(field='dates.nodegroup_id', terms=permitted_nodegroups))
-            date_ranges_query = Bool()
-            date_ranges_query.filter(Range(field='date_ranges.date_range', gte=gte, lte=lte, relation='intersects'))
-            if permitted_nodegroups:
-                date_ranges_query.filter(Terms(field='date_ranges.nodegroup_id', terms=permitted_nodegroups))
-            wrapper_query = Bool()
-            wrapper_query.should(Nested(path='date_ranges', query=date_ranges_query))
-            wrapper_query.should(Nested(path='dates', query=date_query))
-            return wrapper_query
-
-        for millennium in range(int(min_date),int(max_date)+1000,1000):
-            min_millenium = millennium
-            max_millenium = millennium + 1000
-            millenium_name = "Millennium (%s - %s)"%(min_millenium, max_millenium)
-            mill_boolquery = gen_range_agg(gte=ExtendedDateFormat(min_millenium).lower,
-                lte=ExtendedDateFormat(max_millenium).lower,
-                permitted_nodegroups=get_permitted_nodegroups(request.user))
-            millenium_agg = FiltersAgg(name=millenium_name)
-            millenium_agg.add_filter(mill_boolquery)
-            range_lookup[millenium_name] = [min_millenium, max_millenium]
-
-            for century in range(min_millenium,max_millenium,100):
-                min_century = century
-                max_century = century + 100
-                century_name="Century (%s - %s)"%(min_century, max_century)
-                cent_boolquery = gen_range_agg(gte=ExtendedDateFormat(min_century).lower,
-                    lte=ExtendedDateFormat(max_century).lower)
-                century_agg = FiltersAgg(name=century_name)
-                century_agg.add_filter(cent_boolquery)
-                millenium_agg.add_aggregation(century_agg)
-                range_lookup[century_name] = [min_century, max_century]
-
-                for decade in range(min_century,max_century,10):
-                    min_decade = decade
-                    max_decade = decade + 10
-                    decade_name = "Decade (%s - %s)"%(min_decade, max_decade)
-                    dec_boolquery = gen_range_agg(gte=ExtendedDateFormat(min_decade).lower,
-                        lte=ExtendedDateFormat(max_decade).lower)
-                    decade_agg = FiltersAgg(name=decade_name)
-                    decade_agg.add_filter(dec_boolquery)
-                    century_agg.add_aggregation(decade_agg)
-                    range_lookup[decade_name] = [min_decade, max_decade]
-
-            query.add_aggregation(millenium_agg)
-
-        root = d3Item(name='root')
-        results = {'buckets':[query.search(index='resource')['aggregations']]}
-        results_with_ranges = appendDateRanges(results, range_lookup)
-        transformESAggToD3Hierarchy(results_with_ranges, root)
-        return JSONResponse(root, indent=4)
-    else:
-        return HttpResponseNotFound(_('Error retrieving the time wheel config'))
-
-def transformESAggToD3Hierarchy(results, d3ItemInstance):
-    if 'buckets' not in results:
-        return d3ItemInstance
-
-    for key, value in results['buckets'][0].iteritems():
-        if key == 'from':
-            d3ItemInstance.start = int(value)
-        elif key == 'to':
-            d3ItemInstance.end = int(value)
-        elif key == 'doc_count':
-            d3ItemInstance.size = value
-        elif key == 'key':
-            pass
-        else:
-            d3ItemInstance.children.append(transformESAggToD3Hierarchy(value, d3Item(name=key)))
-
-    d3ItemInstance.children = sorted(d3ItemInstance.children, key=lambda item: item.start)
-
-    return d3ItemInstance
-
-def appendDateRanges(results, range_lookup):
-    if 'buckets' in results:
-        bucket = results['buckets'][0]
-        for key, value in bucket.iteritems():
-            if key in range_lookup:
-                bucket[key]['buckets'][0]['from'] = range_lookup[key][0]
-                bucket[key]['buckets'][0]['to'] = range_lookup[key][1]
-                appendDateRanges(value, range_lookup)
-
-    return results
-
-class d3Item(object):
-    name = ''
-    size = 0
-    start = None
-    end = None
-    children = []
-
-    def __init__(self, **kwargs):
-        self.name = kwargs.pop('name', '')
-        self.size = kwargs.pop('size', 0)
-        self.start = kwargs.pop('start',None)
-        self.end = kwargs.pop('end', None)
-        self.children = kwargs.pop('children', [])
+    time_wheel = TimeWheel()
+    root = time_wheel.time_wheel_config(request.user)
+    return JSONResponse(root, indent=4)
