@@ -28,13 +28,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <div class="ep-form-toolbar">
         <div>
             <h4 class="ep-form-toolbar-title">
-            <!-- Layer Filter -->
-            <div class="list-filter" data-bind="" style="margin-right: 10px;">
-                <input type="text" class="form-control" style="width: 250px;" placeholder="{% trans 'Find a node, datatype, card...' %}">
-
-                <!-- Clear Search -->
-                <span class="clear-node-search" style="top: 8px;"><i class="fa fa-times-circle"></i></span>
-            </div>
 
             </h4>
         </div>
@@ -42,7 +35,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     <div class="flex">
         <div class="left-panel" data-bind="resizableSidepanel:true">
-            <div class="jstree jstree-default">
+            <div class="jstree jstree-default" data-bind="visible: true" style="display: none;">
                 <div class="header">
                     <a data-bind="click: expandAll">Expand all</a>
                     <a data-bind="click: collapseAll" style="padding-left:5px;">Collapse all</a>
@@ -51,13 +44,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': rootExpanded, 'jstree-closed' : !rootExpanded()}">
                         <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}"></i>
                         <a class="jstree-anchor" href="#" tabindex="-1">
-                            <!-- <i data-bind="css: card.iconclass" role="presentation"></i> -->
-                            <span style="padding-right: 10px;" data-bind="text: displayname"></span>
-
-                            <!-- <i class="jstree-delete-node fa fa-trash" role="presentation" data-bind="click: graphTree.deleteNode.bind(graphTree)"></i> -->
-
-                            <!-- <i class="jstree-delete-node fa fa-plus-circle" role="presentation" data-bind="click: graphTree.addChildNode.bind(graphTree)"></i> -->
+                            <strong>
+                                <i data-bind="css: graphiconclass" role="presentation"></i>
+                                <span data-bind="text: displayname"></span> (<span data-bind="text: graphname"></span>)
+                            </strong>
                         </a>
+                        <!-- ko foreach: { data: [$data], as: 'self' } -->
                         <ul class="jstree-children" aria-expanded="true">
                             <div data-bind="template: {
                                 name: 'card-tree',
@@ -65,31 +57,54 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 as: 'card'
                             }"></div>
                         </ul>
+                        <!-- /ko -->
                     </li>
                 </ul>
             </div>
 
             <template id="card-tree">
-                <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.tiles().length > 0 && card.expanded), 'jstree-closed' : (card.tiles().length > 0 && !card.expanded()), 'jstree-leaf': card.tiles().length === 0}">
+                <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': card.expanded, 'jstree-closed' : !card.expanded()}">
                     <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
                     <a class="jstree-anchor" href="#" tabindex="-1">
-                        <!-- <i data-bind="css: card.iconclass" role="presentation"></i> -->
+                        <i class="fa fa-file-o" role="presentation"></i>
                         <span style="padding-right: 10px;" data-bind="text: card.name"></span>
-
-                        <!-- <i class="jstree-delete-node fa fa-trash" role="presentation" data-bind="click: graphTree.deleteNode.bind(graphTree)"></i> -->
-
-                        <!-- <i class="jstree-delete-node fa fa-plus-circle" role="presentation" data-bind="click: graphTree.addChildNode.bind(graphTree)"></i> -->
                     </a>
-                    <ul class="jstree-children" aria-expanded="true" data-bind="foreach: card.tiles()">
-                        <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (cards.length > 0 && expanded), 'jstree-closed' : (cards.length > 0 && !expanded()), 'jstree-leaf': cards.length === 0}, click: function () { console.log($data) }">
+                    <ul class="jstree-children" aria-expanded="true">
+                        <!-- ko if: card.cardinality === 'n' || card.tiles().length === 0 -->
+                        <li role="treeitem" class="jstree-node jstree-leaf">
                             <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){expanded(!expanded())}"></i>
                             <a class="jstree-anchor" href="#" tabindex="-1">
-                                <!-- <i data-bind="css: card.iconclass" role="presentation"></i> -->
-                                <span style="padding-right: 10px;" data-bind="text: tileid"></span>
+                                <i class="fa fa-plus-circle" role="presentation"></i>
+                                <span style="padding-right: 10px;">Add New <span data-bind="text: card.name"></span></span>
+                            </a>
+                        </li>
+                        <!-- /ko -->
+                        <!-- ko foreach: card.tiles() -->
+                        <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (cards.length > 0 && expanded), 'jstree-closed' : (cards.length > 0 && !expanded()), 'jstree-leaf': cards.length === 0}">
+                            <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){expanded(!expanded())}"></i>
+                            <a class="jstree-anchor" href="#" tabindex="-1">
+                                <i class="fa fa-file" role="presentation"></i>
+                                <strong style="margin-right: 10px;">
+                                    <!-- ko if: card.widgets.length > 0 -->
+                                    <span data-bind="text: card.widgets[0].label"></span>:
+                                    <div style='display: inline;' data-bind='component: {
+                                        name: self.widgetLookup[card.widgets[0].widget_id].name,
+                                        params: {
+                                            tile: $data,
+                                            node: self.nodeLookup[card.widgets[0].node_id],
+                                            config: self.widgetLookup[card.widgets[0].widget_id].config,
+                                            label: self.widgetLookup[card.widgets[0].widget_id].label,
+                                            value: ko.observable($data.data[card.widgets[0].node_id]),
+                                            type: "resource-editor",
+                                            state: "display_value"
+                                        }
+                                    }'></div>
 
-                                <!-- <i class="jstree-delete-node fa fa-trash" role="presentation" data-bind="click: graphTree.deleteNode.bind(graphTree)"></i> -->
-
-                                <!-- <i class="jstree-delete-node fa fa-plus-circle" role="presentation" data-bind="click: graphTree.addChildNode.bind(graphTree)"></i> -->
+                                    <!-- /ko -->
+                                    <!-- ko if: card.widgets.length === 0 -->
+                                    <span data-bind="text: card.name"></span>
+                                    <!-- /ko -->
+                                </strong>
                             </a>
                             <ul class="jstree-children" aria-expanded="true" data-bind="if: cards.length > 0">
                                 <div data-bind="template: {
@@ -99,6 +114,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 }"></div>
                             </ul>
                         </li>
+                        <!-- /ko -->
                     </ul>
                 </li>
             </template>
@@ -121,9 +137,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             return {
                 graphid: '{{graphid}}',
                 graphiconclass: '{{graphiconclass}}',
+                graphname: '{{graphname}}',
                 displayname: '{{displayname}}',
                 tiles: {{tiles}},
                 cards: {{cards}},
+                nodes: {{nodes}},
+                cardwidgets: {{cardwidgets}},
+                widgets: {{widgets_json}},
                 nodegroups: {{nodegroups}}
             };
         });{% endautoescape %}

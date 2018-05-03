@@ -1,10 +1,12 @@
 define([
     'underscore',
     'knockout',
+    'knockout-mapping',
     'views/base-manager',
     'resource-editor-data',
-    'bindings/resizable-sidepanel'
-], function(_, ko, BaseManagerView, data) {
+    'bindings/resizable-sidepanel',
+    'widgets'
+], function(_, ko, koMapping, BaseManagerView, data) {
     var tiles = data.tiles;
     var cardData = _.map(data.cards, function(card) {
         return _.extend(
@@ -12,13 +14,25 @@ define([
             _.find(data.nodegroups, function(group) {
                 return group.nodegroupid === card.nodegroup_id;
             }), {
-                expanded: ko.observable(true)
+                expanded: ko.observable(true),
+                widgets: _.filter(data.cardwidgets, function (widget) {
+                    return widget.card_id === card.cardid;
+                })
             }
         );
-        return cards;
     });
     var vm = {
+        widgetLookup: _.reduce(data.widgets, function (lookup, widget) {
+            lookup[widget.widgetid] = widget;
+            return lookup
+        }, {}),
+        nodeLookup: _.reduce(data.nodes, function (lookup, node) {
+            node.config = koMapping.fromJS(node.config)
+            lookup[node.nodeid] = node;
+            return lookup
+        }, {}),
         graphid: data.graphid,
+        graphname: data.graphname,
         graphiconclass: data.graphiconclass,
         displayname: ko.observable(data.displayname),
         expandAll: function() {
@@ -29,6 +43,7 @@ define([
         },
         rootExpanded: ko.observable(true)
     };
+
     var toggleAll = function(state) {
         var nodes = _.reduce(
             tiles,
