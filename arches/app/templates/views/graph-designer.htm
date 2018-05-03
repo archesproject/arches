@@ -116,8 +116,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <div style="background-color: #ffffff; flex: 1; overflow-y: auto" >
             <div class="tab-content" data-bind="css: {'graph-designer-loading-mask': contentLoading }"></div>
             <div class="tab-content">
-                <!-- Summary Card -->
-                <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'graph' }">
+                <!-- Settings, Node Form, and Branch List -->
+                <div class="tab-pane fade in" style="position: relative;" data-bind="css: { active: activeTab() === 'graph' }">
                     <!--ko if: selectedNode() -->
                     <div class="graph-designer-graph-content" data-bind="visible: selectedNode().nodeid == graph.root.nodeid()">
                         {% include 'views/new-graph-settings.htm' %}
@@ -127,8 +127,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         {% include 'views/new-node-form.htm' %}
                     </div>
                     <!--/ko-->
+                    <!--Branch Library -->
+                    <div id="branch-library" class="branch-library" data-bind="visible: graphTree.branchListVisible" style=" position: absolute; top: 0px; display: none;">
+                        <div data-bind="">
+                            branch list
+                        </div>
+                    </div>
                 </div>
-                <!-- Summary Card -->
+                <!-- Card Manager -->
                 <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }">card content</div>
             </div>
         </div>
