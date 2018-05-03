@@ -1077,6 +1077,13 @@ a.select2-search-choice-close {
     opacity: 1.0;
 }
 
+.branch-library {
+    position: absolute;
+    top: 0px;
+    background-color: white;
+    height: auto;
+}
+
 #branch-library, #card-crud-permissions .library-card {
     width: 100%;
     margin-left: 1px;
