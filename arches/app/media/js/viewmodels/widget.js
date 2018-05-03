@@ -70,7 +70,7 @@ define(['knockout', 'underscore', 'uuid'], function (ko, _, uuid) {
 
         if (ko.isObservable(this.defaultValue)) {
             var defaultValue = this.defaultValue();
-            if (this.tile && this.tile.tileid() == "" && defaultValue != null && defaultValue != "") {
+            if (this.tile && ko.unwrap(this.tile.tileid) == "" && defaultValue != null && defaultValue != "") {
                 this.value(defaultValue);
             }
 
