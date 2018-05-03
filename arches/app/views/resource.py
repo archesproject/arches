@@ -88,6 +88,7 @@ class NewResourceEditorView(MapBaseManagerView):
             resourceid=resourceid,
             displayname=displayname,
             graphid=resource_instance.graph_id,
+            graphiconclass=resource_instance.graph.iconclass,
             tiles=JSONSerializer().serialize(resource_instance.tilemodel_set.all()),
             cards=JSONSerializer().serialize(cards),
             nodegroups=JSONSerializer().serialize(nodegroups),

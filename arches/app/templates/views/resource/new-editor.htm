@@ -26,12 +26,83 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block main_content %}
 <div class="content-panel">
     <div class="ep-form-toolbar">
-        <!-- top bar -->
+        <div>
+            <h4 class="ep-form-toolbar-title">
+            <!-- Layer Filter -->
+            <div class="list-filter" data-bind="" style="margin-right: 10px;">
+                <input type="text" class="form-control" style="width: 250px;" placeholder="{% trans 'Find a node, datatype, card...' %}">
+
+                <!-- Clear Search -->
+                <span class="clear-node-search" style="top: 8px;"><i class="fa fa-times-circle"></i></span>
+            </div>
+
+            </h4>
+        </div>
     </div>
 
     <div class="flex">
         <div class="left-panel" data-bind="resizableSidepanel:true">
-            <!-- side panel -->
+            <div class="jstree jstree-default">
+                <div class="header">
+                    <a data-bind="click: expandAll">Expand all</a>
+                    <a data-bind="click: collapseAll" style="padding-left:5px;">Collapse all</a>
+                </div>
+                <ul class="jstree-container-ul jstree-children" aria-expanded="true">
+                    <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': rootExpanded, 'jstree-closed' : !rootExpanded()}">
+                        <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}"></i>
+                        <a class="jstree-anchor" href="#" tabindex="-1">
+                            <!-- <i data-bind="css: card.iconclass" role="presentation"></i> -->
+                            <span style="padding-right: 10px;" data-bind="text: displayname"></span>
+
+                            <!-- <i class="jstree-delete-node fa fa-trash" role="presentation" data-bind="click: graphTree.deleteNode.bind(graphTree)"></i> -->
+
+                            <!-- <i class="jstree-delete-node fa fa-plus-circle" role="presentation" data-bind="click: graphTree.addChildNode.bind(graphTree)"></i> -->
+                        </a>
+                        <ul class="jstree-children" aria-expanded="true">
+                            <div data-bind="template: {
+                                name: 'card-tree',
+                                foreach: topCards,
+                                as: 'card'
+                            }"></div>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <template id="card-tree">
+                <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.tiles().length > 0 && card.expanded), 'jstree-closed' : (card.tiles().length > 0 && !card.expanded()), 'jstree-leaf': card.tiles().length === 0}">
+                    <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
+                    <a class="jstree-anchor" href="#" tabindex="-1">
+                        <!-- <i data-bind="css: card.iconclass" role="presentation"></i> -->
+                        <span style="padding-right: 10px;" data-bind="text: card.name"></span>
+
+                        <!-- <i class="jstree-delete-node fa fa-trash" role="presentation" data-bind="click: graphTree.deleteNode.bind(graphTree)"></i> -->
+
+                        <!-- <i class="jstree-delete-node fa fa-plus-circle" role="presentation" data-bind="click: graphTree.addChildNode.bind(graphTree)"></i> -->
+                    </a>
+                    <ul class="jstree-children" aria-expanded="true" data-bind="foreach: card.tiles()">
+                        <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (cards.length > 0 && expanded), 'jstree-closed' : (cards.length > 0 && !expanded()), 'jstree-leaf': cards.length === 0}, click: function () { console.log($data) }">
+                            <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){expanded(!expanded())}"></i>
+                            <a class="jstree-anchor" href="#" tabindex="-1">
+                                <!-- <i data-bind="css: card.iconclass" role="presentation"></i> -->
+                                <span style="padding-right: 10px;" data-bind="text: tileid"></span>
+
+                                <!-- <i class="jstree-delete-node fa fa-trash" role="presentation" data-bind="click: graphTree.deleteNode.bind(graphTree)"></i> -->
+
+                                <!-- <i class="jstree-delete-node fa fa-plus-circle" role="presentation" data-bind="click: graphTree.addChildNode.bind(graphTree)"></i> -->
+                            </a>
+                            <ul class="jstree-children" aria-expanded="true" data-bind="if: cards.length > 0">
+                                <div data-bind="template: {
+                                    name: 'card-tree',
+                                    foreach: cards,
+                                    as: 'card'
+                                }"></div>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </template>
+
         </div>
 
         <div class="main-panel">
@@ -49,6 +120,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         {% autoescape off %}define('resource-editor-data', [], function() {
             return {
                 graphid: '{{graphid}}',
+                graphiconclass: '{{graphiconclass}}',
                 displayname: '{{displayname}}',
                 tiles: {{tiles}},
                 cards: {{cards}},
