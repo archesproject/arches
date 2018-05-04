@@ -10,14 +10,9 @@ def forwards_func(apps, schema_editor):
     GraphModel = apps.get_model("models", "GraphModel")
     NodeGroup = apps.get_model("models", "NodeGroup")
 
-    try:
-        GraphModel.objects.get(graphid='22000000-0000-0000-0000-000000000000').delete()
-        NodeGroup.objects.get(nodegroupid='20000000-0000-0000-0000-100000000000').delete()
-
-        GraphModel.objects.get(graphid='22000000-0000-0000-0000-000000000001').delete()
-        NodeGroup.objects.get(nodegroupid='20000000-0000-0000-0000-100000000001').delete()
-    except:
-        pass
+    GraphModel.objects.get(graphid='22000000-0000-0000-0000-000000000000').delete()
+    GraphModel.objects.get(graphid='22000000-0000-0000-0000-000000000001').delete()
+    NodeGroup.objects.get(nodegroupid='20000000-0000-0000-0000-100000000001').delete()
 
 def reverse_func(apps, schema_editor):
     GraphModel = apps.get_model("models", "GraphModel")
