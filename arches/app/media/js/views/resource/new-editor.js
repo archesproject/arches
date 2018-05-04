@@ -36,10 +36,10 @@ define([
         graphiconclass: data.graphiconclass,
         displayname: ko.observable(data.displayname),
         expandAll: function() {
-            toggleAll(true)
+            toggleAll(true);
         },
         collapseAll: function() {
-            toggleAll(false)
+            toggleAll(false);
         },
         rootExpanded: ko.observable(true)
     };
@@ -54,18 +54,12 @@ define([
                 expanded: vm.rootExpanded
             }].concat(vm.topCards)
         );
-        _.each(
-            nodes,
-            function(node) {
-                node.expanded(state);
-            }
-        );
+        _.each(nodes, function(node) {
+            node.expanded(state);
+        });
     };
 
     vm.topCards = _.filter(cardData, function(card) {
-        card.children = _.filter(cardData, function(candidateChild) {
-            return candidateChild.parentnodegroup_id === card.nodegroup_id;
-        });
         if (!card.parentnodegroup_id) {
             card.tiles = ko.observable(
                 _.filter(tiles, function(tile) {
