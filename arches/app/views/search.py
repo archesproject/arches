@@ -22,6 +22,7 @@ from datetime import datetime
 from django.shortcuts import render
 from django.apps import apps
 from django.contrib.gis.geos import GEOSGeometry, Polygon
+from django.core.cache import cache
 from django.db import connection
 from django.db.models import Q, Max, Min
 from django.http import HttpResponseNotFound
@@ -43,6 +44,7 @@ from arches.app.views.base import BaseManagerView, MapBaseManagerView
 from arches.app.views.concept import get_preflabel_from_conceptid
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
+
 
 
 try:
@@ -585,5 +587,7 @@ def export_results(request):
 
 def time_wheel_config(request):
     time_wheel = TimeWheel()
-    root = time_wheel.time_wheel_config(request.user)
-    return JSONResponse(root, indent=4)
+    config = cache.get('time_wheel_config')
+    if config is None:
+        config = time_wheel.time_wheel_config(request.user)
+    return JSONResponse(config, indent=4)

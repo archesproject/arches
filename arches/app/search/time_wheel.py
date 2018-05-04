@@ -3,6 +3,7 @@ from arches.app.utils.permission_backend import get_nodegroups_by_perm
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Term, Terms, GeoShape, Range, MinAgg, MaxAgg, RangeAgg, Aggregation, GeoHashGridAgg, GeoBoundsAgg, FiltersAgg, NestedAgg
 from arches.app.utils.date_utils import ExtendedDateFormat
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from django.core.cache import cache
 
 class TimeWheel(object):
 
@@ -77,6 +78,7 @@ class TimeWheel(object):
             results = {'buckets':[query.search(index='resource')['aggregations']]}
             results_with_ranges = self.appendDateRanges(results, range_lookup)
             self.transformESAggToD3Hierarchy(results_with_ranges, root)
+            cache.set('time_wheel_config', root)
             return root
 
     def transformESAggToD3Hierarchy(self, results, d3ItemInstance):
