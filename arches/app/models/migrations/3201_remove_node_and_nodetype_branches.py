@@ -7,20 +7,20 @@ from django.db import migrations
 def forwards_func(apps, schema_editor):
     # We get the model from the versioned app registry;
     # if we directly import it, it'll be the wrong version
-    Graph = apps.get_model("models", "Graph")
+    GraphModel = apps.get_model("models", "GraphModel")
     NodeGroup = apps.get_model("models", "NodeGroup")
 
     try:
-        Graph.objects.get(graphid='22000000-0000-0000-0000-000000000000').delete()
+        GraphModel.objects.get(graphid='22000000-0000-0000-0000-000000000000').delete()
         NodeGroup.objects.get(nodegroupid='20000000-0000-0000-0000-100000000000').delete()
 
-        Graph.objects.get(graphid='22000000-0000-0000-0000-000000000001').delete()
+        GraphModel.objects.get(graphid='22000000-0000-0000-0000-000000000001').delete()
         NodeGroup.objects.get(nodegroupid='20000000-0000-0000-0000-100000000001').delete()
     except:
         pass
 
 def reverse_func(apps, schema_editor):
-    Graph = apps.get_model("models", "Graph")
+    GraphModel = apps.get_model("models", "GraphModel")
     Node = apps.get_model("models", "Node")
     NodeGroup = apps.get_model("models", "NodeGroup")
     Edge = apps.get_model("models", "Edge")
@@ -42,7 +42,7 @@ def reverse_func(apps, schema_editor):
         "subtitle": "Represents a single node in a graph.", 
         "version": "v1"
     }
-    Graph.objects.create(**graph_dict).save()
+    GraphModel.objects.create(**graph_dict).save()
 
     node_dict = {
         "config": None, 
@@ -75,7 +75,7 @@ def reverse_func(apps, schema_editor):
         "subtitle": "Represents a node and node type pairing", 
         "version": "v1"
     }
-    Graph.objects.create(**graph_dict).save()
+    GraphModel.objects.create(**graph_dict).save()
 
     nodegroup_dict = {
         "cardinality": "n", 
@@ -100,17 +100,6 @@ def reverse_func(apps, schema_editor):
         "visible": True
     }
     CardModel.objects.create(**card_dict).save()
-
-    edges_dict = {
-        "description": None, 
-        "domainnode_id": "20000000-0000-0000-0000-100000000001", 
-        "edgeid": "22200000-0000-0000-0000-000000000001", 
-        "graph_id": "22000000-0000-0000-0000-000000000001", 
-        "name": None, 
-        "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type", 
-        "rangenode_id": "20000000-0000-0000-0000-100000000002"
-    }
-    Edge.objects.create(**edges_dict).save()
     
     nodes = [
         {
@@ -145,6 +134,17 @@ def reverse_func(apps, schema_editor):
 
     for node in nodes:
         Node.objects.create(**node).save()
+
+    edges_dict = {
+        "description": None, 
+        "domainnode_id": "20000000-0000-0000-0000-100000000001", 
+        "edgeid": "22200000-0000-0000-0000-000000000001", 
+        "graph_id": "22000000-0000-0000-0000-000000000001", 
+        "name": None, 
+        "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type", 
+        "rangenode_id": "20000000-0000-0000-0000-100000000002"
+    }
+    Edge.objects.create(**edges_dict).save()
 
 
 class Migration(migrations.Migration):
