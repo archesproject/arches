@@ -2,7 +2,8 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
     return Backbone.View.extend({
         
         events: {
-            'click .confirm-delete-yes': 'delete'
+            'click .confirm-delete-yes': 'delete',
+            'click .edit-actor': 'toggleEditActor'
         },
 
         constructor: function (options) {
@@ -52,7 +53,8 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
             });
             this.on('change', function(eventtype, item){
                 $('#cancel-workflow').removeClass('disabled');
-                $('#remove-workflow').removeClass('disabled');                    
+                $('#remove-workflow').removeClass('disabled');
+                $('#end-workflow').removeClass('disabled');
             });
             this.$el.find('.form-load-mask').hide();
         },
@@ -94,19 +96,28 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
             return ko.toJSON(data);
         },
 
-        validate: function(){
+        // this fails if any branchlists that have been marked
+        // requiredBranch == true are empty, both of new or existing nodes
+        validate: function(current_data){
             var isValid = true
-            _.each(this.branchLists, function(branchList){
-                isValid = isValid && branchList.validate();
-            }, this); 
+            _.some(this.branchLists, function(branchList){
+                if (branchList.requiredBranch == true) {
+                    if (current_data[branchList.dataKey].length == 0) {
+                        if (branchList['data'][branchList.dataKey]['branch_lists'].length == 0) {
+                            isValid = false;
+                            return
+                        }
+                    }
+                }
+            }, this);
             return isValid;
         },
 
         submit: function(evt){
-            var validationAlert = this.$el.find('.branch-invalid-alert');;
+            var validationAlert = this.$el.find('.wizard-invalid-alert');;
             evt.preventDefault();
 
-            if (this.validate()){
+            if (this.validate(JSON.parse(this.getData()))){
                 this.$el.find('.form-load-mask').show();
                 this.form.find('#formdata').val(this.getData());
                 this.form.submit(); 
@@ -144,6 +155,20 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
 
         isDirty: function () {
             return false;
-        }
+        },
+        
+        toggleEditActor: function (e) {
+            var actorClass = e.target.dataset.actor;
+            if ($(e.target).hasClass("show-box")) {
+                $(".show-box." + actorClass).addClass('hidden');
+                $(".hide-box." + actorClass).removeClass('hidden');
+                $(".edit-actors-row." + actorClass).removeClass('hidden');
+            } else {
+                $(".show-box." + actorClass).removeClass('hidden');
+                $(".hide-box." + actorClass).addClass('hidden');
+                $(".edit-actors-row." + actorClass).addClass('hidden');
+            }
+        },
+
     });
 });
