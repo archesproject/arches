@@ -261,11 +261,19 @@ class GraphDesignerView(GraphBaseView):
         datatypes_json = JSONSerializer().serialize(datatypes, exclude=['modulename','isgeometric'])
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         concept_collections = Concept().concept_tree(mode='collections', lang=lang)
+        branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True)
+        if self.graph.ontology is not None:
+            branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
         context = self.get_context_data(
             main_script='views/graph-designer',
             datatypes_json=datatypes_json,
             datatypes=datatypes,
             ontology_namespaces = get_ontology_namespaces(),
+            branches=JSONSerializer().serialize(branch_graphs, exclude=['cards','domain_connections', 'functions', 'cards', 'deploymentfile', 'deploymentdate']),
+            branch_list={
+                'title': _('Branch Library'),
+                'search_placeholder': _('Find a graph branch')
+            },
         )
         context['ontologies'] = JSONSerializer().serialize(ontologies, exclude=['version', 'path'])
         context['ontology_classes'] = JSONSerializer().serialize(ontology_classes)

@@ -52,6 +52,9 @@ define([
         toggleBranchList: function(node, e) {
             e.stopImmediatePropagation();
             this.branchListVisible(!this.branchListVisible());
+            if(this.branchListVisible()){
+                node.expanded(true);
+            }
             this.trigger('toggle-branch-list');
         },
 

@@ -172,7 +172,7 @@ define([
             if(this.selectedNode()){
                 this.loading(true);
                 this.failed(false);
-                this.graphModel.appendBranch(this.selectedNode().nodeid, null, item.graphModel, function(response, status){
+                this.graphModel.appendBranch(this.selectedNode(), null, item.graphModel, function(response, status){
                     this.loading(false);
                     _.delay(_.bind(function(){
                         this.failed(status !== 'success');

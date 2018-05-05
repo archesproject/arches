@@ -134,13 +134,13 @@ define(['arches',
         /**
          * appendBranch - appends a graph onto a specific node within this graph
          * @memberof GraphModel.prototype
-         * @param  {string} nodeid - the node id of the node within this graph that we're connecting the branch to
+         * @param  {string} node - the node within this graph that we're connecting the branch to
          * @param  {string} property - the ontology property to use to connect the branch, leave null to use the first available property
          * @param  {string} branch_graph - the {@link GraphModel} we're appending to this graph
          * @param  {function} callback - the function to call after the response returns from the server
          * @param  {object} scope - the value of "this" in the callback function
          */
-        appendBranch: function(nodeid, property, branch_graph, callback, scope){
+        appendBranch: function(node, property, branch_graph, callback, scope){
             property = property ? property : null;
             if(property === null){
                 if(this.get('selectedNode')().ontologyclass()){
@@ -164,7 +164,7 @@ define(['arches',
             this._doRequest({
                 type: "POST",
                 url: this.url + this.get('graphid') + '/append_branch',
-                data: JSON.stringify({nodeid:nodeid, property: property, graphid: branch_graph.get('graphid')})
+                data: JSON.stringify({nodeid:node.nodeid, property: property, graphid: branch_graph.get('graphid')})
             }, function(response, status){
                 if (status === 'success' &&  response.responseJSON) {
                     var branchroot = response.responseJSON.root;
@@ -194,6 +194,7 @@ define(['arches',
                             }
                         });
                     }
+                    this.get_tree(null, null, response.responseJSON.edges, true);
                 }else{
                     this.trigger('error', response, 'appendBranch');
                 }
@@ -208,7 +209,7 @@ define(['arches',
         /**
          * appendNode - appends a graph onto a specific node within this graph
          * @memberof GraphModel.prototype
-         * @param  {string} nodeid - the node id of the node within this graph that we're connecting the branch to
+         * @param  {string} node - the node within this graph onto which we're appending a new node
          * @param  {string} property - the ontology property to use to connect the branch, leave null to use the first available property
          * @param  {function} callback - the function to call after the response returns from the server
          * @param  {object} scope - the value of "this" in the callback function
@@ -252,8 +253,6 @@ define(['arches',
                     this.get('nodes').push(newNode);
                     this.get('edges').push(response.responseJSON.edge);
                     node.children.unshift(newNode)
-                    // setTimeout(function(){
-                    // },500)
 
                     // response.responseJSON.nodegroups.forEach(function(nodegroup){
                     //     this.get('nodegroups').push(nodegroup);
@@ -515,7 +514,11 @@ define(['arches',
                 }
             }, this)
 
+            var t0 = performance.now();
             this.tree = this.constructTree(); //ko.pureComputed(this.constructTree, this);
+            var t1 = performance.now();
+
+            console.log("Call to constructTree took " + (t1 - t0) + " milliseconds.");
 
             this.set('selectedNode', ko.computed(function() {
                 var selectedNode = _.find(self.get('nodes')(), function(node){
@@ -523,6 +526,13 @@ define(['arches',
                 }, this);
                 return selectedNode;
             }));
+
+            // this.get('nodes').subscribe(function() {
+            //     this.constructTree();
+            // }, this);
+            // this.get('edges').subscribe(function() {
+            //     this.constructTree();
+            // }, this);
 
             var root = this.get('root');
             if(!!root){
@@ -551,44 +561,78 @@ define(['arches',
          * @return {object} a hierchical node listing
          */
         constructTree: function(){
-            var lut = {};
-            var sorted = [];
-            var edge_map = {};
-            var nodes = this.get('nodes')();
-            var edges = this.get('edges')();
+            // var lut = {};
+            // var sorted = [];
+            // var edge_map = {};
+            // var nodes = this.get('nodes')();
+            // var edges = this.get('edges')();
 
-            function sort(a){
-                var len = a.length;
-                var fix = -1;
-                for (var i = 0; i < len; i++ ){
-                    while (!!~(fix = a.findIndex(e => a[i].parent == e.id)) && fix > i)
-                        [a[i],a[fix]] = [a[fix],a[i]]; // ES6 swap
-                    lut[a[i].id]=i;
-                }
-                //console.log(lut); //check LUT on the console.
-                return a;
-            }
+            // function sort(a){
+            //     var len = a.length;
+            //     var fix = -1;
+            //     for (var i = 0; i < len; i++ ){
+            //         while (!!~(fix = a.findIndex(e => a[i].parent == e.id)) && fix > i)
+            //             [a[i],a[fix]] = [a[fix],a[i]]; // ES6 swap
+            //             console.log('in sort')
+            //         lut[a[i].id]=i;
+            //     }
+            //     //console.log(lut); //check LUT on the console.
+            //     return a;
+            // }
 
-            edges.forEach(function(edge){
-                edge_map[edge.rangenode_id] = edge.domainnode_id;
-            })
+            // edges.forEach(function(edge){
+            //     edge_map[edge.rangenode_id] = edge.domainnode_id;
+            // })
 
+            // nodes.forEach(function(node){
+            //     if(!ko.isObservable(node.children)){
+            //         node.children = ko.observableArray([]);
+            //     }else{
+            //         node.children.removeAll();
+            //     }
+            //     node.parent = edge_map[node.id] ? edge_map[node.id] : '#';
+            // });
+
+            // sorted = sort(nodes.slice(0)); // don't modify things that don't belong to you :)
+            // for (var i = sorted.length-1; i >= 0; i--){
+            //     if (sorted[i].parent != "#") {
+            //         sorted[lut[sorted[i].parent]].children.push(sorted.splice(i,1)[0]);
+            //     }
+            // }
+            // return sorted
+          return this.get_tree();
+        },
+
+        get_tree: function(root, nodes, edges, append){
+            // """
+            // returns a tree based representation of this graph
+
+            // Keyword Arguments:
+            // root -- the node from which to root the tree, defaults to the root node of this graph
+
+            // """
+
+            var node_map = {};
+            var root = !!root ? root : this.get('root');
+            var nodes = !!nodes ? nodes : this.get('nodes')();
+            var edges = !!edges ? edges : this.get('edges')();
             nodes.forEach(function(node){
+                node_map[node.id] = node;
                 if(!ko.isObservable(node.children)){
                     node.children = ko.observableArray([]);
                 }else{
-                    node.children.removeAll();
+                    if(!append) {
+                        node.children.removeAll();
+                    }
                 }
-                node.parent = edge_map[node.id] ? edge_map[node.id] : '#';
-            });
+            })
 
-            sorted = sort(nodes.slice(0)); // don't modify things that don't belong to you :)
-            for (var i = sorted.length-1; i >= 0; i--){
-                if (sorted[i].parent != "#") {
-                    sorted[lut[sorted[i].parent]].children.push(sorted.splice(i,1)[0]);
-                }
-            }
-          return sorted;
+            edges.forEach(function(edge){
+                node_map[edge.domainnode_id].children.unshift(node_map[edge.rangenode_id])
+                console.log('in edges')
+            })
+
+            return root;
         },
 
         /**

@@ -128,9 +128,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
                     <!--/ko-->
                     <!--Branch Library -->
-                    <div id="branch-library" class="branch-library" data-bind="visible: graphTree.branchListVisible" style=" position: absolute; top: 0px; display: none;">
-                        <div data-bind="">
-                            branch list
+                    <div id="branch-library" class="middle-column-container graph-designer branch-library" data-bind="visible: graphTree.branchListVisible" style=" position: absolute; top: 0px; display: none; width: 300px;">
+                        <div>
+                            <div class="title-block-title" style="margin-bottom: 0px; padding-bottom: 0px;">
+                                <span class="">{{branch_list.title}}</span>
+                            </div>
+                            <div class="relative">
+                                <a id="node-crud-close" href="javascript:void(0)" class="library-close-btn" data-bind="click: graphTree.toggleBranchList.bind(graphTree)"><i class="ion-close"></i></a>
+                            </div>
+                            <div style="padding: 4px 0px 12px 6px">{% trans "Add a branch to your model from the library" %}</div>
+                        </div>
+                        <div data-bind="with: branchListView">
+                            {% include 'views/graph/graph-manager/branch-list.htm' %}
                         </div>
                     </div>
                 </div>
@@ -155,7 +164,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 ontologies: {{ontologies}},
                 datatypes: {{datatypes_json}},
                 graph: {{graph}},
-                ontology_namespaces: {{ontology_namespaces}}
+                ontology_namespaces: {{ontology_namespaces}},
+                branches: {{branches}}
             };
         });{% endautoescape %}
     </script>
