@@ -25,6 +25,7 @@ class TimeWheel(object):
             query = Query(se, limit=0)
             range_lookup = {}
 
+
             def gen_range_agg(gte=None, lte=None, permitted_nodegroups=None):
                 date_query = Bool()
                 date_query.filter(Range(field='dates.date', gte=gte, lte=lte, relation='intersects'))
@@ -39,47 +40,91 @@ class TimeWheel(object):
                 wrapper_query.should(Nested(path='dates', query=date_query))
                 return wrapper_query
 
-            for millennium in range(int(min_date),int(max_date)+1000,1000):
-                min_millenium = millennium
-                max_millenium = millennium + 1000
-                millenium_name = "Millennium (%s - %s)"%(min_millenium, max_millenium)
-                mill_boolquery = gen_range_agg(gte=ExtendedDateFormat(min_millenium).lower,
-                    lte=ExtendedDateFormat(max_millenium).lower,
-                    permitted_nodegroups=self.get_permitted_nodegroups(user))
-                millenium_agg = FiltersAgg(name=millenium_name)
-                millenium_agg.add_filter(mill_boolquery)
-                range_lookup[millenium_name] = [min_millenium, max_millenium]
+            # if custom setting is true:
+            #     ['big', 'little', 'tiny']
+            # else:
+            #     if range spans millenia:
+            #         ['mill', 'halfmill', 'century']
+            #         if range spans century:
+            #             ['cent', 'half cent', 'decade']
+            #             if range spans decades:
+            #                 ['decade', 'half dec', 'year']
 
-                for century in range(min_millenium,max_millenium,100):
-                    min_century = century
-                    max_century = century + 100
-                    century_name="Century (%s - %s)"%(min_century, max_century)
-                    cent_boolquery = gen_range_agg(gte=ExtendedDateFormat(min_century).lower,
-                        lte=ExtendedDateFormat(max_century).lower)
-                    century_agg = FiltersAgg(name=century_name)
-                    century_agg.add_filter(cent_boolquery)
-                    millenium_agg.add_aggregation(century_agg)
-                    range_lookup[century_name] = [min_century, max_century]
+            date_tiers = {"name": "Millennium", "interval": 1000, "root": True, "child": {
+                    "name": "Century", "interval": 100, "child": {
+                        "name": "Decade", "interval": 10
+                        }
+                    }
+                }
 
-                    for decade in range(min_century,max_century,10):
-                        min_decade = decade
-                        max_decade = decade + 10
-                        decade_name = "Decade (%s - %s)"%(min_decade, max_decade)
-                        dec_boolquery = gen_range_agg(gte=ExtendedDateFormat(min_decade).lower,
-                            lte=ExtendedDateFormat(max_decade).lower)
-                        decade_agg = FiltersAgg(name=decade_name)
-                        decade_agg.add_filter(dec_boolquery)
-                        century_agg.add_aggregation(decade_agg)
-                        range_lookup[decade_name] = [min_decade, max_decade]
+            def add_date_tier(date_tier, low_date, high_date, previous_period_agg=None):
+                interval = date_tier["interval"]
+                name = date_tier["name"]
+                print name, interval, date_tier, low_date, high_date
+                for period in range(int(low_date), int(high_date) + interval, interval):
+                    min_period = period
+                    max_period = period + interval
+                    period_name = "{0} ({1} - {2})".format(name, min_period, max_period)
+                    nodegroups = self.get_permitted_nodegroups(user) if "root" in date_tier else None
+                    period_boolquery = gen_range_agg(gte=ExtendedDateFormat(min_period).lower,
+                        lte=ExtendedDateFormat(max_period).lower,
+                        permitted_nodegroups=nodegroups)
+                    period_agg = FiltersAgg(name=period_name)
+                    period_agg.add_filter(period_boolquery)
+                    if "root" not in date_tier:
+                        previous_period_agg.add_aggregation(period_agg)
+                    range_lookup[period_name] = [min_period, max_period]
+                    if "child" in date_tier:
+                        add_date_tier(date_tier['child'], min_period, max_period, period_agg)
+                    if "root" in date_tier:
+                        query.add_aggregation(period_agg)
 
-                query.add_aggregation(millenium_agg)
+            add_date_tier(date_tiers, min_date, max_date)
+
+            # for millennium in range(int(min_date),int(max_date)+1000,1000):
+            #     min_millenium = millennium
+            #     max_millenium = millennium + 1000
+            #     millenium_name = "Millennium (%s - %s)"%(min_millenium, max_millenium)
+            #     mill_boolquery = gen_range_agg(gte=ExtendedDateFormat(min_millenium).lower,
+            #         lte=ExtendedDateFormat(max_millenium).lower,
+            #         permitted_nodegroups=self.get_permitted_nodegroups(user))
+            #     millenium_agg = FiltersAgg(name=millenium_name)
+            #     millenium_agg.add_filter(mill_boolquery)
+            #     range_lookup[millenium_name] = [min_millenium, max_millenium]
+            #
+            #     for century in range(min_millenium,max_millenium,100):
+            #         min_century = century
+            #         max_century = century + 100
+            #         century_name="Century (%s - %s)"%(min_century, max_century)
+            #         cent_boolquery = gen_range_agg(gte=ExtendedDateFormat(min_century).lower,
+            #             lte=ExtendedDateFormat(max_century).lower)
+            #         century_agg = FiltersAgg(name=century_name)
+            #         century_agg.add_filter(cent_boolquery)
+            #         millenium_agg.add_aggregation(century_agg)
+            #         range_lookup[century_name] = [min_century, max_century]
+            #
+            #         for decade in range(min_century,max_century,10):
+            #             min_decade = decade
+            #             max_decade = decade + 10
+            #             decade_name = "Decade (%s - %s)"%(min_decade, max_decade)
+            #             dec_boolquery = gen_range_agg(gte=ExtendedDateFormat(min_decade).lower,
+            #                 lte=ExtendedDateFormat(max_decade).lower)
+            #             decade_agg = FiltersAgg(name=decade_name)
+            #             decade_agg.add_filter(dec_boolquery)
+            #             century_agg.add_aggregation(decade_agg)
+            #             range_lookup[decade_name] = [min_decade, max_decade]
+            #
+            #     import ipdb
+            #     ipdb.set_trace()
+            #     query.add_aggregation(millenium_agg)
 
             root = d3Item(name='root')
             results = {'buckets':[query.search(index='resource')['aggregations']]}
             results_with_ranges = self.appendDateRanges(results, range_lookup)
             self.transformESAggToD3Hierarchy(results_with_ranges, root)
-            cache.set('time_wheel_config', root)
+            # cache.set('time_wheel_config', root)
             return root
+
 
     def transformESAggToD3Hierarchy(self, results, d3ItemInstance):
         if 'buckets' not in results:
