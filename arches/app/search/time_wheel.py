@@ -61,7 +61,9 @@ class TimeWheel(object):
                 interval = date_tier["interval"]
                 name = date_tier["name"]
                 print name, interval, date_tier, low_date, high_date
-                for period in range(int(low_date), int(high_date) + interval, interval):
+                if "root" in date_tier:
+                    high_date = int(high_date) + interval
+                for period in range(int(low_date), int(high_date), interval):
                     min_period = period
                     max_period = period + interval
                     period_name = "{0} ({1} - {2})".format(name, min_period, max_period)
@@ -114,15 +116,12 @@ class TimeWheel(object):
             #             century_agg.add_aggregation(decade_agg)
             #             range_lookup[decade_name] = [min_decade, max_decade]
             #
-            #     import ipdb
-            #     ipdb.set_trace()
             #     query.add_aggregation(millenium_agg)
 
             root = d3Item(name='root')
             results = {'buckets':[query.search(index='resource')['aggregations']]}
             results_with_ranges = self.appendDateRanges(results, range_lookup)
             self.transformESAggToD3Hierarchy(results_with_ranges, root)
-            # cache.set('time_wheel_config', root)
             return root
 
 
