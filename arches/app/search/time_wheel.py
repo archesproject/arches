@@ -51,7 +51,7 @@ class TimeWheel(object):
             if abs(int(min_date) - int(max_date)) > 1000:
                 date_tiers = {"name": "Millennium", "interval": 1000, "root": True, "child": {
                         "name": "Half-millennium", "interval": 500, "child": {
-                            "name": "Century", "interval": 100, "range": (100, 500)
+                            "name": "Century", "interval": 100
                             }
                         }
                     }
