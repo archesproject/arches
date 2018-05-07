@@ -67,19 +67,20 @@ class ConceptDataType(BaseConceptDataType):
 
         ## first check to see if the validator has been passed a valid UUID,
         ## which should be the case at this point. return error if not.
-        try:
-            uuid.UUID(str(value))
-        except ValueError:
-            message = "This is an invalid concept prefLabel, or an incomplete UUID"
-            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} {3} - {4}. {5}'.format(self.datatype_model.datatype, value, source, row_number, message, 'This data was not imported.')})
-            return errors
+        if value != None:
+            try:
+                uuid.UUID(str(value))
+            except ValueError:
+                message = "This is an invalid concept prefLabel, or an incomplete UUID"
+                errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} {3} - {4}. {5}'.format(self.datatype_model.datatype, value, source, row_number, message, 'This data was not imported.')})
+                return errors
 
-        ## if good UUID, test whether it corresponds to an actual Value object
-        try:
-            models.Value.objects.get(pk=value)
-        except ObjectDoesNotExist:
-            message = "This UUID does not correspond to a valid domain value"
-            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} {3} - {4}. {5}'.format(self.datatype_model.datatype, value, source, row_number, message, 'This data was not imported.')})
+            ## if good UUID, test whether it corresponds to an actual Value object
+            try:
+                models.Value.objects.get(pk=value)
+            except ObjectDoesNotExist:
+                message = "This UUID does not correspond to a valid domain value"
+                errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} {3} - {4}. {5}'.format(self.datatype_model.datatype, value, source, row_number, message, 'This data was not imported.')})
         return errors
 
     def transform_import_values(self, value, nodeid):
