@@ -387,14 +387,13 @@ CACHES = {
     }
 }
 
-
-#TIMEWHEEL_DATE_TIERS example:
-#{"name": "Millennium", "interval": 1000, "root": True, "child": {
-#    "name": "Century", "interval": 100, "child": {
-#        "name": "Decade", "interval": 10
-#        }
-#    }
-#}
+#Example of a custom time wheel configuration:
+#TIMEWHEEL_DATE_TIERS = {"name": "Millennium", "interval": 1000, "root": True, "child": {
+#       "name": "Cen", "interval": 100, "range": (1500, 2000), "child": {
+#           "name": "Decade", "interval": 10, "range": (1750, 2000)
+#           }
+#       }
+#   }
 TIMEWHEEL_DATE_TIERS = None
 
 DATE_IMPORT_EXPORT_FORMAT = '%Y-%m-%d'
