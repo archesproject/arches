@@ -387,6 +387,16 @@ CACHES = {
     }
 }
 
+
+#TIMEWHEEL_DATE_TIERS example:
+#{"name": "Millennium", "interval": 1000, "root": True, "child": {
+#    "name": "Century", "interval": 100, "child": {
+#        "name": "Decade", "interval": 10
+#        }
+#    }
+#}
+TIMEWHEEL_DATE_TIERS = None
+
 DATE_IMPORT_EXPORT_FORMAT = '%Y-%m-%d'
 
 #######################################

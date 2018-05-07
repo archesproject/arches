@@ -4,6 +4,7 @@ from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nest
 from arches.app.utils.date_utils import ExtendedDateFormat
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from django.core.cache import cache
+from arches.app.models.system_settings import settings
 
 class TimeWheel(object):
 
@@ -54,6 +55,9 @@ class TimeWheel(object):
                             }
                         }
                     }
+
+            if settings.TIMEWHEEL_DATE_TIERS is not None:
+                date_tiers = settings.TIMEWHEEL_DATE_TIERS
 
             def add_date_tier(date_tier, low_date, high_date, previous_period_agg=None):
                 interval = date_tier["interval"]
