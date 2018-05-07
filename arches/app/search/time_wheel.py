@@ -40,16 +40,6 @@ class TimeWheel(object):
                 wrapper_query.should(Nested(path='dates', query=date_query))
                 return wrapper_query
 
-            # if custom setting is true:
-            #     ['big', 'little', 'tiny']
-            # else:
-            #     if range spans millenia:
-            #         ['mill', 'halfmill', 'century']
-            #         if range spans century:
-            #             ['cent', 'half cent', 'decade']
-            #             if range spans decades:
-            #                 ['decade', 'half dec', 'year']
-
             date_tiers = {"name": "Millennium", "interval": 1000, "root": True, "child": {
                     "name": "Century", "interval": 100, "child": {
                         "name": "Decade", "interval": 10
@@ -57,10 +47,17 @@ class TimeWheel(object):
                     }
                 }
 
+            if abs(int(min_date) - int(max_date)) > 1000:
+                date_tiers = {"name": "Millennium", "interval": 1000, "root": True, "child": {
+                        "name": "Half-millennium", "interval": 500, "child": {
+                            "name": "Century", "interval": 100
+                            }
+                        }
+                    }
+
             def add_date_tier(date_tier, low_date, high_date, previous_period_agg=None):
                 interval = date_tier["interval"]
                 name = date_tier["name"]
-                print name, interval, date_tier, low_date, high_date
                 if "root" in date_tier:
                     high_date = int(high_date) + interval
                 for period in range(int(low_date), int(high_date), interval):
@@ -82,41 +79,6 @@ class TimeWheel(object):
                         query.add_aggregation(period_agg)
 
             add_date_tier(date_tiers, min_date, max_date)
-
-            # for millennium in range(int(min_date),int(max_date)+1000,1000):
-            #     min_millenium = millennium
-            #     max_millenium = millennium + 1000
-            #     millenium_name = "Millennium (%s - %s)"%(min_millenium, max_millenium)
-            #     mill_boolquery = gen_range_agg(gte=ExtendedDateFormat(min_millenium).lower,
-            #         lte=ExtendedDateFormat(max_millenium).lower,
-            #         permitted_nodegroups=self.get_permitted_nodegroups(user))
-            #     millenium_agg = FiltersAgg(name=millenium_name)
-            #     millenium_agg.add_filter(mill_boolquery)
-            #     range_lookup[millenium_name] = [min_millenium, max_millenium]
-            #
-            #     for century in range(min_millenium,max_millenium,100):
-            #         min_century = century
-            #         max_century = century + 100
-            #         century_name="Century (%s - %s)"%(min_century, max_century)
-            #         cent_boolquery = gen_range_agg(gte=ExtendedDateFormat(min_century).lower,
-            #             lte=ExtendedDateFormat(max_century).lower)
-            #         century_agg = FiltersAgg(name=century_name)
-            #         century_agg.add_filter(cent_boolquery)
-            #         millenium_agg.add_aggregation(century_agg)
-            #         range_lookup[century_name] = [min_century, max_century]
-            #
-            #         for decade in range(min_century,max_century,10):
-            #             min_decade = decade
-            #             max_decade = decade + 10
-            #             decade_name = "Decade (%s - %s)"%(min_decade, max_decade)
-            #             dec_boolquery = gen_range_agg(gte=ExtendedDateFormat(min_decade).lower,
-            #                 lte=ExtendedDateFormat(max_decade).lower)
-            #             decade_agg = FiltersAgg(name=decade_name)
-            #             decade_agg.add_filter(dec_boolquery)
-            #             century_agg.add_aggregation(decade_agg)
-            #             range_lookup[decade_name] = [min_decade, max_decade]
-            #
-            #     query.add_aggregation(millenium_agg)
 
             root = d3Item(name='root')
             results = {'buckets':[query.search(index='resource')['aggregations']]}
