@@ -379,7 +379,7 @@ class GraphDataView(View):
                     graph.save()
 
                 elif self.action == 'append_node':
-                    ret = graph.append_node(data['property'], nodeid=data['nodeid'])
+                    ret = graph.append_node(nodeid=data['nodeid'])
                     graph.save()
 
                 elif self.action == 'move_node':

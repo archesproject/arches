@@ -60,7 +60,7 @@ define([
 
         addChildNode: function(node, e) {
             e.stopImmediatePropagation();
-            this.graphModel.appendNode(node, null ,function(response, status){
+            this.graphModel.appendNode(node ,function(response, status){
                 if(status === 'success') {
                     node.expanded(true);
                 }
