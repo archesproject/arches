@@ -51,7 +51,7 @@ class TimeWheel(object):
             if abs(int(min_date) - int(max_date)) > 1000:
                 date_tiers = {"name": "Millennium", "interval": 1000, "root": True, "child": {
                         "name": "Half-millennium", "interval": 500, "child": {
-                            "name": "Century", "interval": 100
+                            "name": "Century", "interval": 100, "range": (100, 500)
                             }
                         }
                     }
@@ -62,11 +62,14 @@ class TimeWheel(object):
             def add_date_tier(date_tier, low_date, high_date, previous_period_agg=None):
                 interval = date_tier["interval"]
                 name = date_tier["name"]
+                within_range = True
                 if "root" in date_tier:
                     high_date = int(high_date) + interval
                 for period in range(int(low_date), int(high_date), interval):
                     min_period = period
                     max_period = period + interval
+                    if 'range' in date_tier:
+                        within_range = min_period >= date_tier['range'][0] and max_period <= date_tier['range'][1]
                     period_name = "{0} ({1} - {2})".format(name, min_period, max_period)
                     nodegroups = self.get_permitted_nodegroups(user) if "root" in date_tier else None
                     period_boolquery = gen_range_agg(gte=ExtendedDateFormat(min_period).lower,
@@ -75,7 +78,8 @@ class TimeWheel(object):
                     period_agg = FiltersAgg(name=period_name)
                     period_agg.add_filter(period_boolquery)
                     if "root" not in date_tier:
-                        previous_period_agg.add_aggregation(period_agg)
+                        if within_range == True:
+                            previous_period_agg.add_aggregation(period_agg)
                     range_lookup[period_name] = [min_period, max_period]
                     if "child" in date_tier:
                         add_date_tier(date_tier['child'], min_period, max_period, period_agg)
@@ -106,6 +110,7 @@ class TimeWheel(object):
                 pass
             else:
                 d3ItemInstance.children.append(self.transformESAggToD3Hierarchy(value, d3Item(name=key)))
+
 
         d3ItemInstance.children = sorted(d3ItemInstance.children, key=lambda item: item.start)
 
