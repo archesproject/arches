@@ -689,7 +689,7 @@ define([
                      self.fitToAggregationBounds = function(agg) {
                          var agg = self.searchAggregations();
                          var aggBounds;
-                         if (agg.geo_aggs.bounds.bounds && self.map && !self.extentSearch()) {
+                         if (agg && agg.geo_aggs.bounds.bounds && self.map && !self.extentSearch()) {
                              aggBounds = agg.geo_aggs.bounds.bounds;
                              var bounds = [
                                  [
@@ -813,7 +813,7 @@ define([
                          if (ko.isObservable(bins)) {
                              bins.subscribe(self.updateSearchResultsLayer);
                          }
-                         if (self.searchAggregations) {
+                         if (self.searchAggregations()) {
                              self.updateSearchResultsLayer()
                          }
                          self.results.mouseoverInstanceId.subscribe(updateSearchPointsGeoJSON);
