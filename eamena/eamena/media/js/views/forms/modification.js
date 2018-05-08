@@ -22,13 +22,32 @@ define(['jquery',
                 this.addBranchList(new BranchList({
                     el: this.$el.find('#modification-section')[0],
                     data: this.data,
-                    dataKey: 'MODIFICATION.E11',
+                    dataKey: 'MODIFICATION_TYPE.E55',
                     validateBranch: function (nodes) {
                         var ck0 = this.validateHasValues(nodes)
                         var ck1 = vt.isValidDate(nodes,'MODIFICATION_DATE.E49');
                         return ck0 && ck1;
                     }
                 }));
+                
+                this.addBranchList(new BranchList({
+                    el: this.$el.find('#description-section')[0],
+                    data: this.data,
+                    dataKey: 'MODIFICATION_DESCRIPTION.E62',
+                    validateBranch: function (nodes) {
+                        return this.validateHasValues(nodes);
+                    }
+                }));
+                
+                this.addBranchList(new BranchList({
+                    el: this.$el.find('#construction-section')[0],
+                    data: this.data,
+                    dataKey: 'CONSTRUCTION_TECHNIQUE_TYPE.E55',
+                    validateBranch: function (nodes) {
+                        return this.validateHasValues(nodes);
+                    }
+                }));
+                
             }
         });
     }
