@@ -3,7 +3,6 @@
 {% load i18n %}
 
 <script>
-    var CKEDITOR_BASEPATH = '{{ STATIC_URL }}packages/ckeditor/';
     require.config({
         baseUrl: '{{ STATIC_URL }}js',
         paths: {
@@ -130,6 +129,9 @@
             },
             'leaflet-draw': {
                 deps: ['leaflet']
+            },
+            'ckeditor': {
+                deps: ['jquery']
             },
             'ckeditor-jquery': {
                 deps: ['ckeditor']
