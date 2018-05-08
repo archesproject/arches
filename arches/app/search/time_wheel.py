@@ -31,8 +31,6 @@ class TimeWheel(object):
                 date_query = Bool()
                 date_query.filter(Range(field='dates.date', gte=gte, lte=lte, relation='intersects'))
                 if permitted_nodegroups is not None:
-                    print len(permitted_nodegroups)
-                if permitted_nodegroups is not None:
                     date_query.filter(Terms(field='dates.nodegroup_id', terms=permitted_nodegroups))
                 date_ranges_query = Bool()
                 date_ranges_query.filter(Range(field='date_ranges.date_range', gte=gte, lte=lte, relation='intersects'))
