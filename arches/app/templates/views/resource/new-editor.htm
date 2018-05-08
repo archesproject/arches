@@ -65,14 +65,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <template id="card-tree">
                 <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': card.expanded, 'jstree-closed' : !card.expanded()}">
                     <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
-                    <a class="jstree-anchor" href="#" tabindex="-1">
+                    <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function(){expanded(!expanded())}">
                         <i class="fa fa-file-o" role="presentation"></i>
                         <span style="padding-right: 10px;" data-bind="text: card.name"></span>
                     </a>
                     <ul class="jstree-children" aria-expanded="true">
                         <!-- ko if: card.cardinality === 'n' || card.tiles().length === 0 -->
                         <li role="treeitem" class="jstree-node jstree-leaf">
-                            <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){expanded(!expanded())}"></i>
+                            <i class="jstree-icon jstree-ocl" role="presentation"></i>
                             <a class="jstree-anchor" href="#" tabindex="-1">
                                 <i class="fa fa-plus-circle" role="presentation"></i>
                                 <span style="padding-right: 10px;">Add New <span data-bind="text: card.name"></span></span>
