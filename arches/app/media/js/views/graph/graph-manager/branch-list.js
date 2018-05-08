@@ -33,14 +33,22 @@ define([
                 branch.selected = ko.observable(false);
                 branch.filtered = ko.observable(false);
                 branch.graphModel = new GraphModel({
-                    data: branch
+                    data: branch,
+                    selectRoot: false
                 })
+                branch.graphModel.loadDomainConnections();
                 this.items.push(branch);
             }, this);
             this.selectedBranch = ko.observable(null);
             this.viewMetadata = ko.observable(false);
             this.loadedDomainConnections = {};
 
+            this.filtered_items = ko.pureComputed(function() {
+                var filtered_items = _.filter(this.items(), function(item){ 
+                    return !item.filtered(); 
+                }, this);
+                return filtered_items;
+            }, this)
 
             /**
             * Downloads domain connection data relevant to the selected node's ontology class
@@ -48,6 +56,7 @@ define([
             * @param {object} graph - the branch or graph for which domain connection data is requested
             * @param {boolean} filter - if true updates the branch filter for the selected node
             */
+
             this.loadDomainConnections = function(graph, filter){
                 var self = this;
 
@@ -109,6 +118,7 @@ define([
             valueListener.subscribe(function(){
                 if (!!this.selectedNode()){
                     var lastBranch = this.items().length - 1;
+                    console.log('in valueListener')
                     this.items().forEach(function(branch, i){
                         i === lastBranch ? this.loadDomainConnections(branch.graphModel, true) : this.loadDomainConnections(branch.graphModel)
                     }, this)
@@ -116,7 +126,7 @@ define([
             }, this);
 
             // need to call this on init so that branches that can't be appended get filtered out initially
-            this.loadDomainConnections(this.graphModel, true)
+            //this.loadDomainConnections(this.graphModel, true)
         },
 
         /**

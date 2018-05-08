@@ -456,6 +456,7 @@ define(['arches',
             var datatypelookup = {};
 
             attributes =_.extend({datatypes:[], domain_connections:[]}, attributes);
+            _.defaults(attributes, {selectRoot: true});
 
             _.each(attributes.datatypes, function(datatype){
                 datatypelookup[datatype.datatype] = datatype;
@@ -503,7 +504,9 @@ define(['arches',
 
             var root = this.get('root');
             if(!!root){
-                root.selected(true);
+                if (attributes.selectRoot){
+                    root.selected(true);
+                }
             }
 
             this.graphCards = ko.computed(function(){
@@ -552,6 +555,12 @@ define(['arches',
             })
 
             return root;
+        },
+
+        loadDomainConnections: function() {
+            this.getValidDomainClasses('', function(responseJSON) {
+                console.log(responseJSON)
+            }, this);
         },
 
         /**
