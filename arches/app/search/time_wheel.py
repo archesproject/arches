@@ -30,11 +30,13 @@ class TimeWheel(object):
             def gen_range_agg(gte=None, lte=None, permitted_nodegroups=None):
                 date_query = Bool()
                 date_query.filter(Range(field='dates.date', gte=gte, lte=lte, relation='intersects'))
-                if permitted_nodegroups:
+                if permitted_nodegroups is not None:
+                    print len(permitted_nodegroups)
+                if permitted_nodegroups is not None:
                     date_query.filter(Terms(field='dates.nodegroup_id', terms=permitted_nodegroups))
                 date_ranges_query = Bool()
                 date_ranges_query.filter(Range(field='date_ranges.date_range', gte=gte, lte=lte, relation='intersects'))
-                if permitted_nodegroups:
+                if permitted_nodegroups is not None:
                     date_ranges_query.filter(Terms(field='date_ranges.nodegroup_id', terms=permitted_nodegroups))
                 wrapper_query = Bool()
                 wrapper_query.should(Nested(path='date_ranges', query=date_ranges_query))
@@ -69,7 +71,7 @@ class TimeWheel(object):
                     min_period = period
                     max_period = period + interval
                     if 'range' in date_tier:
-                        within_range = min_period >= date_tier['range'][0] and max_period <= date_tier['range'][1]
+                        within_range = min_period >= date_tier['range']["min"] and max_period <= date_tier['range']["max"]
                     period_name = "{0} ({1} - {2})".format(name, min_period, max_period)
                     nodegroups = self.get_permitted_nodegroups(user) if "root" in date_tier else None
                     period_boolquery = gen_range_agg(gte=ExtendedDateFormat(min_period).lower,
