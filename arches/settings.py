@@ -406,7 +406,7 @@ CACHES = {
 TIMEWHEEL_DATE_TIERS = None
 
 #Identify the usernames and duration (seconds) for which you want to cache the timewheel
-CACHE_BY_USER = {'anonymous': 600}
+CACHE_BY_USER = {'anonymous': 3600 * 24}
 
 DATE_IMPORT_EXPORT_FORMAT = '%Y-%m-%d'
 
