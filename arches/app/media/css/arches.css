@@ -10763,6 +10763,15 @@ ul.select2-choices:after {
     flex: 1
 }
 
+.rich-text {
+    padding:20px;
+}
+
+.jstree .rich-text {
+    padding:0px;
+    display: inline;
+}
+
 @keyframes loader {
     0% {
         background: #ddd;
