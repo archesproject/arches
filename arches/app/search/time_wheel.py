@@ -89,13 +89,12 @@ class TimeWheel(object):
             add_date_tier(date_tiers, min_date, max_date)
 
             root = d3Item(name='root')
-
-            if user.username in settings.CACHE_BY_USER:
-                key = 'time_wheel_config_{0}'.format(user.username)
-                cache.set(key, root, settings.CACHE_BY_USER[user.username])
             results = {'buckets':[query.search(index='resource')['aggregations']]}
             results_with_ranges = self.appendDateRanges(results, range_lookup)
             self.transformESAggToD3Hierarchy(results_with_ranges, root)
+            if user.username in settings.CACHE_BY_USER:
+                key = 'time_wheel_config_{0}'.format(user.username)
+                cache.set(key, root, settings.CACHE_BY_USER[user.username])
             return root
 
 
