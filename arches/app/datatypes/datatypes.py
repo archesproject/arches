@@ -13,6 +13,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.date_utils import ExtendedDateFormat
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Exists, RangeDSLException
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from django.core.cache import cache
 from django.utils.translation import ugettext as _
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
@@ -224,6 +225,10 @@ class DateDataType(BaseDataType):
         except KeyError, e:
             pass
 
+    def after_update_all(self):
+        config = cache.get('time_wheel_config_anonymous')
+        if config is not None:
+            cache.delete('time_wheel_config_anonymous')
 
 class EDTFDataType(BaseDataType):
 

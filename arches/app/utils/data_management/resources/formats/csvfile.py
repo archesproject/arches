@@ -311,8 +311,6 @@ class CsvReader(Reader):
                     newresourceinstance.save()
                 except TransportError as e:
                     cause = json.dumps(e.info['error']['caused_by'],indent=1)
-                    import ipdb
-                    ipdb.set_trace()
                     msg = '%s: WARNING: failed to index document in resource: %s %s. Exception detail:\n%s\n' % (datetime.datetime.now(), resourceinstanceid, row_number, cause)
                     errors.append({'type': 'WARNING', 'message': msg})
                     newresourceinstance.delete()
