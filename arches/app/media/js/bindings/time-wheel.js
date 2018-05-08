@@ -62,8 +62,8 @@ define([
             });
 
             var partition = d3.layout.partition()
-                .sort(function(d) {
-                    return d3.descending(d.start);
+                .sort(function(d, e) {
+                    return d.start - e.start;
                 })
                 .value(function(d) {
                     return d.size;
