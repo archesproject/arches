@@ -587,7 +587,8 @@ def export_results(request):
 
 def time_wheel_config(request):
     time_wheel = TimeWheel()
-    config = cache.get('time_wheel_config')
+    key = 'time_wheel_config_{0}'.format(request.user.username)
+    config = cache.get(key)
     if config is None:
         config = time_wheel.time_wheel_config(request.user)
     return JSONResponse(config, indent=4)
