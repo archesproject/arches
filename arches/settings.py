@@ -387,10 +387,19 @@ CACHES = {
     }
 }
 
-#Example of a custom time wheel configuration:
-# TIMEWHEEL_DATE_TIERS = {"name": "Millennium", "interval": 1000, "root": True, "child": {
-#       "name": "Cen", "interval": 100, "range": (1500, 2000), "child": {
-#           "name": "Decade", "interval": 10, "range": (1750, 2000)
+# Example of a custom time wheel configuration:
+# TIMEWHEEL_DATE_TIERS = {
+#     "name": "Millennium", 
+#     "interval": 1000,
+#     "root": True,
+#     "child": {
+#             "name": "Cen",
+#             "interval": 100,
+#             "range": (1500, 2000),
+#             "child": {
+#                 "name": "Decade",
+#                 "interval": 10,
+#                 "range": (1750, 2000)
 #           }
 #       }
 #   }
