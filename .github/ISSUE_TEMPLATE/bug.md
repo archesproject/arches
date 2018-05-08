@@ -30,3 +30,6 @@
 *   Operating System and version (desktop or mobile):
 *   Browser Name and version:
 *   Link to your Arches Install (optional):
+
+#### Ticket Background
+*   Found by: @ <!--- This could be the person who files the bug, but not always. -->

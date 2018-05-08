@@ -147,7 +147,7 @@ class Reader(object):
             log_nums = [0]
             if os.path.isfile(settings.RESOURCE_IMPORT_LOG):
                 if os.path.getsize(settings.RESOURCE_IMPORT_LOG)/1000000 > 5:
-                    for file in os.listdir('/'.join(settings.RESOURCE_IMPORT_LOG.split('/')[0:-1]),):
+                    for file in os.listdir(os.path.join(os.path.split(settings.RESOURCE_IMPORT_LOG)[0:-1][0])):
                         try:
                             log_nums.append(int(file.split('.')[-1]))
                         except:
