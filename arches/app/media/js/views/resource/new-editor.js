@@ -8,6 +8,7 @@ define([
     'widgets'
 ], function(_, ko, koMapping, BaseManagerView, data) {
     var tiles = data.tiles;
+    var filter = ko.observable('');
     var cardData = _.map(data.cards, function(card) {
         return _.extend(
             card,
@@ -15,6 +16,16 @@ define([
                 return group.nodegroupid === card.nodegroup_id;
             }), {
                 expanded: ko.observable(true),
+                highlight: ko.computed(function() {
+                    var filterText = filter();
+                    if (!filterText) {
+                        return false;
+                    }
+                    filterText = filterText.toLowerCase();
+                    if (card.name.toLowerCase().indexOf(filterText) !== -1) {
+                        return true;
+                    }
+                }, this),
                 widgets: _.filter(data.cardwidgets, function (widget) {
                     return widget.card_id === card.cardid;
                 })
@@ -41,7 +52,8 @@ define([
         collapseAll: function() {
             toggleAll(false);
         },
-        rootExpanded: ko.observable(true)
+        rootExpanded: ko.observable(true),
+        filter: filter
     };
 
     var toggleAll = function(state) {

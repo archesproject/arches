@@ -38,7 +38,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <div class="ep-form-toolbar">
         <div>
             <h4 class="ep-form-toolbar-title">
+                <div class="list-filter" data-bind="" style="margin-right: 10px;">
+                    <input type="text" class="form-control" style="width: 250px;" placeholder="{% trans 'Find a card...' %}" data-bind="textInput: filter">
 
+                    <!-- Clear Search -->
+                    <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }" style="top: 8px;"><i class="fa fa-times-circle"></i></span>
+                </div>
             </h4>
         </div>
     </div>
@@ -77,7 +82,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
                     <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function(){expanded(!expanded())}">
                         <i class="fa fa-file-o" role="presentation"></i>
-                        <span style="padding-right: 10px;" data-bind="text: card.name"></span>
+                        <span style="padding-right: 10px;" data-bind="text: card.name, css:{'filtered': card.highlight()}"></span>
                     </a>
                     <ul class="jstree-children" aria-expanded="true">
                         <!-- ko if: card.cardinality === 'n' || card.tiles().length === 0 -->
@@ -94,7 +99,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){expanded(!expanded())}"></i>
                             <a class="jstree-anchor" href="#" tabindex="-1">
                                 <i class="fa fa-file" role="presentation"></i>
-                                <strong style="margin-right: 10px;">
+                                <strong style="margin-right: 10px;" data-bind="css:{'filtered': card.highlight()}">
                                     <!-- ko if: card.widgets.length > 0 -->
                                     <span data-bind="text: card.widgets[0].label"></span>:
                                     <div style='display: inline;' data-bind='component: {
