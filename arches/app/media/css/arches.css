@@ -10784,6 +10784,10 @@ ul.select2-choices:after {
     display: inline;
 }
 
+.card-component {
+    padding: 25px;
+}
+
 @keyframes loader {
     0% {
         background: #ddd;

@@ -3,6 +3,7 @@
 {% load i18n %}
 
 <script>
+    var CKEDITOR_BASEPATH = '{{ STATIC_URL }}packages/ckeditor/';
     require.config({
         baseUrl: '{{ STATIC_URL }}js',
         paths: {
@@ -360,6 +361,16 @@
                 'componentname': '{{ template.componentname }}',
                 'component': '{{ template.component }}',
                 'defaultconfig': '{{ template.defaultconfig_json }}'
+            },
+        {% endfor %}{% endautoescape %}};
+    });
+
+    define('card-components', [{% for component in card_components %}'{{ component.component }}',{% endfor %}], function () {
+        return {{% autoescape off %}{% for component in card_components %}
+            '{{ component.pk }}': {
+                'componentname': '{{ component.componentname }}',
+                'component': '{{ component.component }}',
+                'defaultconfig': '{{ component.defaultconfig_json }}'
             },
         {% endfor %}{% endautoescape %}};
     });
