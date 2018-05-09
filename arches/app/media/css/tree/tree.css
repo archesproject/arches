@@ -155,17 +155,17 @@
     box-shadow: inset 0 0 1px #999999;
 }
 
-.jstree-delete-node {
+.jstree-node-action-icon {
     display: none;
 }
 
-.jstree-clicked .jstree-delete-node {
+.jstree-clicked .jstree-node-action-icon {
     font: normal normal normal 14px/1 FontAwesome;
     color: white;
     display: inline-block;
     width: 25px;
     height: 25px;
-    padding: 4px 4px 4px 5px;
+    padding: 4px 4px 4px 6px;
     background-color: #0b2342;
     border: 1px solid #253571;
     border-radius: 3px;

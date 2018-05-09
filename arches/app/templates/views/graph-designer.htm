@@ -116,8 +116,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <div style="background-color: #ffffff; flex: 1; overflow-y: auto" >
             <div class="tab-content" data-bind="css: {'graph-designer-loading-mask': contentLoading }"></div>
             <div class="tab-content">
-                <!-- Summary Card -->
-                <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'graph' }">
+                <!-- Settings, Node Form, and Branch List -->
+                <div class="tab-pane fade in" style="position: relative;" data-bind="css: { active: activeTab() === 'graph' }">
                     <!--ko if: selectedNode() -->
                     <div class="graph-designer-graph-content" data-bind="visible: selectedNode().nodeid == graph.root.nodeid()">
                         {% include 'views/new-graph-settings.htm' %}
@@ -127,8 +127,23 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         {% include 'views/new-node-form.htm' %}
                     </div>
                     <!--/ko-->
+                    <!--Branch Library -->
+                    <div id="branch-library" class="middle-column-container graph-designer branch-library" data-bind="visible: graphTree.branchListVisible" style="width: 300px;border-bottom: solid 1px #dddddd;">
+                        <div>
+                            <div class="title-block-title" style="margin-bottom: 0px; padding-bottom: 0px;">
+                                <span class="">{{branch_list.title}}</span>
+                            </div>
+                            <div class="relative">
+                                <a id="node-crud-close" href="javascript:void(0)" class="library-close-btn" data-bind="click: graphTree.toggleBranchList.bind(graphTree)"><i class="ion-close"></i></a>
+                            </div>
+                            <div style="padding: 4px 0px 12px 6px">{% trans "Add a branch to your model from the library" %}</div>
+                        </div>
+                        <div data-bind="with: branchListView">
+                            {% include 'views/graph/graph-manager/branch-list.htm' %}
+                        </div>
+                    </div>
                 </div>
-                <!-- Summary Card -->
+                <!-- Card Manager -->
                 <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }">card content</div>
             </div>
         </div>
@@ -149,7 +164,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 ontologies: {{ontologies}},
                 datatypes: {{datatypes_json}},
                 graph: {{graph}},
-                ontology_namespaces: {{ontology_namespaces}}
+                ontology_namespaces: {{ontology_namespaces}},
+                branches: {{branches}}
             };
         });{% endautoescape %}
     </script>

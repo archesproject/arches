@@ -20,7 +20,7 @@ define([
 
         if (this.node.config.options) {
             this.options = this.node.config.options;
-            this.options().forEach(function(option) {
+            ko.unwrap(this.options).forEach(function(option) {
                 if (!ko.isObservable(option.text)) {
                     option.text = ko.observable(option.text);
                 }
@@ -76,7 +76,7 @@ define([
         };
 
         this.flatOptions = ko.computed(function() {
-            var options = self.options();
+            var options = ko.unwrap(self.options) || [];
             var flatOptions = [];
             options.forEach(function(option) {
                 flattenOptions(option, flatOptions);

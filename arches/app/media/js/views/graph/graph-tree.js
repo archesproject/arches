@@ -32,35 +32,45 @@ define([
             this.graphModel = options.graphModel;
             this.graphSettings = options.graphSettings;
             this.items = this.graphModel.get('nodes');
+            this.branchListVisible = ko.observable(false);
             TreeView.prototype.initialize.apply(this, arguments);
         },
 
         /**
         * Selects the passed in node
         * @memberof GraphTree.prototype
-        * @param {object} item - the node to be selected via {@link GraphModel#selectNode}
+        * @param {object} node - the node to be selected via {@link GraphModel#selectNode}
         * @param {object} e - click event object
         */
-        selectItem: function(item, e){
+        selectItem: function(node, e){
             if (!this.graphSettings.dirty()) {
-                this.graphModel.selectNode(item);
-                this.trigger('node-selected', item);
+                this.graphModel.selectNode(node);
+                this.trigger('node-selected', node);
             }
         },
 
-        addChildNode: function(item, e) {
+        toggleBranchList: function(node, e) {
             e.stopImmediatePropagation();
-            this.graphModel.appendNode(item, null ,function(response, status){
+            this.branchListVisible(!this.branchListVisible());
+            if(this.branchListVisible()){
+                node.expanded(true);
+            }
+            this.trigger('toggle-branch-list');
+        },
+
+        addChildNode: function(node, e) {
+            e.stopImmediatePropagation();
+            this.graphModel.appendNode(node ,function(response, status){
                 if(status === 'success') {
-                    item.expanded(true);
+                    node.expanded(true);
                 }
             }, this);
         },
 
-        deleteNode: function(item, e) {
+        deleteNode: function(node, e) {
             e.stopImmediatePropagation();
-            var parentNode = this.graphModel.getParentNode(item);
-            this.graphModel.deleteNode(item);
+            var parentNode = this.graphModel.getParentNode(node);
+            this.graphModel.deleteNode(node);
         }
 
     });

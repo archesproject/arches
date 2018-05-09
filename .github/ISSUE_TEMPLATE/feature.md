@@ -11,3 +11,9 @@
 -   [ ] Documentation
 
 #### Definition of Done
+
+
+#### Ticket Background
+*   Sponsored by: <!--- Who is funding this effort? Getty Conservation Institute|Self Funded -->
+*   Suggested by: @ <!--- This could be the person who files the Feature Request, but not always. -->
+*   Designed by: @ <!--- Who designed this new feature-->

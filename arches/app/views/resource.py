@@ -76,8 +76,11 @@ def get_resource_relationship_types():
 class NewResourceEditorView(MapBaseManagerView):
     def get(self, request, resourceid=None, view_template='views/resource/new-editor.htm', main_script='views/resource/new-editor', nav_menu=True):
         resource_instance = Resource.objects.get(pk=resourceid)
-        cards = resource_instance.graph.cardmodel_set.select_related('nodegroup').all()
+        nodes = resource_instance.graph.node_set.all()
+        cards = resource_instance.graph.cardmodel_set.order_by('sortorder').select_related('nodegroup').all().prefetch_related('cardxnodexwidget_set')
         nodegroups = [card.nodegroup for card in cards]
+        cardwidgets = [widget for widgets in [card.cardxnodexwidget_set.order_by('sortorder').all() for card in cards] for widget in widgets]
+        widgets = models.Widget.objects.all()
 
         displayname = resource_instance.displayname
         if displayname == 'undefined':
@@ -88,9 +91,15 @@ class NewResourceEditorView(MapBaseManagerView):
             resourceid=resourceid,
             displayname=displayname,
             graphid=resource_instance.graph_id,
+            graphiconclass=resource_instance.graph.iconclass,
+            graphname=resource_instance.graph.name,
+            widgets=widgets,
+            widgets_json=JSONSerializer().serialize(widgets),
             tiles=JSONSerializer().serialize(resource_instance.tilemodel_set.all()),
             cards=JSONSerializer().serialize(cards),
             nodegroups=JSONSerializer().serialize(nodegroups),
+            nodes=JSONSerializer().serialize(nodes),
+            cardwidgets=JSONSerializer().serialize(cardwidgets),
         )
 
         context['nav']['title'] = ''
