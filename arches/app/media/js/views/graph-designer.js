@@ -70,6 +70,12 @@ define([
         graphModel: viewModel.graphModel,
         graphSettings: viewModel.graphSettingsViewModel
     });
+
+    viewModel.graphTree.branchListVisible.subscribe(function(visible){
+        if(visible){
+            viewModel.branchListView.loadDomainConnections();
+        }
+    }, this);
     
     viewModel.loadGraphSettings = function(){
         var self = this;
