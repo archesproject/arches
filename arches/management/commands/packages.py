@@ -536,6 +536,7 @@ class Command(BaseCommand):
             'COPYRIGHT_TEXT',
             'COPYRIGHT_YEAR',
             'MODE',
+            'CACHES',
             'DATABASES',
             'DEBUG',
             'RESOURCE_IMPORT_LOG',
@@ -588,7 +589,8 @@ class Command(BaseCommand):
             'EMAIL_PORT',
             'PROTECTED_GRAPHS',
             'DATE_IMPORT_EXPORT_FORMAT',
-            'ANALYSIS_COORDINATE_SYSTEM_SRID'
+            'ANALYSIS_COORDINATE_SYSTEM_SRID',
+            'CACHE_BY_USER'
             ]
 
         with open('arches/install/arches-templates/project_name/settings_local.py-tpl', 'w') as f:
