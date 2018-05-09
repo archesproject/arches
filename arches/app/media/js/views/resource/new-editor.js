@@ -5,55 +5,79 @@ define([
     'views/base-manager',
     'resource-editor-data',
     'bindings/resizable-sidepanel',
-    'widgets'
+    'widgets',
+    'card-components'
 ], function(_, ko, koMapping, BaseManagerView, data) {
     var tiles = data.tiles;
     var filter = ko.observable('');
-    var cardData = _.map(data.cards, function(card) {
+    var selection = ko.observable();
+    var cards = _.map(data.cards, function(card) {
         return _.extend(
             card,
             _.find(data.nodegroups, function(group) {
                 return group.nodegroupid === card.nodegroup_id;
             }), {
-                expanded: ko.observable(true),
-                highlight: ko.computed(function() {
-                    var filterText = filter();
-                    if (!filterText) {
-                        return false;
-                    }
-                    filterText = filterText.toLowerCase();
-                    if (card.name.toLowerCase().indexOf(filterText) !== -1) {
-                        return true;
-                    }
-                }, this),
                 widgets: _.filter(data.cardwidgets, function (widget) {
                     return widget.card_id === card.cardid;
+                }),
+                nodes: _.filter(data.nodes, function (node) {
+                    return node.nodegroup_id === card.nodegroup_id;
+                }).map(function (node) {
+                    node.configKeys = ko.observableArray(
+                        _.map(node.config, function (val, key) {
+                            return key
+                        })
+                    );
+                    node.config = koMapping.fromJS(node.config);
+                    return node;
                 })
             }
         );
     });
-    var vm = {
-        widgetLookup: _.reduce(data.widgets, function (lookup, widget) {
-            lookup[widget.widgetid] = widget;
-            return lookup
-        }, {}),
-        nodeLookup: _.reduce(data.nodes, function (lookup, node) {
-            node.config = koMapping.fromJS(node.config)
-            lookup[node.nodeid] = node;
-            return lookup
-        }, {}),
-        graphid: data.graphid,
-        graphname: data.graphname,
-        graphiconclass: data.graphiconclass,
-        displayname: ko.observable(data.displayname),
-        expandAll: function() {
-            toggleAll(true);
-        },
-        collapseAll: function() {
-            toggleAll(false);
-        },
-        rootExpanded: ko.observable(true),
-        filter: filter
+
+    var setupCard = function (card, parent) {
+        return _.extend(card, {
+            parent: parent,
+            expanded: ko.observable(true),
+            highlight: ko.computed(function() {
+                var filterText = filter();
+                if (!filterText) {
+                    return false;
+                }
+                filterText = filterText.toLowerCase();
+                if (card.name.toLowerCase().indexOf(filterText) > -1) {
+                    return true;
+                }
+            }, this),
+            tiles: ko.observableArray(
+                _.filter(tiles, function(tile) {
+                    return (
+                        parent ? (tile.parenttile_id === parent.tileid) : true
+                    ) && tile.nodegroup_id === card.nodegroup_id;
+                }).map(function (tile) {
+                    return setupTile(tile, card);
+                })
+            ),
+            selected: ko.computed(function () {
+                return selection() === card;
+            }, this)
+        });
+    };
+
+    var setupTile = function(tile, parent) {
+        return _.extend(tile, {
+            parent: parent,
+            cards: _.filter(cards, function(card) {
+                return card.parentnodegroup_id === tile.nodegroup_id;
+            }).map(function(card) {
+                return setupCard(_.clone(card), tile);
+            }),
+            expanded: ko.observable(true),
+            selected: ko.computed(function () {
+                return selection() === tile;
+            }, this),
+            data: koMapping.fromJS(tile.data)
+        });
     };
 
     var toggleAll = function(state) {
@@ -70,35 +94,55 @@ define([
             node.expanded(state);
         });
     };
-
-    vm.topCards = _.filter(cardData, function(card) {
-        if (!card.parentnodegroup_id) {
-            card.tiles = ko.observable(
-                _.filter(tiles, function(tile) {
-                    return tile.nodegroup_id === card.nodegroup_id;
-                })
-            );
-            card.expanded = ko.observable(true);
-            return true;
-        }
-    });
-
-    _.each(tiles, function(tile) {
-        tile.cards = _.filter(cardData, function(card) {
-            return card.parentnodegroup_id === tile.nodegroup_id;
-        }).map(function(card) {
-            return _.extend(_.clone(card), {
-                expanded: ko.observable(true),
-                tiles: ko.observableArray(
-                    _.filter(tiles, function(childCandidate) {
-                        return childCandidate.parenttile_id === tile.tileid &&
-                            childCandidate.nodegroup_id === card.nodegroup_id;
-                    })
-                )
-            });
-        });
-        tile.expanded = ko.observable(true);
-    });
+    var createLookup = function (list, idKey) {
+        return _.reduce(list, function (lookup, item) {
+            lookup[item[idKey]] = item;
+            return lookup
+        }, {});
+    };
+    var vm = {
+        widgetLookup: createLookup(data.widgets, 'widgetid'),
+        cardComponentLookup: createLookup(data.cardComponents, 'componentid'),
+        nodeLookup: createLookup(data.nodes, 'nodeid'),
+        graphid: data.graphid,
+        graphname: data.graphname,
+        graphiconclass: data.graphiconclass,
+        graph: {
+            graphid: data.graphid,
+            name: data.graphname,
+            iconclass: data.graphiconclass,
+        },
+        displayname: ko.observable(data.displayname),
+        expandAll: function() {
+            toggleAll(true);
+        },
+        collapseAll: function() {
+            toggleAll(false);
+        },
+        rootExpanded: ko.observable(true),
+        topCards: _.filter(cards, function(card) {
+            return !card.parentnodegroup_id
+        }).map(function (card) {
+            return setupCard(card, null);
+        }),
+        selection: selection,
+        selectedTile: ko.computed(function () {
+            var item = selection();
+            if (item && item.tileid) {
+                return item;
+            }
+        }),
+        selectedCard: ko.computed(function () {
+            var item = selection();
+            if (item) {
+                if (item.tileid) {
+                    return item.parent;
+                }
+                return item;
+            }
+        }),
+        filter: filter
+    };
 
     return new BaseManagerView({
         viewModel: vm

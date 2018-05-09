@@ -1,0 +1,27 @@
+<div class="card-component">
+    <h4 data-bind="text: card.name"></h4>
+    <h5 data-bind="text: card.description"></h5>
+    <hr>
+    <div>
+        <form class="widgets" style="margin-bottom: 20px;" data-bind="foreach: {
+                data:card.widgets, as: 'widget'
+            }">
+            <div class='' data-bind='component: {
+                name: $parent.form.widgetLookup[widget.widget_id].name,
+                params: {
+                    formData: $parent.formData,
+                    tile: $parent.tile,
+                    form: $parent.form,
+                    config: widget.config,
+                    label: widget.label,
+                    value: $parent.tile.data[widget.node_id],
+                    node: $parent.form.nodeLookup[widget.node_id],
+                    expanded: $parent.expanded,
+                    graph: $parent.form.graph,
+                    type: "resource-editor"
+                }
+            }'></div>
+        </form>
+
+    </div>
+</div>
