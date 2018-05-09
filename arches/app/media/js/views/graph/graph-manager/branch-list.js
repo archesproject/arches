@@ -60,7 +60,7 @@ define([
                     return oc + datatype + collector;
                 }
                 return false;
-            }, this);
+            }, this).extend({ deferred: true });
 
             valueListener.subscribe(function(){
                 this.loadDomainConnections();
