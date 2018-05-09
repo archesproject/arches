@@ -482,60 +482,57 @@ class Graph(models.GraphModel):
 
             return branch_copy
 
-    def append_node(self, property=None, nodeid=None, skip_validation=True):
+    def append_node(self, nodeid=None):
         """
         Appends a single node onto this graph
-
-        Arguments:
-        property -- the property to use when appending the node
 
         Keyword Arguments:
         nodeid -- if given will append the node to this node, if not supplied will
         append the node to the root of this graph
 
-        skip_validation -- don't validate the resultant graph (post append), defaults to True
-
         """
+
+        node_names = [node.name for node in self.nodes.itervalues()]
+        temp_node_name = 'New Node'
+        if temp_node_name in node_names:
+            i = 1
+            temp_node_name = 'New Node_%s' % i
+            while temp_node_name in node_names:
+                i += 1
+                temp_node_name = 'New Node_%s' % i
 
         nodeToAppendTo = self.nodes[uuid.UUID(str(nodeid))] if nodeid else self.root
 
-        if skip_validation: # or self.can_append(branch_graph, nodeToAppendTo):
+        newNode = models.Node(
+            nodeid = uuid.uuid1(),
+            name = temp_node_name,
+            istopnode = False,
+            ontologyclass = None,
+            datatype = 'semantic',
+            graph = self
+        )
 
-            temp_node_name = 'New Node'
-            if models.Node.objects.filter(name=temp_node_name).count() != 0:
-                i = 1
-                temp_node_name = 'New Node_%s' % i
-                while models.Node.objects.filter(name=temp_node_name).count() > 0:
-                    i += 1
-                    temp_node_name = 'New Node_%s' % i
+        newEdge = models.Edge(
+            domainnode = nodeToAppendTo,
+            rangenode = newNode,
+            ontologyproperty = None,
+            graph = self
+        )
 
-            newNode = models.Node(
-                nodeid = uuid.uuid1(),
-                name = temp_node_name,
-                istopnode = False,
-                ontologyclass = None,
-                datatype = 'semantic',
-                graph = self
-            )
+        self.add_node(newNode)
+        self.add_edge(newEdge)
+        self.populate_null_nodegroups()
 
-            newEdge = models.Edge(
-                domainnode = nodeToAppendTo,
-                rangenode = newNode,
-                ontologyproperty = property,
-                graph = self
-            )
-
-            self.add_node(newNode)
-            self.add_edge(newEdge)
-            self.populate_null_nodegroups()
-
-            # assign the first class and property found
-            if self.ontology:
-                ontology_classes = self.get_valid_ontology_classes(newNode.nodeid, nodeToAppendTo.nodeid)
+        # assign the first class and property found
+        if self.ontology:
+            ontology_classes = self.get_valid_ontology_classes(newNode.nodeid, nodeToAppendTo.nodeid)
+            if len(ontology_classes) > 0:
                 newEdge.ontologyproperty = ontology_classes[0]['ontology_property']
                 newNode.ontologyclass = ontology_classes[0]['ontology_classes'][0]
+            else:
+                raise GraphValidationError(_('Ontology rules don\'t allow this node to be appended'))
 
-            return {'node': newNode, 'edge': newEdge}
+        return {'node': newNode, 'edge': newEdge}
 
     def clear_ontology_references(self):
         """

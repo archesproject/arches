@@ -8,12 +8,13 @@ define([
     'models/graph',
     'views/graph/graph-tree',
     'views/graph/graph-manager/new-node-form',
+    'views/graph/graph-manager/branch-list',
     'graph-designer-data',
     'arches',
     'viewmodels/graph-settings',
     'bindings/resizable-sidepanel',
     'datatype-config-components'
-], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, GraphModel, GraphTree, NodeFormView, data, arches, GraphSettingsViewModel) {
+], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, GraphModel, GraphTree, NodeFormView, BranchListView, data, arches, GraphSettingsViewModel) {
     var viewModel = {
         placeholder: ko.observable(''),
         graphid: ko.observable(data.graphid),
@@ -44,6 +45,15 @@ define([
         node: viewModel.selectedNode
     });
 
+    viewModel.branchListView = new BranchListView({
+        el: $('#branch-library'),
+        branches: data.branches,
+        graphModel: viewModel.graphModel,
+        loading: viewModel.loading,
+        disableAppendButton: ko.computed(function () {
+            return //self.node() && self.node().dirty();
+        })
+    });
 
     viewModel.graphSettingsViewModel = new GraphSettingsViewModel({
         graph: viewModel.graph,
