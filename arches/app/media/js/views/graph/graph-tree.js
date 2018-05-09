@@ -52,12 +52,15 @@ define([
         toggleBranchList: function(node, e) {
             e.stopImmediatePropagation();
             this.branchListVisible(!this.branchListVisible());
+            if(this.branchListVisible()){
+                node.expanded(true);
+            }
             this.trigger('toggle-branch-list');
         },
 
         addChildNode: function(node, e) {
             e.stopImmediatePropagation();
-            this.graphModel.appendNode(node, null ,function(response, status){
+            this.graphModel.appendNode(node ,function(response, status){
                 if(status === 'success') {
                     node.expanded(true);
                 }

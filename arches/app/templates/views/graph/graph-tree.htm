@@ -28,7 +28,7 @@
             <!-- /ko -->
             <i class="jstree-node-action-icon fa fa-plus-circle" role="presentation" data-bind="click: graphTree.addChildNode.bind(graphTree)" data-toggle="tooltip" data-original-title="{% trans "Add Child Node" %}"></i>
             <!-- ko if: node.istopnode && node.graph.get('isresource') -->
-            <i class="jstree-node-action-icon ion-merge" role="presentation" data-bind="click: graphTree.toggleBranchList" data-toggle="tooltip" data-original-title="{% trans "Add Branch" %}"></i>
+            <i class="jstree-node-action-icon ion-merge" role="presentation" data-bind="click: graphTree.toggleBranchList.bind(graphTree)" data-toggle="tooltip" data-original-title="{% trans "Add Branch" %}"></i>
             <!-- /ko -->
         </a>
         <ul class="jstree-children" aria-expanded="true" data-bind="if: node.children().length > 0">

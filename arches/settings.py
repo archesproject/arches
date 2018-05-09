@@ -387,6 +387,27 @@ CACHES = {
     }
 }
 
+# Example of a custom time wheel configuration:
+# TIMEWHEEL_DATE_TIERS = {
+#     "name": "Millennium",
+#     "interval": 1000,
+#     "root": True,
+#     "child": {
+#             "name": "Cen",
+#             "interval": 100,
+#             "range": {"min": 1500, "max": 2000},
+#             "child": {
+#                 "name": "Decade",
+#                 "interval": 10,
+#                 "range": {"min": 1750, "max": 2000}
+#           }
+#       }
+#   }
+TIMEWHEEL_DATE_TIERS = None
+
+#Identify the usernames and duration (seconds) for which you want to cache the timewheel
+CACHE_BY_USER = {'anonymous': 3600 * 24}
+
 DATE_IMPORT_EXPORT_FORMAT = '%Y-%m-%d'
 
 #######################################

@@ -15,8 +15,13 @@
 <div class="grid" class="grid-list">
 
     <!-- Card -->
-    <!-- ko foreach: $data.items -->
-        <div class="library-card" data-bind="visible: $data.filtered() == false, click: $parent.selectItem.bind($parent), css:{ 'selected selected-card': $data.selected() && $data.isactive===true, disabled: $data.isactive === false }">
+    <!-- ko if: $data.filtered_items().length === 0 -->
+    <div class="library-card" style="padding: 20px; background: white; font-weight: 600;">
+        {% trans "Because of ontology rules, there are no branches that can be appended." %}
+    </div>
+    <!-- /ko -->
+    <!-- ko foreach: $data.filtered_items -->
+        <div class="library-card" data-bind="click: $parent.selectItem.bind($parent), css:{ 'selected selected-card': $data.selected() && $data.isactive===true, disabled: $data.isactive === false }">
             <div class="library-icon" style="">
                 <!-- ko if: $data.isactive -->
                 <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-dark" data-bind="click: $parent.appendBranch.bind($parent), clickBubble: false">
@@ -41,3 +46,4 @@
 
 </div>
 {% endblock %}
+
