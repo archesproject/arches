@@ -1157,6 +1157,10 @@ eonasdan-bootstrap-datetimepicker@~4.17.43:
     moment "^2.10"
     moment-timezone "^0.4.0"
 
+escape-latex@1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/escape-latex/-/escape-latex-1.0.3.tgz#1b9085e3e66570faabe21f05655643f64e78717a"
+
 escape-string-regexp@^1.0.2:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz#1b61c0562190a8dff6ae3bb2cf0200ca130b86d4"
@@ -1552,17 +1556,18 @@ marchingsquares@1.2.0, marchingsquares@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/marchingsquares/-/marchingsquares-1.2.0.tgz#36ae2dcc170be576d42579aac3c46da89ab650e6"
 
-mathjs@^3.11.4:
-  version "3.20.1"
-  resolved "https://registry.yarnpkg.com/mathjs/-/mathjs-3.20.1.tgz#cdefb0059ef897fe63fea39828e12041ac242765"
+mathjs@^4.2.2:
+  version "4.2.2"
+  resolved "https://registry.yarnpkg.com/mathjs/-/mathjs-4.2.2.tgz#a56785d49ff23da32c1e4eb26763e380592d22ae"
   dependencies:
     complex.js "2.0.4"
     decimal.js "9.0.1"
+    escape-latex "1.0.3"
     fraction.js "4.0.4"
     javascript-natural-sort "0.7.1"
     seed-random "2.2.0"
     tiny-emitter "2.0.2"
-    typed-function "0.10.6"
+    typed-function "1.0.3"
 
 merge-source-map@1.0.4:
   version "1.0.4"
@@ -2049,9 +2054,9 @@ type-check@~0.3.2:
   dependencies:
     prelude-ls "~1.1.2"
 
-typed-function@0.10.6:
-  version "0.10.6"
-  resolved "https://registry.yarnpkg.com/typed-function/-/typed-function-0.10.6.tgz#314aa0ea72bd586de5920095559683e20b01688b"
+typed-function@1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/typed-function/-/typed-function-1.0.3.tgz#57026246214b664a5af45ef0a06679f4453bd090"
 
 typedarray@^0.0.6, typedarray@~0.0.5:
   version "0.0.6"
