@@ -184,21 +184,34 @@ class ModificationForm(ResourceForm):
         return {
             'id': 'modification',
             'icon': 'fa-plus',
-            'name': _('Modifications'),
+            'name': _('Modification and Construction'),
             'class': ModificationForm
         }
 
     def update(self, data, files):
-        self.update_nodes('MODIFICATION.E11', data)
+        self.update_nodes('MODIFICATION_TYPE.E55', data)
+        self.update_nodes('MODIFICATION_DESCRIPTION.E62', data)
+        self.update_nodes('CONSTRUCTION_TECHNIQUE_TYPE.E55', data)
         return
 
     def load(self, lang):
         if self.resource:
-            self.data['MODIFICATION.E11'] = {
-                'branch_lists': self.get_nodes('MODIFICATION.E11'),
+            self.data['MODIFICATION_TYPE.E55'] = {
+                'branch_lists': datetime_nodes_to_dates(exclude_empty_branches(self.get_nodes('MODIFICATION.E11'),'MODIFICATION_TYPE.E55')),
+                'domains': {
+                    'MODIFICATION_TYPE.E55' : Concept().get_e55_domain('MODIFICATION_TYPE.E55'),
+                }
+            }
+            
+            self.data['MODIFICATION_DESCRIPTION.E62'] = {
+                'branch_lists': datetime_nodes_to_dates(exclude_empty_branches(self.get_nodes('MODIFICATION.E11'),'MODIFICATION_DESCRIPTION.E62')),
+                'domains': {}
+            }
+            
+            self.data['CONSTRUCTION_TECHNIQUE_TYPE.E55'] = {
+                'branch_lists': datetime_nodes_to_dates(exclude_empty_branches(self.get_nodes('MODIFICATION.E11'),'CONSTRUCTION_TECHNIQUE_TYPE.E55')),
                 'domains': {
                     'CONSTRUCTION_TECHNIQUE_TYPE.E55' : Concept().get_e55_domain('CONSTRUCTION_TECHNIQUE_TYPE.E55'),
-                    'MODIFICATION_TYPE.E55' : Concept().get_e55_domain('MODIFICATION_TYPE.E55'),
                     'CONSTRUCTION_MATERIAL.E57' : Concept().get_e55_domain('CONSTRUCTION_MATERIAL.E57')
                 }
             }
@@ -352,6 +365,40 @@ class ArchaeologicalAssessmentForm(ResourceForm):
                     'INTERPRETATION_NUMBER_TYPE.E55' : Concept().get_e55_domain('INTERPRETATION_NUMBER_TYPE.E55'),
                     'FUNCTION_TYPE.I4' : Concept().get_e55_domain('FUNCTION_TYPE.I4'),
                     'FUNCTION_CERTAINTY.I6' : Concept().get_e55_domain('FUNCTION_CERTAINTY.I6')
+                }
+            }
+            
+class FeatureArchaeologicalAssessmentForm(ResourceForm):
+    @staticmethod
+    def get_info():
+        return {
+            'id': 'archaeological-assessment-feature',
+            'icon': 'fa-flag',
+            'name': _('Archeological Assessment'),
+            'class': FeatureArchaeologicalAssessmentForm
+        }
+
+    def update(self, data, files):
+        data = add_actor('DATE_INTERPRETATION_INFERENCE_MAKING.I5', 'DATE_INTERPRETATION_INFERENCE_MAKING_ACTOR_NAME.E41', data, self.user)
+        
+        self.update_nodes('DATE_INTERPRETATION_INFERENCE_MAKING.I5', data)
+
+        return
+    
+    def load(self, lang):
+        print self.resource
+        if self.resource:
+
+            self.data['DATE_INTERPRETATION_INFERENCE_MAKING.I5'] = {
+                'branch_lists': self.get_nodes('DATE_INTERPRETATION_INFERENCE_MAKING.I5'),
+                'domains': {
+                    'FUNCTION_CERTAINTY.I6' : Concept().get_e55_domain('FUNCTION_CERTAINTY.I6'),
+                    'FUNCTION_TYPE.I4' : Concept().get_e55_domain('FUNCTION_TYPE.I4'),
+                    'INTERPRETATION_CERTAINTY.I6' : Concept().get_e55_domain('INTERPRETATION_CERTAINTY.I6'),
+                    'INTERPRETATION_TYPE.I4' : Concept().get_e55_domain('INTERPRETATION_TYPE.I4'),
+                    'CULTURAL_PERIOD_TYPE.I4' : Concept().get_e55_domain('CULTURAL_PERIOD_TYPE.I4'),
+                    'CULTURAL_PERIOD_CERTAINTY.I6' : Concept().get_e55_domain('CULTURAL_PERIOD_CERTAINTY.I6'),
+                    'CULTURAL_PERIOD_DETAIL_TYPE.E55' : Concept().get_e55_domain('CULTURAL_PERIOD_DETAIL_TYPE.E55')
                 }
             }
 
@@ -689,7 +736,134 @@ class ManMadeForm(ResourceForm):
             }
         }      
         return
+        
+class FeatureConditionAssessmentForm(ResourceForm):
+    baseentity = None
 
+    @staticmethod
+    def get_info():
+        return {
+            'id': 'condition-assessment-feature',
+            'icon': 'fa-adjust',
+            'name': _('Condition Assessment'),
+            'class': FeatureConditionAssessmentForm
+        }
+
+    def get_nodes(self, entity, entitytypeid):
+        ret = []
+        entities = entity.find_entities_by_type_id(entitytypeid)
+        for entity in entities:
+            ret.append({'nodes': entity.flatten()})
+
+        return ret
+
+    def update_nodes(self, entitytypeid, data):
+        if self.schema == None:
+            self.schema = Entity.get_mapping_schema(self.resource.entitytypeid)
+        for value in data[entitytypeid]:
+            for newentity in value['nodes']:
+                entity = Entity()
+                entity.create_from_mapping(self.resource.entitytypeid, self.schema[newentity['entitytypeid']]['steps'], newentity['entitytypeid'], newentity['value'], newentity['entityid'])
+
+                if self.baseentity == None:
+                    self.baseentity = entity
+                else:
+                    self.baseentity.merge(entity)
+
+    def update(self, data, files):
+
+        for value in data['CONDITION_ASSESSMENT.E14']:
+            for node in value['nodes']:
+                if node['entitytypeid'] == 'CONDITION_ASSESSMENT.E14' and node['entityid'] != '':
+                    #remove the node
+                    self.resource.filter(lambda entity: entity.entityid != node['entityid'])
+
+        self.update_nodes('DAMAGE_STATE.E3',data)
+        self.update_nodes('OVERALL_DAMAGE_SEVERITY_TYPE.E55', data)
+        self.update_nodes('DAMAGE_EXTENT_TYPE.E55', data)
+        self.update_nodes('RECOMMENDATION_PLAN.E100',data)
+        
+        self.update_nodes('RISK_PLAN.E100',data)
+        
+        self.update_nodes('OVERALL_CONDITION_TYPE.E55',data)
+        self.update_nodes('OVERALL_PRIORITY_TYPE.E55',data)
+        self.update_nodes('NEXT_ASSESSMENT_DATE_TYPE.E55',data)
+        self.update_nodes('CONDITION_REMARKS_ASSIGNMENT.E13',data)
+        
+        # production_entities = self.resource.find_entities_by_type_id('PRODUCTION.E12')
+
+        # if len(production_entities) > 0:
+            # self.resource.merge_at(self.baseentity, 'PRODUCTION.E12')
+        # else:
+        self.resource.merge_at(self.baseentity, self.resource.entitytypeid)
+        self.resource.trim()
+                   
+    def load(self, lang):
+    
+        self.data = {
+            'data': [],
+            'domains': {
+                'OVERALL_DAMAGE_SEVERITY_TYPE.E55' : Concept().get_e55_domain('OVERALL_DAMAGE_SEVERITY_TYPE.E55'),
+                'DAMAGE_EXTENT_TYPE.E55' : Concept().get_e55_domain('DAMAGE_EXTENT_TYPE.E55'),
+                'RECOMMENDATION_TYPE.E55' : Concept().get_e55_domain('RECOMMENDATION_TYPE.E55'),
+                'INTERVENTION_ACTIVITY_TYPE.E55' : Concept().get_e55_domain('INTERVENTION_ACTIVITY_TYPE.E55'),
+                'PRIORITY_TYPE.E55' : Concept().get_e55_domain('PRIORITY_TYPE.E55'),
+                'DISTURBANCE_CAUSE_CATEGORY_TYPE.E55' : Concept().get_e55_domain('DISTURBANCE_CAUSE_CATEGORY_TYPE.E55'),
+                'DISTURBANCE_CAUSE_TYPE.I4' : Concept().get_e55_domain('DISTURBANCE_CAUSE_TYPE.I4'),
+                'DISTURBANCE_CAUSE_CERTAINTY.I6' : Concept().get_e55_domain('DISTURBANCE_CAUSE_CERTAINTY.I6'),
+                'EFFECT_TYPE.S9' : Concept().get_e55_domain('EFFECT_TYPE.S9'),
+                'DAMAGE_TREND_TYPE.E55' : Concept().get_e55_domain('DAMAGE_TREND_TYPE.E55'),
+                
+                'MITIGATION_STRATEGY_TYPE.E55' : Concept().get_e55_domain('MITIGATION_STRATEGY_TYPE.E55'),
+                'MITIGATION_PRIORITY_TYPE.E55' : Concept().get_e55_domain('MITIGATION_PRIORITY_TYPE.E55'),
+                
+                'OVERALL_CONDITION_TYPE.E55' : Concept().get_e55_domain('OVERALL_CONDITION_TYPE.E55'),
+                'OVERALL_PRIORITY_TYPE.E55' : Concept().get_e55_domain('OVERALL_PRIORITY_TYPE.E55'),
+                'NEXT_ASSESSMENT_DATE_TYPE.E55' : Concept().get_e55_domain('NEXT_ASSESSMENT_DATE_TYPE.E55'),
+                'OVERALL_CONDITION_REMARKS_TYPE.E55' : Concept().get_e55_domain('OVERALL_CONDITION_REMARKS_TYPE.E55'),
+            }
+        }
+
+        assessment_entities = self.resource.find_entities_by_type_id('CONDITION_ASSESSMENT.E14')
+
+        for entity in assessment_entities:
+
+            self.data['data'].append({
+                'CONDITION_ASSESSMENT.E14': {
+                    'branch_lists': self.get_nodes(entity, 'CONDITION_ASSESSMENT.E14')
+                },
+                'DAMAGE_STATE.E3': {
+                    'branch_lists': datetime_nodes_to_dates(exclude_empty_branches(self.get_nodes(entity, 'DAMAGE_STATE.E3'),'DISTURBANCE_EVENT.E5'))
+                },
+                'OVERALL_DAMAGE_SEVERITY_TYPE.E55': {
+                    'branch_lists': self.get_nodes(entity, 'OVERALL_DAMAGE_SEVERITY_TYPE.E55')
+                },
+                'DAMAGE_EXTENT_TYPE.E55': {
+                    'branch_lists': self.get_nodes(entity, 'DAMAGE_EXTENT_TYPE.E55')
+                },
+                'RECOMMENDATION_PLAN.E100': {
+                    'branch_lists': self.get_nodes(entity, 'RECOMMENDATION_PLAN.E100')
+                },
+                
+                'RISK_PLAN.E100': {
+                    'branch_lists': self.get_nodes(entity, 'RISK_PLAN.E100')
+                },                
+                
+                'OVERALL_CONDITION_TYPE.E55': {
+                    'branch_lists': self.get_nodes(entity, 'OVERALL_CONDITION_TYPE.E55')
+                },
+                'OVERALL_PRIORITY_TYPE.E55': {
+                    'branch_lists': self.get_nodes(entity, 'OVERALL_PRIORITY_TYPE.E55')
+                },
+                'NEXT_ASSESSMENT_DATE_TYPE.E55': {
+                    'branch_lists': self.get_nodes(entity, 'NEXT_ASSESSMENT_DATE_TYPE.E55')
+                },
+                'CONDITION_REMARKS_ASSIGNMENT.E13': {
+                    'branch_lists': self.get_nodes(entity, 'CONDITION_REMARKS_ASSIGNMENT.E13')
+                }
+                
+            })
+        
 class ExternalReferenceForm(ResourceForm):
     @staticmethod
     def get_info():

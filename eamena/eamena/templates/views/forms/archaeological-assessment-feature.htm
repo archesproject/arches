@@ -1,0 +1,131 @@
+{% extends "views/forms/base.htm" %}
+{% load i18n %}
+
+
+
+{% block form_content %}
+<div class="form-full-content">
+    <div id="assessment-section">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9 margin-bottom-10">
+                <div class="form-section-header"><span>{% trans "Cultural Period" %}</span></div>
+            </div>
+            <div class="col-xs-12 col-sm-9">
+                
+                <div class="col-xs-12 col-sm-4 form-section-input add-padding-right">
+                    <div class="form-group">
+                        <input class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('CULTURAL_PERIOD_TYPE.I4', 'value'), placeholder: '{% trans 'Cultural Period Type' %}', dataKey: 'CULTURAL_PERIOD_TYPE.I4'}"></input>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-4 form-section-input add-padding-right">
+                    <div class="form-group">
+                        <input class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('CULTURAL_PERIOD_DETAIL_TYPE.E55', 'value'), placeholder: '{% trans 'Cultural Period Detail Type' %}', dataKey: 'CULTURAL_PERIOD_DETAIL_TYPE.E55'}"></input>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-4 form-section-input">
+                    <div class="form-group">
+                        <input class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('CULTURAL_PERIOD_CERTAINTY.I6', 'value'), placeholder: '{% trans 'Certainty' %}', dataKey: 'CULTURAL_PERIOD_CERTAINTY.I6'}"></input>
+                    </div>
+                </div>
+                <div class="col-xs-6 form-section-input margin-top-5 add-padding-right">
+                    <div class="form-group datetimepicker">
+                        <div class="input-group">
+                            <input type="text" name="mydate" id="date-from" placeholder='{% trans "from (yyyy-mm-dd)" %}' class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('ARCHAEOLOGICAL_FROM_DATE.E61', 'value')} ">
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6 form-section-input margin-top-5">
+                    <div class="form-group datetimepicker">
+                        <div class="input-group">
+                            <input type="text" name="mydate" id="date-from" placeholder='{% trans "to (yyyy-mm-dd)" %}' class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('ARCHAEOLOGICAL_TO_DATE.E61', 'value')} ">
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6 form-section-input margin-top-5 add-padding-right">
+                    <div class="form-group">
+                        <input class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('FUNCTION_TYPE.I4', 'value'), placeholder: '{% trans 'Function Type' %}', dataKey: 'FUNCTION_TYPE.I4'}"></input>
+                    </div>
+                </div>
+                <div class="col-xs-6 form-section-input margin-top-5">
+                    <div class="form-group">
+                        <input class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('FUNCTION_CERTAINTY.I6', 'value'), placeholder: '{% trans 'Function Certainty' %}', dataKey: 'FUNCTION_CERTAINTY.I6'}"></input>
+                    </div>
+                </div>
+                <div class="col-xs-6 form-section-input margin-top-5 add-padding-right">
+                    <div class="form-group">
+                        <input class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('INTERPRETATION_TYPE.I4', 'value'), placeholder: '{% trans 'Interpretation Type' %}', dataKey: 'INTERPRETATION_TYPE.I4'}"></input>
+                    </div>
+                </div>
+                <div class="col-xs-6 form-section-input margin-top-5">
+                    <div class="form-group">
+                        <input class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('INTERPRETATION_CERTAINTY.I6', 'value'), placeholder: '{% trans 'Interpretation Certainty' %}', dataKey: 'INTERPRETATION_CERTAINTY.I6'}"></input>
+                    </div>
+                </div>
+                <div class="col-xs-12 form-section-subheader">
+                    <div id="arches-names-form">
+                        <span>{% trans "On behalf of" %}
+                        <i class="fa fa-pencil edit-actor show-box inference" data-actor="inference" aria-hidden="true"></i>
+                        <i class="fa fa-pencil-square edit-actor hide-box inference hidden" data-actor="inference" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                </div>
+                <div class="edit-actors-row inference hidden">
+                    <input class="form-control arches-form-input" id="actor-name" style="width: 33%;" placeholder='{% trans "Name" %}' data-bind='value: getEditedNode("DATE_INTERPRETATION_INFERENCE_MAKING_ACTOR_NAME.E41", "value")'>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-3 add-button-column add-margin-top">
+                {% include 'views/components/add-item-button.htm' %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-9">
+                <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "All values must be populated, and dates must be properly formatted (YYYY-MM-DD)." %}</div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="arches-crud-child-section-new">
+                    <dl>
+                        <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                            <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue filler-text-block nr"></div>
+                            <div data-bind='foreach: getBranchLists()'>
+                                <div class="arches-crud-record" style="display:block;">
+                                    <a href="javascript:void(0)" title="remove"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                    <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" title="{% trans 'edit' %}" data-bind='click: $parent.editItem.bind($parent)'>
+                                        <span data-bind="text: nodes.get('CULTURAL_PERIOD_TYPE.I4', 'label')"></span>
+                                        <span class="text-muted">({% trans "Cultural Period" %})</span>
+                                        <span data-bind="text: nodes.get('CULTURAL_PERIOD_DETAIL_TYPE.E55', 'label')"></span>
+                                        <span class="text-muted">({% trans "Cultural Period Details" %})</span>
+                                        <span data-bind="text: nodes.get('CULTURAL_PERIOD_CERTAINTY.I6', 'label')"></span>
+                                        <span class="text-muted">({% trans "Certainty" %})</span><br>
+                                        <span class="text-muted"> from </span>
+                                        <span data-bind="{text: nodes.get('ARCHAEOLOGICAL_FROM_DATE.E61', 'value').slice(0,10)}" style="padding-right:2px"></span>
+                                        <span class="text-muted"> to </span>
+                                        <span data-bind="{text: nodes.get('ARCHAEOLOGICAL_TO_DATE.E61', 'value').slice(0,10)}"></span><br>
+                                        <span data-bind="text: nodes.get('FUNCTION_TYPE.I4', 'label')"></span>
+                                        <span class="text-muted">({% trans "Function Type" %})</span>
+                                        <span data-bind="text: nodes.get('FUNCTION_CERTAINTY.I6', 'label')"></span>
+                                        <span class="text-muted">({% trans "Certainty" %})</span><br>
+                                        <span data-bind="text: nodes.get('INTERPRETATION_TYPE.I4', 'label')"></span>
+                                        <span class="text-muted">({% trans "Interpretation Type" %})</span>
+                                        <span data-bind="text: nodes.get('INTERPRETATION_CERTAINTY.I6', 'label')"></span>
+                                        <span class="text-muted">({% trans "Certainty" %})</span><br>
+                                        <span class="text-muted" data-bind="{visible: nodes.get('DATE_INTERPRETATION_INFERENCE_MAKING_ACTOR_NAME.E41', 'value').length > 0}">{% trans 'by:' %} </span>
+                                        <span data-bind='text: nodes.get("DATE_INTERPRETATION_INFERENCE_MAKING_ACTOR_NAME.E41", "value")' style="padding-right:2px;"></span><span class="text-muted arches-crud-type-identifier"></span>
+                                        
+                                    </a>
+                                    
+                                </div>
+                            </div>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include 'views/forms/sections/SaveEditsFooter.htm' %}
+{% endblock form_content %}

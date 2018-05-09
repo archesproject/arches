@@ -162,7 +162,7 @@
                                     <!-- To date -->
                                     <div class="form-group datetimepicker" style="width:20%;">
                                         <div class="input-group">
-                                            <input type="text" name="mydate" id="date-to" placeholder='{% trans "to (yyyy-mm-dd)" %}' class="form-control datepicker" data-date-format="YYYY-MM-DD"collapse-resource-description data-bind="{value: getEditedNode('DISTURBANCE_DATE_TO.E61', 'value')} ">
+                                            <input type="text" name="mydate" id="date-to" placeholder='{% trans "to (yyyy-mm-dd)" %}' class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('DISTURBANCE_DATE_TO.E61', 'value')} ">
                                             <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
                                         </div>
                                     </div>
@@ -171,7 +171,7 @@
                                     <!-- Before date -->
                                     <div class="form-group datetimepicker" style="width:20%;">
                                         <div class="input-group">
-                                            <input type="text" name="mydate" id="date-before" placeholder='{% trans "before (yyyy-mm-dd)" %}' class="form-control datepicker" data-date-format="YYYY-MM-DD"collapse-resource-description data-bind="{value: getEditedNode('DISTURBANCE_DATE_OCCURRED_BEFORE.E61', 'value')} ">
+                                            <input type="text" name="mydate" id="date-before" placeholder='{% trans "before (yyyy-mm-dd)" %}' class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('DISTURBANCE_DATE_OCCURRED_BEFORE.E61', 'value')} ">
                                             <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
                                         </div>
                                     </div>
@@ -180,7 +180,7 @@
                                     <!-- On date -->
                                     <div class="form-group datetimepicker" style="width:20%;">
                                         <div class="input-group">
-                                            <input type="text" name="mydate" id="date-on" placeholder='{% trans "on (yyyy-mm-dd)" %}' class="form-control datepicker" data-date-format="YYYY-MM-DD"collapse-resource-description data-bind="{value: getEditedNode('DISTURBANCE_DATE_OCCURRED_ON.E61', 'value')} ">
+                                            <input type="text" name="mydate" id="date-on" placeholder='{% trans "on (yyyy-mm-dd)" %}' class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('DISTURBANCE_DATE_OCCURRED_ON.E61', 'value')} ">
                                             <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
                                         </div>
                                     </div>
@@ -226,6 +226,7 @@
                                     <span class="text-muted" data-bind="visible: nodes.get('DISTURBANCE_DATE_FROM.E61', 'value').length > 0">{% trans ' From ' %}</span><span data-bind="{text:nodes.get('DISTURBANCE_DATE_FROM.E61', 'value')}" style="padding-right:2px"></span>
                                     <span class="text-muted" data-bind="visible: nodes.get('DISTURBANCE_DATE_TO.E61', 'value').length > 0">{% trans ' To ' %}</span><span data-bind="{text: nodes.get('DISTURBANCE_DATE_TO.E61', 'value')}"></span>
                                     <span class="text-muted" data-bind="visible: nodes.get('DISTURBANCE_DATE_OCCURRED_BEFORE.E61', 'value').length > 0">{% trans ' Before ' %}</span><span data-bind="{text: nodes.get('DISTURBANCE_DATE_OCCURRED_BEFORE.E61', 'value')}"></span>
+                                    <span class="text-muted" data-bind="visible: nodes.get('DISTURBANCE_DATE_OCCURRED_ON.E61', 'value').length > 0">{% trans ' On ' %}</span><span data-bind="{text: nodes.get('DISTURBANCE_DATE_OCCURRED_ON.E61', 'value')}"></span>
                                     <span class="text-muted" data-bind="visible: nodes.get('DISTURBANCE_CAUSE_ASSIGNMENT_ASSESSOR_NAME.E41', 'value').length > 0">{% trans ' By: ' %}</span><span data-bind='{text: nodes.get("DISTURBANCE_CAUSE_ASSIGNMENT_ASSESSOR_NAME.E41", "value")}' style="padding-right:2px;"></span><span class="text-muted arches-crud-type-identifier"></span>
                                 </a>
                             </div>
