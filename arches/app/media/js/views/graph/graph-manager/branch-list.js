@@ -40,7 +40,7 @@ define([
             }, this);
             this.selectedBranch = ko.observable(null);
             this.viewMetadata = ko.observable(false);
-            this.loadedDomainConnections = {};
+            this.loadingBranchDomains = ko.observable(false);
 
             this.filtered_items = ko.pureComputed(function() {
                 var filtered_items = _.filter(this.items(), function(item){ 
@@ -49,6 +49,8 @@ define([
                 return filtered_items;
             }, this)
 
+            // update the list of items in the branch list 
+            // when any of these properties change
             var valueListener = ko.computed(function() {
                 var node = self.selectedNode;
                 if(!!node()){
@@ -74,14 +76,14 @@ define([
             var self = this;
             var domainConnections = [];
 
-            this.loading(true);
+            this.loadingBranchDomains(true);
             this.items().forEach(function(branch, i){
                 domainConnections.push(branch.graphModel.loadDomainConnections());
             }, this)
 
             $.when(...domainConnections)
             .then(function(){
-                self.loading(false);
+                self.loadingBranchDomains(false);
                 self.filter_function();
             });
 

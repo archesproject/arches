@@ -110,6 +110,17 @@ define([
 
     }
 
+    /**
+    * update the sizing of elements on window resize
+    */
+    var resize = function(){
+        $('.grid').height($(window).height()-208);
+    }
+
+    $( window ).resize(resize);
+
+    resize();
+
     return new BaseManagerView({
         viewModel: viewModel
     });
