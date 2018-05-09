@@ -76,7 +76,8 @@ define([
             selected: ko.computed(function () {
                 return selection() === tile;
             }, this),
-            data: koMapping.fromJS(tile.data)
+            data: koMapping.fromJS(tile.data),
+            formData: new FormData()
         });
     };
 
