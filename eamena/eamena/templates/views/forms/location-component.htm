@@ -1,0 +1,245 @@
+{% extends "views/forms/base.htm" %}
+{% load i18n %}
+
+{% block form_content %}
+
+<div id="geom-list-section">
+
+    <!-- Map -->
+    <div class="row margin-bottom-10">
+        <div class="col-xs-12" >
+                                            
+                                
+
+            <!-- Resource Mapped Locations -->
+            <div class="margin-bottom-10 padding-left-10">
+                <dl>
+
+                    <!-- Title -->
+                    <dt>
+                        <h5 id="arches-names-form" class="section-headline">{% trans 'Mapped Locations' %}</h5>
+                    </dt>
+
+                    <!-- Map -->
+                    <div id="map" class="map arches-report-map margin-left-0 margin-top-10"><div id="tooltip" style="z-index: 1000 !important; font-weight:700;"></div></div>
+                    
+
+                      
+                </dl>
+            </div>
+            <!-- Geometry Type -->
+            <div id="geometry-type" class="row">
+                <div class="col-xs-6 col-xs-offset-1" data-bind="attr: { 'style': getEditedNode('SPATIAL_COORDINATES.E47', 'value')() === '' ? 'opacity:0;' : '' }">
+                    <div class="form-group" style="width:80%; float: left;margin-top:-510px; padding-right: 10px; ">       
+                        <input class="geometry-selection" id="geometry-selection" name="" style="width:40%" data-bind="select2: {value: getEditedNode('GEOMETRY_TYPE.E55', 'value'), placeholder: 'Geometry Type', dataKey: 'GEOMETRY_TYPE.E55'}">
+                    </div>
+                </div>
+            </div>
+            <!-- End Geometry Type -->
+            <!-- Map: Date of Bing Imagery--->
+            <div class="row">
+                <div class="col-xs-12" style="margin-left:-10px;">
+                    <div id = "datescontainer" style= "float: right; margin-top: -470px;  z-index: 900 !important;color:#fff; display:hidden;"> <span id="imagery-tag">{% trans "Date of imagery: " %}</span><div id="imagery-date" ></div></div>
+                    
+                </div>
+            </div>
+            <!-- Map: Scaleline--->
+             <div class="row">
+                <div class="col-xs-12" style="">
+                    <div id="scale-line" style = "margin-top: -430px;"></div>        
+                </div>
+            </div>               
+            
+            <!-- Map Tools Panel -->
+            <div class="row" >
+                <div class="col-xs-4 {% if LANGUAGE_BIDI %}col-xs-offset-7{%else %} col-xs-offset-1{% endif %}" style="">
+
+                    <div id="basemaps-panel" class="tools-panel hidden" style="margin-top: -490px; overflow-y: scroll; height: 435px;">
+                        <div class="modal-header arches-modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                ×
+                            </button>
+                            <h4 class="modal-title">
+                                {% trans 'Basemaps' %}
+                            </h4>
+                        </div>
+
+                        <!-- Body Content -->
+                        <div class="modal-body padding-top-0 padding-bottom-0" data-bind='foreach: baseLayers'>
+
+                            <div class="row">
+                                <hr class="arches-layer-divider" style="border-top: 0px; margin-top: 5px;" />
+
+                                <div class="arches-basemap-entry" style="margin-right: 7px;">
+                            
+                                    <div>
+                                        <a data-bind="attr: { id: id, title: name }" class="basemap info-click" data-rel="" href="javascript:void(0);">
+                                            <span class="">  
+                                                <img data-bind="attr: { src: icon }" class="arches-basemap-thumbnail" alt="" />
+                                                <span class="zoom-icon"></span>                   
+                                            </span>                                              
+                                        </a>                    
+                                        <span class="arches-basemap-caption-search" style="width: 240px;">
+                                            <a data-bind="attr: { id: id }, text: name" class="caption-text-search hover-effect basemap info-click" href="javascript:void(0);"> </a>
+                                        </span>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                        <!-- End Body Content -->
+
+                    </div>
+                </div>
+            </div>
+            <!-- End Map Tools Panel -->
+
+            <!-- Overlays Panel -->
+            <div class="row">
+                <div class="col-xs-4 {% if LANGUAGE_BIDI %}col-xs-offset-7{%else %} col-xs-offset-1{% endif %}" style="">
+
+                    <div id="overlay-panel" class="tools-panel hidden" style="margin-top: -490px; overflow-y: scroll; overflow-x: hidden; height: 435px;">
+                        <div class="modal-header arches-modal-header">
+
+                            <button type="button" class="close pull-right" data-dismiss="modal" aria-hidden="true">
+                                ×
+                            </button>
+
+                            <h4 class="modal-title">
+                                {% trans 'Geometry Tools' %}
+                            </h4>
+                        </div>
+            
+                        <!-- Body Content -->
+                        <div class="modal-body padding-top-10 padding-bottom-0" style="padding-left: 5px; padding-right: 5px;">
+                            
+                            <!-- List overlays -->
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    
+                                    <dl>
+                                        
+                                        <dd class="">
+                                            <div class="arches-tool-item">
+                                                
+                                                <a href="javascript:void(0);" data-geometrytype="Point" class="arches-tool-text geometry-btn info-link" title="">
+                                                    <i class="fa fa-dot-circle-o"></i>
+                                                    {% trans 'Draw new point' %}
+                                                </a>
+                                            </div>
+                                        </dd>
+
+                                        <dd class="">
+                                            <div class="arches-tool-item">
+                                                
+                                                <a href="javascript:void(0);" data-geometrytype="LineString" class="arches-tool-text geometry-btn info-link" title="">
+                                                    <i class="fa fa-minus"></i>
+                                                    {% trans 'Draw new line' %}
+                                                </a>
+                                            </div>
+                                        </dd>
+
+                                        <dd class="">
+                                            <div class="arches-tool-item">
+                                                
+                                                <a href="javascript:void(0);" data-geometrytype="Polygon" class="arches-tool-text geometry-btn info-link" title="">
+                                                    <i class="fa fa-square-o"></i>
+                                                    {% trans 'Draw new polygon' %}
+                                                </a>
+                                            </div>
+                                        </dd>
+
+                                        <dd class="">
+                                            <div class="arches-tool-item file-upload">
+                                                
+                                                <a href="javascript:void(0);" data-geometrytype="Polygon" class="arches-tool-text geometry-btn info-link" title="">
+                                                    <i class="fa fa-upload"></i>
+                                                    {% trans 'Add from gpx, kml, or geojson' %}
+                                                </a>
+                                                <input type="file" class="upload geom-upload" accept=".gpx, .kml, .geojson, .json"/>
+                                            </div>
+                                        </dd>
+
+                                        <dd class="geom-file-instructions">
+                                            {% trans '(or drag and drop the file onto the map)' %}
+                                        </dd>
+                                        <dd>
+                                            <div class="arches-tool-item">
+                                                
+                                                <i class="fa fa-compass"></i>
+                                                {% trans 'Enter latitude/longitude' %}
+                                                <p class="geom-file-instructions">{% trans 'use decimal degrees: dd.ddddd' %}</p>
+                                                
+                                                    <input class="form-control coord-input" id="latinput" placeholder="latitude" maxlength="8" type="text" autocomplete="off"/>
+                                                    <input class="form-control coord-input" id="longinput" placeholder="longitude" maxlength="8" type="text" autocomplete="off"/>
+                                                    <input type="button" id="add-lat-long" value="Add to Map" style="width=100%">
+                                            </div>
+                                        </dd>                                            
+                                    </dl>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Body Content -->
+
+                    </div>
+                </div>
+            </div>
+            <!-- End Overlays Panel -->
+
+            <!-- Map Tools -->
+            <div class="row" style="height:0px;">
+
+                <div class="btn-group" style="top:-80px;left:{% if LANGUAGE_BIDI %}-{% endif %}86px;">
+
+                    <button id="inventory-home" type="button" class="btn btn-primary arches-map-tools-pressed hidden" style="width: 50px; border: 1px solid rgba(206,217,233,.95);"><i class="fa fa-caret-down"></i>
+                    </button>
+
+                    <button id="inventory-basemaps" type="button" class="btn btn-primary arches-map-tools"><i class="fa fa-globe"></i> {% trans 'Basemaps' %}
+                    </button>
+
+                    <button id="inventory-overlays" type="button" class="btn btn-primary arches-map-tools"><i class="fa fa-plus"></i> {% trans 'Add Geometry' %}
+                    </button>
+
+                </div>
+
+            </div>
+            <!-- End Map Tools -->
+
+        </div>
+    </div>
+
+    <!-- Geometry Records -->
+    <div class="row margin-bottom-10">
+        <div class="col-xs-12">
+
+            <!-- Geometries -->
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        {% trans 'This resource is represented by the following geometries:' %}
+                    </dd>
+
+                    <div data-bind="visible: getBranchLists().length == 0" class="margin-left-5 txt-color-blue">{% trans "No geometries defined" %}</div>   
+
+                    <dd class="margin-left-5" data-bind='foreach: getBranchLists()'>
+                        <div class="arches-crud-record">
+                            <a href="#" class="arches-CRUD-child" title="{% trans "Remove this geometry" %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                            <a href="#" class="arches-CRUD-child" data-bind="click: $parent.editItem.bind($parent)" title="{% trans 'Edit this geometry' %}">
+                            
+                                <span data-bind="text: nodes.get('SPATIAL_COORDINATES.E47', 'value').split('(')[0].toLowerCase(), attr: { 'style': editing() ? 'font-weight:bold;' : '' }"></span><span class="text-muted">{% trans '( Geometry Shape Type )' %}</span>
+                                <span data-bind="visible: nodes.get('GEOMETRY_TYPE.E55', 'label').length > 0, text: nodes.get('GEOMETRY_TYPE.E55', 'label')"></span><span class="text-muted">&nbsp;{% trans '( Geometry Type )' %}</span>
+                            </a>
+                        </div>
+                    </dd>
+
+                </dl>
+            </div>
+        </div>
+    </div>
+    <!-- End Geometry Records -->
+</div>
+
+{% include 'views/forms/sections/SaveEditsFooter.htm' %}
+{% endblock form_content %}

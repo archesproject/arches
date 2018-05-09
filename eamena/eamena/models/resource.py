@@ -70,6 +70,7 @@ class Resource(ArchesResource):
         
             ]
 
+        
 
         elif self.entitytypeid == 'HERITAGE_FEATURE.E24':
             description_group['forms'][:0] = [
@@ -80,7 +81,18 @@ class Resource(ArchesResource):
                 forms.FeatureArchaeologicalAssessmentForm.get_info(),
                 forms.RelatedResourcesForm.get_info(),
                 forms.ModificationForm.get_info(),
+                forms.RelatedFilesForm.get_info(),
                 forms.FeatureConditionAssessmentForm.get_info(),
+
+            
+        elif self.entitytypeid == 'HERITAGE_COMPONENT.B2':
+            description_group['forms'][:0] = [
+                forms.ComponentAssessmentForm.get_info(),
+                forms.ComponentClassification.get_info(),
+                forms.ComponentLocationForm.get_info(),
+                forms.MeasurementvaluesForm.get_info(),
+                forms.RelatedFilesForm.get_info(),
+                forms.RelatedResourcesForm.get_info(),
             ]
             
         elif self.entitytypeid == 'ACTIVITY.E7':

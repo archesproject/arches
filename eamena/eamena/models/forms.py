@@ -153,7 +153,31 @@ class FeatureSummaryForm(ResourceForm):
                     'GENERAL_DESCRIPTION_TYPE.E55' : Concept().get_e55_domain('GENERAL_DESCRIPTION_TYPE.E55')
                 }
             }
+            
+class ComponentClassification(ResourceForm):
+    @staticmethod
+    def get_info():
+        return {
+            'id': 'component-classification',
+            'icon': 'fa-tag',
+            'name': _('Component Classification'),
+            'class': ComponentClassification
+        }
 
+    def update(self, data, files):
+        self.update_nodes('COMPONENT_CLASSIFICATION.E17', data)
+        return
+
+    def load(self, lang):
+        if self.resource:
+            self.data['COMPONENT_CLASSIFICATION.E17'] = {
+                'branch_lists': self.get_nodes('COMPONENT_CLASSIFICATION.E17'),
+                'domains': {
+                    'COMPONENT_TYPE.E55' : Concept().get_e55_domain('COMPONENT_TYPE.E55'),
+                    'COMPONENT_ORIENTATION.E55' : Concept().get_e55_domain('COMPONENT_ORIENTATION.E55')
+                }
+            }
+            
 class ModificationForm(ResourceForm):
     @staticmethod
     def get_info():
@@ -214,6 +238,31 @@ class AssessmentSummaryForm(ResourceForm):
                 'domains': {
                     'INVESTIGATOR_ROLE_TYPE.E55' : Concept().get_e55_domain('INVESTIGATOR_ROLE_TYPE.E55'),
                     'ASSESSMENT_ACTIVITY_TYPE.E55' : Concept().get_e55_domain('ASSESSMENT_ACTIVITY_TYPE.E55'),
+                }
+            }
+            
+
+class ComponentAssessmentForm(ResourceForm):
+    @staticmethod
+    def get_info():
+        return {
+            'id': 'component-assessment',
+            'icon': 'fa-tag',
+            'name': _('Assessment Summary'),
+            'class': ComponentAssessmentForm
+        }
+
+    def update(self, data, files):
+        self.update_nodes('INVESTIGATION_ACTIVITY.E7', data)
+        return
+
+    def load(self, lang):
+        if self.resource:
+            self.data['INVESTIGATION_ACTIVITY.E7'] = {
+                'branch_lists': datetime_nodes_to_dates(self.get_nodes('INVESTIGATION_ACTIVITY.E7')),
+                'domains': {
+                    'INVESTIGATION_ACTIVITY_TYPE.E55' : Concept().get_e55_domain('INVESTIGATION_ACTIVITY_TYPE.E55'),
+                    'INVESTIGATOR_ROLE_TYPE.E55' : Concept().get_e55_domain('INVESTIGATOR_ROLE_TYPE.E55')
                 }
             }
 
@@ -1193,6 +1242,32 @@ class LocationForm(ResourceForm):
 
         return
 
+class ComponentLocationForm(ResourceForm):
+    @staticmethod
+    def get_info():
+        return {
+            'id': 'location-component',
+            'icon': 'fa-map-marker',
+            'name': _('Location'),
+            'class': ComponentLocationForm
+        }
+
+    def update(self, data, files):
+
+        self.update_nodes('SPATIAL_COORDINATES.E47', data)
+        
+        return
+
+    def load(self, lang):
+    
+        geom = self.get_nodes('SPATIAL_COORDINATES.E47')[0]['nodes'][0] if self.get_nodes('SPATIAL_COORDINATES.E47') else ''
+        self.data['SPATIAL_COORDINATES.E47'] = {
+            'branch_lists': self.get_nodes('SPATIAL_COORDINATES.E47'),
+            'domains': {
+                'GEOMETRY_TYPE.E55': Concept().get_e55_domain('GEOMETRY_TYPE.E55'),
+            },
+            'BingDates': getdates(geom.value) if geom else ''
+        }
 
 class CoverageForm(ResourceForm):
     @staticmethod
