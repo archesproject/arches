@@ -170,19 +170,19 @@ define([
             this.hoverData = ko.observable(null);
             this.clickData = ko.observable(null);
             this.getMarkup = function(val){
-                if (val().arches_description) {
+                if (val().feature_info_content) {
                     var popupdata = val()
                     var expression = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
                     var regex = new RegExp(expression);
-                    var match = popupdata.arches_description.match(regex)
+                    var match = popupdata.feature_info_content.match(regex)
                     if (match) {
-                        if (popupdata.arches_description === match[0]) {
+                        if (popupdata.feature_info_content === match[0]) {
                             $.ajax({
                                 url: arches.urls.feature_popup_content,
-                                data: {url:popupdata.arches_description},
+                                data: {url:popupdata.feature_info_content},
                                 method: 'POST'
                             }).done(function(data){
-                                popupdata.arches_description = data;
+                                popupdata.feature_info_content = data;
                                 val(popupdata);
                             }, this).fail(function(data) {
                                 console.log('failed', data)
@@ -1455,7 +1455,7 @@ define([
                             var hoverData = null;
                             var clickable = false;
                             var hoverFeature = _.find(features, function(feature) {
-                                if (feature.properties.arches_description) {
+                                if (feature.properties.feature_info_content) {
                                     hoverData = feature.properties;
                                 }
                                 if (feature.properties.resourceinstanceid) {
@@ -1501,7 +1501,7 @@ define([
                     var features = self.map.queryRenderedFeatures(e.point);
                     var clickData = null;
                     var clickFeature = _.find(features, function(feature) {
-                        if (feature.properties.arches_description) {
+                        if (feature.properties.feature_info_content) {
                             clickData = feature.properties;
                         }
                         if (feature.properties.resourceinstanceid) {
