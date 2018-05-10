@@ -33,27 +33,17 @@ class Couch(object):
 
     def create_db(self, name):
         # return reference to db
-        pass
+        if name in self.couch:
+            db = self.couch[name]
+        else:
+            db = self.couch.create(name)
+
+        return db
 
     def delete_db(self, name):
-        pass
-
-    # def create_survey(self, mobile_survey, user=None):
-    #     try:
-    #         print 'Creating Couch DB: project_' + str(mobile_survey.id)
-    #         db = self.couch.create('project_' + str(mobile_survey.id))
-
-    #         survey = JSONSerializer().serializeToPython(mobile_survey, exclude='cards')
-    #         survey['type'] = 'metadata'
-    #         db.save(survey)
-    #     except Exception as e:
-    #         print e
-    #         return connection_error
-
-    # def delete_survey(self, mobile_survey_id):
-    #     try:
-    #         print 'Deleting Couch DB: project_' + str(mobile_survey_id)
-    #         return self.couch.delete('project_' + str(mobile_survey_id))
-    #     except Exception as e:
-    #         print e
-    #         return connection_error
+        try:
+            print ('Deleting Couch DB: ', name)
+            return self.couch.delete(name)
+        except Exception as e:
+            print e
+            return connection_error
