@@ -57,14 +57,15 @@ class MobileSurvey(models.MobileSurveyModel):
     def save(self):
         super(MobileSurvey, self).save()
         db = self.couch.create_db('project_' + str(self.id))
-        # if 'project_' + str(self.id) in self.couch:
-        #     db = self.couch['project_' + str(self.id)]
-        # else:
-        #     db = self.couch.create('project_' + str(self.id))
+
         survey = self.serialize()
         survey['type'] = 'metadata'
         db.save(survey)
         return db
+
+    def delete(self):
+        #Inherit from somewhere?
+        self.couch.delete_db('project_' + str(self.id))
 
     def serialize(self, fields=None, exclude=None):
         """
