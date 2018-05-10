@@ -10803,6 +10803,10 @@ ul.select2-choices:after {
     padding: 25px;
 }
 
+.card-component-panel {
+    padding: 0 20px 10px 20px;
+}
+
 @keyframes loader {
     0% {
         background: #ddd;

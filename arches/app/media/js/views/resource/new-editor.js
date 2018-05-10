@@ -30,7 +30,8 @@ define([
                     );
                     node.config = koMapping.fromJS(node.config);
                     return node;
-                })
+                }),
+                dirty: ko.observable(false)
             }
         );
     });
@@ -129,8 +130,32 @@ define([
         selection: selection,
         selectedTile: ko.computed(function () {
             var item = selection();
-            if (item && item.tileid) {
-                return item;
+            if (item) {
+                if (item.tileid) {
+                    return item;
+                }
+                return {
+                    tileid: '',
+                    resourceinstance_id: data.resourceid,
+                    nodegroup_id: item.nodegroup_id,
+                    parenttile_id: item.parent ? item.parent.tileid : null,
+                    parent: item,
+                    expanded: ko.observable(true),
+                    data: koMapping.fromJS(
+                        _.reduce(item.widgets, function (data, widget) {
+                            data[widget.node_id] = null;
+                            return data;
+                        }, {})
+                    ),
+                    formData: new FormData(),
+                    update: function (newTile) {
+                        var card = vm.selectedCard();
+                        newTile = setupTile(newTile, card);
+                        console.log(newTile);
+                        card.tiles.push(newTile);
+                        vm.selection(newTile);
+                    }
+                };
             }
         }),
         selectedCard: ko.computed(function () {
@@ -144,6 +169,18 @@ define([
         }),
         filter: filter
     };
+
+    vm.selectionBreadcrumbs = ko.computed(function () {
+        var item = vm.selectedTile()
+        var crumbs = [];
+        if (item) {
+            while (item.parent) {
+                item = item.parent;
+                crumbs.unshift(item);
+            }
+        }
+        return crumbs;
+    });
 
     return new BaseManagerView({
         viewModel: vm
