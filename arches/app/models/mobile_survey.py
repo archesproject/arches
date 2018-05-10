@@ -64,6 +64,7 @@ class MobileSurvey(models.MobileSurveyModel):
         return db
 
     def delete(self):
+        super(MobileSurvey, self).delete()
         self.couch.delete_db('project_' + str(self.id))
 
     def serialize(self, fields=None, exclude=None):
@@ -155,12 +156,13 @@ class MobileSurvey(models.MobileSurveyModel):
                 print 'no instances found in', search_res
         return instances
 
-    def load_tiles_into_couch(self, db, instances):
+    def load_tiles_into_couch(self, instances):
         """
         Takes a mobile survey object, a couch database instance, and a dictionary
         of resource instances to identify eligible tiles and load them into the
         database instance
         """
+        db = self.couch.create_db('project_' + str(self.id))
         cards = self.cards.all()
         for card in cards:
             tiles = models.TileModel.objects.filter(nodegroup=card.nodegroup_id)
@@ -179,11 +181,12 @@ class MobileSurvey(models.MobileSurveyModel):
                     except Exception as e:
                         print e, tile
 
-    def load_instances_into_couch(self, db, instances):
+    def load_instances_into_couch(self, instances):
         """
         Takes a mobile survey object, a couch database instance, and a dictionary
         of resource instances and loads them into the database instance.
         """
+        db = self.couch.create_db('project_' + str(self.id))
         for instanceid, instance in instances.iteritems():
             try:
                 instance['type'] = 'resource'
@@ -193,12 +196,12 @@ class MobileSurvey(models.MobileSurveyModel):
             except Exception as e:
                 print e, instance
 
-    def load_data_into_couch(self, db, user):
+    def load_data_into_couch(self, user):
         """
         Takes a mobile survey, a couch database intance and a django user and loads
         tile and resource instance data into the couch instance.
         """
 
         instances = self.collect_resource_instances_for_couch(user)
-        self.load_tiles_into_couch(db, instances)
-        self.load_instances_into_couch(db, instances)
+        self.load_tiles_into_couch( instances)
+        self.load_instances_into_couch( instances)

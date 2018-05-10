@@ -32,17 +32,17 @@ class Couch(object):
 
     def create_db(self, name):
         # return reference to db
-        if name in self.couch:
-            db = self.couch[name]
-        else:
-            db = self.couch.create(name)
-
-        return db
+        try:
+            return self.couch.create(name)
+        except couchdb.PreconditionFailed:
+            return self.couch[name]
+        except Exception as e:
+            print e
 
     def delete_db(self, name):
         try:
-            print ('Deleting Couch DB: ', name)
             return self.couch.delete(name)
+        except couchdb.ResourceNotFound:
+            print 'Database not found: ' + name
         except Exception as e:
             print e
-            return connection_error
