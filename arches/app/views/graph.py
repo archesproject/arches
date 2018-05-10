@@ -337,6 +337,8 @@ class GraphDataView(View):
                 ret = graph.get_valid_ontology_classes(nodeid=nodeid, parent_nodeid=parent_nodeid)
 
             elif self.action == 'get_valid_domain_nodes':
+                if nodeid == '':
+                    nodeid = None
                 ret = graph.get_valid_domain_ontology_classes(nodeid=nodeid)
 
             return JSONResponse(ret)

@@ -36,12 +36,11 @@ define([
                     data: branch,
                     selectRoot: false
                 })
-                branch.graphModel.loadDomainConnections();
                 this.items.push(branch);
             }, this);
             this.selectedBranch = ko.observable(null);
             this.viewMetadata = ko.observable(false);
-            this.loadedDomainConnections = {};
+            this.loadingBranchDomains = ko.observable(false);
 
             this.filtered_items = ko.pureComputed(function() {
                 var filtered_items = _.filter(this.items(), function(item){ 
@@ -50,60 +49,8 @@ define([
                 return filtered_items;
             }, this)
 
-            /**
-            * Downloads domain connection data relevant to the selected node's ontology class
-            * @memberof BranchList.prototype
-            * @param {object} graph - the branch or graph for which domain connection data is requested
-            * @param {boolean} filter - if true updates the branch filter for the selected node
-            */
-
-            this.loadDomainConnections = function(graph, filter){
-                var self = this;
-
-                this.updateDomainConnections = function(newdc, graph) {
-                    var property = newdc.ontology_property
-                    var new_domain_connection = newdc;
-                    _.each(newdc.ontology_classes, function(oc) {
-                        _.each(graph.get('domain_connections'), function(currentdc) {
-                            var new_ontology_class = oc;
-                            if (currentdc.ontology_property === property) {
-                                if (_.contains(currentdc.ontology_classes, new_ontology_class) === false) {
-                                    currentdc.ontology_classes.push(new_ontology_class)
-                                }
-                            }
-                        }, self)
-                    }, self)
-                }
-
-                if (self.selectedNode().ontologyclass() === _.property(self.selectedNode().nodeid)(self.loadedDomainConnections) === false) {
-                        $.ajax({
-                                url: arches.urls.get_domain_connections(graph.get('graphid')),
-                                data: {
-                                    'ontology_class': self.selectedNode().ontologyclass()
-                                }
-                            })
-                            .done(function(data) {
-                                if (graph.get('domain_connections') === null) {
-                                    graph.set('domain_connections', data)
-                                } else {
-                                    _.each(data, function(new_domain_connection) {
-                                        self.updateDomainConnections(new_domain_connection, graph)
-                                    })
-                                }
-                                if (self.selectedNode()) {
-                                    if (self.selectedNode().ontologyclass() === _.property(self.selectedNode().nodeid)(self.loadedDomainConnections) === false) {
-                                        self.loadedDomainConnections[self.selectedNode().nodeid] = self.selectedNode().ontologyclass()
-                                    }
-                                    if (filter) {
-                                        self.filter_function()
-                                    }
-                                }
-                            })
-                    } else if (filter) {
-                        self.filter_function()
-                    }
-                }
-
+            // update the list of items in the branch list 
+            // when any of these properties change
             var valueListener = ko.computed(function() {
                 var node = self.selectedNode;
                 if(!!node()){
@@ -113,20 +60,33 @@ define([
                     return oc + datatype + collector;
                 }
                 return false;
-            });
+            }, this).extend({ deferred: true });
 
             valueListener.subscribe(function(){
-                if (!!this.selectedNode()){
-                    var lastBranch = this.items().length - 1;
-                    console.log('in valueListener')
-                    this.items().forEach(function(branch, i){
-                        i === lastBranch ? this.loadDomainConnections(branch.graphModel, true) : this.loadDomainConnections(branch.graphModel)
-                    }, this)
-                }
+                this.loadDomainConnections();
             }, this);
 
-            // need to call this on init so that branches that can't be appended get filtered out initially
-            //this.loadDomainConnections(this.graphModel, true)
+        },
+
+        /**
+        * Downloads domain connection data for each branch (usually an expensive operation)
+        * @memberof BranchList.prototype
+        */
+        loadDomainConnections: function(){
+            var self = this;
+            var domainConnections = [];
+
+            this.loadingBranchDomains(true);
+            this.items().forEach(function(branch, i){
+                domainConnections.push(branch.graphModel.loadDomainConnections());
+            }, this)
+
+            $.when(...domainConnections)
+            .then(function(){
+                self.loadingBranchDomains(false);
+                self.filter_function();
+            });
+
         },
 
         /**
