@@ -51,7 +51,7 @@ class MobileSurvey(models.MobileSurveyModel):
         # self.tilecache = models.TextField(null=True)
         # self.datadownloadconfig = JSONField(blank=True, null=True, default='{"download":false, "count":1000, "resources":[]}')
         # end from models.MobileSurvey
-        
+
         self.couch = Couch()
 
     def save(self):
@@ -64,7 +64,6 @@ class MobileSurvey(models.MobileSurveyModel):
         return db
 
     def delete(self):
-        #Inherit from somewhere?
         self.couch.delete_db('project_' + str(self.id))
 
     def serialize(self, fields=None, exclude=None):
@@ -108,7 +107,7 @@ class MobileSurvey(models.MobileSurveyModel):
     def push_edits_to_db(self):
         # read all docs that have changes
         # save back to postgres db
-        db = self.couch['project_' + str(self.id)]
+        db = self.couch.create_db('project_' + str(self.id))
         ret = []
         for row in db.view('_all_docs', include_docs=True):
             ret.append(row)
@@ -120,14 +119,14 @@ class MobileSurvey(models.MobileSurveyModel):
                 #tile = models.TileModel.objects.get(pk=row.doc.tileid).update(**row.doc)
         return ret
 
-    def collect_resource_instances_for_couch(self, mobile_survey, user):
+    def collect_resource_instances_for_couch(self, user):
         """
         Uses the data definition configs of a mobile survey object to search for
         resource instances relevant to a mobile survey. Takes a user object which
         is required for search.
         """
-        query = mobile_survey.datadownloadconfig['custom']
-        resource_types = mobile_survey.datadownloadconfig['resources']
+        query = self.datadownloadconfig['custom']
+        resource_types = self.datadownloadconfig['resources']
         instances = {}
         if query in ('', None) and len(resource_types) == 0:
             print "No resources or data query defined"
@@ -136,7 +135,7 @@ class MobileSurvey(models.MobileSurveyModel):
             request.user = user
             request.GET['mobiledownload'] = True
             if query in ('', None):
-                if len(mobile_survey.bounds.coords) == 0:
+                if len(self.bounds.coords) == 0:
                     default_bounds = settings.DEFAULT_BOUNDS
                     default_bounds['features'][0]['properties']['inverted'] = False
                     request.GET['mapFilter'] = json.dumps(default_bounds)
@@ -156,13 +155,13 @@ class MobileSurvey(models.MobileSurveyModel):
                 print 'no instances found in', search_res
         return instances
 
-    def load_tiles_into_couch(self, mobile_survey, db, instances):
+    def load_tiles_into_couch(self, db, instances):
         """
         Takes a mobile survey object, a couch database instance, and a dictionary
         of resource instances to identify eligible tiles and load them into the
         database instance
         """
-        cards = mobile_survey.cards.all()
+        cards = self.cards.all()
         for card in cards:
             tiles = models.TileModel.objects.filter(nodegroup=card.nodegroup_id)
             tiles_serialized = json.loads(JSONSerializer().serialize(tiles))
@@ -180,7 +179,7 @@ class MobileSurvey(models.MobileSurveyModel):
                     except Exception as e:
                         print e, tile
 
-    def load_instances_into_couch(self, mobile_survey, db, instances):
+    def load_instances_into_couch(self, db, instances):
         """
         Takes a mobile survey object, a couch database instance, and a dictionary
         of resource instances and loads them into the database instance.
@@ -194,12 +193,12 @@ class MobileSurvey(models.MobileSurveyModel):
             except Exception as e:
                 print e, instance
 
-    def load_data_into_couch(self, mobile_survey, db, user):
+    def load_data_into_couch(self, db, user):
         """
         Takes a mobile survey, a couch database intance and a django user and loads
         tile and resource instance data into the couch instance.
         """
 
-        instances = self.collect_resource_instances_for_couch(mobile_survey, user)
-        self.load_tiles_into_couch(mobile_survey, db, instances)
-        self.load_instances_into_couch(mobile_survey, db, instances)
+        instances = self.collect_resource_instances_for_couch(user)
+        self.load_tiles_into_couch(db, instances)
+        self.load_instances_into_couch(db, instances)
