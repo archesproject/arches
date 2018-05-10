@@ -737,6 +737,101 @@ class ManMadeForm(ResourceForm):
         }      
         return
         
+class ManMadeComponentForm(ResourceForm):
+    @staticmethod
+    def get_info():
+        return {
+            'id': 'man-made-component',
+            'icon': 'fa-sitemap',
+            'name': _('Related Heritage Components'),
+            'class': ManMadeComponentForm
+
+        }
+        
+    def update(self, data, files):
+        se = SearchEngineFactory().create()
+
+        resource = Resource()
+        resource.entitytypeid = 'HERITAGE_COMPONENT.B2'
+        self.update_nodes('SPATIAL_COORDINATES.E47', data, resource)
+        self.update_nodes('COMPONENT_CLASSIFICATION.E17', data, resource)
+        self.update_nodes('INVESTIGATION_ACTIVITY.E7', data, resource)
+        
+        resource.save()
+        resource.index()
+        for relation in data['related-resources']:
+            try:
+                relation_id=uuid.UUID(relation['nodes'][0]['value'])
+            except:
+                continue
+        relationship = self.resource.create_resource_relationship(resource.entityid, relationship_type_id=relation_id)
+        se.index_data(index='resource_relations', doc_type='all', body=model_to_dict(relationship), idfield='resourcexid')
+
+        return
+
+    def update_nodes(self, entitytypeid, data, resource):
+        resource.prune(entitytypes=[entitytypeid])
+        self.schema = Entity.get_mapping_schema(resource.entitytypeid)
+
+        for value in data[entitytypeid]:
+            self.baseentity = None
+            for newentity in value['nodes']:
+                entity = Entity()
+                entity.create_from_mapping(resource.entitytypeid, self.schema[newentity['entitytypeid']]['steps'], newentity['entitytypeid'], newentity['value'], newentity['entityid'])
+                if self.baseentity == None:
+                    self.baseentity = entity
+                else:
+                    self.baseentity.merge(entity)
+
+            resource.merge_at(self.baseentity, resource.entitytypeid)
+
+        self.resource.trim()
+
+    def load(self, lang):        
+        data = []
+        for relatedentity in self.resource.get_related_resources(entitytypeid='HERITAGE_COMPONENT.B2'):
+            nodes = relatedentity['related_entity'].flatten()
+            data.append({
+                'nodes': nodes, 
+                'relationship': relatedentity['relationship'], 
+                'relatedresourcename':relatedentity['related_entity'].get_primary_name(),
+                'relatedresourceidlink': '/resources/HERITAGE_COMPONENT.B2/default/' + relatedentity['related_entity'].entityid,
+                'related': True,
+            })
+
+        self.data['related-resources'] = {
+            'branch_lists': data,
+            'domains': {
+                'ARCHES_RESOURCE_CROSS-REFERENCE_RELATIONSHIP_TYPES.E55': Concept().get_e55_domain('ARCHES_RESOURCE_CROSS-REFERENCE_RELATIONSHIP_TYPES.E55')
+            },
+        }
+        geom = self.get_nodes('SPATIAL_COORDINATES.E47')[0]['nodes'][0] if self.get_nodes('SPATIAL_COORDINATES.E47') else ''
+        self.data['SPATIAL_COORDINATES.E47'] = {
+            'branch_lists': [],
+            'domains': {
+                'GEOMETRY_TYPE.E55': Concept().get_e55_domain('GEOMETRY_TYPE.E55')
+            },
+            'BingDates': getdates(geom.value) if geom else ''
+        }
+
+        self.data['COMPONENT_CLASSIFICATION.E17'] = {
+            'branch_lists': [],
+            'domains': {
+                'COMPONENT_TYPE.E55' : Concept().get_e55_domain('COMPONENT_TYPE.E55'),
+                'COMPONENT_ORIENTATION.E55' : Concept().get_e55_domain('COMPONENT_ORIENTATION.E55')
+            }
+        }
+
+        self.data['INVESTIGATION_ACTIVITY.E7'] = {
+            'branch_lists': [],
+            'domains': {
+                'INVESTIGATOR_ROLE_TYPE.E55' : Concept().get_e55_domain('INVESTIGATOR_ROLE_TYPE.E55'),
+                'INVESTIGATION_ACTIVITY_TYPE.E55' : Concept().get_e55_domain('INVESTIGATION_ACTIVITY_TYPE.E55')
+            }
+        }        
+        
+        return
+        
 class FeatureConditionAssessmentForm(ResourceForm):
     baseentity = None
 

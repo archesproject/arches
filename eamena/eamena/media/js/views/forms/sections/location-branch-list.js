@@ -65,7 +65,8 @@ define([
                 
             };
             var resourcetypeid = $('#resourcetypeid').val();
-            if (resourcetypeid == 'HERITAGE_COMPONENT.B2') {
+            var formid = $('#form-id').val();
+            if (resourcetypeid == 'HERITAGE_COMPONENT.B2' || formid == 'man-made-component') {
                 var geom_node = 'SPATIAL_COORDINATES.E47';
             } else {
                 var geom_node = 'GEOMETRIC_PLACE_EXPRESSION.SP5';
