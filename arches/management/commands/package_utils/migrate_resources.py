@@ -15,9 +15,11 @@ from .. import utils
 import datetime
 
 
+
 from itertools import groupby
 
 import logging
+
 
 # Script for migrating business data from one part of resource graph to elsewhere.
 # Typically this will be part of a migration from one resource graph to another, after adding new parts from the new resource graph, but before removing old ones.
@@ -31,7 +33,7 @@ def migrate(settings=None):
     
     suffix = '_altered_nodes.csv'
     errors = []
-    
+
     for path in settings.ADDITIONAL_RESOURCE_GRAPH_LOCATIONS:
         if os.path.exists(path):
             print '\nLOADING NODE MIGRATION INFO (%s)' % (path)
@@ -62,9 +64,10 @@ def migrate(settings=None):
                         new_group_root_node_id = group_root_node_ids[1]
                         
                         #Find all entities with the old group root node
-                        group_root_entities = models.Entities.objects.all().filter(entitytypeid=group_root_node_id)
-                        
-                        for group_root_entity_model in group_root_entities:
+                       
+                        group_root_entities = models.Entities.objects.filter(entitytypeid=group_root_node_id)
+                        print "ENTITIES COUNT: ", group_root_entities.count()
+                        for group_root_entity_model in group_root_entities.iterator():
                             # Create a new subgraph for each of the migration steps, then merge them together at the group root node
                             
                             #get full resource graph for the root entity
@@ -83,24 +86,39 @@ def migrate(settings=None):
                                 continue
                             resource = Resource().get(resource_model.entityid)
                             
-                            
                             for group_migration in group_migrations_list:
-                                
+                                 
                                 # get individual entities to be migrated in the source group
                                 old_entities = group_root_entity.find_entities_by_type_id(group_migration['OLDENTITYTYPEID'])
                                 for old_entity in old_entities:
+                                    date_on = False
                                     # Create the corresponding entity in the new schema
                                     new_entity = Entity()
-                                    new_entity_type_id = group_migration['NEWENTITYTYPEID']
+                                    #Disturbance dates need to be mapped to different nodes depending on the value of the now obsolete DISTURBANCE_DATE_TYPE.E55
+                                    if group_migration['OLDENTITYTYPEID'] in ['DISTURBANCE_DATE_END.E49','DISTURBANCE_DATE_START.E49']:
+                                        date_type_node = group_root_entity.find_entities_by_type_id('DISTURBANCE_DATE_TYPE.E55')
+                                        if date_type_node:
+                                            if date_type_node[0].label == 'Occurred before':
+                                                new_entity_type_id = 'DISTURBANCE_DATE_OCCURRED_BEFORE.E61'
+                                            elif date_type_node[0].label == 'Occurred on':
+                                                if group_migration['OLDENTITYTYPEID'] =='DISTURBANCE_DATE_START.E49':
+                                                    date_on = True
+                                                else:
+                                                    new_entity_type_id = 'DISTURBANCE_DATE_OCCURRED_ON.E61'
+                                            else:
+                                                new_entity_type_id = group_migration['NEWENTITYTYPEID']
+                                    else:                                         
+                                        new_entity_type_id = group_migration['NEWENTITYTYPEID']
                                     old_value = old_entity.value
 
                                     if old_entity.businesstablename == 'domains':
                                         # in some cases we move from domains to strings.
-                                        newEntityType = models.EntityTypes.objects.all().get(entitytypeid=new_entity_type_id)
+                                        newEntityType = models.EntityTypes.objects.get(entitytypeid=new_entity_type_id)
                                         if newEntityType.businesstablename == 'strings':
                                             old_value = old_entity.label
                                     
-                                    new_entity.create_from_mapping(resource_entity_type, mapping_schema[new_entity_type_id]['steps'], new_entity_type_id, old_value)
+                                    if not date_on:
+                                        new_entity.create_from_mapping(resource_entity_type, mapping_schema[new_entity_type_id]['steps'], new_entity_type_id, old_value)
                                     
                                     # In some cases a newly created data node is the new group root. In this case we should discard the previously created new group root and use this one instead.
                                     if new_group_root_node_id == new_entity_type_id:
@@ -135,6 +153,8 @@ def migrate(settings=None):
                                                 if len(mergeable_nodes) > 0:
                                                     new_group_root_entity.merge_at(new_entity, step['entitytypedomain'])
                                                     has_merged = True
+                                                    new_entity = None
+#                                                     gc.collect()
                                         
                                         if not has_merged:
                                             logging.warning("Unable to merge newly created entity")
@@ -148,20 +168,28 @@ def migrate(settings=None):
                             resource.trim()
                             try:
                                 resource._save()
+                                resource=None
                             except Exception as e:
                                 logging.warning("Error saving resource")
                                 logging.warning(e)
                                 errors.append("Error saving %s. Error was %s" % (resource, e))
                             
-                        # resource.index()
-                        logging.warning("SAVED RESOURCE, %s", resource)
+                            group_root_entity.clear()
+                            group_root_entity = None
+                            new_group_root_entity.clear()
+                            new_group_root_entity = None
+                            
+                            # end for group root
+                                
+                        
+                            # resource.index()
+                            # logging.warning("SAVED RESOURCE, %s", resource)
                             
     utils.write_to_file(os.path.join(settings.PACKAGE_ROOT, 'logs', 'migration_errors.txt'), '')
     if len(errors) > 0:
         # utils.write_to_file(os.path.join(settings.PACKAGE_ROOT, 'logs', 'migration_errors.txt'), '\n'.join(errors))
         print "\n\nERROR: There were errors migrating some resources. See below"
         print errors
-
 
 def insert_actors(settings=None):
     
@@ -183,7 +211,7 @@ def insert_actors(settings=None):
         
         mapping_step_to_actor = mapping_schema[actor_entitytypeid]['steps'][-1]
         
-        parent_entities = models.Entities.objects.all().filter(entitytypeid=parent_entitytypeid)
+        parent_entities = models.Entities.objects.filter(entitytypeid=parent_entitytypeid).iterator()
         
         for parent_entity_model in parent_entities:
             # check whether an actor node already exists
@@ -196,7 +224,7 @@ def insert_actors(settings=None):
                     continue
                 
                 # find the last edit to the node that the data originated at
-                edits = models.EditLog.objects.all().filter(resourceid=root_resource_model.entityid, attributeentitytypeid=source_entitytypeid).order_by('timestamp')
+                edits = models.EditLog.objects.filter(resourceid=root_resource_model.entityid, attributeentitytypeid=source_entitytypeid).order_by('timestamp')
                 first_edit = edits[0]
                 actor_name = '%s %s' % (edits[0].user_firstname, edits[0].user_lastname)
                 
@@ -232,73 +260,87 @@ def prune_ontology(settings=None):
                     
                     all_entitytypeids_to_remove = [x['NodeId'] for x in nodes_to_remove]
                     
-                    
+                    ### Returns a list of entities to delete which have as top node the name of the name of the csv file containing the nodes to remove
+                    def retrieve_entities_to_delete(resource_type, entitytypeids_to_remove, ontology=False):
+                        entities_or_ontology = {
+                            'entities_to_delete': [],
+                            'mappings': [],
+                            'rule_ids': []
+                        }
+                        for entitytypeid_to_remove in entitytypeids_to_remove:
+                            mappingid=models.Mappings.objects.get(entitytypeidfrom=resource_type, entitytypeidto =entitytypeid_to_remove)
+                            rule_ids = models.MappingSteps.objects.filter(mappingid=mappingid.pk).values_list('ruleid', flat=True)
+                            relations = models.Relations.objects.filter(ruleid__in=list(rule_ids)).values_list('entityidrange', flat=True)
+                            entities_or_ontology['entities_to_delete'].append(list(relations))
+                            entities_or_ontology['mappings'].append(mappingid.pk)
+                            entities_or_ontology['rule_ids'].append(list(rule_ids))
+                        return entities_or_ontology
+                        
                     ### Remove entities and their associated values/relationships
-                    entities_to_delete = models.Entities.objects.all().filter(entitytypeid__in=all_entitytypeids_to_remove)
-                    print "Deleting %s data entities and associated values and relations" % len(entities_to_delete)
+                    entities_to_delete = retrieve_entities_to_delete(name, all_entitytypeids_to_remove)
+                    
+                    print "Deleting %s data entities and associated values and relations" % len(entities_to_delete['entities_to_delete'][0])
                     # delete any value records for this entity id
                     # dates
-                    models.Dates.objects.all().filter(entityid__in=entities_to_delete).delete()
+                    models.Dates.objects.filter(entityid__in=entities_to_delete['entities_to_delete'][0]).delete()
                     # files
-                    models.Files.objects.all().filter(entityid__in=entities_to_delete).delete()
+                    models.Files.objects.filter(entityid__in=entities_to_delete['entities_to_delete'][0]).delete()
                     # strings
-                    models.Strings.objects.all().filter(entityid__in=entities_to_delete).delete()
+                    models.Strings.objects.filter(entityid__in=entities_to_delete['entities_to_delete'][0]).delete()
                     # geometries
-                    models.Geometries.objects.all().filter(entityid__in=entities_to_delete).delete()
+                    models.Geometries.objects.filter(entityid__in=entities_to_delete['entities_to_delete'][0]).delete()
                     # numbers
-                    models.Numbers.objects.all().filter(entityid__in=entities_to_delete).delete()
+                    models.Numbers.objects.filter(entityid__in=entities_to_delete['entities_to_delete'][0]).delete()
                     # domains
-                    models.Domains.objects.all().filter(entityid__in=entities_to_delete).delete()
+                    models.Domains.objects.filter(entityid__in=entities_to_delete['entities_to_delete'][0]).delete()
                     # delete any relationships from or to this entity id
-                    models.Relations.objects.all().filter( Q(entityiddomain__in=entities_to_delete) | Q(entityidrange__in=entities_to_delete) ).delete()
+                    models.Relations.objects.filter( Q(entityiddomain__in=entities_to_delete['entities_to_delete'][0]) | Q(entityidrange__in=entities_to_delete['entities_to_delete'][0]) ).delete()
                     # delete the entity record
-                    entities_to_delete.delete()
+                    models.Entities.objects.filter(entityid__in=entities_to_delete['entities_to_delete'][0]).delete()
                         
                     
                     #### Prune the ontology
-                    
-                    print "Removing entity types from ontology data (entity types, mappings, mapping_steps, and rules)"
-                    # remove mappings to these entitytype if there is one
-                    models.Mappings.objects.all().filter(entitytypeidto__in=all_entitytypeids_to_remove).delete()
-                    
-                    # find rules involving this entity type
-                    rules = models.Rules.objects.all().filter( Q(entitytypedomain__in=all_entitytypeids_to_remove) | Q(entitytyperange__in=all_entitytypeids_to_remove))
-                    # remove mapping steps associated to these rules
-                    models.MappingSteps.objects.all().filter(ruleid__in=rules).delete()
+                    print "Removing entity types and mappings from ontology data (entity types, mappings, mapping_steps, and rules)"
+                    # remove mappings to these entitytype if there is one               
+                    models.Mappings.objects.get(mappingid__in=entities_to_delete['mappings']).delete()
+                    # remove mapping steps associated to the relevant rules
+                    models.MappingSteps.objects.filter(ruleid__in=entities_to_delete['rule_ids'][0]).delete()
                     # remove the rules
-                    rules.delete()
+                    models.Rules.objects.filter(ruleid__in=entities_to_delete['rule_ids'][0]).delete()
                     
-                    # delete the entity_types themselves
-                    entity_types = models.EntityTypes.objects.all().filter(entitytypeid__in=all_entitytypeids_to_remove)
-                    
-                    
-                    #### Prune the concepts
-                    concepts_to_delete = []
-                    
-                    for entity_type in entity_types:
-                        # Find the root concept
-                        concept = entity_type.conceptid
+                    # if the entity_types are no longer associated to any resource graph, then delete the entity_types themselves and then proceed with pruning concepts
+                    still_linked = False if not models.Mappings.objects.filter(entitytypeidto__in = all_entitytypeids_to_remove) else True
+                    if still_linked: 
+                        entity_types = models.EntityTypes.objects.filter(entitytypeid__in=all_entitytypeids_to_remove)
                         
-                        # only add this for deletion if the concept isn't used by any other entitytypes
-                        relations = models.EntityTypes.objects.all().filter(conceptid=concept.pk)
-                        if len(relations) <= 1:
-                            concepts_to_delete.append(entity_type.conceptid)
-                        else:
-                            logging.warning("Concept type for entity in use (perhaps because this node was mapped to a new one). Not deleting. %s", entity_type)
                         
-                    # delete the entity types, and then their concepts
-                    entity_types.delete()
-                    
-                    for concept_model in concepts_to_delete:
-                        # remove it and all of its relations and their values
-                        logging.warning("Removing concept and children/values/relationships for %s", concept_model.legacyoid)
-                        concept = Concept()
-                        concept.get(concept_model.pk, semantic=False, include_subconcepts=True)
+                        #### Prune the concepts
+                        concepts_to_delete = []
                         
-                        concept.delete(delete_self=True)
-                        concept_model.delete()
-                    
-                    logging.warning("Removed all entities and ontology data related to the following entity types: %s", all_entitytypeids_to_remove)
+                        for entity_type in entity_types:
+                            # Find the root concept
+                            concept = entity_type.conceptid
+                            
+                            # only add this for deletion if the concept isn't used by any other entitytypes
+                            relations = models.EntityTypes.objects.filter(conceptid=concept.pk)
+                            if len(relations) <= 1:
+                                concepts_to_delete.append(entity_type.conceptid)
+                            else:
+                                logging.warning("Concept type for entity in use (perhaps because this node was mapped to a new one). Not deleting. %s", entity_type)
+                            
+                        # delete the entity types, and then their concepts
+                        entity_types.delete()
+                        
+                        for concept_model in concepts_to_delete:
+                            # remove it and all of its relations and their values
+                            logging.warning("Removing concept and children/values/relationships for %s", concept_model.legacyoid)
+                            concept = Concept()
+                            concept.get(concept_model.pk, semantic=False, include_subconcepts=True)
+                            
+                            concept.delete(delete_self=True)
+                            concept_model.delete()
+                        
+                        logging.warning("Removed all entities and ontology data related to the following entity types: %s", all_entitytypeids_to_remove)
 
 def log_entity(entity):
     def do_log(subentity):
@@ -314,7 +356,7 @@ def get_resource_for_entity(entity, resource_entity_type_id):
     
     try:
         while typeid != resource_entity_type_id:
-            relationships = models.Relations.objects.all().filter(entityidrange=parent.entityid)
+            relationships = models.Relations.objects.filter(entityidrange=parent.entityid)
             if len(relationships) == 0:
                 # no parent - either an orphan, or the root is not the type we are looking for
                 return None
@@ -352,17 +394,17 @@ def convert_resource(resourceid, target_entitytypeid):
     resource.get(resourceid)
     
     # change its entitytype
-    resource_model = models.Entities.objects.all().get(pk=resourceid)
+    resource_model = models.Entities.objects.get(pk=resourceid)
     logging.warning("Found resource: %s", resource_model)
     
     # update the ruleid for any steps from the root entity to its first children (subsequent entities use the same rules)
     # get first relations
-    relations = models.Relations.objects.all().filter(entityiddomain=resourceid)
+    relations = models.Relations.objects.filter(entityiddomain=resourceid)
     for relation in relations:
         try:
             rule = relation.ruleid
             #now find the rule which maps to the same target, with the same property, from the new entity type
-            new_rule = models.Rules.objects.all().get(entitytypedomain=target_entitytypeid, entitytyperange=rule.entitytyperange, propertyid=rule.propertyid)
+            new_rule = models.Rules.objects.get(entitytypedomain=target_entitytypeid, entitytyperange=rule.entitytyperange, propertyid=rule.propertyid)
             relation.ruleid = new_rule
             relation.save()
             
@@ -427,7 +469,7 @@ def add_resource_relation(entityid1, entityid2, relationship_type_string):
     try:
         
         logging.warning("finding relationship: %s", relationship_type_string)
-        value = models.Values.objects.all().get(value__icontains=relationship_type_string)
+        value = models.Values.objects.get(value__icontains=relationship_type_string)
         relationship = models.RelatedResource(entityid1=entityid1, entityid2=entityid2, relationshiptype=value.pk)
         relationship.save()
         se.index_data(index='resource_relations', doc_type='all', body=model_to_dict(relationship), idfield='resourcexid')

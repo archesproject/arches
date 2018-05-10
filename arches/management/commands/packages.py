@@ -50,7 +50,7 @@ class Command(BaseCommand):
     
     option_list = BaseCommand.option_list + (
         make_option('-o', '--operation', action='store', dest='operation', default='setup',
-            type='choice', choices=['setup', 'install', 'setup_db', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resource_graphs','export_resources','create_backlog', 'remove_resources_from_csv', 'legacy_fixer', 'load_relations', 'unload_relations', 'delete_indices', 'extend_ontology', 'migrate_resources', 'insert_actors', 'prune_ontology', 'load_graphs', 'convert_resources', 'validate_values', 'find_unused_entity_types'],
+            type='choice', choices=['setup', 'install', 'setup_db', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resource_graphs','export_resources','create_backlog', 'remove_resources_from_csv', 'legacy_fixer', 'load_relations', 'unload_relations', 'delete_indices', 'extend_ontology', 'migrate_resources', 'insert_actors', 'prune_ontology', 'load_graphs', 'convert_resources', 'validate_values', 'find_unused_entity_types', 'rename_entity_type'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' + 
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' + 
@@ -68,6 +68,10 @@ class Command(BaseCommand):
             help='Directory where you want to save exported files.'),
         make_option('-a', '--append', action='store_true', dest='appending',
             help='Select this option to append data at the end of a resource'),
+        make_option('-y', '--oldtype', action='store', dest='oldtype',
+            help='Select old node name'),
+        make_option('-z', '--newtype', action='store', dest='newtype',
+            help='select new node name'),
     )
 
     def handle(self, *args, **options):
@@ -143,7 +147,8 @@ class Command(BaseCommand):
             self.validate_values()
         if options['operation'] == 'find_unused_entity_types':
             self.find_unused_entity_types()
-            
+        if options['operation'] == 'rename_entity_type':
+            self.rename_entity_type(options['oldtype'],options['newtype'])            
             
     def setup(self, package_name):
         """
@@ -443,7 +448,7 @@ class Command(BaseCommand):
         
     def load_graphs(self):
         load_graphs()
-        
+               
     def convert_resources(self, config_file):
         migrate_resources.convert_resources(config_file)
         
@@ -452,3 +457,5 @@ class Command(BaseCommand):
         
     def find_unused_entity_types(self):
         find_unused_entity_types()
+    def rename_entity_type(self, oldtype, newtype):
+        migrate_resources.rename_entity_type(oldtype,newtype)
