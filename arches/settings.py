@@ -291,6 +291,7 @@ INSTALLED_APPS = (
     'captcha',
     'revproxy',
     'corsheaders',
+    'oauth2_provider',
     #'debug_toolbar'
 )
 
