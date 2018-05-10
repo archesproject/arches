@@ -43,7 +43,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if options['operation'] == 'delete_surveys':
-            self.delete_couch_surveys()
+            self.delete_associated_surveys()
 
         if options['operation'] == 'rebuild_surveys':
             self.rebuild_couch_surveys()
@@ -51,15 +51,42 @@ class Command(BaseCommand):
         if options['operation'] == 'delete_unassociated_surveys':
             self.delete_unassociated_surveys()
 
-    def delete_couch_surveys(self):
+    # def delete_couch_surveys(self):
+    #     couch = Couch()
+    #     couch.delete_associated_surveys()
+
+    # def delete_unassociated_surveys(self):
+    #     couch = Couch()
+    #     couch.delete_unassociated_surveys()
+
+    def delete_associated_surveys(self):
         couch = Couch()
-        couch.delete_associated_surveys()
+        surveys = [str(msm['id']) for msm in models.MobileSurveyModel.objects.values("id")]
+        couchdbs = [dbname for dbname in self.couch]
+        for db in couchdbs:
+            survey_id = db[-36:]
+            if survey_id in surveys:
+                couch.delete_survey(survey_id)
 
     def delete_unassociated_surveys(self):
         couch = Couch()
-        couch.delete_unassociated_surveys()
+        surveys = [str(msm['id']) for msm in models.MobileSurveyModel.objects.values("id")]
+        couchdbs = [dbname for dbname in couchserver]
+        for db in couchdbs:
+            survey_id = db[-36:]
+            if survey_id not in surveys:
+                if 'project' in db:
+                    couch.delete_survey(survey_id)
+
+    def create_associated_surveys(self):
+        couch = Couch()
+        for mobile_survey in models.MobileSurveyModel.objects.all():
+            print "Creating", mobile_survey
+            couch.create_survey(mobile_survey)
+            print "Populating"
+            db = self.couch['project_' + str(mobile_survey.id)]
+            couch.load_data_into_couch(mobile_survey, db, mobile_survey.lasteditedby)
 
     def rebuild_couch_surveys(self):
-        couch = Couch()
-        couch.delete_associated_surveys()
-        couch.create_associated_surveys()
+        self.delete_associated_surveys()
+        self.create_associated_surveys()
