@@ -20,7 +20,6 @@ import json
 import couchdb
 from urlparse import urlparse, urljoin
 from arches.app.models import models
-from arches.app.models.mobile_survey import MobileSurvey
 from arches.app.models.system_settings import settings
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
