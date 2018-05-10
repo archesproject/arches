@@ -25,6 +25,7 @@ else
 fi
 
 DJANGO_PORT=${DJANGO_PORT:-8000}
+COUCHDB_URL="http://$COUCHDB_USER:$COUCHDB_PASS@$COUCHDB_HOST:$COUCHDB_PORT"
 
 cd_web_root() {
 	cd ${WEB_ROOT}
@@ -83,6 +84,10 @@ setup_arches() {
 	echo "Running: python manage.py packages -o setup_db"
 	python manage.py packages -o setup_db
 
+    echo "Running: Creating couchdb system databaess"
+    curl -X PUT ${COUCHDB_URL}/_users
+    curl -X PUT ${COUCHDB_URL}/_global_changes
+    curl -X PUT ${COUCHDB_URL}/_replicator
 
 	if [[ "${INSTALL_DEFAULT_GRAPHS}" == "True" ]]; then
 		# Import graphs
@@ -117,16 +122,24 @@ setup_arches() {
 	run_migrations
 }
 
-
 wait_for_db() {
 	echo "Testing if database server is up..."
 	while [[ ! ${return_code} == 0 ]]
 	do
-		psql -h ${PGHOST} -p ${PGPORT} -U postgres -c "select 1" >&/dev/null
+		psql -h ${PGHOST} -p ${PGPORT} -U ${PGUSERNAME} -c "select 1" >&/dev/null
 		return_code=$?
 		sleep 1
 	done
 	echo "Database server is up"
+
+    echo "Testing if Elasticsearch is up..."
+    while [[ ! ${return_code} == 0 ]]
+    do
+        curl -s "http://${ESHOST}:${ESPORT}" >&/dev/null
+        return_code=$?
+        sleep 1
+    done
+    echo "Elasticsearch is up"
 }
 
 db_exists() {
@@ -168,8 +181,6 @@ install_yarn_components() {
 	cd_yarn_folder
 	yarn install
 }
-
-
 
 
 #### Misc

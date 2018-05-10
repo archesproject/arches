@@ -26,7 +26,7 @@ define([
             params.configKeys = ['minDate', 'maxDate', 'viewMode', 'dateFormat', 'defaultValue'];
             WidgetViewModel.apply(this, [params]);
 
-            this.placeholder = params.config().placeholder;
+            this.placeholder = this.config().placeholder;
 
             this.viewModeOptions = ko.observableArray([{
                 'id': 'days',

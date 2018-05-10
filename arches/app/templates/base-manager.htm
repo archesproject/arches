@@ -48,7 +48,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             {% endblock navheader %}
 
             <div class="boxed">
-                <div id="content-container" style="{% block content_container_style %}padding-bottom: 20px; padding-top: 0px;{% endblock content_container_style %}">
+                <div id="content-container" style="{% block content_container_style %}padding-bottom: 0px; padding-top: 0px;{% endblock content_container_style %}">
 
                     <!-- ko if: alert() -->
                     <div data-bind="visible: alert().active" style="display: none;" class="relative">
@@ -84,11 +84,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </a>
                             {% if main_script == 'views/resource/editor' %}
                                 {% include 'navbar/resource-manage-menu.htm' %}
+                            {% elif main_script == 'views/resource/new-editor' %}
+                                {% include 'navbar/new-resource-manage-menu.htm' %}
                             {% else %}
                                 {% include 'navbar/graph-manage-menu.htm' %}
                             {% endif %}
                         {% endif %}
 
+
+                        {% block graph_title %}
                         <!-- Page Title and Icon -->
                         <div class="ep-tools-title">
                             <h1 class="page-header text-overflow ep-graph-title">
@@ -96,6 +100,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <span>{% trans nav.title %}</span>
                             </h1>
                         </div>
+                        {% endblock graph_title %}
 
                         <!-- Login -->
                         {% if nav.login %}

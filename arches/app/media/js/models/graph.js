@@ -25,16 +25,18 @@ define(['arches',
         * @memberof GraphModel.prototype
         * @param {NodeModel} node - the node to be selected
         */
-        selectNode: function(node){
-            this.trigger('select-node', node);
-            var currentlySelectedNode = this.get('selectedNode');
-            if (currentlySelectedNode() && currentlySelectedNode().dirty()) {
+        selectNode: function(newly_selected_node){
+            this.trigger('select-node', newly_selected_node);
+            var currentlySelectedNode = this.get('selectedNode')();
+            if (currentlySelectedNode && currentlySelectedNode.dirty()) {
                 return false;
             }else{
                 this.get('nodes')().forEach(function (node) {
-                    node.selected(false);
+                    if(node !== newly_selected_node){
+                        node.selected(false);
+                    }
                 });
-                node.selected(true);
+                newly_selected_node.selected(true);
                 return true;
             }
         },
@@ -52,7 +54,7 @@ define(['arches',
                 type: "DELETE",
                 url: this.url + this.get('graphid') + '/delete_node',
                 data: JSON.stringify({nodeid:node.nodeid})
-            }, function(response, status, self){
+            }, function(response, status){
                 if (status === 'success' &&  response.responseJSON) {
                     var parentNode = this.getParentNode(node);
                     var getEdges = function (node) {
@@ -94,14 +96,17 @@ define(['arches',
                     this.get('nodes').remove(function (node) {
                         return _.contains(nodes, node);
                     });
+                    parentNode.children.remove(node);
                     parentNode.selected(true);
+                }else{
+                    this.trigger('error', response, 'deleteNode');
                 }
 
                 if (typeof callback === 'function') {
-                    scope = scope || self;
+                    scope = scope || this;
                     callback.call(scope, response, status);
                 }
-            }, scope, 'changed');
+            }, this, 'changed');
         },
 
         /**
@@ -129,13 +134,13 @@ define(['arches',
         /**
          * appendBranch - appends a graph onto a specific node within this graph
          * @memberof GraphModel.prototype
-         * @param  {string} nodeid - the node id of the node within this graph that we're connecting the branch to
+         * @param  {string} node - the node within this graph that we're connecting the branch to
          * @param  {string} property - the ontology property to use to connect the branch, leave null to use the first available property
          * @param  {string} branch_graph - the {@link GraphModel} we're appending to this graph
          * @param  {function} callback - the function to call after the response returns from the server
          * @param  {object} scope - the value of "this" in the callback function
          */
-        appendBranch: function(nodeid, property, branch_graph, callback, scope){
+        appendBranch: function(node, property, branch_graph, callback, scope){
             property = property ? property : null;
             if(property === null){
                 if(this.get('selectedNode')().ontologyclass()){
@@ -159,43 +164,90 @@ define(['arches',
             this._doRequest({
                 type: "POST",
                 url: this.url + this.get('graphid') + '/append_branch',
-                data: JSON.stringify({nodeid:nodeid, property: property, graphid: branch_graph.get('graphid')})
-            }, function(response, status, self){
+                data: JSON.stringify({nodeid:node.nodeid, property: property, graphid: branch_graph.get('graphid')})
+            }, function(response, status){
                 if (status === 'success' &&  response.responseJSON) {
                     var branchroot = response.responseJSON.root;
                     response.responseJSON.nodes.forEach(function(node){
-                        self.get('nodes').push(new NodeModel({
+                        this.get('nodes').push(new NodeModel({
                             source: node,
-                            datatypelookup: self.get('datatypelookup'),
-                            graph: self,
-                            ontology_namespaces: self.get('root').ontology_namespaces
+                            datatypelookup: this.get('datatypelookup'),
+                            graph: this,
+                            ontology_namespaces: this.get('root').ontology_namespaces
                         }));
                     }, this);
                     response.responseJSON.edges.forEach(function(edge){
-                        self.get('edges').push(edge);
+                        this.get('edges').push(edge);
                     }, this);
                     response.responseJSON.nodegroups.forEach(function(nodegroup){
-                        self.get('nodegroups').push(nodegroup);
+                        this.get('nodegroups').push(nodegroup);
                     }, this);
                     response.responseJSON.cards.forEach(function(card){
-                        self.get('cards').push(card);
+                        this.get('cards').push(card);
                     }, this);
 
-                    if(!self.get('isresource')){
-                        self.get('nodes')().forEach(function (node) {
+                    if(!this.get('isresource')){
+                        this.get('nodes')().forEach(function (node) {
                             node.selected(false);
                             if (node.nodeid === branchroot.nodeid){
                                 node.selected(true);
                             }
                         });
                     }
+                    this.constructTree(null, null, response.responseJSON.edges, true);
+                }else{
+                    this.trigger('error', response, 'appendBranch');
                 }
 
                 if (typeof callback === 'function') {
-                    scope = scope || self;
+                    scope = scope || this;
                     callback.call(scope, response, status);
                 }
-            }, scope, 'changed');
+            }, this, 'changed');
+        },
+
+        /**
+         * appendNode - appends a graph onto a specific node within this graph
+         * @memberof GraphModel.prototype
+         * @param  {string} node - the node within this graph onto which we're appending a new node
+         * @param  {function} callback - the function to call after the response returns from the server
+         * @param  {object} scope - the value of "this" in the callback function
+         */
+        appendNode: function(node, callback, scope){
+            this._doRequest({
+                type: "POST",
+                url: this.url + this.get('graphid') + '/append_node',
+                data: JSON.stringify({nodeid:node.nodeid})
+            }, function(response, status){
+                if (status === 'success' &&  response.responseJSON) {
+                    var newNode = new NodeModel({
+                        source: response.responseJSON.node,
+                        datatypelookup: this.get('datatypelookup'),
+                        graph: this,
+                        ontology_namespaces: this.get('root').ontology_namespaces
+                    })
+                    newNode.children = ko.observableArray([]);
+
+                    this.get('nodes').push(newNode);
+                    this.get('edges').push(response.responseJSON.edge);
+                    node.children.unshift(newNode)
+
+                    // response.responseJSON.nodegroups.forEach(function(nodegroup){
+                    //     this.get('nodegroups').push(nodegroup);
+                    // }, this);
+
+                    if(!this.get('isresource')){
+                        this.selectNode(newNode);
+                    }
+                }else{
+                    this.trigger('error', response, 'appendNode');
+                }
+
+                if (typeof callback === 'function') {
+                    scope = scope || this;
+                    callback.call(scope, response, status);
+                }
+            }, this, 'changed');
         },
 
         /**
@@ -212,16 +264,16 @@ define(['arches',
                 type: "POST",
                 url: this.url + this.get('graphid') + '/move_node',
                 data: JSON.stringify({nodeid:node.nodeid, property: property, newparentnodeid: newParentNode.nodeid})
-            }, function(response, status, self){
+            }, function(response, status){
                 if (status === 'success' &&  response.responseJSON) {
-                    self.get('edges')().find(function (edge) {
+                    this.get('edges')().find(function (edge) {
                         if(edge.edgeid === response.responseJSON.edges[0].edgeid){
                             edge.domainnode_id = response.responseJSON.edges[0].domainnode_id;
                             return true;
                         }
                         return false;
                     });
-                    self.get('nodes')().forEach(function (node) {
+                    this.get('nodes')().forEach(function (node) {
                         found_node = response.responseJSON.nodes.find(function(response_node){
                             return response_node.nodeid === node.nodeid;
                         });
@@ -229,12 +281,15 @@ define(['arches',
                             node.parse(found_node);
                         }
                     });
+                }else{
+                    this.trigger('error', response, 'moveNode');
                 }
+
                 if (typeof callback === 'function') {
-                    scope = scope || self;
+                    scope = scope || this;
                     callback.call(scope, response, status);
                 }
-            }, scope, 'changed');
+            }, this, 'changed');
         },
 
         /**
@@ -249,20 +304,23 @@ define(['arches',
                 type: "POST",
                 url: this.url + this.get('graphid') + '/update_node',
                 data: JSON.stringify(node.toJSON())
-            }, function(response, status, self){
+            }, function(response, status){
                 if (status === 'success' &&  response.responseJSON) {
-                    _.each(self.get('nodes')(), function(node){
+                    _.each(this.get('nodes')(), function(node){
                         var nodeJSON = _.find(response.responseJSON.nodes, function (returned_node) {
                             return node.nodeid === returned_node.nodeid;
                         });
                         node.parse(nodeJSON);
                     }, this);
+                }else{
+                    this.trigger('error', response, 'updateNode');
                 }
+
                 if (typeof callback === 'function') {
-                    scope = scope || self;
+                    scope = scope || this;
                     callback.call(scope, response, status);
                 }
-            }, scope, 'changed');
+            }, this, 'changed');
         },
 
         /**
@@ -277,7 +335,7 @@ define(['arches',
             this._doRequest({
                 type: "GET",
                 url: this.url + this.get('graphid') + '/get_related_nodes/' + nodeid,
-            }, function(response, status, self){
+            }, function(response, status){
                 callback.call(scope, response.responseJSON);
             }, this);
         },
@@ -289,12 +347,13 @@ define(['arches',
          * @param  {string} nodeid - the node id of the node of interest
          * @param  {function} callback - function to call when the request returns
          * @param  {object} scope - (optional) the scope used for the callback
+         * @return  {jqXHR} - a Proimise compatible asynchronous request
          */
         getValidDomainClasses: function(nodeid, callback, scope){
-            this._doRequest({
+            return this._doRequest({
                 type: "GET",
                 url: this.url + this.get('graphid') + '/get_valid_domain_nodes/' + nodeid,
-            }, function(response, status, self){
+            }, function(response, status){
                 callback.call(scope, response.responseJSON);
             }, this);
         },
@@ -398,6 +457,8 @@ define(['arches',
             var datatypelookup = {};
 
             attributes =_.extend({datatypes:[], domain_connections:[]}, attributes);
+            _.defaults(attributes, {selectRoot: true});
+            this.set('domain_connections_loaded', false);
 
             _.each(attributes.datatypes, function(datatype){
                 datatypelookup[datatype.datatype] = datatype;
@@ -419,6 +480,7 @@ define(['arches',
                                 graph: self,
                                 ontology_namespaces: attributes.ontology_namespaces
                             });
+                            nodeModel.children = ko.observableArray([]);
                             if(node.istopnode){
                                 this.set('root', nodeModel);
                             }
@@ -433,6 +495,8 @@ define(['arches',
                 }
             }, this)
 
+            this.tree = this.constructTree();
+
             this.set('selectedNode', ko.computed(function() {
                 var selectedNode = _.find(self.get('nodes')(), function(node){
                     return node.selected();
@@ -442,7 +506,9 @@ define(['arches',
 
             var root = this.get('root');
             if(!!root){
-                root.selected(true);
+                if (attributes.selectRoot){
+                    root.selected(true);
+                }
             }
 
             this.graphCards = ko.computed(function(){
@@ -459,6 +525,55 @@ define(['arches',
                 }
                 return parentCards;
             }, this);
+        },
+
+        /**
+         * constructTree - creates a hierarchical node listing from this graphs nodes and edges, or the passed in nodes and edges
+         * @memberof GraphModel.prototype
+         * @param  {NodeModel} root - a reference to the root node in the nodes parameter, or of this graph if not defined
+         * @param  {[NodeModel]} nodes - the nodes to make a tree from, defaults to the nodes in this graph
+         * @param  {array} edges - the edges to make a tree from, defaults to the edges in this graph
+         * @param  {boolean} append - if true, won't remove the existing hierarchy 
+         * @return {object} a hierchical node listing
+         */
+        constructTree: function(root, nodes, edges, append){
+            var node_map = {};
+            var root = !!root ? root : this.get('root');
+            var nodes = !!nodes ? nodes : this.get('nodes')();
+            var edges = !!edges ? edges : this.get('edges')();
+            nodes.forEach(function(node){
+                node_map[node.id] = node;
+                if(!ko.isObservable(node.children)){
+                    node.children = ko.observableArray([]);
+                }else{
+                    if(!append) {
+                        node.children.removeAll();
+                    }
+                }
+            })
+
+            edges.forEach(function(edge){
+                node_map[edge.domainnode_id].children.unshift(node_map[edge.rangenode_id])
+            })
+
+            return root;
+        },
+
+        /**
+         * loadDomainConnections - loads the domain connections for the graph asyncronously
+         * @memberof GraphModel.prototype
+         * @return {Promise} the Promise gets passes the responseJSON of the request
+         */
+        loadDomainConnections: function() {
+            if(!this.get('domain_connections_loaded')){
+                return this.getValidDomainClasses('', function(responseJSON) {
+                    this.set('domain_connections', responseJSON);
+                    this.set('domain_connections_loaded', true);
+                }, this);   
+            } else {
+                return Promise.resolve()
+            }
+                
         },
 
         /**
@@ -598,16 +713,14 @@ define(['arches',
          * @param  {function} callback - function to call when the request returns
          * @param  {object} scope - (optional) the scope used for the callback
          * @param  {string} eventname - (optional) the event to trigger upon successfull return of the request
+         * @return  {jqXHR} - a Proimise compatible asynchronous request
          */
         _doRequest: function (config, callback, scope, eventname) {
             var self = this;
-            if (! scope){
-                scope = self;
-            }
-            $.ajax($.extend({
+            return $.ajax($.extend({
                 complete: function (request, status) {
                     if (typeof callback === 'function') {
-                        callback.call(scope, request, status, self);
+                        callback.call(scope || self, request, status);
                     }
                     if(!!eventname){
                         self.trigger(eventname, self, request);

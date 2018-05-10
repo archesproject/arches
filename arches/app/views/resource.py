@@ -71,6 +71,48 @@ def get_resource_relationship_types():
     relationship_type_values = {'values':[{'id':str(c[2]), 'text':str(c[1])} for c in resource_relationship_types], 'default': str(default_relationshiptype_valueid)}
     return relationship_type_values
 
+
+@method_decorator(can_edit_resource_instance(), name='dispatch')
+class NewResourceEditorView(MapBaseManagerView):
+    def get(self, request, resourceid=None, view_template='views/resource/new-editor.htm', main_script='views/resource/new-editor', nav_menu=True):
+        resource_instance = Resource.objects.get(pk=resourceid)
+        nodes = resource_instance.graph.node_set.all()
+        cards = resource_instance.graph.cardmodel_set.order_by('sortorder').select_related('nodegroup').all().prefetch_related('cardxnodexwidget_set')
+        nodegroups = [card.nodegroup for card in cards]
+        cardwidgets = [widget for widgets in [card.cardxnodexwidget_set.order_by('sortorder').all() for card in cards] for widget in widgets]
+        widgets = models.Widget.objects.all()
+        card_components = models.CardComponent.objects.all()
+
+        displayname = resource_instance.displayname
+        if displayname == 'undefined':
+            displayname = 'Unnamed Resource'
+
+        context = self.get_context_data(
+            main_script=main_script,
+            resourceid=resourceid,
+            displayname=displayname,
+            graphid=resource_instance.graph_id,
+            graphiconclass=resource_instance.graph.iconclass,
+            graphname=resource_instance.graph.name,
+            widgets=widgets,
+            widgets_json=JSONSerializer().serialize(widgets),
+            card_components=card_components,
+            card_components_json=JSONSerializer().serialize(card_components),
+            tiles=JSONSerializer().serialize(resource_instance.tilemodel_set.all()),
+            cards=JSONSerializer().serialize(cards),
+            nodegroups=JSONSerializer().serialize(nodegroups),
+            nodes=JSONSerializer().serialize(nodes),
+            cardwidgets=JSONSerializer().serialize(cardwidgets),
+        )
+
+        context['nav']['title'] = ''
+        context['nav']['menu'] = nav_menu
+        context['nav']['help'] = (_('Using the Resource Editor'),'help/base-help.htm')
+        context['help'] = 'resource-editor-help'
+
+        return render(request, view_template, context)
+
+
 @method_decorator(can_edit_resource_instance(), name='dispatch')
 class ResourceEditorView(MapBaseManagerView):
     action = None
@@ -420,16 +462,10 @@ class ResourceReportView(MapBaseManagerView):
         widgets = models.Widget.objects.all()
 
         try:
-            if str(report.template_id) == '50000000-0000-0000-0000-000000000002':
-                map_layers = models.MapLayer.objects.all()
-                map_markers = models.MapMarker.objects.all()
-                map_sources = models.MapSource.objects.all()
-                geocoding_providers = models.Geocoder.objects.all()
-            else:
-                map_markers=None
-                map_layers = []
-                map_sources = []
-                geocoding_providers = []
+            map_layers = models.MapLayer.objects.all()
+            map_markers = models.MapMarker.objects.all()
+            map_sources = models.MapSource.objects.all()
+            geocoding_providers = models.Geocoder.objects.all()
         except AttributeError:
             raise Http404(_("No active report template is available for this resource."))
 

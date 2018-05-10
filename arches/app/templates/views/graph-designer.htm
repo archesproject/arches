@@ -1,0 +1,172 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "base-manager.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+
+{% block title %}
+{{ block.super }}
+{% trans "Graph Designer" %}
+{% endblock title %}
+
+
+{% block graph_title %}
+<div class="ep-tools-title">
+    <h1 class="page-header text-overflow ep-graph-title">
+        <i class="text-center icon-wrap bg-gray ep-graph-title-icon" data-bind="css: (graph.iconclass() || 'fa fa-question')" ></i>
+        <span data-bind="text: graph.name()"></span>
+    </h1>
+</div>
+{% endblock graph_title %}
+
+{% block main_content %}
+<div class="content-panel">
+    <!-- Title Block -->
+    <div class="ep-form-toolbar">
+        <div>
+            <h4 class="ep-form-toolbar-title">
+            <!-- Layer Filter -->
+            <div class="list-filter" data-bind="" style="margin-right: 10px;">
+                <input type="text" class="form-control" style="width: 250px;" placeholder="{% trans 'Find a node, datatype, card...' %}" data-bind="textInput: graphTree.filter">
+
+                <!-- Clear Search -->
+                <span class="clear-node-search" data-bind="visible: graphTree.filter().length > 0, click: function() { graphTree.filter(''); }" style="top: 8px;"><i class="fa fa-times-circle"></i></span>
+            </div>
+
+            </h4>
+        </div>
+
+        <div class="btn-group btn-group-toggle">
+            <button class="btn btn-md viewstate-btn" data-bind="css: { active: viewState() === 'design' }, click: function(){viewState('design');}">{% trans "Design" %}</button>
+            <button class="btn btn-md viewstate-btn" data-bind="css: { active: viewState() === 'preview' }, click: function(){viewState('preview');}">{% trans "Preview" %}</button>
+        </div>
+
+            <div class="graph-settings-crud">
+                <!-- ko if: graphSettingsVisible() -->
+                <!-- ko if: graphSettingsViewModel.dirty() -->
+                <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: graphSettingsViewModel.reset">{% trans "Discard Edits" %}</button>
+                <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: graphSettingsViewModel.save">{% trans "Save Edits" %}</button>
+                <!-- /ko -->
+                <!-- /ko -->
+
+
+                <!-- ko if: selectedNode() -->
+                <!-- ko if: selectedNode().dirty() && selectedNode().istopnode == false -->
+                <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: function(){graphModel.get('selectedNode')().reset()}">{% trans "Discard Edits" %}</button>
+                <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: function(){graphModel.get('selectedNode')().save()}">{% trans "Save Edits" %}</button>
+                <!-- /ko -->
+                <!-- /ko -->
+            </div>
+
+        <!-- Tools -->
+        <div class="ep-form-toolbar-tools">
+            <!-- ko if: dirty() -->
+            <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click:placeholder">{% trans "Discard Edits" %}</button>
+            <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click:placeholder">{% trans "Save Edits" %}</button>
+            <!-- /ko -->
+        </div>
+    </div>
+
+    <div class="flex">
+
+        <!-- Left Panel -->
+        <div class="left-panel" data-bind="resizableSidepanel:true">
+
+            <!--Nav Tabs-->
+            <ul class="nav nav-tabs">
+                <li data-bind="css: { active: activeTab() === 'graph' }, click: function(){activeTab('graph');}">
+                    <a class="graph-designer-tab ion-android-share-alt" aria-expanded="true">
+                        {% trans 'Graph' %}
+                    </a>
+                </li>
+                <li data-bind="css: { active: activeTab() === 'card' }, click: function(){activeTab('card');}">
+                    <a class="graph-designer-tab ion-android-folder" aria-expanded="false">
+                        {% trans 'Cards' %}
+                    </a>
+                </li>
+            </ul>
+
+            <div class="tab-content" >
+                <!-- Summary Card -->
+                <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'graph' }">
+                    <div class="" data-bind="with: graphTree">
+                         {% include 'views/graph/graph-tree.htm' %}
+                     </div></div>
+                <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }">card</div>
+            </div>
+        </div>
+
+        <!-- Main Content Panel -->
+        <div class="flex" style="background-color: #ffffff; overflow-y: auto" >
+            <div class="tab-content" data-bind="css: {'graph-designer-loading-mask': contentLoading }"></div>
+            <div class="tab-content">
+                <!-- Settings, Node Form, and Branch List -->
+                <div class="tab-pane fade in" style="position: relative;" data-bind="css: { active: activeTab() === 'graph' }">
+                    <!--ko if: selectedNode() -->
+                    <div class="graph-designer-graph-content" data-bind="visible: selectedNode().nodeid == graph.root.nodeid()">
+                        {% include 'views/new-graph-settings.htm' %}
+                    </div>
+
+                    <div class="graph-designer-graph-content" data-bind="visible: selectedNode().nodeid != graph.root.nodeid(), with: nodeForm">
+                        {% include 'views/new-node-form.htm' %}
+                    </div>
+                    <!--/ko-->
+                    <!--Branch Library -->
+                    <div id="branch-library" class="middle-column-container graph-designer branch-library" data-bind="visible: graphTree.branchListVisible" style="width: 300px;border-bottom: solid 1px #dddddd;">
+                        <div>
+                            <div class="title-block-title" style="margin-bottom: 0px; padding-bottom: 0px;">
+                                <span class="">{{branch_list.title}}</span>
+                            </div>
+                            <div class="relative">
+                                <a id="node-crud-close" href="javascript:void(0)" class="library-close-btn" data-bind="click: graphTree.toggleBranchList.bind(graphTree)"><i class="ion-close"></i></a>
+                            </div>
+                            <div style="padding: 4px 0px 12px 6px">{% trans "Add a branch to your model from the library" %}</div>
+                        </div>
+                        <div data-bind="with: branchListView">
+                            {% include 'views/graph/graph-manager/branch-list.htm' %}
+                        </div>
+                    </div>
+                </div>
+                <!-- Card Manager -->
+                <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }">card content</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock main_content %}
+
+{% block tabs %}{% endblock tabs %}
+
+{% block pre_require_js %}
+{{block.super}}
+    <script>
+        {% autoescape off %}define('graph-designer-data', [], function() {
+            return {
+                graphid: '{{graphid}}',
+                ontologyClasses: {{ontology_classes}},
+                ontologies: {{ontologies}},
+                datatypes: {{datatypes_json}},
+                graph: {{graph}},
+                ontology_namespaces: {{ontology_namespaces}},
+                branches: {{branches}}
+            };
+        });{% endautoescape %}
+    </script>
+{% endblock pre_require_js %}

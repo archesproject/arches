@@ -40,6 +40,7 @@ from arches.app.utils.data_management.resources.formats.csvfile import MissingCo
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
 from arches.app.utils.data_management.resource_graphs import exporter as ResourceGraphExporter
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
+from arches.app.utils.system_metadata import system_metadata
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.skos import SKOSReader
 from arches.app.views.tileserver import seed_resource_cache
@@ -56,7 +57,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
             choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'load_concept_scheme', 'export_business_data', 'export_graphs', 'add_tileserver_layer', 'delete_tileserver_layer',
-            'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data','import_business_data_relations', 'import_mapping_file', 'save_system_settings', 'add_mapbox_layer', 'seed_resource_tile_cache', 'update_project_templates','load_package','create_package', 'export_package_configs', 'import_node_value_data'],
+            'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data','import_business_data_relations', 'import_mapping_file', 'save_system_settings', 'add_mapbox_layer', 'seed_resource_tile_cache', 'update_project_templates','load_package', 'create_package', 'update_package', 'export_package_configs', 'import_node_value_data'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' +
@@ -201,11 +202,14 @@ class Command(BaseCommand):
         if options['operation'] == 'update_project_templates':
             self.update_project_templates()
 
-        if options['operation'] == 'load_package':
+        if options['operation'] in ['load', 'load_package']:
             self.load_package(options['source'], options['setup_db'], options['overwrite'], options['stage'], options['yes'])
 
-        if options['operation'] == 'create_package':
+        if options['operation'] in ['create', 'create_package']:
             self.create_package(options['dest_dir'])
+
+        if options['operation'] in ['update', 'update_package']:
+            self.update_package(options['dest_dir'], options['yes'])
 
         if options['operation'] == 'export_package_configs':
             self.export_package_configs(options['dest_dir'])
@@ -219,6 +223,54 @@ class Command(BaseCommand):
             except Exception as e:
                 print e
                 print 'Could not read resource to resource constraints'
+
+    def export_resource_graphs(self, dest_dir, force=False):
+        """
+        Saves a json file for each resource model in a project.
+        Uses the graph name as the file name unless a graph
+        (confirmed by matching graphid) already exists in the destination
+        directory. In that case, the existing filename is used.
+        """
+        existing_resource_graphs = {}
+        existing_resource_graph_paths = glob.glob(os.path.join(dest_dir, '*.json'))
+        for existing_graph_file in existing_resource_graph_paths:
+            print 'reading', existing_graph_file
+            with open(existing_graph_file, 'r') as f:
+                existing_graph = json.loads(f.read())
+                if 'graph' in existing_graph:
+                    existing_graph = existing_graph['graph'][0]
+                existing_resource_graphs[existing_graph['graphid']] = {'name': existing_graph['name'], 'path': existing_graph_file }
+
+        resource_graphs = ResourceGraphExporter.get_graphs_for_export(['resource_models'])
+        if 'graph' in resource_graphs:
+            for graph in resource_graphs['graph']:
+                output_graph = {
+                    'graph':[graph],
+                    'metadata': system_metadata()
+                }
+                graph_json = JSONSerializer().serialize(output_graph, indent=4)
+                if graph['graphid'] not in existing_resource_graphs:
+                    output_file = os.path.join(dest_dir, graph['name'] + '.json')
+                    with open(output_file, 'w') as f:
+                        print 'writing', output_file
+                        f.write(graph_json)
+                else:
+                    output_file = existing_resource_graphs[graph['graphid']]['path']
+                    if force == False:
+                        overwrite = raw_input('"{0}" already exists in this directory. Overwrite? (Y/N): '.format(existing_resource_graphs[graph['graphid']]['name']))
+                    else:
+                        overwrite = 'true'
+                    if overwrite.lower() in ('t', 'true', 'y', 'yes'):
+                        with open(output_file, 'w') as f:
+                            print 'writing', output_file
+                            f.write(graph_json)
+
+    def update_package(self, dest_dir, yes):
+        if os.path.exists(os.path.join(dest_dir, 'package_config.json')):
+            print 'Updating Resource Models'
+            self.export_resource_graphs(os.path.join(dest_dir, 'graphs', 'resource_models'), yes)
+        else:
+            print "Could not update package. This directory does not have a package_config.json file. It cannot be verified as a package."
 
     def create_package(self, dest_dir):
 
@@ -254,6 +306,7 @@ class Command(BaseCommand):
                         print 'added', os.path.join(dest_dir, directory, '.gitkeep')
 
             self.export_package_configs(dest_dir)
+            self.export_resource_graphs(os.path.join(dest_dir, 'graphs', 'resource_models'), 'true')
 
             try:
                 self.save_system_settings(data_dest=os.path.join(dest_dir, 'system_settings'))
@@ -318,6 +371,9 @@ class Command(BaseCommand):
                 print e
                 print 'Could not connect to db'
 
+        def load_datatypes(package_dir):
+            load_extensions(package_dir, 'datatypes', 'datatype')
+
         def load_graphs(package_dir):
             branches = glob.glob(os.path.join(package_dir, 'graphs', 'branches'))[0]
             resource_models = glob.glob(os.path.join(package_dir, 'graphs', 'resource_models'))[0]
@@ -367,7 +423,6 @@ class Command(BaseCommand):
 
                     self.add_tileserver_layer(meta['name'], mapnik_xml_path, meta['icon'], basemap, tile_config_path)
 
-
         def load_map_layers(package_dir):
             basemap_styles = glob.glob(os.path.join(package_dir, 'map_layers', 'mapbox_spec_json', 'basemaps', '*', '*.json'))
             overlay_styles = glob.glob(os.path.join(package_dir, 'map_layers', 'mapbox_spec_json', 'overlays', '*', '*.json'))
@@ -382,9 +437,18 @@ class Command(BaseCommand):
             load_tile_server_layers(tile_server_overlays, False)
 
         def load_business_data(package_dir):
+            config_paths = glob.glob(os.path.join(package_dir, 'package_config.json'))
+            if len(config_paths) > 0:
+                configs = json.load(open(config_paths[0]))
+
             business_data = []
-            business_data += glob.glob(os.path.join(package_dir, 'business_data','*.json'))
-            business_data += glob.glob(os.path.join(package_dir, 'business_data','*.csv'))
+            if 'business_data_load_order' in configs and len(configs['business_data_load_order']) > 0:
+                for f in configs['business_data_load_order']:
+                    business_data.append(os.path.join(package_dir, 'business_data', f))
+            else:
+                business_data += glob.glob(os.path.join(package_dir, 'business_data','*.json'))
+                business_data += glob.glob(os.path.join(package_dir, 'business_data','*.csv'))
+
             relations = glob.glob(os.path.join(package_dir, 'business_data', 'relations', '*.relations'))
 
             for path in business_data:
@@ -415,12 +479,13 @@ class Command(BaseCommand):
                 templates = glob.glob(os.path.join(extension, '*.htm'))
                 components = glob.glob(os.path.join(extension, '*.js'))
 
-                if len(templates) == 1 and len(components) == 1:
+                if len(templates) == 1:
                     if os.path.exists(template_dir) == False:
                         os.mkdir(template_dir)
+                    shutil.copy(templates[0], template_dir)
+                if len(components) == 1:
                     if os.path.exists(component_dir) == False:
                         os.mkdir(component_dir)
-                    shutil.copy(templates[0], template_dir)
                     shutil.copy(components[0], component_dir)
 
                 modules = glob.glob(os.path.join(extension, '*.json'))
@@ -434,11 +499,12 @@ class Command(BaseCommand):
         def load_widgets(package_dir):
             load_extensions(package_dir, 'widgets', 'widget')
 
+        def load_reports(package_dir):
+            load_extensions(package_dir, 'reports', 'report')
+
         def load_functions(package_dir):
             load_extensions(package_dir, 'functions', 'fn')
 
-        def load_datatypes(package_dir):
-            load_extensions(package_dir, 'datatypes', 'datatype')
 
         def handle_source(source):
             if os.path.isdir(source):
@@ -483,6 +549,8 @@ class Command(BaseCommand):
         load_system_settings(package_location)
         print 'loading widgets'
         load_widgets(package_location)
+        print 'loading reports'
+        load_reports(package_location)
         print 'loading functions'
         load_functions(package_location)
         print 'loading datatypes'
@@ -520,6 +588,7 @@ class Command(BaseCommand):
             'COPYRIGHT_TEXT',
             'COPYRIGHT_YEAR',
             'MODE',
+            'CACHES',
             'DATABASES',
             'DEBUG',
             'RESOURCE_IMPORT_LOG',
@@ -572,7 +641,8 @@ class Command(BaseCommand):
             'EMAIL_PORT',
             'PROTECTED_GRAPHS',
             'DATE_IMPORT_EXPORT_FORMAT',
-            'ANALYSIS_COORDINATE_SYSTEM_SRID'
+            'ANALYSIS_COORDINATE_SYSTEM_SRID',
+            'CACHE_BY_USER'
             ]
 
         with open('arches/install/arches-templates/project_name/settings_local.py-tpl', 'w') as f:

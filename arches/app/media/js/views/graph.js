@@ -38,7 +38,7 @@ require([
                     url: url,
                     data: JSON.stringify(data),
                     success: function(response) {
-                        window.location = arches.urls.graph_settings(response.graphid);
+                        window.location = arches.urls.graph_designer(response.graphid);
                     },
                     error: function(response) {
                         self.viewModel.loading(false);
@@ -79,10 +79,12 @@ require([
                     }, function(){
                         self.viewModel.loading(true);
                         $.ajax({
-                            complete: function (request, status) {
+                            complete: function (response, status) {
                                 self.viewModel.loading(false);
                                 if (status === 'success') {
-                                    self.viewModel.allGraphs.remove(graph);
+                                  self.viewModel.allGraphs.remove(graph);
+                                } else {
+                                  self.viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.title, response.responseJSON.message));
                                 }
                             },
                             type: "DELETE",
