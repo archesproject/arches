@@ -122,10 +122,8 @@ class MobileSurveyManagerView(MapBaseManagerView):
             print e
 
         if mobile_survey_id is not None:
-            ret = models.MobileSurveyModel.objects.get(pk=mobile_survey_id)
+            ret = MobileSurvey.objects.get(pk=mobile_survey_id)
             ret.delete()
-            couch = Couch()
-            couch.delete_survey(mobile_survey_id)
             return JSONResponse(ret)
 
         return HttpResponseNotFound()
@@ -151,10 +149,10 @@ class MobileSurveyManagerView(MapBaseManagerView):
         data = JSONDeserializer().deserialize(request.body)
 
         if data['id'] is None:
-            mobile_survey = models.MobileSurveyModel()
+            mobile_survey = MobileSurvey()
             mobile_survey.createdby = self.request.user
         else:
-            mobile_survey = models.MobileSurveyModel.objects.get(pk=data['id'])
+            mobile_survey = MobileSurvey.objects.get(pk=data['id'])
             self.update_identities(data, mobile_survey, mobile_survey.users.all(), 'users', User, models.MobileSurveyXUser)
             self.update_identities(data, mobile_survey, mobile_survey.groups.all(), 'groups', Group, models.MobileSurveyXGroup)
 
@@ -209,12 +207,10 @@ class MobileSurveyManagerView(MapBaseManagerView):
         try:
             connection_error = False
             with transaction.atomic():
-                couchdb = mobile_survey.save()
-                couch = Couch()
-                couch.load_data_into_couch(mobile_survey, couchdb, request.user)
+                mobile_survey.save()
         except Exception as e:
             couch = Couch()
-            couch.delete_survey(str(mobile_survey.id))
+            couch.delete_db('project_'+ str(mobile_survey.id))
             if connection_error == False:
                 error_title = _('Unable to save survey')
                 error_message = e
