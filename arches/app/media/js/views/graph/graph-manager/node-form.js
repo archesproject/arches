@@ -119,6 +119,12 @@ define([
                 this.$el.find('a[href="#node-form"]').tab('show');
             }, this);
 
+            // just temporary while we transition to the new graph designer
+            $('a[href="#branch-library"]').on('shown.bs.tab', function (e) {
+                self.branchListView.loadDomainConnections();
+            });
+
+
             this.node.subscribe(function () {
                 self.closeClicked(false);
             });

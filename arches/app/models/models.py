@@ -340,6 +340,7 @@ class GraphModel(models.Model):
     subtitle = models.TextField(blank=True, null=True)
     ontology = models.ForeignKey('Ontology', db_column='ontologyid', related_name='graphs', null=True, blank=True)
     functions = models.ManyToManyField(to='Function', through='FunctionXGraph')
+    jsonldcontext = models.TextField(blank=True, null=True)
 
     @property
     def disable_instance_creation(self):
