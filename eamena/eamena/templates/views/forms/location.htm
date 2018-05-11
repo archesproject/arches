@@ -268,7 +268,7 @@
                             
                             <div class="col-xs-12 hidden-xs">
                                 
-                                <input class="form-control arches-form-input" id="resource-name" style="width: 50%;" placeholder='{% trans "Grid ID" %}' data-bind='value: getEditedNode("GRID_ID.E42", "value")'>
+                                <input class="form-control arches-form-input" id="resource-name" style="width: 50%;" placeholder='{% trans "Grid ID" %}' data-bind='value: getEditedNode("GRID_ID_NEW.E42", "value")'>
                                     
                                     
                                     {% include 'views/components/add-item-button.htm' %}
@@ -277,7 +277,7 @@
                             
                             <div class="col-xs-12 hidden-sm hidden-md hidden-lg">
                                 
-                                <input class="form-control arches-form-input" id="resource-name" style="width: 100%;" placeholder='{% trans "Grid ID" %}' data-bind='value: getEditedNode("GRID_ID.E42", "value")'>
+                                <input class="form-control arches-form-input" id="resource-name" style="width: 100%;" placeholder='{% trans "Grid ID" %}' data-bind='value: getEditedNode("GRID_ID_NEW.E42", "value")'>
                                     <div class="margin-top-5"></div>
                                     >
                                     
@@ -318,7 +318,7 @@
                         <div data-bind='foreach: getBranchLists()'>
                             <div class="arches-crud-record">
                                 <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this name" %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
-                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans "Edit this name" %}"><span data-bind='text: nodes.get("GRID_ID.E42", "value")' style="padding-right:2px;"></span><span class="text-muted arches-crud-type-identifier"></span>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans "Edit this name" %}"><span data-bind='text: nodes.get("GRID_ID_NEW.E42", "value")' style="padding-right:2px;"></span><span class="text-muted arches-crud-type-identifier"></span>
                                 </a>
                             </div>
                         </div>

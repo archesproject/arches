@@ -1141,7 +1141,7 @@ class LocationForm(ResourceForm):
 
         self.update_nodes('GEOMETRIC_PLACE_EXPRESSION.SP5', data)
         self.update_nodes('GEOMETRY_EXTENT_CERTAINTY.I6', data)
-        self.update_nodes('GRID_ID.E42', data)
+        self.update_nodes('GRID_ID_NEW.E42', data)
         
         if self.resource.entitytypeid == 'HERITAGE_FEATURE.E24':
             siteshape_node = 'SITE_OVERALL_SHAPE_TYPE.E55'
@@ -1178,8 +1178,8 @@ class LocationForm(ResourceForm):
             }
         }
 
-        self.data['GRID_ID.E42'] = {
-                'branch_lists': self.get_nodes('GRID_ID.E42'),
+        self.data['GRID_ID_NEW.E42'] = {
+                'branch_lists': self.get_nodes('GRID_ID_NEW.E42'),
                 'domains': {}
             }
         
