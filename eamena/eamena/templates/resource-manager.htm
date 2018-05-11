@@ -122,7 +122,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             
                             <li>
                                 {% if form.id == "man-made" and not resourceid %}
-                                    <a href="javascript:void(0);" title="{% trans "To create new related Heritage Features, first save your Heritage Place!" %}" class="arches-list-item disabled"><i class="fa {{ form.icon }}" data-formid="{{form.id}}" data-formurl="{% url 'resource_manager' resourcetypeid form.id resourceid%}"></i> {{ form.name }} </a>
+                                    <a href="javascript:void(0);" title="{% trans 'To create new related Heritage Features, first save your Heritage Place!' %}" class="arches-list-item disabled"><i class="fa {{ form.icon }}" data-formid="{{form.id}}" data-formurl="{% url 'resource_manager' resourcetypeid form.id resourceid%}"></i> {{ form.name }} </a>
+                                {% elif form.id == "man-made-component" and not resourceid %}
+                                    <a href="javascript:void(0);" title="{% trans 'To create new related Heritage Components, first save your Heritage Place!' %}" class="arches-list-item disabled"><i class="fa {{ form.icon }}" data-formid="{{form.id}}" data-formurl="{% url 'resource_manager' resourcetypeid form.id resourceid%}"></i> {{ form.name }} </a>
                                 {% else %}
                                     <a href="javascript:void(0);" class="arches-list-item{% if form.id == form_id %} arches-selected{% endif %} form-link" style="background-color: #f7f7f7;" data-formid="{{form.id}}" data-formurl="{% url 'resource_manager' resourcetypeid form.id resourceid%}"><i class="fa {{ form.icon }}" data-formid="{{form.id}}" data-formurl="{% url 'resource_manager' resourcetypeid form.id resourceid%}"></i> {{ form.name }}</a>
                                 {% endif %}

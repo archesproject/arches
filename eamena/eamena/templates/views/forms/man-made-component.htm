@@ -1,0 +1,477 @@
+{% extends "views/forms/wizard-base.htm" %}
+{% load i18n %}
+
+{% block form_content %}
+
+
+<div>
+    <div class="col-xs12">
+        <div class="alert alert-danger wizard-invalid-alert" role="alert" style="display:none;">{% trans "A relationship must be specified." %}</div>
+    </div>
+    <!-- E24 Container -->
+    <div id="related-features">
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="padding-left-10">
+                    <dl style="margin-bottom: 0px;">
+                        <dt style="display: none;" data-bind="visible: true">
+                            <h5 id="arches-names-form" class="section-headline">{% trans "E24 Feature" %}</h5>
+                        </dt>
+
+                        <div id="relation-list">
+                            <div class="row margin-top-minus-5 margin-bottom-10" id="no-relationships" style="">
+                                <div class="col-xs-12">
+                                    <div class="margin-left-5" data-bind="visible: true" style="display:none;">
+                                        <dl class="margin-bottom-10"> 
+                                            <dd class="margin-left-5">
+                                                <div data-bind="visible: viewModel.branch_lists().length == 0">
+                                                    <p class="arches-CRUD-child text-primary">{% trans 'This resource has no related features yet' %}</p>
+                                                </div>
+                                                <div data-bind='foreach: getBranchLists()'>
+                                                    <div data-bind='if: relationship'>
+                                                        <div class="arches-crud-record">
+                                                            <a data-bind="attr: { href: relatedresourceidlink }"  class="arches-CRUD-child arches-CRUD-edit" title="{% trans 'Edit this relationship' %}">
+                                                                <strong data-bind='text: relatedresourcename'></strong>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                      
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+    <!-- Condition Assessement Wizard Container --> 
+    <div style="display: none;" id="workflow-container">     
+        <div class="padding-10" id="crud">
+            <div>
+                <!-- Arches form container -->
+                <dl>
+                    <dd class="arches-RDM-labels">
+                        <div class="row">
+                            <div class="col-xs-12 padding-left-0">
+                                <!-- Start Wizard -->
+                                <form class="margin-top-20" id="wizard-1" novalidate="novalidate">
+                                    <div id="bootstrap-wizard-1" class="col-sm-12">
+                                        <div class="form-bootstrapWizard">
+                                            <ul class="bootstrapWizard form-wizard">
+                                                <li class="active" data-target="#step1" style="width: 25%">
+                                                    <a href="#tab1" data-toggle="tab"> <span class="step">1</span> <span class="title">{% trans "Part 1: Location" %}</span> </a>
+                                                </li>
+                                                <li class="" data-target="#step2" style="width: 25%">
+                                                    <a href="#tab2" data-toggle="tab"> <span class="step">2</span> <span class="title">{% trans "Part 2: Classification" %}</span> </a>
+                                                </li>
+                                                <li class="" data-target="#step3" style="width: 25%">
+                                                    <a href="#tab3" data-toggle="tab"> <span class="step">3</span> <span class="title">{% trans "Part 3: Assessment Summary" %}</span> </a>
+                                                </li>
+                                                <li class="" data-target="#step4" style="width: 25%">
+                                                    <a href="#tab4" data-toggle="tab"> <span class="step">4</span> <span class="title">{% trans "Part 4: Relationship" %}</span> </a>
+                                                </li>
+                                            </ul>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                        
+                                        <!-- Wizard Tabs -->
+                                        <div class="tab-content" style="margin-top: 20px;">
+                                            <!-- Tab 1: Feature Location -->
+                                            <div class="tab-pane active" id="tab1" style="min-height: 330px;">
+                                                <br>
+                                                <h3 class="margin-bottom-5"><strong>{% trans "Part 1" %}</strong> {% trans "Feature Location" %}</h3>
+                                                <div class="alert alert-info fade in">
+                                                    <i class="fa-fw fa fa-info"></i>
+                                                    {% trans "Locate your heritage feature (only one geometry may be added)" %}
+                                                </div>
+                                                <div>
+                                                    <dl class="">   
+                                                        <dd class="" style="margin-bottom:5px">
+                                                            <div class="row" style="margin-bottom: 10px;">
+                                                                <!-- Begin Feature Geometry -->
+                                                                <div id="heritage-location" class="col-xs-11" style="margin-left:30px;">
+                                                                    <div class="row margin-bottom-10">
+                                                                            <!-- Resource Mapped Locations -->
+                                                                            <!-- Map -->
+                                                                            <div id="map" class="map arches-report-map margin-left-0 margin-top-10"><div id="tooltip" style="z-index: 1000 !important; font-weight:700;"></div></div>
+                                                                            <!-- Geometry Type -->
+                                                                            <div id="geometry-type" class="row">
+                                                                                <div class="col-xs-6 col-xs-offset-1" data-bind="attr: { 'style': getEditedNode('SPATIAL_COORDINATES.E47', 'value')() === '' ? 'opacity:0;' : '' }">
+                                                                                    <div class="form-group" style="width:80%; float: left;margin-top:-490px; padding-right: 10px; ">       
+                                                                                        <input class="geometry-selection" id="geometry-selection" name="" style="width:40%" data-bind="select2: {value: getEditedNode('GEOMETRY_TYPE.E55', 'value'), placeholder: 'Location Certainty', dataKey: 'GEOMETRY_TYPE.E55'}">
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <!-- End Geometry Type -->
+                                                                            <!-- Map: Date of Bing Imagery--->
+                                                                            <div class="row">
+                                                                                <div class="col-xs-12" style="margin-left:-10px;">
+                                                                                    <div id = "datescontainer" style= "float: right; margin-top: -465px;  z-index: 900 !important;color:#fff; display:hidden;"> <span id="imagery-tag">{% trans "Date of imagery: " %}</span><div id="imagery-date" ></div></div>
+                                                                                    
+                                                                                </div>
+                                                                            </div>
+                                                                            <!-- Map: Scaleline--->
+                                                                            <div class="row">
+                                                                                <div class="col-xs-12" style="">
+                                                                                    <div id="scale-line" style = "margin-top: -425px;"></div>        
+                                                                                </div>
+                                                                            </div>               
+                                                                            <!-- Map Tools Panel -->
+                                                                            <div class="row" >
+                                                                                <div class="col-xs-4 {% if LANGUAGE_BIDI %}col-xs-offset-7{%else %} col-xs-offset-1{% endif %}" style="">
+                                                                                    <div id="basemaps-panel" class="tools-panel hidden" style="margin-top: -490px; overflow-y: scroll; height: 435px;">
+                                                                                        <div class="modal-header arches-modal-header">
+                                                                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                                                                                ×
+                                                                                            </button>
+                                                                                            <h4 class="modal-title">
+                                                                                                {% trans 'Basemaps' %}
+                                                                                            </h4>
+                                                                                        </div>                                                            
+                                                                                        <!-- Body Content -->
+                                                                                        <div class="modal-body padding-top-0 padding-bottom-0" data-bind='foreach: baseLayers'>                                                            
+                                                                                            <div class="row">
+                                                                                                <hr class="arches-layer-divider" style="border-top: 0px; margin-top: 5px;" />
+                                                                                                <div class="arches-basemap-entry" style="margin-right: 7px;">                                                                                           
+                                                                                                    <div>
+                                                                                                        <a data-bind="attr: { id: id, title: name }" class="basemap info-click" data-rel="" href="javascript:void(0);">
+                                                                                                            <span class="">  
+                                                                                                                <img data-bind="attr: { src: icon }" class="arches-basemap-thumbnail" alt="" />
+                                                                                                                <span class="zoom-icon"></span>                   
+                                                                                                            </span>                                              
+                                                                                                        </a>                    
+                                                                                                        <span class="arches-basemap-caption-search" style="width: 240px;">
+                                                                                                            <a data-bind="attr: { id: id }, text: name" class="caption-text-search hover-effect basemap info-click" href="javascript:void(0);"> </a>
+                                                                                                        </span>
+                                                                                                    </div>                                                           
+                                                                                                </div>
+                                                                                            </div>                                                            
+                                                                                        </div>
+                                                                                        <!-- End Body Content -->
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <!-- End Map Tools Panel -->
+                                                                            <!-- Overlays Panel -->
+                                                                            <div class="row">
+                                                                                <div class="col-xs-4 {% if LANGUAGE_BIDI %}col-xs-offset-7{%else %} col-xs-offset-1{% endif %}" style="">                                                          
+                                                                                    <div id="overlay-panel" class="tools-panel hidden" style="margin-top: -490px; overflow-y: scroll; overflow-x: hidden; height: 435px;">
+                                                                                        <div class="modal-header arches-modal-header">
+                                                                                            <button type="button" class="close pull-right" data-dismiss="modal" aria-hidden="true">
+                                                                                                ×
+                                                                                            </button>                                                            
+                                                                                            <h4 class="modal-title">
+                                                                                                {% trans 'Geometry Tools' %}
+                                                                                            </h4>
+                                                                                        </div>                                                                           
+                                                                                        <!-- Body Content -->
+                                                                                        <div class="modal-body padding-top-10 padding-bottom-0" style="padding-left: 5px; padding-right: 5px;">
+                                                                                            <!-- List overlays -->
+                                                                                            <div class="row">
+                                                                                                <div class="col-xs-12">
+                                                                                                    <dl>
+                                                                                                        <dd class="">
+                                                                                                            <div class="arches-tool-item">
+                                                                                                                <a href="javascript:void(0);" data-geometrytype="Point" class="arches-tool-text geometry-btn info-link" title="">
+                                                                                                                    <i class="fa fa-dot-circle-o"></i>
+                                                                                                                    {% trans 'Draw new point' %}
+                                                                                                                </a>
+                                                                                                            </div>
+                                                                                                        </dd>
+                                                                                                        <dd class="">
+                                                                                                            <div class="arches-tool-item">
+                                                                                                                <a href="javascript:void(0);" data-geometrytype="LineString" class="arches-tool-text geometry-btn info-link" title="">
+                                                                                                                    <i class="fa fa-minus"></i>
+                                                                                                                    {% trans 'Draw new line' %}
+                                                                                                                </a>
+                                                                                                            </div>
+                                                                                                        </dd>
+                                                                                                        <dd class="">
+                                                                                                            <div class="arches-tool-item">
+                                                                                                                <a href="javascript:void(0);" data-geometrytype="Polygon" class="arches-tool-text geometry-btn info-link" title="">
+                                                                                                                    <i class="fa fa-square-o"></i>
+                                                                                                                    {% trans 'Draw new polygon' %}
+                                                                                                                </a>
+                                                                                                            </div>
+                                                                                                        </dd>
+                                                                                                        <dd class="">
+                                                                                                            <div class="arches-tool-item file-upload">
+                                                                                                                <a href="javascript:void(0);" data-geometrytype="Polygon" class="arches-tool-text geometry-btn info-link" title="">
+                                                                                                                    <i class="fa fa-upload"></i>
+                                                                                                                    {% trans 'Add from gpx, kml, or geojson' %}
+                                                                                                                </a>
+                                                                                                                <input type="file" class="upload geom-upload" accept=".gpx, .kml, .geojson, .json"/>
+                                                                                                            </div>
+                                                                                                        </dd>
+                                                                                                        <dd class="geom-file-instructions">
+                                                                                                            {% trans '(or drag and drop the file onto the map)' %}
+                                                                                                        </dd>
+                                                                                                    </dl>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <!-- End Body Content -->
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <!-- End Overlays Panel -->
+                                                                            <!-- Map Tools -->
+                                                                            <div class="row" style="height:0px;">
+                                                            
+                                                                                <div class="btn-group" style="top:-80px;left:{% if LANGUAGE_BIDI %}-{% endif %}86px;">
+                                                            
+                                                                                    <button id="inventory-home" type="button" class="btn btn-primary arches-map-tools-pressed hidden" style="width: 50px; border: 1px solid rgba(206,217,233,.95);"><i class="fa fa-caret-down"></i>
+                                                                                    </button>
+                                                            
+                                                                                    <button id="inventory-basemaps" type="button" class="btn btn-primary arches-map-tools"><i class="fa fa-globe"></i> {% trans 'Basemaps' %}
+                                                                                    </button>
+                                                            
+                                                                                    <button id="inventory-overlays" type="button" class="btn btn-primary arches-map-tools"><i class="fa fa-plus"></i> {% trans 'Add Geometry' %}
+                                                                                    </button>
+                                                            
+                                                                                </div>
+                                                            
+                                                                            </div>
+                                                                            <!-- End Map Tools -->
+
+                                                                            <!-- Geometry Records -->
+<!--                                                                             <div class="row margin-bottom-10">
+                                                                                <div class="col-xs-12"> -->
+                                                                    
+                                                                                    <!-- Geometries -->
+<!--                                                                                     <div class="arches-crud-child-section">
+                                                                                        <dl>
+                                                                                            <dd class="arches-CRUD-child-title">
+                                                                                                {% trans 'This resource is represented by the following geometries:' %}
+                                                                                            </dd>
+                                                                    
+                                                                                            <div data-bind="visible: getBranchLists().length == 0" class="margin-left-5 txt-color-blue">{% trans "No geometries defined" %}</div>   
+                                                                    
+                                                                                            <dd class="margin-left-5" data-bind='foreach: getBranchLists()'>
+                                                                                                <div class="arches-crud-record">
+                                                                                                    <a href="#" class="arches-CRUD-child" title="{% trans "Remove this geometry" %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                                                                                    <a href="#" class="arches-CRUD-child" data-bind="click: $parent.editItem.bind($parent)" title="{% trans "Edit this geometry" %}">
+                                                                                                    
+                                                                                                        <span data-bind="text: nodes.get('GEOMETRIC_PLACE_EXPRESSION.SP5', 'value').split('(')[0].toLowerCase(), attr: { 'style': editing() ? 'font-weight:bold;' : '' }"></span><span class="text-muted">{% trans '( Geometry Type )' %}</span>
+                                                                                                        <span data-bind="text: nodes.get('LOCATION_CERTAINTY.I6', 'label')"></span><span class="text-muted" data-bind="visible: nodes.get('LOCATION_CERTAINTY.I6', 'value').length > 0">{% trans '( Location Certainty )' %}</span>
+                                                                                                        <span data-bind="text: nodes.get('SPATIAL_COORDINATES_REF_SYSTEM.SP4', 'label')"></span><span class="text-muted" data-bind="visible: nodes.get('SPATIAL_COORDINATES_REF_SYSTEM.SP4', 'value').length > 0">{% trans '( Coordinate System )' %}</span>
+                                                                                                    </a>
+                                                                                                </div>
+                                                                                            </dd>
+                                                                                        </dl>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div> -->
+                                                                            <!-- End Geometry Records -->
+                                                                    </div>
+                                                                </div>
+                                                                <!-- End Feature Geometry -->
+                                                            </div>
+                                                        </dd>
+                                                    </dl>
+                                                </div>  
+                                            </div>
+                                            <!-- end tab 1 -->
+                                            
+                                            <!-- start tab 2 -->
+                                            <div class="tab-pane" id="tab2" style="min-height: 330px;">
+                                                <br>
+                                                <h3 class="margin-bottom-5"><strong>{% trans "Part 2" %}</strong> {% trans "Classification" %}</h3>
+                                                <div class="alert alert-info fade in">
+                                                    <i class="fa-fw fa fa-info"></i>
+                                                    {% trans "Enter the component's type and orientation" %}
+                                                </div>
+                                                <div>
+                                                    <dl id="classification-section">
+                                                        <dt>
+                                                            <h5 id="arches-names-form" class="section-headline">{% trans "Type" %}</h5>
+                                                        </dt>
+                                                        <dd class="arches-RDM-labels">
+                                                            <div class="row">
+                                                                <div class="col-xs-12">
+                                                                    <input style="height: 36px; width:80%; padding-top: 2px;" placeholder='{% trans "Type" %}' class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('COMPONENT_TYPE.E55', 'value'), dataKey: 'COMPONENT_TYPE.E55'}"></input>
+                                                                    <input style="height: 36px; width:80%; padding-top: 2px;" placeholder='{% trans "Orientation" %}' class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('COMPONENT_ORIENTATION.E55', 'value'), dataKey: 'COMPONENT_ORIENTATION.E55'}"></input>
+                                                                    {% include 'views/components/add-item-button.htm' %}
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-xs-12">
+                                                                        <div class="margin-left-5">
+                                                                            <dl class="margin-bottom-10"> 
+                                                                                <dd class="margin-left-10 margin-top-5" style="display: none;" data-bind="visible: true">
+                                                                                    <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Type added" %}</div>   
+                                                                                    <div data-bind="foreach: getBranchLists()">
+                                                                                        <div class="arches-crud-record">
+                                                                                            <a href="javascript:void(0)" class="arches-CRUD-child" title="Delete this value"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                                                                            <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans 'Edit this value' %}">
+                                                                                                <span data-bind="text: nodes.get('COMPONENT_TYPE.E55', 'label')" style="padding-right:2px;"></span><span class="text-muted"> (Type) </span><span data-bind="text: nodes.get('COMPONENT_ORIENTATION.E55', 'label')" style="padding-right:2px;"></span><span class="text-muted"> (Orientation) </span>
+                                                                                            </a>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </dd>
+                                                                            </dl>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </dd>
+                                                    </dl>
+                                                    
+                                                </div>  
+                                            </div>
+                                            <!-- End Tab 2-->
+                                            
+                                            <!-- Tab 3: Assessment Summary -->
+                                            <div class="tab-pane" id="tab3" style="min-height: 330px;">
+                                                <br>
+                                                <h3 class="margin-bottom-5"><strong>{% trans "Part 3" %}</strong> {% trans "Assessment Summary" %}</h3>
+                                                <div class="alert alert-info fade in">
+                                                    <i class="fa-fw fa fa-info"></i>
+                                                    {% trans "Enter the assessment summary information." %}
+                                                </div>
+                                                <div>
+                                                    <div id="investigation-section">
+                                                        <div class="row">
+                                                            <div class="col-xs-12 col-sm-9">
+                                                                <div class="col-xs-6 form-section-input add-padding-right">
+                                                                    <input class="form-control arches-form-input arches-form-input-100" placeholder='{% trans "Investigator Name" %}' data-bind='value: getEditedNode("INVESTIGATOR_NAME.E41", "value")'></input>
+                                                                </div>
+                                                                <div class="col-xs-6 form-section-input">
+                                                                    <div class="form-group">
+                                                                        <input class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('INVESTIGATOR_ROLE_TYPE.E55', 'value'), placeholder: '{% trans 'Investigator Role' %}', dataKey: 'INVESTIGATOR_ROLE_TYPE.E55'}"></input>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-6 form-section-input add-padding-right margin-top-5">
+                                                                    <div class="form-group">
+                                                                        <input class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('INVESTIGATION_ACTIVITY_TYPE.E55', 'value'), placeholder: '{% trans 'Type of Activity' %}', dataKey: 'INVESTIGATION_ACTIVITY_TYPE.E55'}"></input>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-6 form-section-input margin-top-5">
+                                                                    <div class="form-group datetimepicker">
+                                                                        <div class="input-group">
+                                                                            <input type="text" name="mydate" id="date-from" placeholder='{% trans "Date of Activity (yyyy-mm-dd)" %}' class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('INVESTIGATION_DATE_OF_ACTIVITY.E49', 'value')} ">
+                                                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-xs-12 col-sm-3 add-button-column add-margin-top">
+                                                                {% include 'views/components/add-item-button.htm' %}
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-xs-12 col-sm-9">
+                                                                <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "All values must be populated, and the date must be properly formatted YYYY-MM-DD." %}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-xs-12">
+                                                                <div class="arches-crud-child-section-new">
+                                                                    <dl>
+                                                                        <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                                                                            <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue filler-text-block nr"></div>
+                                                                            <div data-bind='foreach: getBranchLists()'>
+                                                                                <div class="arches-crud-record" style="display:block;">
+                                                                                    <a href="javascript:void(0)" title="remove"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                                                                    <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" title="{% trans 'edit' %}" data-bind='click: $parent.editItem.bind($parent)'>
+                                                                                        <span data-bind="text: nodes.get('INVESTIGATOR_NAME.E41', 'value')"></span>
+                                                                                        <span class="text-muted">{% trans '( Investigator Name )' %}</span>
+                                                                                        <span data-bind="text: nodes.get('INVESTIGATOR_ROLE_TYPE.E55', 'label')"></span>
+                                                                                        <span class="text-muted">{% trans '( Investigator Role )' %}</span>
+                                                                                        <span data-bind="text: nodes.get('INVESTIGATION_ACTIVITY_TYPE.E55', 'label')"></span>
+                                                                                        <span class="text-muted">{% trans '( Type of Activity )' %}</span>
+                                                                                        <span data-bind="text: nodes.get('INVESTIGATION_DATE_OF_ACTIVITY.E49', 'value').slice(0,10)"></span>
+                                                                                        <span class="text-muted">{% trans '( Date of Activity )' %}</span>
+                                                                                    </a>
+                                                                                </div>
+                                                                            </div>
+                                                                        </dd>
+                                                                    </dl>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>  
+                                            </div>
+                                            <!-- End Tab 3-->
+                                            
+                                            <!-- Tab 4: Relation -->
+                                            <div class="tab-pane" id="tab4" style="min-height: 330px;">
+                                                <br>
+                                                <h3 class="margin-bottom-5"><strong>{% trans "Part 4" %}</strong> {% trans "Relation" %}</h3>
+                                                <div class="alert alert-info fade in">
+                                                    <i class="fa-fw fa fa-info"></i>
+                                                    {% trans "Enter the relation type binding the heritage feature to its heritage place" %}
+                                                </div>
+                                                <div>
+                                                    <dl id="relationship-assignment">
+                                                        <dt>
+                                                            <h5 id="arches-names-form" class="section-headline">{% trans "Relation" %}</h5>
+                                                        </dt>
+                                                        <dd class="arches-RDM-labels">
+                                                            <div class="row">
+                                                                <div class="col-xs-12">
+                                                                    <div class="form-group" style="width: 100%">
+                                                                        <input style="width: 80%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form name-type hidden-xs" id="relation-type" data-bind="select2: {value: getEditedNode('ARCHES_RESOURCE_CROSS-REFERENCE_RELATIONSHIP_TYPES.E55', 'value'), placeholder: '{% trans 'Relationship Type' %}', dataKey: 'ARCHES_RESOURCE_CROSS-REFERENCE_RELATIONSHIP_TYPES.E55'}"></input>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </dd>
+                                                    </dl>
+                                                </div>  
+                                            </div>
+                                            <!-- End Tab 4-->
+
+
+                                        </div>
+                                        <!-- End Wizard Tabs -->
+
+                                    </div>
+                                </form>
+                                <!-- End Wizard -->
+
+                            </div>
+                        </div>
+                    </dd>
+                </dl>
+                <!-- End Arches form container -->
+
+            </div>
+        </div>
+    </div>
+    <!-- End E24 Wizard Container --> 
+
+    <div action="" class="modal fade confirm-delete-modal" tabindex="-1" role="dialog" aria-labelledby="alertmodal" aria-hidden="true">
+        <div class="modal-dialog confirm-delete">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">{% trans "Are you ready to delete this assessment?" %}</h4>
+                </div>
+                <div class="modal-body">
+                    <h5 name="warning-text">{% trans "Classification" %}
+                    </h5>
+                    <div name="additional-info" style="max-height: 300px; overflow-y: scroll;">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-u btn-u-default" data-dismiss="modal">{% trans "No" %}</button>
+                    <button class="btn-u btn-u-red confirm-delete-yes" href="javascript:void(0);" data-id="" data-action="delete">{% trans "Yes" %}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock form_content %}

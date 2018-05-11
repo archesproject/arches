@@ -83,6 +83,7 @@ class Resource(ArchesResource):
                 forms.RelatedResourcesForm.get_info(),
                 forms.ModificationForm.get_info(),
                 forms.RelatedFilesForm.get_info(),
+                forms.ManMadeComponentForm.get_info(),
             ]
             
         elif self.entitytypeid == 'HERITAGE_COMPONENT.B2':
