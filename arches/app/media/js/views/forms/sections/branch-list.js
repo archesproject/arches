@@ -65,11 +65,15 @@ define(['jquery',
             return true;
         },
 
-        validateHasValues: function(nodes){
+        validateHasValues: function(nodes,canBeEmpty){
             var valid = nodes != undefined && nodes.length > 0;
             _.each(nodes, function (node) {
-                if (node.entityid === '' && node.value === ''){
-                    valid = false;
+                if (canBeEmpty) {
+                    if (node.entityid === '' && node.value === '' && canBeEmpty.indexOf(node.entitytypeid) == -1){
+                        valid = false;
+                    }
+                } else if (node.entityid === '' && node.value === '') {
+                        valid = false;
                 }
             }, this);
             return valid;
