@@ -1,6 +1,8 @@
 <div class="card-component">
+    <!-- ko if: card.parent -->
     <h4 data-bind="text: card.name"></h4>
     <h5 data-bind="text: card.description"></h5>
+    <!-- /ko -->
     <div>
         <form class="widgets" style="margin-bottom: 20px;">
             <div data-bind="foreach: {
@@ -25,18 +27,16 @@
         </form>
         <div class="install-buttons">
             <!-- ko if: tile.tileid -->
-            <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-trash" data-bind="click: deleteTile">Delete</button>
+            <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-trash" data-bind="click: tile.deleteTile">Delete</button>
             <!-- /ko -->
-            <!-- ko if: dirty() -->
-                <!-- ko if: card.widgets.length > 0 -->
-                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: cancel">Cancel</button>
-                <!-- /ko -->
+            <!-- ko if: tile.dirty() -->
+                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset">Cancel</button>
                 <!-- ko if: tile.tileid -->
-                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: save">Save</button>
+                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: tile.save">Save</button>
                 <!-- /ko -->
             <!-- /ko -->
             <!-- ko if: !tile.tileid -->
-            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: save">Add</button>
+            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: tile.save">Add</button>
             <!-- /ko -->
         </div>
 
