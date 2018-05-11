@@ -218,15 +218,7 @@ class MobileSurveyManagerView(MapBaseManagerView):
             print connection_error
             return connection_error
 
-        ordered_cards = models.MobileSurveyXCard.objects.filter(mobile_survey=mobile_survey).order_by('sortorder')
-        ordered_ids = [unicode(mpc.card_id) for mpc in ordered_cards]
-        mobile_survey_dict = mobile_survey.__dict__
-        mobile_survey_dict['cards'] = ordered_ids
-        mobile_survey_dict['users'] = [u.id for u in mobile_survey.users.all()]
-        mobile_survey_dict['groups'] = [g.id for g in mobile_survey.groups.all()]
-        mobile_survey_dict['bounds'] = mobile_survey.bounds.geojson
-
-        return JSONResponse({'success':True, 'mobile_survey': mobile_survey_dict})
+        return JSONResponse({'success':True, 'mobile_survey': mobile_survey})
 
     def get_mobile_survey_users(self, mobile_survey):
         users = set(mobile_survey.users.all())
