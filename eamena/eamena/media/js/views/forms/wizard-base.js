@@ -114,7 +114,7 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
         },
 
         submit: function(evt){
-            var validationAlert = this.$el.find('.wizard-invalid-alert');;
+            var validationAlert = this.$el.find('.wizard-invalid-alert');
             evt.preventDefault();
 
             if (this.validate(JSON.parse(this.getData()))){
