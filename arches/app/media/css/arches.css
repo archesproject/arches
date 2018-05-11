@@ -5850,6 +5850,10 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     padding-right: 5px;
 }
 
+.node-form-container {
+    width: 100%;
+}
+
 .node-semantic-description {
     display: flex;
     padding: 10px;
