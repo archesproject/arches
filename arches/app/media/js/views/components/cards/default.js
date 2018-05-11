@@ -32,14 +32,19 @@ define([
             var childTiles = {};
             if (tile.cards) {
                 childTiles = _.reduce(tile.cards, function (tiles, card) {
-                    tiles.push(card.tiles);
+                    return tiles.concat(card.tiles());
                 }, []).reduce(function (tileLookup, childTile) {
                     tileLookup[childTile.tileid] = getTileData(childTile)
+                    return tileLookup;
                 }, {});
+            }
+            var tileData = {};
+            if (tile.data) {
+                tileData = koMapping.toJS(tile.data);
             }
             return {
                 "tileid": tile.tileid,
-                "data": koMapping.toJS(tile.data),
+                "data": tileData,
                 "nodegroup_id": tile.nodegroup_id,
                 "parenttile_id": tile.parenttile_id,
                 "resourceinstance_id": tile.resourceinstance_id,
