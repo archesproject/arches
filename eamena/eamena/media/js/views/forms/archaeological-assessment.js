@@ -3,8 +3,10 @@ define(['jquery',
     'knockout-mapping', 
     'views/forms/base', 
     'views/forms/sections/branch-list',
+    'views/forms/sections/validation',
     'bootstrap-datetimepicker',], 
-    function ($, _, koMapping, BaseForm, BranchList) {
+    function ($, _, koMapping, BaseForm, BranchList, ValidationTools) {
+        var vt = new ValidationTools;
         return BaseForm.extend({
             initialize: function() {
                 BaseForm.prototype.initialize.apply(this);                
@@ -30,25 +32,22 @@ define(['jquery',
                     dataKey: 'DATE_INFERENCE_MAKING.I5',
                     rules: true,
                     validateBranch: function (nodes) {
-                        var canBeEmpty = ['DATE_INFERENCE_MAKING_ACTOR_NAME.E41'];
-                        var valid = nodes != undefined && nodes.length > 0;
-                        _.each(nodes, function (node) {
-                            if (node.entityid === '' && node.value === '' &&
-                                canBeEmpty.indexOf(node.entitytypeid) == -1
-                            ){
-                                valid = false;
-                            }
-                        }, this);
-                        return valid;
+                        var canBeEmpty = [
+                            'DATE_INFERENCE_MAKING_ACTOR_NAME.E41',
+                            'CULTURAL_PERIOD_DETAIL_TYPE.E55'
+                        ];
+                        return this.validateHasValues(nodes,canBeEmpty);
                     }
                 }));
                 this.addBranchList(new BranchList({
                     el: this.$el.find('#period-of-occupation')[0],
                     data: this.data,
                     dataKey: 'ARCHAEOLOGICAL_TIMESPAN.E52',
-                    rules: true,
                     validateBranch: function (nodes) {
-                        return this.validateHasValues(nodes);
+                        var ck0 = this.validateHasValues(nodes);
+                        var ck1 =vt.isValidDate(nodes,'ARCHAEOLOGICAL_FROM_DATE.E61');
+                        var ck2 =vt.isValidDate(nodes,'ARCHAEOLOGICAL_TO_DATE.E61');
+                        return ck0 && ck1&& ck2;
                     }
                 }));
                 
@@ -69,15 +68,7 @@ define(['jquery',
                     rules: true,
                     validateBranch: function (nodes) {
                         var canBeEmpty = ['FEATURE_ASSIGNMENT_INVESTIGATOR_NAME.E41'];
-                        var valid = nodes != undefined && nodes.length > 0;
-                        _.each(nodes, function (node) {
-                            if (node.entityid === '' && node.value === '' &&
-                                canBeEmpty.indexOf(node.entitytypeid) == -1
-                            ){
-                                valid = false;
-                            }
-                        }, this);
-                        return valid;
+                        return this.validateHasValues(nodes,canBeEmpty);
                     }
                 }));
                 this.addBranchList(new BranchList({
@@ -87,15 +78,7 @@ define(['jquery',
                     rules: true,
                     validateBranch: function (nodes) {
                         var canBeEmpty = ['FUNCTION_INTERPRETATION_INFERENCE_MAKING_ACTOR_NAME.E41'];
-                        var valid = nodes != undefined && nodes.length > 0;
-                        _.each(nodes, function (node) {
-                            if (node.entityid === '' && node.value === '' &&
-                                canBeEmpty.indexOf(node.entitytypeid) == -1
-                            ){
-                                valid = false;
-                            }
-                        }, this);
-                        return valid;
+                        return this.validateHasValues(nodes,canBeEmpty);
                     }
                 }));
             },

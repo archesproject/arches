@@ -23,7 +23,13 @@ define(['jquery',
                     dataKey: 'DATE_INTERPRETATION_INFERENCE_MAKING.I5',
                     rules: true,
                     validateBranch: function (nodes) {
-                        var ck0 = this.validateHasValues(nodes);
+                        var canBeEmpty = [
+                            'CULTURAL_PERIOD_DETAIL_TYPE.E55',
+                            'ARCHAEOLOGICAL_FROM_DATE.E61',
+                            'ARCHAEOLOGICAL_TO_DATE.E61',
+                            'DATE_INTERPRETATION_INFERENCE_MAKING_ACTOR_NAME.E41'
+                        ]
+                        var ck0 = this.validateHasValues(nodes, canBeEmpty);
                         var ck1 = vt.isValidDate(nodes,'ARCHAEOLOGICAL_FROM_DATE.E61');
                         var ck2 = vt.isValidDate(nodes,'ARCHAEOLOGICAL_TO_DATE.E61');
                         return ck0 && ck1 && ck2;

@@ -3,8 +3,10 @@ define(['jquery',
     'knockout-mapping', 
     'views/forms/base', 
     'views/forms/sections/branch-list',
+    'views/forms/sections/validation',
     'bootstrap-datetimepicker',], 
-    function ($, _, koMapping, BaseForm, BranchList) {
+    function ($, _, koMapping, BaseForm, BranchList,ValidationTools) {
+        var vt = new ValidationTools;
         return BaseForm.extend({
             initialize: function() {
                 BaseForm.prototype.initialize.apply(this);                
@@ -45,19 +47,15 @@ define(['jquery',
                             'DISTURBANCE_DATE_FROM.E61',
                             'DISTURBANCE_DATE_TO.E61',
                             'DISTURBANCE_DATE_OCCURRED_BEFORE.E61',
-                            'DISTURBANCE_DATE_OCCURRED_BEFORE',
                             'DISTURBANCE_DATE_OCCURRED_ON.E61',
                             'DISTURBANCE_CAUSE_ASSIGNMENT_ASSESSOR_NAME.E41',
                         ]
-                        var valid = nodes != undefined && nodes.length > 0;
-                        _.each(nodes, function (node) {
-                            if (node.entityid === '' && node.value === '' &&
-                                canBeEmpty.indexOf(node.entitytypeid) == -1
-                            ){
-                                valid = false;
-                            }
-                        }, this);
-                        return valid;
+                        var ck0 = this.validateHasValues(nodes, canBeEmpty);
+                        var ck1 = vt.isValidDate(nodes,'DISTURBANCE_DATE_FROM.E61');
+                        var ck2 = vt.isValidDate(nodes,'DISTURBANCE_DATE_TO.E61');
+                        var ck3 = vt.isValidDate(nodes,'DISTURBANCE_DATE_OCCURRED_BEFORE.E61');
+                        var ck4 = vt.isValidDate(nodes,'DISTURBANCE_DATE_OCCURRED_ON.E61');
+                        return ck0 && ck1 && ck2 && ck3 && ck4;
                     }
                 }));
                 
@@ -68,15 +66,8 @@ define(['jquery',
                     rules: true,
                     validateBranch: function (nodes) {
                         var canBeEmpty = ['THREAT_INFERENCE_MAKING_ASSESSOR_NAME.E41'];
-                        var valid = nodes != undefined && nodes.length > 0;
-                        _.each(nodes, function (node) {
-                            if (node.entityid === '' && node.value === '' &&
-                                canBeEmpty.indexOf(node.entitytypeid) == -1
-                            ){
-                                valid = false;
-                            }
-                        }, this);
-                        return valid;
+                        return this.validateHasValues(nodes, canBeEmpty);
+
                     }
                 }));
                 
@@ -85,7 +76,7 @@ define(['jquery',
                     data: this.data,
                     dataKey: 'RECOMMENDATION_PLAN.E100',
                     validateBranch: function (nodes) {
-                        return true;
+                        return this.validateHasValues(nodes);
                     }
                 }));
                 this.addBranchList(new BranchList({
@@ -93,7 +84,7 @@ define(['jquery',
                     data: this.data,
                     dataKey: 'PRIORITY_ASSIGNMENT.E13',
                     validateBranch: function (nodes) {
-                        return true;
+                        return this.validateHasValues(nodes);
                     }
                 }));
 
