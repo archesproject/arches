@@ -22,7 +22,7 @@ define([
             var self = this;
             _.extend(this, _.pick(options, 'graphModel'));
             this.datatypes = _.keys(this.graphModel.get('datatypelookup'));
-            this.hasOntolgoy = this.graphModel.get('ontology_id') ? true: false;
+            this.hasOntology = this.graphModel.get('ontology_id') ? true: false;
             this.node = options.node;
             this.loading = options.loading || ko.observable(false);
 
