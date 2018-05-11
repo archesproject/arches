@@ -1,15 +1,18 @@
 define([
+    'jquery',
     'underscore',
     'knockout',
     'knockout-mapping',
     'views/base-manager',
+    'arches',
     'resource-editor-data',
     'bindings/resizable-sidepanel',
     'widgets',
     'card-components'
-], function(_, ko, koMapping, BaseManagerView, data) {
+], function($, _, ko, koMapping, BaseManagerView, arches, data) {
     var tiles = data.tiles;
     var filter = ko.observable('');
+    var loading = ko.observable(false);
     var selection = ko.observable();
     var cards = _.map(data.cards, function(card) {
         return _.extend(
@@ -30,8 +33,7 @@ define([
                     );
                     node.config = koMapping.fromJS(node.config);
                     return node;
-                }),
-                dirty: ko.observable(false)
+                })
             }
         );
     });
@@ -66,6 +68,11 @@ define([
     };
 
     var setupTile = function(tile, parent) {
+        tile._tileData = ko.observable(
+            koMapping.toJSON(tile.data)
+        );
+        tile.data = koMapping.fromJS(tile.data);
+
         return _.extend(tile, {
             parent: parent,
             cards: _.filter(cards, function(card) {
@@ -77,11 +84,83 @@ define([
             selected: ko.computed(function () {
                 return selection() === tile;
             }, this),
-            data: koMapping.fromJS(tile.data),
             formData: new FormData(),
+            dirty: ko.computed(function () {
+                return tile._tileData() !== koMapping.toJSON(tile.data);
+            }, this),
+            reset: function () {
+                ko.mapping.fromJS(
+                    JSON.parse(tile._tileData()),
+                    tile.data
+                );
+            },
+            getData: function () {
+                var children = {};
+                if (tile.cards) {
+                    children = _.reduce(tile.cards, function (tiles, card) {
+                        return tiles.concat(card.tiles());
+                    }, []).reduce(function (tileLookup, child) {
+                        tileLookup[child.tileid] = child.getData();
+                        return tileLookup;
+                    }, {});
+                }
+                var tileData = {};
+                if (tile.data) {
+                    tileData = koMapping.toJS(tile.data);
+                }
+                return {
+                    "tileid": tile.tileid,
+                    "data": tileData,
+                    "nodegroup_id": tile.nodegroup_id,
+                    "parenttile_id": tile.parenttile_id,
+                    "resourceinstance_id": tile.resourceinstance_id,
+                    "tiles": children
+                }
+            },
+            save: function () {
+                loading(true);
+                delete tile.formData.data;
+                tile.formData.append(
+                    'data',
+                    JSON.stringify(
+                        tile.getData()
+                    )
+                );
+
+                $.ajax({
+                    type: "POST",
+                    url: arches.urls.tile,
+                    processData: false,
+                    contentType: false,
+                    data: tile.formData
+                }).done(function(tileData) {
+                    ko.mapping.fromJS(tileData.data,tile.data);
+                    tile._tileData(koMapping.toJSON(tile.data));
+                    if (!tile.tileid) {
+                        tile.tileid = tileData.tileid;
+                        tile.parent.tiles.unshift(tile);
+                        vm.selection(tile);
+                    }
+                }).fail(function(response) {
+                    console.log('there was an error ', response);
+                }).always(function(){
+                    loading(false);
+                });
+            },
             deleteTile: function() {
-                parent.tiles.remove(tile);
-                selection(parent);
+                loading(true);
+                $.ajax({
+                    type: "DELETE",
+                    url: arches.urls.tile,
+                    data: JSON.stringify(tile.getData())
+                }).done(function(response) {
+                    parent.tiles.remove(tile);
+                    selection(parent);
+                }).fail(function(response) {
+                    console.log('there was an error ', response);
+                }).always(function(){
+                    loading(false);
+                });
             }
         });
     };
@@ -107,6 +186,7 @@ define([
         }, {});
     };
     var vm = {
+        loading: loading,
         widgetLookup: createLookup(data.widgets, 'widgetid'),
         cardComponentLookup: createLookup(data.cardComponents, 'componentid'),
         nodeLookup: createLookup(data.nodes, 'nodeid'),
@@ -138,27 +218,16 @@ define([
                 if (item.tileid) {
                     return item;
                 }
-                return {
+                return setupTile({
                     tileid: '',
                     resourceinstance_id: data.resourceid,
                     nodegroup_id: item.nodegroup_id,
                     parenttile_id: item.parent ? item.parent.tileid : null,
-                    parent: item,
-                    expanded: ko.observable(true),
-                    data: koMapping.fromJS(
-                        _.reduce(item.widgets, function (data, widget) {
-                            data[widget.node_id] = null;
-                            return data;
-                        }, {})
-                    ),
-                    formData: new FormData(),
-                    update: function (newTile) {
-                        var card = vm.selectedCard();
-                        newTile = setupTile(newTile, card);
-                        card.tiles.unshift(newTile);
-                        vm.selection(newTile);
-                    }
-                };
+                    data: _.reduce(item.widgets, function (data, widget) {
+                        data[widget.node_id] = null;
+                        return data;
+                    }, {})
+                }, item);
             }
         }),
         selectedCard: ko.computed(function () {
