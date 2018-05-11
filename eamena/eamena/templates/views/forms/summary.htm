@@ -21,7 +21,7 @@
                         <div class="row">
                             <div class="col-xs-12 hidden-xs">
                                 <input class="form-control arches-form-input" id="resource-name" style="width: 33%;" placeholder='{% trans "Name" %}' data-bind='value: getEditedNode("NAME.E41", "value")'>
-                                <input style="width:18%; padding-top: 2px;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-name-type" data-bind="select2: {value: getEditedNode('NAME_TYPE.E55', 'value'), placeholder: '{% trans "Type" %}', dataKey: 'NAME_TYPE.E55'}"></input>
+                                <input style="width:25%; padding-top: 2px;" class="select2 arches-select2-crud-form name-type hidden-xs" id="resource-name-type" data-bind="select2: {value: getEditedNode('NAME_TYPE.E55', 'value'), placeholder: '{% trans "Type" %}', dataKey: 'NAME_TYPE.E55'}"></input>
                                 {% include 'views/components/add-item-button.htm' %}
                             </div>
                             <div class="col-xs-12 hidden-sm hidden-md hidden-lg">
@@ -35,7 +35,7 @@
                         </div>
                     </dd>
                     <!-- End Form -->
-                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "The name value must be populated. A resource can only have one primary name." %}</div>
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "Name and name type must be populated." %}</div>
                 </dl>
             </div>
         </div>
@@ -214,6 +214,7 @@
                         </div>
                     </dd>
                     <!-- End Form -->
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "Designation type must be populated and dates must be in format YYYY-MM-DD" %}</div>
                 </dl>
             </div>
         </div>
