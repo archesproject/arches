@@ -92,11 +92,13 @@ define([
 
         self.reset = function () {
             var graph = self.graph;
-            _.each(JSON.parse(srcJSON), function(value, key) {
+            var src = JSON.parse(srcJSON);
+            _.each(src, function(value, key) {
                 if (ko.isObservable(graph[key])) {
                     graph[key](value);
                 };
             });
+            self.ontologyClass(src.root.ontologyclass);
             JSON.parse(resourceJSON).forEach(function(jsonResource) {
                 var resource = _.find(self.resource_data(), function (resource) {
                     return resource.id === jsonResource.id;

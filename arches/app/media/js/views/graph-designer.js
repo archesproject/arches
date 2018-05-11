@@ -6,8 +6,8 @@ define([
     'views/base-manager',
     'viewmodels/alert',
     'models/graph',
-    'views/graph/graph-tree',
-    'views/graph/graph-manager/new-node-form',
+    'views/graph/graph-designer/graph-tree',
+    'views/graph/graph-designer/node-form',
     'views/graph/graph-manager/branch-list',
     'graph-designer-data',
     'arches',
@@ -76,7 +76,7 @@ define([
             viewModel.branchListView.loadDomainConnections();
         }
     }, this);
-    
+
     viewModel.loadGraphSettings = function(){
         var self = this;
         self.contentLoading(true);
