@@ -78,7 +78,11 @@ define([
                 return selection() === tile;
             }, this),
             data: koMapping.fromJS(tile.data),
-            formData: new FormData()
+            formData: new FormData(),
+            deleteTile: function() {
+                parent.tiles.remove(tile);
+                selection(parent);
+            }
         });
     };
 

@@ -73,6 +73,20 @@ define([
                     self.loading(false);
                 })
         }
+        this.deleteTile = function () {
+            self.loading(true);
+            $.ajax({
+                    type: "DELETE",
+                    url: arches.urls.tile,
+                    data: JSON.stringify(getTileData(self.tile))
+                }).done(function(response) {
+                    self.tile.deleteTile();
+                }).fail(function(response) {
+                    console.log('there was an error ', response);
+                }).always(function(){
+                    self.loading(false);
+                })
+        }
     };
     return ko.components.register('default-card', {
         viewModel: viewModel,

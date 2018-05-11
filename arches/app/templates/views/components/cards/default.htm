@@ -25,7 +25,7 @@
         </form>
         <div class="install-buttons">
             <!-- ko if: tile.tileid -->
-            <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-trash">Delete</button>
+            <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-trash" data-bind="click: deleteTile">Delete</button>
             <!-- /ko -->
             <!-- ko if: dirty() -->
                 <!-- ko if: card.widgets.length > 0 -->

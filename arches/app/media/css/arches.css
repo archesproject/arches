@@ -10808,7 +10808,29 @@ ul.select2-choices:after {
 }
 
 .card-component-panel {
-    padding: 0 20px 10px 20px;
+    padding: 10px 20px 10px 20px;
+    flex: 1 0 250px;
+    width: 250px;
+}
+
+.card-component-panel h4 {
+    color: #2f527a;
+}
+
+.card-component-panel hr {
+    border-color: #e9e9e9;
+}
+
+.card-component-panel h5 {
+    color: #989898;
+}
+
+.card-breadcrumbs {
+    color: #6494cc;
+}
+
+.current-crumb {
+    font-weight: bold;
 }
 
 @keyframes loader {
