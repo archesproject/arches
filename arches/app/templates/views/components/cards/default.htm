@@ -31,7 +31,12 @@
                 <!-- ko if: card.widgets.length > 0 -->
                 <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: cancel">Cancel</button>
                 <!-- /ko -->
+                <!-- ko if: tile.tileid -->
                 <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: save">Save</button>
+                <!-- /ko -->
+            <!-- /ko -->
+            <!-- ko if: !tile.tileid -->
+            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: save">Add</button>
             <!-- /ko -->
         </div>
 

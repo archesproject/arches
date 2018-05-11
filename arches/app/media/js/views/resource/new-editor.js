@@ -151,8 +151,7 @@ define([
                     update: function (newTile) {
                         var card = vm.selectedCard();
                         newTile = setupTile(newTile, card);
-                        console.log(newTile);
-                        card.tiles.push(newTile);
+                        card.tiles.unshift(newTile);
                         vm.selection(newTile);
                     }
                 };
