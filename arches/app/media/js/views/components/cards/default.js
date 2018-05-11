@@ -8,7 +8,7 @@ define([
     var viewModel = function(params) {
         var self = this;
         this._tileData = ko.observable(koMapping.toJSON(params.tile.data));
-        this.loading = ko.observable(false);
+        this.loading = params.loading || ko.observable(false);
         this.card = params.card;
         this.tile = params.tile;
         this.form = params.form;
