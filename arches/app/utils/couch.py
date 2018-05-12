@@ -46,3 +46,11 @@ class Couch(object):
             print 'Database not found: ' + name
         except Exception as e:
             print e
+
+    def update_doc(self, db, doc, doc_id=None):
+        try:
+            x = db.get(doc_id)
+            x.update(doc)
+            db.save(x)
+        except:
+            db[doc_id] = doc

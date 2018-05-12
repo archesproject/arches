@@ -60,12 +60,14 @@ class MobileSurvey(models.MobileSurveyModel):
 
         survey = self.serialize()
         survey['type'] = 'metadata'
-        db.save(survey)
+        self.couch.update_doc(db, survey, 'metadata')
         return db
 
     def delete(self):
+        couchdb_name='project_' + str(self.id)
         super(MobileSurvey, self).delete()
-        self.couch.delete_db('project_' + str(self.id))
+        self.couch.delete_db(couchdb_name)
+
 
     def serialize(self, fields=None, exclude=None):
         """
