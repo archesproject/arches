@@ -48,7 +48,7 @@
                                 </div>
 
                                 <div class="col-xs-12">
-                                    <select class="design" data-bind="attr: {'disabled': graph.nodes().length > 1 }, value: graph.ontology_id, valueAllowUnset: true, options: ontologies, optionsText: 'name', optionsValue:'ontologyid', optionsCaption: '{% trans "No ontology" %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                                    <select class="design" data-bind="attr: {'disabled': graphSettingsViewModel.nodeCount() > 1 }, value: graph.ontology_id, valueAllowUnset: true, options: ontologies, optionsText: 'name', optionsValue:'ontologyid', optionsCaption: '{% trans "No ontology" %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
                                 </div>
                             </div>
                         </div>
@@ -60,7 +60,7 @@
                                 </div>
 
                                 <div class="col-xs-12">
-                                    <select class="design" data-bind="attr: {'disabled': graph.nodes().length > 1 }, value: graphSettingsViewModel.ontologyClass, valueAllowUnset: false, options: ontologyClasses, optionsText: 'display', optionsValue:'source', chosen: {disable_search_threshold: 10, width: '100%', search_contains: true}"></select>
+                                    <select class="design" data-bind="attr: {'disabled': graphSettingsViewModel.nodeCount() > 1 }, value: graphSettingsViewModel.ontologyClass, valueAllowUnset: false, options: ontologyClasses, optionsText: 'display', optionsValue:'source', chosen: {disable_search_threshold: 10, width: '100%', search_contains: true}"></select>
                                 </div>
                             </div>
                         </div>

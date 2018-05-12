@@ -40,6 +40,7 @@ define([
     viewModel.selectedNode = viewModel.graphModel.get('selectedNode');
 
     viewModel.nodeForm = new NodeFormView({
+        graph: viewModel.graph,
         graphModel: viewModel.graphModel,
         loading: viewModel.contentLoading,
         node: viewModel.selectedNode
@@ -57,6 +58,7 @@ define([
 
     viewModel.graphSettingsViewModel = new GraphSettingsViewModel({
         graph: viewModel.graph,
+        graphModel: viewModel.graphModel,
         ontologyClasses: viewModel.ontologyClasses,
         ontologies: viewModel.ontologies,
         ontologyClass: ko.observable(''),
