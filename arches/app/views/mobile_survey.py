@@ -124,7 +124,7 @@ class MobileSurveyManagerView(MapBaseManagerView):
         if mobile_survey_id is not None:
             ret = MobileSurvey.objects.get(pk=mobile_survey_id)
             ret.delete()
-            return JSONResponse(ret)
+            return JSONResponse({'success': True})
 
         return HttpResponseNotFound()
 

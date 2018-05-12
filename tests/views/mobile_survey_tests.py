@@ -169,8 +169,7 @@ class MobileSurveyTests(ArchesTestCase):
 
         post_data = JSONSerializer().serialize(post_data)
         content_type = 'application/x-www-form-urlencoded'
-        response = self.client.delete(url, post_data, content_type)
-        response_json = json.loads(response.content)
+        self.client.delete(url, post_data, content_type)
         couch = couchdb.Server(settings.COUCHDB_URL)
         self.assertFalse(MobileSurvey.objects.filter(pk=self.mobile_survey.id).exists())
         self.assertTrue('project_' + str(self.mobile_survey.id) not in couch)
