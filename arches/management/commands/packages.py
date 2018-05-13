@@ -265,15 +265,29 @@ class Command(BaseCommand):
                             print 'writing', output_file
                             f.write(graph_json)
 
+    def export_package_settings(self, dest_dir, force=False):
+        overwrite = True
+        projects_package_settings_file = os.path.join(settings.APP_ROOT, 'package_settings.py')
+        packages_package_settings_file = os.path.join(dest_dir, 'package_settings.py')
+        if os.path.exists(projects_package_settings_file):
+            if os.path.exists(packages_package_settings_file) and force == False:
+                resp = raw_input('"{0}" already exists in this directory. Overwrite? (Y/N): '.format('package_settings.py'))
+                if resp.lower() in ('t', 'true', 'y', 'yes'):
+                    overwrite = True
+                else:
+                    overwrite = False
+            if overwrite == True:
+                shutil.copy(projects_package_settings_file, dest_dir)
+
     def update_package(self, dest_dir, yes):
         if os.path.exists(os.path.join(dest_dir, 'package_config.json')):
             print 'Updating Resource Models'
             self.export_resource_graphs(os.path.join(dest_dir, 'graphs', 'resource_models'), yes)
         else:
             print "Could not update package. This directory does not have a package_config.json file. It cannot be verified as a package."
+        self.export_package_settings(dest_dir, yes)
 
     def create_package(self, dest_dir):
-
         if os.path.exists(dest_dir):
             print 'Cannot create package', dest_dir, 'already exists'
         else:
@@ -313,6 +327,8 @@ class Command(BaseCommand):
             except Exception as e:
                 print e
                 print "Could not save system settings"
+            self.export_package_settings(dest_dir, 'true')
+
 
     def load_package(self, source, setup_db=True, overwrite_concepts='ignore', stage_concepts='keep', yes=False):
 
@@ -335,8 +351,15 @@ class Command(BaseCommand):
 
         def load_package_settings(package_dir):
             if os.path.exists(os.path.join(package_dir, 'package_settings.py')):
-                package_settings = glob.glob(os.path.join(package_dir, 'package_settings.py'))[0]
-                shutil.copy(package_settings, settings.APP_ROOT)
+                update_package_settings = True
+                if os.path.exists(os.path.join(settings.APP_ROOT, 'package_settings.py')):
+                    if yes == False:
+                        response = raw_input('Overwrite current packages_settings.py? (Y/N): ')
+                        if response.lower() not in ('t', 'true', 'y', 'yes'):
+                            update_package_settings = False
+                    if update_package_settings == True:
+                        package_settings = glob.glob(os.path.join(package_dir, 'package_settings.py'))[0]
+                        shutil.copy(package_settings, settings.APP_ROOT)
 
         def load_resource_to_resource_constraints(package_dir):
             config_paths = glob.glob(os.path.join(package_dir, 'package_config.json'))
@@ -546,6 +569,7 @@ class Command(BaseCommand):
             if setup_db.lower() in ('t', 'true', 'y', 'yes'):
                 self.setup_db(settings.PACKAGE_NAME)
 
+        print 'loading package_settings.py'
         load_package_settings(package_location)
         print 'loading preliminary sql'
         load_preliminary_sql(package_location)
