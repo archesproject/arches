@@ -333,6 +333,10 @@ class Command(BaseCommand):
                     shutil.copy(system_settings, settings.SYSTEM_SETTINGS_LOCAL_PATH)
                     self.import_business_data(settings.SYSTEM_SETTINGS_LOCAL_PATH, overwrite=True)
 
+        def load_package_settings(package_dir):
+            if os.path.exists(os.path.join(package_dir, 'package_settings.py')):
+                package_settings = glob.glob(os.path.join(package_dir, 'package_settings.py'))[0]
+                shutil.copy(package_settings, settings.APP_ROOT)
 
         def load_resource_to_resource_constraints(package_dir):
             config_paths = glob.glob(os.path.join(package_dir, 'package_config.json'))
@@ -542,7 +546,7 @@ class Command(BaseCommand):
             if setup_db.lower() in ('t', 'true', 'y', 'yes'):
                 self.setup_db(settings.PACKAGE_NAME)
 
-
+        load_package_settings(package_location)
         print 'loading preliminary sql'
         load_preliminary_sql(package_location)
         print 'loading system settings'
