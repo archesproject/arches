@@ -92,11 +92,11 @@ class NewResourceEditorView(MapBaseManagerView):
 
         if resource_instance is None:
             tiles = []
-            displayname = 'New Resource'
+            displayname = _('New Resource')
         else:
             displayname = resource_instance.displayname
             if displayname == 'undefined':
-                displayname = 'Unnamed Resource'
+                displayname = _('Unnamed Resource')
             tiles = resource_instance.tilemodel_set.filter(nodegroup__in=nodegroups)
 
         map_layers = models.MapLayer.objects.all()

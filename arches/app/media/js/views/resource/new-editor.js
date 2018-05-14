@@ -99,7 +99,7 @@ define([
                     tile.data
                 );
                 _.each(handlers['tile-reset'], function (handler) {
-                    handler(req, tile);
+                    handler(tile);
                 });
             },
             getData: function () {
