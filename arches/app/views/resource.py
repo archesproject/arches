@@ -77,8 +77,9 @@ class NewResourceEditorView(MapBaseManagerView):
     def get(self, request, resourceid=None, view_template='views/resource/new-editor.htm', main_script='views/resource/new-editor', nav_menu=True):
         resource_instance = Resource.objects.get(pk=resourceid)
         nodes = resource_instance.graph.node_set.all()
-        cards = resource_instance.graph.cardmodel_set.order_by('sortorder').select_related('nodegroup').all().prefetch_related('cardxnodexwidget_set')
-        nodegroups = [card.nodegroup for card in cards]
+        nodegroups = [node.nodegroup for node in nodes if node.is_collector and request.user.has_perm('write_nodegroup', node.nodegroup)]
+        cards = resource_instance.graph.cardmodel_set.order_by('sortorder').select_related('nodegroup').filter(nodegroup__in=nodegroups).prefetch_related('cardxnodexwidget_set')
+        tiles = resource_instance.tilemodel_set.filter(nodegroup__in=nodegroups)
         cardwidgets = [widget for widgets in [card.cardxnodexwidget_set.order_by('sortorder').all() for card in cards] for widget in widgets]
         widgets = models.Widget.objects.all()
         card_components = models.CardComponent.objects.all()
@@ -103,7 +104,7 @@ class NewResourceEditorView(MapBaseManagerView):
             widgets_json=JSONSerializer().serialize(widgets),
             card_components=card_components,
             card_components_json=JSONSerializer().serialize(card_components),
-            tiles=JSONSerializer().serialize(resource_instance.tilemodel_set.all()),
+            tiles=JSONSerializer().serialize(tiles),
             cards=JSONSerializer().serialize(cards),
             nodegroups=JSONSerializer().serialize(nodegroups),
             nodes=JSONSerializer().serialize(nodes),
