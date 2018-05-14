@@ -294,9 +294,15 @@ define([
          });
 
          if (params.graph !== undefined) {
-             this.resourceIcon = params.graph.get('iconclass');
-             this.resourceName = params.graph.get('name');
-             this.graphId = params.graph.get('graphid')
+             if (params.graph.get) {
+                 this.resourceIcon = params.graph.get('iconclass');
+                 this.resourceName = params.graph.get('name');
+                 this.graphId = params.graph.get('graphid')
+             } else {
+                 this.resourceIcon = params.graph.iconclass;
+                 this.resourceName = params.graph.name;
+                 this.graphId = params.graph.graphid;
+             }
              this.featurePointSize(Number(this.featurePointSize()))
              this.featureLineWidth(Number(this.featureLineWidth()));
              this.featureColorCache = this.featureColor()
