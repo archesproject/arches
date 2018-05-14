@@ -18,6 +18,7 @@ define([
     var filter = ko.observable('');
     var loading = ko.observable(false);
     var selection = ko.observable();
+    var resourceId = ko.observable(data.resourceid);
     var cards = _.map(data.cards, function(card) {
         return _.extend(
             card,
@@ -148,6 +149,10 @@ define([
                         tile.parent.tiles.unshift(tile);
                         vm.selection(tile);
                     }
+                    if (!resourceId()) {
+                        tile.resourceinstance_id = tileData.resourceinstance_id;
+                        resourceId(tile.resourceinstance_id);
+                    }
                     _.each(handlers['after-update'], function (handler) {
                         handler(req, tile);
                     });
@@ -230,7 +235,7 @@ define([
                 }
                 return setupTile({
                     tileid: '',
-                    resourceinstance_id: data.resourceid,
+                    resourceinstance_id: resourceId(),
                     nodegroup_id: item.nodegroup_id,
                     parenttile_id: item.parent ? item.parent.tileid : null,
                     data: _.reduce(item.widgets, function (data, widget) {

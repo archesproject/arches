@@ -59,14 +59,16 @@ class TileData(View):
             json = request.POST.get('data', None)
             if json != None:
                 data = JSONDeserializer().deserialize(json)
+                if data['resourceinstance_id'] == '':
+                    data['resourceinstance_id'] = uuid.uuid4()
                 try:
                     models.ResourceInstance.objects.get(pk=data['resourceinstance_id'])
                 except ObjectDoesNotExist:
                     resource = Resource()
-                    resource.resourceinstanceid = data['resourceinstance_id']
                     graphid = models.Node.objects.filter(nodegroup=data['nodegroup_id'])[0].graph_id
                     resource.graph_id = graphid
                     resource.save(user=request.user)
+                    data['resourceinstance_id'] = resource.pk
                     resource.index()
                 tile_id = data['tileid']
                 if tile_id != None and tile_id != '':
