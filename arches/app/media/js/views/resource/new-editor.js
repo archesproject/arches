@@ -10,6 +10,10 @@ define([
     'widgets',
     'card-components'
 ], function($, _, ko, koMapping, BaseManagerView, arches, data) {
+    var handlers = {
+        'after-update': [],
+        'tile-reset': []
+    };
     var tiles = data.tiles;
     var filter = ko.observable('');
     var loading = ko.observable(false);
@@ -93,6 +97,9 @@ define([
                     JSON.parse(tile._tileData()),
                     tile.data
                 );
+                _.each(handlers['tile-reset'], function (handler) {
+                    handler(req, tile);
+                });
             },
             getData: function () {
                 var children = {};
@@ -133,7 +140,7 @@ define([
                     processData: false,
                     contentType: false,
                     data: tile.formData
-                }).done(function(tileData) {
+                }).done(function(tileData, status, req) {
                     ko.mapping.fromJS(tileData.data,tile.data);
                     tile._tileData(koMapping.toJSON(tile.data));
                     if (!tile.tileid) {
@@ -141,6 +148,9 @@ define([
                         tile.parent.tiles.unshift(tile);
                         vm.selection(tile);
                     }
+                    _.each(handlers['after-update'], function (handler) {
+                        handler(req, tile);
+                    });
                 }).fail(function(response) {
                     console.log('there was an error ', response);
                 }).always(function(){
@@ -239,7 +249,12 @@ define([
                 return item;
             }
         }),
-        filter: filter
+        filter: filter,
+        on: function (eventName, handler) {
+            if (handlers[eventName]) {
+                handlers[eventName].push(handler);
+            }
+        }
     };
 
     vm.selectionBreadcrumbs = ko.computed(function () {

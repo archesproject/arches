@@ -83,6 +83,11 @@ class NewResourceEditorView(MapBaseManagerView):
         widgets = models.Widget.objects.all()
         card_components = models.CardComponent.objects.all()
 
+        map_layers = models.MapLayer.objects.all()
+        map_markers = models.MapMarker.objects.all()
+        map_sources = models.MapSource.objects.all()
+        geocoding_providers = models.Geocoder.objects.all()
+
         displayname = resource_instance.displayname
         if displayname == 'undefined':
             displayname = 'Unnamed Resource'
@@ -103,6 +108,10 @@ class NewResourceEditorView(MapBaseManagerView):
             nodegroups=JSONSerializer().serialize(nodegroups),
             nodes=JSONSerializer().serialize(nodes),
             cardwidgets=JSONSerializer().serialize(cardwidgets),
+            map_layers=map_layers,
+            map_markers=map_markers,
+            map_sources=map_sources,
+            geocoding_providers = geocoding_providers,
         )
 
         context['nav']['title'] = ''
