@@ -536,7 +536,7 @@ class Graph(models.GraphModel):
 
     def clear_ontology_references(self):
         """
-        removes any references to ontolgoy classes and properties in a graph
+        removes any references to ontology classes and properties in a graph
 
         """
 

@@ -23,11 +23,17 @@ define([
         var srcJSON = JSON.stringify(koMapping.toJS(params.graph));
 
         self.graph = params.graph;
-
         self.node = params.node
         self.graph.name.subscribe(function(val){
             self.node().name(val);
         })
+
+        self.graphModel = params.graphModel;
+        self.nodes = self.graphModel.get('nodes');
+
+        self.nodeCount = ko.computed(function(){
+            return self.nodes().length
+        });
 
         var ontologyClass = params.node().ontologyclass;
 
