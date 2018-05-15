@@ -103,6 +103,7 @@ define(['jquery',
                 this.total(response.results.hits.total);
                 this.results.removeAll();
                 this.userRequestedNewPage(false);
+                response.results.aggregations.geo_aggs = response.results.aggregations.geo_aggs.inner.buckets[0]
                 this.aggregations(
                     _.extend(response.results.aggregations, {
                         results: response.results.hits.hits
