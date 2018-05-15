@@ -245,14 +245,17 @@ def build_search_results_dsl(request):
     else:
         limit = settings.SEARCH_ITEMS_PER_PAGE
 
+    permitted_nodegroups = get_permitted_nodegroups(request.user)
     query = Query(se, start=limit*int(page-1), limit=limit)
     nested_agg = NestedAgg(path='points', name='geo_aggs')
-    nested_agg.add_aggregation(GeoHashGridAgg(field='points.point', name='grid', precision=settings.HEX_BIN_PRECISION))
-    nested_agg.add_aggregation(GeoBoundsAgg(field='points.point', name='bounds'))
+    nested_agg_filter = FiltersAgg(name='inner')
+    nested_agg_filter.add_filter(Terms(field='points.nodegroup_id', terms=permitted_nodegroups))
+    nested_agg_filter.add_aggregation(GeoHashGridAgg(field='points.point', name='grid', precision=settings.HEX_BIN_PRECISION))
+    nested_agg_filter.add_aggregation(GeoBoundsAgg(field='points.point', name='bounds'))
+    nested_agg.add_aggregation(nested_agg_filter)
     query.add_aggregation(nested_agg)
 
     search_query = Bool()
-    permitted_nodegroups = get_permitted_nodegroups(request.user)
 
     if term_filter != '':
         for term in JSONDeserializer().deserialize(term_filter):
