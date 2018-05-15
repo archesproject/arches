@@ -1,20 +1,9 @@
-define([
-    'knockout',
-    'knockout-mapping'
-], function (ko, koMapping) {
+define(['knockout'], function (ko) {
     var viewModel = function(params) {
+        var self = this;
+        this.loading = params.loading || ko.observable(false);
         this.card = params.card;
-        this.tile = params.tile ? params.tile : {
-            parent: params.card,
-            expanded: ko.observable(true),
-            data: koMapping.fromJS(
-                _.reduce(this.card.widgets, function (data, widget) {
-                    data[widget.node_id] = null;
-                    return data;
-                }, {})
-            ),
-            formData: new FormData()
-        };
+        this.tile = params.tile;
         this.form = params.form;
         this.expanded = ko.observable(true);
     };

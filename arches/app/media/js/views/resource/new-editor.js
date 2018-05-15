@@ -1,16 +1,24 @@
 define([
+    'jquery',
     'underscore',
     'knockout',
     'knockout-mapping',
     'views/base-manager',
+    'arches',
     'resource-editor-data',
     'bindings/resizable-sidepanel',
     'widgets',
     'card-components'
-], function(_, ko, koMapping, BaseManagerView, data) {
+], function($, _, ko, koMapping, BaseManagerView, arches, data) {
+    var handlers = {
+        'after-update': [],
+        'tile-reset': []
+    };
     var tiles = data.tiles;
     var filter = ko.observable('');
+    var loading = ko.observable(false);
     var selection = ko.observable();
+    var resourceId = ko.observable(data.resourceid);
     var cards = _.map(data.cards, function(card) {
         return _.extend(
             card,
@@ -65,6 +73,11 @@ define([
     };
 
     var setupTile = function(tile, parent) {
+        tile._tileData = ko.observable(
+            koMapping.toJSON(tile.data)
+        );
+        tile.data = koMapping.fromJS(tile.data);
+
         return _.extend(tile, {
             parent: parent,
             cards: _.filter(cards, function(card) {
@@ -76,8 +89,94 @@ define([
             selected: ko.computed(function () {
                 return selection() === tile;
             }, this),
-            data: koMapping.fromJS(tile.data),
-            formData: new FormData()
+            formData: new FormData(),
+            dirty: ko.computed(function () {
+                return tile._tileData() !== koMapping.toJSON(tile.data);
+            }, this),
+            reset: function () {
+                ko.mapping.fromJS(
+                    JSON.parse(tile._tileData()),
+                    tile.data
+                );
+                _.each(handlers['tile-reset'], function (handler) {
+                    handler(req, tile);
+                });
+            },
+            getData: function () {
+                var children = {};
+                if (tile.cards) {
+                    children = _.reduce(tile.cards, function (tiles, card) {
+                        return tiles.concat(card.tiles());
+                    }, []).reduce(function (tileLookup, child) {
+                        tileLookup[child.tileid] = child.getData();
+                        return tileLookup;
+                    }, {});
+                }
+                var tileData = {};
+                if (tile.data) {
+                    tileData = koMapping.toJS(tile.data);
+                }
+                return {
+                    "tileid": tile.tileid,
+                    "data": tileData,
+                    "nodegroup_id": tile.nodegroup_id,
+                    "parenttile_id": tile.parenttile_id,
+                    "resourceinstance_id": tile.resourceinstance_id,
+                    "tiles": children
+                }
+            },
+            save: function () {
+                loading(true);
+                delete tile.formData.data;
+                tile.formData.append(
+                    'data',
+                    JSON.stringify(
+                        tile.getData()
+                    )
+                );
+
+                $.ajax({
+                    type: "POST",
+                    url: arches.urls.tile,
+                    processData: false,
+                    contentType: false,
+                    data: tile.formData
+                }).done(function(tileData, status, req) {
+                    ko.mapping.fromJS(tileData.data,tile.data);
+                    tile._tileData(koMapping.toJSON(tile.data));
+                    if (!tile.tileid) {
+                        tile.tileid = tileData.tileid;
+                        tile.parent.tiles.unshift(tile);
+                        vm.selection(tile);
+                    }
+                    if (!resourceId()) {
+                        tile.resourceinstance_id = tileData.resourceinstance_id;
+                        resourceId(tile.resourceinstance_id);
+                    }
+                    _.each(handlers['after-update'], function (handler) {
+                        handler(req, tile);
+                    });
+                }).fail(function(response) {
+                    console.log('there was an error ', response);
+                }).always(function(){
+                    loading(false);
+                });
+            },
+            deleteTile: function() {
+                loading(true);
+                $.ajax({
+                    type: "DELETE",
+                    url: arches.urls.tile,
+                    data: JSON.stringify(tile.getData())
+                }).done(function(response) {
+                    parent.tiles.remove(tile);
+                    selection(parent);
+                }).fail(function(response) {
+                    console.log('there was an error ', response);
+                }).always(function(){
+                    loading(false);
+                });
+            }
         });
     };
 
@@ -102,6 +201,7 @@ define([
         }, {});
     };
     var vm = {
+        loading: loading,
         widgetLookup: createLookup(data.widgets, 'widgetid'),
         cardComponentLookup: createLookup(data.cardComponents, 'componentid'),
         nodeLookup: createLookup(data.nodes, 'nodeid'),
@@ -129,8 +229,20 @@ define([
         selection: selection,
         selectedTile: ko.computed(function () {
             var item = selection();
-            if (item && item.tileid) {
-                return item;
+            if (item) {
+                if (item.tileid) {
+                    return item;
+                }
+                return setupTile({
+                    tileid: '',
+                    resourceinstance_id: resourceId(),
+                    nodegroup_id: item.nodegroup_id,
+                    parenttile_id: item.parent ? item.parent.tileid : null,
+                    data: _.reduce(item.widgets, function (data, widget) {
+                        data[widget.node_id] = null;
+                        return data;
+                    }, {})
+                }, item);
             }
         }),
         selectedCard: ko.computed(function () {
@@ -142,8 +254,25 @@ define([
                 return item;
             }
         }),
-        filter: filter
+        filter: filter,
+        on: function (eventName, handler) {
+            if (handlers[eventName]) {
+                handlers[eventName].push(handler);
+            }
+        }
     };
+
+    vm.selectionBreadcrumbs = ko.computed(function () {
+        var item = vm.selectedTile()
+        var crumbs = [];
+        if (item) {
+            while (item.parent) {
+                item = item.parent;
+                crumbs.unshift(item);
+            }
+        }
+        return crumbs;
+    });
 
     return new BaseManagerView({
         viewModel: vm

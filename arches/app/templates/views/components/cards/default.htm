@@ -1,27 +1,44 @@
 <div class="card-component">
+    <!-- ko if: card.parent -->
     <h4 data-bind="text: card.name"></h4>
     <h5 data-bind="text: card.description"></h5>
-    <hr>
+    <!-- /ko -->
     <div>
-        <form class="widgets" style="margin-bottom: 20px;" data-bind="foreach: {
-                data:card.widgets, as: 'widget'
-            }">
-            <div class='' data-bind='component: {
-                name: $parent.form.widgetLookup[widget.widget_id].name,
-                params: {
-                    formData: $parent.tile.formData,
-                    tile: $parent.tile,
-                    form: $parent.form,
-                    config: widget.config,
-                    label: widget.label,
-                    value: $parent.tile.data[widget.node_id],
-                    node: $parent.form.nodeLookup[widget.node_id],
-                    expanded: $parent.expanded,
-                    graph: $parent.form.graph,
-                    type: "resource-editor"
-                }
-            }'></div>
+        <form class="widgets" style="margin-bottom: 20px;">
+            <div data-bind="foreach: {
+                    data:card.widgets, as: 'widget'
+                }">
+                <div class='' data-bind='component: {
+                    name: $parent.form.widgetLookup[widget.widget_id].name,
+                    params: {
+                        formData: $parent.tile.formData,
+                        tile: $parent.tile,
+                        form: $parent.form,
+                        config: widget.config,
+                        label: widget.label,
+                        value: $parent.tile.data[widget.node_id],
+                        node: $parent.form.nodeLookup[widget.node_id],
+                        expanded: $parent.expanded,
+                        graph: $parent.form.graph,
+                        type: "resource-editor"
+                    }
+                }'></div>
+            </div>
         </form>
+        <div class="install-buttons">
+            <!-- ko if: tile.tileid -->
+            <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-trash" data-bind="click: tile.deleteTile">Delete</button>
+            <!-- /ko -->
+            <!-- ko if: tile.dirty() -->
+                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset">Cancel</button>
+                <!-- ko if: tile.tileid -->
+                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: tile.save">Save</button>
+                <!-- /ko -->
+            <!-- /ko -->
+            <!-- ko if: !tile.tileid -->
+            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: tile.save">Add</button>
+            <!-- /ko -->
+        </div>
 
     </div>
 </div>

@@ -23,11 +23,17 @@ define([
         var srcJSON = JSON.stringify(koMapping.toJS(params.graph));
 
         self.graph = params.graph;
-
         self.node = params.node
         self.graph.name.subscribe(function(val){
             self.node().name(val);
         })
+
+        self.graphModel = params.graphModel;
+        self.nodes = self.graphModel.get('nodes');
+
+        self.nodeCount = ko.computed(function(){
+            return self.nodes().length
+        });
 
         var ontologyClass = params.node().ontologyclass;
 
@@ -92,11 +98,13 @@ define([
 
         self.reset = function () {
             var graph = self.graph;
-            _.each(JSON.parse(srcJSON), function(value, key) {
+            var src = JSON.parse(srcJSON);
+            _.each(src, function(value, key) {
                 if (ko.isObservable(graph[key])) {
                     graph[key](value);
                 };
             });
+            self.ontologyClass(src.root.ontologyclass);
             JSON.parse(resourceJSON).forEach(function(jsonResource) {
                 var resource = _.find(self.resource_data(), function (resource) {
                     return resource.id === jsonResource.id;
