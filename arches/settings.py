@@ -310,7 +310,7 @@ MIDDLEWARE = [
     #'arches.app.utils.middleware.JWTAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    #'arches.app.utils.middleware.SetAnonymousUser',
+    'arches.app.utils.middleware.SetAnonymousUser',
 ]
 
 ROOT_URLCONF = 'arches.urls'
