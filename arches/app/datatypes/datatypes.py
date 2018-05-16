@@ -193,7 +193,7 @@ class DateDataType(BaseDataType):
 
         try:
             if hasattr(settings, 'DATE_IMPORT_EXPORT_FORMAT'):
-                v = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
+                v = datetime.strptime(str(value), settings.DATE_IMPORT_EXPORT_FORMAT)
                 value = str(datetime.strftime(v, '%Y-%m-%d'))
             else:
                 value = str(datetime(value).date())
