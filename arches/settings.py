@@ -271,6 +271,7 @@ TEMPLATES = [
 ]
 
 AUTHENTICATION_BACKENDS = (
+    'oauth2_provider.backends.OAuth2Backend',
     'django.contrib.auth.backends.ModelBackend', # this is default
     'guardian.backends.ObjectPermissionBackend',
     'arches.app.utils.permission_backend.PermissionBackend',
@@ -300,15 +301,16 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'arches.app.utils.middleware.TokenMiddleware',
+    #'arches.app.utils.middleware.TokenMiddleware',
     #'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'oauth2_provider.middleware.OAuth2TokenMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'arches.app.utils.middleware.JWTAuthenticationMiddleware',
+    #'arches.app.utils.middleware.JWTAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'arches.app.utils.middleware.SetAnonymousUser',
+    #'arches.app.utils.middleware.SetAnonymousUser',
 ]
 
 ROOT_URLCONF = 'arches.urls'

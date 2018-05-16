@@ -59,8 +59,8 @@ class LoginView(View):
     def post(self, request):
         # POST request is taken to mean user is logging in
         auth_attempt_success = None
-        username = request.POST['username']
-        password = request.POST['password']
+        username = request.POST.get('username', None)
+        password = request.POST.get('password', None)
         user = authenticate(username=username, password=password)
 
         if user is None:
@@ -71,7 +71,7 @@ class LoginView(View):
             except:
                 pass
 
-        next = request.GET.get('next', reverse('home'))
+        next = request.POST.get('next', reverse('home'))
         
         if user is not None and user.is_active:
             login(request, user)
