@@ -38,7 +38,7 @@ import logging
 from arches.app.utils.JSONResponse import JSONResponse
 
 
-def add_actor(observed_field, actor_field, data, user):
+def add_actor( observed_field, actor_field, data, user):
     observed = data[observed_field]
     for nodes_obj in observed:
         actor_found = False
@@ -48,11 +48,15 @@ def add_actor(observed_field, actor_field, data, user):
                 actor_found = True
                 
         if not actor_found :
-            nodes.append({
-                "entityid": "",
-                "entitytypeid": actor_field,
-                "value": user.first_name + ' ' + user.last_name,
-            })
+            try:
+                #If the node already has a UUID but doesn't have an actor, do not populate it from the current user
+                uuid.UUID(node['entityid'])
+            except(ValueError):
+                nodes.append({
+                    "entityid": "",
+                    "entitytypeid": actor_field,
+                    "value": user.first_name + ' ' + user.last_name
+                })
         
     return data
 
@@ -306,9 +310,9 @@ class ArchaeologicalAssessmentForm(ResourceForm):
         }
 
     def update(self, data, files):
-        data = add_actor('DATE_INFERENCE_MAKING.I5', 'DATE_INFERENCE_MAKING_ACTOR_NAME.E41', data, self.user)
-        data = add_actor('FEATURE_ASSIGNMENT.E13', 'FEATURE_ASSIGNMENT_INVESTIGATOR_NAME.E41', data, self.user)
-        data = add_actor('FUNCTION_INTERPRETATION_INFERENCE_MAKING.I5', 'FUNCTION_INTERPRETATION_INFERENCE_MAKING_ACTOR_NAME.E41', data, self.user)
+        data = add_actor( 'DATE_INFERENCE_MAKING.I5', 'DATE_INFERENCE_MAKING_ACTOR_NAME.E41', data, self.user)
+        data = add_actor( 'FEATURE_ASSIGNMENT.E13', 'FEATURE_ASSIGNMENT_INVESTIGATOR_NAME.E41', data, self.user)
+        data = add_actor( 'FUNCTION_INTERPRETATION_INFERENCE_MAKING.I5', 'FUNCTION_INTERPRETATION_INFERENCE_MAKING_ACTOR_NAME.E41', data, self.user)
         
         self.update_nodes('ARCHAEOLOGICAL_CERTAINTY_OBSERVATION.S4', data)
         self.update_nodes('DATE_INFERENCE_MAKING.I5', data)
