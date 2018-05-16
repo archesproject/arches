@@ -7,6 +7,7 @@ define([
     'arches',
     'resource-editor-data',
     'bindings/resizable-sidepanel',
+    'bindings/sortable',
     'widgets',
     'card-components'
 ], function($, _, ko, koMapping, BaseManagerView, arches, data) {
@@ -102,6 +103,16 @@ define([
                     handler(tile);
                 });
             },
+            getAttributes: function () {
+                var tileData = tile.data ? koMapping.toJS(tile.data) : {};
+                return {
+                    "tileid": tile.tileid,
+                    "data": tileData,
+                    "nodegroup_id": tile.nodegroup_id,
+                    "parenttile_id": tile.parenttile_id,
+                    "resourceinstance_id": tile.resourceinstance_id
+                }
+            },
             getData: function () {
                 var children = {};
                 if (tile.cards) {
@@ -112,18 +123,9 @@ define([
                         return tileLookup;
                     }, {});
                 }
-                var tileData = {};
-                if (tile.data) {
-                    tileData = koMapping.toJS(tile.data);
-                }
-                return {
-                    "tileid": tile.tileid,
-                    "data": tileData,
-                    "nodegroup_id": tile.nodegroup_id,
-                    "parenttile_id": tile.parenttile_id,
-                    "resourceinstance_id": tile.resourceinstance_id,
+                return _.extend(tile.getAttributes(), {
                     "tiles": children
-                }
+                });
             },
             save: function () {
                 loading(true);
@@ -259,6 +261,25 @@ define([
             if (handlers[eventName]) {
                 handlers[eventName].push(handler);
             }
+        },
+        beforeMove: function (e) {
+            e.cancelDrop = (e.sourceParent!==e.targetParent);
+        },
+        reorderTiles: function (e) {
+            loading(true);
+            var tiles = _.map(e.sourceParent(), function(tile) {
+                return tile.getAttributes();
+            });
+            $.ajax({
+                type: "POST",
+                data: JSON.stringify({
+                    tiles: tiles
+                }),
+                url: arches.urls.reorder_tiles,
+                complete: function(response) {
+                    loading(false);
+                }
+            });
         }
     };
 
