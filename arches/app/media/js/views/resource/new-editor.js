@@ -337,7 +337,7 @@ define([
         viewEditHistory: function () {
             if (resourceId()) {
                 vm.menuActive(false);
-                vm.navigate(arches.urls.resource_edit_log + resourceId());
+                vm.navigate(arches.urls.get_resource_edit_log(resourceId()));
             }
         },
         viewReport: function () {
