@@ -21,6 +21,16 @@ define([
     var loading = ko.observable(false);
     var selection = ko.observable();
     var resourceId = ko.observable(data.resourceid);
+
+    var updateDisplayName = function () {
+        $.get(
+            arches.urls.resource_descriptors + resourceId(),
+            function (descriptors) {
+                vm.displayname(descriptors.displayname);
+            }
+        );
+    };
+
     var cards = _.map(data.cards, function(card) {
         return _.extend(
             card,
@@ -159,12 +169,7 @@ define([
                     _.each(handlers['after-update'], function (handler) {
                         handler(req, tile);
                     });
-                    $.get(
-                        arches.urls.resource_descriptors + resourceId(),
-                        function (descriptors) {
-                            vm.displayname(descriptors.displayname);
-                        }
-                    );
+                    updateDisplayName();
                 }).fail(function(response) {
                     console.log('there was an error ', response);
                 }).always(function(){
@@ -285,6 +290,7 @@ define([
                 url: arches.urls.reorder_tiles,
                 complete: function(response) {
                     loading(false);
+                    updateDisplayName();
                 }
             });
         },
