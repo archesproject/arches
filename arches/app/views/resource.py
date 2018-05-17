@@ -124,6 +124,7 @@ class NewResourceEditorView(MapBaseManagerView):
             map_markers=map_markers,
             map_sources=map_sources,
             geocoding_providers = geocoding_providers,
+            active_report_count = models.Report.objects.filter(graph=graph, active=True).count(),
         )
 
         context['nav']['title'] = ''

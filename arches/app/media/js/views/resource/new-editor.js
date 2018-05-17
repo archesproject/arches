@@ -4,13 +4,14 @@ define([
     'knockout',
     'knockout-mapping',
     'views/base-manager',
+    'viewmodels/alert',
     'arches',
     'resource-editor-data',
     'bindings/resizable-sidepanel',
     'bindings/sortable',
     'widgets',
     'card-components'
-], function($, _, ko, koMapping, BaseManagerView, arches, data) {
+], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, arches, data) {
     var handlers = {
         'after-update': [],
         'tile-reset': []
@@ -286,6 +287,64 @@ define([
                     loading(false);
                 }
             });
+        },
+        resourceId: resourceId,
+        copyResource: function () {
+            if (resourceId()) {
+                vm.menuActive(false);
+                loading(true);
+                $.ajax({
+                    type: "GET",
+                    url: arches.urls.resource_copy.replace('//', '/' + resourceId() + '/'),
+                    success: function(response) {
+                        vm.alert(new AlertViewModel('ep-alert-blue', arches.resourceCopySuccess.title, '', null, function(){}));
+                    },
+                    error: function(response) {
+                        vm.alert(new AlertViewModel('ep-alert-red', arches.resourceCopyFailed.title, arches.resourceCopyFailed.text, null, function(){}));
+                    },
+                    complete: function (request, status) {
+                        loading(false);
+                    },
+                });
+            }
+        },
+        deleteResource: function () {
+            if (resourceId()) {
+                vm.menuActive(false);
+                vm.alert(new AlertViewModel('ep-alert-red', arches.confirmResourceDelete.title, arches.confirmResourceDelete.text, function() {
+                    return;
+                }, function(){
+                    loading(true);
+                    $.ajax({
+                        type: "DELETE",
+                        url: arches.urls.resource_editor + resourceId(),
+                        success: function(response) {
+
+                        },
+                        error: function(response) {
+
+                        },
+                        complete: function (request, status) {
+                            loading(false);
+                            if (status === 'success') {
+                                vm.navigate(arches.urls.resource);
+                            }
+                        },
+                    });
+                }));
+            }
+        },
+        viewEditHistory: function () {
+            if (resourceId()) {
+                vm.menuActive(false);
+                vm.navigate(arches.urls.resource_edit_log + resourceId());
+            }
+        },
+        viewReport: function () {
+            if (resourceId()) {
+                vm.menuActive(false);
+                vm.navigate(arches.urls.resource_report + resourceId());
+            }
         }
     };
 
