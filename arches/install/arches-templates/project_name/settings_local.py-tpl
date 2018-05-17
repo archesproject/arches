@@ -6,6 +6,8 @@ import os
 
 #ADMIN_MEDIA_PREFIX = '/media/admin/'
 
+#ANALYSIS_COORDINATE_SYSTEM_SRID = 3857
+
 #ANONYMOUS_USER_NAME = None
 
 #APP_NAME = 'Arches'
