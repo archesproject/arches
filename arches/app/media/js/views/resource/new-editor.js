@@ -158,6 +158,12 @@ define([
                     _.each(handlers['after-update'], function (handler) {
                         handler(req, tile);
                     });
+                    $.get(
+                        arches.urls.resource_descriptors + resourceId(),
+                        function (descriptors) {
+                            vm.displayname(descriptors.displayname);
+                        }
+                    );
                 }).fail(function(response) {
                     console.log('there was an error ', response);
                 }).always(function(){
