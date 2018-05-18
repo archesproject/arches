@@ -14,7 +14,7 @@ For developers interested in installing Arches or in more technical, visit [this
 
 Issue reports are encouraged.  [Please read this article](http://polite.technology/reportabug.html) before reporting issues.
 
-[Version 4.1.0 release notes](https://github.com/archesproject/arches/blob/stable/4.1.x/docs/releases/4.1.0.md)
+[Version 4.1.1 release notes](https://github.com/archesproject/arches/blob/stable/4.1.x/releases/4.1.1.md)
 
 #### Quick Install
 
