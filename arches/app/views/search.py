@@ -317,29 +317,31 @@ def build_search_results_dsl(request):
     nested_agg = NestedAgg(path='points', name='geo_aggs')
     nested_agg_filter = FiltersAgg(name='inner')
 
+    permitted_nodegroups = get_permitted_nodegroups(request.user)
+    geo_agg_filter = Bool()
+
     if include_provisional == True:
-        nested_agg_filter.add_filter(Terms(field='points.provisional', terms=['false','true']))
+        geo_agg_filter.filter(Terms(field='points.provisional', terms=['false','true']))
 
     else:
         provisional_resource_filter = Bool()
 
         if include_provisional == False:
             provisional_resource_filter.filter(Terms(field='provisional', terms=['false', 'partial']))
-            nested_agg_filter.add_filter(Terms(field='points.provisional', terms=['false']))
+            geo_agg_filter.filter(Terms(field='points.provisional', terms=['false']))
 
         elif include_provisional == 'only provisional':
             provisional_resource_filter.filter(Terms(field='provisional', terms=['true', 'partial']))
-            nested_agg_filter.add_filter(Terms(field='points.provisional', terms=['true']))
+            geo_agg_filter.filter(Terms(field='points.provisional', terms=['true']))
 
         search_query.must(provisional_resource_filter)
 
-
+    geo_agg_filter.filter(Terms(field='points.nodegroup_id', terms=permitted_nodegroups))
+    nested_agg_filter.add_filter(geo_agg_filter)
     nested_agg_filter.add_aggregation(GeoHashGridAgg(field='points.point', name='grid', precision=settings.HEX_BIN_PRECISION))
     nested_agg_filter.add_aggregation(GeoBoundsAgg(field='points.point', name='bounds'))
     nested_agg.add_aggregation(nested_agg_filter)
     query.add_aggregation(nested_agg)
-
-    permitted_nodegroups = get_permitted_nodegroups(request.user)
 
     if term_filter != '':
         for term in JSONDeserializer().deserialize(term_filter):
@@ -519,7 +521,6 @@ def build_search_results_dsl(request):
     query.add_query(search_query)
     if search_buffer != None:
         search_buffer = search_buffer.geojson
-
     return {'query': query, 'search_buffer':search_buffer}
 
 def get_permitted_nodegroups(user):
