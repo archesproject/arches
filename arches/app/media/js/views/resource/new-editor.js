@@ -353,6 +353,8 @@ define([
             }
         }
     };
+    var topCard = vm.topCards[0];
+    selection(topCard.tiles().length > 0 ? topCard.tiles()[0] : topCard);
 
     vm.selectionBreadcrumbs = ko.computed(function () {
         var item = vm.selectedTile()
