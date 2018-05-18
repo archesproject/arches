@@ -54,7 +54,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
             <!-- Survey Listing Panel-->
-            <div id="user-grid" class="grid" style="position: relative; height: 0px; margin-left: -7px; display:none;" data-bind="visible: true">
+            <div id="user-grid" class="grid" style="position: relative;" data-bind="visible: true">
 
                 <!-- ko if: mobilesurveys().length ===  0 -->
                 <div id="default-message-panel" class="left-column-message" style="">
@@ -66,7 +66,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- /ko -->
 
                 <!-- ko if: mobilesurveys().length >  0 -->
-                <div id="project-listing-panel" class="library-card library-card-entry library-card-wide selected" style="width: 270px;">
+                <div id="project-listing-panel" class="library-card-entry library-card-wide selected" style="width: 270px;">
                     <!-- ko foreach: filteredMobileSurveys() -->
                     <div class="library-card selected selected-card" data-bind="css: {'selected-card': $parent.selectedMobileSurvey()===$data, 'inactive': !active()}, click: function (p) { $parent.selectedMobileSurvey(null);$parent.selectedMobileSurvey(p); }" style="width: 270px;">
                         <div class="mpm-project-card">
