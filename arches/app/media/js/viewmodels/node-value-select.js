@@ -12,12 +12,11 @@ define([
         this.multiple = params.multiple || false;
 
         WidgetViewModel.apply(this, [params]);
-
+        this.resourceinstanceid = params.tile.resourceinstance_id
         this.tiles = ko.observableArray();
         var updateTiles = function() {
             var nodeid = params.node.config.nodeid();
-            var resourceId = window.location.pathname.split('/');
-            resourceId = resourceId[resourceId.length-1]
+            var resourceId = self.resourceinstanceid();
             var url = arches.urls.resource_tiles.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', resourceId);
             if (nodeid) {
                 $.ajax({
@@ -28,6 +27,9 @@ define([
                     },
                     success: function(data) {
                         self.tiles(data.tiles);
+                    },
+                    error: function(err) {
+                        console.log(err, 'unable to fetch tiles');
                     }
                 });
             }

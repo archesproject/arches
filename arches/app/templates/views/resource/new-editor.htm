@@ -94,40 +94,45 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </a>
                         </li>
                         <!-- /ko -->
-                        <!-- ko foreach: card.tiles() -->
-                        <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (cards.length > 0 && expanded), 'jstree-closed' : (cards.length > 0 && !expanded()), 'jstree-leaf': cards.length === 0}">
-                            <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){expanded(!expanded())}"></i>
-                            <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { self.selection($data) }, css:{'jstree-clicked': selected}">
-                                <i class="fa fa-file" role="presentation"></i>
-                                <strong style="margin-right: 10px;" data-bind="css:{'filtered': card.highlight()}">
-                                    <!-- ko if: card.widgets.length > 0 -->
-                                    <span data-bind="text: card.widgets[0].label"></span>:
-                                    <div style="display: inline;" data-bind="component: {
-                                        name: self.widgetLookup[card.widgets[0].widget_id].name,
-                                        params: {
-                                            tile: $data,
-                                            node: self.nodeLookup[card.widgets[0].node_id],
-                                            config: self.widgetLookup[card.widgets[0].widget_id].config,
-                                            label: self.widgetLookup[card.widgets[0].widget_id].label,
-                                            value: $data.data[card.widgets[0].node_id],
-                                            type: 'resource-editor',
-                                            state: 'display_value'
-                                        }
+                        <div data-bind="sortable: {
+                            data: card.tiles,
+                            beforeMove: self.beforeMove,
+                            afterMove: self.reorderTiles
+                        }">
+                            <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (cards.length > 0 && expanded), 'jstree-closed' : (cards.length > 0 && !expanded()), 'jstree-leaf': cards.length === 0}">
+                                <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){expanded(!expanded())}"></i>
+                                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { self.selection($data) }, css:{'jstree-clicked': selected}">
+                                    <i class="fa fa-file" role="presentation"></i>
+                                    <strong style="margin-right: 10px;" data-bind="css:{'filtered': card.highlight()}">
+                                        <!-- ko if: card.widgets.length > 0 -->
+                                        <span data-bind="text: card.widgets[0].label"></span>:
+                                        <div style="display: inline;" data-bind="component: {
+                                            name: self.widgetLookup[card.widgets[0].widget_id].name,
+                                            params: {
+                                                tile: $data,
+                                                node: self.nodeLookup[card.widgets[0].node_id],
+                                                config: self.widgetLookup[card.widgets[0].widget_id].config,
+                                                label: self.widgetLookup[card.widgets[0].widget_id].label,
+                                                value: $data.data[card.widgets[0].node_id],
+                                                type: 'resource-editor',
+                                                state: 'display_value'
+                                            }
+                                        }"></div>
+                                        <!-- /ko -->
+                                        <!-- ko if: card.widgets.length === 0 -->
+                                        <span data-bind="text: card.name"></span>
+                                        <!-- /ko -->
+                                    </strong>
+                                </a>
+                                <ul class="jstree-children" aria-expanded="true" data-bind="if: cards.length > 0">
+                                    <div data-bind="template: {
+                                        name: 'card-tree',
+                                        foreach: cards,
+                                        as: 'card'
                                     }"></div>
-                                    <!-- /ko -->
-                                    <!-- ko if: card.widgets.length === 0 -->
-                                    <span data-bind="text: card.name"></span>
-                                    <!-- /ko -->
-                                </strong>
-                            </a>
-                            <ul class="jstree-children" aria-expanded="true" data-bind="if: cards.length > 0">
-                                <div data-bind="template: {
-                                    name: 'card-tree',
-                                    foreach: cards,
-                                    as: 'card'
-                                }"></div>
-                            </ul>
-                        </li>
+                                </ul>
+                            </li>
+                        </div>
                         <!-- /ko -->
                     </ul>
                 </li>
