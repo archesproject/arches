@@ -227,7 +227,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                         attr: {
                                                             href: disable_instance_creation ? '#' : ('{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' %}'.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', UUID.generate ).replace('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', graphid))
                                                         }">
-                                                        <i class="fa arches-menu-icon" data-bind="css: iconclass"></i> <span data-bind="text:name"></span></a>
+                                                        <i class="fa arches-menu-icon" data-bind="css: iconclass || 'fa fa-question'"></i> <span data-bind="text:name"></span></a>
                                                 </li>
                                                 <!-- /ko -->
                                             </ul>
