@@ -11,9 +11,13 @@
     color: #337A89;
 }
 
+.jstree.jstree-default {
+    background: #fbfbfb;
+}
+
 .filtered {
     font-weight: bold;
-    color: brown;
+    color: steelblue;
 }
 
 .jstree-node,
@@ -50,14 +54,14 @@
 .jstree-anchor,
 .jstree-anchor:link,
 .jstree-anchor:visited,
-.jstree-anchor:hover,
 .jstree-anchor:active {
     text-decoration: none;
-    color: inherit;
+    color: #7a878e;
 }
 
 .jstree-anchor:hover {
-    background-color: #f8f8f8;
+    background-color: rgba(105,132,160,0.15);
+    color: #425965;
 }
 
 .jstree-icon {
@@ -150,7 +154,8 @@
 }
 
 .jstree-default .jstree-clicked {
-    background: #8ab3c5;
+    background: #25476a;
+    color: #fff;
     border-radius: 2px;
     box-shadow: inset 0 0 1px #999999;
 }
@@ -163,12 +168,12 @@
     font: normal normal normal 14px/1 FontAwesome;
     color: white;
     display: inline-block;
-    width: 25px;
-    height: 25px;
+    width: 23px;
+    height: 23px;
     padding: 4px 4px 4px 6px;
     background-color: #0b2342;
-    border: 1px solid #253571;
-    border-radius: 3px;
+    border-radius: 2px;
+    margin-right: -2px;
 }
 
 .jstree-default .jstree-no-icons .jstree-anchor>.jstree-themeicon {
@@ -225,21 +230,21 @@
 }
 
 .jstree-default .jstree-node {
-    min-height: 32px;
-    line-height: 32px;
-    margin-left: 22px;
-    min-width: 32px;
+    min-height: 28px;
+    line-height: 28px;
+    margin-left: 28px;
+    min-width: 28px;
 }
 
 .jstree-default .jstree-anchor {
-    line-height: 32px;
-    height: 32px;
+    line-height: 28px;
+    height: 28px;
 }
 
 .jstree-default .jstree-icon {
-    width: 32px;
-    height: 32px;
-    line-height: 32px;
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
 }
 
 .jstree-default .jstree-icon:empty {
