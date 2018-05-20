@@ -2120,12 +2120,16 @@ ul.nav.nav-tabs.nav-justified {
 
 .graph-settings-panel-body .widgets .widget-container div div > input {
     max-width: 700px;
-    min-width: 500px;
+    min-width: 450px;
 }
 
 .graph-settings-panel-body .widgets .widget-container div .colorpicker-component {
     max-width: 250px;
     min-width: 250px;
+}
+
+.graph-settings-panel-body .widgets .widget-container div div div div div select .chosen-container {
+    width: 500px;
 }
 
 .node-subtitle {
@@ -5869,15 +5873,16 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .node-form.node-name {
     font-size: 13px;
-    color: #333;
-    font-weight: 600;
-    margin-top: 0;
+    color: #777;
+    margin-top: 1px;
     display: inline;
     padding-right: 5px;
 }
 
 .node-form.ontology {
     padding-right: 5px;
+    font-size: 14px;
+    font-weight: 600;
 }
 
 .node-form-container {
@@ -5886,12 +5891,13 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .node-semantic-description {
     display: flex;
-    padding: 10px;
-    margin-bottom: 15px;
+    height: 75px;
+    padding: 25px 20px;
     border-style: solid;
     border-width: 1px;
     border-color: #ccc;
-    background-color: #fcfcfc;
+    background-color: #f9f9f9;
+    min-width: 900px;
 }
 
 .node-name-report {
