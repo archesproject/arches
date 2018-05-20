@@ -2076,7 +2076,7 @@ ul.nav.nav-tabs.nav-justified {
 }
 
 .settings-panel {
-    padding: 10px 20px 25px 20px;
+    padding: 10px 20px 25px 25px;
 }
 
 .settings-panel-heading {
@@ -2116,6 +2116,16 @@ ul.nav.nav-tabs.nav-justified {
 
 .graph-settings-panel-body {
     padding: 5px 0px;
+}
+
+.graph-settings-panel-body .widgets .widget-container div div > input {
+    max-width: 700px;
+    min-width: 500px;
+}
+
+.graph-settings-panel-body .widgets .widget-container div .colorpicker-component {
+    max-width: 250px;
+    min-width: 250px;
 }
 
 .node-subtitle {
