@@ -32,6 +32,7 @@
 
 .jstree-container-ul {
     margin: 10px 0;
+    padding-bottom: 40px;
 }
 
 .jstree-node {
@@ -176,6 +177,22 @@
     margin-right: -2px;
 }
 
+.jstree-anchor.jstree-addnew {
+    background: rgba(95,218,184,0.85);
+    color: #fff;
+    cursor: pointer;
+}
+
+.jstree-anchor.jstree-addnew:hover {
+    background: #3acaa1;
+    color: #fff;
+}
+
+.jstree-anchor.jstree-addnew:active {
+    background: #3acaa1;
+    color: #fff;
+}
+
 .jstree-default .jstree-no-icons .jstree-anchor>.jstree-themeicon {
     display: none;
 }
@@ -237,8 +254,8 @@
 }
 
 .jstree-default .jstree-anchor {
-    line-height: 28px;
-    height: 28px;
+    line-height: 26px;
+    height: 26px;
 }
 
 .jstree-default .jstree-icon {

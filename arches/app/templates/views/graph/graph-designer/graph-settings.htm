@@ -2,76 +2,77 @@
 
 <div style="overflow-y: auto">
     <div id="external-page-content">
-        <div style="padding: 12px;">
-            <div>
-                <div class="panel-heading">
-                    <div class="graph-designer-title"><i data-bind='css: graph.iconclass'></i><div class="name" data-bind='text: graph.name'></div></div>
-                </div>
-
-                <div class="graph-designer-header">{% trans 'Resource Model Identifiers' %}</div>
-
-                <!-- Data Entry -->
-                <div class="panel-body card-body fade in">
-                    <div id="cards" class="">
-                    <form class="widgets">
-                        <div class="row widget-container">
-                            <div class="form-group">
-                                <div class="relative">
-                                    <label class="col-xs-12 control-label widget-input-label">
-                                        {% trans "Name" %}
-
-                                    </label>
-                                </div>
-
-                                <div class="col-xs-12">
-                                    <input placeholder="{% trans "Name" %}" class="form-control input-lg widget-input" data-bind="value:graph.name, valueUpdate: 'keyup'">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row widget-container">
-                            <div class="form-group">
-                                <div class="relative">
-                                    <label class="col-xs-12 control-label widget-input-label"> {% trans "Subtitle" %} </label>
-                                </div>
-
-                                <div class="col-xs-12">
-                                    <input placeholder="{% trans "Subtitle" %}" class="form-control input-lg widget-input" data-bind="value:graph.subtitle, valueUpdate: 'keyup'">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row widget-container">
-                            <div class="form-group">
-                                <div class="relative">
-                                    <label class="col-xs-12 control-label widget-input-label"> {% trans "Ontology" %} </label>
-                                </div>
-
-                                <div class="col-xs-12">
-                                    <select class="design" data-bind="attr: {'disabled': graphSettingsViewModel.nodeCount() > 1 }, value: graph.ontology_id, valueAllowUnset: true, options: ontologies, optionsText: 'name', optionsValue:'ontologyid', optionsCaption: '{% trans "No ontology" %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row widget-container" data-bind="if: graph.ontology_id()">
-                            <div class="form-group">
-                                <div class="relative">
-                                    <label class="col-xs-12 control-label widget-input-label"> {% trans "Root Class" %} </label>
-                                </div>
-
-                                <div class="col-xs-12">
-                                    <select class="design" data-bind="attr: {'disabled': graphSettingsViewModel.nodeCount() > 1 }, value: graphSettingsViewModel.ontologyClass, valueAllowUnset: false, options: ontologyClasses, optionsText: 'display', optionsValue:'source', chosen: {disable_search_threshold: 10, width: '100%', search_contains: true}"></select>
-                                </div>
-                            </div>
-                        </div>
-
-                    </form>
+        <div class="settings-panel">
+            
+            <div class="settings-panel-heading">
+                <div class="graph-designer-title">
+                    <i data-bind='css: graph.iconclass'></i><div class="name" data-bind='text: graph.name'></div>
                 </div>
             </div>
 
+            <div class="graph-designer-header">{% trans 'Resource Model Identifiers' %}</div>
 
+            <!-- Data Entry -->
+            <div class="graph-settings-panel-body fade in">
+                <div id="cards" class="">
+                <form class="widgets">
+                    <div class="row widget-container">
+                        <div class="form-group">
+                            <div class="relative">
+                                <label class="col-xs-12 control-label widget-input-label">
+                                    {% trans "Name" %}
+
+                                </label>
+                            </div>
+
+                            <div class="col-xs-12">
+                                <input placeholder="{% trans "Name" %}" class="form-control input-lg widget-input" data-bind="value:graph.name, valueUpdate: 'keyup'">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row widget-container">
+                        <div class="form-group">
+                            <div class="relative">
+                                <label class="col-xs-12 control-label widget-input-label"> {% trans "Subtitle" %} </label>
+                            </div>
+
+                            <div class="col-xs-12">
+                                <input placeholder="{% trans "Subtitle" %}" class="form-control input-lg widget-input" data-bind="value:graph.subtitle, valueUpdate: 'keyup'">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row widget-container">
+                        <div class="form-group">
+                            <div class="relative">
+                                <label class="col-xs-12 control-label widget-input-label"> {% trans "Ontology" %} </label>
+                            </div>
+
+                            <div class="col-xs-12">
+                                <select class="design" data-bind="attr: {'disabled': graphSettingsViewModel.nodeCount() > 1 }, value: graph.ontology_id, valueAllowUnset: true, options: ontologies, optionsText: 'name', optionsValue:'ontologyid', optionsCaption: '{% trans "No ontology" %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row widget-container" data-bind="if: graph.ontology_id()">
+                        <div class="form-group">
+                            <div class="relative">
+                                <label class="col-xs-12 control-label widget-input-label"> {% trans "Root Class" %} </label>
+                            </div>
+
+                            <div class="col-xs-12">
+                                <select class="design" data-bind="attr: {'disabled': graphSettingsViewModel.nodeCount() > 1 }, value: graphSettingsViewModel.ontologyClass, valueAllowUnset: false, options: ontologyClasses, optionsText: 'display', optionsValue:'source', chosen: {disable_search_threshold: 10, width: '100%', search_contains: true}"></select>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            
             <div class="graph-designer-header">{% trans 'Configuration' %}</div>
-            <div class="panel-body card-body fade in">
+
+            <div class="graph-settings-panel-body fade">
 
                 <div id="meta-card">
                     <div class="panel-body card-panel-body">
