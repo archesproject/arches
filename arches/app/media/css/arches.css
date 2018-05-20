@@ -2080,7 +2080,7 @@ ul.nav.nav-tabs.nav-justified {
 }
 
 .settings-panel-heading {
-    height: 50px;
+    height: 45px;
     margin-top: -10px;
 }
 
@@ -2111,6 +2111,14 @@ ul.nav.nav-tabs.nav-justified {
     font-size: 16px;
     padding-bottom: 5px;
     border-bottom: solid 1px #ddd;
+}
+
+.columns label.form-checkbox.form-normal:before, .form-radio.form-normal::before {
+    left: 1px;
+}
+
+.form-radio.form-normal::before  {
+    left: 0px;
 }
 
 
