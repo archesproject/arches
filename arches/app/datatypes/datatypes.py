@@ -13,6 +13,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.date_utils import ExtendedDateFormat
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Exists, RangeDSLException
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from django.core.cache import cache
 from django.utils.translation import ugettext as _
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
@@ -192,7 +193,7 @@ class DateDataType(BaseDataType):
 
         try:
             if hasattr(settings, 'DATE_IMPORT_EXPORT_FORMAT'):
-                v = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
+                v = datetime.strptime(str(value), settings.DATE_IMPORT_EXPORT_FORMAT)
                 value = str(datetime.strftime(v, '%Y-%m-%d'))
             else:
                 value = str(datetime(value).date())
@@ -224,6 +225,10 @@ class DateDataType(BaseDataType):
         except KeyError, e:
             pass
 
+    def after_update_all(self):
+        config = cache.get('time_wheel_config_anonymous')
+        if config is not None:
+            cache.delete('time_wheel_config_anonymous')
 
 class EDTFDataType(BaseDataType):
 
@@ -514,7 +519,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         elif node.config is None:
             return None
         count = models.TileModel.objects.filter(data__has_key=str(node.nodeid)).count()
-        if not preview and count < 1 or not node.config["layerActivated"]:
+        if not preview and (count < 1 or not node.config["layerActivated"]):
             return None
 
         source_name = "resources-%s" % node.nodeid

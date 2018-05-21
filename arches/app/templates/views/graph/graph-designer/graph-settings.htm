@@ -19,7 +19,7 @@
                                 <div class="relative">
                                     <label class="col-xs-12 control-label widget-input-label">
                                         {% trans "Name" %}
-                                        <i class="ion-ios-checkmark-outline"></i>
+
                                     </label>
                                 </div>
 
@@ -32,7 +32,7 @@
                         <div class="row widget-container">
                             <div class="form-group">
                                 <div class="relative">
-                                    <label class="col-xs-12 control-label widget-input-label"> {% trans "Subtitle" %} <i class="ion-ios-checkmark-outline"></i></label>
+                                    <label class="col-xs-12 control-label widget-input-label"> {% trans "Subtitle" %} </label>
                                 </div>
 
                                 <div class="col-xs-12">
@@ -44,11 +44,11 @@
                         <div class="row widget-container">
                             <div class="form-group">
                                 <div class="relative">
-                                    <label class="col-xs-12 control-label widget-input-label"> {% trans "Ontology" %} <i class="ion-ios-checkmark-outline"></i></label>
+                                    <label class="col-xs-12 control-label widget-input-label"> {% trans "Ontology" %} </label>
                                 </div>
 
                                 <div class="col-xs-12">
-                                    <select class="design" {% if node_count > 1 %}disabled{% endif %} data-bind="value: graph.ontology_id, valueAllowUnset: true, options: ontologies, optionsText: 'name', optionsValue:'ontologyid', optionsCaption: '{% trans "No ontology" %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                                    <select class="design" data-bind="attr: {'disabled': graphSettingsViewModel.nodeCount() > 1 }, value: graph.ontology_id, valueAllowUnset: true, options: ontologies, optionsText: 'name', optionsValue:'ontologyid', optionsCaption: '{% trans "No ontology" %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
                                 </div>
                             </div>
                         </div>
@@ -56,11 +56,11 @@
                         <div class="row widget-container" data-bind="if: graph.ontology_id()">
                             <div class="form-group">
                                 <div class="relative">
-                                    <label class="col-xs-12 control-label widget-input-label"> {% trans "Root Class" %} <i class="ion-ios-checkmark-outline"></i></label>
+                                    <label class="col-xs-12 control-label widget-input-label"> {% trans "Root Class" %} </label>
                                 </div>
 
                                 <div class="col-xs-12">
-                                    <select class="design" {% if node_count > 1 %}disabled{% endif %} data-bind="value: graphSettingsViewModel.ontologyClass, valueAllowUnset: false, options: ontologyClasses, optionsText: 'display', optionsValue:'source', chosen: {disable_search_threshold: 10, width: '100%', search_contains: true}"></select>
+                                    <select class="design" data-bind="attr: {'disabled': graphSettingsViewModel.nodeCount() > 1 }, value: graphSettingsViewModel.ontologyClass, valueAllowUnset: false, options: ontologyClasses, optionsText: 'display', optionsValue:'source', chosen: {disable_search_threshold: 10, width: '100%', search_contains: true}"></select>
                                 </div>
                             </div>
                         </div>
@@ -82,7 +82,7 @@
                                 <div class="row widget-container">
                                     <div class="form-group">
                                         <div class="relative">
-                                            <label class="col-xs-12 control-label widget-input-label"> {% trans "Status" %} <i class="ion-ios-checkmark-outline"></i></label>
+                                            <label class="col-xs-12 control-label widget-input-label"> {% trans "Status" %} </label>
                                         </div>
 
                                         <div class="col-xs-12">
@@ -134,7 +134,7 @@
                             <div class="row widget-container">
                                 <div class="form-group">
                                     <div>
-                                        <label class="col-xs-12 control-label widget-input-label"> {% trans "Icon" %} <i class="ion-ios-checkmark-outline"></i></label>
+                                        <label class="col-xs-12 control-label widget-input-label"> {% trans "Icon" %} </label>
                                     </div>
 
                                     <!-- Icon search -->
@@ -196,7 +196,7 @@
                                 <div class="row widget-container">
                                     <div class="form-group">
                                       <div class="relative">
-                                          <label class="col-xs-12 control-label widget-input-label"> {% trans "Color" %} <i class="ion-ios-checkmark-outline"></i></label>
+                                          <label class="col-xs-12 control-label widget-input-label"> {% trans "Color" %} </label>
                                       </div>
                                       <div class="colorpicker-component input-group">
                                         <input placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: graph.color, format:'rgba'}">
@@ -241,6 +241,17 @@
 
                                         <div class="col-xs-12">
                                             <textarea placeholder="{% trans "Abstract/description" %}" rows="6" class="form-control" data-bind="value:graph.description, valueUpdate: 'keyup'"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row widget-container">
+                                    <div class="form-group">
+                                        <div class="relative">
+                                            <label class="col-xs-12 control-label widget-input-label"> {% trans "JSON-LD Context" %}</label>
+                                        </div>
+
+                                        <div class="col-xs-12">
+                                            <input placeholder="{% trans "JSON-LD Context URI" %}" class="form-control input-lg widget-input" data-bind="value:graph.jsonldcontext, valueUpdate: 'keyup'">
                                         </div>
                                     </div>
                                 </div>

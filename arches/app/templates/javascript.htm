@@ -69,6 +69,7 @@
         }],
         shim: {
             'nifty': {
+                exports: 'nifty',
                 deps: ['bootstrap', 'jquery', 'jquery-ui', 'metismenu']
             },
             'metismenu': {
@@ -131,6 +132,9 @@
             'leaflet-draw': {
                 deps: ['leaflet']
             },
+            'ckeditor': {
+                deps: ['jquery']
+            },
             'ckeditor-jquery': {
                 deps: ['ckeditor']
             }
@@ -182,6 +186,7 @@
                 resource_copy: "{% url 'resource_copy' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 resource_report: "{% url 'resource_report' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 resource_edit_log: "{% url 'resource_edit_log' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
+                get_resource_edit_log: function(graphid){return "{% url 'resource_edit_log' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 resource_data: "{% url 'resource_data' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace(/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/g, ''),
                 report_data: "{% url 'report_data' %}",
                 resource_cards: "{% url 'resource_cards' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
@@ -358,6 +363,16 @@
                 'componentname': '{{ template.componentname }}',
                 'component': '{{ template.component }}',
                 'defaultconfig': '{{ template.defaultconfig_json }}'
+            },
+        {% endfor %}{% endautoescape %}};
+    });
+
+    define('card-components', [{% for component in card_components %}'{{ component.component }}',{% endfor %}], function () {
+        return {{% autoescape off %}{% for component in card_components %}
+            '{{ component.pk }}': {
+                'componentname': '{{ component.componentname }}',
+                'component': '{{ component.component }}',
+                'defaultconfig': '{{ component.defaultconfig_json }}'
             },
         {% endfor %}{% endautoescape %}};
     });

@@ -40,6 +40,7 @@ from arches.app.utils.data_management.resources.formats.csvfile import MissingCo
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
 from arches.app.utils.data_management.resource_graphs import exporter as ResourceGraphExporter
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
+from arches.app.utils.system_metadata import system_metadata
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.skos import SKOSReader
 from arches.app.views.tileserver import seed_resource_cache
@@ -56,7 +57,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
             choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'load_concept_scheme', 'export_business_data', 'export_graphs', 'add_tileserver_layer', 'delete_tileserver_layer',
-            'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data','import_business_data_relations', 'import_mapping_file', 'save_system_settings', 'add_mapbox_layer', 'seed_resource_tile_cache', 'update_project_templates','load_package','create_package', 'export_package_configs', 'import_node_value_data'],
+            'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data','import_business_data_relations', 'import_mapping_file', 'save_system_settings', 'add_mapbox_layer', 'seed_resource_tile_cache', 'update_project_templates','load_package', 'create_package', 'update_package', 'export_package_configs', 'import_node_value_data'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' +
@@ -201,11 +202,14 @@ class Command(BaseCommand):
         if options['operation'] == 'update_project_templates':
             self.update_project_templates()
 
-        if options['operation'] == 'load_package':
+        if options['operation'] in ['load', 'load_package']:
             self.load_package(options['source'], options['setup_db'], options['overwrite'], options['stage'], options['yes'])
 
-        if options['operation'] == 'create_package':
+        if options['operation'] in ['create', 'create_package']:
             self.create_package(options['dest_dir'])
+
+        if options['operation'] in ['update', 'update_package']:
+            self.update_package(options['dest_dir'], options['yes'])
 
         if options['operation'] == 'export_package_configs':
             self.export_package_configs(options['dest_dir'])
@@ -220,8 +224,70 @@ class Command(BaseCommand):
                 print e
                 print 'Could not read resource to resource constraints'
 
-    def create_package(self, dest_dir):
+    def export_resource_graphs(self, dest_dir, force=False):
+        """
+        Saves a json file for each resource model in a project.
+        Uses the graph name as the file name unless a graph
+        (confirmed by matching graphid) already exists in the destination
+        directory. In that case, the existing filename is used.
+        """
+        existing_resource_graphs = {}
+        existing_resource_graph_paths = glob.glob(os.path.join(dest_dir, '*.json'))
+        for existing_graph_file in existing_resource_graph_paths:
+            print 'reading', existing_graph_file
+            with open(existing_graph_file, 'r') as f:
+                existing_graph = json.loads(f.read())
+                if 'graph' in existing_graph:
+                    existing_graph = existing_graph['graph'][0]
+                existing_resource_graphs[existing_graph['graphid']] = {'name': existing_graph['name'], 'path': existing_graph_file }
 
+        resource_graphs = ResourceGraphExporter.get_graphs_for_export(['resource_models'])
+        if 'graph' in resource_graphs:
+            for graph in resource_graphs['graph']:
+                output_graph = {
+                    'graph':[graph],
+                    'metadata': system_metadata()
+                }
+                graph_json = JSONSerializer().serialize(output_graph, indent=4)
+                if graph['graphid'] not in existing_resource_graphs:
+                    output_file = os.path.join(dest_dir, graph['name'] + '.json')
+                    with open(output_file, 'w') as f:
+                        print 'writing', output_file
+                        f.write(graph_json)
+                else:
+                    output_file = existing_resource_graphs[graph['graphid']]['path']
+                    if force == False:
+                        overwrite = raw_input('"{0}" already exists in this directory. Overwrite? (Y/N): '.format(existing_resource_graphs[graph['graphid']]['name']))
+                    else:
+                        overwrite = 'true'
+                    if overwrite.lower() in ('t', 'true', 'y', 'yes'):
+                        with open(output_file, 'w') as f:
+                            print 'writing', output_file
+                            f.write(graph_json)
+
+    def export_package_settings(self, dest_dir, force=False):
+        overwrite = True
+        projects_package_settings_file = os.path.join(settings.APP_ROOT, 'package_settings.py')
+        packages_package_settings_file = os.path.join(dest_dir, 'package_settings.py')
+        if os.path.exists(projects_package_settings_file):
+            if os.path.exists(packages_package_settings_file) and force == False:
+                resp = raw_input('"{0}" already exists in this directory. Overwrite? (Y/N): '.format('package_settings.py'))
+                if resp.lower() in ('t', 'true', 'y', 'yes'):
+                    overwrite = True
+                else:
+                    overwrite = False
+            if overwrite == True:
+                shutil.copy(projects_package_settings_file, dest_dir)
+
+    def update_package(self, dest_dir, yes):
+        if os.path.exists(os.path.join(dest_dir, 'package_config.json')):
+            print 'Updating Resource Models'
+            self.export_resource_graphs(os.path.join(dest_dir, 'graphs', 'resource_models'), yes)
+        else:
+            print "Could not update package. This directory does not have a package_config.json file. It cannot be verified as a package."
+        self.export_package_settings(dest_dir, yes)
+
+    def create_package(self, dest_dir):
         if os.path.exists(dest_dir):
             print 'Cannot create package', dest_dir, 'already exists'
         else:
@@ -254,12 +320,15 @@ class Command(BaseCommand):
                         print 'added', os.path.join(dest_dir, directory, '.gitkeep')
 
             self.export_package_configs(dest_dir)
+            self.export_resource_graphs(os.path.join(dest_dir, 'graphs', 'resource_models'), 'true')
 
             try:
                 self.save_system_settings(data_dest=os.path.join(dest_dir, 'system_settings'))
             except Exception as e:
                 print e
                 print "Could not save system settings"
+            self.export_package_settings(dest_dir, 'true')
+
 
     def load_package(self, source, setup_db=True, overwrite_concepts='ignore', stage_concepts='keep', yes=False):
 
@@ -280,6 +349,17 @@ class Command(BaseCommand):
                     shutil.copy(system_settings, settings.SYSTEM_SETTINGS_LOCAL_PATH)
                     self.import_business_data(settings.SYSTEM_SETTINGS_LOCAL_PATH, overwrite=True)
 
+        def load_package_settings(package_dir):
+            if os.path.exists(os.path.join(package_dir, 'package_settings.py')):
+                update_package_settings = True
+                if os.path.exists(os.path.join(settings.APP_ROOT, 'package_settings.py')):
+                    if yes == False:
+                        response = raw_input('Overwrite current packages_settings.py? (Y/N): ')
+                        if response.lower() not in ('t', 'true', 'y', 'yes'):
+                            update_package_settings = False
+                    if update_package_settings == True:
+                        package_settings = glob.glob(os.path.join(package_dir, 'package_settings.py'))[0]
+                        shutil.copy(package_settings, settings.APP_ROOT)
 
         def load_resource_to_resource_constraints(package_dir):
             config_paths = glob.glob(os.path.join(package_dir, 'package_config.json'))
@@ -369,7 +449,6 @@ class Command(BaseCommand):
                         mapnik_xml_path = path
 
                     self.add_tileserver_layer(meta['name'], mapnik_xml_path, meta['icon'], basemap, tile_config_path)
-
 
         def load_map_layers(package_dir):
             basemap_styles = glob.glob(os.path.join(package_dir, 'map_layers', 'mapbox_spec_json', 'basemaps', '*', '*.json'))
@@ -490,7 +569,8 @@ class Command(BaseCommand):
             if setup_db.lower() in ('t', 'true', 'y', 'yes'):
                 self.setup_db(settings.PACKAGE_NAME)
 
-
+        print 'loading package_settings.py'
+        load_package_settings(package_location)
         print 'loading preliminary sql'
         load_preliminary_sql(package_location)
         print 'loading system settings'
@@ -536,6 +616,7 @@ class Command(BaseCommand):
             'COPYRIGHT_TEXT',
             'COPYRIGHT_YEAR',
             'MODE',
+            'CACHES',
             'DATABASES',
             'DEBUG',
             'RESOURCE_IMPORT_LOG',
@@ -588,7 +669,8 @@ class Command(BaseCommand):
             'EMAIL_PORT',
             'PROTECTED_GRAPHS',
             'DATE_IMPORT_EXPORT_FORMAT',
-            'ANALYSIS_COORDINATE_SYSTEM_SRID'
+            'ANALYSIS_COORDINATE_SYSTEM_SRID',
+            'CACHE_BY_USER'
             ]
 
         with open('arches/install/arches-templates/project_name/settings_local.py-tpl', 'w') as f:

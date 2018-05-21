@@ -47,6 +47,8 @@ class CardModel(models.Model):
     active = models.BooleanField(default=True)
     visible = models.BooleanField(default=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
+    component = models.ForeignKey('CardComponent', db_column='componentid', default=uuid.UUID('f05e4d3a-53c1-11e8-b0ea-784f435179ea'))
+    config = JSONField(blank=True, null=True, db_column='config')
 
     def is_editable(self):
         result = True
@@ -60,6 +62,22 @@ class CardModel(models.Model):
         managed = True
         db_table = 'cards'
 
+class CardComponent(models.Model):
+    componentid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    name = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    component = models.TextField()
+    componentname = models.TextField()
+    defaultconfig = JSONField(blank=True, null=True, db_column='defaultconfig')
+
+    @property
+    def defaultconfig_json(self):
+        json_string = json.dumps(self.defaultconfig)
+        return json_string
+
+    class Meta:
+        managed = True
+        db_table = 'card_components'
 
 class CardXNodeXWidget(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid1)
@@ -322,6 +340,7 @@ class GraphModel(models.Model):
     subtitle = models.TextField(blank=True, null=True)
     ontology = models.ForeignKey('Ontology', db_column='ontologyid', related_name='graphs', null=True, blank=True)
     functions = models.ManyToManyField(to='Function', through='FunctionXGraph')
+    jsonldcontext = models.TextField(blank=True, null=True)
 
     @property
     def disable_instance_creation(self):

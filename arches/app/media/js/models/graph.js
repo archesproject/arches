@@ -324,7 +324,7 @@ define(['arches',
         },
 
         /**
-         * getValidNodesEdges - gets a list of possible ontolgoy properties and classes the node
+         * getValidNodesEdges - gets a list of possible ontology properties and classes the node
          * referenced by it's id could be based on the location of the node in the graph
          * @memberof GraphModel.prototype
          * @param  {string} nodeid - the node id of the node of interest
@@ -341,15 +341,16 @@ define(['arches',
         },
 
         /**
-         * getValidDomainClasses - gets a list of possible ontolgoy properties and classes the node
+         * getValidDomainClasses - gets a list of possible ontology properties and classes the node
          * referenced by it's id could use to be appened to other nodes
          * @memberof GraphModel.prototype
          * @param  {string} nodeid - the node id of the node of interest
          * @param  {function} callback - function to call when the request returns
          * @param  {object} scope - (optional) the scope used for the callback
+         * @return  {jqXHR} - a Proimise compatible asynchronous request
          */
         getValidDomainClasses: function(nodeid, callback, scope){
-            this._doRequest({
+            return this._doRequest({
                 type: "GET",
                 url: this.url + this.get('graphid') + '/get_valid_domain_nodes/' + nodeid,
             }, function(response, status){
@@ -457,6 +458,7 @@ define(['arches',
 
             attributes =_.extend({datatypes:[], domain_connections:[]}, attributes);
             _.defaults(attributes, {selectRoot: true});
+            this.set('domain_connections_loaded', false);
 
             _.each(attributes.datatypes, function(datatype){
                 datatypelookup[datatype.datatype] = datatype;
@@ -531,7 +533,7 @@ define(['arches',
          * @param  {NodeModel} root - a reference to the root node in the nodes parameter, or of this graph if not defined
          * @param  {[NodeModel]} nodes - the nodes to make a tree from, defaults to the nodes in this graph
          * @param  {array} edges - the edges to make a tree from, defaults to the edges in this graph
-         * @param  {boolean} append - if true, won't remove the existing hierarchy 
+         * @param  {boolean} append - if true, won't remove the existing hierarchy
          * @return {object} a hierchical node listing
          */
         constructTree: function(root, nodes, edges, append){
@@ -557,10 +559,21 @@ define(['arches',
             return root;
         },
 
+        /**
+         * loadDomainConnections - loads the domain connections for the graph asyncronously
+         * @memberof GraphModel.prototype
+         * @return {Promise} the Promise gets passes the responseJSON of the request
+         */
         loadDomainConnections: function() {
-            this.getValidDomainClasses('', function(responseJSON) {
-                console.log(responseJSON)
-            }, this);
+            if(!this.get('domain_connections_loaded')){
+                return this.getValidDomainClasses('', function(responseJSON) {
+                    this.set('domain_connections', responseJSON);
+                    this.set('domain_connections_loaded', true);
+                }, this);
+            } else {
+                return Promise.resolve()
+            }
+
         },
 
         /**
@@ -700,10 +713,11 @@ define(['arches',
          * @param  {function} callback - function to call when the request returns
          * @param  {object} scope - (optional) the scope used for the callback
          * @param  {string} eventname - (optional) the event to trigger upon successfull return of the request
+         * @return  {jqXHR} - a Proimise compatible asynchronous request
          */
         _doRequest: function (config, callback, scope, eventname) {
             var self = this;
-            $.ajax($.extend({
+            return $.ajax($.extend({
                 complete: function (request, status) {
                     if (typeof callback === 'function') {
                         callback.call(scope || self, request, status);

@@ -294,9 +294,15 @@ define([
          });
 
          if (params.graph !== undefined) {
-             this.resourceIcon = params.graph.get('iconclass');
-             this.resourceName = params.graph.get('name');
-             this.graphId = params.graph.get('graphid')
+             if (params.graph.get) {
+                 this.resourceIcon = params.graph.get('iconclass');
+                 this.resourceName = params.graph.get('name');
+                 this.graphId = params.graph.get('graphid')
+             } else {
+                 this.resourceIcon = params.graph.iconclass;
+                 this.resourceName = params.graph.name;
+                 this.graphId = params.graph.graphid;
+             }
              this.featurePointSize(Number(this.featurePointSize()))
              this.featureLineWidth(Number(this.featureLineWidth()));
              this.featureColorCache = this.featureColor()
@@ -660,10 +666,11 @@ define([
                          var size = se.sub(nw);
                          var scaleX = (tr.width - 80) / size.x;
                          var scaleY = (tr.height - 80) / size.y;
-
+                         var maxZoom = ko.unwrap(self.maxZoom);
+                         maxZoom = maxZoom > 17 ? 17 : maxZoom;
                          var options = {
                              center: tr.unproject(nw.add(se).div(2)),
-                             zoom: Math.min(tr.scaleZoom(tr.scale * Math.min(scaleX, scaleY)), ko.unwrap(self.maxZoom))
+                             zoom: Math.min(tr.scaleZoom(tr.scale * Math.min(scaleX, scaleY)), maxZoom)
                          };
                          self.map[method](options);
                      };
@@ -689,7 +696,7 @@ define([
                      self.fitToAggregationBounds = function(agg) {
                          var agg = self.searchAggregations();
                          var aggBounds;
-                         if (agg.geo_aggs.bounds.bounds && self.map && !self.extentSearch()) {
+                         if (agg && agg.geo_aggs.bounds.bounds && self.map && !self.extentSearch()) {
                              aggBounds = agg.geo_aggs.bounds.bounds;
                              var bounds = [
                                  [
@@ -701,7 +708,12 @@ define([
                                      aggBounds.top_left.lat
                                  ]
                              ];
-                             map.fitBounds(bounds, {padding: 30});
+                             var maxZoom = ko.unwrap(self.maxZoom);
+                             maxZoom = maxZoom > 17 ? 17 : maxZoom;
+                             map.fitBounds(bounds, {
+                                 padding: 45,
+                                 maxZoom: maxZoom
+                             });
                          }
                      }
 
@@ -813,7 +825,7 @@ define([
                          if (ko.isObservable(bins)) {
                              bins.subscribe(self.updateSearchResultsLayer);
                          }
-                         if (self.searchAggregations) {
+                         if (self.searchAggregations()) {
                              self.updateSearchResultsLayer()
                          }
                          self.results.mouseoverInstanceId.subscribe(updateSearchPointsGeoJSON);

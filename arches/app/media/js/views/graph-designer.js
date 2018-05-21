@@ -6,8 +6,8 @@ define([
     'views/base-manager',
     'viewmodels/alert',
     'models/graph',
-    'views/graph/graph-tree',
-    'views/graph/graph-manager/new-node-form',
+    'views/graph/graph-designer/graph-tree',
+    'views/graph/graph-designer/node-form',
     'views/graph/graph-manager/branch-list',
     'graph-designer-data',
     'arches',
@@ -40,6 +40,7 @@ define([
     viewModel.selectedNode = viewModel.graphModel.get('selectedNode');
 
     viewModel.nodeForm = new NodeFormView({
+        graph: viewModel.graph,
         graphModel: viewModel.graphModel,
         loading: viewModel.contentLoading,
         node: viewModel.selectedNode
@@ -57,6 +58,7 @@ define([
 
     viewModel.graphSettingsViewModel = new GraphSettingsViewModel({
         graph: viewModel.graph,
+        graphModel: viewModel.graphModel,
         ontologyClasses: viewModel.ontologyClasses,
         ontologies: viewModel.ontologies,
         ontologyClass: ko.observable(''),
@@ -70,7 +72,13 @@ define([
         graphModel: viewModel.graphModel,
         graphSettings: viewModel.graphSettingsViewModel
     });
-    
+
+    viewModel.graphTree.branchListVisible.subscribe(function(visible){
+        if(visible){
+            viewModel.branchListView.loadDomainConnections();
+        }
+    }, this);
+
     viewModel.loadGraphSettings = function(){
         var self = this;
         self.contentLoading(true);
@@ -103,6 +111,17 @@ define([
     }else{
 
     }
+
+    /**
+    * update the sizing of elements on window resize
+    */
+    var resize = function(){
+        $('.grid').height($(window).height()-208);
+    }
+
+    $( window ).resize(resize);
+
+    resize();
 
     return new BaseManagerView({
         viewModel: viewModel

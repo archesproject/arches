@@ -687,11 +687,12 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 }
 
 .grid {
-    background: #DDD;
+    background: #ebeef0;
     max-width: 1200px;
     margin-left: -8px;
     margin-right: -6px;
     border-top: 1px solid #ddd;
+    overflow: auto;
 }
 
 .grid-item {
@@ -1020,14 +1021,6 @@ a.select2-search-choice-close {
 .library-card.active:hover {
     background: #fff;
     border-left: 5px solid steelblue;
-}
-
-.library-card:first-of-type {
-    border-top: 1px solid #ddd;
-}
-
-.library-card:last-of-type {
-    margin-bottom: 60px;
 }
 
 .selected-card {
@@ -2640,6 +2633,32 @@ div.dropdown-menu.open {
     font-size: 14vw;
     margin-top: 42vh;
     margin-left: 32vw;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transform: translate(0, 0);
+    z-index: 100000001;
+}
+
+.branch-list-loading-mask {
+    height: 100%;
+    position: relative;
+    margin: auto;
+    width: 50%;
+    padding: 36px;
+    text-align: center;
+    opacity: .5;
+    z-index: 100000001;
+}
+
+.branch-list-loading-mask:after {
+    position: relative;
+    content: '\f110';
+    animation: fa-spin 2s infinite linear;
+    -webkit-animation: fa-spin 2s infinite linear;
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: 30px;
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -5390,10 +5409,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
   overflow-y: hidden;
 }
 
-.middle-column-container.graph-designer {
-  height: fit-content;
-}
-
 .form-list {
     padding-top: 0px;
     background: #f0f0f0;
@@ -5833,6 +5848,10 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .node-form.ontology {
     padding-right: 5px;
+}
+
+.node-form-container {
+    width: 100%;
 }
 
 .node-semantic-description {
@@ -10773,6 +10792,51 @@ ul.select2-choices:after {
 .main-panel{
     background-color: #ffffff;
     flex: 1
+}
+
+.rich-text {
+    padding:20px;
+}
+
+.jstree .rich-text {
+    padding:0px;
+    display: inline;
+}
+
+.card-component {
+    padding: 25px;
+}
+
+.card-component-panel {
+    padding: 10px 20px 10px 20px;
+    flex: 1 0 250px;
+    width: 250px;
+}
+
+.card-component-panel h4 {
+    color: #2f527a;
+}
+
+.card-component-panel hr {
+    border-color: #e9e9e9;
+}
+
+.card-component-panel h5 {
+    color: #989898;
+}
+
+.card-breadcrumbs {
+    color: #6494cc;
+}
+
+.current-crumb {
+    font-weight: bold;
+}
+
+.expanded-nav {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 @keyframes loader {

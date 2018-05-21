@@ -89,6 +89,28 @@ TILE_CACHE_CONFIG = {
     # "secret": "<secret key>"
 }
 
+CACHES = {
+    # 'default': {
+    #     'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+    #     'LOCATION': os.path.join(APP_ROOT, 'tmp', 'djangocache'),
+    #     'OPTIONS': {
+    #         'MAX_ENTRIES': 1000
+    #     }
+    # }
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}
+
+#Identify the usernames and duration (seconds) for which you want to cache the time wheel
+CACHE_BY_USER = {'anonymous': 3600 * 24}
+
+try:
+    from package_settings import *
+except ImportError:
+    pass
+
 try:
     from settings_local import *
 except ImportError:
