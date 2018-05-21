@@ -176,6 +176,47 @@ define([
             if ($('#tooltip').length) {
                  $("#tooltip").hide();
             }
+        },
+        
+        addResourceGeomLayer: function(){
+
+            var geojson = $('#resource_geom').val();
+            var format = new ol.format.GeoJSON;
+
+            var green_style = function (feature) {
+                return [new ol.style.Style({
+                    fill: new ol.style.Fill({
+                        color: 'rgba(179, 0, 0, 0)'
+                    }),
+                    stroke: new ol.style.Stroke({
+                        color: 'rgba(179, 0, 0, 100)',
+                        width: 3
+                    }),
+                    image: new ol.style.Circle({
+                        radius: 7,
+                        fill: new ol.style.Fill({
+                            color: 'rgba(179, 0, 0, 0)'
+                        }),
+                        stroke: new ol.style.Stroke({
+                            color: 'rgba(179, 0, 0, 100)',
+                            width: 3
+                        })
+                    })
+                })];
+            }
+            
+            var source = new ol.source.Vector({
+                features: format.readFeatures(geojson)
+            })
+            
+            var newlayer = new ol.layer.Vector({
+                title: 'Existing Resource Geometries',
+                source: source,
+                style: green_style
+            })
+            
+            this.map.addLayer(newlayer);
+            this.map.getView().fit(source.getExtent(), ([500,500]));
         }
     });
 });
