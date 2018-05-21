@@ -20,7 +20,8 @@ define(['jquery',
             var locationBranchList = new LocationBranchList({
                 el: this.$el.find('#heritage-location')[0],
                 data: this.data,
-                dataKey: 'SPATIAL_COORDINATES.E47'
+                dataKey: 'SPATIAL_COORDINATES.E47',
+                addParentGeom: true
             });
             this.addBranchList(locationBranchList);
 

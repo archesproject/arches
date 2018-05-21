@@ -133,21 +133,36 @@ define([
 
             var style = function (feature) {
                 var editing = feature.get('editing');
+                // change the new feature color to green if this is a map to
+                // which existing geometries are being added.
+                console.log(self.addParentGeom)
+                
+                if (self.addParentGeom) {
+                    var colors = {
+                        full:'rgba(101, 191, 11, 100)',
+                        trans: 'rgba(101, 191, 11, 0)'
+                    }
+                } else {
+                    var colors = {
+                        full:'rgba(179, 0, 0, 100)',
+                        trans: 'rgba(179, 0, 0, 0)'
+                    }
+                }
                 return [new ol.style.Style({
                     fill: new ol.style.Fill({
-                        color: 'rgba(92, 184, 92, 0)'
+                        color: colors['trans']
                     }),
                     stroke: new ol.style.Stroke({
-                        color: '#b30000',
+                        color: colors['full'],
                         width: editing ? 4 : 3
                     }),
                     image: new ol.style.Circle({
                         radius: editing ? 9 : 7,
                         fill: new ol.style.Fill({
-                            color: 'rgba(92, 184, 92, 0)'
+                            color: colors['trans']
                         }),
                         stroke: new ol.style.Stroke({
-                            color: '#b30000',
+                            color: colors['full'],
                             width: editing ? 4 : 3
                         })
                     })
@@ -221,7 +236,7 @@ define([
             this.on('formloaded', function(){
                 map.map.updateSize()
             });
-
+            
             var draw = null;
 
             self.$el.find(".geometry-btn").click(function (){ 
@@ -375,6 +390,11 @@ define([
               }
             });
             map.map.addInteraction(modify);
+
+            // add overlay of this resource's geometry if desired
+            if (self.addParentGeom) {
+                map.addResourceGeomLayer();
+            }
         },
         getBranchLists: function() {    
             var self = this;
@@ -394,6 +414,7 @@ define([
                 branch.editing(false);
             }
             return branch;
-        },
+        }
+        
     });
 });
