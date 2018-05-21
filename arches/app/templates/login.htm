@@ -48,7 +48,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 			<div class="panel-body">
 				<h3 class="login-panel-header">{% trans "Sign In to your account" %}</h3>
 				<form id="login-form" action="?next={{ next }}" method='POST' {% if auth_failed %} autocomplete="off" {% endif %}>
-				 	{% csrf_token %}
+					{% csrf_token %}
+					<input type="hidden" name="next" value="{{ next }}" />
 					<div class="form-group">
 						<div class="input-group">
 							<div class="input-group-addon"><i class="text-lg ion-log-in"></i></div>
