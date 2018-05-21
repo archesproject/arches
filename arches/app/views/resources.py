@@ -100,7 +100,8 @@ def resource_manager(request, resourcetypeid='', form_id='default', resourceid='
                     'min_date': min_max_dates['val__min'].year if min_max_dates['val__min'] != None else 0,
                     'max_date': min_max_dates['val__max'].year if min_max_dates['val__min'] != None else 1,
                     'timefilterdata': JSONSerializer().serialize(Concept.get_time_filter_data()),
-                    'resource_icon': settings.RESOURCE_TYPE_CONFIGS()[resourcetypeid]['icon_class']
+                    'resource_icon': settings.RESOURCE_TYPE_CONFIGS()[resourcetypeid]['icon_class'],
+                    'resource_geom': JSONSerializer().serialize(resource.get_geom())
                 },
                 context_instance=RequestContext(request))
         else:
