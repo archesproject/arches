@@ -10833,6 +10833,12 @@ ul.select2-choices:after {
     font-weight: bold;
 }
 
+.expanded-nav {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 @keyframes loader {
     0% {
         background: #ddd;
