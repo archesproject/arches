@@ -152,7 +152,7 @@ define([
             var format = ol.coordinate.createStringXY(4);
             var overFeature = this.map.forEachFeatureAtPixel(pixels, function (feature, layer) {
                 //return the first actual marker, but ignore any other geometries under the cursor (most likely )
-                if(feature.get('arches_marker') || feature.get('arches_cluster')) {
+                if(feature.get('arches_marker') || feature.get('arches_cluster') || feature.get('name')) {
                     return feature;
                 }
             });
@@ -162,8 +162,12 @@ define([
                 this.trigger('mousePositionChanged', format(coords), pixels, overFeature);
                 if ($('#tooltip').length) {
                     $("#tooltip").show();
-                    $("#tooltip").html("<label>" + coords[1].toFixed(4) + "° N</label>&nbsp;<label>" + coords[0].toFixed(4) + " ° E</label>");
-            	    $("#tooltip").css({position:"absolute", left:xpos+15,top:ypos});
+                    var msg_content = coords[1].toFixed(4) + "° N&nbsp;&nbsp;" + coords[0].toFixed(4) + " ° E"
+                    if (overFeature && overFeature.get('name')) {
+                        msg_content += "<br><span style='color:rgb(179, 0, 0);'>"+overFeature.get('name')+"</span>"
+                    };
+                    $("#tooltip").html("<label>"+msg_content+"</label>");
+                    $("#tooltip").css({position:"absolute", left:xpos+15,top:ypos});
                 }
             } else {
                 this.trigger('mousePositionChanged', '');
