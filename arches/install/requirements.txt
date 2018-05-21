@@ -14,7 +14,7 @@ mapnik==0.1
 SPARQLWrapper==1.8.0
 django-recaptcha==1.4.0
 python-jose==2.0.2
-edtf==2.7.0
+edtf==3.0.0
 couchdb==1.2
 django-revproxy==0.9.14
 django-cors-headers==2.2.0
