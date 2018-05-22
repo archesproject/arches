@@ -61,7 +61,6 @@ define(['jquery',
                     el: this.$el.find('#designation-section')[0],
                     data: this.data,
                     dataKey: 'RIGHT.E30', 
-                    rules: true,
                     validateBranch: function (nodes) {
                         var ck0 = this.validateHasValues(nodes)
                         var ck1 = vt.isValidDate(nodes,'DESIGNATION_TO_DATE.E61');
