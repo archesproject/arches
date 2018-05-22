@@ -1,4 +1,5 @@
 import time
+from django.urls import reverse
 from django.http import HttpResponse
 from django.contrib.auth.models import User, AnonymousUser
 from django.utils.deprecation import MiddlewareMixin
@@ -14,7 +15,10 @@ HTTP_HEADER_ENCODING = 'iso-8859-1'
 
 class SetAnonymousUser(MiddlewareMixin):
     def process_request(self, request):
-        if request.user.is_anonymous():
+        # for OAuth authentication to work, we can't automatically assign 
+        # the anonymous user to the request, otherwise the anonymous user is 
+        # used for all OAuth resourse requests
+        if request.path != reverse('oauth2:authorize') and request.user.is_anonymous():
             try:
                 request.user = User.objects.get(username='anonymous')
             except:

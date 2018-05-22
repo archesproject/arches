@@ -666,10 +666,11 @@ define([
                          var size = se.sub(nw);
                          var scaleX = (tr.width - 80) / size.x;
                          var scaleY = (tr.height - 80) / size.y;
-
+                         var maxZoom = ko.unwrap(self.maxZoom);
+                         maxZoom = maxZoom > 17 ? 17 : maxZoom;
                          var options = {
                              center: tr.unproject(nw.add(se).div(2)),
-                             zoom: Math.min(tr.scaleZoom(tr.scale * Math.min(scaleX, scaleY)), ko.unwrap(self.maxZoom))
+                             zoom: Math.min(tr.scaleZoom(tr.scale * Math.min(scaleX, scaleY)), maxZoom)
                          };
                          self.map[method](options);
                      };
@@ -707,7 +708,12 @@ define([
                                      aggBounds.top_left.lat
                                  ]
                              ];
-                             map.fitBounds(bounds, {padding: 30});
+                             var maxZoom = ko.unwrap(self.maxZoom);
+                             maxZoom = maxZoom > 17 ? 17 : maxZoom;
+                             map.fitBounds(bounds, {
+                                 padding: 45,
+                                 maxZoom: maxZoom
+                             });
                          }
                      }
 

@@ -51,6 +51,11 @@ define([
               }
             };
 
+            options.viewModel.navExpanded = ko.observable(false);
+            options.viewModel.navExpanded.subscribe(function () {
+                window.nifty.window.trigger('resize');
+            });
+
             PageView.prototype.constructor.call(this, options);
             return this;
         }

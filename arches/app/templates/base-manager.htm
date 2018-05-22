@@ -28,14 +28,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     <div class="wrapper">
 
-        <div id="container" class="effect mainnav-sm aside-left aside-bright navbar-fixed" data-bind="css: {'mainnav-in': tabsActive() && showTabs()}">
+        <div id="container" class="effect aside-left aside-bright navbar-fixed mainnav-sm" data-bind="css: {'mainnav-in': tabsActive() && showTabs(), 'mainnav-sm': !navExpanded(), 'mainnav-lg': navExpanded()}">
 
             {% block navheader %}
             <header id="navbar">
 
                 <div id="navbar-container" class="boxed" style="background-color: inherit; padding-right: 0px">
                     <div class="navbar-header">
-                        <a href="{% url 'home' %}" class="navbar-brand">
+                        <a href="#" class="navbar-brand" data-bind="click: function () { navExpanded(!navExpanded()) }">
                             <img src="{{ STATIC_URL }}img/arches_logo_light.png" alt="Nifty Logo" class="brand-icon">
                             <div class="brand-title">
                                 <span class="brand-text">{{ app_name }}</span>
@@ -198,7 +198,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     <strong>{% trans "Manage System Settings" %}</strong>
                                                 </span>
                                             </a>
-                                            <ul class="collapse" aria-expanded="false">
+                                            <ul class="collapse in pop-in" data-bind="css:{'expanded-nav': navExpanded()}">
                                                 <li class="link-submenu-item">
                                                     <a class="link-submenu" href="{% url 'config' %}" data-bind="click: navigate.bind(this, '{% url 'config' %}')">{% trans "System Settings" %}</a>
                                                 </li>
@@ -219,7 +219,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     <strong>{% trans "Add New Resource" %}</strong>
                                                 </span>
                                             </a>
-                                            <ul class="collapse in pop-in" aria-expanded="false">
+                                            <ul class="collapse in pop-in" data-bind="css:{'expanded-nav': navExpanded()}">
                                                 <!-- ko foreach: createableResources -->
                                                 <li class="link-submenu-item">
                                                     <a class="link-submenu" href="#" data-bind="click: disable_instance_creation ? null: $parent.navigate.bind(this, '{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' %}'.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', UUID.generate ).replace('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', graphid)),
@@ -227,7 +227,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                         attr: {
                                                             href: disable_instance_creation ? '#' : ('{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' %}'.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', UUID.generate ).replace('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', graphid))
                                                         }">
-                                                        <i class="fa arches-menu-icon" data-bind="css: iconclass"></i> <span data-bind="text:name"></span></a>
+                                                        <i class="fa arches-menu-icon" data-bind="css: iconclass || 'fa fa-question'"></i> <span data-bind="text:name"></span></a>
                                                 </li>
                                                 <!-- /ko -->
                                             </ul>
@@ -243,7 +243,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     <strong>{% trans "Arches Designer" %}</strong>
                                                 </span>
                                             </a>
-                                            <ul class="collapse" aria-expanded="false">
+                                            <ul class="collapse in pop-in" data-bind="css:{'expanded-nav': navExpanded()}">
                                                 <li class="link-submenu-item">
                                                     <a class="link-submenu"  href="{% url 'graph' '' %}" data-bind="click: navigate.bind(this, '{% url 'graph' '' %}')">{% trans "Resource Models" %}</a>
                                                 </li>
@@ -263,7 +263,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     <strong>{% trans "Map Layer Manager" %}</strong>
                                                 </span>
                                             </a>
-                                            <ul class="collapse" aria-expanded="false">
+                                            <ul class="collapse in pop-in" data-bind="css:{'expanded-nav': navExpanded()}">
                                                 <li class="link-submenu-item">
                                                     <a class="link-submenu" href="{% url 'map_layer_manager' %}" data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}')">{% trans "Resource Layers" %}</a>
                                                 </li>
@@ -322,7 +322,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <a href="{% url 'rdm' '' %}" data-bind="click: navigate.bind(this, '{% url 'rdm' '' %}') ">
                                                 <i class="fa fa-align-left"></i>
                                                 <span class="menu-title">
-                                                    {% trans "RDM" %}
+                                                    {% trans "Reference Data Manager" %}
                                                 </span>
                                             </a>
                                         </li>
