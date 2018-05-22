@@ -268,25 +268,26 @@
                             
                             <div class="col-xs-12 hidden-xs">
                                 
+                            {% if resourcetypeid == 'HERITAGE_FEATURE.E24' %}
+                                <input class="form-control arches-form-input" id="resource-name" style="width: 50%;" placeholder='{% trans "Grid ID" %}' data-bind='value: getEditedNode("GRID_ID.E42", "value")'>
+                            {% else %}                                    
                                 <input class="form-control arches-form-input" id="resource-name" style="width: 50%;" placeholder='{% trans "Grid ID" %}' data-bind='value: getEditedNode("GRID_ID_NEW.E42", "value")'>
-                                    
-                                    
+                            {% endif %}                                    
                                     {% include 'views/components/add-item-button.htm' %}
                                     
                                     </div>
                             
                             <div class="col-xs-12 hidden-sm hidden-md hidden-lg">
                                 
-                                <input class="form-control arches-form-input" id="resource-name" style="width: 100%;" placeholder='{% trans "Grid ID" %}' data-bind='value: getEditedNode("GRID_ID_NEW.E42", "value")'>
                                     <div class="margin-top-5"></div>
-                                    >
+
                                     
                                     <!-- Spacer (for xs screens) -->
                                     <div class="margin-top-5"></div>
                                     
                                     {% include 'views/components/add-item-button.htm' %}
                                     
-                                    </div>
+
                             
                             
                         </div>
@@ -318,7 +319,12 @@
                         <div data-bind='foreach: getBranchLists()'>
                             <div class="arches-crud-record">
                                 <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this name" %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
-                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans "Edit this name" %}"><span data-bind='text: nodes.get("GRID_ID_NEW.E42", "value")' style="padding-right:2px;"></span><span class="text-muted arches-crud-type-identifier"></span>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans "Edit this name" %}">
+                                {% if resourcetypeid == 'HERITAGE_FEATURE.E24' %}
+                                <span data-bind='text: nodes.get("GRID_ID.E42", "value")' style="padding-right:2px;"></span><span class="text-muted arches-crud-type-identifier"></span>
+                                {% else %}
+                                <span data-bind='text: nodes.get("GRID_ID_NEW.E42", "value")' style="padding-right:2px;"></span><span class="text-muted arches-crud-type-identifier"></span>
+                                {% endif %}                                
                                 </a>
                             </div>
                         </div>
@@ -352,12 +358,8 @@
                             <div class="col-xs-12">
                                 {% if resourcetypeid == 'HERITAGE_FEATURE.E24' %}
                                 <input style="width:33%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type hidden-xs" id="culturalp-dropdown" placeholder="{% trans 'Shape' %}" data-bind="select2: {value: getEditedNode('SITE_OVERALL_SHAPE_TYPE.E55', 'value'), dataKey: 'SITE_OVERALL_SHAPE_TYPE.E55'}"></input>
-                                
-                                <input style="width:33%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type  hidden-sm hidden-md hidden-lg" id="culperiod-dropdown" placeholder= "{% trans 'Shape' %}" data-bind="select2: {value: getEditedNode('SITE_OVERALL_SHAPE_TYPE.E55', 'value'), dataKey: 'SITE_OVERALL_SHAPE_TYPE.E55'}"></input>
                                 {% else %}
-                                <input style="width:33%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type hidden-xs" id="culturalp-dropdown" placeholder="{% trans 'Shape' %}" data-bind="select2: {value: getEditedNode('SITE_OVERALL_SHAPE_TYPE_NEW.E55', 'value'), dataKey: 'SITE_OVERALL_SHAPE_TYPE_NEW.E55'}"></input>
-                                
-                                <input style="width:33%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type  hidden-sm hidden-md hidden-lg" id="culperiod-dropdown" placeholder= "{% trans 'Shape' %}" data-bind="select2: {value: getEditedNode('SITE_OVERALL_SHAPE_TYPE_NEW.E55', 'value'), dataKey: 'SITE_OVERALL_SHAPE_TYPE_NEW.E55'}"></input>
+                                <input style="width:33%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type hidden-xs" id="culturalp-dropdown" placeholder="{% trans 'Shape' %}" data-bind="select2: {value: getEditedNode('SITE_OVERALL_SHAPE_TYPE_NEW.E55', 'value'), dataKey: 'SITE_OVERALL_SHAPE_TYPE_NEW.E55'}"></input>                       
                                 {% endif %}
                                 
                                 <!-- Spacer (for xs screens) -->
