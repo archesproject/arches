@@ -152,7 +152,7 @@ define([
             var format = ol.coordinate.createStringXY(4);
             var overFeature = this.map.forEachFeatureAtPixel(pixels, function (feature, layer) {
                 //return the first actual marker, but ignore any other geometries under the cursor (most likely )
-                if(feature.get('arches_marker') || feature.get('arches_cluster')) {
+                if(feature.get('arches_marker') || feature.get('arches_cluster') || feature.get('name')) {
                     return feature;
                 }
             });
@@ -162,8 +162,12 @@ define([
                 this.trigger('mousePositionChanged', format(coords), pixels, overFeature);
                 if ($('#tooltip').length) {
                     $("#tooltip").show();
-                    $("#tooltip").html("<label>" + coords[1].toFixed(4) + "° N</label>&nbsp;<label>" + coords[0].toFixed(4) + " ° E</label>");
-            	    $("#tooltip").css({position:"absolute", left:xpos+15,top:ypos});
+                    var msg_content = coords[1].toFixed(4) + "° N&nbsp;&nbsp;" + coords[0].toFixed(4) + " ° E"
+                    if (overFeature && overFeature.get('name')) {
+                        msg_content += "<br><span style='color:rgb(179, 0, 0);'>"+overFeature.get('name')+"</span>"
+                    };
+                    $("#tooltip").html("<label>"+msg_content+"</label>");
+                    $("#tooltip").css({position:"absolute", left:xpos+15,top:ypos});
                 }
             } else {
                 this.trigger('mousePositionChanged', '');
@@ -176,6 +180,47 @@ define([
             if ($('#tooltip').length) {
                  $("#tooltip").hide();
             }
+        },
+        
+        addResourceGeomLayer: function(){
+
+            var geojson = $('#resource_geom').val();
+            var format = new ol.format.GeoJSON;
+
+            var green_style = function (feature) {
+                return [new ol.style.Style({
+                    fill: new ol.style.Fill({
+                        color: 'rgba(179, 0, 0, 0)'
+                    }),
+                    stroke: new ol.style.Stroke({
+                        color: 'rgba(179, 0, 0, 100)',
+                        width: 3
+                    }),
+                    image: new ol.style.Circle({
+                        radius: 7,
+                        fill: new ol.style.Fill({
+                            color: 'rgba(179, 0, 0, 0)'
+                        }),
+                        stroke: new ol.style.Stroke({
+                            color: 'rgba(179, 0, 0, 100)',
+                            width: 3
+                        })
+                    })
+                })];
+            }
+            
+            var source = new ol.source.Vector({
+                features: format.readFeatures(geojson)
+            })
+            
+            var newlayer = new ol.layer.Vector({
+                title: 'Existing Resource Geometries',
+                source: source,
+                style: green_style
+            })
+            
+            this.map.addLayer(newlayer);
+            this.map.getView().fit(source.getExtent(), ([500,500]));
         }
     });
 });
