@@ -92,7 +92,7 @@ class SummaryForm(ResourceForm):
 
     def update(self, data, files):
         self.update_nodes('NAME.E41', data)
-        self.update_nodes('HERITAGE_RESOURCE_GROUP_TYPE.E55', data)
+        self.update_nodes('HERITAGE_PLACE_TYPE.E55', data)
         self.update_nodes('RIGHT_NEW.E30', data)
         self.update_nodes('DESCRIPTION_ASSIGNMENT.E13', data)
         return
@@ -103,9 +103,9 @@ class SummaryForm(ResourceForm):
                 'branch_lists': self.get_nodes('NAME.E41'),
                 'domains': {'NAME_TYPE.E55' : Concept().get_e55_domain('NAME_TYPE.E55')}
             }
-            self.data['HERITAGE_RESOURCE_GROUP_TYPE.E55'] = {
-                'branch_lists': self.get_nodes('HERITAGE_RESOURCE_GROUP_TYPE.E55'),
-                'domains': {'HERITAGE_RESOURCE_GROUP_TYPE.E55' : Concept().get_e55_domain('HERITAGE_RESOURCE_GROUP_TYPE.E55')}
+            self.data['HERITAGE_PLACE_TYPE.E55'] = {
+                'branch_lists': self.get_nodes('HERITAGE_PLACE_TYPE.E55'),
+                'domains': {'HERITAGE_PLACE_TYPE.E55' : Concept().get_e55_domain('HERITAGE_PLACE_TYPE.E55')}
             }            
             
             self.data['RIGHT_NEW.E30'] = {
@@ -1217,12 +1217,15 @@ class LocationForm(ResourceForm):
 
         self.update_nodes('GEOMETRIC_PLACE_EXPRESSION.SP5', data)
         self.update_nodes('GEOMETRY_EXTENT_CERTAINTY.I6', data)
-        self.update_nodes('GRID_ID_NEW.E42', data)
+
         
         if self.resource.entitytypeid == 'HERITAGE_FEATURE.E24':
             siteshape_node = 'SITE_OVERALL_SHAPE_TYPE.E55'
+            grid_node = 'GRID_ID.E42'
         else:
             siteshape_node = 'SITE_OVERALL_SHAPE_TYPE_NEW.E55'
+            grid_node = 'GRID_ID_NEW.E42'
+        self.update_nodes(grid_node, data)
         self.update_nodes(siteshape_node, data)
         
         self.update_nodes('TOPOGRAPHY_TYPE.E55', data)
@@ -1253,16 +1256,21 @@ class LocationForm(ResourceForm):
                 'GEOMETRY_EXTENT_CERTAINTY.I6': Concept().get_e55_domain('GEOMETRY_EXTENT_CERTAINTY.I6')
             }
         }
-
-        self.data['GRID_ID_NEW.E42'] = {
+        
+        if self.resource.entitytypeid == 'HERITAGE_FEATURE.E24':
+            siteshape_node = 'SITE_OVERALL_SHAPE_TYPE.E55'
+            grid_node = 'GRID_ID.E42'
+        else:
+            siteshape_node = 'SITE_OVERALL_SHAPE_TYPE_NEW.E55'
+            grid_node = 'GRID_ID_NEW.E42'
+            
+            
+        self.data[grid_node] = {
                 'branch_lists': self.get_nodes('GRID_ID_NEW.E42'),
                 'domains': {}
             }
         
-        if self.resource.entitytypeid == 'HERITAGE_FEATURE.E24':
-            siteshape_node = 'SITE_OVERALL_SHAPE_TYPE.E55'
-        else:
-            siteshape_node = 'SITE_OVERALL_SHAPE_TYPE_NEW.E55'
+
             
         self.data[siteshape_node] = {
             'branch_lists': self.get_nodes(siteshape_node),
