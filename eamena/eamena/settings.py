@@ -46,7 +46,7 @@ def RESOURCE_TYPE_CONFIGS():
             'categories': [_('Resource')],
             'has_layer': True,
             'on_map': True,
-            'marker_color': '#a44b0f',
+            'marker_color': '#e53d20',
             'stroke_color': '#d9b562',
             'fill_color': '#eedbad',
             'primary_name_lookup': {
@@ -65,7 +65,7 @@ def RESOURCE_TYPE_CONFIGS():
             'categories': [_('Resource')],
             'has_layer': True,
             'on_map': True,
-            'marker_color': '#FFC53D',
+            'marker_color': '#42b472',
             'stroke_color': '#d9b562',
             'fill_color': '#eedbad',
             'primary_name_lookup': {
