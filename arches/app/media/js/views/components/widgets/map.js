@@ -1432,27 +1432,37 @@ define([
                  });
                  return !overlay.invisible();
              }
-             var highlightResource = function(resourceId, layerIdSuffix) {
+             var highlightResource = function(featureId, layerIdSuffix) {
                  var style = self.getMapStyle();
                  _.each(style.layers, function(layer) {
                      var filter = self.map.getFilter(layer.id);
                      var filterToUpdate;
-                     if (filter && layer.id.split('-').pop() === layerIdSuffix) {
-                         if (filter[1] === 'resourceinstanceid') {
+                     var layerIdElements = layer.id.split('-')
+                     var name = layerIdElements.slice(0, layerIdElements.length - 1)
+                     var suffix = layerIdElements.pop()
+                     if (filter && suffix === layerIdSuffix) {
+                         if (filter[1] === 'resourceinstanceid' || filter[1] === '_featureid') {
                              filterToUpdate = filter;
                          } else {
                              _.each(filter, function(item) {
-                                 if (Array.isArray(item) && item[1] === 'resourceinstanceid') {
+                                 if (Array.isArray(item) && (item[1] === 'resourceinstanceid' || item[1] === '_featureid')) {
                                      filterToUpdate = item;
                                  }
                              })
                          }
                          if (filterToUpdate) {
-                             filterToUpdate[2] = resourceId;
+                             filterToUpdate[2] = featureId;
                          }
+                         map.setFilter(layer.id, filter);
+                         filter[2][0] = "!="
+                         map.setFilter(name, filter)
+                     } else {
                          map.setFilter(layer.id, filter);
                      }
                  });
+             };
+             var highlightOverlayFeature = function(featureId, layerIdSuffix) {
+                 console.log('highlighting', featureId, layerIdSuffix);
              };
              self.map.hoverFeatures = [];
              self.map.on('mousemove', function(e) {
@@ -1468,7 +1478,7 @@ define([
                              if (feature.properties.feature_info_content) {
                                  hoverData = feature.properties;
                              }
-                             if (feature.properties.resourceinstanceid) {
+                             if (feature.properties.resourceinstanceid || feature.properties._featureid) {
                                  return isFeatureVisible(feature);
                              }
                          }) || _.find(features, function(feature) {
@@ -1495,8 +1505,11 @@ define([
                          }
 
                          if (self.hoverData() !== hoverData) {
-                             self.hoverData(hoverData);
+                             self.hoverData(hoverData, hoverFeature);
                              var hoverFeatureId = hoverFeature && hoverFeature.properties.resourceinstanceid ? hoverFeature.properties.resourceinstanceid : '';
+                             if (hoverFeatureId === '') {
+                                 hoverFeatureId = hoverFeature && hoverFeature.properties._featureid ? hoverFeature.properties._featureid : '';
+                             }
                              highlightResource(hoverFeatureId, 'hover')
                          }
                          self.map.getCanvas().style.cursor = clickable ? 'pointer' : '';
@@ -1595,6 +1608,7 @@ define([
 
              self.clickData.subscribe(function(val) {
                  var clickFeatureId = val && val.resourceinstanceid ? ko.unwrap(val.resourceinstanceid) : '';
+                 clickFeatureId = !clickFeatureId && val && val._featureid ? val._featureid : '';
                  highlightResource(clickFeatureId, 'click');
              });
 
