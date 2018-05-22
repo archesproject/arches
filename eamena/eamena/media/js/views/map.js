@@ -185,6 +185,9 @@ define([
         addResourceGeomLayer: function(){
 
             var geojson = $('#resource_geom').val();
+            if (geojson == 'null') { 
+                return;
+            };
             var format = new ol.format.GeoJSON;
 
             var green_style = function (feature) {
