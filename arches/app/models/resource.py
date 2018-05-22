@@ -1047,8 +1047,9 @@ class Resource(Entity):
         bool.must(Match(field='_all', query=self.entityid))
         query.add_query(bool)
         results = query.search(index='resource')
-        geomjson = results['hits']['hits'][0]['_source']['geometry']
-        if not geomjson:
+        try:
+            geomjson = results['hits']['hits'][0]['_source']['geometry']
+        except:
             return None
             
         ## taking care of the transformation here is easier/more efficient

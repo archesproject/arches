@@ -6,8 +6,9 @@ define([
     'underscore',
     'openlayers',
     'views/forms/sections/branch-list',
-    'views/map'
-], function ($, Backbone, ko, koMapping, _, ol, BranchList, MapView) {
+    'views/map',
+    'resource-types'
+], function ($, Backbone, ko, koMapping, _, ol, BranchList, MapView, Resources) {
     var wkt = new ol.format.WKT();
     return BranchList.extend({
         initialize: function(options) {
@@ -130,39 +131,24 @@ define([
             BranchList.prototype.initialize.apply(this, arguments);
 
             self.addDefaultNode(self.dataKey, '')
-
             var style = function (feature) {
                 var editing = feature.get('editing');
-                // change the new feature color to green if this is a map to
-                // which existing geometries are being added.
-                console.log(self.addParentGeom)
-                
+                // colour of feature depends on colour assigned to resource type in settings file. If self.addParentGeom, then the colour switches to the colour of the child
                 if (self.addParentGeom) {
-                    var colors = {
-                        full:'rgba(101, 191, 11, 100)',
-                        trans: 'rgba(101, 191, 11, 0)'
-                    }
-                } else {
-                    var colors = {
-                        full:'rgba(179, 0, 0, 100)',
-                        trans: 'rgba(179, 0, 0, 0)'
-                    }
+                    var color = Resources[$("#childresourcetypeid").val()].color;
+
+                }else{
+                    var color = Resources[$("#resourcetypeid").val()].color;
                 }
                 return [new ol.style.Style({
-                    fill: new ol.style.Fill({
-                        color: colors['trans']
-                    }),
                     stroke: new ol.style.Stroke({
-                        color: colors['full'],
+                        color: color,
                         width: editing ? 4 : 3
                     }),
                     image: new ol.style.Circle({
                         radius: editing ? 9 : 7,
-                        fill: new ol.style.Fill({
-                            color: colors['trans']
-                        }),
                         stroke: new ol.style.Stroke({
-                            color: colors['full'],
+                            color: color,
                             width: editing ? 4 : 3
                         })
                     })
