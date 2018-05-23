@@ -1429,25 +1429,7 @@ define([
                  return !overlay.invisible();
              }
 
-             var highlightResource = function(featureId, layerIdSuffix, style, feature) {
-                 var layers = style.layers;
-                 if (feature) {
-                     layers = _.filter(style.layers, function(layer){return layer.source === feature.layer.source});
-                 }
-                 _.each(layers, function(layer) {
-                     var filter = self.map.getFilter(layer.id);
-                     if (filter && layer.id.endsWith(layerIdSuffix)) {
-                         _.each(filter, function(query) {
-                             if (Array.isArray(query) && query[1] === 'resourceinstanceid') {
-                                 query[2] = featureId;
-                             }
-                         })
-                         map.setFilter(layer.id, filter);
-                     }
-                 });
-             };
-
-             var highlightOverlayFeature = function(feature, layerIdSuffix, featureType, style) {
+             var highlightFeature = function(feature, layerIdSuffix, featureType, style) {
                  var feature;
                  var featureLayer;
                  var featureId = feature && feature.properties[featureType] ? feature.properties[featureType] : '';
@@ -1567,10 +1549,10 @@ define([
                              var hoverResourceId = hoverFeature && hoverFeature.properties.resourceinstanceid ? hoverFeature.properties.resourceinstanceid : '';
                              var style = self.getMapStyle();
                              if (hoverFeature && hoverFeature.properties.resourceinstanceid) {
-                                 highlightOverlayFeature(hoverFeature, 'hover', 'resourceinstanceid', style);
+                                 highlightFeature(hoverFeature, 'hover', 'resourceinstanceid', style);
                              }
                              if (hoverFeature && hoverFeature.properties._featureid) {
-                                 highlightOverlayFeature(hoverFeature, 'hover', '_featureid', style);
+                                 highlightFeature(hoverFeature, 'hover', '_featureid', style);
                              } if (hoverFeature === null) {
                                  self.clearHighlight('hover');
                              }
@@ -1623,9 +1605,9 @@ define([
                      self.clearHighlight('click');
                      var clickFeatureId = clickFeature.properties && clickFeature.properties.resourceinstanceid ? ko.unwrap(clickFeature.properties.resourceinstanceid) : '';
                      if (clickFeatureId) {
-                         highlightResource(clickFeatureId, 'click', style, clickFeature);
+                         highlightFeature(clickFeature, 'click', 'resourceinstanceid', style);
                      } else if (clickFeature.properties && clickFeature.properties._featureid) {
-                         highlightOverlayFeature(clickFeature, 'click', '_featureid', style);
+                         highlightFeature(clickFeature, 'click', '_featureid', style);
                      }
                  }
 
