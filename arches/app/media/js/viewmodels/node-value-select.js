@@ -12,11 +12,11 @@ define([
         this.multiple = params.multiple || false;
 
         WidgetViewModel.apply(this, [params]);
-        this.resourceinstanceid = params.tile.resourceinstance_id
+        this.resourceinstanceid = params.tile.resourceinstance_id;
         this.tiles = ko.observableArray();
         var updateTiles = function() {
             var nodeid = params.node.config.nodeid();
-            var resourceId = self.resourceinstanceid();
+            var resourceId = ko.unwrap(self.resourceinstanceid);
             var url = arches.urls.resource_tiles.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', resourceId);
             if (nodeid) {
                 $.ajax({
