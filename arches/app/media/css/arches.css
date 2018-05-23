@@ -2146,8 +2146,8 @@ ul.nav.nav-tabs.nav-justified {
 }
 
 .graph-settings-panel-body .widgets .widget-container div div > input {
-    max-width: 700px;
-    min-width: 450px;
+    max-width: 500px;
+    min-width: 500px;
 }
 
 .graph-settings-panel-body .widgets .widget-container div .colorpicker-component {
@@ -2157,6 +2157,20 @@ ul.nav.nav-tabs.nav-justified {
 
 .graph-settings-panel-body .widgets .widget-container div div div div div select .chosen-container {
     width: 500px;
+}
+
+.graph-settings-panel-body .widgets .widget-container div div .domain-input {
+    max-width: 480px;
+    min-width: 480px;
+}
+
+.graph-settings-panel-body .widgets .widget-container div div .domain-input-item {
+    max-width: 474px;
+    min-width: 474px;
+}
+
+.edtf-input {
+    padding-bottom: 15px;
 }
 
 .node-subtitle {
@@ -8275,6 +8289,23 @@ a.clear-geojson-button:hover {
 
 .added-domain-option {
     padding-bottom: 4px;
+}
+
+.domain-container {
+    width: 500px;
+}
+
+.domain-input {
+    height: 32px;
+}
+
+.domain-input-item {
+    height: 32px;
+}
+
+.option-drag-handle {
+    color: #999; 
+    cursor: move
 }
 
 .content-instructions {
