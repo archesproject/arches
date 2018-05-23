@@ -1400,6 +1400,7 @@ define([
              this.buffer.subscribe(function(val) {
                  this.updateBuffer(val, this.bufferUnit());
              }, this);
+
              this.bufferUnit.subscribe(function(val) {
                  this.updateBuffer(this.buffer(), val);
              }, this);
@@ -1430,6 +1431,7 @@ define([
                  });
                  return resourceLookup[resourceId];
              }
+
              var isFeatureVisible = function(feature) {
                  var overlay = _.find(self.overlays(), function(overlay) {
                      return _.find(overlay.layer_definitions, function(layer) {
@@ -1438,38 +1440,100 @@ define([
                  });
                  return !overlay.invisible();
              }
-             var highlightResource = function(featureId, layerIdSuffix) {
-                 var style = self.getMapStyle();
-                 _.each(style.layers, function(layer) {
+
+             var highlightResource = function(featureId, layerIdSuffix, style, feature) {
+                 var layers = style.layers;
+                 if (feature) {
+                     layers = _.filter(style.layers, function(layer){return layer.source === feature.layer.source});
+                 }
+                 _.each(layers, function(layer) {
                      var filter = self.map.getFilter(layer.id);
-                     var filterToUpdate;
-                     var layerIdElements = layer.id.split('-')
-                     var name = layerIdElements.slice(0, layerIdElements.length - 1)
-                     var suffix = layerIdElements.pop()
-                     if (filter && suffix === layerIdSuffix) {
-                         if (filter[1] === 'resourceinstanceid' || filter[1] === '_featureid') {
-                             filterToUpdate = filter;
-                         } else {
-                             _.each(filter, function(item) {
-                                 if (Array.isArray(item) && (item[1] === 'resourceinstanceid' || item[1] === '_featureid')) {
-                                     filterToUpdate = item;
-                                 }
-                             })
-                         }
-                         if (filterToUpdate) {
-                             filterToUpdate[2] = featureId;
-                         }
-                         map.setFilter(layer.id, filter);
-                         filter[2][0] = "!="
-                         map.setFilter(name, filter)
-                     } else {
+                     if (filter && layer.id.endsWith(layerIdSuffix)) {
+                         _.each(filter, function(query) {
+                             if (Array.isArray(query) && query[1] === 'resourceinstanceid') {
+                                 query[2] = featureId;
+                             }
+                         })
                          map.setFilter(layer.id, filter);
                      }
                  });
              };
-             var highlightOverlayFeature = function(featureId, layerIdSuffix) {
-                 console.log('highlighting', featureId, layerIdSuffix);
+
+             var highlightOverlayFeature = function(feature, layerIdSuffix, featureType, style) {
+                 var feature;
+                 var featureLayer;
+                 var featureId = feature && feature.properties[featureType] ? feature.properties[featureType] : '';
+                 var layers = _.filter(style.layers, function(layer){return layer.source === feature.layer.source});
+                 var highlightLayers = _.filter(layers, function(layer){return layer.id.endsWith(layerIdSuffix)});
+                 var rootLayers = _.filter(layers, function(layer){return (layer.id.endsWith('click') || layer.id.endsWith('hover')) == false })
+                 _.each(highlightLayers, function(highlightLayer) {
+                     if (highlightLayer) {
+                         var filter = self.map.getFilter(highlightLayer.id);
+                         if (filter) {
+                             _.each(filter, function(query) {
+                                 if (Array.isArray(query) && query[1] === featureType) {
+                                     query[2] = featureId;
+                                 }
+                             });
+                         } else {
+                             map.setFilter(highlightLayer.layer.id, ["all", ["==", featureType, featureId]]);
+                         }
+                         map.setFilter(highlightLayer.id, filter); //shows the highlight filter
+                     }
+                 })
+
+                 if (layerIdSuffix === 'hover') {
+                     _.each(rootLayers, function(rootLayer){
+                         if (!rootLayer.filter) {
+                             rootLayer.filter = ["all", ["!=", featureType, featureId]]
+                             map.setFilter(rootLayer.id, rootLayer.filter); //removes the unhighlighted feature
+                         } else {
+                             resetQuery = _.find(rootLayer.filter, function(query){return Array.isArray(query) && query[1] === featureType})
+                             if (!resetQuery) {
+                                 rootLayer.filter.push(["!=", featureType, featureId])
+                             };
+                             map.setFilter(rootLayer.id, null); //resets the root layer filter
+                             map.setFilter(rootLayer.id, rootLayer.filter); //removes the unhighlighted feature
+                         };
+                     })
+                 }
+             }
+
+             self.clearHighlight = function(layerIdSuffix, idType) {
+                 style = self.getMapStyle();
+                 suffixLayers = _.filter(style.layers, function(layer){return layer.id.endsWith(layerIdSuffix)});
+                 _.each(suffixLayers, function(layer) {
+                     var filter = self.map.getFilter(layer.id);
+                     var filterToUpdate;
+                     var layerIdElements = layer.id.split('-')
+                     var name = layerIdElements.slice(0, layerIdElements.length - 1).join('-')
+                     var rootLayer = _.findWhere(style.layers, {'id': name})
+                     var suffix = layerIdElements.pop()
+                     if (filter) {
+                         _.each(filter, function(item) {
+                             if (Array.isArray(item) && (item[1] === '_featureid' || item[1] === 'resourceinstanceid')) {
+                                 filterToUpdate = item;
+                             }
+                         });
+                         if (filterToUpdate) {
+                             filterToUpdate[2] = '';
+                             map.setFilter(layer.id, filter);
+                         };
+                     };
+                     if (rootLayer.filter) {
+                         var queryToRemove;
+                         var resetFilter;
+                         _.each(rootLayer.filter, function(query){
+                             if (Array.isArray(query) && (query[1] === '_featureid' || query[1] === 'resourceinstanceid')) {
+                                 queryToRemove = query
+                             }
+                         })
+                         rootLayer.filter = _.without(rootLayer.filter, queryToRemove);
+                         map.setFilter(rootLayer.id, rootLayer.filter);
+                     }
+                 });
              };
+
              self.map.hoverFeatures = [];
              self.map.on('mousemove', function(e) {
                  var features = self.map.queryRenderedFeatures(e.point);
@@ -1512,11 +1576,16 @@ define([
 
                          if (self.hoverData() !== hoverData) {
                              self.hoverData(hoverData, hoverFeature);
-                             var hoverFeatureId = hoverFeature && hoverFeature.properties.resourceinstanceid ? hoverFeature.properties.resourceinstanceid : '';
-                             if (hoverFeatureId === '') {
-                                 hoverFeatureId = hoverFeature && hoverFeature.properties._featureid ? hoverFeature.properties._featureid : '';
+                             var hoverResourceId = hoverFeature && hoverFeature.properties.resourceinstanceid ? hoverFeature.properties.resourceinstanceid : '';
+                             var style = self.getMapStyle();
+                             if (hoverFeature && hoverFeature.properties.resourceinstanceid) {
+                                 highlightOverlayFeature(hoverFeature, 'hover', 'resourceinstanceid', style);
                              }
-                             highlightResource(hoverFeatureId, 'hover')
+                             if (hoverFeature && hoverFeature.properties._featureid) {
+                                 highlightOverlayFeature(hoverFeature, 'hover', '_featureid', style);
+                             } if (hoverFeature === null) {
+                                 self.clearHighlight('hover');
+                             }
                          }
                          self.map.getCanvas().style.cursor = clickable ? 'pointer' : '';
                          self.map.hoverFeatures = features;
@@ -1533,7 +1602,7 @@ define([
                      if (feature.properties.feature_info_content) {
                          clickData = feature.properties;
                      }
-                     if (feature.properties.resourceinstanceid) {
+                     if (feature.properties.resourceinstanceid || feature.properties._featureid) {
                          return isFeatureVisible(feature);
                      }
                  }) || _.find(features, function(feature) {
@@ -1560,6 +1629,15 @@ define([
                          map.fitBounds(bounds, {
                              padding: 20
                          });
+                     }
+
+                     var style = self.getMapStyle();
+                     self.clearHighlight('click');
+                     var clickFeatureId = clickFeature.properties && clickFeature.properties.resourceinstanceid ? ko.unwrap(clickFeature.properties.resourceinstanceid) : '';
+                     if (clickFeatureId) {
+                         highlightResource(clickFeatureId, 'click', style, clickFeature);
+                     } else if (clickFeature.properties && clickFeature.properties._featureid) {
+                         highlightOverlayFeature(clickFeature, 'click', '_featureid', style);
                      }
                  }
 
@@ -1613,9 +1691,9 @@ define([
              });
 
              self.clickData.subscribe(function(val) {
-                 var clickFeatureId = val && val.resourceinstanceid ? ko.unwrap(val.resourceinstanceid) : '';
-                 clickFeatureId = !clickFeatureId && val && val._featureid ? val._featureid : '';
-                 highlightResource(clickFeatureId, 'click');
+                if (val === null){
+                    self.clearHighlight('click');
+                };
              });
 
              ['draw.create', 'draw.update', 'draw.delete'].forEach(function(event) {
