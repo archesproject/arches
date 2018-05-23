@@ -413,7 +413,7 @@ CACHE_BY_USER = {'anonymous': 3600 * 24}
 
 DATE_IMPORT_EXPORT_FORMAT = '%Y-%m-%d'
 
-API_URL_SLUG = 'api/'
+API_URL_SLUG = 'api'
 
 #######################################
 ###       END STATIC SETTINGS       ###
