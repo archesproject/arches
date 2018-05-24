@@ -139,8 +139,8 @@ urlpatterns = [
     url(r'^user/get_user_names$', UserManagerView.as_view(action='get_user_names'), name="get_user_names"),
     url(r'^mobile_survey_resources/(?P<surveyid>%s)/resources$' % uuid_regex, MobileSurveyResources.as_view(), name='mobile_survey_resources'),
     url(r'^mobile_survey_manager/*', MobileSurveyManagerView.as_view(), name="mobile_survey_manager"),
-    url(r'^couchdb/(?P<path>.*)$', api.CouchdbProxy.as_view()),
-    url(r'^surveys$', api.Surveys.as_view(), name='surveys'),
+    url(r'^' + settings.API_URL_SLUG + 'couchdb/(?P<path>.*)$', api.CouchdbProxy.as_view()),
+    url(r'^' + settings.API_URL_SLUG + 'surveys$', api.Surveys.as_view(), name='surveys'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
@@ -151,7 +151,10 @@ urlpatterns = [
     url(r'^password_reset/done/$', auth_views.password_reset_done, name='password_reset_done'),
     url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', auth_views.password_reset_confirm, name='password_reset_confirm', kwargs={"set_password_form":ArchesSetPasswordForm}),
     url(r'^reset/done/$', auth_views.password_reset_complete, name='password_reset_complete'),
+
+    url(r'^o/', include('oauth2_provider.urls', namespace='oauth2')),
 ]
+
 
 if settings.DEBUG:
     try:

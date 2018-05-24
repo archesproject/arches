@@ -271,6 +271,7 @@ TEMPLATES = [
 ]
 
 AUTHENTICATION_BACKENDS = (
+    'oauth2_provider.backends.OAuth2Backend',
     'django.contrib.auth.backends.ModelBackend', # this is default
     'guardian.backends.ObjectPermissionBackend',
     'arches.app.utils.permission_backend.PermissionBackend',
@@ -291,6 +292,7 @@ INSTALLED_APPS = (
     'captcha',
     'revproxy',
     'corsheaders',
+    'oauth2_provider',
     #'debug_toolbar'
 )
 
@@ -299,12 +301,13 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'arches.app.utils.middleware.TokenMiddleware',
+    #'arches.app.utils.middleware.TokenMiddleware',
     #'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'oauth2_provider.middleware.OAuth2TokenMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'arches.app.utils.middleware.JWTAuthenticationMiddleware',
+    #'arches.app.utils.middleware.JWTAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'arches.app.utils.middleware.SetAnonymousUser',
@@ -409,6 +412,8 @@ TIMEWHEEL_DATE_TIERS = None
 CACHE_BY_USER = {'anonymous': 3600 * 24}
 
 DATE_IMPORT_EXPORT_FORMAT = '%Y-%m-%d'
+
+API_URL_SLUG = 'api/'
 
 #######################################
 ###       END STATIC SETTINGS       ###
