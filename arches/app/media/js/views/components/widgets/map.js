@@ -1449,27 +1449,32 @@ define([
                              map.setFilter(highlightLayer.layer.id, ["all", ["==", featureType, featureId]]);
                          }
                          map.setFilter(highlightLayer.id, filter); //shows the highlight filter
+
+                         // TODO The block below works to hide the hovered featured when features are not overlapping or contiguous. The hovered feature is filtered so that only the 'hover' feature is shown, but when the user mouses over a contiguous feature the hovered filter is not removed by the clearHighlight function.
+                         // if (layerIdSuffix === 'hover') {
+                         //     _.each(rootLayers, function(rootLayer){
+                         //         if (!rootLayer.filter) {
+                         //             console.log('here')
+                         //             rootLayer.filter = ["all", ["!=", featureType, featureId]]
+                         //             map.setFilter(rootLayer.id, rootLayer.filter); //removes the unhighlighted feature
+                         //         } else {
+                         //             console.log('there')
+                         //             resetQuery = _.find(rootLayer.filter, function(query){return Array.isArray(query) && query[1] === featureType})
+                         //             if (!resetQuery) {
+                         //                 rootLayer.filter.push(["!=", featureType, featureId])
+                         //             };
+                         //             map.setFilter(rootLayer.id, null); //resets the root layer filter
+                         //             map.setFilter(rootLayer.id, rootLayer.filter); //removes the unhighlighted feature
+                         //         };
+                         //     })
+                         // }
+
                      }
                  })
 
-                 // if (layerIdSuffix === 'hover') {
-                 //     _.each(rootLayers, function(rootLayer){
-                 //         if (!rootLayer.filter) {
-                 //             rootLayer.filter = ["all", ["!=", featureType, featureId]]
-                 //             map.setFilter(rootLayer.id, rootLayer.filter); //removes the unhighlighted feature
-                 //         } else {
-                 //             resetQuery = _.find(rootLayer.filter, function(query){return Array.isArray(query) && query[1] === featureType})
-                 //             if (!resetQuery) {
-                 //                 rootLayer.filter.push(["!=", featureType, featureId])
-                 //             };
-                 //             map.setFilter(rootLayer.id, null); //resets the root layer filter
-                 //             map.setFilter(rootLayer.id, rootLayer.filter); //removes the unhighlighted feature
-                 //         };
-                 //     })
-                 // }
              }
 
-             self.clearHighlight = function(layerIdSuffix, idType) {
+             self.clearHighlight = function(layerIdSuffix) {
                  style = self.getMapStyle();
                  suffixLayers = _.filter(style.layers, function(layer){return layer.id.endsWith(layerIdSuffix)});
                  _.each(suffixLayers, function(layer) {
@@ -1497,7 +1502,7 @@ define([
                              if (Array.isArray(query) && (query[1] === '_featureid' || query[1] === 'resourceinstanceid')) {
                                  queryToRemove = query
                              }
-                         })
+                         });
                          rootLayer.filter = _.without(rootLayer.filter, queryToRemove);
                          map.setFilter(rootLayer.id, rootLayer.filter);
                      }
@@ -1557,6 +1562,7 @@ define([
                                  self.clearHighlight('hover');
                              }
                          }
+
                          self.map.getCanvas().style.cursor = clickable ? 'pointer' : '';
                          self.map.hoverFeatures = features;
                      }
