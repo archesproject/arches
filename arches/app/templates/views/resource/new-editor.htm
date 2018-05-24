@@ -49,7 +49,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </div>
 
     <div class="flex">
-        <div class="left-panel" data-bind="resizableSidepanel:true">
+        <div class="left-panel graph-designer" data-bind="resizableSidepanel:true">
             <div class="jstree jstree-default" data-bind="visible: true" style="display: none;">
                 <div class="header">
                     <a data-bind="click: expandAll">Expand all</a>
@@ -88,7 +88,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!-- ko if: card.cardinality === 'n' || card.tiles().length === 0 -->
                         <li role="treeitem" class="jstree-node jstree-leaf">
                             <i class="jstree-icon jstree-ocl" role="presentation"></i>
-                            <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { self.selection(card) }, css:{'jstree-clicked': card.selected}">
+                            <a class="jstree-anchor jstree-addnew" href="#" tabindex="-1" data-bind="click: function () { self.selection(card) }, css:{'jstree-clicked': card.selected}">
                                 <i class="fa fa-plus-circle" role="presentation"></i>
                                 <span style="padding-right: 10px;">Add New</span>
                             </a>
