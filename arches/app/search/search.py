@@ -23,7 +23,7 @@ from django.conf import settings
 from datetime import datetime
 from elasticsearch import Elasticsearch, helpers
 
-
+import logging
 class SearchEngine(object):
 
     def __init__(self):
@@ -222,13 +222,11 @@ class SearchEngine(object):
 
             try:
                 self.es.index(index=index, doc_type=doc_type, body=document, id=id, **kwargs)
-            except:
-                print "Exception raised"
+            except Exception as detail:
+                logging.warning('%s: WARNING: failed to index document: %s \nException detail: %s\n' % (datetime.now(), document, detail))
+                raise detail
                 return False    
  
-#             except Exception as detail:
-#                 self.logger.warning('%s: WARNING: failed to index document: %s \nException detail: %s\n' % (datetime.now(), document, detail))
-#                 raise detail
 
 
     def bulk_index(self, data):
