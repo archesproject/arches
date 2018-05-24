@@ -1464,21 +1464,21 @@ define([
                      }
                  })
 
-                 if (layerIdSuffix === 'hover') {
-                     _.each(rootLayers, function(rootLayer){
-                         if (!rootLayer.filter) {
-                             rootLayer.filter = ["all", ["!=", featureType, featureId]]
-                             map.setFilter(rootLayer.id, rootLayer.filter); //removes the unhighlighted feature
-                         } else {
-                             resetQuery = _.find(rootLayer.filter, function(query){return Array.isArray(query) && query[1] === featureType})
-                             if (!resetQuery) {
-                                 rootLayer.filter.push(["!=", featureType, featureId])
-                             };
-                             map.setFilter(rootLayer.id, null); //resets the root layer filter
-                             map.setFilter(rootLayer.id, rootLayer.filter); //removes the unhighlighted feature
-                         };
-                     })
-                 }
+                 // if (layerIdSuffix === 'hover') {
+                 //     _.each(rootLayers, function(rootLayer){
+                 //         if (!rootLayer.filter) {
+                 //             rootLayer.filter = ["all", ["!=", featureType, featureId]]
+                 //             map.setFilter(rootLayer.id, rootLayer.filter); //removes the unhighlighted feature
+                 //         } else {
+                 //             resetQuery = _.find(rootLayer.filter, function(query){return Array.isArray(query) && query[1] === featureType})
+                 //             if (!resetQuery) {
+                 //                 rootLayer.filter.push(["!=", featureType, featureId])
+                 //             };
+                 //             map.setFilter(rootLayer.id, null); //resets the root layer filter
+                 //             map.setFilter(rootLayer.id, rootLayer.filter); //removes the unhighlighted feature
+                 //         };
+                 //     })
+                 // }
              }
 
              self.clearHighlight = function(layerIdSuffix, idType) {
