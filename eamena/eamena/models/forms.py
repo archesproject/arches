@@ -305,7 +305,7 @@ class ArchaeologicalAssessmentForm(ResourceForm):
         return {
             'id': 'archaeological-assessment',
             'icon': 'fa-flag',
-            'name': _('Archeological Assessment'),
+            'name': _('Archaeological Assessment'),
             'class': ArchaeologicalAssessmentForm
         }
 
@@ -378,7 +378,7 @@ class FeatureArchaeologicalAssessmentForm(ResourceForm):
         return {
             'id': 'archaeological-assessment-feature',
             'icon': 'fa-flag',
-            'name': _('Archeological Assessment'),
+            'name': _('Archaeological Assessment'),
             'class': FeatureArchaeologicalAssessmentForm
         }
 
