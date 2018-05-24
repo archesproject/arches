@@ -9987,6 +9987,10 @@ a.search-facet-item.disabled {
     padding: 15px 25px 15px 25px;
 }
 
+.graph-designer-tab-container {
+    background: #e7e7e7;
+}
+
 .viewstate-btn {
     width: 100px;
 }

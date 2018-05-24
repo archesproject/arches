@@ -88,18 +88,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <div class="left-panel graph-designer" data-bind="resizableSidepanel:true">
 
             <!--Nav Tabs-->
-            <ul class="nav nav-tabs">
-                <li data-bind="css: { active: activeTab() === 'graph' }, click: function(){activeTab('graph');}">
-                    <a class="graph-designer-tab ion-android-share-alt" aria-expanded="true">
-                        {% trans 'Graph' %}
-                    </a>
-                </li>
-                <li data-bind="css: { active: activeTab() === 'card' }, click: function(){activeTab('card');}">
-                    <a class="graph-designer-tab ion-android-folder" aria-expanded="false">
-                        {% trans 'Cards' %}
-                    </a>
-                </li>
-            </ul>
+            <div class="graph-designer-tab-container">
+                <ul class="nav nav-tabs">
+                    <li data-bind="css: { active: activeTab() === 'graph' }, click: function(){activeTab('graph');}">
+                        <a class="graph-designer-tab ion-android-share-alt" aria-expanded="true">
+                            {% trans 'Graph' %}
+                        </a>
+                    </li>
+                    <li data-bind="css: { active: activeTab() === 'card' }, click: function(){activeTab('card');}">
+                        <a class="graph-designer-tab ion-android-folder" aria-expanded="false">
+                            {% trans 'Cards' %}
+                        </a>
+                    </li>
+                </ul>
+            </div>
 
             <div class="tab-content" >
                 <!-- Summary Card -->
