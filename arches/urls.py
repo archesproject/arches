@@ -139,8 +139,8 @@ urlpatterns = [
     url(r'^user/get_user_names$', UserManagerView.as_view(action='get_user_names'), name="get_user_names"),
     url(r'^mobile_survey_resources/(?P<surveyid>%s)/resources$' % uuid_regex, MobileSurveyResources.as_view(), name='mobile_survey_resources'),
     url(r'^mobile_survey_manager/*', MobileSurveyManagerView.as_view(), name="mobile_survey_manager"),
-    url(r'^%scouchdb/(?P<path>.*)$' % settings.API_URL_SLUG, api.CouchdbProxy.as_view()),
-    url(r'^%ssurveys$' % settings.API_URL_SLUG, api.Surveys.as_view(), name='surveys'),
+    url(r'^couchdb/(?P<path>.*)$', api.CouchdbProxy.as_view()),
+    url(r'^surveys$', api.Surveys.as_view(), name='surveys'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
