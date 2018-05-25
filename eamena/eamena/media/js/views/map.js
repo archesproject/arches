@@ -5,8 +5,9 @@ define([
     'openlayers',
     'arches',
     'map/base-layers',
+    'resource-types',
     'bootstrap'
-], function($, Backbone, _, ol, arches, baseLayers) {
+], function($, Backbone, _, ol, arches, baseLayers, Resources) {
     return Backbone.View.extend({
         events: {
             'mousemove': 'handleMouseMove',
@@ -162,11 +163,12 @@ define([
                 this.trigger('mousePositionChanged', format(coords), pixels, overFeature);
                 if ($('#tooltip').length) {
                     $("#tooltip").show();
-                    var msg_content = coords[1].toFixed(4) + "° N&nbsp;&nbsp;" + coords[0].toFixed(4) + " ° E"
+                    var msg_content = "<span style='color:white'>"+coords[1].toFixed(4) + "° N&nbsp;&nbsp;" + coords[0].toFixed(4) + " ° E</span>"
                     if (overFeature && overFeature.get('name')) {
-                        msg_content += "<br><span style='color:rgb(179, 0, 0);'>"+overFeature.get('name')+"</span>"
+                        var color = Resources[$("#resourcetypeid").val()].color;
+                        msg_content += "<br><span style='color:"+color+"'>"+overFeature.get('name')+"</span>"
                     };
-                    $("#tooltip").html("<label>"+msg_content+"</label>");
+                    $("#tooltip").html("<label style='text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;'>"+msg_content+"</label>");
                     $("#tooltip").css({position:"absolute", left:xpos+15,top:ypos});
                 }
             } else {
@@ -189,23 +191,17 @@ define([
                 return;
             };
             var format = new ol.format.GeoJSON;
-
-            var green_style = function (feature) {
+            var color = Resources[$("#resourcetypeid").val()].color;
+            var style = function (feature) {
                 return [new ol.style.Style({
-                    fill: new ol.style.Fill({
-                        color: 'rgba(179, 0, 0, 0)'
-                    }),
                     stroke: new ol.style.Stroke({
-                        color: 'rgba(179, 0, 0, 100)',
+                        color: color,
                         width: 3
                     }),
                     image: new ol.style.Circle({
                         radius: 7,
-                        fill: new ol.style.Fill({
-                            color: 'rgba(179, 0, 0, 0)'
-                        }),
                         stroke: new ol.style.Stroke({
-                            color: 'rgba(179, 0, 0, 100)',
+                            color: color,
                             width: 3
                         })
                     })
@@ -219,7 +215,7 @@ define([
             var newlayer = new ol.layer.Vector({
                 title: 'Existing Resource Geometries',
                 source: source,
-                style: green_style
+                style: style
             })
             
             this.map.addLayer(newlayer);
