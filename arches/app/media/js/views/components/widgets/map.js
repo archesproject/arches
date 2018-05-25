@@ -1574,7 +1574,7 @@ define([
                                  highlightFeature(hoverFeature, 'hover', filterProperty, style);
                                  var sourceLayerId = filterProperty === '_featureid' ? hoverFeature.layer['source-layer'] : 'resources-fill-' + hoverFeature.layer['source-layer'];
                                  sourceLayer = map.getLayer(sourceLayerId);
-                                 self.hoverCache = {id: sourceLayer, filter: hoverFeature.layer.filter}
+                                 self.hoverCache = {id: sourceLayerId, filter: hoverFeature.layer.filter}
                                  filterSourceFeature(sourceLayer, filterProperty, featureId)
                              }
                              if (hoverFeature === null && self.clickData() === null) {
@@ -1640,9 +1640,10 @@ define([
                      if (filterProperty !== null) {
                          map.setFilter(self.hoverCache.id, self.hoverCache.filter)
                          highlightFeature(clickFeature, 'click', filterProperty, style);
-                         var sourceLayer = filterProperty === '_featureid' ? self.map.getLayer(clickFeature.layer['source-layer']) : self.map.getLayer('resources-fill-' + clickFeature.layer['source-layer']);
-                         console.log(sourceLayer.id)
-                         filterSourceFeature(sourceLayer, filterProperty, clickFeatureId)
+                         if (clickFeature.layer.type === 'fill') {
+                             var sourceLayer = filterProperty === '_featureid' ? self.map.getLayer(clickFeature.layer['source-layer']) : self.map.getLayer('resources-fill-' + clickFeature.layer['source-layer']);
+                             filterSourceFeature(sourceLayer, filterProperty, clickFeatureId);
+                         }
                      }
                  }
 
