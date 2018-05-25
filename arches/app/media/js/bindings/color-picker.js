@@ -3,23 +3,19 @@ define([
     'knockout',
     'bootstrap-colorpicker'
 ], function($, ko, colorpicker) {
+
     ko.bindingHandlers.colorPicker = {
         init: function(element, valueAccessor) {
             var options = ko.unwrap(valueAccessor());
             var values = [];
             var picking = false;
-            var updateValues = function() {
+            var updateValues = function(val) {
                 if (!picking) {
-                    console.log($(cp).colorpicker('getValue'))
+                    $(cp).colorpicker('setValue', val)
                 }
             };
 
-            // $('body').mousemove(function(event) {
-            //       event.stopPropagation();
-            // });
-
             var keys = ['color','format'];
-
             keys.forEach(function (key) {
                 var value = options[key];
                 if (ko.isObservable(value)) {
