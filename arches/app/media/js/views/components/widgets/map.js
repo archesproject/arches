@@ -141,6 +141,7 @@ define([
          }
 
          this.hoverCache;
+         this.clickCache;
 
          this.bufferUnits = [{
                  name: 'meters',
@@ -1442,7 +1443,7 @@ define([
                                      query[2] = featureId;
                                  }
                              });
-                             map.setFilter(layer.id, filter); //shows the highlight
+                             map.setFilter(layer.id, filter);
                          } else {
                              map.setFilter(layer.layer.id, ["all", ["==", filterProperty, featureId]]);
                          }
@@ -1451,7 +1452,6 @@ define([
              };
 
              self.clearHighlight = function(layerIdSuffix) {
-                 console.log('clearing highlight')
                  style = self.getMapStyle();
                  suffixLayers = _.filter(style.layers, function(layer){return layer.id.endsWith(layerIdSuffix)});
                  _.each(suffixLayers, function(layer) {
@@ -1472,7 +1472,7 @@ define([
                              map.setFilter(layer.id, filter);
                          };
                      };
-                     if (sourceLayer.filter) {
+                     if (sourceLayer.filter && self.clickData() === null) {
                          var queryToRemove;
                          var resetFilter;
                          _.each(sourceLayer.filter, function(query){
@@ -1485,6 +1485,21 @@ define([
                      }
                  });
              };
+
+             var filterSourceFeature = function(layer, filterProperty, featureId) {
+                 var sourceFilterCopy;
+                 sourceFilterCopy = null;
+                 if (!layer.filter) {
+                     sourceFilterCopy = ["all", ["!=", filterProperty, featureId]]
+                 } else {
+                     sourceFilterCopy = $.extend(true, [], layer.filter);
+                     hideSourceQuery = _.find(sourceFilterCopy, function(query){return Array.isArray(query) && query[1] === filterProperty})
+                     if (!hideSourceQuery) {
+                         sourceFilterCopy.push(["!=", filterProperty, featureId])
+                     };
+                 };
+                 map.setFilter(layer.id, sourceFilterCopy); //filters the source feature
+             }
 
              self.map.hoverFeatures = [];
              self.map.on('mousemove', function(e) {
@@ -1531,13 +1546,11 @@ define([
                              var filterProperty = ''
                              var style;
                              var featureId;
-                             var sourceFilterCopy;
-                             if (hoverFeature && (hoverFeature.layer.id.endsWith('hover') === false) && (hoverFeature.layer.id.endsWith('click') === false)){
-
+                             var sourceLayer;
+                             if (hoverFeature && (hoverFeature.layer.id.endsWith('hover') === false) && (hoverFeature.layer.id.endsWith('click') === false) && self.clickData() === null){
                                  if (hoverFeature && self.hoverCache) {
                                      map.setFilter(self.hoverCache.id, self.hoverCache.filter)
                                  }
-
                                  if (hoverFeature && hoverFeature.properties.resourceinstanceid) {
                                      filterProperty = 'resourceinstanceid';
                                  } else if (hoverFeature && hoverFeature.properties._featureid) {
@@ -1546,24 +1559,13 @@ define([
                                  featureId = hoverFeature && hoverFeature.properties[filterProperty] ? hoverFeature.properties[filterProperty] : '';
                                  style = self.getMapStyle();
 
-                                 highlightFeature(hoverFeature, 'hover', '_featureid', style);
-                                 self.hoverCache = {id: hoverFeature.layer.id, filter: hoverFeature.layer.filter}
-
-                                 sourceFilterCopy = null;
-                                 if (!hoverFeature.filter) {
-                                     sourceFilterCopy = ["all", ["!=", filterProperty, featureId]]
-                                 } else {
-                                     sourceFilterCopy = $.extend(true, [], hoverFeature.layer.filter);
-                                     hideSourceQuery = _.find(sourceFilterCopy, function(query){return Array.isArray(query) && query[1] === filterProperty})
-                                     if (!hideSourceQuery) {
-                                         sourceFilterCopy.push(["!=", filterProperty, featureId])
-                                     };
-                                 };
-
-                                 map.setFilter(hoverFeature.layer.id, sourceFilterCopy); //filters the source feature
-
+                                 highlightFeature(hoverFeature, 'hover', filterProperty, style);
+                                 var sourceLayerId = filterProperty === '_featureid' ? hoverFeature.layer['source-layer'] : 'resources-fill-' + hoverFeature.layer['source-layer'];
+                                 sourceLayer = map.getLayer(sourceLayerId);
+                                 self.hoverCache = {id: sourceLayer, filter: hoverFeature.layer.filter}
+                                 filterSourceFeature(sourceLayer, filterProperty, featureId)
                              }
-                             if (hoverFeature === null) {
+                             if (hoverFeature === null && self.clickData() === null) {
                                  self.clearHighlight('hover');
                                  self.hoverCache = null;
                              }
@@ -1593,7 +1595,6 @@ define([
                      }
                  }) || null;
                  if (clickFeature) {
-
                      if (clickFeature.properties.resourceinstanceid) {
                          clickData = lookupResourceData(clickFeature.properties);
                      } else if (clickFeature.properties.total > 1) {
@@ -1615,16 +1616,27 @@ define([
 
                      var style = self.getMapStyle();
                      self.clearHighlight('click');
+
                      var clickFeatureId = clickFeature.properties && clickFeature.properties.resourceinstanceid ? ko.unwrap(clickFeature.properties.resourceinstanceid) : '';
+                     var filterProperty = null;
                      if (clickFeatureId) {
-                         highlightFeature(clickFeature, 'click', 'resourceinstanceid', style);
+                         filterProperty = 'resourceinstanceid';
                      } else if (clickFeature.properties && clickFeature.properties._featureid) {
-                         highlightFeature(clickFeature, 'click', '_featureid', style);
+                         filterProperty = '_featureid';
+                         clickFeatureId = clickFeature.properties._featureid
+                     }
+                     if (filterProperty !== null) {
+                         map.setFilter(self.hoverCache.id, self.hoverCache.filter)
+                         highlightFeature(clickFeature, 'click', filterProperty, style);
+                         var sourceLayer = filterProperty === '_featureid' ? self.map.getLayer(clickFeature.layer['source-layer']) : self.map.getLayer('resources-fill-' + clickFeature.layer['source-layer']);
+                         console.log(sourceLayer.id)
+                         filterSourceFeature(sourceLayer, filterProperty, clickFeatureId)
                      }
                  }
 
                  if (self.clickData() !== clickData) {
                      self.clickData(clickData);
+                     self.clearHighlight('hover');
                  }
              });
 
