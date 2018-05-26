@@ -18,7 +18,8 @@ define(['jquery',
                 'click .related-resources-graph': 'showRelatedResouresGraph',
                 'click .navigate-map': 'zoomToFeature',
                 'mouseover .arches-search-item': 'itemMouseover',
-                'mouseout .arches-search-item': 'itemMouseout'
+                'mouseout .arches-search-item': 'itemMouseout',
+                'keyup .go-to': 'NavigateTo'
             },
 
             initialize: function(options) { 
@@ -42,6 +43,7 @@ define(['jquery',
                 this.results = ko.observableArray();
                 this.page = ko.observable(1);
                 this.paginator = ko.observable();
+
 
                 ko.applyBindings(this, $('#search-results-list')[0]);
                 ko.applyBindings(this, $('#search-results-count')[0]);
@@ -79,7 +81,7 @@ define(['jquery',
                         });                
                     }
                 };
-
+            
             },
             showRelatedResouresGraph: function (e) {
                 var resourceId = $(e.target).data('resourceid');
@@ -102,10 +104,19 @@ define(['jquery',
             },
 
             newPage: function(evt){
-                var data = $(evt.target).data();             
+                var data = $(evt.target).data();  
                 this.page(data.page);
             },
-
+            NavigateTo: function(evt) {
+                if (evt.keyCode === 13) {
+                    var pageto = $("#navigateto").val();
+                    if (pageto >= $("#firstpage").val() && pageto <= $("#lastpage").val()) {
+                        this.page(pageto);
+                    } else {
+                         $("#invalidpage").show(0).delay(4000).hide(0);
+                    }
+                }
+            },
             updateResults: function(results){
                 var self = this;
                 this.paginator(results);

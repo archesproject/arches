@@ -485,7 +485,6 @@ h3.heading-xs {
 .pagination > .active > a, 
 .pagination > .active > span, 
 .pagination > .active > a:hover, 
-.pagination > .active > span:hover, 
 .pagination > .active > a:focus, 
 .pagination > .active > span:focus {
    border-color: #72c02c;
