@@ -1562,8 +1562,11 @@ define([
                                  highlightFeature(hoverFeature, 'hover', filterProperty, style);
                                  var sourceLayerId = filterProperty === '_featureid' ? hoverFeature.layer['source-layer'] : 'resources-fill-' + hoverFeature.layer['source-layer'];
                                  sourceLayer = map.getLayer(sourceLayerId);
-                                 self.hoverCache = {id: sourceLayerId, filter: hoverFeature.layer.filter}
-                                 filterSourceFeature(sourceLayer, filterProperty, featureId)
+                                 if (sourceLayer && sourceLayer.type === 'fill') {
+                                     self.hoverCache = {id: sourceLayerId, filter: hoverFeature.layer.filter}
+                                     console.log('hoverCache', self.hoverCache)
+                                     filterSourceFeature(sourceLayer, filterProperty, featureId)
+                                 }
                              }
                              if (hoverFeature === null && self.clickData() === null) {
                                  self.clearHighlight('hover');
@@ -1626,12 +1629,17 @@ define([
                          clickFeatureId = clickFeature.properties._featureid
                      }
                      if (filterProperty !== null) {
-                         map.setFilter(self.hoverCache.id, self.hoverCache.filter)
                          highlightFeature(clickFeature, 'click', filterProperty, style);
-                         if (clickFeature.layer.type === 'fill') {
-                             var sourceLayer = filterProperty === '_featureid' ? self.map.getLayer(clickFeature.layer['source-layer']) : self.map.getLayer('resources-fill-' + clickFeature.layer['source-layer']);
-                             filterSourceFeature(sourceLayer, filterProperty, clickFeatureId);
+                         var sourceLayer = filterProperty === '_featureid' ? self.map.getLayer(clickFeature.layer['source-layer']) : self.map.getLayer('resources-fill-' + clickFeature.layer['source-layer']);
+                         if (!sourceLayer && (clickFeature.layer.source === 'search-results-points')) {
+
                          }
+                         if (self.hoverCache) {
+                             map.setFilter(self.hoverCache.id, self.hoverCache.filter)
+                         };
+                         if (sourceLayer && clickFeature.layer.type === 'fill') {
+                             filterSourceFeature(sourceLayer, filterProperty, clickFeatureId);
+                         };
                      }
                  }
 
