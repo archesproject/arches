@@ -81,6 +81,9 @@ def resource_manager(request, resourcetypeid='', form_id='default', resourceid='
     
     if request.method == 'GET':
         if form != None:
+        
+            ## geom will be a geojson FeatureCollection or 'null'
+            geom = JSONSerializer().serialize(resource.get_geom())
             
             lang = request.GET.get('lang', request.LANGUAGE_CODE)
             form.load(lang)
@@ -101,7 +104,7 @@ def resource_manager(request, resourcetypeid='', form_id='default', resourceid='
                     'max_date': min_max_dates['val__max'].year if min_max_dates['val__min'] != None else 1,
                     'timefilterdata': JSONSerializer().serialize(Concept.get_time_filter_data()),
                     'resource_icon': settings.RESOURCE_TYPE_CONFIGS()[resourcetypeid]['icon_class'],
-                    'resource_geom': JSONSerializer().serialize(resource.get_geom()),
+                    'resource_geom': geom,
                     'child_resource': 'HERITAGE_FEATURE.E24' if resourcetypeid == 'HERITAGE_RESOURCE_GROUP.E27' else 'HERITAGE_COMPONENT.B2'
                 },
                 context_instance=RequestContext(request))
