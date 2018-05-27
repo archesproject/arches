@@ -133,15 +133,13 @@ define([
          this.geocoderConfigOpen = ko.observable(false);
          this.resourcePropertiesConfigOpen = ko.observable(false);
          this.defaultValueConfigOpen = ko.observable(false);
+         this.clickSourceLayerCache;
 
          if (this.context === 'search-filter') {
              this.query = params.query;
              this.clearSearch = params.clearSearch;
              this.searchBuffer = params.searchBuffer;
          }
-
-         this.hoverCache;
-         this.clickCache;
 
          this.bufferUnits = [{
                  name: 'meters',
@@ -1453,51 +1451,84 @@ define([
 
              self.clearHighlight = function(layerIdSuffix) {
                  style = self.getMapStyle();
-                 suffixLayers = _.filter(style.layers, function(layer){return layer.id.endsWith(layerIdSuffix)});
-                 _.each(suffixLayers, function(layer) {
-                     var filter = self.map.getFilter(layer.id);
-                     var filterToUpdate;
-                     var layerIdElements = layer.id.split('-')
-                     var name = layerIdElements.slice(0, layerIdElements.length - 1).join('-')
-                     var sourceLayer = _.findWhere(style.layers, {'id': name})
-                     var suffix = layerIdElements.pop()
-                     if (filter) {
-                         _.each(filter, function(item) {
-                             if (Array.isArray(item) && (item[1] === '_featureid' || item[1] === 'resourceinstanceid')) {
-                                 filterToUpdate = item;
-                             }
-                         });
-                         if (filterToUpdate) {
-                             filterToUpdate[2] = '';
-                             map.setFilter(layer.id, filter);
+                 _.each(style.layers, function(layer) {
+                     if (layer.id.endsWith(layerIdSuffix)) {
+                         var filter = self.map.getFilter(layer.id);
+                         var filterToUpdate;
+                         var layerIdElements = layer.id.split('-')
+                         var name = layerIdElements.slice(0, layerIdElements.length - 1).join('-')
+                         var sourceLayer = _.findWhere(style.layers, {'id': name})
+                         var suffix = layerIdElements.pop()
+                         if (filter) {
+                             _.each(filter, function(item) {
+                                 if (Array.isArray(item) && (item[1] === '_featureid' || item[1] === 'resourceinstanceid')) {
+                                     filterToUpdate = item;
+                                 }
+                             });
+                             if (filterToUpdate) {
+                                 filterToUpdate[2] = '';
+                                 map.setFilter(layer.id, filter);
+                             };
                          };
-                     };
-                     if (sourceLayer.filter && self.clickData() === null) {
-                         var queryToRemove;
-                         var resetFilter;
-                         _.each(sourceLayer.filter, function(query){
-                             if (Array.isArray(query) && (query[1] === '_featureid' || query[1] === 'resourceinstanceid')) {
-                                 queryToRemove = query
+                         if (sourceLayer.filter) {
+                             var clickCacheFeatureId;
+                             var clickCacheFilterProperty;
+                             if (self.clickSourceLayerCache && self.clickData()) {
+                                 clickCacheFeatureId = self.clickSourceLayerCache.featureid;
+                                 clickCacheFilterProperty = self.clickSourceLayerCache.filterProperty;
                              }
-                         });
-                         sourceLayer.filter = _.without(sourceLayer.filter, queryToRemove);
-                         map.setFilter(sourceLayer.id, sourceLayer.filter);
-                     }
+                             _.each(sourceLayer.filter, function(query){
+                                 if (Array.isArray(query) && query.length === 3) {
+                                     if ((query[1] === '_featureid' || query[1] === 'resourceinstanceid') && (query[2] != clickCacheFeatureId && query[1] != clickCacheFilterProperty)) {
+                                         sourceLayer.filter = self.removeLayerFilterQuery(sourceLayer.filter, query);
+                                     }
+                                 }
+                             });
+                             map.setFilter(sourceLayer.id, sourceLayer.filter);
+                         }
+                 }
                  });
              };
 
-             var filterSourceFeature = function(layer, filterProperty, featureId) {
-                 var sourceFilterCopy;
-                 sourceFilterCopy = null;
+             self.layerFilterHasQuery = function(filter, query) {
+                 var matchingQueries = _.find(filter, function(q) {
+                     return _.difference(q, query).length === 0;
+                 })
+                 if (matchingQueries) {
+                     return true;
+                 } else {
+                     return false;
+                 }
+             };
+
+             self.removeLayerFilterQuery = function(filter, query) {
+                 filter = _.without(filter, query);
+                 return filter;
+             }
+
+             self.filterSourceFeature = function(layer, filterProperty, featureId) {
+                 var sourceFilterCopy = null;
+                 var clickSourceCacheFilterCopy = null;
+                 var hideSourceQuery;
+                 var hideClickCacheQuery;
                  if (!layer.filter) {
                      sourceFilterCopy = ["all", ["!=", filterProperty, featureId]]
                  } else {
                      sourceFilterCopy = $.extend(true, [], layer.filter);
-                     hideSourceQuery = _.find(sourceFilterCopy, function(query){return Array.isArray(query) && query[1] === filterProperty})
-                     if (!hideSourceQuery) {
+                     filtersCurrentFeature = self.layerFilterHasQuery(sourceFilterCopy, ["!=", filterProperty, featureId]);
+                     if (filtersCurrentFeature === false) {
                          sourceFilterCopy.push(["!=", filterProperty, featureId])
-                     };
+                     }
                  };
+                 if (self.clickSourceLayerCache) {
+                     clickSourceCacheFilter = ["!=", self.clickSourceLayerCache.filterproperty, self.clickSourceLayerCache.featureid]
+                     filtersClickedFeature = self.layerFilterHasQuery(sourceFilterCopy, clickSourceCacheFilter);
+                     if (filtersClickedFeature === false) {
+                         console.log('pushing filter:', clickSourceCacheFilter);
+                         sourceFilterCopy.push(clickSourceCacheFilter);
+                     }
+                     console.log(sourceFilterCopy);
+                 }
                  map.setFilter(layer.id, sourceFilterCopy); //filters the source feature
              }
 
@@ -1547,10 +1578,7 @@ define([
                              var style;
                              var featureId;
                              var sourceLayer;
-                             if (hoverFeature && (hoverFeature.layer.id.endsWith('hover') === false) && (hoverFeature.layer.id.endsWith('click') === false) && self.clickData() === null){
-                                 if (hoverFeature && self.hoverCache) {
-                                     map.setFilter(self.hoverCache.id, self.hoverCache.filter)
-                                 }
+                             if (hoverFeature && (hoverFeature.layer.id.endsWith('hover') === false) && (hoverFeature.layer.id.endsWith('click') === false)){
                                  if (hoverFeature && hoverFeature.properties.resourceinstanceid) {
                                      filterProperty = 'resourceinstanceid';
                                  } else if (hoverFeature && hoverFeature.properties._featureid) {
@@ -1563,14 +1591,11 @@ define([
                                  var sourceLayerId = filterProperty === '_featureid' ? hoverFeature.layer['source-layer'] : 'resources-fill-' + hoverFeature.layer['source-layer'];
                                  sourceLayer = map.getLayer(sourceLayerId);
                                  if (sourceLayer && sourceLayer.type === 'fill') {
-                                     self.hoverCache = {id: sourceLayerId, filter: hoverFeature.layer.filter}
-                                     console.log('hoverCache', self.hoverCache)
-                                     filterSourceFeature(sourceLayer, filterProperty, featureId)
+                                     self.filterSourceFeature(sourceLayer, filterProperty, featureId)
                                  }
                              }
-                             if (hoverFeature === null && self.clickData() === null) {
+                             if (hoverFeature === null) {
                                  self.clearHighlight('hover');
-                                 self.hoverCache = null;
                              }
                          }
 
@@ -1622,6 +1647,7 @@ define([
 
                      var clickFeatureId = clickFeature.properties && clickFeature.properties.resourceinstanceid ? ko.unwrap(clickFeature.properties.resourceinstanceid) : '';
                      var filterProperty = null;
+                     self.clickSourceLayerCache = null;
                      if (clickFeatureId) {
                          filterProperty = 'resourceinstanceid';
                      } else if (clickFeature.properties && clickFeature.properties._featureid) {
@@ -1634,11 +1660,9 @@ define([
                          if (!sourceLayer && (clickFeature.layer.source === 'search-results-points')) {
 
                          }
-                         if (self.hoverCache) {
-                             map.setFilter(self.hoverCache.id, self.hoverCache.filter)
-                         };
                          if (sourceLayer && clickFeature.layer.type === 'fill') {
-                             filterSourceFeature(sourceLayer, filterProperty, clickFeatureId);
+                             self.filterSourceFeature(sourceLayer, filterProperty, clickFeatureId);
+                             self.clickSourceLayerCache = {sourcelayer: sourceLayer, filterproperty: filterProperty, featureid: clickFeatureId};
                          };
                      }
                  }
@@ -1696,6 +1720,7 @@ define([
              self.clickData.subscribe(function(val) {
                 if (val === null){
                     self.clearHighlight('click');
+                    self.clickSourceLayerCache = null;
                 };
              });
 
