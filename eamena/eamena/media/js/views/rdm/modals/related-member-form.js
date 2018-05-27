@@ -17,16 +17,20 @@ define(['jquery', 'backbone', 'arches', 'views/concept-search', 'models/concept'
         save: function(){
             var self = this;
             if (this.searchbox.val() !== ''){
-                var relatedConcept = new ConceptModel({
-                    id: this.searchbox.val(),
-                    relationshiptype: this.relationshiptype.val()
-                });
-                this.model.set('relatedconcepts', [relatedConcept]);
-
-                this.modal.on('hidden.bs.modal', function (e) {
-                    self.model.save();
-                })
-                this.modal.modal('hide');
+                if (this.searchbox.val() === $("#parentconceptid").val()) {
+                    $("#invalidvalue").show(0).delay(4000).hide(0);
+                } else {
+                    var relatedConcept = new ConceptModel({
+                        id: this.searchbox.val(),
+                        relationshiptype: this.relationshiptype.val()
+                    });
+                    this.model.set('relatedconcepts', [relatedConcept]);
+    
+                    this.modal.on('hidden.bs.modal', function (e) {
+                        self.model.save();
+                    })
+                    this.modal.modal('hide');                    
+                }
             }
         }
     });
