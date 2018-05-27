@@ -110,7 +110,9 @@ define(['jquery',
             NavigateTo: function(evt) {
                 if (evt.keyCode === 13) {
                     var pageto = $("#navigateto").val();
-                    if (pageto >= $("#firstpage").val() && pageto <= $("#lastpage").val()) {
+                    var firstpage = parseInt($("#firstpage").val());
+                    var lastpage = parseInt($("#lastpage").val());
+                    if (pageto >= firstpage && pageto <= lastpage) {
                         this.page(pageto);
                     } else {
                          $("#invalidpage").show(0).delay(4000).hide(0);
