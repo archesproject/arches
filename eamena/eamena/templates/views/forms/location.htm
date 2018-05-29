@@ -349,7 +349,14 @@
                 <dl>
                     <!-- Title -->
                     <dt>
-                        <h5 id="arches-subjects-form" class="section-headline">{% trans "Overall Site Shape" %}</h5>
+                        <h5 id="arches-subjects-form" class="section-headline">
+                        {% if resourcetypeid == 'HERITAGE_FEATURE.E24' %}
+                            {% trans "Overall Feature Shape" %}
+                        {% else %}
+                            {% trans "Overall Site Shape" %}
+                        {% endif %}
+                        </h5>
+                        
                     </dt>
                     
                     <!-- Form -->
