@@ -34,7 +34,6 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.management.commands import utils
 from arches.setup import unzip_file
-from formats.archesjson import JsonReader
 from formats.csvfile import CsvReader
 from formats.archesfile import ArchesFileReader
 

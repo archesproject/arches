@@ -47,15 +47,3 @@ class JsonWriter(Writer):
         json_for_export.append({'name':json_name, 'outputfile': dest})
 
         return json_for_export
-
-
-class JsonReader():
-
-    def validate_file(self, archesjson, break_on_error=True):
-        pass
-
-    def load_file(self, archesjson):
-        resources = []
-        with open(archesjson, 'r') as f:
-            resources = JSONDeserializer().deserialize(f.read())
-        return resources['resources']
