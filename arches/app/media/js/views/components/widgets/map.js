@@ -1461,7 +1461,7 @@ define([
                  })
              };
 
-             self.clearHighlight = function(layerIdSuffix) {
+             self.clearHighlight = function(layerIdSuffix, currentFeature) {
                  style = self.getMapStyle();
                  _.each(style.layers, function(layer) {
                      if (layer.id.endsWith(layerIdSuffix)) {
@@ -1469,11 +1469,10 @@ define([
                          var filterToUpdate;
                          var layerIdElements = layer.id.split('-')
                          var name = layerIdElements.slice(0, layerIdElements.length - 1).join('-')
-                         var sourceLayer = _.findWhere(style.layers, {'id': name})
-                         var suffix = layerIdElements.pop()
+                         var sourceLayer = _.findWhere(style.layers, {'id': layer['source-layer']})
                          if (filter) {
                              _.each(filter, function(item) {
-                                 if (Array.isArray(item) && (item[1] === '_featureid' || item[1] === 'resourceinstanceid')) {
+                                 if (Array.isArray(item) && (item[1] === '_featureid' || item[1] === 'resourceinstanceid') && item[2] != currentFeature) {
                                      filterToUpdate = item;
                                  }
                              });
@@ -1491,11 +1490,12 @@ define([
                              }
                              _.each(sourceLayer.filter, function(query){
                                  if (Array.isArray(query) && query.length === 3) {
-                                     if ((query[1] === '_featureid' || query[1] === 'resourceinstanceid') && (query[2] != clickCacheFeatureId && query[1] != clickCacheFilterProperty)) {
+                                     if ((query[1] === '_featureid' || query[1] === 'resourceinstanceid') && (query[2] != clickCacheFeatureId && query[1] != clickCacheFilterProperty) &&  query[2] != currentFeature) {
                                          sourceLayer.filter = self.removeLayerFilterQuery(sourceLayer.filter, query);
                                      }
                                  }
                              });
+                             console.log(sourceLayer.filter)
                              map.setFilter(sourceLayer.id, sourceLayer.filter);
                          }
                  }
@@ -1608,7 +1608,11 @@ define([
                              }
                              if (hoverFeature === null) {
                                  self.clearHighlight('hover');
+                             } else if (hoverFeature && hoverFeature.id === featureId) {
+                                 self.clearHighlight('hover', featureId)
+                                 console.log(featureId, hoverFeature)
                              }
+
                          }
 
                          self.map.getCanvas().style.cursor = clickable ? 'pointer' : '';
