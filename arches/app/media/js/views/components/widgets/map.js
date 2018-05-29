@@ -1462,12 +1462,10 @@ define([
                              _.each(filter, function(item) {
                                  if (Array.isArray(item) && (item[1] === '_featureid' || item[1] === 'resourceinstanceid') && item[2] != currentFeature) {
                                      filterToUpdate = item;
+                                     item[2] = '';
+                                     map.setFilter(layer.id, filter);
                                  }
                              });
-                             if (filterToUpdate) {
-                                 filterToUpdate[2] = '';
-                                 map.setFilter(layer.id, filter);
-                             };
                          };
                          if (sourceLayer.filter) {
                              var clickCacheFeatureId;
@@ -1478,12 +1476,11 @@ define([
                              }
                              _.each(sourceLayer.filter, function(query){
                                  if (Array.isArray(query) && query.length === 3) {
-                                     if ((query[1] === '_featureid' || query[1] === 'resourceinstanceid') && (query[2] != clickCacheFeatureId && query[1] != clickCacheFilterProperty) &&  query[2] != currentFeature) {
+                                     if ((query[1] === '_featureid' || query[1] === 'resourceinstanceid') && (query[2] != clickCacheFeatureId && query[1] != clickCacheFilterProperty) && query[2] != currentFeature) {
                                          sourceLayer.filter = self.removeLayerFilterQuery(sourceLayer.filter, query);
                                      }
                                  }
                              });
-                             console.log(sourceLayer.filter)
                              map.setFilter(sourceLayer.id, sourceLayer.filter);
                          }
                  }
@@ -1524,10 +1521,8 @@ define([
                      clickSourceCacheFilter = ["!=", self.clickSourceLayerCache.filterproperty, self.clickSourceLayerCache.featureid]
                      filtersClickedFeature = self.layerFilterHasQuery(sourceFilterCopy, clickSourceCacheFilter);
                      if (filtersClickedFeature === false) {
-                         console.log('pushing filter:', clickSourceCacheFilter);
                          sourceFilterCopy.push(clickSourceCacheFilter);
                      }
-                     console.log(sourceFilterCopy);
                  }
                  map.setFilter(layer.id, sourceFilterCopy); //filters the source feature
              }
@@ -1598,7 +1593,6 @@ define([
                                  self.clearHighlight('hover');
                              } else if (hoverFeature && hoverFeature.id === featureId) {
                                  self.clearHighlight('hover', featureId)
-                                 console.log(featureId, hoverFeature)
                              }
 
                          }
