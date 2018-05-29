@@ -1457,7 +1457,8 @@ define([
                          var filterToUpdate;
                          var layerIdElements = layer.id.split('-')
                          var name = layerIdElements.slice(0, layerIdElements.length - 1).join('-')
-                         var sourceLayer = _.findWhere(style.layers, {'id': layer['source-layer']})
+                         var sourceLayerId = layer.id.startsWith('resources-') ? 'resources-fill-' + layer['source-layer'] : layer['source-layer'];
+                         var sourceLayer = _.findWhere(style.layers, {'id': sourceLayerId})
                          if (filter) {
                              _.each(filter, function(item) {
                                  if (Array.isArray(item) && (item[1] === '_featureid' || item[1] === 'resourceinstanceid') && item[2] != currentFeature) {
