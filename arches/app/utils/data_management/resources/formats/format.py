@@ -184,6 +184,7 @@ class Writer(object):
         }
         self.resourceinstances = {}
         self.file_prefix = ''
+        self.file_name = ''
         self.tiles = []
         self.graph_id = None
 
@@ -222,7 +223,9 @@ class Writer(object):
             raise MissingGraphException(_("Must supply either a graph id or a list of resource instance ids to export"))
         self.graph_id = graph_id
         if graph_id:
+            iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
             self.file_prefix = models.GraphModel.objects.get(graphid=graph_id).name.replace(' ', '_')
+            self.file_name = '{0}_{1}'.format(self.file_prefix, iso_date)
             self.tiles = models.TileModel.objects.filter(resourceinstance__graph_id=graph_id)
         else:
             self.tiles = models.TileModel.objects.filter(resourceinstance_id__in=resourceinstanceids)

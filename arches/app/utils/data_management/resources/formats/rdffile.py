@@ -27,7 +27,8 @@ class RdfWriter(Writer):
         dest = StringIO()
         self.serialize(g, destination=dest, format=self.format)
 
-        return [{'name':self.get_filename(), 'outputfile': dest}]
+        full_file_name = os.path.join('{0}.{1}'.format(self.file_name, 'rdf'))
+        return [{'name':full_file_name, 'outputfile': dest}]
 
     def get_rdf_graph(self):
 
@@ -128,11 +129,6 @@ class RdfWriter(Writer):
                     add_edge_to_graph(g, domainnode, rangenode, edge)
 
         return g
-
-    def get_filename(self):
-        iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        file_name = os.path.join('{0}_{1}.{2}'.format(self.file_prefix, iso_date, 'rdf'))
-        return file_name
     
     def serialize(self, g, **kwargs):
         g.serialize(**kwargs)

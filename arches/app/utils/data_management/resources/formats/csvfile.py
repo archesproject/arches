@@ -155,9 +155,7 @@ class CsvWriter(Writer):
             if csv_record != {'ResourceID': resourceinstanceid}:
                 csv_records.append(csv_record)
 
-        iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        file_name = '{0}_{1}'.format(self.file_prefix, iso_date)
-        csv_name = os.path.join('{0}.{1}'.format(file_name, 'csv'))
+        csv_name = os.path.join('{0}.{1}'.format(self.file_name, 'csv'))
 
         if self.single_file != True:
             dest = StringIO()
@@ -190,7 +188,7 @@ class CsvWriter(Writer):
                 csvwriter.writerow({k:str(v) for k,v in csv_record.items()})
 
         if self.graph_id != None:
-            csvs_for_export = csvs_for_export + self.write_resource_relations(file_name=file_name)
+            csvs_for_export = csvs_for_export + self.write_resource_relations(file_name=self.file_name)
 
         return csvs_for_export
 
@@ -266,21 +264,18 @@ class TileCsvWriter(Writer):
 
                 if csv_record != {'ResourceID': resourceinstanceid}:
                     csv_records.append(csv_record)
-
-        iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        file_name = '{0}_{1}'.format(self.file_prefix, iso_date)
-        csv_name = os.path.join('{0}.{1}'.format(file_name, 'csv'))
-
-        all_records = sorted(csv_records, key=lambda k: k['ResourceID'])
+        
         dest = StringIO()
         csvwriter = csv.DictWriter(dest, delimiter=',', fieldnames=csv_header)
         csvwriter.writeheader()
-        csvs_for_export.append({'name':csv_name, 'outputfile': dest})
+        all_records = sorted(csv_records, key=lambda k: k['ResourceID'])
         for csv_record in all_records:
             if 'populated_node_groups' in csv_record:
                 del csv_record['populated_node_groups']
             csvwriter.writerow({k:str(v) for k,v in csv_record.items()})
 
+        csv_name = os.path.join('{0}.{1}'.format(self.file_name, 'csv'))
+        csvs_for_export.append({'name':csv_name, 'outputfile': dest})
         if self.graph_id != None:
             csvs_for_export = csvs_for_export
 

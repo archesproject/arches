@@ -67,9 +67,8 @@ class ArchesFileWriter(Writer):
         export['business_data']['resources'] = resources
         graph_id = export['business_data']['resources'][0]['resourceinstance'].graph_id
         
-        iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         if str(graph_id) != settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
-            json_name = os.path.join('{0}_{1}.{2}'.format(self.file_prefix, iso_date, 'json'))
+            json_name = os.path.join('{0}.{1}'.format(self.file_name, 'json'))
         else:
             json_name = os.path.join('{0}'.format(os.path.basename(settings.SYSTEM_SETTINGS_LOCAL_PATH)))
         
