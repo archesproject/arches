@@ -23,20 +23,62 @@ import json
 import uuid
 import datetime
 from time import time
+from copy import deepcopy
 from os.path import isfile, join
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as resourceGraphImporter
 from arches.app.models.tile import Tile
-import arches.app.models.models as models
 from arches.app.models.models import ResourceInstance
 from arches.app.models.models import FunctionXGraph
 from arches.app.models.models import NodeGroup
+from arches.app.models.models import GraphModel
+from arches.app.models.system_settings import settings
 from django.core.exceptions import ValidationError
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from copy import deepcopy
 from format import Writer
 from format import Reader
 from format import ResourceImportReporter
+
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
+
+class ArchesFileWriter(Writer):
+
+    def __init__(self, **kwargs):
+        super(ArchesFileWriter, self).__init__(**kwargs)
+
+    def write_resources(self, graph_id=None, resourceinstanceids=None):
+        super(ArchesFileWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids)
+        json_for_export = []
+        resources = []
+        relations = []
+        export = {}
+        export['business_data'] = {}
+
+        for resourceinstanceid, tiles in self.resourceinstances.iteritems():
+            resourceinstanceid = uuid.UUID(str(resourceinstanceid))
+            resource = {}
+            resource['tiles'] = tiles
+            resource['resourceinstance'] = ResourceInstance.objects.get(resourceinstanceid=resourceinstanceid)
+            resources.append(resource)
+
+        export['business_data']['resources'] = resources
+        graph_id = export['business_data']['resources'][0]['resourceinstance'].graph_id
+        
+        iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        if str(graph_id) != settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
+            json_name = os.path.join('{0}_{1}.{2}'.format(self.file_prefix, iso_date, 'json'))
+        else:
+            json_name = os.path.join('{0}'.format(os.path.basename(settings.SYSTEM_SETTINGS_LOCAL_PATH)))
+        
+        dest = StringIO()
+        export = JSONDeserializer().deserialize(JSONSerializer().serialize(JSONSerializer().serializeToPython(export)))
+        json.dump(export, dest, indent=4)
+        json_for_export.append({'name':json_name, 'outputfile': dest})
+
+        return json_for_export
 
 
 class ArchesFileReader(Reader):
@@ -114,7 +156,7 @@ class ArchesFileReader(Reader):
         errors = []
         for resource in business_data['resources']:
             if resource['resourceinstance'] != None:
-                if models.GraphModel.objects.filter(graphid=str(resource['resourceinstance']['graph_id'])).count() > 0:
+                if GraphModel.objects.filter(graphid=str(resource['resourceinstance']['graph_id'])).count() > 0:
                     resourceinstance, created = ResourceInstance.objects.update_or_create(
                     resourceinstanceid = uuid.UUID(str(resource['resourceinstance']['resourceinstanceid'])),
                     defaults = {
