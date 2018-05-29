@@ -147,14 +147,14 @@ class Reader(object):
             log_nums = [0]
             if os.path.isfile(settings.RESOURCE_IMPORT_LOG):
                 if os.path.getsize(settings.RESOURCE_IMPORT_LOG)/1000000 > 5:
-                    for file in os.listdir(os.path.join(os.path.split(settings.RESOURCE_IMPORT_LOG)[0:-1][0])):
+                    for file in os.listdir(os.path.dirname(settings.RESOURCE_IMPORT_LOG)):
                         try:
                             log_nums.append(int(file.split('.')[-1]))
                         except:
                             pass
 
                     archive_log_num = str(max(log_nums) + 1)
-                    shutil.copy2(settings.RESOURCE_IMPORT_LOG, settings.RESOURCE_IMPORT_LOG + '.' + archive_log_num)
+                    shutil.copy2(settings.RESOURCE_IMPORT_LOG , settings.RESOURCE_IMPORT_LOG.split('.')[0] + '_' + archive_log_num + '.' + settings.RESOURCE_IMPORT_LOG.split('.')[-1])
                     f = open(settings.RESOURCE_IMPORT_LOG, 'w')
                 else:
                     f = open(settings.RESOURCE_IMPORT_LOG, 'a')

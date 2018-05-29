@@ -653,6 +653,7 @@ class CsvReader(Reader):
                         self.errors += errors
 
                 resources = []
+                missing_display_values = {}
 
                 for row_number, row in enumerate(business_data):
                     row_number = 'on line ' + unicode(row_number + 2) #to represent the row in a csv accounting for the header and 0 index
@@ -675,9 +676,10 @@ class CsvReader(Reader):
                         errors = []
                         for mdn in missing_display_nodes:
                             mdn_name = all_nodes.filter(nodeid=mdn).values_list('name', flat=True)[0]
-                            errors.append({'type': 'WARNING', 'message': '{0} {1} is null or not mapped and participates in a {2} display value function.'.format(mdn_name, row_number, mapping['resource_model_name'])})
-                        if len(errors) > 0:
-                            self.errors += errors
+                            try:
+                                missing_display_values[mdn_name].append(row_number.split('on line ')[-1])
+                            except:
+                                missing_display_values[mdn_name] = [row_number.split('on line ')[-1]]
 
                     if len(source_data) > 0:
                         if source_data[0].keys():
@@ -808,6 +810,14 @@ class CsvReader(Reader):
 
                     previous_row_resourceid = row['ResourceID']
                     legacyid = row['ResourceID']
+
+                # check for missing display value nodes.
+                errors = []
+                for k,v in missing_display_values.iteritems():
+                    if len(v) > 0:
+                        errors.append({'type': 'WARNING', 'message': '{0} is null or not mapped on rows {1} and participates in a display value function.'.format(k, ','.join(v))})
+                if len(errors) > 0:
+                    self.errors += errors
 
                 if 'legacyid' in locals():
                     self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number)
