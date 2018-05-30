@@ -237,6 +237,46 @@ SEARCH_GROUP_ROOTS= [
 
 EXPORT_CONFIG = os.path.normpath(os.path.join(PACKAGE_ROOT, 'source_data', 'business_data', 'resource_export_mappings.json'))
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format':'%(levelname)s|%(message)s',
+        },
+        'simple': {
+            'format':'%(message)s',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(ROOT_DIR, 'arches.log'),
+            'formatter':'simple'
+        },
+        'excel-reader': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(PACKAGE_ROOT, 'excel-reader.log'),
+            'mode':'w',
+            'formatter':'standard'
+        },
+    },
+    'loggers': {
+        'arches': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'excel-reader': {
+            'handlers': ['excel-reader'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
+
 try:
     from settings_local import *
 except ImportError:

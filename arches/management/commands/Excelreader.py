@@ -11,7 +11,8 @@ import arches.app.models.models as archesmodels
 from arches.management.commands import utils
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.gis.geos import GEOSGeometry
-
+import logging
+logger = logging.getLogger('excel-reader')
 
 class Command(BaseCommand):
     
@@ -25,12 +26,15 @@ class Command(BaseCommand):
     )
     
     def handle(self, *args, **options):
+        
         print 'operation: '+ options['operation']
         package_name = settings.PACKAGE_NAME
         print 'package: '+ package_name
         
         if options['operation'] == 'site_dataset':
             self.SiteDataset(options['source'], options['resource_type'], options['dest_dir'],options['append_data'])
+
+        return
     
     
     def validatedates(self, date):
@@ -59,11 +63,13 @@ class Command(BaseCommand):
                                 isodate = d.isoformat()
                                 date = isodate.strip().split("T")[0] #
                             except:
-                                raise ValueError("The value %s inserted is not a date" % date)
+                                # raise ValueError("The value %s inserted is not a date" % date)
+                                logger.error("The value %s inserted is not a date" % date)
         return date
     
     '''Validates that the number of semicolon-separated values is consistent across a worksheet and spots empty cells'''
     def validate_rows_and_values(self,workbook):
+        test_passed = True
         sheet_count = len(workbook.worksheets)
         rows_count  = 0
         ret = []
@@ -81,9 +87,18 @@ class Command(BaseCommand):
 
             ret = self.validate_value_number(sheet, workbook.sheetnames[sheet_index])
             if ret:
-                raise ValueError("Error: cells in sheet %s do not contain an equal number of semicolon separated values or are empty. Errors are at the following lines: %s" % (workbook.sheetnames[sheet_index], sorted(ret)))
+                test_passed = False
+                # raise ValueError("Error: cells in sheet %s do not contain an equal number of semicolon separated values or are empty. Errors are at the following lines: %s" % (workbook.sheetnames[sheet_index], sorted(ret)))
+                logger.error("cells in sheet %s do not contain an equal number of semicolon separated values or are empty. Errors are at the following lines:" % (workbook.sheetnames[sheet_index]))
+                for row in sorted(ret):
+                    logger.error(row)
         if (rows_count/sheet_count).is_integer() is not True:
-            raise ValueError("Error: some sheets in your XLSX file have a different number of rows")
+            test_passed = False
+            # raise ValueError("Error: some sheets in your XLSX file have a different number of rows")
+            logger.error("some sheets in your XLSX file have a different number of rows")
+            
+        if test_passed:
+            logger.info("validate_rows_and_values all ok")
             
     def validate_value_number(self, sheet, sheet_name):
         FaultyRows=[]
@@ -111,6 +126,7 @@ class Command(BaseCommand):
     #def validate_resourcetype(self, resourcetype):
 
     def validate_headers(self, workbook, skip_resourceid_col = False):
+        test_passed = True
         for sheet in workbook.worksheets:
             for header in sheet.iter_cols(max_row = 1):
                 if header[0].value is not None:
@@ -120,8 +136,13 @@ class Command(BaseCommand):
                         try:
                             modelinstance = archesmodels.EntityTypes.objects.get(pk = header[0].value)
                         except ObjectDoesNotExist:
-                            raise ObjectDoesNotExist("The header %s is not a valid EAMENA node name" % header[0].value)
+                            test_passed = False
+                            logger.error("The header %s is not a valid EAMENA node name" % header[0].value)
+                            # raise ObjectDoesNotExist("The header %s is not a valid EAMENA node name" % header[0].value)
+        if test_passed:
+            logger.info("All headers OK")
         return
+        
     def validate_concept(self, concept, concepts_in_node):
         valuelist = [archesmodels.Values.objects.filter(value__iexact = concept, conceptid= concept_in_node) for concept_in_node in concepts_in_node]
         valuelist = filter(None, valuelist)
@@ -148,7 +169,9 @@ class Command(BaseCommand):
             GEOSGeometry(geometry)
             return True
         except:
-            raise ValueError("The geometry at line %s is not an acceptable GEOSGeometry" % row+2)
+            logger.error("The geometry at line %s is not an acceptable GEOSGeometry" % row+2)
+            # raise ValueError("The geometry at line %s is not an acceptable GEOSGeometry" % row+2)
+            return False
     
     def create_resourceid_list(self, workbook):
         ''''Looks for RESOURCEID column and creates a list of resourceids and returns '''
@@ -180,6 +203,7 @@ class Command(BaseCommand):
                 GroupNo = 0
                 if header[0].value is not None and header[0].value != 'RESOURCEID':
                     print "Now analysing values for %s" % header[0].value
+                    logger.info("Now analysing values for %s" % header[0].value)
                     modelinstance = archesmodels.EntityTypes.objects.get(pk = header[0].value)
                     for row_index, row in enumerate(sheet.iter_rows(row_offset = 1)):
     #                     print "Row %s column %s with value %s" %(row_index, col_index, row[col_index].value)
@@ -201,6 +225,7 @@ class Command(BaseCommand):
 #                                             print "ConceptId %s, ResourceId %s, AttributeName %s, AttributeValue %s, GroupId %s" %(valueinstance[0][0].conceptid, row_index,modelinstance.entitytypeid,conceptinstance.legacyoid,GroupName)
                                         else:
                                             FaultyConceptsList.append("{0} in {1}, at row no. {2}".format(concept,header[0].value,(row_index+2)))
+                                            # logger.info("{0} in {1}, at row no. {2}".format(concept,header[0].value,(row_index+2)))
                                     if modelinstance.businesstablename == 'strings':
                                             concept_list = [str(resourceid),resourcetype,modelinstance.entitytypeid,concept, GroupName]
                                             ResourceList.append(concept_list)
@@ -215,9 +240,12 @@ class Command(BaseCommand):
                                                 ResourceList.append(concept_list)
                                     
         if FaultyConceptsList:
-            raise ValueError("The following concepts had issues %s" % FaultyConceptsList)
+            logger.error("The following concepts had issues:")
+            for c in FaultyConceptsList:
+                logger.error(c)
+            # raise ValueError("The following concepts had issues %s" % FaultyConceptsList)
                                                                         
-        with open(destination, 'w') as csvfile:
+        with open(destination, 'wb') as csvfile:
                 writer = csv.writer(csvfile, delimiter ="|")
                 writer.writerow(['RESOURCEID', 'RESOURCETYPE', 'ATTRIBUTENAME', 'ATTRIBUTEVALUE', 'GROUPID'])
                 for row in ResourceList:
