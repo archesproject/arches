@@ -18,5 +18,4 @@ class Migration(migrations.Migration):
             name='provisionaledits',
             field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='provisionaledits', null=True),
         ),
-        migrations.RunPython(index_database.index_resources, index_database.index_resources),
     ]
