@@ -88,10 +88,8 @@ class MobileSurvey(models.MobileSurveyModel):
                 #we may want the full proxy model at some point, but for now just the root node color
                 # graphs.append(Graph.objects.get(pk=card.graph_id))
                 proxy_graph = Graph.objects.get(pk=card.graph_id)
-                color = proxy_graph.color
-                graph = card.graph
-                graph = JSONSerializer().serializeToPython(graph, exclude=['functions','disable_instance_creation','deploymentdate','deploymentfile'])
-                graph['color'] = color
+                graph = JSONSerializer().serializeToPython(card.graph, exclude=['functions','disable_instance_creation','deploymentdate','deploymentfile'])
+                graph['color'] = proxy_graph.color
                 graph['ontology_id']=str(graph['ontology_id'])
                 graphs.append(graph)
         ret['graphs'] = graphs
