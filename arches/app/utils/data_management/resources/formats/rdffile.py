@@ -73,10 +73,19 @@ class RdfWriter(Writer):
             return graph_cache[graphid]
 
 
-        def add_edge_to_graph(graph, domainnode, rangenode, edge):
+        def add_edge_to_graph(graph, domainnode, rangenode, edge, tile):
             graph.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
             graph.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
             graph.add((domainnode, URIRef(edge.ontologyproperty), rangenode))
+
+            try:
+                g.add((domainnode, RDF.value, Literal(tile.data[str(edge.domainnode_id)]))) 
+            except:
+                pass    
+            try:
+                g.add((rangenode, RDF.value, Literal(tile.data[str(edge.rangenode_id)]))) 
+            except:
+                pass 
 
 
         archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
@@ -91,23 +100,14 @@ class RdfWriter(Writer):
             for edge in graph_cache[graphid]['rootedges']:
                 domainnode = archesproject[str(edge.domainnode.pk)]
                 rangenode = archesproject[str(edge.rangenode.pk)]
-                add_edge_to_graph(g, domainnode, rangenode, edge)
+                add_edge_to_graph(g, domainnode, rangenode, edge, None)
 
             for tile in tiles:
                 # add all the edges for a given tile/nodegroup
                 for edge in graph_info['subgraphs'][tile.nodegroup]['edges']:
                     domainnode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.domainnode.pk))]
                     rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
-                    add_edge_to_graph(g, domainnode, rangenode, edge)
-
-                    try:
-                        g.add((domainnode, RDF.value, Literal(tile.data[str(edge.domainnode_id)]))) 
-                    except:
-                        pass    
-                    try:
-                        g.add((rangenode, RDF.value, Literal(tile.data[str(edge.rangenode_id)]))) 
-                    except:
-                        pass 
+                    add_edge_to_graph(g, domainnode, rangenode, edge, tile)
 
                 # add the edge from the parent node to this tile's root node
                 # tile has no parent tile, which means the domain node has no tile_id
@@ -118,7 +118,7 @@ class RdfWriter(Writer):
                     else:
                         domainnode = archesproject[str(edge.domainnode.pk)]
                     rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
-                    add_edge_to_graph(g, domainnode, rangenode, edge)
+                    add_edge_to_graph(g, domainnode, rangenode, edge, tile)
 
                 # add the edge from the parent node to this tile's root node
                 # tile has a parent tile
@@ -126,7 +126,8 @@ class RdfWriter(Writer):
                     edge = graph_info['subgraphs'][tile.nodegroup]['inedge']
                     domainnode = archesproject["tile/%s/node/%s" % (str(tile.parenttile.pk), str(edge.domainnode.pk))]
                     rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
-                    add_edge_to_graph(g, domainnode, rangenode, edge)
+                    add_edge_to_graph(g, domainnode, rangenode, edge, tile)
+
 
         return g
     
