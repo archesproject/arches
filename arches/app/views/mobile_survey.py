@@ -209,8 +209,6 @@ class MobileSurveyManagerView(MapBaseManagerView):
             with transaction.atomic():
                 mobile_survey.save()
         except Exception as e:
-            couch = Couch()
-            couch.delete_db('project_'+ str(mobile_survey.id))
             if connection_error == False:
                 error_title = _('Unable to save survey')
                 error_message = e

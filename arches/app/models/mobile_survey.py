@@ -22,6 +22,7 @@ from arches.app.models import models
 from arches.app.models.tile import Tile
 from arches.app.models.graph import Graph
 from arches.app.models.system_settings import settings
+from django.http import HttpRequest
 from arches.app.utils.couch import Couch
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.utils.translation import ugettext as _
@@ -61,13 +62,12 @@ class MobileSurvey(models.MobileSurveyModel):
         survey = self.serialize()
         survey['type'] = 'metadata'
         self.couch.update_doc(db, survey, 'metadata')
+        self.load_data_into_couch()
         return db
 
     def delete(self):
-        couchdb_name='project_' + str(self.id)
+        self.couch.delete_db('project_' + str(self.id))
         super(MobileSurvey, self).delete()
-        self.couch.delete_db(couchdb_name)
-
 
     def serialize(self, fields=None, exclude=None):
         """
@@ -122,7 +122,7 @@ class MobileSurvey(models.MobileSurveyModel):
                 #tile = models.TileModel.objects.get(pk=row.doc.tileid).update(**row.doc)
         return ret
 
-    def collect_resource_instances_for_couch(self, user):
+    def collect_resource_instances_for_couch(self):
         """
         Uses the data definition configs of a mobile survey object to search for
         resource instances relevant to a mobile survey. Takes a user object which
@@ -135,7 +135,7 @@ class MobileSurvey(models.MobileSurveyModel):
             print "No resources or data query defined"
         else:
             request = HttpRequest()
-            request.user = user
+            request.user = self.lasteditedby
             request.GET['mobiledownload'] = True
             if query in ('', None):
                 if len(self.bounds.coords) == 0:
@@ -198,12 +198,11 @@ class MobileSurvey(models.MobileSurveyModel):
             except Exception as e:
                 print e, instance
 
-    def load_data_into_couch(self, user):
+    def load_data_into_couch(self):
         """
         Takes a mobile survey, a couch database intance and a django user and loads
         tile and resource instance data into the couch instance.
         """
-
-        instances = self.collect_resource_instances_for_couch(user)
-        self.load_tiles_into_couch( instances)
-        self.load_instances_into_couch( instances)
+        instances = self.collect_resource_instances_for_couch()
+        self.load_tiles_into_couch(instances)
+        self.load_instances_into_couch(instances)
