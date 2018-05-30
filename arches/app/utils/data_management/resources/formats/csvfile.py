@@ -12,7 +12,7 @@ from format import Reader
 from elasticsearch import TransportError
 from arches.app.models.tile import Tile
 from arches.app.models.concept import Concept
-from arches.app.models.models import Node, NodeGroup, ResourceXResource, ResourceInstance, FunctionXGraph
+from arches.app.models.models import Node, NodeGroup, ResourceXResource, ResourceInstance, FunctionXGraph, GraphXMapping
 from arches.app.utils.data_management.resource_graphs import exporter as GraphExporter
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
