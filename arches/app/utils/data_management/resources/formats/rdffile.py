@@ -4,6 +4,7 @@ import datetime
 from format import Writer
 from arches.app.models import models
 from arches.app.models.system_settings import settings
+from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from rdflib import Namespace
 from rdflib import URIRef, Literal
 from rdflib import Graph
@@ -145,27 +146,28 @@ class JsonLdWriter(RdfWriter):
         value = g.serialize(format='nt')
         js = from_rdf(str(value), options={format:'application/nquads'})
 
-        myframe = {
+        framing = {
             "@omitDefault": True,
             "@type": "%sgraph/%s" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, self.graph_id)
         }
 
-        js = frame(js, myframe)
+        js = frame(js, framing)
 
-        # self.context = {
-        #     "@context": "https://linked.art/ns/v1/linked-art.json"
-        # }
-
-        if self.graph_model.jsonldcontext:
-            self.context = {
-                "@context": self.graph_model.jsonldcontext
+        context = self.graph_model.jsonldcontext
+        try:
+            context = JSONDeserializer().deserialize(context)
+        except ValueError:
+            if context == '':
+                context = {}
+            context = {
+                "@context": context
             }
-        else:
-            self.context = {
+        except AttributeError:
+            context = {
                 "@context": {}
             }
 
-        out = compact(js, self.context)
+        out = compact(js, context)
         out = json.dumps(out, indent=4, sort_keys=True)
         dest = StringIO(out)
 
