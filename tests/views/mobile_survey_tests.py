@@ -54,7 +54,7 @@ class MobileSurveyTests(ArchesTestCase):
         mobile_survey.lasteditedby = User.objects.get(id=1)
         mobile_survey.iconclass = "fa fa-building"
         mobile_survey.nodegroups = []
-        mobile_survey.datadownloadconfig='{"download":false, "count":10, "resources":[], "custom":''}'
+        mobile_survey.datadownloadconfig={"download":False, "count":10, "resources":[], "custom":""}
         mobile_survey.id = '08960fb5-385b-11e8-add6-c4b301baab9f'
         mobile_survey.save()
         mobile_survey = MobileSurvey.objects.get(pk=mobile_survey.id)
@@ -152,8 +152,8 @@ class MobileSurveyTests(ArchesTestCase):
         else:
             print '{0} is not in couch'.format('project_' + str(self.mobile_survey.id))
 
-        self.assertTrue(tiles==2)
-        self.assertTrue(resources==1)
+        self.assertEqual(tiles, 2)
+        self.assertEqual(resources,1)
 
     def test_delete_mobile_survey(self):
         """
@@ -169,8 +169,7 @@ class MobileSurveyTests(ArchesTestCase):
 
         post_data = JSONSerializer().serialize(post_data)
         content_type = 'application/x-www-form-urlencoded'
-        response = self.client.delete(url, post_data, content_type)
-        response_json = json.loads(response.content)
+        self.client.delete(url, post_data, content_type)
         couch = couchdb.Server(settings.COUCHDB_URL)
         self.assertFalse(MobileSurvey.objects.filter(pk=self.mobile_survey.id).exists())
         self.assertTrue('project_' + str(self.mobile_survey.id) not in couch)

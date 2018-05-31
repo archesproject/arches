@@ -22,7 +22,10 @@ from arches.app.models import models
 from arches.app.models.tile import Tile
 from arches.app.models.graph import Graph
 from arches.app.models.system_settings import settings
+from django.http import HttpRequest
+from arches.app.utils.couch import Couch
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+import arches.app.views.search as search
 from django.utils.translation import ugettext as _
 
 class MobileSurvey(models.MobileSurveyModel):
@@ -50,17 +53,22 @@ class MobileSurvey(models.MobileSurveyModel):
         # self.tilecache = models.TextField(null=True)
         # self.datadownloadconfig = JSONField(blank=True, null=True, default='{"download":false, "count":1000, "resources":[]}')
         # end from models.MobileSurvey
-        self.couch = couchdb.Server(settings.COUCHDB_URL)
+
+        self.couch = Couch()
 
     def save(self):
         super(MobileSurvey, self).save()
-        if 'project_' + str(self.id) in self.couch:
-            db = self.couch['project_' + str(self.id)]
-        else:
-            db = self.couch.create('project_' + str(self.id))
+        db = self.couch.create_db('project_' + str(self.id))
+
         survey = self.serialize()
         survey['type'] = 'metadata'
-        db.save(survey)
+        self.couch.update_doc(db, survey, 'metadata')
+        self.load_data_into_couch()
+        return db
+
+    def delete(self):
+        self.couch.delete_db('project_' + str(self.id))
+        super(MobileSurvey, self).delete()
 
     def serialize(self, fields=None, exclude=None):
         """
@@ -80,11 +88,9 @@ class MobileSurvey(models.MobileSurveyModel):
                 graphids.append(card.graph_id)
                 #we may want the full proxy model at some point, but for now just the root node color
                 # graphs.append(Graph.objects.get(pk=card.graph_id))
-                proxy_graph = Graph.objects.get(pk=card.graph_id)
-                color = proxy_graph.color
-                graph = card.graph
-                graph = JSONSerializer().serializeToPython(graph, exclude=['functions','disable_instance_creation','deploymentdate','deploymentfile'])
-                graph['color'] = color
+                graph = JSONSerializer().serializeToPython(card.graph, exclude=['functions','disable_instance_creation','deploymentdate','deploymentfile'])
+                graph['color'] = card.graph.color
+                graph['ontology_id']=str(graph['ontology_id'])
                 graphs.append(graph)
         ret['graphs'] = graphs
         ret['cards'] = ordered_cards
@@ -103,7 +109,7 @@ class MobileSurvey(models.MobileSurveyModel):
     def push_edits_to_db(self):
         # read all docs that have changes
         # save back to postgres db
-        db = self.couch['project_' + str(self.id)]
+        db = self.couch.create_db('project_' + str(self.id))
         ret = []
         for row in db.view('_all_docs', include_docs=True):
             ret.append(row)
@@ -114,3 +120,87 @@ class MobileSurvey(models.MobileSurveyModel):
                     tile.save()
                 #tile = models.TileModel.objects.get(pk=row.doc.tileid).update(**row.doc)
         return ret
+
+    def collect_resource_instances_for_couch(self):
+        """
+        Uses the data definition configs of a mobile survey object to search for
+        resource instances relevant to a mobile survey. Takes a user object which
+        is required for search.
+        """
+        query = self.datadownloadconfig['custom']
+        resource_types = self.datadownloadconfig['resources']
+        instances = {}
+        if query in ('', None) and len(resource_types) == 0:
+            print "No resources or data query defined"
+        else:
+            request = HttpRequest()
+            request.user = self.lasteditedby
+            request.GET['mobiledownload'] = True
+            if query in ('', None):
+                if len(self.bounds.coords) == 0:
+                    default_bounds = settings.DEFAULT_BOUNDS
+                    default_bounds['features'][0]['properties']['inverted'] = False
+                    request.GET['mapFilter'] = json.dumps(default_bounds)
+                else:
+                    request.GET['mapFilter'] = json.dumps({u'type': u'FeatureCollection', 'features':[{'geometry': json.loads(self.bounds.json)}]})
+                request.GET['typeFilter'] = json.dumps([{'graphid': resourceid, 'inverted': False } for resourceid in self.datadownloadconfig['resources']])
+            else:
+                parsed = urlparse.urlparse(query)
+                urlparams = urlparse.parse_qs(parsed.query)
+                for k, v in urlparams.iteritems():
+                    request.GET[k] = v[0]
+            search_res_json = search.search_results(request)
+            search_res = JSONDeserializer().deserialize(search_res_json.content)
+            try:
+                instances = {hit['_source']['resourceinstanceid']: hit['_source'] for hit in search_res['results']['hits']['hits']}
+            except KeyError:
+                print 'no instances found in', search_res
+        return instances
+
+    def load_tiles_into_couch(self, instances):
+        """
+        Takes a mobile survey object, a couch database instance, and a dictionary
+        of resource instances to identify eligible tiles and load them into the
+        database instance
+        """
+        db = self.couch.create_db('project_' + str(self.id))
+        cards = self.cards.all()
+        for card in cards:
+            tiles = models.TileModel.objects.filter(nodegroup=card.nodegroup_id)
+            tiles_serialized = json.loads(JSONSerializer().serialize(tiles))
+            for tile in tiles_serialized:
+                if str(tile['resourceinstance_id']) in instances:
+                    try:
+                        tile['type'] = 'tile'
+                        self.couch.update_doc(db, tile, tile['tileid'])
+                        # couch_record = db.get(tile['tileid'])
+                        # if couch_record == None:
+                        #     db[tile['tileid']] = tile
+                        # else:
+                        #     if couch_record['data'] != tile['data']:
+                        #         couch_record['data'] = tile['data']
+                        #         db[tile['tileid']] = couch_record
+                    except Exception as e:
+                        print e, tile
+
+    def load_instances_into_couch(self, instances):
+        """
+        Takes a mobile survey object, a couch database instance, and a dictionary
+        of resource instances and loads them into the database instance.
+        """
+        db = self.couch.create_db('project_' + str(self.id))
+        for instanceid, instance in instances.iteritems():
+            try:
+                instance['type'] = 'resource'
+                self.couch.update_doc(db, instance, instanceid)
+            except Exception as e:
+                print e, instance
+
+    def load_data_into_couch(self):
+        """
+        Takes a mobile survey, a couch database intance and a django user and loads
+        tile and resource instance data into the couch instance.
+        """
+        instances = self.collect_resource_instances_for_couch()
+        self.load_tiles_into_couch(instances)
+        self.load_instances_into_couch(instances)
