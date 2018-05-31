@@ -85,8 +85,9 @@ class Resources(APIBase):
                 "id": "%sresources/%s/" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, 'modelid'),
                 "type": "BasicContainer",
                 # Here we actually mean the name
+                "next-link": 'test',
                 #"label": str(model.name),
-                "contains": list(Resource.objects.values_list('pk', flat=True).order_by('pk')[:100])
+                "contains": list(Resource.objects.values_list('pk', flat=True).order_by('pk')[:10])
             }
 
             #

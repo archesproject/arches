@@ -151,35 +151,19 @@ class JsonLdWriter(RdfWriter):
         }
 
         js = frame(js, myframe)
-        self.context = {
-            "@context": "https://linked.art/ns/v1/linked-art.json"
-        }
 
-        # self.context = [{
-        #     "@context": {
-        #         "id": "@id", 
-        #         "type": "@type",
-        #         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-        #         "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-        #         "crm": "http://www.cidoc-crm.org/cidoc-crm/",
-        #         "la": "https://linked.art/ns/terms/",
+        # self.context = {
+        #     "@context": "https://linked.art/ns/v1/linked-art.json"
+        # }
 
-        #         "Right": "crm:E30_Right",
-        #         "LinguisticObject": "crm:E33_Linguistic_Object",
-        #         "Name": "la:Name",
-        #         "Identifier": "crm:E42_Identifier",
-        #         "Language": "crm:E56_Language",
-        #         "Type": "crm:E55_Type",
-
-        #         "label": "rdfs:label",
-        #         "value": "rdf:value",
-        #         "classified_as": "crm:P2_has_type",
-        #         "referred_to_by": "crm:P67i_is_referred_to_by",
-        #         "language": "crm:P72_has_language",
-        #         "includes": "crm:P106_is_composed_of",
-        #         "identified_by": "crm:P1_is_identified_by"
-        #     }
-        # }]
+        if self.graph_model.jsonldcontext:
+            self.context = {
+                "@context": self.graph_model.jsonldcontext
+            }
+        else:
+            self.context = {
+                "@context": {}
+            }
 
         out = compact(js, self.context)
         out = json.dumps(out, indent=4, sort_keys=True)

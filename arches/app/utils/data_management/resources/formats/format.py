@@ -187,6 +187,7 @@ class Writer(object):
         self.file_name = ''
         self.tiles = []
         self.graph_id = None
+        self.graph_model = None
 
     def write_resources(self, graph_id=None, resourceinstanceids=None):
         """
@@ -223,15 +224,17 @@ class Writer(object):
             raise MissingGraphException(_("Must supply either a graph id or a list of resource instance ids to export"))
         
         if graph_id:
-            iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-            self.graph_id = graph_id
-            self.file_prefix = models.GraphModel.objects.get(graphid=graph_id).name.replace(' ', '_')
-            self.file_name = '{0}_{1}'.format(self.file_prefix, iso_date)
             self.tiles = models.TileModel.objects.filter(resourceinstance__graph_id=graph_id)
+            self.graph_id = graph_id
         else:
             self.tiles = models.TileModel.objects.filter(resourceinstance_id__in=resourceinstanceids)
             self.graph_id = self.tiles[0].resourceinstance.graph_id
 
+        iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        self.graph_model = models.GraphModel.objects.get(graphid=self.graph_id)
+        self.file_prefix = self.graph_model.name.replace(' ', '_')
+        self.file_name = '{0}_{1}'.format(self.file_prefix, iso_date)
+        
         for tile in self.tiles:
             try:
                 self.resourceinstances[tile.resourceinstance_id].append(tile)
