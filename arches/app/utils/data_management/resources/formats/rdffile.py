@@ -1,4 +1,5 @@
 import os
+import json
 import datetime
 from format import Writer
 from arches.app.models import models
@@ -7,6 +8,7 @@ from rdflib import Namespace
 from rdflib import URIRef, Literal
 from rdflib import Graph
 from rdflib.namespace import RDF, RDFS
+from pyld.jsonld import compact, expand, frame, from_rdf
 
 try:
     from cStringIO import StringIO
@@ -23,14 +25,20 @@ class RdfWriter(Writer):
     def write_resources(self, graph_id=None, resourceinstanceids=None):
         super(RdfWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids)
 
-        g = self.get_rdf_graph()
         dest = StringIO()
-        self.serialize(g, destination=dest, format=self.format)
+        g = self.get_rdf_graph()
+        g.serialize(destination=dest, format=self.format)
 
         full_file_name = os.path.join('{0}.{1}'.format(self.file_name, 'rdf'))
         return [{'name':full_file_name, 'outputfile': dest}]
 
     def get_rdf_graph(self):
+        archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
+        graph_uri = URIRef(archesproject["graph/%s" % self.graph_id])
+
+        g = Graph()
+        g.bind('archesproject', archesproject, False)
+        graph_cache = {}
 
         def get_nodegroup_edges_by_collector_node(node):
             edges = []
@@ -44,7 +52,6 @@ class RdfWriter(Writer):
             getchildedges(node)
             return edges
 
-        graph_cache = {}
         def get_graph_parts(graphid):
             if graphid not in graph_cache:
                 graph_cache[graphid] = {
@@ -72,11 +79,15 @@ class RdfWriter(Writer):
 
             return graph_cache[graphid]
 
-
         def add_edge_to_graph(graph, domainnode, rangenode, edge, tile):
-            graph.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
             graph.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
             graph.add((domainnode, URIRef(edge.ontologyproperty), rangenode))
+
+            if edge.domainnode.istopnode:
+                graph.add((domainnode, RDF.type, graph_uri))
+                graph.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
+            else:
+                graph.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
 
             try:
                 g.add((domainnode, RDF.value, Literal(tile.data[str(edge.domainnode_id)]))) 
@@ -87,17 +98,11 @@ class RdfWriter(Writer):
             except:
                 pass 
 
-
-        archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
-        g = Graph()
-        g.bind('archesproject', archesproject, False)
-
         for resourceinstanceid, tiles in self.resourceinstances.iteritems():
-            graphid = tiles[0].resourceinstance.graph_id
-            graph_info = get_graph_parts(graphid)
+            graph_info = get_graph_parts(self.graph_id)
 
             # add the edges for the group of nodes that include the root (this group of nodes has no nodegroup)
-            for edge in graph_cache[graphid]['rootedges']:
+            for edge in graph_cache[self.graph_id]['rootedges']:
                 domainnode = archesproject[str(edge.domainnode.pk)]
                 rangenode = archesproject[str(edge.rangenode.pk)]
                 add_edge_to_graph(g, domainnode, rangenode, edge, None)
@@ -110,7 +115,7 @@ class RdfWriter(Writer):
                     add_edge_to_graph(g, domainnode, rangenode, edge, tile)
 
                 # add the edge from the parent node to this tile's root node
-                # tile has no parent tile, which means the domain node has no tile_id
+                # where the tile has no parent tile, which means the domain node has no tile_id
                 if graph_info['subgraphs'][tile.nodegroup]['parentnode_nodegroup'] == None:
                     edge = graph_info['subgraphs'][tile.nodegroup]['inedge']
                     if edge.domainnode.istopnode:
@@ -121,7 +126,7 @@ class RdfWriter(Writer):
                     add_edge_to_graph(g, domainnode, rangenode, edge, tile)
 
                 # add the edge from the parent node to this tile's root node
-                # tile has a parent tile
+                # where the tile has a parent tile
                 if graph_info['subgraphs'][tile.nodegroup]['parentnode_nodegroup'] != None:
                     edge = graph_info['subgraphs'][tile.nodegroup]['inedge']
                     domainnode = archesproject["tile/%s/node/%s" % (str(tile.parenttile.pk), str(edge.domainnode.pk))]
@@ -130,12 +135,55 @@ class RdfWriter(Writer):
 
 
         return g
-    
-    def serialize(self, g, **kwargs):
-        g.serialize(**kwargs)
 
 
 class JsonLdWriter(RdfWriter):
 
-    def serialize(self, g, **kwargs):
-        g.serialize(context=settings.JSON_LD_CONTEXT, **kwargs)
+    def write_resources(self, graph_id=None, resourceinstanceids=None):
+        super(RdfWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids)
+        g = self.get_rdf_graph()
+        value = g.serialize(format='nt')
+        js = from_rdf(str(value), options={format:'application/nquads'})
+
+        myframe = {
+            "@omitDefault": True,
+            "@type": "%sgraph/%s" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, self.graph_id)
+        }
+
+        js = frame(js, myframe)
+        self.context = {
+            "@context": "https://linked.art/ns/v1/linked-art.json"
+        }
+
+        # self.context = [{
+        #     "@context": {
+        #         "id": "@id", 
+        #         "type": "@type",
+        #         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        #         "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+        #         "crm": "http://www.cidoc-crm.org/cidoc-crm/",
+        #         "la": "https://linked.art/ns/terms/",
+
+        #         "Right": "crm:E30_Right",
+        #         "LinguisticObject": "crm:E33_Linguistic_Object",
+        #         "Name": "la:Name",
+        #         "Identifier": "crm:E42_Identifier",
+        #         "Language": "crm:E56_Language",
+        #         "Type": "crm:E55_Type",
+
+        #         "label": "rdfs:label",
+        #         "value": "rdf:value",
+        #         "classified_as": "crm:P2_has_type",
+        #         "referred_to_by": "crm:P67i_is_referred_to_by",
+        #         "language": "crm:P72_has_language",
+        #         "includes": "crm:P106_is_composed_of",
+        #         "identified_by": "crm:P1_is_identified_by"
+        #     }
+        # }]
+
+        out = compact(js, self.context)
+        out = json.dumps(out, indent=4, sort_keys=True)
+        dest = StringIO(out)
+
+        full_file_name = os.path.join('{0}.{1}'.format(self.file_name, 'jsonld'))
+        return [{'name':full_file_name, 'outputfile': dest}]

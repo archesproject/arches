@@ -840,7 +840,7 @@ class Command(BaseCommand):
 
         if data_dest != '':
             try:
-                data = resource_exporter.export(graph_id=graph)
+                data = resource_exporter.export(graph_id=graph, resourceinstanceids=None)
             except MissingGraphException as e:
 
                 print utils.print_message('No resource graph specified. Please rerun this command with the \'-g\' parameter populated.')

@@ -4,7 +4,7 @@ from django.views.generic import View
 from django.db.models import Q
 from django.http.request import QueryDict
 from revproxy.views import ProxyView
-from pyld.jsonld import compact, expand, frame
+from pyld.jsonld import compact, expand, frame, from_rdf
 
 from arches.app.models import models
 from arches.app.models.mobile_survey import MobileSurvey
@@ -42,7 +42,7 @@ class Surveys(APIBase):
 
 
 class Resources(APIBase):
-    context = {
+    context = [{
         "@context": {
             "id": "@id", 
             "type": "@type",
@@ -66,69 +66,17 @@ class Resources(APIBase):
             "includes": "crm:P106_is_composed_of",
             "identified_by": "crm:P1_is_identified_by"
         }
-    }
+    },{
+        "@context": "https://linked.art/ns/v1/linked-art.json"
+    }]
+
     def get(self, request, resourceid=None):
         if resourceid:
             format = request.GET.get('format', 'json-ld')
             exporter = ResourceExporter(format=format)
-            exporter.writer.get_tiles(resourceinstanceids=[resourceid])
-            graph = exporter.writer.get_rdf_graph()
-            value = graph.serialize(format='json-ld', indent=4)
-            js = json.loads(value)
-
-            # Now pass to pyld to frame it so it's nested properly
-            myframe = {
-                "@omitDefault": True,
-                # This needs to be fixed
-                "@id": "http://localhost/resource/%s" % resourceid
-            }
-
-            framed = frame(js, myframe)
-            out = compact(framed, self.context)
-            out['@context'] = "https://linked.art/ns/v1/linked-art.json"
-            value = json.dumps(out, indent=4, sort_keys=True)
-            response = JSONResponse(value, indent=4)
-            return response
-
-        # modelid = kw['modelid']
-        # resourceid = kw['resourceid']
-        # context = self.get_context_data()
-        # models = context['graph_models']
-        # model = None
-        # for m in models:
-        #     # This shouldn't be the name, but a separate slug
-        #     if m.name == modelid:
-        #         model = m
-        #         break
-        # if model == None:
-        #     return HttpResponseNotFound('<h1>Model not found</h1>')
-        # if resourceid is not None:
-        #     resource_instance = Resource.objects.get(pk=resourceid)
-        #     list(models.TileModel.objects.filter(resourceinstance=self))
-        #     if resource_instance:
-        #         ri_graph = resource_instance.graph
-        #         if ri_graph != model:
-        #             return HttpResponseNotFound('<h1>Instance not found</h1>')
-        #     else:
-        #         return HttpResponseNotFound('<h1>Instance not found</h1>')              
-
-        #     writer = RdfWriter()
-        #     writer.get_tiles(resourceinstanceids=[resourceid])
-        #     graph = writer.get_rdf_graph()
-        #     value = graph.serialize(format='json-ld', indent=2, context=self.context)
-        #     js = json.loads(value)
-
-        #     # Now pass to pyld to frame it so it's nested properly
-        #     myframe = {
-        #         "@omitDefault": True,
-        #         # This needs to be fixed
-        #         "@id": "http://localhost/resource/%s" % resourceid
-        #     }
-
-        #     framed = frame(js, myframe)
-        #     out = compact(framed, self.context)
-        #     out['@context'] = "https://linked.art/ns/v1/linked-art.json"
-        #     value = json.dumps(out, indent=2, sort_keys=True)
+            output = exporter.writer.write_resources(resourceinstanceids=[resourceid])
+            out = output[0]['outputfile'].getvalue()
+            print out
 
         else:
             # GET on the container

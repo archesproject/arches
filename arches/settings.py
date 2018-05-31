@@ -134,6 +134,7 @@ JSON_LD_CONTEXT = {
 
 # This is the namespace to use for export of data (for RDF/XML for example)
 # Ideally this should point to the url where you host your site
+# Make sure to use a trailing slash
 ARCHES_NAMESPACE_FOR_DATA_EXPORT = 'http://localhost/'
 
 PREFERRED_COORDINATE_SYSTEMS = (
