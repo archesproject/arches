@@ -2075,28 +2075,103 @@ ul.nav.nav-tabs.nav-justified {
     padding: 15px 0 5px 5px;
 }
 
+.settings-panel {
+    padding: 10px 20px 25px 25px;
+}
+
+.settings-panel-heading {
+    height: 45px;
+    margin-top: -10px;
+}
+
+.graph-designer {
+    background: #fbfbfb;
+}
+
 .graph-designer-graph-content .graph-designer-title {
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 500;
     margin-top: 0;
     margin-bottom: 5px;
     color: #555;
-    padding: 15px 0 5px 0px;
+    padding: 10px 0 5px 0px;
     display: flex;
     flex-direction:row;
     align-items: center;
 }
 
 .graph-designer-title .name {
-    padding-left: 10px;
+    padding-left: 5px;
+    font-size: 17px;
+    margin-top: 2px;
 }
 
 .graph-designer-header {
-    color: #777;
-    font-size: 15px;
-    border-bottom: solid 1px #ccc;
+    color: #888;
+    font-size: 16px;
+    padding-bottom: 5px;
+    border-bottom: solid 1px #ddd;
 }
 
+.columns label.form-checkbox.form-normal:before, .form-radio.form-normal::before {
+    left: 1px;
+}
+
+.form-radio.form-normal::before  {
+    left: 0px;
+}
+
+.widget-container.graph-settings-switch {
+    padding-bottom: 0px;
+}
+
+.graph-settings-switch-label {
+    margin-left: 40px; 
+    margin-top: -20px; 
+    margin-bottom: 0px;
+}
+
+.graph-settings-switch-subtitle {
+    margin-left: 40px; 
+    margin-top: -5px;
+    display: inline-block; 
+    color: #8ba2b9; 
+    font-size: 11px;
+    position: relative;
+    top: -5px;
+}
+
+.graph-settings-panel-body {
+    padding: 5px 0px;
+}
+
+.graph-settings-panel-body .widgets .widget-container div div > input {
+    max-width: 500px;
+    min-width: 500px;
+}
+
+.graph-settings-panel-body .widgets .widget-container div .colorpicker-component {
+    max-width: 250px;
+    min-width: 250px;
+}
+
+.graph-settings-panel-body .widgets .widget-container div div div div div select .chosen-container {
+    width: 500px;
+}
+
+.graph-settings-panel-body .widgets .widget-container div div .domain-input {
+    max-width: 480px;
+    min-width: 480px;
+}
+
+.graph-settings-panel-body .widgets .widget-container div div .domain-input-item {
+    max-width: 474px;
+    min-width: 474px;
+}
+
+.edtf-input {
+    padding-bottom: 15px;
+}
 
 .node-subtitle {
     font-size: 12px;
@@ -5839,25 +5914,31 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .node-form.node-name {
     font-size: 13px;
-    color: #333;
-    font-weight: 600;
-    margin-top: 0;
+    color: #777;
+    margin-top: 1px;
     display: inline;
     padding-right: 5px;
 }
 
 .node-form.ontology {
     padding-right: 5px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.node-form-container {
+    width: 100%;
 }
 
 .node-semantic-description {
     display: flex;
-    padding: 10px;
-    margin-bottom: 15px;
+    height: 75px;
+    padding: 25px 20px;
     border-style: solid;
     border-width: 1px;
     border-color: #ccc;
-    background-color: #fcfcfc;
+    background-color: #f9f9f9;
+    min-width: 900px;
 }
 
 .node-name-report {
@@ -8210,6 +8291,23 @@ a.clear-geojson-button:hover {
     padding-bottom: 4px;
 }
 
+.domain-container {
+    width: 500px;
+}
+
+.domain-input {
+    height: 32px;
+}
+
+.domain-input-item {
+    height: 32px;
+}
+
+.option-drag-handle {
+    color: #999; 
+    cursor: move
+}
+
 .content-instructions {
     font-size: 13px;
     color: #8d8d8d;
@@ -9889,6 +9987,10 @@ a.search-facet-item.disabled {
     padding: 15px 25px 15px 25px;
 }
 
+.graph-designer-tab-container {
+    background: #e7e7e7;
+}
+
 .viewstate-btn {
     width: 100px;
 }
@@ -10801,6 +10903,38 @@ ul.select2-choices:after {
 
 .card-component {
     padding: 25px;
+}
+
+.card-component-panel {
+    padding: 10px 20px 10px 20px;
+    flex: 1 0 250px;
+    width: 250px;
+}
+
+.card-component-panel h4 {
+    color: #2f527a;
+}
+
+.card-component-panel hr {
+    border-color: #e9e9e9;
+}
+
+.card-component-panel h5 {
+    color: #989898;
+}
+
+.card-breadcrumbs {
+    color: #6494cc;
+}
+
+.current-crumb {
+    font-weight: bold;
+}
+
+.expanded-nav {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 @keyframes loader {

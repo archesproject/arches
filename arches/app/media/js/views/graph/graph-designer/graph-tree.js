@@ -37,6 +37,17 @@ define([
         },
 
         /**
+        * Returns a knockout computed used to calculate display name of the node
+        * @memberof GraphTree.prototype
+        * @param {object} node - a node in the tree
+        */
+        getDisplayName: function(node) {
+            return ko.computed(function(){
+                return node.name() + ' (' + node.ontologyclass_friendlyname().split('_')[0] + ')';
+            }, this);
+        },
+
+        /**
         * Selects the passed in node
         * @memberof GraphTree.prototype
         * @param {object} node - the node to be selected via {@link GraphModel#selectNode}

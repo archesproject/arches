@@ -105,6 +105,7 @@ urlpatterns = [
     url(r'^resource/(?P<resourceid>%s)/(?P<graphid>%s)/add_resource$' % (uuid_regex, uuid_regex), ResourceEditorView.as_view(), name='add_resource'),
     url(r'^resource/(?P<resourceid>%s)$' % uuid_regex, ResourceEditorView.as_view(), name='resource_editor'),
     url(r'^resource-new/(?P<resourceid>%s)$' % uuid_regex, NewResourceEditorView.as_view(), name='new_resource_editor'),
+    url(r'^add-resource/(?P<graphid>%s)$' % uuid_regex, NewResourceEditorView.as_view(), name='add_resource'),
     url(r'^resource/(?P<resourceid>%s)/copy$' % uuid_regex, ResourceEditorView.as_view(action='copy'), name='resource_copy'),
     url(r'^resource/(?P<resourceid>%s)/history$' % uuid_regex, ResourceEditLogView.as_view(), name='resource_edit_log'),
     url(r'^resource/(?P<resourceid>%s)/data/(?P<formid>%s)$' % (uuid_regex, uuid_regex), ResourceData.as_view(), name='resource_data'),
@@ -150,7 +151,10 @@ urlpatterns = [
     url(r'^password_reset/done/$', auth_views.password_reset_done, name='password_reset_done'),
     url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', auth_views.password_reset_confirm, name='password_reset_confirm', kwargs={"set_password_form":ArchesSetPasswordForm}),
     url(r'^reset/done/$', auth_views.password_reset_complete, name='password_reset_complete'),
+
+    url(r'^o/', include('oauth2_provider.urls', namespace='oauth2')),
 ]
+
 
 if settings.DEBUG:
     try:

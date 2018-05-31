@@ -324,7 +324,7 @@ define(['arches',
         },
 
         /**
-         * getValidNodesEdges - gets a list of possible ontolgoy properties and classes the node
+         * getValidNodesEdges - gets a list of possible ontology properties and classes the node
          * referenced by it's id could be based on the location of the node in the graph
          * @memberof GraphModel.prototype
          * @param  {string} nodeid - the node id of the node of interest
@@ -341,7 +341,7 @@ define(['arches',
         },
 
         /**
-         * getValidDomainClasses - gets a list of possible ontolgoy properties and classes the node
+         * getValidDomainClasses - gets a list of possible ontology properties and classes the node
          * referenced by it's id could use to be appened to other nodes
          * @memberof GraphModel.prototype
          * @param  {string} nodeid - the node id of the node of interest
@@ -533,7 +533,7 @@ define(['arches',
          * @param  {NodeModel} root - a reference to the root node in the nodes parameter, or of this graph if not defined
          * @param  {[NodeModel]} nodes - the nodes to make a tree from, defaults to the nodes in this graph
          * @param  {array} edges - the edges to make a tree from, defaults to the edges in this graph
-         * @param  {boolean} append - if true, won't remove the existing hierarchy 
+         * @param  {boolean} append - if true, won't remove the existing hierarchy
          * @return {object} a hierchical node listing
          */
         constructTree: function(root, nodes, edges, append){
@@ -569,11 +569,11 @@ define(['arches',
                 return this.getValidDomainClasses('', function(responseJSON) {
                     this.set('domain_connections', responseJSON);
                     this.set('domain_connections_loaded', true);
-                }, this);   
+                }, this);
             } else {
                 return Promise.resolve()
             }
-                
+
         },
 
         /**

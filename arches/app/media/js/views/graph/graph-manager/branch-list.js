@@ -25,7 +25,6 @@ define([
             ListView.prototype.initialize.apply(this, arguments);
 
             this.loading = options.loading || ko.observable(false);
-            this.failed = options.failed || ko.observable(false);
             this.disableAppendButton = options.disableAppendButton || ko.observable(false);
             this.graphModel = options.graphModel;
             this.selectedNode = this.graphModel.get('selectedNode');
@@ -141,12 +140,10 @@ define([
             var self = this;
             if(this.selectedNode()){
                 this.loading(true);
-                this.failed(false);
                 this.graphModel.appendBranch(this.selectedNode(), null, item.graphModel, function(response, status){
                     this.loading(false);
                     _.delay(_.bind(function(){
-                        this.failed(status !== 'success');
-                        if(!(this.failed())){
+                        if(status === 'success'){
                             this.closeForm();
                         }
                     }, this), 300, true);

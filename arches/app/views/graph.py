@@ -120,7 +120,7 @@ class GraphSettingsView(GraphBaseView):
         data = JSONDeserializer().deserialize(request.body)
         for key, value in data.get('graph').iteritems():
             if key in ['iconclass', 'name', 'author', 'description', 'isresource',
-                'ontology_id', 'version',  'subtitle', 'isactive', 'color']:
+                'ontology_id', 'version',  'subtitle', 'isactive', 'color', 'jsonldcontext']:
                 setattr(graph, key, value)
 
         node = models.Node.objects.get(graph_id=graphid, istopnode=True)
@@ -170,7 +170,7 @@ class NewGraphSettingsView(GraphBaseView):
         data = JSONDeserializer().deserialize(request.body)
         for key, value in data.get('graph').iteritems():
             if key in ['iconclass', 'name', 'author', 'description', 'isresource',
-                'ontology_id', 'version',  'subtitle', 'isactive', 'color']:
+                'ontology_id', 'version',  'subtitle', 'isactive', 'color', 'jsonldcontext']:
                 setattr(graph, key, value)
 
         node = models.Node.objects.get(graph_id=graphid, istopnode=True)
@@ -204,7 +204,6 @@ class GraphManagerView(GraphBaseView):
             context['nav']['icon'] = 'fa-bookmark'
             context['nav']['help'] = (_('About the Arches Designer'),'help/base-help.htm')
             context['help'] = 'arches-designer-help'
-            context['protected_graphs'] = json.dumps(settings.PROTECTED_GRAPHS)
             return render(request, 'views/graph.htm', context)
 
         self.graph = Graph.objects.get(graphid=graphid)

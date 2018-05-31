@@ -46,7 +46,6 @@ require([
                 });
             };
 
-            this.viewModel.protectedGraphs = graphManagerData.protected_graphs;
             this.viewModel.leaveDropdown = function(e){
               $('.dropdown').dropdown('toggle')
             };

@@ -193,7 +193,7 @@ class DateDataType(BaseDataType):
 
         try:
             if hasattr(settings, 'DATE_IMPORT_EXPORT_FORMAT'):
-                v = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
+                v = datetime.strptime(str(value), settings.DATE_IMPORT_EXPORT_FORMAT)
                 value = str(datetime.strftime(v, '%Y-%m-%d'))
             else:
                 value = str(datetime(value).date())
@@ -519,7 +519,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         elif node.config is None:
             return None
         count = models.TileModel.objects.filter(data__has_key=str(node.nodeid)).count()
-        if not preview and count < 1 or not node.config["layerActivated"]:
+        if not preview and (count < 1 or not node.config["layerActivated"]):
             return None
 
         source_name = "resources-%s" % node.nodeid

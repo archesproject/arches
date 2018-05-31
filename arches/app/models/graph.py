@@ -351,33 +351,29 @@ class Graph(models.GraphModel):
         return self
 
     def delete(self):
+        if self.is_editable() == True:
+            with transaction.atomic():
+                for nodegroup in self.get_nodegroups():
+                    nodegroup.delete()
 
-        if str(self.graphid) not in settings.PROTECTED_GRAPHS:
-            if self.is_editable() == True:
-                with transaction.atomic():
-                    for nodegroup in self.get_nodegroups():
-                        nodegroup.delete()
+                for edge in self.edges.itervalues():
+                    edge.delete()
 
-                    for edge in self.edges.itervalues():
-                        edge.delete()
+                for node in self.nodes.itervalues():
+                    node.delete()
 
-                    for node in self.nodes.itervalues():
-                        node.delete()
+                for card in self.cards.itervalues():
+                    card.delete()
 
-                    for card in self.cards.itervalues():
-                        card.delete()
+                for widget in self.widgets.itervalues():
+                    widget.delete()
 
-                    for widget in self.widgets.itervalues():
-                        widget.delete()
+                # if self.isresource:
+                #     delete_search_index(self.graphid)
 
-                    # if self.isresource:
-                    #     delete_search_index(self.graphid)
-
-                    super(Graph, self).delete()
-            else:
-                raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot delete a Resource Model with instances.".format(self.name)))
+                super(Graph, self).delete()
         else:
-            raise GraphValidationError(_('This graph is essential to Arches and cannot be deleted'))
+            raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot delete a Resource Model with instances.".format(self.name)))
 
 
 
@@ -536,7 +532,7 @@ class Graph(models.GraphModel):
 
     def clear_ontology_references(self):
         """
-        removes any references to ontolgoy classes and properties in a graph
+        removes any references to ontology classes and properties in a graph
 
         """
 
