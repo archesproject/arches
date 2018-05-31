@@ -51,6 +51,7 @@ class ArchesFileWriter(Writer):
 
     def write_resources(self, graph_id=None, resourceinstanceids=None):
         super(ArchesFileWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids)
+        
         json_for_export = []
         resources = []
         relations = []
@@ -65,9 +66,8 @@ class ArchesFileWriter(Writer):
             resources.append(resource)
 
         export['business_data']['resources'] = resources
-        graph_id = export['business_data']['resources'][0]['resourceinstance'].graph_id
         
-        if str(graph_id) != settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
+        if str(self.graph_id) != settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
             json_name = os.path.join('{0}.{1}'.format(self.file_name, 'json'))
         else:
             json_name = os.path.join('{0}'.format(os.path.basename(settings.SYSTEM_SETTINGS_LOCAL_PATH)))

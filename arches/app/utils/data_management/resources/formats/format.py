@@ -221,14 +221,16 @@ class Writer(object):
 
         if (graph_id is None or graph_id is False) and resourceinstanceids is None:
             raise MissingGraphException(_("Must supply either a graph id or a list of resource instance ids to export"))
-        self.graph_id = graph_id
+        
         if graph_id:
             iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            self.graph_id = graph_id
             self.file_prefix = models.GraphModel.objects.get(graphid=graph_id).name.replace(' ', '_')
             self.file_name = '{0}_{1}'.format(self.file_prefix, iso_date)
             self.tiles = models.TileModel.objects.filter(resourceinstance__graph_id=graph_id)
         else:
             self.tiles = models.TileModel.objects.filter(resourceinstance_id__in=resourceinstanceids)
+            self.graph_id = self.tiles[0].resourceinstance.graph_id
 
         for tile in self.tiles:
             try:

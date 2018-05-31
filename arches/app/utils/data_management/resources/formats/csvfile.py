@@ -26,11 +26,13 @@ try:
 except ImportError:
     from StringIO import StringIO
 
+
 class MissingConfigException(Exception):
      def __init__(self, value=None):
          self.value = value
      def __str__(self):
          return repr(self.value)
+
 
 class ConceptLookup():
     def __init__(self, create=False):
@@ -102,6 +104,7 @@ class CsvWriter(Writer):
         return value
 
     def write_resources(self, graph_id=None, resourceinstanceids=None):
+        # use the graph id from the mapping file, not the one passed in to the method
         graph_id = self.resource_export_configs[0]['resource_model_id']
         super(CsvWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids)
 
@@ -213,6 +216,7 @@ class CsvWriter(Writer):
 
         return relations_file
 
+
 class TileCsvWriter(Writer):
 
     def __init__(self, **kwargs):
@@ -233,7 +237,7 @@ class TileCsvWriter(Writer):
         concept_export_value_lookup = {}
         csv_header = ['ResourceID']
         mapping = {}
-        nodes = Node.objects.filter(graph_id=graph_id)
+        nodes = Node.objects.filter(graph_id=self.graph_id)
         for node in nodes:
             mapping[str(node.nodeid)] = node.name
         csv_header = ['ResourceID', 'ResourceLegacyID', 'ResourceModelID', 'TileID', 'ParentTileID', 'NodeGroupID' ] + mapping.values()
@@ -244,7 +248,7 @@ class TileCsvWriter(Writer):
             for tile in tiles:
                 csv_record = {}
                 csv_record['ResourceID'] = resourceinstanceid
-                csv_record['ResourceModelID'] = graph_id
+                csv_record['ResourceModelID'] = self.graph_id
                 csv_record['TileID'] = tile.tileid
                 csv_record['ParentTileID'] = str(tile.parenttile_id)
                 csv_record['NodeGroupID'] = str(tile.nodegroup_id)
@@ -280,6 +284,7 @@ class TileCsvWriter(Writer):
             csvs_for_export = csvs_for_export
 
         return csvs_for_export
+
 
 class CsvReader(Reader):
 
@@ -831,6 +836,7 @@ class CsvReader(Reader):
 
         finally:
             pass
+
 
 class TileCsvReader(Reader):
 
