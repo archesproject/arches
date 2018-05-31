@@ -461,8 +461,6 @@ RESOURCE_GRAPH_LOCATIONS = (
     os.path.join(ROOT_DIR, 'db', 'graphs', 'resource_models'),
 )
 
-PROTECTED_GRAPHS = ('22000000-0000-0000-0000-000000000000', '22000000-0000-0000-0000-000000000001',)
-
 BUSINESS_DATA_FILES = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
