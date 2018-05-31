@@ -172,13 +172,14 @@ class MobileSurvey(models.MobileSurveyModel):
                 if str(tile['resourceinstance_id']) in instances:
                     try:
                         tile['type'] = 'tile'
-                        couch_record = db.get(tile['tileid'])
-                        if couch_record == None:
-                            db[tile['tileid']] = tile
-                        else:
-                            if couch_record['data'] != tile['data']:
-                                couch_record['data'] = tile['data']
-                                db[tile['tileid']] = couch_record
+                        self.couch.update_doc(db, tile, tile['tileid'])
+                        # couch_record = db.get(tile['tileid'])
+                        # if couch_record == None:
+                        #     db[tile['tileid']] = tile
+                        # else:
+                        #     if couch_record['data'] != tile['data']:
+                        #         couch_record['data'] = tile['data']
+                        #         db[tile['tileid']] = couch_record
                     except Exception as e:
                         print e, tile
 
@@ -191,9 +192,7 @@ class MobileSurvey(models.MobileSurveyModel):
         for instanceid, instance in instances.iteritems():
             try:
                 instance['type'] = 'resource'
-                couch_record = db.get(instanceid)
-                if couch_record == None:
-                    db[instanceid] = instance
+                self.couch.update_doc(db, instance, instanceid)
             except Exception as e:
                 print e, instance
 
