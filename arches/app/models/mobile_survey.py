@@ -25,6 +25,7 @@ from arches.app.models.system_settings import settings
 from django.http import HttpRequest
 from arches.app.utils.couch import Couch
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+import arches.app.views.search as search
 from django.utils.translation import ugettext as _
 
 class MobileSurvey(models.MobileSurveyModel):
@@ -87,9 +88,8 @@ class MobileSurvey(models.MobileSurveyModel):
                 graphids.append(card.graph_id)
                 #we may want the full proxy model at some point, but for now just the root node color
                 # graphs.append(Graph.objects.get(pk=card.graph_id))
-                proxy_graph = Graph.objects.get(pk=card.graph_id)
                 graph = JSONSerializer().serializeToPython(card.graph, exclude=['functions','disable_instance_creation','deploymentdate','deploymentfile'])
-                graph['color'] = proxy_graph.color
+                graph['color'] = card.graph.color
                 graph['ontology_id']=str(graph['ontology_id'])
                 graphs.append(graph)
         ret['graphs'] = graphs
@@ -142,8 +142,8 @@ class MobileSurvey(models.MobileSurveyModel):
                     default_bounds['features'][0]['properties']['inverted'] = False
                     request.GET['mapFilter'] = json.dumps(default_bounds)
                 else:
-                    request.GET['mapFilter'] = json.dumps({u'type': u'FeatureCollection', 'features':[{'geometry': json.loads(mobile_survey.bounds.json)}]})
-                request.GET['typeFilter'] = json.dumps([{'graphid': resourceid, 'inverted': False } for resourceid in mobile_survey.datadownloadconfig['resources']])
+                    request.GET['mapFilter'] = json.dumps({u'type': u'FeatureCollection', 'features':[{'geometry': json.loads(self.bounds.json)}]})
+                request.GET['typeFilter'] = json.dumps([{'graphid': resourceid, 'inverted': False } for resourceid in self.datadownloadconfig['resources']])
             else:
                 parsed = urlparse.urlparse(query)
                 urlparams = urlparse.parse_qs(parsed.query)
@@ -163,7 +163,6 @@ class MobileSurvey(models.MobileSurveyModel):
         of resource instances to identify eligible tiles and load them into the
         database instance
         """
-        db = self.couch.create_db('project_' + str(self.id))
         cards = self.cards.all()
         for card in cards:
             tiles = models.TileModel.objects.filter(nodegroup=card.nodegroup_id)
