@@ -11,7 +11,7 @@ TileStache==1.51.6
 python-memcached==1.59
 mapbox-vector-tile==1.2.0
 mapnik==0.1
-SPARQLWrapper==1.8.0
+SPARQLWrapper==1.8.1
 django-recaptcha==1.4.0
 python-jose==2.0.2
 edtf==2.7.0
