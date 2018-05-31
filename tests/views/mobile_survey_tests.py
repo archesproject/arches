@@ -153,7 +153,7 @@ class MobileSurveyTests(ArchesTestCase):
             print '{0} is not in couch'.format('project_' + str(self.mobile_survey.id))
 
         self.assertEqual(tiles, 2)
-        self.assertTrue(resources==1)
+        self.assertEqual(resources,1)
 
     def test_delete_mobile_survey(self):
         """

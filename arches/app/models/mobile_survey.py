@@ -163,6 +163,7 @@ class MobileSurvey(models.MobileSurveyModel):
         of resource instances to identify eligible tiles and load them into the
         database instance
         """
+        db = self.couch.create_db('project_' + str(self.id))
         cards = self.cards.all()
         for card in cards:
             tiles = models.TileModel.objects.filter(nodegroup=card.nodegroup_id)
