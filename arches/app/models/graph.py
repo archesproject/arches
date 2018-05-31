@@ -25,7 +25,7 @@ from arches.app.models.system_settings import settings
 from arches.app.search.mappings import prepare_search_index, delete_search_index
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.utils.translation import ugettext as _
-
+from pyld.jsonld import compact, JsonLdError
 
 class Graph(models.GraphModel):
     """
@@ -1322,6 +1322,28 @@ class Graph(models.GraphModel):
             for node_id, node in self.nodes.iteritems():
                 if node.ontologyclass is not None:
                     raise GraphValidationError(_("You have assigned ontology classes to your graph nodes but not assigned an ontology to your graph."), 1005)
+
+
+        # make sure the supplied json-ld context is valid
+        # https://www.w3.org/TR/json-ld/#the-context
+        context = self.jsonldcontext
+        try:
+            context = JSONDeserializer().deserialize(context)
+        except ValueError:
+            if context == '':
+                context = {}
+            context = {
+                "@context": context
+            }
+        except AttributeError:
+            context = {
+                "@context": {}
+            }
+
+        try:
+            out = compact({}, context)
+        except JsonLdError as err:
+            raise GraphValidationError(_("The json-ld context you supplied wasn't formatted correctly."), 1006)
 
 
 class GraphValidationError(Exception):
