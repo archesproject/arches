@@ -43,7 +43,7 @@ def prepare_term_index(create=False):
                     'tileid': {'type': 'keyword'},
                     'nodeid': {'type': 'keyword'},
                     'resourceinstanceid': {'type': 'keyword'},
-                    'provisional': {'type': 'keyword'},
+                    'provisional': {'type': 'boolean'},
                     'value': {
                         'analyzer': 'standard',
                         'type': 'text',
@@ -64,7 +64,7 @@ def prepare_term_index(create=False):
                     'language': {'type': 'keyword'},
                     'id': {'type': 'keyword'},
                     'category': {'type': 'keyword'},
-                    'provisional': {'type': 'keyword'},
+                    'provisional': {'type': 'boolean'},
                     'type': {'type': 'keyword'},
                     'value': {
                         'analyzer': 'standard',
@@ -118,7 +118,7 @@ def prepare_search_index(resource_model_id, create=False):
                     'displayname': {'type': 'keyword'},
                     'displaydescription': {'type': 'keyword'},
                     'map_popup': {'type': 'keyword'},
-                    'provisional': {'type': 'keyword'},
+                    'provisional_resource': {'type': 'keyword'},
                     'tiles' : {
                         'type' : 'nested',
                         'properties' : {
@@ -141,7 +141,7 @@ def prepare_search_index(resource_model_id, create=False):
                                 }
                             },
                             'nodegroup_id' : {'type': 'keyword'},
-                            'provisional': {'type': 'keyword'}
+                            'provisional': {'type': 'boolean'}
                         }
                     },
                     'domains' : {
@@ -157,7 +157,7 @@ def prepare_search_index(resource_model_id, create=False):
                             'conceptid' : {'type': 'keyword'},
                             'valueid' : {'type': 'keyword'},
                             'nodegroup_id' : {'type': 'keyword'},
-                            'provisional': {'type': 'keyword'}
+                            'provisional': {'type': 'boolean'}
                         }
                     },
                     'geometries' : {
@@ -179,7 +179,7 @@ def prepare_search_index(resource_model_id, create=False):
                                 }
                             },
                             'nodegroup_id' : {'type': 'keyword'},
-                            'provisional': {'type': 'keyword'}
+                            'provisional': {'type': 'boolean'}
                         }
                     },
                     'points': {
@@ -187,7 +187,7 @@ def prepare_search_index(resource_model_id, create=False):
                         'properties' : {
                             'point' : {'type': 'geo_point'},
                             'nodegroup_id' : {'type': 'keyword'},
-                            'provisional': {'type': 'keyword'}
+                            'provisional': {'type': 'boolean'}
                         }
                     },
                     'dates' : {
@@ -196,7 +196,7 @@ def prepare_search_index(resource_model_id, create=False):
                             'date' : {'type': 'float'},
                             'nodegroup_id' : {'type': 'keyword'},
                             'nodeid' : {'type': 'keyword'},
-                            'provisional': {'type': 'keyword'}
+                            'provisional': {'type': 'boolean'}
                         }
                     },
                     'numbers' : {
@@ -204,7 +204,7 @@ def prepare_search_index(resource_model_id, create=False):
                         'properties' : {
                             'number' : {'type': 'double'},
                             'nodegroup_id' : {'type': 'keyword'},
-                            'provisional': {'type': 'keyword'}
+                            'provisional': {'type': 'boolean'}
                         }
                     },
                     'date_ranges': {
@@ -212,7 +212,7 @@ def prepare_search_index(resource_model_id, create=False):
                         'properties' : {
                             'date_range' : {'type': 'float_range'},
                             'nodegroup_id' : {'type': 'keyword'},
-                            'provisional': {'type': 'keyword'}
+                            'provisional': {'type': 'boolean'}
                         }
                     }
                 }
