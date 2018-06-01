@@ -9,7 +9,7 @@ from rdflib import Namespace
 from rdflib import URIRef, Literal
 from rdflib import Graph
 from rdflib.namespace import RDF, RDFS
-from pyld.jsonld import compact, expand, frame, from_rdf
+from pyld.jsonld import compact, frame, from_rdf
 
 try:
     from cStringIO import StringIO
@@ -140,7 +140,7 @@ class RdfWriter(Writer):
 
 class JsonLdWriter(RdfWriter):
 
-    def write_resources(self, graph_id=None, resourceinstanceids=None):
+    def write_resources(self, graph_id=None, resourceinstanceids=None, indent=None):
         super(RdfWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids)
         g = self.get_rdf_graph()
         value = g.serialize(format='nt')
@@ -168,7 +168,7 @@ class JsonLdWriter(RdfWriter):
             }
 
         out = compact(js, context)
-        out = json.dumps(out, indent=4, sort_keys=True)
+        out = json.dumps(out, indent=indent, sort_keys=True)
         dest = StringIO(out)
 
         full_file_name = os.path.join('{0}.{1}'.format(self.file_name, 'jsonld'))
