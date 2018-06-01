@@ -16,6 +16,9 @@ LOCALE_PATHS = (os.path.join(PACKAGE_ROOT, '../locale'),)
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # MEDIA_ROOT =  os.path.join(PACKAGE_ROOT, 'uploadedfiles')
 
+# Absolute filesystem path to the directory holds bulk upload data
+BULK_UPLOAD_DIR =  os.path.join(PACKAGE_ROOT, 'bulk_upload')
+
 ugettext = lambda s: s
 LANGUAGES = (
     ('en-US', ugettext('English')),
@@ -258,7 +261,7 @@ LOGGING = {
         'excel-reader': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(PACKAGE_ROOT, 'excel-reader.log'),
+            'filename': os.path.join(BULK_UPLOAD_DIR, 'excel-reader.log'),
             'mode':'w',
             'formatter':'standard'
         },

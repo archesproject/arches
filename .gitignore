@@ -1,5 +1,6 @@
 *.pyc
 *.xslx
+*.log
 arches.egg-info
 eamena/eamena/settings_local.py
 eamena/eamena/source_data
