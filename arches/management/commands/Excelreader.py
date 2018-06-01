@@ -11,6 +11,7 @@ import arches.app.models.models as archesmodels
 from arches.management.commands import utils
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.gis.geos import GEOSGeometry
+import json
 import logging
 logger = logging.getLogger('excel-reader')
 
@@ -26,14 +27,27 @@ class Command(BaseCommand):
     )
     
     def handle(self, *args, **options):
-        
+    
+        ## flush logger here to start fresh for each iteration
+        ## (is this really working??)
+        logger = logging.getLogger('excel-reader')
+        logger.handlers[0].flush()
+
         print 'operation: '+ options['operation']
         package_name = settings.PACKAGE_NAME
         print 'package: '+ package_name
         
         if options['operation'] == 'site_dataset':
             self.SiteDataset(options['source'], options['resource_type'], options['dest_dir'],options['append_data'])
+        
+        ## ultimately, the result should come from the SiteDataset function
+        ## below is just an example of what it could look like, and it should
+        ## be dumped to a .json file and that path returned from here.
+        ## returning an actual dictionary object seems to cause problems...
+        result = {'success':True,'msg':[]}
 
+        # self.stdout.write(path/to/.json)
+        
         return
     
     
