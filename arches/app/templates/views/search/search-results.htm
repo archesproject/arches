@@ -27,9 +27,14 @@
                 </div>
 
                 <div class="search-listing-footer">
-                    <!--ko if: provisional_resource != 'false' -->
+                    <!--ko if: provisional_resource == 'true' -->
                     <a class="provisional-edits" href=""><i class="fa fa-exclamation-circle"></i> {% trans "Provisional" %} </a>
                     <!--/ko-->
+
+                    <!--ko if: provisional_resource == 'partial' && $parent.userIsReviewer -->
+                    <a class="provisional-edits" href=""><i class="fa fa-exclamation-circle"></i> {% trans "Has provisional edits" %} </a>
+                    <!--/ko-->
+
 
                     {% if user|can_edit_resource_instance %}<a class="search-candidate-link" href="" data-bind="click: $parent.editResource.bind($parent)"><i class="ion-ios-refresh-empty"></i> {% trans "Edit" %} </a>{% endif %}
                     <a class="search-candidate-link" href="" data-bind="visible: point, click: mapLinkClicked"><i class="fa fa-map-marker"></i> {% trans "Map" %} </a>
