@@ -79,7 +79,7 @@ class Resources(APIBase):
         
         if resourceid:
             exporter = ResourceExporter(format=format)
-            output = exporter.writer.write_resources(resourceinstanceids=[resourceid], indent=indent)
+            output = exporter.writer.write_resources(resourceinstanceids=[resourceid], indent=indent, user=request.user)
             out = output[0]['outputfile'].getvalue()
         else:
             # 

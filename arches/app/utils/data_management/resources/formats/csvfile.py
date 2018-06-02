@@ -103,10 +103,10 @@ class CsvWriter(Writer):
         value = datatype_instance.transform_export_values(value, concept_export_value_type=concept_export_value_type, node=node)
         return value
 
-    def write_resources(self, graph_id=None, resourceinstanceids=None):
+    def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
         # use the graph id from the mapping file, not the one passed in to the method
         graph_id = self.resource_export_configs[0]['resource_model_id']
-        super(CsvWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids)
+        super(CsvWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
 
         csv_records = []
         other_group_records = []
@@ -229,8 +229,8 @@ class TileCsvWriter(Writer):
         value = datatype_instance.transform_export_values(value, concept_export_value_type=concept_export_value_type, node=node)
         return value
 
-    def write_resources(self, graph_id=None, resourceinstanceids=None):
-        super(TileCsvWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids)
+    def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
+        super(TileCsvWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
 
         csv_records = []
         other_group_records = []

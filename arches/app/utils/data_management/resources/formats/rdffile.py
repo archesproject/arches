@@ -23,8 +23,8 @@ class RdfWriter(Writer):
         self.format = kwargs.pop('format', 'xml')
         super(RdfWriter, self).__init__(**kwargs)
 
-    def write_resources(self, graph_id=None, resourceinstanceids=None):
-        super(RdfWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids)
+    def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
+        super(RdfWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
 
         dest = StringIO()
         g = self.get_rdf_graph()
@@ -140,8 +140,8 @@ class RdfWriter(Writer):
 
 class JsonLdWriter(RdfWriter):
 
-    def write_resources(self, graph_id=None, resourceinstanceids=None, indent=None):
-        super(RdfWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids)
+    def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
+        super(RdfWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
         g = self.get_rdf_graph()
         value = g.serialize(format='nt')
         js = from_rdf(str(value), options={format:'application/nquads'})
@@ -168,7 +168,7 @@ class JsonLdWriter(RdfWriter):
             }
 
         out = compact(js, context)
-        out = json.dumps(out, indent=indent, sort_keys=True)
+        out = json.dumps(out, indent=kwargs.get('indent', None), sort_keys=True)
         dest = StringIO(out)
 
         full_file_name = os.path.join('{0}.{1}'.format(self.file_name, 'jsonld'))

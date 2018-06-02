@@ -49,8 +49,8 @@ class ArchesFileWriter(Writer):
     def __init__(self, **kwargs):
         super(ArchesFileWriter, self).__init__(**kwargs)
 
-    def write_resources(self, graph_id=None, resourceinstanceids=None):
-        super(ArchesFileWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids)
+    def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
+        super(ArchesFileWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
         
         json_for_export = []
         resources = []
@@ -74,7 +74,7 @@ class ArchesFileWriter(Writer):
         
         dest = StringIO()
         export = JSONDeserializer().deserialize(JSONSerializer().serialize(JSONSerializer().serializeToPython(export)))
-        json.dump(export, dest, indent=4)
+        json.dump(export, dest, indent=kwargs.get('indent', None))
         json_for_export.append({'name':json_name, 'outputfile': dest})
 
         return json_for_export
