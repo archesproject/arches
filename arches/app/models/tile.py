@@ -149,8 +149,6 @@ class Tile(models.TileModel):
                     user.id: provisionaledit
                     }
             self.provisionaledits = JSONSerializer().serialize(provisionaledits)
-        else:
-            print "this appears to be a collector node, no provisional edit applied"
 
     def is_provisional(self):
         """
@@ -261,7 +259,7 @@ class Tile(models.TileModel):
 
         if index:
             self.index()
-        print self.provisionaledits, self.tileid
+
         for tiles in self.tiles.itervalues():
             for tile in tiles:
                 # print tile.provisionaledits, tile.tileid
