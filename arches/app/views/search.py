@@ -241,6 +241,7 @@ def search_results(request):
         ret['paginator']['start_index'] = page.start_index()
         ret['paginator']['end_index'] = page.end_index()
         ret['paginator']['pages'] = pages
+        ret['reviewer'] = user_is_reviewer
 
         return JSONResponse(ret)
     else:

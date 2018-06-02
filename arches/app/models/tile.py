@@ -117,29 +117,40 @@ class Tile(models.TileModel):
         edit.oldprovisionalvalue = oldprovisionalvalue
         edit.save()
 
+    def tile_collects_data(self):
+        result = True
+        if self.tiles != None and len(self.tiles) > 0:
+            nodes = models.Node.objects.filter(nodegroup=self.nodegroup)
+            if len(nodes) == 1 and nodes[0].datatype == 'semantic':
+                result = False
+        return result
+
     def apply_provisional_edit(self, user, data, action='create', status='review'):
         """
         Creates or updates the json stored in a tile's provisionaledits db_column
 
         """
+        if self.tile_collects_data() == True:
 
-        provisionaledit =  {
-            "value": data,
-            "status": status,
-            "action": action,
-            "reviewer": None,
-            "timestamp": timezone.now(),
-            "reviewtimestamp": None
-        }
+            provisionaledit =  {
+                "value": data,
+                "status": status,
+                "action": action,
+                "reviewer": None,
+                "timestamp": timezone.now(),
+                "reviewtimestamp": None
+            }
 
-        if self.provisionaledits is not None:
-            provisionaledits = JSONDeserializer().deserialize(self.provisionaledits)
-            provisionaledits[str(user.id)] = provisionaledit
+            if self.provisionaledits is not None:
+                provisionaledits = JSONDeserializer().deserialize(self.provisionaledits)
+                provisionaledits[str(user.id)] = provisionaledit
+            else:
+                provisionaledits = {
+                    user.id: provisionaledit
+                    }
+            self.provisionaledits = JSONSerializer().serialize(provisionaledits)
         else:
-            provisionaledits = {
-                user.id: provisionaledit
-                }
-        self.provisionaledits = JSONSerializer().serialize(provisionaledits)
+            print "this appears to be a collector node, no provisional edit applied"
 
     def is_provisional(self):
         """
@@ -250,8 +261,10 @@ class Tile(models.TileModel):
 
         if index:
             self.index()
+        print self.provisionaledits, self.tileid
         for tiles in self.tiles.itervalues():
             for tile in tiles:
+                # print tile.provisionaledits, tile.tileid
                 tile.resourceinstance = self.resourceinstance
                 tile.parenttile = self
                 tile.save(*args, request=request, index=index, **kwargs)
