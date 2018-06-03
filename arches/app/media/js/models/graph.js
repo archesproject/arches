@@ -96,7 +96,13 @@ define(['arches',
                     this.get('nodes').remove(function (node) {
                         return _.contains(nodes, node);
                     });
-                    parentNode.children.remove(node);
+                    if (parentNode.children) {
+                        try {
+                            parentNode.children.remove(node);
+                        } catch (err) {
+                            console.log(err);
+                        };
+                    };
                     parentNode.selected(true);
                 }else{
                     this.trigger('error', response, 'deleteNode');
@@ -533,7 +539,7 @@ define(['arches',
          * @param  {NodeModel} root - a reference to the root node in the nodes parameter, or of this graph if not defined
          * @param  {[NodeModel]} nodes - the nodes to make a tree from, defaults to the nodes in this graph
          * @param  {array} edges - the edges to make a tree from, defaults to the edges in this graph
-         * @param  {boolean} append - if true, won't remove the existing hierarchy 
+         * @param  {boolean} append - if true, won't remove the existing hierarchy
          * @return {object} a hierchical node listing
          */
         constructTree: function(root, nodes, edges, append){
@@ -569,11 +575,11 @@ define(['arches',
                 return this.getValidDomainClasses('', function(responseJSON) {
                     this.set('domain_connections', responseJSON);
                     this.set('domain_connections_loaded', true);
-                }, this);   
+                }, this);
             } else {
                 return Promise.resolve()
             }
-                
+
         },
 
         /**
