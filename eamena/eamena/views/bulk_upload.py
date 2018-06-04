@@ -91,7 +91,7 @@ def validate(request):
     
 def upload_spreadsheet(request):
     '''this is the view that handles the file upload ajax call. it includes a
-    very simple test for the file format, and returns the file path, name, and
+    very simple test for the file format, which should be XLSX, and returns the file path, name, and
     validity, all of which are used on the front-end.'''
     
     if request.method == 'POST':
@@ -103,7 +103,7 @@ def upload_spreadsheet(request):
             'filepath':'',
         }
         ## simple test for file type; don't upload non-excel files
-        if not fname.endswith('.xls') and not fname.endswith('.xlsx'):
+        if not fname.endswith('.xlsx'):
             response_data['filevalid'] = False
         else:
             fpath = handle_uploaded_file(f)
