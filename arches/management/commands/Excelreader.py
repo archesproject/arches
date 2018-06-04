@@ -50,7 +50,6 @@ class Command(BaseCommand):
         
         return
     
-    
     def validatedates(self, date):
         try:
             datetime.datetime.strptime(date, '%Y-%m-%d') #Checks for format  YYYY-MM-DD
@@ -83,11 +82,13 @@ class Command(BaseCommand):
     
     '''Validates that the number of semicolon-separated values is consistent across a worksheet and spots empty cells'''
     def validate_rows_and_values(self,workbook):
-        test_passed = True
         sheet_count = len(workbook.worksheets)
         rows_count  = 0
         ret = []
         offset_max = False
+        errors = {
+            'different_rows': False
+        }
 
                
                     
@@ -101,18 +102,22 @@ class Command(BaseCommand):
 
             ret = self.validate_value_number(sheet, workbook.sheetnames[sheet_index])
             if ret:
-                test_passed = False
+                ret = sorted(ret)
+                errors[workbook.sheetnames[sheet_index]] = ','.join(str(e) for e in ret)
                 # raise ValueError("Error: cells in sheet %s do not contain an equal number of semicolon separated values or are empty. Errors are at the following lines: %s" % (workbook.sheetnames[sheet_index], sorted(ret)))
-                logger.error("cells in sheet %s do not contain an equal number of semicolon separated values or are empty. Errors are at the following lines:" % (workbook.sheetnames[sheet_index]))
-                for row in sorted(ret):
-                    logger.error(row)
+#                 logger.error("cells in sheet %s do not contain an equal number of semicolon separated values or are empty. Errors are at the following lines:" % (workbook.sheetnames[sheet_index]))
+#                 for row in sorted(ret):
+#                     logger.error(row)
         if (rows_count/sheet_count).is_integer() is not True:
-            test_passed = False
+            errors['different_rows'] = True
+            return errors
             # raise ValueError("Error: some sheets in your XLSX file have a different number of rows")
-            logger.error("some sheets in your XLSX file have a different number of rows")
+#             logger.error("some sheets in your XLSX file have a different number of rows")
             
-        if test_passed:
-            logger.info("validate_rows_and_values all ok")
+        if errors:
+            return errors
+        else:
+            return None
             
     def validate_value_number(self, sheet, sheet_name):
         FaultyRows=[]
@@ -140,7 +145,7 @@ class Command(BaseCommand):
     #def validate_resourcetype(self, resourcetype):
 
     def validate_headers(self, workbook, skip_resourceid_col = False):
-        test_passed = True
+        errors = []
         for sheet in workbook.worksheets:
             for header in sheet.iter_cols(max_row = 1):
                 if header[0].value is not None:
@@ -150,12 +155,13 @@ class Command(BaseCommand):
                         try:
                             modelinstance = archesmodels.EntityTypes.objects.get(pk = header[0].value)
                         except ObjectDoesNotExist:
-                            test_passed = False
-                            logger.error("The header %s is not a valid EAMENA node name" % header[0].value)
+                            errors.append("The header %s is not a valid EAMENA node name" % header[0].value)
+#                             logger.error("The header %s is not a valid EAMENA node name" % header[0].value)
                             # raise ObjectDoesNotExist("The header %s is not a valid EAMENA node name" % header[0].value)
-        if test_passed:
-            logger.info("All headers OK")
-        return
+        if errors:
+            return errors
+        else:
+            return None
         
     def validate_concept(self, concept, concepts_in_node):
         valuelist = [archesmodels.Values.objects.filter(value__iexact = concept, conceptid= concept_in_node) for concept_in_node in concepts_in_node]
@@ -181,11 +187,11 @@ class Command(BaseCommand):
     def validate_geometries(self, geometry,row):
         try:
             GEOSGeometry(geometry)
-            return True
+            return
         except:
             logger.error("The geometry at line %s is not an acceptable GEOSGeometry" % row+2)
             # raise ValueError("The geometry at line %s is not an acceptable GEOSGeometry" % row+2)
-            return False
+            return "The geometry at line %s is not an acceptable GEOSGeometry" % row+2
     
     def create_resourceid_list(self, workbook):
         ''''Looks for RESOURCEID column and creates a list of resourceids and returns '''
@@ -206,10 +212,29 @@ class Command(BaseCommand):
         
         ResourceList = []
         FaultyConceptsList = []
+        Error_Log = {
+            'validate_headers' : {'errors': [], 'passed': True},
+            'validate_rows_and_values' : {'errors': [], 'passed': True},
+            'validate_geometries' :  {'errors': [], 'passed': True},
+            'validate_dates' : {'errors': [], 'passed': True},
+            'validate_concepts' :  {'errors': [], 'passed': True},
+        }
         if append:
             resourceids_list = self.create_resourceid_list(wb2)
-        self.validate_headers(wb2,skip_resourceid_col = append)
-        self.validate_rows_and_values(wb2)
+        
+        headers_errors = self.validate_headers(wb2,skip_resourceid_col = append)
+        rows_values_errors =  self.validate_rows_and_values(wb2)
+        if headers_errors:
+            Error_Log['validate_headers']['errors'].append(headers_errors)
+            Error_Log['validate_headers']['passed'] = False
+            return Error_Log
+        if rows_values_errors:
+            if rows_values_errors['different_rows'] == True:
+                Error_Log['validate_rows_and_values']['passed'] = False
+            else:       
+                Error_Log['validate_rows_and_values']['errors'].append(self.validate_rows_and_values(wb2))
+                Error_Log['validate_rows_and_values']['passed'] = False
+            return Error_Log
         
         for sheet_index,sheet in enumerate(wb2.worksheets):
             sheet_name = wb2.sheetnames[sheet_index]
@@ -238,7 +263,8 @@ class Command(BaseCommand):
                                             ResourceList.append(concept_list)
 #                                             print "ConceptId %s, ResourceId %s, AttributeName %s, AttributeValue %s, GroupId %s" %(valueinstance[0][0].conceptid, row_index,modelinstance.entitytypeid,conceptinstance.legacyoid,GroupName)
                                         else:
-                                            FaultyConceptsList.append("{0} in {1}, at row no. {2}".format(concept,header[0].value,(row_index+2)))
+                                            Error_Log['validate_concepts']['errors'].append("{0} in {1}, at row no. {2}".format(concept,header[0].value,(row_index+2)))
+                                            Error_Log['validate_concepts']['passed'] = False
                                             # logger.info("{0} in {1}, at row no. {2}".format(concept,header[0].value,(row_index+2)))
                                     if modelinstance.businesstablename == 'strings':
                                             concept_list = [str(resourceid),resourcetype,modelinstance.entitytypeid,concept, GroupName]
@@ -250,17 +276,21 @@ class Command(BaseCommand):
                                             ResourceList.append(concept_list)
                                     if modelinstance.businesstablename == 'geometries':
                                             if self.validate_geometries(concept,row_index):
+                                                Error_Log['validate_geometries']['errors'].append(self.validate_geometries(concept,row_index))
+                                                Error_Log['validate_geometries']['passed'] = False
+                                            else:
                                                 concept_list = [str(resourceid),resourcetype,modelinstance.entitytypeid,concept, GroupName]
                                                 ResourceList.append(concept_list)
                                     
-        if FaultyConceptsList:
-            logger.error("The following concepts had issues:")
-            for c in FaultyConceptsList:
-                logger.error(c)
-            # raise ValueError("The following concepts had issues %s" % FaultyConceptsList)
-                                                                        
-        with open(destination, 'wb') as csvfile:
+#         if FaultyConceptsList:
+        if Error_Log['validate_geometries']['errors'] or Error_Log['validate_concepts']['errors']:
+            return Error_Log
+        else:
+            with open(destination, 'wb') as csvfile:
                 writer = csv.writer(csvfile, delimiter ="|")
                 writer.writerow(['RESOURCEID', 'RESOURCETYPE', 'ATTRIBUTENAME', 'ATTRIBUTEVALUE', 'GROUPID'])
                 for row in ResourceList:
-                    writer.writerow(row)                                  
+                    writer.writerow(row)      
+            # raise ValueError("The following concepts had issues %s" % FaultyConceptsList)
+                                                                        
+                            
