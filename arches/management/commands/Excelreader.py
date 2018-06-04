@@ -77,7 +77,7 @@ class Command(BaseCommand):
                                 date = isodate.strip().split("T")[0] #
                             except:
                                 # raise ValueError("The value %s inserted is not a date" % date)
-                                logger.error("The value %s inserted is not a date" % date)
+                                return "The value %s inserted is not a date" % date
         return date
     
     '''Validates that the number of semicolon-separated values is consistent across a worksheet and spots empty cells'''
@@ -271,9 +271,12 @@ class Command(BaseCommand):
                                             ResourceList.append(concept_list)
         #                                     print "ResourceId %s, AttributeName %s, AttributeValue %s, GroupId %s" %(row_index,modelinstance.entitytypeid,concept, GroupName)
                                     if modelinstance.businesstablename == 'dates':
-                                            date = self.validatedates(concept)
-                                            concept_list = [str(resourceid),resourcetype,modelinstance.entitytypeid,date, GroupName]
-                                            ResourceList.append(concept_list)
+                                            if isinstance(self.validatedates(concept), datetime.date):
+                                                concept_list = [str(resourceid),resourcetype,modelinstance.entitytypeid,date, GroupName]
+                                                ResourceList.append(concept_list)                                                
+                                            else:
+                                                Log['validate_dates']['errors'].append(self.validatedates(concept))
+                                                Log['validate_dates']['passed'] = False
                                     if modelinstance.businesstablename == 'geometries':
                                             if self.validate_geometries(concept,row_index):
                                                 Log['validate_geometries']['errors'].append(self.validate_geometries(concept,row_index))
@@ -283,7 +286,7 @@ class Command(BaseCommand):
                                                 ResourceList.append(concept_list)
                                     
 #         if FaultyConceptsList:
-        if Log['validate_geometries']['errors'] or Log['validate_concepts']['errors']:
+        if Log['validate_geometries']['errors'] or Log['validate_dates']['errors'] or Log['validate_concepts']['errors']:
             return Log
         else:
             Log['success'] = True
@@ -294,6 +297,7 @@ class Command(BaseCommand):
                 for row in ResourceList:
                     writer.writerow(row)
             return Log
+        print Log
             # raise ValueError("The following concepts had issues %s" % FaultyConceptsList)
                                                                         
                             
