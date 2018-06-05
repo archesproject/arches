@@ -7,6 +7,7 @@ from django.core.urlresolvers import reverse
 from revproxy.views import ProxyView
 
 from arches.app.models import models
+from arches.app.models.concept import Concept
 from arches.app.models.mobile_survey import MobileSurvey
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
@@ -133,3 +134,22 @@ class Resources(APIBase):
             }
 
         return JSONResponse(out, indent=indent)
+
+class Concepts(APIBase):
+
+    def get(self, request, conceptid=None):
+        include_subconcepts = request.GET.get('include_subconcepts', 'true') == 'true'
+        include_parentconcepts = request.GET.get('include_parentconcepts', 'true') == 'true'
+        include_relatedconcepts = request.GET.get('include_relatedconcepts', 'true') == 'true'
+        depth_limit = request.GET.get('depth_limit', None)
+        lang = request.GET.get('lang', settings.LANGUAGE_CODE)
+        pretty = request.GET.get('pretty', False)
+
+        ret = []
+        concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
+                include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
+                depth_limit=depth_limit, up_depth_limit=None, lang=lang)
+
+        ret.append(concept_graph)
+
+        return JSONResponse(ret, indent=4 if pretty else None)

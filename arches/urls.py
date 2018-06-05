@@ -142,6 +142,7 @@ urlpatterns = [
     url(r'^couchdb/(?P<path>.*)$', api.CouchdbProxy.as_view()),
     url(r'^surveys$', api.Surveys.as_view(), name='surveys'),
     url(r'^resources/(?P<resourceid>%s|())$' % uuid_regex, api.Resources.as_view(), name='resources'),
+    url(r'^concepts2/(?P<conceptid>%s|())$' % uuid_regex, api.Concepts.as_view(), name='concepts'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
