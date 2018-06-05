@@ -32,7 +32,6 @@ import arches.app.utils.data_management.resource_graphs.importer as graph_import
 from arches.db.install import truncate_db
 from arches.app.models import models
 from arches.app.models.system_settings import settings
-from arches.app.utils.data_management.resources.importer import ResourceLoader
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.format import Reader as RelationImporter
 from arches.app.utils.data_management.resources.formats.format import MissingGraphException
@@ -840,7 +839,7 @@ class Command(BaseCommand):
 
         if data_dest != '':
             try:
-                data = resource_exporter.export(graph_id=graph)
+                data = resource_exporter.export(graph_id=graph, resourceinstanceids=None)
             except MissingGraphException as e:
 
                 print utils.print_message('No resource graph specified. Please rerun this command with the \'-g\' parameter populated.')

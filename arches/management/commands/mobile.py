@@ -21,7 +21,7 @@ import urllib2
 import json
 from urlparse import urlparse, urljoin
 from arches.management.commands import utils
-from arches.app.models import models
+from arches.app.models.mobile_survey import MobileSurvey
 from arches.app.models.system_settings import settings
 from django.core.management.base import BaseCommand, CommandError
 from arches.app.utils.couch import Couch
@@ -53,17 +53,14 @@ class Command(BaseCommand):
 
     def delete_associated_surveys(self):
         couch = Couch()
-        surveys = [str(msm['id']) for msm in models.MobileSurveyModel.objects.values("id")]
-        couchdbs = [dbname for dbname in couch]
-        for db in couchdbs:
-            survey_id = db[-36:]
-            if survey_id in surveys:
-                couch.delete_db('project_' + str(survey_id))
+        surveys = [str(msm['id']) for msm in MobileSurvey.objects.values("id")]
+        for survey in surveys:
+            couch.delete_db('project_' + str(survey))
 
     def delete_unassociated_surveys(self):
         couch = Couch()
-        surveys = [str(msm['id']) for msm in models.MobileSurveyModel.objects.values("id")]
-        couchdbs = [dbname for dbname in couch]
+        surveys = [str(msm['id']) for msm in MobileSurvey.objects.values("id")]
+        couchdbs = [dbname for dbname in couch.couch]
         for db in couchdbs:
             survey_id = db[-36:]
             if survey_id not in surveys:
@@ -71,9 +68,8 @@ class Command(BaseCommand):
                     couch.delete_db('project_' + str(survey_id))
 
     def create_associated_surveys(self):
-        couch = Couch()
-        for mobile_survey in models.MobileSurveyModel.objects.all():
-            print "Saving", mobile_survey
+        for mobile_survey in MobileSurvey.objects.all():
+            print "Writing", mobile_survey, "to CouchDB"
             mobile_survey.save()
 
     def rebuild_couch_surveys(self):

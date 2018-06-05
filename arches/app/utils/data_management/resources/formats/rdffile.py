@@ -1,12 +1,15 @@
 import os
+import json
 import datetime
 from format import Writer
 from arches.app.models import models
 from arches.app.models.system_settings import settings
+from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from rdflib import Namespace
 from rdflib import URIRef, Literal
 from rdflib import Graph
 from rdflib.namespace import RDF, RDFS
+from pyld.jsonld import compact, frame, from_rdf
 
 try:
     from cStringIO import StringIO
@@ -20,16 +23,23 @@ class RdfWriter(Writer):
         self.format = kwargs.pop('format', 'xml')
         super(RdfWriter, self).__init__(**kwargs)
 
-    def write_resources(self, graph_id=None, resourceinstanceids=None):
-        super(RdfWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids)
+    def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
+        super(RdfWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
 
-        g = self.get_rdf_graph()
         dest = StringIO()
-        self.serialize(g, destination=dest, format=self.format)
+        g = self.get_rdf_graph()
+        g.serialize(destination=dest, format=self.format)
 
-        return [{'name':self.get_filename(), 'outputfile': dest}]
+        full_file_name = os.path.join('{0}.{1}'.format(self.file_name, 'rdf'))
+        return [{'name':full_file_name, 'outputfile': dest}]
 
     def get_rdf_graph(self):
+        archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
+        graph_uri = URIRef(archesproject["graph/%s" % self.graph_id])
+
+        g = Graph()
+        g.bind('archesproject', archesproject, False)
+        graph_cache = {}
 
         def get_nodegroup_edges_by_collector_node(node):
             edges = []
@@ -43,7 +53,6 @@ class RdfWriter(Writer):
             getchildedges(node)
             return edges
 
-        graph_cache = {}
         def get_graph_parts(graphid):
             if graphid not in graph_cache:
                 graph_cache[graphid] = {
@@ -71,45 +80,43 @@ class RdfWriter(Writer):
 
             return graph_cache[graphid]
 
-
-        def add_edge_to_graph(graph, domainnode, rangenode, edge):
-            graph.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
+        def add_edge_to_graph(graph, domainnode, rangenode, edge, tile):
             graph.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
             graph.add((domainnode, URIRef(edge.ontologyproperty), rangenode))
 
+            if edge.domainnode.istopnode:
+                graph.add((domainnode, RDF.type, graph_uri))
+                graph.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
+            else:
+                graph.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
 
-        archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
-        g = Graph()
-        g.bind('archesproject', archesproject, False)
+            try:
+                g.add((domainnode, RDF.value, Literal(tile.data[str(edge.domainnode_id)]))) 
+            except:
+                pass    
+            try:
+                g.add((rangenode, RDF.value, Literal(tile.data[str(edge.rangenode_id)]))) 
+            except:
+                pass 
 
         for resourceinstanceid, tiles in self.resourceinstances.iteritems():
-            graphid = tiles[0].resourceinstance.graph_id
-            graph_info = get_graph_parts(graphid)
+            graph_info = get_graph_parts(self.graph_id)
 
             # add the edges for the group of nodes that include the root (this group of nodes has no nodegroup)
-            for edge in graph_cache[graphid]['rootedges']:
+            for edge in graph_cache[self.graph_id]['rootedges']:
                 domainnode = archesproject[str(edge.domainnode.pk)]
                 rangenode = archesproject[str(edge.rangenode.pk)]
-                add_edge_to_graph(g, domainnode, rangenode, edge)
+                add_edge_to_graph(g, domainnode, rangenode, edge, None)
 
             for tile in tiles:
                 # add all the edges for a given tile/nodegroup
                 for edge in graph_info['subgraphs'][tile.nodegroup]['edges']:
                     domainnode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.domainnode.pk))]
                     rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
-                    add_edge_to_graph(g, domainnode, rangenode, edge)
-
-                    try:
-                        g.add((domainnode, RDF.value, Literal(tile.data[str(edge.domainnode_id)]))) 
-                    except:
-                        pass    
-                    try:
-                        g.add((rangenode, RDF.value, Literal(tile.data[str(edge.rangenode_id)]))) 
-                    except:
-                        pass 
+                    add_edge_to_graph(g, domainnode, rangenode, edge, tile)
 
                 # add the edge from the parent node to this tile's root node
-                # tile has no parent tile, which means the domain node has no tile_id
+                # where the tile has no parent tile, which means the domain node has no tile_id
                 if graph_info['subgraphs'][tile.nodegroup]['parentnode_nodegroup'] == None:
                     edge = graph_info['subgraphs'][tile.nodegroup]['inedge']
                     if edge.domainnode.istopnode:
@@ -117,28 +124,52 @@ class RdfWriter(Writer):
                     else:
                         domainnode = archesproject[str(edge.domainnode.pk)]
                     rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
-                    add_edge_to_graph(g, domainnode, rangenode, edge)
+                    add_edge_to_graph(g, domainnode, rangenode, edge, tile)
 
                 # add the edge from the parent node to this tile's root node
-                # tile has a parent tile
+                # where the tile has a parent tile
                 if graph_info['subgraphs'][tile.nodegroup]['parentnode_nodegroup'] != None:
                     edge = graph_info['subgraphs'][tile.nodegroup]['inedge']
                     domainnode = archesproject["tile/%s/node/%s" % (str(tile.parenttile.pk), str(edge.domainnode.pk))]
                     rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
-                    add_edge_to_graph(g, domainnode, rangenode, edge)
+                    add_edge_to_graph(g, domainnode, rangenode, edge, tile)
+
 
         return g
-
-    def get_filename(self):
-        iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        file_name = os.path.join('{0}_{1}.{2}'.format(self.file_prefix, iso_date, 'rdf'))
-        return file_name
-    
-    def serialize(self, g, **kwargs):
-        g.serialize(**kwargs)
 
 
 class JsonLdWriter(RdfWriter):
 
-    def serialize(self, g, **kwargs):
-        g.serialize(context=settings.JSON_LD_CONTEXT, **kwargs)
+    def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
+        super(RdfWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
+        g = self.get_rdf_graph()
+        value = g.serialize(format='nt')
+        js = from_rdf(str(value), options={format:'application/nquads'})
+
+        framing = {
+            "@omitDefault": True,
+            "@type": "%sgraph/%s" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, self.graph_id)
+        }
+
+        js = frame(js, framing)
+
+        context = self.graph_model.jsonldcontext
+        try:
+            context = JSONDeserializer().deserialize(context)
+        except ValueError:
+            if context == '':
+                context = {}
+            context = {
+                "@context": context
+            }
+        except AttributeError:
+            context = {
+                "@context": {}
+            }
+
+        out = compact(js, context)
+        out = json.dumps(out, indent=kwargs.get('indent', None), sort_keys=True)
+        dest = StringIO(out)
+
+        full_file_name = os.path.join('{0}.{1}'.format(self.file_name, 'jsonld'))
+        return [{'name':full_file_name, 'outputfile': dest}]
