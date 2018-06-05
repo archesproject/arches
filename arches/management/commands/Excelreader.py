@@ -210,7 +210,7 @@ class Command(BaseCommand):
         
         ResourceList = []
         FaultyConceptsList = []
-        Error_Log = {
+        Log = {
             'validate_headers' : {'errors': [], 'passed': True},
             'validate_rows_and_values' : {'errors': [], 'passed': True},
             'validate_geometries' :  {'errors': [], 'passed': True},
@@ -223,16 +223,16 @@ class Command(BaseCommand):
         headers_errors = self.validate_headers(wb2,skip_resourceid_col = append)
         rows_values_errors =  self.validate_rows_and_values(wb2)
         if headers_errors:
-            Error_Log['validate_headers']['errors'].append(headers_errors)
-            Error_Log['validate_headers']['passed'] = False
-            return Error_Log
+            Log['validate_headers']['errors'].append(headers_errors)
+            Log['validate_headers']['passed'] = False
+            return Log
         if rows_values_errors:
             if rows_values_errors['different_rows'] == True:
-                Error_Log['validate_rows_and_values']['passed'] = False
+                Log['validate_rows_and_values']['passed'] = False
             else:       
-                Error_Log['validate_rows_and_values']['errors'].append(self.validate_rows_and_values(wb2))
-                Error_Log['validate_rows_and_values']['passed'] = False
-            return Error_Log
+                Log['validate_rows_and_values']['errors'].append(self.validate_rows_and_values(wb2))
+                Log['validate_rows_and_values']['passed'] = False
+            return Log
         
         for sheet_index,sheet in enumerate(wb2.worksheets):
             sheet_name = wb2.sheetnames[sheet_index]
@@ -261,8 +261,8 @@ class Command(BaseCommand):
                                             ResourceList.append(concept_list)
 #                                             print "ConceptId %s, ResourceId %s, AttributeName %s, AttributeValue %s, GroupId %s" %(valueinstance[0][0].conceptid, row_index,modelinstance.entitytypeid,conceptinstance.legacyoid,GroupName)
                                         else:
-                                            Error_Log['validate_concepts']['errors'].append("{0} in {1}, at row no. {2}".format(concept,header[0].value,(row_index+2)))
-                                            Error_Log['validate_concepts']['passed'] = False
+                                            Log['validate_concepts']['errors'].append("{0} in {1}, at row no. {2}".format(concept,header[0].value,(row_index+2)))
+                                            Log['validate_concepts']['passed'] = False
                                             # logger.info("{0} in {1}, at row no. {2}".format(concept,header[0].value,(row_index+2)))
                                     if modelinstance.businesstablename == 'strings':
                                             concept_list = [str(resourceid),resourcetype,modelinstance.entitytypeid,concept, GroupName]
@@ -274,28 +274,30 @@ class Command(BaseCommand):
                                             ResourceList.append(concept_list)
                                     if modelinstance.businesstablename == 'geometries':
                                             if self.validate_geometries(concept,row_index):
-                                                Error_Log['validate_geometries']['errors'].append(self.validate_geometries(concept,row_index))
-                                                Error_Log['validate_geometries']['passed'] = False
+                                                Log['validate_geometries']['errors'].append(self.validate_geometries(concept,row_index))
+                                                Log['validate_geometries']['passed'] = False
                                             else:
                                                 concept_list = [str(resourceid),resourcetype,modelinstance.entitytypeid,concept, GroupName]
                                                 ResourceList.append(concept_list)
                                     
 #         if FaultyConceptsList:
-        if Error_Log['validate_geometries']['errors'] or Error_Log['validate_concepts']['errors']:
-            return ErrorLog
+        if Log['validate_geometries']['errors'] or Log['validate_concepts']['errors']:
+            return Log
 
         else:
-            with open(destination, 'wb') as csvfile:
-                writer = csv.writer(csvfile, delimiter ="|")
+            Log['success'] = True
+            with open(destination, 'wb') as archesfile:
+                writer = csv.writer(archesfile, delimiter ="|")
                 writer.writerow(['RESOURCEID', 'RESOURCETYPE', 'ATTRIBUTENAME', 'ATTRIBUTEVALUE', 'GROUPID'])
+                ResourceList = sorted(ResourceList, key = lambda row:(row[0],row[4],row[2]), reverse = False)
                 for row in ResourceList:
                     writer.writerow(row)
-            
+
             ## make blank relations file
             relationsfile = destination.replace(".arches",".relations")
             with open(relationsfile, 'wb') as rel:
                 writer = csv.writer(rel, delimiter ="|")
                 writer.writerow(['RESOURCEID_FROM','RESOURCEID_TO','START_DATE','END_DATE','RELATION_TYPE','NOTES'])
 
-            return Error_Log
-                            
+            return Log
+            # raise ValueError("The following concepts had issues %s" % FaultyConceptsList)
