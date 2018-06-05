@@ -400,11 +400,11 @@ input.file {
     margin-bottom: 10px;
 }
 
-.resource-type-select {
+.upload-page-select {
     font-size: 17px;
     font-weight: 300;
 }
-.resource-type-select[disabled] { color: grey; }
+.upload-page-select[disabled] { color: grey; }
 
 .bulk-upload-btn {
     font-size: 17px;

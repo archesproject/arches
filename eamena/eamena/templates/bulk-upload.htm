@@ -50,8 +50,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <div id="files-msg" class="upload-msg-box">No file yet...</div>
                 </div>
                 <div class="bulk-upload-step-box">
-                    <h5>2. Choose the Resource Type</h5>
-                    <select class="resource-type-select" disabled>
+                    <h5>2. Choose the Configuration</h5>
+                    <select id="append-select" class="upload-page-select" disabled>
+                        <option value="false">New Data</option>
+                        <option value="true">Append to Existing</option>
+                    </select>
+                    <select id="resource-type-select" class="upload-page-select" disabled>
                     {% for type, type_data in resource_types %}
                         <option value="{{type}}">{{type_data.name}}</option>
                     {% endfor %}

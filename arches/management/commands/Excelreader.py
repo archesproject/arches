@@ -1,4 +1,5 @@
 from __future__ import division
+import os
 import re
 import csv
 import datetime
@@ -36,19 +37,16 @@ class Command(BaseCommand):
         print 'operation: '+ options['operation']
         package_name = settings.PACKAGE_NAME
         print 'package: '+ package_name
-        
-        if options['operation'] == 'site_dataset':
-            self.SiteDataset(options['source'], options['resource_type'], options['dest_dir'],options['append_data'])
-        
-        ## ultimately, the result should come from the SiteDataset function
-        ## below is just an example of what it could look like, and it should
-        ## be dumped to a .json file and that path returned from here.
-        ## returning an actual dictionary object seems to cause problems...
-        result = {'success':True,'msg':[]}
 
-        # self.stdout.write(path/to/.json)
+        if options['operation'] == 'site_dataset':
+            result = self.SiteDataset(options['source'], options['resource_type'], options['dest_dir'],options['append_data'])
         
-        return
+        error_path = os.path.join(settings.BULK_UPLOAD_DIR,"errors.json")
+        with open(error_path,'w') as out:
+            json.dump(result,out)
+        self.stdout.write(error_path)
+
+        return 
     
     def validatedates(self, date):
         try:
@@ -284,13 +282,20 @@ class Command(BaseCommand):
                                     
 #         if FaultyConceptsList:
         if Error_Log['validate_geometries']['errors'] or Error_Log['validate_concepts']['errors']:
-            return Error_Log
+            return ErrorLog
+
         else:
             with open(destination, 'wb') as csvfile:
                 writer = csv.writer(csvfile, delimiter ="|")
                 writer.writerow(['RESOURCEID', 'RESOURCETYPE', 'ATTRIBUTENAME', 'ATTRIBUTEVALUE', 'GROUPID'])
                 for row in ResourceList:
-                    writer.writerow(row)      
-            # raise ValueError("The following concepts had issues %s" % FaultyConceptsList)
-                                                                        
+                    writer.writerow(row)
+            
+            ## make blank relations file
+            relationsfile = destination.replace(".arches",".relations")
+            with open(relationsfile, 'wb') as rel:
+                writer = csv.writer(rel, delimiter ="|")
+                writer.writerow(['RESOURCEID_FROM','RESOURCEID_TO','START_DATE','END_DATE','RELATION_TYPE','NOTES'])
+
+            return Error_Log
                             
