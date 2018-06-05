@@ -26,11 +26,13 @@ try:
 except ImportError:
     from StringIO import StringIO
 
+
 class MissingConfigException(Exception):
      def __init__(self, value=None):
          self.value = value
      def __str__(self):
          return repr(self.value)
+
 
 class ConceptLookup():
     def __init__(self, create=False):
@@ -101,9 +103,10 @@ class CsvWriter(Writer):
         value = datatype_instance.transform_export_values(value, concept_export_value_type=concept_export_value_type, node=node)
         return value
 
-    def write_resources(self, graph_id=None, resourceinstanceids=None):
+    def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
+        # use the graph id from the mapping file, not the one passed in to the method
         graph_id = self.resource_export_configs[0]['resource_model_id']
-        super(CsvWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids)
+        super(CsvWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
 
         csv_records = []
         other_group_records = []
@@ -155,9 +158,7 @@ class CsvWriter(Writer):
             if csv_record != {'ResourceID': resourceinstanceid}:
                 csv_records.append(csv_record)
 
-        iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        file_name = '{0}_{1}'.format(self.file_prefix, iso_date)
-        csv_name = os.path.join('{0}.{1}'.format(file_name, 'csv'))
+        csv_name = os.path.join('{0}.{1}'.format(self.file_name, 'csv'))
 
         if self.single_file != True:
             dest = StringIO()
@@ -190,7 +191,7 @@ class CsvWriter(Writer):
                 csvwriter.writerow({k:str(v) for k,v in csv_record.items()})
 
         if self.graph_id != None:
-            csvs_for_export = csvs_for_export + self.write_resource_relations(file_name=file_name)
+            csvs_for_export = csvs_for_export + self.write_resource_relations(file_name=self.file_name)
 
         return csvs_for_export
 
@@ -215,6 +216,7 @@ class CsvWriter(Writer):
 
         return relations_file
 
+
 class TileCsvWriter(Writer):
 
     def __init__(self, **kwargs):
@@ -227,15 +229,15 @@ class TileCsvWriter(Writer):
         value = datatype_instance.transform_export_values(value, concept_export_value_type=concept_export_value_type, node=node)
         return value
 
-    def write_resources(self, graph_id=None, resourceinstanceids=None):
-        super(TileCsvWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids)
+    def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
+        super(TileCsvWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
 
         csv_records = []
         other_group_records = []
         concept_export_value_lookup = {}
         csv_header = ['ResourceID']
         mapping = {}
-        nodes = Node.objects.filter(graph_id=graph_id)
+        nodes = Node.objects.filter(graph_id=self.graph_id)
         for node in nodes:
             mapping[str(node.nodeid)] = node.name
         csv_header = ['ResourceID', 'ResourceLegacyID', 'ResourceModelID', 'TileID', 'ParentTileID', 'NodeGroupID' ] + mapping.values()
@@ -246,7 +248,7 @@ class TileCsvWriter(Writer):
             for tile in tiles:
                 csv_record = {}
                 csv_record['ResourceID'] = resourceinstanceid
-                csv_record['ResourceModelID'] = graph_id
+                csv_record['ResourceModelID'] = self.graph_id
                 csv_record['TileID'] = tile.tileid
                 csv_record['ParentTileID'] = str(tile.parenttile_id)
                 csv_record['NodeGroupID'] = str(tile.nodegroup_id)
@@ -266,25 +268,23 @@ class TileCsvWriter(Writer):
 
                 if csv_record != {'ResourceID': resourceinstanceid}:
                     csv_records.append(csv_record)
-
-        iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        file_name = '{0}_{1}'.format(self.file_prefix, iso_date)
-        csv_name = os.path.join('{0}.{1}'.format(file_name, 'csv'))
-
-        all_records = sorted(csv_records, key=lambda k: k['ResourceID'])
+        
         dest = StringIO()
         csvwriter = csv.DictWriter(dest, delimiter=',', fieldnames=csv_header)
         csvwriter.writeheader()
-        csvs_for_export.append({'name':csv_name, 'outputfile': dest})
+        all_records = sorted(csv_records, key=lambda k: k['ResourceID'])
         for csv_record in all_records:
             if 'populated_node_groups' in csv_record:
                 del csv_record['populated_node_groups']
             csvwriter.writerow({k:str(v) for k,v in csv_record.items()})
 
+        csv_name = os.path.join('{0}.{1}'.format(self.file_name, 'csv'))
+        csvs_for_export.append({'name':csv_name, 'outputfile': dest})
         if self.graph_id != None:
             csvs_for_export = csvs_for_export
 
         return csvs_for_export
+
 
 class CsvReader(Reader):
 
@@ -836,6 +836,7 @@ class CsvReader(Reader):
 
         finally:
             pass
+
 
 class TileCsvReader(Reader):
 

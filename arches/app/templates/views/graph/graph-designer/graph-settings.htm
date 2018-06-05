@@ -207,7 +207,7 @@
                                 </div>
 
                                 <div class="col-xs-12">
-                                    <input placeholder="{% trans "JSON-LD Context URI" %}" class="form-control input-lg widget-input" data-bind="value:graph.jsonldcontext, valueUpdate: 'keyup'">
+                                    <textarea placeholder="{% trans "URI to a JSON-LD Context Object or a Raw Context Object or Array of Context Objects" %}" class="form-control input-lg widget-input" data-bind="textInput:graph.jsonldcontext"></textarea>
                                 </div>
                             </div>
                         </div>
