@@ -49,6 +49,30 @@ define([
         },
 
         /**
+        * Returns a knockout computed used to calculate display name of the node
+        * @memberof GraphTree.prototype
+        * @param {object} node - a node in the tree
+        */
+        isChildSelected: function(node) {
+            var isChildSelected = function (parent) {
+                var childSelected = false;
+                if (!parent.istopnode) {
+                    parent.children().forEach(function(child) {
+                        if (child && child.selected() || isChildSelected(child)){
+                            childSelected = true;
+                        }
+                    });
+                    return childSelected;
+
+                    };
+                }
+            return ko.computed(function() {
+                return isChildSelected(node);
+            }, this);
+        },
+
+
+        /**
         * Selects the passed in node
         * @memberof GraphTree.prototype
         * @param {object} node - the node to be selected via {@link GraphModel#selectNode}

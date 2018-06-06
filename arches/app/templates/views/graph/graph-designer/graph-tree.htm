@@ -20,7 +20,7 @@
 <template id="graph-tree">
     <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (node.children().length > 0 && node.expanded), 'jstree-closed' : (node.children().length > 0 && !node.expanded()), 'jstree-leaf': node.children().length === 0}">
         <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){node.expanded(!node.expanded())}"></i>
-        <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: graphTree.selectItem.bind(graphTree), css:{'jstree-clicked': node.selected}">
+        <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: graphTree.selectItem.bind(graphTree), css:{'jstree-clicked': node.selected, 'child-selected': graphTree.isChildSelected(node) }">
             <i data-bind="css: node.iconclass" role="presentation"></i>
             <span style="padding-right: 10px;" data-bind="text: graphTree.getDisplayName(node), css:{filtered: graphTree.filter().length > 0 && !node.filtered()}"></span>
             <!-- ko if: !node.istopnode -->
