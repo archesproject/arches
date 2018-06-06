@@ -141,9 +141,14 @@ class Concepts(APIBase):
         include_subconcepts = request.GET.get('includesubconcepts', 'true') == 'true'
         include_parentconcepts = request.GET.get('includeparentconcepts', 'true') == 'true'
         include_relatedconcepts = request.GET.get('includerelatedconcepts', 'true') == 'true'
-        depth_limit = request.GET.get('depth_limit', None)
+
+        depth_limit = request.GET.get('depthlimit', None)
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
-        pretty = request.GET.get('pretty', False)
+
+        try:
+            indent = int(request.GET.get('indent', None))
+        except:
+            indent = None
 
         ret = []
         concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
@@ -152,4 +157,4 @@ class Concepts(APIBase):
 
         ret.append(concept_graph)
 
-        return JSONResponse(ret, indent=4 if pretty else None)
+        return JSONResponse(ret, indent=indent)
