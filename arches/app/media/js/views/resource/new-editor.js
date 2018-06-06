@@ -55,8 +55,19 @@ define([
         );
     });
 
+    var isChildSelected = function (parent) {
+        var childSelected = false;
+        var childrenKey = parent.tiles ? 'tiles' : 'cards';
+        ko.unwrap(parent[childrenKey]).forEach(function(child) {
+            if (child.selected() || isChildSelected(child)){
+                childSelected = true;
+            }
+        });
+        return childSelected;
+    };
+
     var setupCard = function (card, parent) {
-        return _.extend(card, {
+        card = _.extend(card, {
             parent: parent,
             expanded: ko.observable(true),
             highlight: ko.computed(function() {
@@ -82,6 +93,10 @@ define([
                 return selection() === card;
             }, this)
         });
+        card.isChildSelected = ko.computed(function() {
+            return isChildSelected(card);
+        }, this);
+        return card;
     };
 
     var setupTile = function(tile, parent) {
@@ -90,7 +105,7 @@ define([
         );
         tile.data = koMapping.fromJS(tile.data);
 
-        return _.extend(tile, {
+        tile = _.extend(tile, {
             parent: parent,
             cards: _.filter(cards, function(card) {
                 return card.parentnodegroup_id === tile.nodegroup_id;
@@ -192,6 +207,10 @@ define([
                 });
             }
         });
+        tile.isChildSelected = ko.computed(function() {
+            return isChildSelected(tile);
+        }, this);
+        return tile;
     };
 
     var toggleAll = function(state) {
