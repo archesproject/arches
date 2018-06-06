@@ -204,7 +204,6 @@ class GraphManagerView(GraphBaseView):
             context['nav']['icon'] = 'fa-bookmark'
             context['nav']['help'] = (_('About the Arches Designer'),'help/base-help.htm')
             context['help'] = 'arches-designer-help'
-            context['protected_graphs'] = json.dumps(settings.PROTECTED_GRAPHS)
             return render(request, 'views/graph.htm', context)
 
         self.graph = Graph.objects.get(graphid=graphid)

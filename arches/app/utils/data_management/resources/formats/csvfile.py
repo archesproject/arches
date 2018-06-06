@@ -12,7 +12,7 @@ from format import Reader
 from elasticsearch import TransportError
 from arches.app.models.tile import Tile
 from arches.app.models.concept import Concept
-from arches.app.models.models import Node, NodeGroup, ResourceXResource, ResourceInstance, FunctionXGraph
+from arches.app.models.models import Node, NodeGroup, ResourceXResource, ResourceInstance, FunctionXGraph, GraphXMapping
 from arches.app.utils.data_management.resource_graphs import exporter as GraphExporter
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
@@ -26,11 +26,13 @@ try:
 except ImportError:
     from StringIO import StringIO
 
+
 class MissingConfigException(Exception):
      def __init__(self, value=None):
          self.value = value
      def __str__(self):
          return repr(self.value)
+
 
 class ConceptLookup():
     def __init__(self, create=False):
@@ -101,9 +103,10 @@ class CsvWriter(Writer):
         value = datatype_instance.transform_export_values(value, concept_export_value_type=concept_export_value_type, node=node)
         return value
 
-    def write_resources(self, graph_id=None, resourceinstanceids=None):
+    def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
+        # use the graph id from the mapping file, not the one passed in to the method
         graph_id = self.resource_export_configs[0]['resource_model_id']
-        super(CsvWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids)
+        super(CsvWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
 
         csv_records = []
         other_group_records = []
@@ -155,9 +158,7 @@ class CsvWriter(Writer):
             if csv_record != {'ResourceID': resourceinstanceid}:
                 csv_records.append(csv_record)
 
-        iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        file_name = '{0}_{1}'.format(self.file_prefix, iso_date)
-        csv_name = os.path.join('{0}.{1}'.format(file_name, 'csv'))
+        csv_name = os.path.join('{0}.{1}'.format(self.file_name, 'csv'))
 
         if self.single_file != True:
             dest = StringIO()
@@ -190,7 +191,7 @@ class CsvWriter(Writer):
                 csvwriter.writerow({k:str(v) for k,v in csv_record.items()})
 
         if self.graph_id != None:
-            csvs_for_export = csvs_for_export + self.write_resource_relations(file_name=file_name)
+            csvs_for_export = csvs_for_export + self.write_resource_relations(file_name=self.file_name)
 
         return csvs_for_export
 
@@ -215,6 +216,7 @@ class CsvWriter(Writer):
 
         return relations_file
 
+
 class TileCsvWriter(Writer):
 
     def __init__(self, **kwargs):
@@ -227,15 +229,15 @@ class TileCsvWriter(Writer):
         value = datatype_instance.transform_export_values(value, concept_export_value_type=concept_export_value_type, node=node)
         return value
 
-    def write_resources(self, graph_id=None, resourceinstanceids=None):
-        super(TileCsvWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids)
+    def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
+        super(TileCsvWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
 
         csv_records = []
         other_group_records = []
         concept_export_value_lookup = {}
         csv_header = ['ResourceID']
         mapping = {}
-        nodes = Node.objects.filter(graph_id=graph_id)
+        nodes = Node.objects.filter(graph_id=self.graph_id)
         for node in nodes:
             mapping[str(node.nodeid)] = node.name
         csv_header = ['ResourceID', 'ResourceLegacyID', 'ResourceModelID', 'TileID', 'ParentTileID', 'NodeGroupID' ] + mapping.values()
@@ -246,7 +248,7 @@ class TileCsvWriter(Writer):
             for tile in tiles:
                 csv_record = {}
                 csv_record['ResourceID'] = resourceinstanceid
-                csv_record['ResourceModelID'] = graph_id
+                csv_record['ResourceModelID'] = self.graph_id
                 csv_record['TileID'] = tile.tileid
                 csv_record['ParentTileID'] = str(tile.parenttile_id)
                 csv_record['NodeGroupID'] = str(tile.nodegroup_id)
@@ -266,25 +268,23 @@ class TileCsvWriter(Writer):
 
                 if csv_record != {'ResourceID': resourceinstanceid}:
                     csv_records.append(csv_record)
-
-        iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        file_name = '{0}_{1}'.format(self.file_prefix, iso_date)
-        csv_name = os.path.join('{0}.{1}'.format(file_name, 'csv'))
-
-        all_records = sorted(csv_records, key=lambda k: k['ResourceID'])
+        
         dest = StringIO()
         csvwriter = csv.DictWriter(dest, delimiter=',', fieldnames=csv_header)
         csvwriter.writeheader()
-        csvs_for_export.append({'name':csv_name, 'outputfile': dest})
+        all_records = sorted(csv_records, key=lambda k: k['ResourceID'])
         for csv_record in all_records:
             if 'populated_node_groups' in csv_record:
                 del csv_record['populated_node_groups']
             csvwriter.writerow({k:str(v) for k,v in csv_record.items()})
 
+        csv_name = os.path.join('{0}.{1}'.format(self.file_name, 'csv'))
+        csvs_for_export.append({'name':csv_name, 'outputfile': dest})
         if self.graph_id != None:
             csvs_for_export = csvs_for_export
 
         return csvs_for_export
+
 
 class CsvReader(Reader):
 
@@ -653,6 +653,7 @@ class CsvReader(Reader):
                         self.errors += errors
 
                 resources = []
+                missing_display_values = {}
 
                 for row_number, row in enumerate(business_data):
                     row_number = 'on line ' + unicode(row_number + 2) #to represent the row in a csv accounting for the header and 0 index
@@ -675,9 +676,10 @@ class CsvReader(Reader):
                         errors = []
                         for mdn in missing_display_nodes:
                             mdn_name = all_nodes.filter(nodeid=mdn).values_list('name', flat=True)[0]
-                            errors.append({'type': 'WARNING', 'message': '{0} {1} is null or not mapped and participates in a {2} display value function.'.format(mdn_name, row_number, mapping['resource_model_name'])})
-                        if len(errors) > 0:
-                            self.errors += errors
+                            try:
+                                missing_display_values[mdn_name].append(row_number.split('on line ')[-1])
+                            except:
+                                missing_display_values[mdn_name] = [row_number.split('on line ')[-1]]
 
                     if len(source_data) > 0:
                         if source_data[0].keys():
@@ -809,6 +811,14 @@ class CsvReader(Reader):
                     previous_row_resourceid = row['ResourceID']
                     legacyid = row['ResourceID']
 
+                # check for missing display value nodes.
+                errors = []
+                for k,v in missing_display_values.iteritems():
+                    if len(v) > 0:
+                        errors.append({'type': 'WARNING', 'message': '{0} is null or not mapped on rows {1} and participates in a display value function.'.format(k, ','.join(v))})
+                if len(errors) > 0:
+                    self.errors += errors
+
                 if 'legacyid' in locals():
                     self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count, row_number)
 
@@ -826,6 +836,7 @@ class CsvReader(Reader):
 
         finally:
             pass
+
 
 class TileCsvReader(Reader):
 

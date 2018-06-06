@@ -63,15 +63,14 @@ RESOURCE_IMPORT_LOG = 'arches/logs/resource_import.log'
 
 RESOURCE_FORMATERS = {
     'csv': 'arches.app.utils.data_management.resources.formats.csvfile.CsvWriter',
-    'json': 'arches.app.utils.data_management.resources.formats.archesjson.JsonWriter',
+    'json': 'arches.app.utils.data_management.resources.formats.archesfile.ArchesFileWriter',
     'tilecsv': 'arches.app.utils.data_management.resources.formats.csvfile.TileCsvWriter',
     'xml': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter',
     'pretty-xml': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter',
     'json-ld': 'arches.app.utils.data_management.resources.formats.rdffile.JsonLdWriter',
     'n3': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter',
     'nt': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter',
-    'trix': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter',
-    'rdfa': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter'
+    'trix': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter'
 }
 
 ONTOLOGY_PATH = os.path.join(ROOT_DIR, 'db', 'ontologies', 'cidoc_crm')
@@ -101,40 +100,11 @@ ONTOLOGY_NAMESPACES = {
     'http://www.ics.forth.gr/isl/CRMsci/': '',
 }
 
-# A context to supply for use in export of resource instances in JSON-LD format
-JSON_LD_CONTEXT = {
-    # "crm": "http://www.cidoc-crm.org/cidoc-crm/",
-    # "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-    # "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-    # "dc": "http://purl.org/dc/elements/1.1/",
-    # "dcterms": "http://purl.org/dc/terms/",
-    # "schema": "http://schema.org/",
-    # "skos": "http://www.w3.org/2004/02/skos/core#",
-    # "foaf": "http://xmlns.com/foaf/0.1/",
-    # "xsd": "http://www.w3.org/2001/XMLSchema#",
-    # "pi": "http://linked.art/ns/prov/",
-    # "aat": "http://vocab.getty.edu/aat/",
-    # "ulan": "http://vocab.getty.edu/ulan/",
-    # "tgn": "http://vocab.getty.edu/tgn/",
-    # "id": "@id",
-    # "type": "@type",
-    # "Period": "crm:E4_Period",
-    # "Event": "crm:E5_Event",
-    # "Activity": "crm:E7_Activity",
-    # "identified_by": {
-    #     "@id": "crm:P1_is_identified_by",
-    #     "@type": "@id",
-    #     "@container": "@set"
-    # },
-    # "identifies": {
-    #     "@id": "crm:P1i_identifies",
-    #     "@type": "@id"
-    # }
-}
 
 # This is the namespace to use for export of data (for RDF/XML for example)
 # Ideally this should point to the url where you host your site
-ARCHES_NAMESPACE_FOR_DATA_EXPORT = 'http://localhost/'
+# Make sure to use a trailing slash
+ARCHES_NAMESPACE_FOR_DATA_EXPORT = 'http://localhost:8000/'
 
 PREFERRED_COORDINATE_SYSTEMS = (
     {"name": "Geographic", "srid": "4326", "proj4": "+proj=longlat +datum=WGS84 +no_defs", "default": True}, #Required
@@ -413,6 +383,8 @@ CACHE_BY_USER = {'anonymous': 3600 * 24}
 
 DATE_IMPORT_EXPORT_FORMAT = '%Y-%m-%d'
 
+API_MAX_PAGE_SIZE = 500
+
 #######################################
 ###       END STATIC SETTINGS       ###
 #######################################
@@ -459,8 +431,6 @@ RESOURCE_GRAPH_LOCATIONS = (
     os.path.join(ROOT_DIR, 'db', 'graphs', 'branches'),
     os.path.join(ROOT_DIR, 'db', 'graphs', 'resource_models'),
 )
-
-PROTECTED_GRAPHS = ('22000000-0000-0000-0000-000000000000', '22000000-0000-0000-0000-000000000001',)
 
 BUSINESS_DATA_FILES = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".

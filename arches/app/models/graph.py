@@ -25,7 +25,7 @@ from arches.app.models.system_settings import settings
 from arches.app.search.mappings import prepare_search_index, delete_search_index
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.utils.translation import ugettext as _
-
+from pyld.jsonld import compact, JsonLdError
 
 class Graph(models.GraphModel):
     """
@@ -351,33 +351,29 @@ class Graph(models.GraphModel):
         return self
 
     def delete(self):
+        if self.is_editable() == True:
+            with transaction.atomic():
+                for nodegroup in self.get_nodegroups():
+                    nodegroup.delete()
 
-        if str(self.graphid) not in settings.PROTECTED_GRAPHS:
-            if self.is_editable() == True:
-                with transaction.atomic():
-                    for nodegroup in self.get_nodegroups():
-                        nodegroup.delete()
+                for edge in self.edges.itervalues():
+                    edge.delete()
 
-                    for edge in self.edges.itervalues():
-                        edge.delete()
+                for node in self.nodes.itervalues():
+                    node.delete()
 
-                    for node in self.nodes.itervalues():
-                        node.delete()
+                for card in self.cards.itervalues():
+                    card.delete()
 
-                    for card in self.cards.itervalues():
-                        card.delete()
+                for widget in self.widgets.itervalues():
+                    widget.delete()
 
-                    for widget in self.widgets.itervalues():
-                        widget.delete()
+                # if self.isresource:
+                #     delete_search_index(self.graphid)
 
-                    # if self.isresource:
-                    #     delete_search_index(self.graphid)
-
-                    super(Graph, self).delete()
-            else:
-                raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot delete a Resource Model with instances.".format(self.name)))
+                super(Graph, self).delete()
         else:
-            raise GraphValidationError(_('This graph is essential to Arches and cannot be deleted'))
+            raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot delete a Resource Model with instances.".format(self.name)))
 
 
 
@@ -1360,6 +1356,28 @@ class Graph(models.GraphModel):
             for node_id, node in self.nodes.iteritems():
                 if node.ontologyclass is not None:
                     raise GraphValidationError(_("You have assigned ontology classes to your graph nodes but not assigned an ontology to your graph."), 1005)
+
+
+        # make sure the supplied json-ld context is valid
+        # https://www.w3.org/TR/json-ld/#the-context
+        context = self.jsonldcontext
+        try:
+            context = JSONDeserializer().deserialize(context)
+        except ValueError:
+            if context == '':
+                context = {}
+            context = {
+                "@context": context
+            }
+        except AttributeError:
+            context = {
+                "@context": {}
+            }
+
+        try:
+            out = compact({}, context)
+        except JsonLdError as err:
+            raise GraphValidationError(_("The json-ld context you supplied wasn't formatted correctly."), 1006)
 
 
 class GraphValidationError(Exception):
