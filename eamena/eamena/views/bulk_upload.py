@@ -17,6 +17,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 import os
 import json
+import time
+from StringIO import StringIO
 from django import forms
 from django.conf import settings
 from django.core.management import call_command
@@ -33,6 +35,16 @@ def handle_uploaded_file(f):
         for chunk in f.chunks():
             destination.write(chunk)
     return dest_path
+    
+def get_archesfile_path(filepath):
+    '''takes the input spreadsheet path and outputs a path for a new .arches
+    file inside of the BULK_UPLOAD_DIR.'''
+    
+    basename = os.path.splitext(os.path.basename(filepath))[0].replace(" ","_")
+    name = time.strftime("{}_%H%M%d%m%Y.arches".format(basename))
+    destpath = os.path.join(settings.BULK_UPLOAD_DIR,name)
+    
+    return destpath
 
 def main(request):
     ''' nothing special here, everything is handled with ajax'''
@@ -46,46 +58,55 @@ def validate(request):
     '''this view is designed to be hit with an ajax call that includes the path
     to the spreadsheet on the server, and the resource type for the spreadsheet
     '''
-    
-    fpath = request.POST['filepath']
-    restype = request.POST['restype']
+    try:
+        fpath = request.POST['filepath']
+        restype = request.POST['restype']
 
-    ## using StringIO we can capture the json path output from the command
-    ## this is mocked up but not fully implemented.
-    from StringIO import StringIO
-    out = StringIO()
-    call_command('Excelreader',
-        operation='site_dataset',
-        source=fpath,
-        res_type=restype,
-        dest_dir='output.arches',
-        stdout = out,
-    )
-    comm_result = out.getvalue()
-    
-    ## METHOD 1: load logged messages from logger pass them
-    ## as a list of lines to the ajax result.
-    ## this method currently in use
-    logger = logging.getLogger('excel-reader')
-    log = logger.handlers[0].baseFilename
-    with open(log,'r') as openlog:
-        lines = [l.rstrip() for l in openlog]
-    result = {
-        'success':True,
-        'msg': lines,
-    }
-    
-    ## METHOD 2: get the json directly from the management command
-    ## and load it here. not currently in use. I think this may be a
-    ## good direction to go, but we'll still have to load from a file
-    ## for the easiest method
-    
-    ## results = json.loads(comm_result)
-    
-    
-    ## delete if any of the tests fail
-    if not result['success']:
-        os.remove(fpath)
+        convert = {'false':False,'true':True}
+        append = convert[request.POST['append']]
+        
+        destpath = get_archesfile_path(fpath)
+
+        ## using StringIO we can capture the json path output from the command
+        out = StringIO()
+        call_command('Excelreader',
+            operation='site_dataset',
+            source=fpath,
+            dest_dir=destpath,
+            resource_type=restype,
+            append_data=append,
+            stdout = out,
+        )
+        comm_result = out.getvalue().rstrip() # remove newline
+
+        ## METHOD 1: load logged messages from logger pass them
+        ## as a list of lines to the ajax result.
+        ## this method currently in use
+        logger = logging.getLogger('excel-reader')
+        log = logger.handlers[0].baseFilename
+        with open(log,'r') as openlog:
+            lines = [l.rstrip() for l in openlog]
+        result = {
+            'success':True,
+            'msg': lines,
+        }
+        
+        ## METHOD 2: get the json directly from the management command
+        ## and load it here. not currently in use. I think this may be a
+        ## good direction to go, but we'll still have to load from a file
+        ## for the easiest method
+
+        with open(comm_result,'r') as readjson:
+            data = readjson.read()
+            result = json.loads(data)
+        
+        if False in [i['passed'] for i in result.values()]:
+            os.remove(fpath)
+        else:
+            result['filepath'] = destpath
+            
+    except Exception as e:
+        print e
 
     return HttpResponse(json.dumps(result), content_type="application/json")
     
@@ -110,3 +131,24 @@ def upload_spreadsheet(request):
             response_data['filepath'] = fpath
 
         return HttpResponse(json.dumps(response_data), content_type="application/json")
+
+def import_archesfile(request):
+    
+    try:
+        fpath = request.POST['filepath']
+        append = request.POST['append']
+        
+        print "loading"
+    
+        out = StringIO()
+        call_command('packages',
+            operation='load_resources',
+            source=fpath,
+            appending=append,
+            stdout = out,
+        )
+        
+        comm_result = out.getvalue().rstrip() # remove newline
+        
+    except Exception as e:
+        print e

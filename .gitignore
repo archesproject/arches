@@ -8,6 +8,7 @@ eamena/eamena/media/js/views/crypto
 eamena/eamena/elasticsearch
 eamena/eamena/logs
 eamena/eamena/uploadedfiles
+eamena/eamena/bulk_upload/*
 virtualenv/ENV
 tests/elasticsearch
 tests/logs

@@ -32,7 +32,7 @@ class Command(BaseCommand):
         print 'operation: '+ options['operation']
         package_name = settings.PACKAGE_NAME
         print 'package: '+ package_name
-        
+
         if options['operation'] == 'site_dataset':
             result = self.SiteDataset(options['source'], options['resource_type'], options['dest_dir'],options['append_data'])
         
@@ -270,6 +270,7 @@ class Command(BaseCommand):
                                     
         if Log['validate_geometries']['errors'] or Log['validate_dates']['errors'] or Log['validate_concepts']['errors']:
             return Log
+
         else:
             Log['success'] = True
             with open(destination, 'wb') as archesfile:
@@ -278,12 +279,12 @@ class Command(BaseCommand):
                 ResourceList = sorted(ResourceList, key = lambda row:(row[0],row[4],row[2]), reverse = False)
                 for row in ResourceList:
                     writer.writerow(row)
-            
+
             ## make blank relations file
             relationsfile = destination.replace(".arches",".relations")
             with open(relationsfile, 'wb') as rel:
                 writer = csv.writer(rel, delimiter ="|")
                 writer.writerow(['RESOURCEID_FROM','RESOURCEID_TO','START_DATE','END_DATE','RELATION_TYPE','NOTES'])
-                
+
             return Log
                                                                         

@@ -1,5 +1,39 @@
+function updateRestype() {
+    $('#restype-msg').text($('#resource-type-select').val());
+    $('#resource-type-select').change( function() {
+        $('#restype-msg').text($('#resource-type-select').val());
+    });
+};
+
+function displayResults(result,testName,logEl) {
+    var passColor = 'green';
+    var failColor = 'red';
+    var pass = true;
+    if (result.passed) {
+        t = testName+": PASS";
+        logEl.insertAdjacentHTML('beforeend',
+            '<p class="log-line" style="color:'+passColor+'">'+t+'</p>'
+        );
+    } else {
+        pass = false;
+        t = testName+": FAIL";
+        logEl.insertAdjacentHTML('beforeend',
+            '<p class="log-line" style="color:'+failColor+'">'+t+'</p>'
+        );
+        $.each(result.errors, function (index, line) {
+            logEl.insertAdjacentHTML('beforeend',
+                '<p class="log-line" style="color:'+failColor+'">'+line+'</p>'
+            );
+        });
+    }
+    return pass;
+}
+
 $( document ).ready(function() {
+    
     var filepath = '';
+    var archesFilepath = '';
+
     'use strict';
     var csrftoken = $("[name=csrfmiddlewaretoken]").val();
     $('#fileupload').fileupload({
@@ -14,7 +48,8 @@ $( document ).ready(function() {
             } else {
                 filepath = data.result.filepath;
                 $('#files-msg').text(data.result.filename);
-                $('.resource-type-select').removeAttr('disabled');
+                $('#resource-type-select').removeAttr('disabled');
+                $('#append-select').removeAttr('disabled');
                 $('#validate-button').removeAttr('disabled');
             }
         },
@@ -30,7 +65,6 @@ $( document ).ready(function() {
         .parent().addClass($.support.fileInput ? undefined : 'disabled');
         
     $('#validate-button').click( function () {
-        console.log("validating...");
         $('#validation-msg').text("Validating...");
         $('.form-load-mask').show();
         $('.log-line').remove();
@@ -42,33 +76,66 @@ $( document ).ready(function() {
             type: 'post',
             data: {
                 'filepath':filepath,
-                'restype':$('.resource-type-select').val(),
+                'restype':$('#resource-type-select').val(),
+                'append':$('#append-select').val(),
             },
             done: function (result) {
             },
             success: function(result) {
                 $('.form-load-mask').hide();
-                $('#validation-msg').text("Validation complete.");
                 var logEl = document.getElementById('upload-log-output');
-                $.each(result.msg, function (index, line) {
-                    var textColor = 'green';
-                    if (line.slice(0,5)=='ERROR') { textColor = 'red' }
-                    logEl.insertAdjacentHTML('beforeend', '<p class="log-line" style="color:'+textColor+'">'+line+'</p>');
+                console.log(result);
+                var allPassed = true;
+                
+                
+                var testList = new Array(
+                    'validate_headers',
+                    'validate_rows_and_values',
+                    'validate_dates',
+                    'validate_geometries',
+                    'validate_concepts'
+                );
+                
+                $.each(testList, function (index, test) {
+                    var pass = displayResults(result[test],test,logEl);
+                    if (!pass) {
+                        allPassed = false;
+                        return false; // this line breaks the reporting early
+                    };
                 });
+                if (allPassed) {
+                    $('#load-data-button').removeAttr('disabled');
+                    $('#validation-msg').text("Validation complete. All tests passed.");
+                    archesFilepath = result.filepath;
+                } else {
+                    $('#validation-msg').text("Validation complete. Some tests failed.");
+                }
             }
         });
     });
     $('#load-data-button').click( function () {
-        console.log("Loading data...");
-        // nothing here yet, but it will be another ajax call
+        $('#import-msg').text("Importing data... this may take a few minutes.");
+        $.ajax({
+            beforeSend: function(request) {
+                request.setRequestHeader("X-CSRFToken",csrftoken);
+            },
+            url: '/bulk-upload/import',
+            type: 'post',
+            data: {
+                'filepath':archesFilepath,
+                'append':$('#append-select').val(),
+            },
+            done: function (result) {
+            },
+            success: function(result) {
+                
+                console.log(result);
+                
+            }
+        });
     });
     
     updateRestype();
+
 });
 
-var updateRestype = new function() {
-    $('#restype-msg').text($('.resource-type-select').val());
-    $('.resource-type-select').change( function() {
-        $('#restype-msg').text($('.resource-type-select').val());
-    });
-};
