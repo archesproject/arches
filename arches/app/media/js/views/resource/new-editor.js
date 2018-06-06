@@ -55,6 +55,17 @@ define([
         );
     });
 
+    var isChildSelected = function (parent) {
+        var childSelected = false;
+        var childKey = parent.tiles ? 'tiles' : 'cards';
+        ko.unwrap(parent[childKey]).forEach(function(child) {
+            if (child.selected() || isChildSelected(child)){
+                childSelected = true;
+            }
+        });
+        return childSelected;
+    };
+
     var setupCard = function (card, parent) {
         return _.extend(card, {
             parent: parent,
@@ -80,6 +91,9 @@ define([
             ),
             selected: ko.computed(function () {
                 return selection() === card;
+            }, this),
+            isChildSelected: ko.computed(function() {
+                return isChildSelected(card);
             }, this)
         });
     };
@@ -100,6 +114,9 @@ define([
             expanded: ko.observable(true),
             selected: ko.computed(function () {
                 return selection() === tile;
+            }, this),
+            isChildSelected: ko.computed(function() {
+                return isChildSelected(tile);
             }, this),
             formData: new FormData(),
             dirty: ko.computed(function () {
