@@ -323,6 +323,25 @@ define(['arches',
             }, this, 'changed');
         },
 
+        exportBranch: function(node, callback, scope){
+            this._doRequest({
+                type: "POST",
+                url: this.url + this.get('graphid') + '/export_branch',
+                data: JSON.stringify(node.toJSON())
+            }, function(response, status){
+                if (status === 'success' &&  response.responseJSON) {
+                    console.log(response.responseJSON);
+                }else{
+                    this.trigger('error', response, 'exportBranch');
+                }
+
+                if (typeof callback === 'function') {
+                    scope = scope || this;
+                    callback.call(scope, response, status);
+                }
+            }, this, 'changed');
+        },
+
         /**
          * getValidNodesEdges - gets a list of possible ontology properties and classes the node
          * referenced by it's id could be based on the location of the node in the graph

@@ -615,7 +615,7 @@ class Graph(models.GraphModel):
                 active=report.active
             ).save()
 
-    def copy(self):
+    def copy(self, root=None):
         """
         returns an unsaved copy of self
 
@@ -624,6 +624,40 @@ class Graph(models.GraphModel):
         nodegroup_map = {}
 
         copy_of_self = deepcopy(self)
+
+        if root is not None:
+            root['nodegroup_id'] = root['nodeid']
+            root['istopnode'] = True
+            copy_of_self.update_node(root)
+            root_node = copy_of_self.nodes[root['nodeid']]
+            tree = self.get_tree(root_node)
+            def flatten_tree(tree, node_id_list=[]):
+                node_id_list.append(tree['node'].pk)
+                for node in tree['children']:
+                    flatten_tree(node, node_id_list)
+                return node_id_list
+
+            node_ids = flatten_tree(tree)
+            for edge_id in copy_of_self.edges.keys():
+                edge = copy_of_self.edges[edge_id]
+                if edge.domainnode_id not in node_ids:
+                    copy_of_self.edges.pop(edge_id)
+            for node_id in copy_of_self.nodes.keys():
+                node = copy_of_self.nodes[node_id]
+                if node.pk not in node_ids:
+                    copy_of_self.nodes.pop(node_id)
+            for widget_id in copy_of_self.widgets.keys():
+                widget = copy_of_self.widgets[widget_id]
+                if widget.node_id not in node_ids:
+                    copy_of_self.widgets.pop(widget_id)
+            for card_id in copy_of_self.cards.keys():
+                card = copy_of_self.cards[card_id]
+                if card.nodegroup_id not in node_ids:
+                    copy_of_self.cards.pop(card_id)
+            copy_of_self.root = root_node
+            copy_of_self.name = root_node.name
+            copy_of_self.isresource = False
+
         # returns a list of node ids sorted by nodes that are collector nodes first and then others last
         node_ids = sorted(copy_of_self.nodes, key=lambda node_id: copy_of_self.nodes[node_id].is_collector, reverse=True)
 

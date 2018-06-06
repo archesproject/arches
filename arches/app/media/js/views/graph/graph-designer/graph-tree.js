@@ -82,6 +82,15 @@ define([
             e.stopImmediatePropagation();
             var parentNode = this.graphModel.getParentNode(node);
             this.graphModel.deleteNode(node);
+        },
+
+        exportBranch: function(node, e) {
+            e.stopImmediatePropagation();
+            this.graphModel.exportBranch(node, function() {
+                console.log(response.responseJSON)
+                //     var win = window.open(url, '_blank');
+                //     win.focus();
+            });
         }
 
     });
