@@ -138,9 +138,9 @@ class Resources(APIBase):
 class Concepts(APIBase):
 
     def get(self, request, conceptid=None):
-        include_subconcepts = request.GET.get('include_subconcepts', 'true') == 'true'
-        include_parentconcepts = request.GET.get('include_parentconcepts', 'true') == 'true'
-        include_relatedconcepts = request.GET.get('include_relatedconcepts', 'true') == 'true'
+        include_subconcepts = request.GET.get('includesubconcepts', 'true') == 'true'
+        include_parentconcepts = request.GET.get('includeparentconcepts', 'true') == 'true'
+        include_relatedconcepts = request.GET.get('includerelatedconcepts', 'true') == 'true'
         depth_limit = request.GET.get('depth_limit', None)
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         pretty = request.GET.get('pretty', False)
