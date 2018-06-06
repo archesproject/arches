@@ -4,6 +4,8 @@ from django.views.generic import View
 from django.db.models import Q
 from django.http.request import QueryDict
 from django.core.urlresolvers import reverse
+from django.utils.decorators import method_decorator
+
 from revproxy.views import ProxyView
 
 from arches.app.models import models
@@ -14,6 +16,7 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
+from arches.app.utils.decorators import group_required
 
 
 class CouchdbProxy(ProxyView):
@@ -135,6 +138,7 @@ class Resources(APIBase):
 
         return JSONResponse(out, indent=indent)
 
+@method_decorator(group_required('RDM Administrator'), name='dispatch')
 class Concepts(APIBase):
 
     def get(self, request, conceptid=None):
