@@ -1,4 +1,5 @@
 from __future__ import division
+import os
 import re
 import csv
 import datetime
@@ -13,7 +14,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.gis.geos import GEOSGeometry
 import json
 import logging
-logger = logging.getLogger('excel-reader')
+
 
 class Command(BaseCommand):
     
@@ -27,57 +28,44 @@ class Command(BaseCommand):
     )
     
     def handle(self, *args, **options):
-    
-        ## flush logger here to start fresh for each iteration
-        ## (is this really working??)
-        logger = logging.getLogger('excel-reader')
-        logger.handlers[0].flush()
-
+        
         print 'operation: '+ options['operation']
         package_name = settings.PACKAGE_NAME
         print 'package: '+ package_name
         
         if options['operation'] == 'site_dataset':
-            self.SiteDataset(options['source'], options['resource_type'], options['dest_dir'],options['append_data'])
+            result = self.SiteDataset(options['source'], options['resource_type'], options['dest_dir'],options['append_data'])
         
-        ## ultimately, the result should come from the SiteDataset function
-        ## below is just an example of what it could look like, and it should
-        ## be dumped to a .json file and that path returned from here.
-        ## returning an actual dictionary object seems to cause problems...
-        result = {'success':True,'msg':[]}
-
-        # self.stdout.write(path/to/.json)
+        error_path = os.path.join(settings.BULK_UPLOAD_DIR,"errors.json")
+        with open(error_path,'w') as out:
+            json.dump(result,out)
+        self.stdout.write(error_path)
         
         return
     
-    def validatedates(self, date):
+    def validatedates(self, date, header = None, row_no = None):
         try:
-            datetime.datetime.strptime(date, '%Y-%m-%d') #Checks for format  YYYY-MM-DD
+            d = datetime.datetime.strptime(date, '%Y-%m-%d') #Checks for format  YYYY-MM-DD
         except ValueError:
             try:
-                d =datetime.datetime.strptime(date, '%Y-%m-%d %X') #Checks for format  YYYY-MM-DD hh:mm:ss
-                date = d.strftime('%Y-%m-%d')
+                d =datetime.datetime.strptime(date, '%Y-%m-%d %X') #Checks for format  YYYY-MM-DD hh:mm:ss (locale)
             except ValueError:
                 try:
                     d = datetime.datetime.strptime(date,'%d-%m-%Y') #Checks for format  DD-MM-YYYY
-                    date = d.strftime('%Y-%m-%d')
                 except ValueError:
                     try:
                         d = datetime.datetime.strptime(date,'%d/%m/%Y') #Checks for format  DD/MM/YYYY
-                        date = d.strftime('%Y-%m-%d')
                     except ValueError:
                         try:
                             d = datetime.datetime.strptime(date,'%d/%m/%y') #Checks for format  DD/MM/YY
-                            date = d.strftime('%Y-%m-%d')
-                            
                         except ValueError:
                             try:
                                 d = datetime.datetime.strptime(date,'%Y') #Checks for format  YYYY
                                 isodate = d.isoformat()
-                                date = isodate.strip().split("T")[0] #
+                                d = isodate.strip().split("T")[0]
                             except:
-                                # raise ValueError("The value %s inserted is not a date" % date)
-                                return "The value %s inserted is not a date" % date
+                                return "The value %s inserted under header %s at line %s is not a date" % (date, header, row_no)
+        date = d.date()
         return date
     
     '''Validates that the number of semicolon-separated values is consistent across a worksheet and spots empty cells'''
@@ -105,14 +93,11 @@ class Command(BaseCommand):
                 ret = sorted(ret)
                 errors[workbook.sheetnames[sheet_index]] = ','.join(str(e) for e in ret)
                 # raise ValueError("Error: cells in sheet %s do not contain an equal number of semicolon separated values or are empty. Errors are at the following lines: %s" % (workbook.sheetnames[sheet_index], sorted(ret)))
-#                 logger.error("cells in sheet %s do not contain an equal number of semicolon separated values or are empty. Errors are at the following lines:" % (workbook.sheetnames[sheet_index]))
-#                 for row in sorted(ret):
-#                     logger.error(row)
+
         if (rows_count/sheet_count).is_integer() is not True:
             errors['different_rows'] = True
             return errors
             # raise ValueError("Error: some sheets in your XLSX file have a different number of rows")
-#             logger.error("some sheets in your XLSX file have a different number of rows")
             
         if errors:
             return errors
@@ -121,7 +106,6 @@ class Command(BaseCommand):
             
     def validate_value_number(self, sheet, sheet_name):
         FaultyRows=[]
-        print sheet_name
         for row_index, row in enumerate(sheet.iter_rows(row_offset = 1)):
             values_no = []
             if any(cell.value for cell in row):
@@ -133,7 +117,6 @@ class Command(BaseCommand):
                             cell_no = len(re.sub(ur';\s+', ';', value_encoded).split(';'))
                             values_no.append(cell_no)
                     else:
-                        print row_index
                         values_no.append(0)
             try: 
                 if values_no.count(values_no[0]) != len(values_no) or 0 in values_no:
@@ -184,14 +167,13 @@ class Command(BaseCommand):
             full_concept_list.append(node_conceptid)
         return list(set(full_concept_list)) 
     
-    def validate_geometries(self, geometry,row):
+    def validate_geometries(self, geometry,header,row):
         try:
             GEOSGeometry(geometry)
             return
         except:
-            logger.error("The geometry at line %s is not an acceptable GEOSGeometry" % row+2)
             # raise ValueError("The geometry at line %s is not an acceptable GEOSGeometry" % row+2)
-            return "The geometry at line %s is not an acceptable GEOSGeometry" % row+2
+            return "The geometry at header %s, line %s is not an acceptable GEOSGeometry" % (header, row+2)
     
     def create_resourceid_list(self, workbook):
         ''''Looks for RESOURCEID column and creates a list of resourceids and returns '''
@@ -209,7 +191,7 @@ class Command(BaseCommand):
     def SiteDataset(self, source, resourcetype, destination, append = False):
         wb2 = load_workbook(source)
 #             self.validaterows(wb2)
-        
+                
         ResourceList = []
         FaultyConceptsList = []
         Log = {
@@ -227,13 +209,15 @@ class Command(BaseCommand):
         if headers_errors:
             Log['validate_headers']['errors'].append(headers_errors)
             Log['validate_headers']['passed'] = False
-            return Log
         if rows_values_errors:
             if rows_values_errors['different_rows'] == True:
                 Log['validate_rows_and_values']['passed'] = False
-            else:       
+            else:
+                rows_values_errors.pop('different_rows', None)       
                 Log['validate_rows_and_values']['errors'].append(self.validate_rows_and_values(wb2))
                 Log['validate_rows_and_values']['passed'] = False
+        
+        if headers_errors or rows_values_errors:
             return Log
         
         for sheet_index,sheet in enumerate(wb2.worksheets):
@@ -242,7 +226,6 @@ class Command(BaseCommand):
                 GroupNo = 0
                 if header[0].value is not None and header[0].value != 'RESOURCEID':
                     print "Now analysing values for %s" % header[0].value
-                    logger.info("Now analysing values for %s" % header[0].value)
                     modelinstance = archesmodels.EntityTypes.objects.get(pk = header[0].value)
                     for row_index, row in enumerate(sheet.iter_rows(row_offset = 1)):
     #                     print "Row %s column %s with value %s" %(row_index, col_index, row[col_index].value)
@@ -271,21 +254,20 @@ class Command(BaseCommand):
                                             ResourceList.append(concept_list)
         #                                     print "ResourceId %s, AttributeName %s, AttributeValue %s, GroupId %s" %(row_index,modelinstance.entitytypeid,concept, GroupName)
                                     if modelinstance.businesstablename == 'dates':
-                                            if isinstance(self.validatedates(concept), datetime.date):
-                                                concept_list = [str(resourceid),resourcetype,modelinstance.entitytypeid,date, GroupName]
-                                                ResourceList.append(concept_list)                                                
+                                            if isinstance(self.validatedates(concept), basestring):
+                                                Log['validate_dates']['errors'].append(self.validatedates(concept,header =header[0].value, row_no = row_index+2))
+                                                Log['validate_dates']['passed'] = False                                       
                                             else:
-                                                Log['validate_dates']['errors'].append(self.validatedates(concept))
-                                                Log['validate_dates']['passed'] = False
+                                                concept_list = [str(resourceid),resourcetype,modelinstance.entitytypeid,self.validatedates(concept), GroupName]
+                                                ResourceList.append(concept_list)                                                         
                                     if modelinstance.businesstablename == 'geometries':
-                                            if self.validate_geometries(concept,row_index):
-                                                Log['validate_geometries']['errors'].append(self.validate_geometries(concept,row_index))
+                                            if self.validate_geometries(concept,header[0].value,row_index):
+                                                Log['validate_geometries']['errors'].append(self.validate_geometries(concept,header[0].value,row_index))
                                                 Log['validate_geometries']['passed'] = False
                                             else:
                                                 concept_list = [str(resourceid),resourcetype,modelinstance.entitytypeid,concept, GroupName]
                                                 ResourceList.append(concept_list)
                                     
-#         if FaultyConceptsList:
         if Log['validate_geometries']['errors'] or Log['validate_dates']['errors'] or Log['validate_concepts']['errors']:
             return Log
         else:
@@ -296,8 +278,12 @@ class Command(BaseCommand):
                 ResourceList = sorted(ResourceList, key = lambda row:(row[0],row[4],row[2]), reverse = False)
                 for row in ResourceList:
                     writer.writerow(row)
+            
+            ## make blank relations file
+            relationsfile = destination.replace(".arches",".relations")
+            with open(relationsfile, 'wb') as rel:
+                writer = csv.writer(rel, delimiter ="|")
+                writer.writerow(['RESOURCEID_FROM','RESOURCEID_TO','START_DATE','END_DATE','RELATION_TYPE','NOTES'])
+                
             return Log
-        print Log
-            # raise ValueError("The following concepts had issues %s" % FaultyConceptsList)
                                                                         
-                            
