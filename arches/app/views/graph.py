@@ -387,6 +387,11 @@ class GraphDataView(View):
                     ret = graph.move_node(data['nodeid'], data['property'], data['newparentnodeid'])
                     graph.save()
 
+                elif self.action == 'export_branch':
+                    clone_data = graph.copy(root=data)
+                    ret = clone_data['copy']
+                    ret.save()
+
                 elif self.action == 'clone_graph':
                     clone_data = graph.copy()
                     ret = clone_data['copy']

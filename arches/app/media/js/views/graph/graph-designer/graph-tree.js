@@ -1,7 +1,8 @@
 define([
     'knockout',
-    'views/tree-view'
-], function(ko, TreeView) {
+    'views/tree-view',
+    'arches'
+], function(ko, TreeView, arches) {
     var GraphTree = TreeView.extend({
         /**
         * A backbone view to manage a list of graph nodes
@@ -106,6 +107,14 @@ define([
             e.stopImmediatePropagation();
             var parentNode = this.graphModel.getParentNode(node);
             this.graphModel.deleteNode(node);
+        },
+
+        exportBranch: function(node, e) {
+            e.stopImmediatePropagation();
+            this.graphModel.exportBranch(node, function(response) {
+                var url = arches.urls.graph_designer(response.responseJSON.graphid);
+                window.open(url);
+            });
         }
 
     });
