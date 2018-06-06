@@ -110,88 +110,71 @@ def concept(request, conceptid):
         emulate_elastic_search = request.GET.get('emulate_elastic_search', 'false') == 'true'
         depth_limit = request.GET.get('depth_limit', None)
 
-        if f == 'html':
-            depth_limit = 1
-            if not conceptid:
-                return render(request, 'views/rdm/concept-report.htm', {
-                    'lang': lang,
-                    'concept_count': models.Concept.objects.filter(nodetype='Concept').count(),
-                    'collection_count': models.Concept.objects.filter(nodetype='Collection').count(),
-                    'scheme_count': models.Concept.objects.filter(nodetype='ConceptScheme').count(),
-                    'entitytype_count': models.Concept.objects.filter(nodetype='EntityType').count(),
-                    'default_report': True
-                })
+        depth_limit = 1
+        if not conceptid:
+            return render(request, 'views/rdm/concept-report.htm', {
+                'lang': lang,
+                'concept_count': models.Concept.objects.filter(nodetype='Concept').count(),
+                'collection_count': models.Concept.objects.filter(nodetype='Collection').count(),
+                'scheme_count': models.Concept.objects.filter(nodetype='ConceptScheme').count(),
+                'entitytype_count': models.Concept.objects.filter(nodetype='EntityType').count(),
+                'default_report': True
+            })
 
 
-            labels = []
+        labels = []
 
-            concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
-                include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
-                depth_limit=depth_limit, up_depth_limit=None, lang=lang, semantic=(mode == 'semantic' or mode == ''))
-
-            languages = sort_languages(models.DLanguage.objects.all(), lang)
-
-            valuetypes = models.DValueType.objects.all()
-            relationtypes = models.DRelationType.objects.all()
-            prefLabel = concept_graph.get_preflabel(lang=lang)
-            for subconcept in concept_graph.subconcepts:
-                subconcept.prefLabel = subconcept.get_preflabel(lang=lang)
-            for relatedconcept in concept_graph.relatedconcepts:
-                relatedconcept.prefLabel = relatedconcept.get_preflabel(lang=lang)
-            for value in concept_graph.values:
-                if value.category == 'label':
-                    labels.append(value)
-
-            if (mode == 'semantic' or mode == '') and (concept_graph.nodetype == 'Concept' or concept_graph.nodetype == 'ConceptScheme' or concept_graph.nodetype == 'EntityType'):
-                if concept_graph.nodetype == 'ConceptScheme':
-                    parent_relations = relationtypes.filter(category='Properties')
-                else:
-                    parent_relations = relationtypes.filter(category='Semantic Relations').exclude(relationtype = 'related').exclude(relationtype='broader').exclude(relationtype='broaderTransitive')
-                return render(request, 'views/rdm/concept-report.htm', {
-                    'lang': lang,
-                    'prefLabel': prefLabel,
-                    'labels': labels,
-                    'concept': concept_graph,
-                    'languages': languages,
-                    'sparql_providers': get_sparql_providers(),
-                    'valuetype_labels': valuetypes.filter(category='label'),
-                    'valuetype_notes': valuetypes.filter(category='note'),
-                    'valuetype_related_values': valuetypes.filter(category__in=['undefined','identifiers']),
-                    'parent_relations': parent_relations,
-                    'related_relations': relationtypes.filter(Q(category='Mapping Properties') | Q(relationtype = 'related')),
-                    'concept_paths': concept_graph.get_paths(lang=lang),
-                    'graph_json': JSONSerializer().serialize(concept_graph.get_node_and_links(lang=lang)),
-                    'direct_parents': [parent.get_preflabel(lang=lang) for parent in concept_graph.parentconcepts]
-                })
-            elif mode == 'collections':
-                return render(request, 'views/rdm/entitytype-report.htm', {
-                    'lang': lang,
-                    'prefLabel': prefLabel,
-                    'labels': labels,
-                    'concept': concept_graph,
-                    'languages': languages,
-                    'valuetype_labels': valuetypes.filter(category='label'),
-                    'valuetype_notes': valuetypes.filter(category='note'),
-                    'valuetype_related_values': valuetypes.filter(category__in=['undefined','identifiers']),
-                    'related_relations': relationtypes.filter(relationtype = 'member'),
-                    'concept_paths': concept_graph.get_paths(lang=lang)
-                })
-
-
-        ret = []
         concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
-                include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
-                depth_limit=depth_limit, up_depth_limit=None, lang=lang)
+            include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
+            depth_limit=depth_limit, up_depth_limit=None, lang=lang, semantic=(mode == 'semantic' or mode == ''))
 
-        if emulate_elastic_search:
-            ret.append({'_type': id, '_source': concept_graph})
-        else:
-            ret.append(concept_graph)
+        languages = sort_languages(models.DLanguage.objects.all(), lang)
 
-        if emulate_elastic_search:
-            ret = {'hits':{'hits':ret}}
+        valuetypes = models.DValueType.objects.all()
+        relationtypes = models.DRelationType.objects.all()
+        prefLabel = concept_graph.get_preflabel(lang=lang)
+        for subconcept in concept_graph.subconcepts:
+            subconcept.prefLabel = subconcept.get_preflabel(lang=lang)
+        for relatedconcept in concept_graph.relatedconcepts:
+            relatedconcept.prefLabel = relatedconcept.get_preflabel(lang=lang)
+        for value in concept_graph.values:
+            if value.category == 'label':
+                labels.append(value)
 
-        return JSONResponse(ret, indent=4 if pretty else None)
+        if (mode == 'semantic' or mode == '') and (concept_graph.nodetype == 'Concept' or concept_graph.nodetype == 'ConceptScheme' or concept_graph.nodetype == 'EntityType'):
+            if concept_graph.nodetype == 'ConceptScheme':
+                parent_relations = relationtypes.filter(category='Properties')
+            else:
+                parent_relations = relationtypes.filter(category='Semantic Relations').exclude(relationtype = 'related').exclude(relationtype='broader').exclude(relationtype='broaderTransitive')
+            return render(request, 'views/rdm/concept-report.htm', {
+                'lang': lang,
+                'prefLabel': prefLabel,
+                'labels': labels,
+                'concept': concept_graph,
+                'languages': languages,
+                'sparql_providers': get_sparql_providers(),
+                'valuetype_labels': valuetypes.filter(category='label'),
+                'valuetype_notes': valuetypes.filter(category='note'),
+                'valuetype_related_values': valuetypes.filter(category__in=['undefined','identifiers']),
+                'parent_relations': parent_relations,
+                'related_relations': relationtypes.filter(Q(category='Mapping Properties') | Q(relationtype = 'related')),
+                'concept_paths': concept_graph.get_paths(lang=lang),
+                'graph_json': JSONSerializer().serialize(concept_graph.get_node_and_links(lang=lang)),
+                'direct_parents': [parent.get_preflabel(lang=lang) for parent in concept_graph.parentconcepts]
+            })
+        elif mode == 'collections':
+            return render(request, 'views/rdm/entitytype-report.htm', {
+                'lang': lang,
+                'prefLabel': prefLabel,
+                'labels': labels,
+                'concept': concept_graph,
+                'languages': languages,
+                'valuetype_labels': valuetypes.filter(category='label'),
+                'valuetype_notes': valuetypes.filter(category='note'),
+                'valuetype_related_values': valuetypes.filter(category__in=['undefined','identifiers']),
+                'related_relations': relationtypes.filter(relationtype = 'member'),
+                'concept_paths': concept_graph.get_paths(lang=lang)
+            })
 
     if request.method == 'POST':
 
