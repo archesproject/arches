@@ -326,12 +326,11 @@ define(['arches',
         exportBranch: function(node, callback, scope){
             this._doRequest({
                 type: "POST",
+                async: false,
                 url: this.url + this.get('graphid') + '/export_branch',
                 data: JSON.stringify(node.toJSON())
             }, function(response, status){
-                if (status === 'success' &&  response.responseJSON) {
-                    console.log(response.responseJSON);
-                }else{
+                if (status !== 'success' || !response.responseJSON) {
                     this.trigger('error', response, 'exportBranch');
                 }
 
