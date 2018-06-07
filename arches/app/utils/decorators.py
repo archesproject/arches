@@ -22,8 +22,8 @@ import logging
 import datetime
 from arches.app.utils.permission_backend import get_editable_resource_types
 from arches.app.utils.permission_backend import get_resource_types_by_perm
-from arches.app.utils.permission_backend import user_can_read_resource
-from arches.app.utils.permission_backend import user_can_edit_resource
+from arches.app.utils.permission_backend import user_can_read_resources
+from arches.app.utils.permission_backend import user_can_edit_resources
 from django.contrib.auth.decorators import user_passes_test
 
 # Get an instance of a logger
@@ -68,7 +68,7 @@ def can_edit_resource_instance():
 
     """
 
-    return user_passes_test(user_can_edit_resource)
+    return user_passes_test(user_can_edit_resources)
 
 def can_read_resource_instance():
     """
@@ -76,4 +76,4 @@ def can_read_resource_instance():
 
     """
 
-    return user_passes_test(user_can_read_resource)
+    return user_passes_test(user_can_read_resources)

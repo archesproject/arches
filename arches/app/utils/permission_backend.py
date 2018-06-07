@@ -143,7 +143,7 @@ def get_resource_types_by_perm(user, perms):
     return list(graphs)
 
 
-def user_can_read_resource(user):
+def user_can_read_resources(user):
     """
     Requires that a user be able to read a single nodegroup of a resource
 
@@ -154,7 +154,7 @@ def user_can_read_resource(user):
     return False
 
 
-def user_can_edit_resource(user):
+def user_can_edit_resources(user):
     """
     Requires that a user be able to edit or delete a single nodegroup of a resource
 

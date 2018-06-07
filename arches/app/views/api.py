@@ -17,8 +17,8 @@ from arches.app.utils.decorators import can_read_resource_instance, can_edit_res
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
-from arches.app.utils.permission_backend import get_editable_resource_types
-
+from arches.app.utils.permission_backend import user_can_read_resources
+from arches.app.utils.permission_backend import user_can_edit_resources
 
 class CouchdbProxy(ProxyView):
     #check user credentials here
@@ -147,7 +147,7 @@ class Resources(APIBase):
         return JSONResponse(out, indent=indent)
 
     def put(self, request, resourceid):
-        if can_edit_resource_instance(redirect_to_login=False, user=request.user):
+        if user_can_edit_resources(user=request.user):
             data = JSONDeserializer().deserialize(request.body)
             #print data
             reader = JsonLdReader()
