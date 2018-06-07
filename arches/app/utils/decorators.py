@@ -60,17 +60,22 @@ def group_required(*group_names):
         return False
     return user_passes_test(in_groups)
 
-def can_edit_resource_instance():
+def can_edit_resource_instance(**kwargs):
     """
     Requires that a user be able to edit or delete a single nodegroup of a resource
 
     """
 
-    def test(u):
-        if u.is_authenticated():
-            return u.is_superuser or len(get_editable_resource_types(u)) > 0
+    def test(user):
+        if user.is_authenticated():
+            return user.is_superuser or len(get_editable_resource_types(user)) > 0
         return False
     return user_passes_test(test)
+
+    # if kwargs.get('redirect_to_login', True):
+    #     return user_passes_test(test)
+    # else:
+    #     return test(kwargs.get('user', None))
 
 
 def can_read_resource_instance():

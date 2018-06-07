@@ -1,21 +1,24 @@
 import os
+import re
 import json
 import datetime
-from format import Writer
+from format import Writer, Reader
 from arches.app.models import models
+from arches.app.models.tile import Tile
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from rdflib import Namespace
 from rdflib import URIRef, Literal
 from rdflib import Graph
 from rdflib.namespace import RDF, RDFS
-from pyld.jsonld import compact, frame, from_rdf
+from pyld.jsonld import compact, frame, from_rdf, to_rdf
 
 try:
     from cStringIO import StringIO
 except ImportError:
     from StringIO import StringIO
 
+uuid_regex = '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
 
 class RdfWriter(Writer):
 
@@ -173,3 +176,32 @@ class JsonLdWriter(RdfWriter):
 
         full_file_name = os.path.join('{0}.{1}'.format(self.file_name, 'jsonld'))
         return [{'name':full_file_name, 'outputfile': dest}]
+
+
+class JsonLdReader(Reader):
+    def read_resource(self, data):
+        # import ipdb
+        # ipdb.set_trace()
+        rdf = to_rdf(data, {'format': 'application/n-quads'})
+        g = Graph().parse(format='nquads', data=rdf)
+        tiles = {}
+        for su,p,ob in g.triples( (None,  RDF.value, None) ):
+            print "%s is a %s"%(su,ob)
+            match = re.match(r'.*?/tile/(?P<tileid>%s)/node/(?P<nodeid>%s)' % (uuid_regex, uuid_regex), str(su))
+            if match:
+                if match.group('tileid') not in tiles:
+                    tiles[match.group('tileid')] = {} 
+
+                tiles[match.group('tileid')][match.group('nodeid')] = str(ob)
+
+
+        for tileid, tile_data in tiles.iteritems():
+            Tile.objects.filter(pk=tileid).update(data=tile_data)
+            # tile, created = Tile.objects.update_or_create(
+            #     tileid = tileid,
+            #     defaults = {
+            #         'data': tile_data
+            #     }
+            # )
+
+        print tiles

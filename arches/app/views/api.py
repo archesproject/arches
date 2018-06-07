@@ -13,10 +13,11 @@ from arches.app.models.mobile_survey import MobileSurvey
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.utils.response import JSONResponse
-from arches.app.utils.decorators import can_read_resource_instance
+from arches.app.utils.decorators import can_read_resource_instance, can_edit_resource_instance
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
+from arches.app.utils.permission_backend import get_editable_resource_types
 
 
 class CouchdbProxy(ProxyView):
@@ -144,3 +145,14 @@ class Resources(APIBase):
             }
 
         return JSONResponse(out, indent=indent)
+
+    def put(self, request, resourceid):
+        if can_edit_resource_instance(redirect_to_login=False, user=request.user):
+            data = JSONDeserializer().deserialize(request.body)
+            #print data
+            reader = JsonLdReader()
+            reader.read_resource(data)
+        else:
+            return JSONResponse(status=500)    
+        
+        return JSONResponse(self.get(request, resourceid))
