@@ -150,6 +150,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="card-breadcrumbs">
                 <!-- ko foreach: { data: selectionBreadcrumbs(), as: 'crumb' } -->
                     <!-- ko if: crumb.tileid -->
+                    <a href="#" data-bind="click: $parent.selection(crumb)">
                         <!-- ko if: crumb.parent.widgets.length > 0 -->
                         <span data-bind="text: crumb.parent.widgets[0].label"></span>:
                         <div style="display: inline;" data-bind="component: {
@@ -168,9 +169,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!-- ko if: crumb.parent.widgets.length === 0 -->
                         <span data-bind="text: crumb.parent.name"></span> &gt;
                         <!-- /ko -->
-                    <!-- /ko -->
-                    <!-- ko if: !crumb.tileid -->
-                    <span data-bind="text: crumb.name"></span> &gt;
+                    </a>
                     <!-- /ko -->
                 <!-- /ko -->
                 <span class="current-crumb">
