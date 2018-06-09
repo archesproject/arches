@@ -141,3 +141,25 @@ def get_resource_types_by_perm(user, perms):
         if node.graph.isresource and str(node.graph_id) != settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
             graphs.add(node.graph)
     return list(graphs)
+
+
+def user_can_read_resources(user):
+    """
+    Requires that a user be able to read a single nodegroup of a resource
+
+    """
+
+    if user.is_authenticated():
+        return user.is_superuser or len(get_resource_types_by_perm(user, ['models.read_nodegroup'])) > 0
+    return False
+
+
+def user_can_edit_resources(user):
+    """
+    Requires that a user be able to edit or delete a single nodegroup of a resource
+
+    """
+
+    if user.is_authenticated():
+        return user.is_superuser or len(get_editable_resource_types(user)) > 0
+    return False
