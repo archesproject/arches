@@ -180,11 +180,10 @@ class JsonLdWriter(RdfWriter):
 
 class JsonLdReader(Reader):
     def read_resource(self, data):
-        # import ipdb
-        # ipdb.set_trace()
         rdf = to_rdf(data, {'format': 'application/n-quads'})
         g = Graph().parse(format='nquads', data=rdf)
         tiles = {}
+
         for su,p,ob in g.triples( (None,  RDF.value, None) ):
             print "%s is a %s"%(su,ob)
             match = re.match(r'.*?/tile/(?P<tileid>%s)/node/(?P<nodeid>%s)' % (uuid_regex, uuid_regex), str(su))
@@ -193,7 +192,6 @@ class JsonLdReader(Reader):
                     tiles[match.group('tileid')] = {} 
 
                 tiles[match.group('tileid')][match.group('nodeid')] = str(ob)
-
 
         for tileid, tile_data in tiles.iteritems():
             Tile.objects.filter(pk=tileid).update(data=tile_data)
