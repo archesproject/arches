@@ -60,7 +60,9 @@
             'mathjs': '{{ STATIC_URL }}packages/mathjs/dist/math.min',
             'metismenu': '{{ STATIC_URL }}packages/metismenu/dist/metisMenu.min',
             'knockstrap': '{{ STATIC_URL }}packages/knockstrap/build/knockstrap.min',
-            'jqtree': '{{ STATIC_URL }}packages/jqtree/tree.jquery'
+            'jqtree': '{{ STATIC_URL }}packages/jqtree/tree.jquery',
+            'core-js':'{{ STATIC_URL }}packages/core-js/client/shim.min',
+            'dom-4': '{{ STATIC_URL }}packages/dom4/build/dom4'
         },
         packages: [{
             name: "codemirror",
@@ -141,7 +143,6 @@
     });
 
     require(['utils/set-csrf-token']);
-    require(['utils/polyfills']);
 
     // put values here that should be accessible application wide
     define('arches', [], function () {
