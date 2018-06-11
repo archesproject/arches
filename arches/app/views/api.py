@@ -1,6 +1,8 @@
 import json
 from django.shortcuts import render
 from django.views.generic import View
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from django.db.models import Q
 from django.http.request import QueryDict
 from django.core.urlresolvers import reverse
@@ -11,9 +13,12 @@ from arches.app.models.mobile_survey import MobileSurvey
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.utils.response import JSONResponse
-from arches.app.utils.betterJSONSerializer import JSONSerializer
+from arches.app.utils.decorators import can_read_resource_instance, can_edit_resource_instance
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
-
+from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
+from arches.app.utils.permission_backend import user_can_read_resources
+from arches.app.utils.permission_backend import user_can_edit_resources
 
 class CouchdbProxy(ProxyView):
     #check user credentials here
@@ -41,6 +46,7 @@ class Surveys(APIBase):
         return response
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class Resources(APIBase):
     # context = [{
     #     "@context": {
@@ -70,6 +76,7 @@ class Resources(APIBase):
     #     "@context": "https://linked.art/ns/v1/linked-art.json"
     # }]
 
+    @method_decorator(can_read_resource_instance())
     def get(self, request, resourceid=None):
         format = request.GET.get('format', 'json-ld')
         try:  
@@ -78,9 +85,14 @@ class Resources(APIBase):
             indent = None
         
         if resourceid:
-            exporter = ResourceExporter(format=format)
-            output = exporter.writer.write_resources(resourceinstanceids=[resourceid], indent=indent, user=request.user)
-            out = output[0]['outputfile'].getvalue()
+            try:
+                exporter = ResourceExporter(format=format)
+                output = exporter.writer.write_resources(resourceinstanceids=[resourceid], indent=indent, user=request.user)
+                out = output[0]['outputfile'].getvalue()
+            except models.ResourceInstance.DoesNotExist:
+                return JSONResponse(status=404)
+            except:
+                return JSONResponse(status=500)
         else:
             # 
             # The following commented code would be what you would use if you wanted to use the rdflib module, 
@@ -133,3 +145,14 @@ class Resources(APIBase):
             }
 
         return JSONResponse(out, indent=indent)
+
+    def put(self, request, resourceid):
+        if user_can_edit_resources(user=request.user):
+            data = JSONDeserializer().deserialize(request.body)
+            #print data
+            reader = JsonLdReader()
+            reader.read_resource(data)
+        else:
+            return JSONResponse(status=500)    
+        
+        return JSONResponse(self.get(request, resourceid))
