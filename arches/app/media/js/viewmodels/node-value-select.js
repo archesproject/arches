@@ -17,6 +17,10 @@ define([
         var updateTiles = function() {
             var nodeid = params.node.config.nodeid();
             var resourceId = ko.unwrap(self.resourceinstanceid);
+            if (resourceId === '') {
+                resourceId = window.location.pathname.split('/');
+                resourceId = resourceId[resourceId.length-1]
+            };
             var url = arches.urls.resource_tiles.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', resourceId);
             if (nodeid && resourceId) {
                 $.ajax({
