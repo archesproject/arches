@@ -89,6 +89,7 @@ class NewResourceEditorView(MapBaseManagerView):
         cardwidgets = [widget for widgets in [card.cardxnodexwidget_set.order_by('sortorder').all() for card in cards] for widget in widgets]
         widgets = models.Widget.objects.all()
         card_components = models.CardComponent.objects.all()
+        datatypes = models.DDataType.objects.all()
 
         if resource_instance is None:
             tiles = []
@@ -120,6 +121,7 @@ class NewResourceEditorView(MapBaseManagerView):
             nodegroups=JSONSerializer().serialize(nodegroups),
             nodes=JSONSerializer().serialize(nodes),
             cardwidgets=JSONSerializer().serialize(cardwidgets),
+            datatypes_json=JSONSerializer().serialize(datatypes, exclude=['iconclass', 'modulename', 'classname']),
             map_layers=map_layers,
             map_markers=map_markers,
             map_sources=map_sources,
