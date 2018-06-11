@@ -6596,14 +6596,14 @@ div.row.widget-wrapper {
 .related-resources-nodes {
     position: absolute;
     width: 275px;
-    top: 0px;
+    top: -50px;
     right: 0px;
     height: 100vh;
     background: #fff;
     z-index: 3;
     opacity: 0.9;
     border-left: 1px solid #ddd;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .relation-properties-buttons {
@@ -9164,7 +9164,7 @@ table.table.dataTable {
 
 .arches-related-resource-panel {
     position: absolute;
-    top: 0;
+    top: 50px;
     right: 0;
     left: 0;
     z-index: 1;
@@ -9172,7 +9172,16 @@ table.table.dataTable {
 
 .related-resources-header {
     position: relative;
-    z-index: 2;
+    top: 0;
+    margin-top: 15px;
+    float: left;
+    height: 35px;
+    width:100%;
+    z-index: 0;
+}
+
+.related-resources-header .btn-group>.btn:hover {
+    z-index: 0;
 }
 
 .related-resources-header.open-graph {
