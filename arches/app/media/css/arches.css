@@ -10909,6 +10909,7 @@ ul.select2-choices:after {
     padding: 10px 20px 10px 20px;
     flex: 1 0 250px;
     width: 250px;
+    overflow-y: auto;
 }
 
 .card-component-panel h4 {
