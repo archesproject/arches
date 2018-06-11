@@ -219,6 +219,7 @@ define([
                     if (!tile.tileid) {
                         tile.tileid = tileData.tileid;
                         tile.parent.tiles.unshift(tile);
+                        tile.parent.expanded(true);
                         vm.selection(tile);
                     }
                     if (!resourceId()) {
