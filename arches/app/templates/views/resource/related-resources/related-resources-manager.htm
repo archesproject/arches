@@ -101,7 +101,7 @@
         <div id="rr-manager-content-id" class="relative rr-drag-panel-target" data-bind="style: {'margin-bottom': containerBottomMargin }">
 
             <div class="related-resources-header" data-bind="css: {'open-graph': showGraph() == true}">
-                <h3 class="related-resources-title">{% trans "Related Resources" %}</h3>
+                <div class="related-resources-title">{% trans "Related Resources" %}</div>
 
                 <div class="btn-group rr-display-toggle" data-bind="css: {'open-graph': showGraph() == true}">
                     <button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="grid" data-bind="click: function () { showGraph(false); }, css: {'selected': !showGraph()}"><i class="ion-grid"></i></button>
