@@ -11,14 +11,12 @@ For the documentation pertaining to the bleeding edge code (what is in the ``mas
 Note that we are trying to pare down the contents of [this repo's wiki](https://github.com/archesproject/arches/wiki) in order to consolidate content into readthedocs, but for the time being interested developers can still find relevant information there.
 
 Issue reports are encouraged! [Please read this article](http://polite.technology/reportabug.html) before reporting issues.
-*   [Report a Bug](https://github.com/archesproject/arches/issues/new?template=bug.md)
-*   [File a Feature Ticket](https://github.com/archesproject/arches/issues/new?template=feature.md)
 
 [Version 4.1.1 release notes](https://github.com/archesproject/arches/blob/stable/4.1.x/releases/4.1.1.md)
 
 #### Quick Install
 
-Installation is fully documented in the official documentation, (arches.readthedocs.io/en/stable)[https://arches.readthedocs.io/en/stable], but assuming you have all of the dependencies installed you should make a virtual environment, activate it, and then run
+Installation is fully documented in the official documentation, [arches.readthedocs.io/en/stable](https://arches.readthedocs.io/en/stable), but assuming you have all of the dependencies installed you should make a virtual environment, activate it, and then run
 
     pip install arches --no-binary :all:
     
