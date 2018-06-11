@@ -89,9 +89,17 @@ define([
                     return setupTile(tile, card);
                 })
             ),
-            selected: ko.computed(function () {
-                return selection() === card;
-            }, this)
+            selected: ko.pureComputed({
+                read: function () {
+                    return selection() === this;
+                },
+                write: function (value) {
+                    if (value) {
+                        selection(this);
+                    }
+                },
+                owner: card
+            })
         });
         card.isChildSelected = ko.computed(function() {
             return isChildSelected(card);
@@ -113,9 +121,17 @@ define([
                 return setupCard(_.clone(card), tile);
             }),
             expanded: ko.observable(true),
-            selected: ko.computed(function () {
-                return selection() === tile;
-            }, this),
+            selected: ko.pureComputed({
+                read: function () {
+                    return selection() === this;
+                },
+                write: function (value) {
+                    if (value) {
+                        selection(this);
+                    }
+                },
+                owner: tile
+            }),
             formData: new FormData(),
             dirty: ko.computed(function () {
                 return tile._tileData() !== koMapping.toJSON(tile.data);
