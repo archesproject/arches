@@ -12,7 +12,7 @@ define([
                 graphid: null,
                 name: ''
             }].concat(_.filter(data.createableResources, function (graph) {
-                return graph.isresource && graph.isactive;
+                return graph;
             }));
             this.config = params.config;
             this.search = params.search;
