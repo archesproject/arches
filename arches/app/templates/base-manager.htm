@@ -222,10 +222,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <ul class="collapse in pop-in" data-bind="css:{'expanded-nav': navExpanded()}">
                                                 <!-- ko foreach: createableResources -->
                                                 <li class="link-submenu-item">
-                                                    <a class="link-submenu" href="#" data-bind="click: disable_instance_creation ? null: $parent.navigate.bind(this, '{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' %}'.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', UUID.generate ).replace('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', graphid)),
+                                                    <a class="link-submenu" href="#" data-bind="click: disable_instance_creation ? null: $parent.navigate.bind(this, '{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}'.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)),
                                                         css: { 'arches-menu-item-disabled': disable_instance_creation },
                                                         attr: {
-                                                            href: disable_instance_creation ? '#' : ('{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' %}'.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', UUID.generate ).replace('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', graphid))
+                                                            href: disable_instance_creation ? '#' : ('{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}'.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid))
                                                         }">
                                                         <i class="fa arches-menu-icon" data-bind="css: iconclass || 'fa fa-question'"></i> <span data-bind="text:name"></span></a>
                                                 </li>

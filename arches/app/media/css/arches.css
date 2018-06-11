@@ -10937,6 +10937,14 @@ ul.select2-choices:after {
     text-overflow: ellipsis;
 }
 
+.add-new-tile {
+    display: none;
+}
+
+.jstree-anchor:hover .add-new-tile, .add-new-tile.jstree-clicked {
+    display:inline;
+}
+
 @keyframes loader {
     0% {
         background: #ddd;

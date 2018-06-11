@@ -22,7 +22,7 @@ require([
 
             this.viewModel.graphId.subscribe(function (graphid) {
                 if(graphid && graphid !== ""){
-                    self.viewModel.navigate(arches.urls.add_resource(uuid.UUID.generate(), graphid));
+                    self.viewModel.navigate(arches.urls.add_resource(graphid));
                 }
             });
 
