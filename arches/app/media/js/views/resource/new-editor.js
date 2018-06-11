@@ -32,25 +32,53 @@ define([
     };
 
     var cards = _.map(data.cards, function(card) {
+        var nodes = _.filter(data.nodes, function (node) {
+            return node.nodegroup_id === card.nodegroup_id;
+        }).map(function (node) {
+            node.configKeys = ko.observableArray(
+                _.map(node.config, function (val, key) {
+                    return key
+                })
+            );
+            node.config = koMapping.fromJS(node.config);
+            return node;
+        });
+        var widgets = _.filter(data.cardwidgets, function (widget) {
+            return widget.card_id === card.cardid;
+        });
+        _.each(nodes, function (node) {
+            var widget = _.find(widgets, function (widget) {
+                return widget.node_id === node.nodeid
+            });
+            if (!widget) {
+                var datatype = _.find(data.datatypes, function (datatype) {
+                    return datatype.datatype === node.datatype;
+                });
+                if (datatype.defaultwidget_id) {
+                    var widgetData = _.find(data.widgets, function (widget) {
+                        return widget.widgetid === datatype.defaultwidget_id;
+                    });
+                    widgets.push({
+                        widget_id: datatype.defaultwidget_id,
+                        config: _.extend({
+                            label: node.name
+                        }, widgetData.defaultconfig),
+                        label: node.name,
+                        node_id: node.nodeid,
+                        card_id: card.cardid,
+                        id: '',
+                        sortorder: ''
+                    });
+                }
+            }
+        });
         return _.extend(
             card,
             _.find(data.nodegroups, function(group) {
                 return group.nodegroupid === card.nodegroup_id;
             }), {
-                widgets: _.filter(data.cardwidgets, function (widget) {
-                    return widget.card_id === card.cardid;
-                }),
-                nodes: _.filter(data.nodes, function (node) {
-                    return node.nodegroup_id === card.nodegroup_id;
-                }).map(function (node) {
-                    node.configKeys = ko.observableArray(
-                        _.map(node.config, function (val, key) {
-                            return key
-                        })
-                    );
-                    node.config = koMapping.fromJS(node.config);
-                    return node;
-                })
+                widgets: widgets,
+                nodes: nodes
             }
         );
     });
