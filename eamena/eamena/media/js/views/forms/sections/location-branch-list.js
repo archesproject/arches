@@ -6,8 +6,9 @@ define([
     'underscore',
     'openlayers',
     'views/forms/sections/branch-list',
-    'views/map'
-], function ($, Backbone, ko, koMapping, _, ol, BranchList, MapView) {
+    'views/map',
+    'resource-types'
+], function ($, Backbone, ko, koMapping, _, ol, BranchList, MapView, Resources) {
     var wkt = new ol.format.WKT();
     return BranchList.extend({
         initialize: function(options) {
@@ -130,24 +131,24 @@ define([
             BranchList.prototype.initialize.apply(this, arguments);
 
             self.addDefaultNode(self.dataKey, '')
-
             var style = function (feature) {
                 var editing = feature.get('editing');
+                // colour of feature depends on colour assigned to resource type in settings file. If self.addParentGeom, then the colour switches to the colour of the child
+                if (self.addParentGeom) {
+                    var color = Resources[$("#childresourcetypeid").val()].color;
+
+                }else{
+                    var color = Resources[$("#resourcetypeid").val()].color;
+                }
                 return [new ol.style.Style({
-                    fill: new ol.style.Fill({
-                        color: 'rgba(92, 184, 92, 0)'
-                    }),
                     stroke: new ol.style.Stroke({
-                        color: '#b30000',
+                        color: color,
                         width: editing ? 4 : 3
                     }),
                     image: new ol.style.Circle({
                         radius: editing ? 9 : 7,
-                        fill: new ol.style.Fill({
-                            color: 'rgba(92, 184, 92, 0)'
-                        }),
                         stroke: new ol.style.Stroke({
-                            color: '#b30000',
+                            color: color,
                             width: editing ? 4 : 3
                         })
                     })
@@ -221,7 +222,7 @@ define([
             this.on('formloaded', function(){
                 map.map.updateSize()
             });
-
+            
             var draw = null;
 
             self.$el.find(".geometry-btn").click(function (){ 
@@ -375,6 +376,11 @@ define([
               }
             });
             map.map.addInteraction(modify);
+
+            // add overlay of this resource's geometry if desired
+            if (self.addParentGeom) {
+                map.addResourceGeomLayer();
+            }
         },
         getBranchLists: function() {    
             var self = this;
@@ -394,6 +400,7 @@ define([
                 branch.editing(false);
             }
             return branch;
-        },
+        }
+        
     });
 });

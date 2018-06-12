@@ -20,7 +20,8 @@ define(['jquery',
                 var locationBranchList = new LocationBranchList({
                     el: this.$el.find('#heritage-location')[0],
                     data: this.data,
-                    dataKey: 'GEOMETRIC_PLACE_EXPRESSION.SP5'
+                    dataKey: 'GEOMETRIC_PLACE_EXPRESSION.SP5',
+                    addParentGeom: true
                 });
                 this.addBranchList(locationBranchList);
     

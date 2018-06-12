@@ -62,6 +62,7 @@ class Command(BaseCommand):
                                 raise ValueError("The value %s inserted is not a date" % date)
         return date
     
+    '''Validates that the number of semicolon-separated values is consistent across a worksheet and spots empty cells'''
     def validate_rows_and_values(self,workbook):
         sheet_count = len(workbook.worksheets)
         rows_count  = 0
@@ -77,27 +78,31 @@ class Command(BaseCommand):
             else:
                 max_row = sheet.max_row
             rows_count = rows_count + max_row
-            
-            if workbook.sheetnames[sheet_index] != 'NOT':
-                ret = self.validate_value_number(sheet)
-                if ret:
-                    raise ValueError("Error: cells in sheet %s do not contain an equal number of semicolon separated values. Errors are at the following lines: %s" % (workbook.sheetnames[sheet_index], sorted(ret)))
 
+            ret = self.validate_value_number(sheet, workbook.sheetnames[sheet_index])
+            if ret:
+                raise ValueError("Error: cells in sheet %s do not contain an equal number of semicolon separated values or are empty. Errors are at the following lines: %s" % (workbook.sheetnames[sheet_index], sorted(ret)))
         if (rows_count/sheet_count).is_integer() is not True:
             raise ValueError("Error: some sheets in your XLSX file have a different number of rows")
             
-    def validate_value_number(self, sheet):
+    def validate_value_number(self, sheet, sheet_name):
         FaultyRows=[]
+        print sheet_name
         for row_index, row in enumerate(sheet.iter_rows(row_offset = 1)):
             values_no = []
-            for cell in row:
-                if cell.value is not None:
-                    cell_no = 0
-                    value_encoded = (unicode(cell.value)).encode('utf-8') #Values could be in Arabic or containing unicode chars, so it is essential to encode them properly.
-                    cell_no = len(re.sub(ur';\s+', ';', value_encoded).split(';'))
-                    values_no.append(cell_no)
+            if any(cell.value for cell in row):
+                for cell in row:
+                    if cell.value is not None:
+                        if sheet_name !='NOT': #In the NOT tab, cells in a row are not part of the same merge group, so the number of semicolon separated values need not be equal
+                            cell_no = 0
+                            value_encoded = (unicode(cell.value)).encode('utf-8') #Values could be in Arabic or containing unicode chars, so it is essential to encode them properly.
+                            cell_no = len(re.sub(ur';\s+', ';', value_encoded).split(';'))
+                            values_no.append(cell_no)
+                    else:
+                        print row_index
+                        values_no.append(0)
             try: 
-                if values_no.count(values_no[0]) != len(values_no):
+                if values_no.count(values_no[0]) != len(values_no) or 0 in values_no:
                     FaultyRows.append(row_index+2) 
             except:
                 pass

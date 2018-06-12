@@ -99,9 +99,8 @@
                                 <span class="text-muted" style="padding-left:13px;">{% for i in range %}...{% endfor %}</span>
                                 {% endwith %}
                                 <a href="javascript:void(0);" class="arches-CRUD-child" title="{% trans "Expand this entry" %}" data-action="viewddconcept" data-conceptid="{{parent_concept.id}}"> {{parent_concept.label}}</a>
-                               
                             </dd>
-                        {% if forloop.last %}{% with ''|center:forloop.counter as range %}
+                        {% if forloop.last %}<input type ="hidden" id= "parentconceptid" value = {{parent_concept.id}}></input>{% with ''|center:forloop.counter as range %}
                             {% if show_children%}
                                 {% for childmember in concept.subconcepts %}
                                 <dd class="arches-concept-heirarchy">

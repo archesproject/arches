@@ -46,7 +46,7 @@ def RESOURCE_TYPE_CONFIGS():
             'categories': [_('Resource')],
             'has_layer': True,
             'on_map': True,
-            'marker_color': '#a44b0f',
+            'marker_color': '#e53d20',
             'stroke_color': '#d9b562',
             'fill_color': '#eedbad',
             'primary_name_lookup': {
@@ -65,7 +65,7 @@ def RESOURCE_TYPE_CONFIGS():
             'categories': [_('Resource')],
             'has_layer': True,
             'on_map': True,
-            'marker_color': '#FFC53D',
+            'marker_color': '#42b472',
             'stroke_color': '#d9b562',
             'fill_color': '#eedbad',
             'primary_name_lookup': {
@@ -180,7 +180,11 @@ ADD_ACTOR_TO = {
 # Map new actor nodes to the pre-existing nodes to search for edits to the affected resource
 # ( actor node entityid, parent node entityid of actor node, node entityid to check in edit log )
 ACTOR_NODES = [
-    ('FUNCTION_AND_INTERPRETATION_ACTOR.E39', 'FUNCTION_AND_INTERPRETATION.I5', 'FEATURE_EVIDENCE_INTERPRETATION_TYPE.E55')
+    ('DATE_INFERENCE_MAKING_ACTOR_NAME.E41', 'DATE_INFERENCE_MAKING.I5', 'CULTURAL_PERIOD.E55'),
+    ('FEATURE_ASSIGNMENT_INVESTIGATOR_NAME.E41', 'FEATURE_ASSIGNMENT.E13', 'FEATURE_EVIDENCE_TYPE.E55'),
+    ('FUNCTION_INTERPRETATION_INFERENCE_MAKING_ACTOR_NAME.E41', 'FUNCTION_INTERPRETATION_INFERENCE_MAKING.I5', 'FEATURE_EVIDENCE_INTERPRETATION_TYPE.E55'),
+    ('DISTURBANCE_CAUSE_ASSIGNMENT_ASSESSOR_NAME.E41', 'DAMAGE_STATE.E3', 'DISTURBANCE_CAUSE_TYPE.E55'),
+    ('THREAT_INFERENCE_MAKING_ASSESSOR_NAME.E41', 'THREAT_INFERENCE_MAKING.I5', 'THREAT_TYPE.E55'),
 ]
 
 

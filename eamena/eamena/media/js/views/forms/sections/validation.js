@@ -66,17 +66,19 @@ define(['jquery',
             });
             return valid;
         },
-        
+        //this now has the same syntax as validateHasValues.
         nodesHaveValues: function(nodes, node_names) {
-            vals_good = true;
-            _.each(nodes, function(node) {
-                if (node_names.indexOf(node["entitytypeid"]) > -1) {
-                    if (node["value"] === "") {
-                        vals_good = false;
+            var valid = nodes != undefined && nodes.length > 0;
+            _.each(nodes, function (node) {
+                if (canBeEmpty) {
+                    if (node.entityid === '' && node.value === '' && canBeEmpty.indexOf(node.entitytypeid) == -1){
+                        valid = false;
                     }
+                } else if (node.entityid === '' && node.value === '') {
+                        valid = false;
                 }
-            });
-            return vals_good;
+            }, this);
+            return valid;
         }
     });
 });
