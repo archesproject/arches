@@ -26,7 +26,7 @@ define(['jquery', 'backbone', 'arches', 'views/concept-search', 'models/concept'
                     self.modal.on('hidden.bs.modal', function (e) {
                         self.model.save();
                     })
-                    self.modal.modal('hide');
+                    self.modal.modal('hide');    
                 }
             });
         }

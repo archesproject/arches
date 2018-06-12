@@ -71,7 +71,11 @@ def migrate(settings=None):
                             # Create a new subgraph for each of the migration steps, then merge them together at the group root node
                             
                             #get full resource graph for the root entity
-                            group_root_entity = Entity(group_root_entity_model.pk)
+                            try:
+                                group_root_entity = Entity(group_root_entity_model.pk)
+                            except:
+                                print "Faulty group entity's ID %s and entitytype %s" % (group_root_entity_model.pk,group_root_entity_model.entitytypeid)
+                                continue
                             new_group_root_entity = Entity().create_from_mapping(resource_entity_type, mapping_schema[new_group_root_node_id]['steps'], new_group_root_node_id, '')
                             
                             if group_migrations_list[0]['NEWENTITYTYPEID'] != new_group_root_node_id:

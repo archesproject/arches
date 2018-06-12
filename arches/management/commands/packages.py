@@ -50,7 +50,7 @@ class Command(BaseCommand):
     
     option_list = BaseCommand.option_list + (
         make_option('-o', '--operation', action='store', dest='operation', default='setup',
-            type='choice', choices=['setup', 'install', 'setup_db', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resource_graphs','export_resources','create_backlog', 'remove_resources_from_csv', 'legacy_fixer', 'load_relations', 'unload_relations', 'delete_indices', 'extend_ontology', 'migrate_resources', 'insert_actors', 'prune_ontology', 'load_graphs', 'convert_resources', 'validate_values', 'find_unused_entity_types', 'rename_entity_type'],
+            type='choice', choices=['setup', 'install', 'setup_db', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resource_graphs','export_resources','create_backlog', 'remove_resources_from_csv', 'legacy_fixer', 'load_relations', 'unload_relations', 'delete_indices', 'extend_ontology', 'migrate_resources', 'insert_actors', 'prune_ontology', 'load_graphs', 'convert_resources', 'validate_values', 'find_unused_entity_types', 'rename_entity_type', 'insert_actors'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' + 
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' + 
@@ -149,7 +149,8 @@ class Command(BaseCommand):
             self.find_unused_entity_types()
         if options['operation'] == 'rename_entity_type':
             self.rename_entity_type(options['oldtype'],options['newtype'])            
-            
+        if options['operation'] == 'insert_actors':
+            self.insert_actors()            
     def setup(self, package_name):
         """
         Installs Elasticsearch into the package directory and 
@@ -459,3 +460,5 @@ class Command(BaseCommand):
         find_unused_entity_types()
     def rename_entity_type(self, oldtype, newtype):
         migrate_resources.rename_entity_type(oldtype,newtype)
+    def insert_actors(self):
+        migrate_resources.insert_actors()

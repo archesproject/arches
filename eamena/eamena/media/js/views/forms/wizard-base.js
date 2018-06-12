@@ -37,7 +37,7 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
             // parse then restringify JSON data to ensure whitespace is identical
             this._rawdata = ko.toJSON(JSON.parse(this.form.find('#formdata').val()));
             this.data = JSON.parse(this._rawdata);
-
+            
             //Show and hide Upload Wizard.  
             $("#start-workflow").click(function(){ 
                 self.startWorkflow();
@@ -48,7 +48,7 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
                 return false; 
             });
             $("#cancel-workflow").click(function(){ 
-                self.cancleWorkflow();
+                self.cancelWorkflow();
                 return false; 
             });
             this.on('change', function(eventtype, item){
@@ -74,7 +74,7 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
             this.toggleEditor(); 
         },
 
-        cancleWorkflow: function() { 
+        cancelWorkflow: function() { 
             this.toggleEditor(); 
         },
 

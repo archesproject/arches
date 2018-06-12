@@ -5,8 +5,9 @@ define([
     'openlayers',
     'arches',
     'map/base-layers',
+    'resource-types',
     'bootstrap'
-], function($, Backbone, _, ol, arches, baseLayers) {
+], function($, Backbone, _, ol, arches, baseLayers, Resources) {
     return Backbone.View.extend({
         events: {
             'mousemove': 'handleMouseMove',
@@ -152,7 +153,7 @@ define([
             var format = ol.coordinate.createStringXY(4);
             var overFeature = this.map.forEachFeatureAtPixel(pixels, function (feature, layer) {
                 //return the first actual marker, but ignore any other geometries under the cursor (most likely )
-                if(feature.get('arches_marker') || feature.get('arches_cluster')) {
+                if(feature.get('arches_marker') || feature.get('arches_cluster') || feature.get('name')) {
                     return feature;
                 }
             });
@@ -162,8 +163,13 @@ define([
                 this.trigger('mousePositionChanged', format(coords), pixels, overFeature);
                 if ($('#tooltip').length) {
                     $("#tooltip").show();
-                    $("#tooltip").html("<label>" + coords[1].toFixed(4) + "° N</label>&nbsp;<label>" + coords[0].toFixed(4) + " ° E</label>");
-            	    $("#tooltip").css({position:"absolute", left:xpos+15,top:ypos});
+                    var msg_content = "<span style='color:white'>"+coords[1].toFixed(4) + "° N&nbsp;&nbsp;" + coords[0].toFixed(4) + " ° E</span>"
+                    if (overFeature && overFeature.get('name')) {
+                        var color = Resources[$("#resourcetypeid").val()].color;
+                        msg_content += "<br><span style='color:"+color+"'>"+overFeature.get('name')+"</span>"
+                    };
+                    $("#tooltip").html("<label style='text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;'>"+msg_content+"</label>");
+                    $("#tooltip").css({position:"absolute", left:xpos+15,top:ypos});
                 }
             } else {
                 this.trigger('mousePositionChanged', '');
@@ -176,6 +182,44 @@ define([
             if ($('#tooltip').length) {
                  $("#tooltip").hide();
             }
+        },
+        
+        addResourceGeomLayer: function(){
+
+            var geojson = $('#resource_geom').val();
+            if (geojson == 'null') { 
+                return;
+            };
+            var format = new ol.format.GeoJSON;
+            var color = Resources[$("#resourcetypeid").val()].color;
+            var style = function (feature) {
+                return [new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                        color: color,
+                        width: 3
+                    }),
+                    image: new ol.style.Circle({
+                        radius: 7,
+                        stroke: new ol.style.Stroke({
+                            color: color,
+                            width: 3
+                        })
+                    })
+                })];
+            }
+            
+            var source = new ol.source.Vector({
+                features: format.readFeatures(geojson)
+            })
+            
+            var newlayer = new ol.layer.Vector({
+                title: 'Existing Resource Geometries',
+                source: source,
+                style: style
+            })
+            
+            this.map.addLayer(newlayer);
+            this.map.getView().fit(source.getExtent(), ([500,500]));
         }
     });
 });

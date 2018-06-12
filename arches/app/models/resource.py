@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import uuid
+import json
 from datetime import datetime
 from django.conf import settings
 from django.contrib.gis.geos import fromstr
@@ -25,10 +26,12 @@ from django.db.models import Q
 from arches.app.models.entity import Entity
 from arches.app.models.concept import Concept
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.utils.translation import ugettext as _
 from django.forms.models import model_to_dict
 from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.gdal import SpatialReference, CoordTransform
 
 
 class Resource(Entity):
@@ -1021,3 +1024,63 @@ class Resource(Entity):
             'id': None,
             'data': None
         }
+        
+    def get_geom(self,buffer_distance=''):
+        ''' Returns a geojson object representing the resource's geometry,
+        as well as a couple useful properties.
+        
+        Technically, a FeatureCollection is returned. This is in antici-
+        pation of augmenting this method to return, for example, the 
+        geometries of nearby features as well.
+        
+        If the Resource has not yet been saved (has no UUID entityid),
+        or does not have a geometry yet, None is returned.
+        '''
+        
+        if not self.entityid:
+            return None
+        
+        ## use entity id to find this resource in ES
+        se = SearchEngineFactory().create()
+        query = Query(se)
+        bool = Bool()
+        bool.must(Match(field='_all', query=self.entityid))
+        query.add_query(bool)
+        results = query.search(index='resource')
+        hits = results['hits']['hits']
+        
+        if len(hits) == 0:
+            return None
+        
+        geomjson = hits[0]['_source']['geometry']
+        if not geomjson:
+            return None
+            
+        ## taking care of the transformation here is easier/more efficient
+        ## than on the front-end, however, elsewhere in the app transformations
+        ## are handled on the front-end.
+        geosgeom = GEOSGeometry(json.dumps(geomjson),srid=4326)
+        trans = CoordTransform(SpatialReference(4326), SpatialReference(3857))
+        geosgeom.transform(trans)
+        
+        fulljson = {
+            'type':'FeatureCollection',
+            'crs': {
+              'type': 'name',
+              'properties': {
+                'name': 'EPSG:3857'
+              }
+            },
+            'features': [
+                {
+                    'type':'Feature',
+                    'geometry':json.loads(geosgeom.geojson),
+                    'properties': {
+                        'name':self.get_primary_name(),
+                        'resource_type':self.entitytypeid
+                    }
+                }
+            ]
+        }
+
+        return fulljson

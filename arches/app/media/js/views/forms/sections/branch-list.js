@@ -64,7 +64,7 @@ define(['jquery',
         validateBranch: function (data) {
             return true;
         },
-
+       //to be deprecated in favour of nodesHaveValues
         validateHasValues: function(nodes,canBeEmpty){
             var valid = nodes != undefined && nodes.length > 0;
             _.each(nodes, function (node) {

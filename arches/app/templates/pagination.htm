@@ -1,3 +1,4 @@
+{% load i18n %}
 <div class="text-center">
     <ul class="pagination">
         <li><a class="{% if not page_obj.has_previous %}disabled"{% else %}page-button" data-page="{{ page_obj.previous_page_number }}"{% endif %} href="#">«</a></li>
@@ -13,7 +14,11 @@
         {% endif %}
     {% endfor %}
         <li><a class="{% if not page_obj.has_next %}disabled"{% else %}page-button" data-page="{{ page_obj.next_page_number }}"{% endif %} href="#">»</a></li>
+        <li class ="page"><span>{% trans 'Navigate to' %}</span><input id = "navigateto" type ="number" class="go-to" />
+            <input id = "firstpage" type ="hidden" value="1" />
+            <input id = "lastpage" type ="hidden" value="{{ page_obj.paginator.num_pages }}" />
     </ul>
+            <div id="invalidpage" class="alert alert-danger wizard-invalid-alert" role="alert" style="display:none;">{% trans "You must specify a valid page." %}</div>
 </div>  
 <div name="search-result-data" data-results="{{results}}"></div>
 <div class="search-result-all-ids" data-results="{{all_ids}}"></div>

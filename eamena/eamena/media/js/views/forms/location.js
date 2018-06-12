@@ -86,17 +86,6 @@ define([
                 el: this.$el.find('#certainty-of-geometry')[0],
                 data: this.data,
                 dataKey: 'GEOMETRY_EXTENT_CERTAINTY.I6',
-                rules: true,
-                validateBranch: function (nodes) {
-                    return this.validateHasValues(nodes);
-                }
-            }));
-
-            this.addBranchList(new BranchList({
-                el: this.$el.find('#grid_ID-section')[0],
-                data: this.data,
-                dataKey: 'GRID_ID_NEW.E42',
-                rules: true,
                 validateBranch: function (nodes) {
                     return this.validateHasValues(nodes);
                 }
@@ -104,15 +93,28 @@ define([
             
             if (resourcetypeid == 'HERITAGE_FEATURE.E24') {
                 var siteshape_node = 'SITE_OVERALL_SHAPE_TYPE.E55';
+                var grid_node = 'GRID_ID.E42';
             } else { 
                 var siteshape_node = 'SITE_OVERALL_SHAPE_TYPE_NEW.E55';
+                var grid_node = 'GRID_ID_NEW.E42';
             }
+            
+            this.addBranchList(new BranchList({
+                el: this.$el.find('#grid_ID-section')[0],
+                data: this.data,
+                dataKey: grid_node,
+
+                validateBranch: function (nodes) {
+                    return this.validateHasValues(nodes);
+                }
+            }));
+    
             
             this.addBranchList(new BranchList({
                 el: this.$el.find('#siteshape-section')[0],
                 data: this.data,
                 dataKey: siteshape_node,
-                rules: true,
+
                 validateBranch: function (nodes) {
                     return this.validateHasValues(nodes);
                 }
@@ -122,7 +124,7 @@ define([
                 el: this.$el.find('#topography')[0],
                 data: this.data,
                 dataKey: 'TOPOGRAPHY_TYPE.E55',
-                rules: true,
+
                 validateBranch: function (nodes) {
                     return this.validateHasValues(nodes);
                 }
@@ -132,7 +134,7 @@ define([
                 el: this.$el.find('#country')[0],
                 data: this.data,
                 dataKey: 'COUNTRY_TYPE.E55',
-                rules: true,
+
                 validateBranch: function (nodes) {
                     return this.validateHasValues(nodes);
                 }
@@ -142,7 +144,6 @@ define([
                 el: this.$el.find('#administrative-area')[0],
                 data: this.data,
                 dataKey: 'ADMINISTRATIVE_DIVISION.E53',
-                rules: true,
                 validateBranch: function (nodes) {
                     return this.validateHasValues(nodes);
                 }
