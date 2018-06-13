@@ -258,22 +258,10 @@ LOGGING = {
             'filename': os.path.join(ROOT_DIR, 'arches.log'),
             'formatter':'simple'
         },
-        'excel-reader': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BULK_UPLOAD_DIR, 'excel-reader.log'),
-            'mode':'w',
-            'formatter':'standard'
-        },
     },
     'loggers': {
         'arches': {
             'handlers': ['file'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-        'excel-reader': {
-            'handlers': ['excel-reader'],
             'level': 'DEBUG',
             'propagate': True,
         },
