@@ -13,8 +13,6 @@ from arches.management.commands import utils
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.gis.geos import GEOSGeometry
 import json
-import logging
-
 
 class Command(BaseCommand):
     
@@ -36,7 +34,7 @@ class Command(BaseCommand):
         if options['operation'] == 'site_dataset':
             result = self.SiteDataset(options['source'], options['resource_type'], options['dest_dir'],options['append_data'])
         
-        error_path = os.path.join(settings.BULK_UPLOAD_DIR,"errors.json")
+        error_path = os.path.join(settings.BULK_UPLOAD_DIR,"_validation_errors.json")
         with open(error_path,'w') as out:
             json.dump(result,out)
         self.stdout.write(error_path)
@@ -77,6 +75,7 @@ class Command(BaseCommand):
         errors = {
             'different_rows': False
         }
+        errors = []
 
                
                     
@@ -91,11 +90,12 @@ class Command(BaseCommand):
             ret = self.validate_value_number(sheet, workbook.sheetnames[sheet_index])
             if ret:
                 ret = sorted(ret)
-                errors[workbook.sheetnames[sheet_index]] = ','.join(str(e) for e in ret)
+                # errors[workbook.sheetnames[sheet_index]] = ','.join(str(e) for e in ret)
                 # raise ValueError("Error: cells in sheet %s do not contain an equal number of semicolon separated values or are empty. Errors are at the following lines: %s" % (workbook.sheetnames[sheet_index], sorted(ret)))
-
+                errors.append("Error: cells in sheet %s do not contain an equal number of semicolon separated values or are empty. Errors are at the following lines: %s" % (workbook.sheetnames[sheet_index], sorted(ret)))
         if (rows_count/sheet_count).is_integer() is not True:
-            errors['different_rows'] = True
+            # errors['different_rows'] = True
+            errors.append("Error: some sheets in your XLSX file have a different number of rows")
             return errors
             # raise ValueError("Error: some sheets in your XLSX file have a different number of rows")
             
