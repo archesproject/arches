@@ -44,9 +44,11 @@ $( document ).ready(function() {
         done: function (e, data) {
             if (!data.result.filevalid) {
                 // note that invalid file types will not have been uploaded
+                $('#files-msg').css("color","red");
                 $('#files-msg').text("Invalid file format rejected for upload.");
             } else {
                 filepath = data.result.filepath;
+                $('#files-msg').css("color","green");
                 $('#files-msg').text(data.result.filename);
                 $('#resource-type-select').removeAttr('disabled');
                 $('#append-select').removeAttr('disabled');
@@ -55,7 +57,6 @@ $( document ).ready(function() {
         },
         progressall: function (e, data) {
             var progress = parseInt(data.loaded / data.total * 100, 10);
-            console.log(progress);
             $('#progress .progress-bar').css(
                 'width',
                 progress + '%'
@@ -65,8 +66,9 @@ $( document ).ready(function() {
         .parent().addClass($.support.fileInput ? undefined : 'disabled');
         
     $('#validate-button').click( function () {
-        $('#validation-msg').text("Validating...");
-        $('.form-load-mask').show();
+        $('#validation-msg').css("color","orange");
+        $('#validation-msg').text("Validating... this may take a while.");
+        $('#validate-load-mask').show();
         $('.log-line').remove();
         $.ajax({
             beforeSend: function(request) {
@@ -82,12 +84,9 @@ $( document ).ready(function() {
             done: function (result) {
             },
             success: function(result) {
-                $('.form-load-mask').hide();
+                $('#validate-load-mask').hide();
                 var logEl = document.getElementById('upload-log-output');
-                console.log(result);
                 var allPassed = true;
-                
-                
                 var testList = new Array(
                     'validate_headers',
                     'validate_rows_and_values',
@@ -105,16 +104,22 @@ $( document ).ready(function() {
                 });
                 if (allPassed) {
                     $('#load-data-button').removeAttr('disabled');
+                    $('#validation-msg').css("color","green");
                     $('#validation-msg').text("Validation complete. All tests passed.");
+                    $('#import-msg').css("color","green");
+                    $('#import-msg').text("Ready to load.");
                     archesFilepath = result.filepath;
                 } else {
-                    $('#validation-msg').text("Validation complete. Some tests failed.");
+                    $('#validation-msg').css("color","red");
+                    $('#validation-msg').text("Validation complete. Some tests failed. Fix the errors locally and re-upload the file.");
                 }
             }
         });
     });
     $('#load-data-button').click( function () {
-        $('#import-msg').text("Importing data... this may take a few minutes.");
+        $('#import-msg').css("color","orange");
+        $('#import-msg').text("Importing data... this may take a while.");
+        $('#full-load-mask').show();
         $.ajax({
             beforeSend: function(request) {
                 request.setRequestHeader("X-CSRFToken",csrftoken);
@@ -125,17 +130,15 @@ $( document ).ready(function() {
                 'filepath':archesFilepath,
                 'append':$('#append-select').val(),
             },
-            done: function (result) {
-            },
             success: function(result) {
-                
-                console.log(result);
-                
+                if (result.errors) {
+                    console.log("python errors:");
+                    console.log(result.errors);
+                }
+                window.location.href = $("#bulk-url").attr("data-url");
             }
         });
     });
-    
     updateRestype();
-
 });
 

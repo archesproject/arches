@@ -15,24 +15,11 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
-{% extends "base.htm" %}
+{% extends "bulk-upload/bulk-upload.htm" %}
 {% load staticfiles %}
 {% load i18n %}
 
 {% block content %}
-<!--=== App Header ===-->
-<div class="breadcrumbs arches-app-header sticky" id="appheader" style="padding-top: 0px; padding-bottom: 0px;">
-    <div class="container">
-        <div class="row">
-            <div class="col-xs-12">
-                <h1 class="arches-breadcrumb-title">{% trans "Bulk Upload Manager" %}</h1>
-            </div>
-        </div>
-    </div>
-</div>
-<!--=== End App Header ===-->
-
-<!--=== Content Part ===-->
 <link rel="stylesheet" href="{% static 'plugins/jQueryFileUpload/jquery.fileupload-ui.css' %}">
 <div class="block-description arches-secondary-header" style="padding-top:20px;">
     <div class="container content padding-top-0">
@@ -47,7 +34,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <div id="progress" class="progress">
                         <div class="progress-bar progress-bar-success"></div>
                     </div>
-                    <div id="files-msg" class="upload-msg-box">No file yet...</div>
+                    <div id="files-msg" class="upload-msg-box" style="color:red;">No file yet...</div>
                 </div>
                 <div class="bulk-upload-step-box">
                     <h5>2. Choose the Configuration</h5>
@@ -65,18 +52,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="bulk-upload-step-box">
                     <h5>3. Run the Validation</h5>
                     <button id="validate-button" class="bulk-upload-btn" type="button" disabled>Validate File</button>
-                    <div id="validation-msg" class="upload-msg-box">Not ready to validate...</div>
+                    <div id="validation-msg" class="upload-msg-box" style="color:red;">Not ready to validate...</div>
                 </div>
                 <div class="bulk-upload-step-box">
+                    <input type="hidden" id="bulk-url" data-url="{% url 'bulk_upload' %}" />
                     <h5>4. Load Resources into EAMENA</h5>
                     <button id="load-data-button" class="bulk-upload-btn" type="button" disabled>Load Resources</button>
-                    <div id="import-msg" class="upload-msg-box">Not ready to load...</div>
+                    <div id="import-msg" class="upload-msg-box" style="color:red;">Not ready to load...</div>
                 </div>
             </div>
             <div class="col-xs-8">
                 <div id="upload-log-output">
                     <!-- loading mask -->
-                    <div class="form-load-mask" style="position:relative;margin:0px;" hidden>
+                    <div id="validate-load-mask" class="form-load-mask" style="position:relative;margin:0px;" hidden>
                         <i class="fa fa-spinner fa-spin" style="margin-top:200px;"></i>
                     </div>
                     <!-- all of the log lines are inserted here as separate <p> elements -->
