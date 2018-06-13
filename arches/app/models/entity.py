@@ -30,12 +30,14 @@ from django.contrib.gis.geos import GEOSGeometry
 from django.db import connection
 from django.db import transaction
 from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
+from django.core.files import File
 from arches.app.models.concept import Concept
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.core.exceptions import ObjectDoesNotExist
 
 import __builtin__
 import logging
+import urllib
 
 class Entity(object):
     """ 
@@ -241,6 +243,21 @@ class Entity(object):
                     themodelinstance.save()
                     self.value = themodelinstance.geturl()
                     self.label = themodelinstance.getname()
+                else:
+                    try:  # Will download, open and upload file contents. If it's an S3 file, it will create a copy.
+                        result = urllib.urlretrieve(self.value)
+                        f = File(open(result[0], 'rb'))
+                        if "AccessDenied" in f.read():
+                            raise Exception("File %s does not exist" % self.value)
+                        f.seek(0)
+                        themodelinstancefileattr = getattr(themodelinstance, columnname)
+                        themodelinstancefileattr.save(self.label, f)
+                        f.close()
+                        themodelinstance.save()
+                        self.value = themodelinstance.geturl()
+                        self.label = themodelinstance.getname()
+                    except:
+                        pass
 
         for child_entity in self.child_entities:
             child = child_entity._save()
