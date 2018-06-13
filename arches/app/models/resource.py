@@ -196,7 +196,7 @@ class Resource(models.ResourceInstance):
         document['points'] = []
         document['numbers'] = []
         document['date_ranges'] = []
-        document['provisional'] = True if sum([len(t.data) for t in tiles]) == 0 else False
+        document['provisional_resource'] = 'true' if sum([len(t.data) for t in tiles]) == 0 else 'false'
 
         terms = []
 
@@ -213,8 +213,8 @@ class Resource(models.ResourceInstance):
             if tile.provisionaledits is not None:
                 provisionaledits = JSONDeserializer().deserialize(tile.provisionaledits)
                 if len(provisionaledits) > 0:
-                    if document['provisional'] == False:
-                        document['provisional'] = 'partial'
+                    if document['provisional_resource'] == 'false':
+                        document['provisional_resource'] = 'partial'
                     for user, edit in provisionaledits.iteritems():
                         if edit['status'] == 'review':
                             for nodeid, nodevalue in edit['value'].iteritems():
