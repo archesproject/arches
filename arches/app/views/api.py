@@ -28,11 +28,19 @@ class CouchdbProxy(ProxyView):
 class APIBase(View):
     def dispatch(self, request, *args, **kwargs):
         get_params = request.GET.copy()
+        accept = request.META.get('HTTP_ACCEPT')
+        format = request.GET.get('format', None)
+        format_values = {
+            'application/ld+json': 'json-ld',
+            'application/json': 'json',
+            'application/xml': 'xml',
+        }
+        if format is None and accept in format_values:
+            get_params['format'] = format_values[accept]
         for key, value in request.META.iteritems():
             if key.startswith('HTTP_X_ARCHES_'):
                 if key.replace('HTTP_X_ARCHES_','').lower() not in request.GET:
                     get_params[key.replace('HTTP_X_ARCHES_','').lower()] = value
-
         get_params._mutable = False
         request.GET = get_params
         return super(APIBase, self).dispatch(request, *args, **kwargs)
@@ -50,7 +58,7 @@ class Surveys(APIBase):
 class Resources(APIBase):
     # context = [{
     #     "@context": {
-    #         "id": "@id", 
+    #         "id": "@id",
     #         "type": "@type",
     #         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
     #         "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
@@ -79,11 +87,11 @@ class Resources(APIBase):
     @method_decorator(can_read_resource_instance())
     def get(self, request, resourceid=None):
         format = request.GET.get('format', 'json-ld')
-        try:  
+        try:
             indent = int(request.GET.get('indent', None))
         except:
             indent = None
-        
+
         if resourceid:
             try:
                 exporter = ResourceExporter(format=format)
@@ -94,10 +102,10 @@ class Resources(APIBase):
             except:
                 return JSONResponse(status=500)
         else:
-            # 
-            # The following commented code would be what you would use if you wanted to use the rdflib module, 
+            #
+            # The following commented code would be what you would use if you wanted to use the rdflib module,
             # the problem with using this is that items in the "ldp:contains" array don't maintain a consistent order
-            # 
+            #
 
             # archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
             # ldp = Namespace('https://www.w3.org/ns/ldp/')
@@ -105,10 +113,10 @@ class Resources(APIBase):
             # g = Graph()
             # g.bind('archesproject', archesproject, False)
             # g.add((archesproject['resources'], RDF.type, ldp['BasicContainer']))
-            
+
             # base_url = "%s%s" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, reverse('resources',args=['']).lstrip('/'))
             # for resourceid in list(Resource.objects.values_list('pk', flat=True).order_by('pk')[:10]):
-            #     g.add((archesproject['resources'], ldp['contains'], URIRef("%s%s") % (base_url, resourceid) ))   
+            #     g.add((archesproject['resources'], ldp['contains'], URIRef("%s%s") % (base_url, resourceid) ))
 
             # value = g.serialize(format='nt')
             # out = from_rdf(str(value), options={format:'application/nquads'})
@@ -153,6 +161,6 @@ class Resources(APIBase):
             reader = JsonLdReader()
             reader.read_resource(data)
         else:
-            return JSONResponse(status=500)    
-        
+            return JSONResponse(status=500)
+
         return JSONResponse(self.get(request, resourceid))
