@@ -111,6 +111,7 @@
                             {% for type, type_data in resource_types %}
                                 <li><a href="{% url 'resource_manager' type type_data.default_page '' %}"><i class="{{type_data.icon_class}}"></i>{{type_data.name}}</a></li>
                             {% endfor %}
+                            <li><a href="{% url 'bulk_upload' %}"><i class="fa fa-upload"></i><strong>Bulk Upload</strong></a></li>
                         </ul>
                     </li>
                     <!-- End Resource Editor -->
