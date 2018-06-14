@@ -47,3 +47,8 @@ Our general release cycle will typically be a functional release (either major i
 ##### Support for previous releases
 
 Functional releases will be supported until the next functional release. After that users are expected to upgrade to the latest release on [pypi.python.org](https://pypi.python.org/pypi/arches)
+
+
+#### A test for a PR we're gonna throw away
+
+As tempted as I am to cut up here, well, it's best to keep things professional. Alas. Anyway, this PR will be rejected if Legion GIS's fork is broken in the way we think it is. n ts n ts n ts
