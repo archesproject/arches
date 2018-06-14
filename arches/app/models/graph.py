@@ -862,11 +862,11 @@ class Graph(models.GraphModel):
             if not found:
                 raise GraphValidationError(_('Ontology rules don\'t allow this graph to be appended'))
         if self.isresource:
-            if(nodeToAppendTo != self.root):
-                raise GraphValidationError(_('Can\'t append a graph to a resource except at the root'))
-            else:
-                if typeOfGraphToAppend == 'undefined':
-                    raise GraphValidationError(_('Can\'t append an undefined graph to a resource graph'))
+            # if(nodeToAppendTo != self.root):
+            #     raise GraphValidationError(_('Can\'t append a graph to a resource except at the root'))
+            # else:
+            if typeOfGraphToAppend == 'undefined':
+                raise GraphValidationError(_('Can\'t append an undefined graph to a resource graph'))
         else: # self graph is a Graph
             graph_type = self.is_type()
             if graph_type == 'undefined':
@@ -1323,11 +1323,11 @@ class Graph(models.GraphModel):
 
         # validates that a all parent node groups that are not root nodegroup only contain semantic nodes.
 
-        for nodegroup in self.get_nodegroups():
-            if nodegroup.parentnodegroup and nodegroup.parentnodegroup_id != self.root.nodeid:
-                for node_id, node in self.nodes.iteritems():
-                    if str(node.nodegroup_id) == str(nodegroup.parentnodegroup_id) and node.datatype != 'semantic':
-                        raise GraphValidationError(_("A parent node group must only contain semantic nodes."), 1000)
+        # for nodegroup in self.get_nodegroups():
+        #     if nodegroup.parentnodegroup and nodegroup.parentnodegroup_id != self.root.nodeid:
+        #         for node_id, node in self.nodes.iteritems():
+        #             if str(node.nodegroup_id) == str(nodegroup.parentnodegroup_id) and node.datatype != 'semantic':
+        #                 raise GraphValidationError(_("A parent node group must only contain semantic nodes."), 1000)
 
 
         # validate that nodes in a resource graph belong to the ontology assigned to the resource graph
