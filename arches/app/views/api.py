@@ -29,13 +29,13 @@ class APIBase(View):
     def dispatch(self, request, *args, **kwargs):
         get_params = request.GET.copy()
         accept = request.META.get('HTTP_ACCEPT')
-        format = request.GET.get('format', None)
+        format = request.GET.get('format', False)
         format_values = {
             'application/ld+json': 'json-ld',
             'application/json': 'json',
             'application/xml': 'xml',
         }
-        if format is None and accept in format_values:
+        if format and accept in format_values:
             get_params['format'] = format_values[accept]
         for key, value in request.META.iteritems():
             if key.startswith('HTTP_X_ARCHES_'):
