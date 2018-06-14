@@ -209,7 +209,7 @@ def search_results(request):
     dsl.include('displayname')
     dsl.include('displaydescription')
     dsl.include('map_popup')
-    dsl.include('provisional')
+    dsl.include('provisional_resource')
 
     results = dsl.search(index='resource', doc_type=get_doc_type(request))
 
@@ -241,6 +241,7 @@ def search_results(request):
         ret['paginator']['start_index'] = page.start_index()
         ret['paginator']['end_index'] = page.end_index()
         ret['paginator']['pages'] = pages
+        ret['reviewer'] = user_is_reviewer
 
         return JSONResponse(ret)
     else:
@@ -327,11 +328,11 @@ def build_search_results_dsl(request):
         provisional_resource_filter = Bool()
 
         if include_provisional == False:
-            provisional_resource_filter.filter(Terms(field='provisional', terms=['false', 'partial']))
+            provisional_resource_filter.filter(Terms(field='provisional_resource', terms=['false', 'partial']))
             geo_agg_filter.filter(Terms(field='points.provisional', terms=['false']))
 
         elif include_provisional == 'only provisional':
-            provisional_resource_filter.filter(Terms(field='provisional', terms=['true', 'partial']))
+            provisional_resource_filter.filter(Terms(field='provisional_resource', terms=['true', 'partial']))
             geo_agg_filter.filter(Terms(field='points.provisional', terms=['true']))
 
         search_query.must(provisional_resource_filter)

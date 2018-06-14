@@ -336,7 +336,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         return errors
 
     def clean(self, tile, nodeid):
-        if 'features' in tile.data[nodeid]:
+        if tile.data[nodeid] is not None and 'features' in tile.data[nodeid]:
             if len(tile.data[nodeid]['features']) == 0:
                 tile.data[nodeid] = None
 
