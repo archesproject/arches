@@ -133,6 +133,7 @@ define([
          this.geocoderConfigOpen = ko.observable(false);
          this.resourcePropertiesConfigOpen = ko.observable(false);
          this.defaultValueConfigOpen = ko.observable(false);
+         this.clickSourceLayerCache;
 
          if (this.context === 'search-filter') {
              this.query = params.query;
@@ -1441,85 +1442,103 @@ define([
                  return !overlay.invisible();
              }
 
-             var highlightFeature = function(feature, layerIdSuffix, featureType, style) {
-                 var feature;
-                 var featureLayer;
-                 var featureId = feature && feature.properties[featureType] ? feature.properties[featureType] : '';
-                 var layers = _.filter(style.layers, function(layer){return layer.source === feature.layer.source});
-                 var highlightLayers = _.filter(layers, function(layer){return layer.id.endsWith(layerIdSuffix)});
-                 var rootLayers = _.filter(layers, function(layer){return (layer.id.endsWith('click') || layer.id.endsWith('hover')) == false })
-                 _.each(highlightLayers, function(highlightLayer) {
-                     if (highlightLayer) {
-                         var filter = self.map.getFilter(highlightLayer.id);
+             var highlightFeature = function(feature, layerIdSuffix, filterProperty, style) {
+                 var featureId = feature && feature.properties[filterProperty] ? feature.properties[filterProperty] : '';
+                 _.each(style.layers, function(layer) {
+                     if (layer.id.endsWith(layerIdSuffix)) {
+                         var filter = self.map.getFilter(layer.id);
                          if (filter) {
                              _.each(filter, function(query) {
-                                 if (Array.isArray(query) && query[1] === featureType) {
+                                 if (Array.isArray(query) && query[1] === filterProperty) {
                                      query[2] = featureId;
                                  }
                              });
+                             map.setFilter(layer.id, filter);
                          } else {
-                             map.setFilter(highlightLayer.layer.id, ["all", ["==", featureType, featureId]]);
+                             map.setFilter(layer.layer.id, ["all", ["==", filterProperty, featureId]]);
                          }
-                         map.setFilter(highlightLayer.id, filter); //shows the highlight filter
-
-                         // TODO The block below works to hide the hovered featured when features are not overlapping or contiguous. The hovered feature is filtered so that only the 'hover' feature is shown, but when the user mouses over a contiguous feature the hovered filter is not removed by the clearHighlight function.
-                         // if (layerIdSuffix === 'hover') {
-                         //     _.each(rootLayers, function(rootLayer){
-                         //         if (!rootLayer.filter) {
-                         //             console.log('here')
-                         //             rootLayer.filter = ["all", ["!=", featureType, featureId]]
-                         //             map.setFilter(rootLayer.id, rootLayer.filter); //removes the unhighlighted feature
-                         //         } else {
-                         //             console.log('there')
-                         //             resetQuery = _.find(rootLayer.filter, function(query){return Array.isArray(query) && query[1] === featureType})
-                         //             if (!resetQuery) {
-                         //                 rootLayer.filter.push(["!=", featureType, featureId])
-                         //             };
-                         //             map.setFilter(rootLayer.id, null); //resets the root layer filter
-                         //             map.setFilter(rootLayer.id, rootLayer.filter); //removes the unhighlighted feature
-                         //         };
-                         //     })
-                         // }
-
                      }
                  })
+             };
 
-             }
-
-             self.clearHighlight = function(layerIdSuffix) {
+             self.clearHighlight = function(layerIdSuffix, currentFeature) {
                  style = self.getMapStyle();
-                 suffixLayers = _.filter(style.layers, function(layer){return layer.id.endsWith(layerIdSuffix)});
-                 _.each(suffixLayers, function(layer) {
-                     var filter = self.map.getFilter(layer.id);
-                     var filterToUpdate;
-                     var layerIdElements = layer.id.split('-')
-                     var name = layerIdElements.slice(0, layerIdElements.length - 1).join('-')
-                     var rootLayer = _.findWhere(style.layers, {'id': name})
-                     var suffix = layerIdElements.pop()
-                     if (filter) {
-                         _.each(filter, function(item) {
-                             if (Array.isArray(item) && (item[1] === '_featureid' || item[1] === 'resourceinstanceid')) {
-                                 filterToUpdate = item;
-                             }
-                         });
-                         if (filterToUpdate) {
-                             filterToUpdate[2] = '';
-                             map.setFilter(layer.id, filter);
+                 _.each(style.layers, function(layer) {
+                     if (layer.id.endsWith(layerIdSuffix)) {
+                         var filter = self.map.getFilter(layer.id);
+                         var filterToUpdate;
+                         var layerIdElements = layer.id.split('-')
+                         var name = layerIdElements.slice(0, layerIdElements.length - 1).join('-')
+                         var sourceLayerId = layer.id.startsWith('resources-') ? 'resources-fill-' + layer['source-layer'] : layer['source-layer'];
+                         var sourceLayer = _.findWhere(style.layers, {'id': sourceLayerId})
+                         if (filter) {
+                             _.each(filter, function(item) {
+                                 if (Array.isArray(item) && (item[1] === '_featureid' || item[1] === 'resourceinstanceid') && item[2] != currentFeature) {
+                                     filterToUpdate = item;
+                                     item[2] = '';
+                                     map.setFilter(layer.id, filter);
+                                 }
+                             });
                          };
-                     };
-                     if (rootLayer.filter) {
-                         var queryToRemove;
-                         var resetFilter;
-                         _.each(rootLayer.filter, function(query){
-                             if (Array.isArray(query) && (query[1] === '_featureid' || query[1] === 'resourceinstanceid')) {
-                                 queryToRemove = query
+                         if (sourceLayer.filter) {
+                             var clickCacheFeatureId;
+                             var clickCacheFilterProperty;
+                             if (self.clickSourceLayerCache && self.clickData()) {
+                                 clickCacheFeatureId = self.clickSourceLayerCache.featureid;
+                                 clickCacheFilterProperty = self.clickSourceLayerCache.filterProperty;
                              }
-                         });
-                         rootLayer.filter = _.without(rootLayer.filter, queryToRemove);
-                         map.setFilter(rootLayer.id, rootLayer.filter);
-                     }
+                             _.each(sourceLayer.filter, function(query){
+                                 if (Array.isArray(query) && query.length === 3) {
+                                     if ((query[1] === '_featureid' || query[1] === 'resourceinstanceid') && (query[2] != clickCacheFeatureId && query[1] != clickCacheFilterProperty) && query[2] != currentFeature) {
+                                         sourceLayer.filter = self.removeLayerFilterQuery(sourceLayer.filter, query);
+                                     }
+                                 }
+                             });
+                             map.setFilter(sourceLayer.id, sourceLayer.filter);
+                         }
+                 }
                  });
              };
+
+             self.layerFilterHasQuery = function(filter, query) {
+                 var matchingQueries = _.find(filter, function(q) {
+                     return _.difference(q, query).length === 0;
+                 })
+                 if (matchingQueries) {
+                     return true;
+                 } else {
+                     return false;
+                 }
+             };
+
+             self.removeLayerFilterQuery = function(filter, query) {
+                 filter = _.without(filter, query);
+                 return filter;
+             }
+
+             self.filterSourceFeature = function(layer, filterProperty, featureId) {
+                 var sourceFilterCopy = null;
+                 var clickSourceCacheFilterCopy = null;
+                 var hideSourceQuery;
+                 var hideClickCacheQuery;
+                 if (!layer.filter) {
+                     sourceFilterCopy = ["all", ["!=", filterProperty, featureId]]
+                 } else {
+                     sourceFilterCopy = $.extend(true, [], layer.filter);
+                     filtersCurrentFeature = self.layerFilterHasQuery(sourceFilterCopy, ["!=", filterProperty, featureId]);
+                     if (filtersCurrentFeature === false) {
+                         sourceFilterCopy.push(["!=", filterProperty, featureId])
+                     }
+                 };
+                 if (self.clickSourceLayerCache) {
+                     clickSourceCacheFilter = ["!=", self.clickSourceLayerCache.filterproperty, self.clickSourceLayerCache.featureid]
+                     filtersClickedFeature = self.layerFilterHasQuery(sourceFilterCopy, clickSourceCacheFilter);
+                     if (filtersClickedFeature === false) {
+                         sourceFilterCopy.push(clickSourceCacheFilter);
+                     }
+                 }
+                 map.setFilter(layer.id, sourceFilterCopy); //filters the source feature
+             }
 
              self.map.hoverFeatures = [];
              self.map.on('mousemove', function(e) {
@@ -1563,16 +1582,32 @@ define([
 
                          if (self.hoverData() !== hoverData) {
                              self.hoverData(hoverData, hoverFeature);
-                             var hoverResourceId = hoverFeature && hoverFeature.properties.resourceinstanceid ? hoverFeature.properties.resourceinstanceid : '';
-                             var style = self.getMapStyle();
-                             if (hoverFeature && hoverFeature.properties.resourceinstanceid) {
-                                 highlightFeature(hoverFeature, 'hover', 'resourceinstanceid', style);
+                             var filterProperty = ''
+                             var style;
+                             var featureId;
+                             var sourceLayer;
+                             if (hoverFeature && (hoverFeature.layer.id.endsWith('hover') === false) && (hoverFeature.layer.id.endsWith('click') === false)){
+                                 if (hoverFeature && hoverFeature.properties.resourceinstanceid) {
+                                     filterProperty = 'resourceinstanceid';
+                                 } else if (hoverFeature && hoverFeature.properties._featureid) {
+                                     filterProperty = '_featureid';
+                                 }
+                                 featureId = hoverFeature && hoverFeature.properties[filterProperty] ? hoverFeature.properties[filterProperty] : '';
+                                 style = self.getMapStyle();
+
+                                 highlightFeature(hoverFeature, 'hover', filterProperty, style);
+                                 var sourceLayerId = filterProperty === '_featureid' ? hoverFeature.layer['source-layer'] : 'resources-fill-' + hoverFeature.layer['source-layer'];
+                                 sourceLayer = map.getLayer(sourceLayerId);
+                                 if (sourceLayer && sourceLayer.type === 'fill') {
+                                     self.filterSourceFeature(sourceLayer, filterProperty, featureId)
+                                 }
                              }
-                             if (hoverFeature && hoverFeature.properties._featureid) {
-                                 highlightFeature(hoverFeature, 'hover', '_featureid', style);
-                             } if (hoverFeature === null) {
+                             if (hoverFeature === null) {
                                  self.clearHighlight('hover');
+                             } else if (hoverFeature && hoverFeature.id === featureId) {
+                                 self.clearHighlight('hover', featureId)
                              }
+
                          }
 
                          self.map.getCanvas().style.cursor = clickable ? 'pointer' : '';
@@ -1599,7 +1634,6 @@ define([
                      }
                  }) || null;
                  if (clickFeature) {
-
                      if (clickFeature.properties.resourceinstanceid) {
                          clickData = lookupResourceData(clickFeature.properties);
                      } else if (clickFeature.properties.total > 1) {
@@ -1621,16 +1655,32 @@ define([
 
                      var style = self.getMapStyle();
                      self.clearHighlight('click');
+
                      var clickFeatureId = clickFeature.properties && clickFeature.properties.resourceinstanceid ? ko.unwrap(clickFeature.properties.resourceinstanceid) : '';
+                     var filterProperty = null;
+                     self.clickSourceLayerCache = null;
                      if (clickFeatureId) {
-                         highlightFeature(clickFeature, 'click', 'resourceinstanceid', style);
+                         filterProperty = 'resourceinstanceid';
                      } else if (clickFeature.properties && clickFeature.properties._featureid) {
-                         highlightFeature(clickFeature, 'click', '_featureid', style);
+                         filterProperty = '_featureid';
+                         clickFeatureId = clickFeature.properties._featureid
+                     }
+                     if (filterProperty !== null) {
+                         highlightFeature(clickFeature, 'click', filterProperty, style);
+                         var sourceLayer = filterProperty === '_featureid' ? self.map.getLayer(clickFeature.layer['source-layer']) : self.map.getLayer('resources-fill-' + clickFeature.layer['source-layer']);
+                         if (!sourceLayer && (clickFeature.layer.source === 'search-results-points')) {
+
+                         }
+                         if (sourceLayer && clickFeature.layer.type === 'fill') {
+                             self.filterSourceFeature(sourceLayer, filterProperty, clickFeatureId);
+                             self.clickSourceLayerCache = {sourcelayer: sourceLayer, filterproperty: filterProperty, featureid: clickFeatureId};
+                         };
                      }
                  }
 
                  if (self.clickData() !== clickData) {
                      self.clickData(clickData);
+                     self.clearHighlight('hover');
                  }
              });
 
@@ -1681,6 +1731,7 @@ define([
              self.clickData.subscribe(function(val) {
                 if (val === null){
                     self.clearHighlight('click');
+                    self.clickSourceLayerCache = null;
                 };
              });
 
