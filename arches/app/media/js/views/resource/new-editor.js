@@ -285,6 +285,7 @@ define([
         nodeLookup: createLookup(data.nodes, 'nodeid'),
         graphid: data.graphid,
         graphname: data.graphname,
+        reviewer: data.userisreviewer,
         graphiconclass: data.graphiconclass,
         graph: {
             graphid: data.graphid,
