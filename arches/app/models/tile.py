@@ -125,7 +125,7 @@ class Tile(models.TileModel):
                 result = False
         return result
 
-    def apply_provisional_edit(self, user, data, action='create', status='review'):
+    def apply_provisional_edit(self, user, data, action='create', status='review', existing_model=None):
         """
         Creates or updates the json stored in a tile's provisionaledits db_column
 
@@ -141,8 +141,8 @@ class Tile(models.TileModel):
                 "reviewtimestamp": None
             }
 
-            if self.provisionaledits is not None:
-                provisionaledits = JSONDeserializer().deserialize(self.provisionaledits)
+            if existing_model and existing_model.provisionaledits is not None:
+                provisionaledits = JSONDeserializer().deserialize(existing_model.provisionaledits)
                 provisionaledits[str(user.id)] = provisionaledit
             else:
                 provisionaledits = {
@@ -234,7 +234,8 @@ class Tile(models.TileModel):
 
         if user is not None:
             if user_is_reviewer == False and creating_new_tile == False:
-                self.apply_provisional_edit(user, self.data, action='update')
+                self.apply_provisional_edit(user, self.data, action='update', existing_model=existing_model)
+                print self.provisionaledits
                 newprovisionalvalue = self.data
                 oldprovisional = self.get_provisional_edit(existing_model, user)
                 if oldprovisional is not None:
@@ -262,7 +263,6 @@ class Tile(models.TileModel):
 
         for tiles in self.tiles.itervalues():
             for tile in tiles:
-                # print tile.provisionaledits, tile.tileid
                 tile.resourceinstance = self.resourceinstance
                 tile.parenttile = self
                 tile.save(*args, request=request, index=index, **kwargs)
