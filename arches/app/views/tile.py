@@ -98,6 +98,13 @@ class TileData(View):
                         tile.after_update_all()
                         clean_resource_cache(tile)
                         update_system_settings_cache(tile)
+
+                    if tile.provisionaledits is not None:
+                        if str(request.user.id) in tile.provisionaledits:
+                            edit = tile.provisionaledits[str(request.user.id)]
+                            tile.provisionaledits = edit
+                            tile.data = edit['value']
+
                     return JSONResponse(tile)
                 else:
                     return JSONResponse({'status':'false','message': [_('Request Failed'), _('Permission Denied')]}, status=500)

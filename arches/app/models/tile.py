@@ -137,18 +137,18 @@ class Tile(models.TileModel):
                 "status": status,
                 "action": action,
                 "reviewer": None,
-                "timestamp": timezone.now(),
+                "timestamp": unicode(timezone.now()),
                 "reviewtimestamp": None
             }
 
             if existing_model and existing_model.provisionaledits is not None:
-                provisionaledits = JSONDeserializer().deserialize(existing_model.provisionaledits)
+                provisionaledits = existing_model.provisionaledits
                 provisionaledits[str(user.id)] = provisionaledit
             else:
                 provisionaledits = {
                     user.id: provisionaledit
                     }
-            self.provisionaledits = JSONSerializer().serialize(provisionaledits)
+            self.provisionaledits = provisionaledits
 
     def is_provisional(self):
         """
@@ -178,7 +178,7 @@ class Tile(models.TileModel):
     def get_provisional_edit(self, tile, user):
         edit = None
         if tile.provisionaledits is not None:
-            edits = json.loads(tile.provisionaledits)
+            edits = tile.provisionaledits
             if str(user.id) in edits:
                 edit = edits[str(user.id)]
         return edit
