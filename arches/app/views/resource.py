@@ -104,9 +104,12 @@ class NewResourceEditorView(MapBaseManagerView):
             provisionaltiles = []
             for tile in tiles:
                 if tile.provisionaledits is not None:
-                    if str(request.user.id) in tile.provisionaledits:
-                        tile.provisionaledits = tile.provisionaledits[str(request.user.id)]
-                        tile.data = tile.provisionaledits['value']
+                    if user_is_reviewer == False:
+                        if str(request.user.id) in tile.provisionaledits:
+                            tile.provisionaledits = tile.provisionaledits[str(request.user.id)]
+                            tile.data = tile.provisionaledits['value']
+                        else:
+                            tile.provisionaledits = None
                 provisionaltiles.append(tile)
             tiles = provisionaltiles
 

@@ -143,7 +143,7 @@ class Tile(models.TileModel):
 
             if existing_model and existing_model.provisionaledits is not None:
                 provisionaledits = existing_model.provisionaledits
-                provisionaledits[str(user.id)] = provisionaledit
+                provisionaledits[user.id] = provisionaledit
             else:
                 provisionaledits = {
                     user.id: provisionaledit
