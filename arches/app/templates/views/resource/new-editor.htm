@@ -81,7 +81,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.tiles().length > 0 && card.expanded), 'jstree-closed' : (card.tiles().length > 0 && !card.expanded()), 'jstree-leaf': card.tiles().length === 0}">
                     <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
                     <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'jstree-clicked': card.selected, 'child-selected': card.isChildSelected()}">
-                        <i class="fa fa-file-o" role="presentation"></i>
+                        <i class="fa fa-file-o" role="presentation" data-bind="css:{'has-provisional-edits fa-file': card.provisionaleditcount() > 0 }"></i>
                         <span style="padding-right: 5px;" data-bind="text: card.name, css:{'filtered': card.highlight()}"></span>
                         <!-- ko if: card.cardinality === 'n' || card.tiles().length === 0 -->
                         <i class="fa fa-plus-circle add-new-tile" role="presentation" data-bind="click: function () { self.selection(card) }, css:{'jstree-clicked': card.selected}" data-toggle="tooltip" data-original-title="{% trans "Add New" %}"></i>
@@ -96,7 +96,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (cards.length > 0 && expanded), 'jstree-closed' : (cards.length > 0 && !expanded()), 'jstree-leaf': cards.length === 0}">
                                 <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){expanded(!expanded())}"></i>
                                 <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { self.selection($data) }, css:{'jstree-clicked': selected, 'child-selected': isChildSelected()}">
-                                    <i class="fa fa-file" role="presentation"></i>
+                                    <i class="fa fa-file" role="presentation" data-bind="css:{'has-provisional-edits': $data.hasprovisionaledits }"></i>
                                     <strong style="margin-right: 10px;" data-bind="css:{'filtered': card.highlight()}">
                                         <!-- ko if: card.widgets.length > 0 -->
                                         <span data-bind="text: card.widgets[0].label"></span>:

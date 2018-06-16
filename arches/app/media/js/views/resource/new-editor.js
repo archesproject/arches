@@ -117,6 +117,13 @@ define([
                     return setupTile(tile, card);
                 })
             ),
+            provisionaleditcount: ko.computed(function(){
+                return _.filter(tiles, function(tile){
+                    return (
+                        parent ? (tile.parenttile_id === parent.tileid) : true
+                    ) && tile.nodegroup_id === card.nodegroup_id && ko.unwrap(tile.provisionaledits);
+                }).length
+            }),
             selected: ko.pureComputed({
                 read: function () {
                     return selection() === this;
@@ -140,6 +147,7 @@ define([
             koMapping.toJSON(tile.data)
         );
         tile.data = koMapping.fromJS(tile.data);
+        tile.provisionaledits = ko.observable(tile.provisionaledits);
 
         tile = _.extend(tile, {
             parent: parent,
@@ -149,6 +157,9 @@ define([
                 return setupCard(_.clone(card), tile);
             }),
             expanded: ko.observable(true),
+            hasprovisionaledits: ko.computed(function () {
+                return !!tile.provisionaledits();
+            }, this),
             selected: ko.pureComputed({
                 read: function () {
                     return selection() === this;
@@ -221,6 +232,12 @@ define([
                         tile.parent.tiles.unshift(tile);
                         tile.parent.expanded(true);
                         vm.selection(tile);
+                    }
+                    if (data.userisreviewer === false && tile.provisionaledits() === null) {
+                        tile.provisionaledits(tile.data);
+                    };
+                    if (data.userisreviewer === true) {
+                        tile.provisionaledits(null);
                     }
                     if (!resourceId()) {
                         tile.resourceinstance_id = tileData.resourceinstance_id;

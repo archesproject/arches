@@ -33,7 +33,6 @@
     overflow-x: scroll;
 }
 
-
 /*.navbar-top-links:last-child>li {
     border-right: 1px solid rgba(0,0,0,0.07);
 }*/
@@ -5501,6 +5500,10 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     margin-right: 10px;
     background: #F5BB25;
     color: #fff;
+}
+
+.has-provisional-edits {
+    color: #F5BB25;
 }
 
 .provisional-edits-list {
