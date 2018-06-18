@@ -1,6 +1,7 @@
 define([
     'jquery',
     'knockout',
+    'knockout-mapping',
     'underscore',
     'viewmodels/widget',
     'arches',
@@ -23,7 +24,7 @@ define([
     'bindings/chosen',
     'bindings/color-picker',
     'geocoder-templates'
-], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, turf, geohash, koMapping, geojsonExtent, ListView, mapStyles, binFeatureCollection, MapControlsViewModel, XYInputViewModel, mathjs) {
+], function($, ko, koMapping, _, WidgetViewModel, arches, mapboxgl, Draw, turf, geohash, koMapping, geojsonExtent, ListView, mapStyles, binFeatureCollection, MapControlsViewModel, XYInputViewModel, mathjs) {
     /**
      * knockout components namespace used in arches
      * @external "ko.components"
@@ -1904,6 +1905,14 @@ define([
          this.reportURL = arches.urls.resource_report;
 
          this.editURL = arches.urls.resource_editor;
+
+         this.displayValue = ko.computed(function() {
+             var value = koMapping.toJS(this.value);
+             if (!value.features) {
+                 return 0;
+             }
+             return value.features.length;
+         }, this);
     };
     ko.components.register('map-widget', {
         viewModel: viewModel,
