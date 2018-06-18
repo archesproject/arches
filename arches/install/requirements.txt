@@ -16,7 +16,7 @@ django-recaptcha==1.4.0
 python-jose==2.0.2
 edtf==2.7.0
 couchdb==1.2
-django-revproxy==0.9.14
+django-revproxy==0.9.15
 django-cors-headers==2.2.0
 
 # Leave the following line commented so that pip install will ignore this
