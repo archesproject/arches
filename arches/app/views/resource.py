@@ -90,6 +90,7 @@ class NewResourceEditorView(MapBaseManagerView):
         widgets = models.Widget.objects.all()
         card_components = models.CardComponent.objects.all()
         datatypes = models.DDataType.objects.all()
+        user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
 
         if resource_instance is None:
             tiles = []
@@ -99,6 +100,20 @@ class NewResourceEditorView(MapBaseManagerView):
             if displayname == 'undefined':
                 displayname = _('Unnamed Resource')
             tiles = resource_instance.tilemodel_set.order_by('sortorder').filter(nodegroup__in=nodegroups)
+
+            provisionaltiles = []
+            for tile in tiles:
+                if tile.provisionaledits is not None:
+                    edits = json.loads(tile.provisionaledits)
+                    if user_is_reviewer == True:
+                        tile.provisionaledits = edits
+                    else:
+                        if str(request.user.id) in edits:
+                            edit = edits[str(request.user.id)]
+                            tile.provisionaledits = edit
+                            tile.data = edit['value']
+                provisionaltiles.append(tile)
+            tiles = provisionaltiles
 
         map_layers = models.MapLayer.objects.all()
         map_markers = models.MapMarker.objects.all()
@@ -127,6 +142,7 @@ class NewResourceEditorView(MapBaseManagerView):
             map_sources=map_sources,
             geocoding_providers = geocoding_providers,
             active_report_count = models.Report.objects.filter(graph=graph, active=True).count(),
+            user_is_reviewer=json.dumps(user_is_reviewer),
         )
 
         context['nav']['title'] = ''

@@ -23,9 +23,6 @@ If applicable, add screenshots to help explain your problem.
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
-
 **Your Arches Information**
 <!--- Include as many relevant details about the environment you experienced the bug in -->
 *   Version used:
