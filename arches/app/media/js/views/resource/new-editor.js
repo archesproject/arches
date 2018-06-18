@@ -220,7 +220,11 @@ define([
                     contentType: false,
                     data: tile.formData
                 }).done(function(tileData, status, req) {
-                    ko.mapping.fromJS(tileData.data,tile.data);
+                    if (tile.tileid) {
+                        koMapping.fromJS(tileData.data,tile.data);
+                    } else {
+                        tile.data = koMapping.fromJS(tileData.data);
+                    }
                     tile._tileData(koMapping.toJSON(tile.data));
                     if (!tile.tileid) {
                         tile.tileid = tileData.tileid;
