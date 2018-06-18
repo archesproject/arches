@@ -4,7 +4,7 @@ Arches is a web-based, geospatial information system for cultural heritage inven
 
 For general inquiries and to get technical support from the wider Arches community, visit our [Google groups forum](https://groups.google.com/forum/#!forum/archesproject).
 
-For general user installation and app documentation, visit [arches4.readthedocs.io](https://arches4.readthedocs.io/en/stable).
+For general user installation and app documentation, visit [arches.readthedocs.io](https://arches.readthedocs.io/en/4.2.0/).
 
 For developers interested in installing Arches or in more technical, visit [this repo's wiki](https://github.com/archesproject/arches/wiki). You will also find info on how to contribute to the repo.
 
@@ -12,7 +12,7 @@ Issue reports are encouraged! [Please read this article](http://polite.technolog
 *   [Report a Bug](https://github.com/archesproject/arches/issues/new?template=bug.md)
 *   [File a Feature Ticket](https://github.com/archesproject/arches/issues/new?template=feature.md)
 
-[Version 4.1.0 release notes](https://github.com/archesproject/arches/blob/stable/4.1.x/docs/releases/4.1.0.md)
+[Version 4.2.0 release notes](https://github.com/archesproject/arches/blob/4.2.0/releases/4.2.0.md)
 
 #### Quick Install
 
