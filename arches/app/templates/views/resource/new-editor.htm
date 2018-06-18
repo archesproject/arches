@@ -80,11 +80,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <template id="card-tree">
                 <li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.tiles().length > 0 && card.expanded), 'jstree-closed' : (card.tiles().length > 0 && !card.expanded()), 'jstree-leaf': card.tiles().length === 0}">
                     <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
-                    <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'jstree-clicked': card.selected, 'child-selected': card.isChildSelected()}">
+                    <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'jstree-clicked': card.selected, 'child-selected': card.isChildSelected()}, click: function () { card.canAdd() ? self.selection(card) : self.selection(card.tiles()[0]) },">
                         <i class="fa fa-file-o" role="presentation" data-bind="css:{'has-provisional-edits fa-file': card.provisionaleditcount() > 0 }"></i>
                         <span style="padding-right: 5px;" data-bind="text: card.name, css:{'filtered': card.highlight()}"></span>
-                        <!-- ko if: card.cardinality === 'n' || card.tiles().length === 0 -->
-                        <i class="fa fa-plus-circle add-new-tile" role="presentation" data-bind="click: function () { self.selection(card) }, css:{'jstree-clicked': card.selected}" data-toggle="tooltip" data-original-title="{% trans "Add New" %}"></i>
+                        <!-- ko if: card.canAdd() -->
+                        <i class="fa fa-plus-circle add-new-tile" role="presentation" data-bind="css:{'jstree-clicked': card.selected}" data-toggle="tooltip" data-original-title="{% trans "Add New" %}"></i>
                         <!-- /ko -->
                     </a>
                     <ul class="jstree-children" aria-expanded="true">
@@ -199,7 +199,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </a>
                     <ul class="dropdown-menu">
                         <!-- ko foreach: { data: selectedTile().cards, as: 'card' } -->
-                            <!-- ko if: card.cardinality === 'n' || card.tiles().length === 0 -->
+                            <!-- ko if: card.canAdd() -->
                             <li>
                                 <a href="javascript:void(0)" data-bind="text: card.name, click: function () { card.selected(true) }"></a>
                             </li>
