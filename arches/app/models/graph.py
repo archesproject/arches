@@ -649,6 +649,10 @@ class Graph(models.GraphModel):
                     copy_of_self.widgets.pop(widget_id)
                 if widget.card.nodegroup_id not in node_ids:
                     widget.card = root_card
+            for card_id in copy_of_self.cards.keys():
+                card = copy_of_self.cards[card_id]
+                if card.nodegroup_id not in node_ids:
+                    copy_of_self.cards.pop(card_id)
             copy_of_self.root = root_node
             copy_of_self.name = root_node.name
             copy_of_self.isresource = False
