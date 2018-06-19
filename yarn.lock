@@ -1142,9 +1142,9 @@ dom4@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/dom4/-/dom4-2.0.1.tgz#03000cbea1ec33b3dde8cfd7a0cf77587d27e9d5"
 
-dropzone@3.8.4:
-  version "3.8.4"
-  resolved "https://registry.yarnpkg.com/dropzone/-/dropzone-3.8.4.tgz#526470f5cb83d0e653debe610b58e3126f8eb162"
+dropzone@5.4.0:
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/dropzone/-/dropzone-5.4.0.tgz#3290c07f59b189eb5a11e99a58c9b2adae5acfec"
 
 duplexer2@~0.1.4:
   version "0.1.4"
