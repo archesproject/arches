@@ -22,6 +22,7 @@ import urllib, uuid, glob
 from datetime import datetime
 from django.core import management
 from django.core.management.base import BaseCommand, CommandError
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils.module_loading import import_string
 from django.db import transaction, connection
 from django.db.utils import IntegrityError
@@ -1096,11 +1097,18 @@ class Command(BaseCommand):
     
     def delete_mapbox_layer(self, layer_name=False):
         if layer_name != False:
-            with transaction.atomic():
+            try:
                 mapbox_layer = models.MapLayer.objects.get(name=layer_name)
-                for layerdef in mapbox_layer.layerdefinitions:
-                    mapbox_layer_source = models.MapSource.objects.get(name=layerdef['source'])
-                    mapbox_layer_source.delete()
+            except ObjectDoesNotExist:
+                print "error: no mapbox layer named \"{}\"".format(layer_name)
+                return
+            all_sources = [i.get('source') for i in mapbox_layer.layerdefinitions]
+            ## remove duplicates and None
+            sources = set([i for i in all_sources if i])
+            with transaction.atomic():
+                for source in sources:
+                    src = models.MapSource.objects.get(name=source)
+                    src.delete()
                 mapbox_layer.delete()
 
     def create_mapping_file(self, dest_dir=None, graphs=None):
