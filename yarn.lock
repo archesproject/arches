@@ -954,7 +954,11 @@ bootstrap-colorpicker@^2.3.6:
   dependencies:
     jquery ">=1.10"
 
-bootstrap@3.3.2, bootstrap@^3.3:
+bootstrap@4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-4.1.1.tgz#3aec85000fa619085da8d2e4983dfd67cf2114cb"
+
+bootstrap@^3.3:
   version "3.3.2"
   resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-3.3.2.tgz#43b0283dfb2ac83b12cd3dc1f4238f5042ed02cc"
 
