@@ -1011,9 +1011,9 @@ chosen-js@1.8.2:
   version "1.8.2"
   resolved "https://registry.yarnpkg.com/chosen-js/-/chosen-js-1.8.2.tgz#bfd8ed1266ef667fbbc453c7e5b88d4c470e897e"
 
-ckeditor@~4.6.2:
-  version "4.6.2"
-  resolved "https://registry.yarnpkg.com/ckeditor/-/ckeditor-4.6.2.tgz#b1552b7a2f9537e165d7afd2d29d3d4959ff6bad"
+ckeditor@~4.9.2:
+  version "4.9.2"
+  resolved "https://registry.yarnpkg.com/ckeditor/-/ckeditor-4.9.2.tgz#385600cb4028e0055c92720e22435bb97f413cdc"
 
 code-point-at@^1.0.0:
   version "1.1.0"
