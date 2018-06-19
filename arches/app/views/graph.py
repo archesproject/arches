@@ -392,8 +392,11 @@ class GraphDataView(View):
 
                 elif self.action == 'export_branch':
                     clone_data = graph.copy(root=data)
-                    ret = clone_data['copy']
-                    ret.save()
+                    clone_data['copy'].save()
+                    ret = {
+                        'success': True,
+                        'graphid': clone_data['copy'].pk
+                    }
 
                 elif self.action == 'clone_graph':
                     clone_data = graph.copy()
