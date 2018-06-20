@@ -185,12 +185,19 @@ class Concepts(APIBase):
             indent = int(request.GET.get('indent', None))
         except:
             indent = None
+        if conceptid:
+            try:
+                ret = []
+                concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
+                    include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
+                    depth_limit=depth_limit, up_depth_limit=None, lang=lang)
 
-        ret = []
-        concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
-                include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
-                depth_limit=depth_limit, up_depth_limit=None, lang=lang)
-
-        ret.append(concept_graph)
+                ret.append(concept_graph)
+            except models.Concept.DoesNotExist:
+                return JSONResponse(status=404)
+            except:
+                return JSONResponse(status=500)
+        else:
+            return JSONResponse(status=500)
 
         return JSONResponse(ret, indent=indent)
