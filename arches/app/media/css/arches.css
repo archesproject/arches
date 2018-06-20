@@ -5516,6 +5516,28 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     margin-top: 0px;
 }
 
+.new-provisional-edits-list {
+    display: flex;
+    flex-direction: column;
+    margin-top: 0px;
+}
+
+
+.new-provisional-edit-entry {
+    display: flex;
+    flex-direction: row;
+    padding: 3px;
+    margin: 2px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ccc;
+    background-color: #ddd;
+}
+
+.new-provisional-edit-entry .field {
+    padding: 5px
+}
+
 .provisional-edits-list-header {
     display: inline-flex;
     width: 100%;

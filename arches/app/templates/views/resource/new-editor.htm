@@ -220,7 +220,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 }
             }"></div>
             <!-- /ko -->
+            <!--ko if: reviewer -->
+            <div class='new-provisional-edits-list'>
+            <!--ko foreach: { data: provisionalTileViewModel.provisionaledits(), as: 'pe' } -->
+            <div class='new-provisional-edit-entry'>
+            <span class='field' data-bind="text : pe.username"></span>
+            <span class='field' data-bind="text : pe.timestamp"></span>
+            </div>
+            <!-- /ko -->
+            </div>
+            <!--/ko-->
         </div>
+
     </div>
 </div>
 {% endblock main_content %}

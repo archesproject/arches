@@ -100,7 +100,7 @@ class TileData(View):
                         update_system_settings_cache(tile)
 
                     if tile.provisionaledits is not None and request.user.id in tile.provisionaledits:
-                        tile.data = tile.provisionaledits[request.user.id]
+                        tile.data = tile.provisionaledits[request.user.id]['value']
 
                     return JSONResponse(tile)
                 else:

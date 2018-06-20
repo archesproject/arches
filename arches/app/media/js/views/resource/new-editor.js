@@ -3,15 +3,17 @@ define([
     'underscore',
     'knockout',
     'knockout-mapping',
+    'moment',
     'views/base-manager',
     'viewmodels/alert',
+    'viewmodels/new-provisional-tile',
     'arches',
     'resource-editor-data',
     'bindings/resizable-sidepanel',
     'bindings/sortable',
     'widgets',
     'card-components'
-], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, arches, data) {
+], function($, _, ko, koMapping, moment, BaseManagerView, AlertViewModel, ProvisionalTileViewModel, arches, data) {
     var handlers = {
         'after-update': [],
         'tile-reset': []
@@ -152,6 +154,7 @@ define([
         tile._tileData = ko.observable(
             koMapping.toJSON(tile.data)
         );
+
         tile.data = koMapping.fromJS(tile.data);
         tile.provisionaledits = ko.observable(tile.provisionaledits);
 
@@ -243,7 +246,8 @@ define([
                         tile.parent.expanded(true);
                         vm.selection(tile);
                     }
-                    if (data.userisreviewer === false && tile.provisionaledits() === null) {
+                    if (data.userisreviewer === false && !tile.provisionaledits()) {
+                        //If the user is provisional ensure their edits are provisional
                         tile.provisionaledits(tile.data);
                     };
                     if (data.userisreviewer === true) {
@@ -446,6 +450,7 @@ define([
         }
     };
     var topCard = vm.topCards[0];
+    vm.provisionalTileViewModel = new ProvisionalTileViewModel({tile: vm.selectedTile, reviewer: data.user_is_reviewer});
     selection(topCard.tiles().length > 0 ? topCard.tiles()[0] : topCard);
 
     vm.selectionBreadcrumbs = ko.computed(function () {
