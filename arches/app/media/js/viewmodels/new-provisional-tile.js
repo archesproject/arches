@@ -61,6 +61,11 @@ define([
             };
         };
 
+        self.removeSelectedProvisionalEdit = function() {
+            this.provisionaledits.remove(this.selectedProvisionalEdit());
+            this.selectedProvisionalEdit(undefined);
+        };
+
         self.selectProvisionalEdit = function(val){
             self.selectedProvisionalEdit(val);
             koMapping.fromJS(val['value'], self.selectedTile().data);
@@ -71,23 +76,23 @@ define([
         self.selectedTile.subscribe(self.updateProvisionalEdits, this);
 
 
-
-        // self.deleteProvisionalEdit = function(val){
-        //     $.ajax({
-        //         url: arches.urls.delete_provisional_tile,
-        //         context: this,
-        //         method: 'POST',
-        //         dataType: 'json',
-        //         data: koMapping.toJS(val)
-        //     })
-        //     .done(function(data) {
-        //         self.edits.remove(val);
-        //         self.form.loadForm(self.selectedForm());
-        //     })
-        //     .fail(function(data) {
-        //         console.log('Related resource request failed', data)
-        //     });
-        // }
+        self.deleteProvisionalEdit = function(val){
+            console.log('deleting', val)
+            // $.ajax({
+            //     url: arches.urls.delete_provisional_tile,
+            //     context: this,
+            //     method: 'POST',
+            //     dataType: 'json',
+            //     data: koMapping.toJS(val)
+            // })
+            // .done(function(data) {
+            //     self.edits.remove(val);
+            //     self.form.loadForm(self.selectedForm());
+            // })
+            // .fail(function(data) {
+            //     console.log('Related resource request failed', data)
+            // });
+        }
 
         // self.deleteAllProvisionalEdits = function() {
         //     var edits = koMapping.toJSON({'edits':self.edits()})
@@ -107,24 +112,43 @@ define([
         //     });
         // }
 
+
+        self.acceptProvisionalEdit = function(){
+            var provisionaledits = this.selectedTile().provisionaledits();
+            var user = this.selectedProvisionalEdit().user
+            if (provisionaledits) {
+                delete provisionaledits[user]
+                if (_.keys(this.selectedTile().provisionaledits()).length === 0) {
+                    this.selectedTile().provisionaledits(null);
+                }
+                this.provisionaledits.remove(this.selectedProvisionalEdit());
+                this.selectedProvisionalEdit(undefined);
+            }
+        };
+
+        self.acceptEdit = function(val){
+            this.selectProvisionalEdit(val);
+            this.selectedTile().save();
+        };
+
         // self.acceptProvisionalEdit = function(val){
-        //     self.loading(true);
-        //     this.selectedProvisionalEdit().data = val.value
-        //     var tile = this.selectedProvisionalEdit()
-        //     this.form.saveTile(this.parentTile, this.cardinality, this.selectedProvisionalEdit())
-        //     this.form.on('after-update', function(){
-        //         if (this.declineUnacceptedEdits()) {
-        //             this.deleteAllProvisionalEdits();
-        //         } else {
-        //             this.deleteProvisionalEdit(val);
+        //     var provisionaledits = this.selectedTile().provisionaledits();
+        //     if (provisionaledits) {
+        //         delete provisionaledits[val.user]
+        //         if (_.keys(this.selectedTile().provisionaledits()).length === 0) {
+        //             this.selectedTile().provisionaledits(null);
         //         }
-        //         this.loading(false);
-        //     }, this)
+        //         this.selectProvisionalEdit(val);
+        //         this.selectedTile().save();
+        //         this.selectedProvisionalEdit(undefined);
+        //         this.provisionaledits.remove(val);
+        //     }
         // }
         //
-        // self.rejectProvisionalEdit = function(val){
-        //     self.deleteProvisionalEdit(val);
-        // }
+        self.rejectProvisionalEdit = function(val){
+            console.log('rejecting')
+            self.deleteProvisionalEdit(val);
+        }
         //
         // self.findCard = function(cards, nodegroupid){
         //     _.each(cards, function(card) {

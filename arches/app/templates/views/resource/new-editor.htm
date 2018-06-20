@@ -226,6 +226,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class='new-provisional-edit-entry' data-bind="css: {'selected': pe === $parent.provisionalTileViewModel.selectedProvisionalEdit()}, click: function(){$parent.provisionalTileViewModel.selectProvisionalEdit(pe)}">
             <span class='field' data-bind="text : pe.username"></span>
             <span class='field' data-bind="text : pe.timestamp"></span>
+            <a href='' class='field' data-bind="click : function(){$parent.provisionalTileViewModel.acceptEdit(pe)}">Accept</a>
+            <a href='' class='field' data-bind="click : function(){$parent.provisionalTileViewModel.rejectProvisionalEdit(pe)}">Delete</a>
             </div>
             <!-- /ko -->
             </div>

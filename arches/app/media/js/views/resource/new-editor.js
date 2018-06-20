@@ -195,12 +195,14 @@ define([
             },
             getAttributes: function () {
                 var tileData = tile.data ? koMapping.toJS(tile.data) : {};
+                var tileProvisionalEdits = tile.provisionaledits ? koMapping.toJS(tile.provisionaledits) : {};
                 return {
                     "tileid": tile.tileid,
                     "data": tileData,
                     "nodegroup_id": tile.nodegroup_id,
                     "parenttile_id": tile.parenttile_id,
-                    "resourceinstance_id": tile.resourceinstance_id
+                    "resourceinstance_id": tile.resourceinstance_id,
+                    "provisionaledits": tileProvisionalEdits
                 }
             },
             getData: function () {
@@ -220,6 +222,9 @@ define([
             save: function () {
                 loading(true);
                 delete tile.formData.data;
+                if (vm.provisionalTileViewModel.selectedProvisionalEdit()) {
+                    vm.provisionalTileViewModel.acceptProvisionalEdit();
+                };
                 tile.formData.append(
                     'data',
                     JSON.stringify(
@@ -236,6 +241,7 @@ define([
                 }).done(function(tileData, status, req) {
                     if (tile.tileid) {
                         koMapping.fromJS(tileData.data,tile.data);
+                        koMapping.fromJS(tileData.provisionaledits,tile.provisionaledits);
                     } else {
                         tile.data = koMapping.fromJS(tileData.data);
                     }
@@ -250,9 +256,11 @@ define([
                         //If the user is provisional ensure their edits are provisional
                         tile.provisionaledits(tile.data);
                     };
-                    if (data.userisreviewer === true) {
-                        tile.provisionaledits(null);
-                    }
+                    if (data.userisreviewer === true && vm.provisionalTileViewModel.selectedProvisionalEdit()) {
+                        if (JSON.stringify(vm.provisionalTileViewModel.selectedProvisionalEdit().value) === koMapping.toJSON(tile.data)) {
+                            vm.provisionalTileViewModel.removeSelectedProvisionalEdit();
+                        };
+                    };
                     if (!resourceId()) {
                         tile.resourceinstance_id = tileData.resourceinstance_id;
                         resourceId(tile.resourceinstance_id);
