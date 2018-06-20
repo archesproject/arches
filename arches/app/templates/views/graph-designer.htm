@@ -41,12 +41,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <div class="ep-form-toolbar">
 
         <h4 class="ep-form-toolbar-title">
-            <!-- Layer Filter -->
-            <div class="list-filter" data-bind="" style="margin-right: 10px;">
-                <input type="text" class="form-control" style="width: 250px;" placeholder="{% trans 'Find a node, datatype, card...' %}" data-bind="textInput: graphTree.filter">
-
-                <!-- Clear Search -->
-                <span class="clear-node-search" data-bind="visible: graphTree.filter().length > 0, click: function() { graphTree.filter(''); }" style="top: 8px;"><i class="fa fa-times-circle"></i></span>
+            <!-- Menu Item -->
+            <div class="graph-selector" data-bind="" style="margin-right: 10px;">
+                <select data-placeholder="{% trans "Select a graph..." %}" class="design" style="width:100px;" data-bind="value: graphid, options: allGraphs, optionsText: 'name', optionsValue: 'graphid', chosen: {'width': '100%'}"></select>
             </div>
         </h4>
 
