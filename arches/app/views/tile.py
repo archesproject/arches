@@ -93,14 +93,14 @@ class TileData(View):
                                             tile_json['_rev'] = row.doc['_rev']
                                             db.save(tile_json)
 
+                            if tile.provisionaledits is not None and str(request.user.id) in tile.provisionaledits:
+                                tile.data = tile.provisionaledits[str(request.user.id)]['value']
+
                         except ValidationError as e:
                             return JSONResponse({'status':'false','message':e.args}, status=500)
                         tile.after_update_all()
                         clean_resource_cache(tile)
                         update_system_settings_cache(tile)
-
-                    if tile.provisionaledits is not None and request.user.id in tile.provisionaledits:
-                        tile.data = tile.provisionaledits[request.user.id]['value']
 
                     return JSONResponse(tile)
                 else:

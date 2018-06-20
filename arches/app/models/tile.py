@@ -140,13 +140,12 @@ class Tile(models.TileModel):
                 "timestamp": unicode(timezone.now()),
                 "reviewtimestamp": None
             }
-
             if existing_model and existing_model.provisionaledits is not None:
                 provisionaledits = existing_model.provisionaledits
-                provisionaledits[user.id] = provisionaledit
+                provisionaledits[str(user.id)] = provisionaledit
             else:
                 provisionaledits = {
-                    user.id: provisionaledit
+                    str(user.id): provisionaledit
                     }
             self.provisionaledits = provisionaledits
 
