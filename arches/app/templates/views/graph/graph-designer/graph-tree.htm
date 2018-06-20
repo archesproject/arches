@@ -7,11 +7,18 @@
     </div>
     <!-- <div data-bind="sortable: $data"> -->
     <ul class="jstree-container-ul jstree-children" aria-expanded="true">
-        <div class="" data-bind="template: {
-            name: 'graph-tree',
-            foreach: graphTree.graphModel.tree,
-            as: 'node'
-        }"></div>
+        <div data-bind="sortable: {
+                    data: graphTree.graphModel.tree,
+                    as: 'node',
+                    beforeMove: graphTree.beforeMove,
+                    afterMove: graphTree.reorderNodes
+                }">
+            <div class="" data-bind="template: {
+                name: 'graph-tree',
+                foreach: node,
+                as: 'node'
+            }"></div>
+        </div>
     </ul>
     <!-- </div> -->
 </div>
@@ -33,11 +40,18 @@
             <!-- /ko -->
         </a>
         <ul class="jstree-children" aria-expanded="true" data-bind="if: node.children().length > 0">
-            <div data-bind="template: {
-                name: 'graph-tree',
-                foreach: node.children(),
-                as: 'node'
-            }"></div>
+            <div data-bind="sortable: {
+                data: node.children,
+                as: 'node',
+                beforeMove: graphTree.beforeMove,
+                afterMove: graphTree.reorderNodes
+            }">
+                <div data-bind="template: {
+                    name: 'graph-tree',
+                    data: node,
+                    as: 'node'
+                }"></div>
+            </div>
         </ul>
     </li>
 </template>

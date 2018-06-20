@@ -74,6 +74,7 @@ urlpatterns = [
     url(r'^settings/', ResourceEditorView.as_view(), { 'resourceid': settings.RESOURCE_INSTANCE_ID, 'view_template':'views/system-settings.htm', 'main_script':'views/system-settings', 'nav_menu':False}, name='config'),
     url(r'^graph/new$', GraphDataView.as_view(action='new_graph'), name='new_graph'),
     url(r'^graph/import/', GraphDataView.as_view(action='import_graph'), name='import_graph'),
+    url(r'^graph/reorder_nodes$', GraphDataView.as_view(action='reorder_nodes'), name='reorder_nodes'),
     url(r'^graph/permissions$', PermissionDataView.as_view(), name='permission_data'),
     url(r'^graph/(?P<graphid>%s|())$' % uuid_regex, GraphManagerView.as_view(), name='graph'),
     url(r'^graph/(?P<graphid>%s)/settings$' % uuid_regex, GraphSettingsView.as_view(), name='graph_settings'),
