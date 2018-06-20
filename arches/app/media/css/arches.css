@@ -5534,6 +5534,15 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     background-color: #ddd;
 }
 
+.new-provisional-edit-entry:hover {
+    border-color: #111;
+    background-color: #ececec;
+}
+
+.new-provisional-edit-entry.selected {
+    background-color: #ececec;
+}
+
 .new-provisional-edit-entry .field {
     padding: 5px
 }

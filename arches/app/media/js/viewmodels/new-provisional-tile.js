@@ -21,7 +21,7 @@ define([
         self.selectedTile = params.tile;
         self.provisionaledits = ko.observableArray();
         self.declineUnacceptedEdits = ko.observable(true);
-        self.selectedProvisionalTile = ko.observable();
+        self.selectedProvisionalEdit = ko.observable();
 
         self.getUserNames = function(edits, users){
             $.ajax({
@@ -54,14 +54,20 @@ define([
                 this.provisionaledits(_.sortBy(provisionaleditlist, function(pe){return moment(pe.timestamp)}));
                 if (data && _.keys(data).length === 0 && tile.provisionaledits()) {
                     koMapping.fromJS(this.provisionaledits()[0]['value'], tile.data);
+                    this.selectedProvisionalEdit(this.provisionaledits()[0])
                     tile._tileData.valueHasMutated()
                 };
                 this.getUserNames(this.provisionaleditlist, users);
             };
         };
 
-        self.updateProvisionalEdits(self.selectedTile);
+        self.selectProvisionalEdit = function(val){
+            self.selectedProvisionalEdit(val);
+            koMapping.fromJS(val['value'], self.selectedTile().data);
+            self.selectedTile()._tileData.valueHasMutated()
+        };
 
+        self.updateProvisionalEdits(self.selectedTile);
         self.selectedTile.subscribe(self.updateProvisionalEdits, this);
 
 
@@ -103,9 +109,9 @@ define([
 
         // self.acceptProvisionalEdit = function(val){
         //     self.loading(true);
-        //     this.selectedProvisionalTile().data = val.value
-        //     var tile = this.selectedProvisionalTile()
-        //     this.form.saveTile(this.parentTile, this.cardinality, this.selectedProvisionalTile())
+        //     this.selectedProvisionalEdit().data = val.value
+        //     var tile = this.selectedProvisionalEdit()
+        //     this.form.saveTile(this.parentTile, this.cardinality, this.selectedProvisionalEdit())
         //     this.form.on('after-update', function(){
         //         if (this.declineUnacceptedEdits()) {
         //             this.deleteAllProvisionalEdits();
@@ -131,8 +137,8 @@ define([
         //     }, self);
         // }
         //
-        // self.selectedProvisionalTile = params.selectedProvisionalTile
-        // self.selectedProvisionalTile.subscribe(function(val) {
+        // self.selectedProvisionalEdit = params.selectedProvisionalEdit
+        // self.selectedProvisionalEdit.subscribe(function(val) {
         //     if (!self.selectedForm()) {
         //         self.selectedForm(self.form.formid)
         //     };
