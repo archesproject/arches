@@ -635,11 +635,9 @@ class Graph(models.GraphModel):
                 return node_id_list
 
             node_ids = flatten_tree(tree)
-            copy_of_self.edges = {
-                edge_id: edge
+            copy_of_self.edges = {edge_id: edge
                 for edge_id, edge in copy_of_self.edges.iteritems()
-                if edge.domainnode_id in node_ids
-            }
+                if edge.domainnode_id in node_ids}
             copy_of_self.nodes = {
                 node_id: node
                 for node_id, node in copy_of_self.nodes.iteritems()
