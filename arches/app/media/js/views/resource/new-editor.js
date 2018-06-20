@@ -32,31 +32,70 @@ define([
     };
 
     var cards = _.map(data.cards, function(card) {
+        var nodes = _.filter(data.nodes, function (node) {
+            return node.nodegroup_id === card.nodegroup_id;
+        }).map(function (node) {
+            node.configKeys = ko.observableArray(
+                _.map(node.config, function (val, key) {
+                    return key
+                })
+            );
+            node.config = koMapping.fromJS(node.config);
+            return node;
+        });
+        var widgets = _.filter(data.cardwidgets, function (widget) {
+            return widget.card_id === card.cardid;
+        });
+        _.each(nodes, function (node) {
+            var widget = _.find(widgets, function (widget) {
+                return widget.node_id === node.nodeid
+            });
+            if (!widget) {
+                var datatype = _.find(data.datatypes, function (datatype) {
+                    return datatype.datatype === node.datatype;
+                });
+                if (datatype.defaultwidget_id) {
+                    var widgetData = _.find(data.widgets, function (widget) {
+                        return widget.widgetid === datatype.defaultwidget_id;
+                    });
+                    widgets.push({
+                        widget_id: datatype.defaultwidget_id,
+                        config: _.extend({
+                            label: node.name
+                        }, widgetData.defaultconfig),
+                        label: node.name,
+                        node_id: node.nodeid,
+                        card_id: card.cardid,
+                        id: '',
+                        sortorder: ''
+                    });
+                }
+            }
+        });
         return _.extend(
             card,
             _.find(data.nodegroups, function(group) {
                 return group.nodegroupid === card.nodegroup_id;
             }), {
-                widgets: _.filter(data.cardwidgets, function (widget) {
-                    return widget.card_id === card.cardid;
-                }),
-                nodes: _.filter(data.nodes, function (node) {
-                    return node.nodegroup_id === card.nodegroup_id;
-                }).map(function (node) {
-                    node.configKeys = ko.observableArray(
-                        _.map(node.config, function (val, key) {
-                            return key
-                        })
-                    );
-                    node.config = koMapping.fromJS(node.config);
-                    return node;
-                })
+                widgets: widgets,
+                nodes: nodes
             }
         );
     });
 
+    var isChildSelected = function (parent) {
+        var childSelected = false;
+        var childrenKey = parent.tiles ? 'tiles' : 'cards';
+        ko.unwrap(parent[childrenKey]).forEach(function(child) {
+            if (child.selected() || isChildSelected(child)){
+                childSelected = true;
+            }
+        });
+        return childSelected;
+    };
+
     var setupCard = function (card, parent) {
-        return _.extend(card, {
+        card = _.extend(card, {
             parent: parent,
             expanded: ko.observable(true),
             highlight: ko.computed(function() {
@@ -78,10 +117,28 @@ define([
                     return setupTile(tile, card);
                 })
             ),
-            selected: ko.computed(function () {
-                return selection() === card;
-            }, this)
+            selected: ko.pureComputed({
+                read: function () {
+                    return selection() === this;
+                },
+                write: function (value) {
+                    if (value) {
+                        selection(this);
+                    }
+                },
+                owner: card
+            }),
+            canAdd: ko.pureComputed({
+                read: function () {
+                    return this.cardinality === 'n' || this.tiles().length === 0
+                },
+                owner: card
+            })
         });
+        card.isChildSelected = ko.computed(function() {
+            return isChildSelected(card);
+        }, this);
+        return card;
     };
 
     var setupTile = function(tile, parent) {
@@ -90,7 +147,7 @@ define([
         );
         tile.data = koMapping.fromJS(tile.data);
 
-        return _.extend(tile, {
+        tile = _.extend(tile, {
             parent: parent,
             cards: _.filter(cards, function(card) {
                 return card.parentnodegroup_id === tile.nodegroup_id;
@@ -98,9 +155,17 @@ define([
                 return setupCard(_.clone(card), tile);
             }),
             expanded: ko.observable(true),
-            selected: ko.computed(function () {
-                return selection() === tile;
-            }, this),
+            selected: ko.pureComputed({
+                read: function () {
+                    return selection() === this;
+                },
+                write: function (value) {
+                    if (value) {
+                        selection(this);
+                    }
+                },
+                owner: tile
+            }),
             formData: new FormData(),
             dirty: ko.computed(function () {
                 return tile._tileData() !== koMapping.toJSON(tile.data);
@@ -155,11 +220,16 @@ define([
                     contentType: false,
                     data: tile.formData
                 }).done(function(tileData, status, req) {
-                    ko.mapping.fromJS(tileData.data,tile.data);
+                    if (tile.tileid) {
+                        koMapping.fromJS(tileData.data,tile.data);
+                    } else {
+                        tile.data = koMapping.fromJS(tileData.data);
+                    }
                     tile._tileData(koMapping.toJSON(tile.data));
                     if (!tile.tileid) {
                         tile.tileid = tileData.tileid;
                         tile.parent.tiles.unshift(tile);
+                        tile.parent.expanded(true);
                         vm.selection(tile);
                     }
                     if (!resourceId()) {
@@ -192,6 +262,10 @@ define([
                 });
             }
         });
+        tile.isChildSelected = ko.computed(function() {
+            return isChildSelected(tile);
+        }, this);
+        return tile;
     };
 
     var toggleAll = function(state) {
@@ -221,6 +295,7 @@ define([
         nodeLookup: createLookup(data.nodes, 'nodeid'),
         graphid: data.graphid,
         graphname: data.graphname,
+        reviewer: data.userisreviewer,
         graphiconclass: data.graphiconclass,
         graph: {
             graphid: data.graphid,

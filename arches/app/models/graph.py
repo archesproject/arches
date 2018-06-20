@@ -611,7 +611,7 @@ class Graph(models.GraphModel):
                 active=report.active
             ).save()
 
-    def copy(self):
+    def copy(self, root=None):
         """
         returns an unsaved copy of self
 
@@ -620,6 +620,48 @@ class Graph(models.GraphModel):
         nodegroup_map = {}
 
         copy_of_self = deepcopy(self)
+
+        if root is not None:
+            root['nodegroup_id'] = root['nodeid']
+            root['istopnode'] = True
+            updated_values = copy_of_self.update_node(root)
+            root_node = updated_values['node']
+            root_card = updated_values['card']
+            tree = self.get_tree(root_node)
+            def flatten_tree(tree, node_id_list=[]):
+                node_id_list.append(tree['node'].pk)
+                for node in tree['children']:
+                    flatten_tree(node, node_id_list)
+                return node_id_list
+
+            node_ids = flatten_tree(tree)
+            copy_of_self.edges = {
+                edge_id: edge
+                for edge_id, edge in copy_of_self.edges.iteritems()
+                if edge.domainnode_id in node_ids
+            }
+            copy_of_self.nodes = {
+                node_id: node
+                for node_id, node in copy_of_self.nodes.iteritems()
+                if node_id in node_ids
+            }
+            copy_of_self.cards = {
+                card_id: card
+                for card_id, card in copy_of_self.cards.iteritems()
+                if card.nodegroup_id in node_ids
+            }
+            copy_of_self.widgets = {
+                widget_id: widget
+                for widget_id, widget in copy_of_self.widgets.iteritems()
+                if widget.card.nodegroup_id in node_ids
+            }
+            for widget_id, widget in copy_of_self.widgets.iteritems():
+                if widget.card.nodegroup_id not in node_ids:
+                    widget.card = root_card
+            copy_of_self.root = root_node
+            copy_of_self.name = root_node.name
+            copy_of_self.isresource = False
+
         # returns a list of node ids sorted by nodes that are collector nodes first and then others last
         node_ids = sorted(copy_of_self.nodes, key=lambda node_id: copy_of_self.nodes[node_id].is_collector, reverse=True)
 
@@ -731,6 +773,7 @@ class Graph(models.GraphModel):
         node['nodeid'] = uuid.UUID(str(node.get('nodeid')))
         old_node = self.nodes.pop(node['nodeid'])
         new_node = self.add_node(node)
+        new_card = None
 
         for edge_id, edge in self.edges.iteritems():
             if edge.domainnode_id == new_node.nodeid:
@@ -748,7 +791,8 @@ class Graph(models.GraphModel):
         if new_node.nodegroup_id != old_node.nodegroup_id:
             if new_node.is_collector:
                 # add a card
-                self.add_card(models.CardModel(name=new_node.name, nodegroup=new_node.nodegroup))
+                new_card = models.CardModel(name=new_node.name, nodegroup=new_node.nodegroup)
+                self.add_card(new_card)
             else:
                 self._nodegroups_to_delete = [old_node.nodegroup]
                 # remove a card
@@ -757,7 +801,7 @@ class Graph(models.GraphModel):
                         if card.nodegroup_id != old_node.nodegroup_id
                 }
 
-        return self
+        return {'card': new_card, 'node': new_node}
 
     def delete_node(self, node=None):
         """

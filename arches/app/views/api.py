@@ -1,6 +1,8 @@
 import json
 from django.shortcuts import render
 from django.views.generic import View
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from django.db.models import Q
 from django.http.request import QueryDict
 from django.core.urlresolvers import reverse
@@ -14,8 +16,12 @@ from arches.app.models.mobile_survey import MobileSurvey
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.utils.response import JSONResponse
-from arches.app.utils.betterJSONSerializer import JSONSerializer
+from arches.app.utils.decorators import can_read_resource_instance, can_edit_resource_instance
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
+from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
+from arches.app.utils.permission_backend import user_can_read_resources
+from arches.app.utils.permission_backend import user_can_edit_resources
 from arches.app.utils.decorators import group_required
 
 
@@ -27,11 +33,19 @@ class CouchdbProxy(ProxyView):
 class APIBase(View):
     def dispatch(self, request, *args, **kwargs):
         get_params = request.GET.copy()
+        accept = request.META.get('HTTP_ACCEPT')
+        format = request.GET.get('format', False)
+        format_values = {
+            'application/ld+json': 'json-ld',
+            'application/json': 'json',
+            'application/xml': 'xml',
+        }
+        if format and accept in format_values:
+            get_params['format'] = format_values[accept]
         for key, value in request.META.iteritems():
             if key.startswith('HTTP_X_ARCHES_'):
                 if key.replace('HTTP_X_ARCHES_','').lower() not in request.GET:
                     get_params[key.replace('HTTP_X_ARCHES_','').lower()] = value
-
         get_params._mutable = False
         request.GET = get_params
         return super(APIBase, self).dispatch(request, *args, **kwargs)
@@ -45,10 +59,11 @@ class Surveys(APIBase):
         return response
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class Resources(APIBase):
     # context = [{
     #     "@context": {
-    #         "id": "@id", 
+    #         "id": "@id",
     #         "type": "@type",
     #         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
     #         "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
@@ -74,22 +89,28 @@ class Resources(APIBase):
     #     "@context": "https://linked.art/ns/v1/linked-art.json"
     # }]
 
+    @method_decorator(can_read_resource_instance())
     def get(self, request, resourceid=None):
         format = request.GET.get('format', 'json-ld')
-        try:  
+        try:
             indent = int(request.GET.get('indent', None))
         except:
             indent = None
-        
+
         if resourceid:
-            exporter = ResourceExporter(format=format)
-            output = exporter.writer.write_resources(resourceinstanceids=[resourceid], indent=indent, user=request.user)
-            out = output[0]['outputfile'].getvalue()
+            try:
+                exporter = ResourceExporter(format=format)
+                output = exporter.writer.write_resources(resourceinstanceids=[resourceid], indent=indent, user=request.user)
+                out = output[0]['outputfile'].getvalue()
+            except models.ResourceInstance.DoesNotExist:
+                return JSONResponse(status=404)
+            except:
+                return JSONResponse(status=500)
         else:
-            # 
-            # The following commented code would be what you would use if you wanted to use the rdflib module, 
+            #
+            # The following commented code would be what you would use if you wanted to use the rdflib module,
             # the problem with using this is that items in the "ldp:contains" array don't maintain a consistent order
-            # 
+            #
 
             # archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
             # ldp = Namespace('https://www.w3.org/ns/ldp/')
@@ -97,10 +118,10 @@ class Resources(APIBase):
             # g = Graph()
             # g.bind('archesproject', archesproject, False)
             # g.add((archesproject['resources'], RDF.type, ldp['BasicContainer']))
-            
+
             # base_url = "%s%s" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, reverse('resources',args=['']).lstrip('/'))
             # for resourceid in list(Resource.objects.values_list('pk', flat=True).order_by('pk')[:10]):
-            #     g.add((archesproject['resources'], ldp['contains'], URIRef("%s%s") % (base_url, resourceid) ))   
+            #     g.add((archesproject['resources'], ldp['contains'], URIRef("%s%s") % (base_url, resourceid) ))
 
             # value = g.serialize(format='nt')
             # out = from_rdf(str(value), options={format:'application/nquads'})
@@ -137,6 +158,17 @@ class Resources(APIBase):
             }
 
         return JSONResponse(out, indent=indent)
+
+    def put(self, request, resourceid):
+        if user_can_edit_resources(user=request.user):
+            data = JSONDeserializer().deserialize(request.body)
+            #print data
+            reader = JsonLdReader()
+            reader.read_resource(data)
+        else:
+            return JSONResponse(status=500)
+
+        return JSONResponse(self.get(request, resourceid))
 
 @method_decorator(group_required('RDM Administrator'), name='dispatch')
 class Concepts(APIBase):

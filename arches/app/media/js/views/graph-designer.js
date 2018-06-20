@@ -57,6 +57,7 @@ define([
     });
 
     viewModel.graphSettingsViewModel = new GraphSettingsViewModel({
+        designerViewModel: viewModel,
         graph: viewModel.graph,
         graphModel: viewModel.graphModel,
         ontologyClasses: viewModel.ontologyClasses,

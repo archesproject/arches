@@ -647,3 +647,7 @@
     </div>
 </div>
 {% endblock config_form %}
+
+{% block display_value %}
+<span data-bind="text: displayValue()"></span> {% trans "feature(s)" %}
+{% endblock display_value %}

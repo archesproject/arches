@@ -6,7 +6,9 @@ define([
     'views/page-view',
     'view-data',
     'bindings/datatable',
-    'uuid'
+    'uuid',
+    'core-js',
+    'dom-4'
 ], function($, _, ko, Backbone, PageView, data) {
 
     var BaseManager = PageView.extend({

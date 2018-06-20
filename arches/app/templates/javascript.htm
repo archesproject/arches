@@ -6,6 +6,7 @@
     var CKEDITOR_BASEPATH = '{{ STATIC_URL }}packages/ckeditor/';
     require.config({
         baseUrl: '{{ STATIC_URL }}js',
+        urlArgs: '_dc={{ app_settings.VERSION }}',
         paths: {
             'plugins': '{{ STATIC_URL }}plugins',
             'widget-templates': '{% url "widgets" ""%}'.replace(/\/$/, ""),
@@ -60,7 +61,9 @@
             'mathjs': '{{ STATIC_URL }}packages/mathjs/dist/math.min',
             'metismenu': '{{ STATIC_URL }}packages/metismenu/dist/metisMenu.min',
             'knockstrap': '{{ STATIC_URL }}packages/knockstrap/build/knockstrap.min',
-            'jqtree': '{{ STATIC_URL }}packages/jqtree/tree.jquery'
+            'jqtree': '{{ STATIC_URL }}packages/jqtree/tree.jquery',
+            'core-js':'{{ STATIC_URL }}packages/core-js/client/shim.min',
+            'dom-4': '{{ STATIC_URL }}packages/dom4/build/dom4'
         },
         packages: [{
             name: "codemirror",
@@ -209,7 +212,7 @@
                 clone_graph: function(graphid){return "{% url 'clone_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 export_graph: function(graphid){return "{% url 'export_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 export_mapping_file: function(graphid){return "{% url 'export_mapping_file' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
-                add_resource: function(resourceid, graphid){return "{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', resourceid).replace('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', graphid)},
+                add_resource: function(graphid){return "{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 card_manager: function(graphid){return "{% url 'card_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 report_manager: function(graphid){return "{% url 'report_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 function_manager: function(graphid){return "{% url 'function_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},

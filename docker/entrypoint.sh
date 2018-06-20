@@ -144,7 +144,7 @@ wait_for_db() {
 
 db_exists() {
 	echo "Checking if database "${PGDBNAME}" exists..."
-	count=`psql -h ${PGHOST} -p ${PGPORT} -U postgres -Atc "SELECT COUNT(*) FROM pg_catalog.pg_database WHERE datname='${PGDBNAME}'"`
+	count=`psql -h ${PGHOST} -p ${PGPORT} -U ${PGUSERNAME} -Atc "SELECT COUNT(*) FROM pg_catalog.pg_database WHERE datname='${PGDBNAME}'"`
 
 	# Check if returned value is a number and not some error message
 	re='^[0-9]+$'

@@ -112,7 +112,7 @@ define(['jquery',
                 );
                 this.searchBuffer(response.search_buffer);
                 this.selectedResourceId(null);
-
+                this.userIsReviewer = response.reviewer
                 response.results.hits.hits.forEach(function(result){
                     var graphdata = _.find(viewdata.graphs, function(graphdata){
                         return result._source.graph_id === graphdata.graphid;
@@ -138,7 +138,7 @@ define(['jquery',
                         resourceinstanceid: result._source.resourceinstanceid,
                         displaydescription: result._source.displaydescription,
                         map_popup: result._source.map_popup,
-                        provisional: result._source.provisional,
+                        provisional_resource: result._source.provisional_resource,
                         geometries: ko.observableArray(result._source.geometries),
                         iconclass: graphdata ? graphdata.iconclass : '',
                         showrelated: this.showRelatedResources(result._source.resourceinstanceid),

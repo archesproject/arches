@@ -178,16 +178,19 @@ class NewGraphSettingsView(GraphBaseView):
         node.ontologyclass = data.get('ontology_class') if data.get('graph').get('ontology_id') is not None else None
         node.name = graph.name
 
-        with transaction.atomic():
-            graph.save()
-            node.save()
+        try:
+            with transaction.atomic():
+                graph.save()
+                node.save()
 
-        return JSONResponse({
-            'success': True,
-            'graph': graph,
-            'relatable_resource_ids': [res.nodeid for res in node.get_relatable_resources()]
-        })
+            return JSONResponse({
+                'success': True,
+                'graph': graph,
+                'relatable_resource_ids': [res.nodeid for res in node.get_relatable_resources()]
+            })
 
+        except GraphValidationError as e:
+            return JSONResponse({'status':'false','message':e.message, 'title':e.title}, status=500)
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
 class GraphManagerView(GraphBaseView):
@@ -386,6 +389,14 @@ class GraphDataView(View):
                 elif self.action == 'move_node':
                     ret = graph.move_node(data['nodeid'], data['property'], data['newparentnodeid'])
                     graph.save()
+
+                elif self.action == 'export_branch':
+                    clone_data = graph.copy(root=data)
+                    clone_data['copy'].save()
+                    ret = {
+                        'success': True,
+                        'graphid': clone_data['copy'].pk
+                    }
 
                 elif self.action == 'clone_graph':
                     clone_data = graph.copy()

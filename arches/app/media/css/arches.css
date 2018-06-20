@@ -2126,16 +2126,16 @@ ul.nav.nav-tabs.nav-justified {
 }
 
 .graph-settings-switch-label {
-    margin-left: 40px; 
-    margin-top: -20px; 
+    margin-left: 40px;
+    margin-top: -20px;
     margin-bottom: 0px;
 }
 
 .graph-settings-switch-subtitle {
-    margin-left: 40px; 
+    margin-left: 40px;
     margin-top: -5px;
-    display: inline-block; 
-    color: #8ba2b9; 
+    display: inline-block;
+    color: #8ba2b9;
     font-size: 11px;
     position: relative;
     top: -5px;
@@ -6673,14 +6673,14 @@ div.row.widget-wrapper {
 .related-resources-nodes {
     position: absolute;
     width: 275px;
-    top: 0px;
+    top: -50px;
     right: 0px;
     height: 100vh;
     background: #fff;
     z-index: 3;
     opacity: 0.9;
     border-left: 1px solid #ddd;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .relation-properties-buttons {
@@ -8304,7 +8304,7 @@ a.clear-geojson-button:hover {
 }
 
 .option-drag-handle {
-    color: #999; 
+    color: #999;
     cursor: move
 }
 
@@ -9258,7 +9258,7 @@ table.table.dataTable {
 
 .arches-related-resource-panel {
     position: absolute;
-    top: 0;
+    top: 50px;
     right: 0;
     left: 0;
     z-index: 1;
@@ -9266,7 +9266,16 @@ table.table.dataTable {
 
 .related-resources-header {
     position: relative;
-    z-index: 2;
+    top: 0;
+    margin-top: 15px;
+    float: left;
+    height: 35px;
+    width:100%;
+    z-index: 0;
+}
+
+.related-resources-header .btn-group>.btn:hover {
+    z-index: 0;
 }
 
 .related-resources-header.open-graph {
@@ -10884,6 +10893,11 @@ ul.select2-choices:after {
 
 .left-panel {
     width: 270px;
+    overflow-x: auto;
+}
+
+.left-panel-overflow {
+    height: 90%;
     overflow-y: auto;
 }
 
@@ -10909,6 +10923,7 @@ ul.select2-choices:after {
     padding: 10px 20px 10px 20px;
     flex: 1 0 250px;
     width: 250px;
+    overflow-y: auto;
 }
 
 .card-component-panel h4 {
@@ -10923,7 +10938,7 @@ ul.select2-choices:after {
     color: #989898;
 }
 
-.card-breadcrumbs {
+.card-breadcrumbs, .card-breadcrumbs a {
     color: #6494cc;
 }
 
@@ -10935,6 +10950,14 @@ ul.select2-choices:after {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.add-new-tile {
+    display: none;
+}
+
+.jstree-anchor:hover .add-new-tile, .add-new-tile.jstree-clicked {
+    display:inline;
 }
 
 @keyframes loader {
