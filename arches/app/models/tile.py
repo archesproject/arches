@@ -172,7 +172,7 @@ class Tile(models.TileModel):
         if self.provisionaledits is None:
             return False
         else:
-            return str(user.id) in JSONDeserializer().deserialize(self.provisionaledits)
+            return str(user.id) in self.provisionaledits
 
     def get_provisional_edit(self, tile, user):
         edit = None
