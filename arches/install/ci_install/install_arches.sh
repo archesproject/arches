@@ -14,15 +14,15 @@ git clone -b stable/4.2.x https://github.com/archesproject/arches.git /home/ubun
 virtualenv /home/ubuntu/ENV
 source /home/ubuntu/ENV/bin/activate
 
-cd /home/ubuntu/qa
+cd /home/ubuntu/arches
 python setup.py install
 yarn install
-
-python manage.py packages -o setup
 
 cp /home/ubuntu/settings_local.py /home/ubuntu/qa/qa
 
 sudo chown ubuntu:ubuntu /home/ubuntu/qa/qa/arches.log
+
+cd /home/ubuntu/qa
 
 python manage.py migrate
 
