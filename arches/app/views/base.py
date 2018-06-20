@@ -33,7 +33,7 @@ class BaseManagerView(TemplateView):
         context = super(BaseManagerView, self).get_context_data(**kwargs)
         context['system_settings_graphid'] = settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
         context['graph_models'] = []
-        context['graphs'] = '[]'
+        context['graphs'] = []
         context['createable_resources'] = JSONSerializer().serialize(get_createable_resource_types(self.request.user), exclude=['functions', 'ontology', 'subtitle', 'color', 'isactive', 'isresource', 'version', 'deploymentdate', 'deploymentfile', 'author'])
         context['nav'] = {
             'icon':'fa fa-chevron-circle-right',
