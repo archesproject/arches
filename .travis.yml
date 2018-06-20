@@ -99,7 +99,7 @@ deploy:
     deployment_group: arches_qa
     region: us-west-1
     on: *4
-  before_deploy:
+before_deploy:
   - zip codedeploy.zip -r  --exclude=*__pycache__* appspec.yml arches/install/ci_install/*.sh
   - mkdir -p dpl_cd_upload
   - mv codedeploy.zip dpl_cd_upload/arches-stable-4.2.x-$TRAVIS_BUILD_NUMBER-$TRAVIS_COMMIT.zip
