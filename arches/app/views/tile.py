@@ -37,22 +37,18 @@ from django.db import transaction
 class TileData(View):
     action = 'update_tile'
 
-    def delete_provisional_edit(self, data, request):
-        tile = Tile.objects.get(tileid = data['tileid'])
+    def delete_provisional_edit(self, tileid, user):
+        tile = Tile.objects.get(tileid = tileid)
         provisionaledits = None
         if tile.provisionaledits is not None:
-            provisionaledits = jsonparser.loads(tile.provisionaledits)
-            if data['user'] in provisionaledits:
-                provisionaledits.pop(data['user'])
+            provisionaledits = tile.provisionaledits
+            if user in provisionaledits:
+                provisionaledits.pop(user)
                 if len(provisionaledits) == 0:
                     tile.provisionaledits = None
                 else:
-                    tile.provisionaledits = jsonparser.dumps(provisionaledits)
-
-                if len(tile.data) == 0 and tile.provisionaledits == None:
-                    tile.delete(request=request)
-                else:
-                    tile.save(log=False)
+                    tile.provisionaledits = provisionaledits
+                tile.save(log=False)
 
     def post(self, request):
         if self.action == 'update_tile':
@@ -124,9 +120,10 @@ class TileData(View):
                     return JSONResponse(data)
 
         if self.action == 'delete_provisional_tile':
-            data = request.POST
-            if 'tileid' in data:
-                provisionaledits = self.delete_provisional_edit(data, request)
+            user = request.POST.get('user', None)
+            tileid = request.POST.get('tileid', None)
+            if 'tileid' is not None:
+                provisionaledits = self.delete_provisional_edit(tileid, user)
                 return JSONResponse(provisionaledits)
 
             else:

@@ -192,6 +192,7 @@ define([
                 _.each(handlers['tile-reset'], function (handler) {
                     handler(tile);
                 });
+                vm.provisionalTileViewModel.selectedProvisionalEdit(undefined);
             },
             getAttributes: function () {
                 var tileData = tile.data ? koMapping.toJS(tile.data) : {};

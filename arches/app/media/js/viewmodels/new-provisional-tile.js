@@ -75,23 +75,24 @@ define([
         self.updateProvisionalEdits(self.selectedTile);
         self.selectedTile.subscribe(self.updateProvisionalEdits, this);
 
-
         self.deleteProvisionalEdit = function(val){
-            console.log('deleting', val)
-            // $.ajax({
-            //     url: arches.urls.delete_provisional_tile,
-            //     context: this,
-            //     method: 'POST',
-            //     dataType: 'json',
-            //     data: koMapping.toJS(val)
-            // })
-            // .done(function(data) {
-            //     self.edits.remove(val);
-            //     self.form.loadForm(self.selectedForm());
-            // })
-            // .fail(function(data) {
-            //     console.log('Related resource request failed', data)
-            // });
+            $.ajax({
+                url: arches.urls.delete_provisional_tile,
+                context: this,
+                method: 'POST',
+                dataType: 'json',
+                data: {'user': koMapping.toJS(val).user, 'tileid': this.selectedTile().tileid }
+            })
+            .done(function(data) {
+                if (self.selectedProvisionalEdit() === val) {
+                    self.selectedProvisionalEdit(undefined);
+                    self.selectedTile().reset();
+                };
+                self.provisionaledits.remove(val);
+            })
+            .fail(function(data) {
+                console.log('request failed', data)
+            });
         }
 
         // self.deleteAllProvisionalEdits = function() {
@@ -131,49 +132,11 @@ define([
             this.selectedTile().save();
         };
 
-        // self.acceptProvisionalEdit = function(val){
-        //     var provisionaledits = this.selectedTile().provisionaledits();
-        //     if (provisionaledits) {
-        //         delete provisionaledits[val.user]
-        //         if (_.keys(this.selectedTile().provisionaledits()).length === 0) {
-        //             this.selectedTile().provisionaledits(null);
-        //         }
-        //         this.selectProvisionalEdit(val);
-        //         this.selectedTile().save();
-        //         this.selectedProvisionalEdit(undefined);
-        //         this.provisionaledits.remove(val);
-        //     }
-        // }
-        //
         self.rejectProvisionalEdit = function(val){
             console.log('rejecting')
             self.deleteProvisionalEdit(val);
         }
-        //
-        // self.findCard = function(cards, nodegroupid){
-        //     _.each(cards, function(card) {
-        //         if (card.get('nodegroup_id') == nodegroupid) {
-        //             this.card = card
-        //         }
-        //         if (this.card == null) {
-        //             self.findCard(card.get('cards')(), nodegroupid)
-        //         }
-        //     }, self);
-        // }
-        //
-        // self.selectedProvisionalEdit = params.selectedProvisionalEdit
-        // self.selectedProvisionalEdit.subscribe(function(val) {
-        //     if (!self.selectedForm()) {
-        //         self.selectedForm(self.form.formid)
-        //     };
-        //     self.edits.removeAll();
-        //     if (val) {
-        //         self.card = null;
-        //         self.findCard(this.cards(), val.nodegroup_id())
-        //         this.parseProvisionalEdits(val.provisionaledits());
-        //         this.getUserNames(self.edits())
-        //     }
-        // }, self)
+
     };
 
     return ProvisionalTileViewModel;
