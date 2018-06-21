@@ -96,6 +96,17 @@ define([
         return childSelected;
     };
 
+    var doesChildHaveProvisionalEdits = function(parent) {
+        var hasEdits = false;
+        var childrenKey = parent.tiles ? 'tiles' : 'cards';
+        ko.unwrap(parent[childrenKey]).forEach(function(child) {
+            if (child.hasprovisionaledits() || doesChildHaveProvisionalEdits(child)){
+                hasEdits = true;
+            }
+        });
+        return hasEdits;
+    };
+
     var setupCard = function (card, parent) {
         card = _.extend(card, {
             parent: parent,
@@ -119,7 +130,7 @@ define([
                     return setupTile(tile, card);
                 })
             ),
-            provisionaleditcount: ko.computed(function(){
+            hasprovisionaledits: ko.computed(function(){
                 return _.filter(tiles, function(tile){
                     return (
                         parent ? (tile.parenttile_id === parent.tileid) : true
@@ -147,6 +158,9 @@ define([
         card.isChildSelected = ko.computed(function() {
             return isChildSelected(card);
         }, this);
+        card.doesChildHaveProvisionalEdits = ko.computed(function() {
+            return doesChildHaveProvisionalEdits(card);
+        });
         return card;
     };
 
@@ -295,6 +309,9 @@ define([
         tile.isChildSelected = ko.computed(function() {
             return isChildSelected(tile);
         }, this);
+        tile.doesChildHaveProvisionalEdits = ko.computed(function() {
+            return doesChildHaveProvisionalEdits(tile);
+        });
         return tile;
     };
 
