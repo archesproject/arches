@@ -10960,6 +10960,45 @@ ul.select2-choices:after {
     display:inline;
 }
 
+.card-summary-section li {
+    list-style: none;
+}
+
+.card-summary-section .card-summary {
+    padding-bottom:5px;
+}
+
+.card-summary-section.disabled  h4 {
+    color: #7a7a7a;
+}
+
+.card-summary-section.disabled  a {
+    cursor: default;
+}
+
+.card-summary-section .card-summary .card-summary-add {
+    margin-left: 2px;
+}
+
+.card-summary-section .card-summary {
+    margin-bottom:5px;
+}
+
+.card-summary-section .tile-summary {
+    padding: 2px;
+}
+.card-summary-section .tile-summary a {
+    color: #6494cc;
+}
+
+.card-summary-section .tile-summary .tile-summary-label {
+    font-weight: bold;
+}
+
+.card-summary-section {
+    padding-bottom: 10px;
+}
+
 @keyframes loader {
     0% {
         background: #ddd;

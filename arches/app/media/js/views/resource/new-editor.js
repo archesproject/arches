@@ -127,6 +127,12 @@ define([
                     }
                 },
                 owner: card
+            }),
+            canAdd: ko.pureComputed({
+                read: function () {
+                    return this.cardinality === 'n' || this.tiles().length === 0
+                },
+                owner: card
             })
         });
         card.isChildSelected = ko.computed(function() {
@@ -214,7 +220,11 @@ define([
                     contentType: false,
                     data: tile.formData
                 }).done(function(tileData, status, req) {
-                    ko.mapping.fromJS(tileData.data,tile.data);
+                    if (tile.tileid) {
+                        koMapping.fromJS(tileData.data,tile.data);
+                    } else {
+                        tile.data = koMapping.fromJS(tileData.data);
+                    }
                     tile._tileData(koMapping.toJSON(tile.data));
                     if (!tile.tileid) {
                         tile.tileid = tileData.tileid;
@@ -285,6 +295,7 @@ define([
         nodeLookup: createLookup(data.nodes, 'nodeid'),
         graphid: data.graphid,
         graphname: data.graphname,
+        reviewer: data.userisreviewer,
         graphiconclass: data.graphiconclass,
         graph: {
             graphid: data.graphid,

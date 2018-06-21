@@ -635,18 +635,27 @@ class Graph(models.GraphModel):
                 return node_id_list
 
             node_ids = flatten_tree(tree)
-            for edge_id in copy_of_self.edges.keys():
-                edge = copy_of_self.edges[edge_id]
-                if edge.domainnode_id not in node_ids:
-                    copy_of_self.edges.pop(edge_id)
-            for node_id in copy_of_self.nodes.keys():
-                node = copy_of_self.nodes[node_id]
-                if node.pk not in node_ids:
-                    copy_of_self.nodes.pop(node_id)
-            for widget_id in copy_of_self.widgets.keys():
-                widget = copy_of_self.widgets[widget_id]
-                if widget.node_id not in node_ids:
-                    copy_of_self.widgets.pop(widget_id)
+            copy_of_self.edges = {
+                edge_id: edge
+                for edge_id, edge in copy_of_self.edges.iteritems()
+                if edge.domainnode_id in node_ids
+            }
+            copy_of_self.nodes = {
+                node_id: node
+                for node_id, node in copy_of_self.nodes.iteritems()
+                if node_id in node_ids
+            }
+            copy_of_self.cards = {
+                card_id: card
+                for card_id, card in copy_of_self.cards.iteritems()
+                if card.nodegroup_id in node_ids
+            }
+            copy_of_self.widgets = {
+                widget_id: widget
+                for widget_id, widget in copy_of_self.widgets.iteritems()
+                if widget.card.nodegroup_id in node_ids
+            }
+            for widget_id, widget in copy_of_self.widgets.iteritems():
                 if widget.card.nodegroup_id not in node_ids:
                     widget.card = root_card
             copy_of_self.root = root_node

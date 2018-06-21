@@ -282,6 +282,8 @@ class GraphDesignerView(GraphBaseView):
         context['nav']['title'] = self.graph.name
         #context['nav']['menu'] = True
         context['graph'] = JSONSerializer().serialize(self.graph, exclude = ['functions', 'cards', 'deploymentfile', 'deploymentdate', '_nodegroups_to_delete', '_functions'])
+        context['graph_models'] = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+        context['graphs'] = JSONSerializer().serialize(context['graph_models'], exclude = ['functions'])
         return render(request, 'views/graph-designer.htm', context)
 
 
@@ -392,8 +394,11 @@ class GraphDataView(View):
 
                 elif self.action == 'export_branch':
                     clone_data = graph.copy(root=data)
-                    ret = clone_data['copy']
-                    ret.save()
+                    clone_data['copy'].save()
+                    ret = {
+                        'success': True,
+                        'graphid': clone_data['copy'].pk
+                    }
 
                 elif self.action == 'clone_graph':
                     clone_data = graph.copy()

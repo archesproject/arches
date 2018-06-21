@@ -27,6 +27,12 @@ define([
         ontologyClasses: ko.observable(data['ontologyClasses']),
     }
 
+    viewModel.graphid.subscribe(function (graphid) {
+        var re = /\b[a-f\d-]{36}\b/
+        var newPath = window.location.pathname.replace(re, graphid);
+        viewModel.navigate(newPath);
+    });
+
     viewModel.graphModel = new GraphModel({
         data: data.graph,
         datatypes: data.datatypes,
