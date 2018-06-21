@@ -286,7 +286,7 @@ define([
                     parent.tiles.remove(tile);
                     selection(parent);
                 }).fail(function(response) {
-                    console.log('there was an error ', response);
+                    vm.alert(new AlertViewModel('ep-alert-red', response.responseJSON.message[0], response.responseJSON.message[1], null, function(){}));
                 }).always(function(){
                     loading(false);
                 });
