@@ -5531,7 +5531,25 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     border-style: solid;
     border-width: 1px;
     border-color: #ccc;
-    background-color: #ddd;
+    background-color: #fafafa;
+    justify-content: space-between;
+}
+
+.new-provisional-edits-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #2f527a;
+}
+
+.new-delete-provisional-edit {
+    color: red;
+    font-size: 16px;
+}
+
+.new-provisional-edits-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
 .new-provisional-edit-entry:hover {
