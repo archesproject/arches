@@ -12,9 +12,10 @@ define([
     'graph-designer-data',
     'arches',
     'viewmodels/graph-settings',
+    'view-data',
     'bindings/resizable-sidepanel',
     'datatype-config-components'
-], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, GraphModel, GraphTree, NodeFormView, BranchListView, data, arches, GraphSettingsViewModel) {
+], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, GraphModel, GraphTree, NodeFormView, BranchListView, data, arches, GraphSettingsViewModel, viewData) {
     var viewModel = {
         placeholder: ko.observable(''),
         graphid: ko.observable(data.graphid),
@@ -26,11 +27,24 @@ define([
         ontologies: ko.observable(data['ontologies']),
         ontologyClasses: ko.observable(data['ontologyClasses']),
     }
+    var resources = ko.utils.arrayFilter(viewData.graphs, function(graph) {
+            return graph.isresource;
+        });
+    var graphs = ko.utils.arrayFilter(viewData.graphs, function(graph) {
+            return !graph.isresource;
+        });
+
+    viewModel.groupedGraphs = ko.observable({
+        groups: [
+            { name: 'Resource Models', items: resources },
+            { name: 'Branches', items: graphs }
+        ]
+    }),
 
     viewModel.graphid.subscribe(function (graphid) {
-        var re = /\b[a-f\d-]{36}\b/
-        var newPath = window.location.pathname.replace(re, graphid);
-        viewModel.navigate(newPath);
+        if(graphid && graphid !== ""){
+            viewModel.navigate(arches.urls.graph_designer(graphid));
+        }
     });
 
     viewModel.graphModel = new GraphModel({

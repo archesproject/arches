@@ -43,7 +43,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <h4 class="ep-form-toolbar-title">
             <!-- Menu Item -->
             <div class="graph-selector" data-bind="" style="margin-right: 10px;">
-                <select data-placeholder="{% trans "Select a graph..." %}" class="design" style="width:100px;" data-bind="value: graphid, options: allGraphs, optionsText: 'name', optionsValue: 'graphid', chosen: {'width': '100%'}"></select>
+                <!-- ko if: groupedGraphs -->
+                <select data-bind="template: { name: 'selectGraphTemplate', data: groupedGraphs }, chosen: {width: '100%'}, value: graphid"></select>
+                <!-- /ko -->
+                <script type="text/html" id="selectGraphTemplate">
+                    <option disabled selected value>{% trans "Find a Resource Model/Branch..." %}</option>
+                    <!-- ko foreach: groups -->
+                        <optgroup data-bind="attr: { 'label': (name==='Resource Models')?'{% trans "Resource Models" %}':'{% trans "Branches" %}' }, foreach: items">
+                            <option data-bind="value: graphid, text: name"></option>
+                        </optgroup>
+                    <!-- /ko -->
+                </script>
             </div>
         </h4>
 
