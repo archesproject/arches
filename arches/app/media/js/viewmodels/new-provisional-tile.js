@@ -48,6 +48,7 @@ define([
                 var provisionaleditlist = _.map(tile.provisionaledits(), function(edit, key){
                     users.push(key);
                     edit['username'] = ko.observable('');
+                    edit['displaytimestamp'] =  moment(edit.timestamp).format("MMMM Do YYYY, h:mm a");
                     edit['user'] = key;
                     return edit;
                 }, this);
