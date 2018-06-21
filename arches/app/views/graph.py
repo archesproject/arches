@@ -239,6 +239,8 @@ class GraphManagerView(GraphBaseView):
         context['nav']['help'] = (_('Using the Graph Manager'),'help/base-help.htm')
         context['nav']['menu'] = True
         context['help'] = 'graph-designer-help'
+        context['graph_models'] = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+        context['graphs'] = JSONSerializer().serialize(context['graph_models'], exclude = ['functions'])
 
         return render(request, 'views/graph/graph-manager.htm', context)
 
