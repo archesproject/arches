@@ -95,23 +95,24 @@ define([
             });
         }
 
-        // self.deleteAllProvisionalEdits = function() {
-        //     var edits = koMapping.toJSON({'edits':self.edits()})
-        //     $.ajax({
-        //         url: arches.urls.delete_provisional_tile,
-        //         context: this,
-        //         method: 'POST',
-        //         dataType: 'json',
-        //         data: {payload: edits}
-        //     })
-        //     .done(function(data) {
-        //         self.edits.removeAll();
-        //         self.form.loadForm(self.selectedForm());
-        //     })
-        //     .fail(function(data) {
-        //         console.log('Related resource request failed', data)
-        //     });
-        // }
+        self.deleteAllProvisionalEdits = function() {
+            var users = _.map(self.provisionaledits(), function(edit){return edit.user});
+            $.ajax({
+                url: arches.urls.delete_provisional_tile,
+                context: this,
+                method: 'POST',
+                dataType: 'json',
+                data: {'users': JSON.stringify(users), 'tileid': this.selectedTile().tileid }
+            })
+            .done(function(data) {
+                self.selectedTile().reset();
+                self.selectedProvisionalEdit(undefined);
+                self.provisionaledits.removeAll();
+            })
+            .fail(function(data) {
+                console.log('request failed', data)
+            });
+        }
 
 
         self.acceptProvisionalEdit = function(){

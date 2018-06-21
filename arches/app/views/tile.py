@@ -122,16 +122,15 @@ class TileData(View):
         if self.action == 'delete_provisional_tile':
             user = request.POST.get('user', None)
             tileid = request.POST.get('tileid', None)
-            if 'tileid' is not None:
+            users = request.POST.get('users', None)
+            if tileid is not None and user is not None:
                 provisionaledits = self.delete_provisional_edit(tileid, user)
                 return JSONResponse(provisionaledits)
 
-            else:
-                payload = data.get('payload', None)
-                if payload is not None:
-                    edits = jsonparser.loads(payload)
-                    for edit in edits['edits']:
-                        provisionaledits = self.delete_provisional_edit(edit, request)
+            elif tileid is not None and users is not None:
+                users = jsonparser.loads(users)
+                for user in users:
+                    self.delete_provisional_edit(tileid, user)
                 return JSONResponse({'result':'success'})
 
         return HttpResponseNotFound()
