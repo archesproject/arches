@@ -1,7 +1,7 @@
 {% load i18n %}
 <!-- ko foreach: { data: [$data], as: 'graphTree' } -->
 <div class="jstree jstree-default">
-    <div class="header">
+    <div class="header" style="padding-bottom: 55px">
         <!-- Layer Filter -->
         <div class="list-filter" data-bind="" style="margin-right: 10px;">
             <input type="text" class="form-control" style="width: 250px;" placeholder="{% trans 'Find a node, datatype, card...' %}" data-bind="textInput: graphTree.filter">
@@ -9,19 +9,22 @@
             <!-- Clear Search -->
             <span class="clear-node-search" data-bind="visible: graphTree.filter().length > 0, click: function() { graphTree.filter(''); }" style="top: 8px;"><i class="fa fa-times-circle"></i></span>
         </div>
-
-        <a data-bind="click: expandAll">Expand all</a>
-        <a data-bind="click: collapseAll" style="padding-left:5px;">Collapse all</a>
+        <div style="text-align: center;">
+            <a data-bind="click: expandAll" style="cursor:pointer;">Expand all</a>
+            <a data-bind="click: collapseAll" style="padding-left:30px; cursor:pointer;">Collapse all</a>
+        </div>
     </div>
-    <!-- <div data-bind="sortable: $data"> -->
-    <ul class="jstree-container-ul jstree-children" aria-expanded="true">
-        <div class="" data-bind="template: {
-            name: 'graph-tree',
-            foreach: graphTree.graphModel.tree,
-            as: 'node'
-        }"></div>
-    </ul>
-    <!-- </div> -->
+    <div class="left-panel-overflow">
+        <!-- <div data-bind="sortable: $data"> -->
+        <ul class="jstree-container-ul jstree-children" aria-expanded="true">
+            <div class="" data-bind="template: {
+                name: 'graph-tree',
+                foreach: graphTree.graphModel.tree,
+                as: 'node'
+            }"></div>
+        </ul>
+        <!-- </div> -->
+    </div>
 </div>
 <!-- /ko -->
 
