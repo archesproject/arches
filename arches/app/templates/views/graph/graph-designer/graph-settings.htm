@@ -3,7 +3,7 @@
 <div style="overflow-y: auto">
     <div id="external-page-content">
         <div class="settings-panel">
-            
+
             <div class="settings-panel-heading">
                 <div class="graph-designer-title">
                     <i data-bind='css: graph.iconclass'></i><div class="name" data-bind='text: graph.name'></div>
@@ -68,7 +68,7 @@
 
                     </form>
                 </div>
-                
+
                 <div class="graph-designer-header">{% trans 'Configuration' %}</div>
                 <div id="meta-card" class="graph-settings-panel-body fade in">
 
@@ -109,17 +109,58 @@
                                     </div>
                                 </div>
                             </div>
-                        </div> 
+                        </div>
+                    </form>
+                </div>
+
+                <div class="graph-designer-header">{% trans 'Description' %}</div>
+                <div id="desc-card" class="graph-settings-panel-body fade in">
+
+                    <form class="widgets" style="margin-bottom: 20px;">
+                        <div class="row widget-container">
+                            <div class="form-group">
+                                <div class="relative">
+                                    <label class="col-xs-12 control-label widget-input-label"> {% trans "Author" %}</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <input placeholder="{% trans "Author name" %}" class="form-control input-lg widget-input" data-bind="value:graph.author, valueUpdate: 'keyup'">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row widget-container">
+                            <div class="form-group">
+                                <div class="relative">
+                                    <label class="col-xs-12 control-label widget-input-label"> {% trans "Abstract" %}</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <textarea placeholder="{% trans "Abstract/description" %}" rows="6" class="form-control" data-bind="value:graph.description, valueUpdate: 'keyup'"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row widget-container">
+                            <div class="form-group">
+                                <div class="relative">
+                                    <label class="col-xs-12 control-label widget-input-label"> {% trans "JSON-LD Context" %}</label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <textarea placeholder="{% trans "URI to a JSON-LD Context Object or a Raw Context Object or Array of Context Objects" %}" class="form-control input-lg widget-input" data-bind="textInput:graph.jsonldcontext"></textarea>
+                                </div>
+                            </div>
+                        </div>
                     </form>
                 </div>
 
                 <div class="graph-designer-header">{% trans 'Appearance' %}</div>
                 <div class="graph-settings-panel-body fade in">
-                    
+
                     <form class="widgets">
                         <div class=" row widget-container">
                             <div class="form-group">
-                                
+
                                 <!-- Icon search -->
                                 <div style="padding-left: 10px;">
                                     <div class="relative" style="padding: 10px 0px;">
@@ -161,53 +202,10 @@
                                 <div class="relative">
                                     <label class="col-xs-12 control-label widget-input-label"> {% trans "Color" %} </label>
                                 </div>
-                                
+
                                 <div class="colorpicker-component input-group">
                                     <input placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: graph.color, format:'rgba'}">
                                     <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: graph.color}"></i></span>
-                                </div>
-                            </div>
-                        </div>
-                    </form> 
-                </div>
-
-
-                <!-- Card -->
-                <div class="graph-designer-header">{% trans 'Description' %}</div>
-                <div id="desc-card" class="graph-settings-panel-body fade in">
-
-                    <form class="widgets" style="margin-bottom: 20px;">
-                        <div class="row widget-container">
-                            <div class="form-group">
-                                <div class="relative">
-                                    <label class="col-xs-12 control-label widget-input-label"> {% trans "Author" %}</label>
-                                </div>
-
-                                <div class="col-xs-12">
-                                    <input placeholder="{% trans "Author name" %}" class="form-control input-lg widget-input" data-bind="value:graph.author, valueUpdate: 'keyup'">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row widget-container">
-                            <div class="form-group">
-                                <div class="relative">
-                                    <label class="col-xs-12 control-label widget-input-label"> {% trans "Abstract" %}</label>
-                                </div>
-
-                                <div class="col-xs-12">
-                                    <textarea placeholder="{% trans "Abstract/description" %}" rows="6" class="form-control" data-bind="value:graph.description, valueUpdate: 'keyup'"></textarea>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row widget-container">
-                            <div class="form-group">
-                                <div class="relative">
-                                    <label class="col-xs-12 control-label widget-input-label"> {% trans "JSON-LD Context" %}</label>
-                                </div>
-
-                                <div class="col-xs-12">
-                                    <textarea placeholder="{% trans "URI to a JSON-LD Context Object or a Raw Context Object or Array of Context Objects" %}" class="form-control input-lg widget-input" data-bind="textInput:graph.jsonldcontext"></textarea>
                                 </div>
                             </div>
                         </div>
