@@ -126,7 +126,8 @@ def prepare_search_index(resource_model_id, create=False):
                             'tileid' : {'type': 'keyword'},
                             'nodegroup_id' : {'type': 'keyword'},
                             'parenttile_id' : {'type': 'keyword'},
-                            'resourceinstanceid_id' : {'type': 'keyword'}
+                            'resourceinstanceid_id' : {'type': 'keyword'},
+                            'provisionaledits': {'enabled': False}
                         }
                     },
                     'strings' : {

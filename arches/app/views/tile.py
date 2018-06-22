@@ -37,22 +37,18 @@ from django.db import transaction
 class TileData(View):
     action = 'update_tile'
 
-    def delete_provisional_edit(self, data, request):
-        tile = Tile.objects.get(tileid = data['tileid'])
+    def delete_provisional_edit(self, tileid, user):
+        tile = Tile.objects.get(tileid = tileid)
         provisionaledits = None
         if tile.provisionaledits is not None:
-            provisionaledits = jsonparser.loads(tile.provisionaledits)
-            if data['user'] in provisionaledits:
-                provisionaledits.pop(data['user'])
+            provisionaledits = tile.provisionaledits
+            if user in provisionaledits:
+                provisionaledits.pop(user)
                 if len(provisionaledits) == 0:
                     tile.provisionaledits = None
                 else:
-                    tile.provisionaledits = jsonparser.dumps(provisionaledits)
-
-                if len(tile.data) == 0 and tile.provisionaledits == None:
-                    tile.delete(request=request)
-                else:
-                    tile.save(log=False)
+                    tile.provisionaledits = provisionaledits
+                tile.save(log=False)
 
     def post(self, request):
         if self.action == 'update_tile':
@@ -93,11 +89,15 @@ class TileData(View):
                                             tile_json['_rev'] = row.doc['_rev']
                                             db.save(tile_json)
 
+                            if tile.provisionaledits is not None and str(request.user.id) in tile.provisionaledits:
+                                tile.data = tile.provisionaledits[str(request.user.id)]['value']
+
                         except ValidationError as e:
                             return JSONResponse({'status':'false','message':e.args}, status=500)
                         tile.after_update_all()
                         clean_resource_cache(tile)
                         update_system_settings_cache(tile)
+
                     return JSONResponse(tile)
                 else:
                     return JSONResponse({'status':'false','message': [_('Request Failed'), _('Permission Denied')]}, status=500)
@@ -120,17 +120,17 @@ class TileData(View):
                     return JSONResponse(data)
 
         if self.action == 'delete_provisional_tile':
-            data = request.POST
-            if 'tileid' in data:
-                provisionaledits = self.delete_provisional_edit(data, request)
+            user = request.POST.get('user', None)
+            tileid = request.POST.get('tileid', None)
+            users = request.POST.get('users', None)
+            if tileid is not None and user is not None:
+                provisionaledits = self.delete_provisional_edit(tileid, user)
                 return JSONResponse(provisionaledits)
 
-            else:
-                payload = data.get('payload', None)
-                if payload is not None:
-                    edits = jsonparser.loads(payload)
-                    for edit in edits['edits']:
-                        provisionaledits = self.delete_provisional_edit(edit, request)
+            elif tileid is not None and users is not None:
+                users = jsonparser.loads(users)
+                for user in users:
+                    self.delete_provisional_edit(tileid, user)
                 return JSONResponse({'result':'success'})
 
         return HttpResponseNotFound()
