@@ -282,6 +282,8 @@ class GraphDesignerView(GraphBaseView):
         context['nav']['title'] = self.graph.name
         #context['nav']['menu'] = True
         context['graph'] = JSONSerializer().serialize(self.graph, exclude = ['functions', 'cards', 'deploymentfile', 'deploymentdate', '_nodegroups_to_delete', '_functions'])
+        context['graph_models'] = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+        context['graphs'] = JSONSerializer().serialize(context['graph_models'], exclude = ['functions'])
         return render(request, 'views/graph-designer.htm', context)
 
 

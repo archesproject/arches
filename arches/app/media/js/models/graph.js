@@ -423,13 +423,13 @@ define(['arches',
             }
 
             if(this.get('isresource')){
-                if(nodeToAppendTo.nodeid !== this.get('root').nodeid){
-                    return false;
-                }else{
+                // if(nodeToAppendTo.nodeid !== this.get('root').nodeid){
+                //     return false;
+                // }else{
                     if(typeOfGraphToAppend === 'undefined'){
                         return false;
                     }
-                }
+                // }
             }else{ // this graph is a Graph
                 switch(this.isType()) {
                     case 'undefined':

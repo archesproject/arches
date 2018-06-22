@@ -3,15 +3,17 @@ define([
     'underscore',
     'knockout',
     'knockout-mapping',
+    'moment',
     'views/base-manager',
     'viewmodels/alert',
+    'viewmodels/new-provisional-tile',
     'arches',
     'resource-editor-data',
     'bindings/resizable-sidepanel',
     'bindings/sortable',
     'widgets',
     'card-components'
-], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, arches, data) {
+], function($, _, ko, koMapping, moment, BaseManagerView, AlertViewModel, ProvisionalTileViewModel, arches, data) {
     var handlers = {
         'after-update': [],
         'tile-reset': []
@@ -94,6 +96,17 @@ define([
         return childSelected;
     };
 
+    var doesChildHaveProvisionalEdits = function(parent) {
+        var hasEdits = false;
+        var childrenKey = parent.tiles ? 'tiles' : 'cards';
+        ko.unwrap(parent[childrenKey]).forEach(function(child) {
+            if (child.hasprovisionaledits() || doesChildHaveProvisionalEdits(child)){
+                hasEdits = true;
+            }
+        });
+        return hasEdits;
+    };
+
     var setupCard = function (card, parent) {
         card = _.extend(card, {
             parent: parent,
@@ -117,6 +130,13 @@ define([
                     return setupTile(tile, card);
                 })
             ),
+            hasprovisionaledits: ko.computed(function(){
+                return _.filter(tiles, function(tile){
+                    return (
+                        parent ? (tile.parenttile_id === parent.tileid) : true
+                    ) && tile.nodegroup_id === card.nodegroup_id && ko.unwrap(tile.provisionaledits);
+                }).length
+            }),
             selected: ko.pureComputed({
                 read: function () {
                     return selection() === this;
@@ -138,6 +158,9 @@ define([
         card.isChildSelected = ko.computed(function() {
             return isChildSelected(card);
         }, this);
+        card.doesChildHaveProvisionalEdits = ko.computed(function() {
+            return doesChildHaveProvisionalEdits(card);
+        });
         return card;
     };
 
@@ -145,7 +168,9 @@ define([
         tile._tileData = ko.observable(
             koMapping.toJSON(tile.data)
         );
+
         tile.data = koMapping.fromJS(tile.data);
+        tile.provisionaledits = ko.observable(tile.provisionaledits);
 
         tile = _.extend(tile, {
             parent: parent,
@@ -155,6 +180,9 @@ define([
                 return setupCard(_.clone(card), tile);
             }),
             expanded: ko.observable(true),
+            hasprovisionaledits: ko.computed(function () {
+                return !!tile.provisionaledits();
+            }, this),
             selected: ko.pureComputed({
                 read: function () {
                     return selection() === this;
@@ -178,15 +206,18 @@ define([
                 _.each(handlers['tile-reset'], function (handler) {
                     handler(tile);
                 });
+                vm.provisionalTileViewModel.selectedProvisionalEdit(undefined);
             },
             getAttributes: function () {
                 var tileData = tile.data ? koMapping.toJS(tile.data) : {};
+                var tileProvisionalEdits = tile.provisionaledits ? koMapping.toJS(tile.provisionaledits) : {};
                 return {
                     "tileid": tile.tileid,
                     "data": tileData,
                     "nodegroup_id": tile.nodegroup_id,
                     "parenttile_id": tile.parenttile_id,
-                    "resourceinstance_id": tile.resourceinstance_id
+                    "resourceinstance_id": tile.resourceinstance_id,
+                    "provisionaledits": tileProvisionalEdits
                 }
             },
             getData: function () {
@@ -206,6 +237,9 @@ define([
             save: function () {
                 loading(true);
                 delete tile.formData.data;
+                if (vm.provisionalTileViewModel.selectedProvisionalEdit()) {
+                    vm.provisionalTileViewModel.acceptProvisionalEdit();
+                };
                 tile.formData.append(
                     'data',
                     JSON.stringify(
@@ -222,6 +256,7 @@ define([
                 }).done(function(tileData, status, req) {
                     if (tile.tileid) {
                         koMapping.fromJS(tileData.data,tile.data);
+                        koMapping.fromJS(tileData.provisionaledits,tile.provisionaledits);
                     } else {
                         tile.data = koMapping.fromJS(tileData.data);
                     }
@@ -232,6 +267,15 @@ define([
                         tile.parent.expanded(true);
                         vm.selection(tile);
                     }
+                    if (data.userisreviewer === false && !tile.provisionaledits()) {
+                        //If the user is provisional ensure their edits are provisional
+                        tile.provisionaledits(tile.data);
+                    };
+                    if (data.userisreviewer === true && vm.provisionalTileViewModel.selectedProvisionalEdit()) {
+                        if (JSON.stringify(vm.provisionalTileViewModel.selectedProvisionalEdit().value) === koMapping.toJSON(tile.data)) {
+                            vm.provisionalTileViewModel.removeSelectedProvisionalEdit();
+                        };
+                    };
                     if (!resourceId()) {
                         tile.resourceinstance_id = tileData.resourceinstance_id;
                         resourceId(tile.resourceinstance_id);
@@ -256,7 +300,7 @@ define([
                     parent.tiles.remove(tile);
                     selection(parent);
                 }).fail(function(response) {
-                    console.log('there was an error ', response);
+                    vm.alert(new AlertViewModel('ep-alert-red', response.responseJSON.message[0], response.responseJSON.message[1], null, function(){}));
                 }).always(function(){
                     loading(false);
                 });
@@ -265,6 +309,9 @@ define([
         tile.isChildSelected = ko.computed(function() {
             return isChildSelected(tile);
         }, this);
+        tile.doesChildHaveProvisionalEdits = ko.computed(function() {
+            return doesChildHaveProvisionalEdits(tile);
+        });
         return tile;
     };
 
@@ -429,6 +476,7 @@ define([
         }
     };
     var topCard = vm.topCards[0];
+    vm.provisionalTileViewModel = new ProvisionalTileViewModel({tile: vm.selectedTile, reviewer: data.user_is_reviewer});
     selection(topCard.tiles().length > 0 ? topCard.tiles()[0] : topCard);
 
     vm.selectionBreadcrumbs = ko.computed(function () {

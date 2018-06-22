@@ -35,23 +35,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block main_content %}
 <div class="content-panel">
-    <div class="ep-form-toolbar">
-        <div>
-            <h4 class="ep-form-toolbar-title">
-                <div class="list-filter" data-bind="" style="margin-right: 10px;">
-                    <input type="text" class="form-control" style="width: 250px;" placeholder="{% trans 'Find a card...' %}" data-bind="textInput: filter">
-
-                    <!-- Clear Search -->
-                    <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }" style="top: 8px;"><i class="fa fa-times-circle"></i></span>
-                </div>
-            </h4>
-        </div>
-    </div>
-
     <div class="flex">
         <div class="left-panel graph-designer" data-bind="resizableSidepanel:true">
             <div class="jstree jstree-default" data-bind="visible: true" style="display: none;">
                 <div class="header">
+                    <div class="list-filter" data-bind="" style="margin-right: 10px;">
+                        <input type="text" class="form-control" style="width: 250px;" placeholder="{% trans 'Find a card...' %}" data-bind="textInput: filter">
+
+                        <!-- Clear Search -->
+                        <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }" style="top: 8px;"><i class="fa fa-times-circle"></i></span>
+                    </div>
                     <a data-bind="click: expandAll">Expand all</a>
                     <a data-bind="click: collapseAll" style="padding-left:5px;">Collapse all</a>
                 </div>
@@ -81,7 +74,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.tiles().length > 0 && card.expanded), 'jstree-closed' : (card.tiles().length > 0 && !card.expanded()), 'jstree-leaf': card.tiles().length === 0}">
                     <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
                     <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'jstree-clicked': card.selected, 'child-selected': card.isChildSelected()}, click: function () { card.canAdd() ? self.selection(card) : self.selection(card.tiles()[0]) },">
-                        <i class="fa fa-file-o" role="presentation"></i>
+                        <i class="fa fa-file-o" role="presentation" data-bind="css:{'has-provisional-edits fa-file': card.doesChildHaveProvisionalEdits()}"></i>
                         <span style="padding-right: 5px;" data-bind="text: card.name, css:{'filtered': card.highlight()}"></span>
                         <!-- ko if: card.canAdd() -->
                         <i class="fa fa-plus-circle add-new-tile" role="presentation" data-bind="css:{'jstree-clicked': card.selected}" data-toggle="tooltip" data-original-title="{% trans "Add New" %}"></i>
@@ -96,10 +89,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (cards.length > 0 && expanded), 'jstree-closed' : (cards.length > 0 && !expanded()), 'jstree-leaf': cards.length === 0}">
                                 <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){expanded(!expanded())}"></i>
                                 <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { self.selection($data) }, css:{'jstree-clicked': selected, 'child-selected': isChildSelected()}">
-                                    <i class="fa fa-file" role="presentation"></i>
+                                    <i class="fa fa-file" role="presentation" data-bind="css:{'has-provisional-edits': doesChildHaveProvisionalEdits() || $data.hasprovisionaledits()}"></i>
                                     <strong style="margin-right: 10px;" data-bind="css:{'filtered': card.highlight()}">
                                         <!-- ko if: card.widgets.length > 0 -->
-                                        <span data-bind="text: card.widgets[0].label"></span>:
+                                        <span data-bind="text: card.widgets[0].label || card.name"></span>:
                                         <div style="display: inline;" data-bind="component: {
                                             name: self.widgetLookup[card.widgets[0].widget_id].name,
                                             params: {
@@ -146,7 +139,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <!-- ko if: crumb.tileid -->
                     <a href="#" data-bind="click: function () { crumb.selected(true) }">
                         <!-- ko if: crumb.parent.widgets.length > 0 -->
-                        <span data-bind="text: crumb.parent.widgets[0].label"></span>:
+                        <span data-bind="text: crumb.parent.widgets[0].label || crumb.parent.name"></span>:
                         <div style="display: inline;" data-bind="component: {
                             name: $parent.widgetLookup[crumb.parent.widgets[0].widget_id].name,
                             params: {
@@ -169,7 +162,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <span class="current-crumb">
                     <!-- ko if: selectedTile().tileid -->
                         <!-- ko if: selectedCard().widgets.length > 0 -->
-                        <span data-bind="text: selectedCard().widgets[0].label"></span>:
+                        <span data-bind="text: selectedCard().widgets[0].label || selectedCard().name"></span>:
                         <div style="display: inline;" data-bind="component: {
                             name: widgetLookup[selectedCard().widgets[0].widget_id].name,
                             params: {
@@ -220,7 +213,25 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 }
             }"></div>
             <!-- /ko -->
+            <!--ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 -->
+            <div class='new-provisional-edits-list'>
+            <div class='new-provisional-edits-header'>
+            <div class='new-provisional-edits-title'>{% trans 'Provisional Edits' %}</div>
+
+            <button class="btn btn-shim btn-danger btn-labeled btn-sm fa fa-trash" data-bind="click: function(){provisionalTileViewModel.deleteAllProvisionalEdits()}">{% trans 'Delete All Provisional Edits' %}</button>
+            </div>
+            <!--ko foreach: { data: provisionalTileViewModel.provisionaledits(), as: 'pe' } -->
+            <div class='new-provisional-edit-entry' data-bind="css: {'selected': pe === $parent.provisionalTileViewModel.selectedProvisionalEdit()}, click: function(){$parent.provisionalTileViewModel.selectProvisionalEdit(pe)}">
+            <span class='field' data-bind="text : 'User: ' + pe.username()"></span>
+            <span class='field' data-bind="text : 'Edited: ' + pe.displaytimestamp"></span>
+            <a href='' class='field' data-bind="click : function(){$parent.provisionalTileViewModel.acceptEdit(pe)}">Accept</a>
+            <a href='' class='field fa fa-times-circle new-delete-provisional-edit' data-bind="click : function(){$parent.provisionalTileViewModel.rejectProvisionalEdit(pe)}"></a>
+            </div>
+            <!-- /ko -->
+            </div>
+            <!--/ko-->
         </div>
+
     </div>
 </div>
 {% endblock main_content %}

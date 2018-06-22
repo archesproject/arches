@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '3201_second_removal_of_node_nodetype_branch'),
+        ('models', 'deserialize_provisional_edits'),
     ]
 
     operations = [
