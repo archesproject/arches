@@ -234,7 +234,6 @@ class Tile(models.TileModel):
         if user is not None:
             if user_is_reviewer == False and creating_new_tile == False:
                 self.apply_provisional_edit(user, self.data, action='update', existing_model=existing_model)
-                print self.provisionaledits
                 newprovisionalvalue = self.data
                 oldprovisional = self.get_provisional_edit(existing_model, user)
                 if oldprovisional is not None:

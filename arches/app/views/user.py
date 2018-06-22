@@ -104,7 +104,6 @@ class UserManagerView(BaseManagerView):
             if self.request.user.is_authenticated() and request.user.groups.filter(name='Resource Reviewer').exists():
                 userids = json.loads(request.POST.get('userids', '[]'))
                 data = {u.id:u.username for u in User.objects.filter(id__in=userids)}
-                print userids, data
                 return JSONResponse(data)
 
         if self.request.user.is_authenticated() and self.request.user.username != 'anonymous':

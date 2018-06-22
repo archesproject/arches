@@ -143,7 +143,6 @@ define([
         };
 
         self.rejectProvisionalEdit = function(val){
-            console.log('rejecting')
             self.deleteProvisionalEdit(val);
         }
 
