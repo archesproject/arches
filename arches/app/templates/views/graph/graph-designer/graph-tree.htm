@@ -17,24 +17,13 @@
     <div class="left-panel-overflow">
         <!-- <div data-bind="sortable: $data"> -->
         <ul class="jstree-container-ul jstree-children" aria-expanded="true">
-            <div data-bind="sortable: {
-                        data: graphTree.graphModel.tree,
-                        as: 'node',
-                        beforeMove: graphTree.beforeMove,
-                        afterMove: graphTree.reorderNodes
-                    }">
                 <div class="" data-bind="template: {
                     name: 'graph-tree',
                     foreach: graphTree.graphModel.tree,
                     as: 'node'
                 }"></div>
-            </div>
         </ul>
         <!-- </div> -->
-    </div>
-    <div class="header">
-        <a data-bind="click: expandAll">Expand all</a>
-        <a data-bind="click: collapseAll" style="padding-left:5px;">Collapse all</a>
     </div>
 </div>
 <!-- /ko -->
