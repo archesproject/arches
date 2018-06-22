@@ -85,11 +85,18 @@ define([
                 data: {'user': koMapping.toJS(val).user, 'tileid': this.selectedTile().tileid }
             })
             .done(function(data) {
+                var user = val.user;
+                var provisionaledits = this.selectedTile().provisionaledits();
+                delete provisionaledits[user]
+                this.selectedTile().provisionaledits(provisionaledits);
                 if (self.selectedProvisionalEdit() === val) {
                     self.selectedProvisionalEdit(undefined);
                     self.selectedTile().reset();
                 };
                 self.provisionaledits.remove(val);
+                if (_.keys(this.selectedTile().provisionaledits()).length === 0) {
+                    this.selectedTile().provisionaledits(null);
+                };
             })
             .fail(function(data) {
                 console.log('request failed', data)
@@ -109,6 +116,7 @@ define([
                 self.selectedTile().reset();
                 self.selectedProvisionalEdit(undefined);
                 self.provisionaledits.removeAll();
+                this.selectedTile().provisionaledits(null);
             })
             .fail(function(data) {
                 console.log('request failed', data)
