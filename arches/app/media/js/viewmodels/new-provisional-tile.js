@@ -48,15 +48,19 @@ define([
                 var provisionaleditlist = _.map(tile.provisionaledits(), function(edit, key){
                     users.push(key);
                     edit['username'] = ko.observable('');
-                    edit['displaytimestamp'] =  moment(edit.timestamp).format("MMMM Do YYYY, h:mm a");
+                    edit['displaytimestamp'] = moment(edit.timestamp).format("hh:mm");
+                    edit['displaydate'] = moment(edit.timestamp).format("DD-MM-YYYY");
                     edit['user'] = key;
                     return edit;
                 }, this);
                 this.provisionaledits(_.sortBy(provisionaleditlist, function(pe){return moment(pe.timestamp)}));
                 if (data && _.keys(data).length === 0 && tile.provisionaledits()) {
+                    // this.provisionaledits()[0]['isfullyprovisional'] = true;
                     koMapping.fromJS(this.provisionaledits()[0]['value'], tile.data);
-                    this.selectedProvisionalEdit(this.provisionaledits()[0])
-                    tile._tileData.valueHasMutated()
+                    this.selectedProvisionalEdit(this.provisionaledits()[0]);
+                    tile._tileData.valueHasMutated();
+                } else {
+                    self.selectedProvisionalEdit(undefined);
                 };
                 this.getUserNames(this.provisionaleditlist, users);
             };
@@ -68,9 +72,15 @@ define([
         };
 
         self.selectProvisionalEdit = function(val){
-            self.selectedProvisionalEdit(val);
-            koMapping.fromJS(val['value'], self.selectedTile().data);
-            self.selectedTile()._tileData.valueHasMutated()
+            if (self.selectedProvisionalEdit() != val) {
+                self.selectedProvisionalEdit(val);
+                koMapping.fromJS(val['value'], self.selectedTile().data);
+                self.selectedTile()._tileData.valueHasMutated()
+            }
+            // else if (val['isfullyprovisional'] === false) {
+            //     self.selectedProvisionalEdit(undefined);
+            //     self.selectedTile().reset();
+            // };
         };
 
         self.updateProvisionalEdits(self.selectedTile);
@@ -135,11 +145,6 @@ define([
                 this.provisionaledits.remove(this.selectedProvisionalEdit());
                 this.selectedProvisionalEdit(undefined);
             }
-        };
-
-        self.acceptEdit = function(val){
-            this.selectProvisionalEdit(val);
-            this.selectedTile().save();
         };
 
         self.rejectProvisionalEdit = function(val){

@@ -5519,24 +5519,38 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 .new-provisional-edits-list {
     display: flex;
     flex-direction: column;
-    margin-top: 0px;
+    margin-top: 26px;
+    width: 165px;
+    padding: 5px;
+    border-color: #ddd;
+    border-right-style: solid;
+    border-width: 1px;
+    height: 100%;
 }
 
+.new-provisional-edit-card-container {
+    display: flex;
+    flex-direction: row;
+}
 
 .new-provisional-edit-entry {
     display: flex;
-    flex-direction: row;
-    padding: 3px;
+    flex-direction: column;
     margin: 2px;
     border-style: solid;
     border-width: 1px;
-    border-color: #ccc;
-    background-color: #fafafa;
+    border-color: #ddd;
+}
+
+.new-provisional-edit-entry .title {
+    display: flex;
+    flex-direction: row;
     justify-content: space-between;
+    background-color: #f1f1f1;
 }
 
 .new-provisional-edits-title {
-    font-size: 16px;
+    font-size: 13px;
     font-weight: 600;
     color: #2f527a;
 }
@@ -5554,15 +5568,27 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .new-provisional-edit-entry:hover {
     border-color: #111;
-    background-color: #ececec;
+    background-color: #fff;
 }
 
 .new-provisional-edit-entry.selected {
-    background-color: #ececec;
+    background-color: #fff;
+    border-color: #729dd2;
+    border-width: 2px;
+}
+
+.new-provisional-edit-entry .field-name {
+    font-weight: 600;
 }
 
 .new-provisional-edit-entry .field {
     padding: 5px
+}
+
+.new-provisional-edits-delete-all {
+    width: auto;
+    padding-left: 0px;
+    margin: 3px;
 }
 
 .provisional-edits-list-header {

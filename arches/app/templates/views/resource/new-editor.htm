@@ -210,6 +210,45 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 <!-- /ko -->
             </div>
+            <!--ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
+            <div>
+            <span>{% trans 'Currently showing edits by' %}</span>
+            <span data-bind="text: provisionalTileViewModel.selectedProvisionalEdit().username() + '.'"></span>
+            <!--ko if: provisionalTileViewModel.selectedProvisionalEdit().isfullyprovisional -->
+            <span>{% trans 'No authoritative data has been saved to this card.' %}</span>
+            <!--/ko-->
+            </div>
+            <!--/ko-->
+            <div class="new-provisional-edit-card-container">
+                <div class="testing-this">
+                <!--ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 -->
+                <div class='new-provisional-edits-list'>
+                    <div class='new-provisional-edits-header'>
+                        <div class='new-provisional-edits-title'>{% trans 'Provisional Edits' %}</div>
+                    </div>
+                    <!--ko foreach: { data: provisionalTileViewModel.provisionaledits(), as: 'pe' } -->
+                    <div class='new-provisional-edit-entry' data-bind="css: {'selected': pe === $parent.provisionalTileViewModel.selectedProvisionalEdit()}, click: function(){$parent.provisionalTileViewModel.selectProvisionalEdit(pe)}">
+                        <div class='title'>
+                            <div class='field'>
+                            <span class='field-name'>{%trans 'User: ' %}</span>
+                            <span data-bind="text : pe.username"></span>
+                            </div>
+                            <a href='' class='field fa fa-times-circle new-delete-provisional-edit' data-bind="click : function(){$parent.provisionalTileViewModel.rejectProvisionalEdit(pe)}"></a>
+                        </div>
+                        <div class='field'>
+                            <span class='field-name'>{%trans 'Date: ' %}</span>
+                            <span data-bind="text : pe.displaydate"></span>
+                        </div>
+                        <div class='field'>
+                            <span class='field-name'>{%trans 'Time: ' %}</span>
+                            <span data-bind="text : pe.displaytimestamp"></span>
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                    <div class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" data-bind="click: function(){provisionalTileViewModel.deleteAllProvisionalEdits()}">{% trans 'Delete all edits' %}</div>
+                </div>
+                <!--/ko-->
+            </div>
             <div data-bind="component: {
                 name: cardComponentLookup[selectedCard().component_id].componentname,
                 params: {
@@ -219,24 +258,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     form: $data
                 }
             }"></div>
+            </div>
             <!-- /ko -->
-            <!--ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 -->
-            <div class='new-provisional-edits-list'>
-            <div class='new-provisional-edits-header'>
-            <div class='new-provisional-edits-title'>{% trans 'Provisional Edits' %}</div>
 
-            <button class="btn btn-shim btn-danger btn-labeled btn-sm fa fa-trash" data-bind="click: function(){provisionalTileViewModel.deleteAllProvisionalEdits()}">{% trans 'Delete All Provisional Edits' %}</button>
-            </div>
-            <!--ko foreach: { data: provisionalTileViewModel.provisionaledits(), as: 'pe' } -->
-            <div class='new-provisional-edit-entry' data-bind="css: {'selected': pe === $parent.provisionalTileViewModel.selectedProvisionalEdit()}, click: function(){$parent.provisionalTileViewModel.selectProvisionalEdit(pe)}">
-            <span class='field' data-bind="text : 'User: ' + pe.username()"></span>
-            <span class='field' data-bind="text : 'Edited: ' + pe.displaytimestamp"></span>
-            <a href='' class='field' data-bind="click : function(){$parent.provisionalTileViewModel.acceptEdit(pe)}">Accept</a>
-            <a href='' class='field fa fa-times-circle new-delete-provisional-edit' data-bind="click : function(){$parent.provisionalTileViewModel.rejectProvisionalEdit(pe)}"></a>
-            </div>
-            <!-- /ko -->
-            </div>
-            <!--/ko-->
         </div>
 
     </div>
