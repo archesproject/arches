@@ -166,7 +166,7 @@ def user_can_edit_resources(user):
 
 def user_can_read_concepts(user):
     """
-    Requires that a user is a part of the RDM Administrator groups
+    Requires that a user is a part of the RDM Administrator group
 
     """
 
