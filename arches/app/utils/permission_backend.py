@@ -163,3 +163,13 @@ def user_can_edit_resources(user):
     if user.is_authenticated():
         return user.is_superuser or len(get_editable_resource_types(user)) > 0
     return False
+
+def user_can_read_concepts(user):
+    """
+    Requires that a user is a part of the RDM Administrator groups
+
+    """
+
+    if user.is_authenticated():
+        return user.groups.filter(name='RDM Administrator').exists()
+    return False

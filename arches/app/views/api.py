@@ -16,12 +16,13 @@ from arches.app.models.mobile_survey import MobileSurvey
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.utils.response import JSONResponse
-from arches.app.utils.decorators import can_read_resource_instance, can_edit_resource_instance
+from arches.app.utils.decorators import can_read_resource_instance, can_edit_resource_instance, can_read_concept
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
 from arches.app.utils.permission_backend import user_can_read_resources
 from arches.app.utils.permission_backend import user_can_edit_resources
+from arches.app.utils.permission_backend import user_can_read_concepts
 from arches.app.utils.decorators import group_required
 
 
@@ -173,6 +174,7 @@ class Resources(APIBase):
 @method_decorator(group_required('RDM Administrator'), name='dispatch')
 class Concepts(APIBase):
 
+    @method_decorator(can_read_concept())
     def get(self, request, conceptid=None):
         include_subconcepts = request.GET.get('includesubconcepts', 'true') == 'true'
         include_parentconcepts = request.GET.get('includeparentconcepts', 'true') == 'true'
