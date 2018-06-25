@@ -7,6 +7,9 @@ define(['knockout'], function (ko) {
         this.tile = params.tile;
         this.form = params.form;
         this.expanded = ko.observable(true);
+        this.beforeMove = function (e) {
+            e.cancelDrop = (e.sourceParent!==e.targetParent);
+        };
     };
     return ko.components.register('default-card', {
         viewModel: viewModel,

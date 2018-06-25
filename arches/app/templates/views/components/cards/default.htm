@@ -14,8 +14,8 @@
     <ul class="jstree-children" aria-expanded="true">
         <div data-bind="sortable: {
             data: card.tiles,
-            beforeMove: self.form.beforeMove,
-            afterMove: self.form.reorderTiles
+            beforeMove: self.beforeMove,
+            afterMove: card.reorderTiles
         }">
             <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (cards.length > 0 && expanded), 'jstree-closed' : (cards.length > 0 && !expanded()), 'jstree-leaf': cards.length === 0}">
                 <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){expanded(!expanded())}"></i>
