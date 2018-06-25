@@ -26,7 +26,7 @@ define([
             }
             self.loading(false);
         })
-        };
+    };
 
     viewModel.discardEdits = function() {
         if (!this.selectedMobileSurvey().get('id')) {
