@@ -1,6 +1,6 @@
 ### Arches 4.3.0 release notes
 
-The Arches team has been busy trying to improve Arches and fix a several bugs as well.
+The Arches team has been busy improving Arches and fixing several bugs as well.
 Below you'll find a listing of all the changes that are included in the latest release.
 
 Some of the highlights:
@@ -23,7 +23,7 @@ python manage.py es index_database
 
 If you have Arches running on a web server such as Apache, be sure to update your static files directory and restart your web server.
 
-As always the documentation can be found at http://arches4.readthedocs.io/en/stable/
+As always the documentation can be found at http://arches.readthedocs.io
 
 #### Upgrading an Arches project
 
