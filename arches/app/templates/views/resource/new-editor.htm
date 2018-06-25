@@ -167,19 +167,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <!-- /ko -->
             <!--ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 -->
             <div class='new-provisional-edits-list'>
-            <div class='new-provisional-edits-header'>
-            <div class='new-provisional-edits-title'>{% trans 'Provisional Edits' %}</div>
+                <div class='new-provisional-edits-header'>
+                    <div class='new-provisional-edits-title'>{% trans 'Provisional Edits' %}</div>
 
-            <button class="btn btn-shim btn-danger btn-labeled btn-sm fa fa-trash" data-bind="click: function(){provisionalTileViewModel.deleteAllProvisionalEdits()}">{% trans 'Delete All Provisional Edits' %}</button>
-            </div>
-            <!--ko foreach: { data: provisionalTileViewModel.provisionaledits(), as: 'pe' } -->
-            <div class='new-provisional-edit-entry' data-bind="css: {'selected': pe === $parent.provisionalTileViewModel.selectedProvisionalEdit()}, click: function(){$parent.provisionalTileViewModel.selectProvisionalEdit(pe)}">
-            <span class='field' data-bind="text : 'User: ' + pe.username()"></span>
-            <span class='field' data-bind="text : 'Edited: ' + pe.displaytimestamp"></span>
-            <a href='' class='field' data-bind="click : function(){$parent.provisionalTileViewModel.acceptEdit(pe)}">Accept</a>
-            <a href='' class='field fa fa-times-circle new-delete-provisional-edit' data-bind="click : function(){$parent.provisionalTileViewModel.rejectProvisionalEdit(pe)}"></a>
-            </div>
-            <!-- /ko -->
+                    <button class="btn btn-shim btn-danger btn-labeled btn-sm fa fa-trash" data-bind="click: function(){provisionalTileViewModel.deleteAllProvisionalEdits()}">{% trans 'Delete All Provisional Edits' %}</button>
+                </div>
+                <!--ko foreach: { data: provisionalTileViewModel.provisionaledits(), as: 'pe' } -->
+                <div class='new-provisional-edit-entry' data-bind="css: {'selected': pe === $parent.provisionalTileViewModel.selectedProvisionalEdit()}, click: function(){$parent.provisionalTileViewModel.selectProvisionalEdit(pe)}">
+                    <span class='field' data-bind="text : 'User: ' + pe.username()"></span>
+                    <span class='field' data-bind="text : 'Edited: ' + pe.displaytimestamp"></span>
+                    <a href='' class='field' data-bind="click : function(){$parent.provisionalTileViewModel.acceptEdit(pe)}">Accept</a>
+                    <a href='' class='field fa fa-times-circle new-delete-provisional-edit' data-bind="click : function(){$parent.provisionalTileViewModel.rejectProvisionalEdit(pe)}"></a>
+                </div>
+                <!-- /ko -->
             </div>
             <!--/ko-->
         </div>
