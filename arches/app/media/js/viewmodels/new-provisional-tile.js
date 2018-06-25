@@ -81,11 +81,7 @@ define([
                 self.selectedProvisionalEdit(val);
                 koMapping.fromJS(val['value'], self.selectedTile().data);
                 self.selectedTile()._tileData.valueHasMutated()
-            }
-            // else if (val['isfullyprovisional'] === false) {
-            //     self.selectedProvisionalEdit(undefined);
-            //     self.selectedTile().reset();
-            // };
+            };
         };
 
         self.updateProvisionalEdits(self.selectedTile);
