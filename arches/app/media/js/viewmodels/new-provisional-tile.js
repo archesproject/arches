@@ -51,16 +51,21 @@ define([
                     edit['displaytimestamp'] = moment(edit.timestamp).format("hh:mm");
                     edit['displaydate'] = moment(edit.timestamp).format("DD-MM-YYYY");
                     edit['user'] = key;
+                    if (edit.isfullyprovisional === undefined) {
+                        edit['isfullyprovisional'] = ko.observable(false);
+                    };
                     return edit;
                 }, this);
                 this.provisionaledits(_.sortBy(provisionaleditlist, function(pe){return moment(pe.timestamp)}));
-                if (data && _.keys(data).length === 0 && tile.provisionaledits()) {
-                    // this.provisionaledits()[0]['isfullyprovisional'] = true;
+                if ((data && _.keys(data).length === 0 && tile.provisionaledits()) || this.provisionaledits().length > 0 && this.provisionaledits()[0].isfullyprovisional() === true) {
+                    self.selectedProvisionalEdit(undefined);
+                    this.provisionaledits()[0].isfullyprovisional(true);
                     koMapping.fromJS(this.provisionaledits()[0]['value'], tile.data);
                     this.selectedProvisionalEdit(this.provisionaledits()[0]);
                     tile._tileData.valueHasMutated();
                 } else {
                     self.selectedProvisionalEdit(undefined);
+                    self.selectedTile().reset();
                 };
                 this.getUserNames(this.provisionaleditlist, users);
             };
