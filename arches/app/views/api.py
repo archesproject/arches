@@ -171,33 +171,35 @@ class Resources(APIBase):
 
         return JSONResponse(self.get(request, resourceid))
 
-@method_decorator(group_required('RDM Administrator'), name='dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
 class Concepts(APIBase):
 
-    @method_decorator(can_read_concept())
     def get(self, request, conceptid=None):
-        include_subconcepts = request.GET.get('includesubconcepts', 'true') == 'true'
-        include_parentconcepts = request.GET.get('includeparentconcepts', 'true') == 'true'
-        include_relatedconcepts = request.GET.get('includerelatedconcepts', 'true') == 'true'
+        if user_can_read_concepts(user=request.user):
+            include_subconcepts = request.GET.get('includesubconcepts', 'true') == 'true'
+            include_parentconcepts = request.GET.get('includeparentconcepts', 'true') == 'true'
+            include_relatedconcepts = request.GET.get('includerelatedconcepts', 'true') == 'true'
 
-        depth_limit = request.GET.get('depthlimit', None)
-        lang = request.GET.get('lang', settings.LANGUAGE_CODE)
+            depth_limit = request.GET.get('depthlimit', None)
+            lang = request.GET.get('lang', settings.LANGUAGE_CODE)
 
-        try:
-            indent = int(request.GET.get('indent', None))
-        except:
-            indent = None
-        if conceptid:
             try:
-                ret = []
-                concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
-                    include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
-                    depth_limit=depth_limit, up_depth_limit=None, lang=lang)
-
-                ret.append(concept_graph)
-            except models.Concept.DoesNotExist:
-                return JSONResponse(status=404)
+                indent = int(request.GET.get('indent', None))
             except:
+                indent = None
+            if conceptid:
+                try:
+                    ret = []
+                    concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
+                        include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
+                        depth_limit=depth_limit, up_depth_limit=None, lang=lang)
+
+                    ret.append(concept_graph)
+                except models.Concept.DoesNotExist:
+                    return JSONResponse(status=404)
+                except:
+                    return JSONResponse(status=500)
+            else:
                 return JSONResponse(status=500)
         else:
             return JSONResponse(status=500)
