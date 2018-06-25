@@ -871,9 +871,6 @@ class Graph(models.GraphModel):
             if not found:
                 raise GraphValidationError(_('Ontology rules don\'t allow this graph to be appended'))
         if self.isresource:
-            # if(nodeToAppendTo != self.root):
-            #     raise GraphValidationError(_('Can\'t append a graph to a resource except at the root'))
-            # else:
             if typeOfGraphToAppend == 'undefined':
                 raise GraphValidationError(_('Can\'t append an undefined graph to a resource graph'))
         else: # self graph is a Graph
@@ -1313,31 +1310,6 @@ class Graph(models.GraphModel):
             if self.root.is_collector == False:
                 if len(self.nodes) > 1:
                     raise GraphValidationError(_("If your graph contains more than one node and is not a resource the root must be a collector."), 999)
-
-
-        # validates that a node group that has child node groups is not itself a child node group
-        # 20160609 can't implement this without changing our default resource graph --REA
-
-        # parentnodegroups = []
-        # for nodegroup in self.get_nodegroups():
-        #     if nodegroup.parentnodegroup:
-        #         parentnodegroups.append(nodegroup)
-
-        # for parent in parentnodegroups:
-        #     for child in parentnodegroups:
-        #         if parent.parentnodegroup_id == child.nodegroupid:
-        #             raise GraphValidationError(_("A parent node group cannot be a child of another node group."))
-
-
-
-        # validates that a all parent node groups that are not root nodegroup only contain semantic nodes.
-
-        # for nodegroup in self.get_nodegroups():
-        #     if nodegroup.parentnodegroup and nodegroup.parentnodegroup_id != self.root.nodeid:
-        #         for node_id, node in self.nodes.iteritems():
-        #             if str(node.nodegroup_id) == str(nodegroup.parentnodegroup_id) and node.datatype != 'semantic':
-        #                 raise GraphValidationError(_("A parent node group must only contain semantic nodes."), 1000)
-
 
         # validate that nodes in a resource graph belong to the ontology assigned to the resource graph
 
