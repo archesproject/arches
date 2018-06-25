@@ -281,7 +281,7 @@ class TileTests(ArchesTestCase):
         provisional_tile.save(index=False, request=request)
         tiles = Tile.objects.filter(resourceinstance_id="40000000-0000-0000-0000-000000000000")
 
-        provisionaledits = JSONDeserializer().deserialize(provisional_tile.provisionaledits)
+        provisionaledits = provisional_tile.provisionaledits
         self.assertEqual(tiles.count(), 2)
         self.assertEqual(provisional_tile.data["72048cb3-adbc-11e6-9ccf-14109fd34195"], 'AUTHORITATIVE')
         self.assertEqual(provisionaledits[str(self.user.id)]['action'], 'update')
@@ -310,7 +310,7 @@ class TileTests(ArchesTestCase):
         request.user = user
         provisional_tile.save(index=False, request=request)
         provisional_tile.apply_provisional_edit(user, {"test":"test"}, 'update')
-        provisionaledits = JSONDeserializer().deserialize(provisional_tile.provisionaledits)
+        provisionaledits = provisional_tile.provisionaledits
         userid = str(user.id)
         self.assertEqual(provisionaledits[userid]['action'], 'update')
         self.assertEqual(provisionaledits[userid]['reviewer'], None)

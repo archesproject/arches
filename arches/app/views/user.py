@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import json
 from datetime import datetime
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User, Group
@@ -101,7 +102,7 @@ class UserManagerView(BaseManagerView):
         if self.action == 'get_user_names':
             data = {}
             if self.request.user.is_authenticated() and request.user.groups.filter(name='Resource Reviewer').exists():
-                userids = [str(id) for id in request.POST.get('userids[]', [])]
+                userids = json.loads(request.POST.get('userids', '[]'))
                 data = {u.id:u.username for u in User.objects.filter(id__in=userids)}
                 return JSONResponse(data)
 

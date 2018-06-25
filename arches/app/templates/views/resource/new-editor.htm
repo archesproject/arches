@@ -35,23 +35,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block main_content %}
 <div class="content-panel">
-    <div class="ep-form-toolbar">
-        <div>
-            <h4 class="ep-form-toolbar-title">
-                <div class="list-filter" data-bind="" style="margin-right: 10px;">
-                    <input type="text" class="form-control" style="width: 250px;" placeholder="{% trans 'Find a card...' %}" data-bind="textInput: filter">
-
-                    <!-- Clear Search -->
-                    <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }" style="top: 8px;"><i class="fa fa-times-circle"></i></span>
-                </div>
-            </h4>
-        </div>
-    </div>
-
     <div class="flex">
         <div class="left-panel graph-designer" data-bind="resizableSidepanel:true">
             <div class="jstree jstree-default" data-bind="visible: true" style="display: none;">
                 <div class="header">
+                    <div class="list-filter" data-bind="" style="margin-right: 10px;">
+                        <input type="text" class="form-control" style="width: 250px;" placeholder="{% trans 'Find a card...' %}" data-bind="textInput: filter">
+
+                        <!-- Clear Search -->
+                        <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }" style="top: 8px;"><i class="fa fa-times-circle"></i></span>
+                    </div>
                     <a data-bind="click: expandAll">Expand all</a>
                     <a data-bind="click: collapseAll" style="padding-left:5px;">Collapse all</a>
                 </div>
@@ -172,7 +165,25 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 }
             }"></div>
             <!-- /ko -->
+            <!--ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 -->
+            <div class='new-provisional-edits-list'>
+            <div class='new-provisional-edits-header'>
+            <div class='new-provisional-edits-title'>{% trans 'Provisional Edits' %}</div>
+
+            <button class="btn btn-shim btn-danger btn-labeled btn-sm fa fa-trash" data-bind="click: function(){provisionalTileViewModel.deleteAllProvisionalEdits()}">{% trans 'Delete All Provisional Edits' %}</button>
+            </div>
+            <!--ko foreach: { data: provisionalTileViewModel.provisionaledits(), as: 'pe' } -->
+            <div class='new-provisional-edit-entry' data-bind="css: {'selected': pe === $parent.provisionalTileViewModel.selectedProvisionalEdit()}, click: function(){$parent.provisionalTileViewModel.selectProvisionalEdit(pe)}">
+            <span class='field' data-bind="text : 'User: ' + pe.username()"></span>
+            <span class='field' data-bind="text : 'Edited: ' + pe.displaytimestamp"></span>
+            <a href='' class='field' data-bind="click : function(){$parent.provisionalTileViewModel.acceptEdit(pe)}">Accept</a>
+            <a href='' class='field fa fa-times-circle new-delete-provisional-edit' data-bind="click : function(){$parent.provisionalTileViewModel.rejectProvisionalEdit(pe)}"></a>
+            </div>
+            <!-- /ko -->
+            </div>
+            <!--/ko-->
         </div>
+
     </div>
 </div>
 {% endblock main_content %}

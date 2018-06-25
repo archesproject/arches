@@ -33,7 +33,6 @@
     overflow-x: scroll;
 }
 
-
 /*.navbar-top-links:last-child>li {
     border-right: 1px solid rgba(0,0,0,0.07);
 }*/
@@ -5503,6 +5502,10 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     color: #fff;
 }
 
+.has-provisional-edits {
+    color: #F5BB25;
+}
+
 .provisional-edits-list {
     width: 0px;
     background-color: #f0f0f0;
@@ -5511,6 +5514,55 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     border-color: #ccc;
     border-width: 1px;
     margin-top: 0px;
+}
+
+.new-provisional-edits-list {
+    display: flex;
+    flex-direction: column;
+    margin-top: 0px;
+}
+
+
+.new-provisional-edit-entry {
+    display: flex;
+    flex-direction: row;
+    padding: 3px;
+    margin: 2px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ccc;
+    background-color: #fafafa;
+    justify-content: space-between;
+}
+
+.new-provisional-edits-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #2f527a;
+}
+
+.new-delete-provisional-edit {
+    color: red;
+    font-size: 16px;
+}
+
+.new-provisional-edits-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.new-provisional-edit-entry:hover {
+    border-color: #111;
+    background-color: #ececec;
+}
+
+.new-provisional-edit-entry.selected {
+    background-color: #ececec;
+}
+
+.new-provisional-edit-entry .field {
+    padding: 5px
 }
 
 .provisional-edits-list-header {
@@ -10894,10 +10946,11 @@ ul.select2-choices:after {
 .left-panel {
     width: 270px;
     overflow-x: auto;
+    overflow-y: hidden;
 }
 
 .left-panel-overflow {
-    height: 90%;
+    height: calc(90vh - 100px);
     overflow-y: auto;
 }
 

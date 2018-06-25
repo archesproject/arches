@@ -6,19 +6,25 @@ from django.utils.decorators import method_decorator
 from django.db.models import Q
 from django.http.request import QueryDict
 from django.core.urlresolvers import reverse
+from django.utils.decorators import method_decorator
+
 from revproxy.views import ProxyView
 
 from arches.app.models import models
+from arches.app.models.concept import Concept
 from arches.app.models.mobile_survey import MobileSurvey
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.utils.response import JSONResponse
-from arches.app.utils.decorators import can_read_resource_instance, can_edit_resource_instance
+from arches.app.utils.decorators import can_read_resource_instance, can_edit_resource_instance, can_read_concept
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
 from arches.app.utils.permission_backend import user_can_read_resources
 from arches.app.utils.permission_backend import user_can_edit_resources
+from arches.app.utils.permission_backend import user_can_read_concepts
+from arches.app.utils.decorators import group_required
+
 
 class CouchdbProxy(ProxyView):
     #check user credentials here
@@ -164,3 +170,36 @@ class Resources(APIBase):
             return JSONResponse(status=500)
 
         return JSONResponse(self.get(request, resourceid))
+
+@method_decorator(group_required('RDM Administrator'), name='dispatch')
+class Concepts(APIBase):
+
+    @method_decorator(can_read_concept())
+    def get(self, request, conceptid=None):
+        include_subconcepts = request.GET.get('includesubconcepts', 'true') == 'true'
+        include_parentconcepts = request.GET.get('includeparentconcepts', 'true') == 'true'
+        include_relatedconcepts = request.GET.get('includerelatedconcepts', 'true') == 'true'
+
+        depth_limit = request.GET.get('depthlimit', None)
+        lang = request.GET.get('lang', settings.LANGUAGE_CODE)
+
+        try:
+            indent = int(request.GET.get('indent', None))
+        except:
+            indent = None
+        if conceptid:
+            try:
+                ret = []
+                concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
+                    include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
+                    depth_limit=depth_limit, up_depth_limit=None, lang=lang)
+
+                ret.append(concept_graph)
+            except models.Concept.DoesNotExist:
+                return JSONResponse(status=404)
+            except:
+                return JSONResponse(status=500)
+        else:
+            return JSONResponse(status=500)
+
+        return JSONResponse(ret, indent=indent)

@@ -170,7 +170,6 @@ class Resource(models.ResourceInstance):
             document, terms = self.get_documents_to_index(datatype_factory=datatype_factory, node_datatypes=node_datatypes)
             document['root_ontology_class'] = self.get_root_ontology()
             se.index_data('resource', self.graph_id, JSONSerializer().serializeToPython(document), id=self.pk)
-
             for term in terms:
                 se.index_data('strings', 'term', term['_source'], id=term['_id'])
 
@@ -211,7 +210,7 @@ class Resource(models.ResourceInstance):
                         terms.append({'_id':unicode(nodeid)+unicode(tile.tileid)+unicode(index), '_source': {'value': term, 'nodeid': nodeid, 'nodegroupid': tile.nodegroup_id, 'tileid': tile.tileid, 'resourceinstanceid':tile.resourceinstance_id, 'provisional': False}})
 
             if tile.provisionaledits is not None:
-                provisionaledits = JSONDeserializer().deserialize(tile.provisionaledits)
+                provisionaledits = tile.provisionaledits
                 if len(provisionaledits) > 0:
                     if document['provisional_resource'] == 'false':
                         document['provisional_resource'] = 'partial'
