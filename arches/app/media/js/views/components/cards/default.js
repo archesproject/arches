@@ -1,6 +1,7 @@
 define(['knockout'], function (ko) {
     var viewModel = function(params) {
         var self = this;
+        this.state = params.state || 'form';
         this.loading = params.loading || ko.observable(false);
         this.card = params.card;
         this.tile = params.tile;
