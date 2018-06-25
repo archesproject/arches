@@ -468,12 +468,6 @@ class GraphTests(ArchesTestCase):
         graph.isresource = True
         self.assertIsNotNone(graph.append_branch('http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID))
 
-        # try to append to any other node that is not the root
-        # for node in graph.nodes.itervalues():
-        #     if node is not graph.root:
-        #         with self.assertRaises(GraphValidationError):
-        #             graph.append_branch('http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID, nodeid=node.nodeid)
-
         # try to append a non-grouped graph
         with self.assertRaises(GraphValidationError):
             graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
@@ -662,8 +656,6 @@ class GraphTests(ArchesTestCase):
 
         # save and retrieve the graph from the database and confirm that
         # the graph shape has been saved properly
-        # have to set the parentnodegroup nodes to semantic datatype to pass validation
-        # with self.assertRaises(GraphValidationError):
         graph.save()
         for node in branch_two.nodes.itervalues():
             node.datatype = 'semantic'
