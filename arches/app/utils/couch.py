@@ -36,16 +36,9 @@ class Couch(object):
             return self.couch.create(name)
         except couchdb.PreconditionFailed:
             return self.couch[name]
-        except Exception as e:
-            print e
 
     def delete_db(self, name):
-        try:
-            return self.couch.delete(name)
-        except couchdb.ResourceNotFound:
-            print 'Database not found: ' + name
-        except Exception as e:
-            print e
+        return self.couch.delete(name)
 
     def update_doc(self, db, doc, doc_id=None):
         try:
