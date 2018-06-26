@@ -661,6 +661,9 @@ class Graph(models.GraphModel):
             copy_of_self.root = root_node
             copy_of_self.name = root_node.name
             copy_of_self.isresource = False
+            copy_of_self.subtitle = ''
+            copy_of_self.description = ''
+            copy_of_self.author = ''
 
         # returns a list of node ids sorted by nodes that are collector nodes first and then others last
         node_ids = sorted(copy_of_self.nodes, key=lambda node_id: copy_of_self.nodes[node_id].is_collector, reverse=True)
