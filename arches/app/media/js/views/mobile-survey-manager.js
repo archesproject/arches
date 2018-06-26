@@ -86,7 +86,6 @@ define([
     viewModel.deleteSelectedMobileSurvey = function(){
         if (this.selectedMobileSurvey()) {
             this.deleteMobileSurvey(this.selectedMobileSurvey())
-            this.selectedMobileSurvey(undefined)
         };
     }
 
