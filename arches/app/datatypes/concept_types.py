@@ -119,10 +119,11 @@ class ConceptListDataType(BaseConceptDataType):
         errors = []
 
         ## iterate list of values and use the concept validation on each one
-        validate_concept = DataTypeFactory().get_instance('concept')
-        for v in value:
-            val = v.strip()
-            errors += validate_concept.validate(val, row_number)
+        if value != None:
+            validate_concept = DataTypeFactory().get_instance('concept')
+            for v in value:
+                val = v.strip()
+                errors += validate_concept.validate(val, row_number)
         return errors
 
     def transform_import_values(self, value, nodeid):
