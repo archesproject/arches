@@ -370,7 +370,11 @@ class GraphDataView(View):
 
                 elif self.action == 'update_node':
                     graph.update_node(data)
-                    ret = graph
+                    ret = {
+                        'success': True,
+                        'graphid': graph
+                    }
+                    # ret = graph
                     graph.save()
 
                 elif self.action == 'update_node_layer':
@@ -410,7 +414,7 @@ class GraphDataView(View):
 
             return JSONResponse(ret)
         except GraphValidationError as e:
-            return JSONResponse({'status':'false','message':e.message, 'title':e.title}, status=500)
+            return JSONResponse({'status':'false','success':False,'message':e.message, 'title':e.title}, status=500)
 
     def delete(self, request, graphid):
         data = JSONDeserializer().deserialize(request.body)
