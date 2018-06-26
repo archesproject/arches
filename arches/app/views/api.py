@@ -41,7 +41,7 @@ class APIBase(View):
             'application/json': 'json',
             'application/xml': 'xml',
         }
-        if format and accept in format_values:
+        if not format and accept in format_values:
             get_params['format'] = format_values[accept]
         for key, value in request.META.iteritems():
             if key.startswith('HTTP_X_ARCHES_'):
