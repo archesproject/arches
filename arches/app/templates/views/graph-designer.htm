@@ -116,7 +116,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <div class="" data-bind="with: graphTree">
                          {% include 'views/graph/graph-designer/graph-tree.htm' %}
                      </div></div>
-                <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }">card</div>
+                <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }">
+
+                </div>
             </div>
         </div>
 
@@ -173,7 +175,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 datatypes: {{datatypes_json}},
                 graph: {{graph}},
                 ontology_namespaces: {{ontology_namespaces}},
-                branches: {{branches}}
+                branches: {{branches}},
+                cards: {{cards}},
+                cardwidgets: {{cardwidgets}},
+                widgets: {{widgets_json}},
+                cardComponents: {{card_components_json}}
             };
         });{% endautoescape %}
     </script>
