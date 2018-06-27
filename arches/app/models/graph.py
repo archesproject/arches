@@ -383,9 +383,11 @@ class Graph(models.GraphModel):
         deletes all associated resource instances
 
         """
+        activestate = self.isactive
+        self.isactive = False
         for resource in Resource.objects.filter(graph_id=self.graphid):
-            print("Deleting resource:", resource.resourceinstanceid)
             resource.delete()
+        self.isactive = activestate
 
     def get_tree(self, root=None):
         """
