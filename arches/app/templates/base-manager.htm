@@ -123,6 +123,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </div>
                         </a>
                         {% endif %}
+                        <!-- Search Bar -->
+                        {% if  nav.search %}
+                        <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right" data-bind="click:function () { getProvisionalHistory(); }">
+                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Search" %}'>
+                              <i class="ion-clock"></i>
+                            </div>
+                        </a>
+                        {% endif %}
 
                         {% if nav.res_edit and user|can_edit_resource_instance %}
                         <a href="{% url 'resource_editor' resourceid %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'resource_editor' resourceid %}') }">

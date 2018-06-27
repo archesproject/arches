@@ -235,9 +235,11 @@ define([
                 });
             },
             save: function () {
+                var acceptedProvisionalEdit = null;
                 loading(true);
                 delete tile.formData.data;
                 if (vm.provisionalTileViewModel.selectedProvisionalEdit()) {
+                    acceptedProvisionalEdit = vm.provisionalTileViewModel.selectedProvisionalEdit() ? vm.provisionalTileViewModel.selectedProvisionalEdit() : null;
                     vm.provisionalTileViewModel.acceptProvisionalEdit();
                 };
                 tile.formData.append(
@@ -246,6 +248,11 @@ define([
                         tile.getData()
                     )
                 );
+                if (acceptedProvisionalEdit) {
+                    tile.formData.append(
+                        'accepted_provisional', JSON.stringify(acceptedProvisionalEdit)
+                    );
+                };
 
                 $.ajax({
                     type: "POST",

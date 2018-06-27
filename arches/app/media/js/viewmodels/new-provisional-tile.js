@@ -42,6 +42,7 @@ define([
         }
 
         self.updateProvisionalEdits = function(tile) {
+            var isfullyprovisional;
             if (tile.data) {
                 var users = [];
                 var data = koMapping.toJS(tile.data);
@@ -57,7 +58,12 @@ define([
                     return edit;
                 }, this);
                 this.provisionaledits(_.sortBy(provisionaleditlist, function(pe){return moment(pe.timestamp)}));
-                if ((data && _.keys(data).length === 0 && tile.provisionaledits()) || this.provisionaledits().length > 0 && this.provisionaledits()[0].isfullyprovisional() === true) {
+                if (this.provisionaledits().length > 0) {
+                    if (ko.unwrap(this.provisionaledits()[0].isfullyprovisional) === true) {
+                        isfullyprovisional = true;
+                    };
+                };
+                if ((data && _.keys(data).length === 0 && tile.provisionaledits()) ||  isfullyprovisional) {
                     self.selectedProvisionalEdit(undefined);
                     this.provisionaledits()[0].isfullyprovisional(true);
                     koMapping.fromJS(this.provisionaledits()[0]['value'], tile.data);

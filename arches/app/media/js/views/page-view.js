@@ -84,6 +84,22 @@ define([
                             }
                         });
                     }
+                },
+                getProvisionalHistory: function(){
+                    $.ajax({
+                        type: "GET",
+                        url: arches.urls.tile_history,
+                        success : function(data) {
+                            console.log(data)
+                            self.viewModel.helploaded(true);
+                            self.viewModel.helploading(false);
+                            $('.ep-help-topic-toggle').click(function (){
+                                var sectionEl = $(this).closest('div');
+                                contentEl = $(sectionEl).find('.ep-help-topic-content').first();
+                                contentEl.slideToggle();
+                            });
+                        }
+                    });
                 }
             });
 
