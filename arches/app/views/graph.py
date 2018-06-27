@@ -410,7 +410,7 @@ class GraphDataView(View):
 
             return JSONResponse(ret)
         except GraphValidationError as e:
-            return JSONResponse({'status':'false','message':e.message, 'title':e.title}, status=500)
+            return JSONResponse({'status':'false','success':False,'message':e.message, 'title':e.title}, status=500)
 
     def delete(self, request, graphid):
         data = JSONDeserializer().deserialize(request.body)

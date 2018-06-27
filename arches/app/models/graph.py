@@ -325,6 +325,8 @@ class Graph(models.GraphModel):
                 nodegroup.save()
 
             for node in self.nodes.itervalues():
+                if node.datatype =='':
+                    raise GraphValidationError(_("A valid node datatype must be selected"))
                 node.save()
 
             for edge in self.edges.itervalues():
@@ -1320,6 +1322,8 @@ class Graph(models.GraphModel):
             ontology_classes = self.ontology.ontologyclasses.values_list('source', flat=True)
 
             for node_id, node in self.nodes.iteritems():
+                if (node.ontologyclass==''):
+                    raise GraphValidationError(_("A valid {0} ontology class must be selected").format(self.ontology.name), 1000)
                 if node.ontologyclass not in ontology_classes:
                     raise GraphValidationError(_("'{0}' is not a valid {1} ontology class").format(node.ontologyclass, self.ontology.name), 1001)
 

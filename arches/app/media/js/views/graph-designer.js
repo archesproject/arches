@@ -59,6 +59,25 @@ define([
 
     viewModel.selectedNode = viewModel.graphModel.get('selectedNode');
 
+    viewModel.saveNode = function(node){
+        var self = this;
+        if (node) {
+            self.loading(true);
+            node.save(function(data){
+                if (data.responseJSON.success == false){
+                    viewModel.alert(new AlertViewModel('ep-alert-red', data.responseJSON.title, data.responseJSON.message));
+                }
+                self.loading(false);
+            });
+        };
+    }
+
+    viewModel.saveSelectedNode = function(){
+        if (viewModel.selectedNode()) {
+            viewModel.saveNode(viewModel.selectedNode())
+        };
+    }
+
     viewModel.nodeForm = new NodeFormView({
         graph: viewModel.graph,
         graphModel: viewModel.graphModel,
