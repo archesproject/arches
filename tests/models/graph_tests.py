@@ -987,6 +987,21 @@ class GraphTests(ArchesTestCase):
             if card.nodegroup.parentnodegroup is None:
                 self.assertEqual(graph.get_root_card(), card)
 
+    def test_graph_validation_of_null_ontology_class(self):
+        """
+        test to make sure null ontology classes aren't allowed
+
+        """
+
+        graph = Graph.objects.get(graphid=self.rootNode.graph_id)
+        new_node = graph.add_node({'nodeid':uuid.uuid1()}) # A blank node with no ontology class is specified
+        graph.add_edge({'domainnode_id':self.rootNode.pk, 'rangenode_id':new_node.pk, 'ontologyproperty':None})
+
+        with self.assertRaises(GraphValidationError) as cm:
+            graph.save()
+        the_exception = cm.exception
+        self.assertEqual(the_exception.code, 1000)
+
     def test_graph_validation_of_invalid_ontology_class(self):
         """
         test to make sure invalid ontology classes aren't allowed
@@ -994,7 +1009,7 @@ class GraphTests(ArchesTestCase):
         """
 
         graph = Graph.objects.get(graphid=self.rootNode.graph_id)
-        new_node = graph.add_node({'nodeid':uuid.uuid1()}) # A blank node with no ontology class is specified
+        new_node = graph.add_node({'nodeid':uuid.uuid1(), 'ontologyclass': 'InvalidOntologyClass'}) # A blank node with an invalid ontology class specified
         graph.add_edge({'domainnode_id':self.rootNode.pk, 'rangenode_id':new_node.pk, 'ontologyproperty':None})
 
         with self.assertRaises(GraphValidationError) as cm:
