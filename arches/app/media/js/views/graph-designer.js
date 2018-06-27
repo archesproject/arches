@@ -64,7 +64,7 @@ define([
         self.loading(true)
         if (node) {
             node.save(function(data){
-                if (!data.responseJSON.success){
+                if (data.responseJSON.success == false){
                     viewModel.alert(new AlertViewModel('ep-alert-red', data.responseJSON.title, data.responseJSON.message));
                 }
                 self.loading(false);
