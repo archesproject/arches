@@ -21,6 +21,7 @@ import json
 from copy import copy, deepcopy
 from django.db import transaction
 from arches.app.models import models
+from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.search.mappings import prepare_search_index, delete_search_index
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -377,7 +378,14 @@ class Graph(models.GraphModel):
         else:
             raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot delete a Resource Model with instances.".format(self.name)))
 
+    def delete_instances(self):
+        """
+        deletes all associated resource instances
 
+        """
+        for resource in Resource.objects.filter(graph_id=self.graphid):
+            print("Deleting resource:", resource.resourceinstanceid)
+            resource.delete()
 
     def get_tree(self, root=None):
         """

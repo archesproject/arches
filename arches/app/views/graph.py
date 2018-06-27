@@ -247,6 +247,7 @@ class GraphManagerView(GraphBaseView):
     def delete(self, request, graphid):
         try:
             graph = Graph.objects.get(graphid=graphid)
+            graph.delete_instances()
             graph.delete()
             return JSONResponse({'success':True})
         except GraphValidationError as e:
