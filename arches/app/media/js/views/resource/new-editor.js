@@ -22,6 +22,7 @@ define([
     var filter = ko.observable('');
     var loading = ko.observable(false);
     var selection = ko.observable();
+    var displayname = ko.observable(data.displayname);
     var resourceId = ko.observable(data.resourceid);
     var selectedTile = ko.computed(function () {
         var item = selection();
@@ -33,15 +34,6 @@ define([
         }
     });
     var provisionalTileViewModel = new ProvisionalTileViewModel({tile: selectedTile, reviewer: data.user_is_reviewer});
-
-    var updateDisplayName = function () {
-        $.get(
-            arches.urls.resource_descriptors + resourceId(),
-            function (descriptors) {
-                vm.displayname(descriptors.displayname);
-            }
-        );
-    };
 
     var cards = data.cards;
 
@@ -79,7 +71,7 @@ define([
             name: data.graphname,
             iconclass: data.graphiconclass,
         },
-        displayname: ko.observable(data.displayname),
+        displayname: displayname,
         expandAll: function() {
             toggleAll(true);
         },
@@ -97,6 +89,7 @@ define([
                 card: card,
                 tile: null,
                 resourceId: resourceId,
+                displayname: displayname,
                 handlers: handlers,
                 cards: data.cards,
                 tiles: tiles,
@@ -108,7 +101,8 @@ define([
                 cardwidgets: data.cardwidgets,
                 datatypes: data.datatypes,
                 widgets: data.widgets,
-                nodegroups: data.nodegroups
+                nodegroups: data.nodegroups,
+                userisreviewer: data.userisreviewer
             });
         }),
         selection: selection,

@@ -35,6 +35,16 @@ define([
         return hasEdits;
     };
 
+    var updateDisplayName = function(resourceId, displayname) {
+        $.get(
+            arches.urls.resource_descriptors + resourceId(),
+            function (descriptors) {
+                displayname(descriptors.displayname);
+            }
+        );
+    };
+
+
     var TileViewModel = function(params) {
         var self = this;
         var selection = params.selection || ko.observable();
@@ -58,10 +68,11 @@ define([
                 })
                 return nodegroup.parentnodegroup_id === self.nodegroup_id;
             }).map(function(card) {
-                var cardVM = new CardViewModel({
+                return new CardViewModel({
                     card: _.clone(card),
                     tile: self,
                     resourceId: params.resourceId,
+                    displayname: params.displayname,
                     handlers: params.handlers,
                     cards: params.cards,
                     tiles: params.tiles,
@@ -75,7 +86,6 @@ define([
                     widgets: params.widgets,
                     nodegroups: params.nodegroups
                 });
-                return cardVM;
             }),
             expanded: ko.observable(true),
             hasprovisionaledits: ko.computed(function () {
@@ -153,8 +163,8 @@ define([
                     data: self.formData
                 }).done(function(tileData, status, req) {
                     if (self.tileid) {
-                        koMapping.fromJS(tileData.data,tile.data);
-                        koMapping.fromJS(tileData.provisionaledits,tile.provisionaledits);
+                        koMapping.fromJS(tileData.data, self.data);
+                        koMapping.fromJS(tileData.provisionaledits, self.provisionaledits);
                     } else {
                         self.data = koMapping.fromJS(tileData.data);
                     }
@@ -165,11 +175,11 @@ define([
                         self.parent.expanded(true);
                         selection(self);
                     }
-                    if (data.userisreviewer === false && !self.provisionaledits()) {
+                    if (params.userisreviewer === false && !self.provisionaledits()) {
                         //If the user is provisional ensure their edits are provisional
                         self.provisionaledits(self.data);
                     };
-                    if (data.userisreviewer === true && params.provisionalTileViewModel.selectedProvisionalEdit()) {
+                    if (params.userisreviewer === true && params.provisionalTileViewModel.selectedProvisionalEdit()) {
                         if (JSON.stringify(params.provisionalTileViewModel.selectedProvisionalEdit().value) === koMapping.toJSON(self.data)) {
                             params.provisionalTileViewModel.removeSelectedProvisionalEdit();
                         };
@@ -181,7 +191,7 @@ define([
                     _.each(params.handlers['after-update'], function (handler) {
                         handler(req, self);
                     });
-                    updateDisplayName();
+                    updateDisplayName(params.resourceId, params.displayname);
                 }).fail(function(response) {
                 }).always(function(){
                     loading(false);
@@ -263,33 +273,6 @@ define([
             return group.nodegroupid === params.card.nodegroup_id;
         });
 
-        var tiles = ko.observableArray(
-            _.filter(params.tiles, function(tile) {
-                return (
-                    params.tile ? (tile.parenttile_id === params.tile.tileid) : true
-                ) && tile.nodegroup_id === params.card.nodegroup_id;
-            }).map(function (tile) {
-                var tileVM = new TileViewModel({
-                    tile: tile,
-                    card: self,
-                    resourceId: params.resourceId,
-                    handlers: params.handlers,
-                    cards: params.cards,
-                    tiles: params.tiles,
-                    provisionalTileViewModel: params.provisionalTileViewModel,
-                    selection: selection,
-                    loading: loading,
-                    filter: filter,
-                    nodes: params.nodes,
-                    cardwidgets: params.cardwidgets,
-                    datatypes: params.datatypes,
-                    widgets: params.widgets,
-                    nodegroups: params.nodegroups
-                });
-                return tileVM;
-            })
-        );
-
         _.extend(this, params.card, nodegroup, {
             widgets: widgets,
             nodes: nodes,
@@ -305,8 +288,33 @@ define([
                     return true;
                 }
             }, this),
-            // tiles: ko.observableArray(),
-            tiles: tiles,
+            tiles: ko.observableArray(
+                _.filter(params.tiles, function(tile) {
+                    return (
+                        params.tile ? (tile.parenttile_id === params.tile.tileid) : true
+                    ) && tile.nodegroup_id === params.card.nodegroup_id;
+                }).map(function (tile) {
+                    return new TileViewModel({
+                        tile: tile,
+                        card: self,
+                        resourceId: params.resourceId,
+                        displayname: params.displayname,
+                        handlers: params.handlers,
+                        userisreviewer: params.userisreviewer,
+                        cards: params.cards,
+                        tiles: params.tiles,
+                        provisionalTileViewModel: params.provisionalTileViewModel,
+                        selection: selection,
+                        loading: loading,
+                        filter: filter,
+                        nodes: params.nodes,
+                        cardwidgets: params.cardwidgets,
+                        datatypes: params.datatypes,
+                        widgets: params.widgets,
+                        nodegroups: params.nodegroups
+                    });
+                })
+            ),
             hasprovisionaledits: ko.computed(function(){
                 return _.filter(params.tiles, function(tile){
                     return (
@@ -344,7 +352,7 @@ define([
                     url: arches.urls.reorder_tiles,
                     complete: function(response) {
                         loading(false);
-                        updateDisplayName();
+                        updateDisplayName(params.resourceId, params.displayname);
                     }
                 });
             },
@@ -361,7 +369,10 @@ define([
                         }, {})
                     },
                     card: self,
+                    resourceId: params.resourceId,
+                    displayname: params.displayname,
                     handlers: params.handlers,
+                    userisreviewer: params.userisreviewer,
                     cards: params.cards,
                     tiles: params.tiles,
                     selection: selection,
