@@ -370,11 +370,7 @@ class GraphDataView(View):
 
                 elif self.action == 'update_node':
                     graph.update_node(data)
-                    ret = {
-                        'success': True,
-                        'graphid': graph
-                    }
-                    # ret = graph
+                    ret = graph
                     graph.save()
 
                 elif self.action == 'update_node_layer':
