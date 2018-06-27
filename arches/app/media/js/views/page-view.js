@@ -3,11 +3,12 @@ define([
     'underscore',
     'backbone',
     'knockout',
+    'moment',
     'arches',
     'viewmodels/alert',
     'bindings/scrollTo',
     'bootstrap'
-], function($, _, Backbone, ko, arches,  AlertViewModel) {
+], function($, _, Backbone, ko, moment, arches,  AlertViewModel) {
     /**
     * A backbone view representing a basic page in arches.  It sets up the
     * viewModel defaults, optionally accepts additional view model data and
@@ -47,6 +48,7 @@ define([
                 dirty: ko.observable(false),
                 showConfirmNav: ko.observable(false),
                 navDestination: ko.observable(''),
+                provisionalEdits: ko.observableArray(),
                 navigate: function(url, bypass) {
                     if (!bypass && self.viewModel.dirty()) {
                         self.viewModel.navDestination(url);
@@ -86,18 +88,18 @@ define([
                     }
                 },
                 getProvisionalHistory: function(){
+                    self.viewModel.helploading(true);
+                    self.viewModel.provisionalEdits.removeAll();
                     $.ajax({
                         type: "GET",
                         url: arches.urls.tile_history,
                         success : function(data) {
-                            console.log(data)
                             self.viewModel.helploaded(true);
                             self.viewModel.helploading(false);
-                            $('.ep-help-topic-toggle').click(function (){
-                                var sectionEl = $(this).closest('div');
-                                contentEl = $(sectionEl).find('.ep-help-topic-content').first();
-                                contentEl.slideToggle();
-                            });
+                            self.viewModel.provisionalEdits(_.map(data, function(edit){
+                                edit.displaytime = moment(edit.lasttimestamp).format('DD-MM-YYYY hh:mm a');
+                                return edit;
+                            }))
                         }
                     });
                 }
@@ -117,6 +119,10 @@ define([
 
             $('.ep-help-toggle').click(function (){
                 $('#ep-help-panel').toggle('slide', { direction: 'right' });
+            });
+
+            $('.ep-edits-toggle').click(function (){
+                $('#ep-edits-panel').toggle('slide', { direction: 'right' });
             });
         }
     });

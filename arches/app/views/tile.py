@@ -186,15 +186,27 @@ class TileData(View):
                 summary[edit.tileinstanceid]['reviewer'] = ''
                 summary[edit.tileinstanceid]['resourceinstanceid'] = edit.resourceinstanceid
                 summary[edit.tileinstanceid]['resourcemodelid'] = edit.resourceclassid
+                summary[edit.tileinstanceid]['nodegroupid'] = edit.nodegroupid
                 if edit.provisional_edittype in ['accept edit', 'delete edit']:
                     summary[edit.tileinstanceid]['reviewer'] = edit.user_username
 
             chronological_summary = []
+            resource_models = models.GraphModel.objects.filter(isresource=True).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).values('iconclass','color','graphid','name')
+            cards = models.CardModel.objects.all().values('name', 'nodegroup_id')
+            card_lookup = {str(card['nodegroup_id']): card for card in cards}
+            resource_model_lookup = {str(graph['graphid']): graph for graph in resource_models}
             for k, v in summary.iteritems():
                 if v['lastedittype'] not in ['accept edit', 'delete edit']:
                     tile = Tile.objects.get(pk=k)
                     if tile.provisionaledits is not None and str(request.user.id) in tile.provisionaledits:
                         v['pending'] = True
+
+                v['resourcemodel'] = resource_model_lookup[v['resourcemodelid']]
+                v['card'] = card_lookup[v['nodegroupid']]
+                if 'graphid' in v['resourcemodel']:
+                    v['resourcemodel'].pop('graphid')
+                if 'nodegroup_id' in v['card']:
+                    v['card'].pop('nodegroup_id')
                 chronological_summary.append(v)
 
             print sorted(chronological_summary, key=lambda k: k['lasttimestamp'])
