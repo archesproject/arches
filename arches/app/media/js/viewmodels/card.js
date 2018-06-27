@@ -142,7 +142,7 @@ define([
                     "tiles": children
                 });
             },
-            save: function () {
+            save: function (onFail) {
                 loading(true);
                 delete self.formData.data;
                 if (params.provisionalTileViewModel.selectedProvisionalEdit()) {
@@ -193,6 +193,9 @@ define([
                     });
                     updateDisplayName(params.resourceId, params.displayname);
                 }).fail(function(response) {
+                    if (typeof onFail === 'function') {
+                        onFail(response);
+                    }
                 }).always(function(){
                     loading(false);
                 });
@@ -210,7 +213,6 @@ define([
                     if (typeof onFail === 'function') {
                         onFail(response);
                     }
-                    // vm.alert(new AlertViewModel('ep-alert-red', response.responseJSON.message[0], response.responseJSON.message[1], null, function(){}));
                 }).always(function(){
                     loading(false);
                 });
