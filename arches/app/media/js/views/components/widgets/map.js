@@ -1908,7 +1908,7 @@ define([
 
          this.displayValue = ko.computed(function() {
              var value = koMapping.toJS(this.value);
-             if (!value.features) {
+             if (!value || !value.features) {
                  return 0;
              }
              return value.features.length;

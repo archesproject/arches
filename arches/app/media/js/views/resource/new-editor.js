@@ -2,10 +2,10 @@ define([
     'jquery',
     'underscore',
     'knockout',
-    'knockout-mapping',
     'moment',
     'views/base-manager',
     'viewmodels/alert',
+    'viewmodels/card',
     'viewmodels/new-provisional-tile',
     'arches',
     'resource-editor-data',
@@ -13,7 +13,7 @@ define([
     'bindings/sortable',
     'widgets',
     'card-components'
-], function($, _, ko, koMapping, moment, BaseManagerView, AlertViewModel, ProvisionalTileViewModel, arches, data) {
+], function($, _, ko, moment, BaseManagerView, AlertViewModel, CardViewModel, ProvisionalTileViewModel, arches, data) {
     var handlers = {
         'after-update': [],
         'tile-reset': []
@@ -23,6 +23,16 @@ define([
     var loading = ko.observable(false);
     var selection = ko.observable();
     var resourceId = ko.observable(data.resourceid);
+    var selectedTile = ko.computed(function () {
+        var item = selection();
+        if (item) {
+            if (item.tileid) {
+                return item;
+            }
+            return item.getNewTile();
+        }
+    });
+    var provisionalTileViewModel = new ProvisionalTileViewModel({tile: selectedTile, reviewer: data.user_is_reviewer});
 
     var updateDisplayName = function () {
         $.get(
@@ -33,304 +43,7 @@ define([
         );
     };
 
-    var cards = _.map(data.cards, function(card) {
-        var nodes = _.filter(data.nodes, function (node) {
-            return node.nodegroup_id === card.nodegroup_id;
-        }).map(function (node) {
-            node.configKeys = ko.observableArray(
-                _.map(node.config, function (val, key) {
-                    return key
-                })
-            );
-            node.config = koMapping.fromJS(node.config);
-            return node;
-        });
-        var widgets = _.filter(data.cardwidgets, function (widget) {
-            return widget.card_id === card.cardid;
-        });
-        _.each(nodes, function (node) {
-            var widget = _.find(widgets, function (widget) {
-                return widget.node_id === node.nodeid
-            });
-            if (!widget) {
-                var datatype = _.find(data.datatypes, function (datatype) {
-                    return datatype.datatype === node.datatype;
-                });
-                if (datatype.defaultwidget_id) {
-                    var widgetData = _.find(data.widgets, function (widget) {
-                        return widget.widgetid === datatype.defaultwidget_id;
-                    });
-                    widgets.push({
-                        widget_id: datatype.defaultwidget_id,
-                        config: _.extend({
-                            label: node.name
-                        }, widgetData.defaultconfig),
-                        label: node.name,
-                        node_id: node.nodeid,
-                        card_id: card.cardid,
-                        id: '',
-                        sortorder: ''
-                    });
-                }
-            }
-        });
-        return _.extend(
-            card,
-            _.find(data.nodegroups, function(group) {
-                return group.nodegroupid === card.nodegroup_id;
-            }), {
-                widgets: widgets,
-                nodes: nodes
-            }
-        );
-    });
-
-    var isChildSelected = function (parent) {
-        var childSelected = false;
-        var childrenKey = parent.tiles ? 'tiles' : 'cards';
-        ko.unwrap(parent[childrenKey]).forEach(function(child) {
-            if (child.selected() || isChildSelected(child)){
-                childSelected = true;
-            }
-        });
-        return childSelected;
-    };
-
-    var doesChildHaveProvisionalEdits = function(parent) {
-        var hasEdits = false;
-        var childrenKey = parent.tiles ? 'tiles' : 'cards';
-        ko.unwrap(parent[childrenKey]).forEach(function(child) {
-            if (child.hasprovisionaledits() || doesChildHaveProvisionalEdits(child)){
-                hasEdits = true;
-            }
-        });
-        return hasEdits;
-    };
-
-    var setupCard = function (card, parent) {
-        card = _.extend(card, {
-            parent: parent,
-            expanded: ko.observable(true),
-            highlight: ko.computed(function() {
-                var filterText = filter();
-                if (!filterText) {
-                    return false;
-                }
-                filterText = filterText.toLowerCase();
-                if (card.name.toLowerCase().indexOf(filterText) > -1) {
-                    return true;
-                }
-            }, this),
-            tiles: ko.observableArray(
-                _.filter(tiles, function(tile) {
-                    return (
-                        parent ? (tile.parenttile_id === parent.tileid) : true
-                    ) && tile.nodegroup_id === card.nodegroup_id;
-                }).map(function (tile) {
-                    return setupTile(tile, card);
-                })
-            ),
-            hasprovisionaledits: ko.computed(function(){
-                return _.filter(tiles, function(tile){
-                    return (
-                        parent ? (tile.parenttile_id === parent.tileid) : true
-                    ) && tile.nodegroup_id === card.nodegroup_id && ko.unwrap(tile.provisionaledits);
-                }).length
-            }),
-            selected: ko.pureComputed({
-                read: function () {
-                    return selection() === this;
-                },
-                write: function (value) {
-                    if (value) {
-                        selection(this);
-                    }
-                },
-                owner: card
-            }),
-            canAdd: ko.pureComputed({
-                read: function () {
-                    return this.cardinality === 'n' || this.tiles().length === 0
-                },
-                owner: card
-            }),
-            reorderTiles: function (e) {
-                loading(true);
-                var tiles = _.map(card.tiles(), function(tile) {
-                    return tile.getAttributes();
-                });
-                $.ajax({
-                    type: "POST",
-                    data: JSON.stringify({
-                        tiles: tiles
-                    }),
-                    url: arches.urls.reorder_tiles,
-                    complete: function(response) {
-                        loading(false);
-                        updateDisplayName();
-                    }
-                });
-            },
-        });
-        card.isChildSelected = ko.computed(function() {
-            return isChildSelected(card);
-        }, this);
-        card.doesChildHaveProvisionalEdits = ko.computed(function() {
-            return doesChildHaveProvisionalEdits(card);
-        });
-        return card;
-    };
-
-    var setupTile = function(tile, parent) {
-        tile._tileData = ko.observable(
-            koMapping.toJSON(tile.data)
-        );
-
-        tile.data = koMapping.fromJS(tile.data);
-        tile.provisionaledits = ko.observable(tile.provisionaledits);
-
-        tile = _.extend(tile, {
-            parent: parent,
-            cards: _.filter(cards, function(card) {
-                return card.parentnodegroup_id === tile.nodegroup_id;
-            }).map(function(card) {
-                return setupCard(_.clone(card), tile);
-            }),
-            expanded: ko.observable(true),
-            hasprovisionaledits: ko.computed(function () {
-                return !!tile.provisionaledits();
-            }, this),
-            selected: ko.pureComputed({
-                read: function () {
-                    return selection() === this;
-                },
-                write: function (value) {
-                    if (value) {
-                        selection(this);
-                    }
-                },
-                owner: tile
-            }),
-            formData: new FormData(),
-            dirty: ko.computed(function () {
-                return tile._tileData() !== koMapping.toJSON(tile.data);
-            }, this),
-            reset: function () {
-                ko.mapping.fromJS(
-                    JSON.parse(tile._tileData()),
-                    tile.data
-                );
-                _.each(handlers['tile-reset'], function (handler) {
-                    handler(tile);
-                });
-                vm.provisionalTileViewModel.selectedProvisionalEdit(undefined);
-            },
-            getAttributes: function () {
-                var tileData = tile.data ? koMapping.toJS(tile.data) : {};
-                var tileProvisionalEdits = tile.provisionaledits ? koMapping.toJS(tile.provisionaledits) : {};
-                return {
-                    "tileid": tile.tileid,
-                    "data": tileData,
-                    "nodegroup_id": tile.nodegroup_id,
-                    "parenttile_id": tile.parenttile_id,
-                    "resourceinstance_id": tile.resourceinstance_id,
-                    "provisionaledits": tileProvisionalEdits
-                }
-            },
-            getData: function () {
-                var children = {};
-                if (tile.cards) {
-                    children = _.reduce(tile.cards, function (tiles, card) {
-                        return tiles.concat(card.tiles());
-                    }, []).reduce(function (tileLookup, child) {
-                        tileLookup[child.tileid] = child.getData();
-                        return tileLookup;
-                    }, {});
-                }
-                return _.extend(tile.getAttributes(), {
-                    "tiles": children
-                });
-            },
-            save: function () {
-                loading(true);
-                delete tile.formData.data;
-                if (vm.provisionalTileViewModel.selectedProvisionalEdit()) {
-                    vm.provisionalTileViewModel.acceptProvisionalEdit();
-                };
-                tile.formData.append(
-                    'data',
-                    JSON.stringify(
-                        tile.getData()
-                    )
-                );
-
-                $.ajax({
-                    type: "POST",
-                    url: arches.urls.tile,
-                    processData: false,
-                    contentType: false,
-                    data: tile.formData
-                }).done(function(tileData, status, req) {
-                    if (tile.tileid) {
-                        koMapping.fromJS(tileData.data,tile.data);
-                        koMapping.fromJS(tileData.provisionaledits,tile.provisionaledits);
-                    } else {
-                        tile.data = koMapping.fromJS(tileData.data);
-                    }
-                    tile._tileData(koMapping.toJSON(tile.data));
-                    if (!tile.tileid) {
-                        tile.tileid = tileData.tileid;
-                        tile.parent.tiles.unshift(tile);
-                        tile.parent.expanded(true);
-                        vm.selection(tile);
-                    }
-                    if (data.userisreviewer === false && !tile.provisionaledits()) {
-                        //If the user is provisional ensure their edits are provisional
-                        tile.provisionaledits(tile.data);
-                    };
-                    if (data.userisreviewer === true && vm.provisionalTileViewModel.selectedProvisionalEdit()) {
-                        if (JSON.stringify(vm.provisionalTileViewModel.selectedProvisionalEdit().value) === koMapping.toJSON(tile.data)) {
-                            vm.provisionalTileViewModel.removeSelectedProvisionalEdit();
-                        };
-                    };
-                    if (!resourceId()) {
-                        tile.resourceinstance_id = tileData.resourceinstance_id;
-                        resourceId(tile.resourceinstance_id);
-                    }
-                    _.each(handlers['after-update'], function (handler) {
-                        handler(req, tile);
-                    });
-                    updateDisplayName();
-                }).fail(function(response) {
-                    console.log('there was an error ', response);
-                }).always(function(){
-                    loading(false);
-                });
-            },
-            deleteTile: function() {
-                loading(true);
-                $.ajax({
-                    type: "DELETE",
-                    url: arches.urls.tile,
-                    data: JSON.stringify(tile.getData())
-                }).done(function(response) {
-                    parent.tiles.remove(tile);
-                    selection(parent);
-                }).fail(function(response) {
-                    vm.alert(new AlertViewModel('ep-alert-red', response.responseJSON.message[0], response.responseJSON.message[1], null, function(){}));
-                }).always(function(){
-                    loading(false);
-                });
-            }
-        });
-        tile.isChildSelected = ko.computed(function() {
-            return isChildSelected(tile);
-        }, this);
-        tile.doesChildHaveProvisionalEdits = ko.computed(function() {
-            return doesChildHaveProvisionalEdits(tile);
-        });
-        return tile;
-    };
+    var cards = data.cards;
 
     var toggleAll = function(state) {
         var nodes = _.reduce(
@@ -374,30 +87,32 @@ define([
             toggleAll(false);
         },
         rootExpanded: ko.observable(true),
-        topCards: _.filter(cards, function(card) {
-            return !card.parentnodegroup_id
+        topCards: _.filter(data.cards, function(card) {
+            var nodegroup = _.find(data.nodegroups, function(group) {
+                return group.nodegroupid === card.nodegroup_id;
+            })
+            return !nodegroup || !nodegroup.parentnodegroup_id;
         }).map(function (card) {
-            return setupCard(card, null);
+            return new CardViewModel({
+                card: card,
+                tile: null,
+                resourceId: resourceId,
+                handlers: handlers,
+                cards: data.cards,
+                tiles: tiles,
+                selection: selection,
+                loading: loading,
+                filter: filter,
+                provisionalTileViewModel: provisionalTileViewModel,
+                nodes: data.nodes,
+                cardwidgets: data.cardwidgets,
+                datatypes: data.datatypes,
+                widgets: data.widgets,
+                nodegroups: data.nodegroups
+            });
         }),
         selection: selection,
-        selectedTile: ko.computed(function () {
-            var item = selection();
-            if (item) {
-                if (item.tileid) {
-                    return item;
-                }
-                return setupTile({
-                    tileid: '',
-                    resourceinstance_id: resourceId(),
-                    nodegroup_id: item.nodegroup_id,
-                    parenttile_id: item.parent ? item.parent.tileid : null,
-                    data: _.reduce(item.widgets, function (data, widget) {
-                        data[widget.node_id] = null;
-                        return data;
-                    }, {})
-                }, item);
-            }
-        }),
+        selectedTile: selectedTile,
         selectedCard: ko.computed(function () {
             var item = selection();
             if (item) {
@@ -407,6 +122,7 @@ define([
                 return item;
             }
         }),
+        provisionalTileViewModel: provisionalTileViewModel,
         filter: filter,
         on: function (eventName, handler) {
             if (handlers[eventName]) {
@@ -473,7 +189,6 @@ define([
         }
     };
     var topCard = vm.topCards[0];
-    vm.provisionalTileViewModel = new ProvisionalTileViewModel({tile: vm.selectedTile, reviewer: data.user_is_reviewer});
     selection(topCard.tiles().length > 0 ? topCard.tiles()[0] : topCard);
 
     vm.selectionBreadcrumbs = ko.computed(function () {
