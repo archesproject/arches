@@ -185,16 +185,16 @@
         <!-- /ko -->
         <div class="install-buttons">
             <!-- ko if: tile.tileid -->
-            <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-trash" data-bind="click: tile.deleteTile">Delete</button>
+            <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-trash" data-bind="click: function () { self.form.deleteTile(tile); }">Delete</button>
             <!-- /ko -->
             <!-- ko if: tile.dirty() -->
             <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset">Cancel</button>
                 <!-- ko if: tile.tileid -->
-                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: tile.save">Save</button>
+                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: function () { self.form.saveTile(tile); }">Save</button>
                 <!-- /ko -->
             <!-- /ko -->
             <!-- ko if: !tile.tileid -->
-            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: tile.save">Add</button>
+            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: function () { self.form.saveTile(tile); }">Add</button>
             <!-- /ko -->
         </div>
 
