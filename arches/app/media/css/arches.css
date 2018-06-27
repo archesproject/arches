@@ -5519,7 +5519,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 .new-provisional-edits-list {
     display: flex;
     flex-direction: column;
-    margin-top: 26px;
+    margin-top: 0px;
     width: 165px;
     padding: 5px;
     border-color: #ddd;
@@ -5531,6 +5531,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 .new-provisional-edit-card-container {
     display: flex;
     flex-direction: row;
+    align-items: baseline;
 }
 
 .new-provisional-edit-entry {

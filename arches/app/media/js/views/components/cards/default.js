@@ -6,6 +6,8 @@ define(['knockout'], function (ko) {
         this.card = params.card;
         this.tile = params.tile;
         this.form = params.form;
+        this.provisionalTileViewModel = params.provisionalTileViewModel;
+        this.reviewer = params.reviewer;
         this.expanded = ko.observable(true);
         this.beforeMove = function (e) {
             e.cancelDrop = (e.sourceParent!==e.targetParent);
