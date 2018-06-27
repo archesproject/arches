@@ -41,12 +41,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <div class="ep-form-toolbar">
 
         <h4 class="ep-form-toolbar-title">
-            <!-- Layer Filter -->
-            <div class="list-filter" data-bind="" style="margin-right: 10px;">
-                <input type="text" class="form-control" style="width: 250px;" placeholder="{% trans 'Find a node, datatype, card...' %}" data-bind="textInput: graphTree.filter">
-
-                <!-- Clear Search -->
-                <span class="clear-node-search" data-bind="visible: graphTree.filter().length > 0, click: function() { graphTree.filter(''); }" style="top: 8px;"><i class="fa fa-times-circle"></i></span>
+            <!-- Menu Item -->
+            <div class="graph-selector" data-bind="" style="margin-right: 10px;">
+                <!-- ko if: groupedGraphs -->
+                <select data-bind="template: { name: 'selectGraphTemplate', data: groupedGraphs }, chosen: {width: '100%'}, value: graphid"></select>
+                <!-- /ko -->
+                <script type="text/html" id="selectGraphTemplate">
+                    <option disabled selected value>{% trans "Find a Resource Model/Branch..." %}</option>
+                    <!-- ko foreach: groups -->
+                        <optgroup data-bind="attr: { 'label': (name==='Resource Models')?'{% trans "Resource Models" %}':'{% trans "Branches" %}' }, foreach: items">
+                            <option data-bind="value: graphid, text: name"></option>
+                        </optgroup>
+                    <!-- /ko -->
+                </script>
             </div>
         </h4>
 
@@ -103,7 +110,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </ul>
             </div>
 
-            <div class="tab-content left-panel-overflow" >
+            <div class="tab-content" >
                 <!-- Summary Card -->
                 <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'graph' }">
                     <div class="" data-bind="with: graphTree">

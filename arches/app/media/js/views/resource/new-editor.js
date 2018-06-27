@@ -153,7 +153,24 @@ define([
                     return this.cardinality === 'n' || this.tiles().length === 0
                 },
                 owner: card
-            })
+            }),
+            reorderTiles: function (e) {
+                loading(true);
+                var tiles = _.map(card.tiles(), function(tile) {
+                    return tile.getAttributes();
+                });
+                $.ajax({
+                    type: "POST",
+                    data: JSON.stringify({
+                        tiles: tiles
+                    }),
+                    url: arches.urls.reorder_tiles,
+                    complete: function(response) {
+                        loading(false);
+                        updateDisplayName();
+                    }
+                });
+            },
         });
         card.isChildSelected = ko.computed(function() {
             return isChildSelected(card);
@@ -402,26 +419,6 @@ define([
             if (handlers[eventName]) {
                 handlers[eventName].push(handler);
             }
-        },
-        beforeMove: function (e) {
-            e.cancelDrop = (e.sourceParent!==e.targetParent);
-        },
-        reorderTiles: function (e) {
-            loading(true);
-            var tiles = _.map(e.sourceParent(), function(tile) {
-                return tile.getAttributes();
-            });
-            $.ajax({
-                type: "POST",
-                data: JSON.stringify({
-                    tiles: tiles
-                }),
-                url: arches.urls.reorder_tiles,
-                complete: function(response) {
-                    loading(false);
-                    updateDisplayName();
-                }
-            });
         },
         resourceId: resourceId,
         copyResource: function () {

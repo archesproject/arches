@@ -232,10 +232,6 @@ define(['arches',
                     this.get('edges').push(response.responseJSON.edge);
                     node.children.unshift(newNode)
 
-                    // response.responseJSON.nodegroups.forEach(function(nodegroup){
-                    //     this.get('nodegroups').push(nodegroup);
-                    // }, this);
-
                     if(!this.get('isresource')){
                         this.selectNode(newNode);
                     }
@@ -423,12 +419,8 @@ define(['arches',
             }
 
             if(this.get('isresource')){
-                if(nodeToAppendTo.nodeid !== this.get('root').nodeid){
+                if(typeOfGraphToAppend === 'undefined'){
                     return false;
-                }else{
-                    if(typeOfGraphToAppend === 'undefined'){
-                        return false;
-                    }
                 }
             }else{ // this graph is a Graph
                 switch(this.isType()) {

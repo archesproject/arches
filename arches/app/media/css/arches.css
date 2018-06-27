@@ -10972,10 +10972,11 @@ ul.select2-choices:after {
 .left-panel {
     width: 270px;
     overflow-x: auto;
+    overflow-y: hidden;
 }
 
 .left-panel-overflow {
-    height: 90%;
+    height: calc(90vh - 100px);
     overflow-y: auto;
 }
 
@@ -11036,6 +11037,45 @@ ul.select2-choices:after {
 
 .jstree-anchor:hover .add-new-tile, .add-new-tile.jstree-clicked {
     display:inline;
+}
+
+.card-summary-section li {
+    list-style: none;
+}
+
+.card-summary-section .card-summary {
+    padding-bottom:5px;
+}
+
+.card-summary-section.disabled  h4 {
+    color: #7a7a7a;
+}
+
+.card-summary-section.disabled  a {
+    cursor: default;
+}
+
+.card-summary-section .card-summary .card-summary-add {
+    margin-left: 2px;
+}
+
+.card-summary-section .card-summary {
+    margin-bottom:5px;
+}
+
+.card-summary-section .tile-summary {
+    padding: 2px;
+}
+.card-summary-section .tile-summary a {
+    color: #6494cc;
+}
+
+.card-summary-section .tile-summary .tile-summary-label {
+    font-weight: bold;
+}
+
+.card-summary-section {
+    padding-bottom: 10px;
 }
 
 @keyframes loader {

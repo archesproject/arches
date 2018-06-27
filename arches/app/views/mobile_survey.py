@@ -114,17 +114,28 @@ class MobileSurveyManagerView(MapBaseManagerView):
         return render(request, 'views/mobile-survey-manager.htm', context)
 
     def delete(self, request):
-
         mobile_survey_id = None
         try:
             mobile_survey_id = JSONDeserializer().deserialize(request.body)['id']
         except Exception as e:
             print e
 
-        if mobile_survey_id is not None:
-            ret = MobileSurvey.objects.get(pk=mobile_survey_id)
-            ret.delete()
-            return JSONResponse({'success': True})
+        try:
+            connection_error = False
+            with transaction.atomic():
+                if mobile_survey_id is not None:
+                    ret = MobileSurvey.objects.get(pk=mobile_survey_id)
+                    ret.delete()
+                    return JSONResponse({'success': True})
+        except Exception as e:
+            if connection_error == False:
+                error_title = _('Unable to delete survey')
+                if e.strerror == 'Connection refused':
+                    error_message = "Unable to connect to CouchDB"
+                else:
+                    error_message = e.message
+                connection_error = JSONResponse({'success':False,'message': error_message,'title': error_title}, status=500)
+            return connection_error
 
         return HttpResponseNotFound()
 
@@ -211,9 +222,11 @@ class MobileSurveyManagerView(MapBaseManagerView):
         except Exception as e:
             if connection_error == False:
                 error_title = _('Unable to save survey')
-                error_message = e
+                if e.strerror == 'Connection refused':
+                    error_message = "Unable to connect to CouchDB"
+                else:
+                    error_message = e.message
                 connection_error = JSONResponse({'success':False,'message': error_message,'title': error_title}, status=500)
-            print connection_error
             return connection_error
 
         return JSONResponse({'success':True, 'mobile_survey': mobile_survey})
