@@ -10,8 +10,6 @@ define([
     'card-components'
 ], function($, _, ko, CardViewModel, arches, data) {
     var CardTreeViewModel = function(params) {
-        console.log(params)
-
         var self = this;
         var filter = ko.observable('');
         var loading = ko.observable(false);
