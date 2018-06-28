@@ -9,13 +9,14 @@ define([
     'views/graph/graph-designer/graph-tree',
     'views/graph/graph-designer/node-form',
     'views/graph/graph-manager/branch-list',
+    'views/graph/graph-designer/card-tree',
     'graph-designer-data',
     'arches',
     'viewmodels/graph-settings',
     'view-data',
     'bindings/resizable-sidepanel',
     'datatype-config-components'
-], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, GraphModel, GraphTree, NodeFormView, BranchListView, data, arches, GraphSettingsViewModel, viewData) {
+], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, GraphModel, GraphTree, NodeFormView, BranchListView, CardTreeViewModel, data, arches, GraphSettingsViewModel, viewData) {
     var viewModel = {
         placeholder: ko.observable(''),
         graphid: ko.observable(data.graphid),
@@ -77,6 +78,12 @@ define([
             viewModel.saveNode(viewModel.selectedNode())
         };
     }
+
+
+    viewModel.cardTree = new CardTreeViewModel({
+        graph: viewModel.graph,
+        graphModel: viewModel.graphModel
+    });
 
     viewModel.nodeForm = new NodeFormView({
         graph: viewModel.graph,

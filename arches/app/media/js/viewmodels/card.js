@@ -63,10 +63,10 @@ define([
         _.extend(this, {
             parent: params.card,
             cards: _.filter(params.cards, function(card) {
-                var nodegroup = _.find(params.nodegroups, function(group) {
-                    return group.nodegroupid === card.nodegroup_id;
+                var nodegroup = _.find(ko.unwrap(params.nodegroups), function(group) {
+                    return ko.unwrap(group.nodegroupid) === ko.unwrap(card.nodegroup_id);
                 })
-                return nodegroup.parentnodegroup_id === self.nodegroup_id;
+                return ko.unwrap(nodegroup.parentnodegroup_id) === ko.unwrap(self.nodegroup_id);
             }).map(function(card) {
                 return new CardViewModel({
                     card: _.clone(card),
@@ -84,7 +84,7 @@ define([
                     cardwidgets: params.cardwidgets,
                     datatypes: params.datatypes,
                     widgets: params.widgets,
-                    nodegroups: params.nodegroups
+                    nodegroups: ko.unwrap(params.nodegroups)
                 });
             }),
             expanded: ko.observable(true),
@@ -122,7 +122,7 @@ define([
                 return {
                     "tileid": self.tileid,
                     "data": tileData,
-                    "nodegroup_id": self.nodegroup_id,
+                    "nodegroup_id": ko.unwrap(self.nodegroup_id),
                     "parenttile_id": self.parenttile_id,
                     "resourceinstance_id": self.resourceinstance_id,
                     "provisionaledits": tileProvisionalEdits
@@ -231,8 +231,8 @@ define([
         var selection = params.selection || ko.observable();
         var filter = params.filter || ko.observable();
         var loading = params.loading || ko.observable();
-        var nodes = _.filter(params.nodes, function (node) {
-            return node.nodegroup_id === params.card.nodegroup_id;
+        var nodes = _.filter(ko.unwrap(params.nodes), function (node) {
+            return ko.unwrap(node.nodegroup_id) === ko.unwrap(params.card.nodegroup_id);
         }).map(function (node) {
             node.configKeys = ko.observableArray(
                 _.map(node.config, function (val, key) {
@@ -245,13 +245,13 @@ define([
         var widgets = _.filter(params.cardwidgets, function (widget) {
             return widget.card_id === params.card.cardid;
         });
-        _.each(nodes, function (node) {
+        _.each(ko.unwrap(nodes), function (node) {
             var widget = _.find(widgets, function (widget) {
-                return widget.node_id === node.nodeid
+                return widget.node_id === ko.unwrap(node.nodeid)
             });
             if (!widget) {
                 var datatype = _.find(params.datatypes, function (datatype) {
-                    return datatype.datatype === node.datatype;
+                    return datatype.datatype === ko.unwrap(node.datatype);
                 });
                 if (datatype.defaultwidget_id) {
                     var widgetData = _.find(params.widgets, function (widget) {
@@ -260,10 +260,10 @@ define([
                     widgets.push({
                         widget_id: datatype.defaultwidget_id,
                         config: _.extend({
-                            label: node.name
+                            label: ko.unwrap(node.name)
                         }, widgetData.defaultconfig),
-                        label: node.name,
-                        node_id: node.nodeid,
+                        label: ko.unwrap(node.name),
+                        node_id: ko.unwrap(node.nodeid),
                         card_id: params.card.cardid,
                         id: '',
                         sortorder: ''
@@ -271,10 +271,9 @@ define([
                 }
             }
         });
-        var nodegroup = _.find(params.nodegroups, function(group) {
-            return group.nodegroupid === params.card.nodegroup_id;
+        var nodegroup = _.find(ko.unwrap(params.nodegroups), function(group) {
+            return ko.unwrap(group.nodegroupid) === ko.unwrap(params.card.nodegroup_id);
         });
-
         _.extend(this, params.card, nodegroup, {
             widgets: widgets,
             nodes: nodes,
@@ -294,7 +293,7 @@ define([
                 _.filter(params.tiles, function(tile) {
                     return (
                         params.tile ? (tile.parenttile_id === params.tile.tileid) : true
-                    ) && tile.nodegroup_id === params.card.nodegroup_id;
+                    ) && ko.unwrap(tile.nodegroup_id) === ko.unwrap(params.card.nodegroup_id);
                 }).map(function (tile) {
                     return new TileViewModel({
                         tile: tile,
@@ -313,15 +312,40 @@ define([
                         cardwidgets: params.cardwidgets,
                         datatypes: params.datatypes,
                         widgets: params.widgets,
-                        nodegroups: params.nodegroups
+                        nodegroups: ko.unwrap(params.nodegroups)
                     });
                 })
             ),
+            cards: _.filter(params.cards, function(card) {
+                var nodegroup = _.find(ko.unwrap(params.nodegroups), function(group) {
+                    return ko.unwrap(group.nodegroupid) === ko.unwrap(card.nodegroup_id);
+                })
+                return ko.unwrap(nodegroup.parentnodegroup_id) === ko.unwrap(params.card.nodegroup_id);
+            }).map(function(card) {
+                return new CardViewModel({
+                    card: _.clone(card),
+                    tile: null,
+                    resourceId: params.resourceId,
+                    displayname: params.displayname,
+                    handlers: params.handlers,
+                    cards: params.cards,
+                    tiles: params.tiles,
+                    selection: selection,
+                    loading: loading,
+                    filter: filter,
+                    provisionalTileViewModel: params.provisionalTileViewModel,
+                    nodes: params.nodes,
+                    cardwidgets: params.cardwidgets,
+                    datatypes: params.datatypes,
+                    widgets: params.widgets,
+                    nodegroups: ko.unwrap(params.nodegroups)
+                });
+            }),
             hasprovisionaledits: ko.computed(function(){
                 return _.filter(params.tiles, function(tile){
                     return (
                         params.tile ? (tile.parenttile_id === params.tile.tileid) : true
-                    ) && tile.nodegroup_id === params.card.nodegroup_id && ko.unwrap(tile.provisionaledits);
+                    ) && ko.unwrap(tile.nodegroup_id) === ko.unwrap(params.card.nodegroup_id) && ko.unwrap(tile.provisionaledits);
                 }).length
             }),
             selected: ko.pureComputed({
@@ -363,7 +387,7 @@ define([
                     tile: {
                         tileid: '',
                         resourceinstance_id: params.resourceId(),
-                        nodegroup_id: self.nodegroup_id,
+                        nodegroup_id: ko.unwrap(self.nodegroup_id),
                         parenttile_id: self.parent ? self.parent.tileid : null,
                         data: _.reduce(self.widgets, function (data, widget) {
                             data[widget.node_id] = null;
@@ -385,7 +409,7 @@ define([
                     cardwidgets: params.cardwidgets,
                     datatypes: params.datatypes,
                     widgets: params.widgets,
-                    nodegroups: params.nodegroups
+                    nodegroups: ko.unwrap(params.nodegroups)
                 });
             }
         });
