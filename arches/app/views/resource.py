@@ -308,7 +308,8 @@ class ResourceEditLogView(BaseManagerView):
                 'delete': _('Resource Deleted'),
                 'tile delete': _('Tile Deleted'),
                 'tile create': _('Tile Created'),
-                'tile edit': _('Tile Updated')
+                'tile edit': _('Tile Updated'),
+                'delete edit': _('Edit Deleted')
             }
             deleted_instances = [e.resourceinstanceid for e in recent_edits if e.edittype == 'delete']
             graph_name_lookup = {str(r.resourceinstanceid): r.graph.name for r in resources}

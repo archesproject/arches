@@ -73,7 +73,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             relationship_types: {{ relationship_types }},
             displayName: '{{ displayname | escapejs }}',
             resourceInstanceExists: '{{resource_instance_exists}}',
-            userisreviewer: {{ user_is_reviewer }},
+            userisreviewer: JSON.parse('{{ user_is_reviewer }}'.toLowerCase()),
             userid: '{{ userid }}'
         };
     });

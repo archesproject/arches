@@ -18,7 +18,6 @@ import datetime
 from django.forms.models import model_to_dict
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
-from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
 from django.core.validators import RegexValidator
 from django.db.models import Q, Max
@@ -193,6 +192,9 @@ class EditLog(models.Model):
     user_lastname = models.TextField(blank=True, null=True)
     user_email = models.TextField(blank=True, null=True)
     user_username = models.TextField(blank=True, null=True)
+    provisional_userid = models.TextField(blank=True, null=True)
+    provisional_user_username = models.TextField(blank=True, null=True)
+    provisional_edittype = models.TextField(blank=True, null=True)
     note = models.TextField(blank=True, null=True)
 
     class Meta:
