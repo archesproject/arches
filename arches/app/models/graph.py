@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid
 import json
+import pyprind
 from copy import copy, deepcopy
 from django.db import transaction
 from arches.app.models import models
@@ -385,9 +386,12 @@ class Graph(models.GraphModel):
         """
         activestate = self.isactive
         self.isactive = False
+        bar = pyprind.ProgBar(Resource.objects.filter(graph_id=self.graphid).count())
         for resource in Resource.objects.filter(graph_id=self.graphid):
             resource.delete()
+            bar.update()
         self.isactive = activestate
+        print(bar)
 
     def get_tree(self, root=None):
         """
