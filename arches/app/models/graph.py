@@ -18,9 +18,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid
 import json
+import pyprind
 from copy import copy, deepcopy
 from django.db import transaction
 from arches.app.models import models
+from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.search.mappings import prepare_search_index, delete_search_index
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -377,7 +379,22 @@ class Graph(models.GraphModel):
         else:
             raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot delete a Resource Model with instances.".format(self.name)))
 
+    def delete_instances(self, verbose=False):
+        """
+        deletes all associated resource instances
 
+        """
+        activestate = self.isactive
+        self.isactive = False
+        if verbose == True:
+            bar = pyprind.ProgBar(Resource.objects.filter(graph_id=self.graphid).count())
+        for resource in Resource.objects.filter(graph_id=self.graphid):
+            resource.delete()
+            if verbose == True:
+                bar.update()
+        self.isactive = activestate
+        if verbose == True:
+            print(bar)
 
     def get_tree(self, root=None):
         """
