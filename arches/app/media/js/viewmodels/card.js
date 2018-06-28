@@ -257,7 +257,7 @@ define([
                     var widgetData = _.find(params.widgets, function (widget) {
                         return widget.widgetid === datatype.defaultwidget_id;
                     });
-                    widgets.push({
+                    widget = {
                         widget_id: datatype.defaultwidget_id,
                         config: _.extend({
                             label: ko.unwrap(node.name)
@@ -267,8 +267,22 @@ define([
                         card_id: params.card.cardid,
                         id: '',
                         sortorder: ''
-                    });
+                    }
+                    widgets.push(widget);
                 }
+            }
+            if (widget) {
+                widget.selected = ko.pureComputed({
+                    read: function () {
+                        return selection() === this;
+                    },
+                    write: function (value) {
+                        if (value) {
+                            selection(this);
+                        }
+                    },
+                    owner: widget
+                });
             }
         });
 
