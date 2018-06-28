@@ -11161,14 +11161,21 @@ ul.select2-choices:after {
 }
 
 .card-component-panel {
-    padding: 10px 20px 10px 20px;
+    padding: 0px;
     flex: 1 0 250px;
     width: 250px;
     overflow-y: auto;
 }
 
+.card-component-panel h3 {
+    color: #2f527a;
+    font-size: 17px;
+    font-weight: 400;
+}
+
 .card-component-panel h4 {
     color: #2f527a;
+    font-weight: 400;
 }
 
 .card-component-panel hr {
@@ -11177,6 +11184,16 @@ ul.select2-choices:after {
 
 .card-component-panel h5 {
     color: #989898;
+}
+
+.card-header {
+    height: 50px;
+    padding: 10px 20px;
+    background: #f4f4f4;
+}
+
+.card-header-title {
+    margin-top: -15px;
 }
 
 .card-breadcrumbs, .card-breadcrumbs a {
