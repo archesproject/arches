@@ -5665,6 +5665,11 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     align-items: baseline;
 }
 
+.new-provisional-edit-card-container .card {
+    width: 100%;
+}
+
+
 .new-provisional-edit-entry {
     display: flex;
     flex-direction: column;
