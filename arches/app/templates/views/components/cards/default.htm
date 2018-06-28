@@ -2,7 +2,7 @@
 <!-- ko foreach: { data: [$data], as: 'self' } -->
 
 <!-- ko if: state === 'editor-tree' -->
-<li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.tiles().length > 0 && card.expanded), 'jstree-closed' : (card.tiles().length > 0 && !card.expanded()), 'jstree-leaf': card.tiles().length === 0}">
+<li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.tiles().length > 0 && card.expanded()), 'jstree-closed' : (card.tiles().length > 0 && !card.expanded()), 'jstree-leaf': card.tiles().length === 0}">
     <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
     <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'jstree-clicked': card.selected, 'child-selected': card.isChildSelected()}, click: function () { card.canAdd() ? card.selected(true) : card.tiles()[0].selected(true) },">
         <i class="fa fa-file-o" role="presentation" data-bind="css:{'has-provisional-edits fa-file': card.doesChildHaveProvisionalEdits()}"></i>
@@ -67,32 +67,47 @@
 <!-- /ko -->
 
 <!-- ko if: state === 'designer-tree' -->
-<li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.cards.length > 0 && card.expanded), 'jstree-closed' : (card.cards.length > 0 && !card.expanded()), 'jstree-leaf': card.cards.length === 0}">
+<li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards.length > 0 || card.widgets.length > 0) && card.expanded()), 'jstree-closed' : ((card.cards.length > 0 || card.widgets.length > 0) && !card.expanded()), 'jstree-leaf': card.cards.length === 0 && card.widgets.length === 0}">
     <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
     <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'jstree-clicked': card.selected, 'child-selected': card.isChildSelected()}, click: function () { card.selected(true) },">
         <i class="fa fa-file-o" role="presentation"></i>
         <span style="padding-right: 5px;" data-bind="text: card.name, css:{'filtered': card.highlight()}"></span>
     </a>
-    <!-- ko if: card.cards && card.cards.length > 0 -->
-    <ul class="jstree-children" aria-expanded="true" data-bind="foreach: {
-            data: card.cards,
-            as: 'card'
-        }">
-        <!-- ko component: {
-            name: self.form.cardComponentLookup[card.component_id].componentname,
-            params: {
-                state: 'designer-tree',
-                card: card,
-                tile: null,
-                loading: self.loading,
-                form: self.form
-            }
-        } --> <!-- /ko -->
+    <!-- ko if: card.cards.length > 0 || card.widgets.length > 0 -->
+    <ul class="jstree-children" aria-expanded="true">
+        <div data-bind="foreach: {
+                data: card.widgets,
+                as: 'widget'
+            }">
+            <li role="treeitem" class="jstree-node jstree-leaf">
+                <i class="jstree-icon jstree-ocl" role="presentation"></i>
+                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { card.selected }, css:{'jstree-clicked': card.selected, 'child-selected': card.isChildSelected()}">
+                    <i class="fa fa-file" role="presentation" ></i>
+                    <strong style="margin-right: 10px;" data-bind="css:{'filtered': card.highlight()}">
+                        <span data-bind="text: widget.label || card.name"></span>
+                    </strong>
+                </a>
+            </li>
+        </div>
+        <div data-bind="foreach: {
+                data: card.cards,
+                as: 'card'
+            }">
+            <!-- ko component: {
+                name: self.form.cardComponentLookup[card.component_id].componentname,
+                params: {
+                    state: 'designer-tree',
+                    card: card,
+                    tile: null,
+                    loading: self.loading,
+                    form: self.form
+                }
+            } --> <!-- /ko -->
+        </div>
     </ul>
     <!-- /ko -->
 </li>
 <!-- /ko -->
-
 
 <!-- ko if: state === 'form' -->
 <div class="card-component">

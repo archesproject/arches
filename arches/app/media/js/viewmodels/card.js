@@ -271,6 +271,8 @@ define([
                 }
             }
         });
+        console.log(widgets);
+
         var nodegroup = _.find(ko.unwrap(params.nodegroups), function(group) {
             return ko.unwrap(group.nodegroupid) === ko.unwrap(params.card.nodegroup_id);
         });
@@ -419,6 +421,8 @@ define([
         this.doesChildHaveProvisionalEdits = ko.computed(function() {
             return doesChildHaveProvisionalEdits(this);
         }, this);
+
+        console.log(self.widgets);
     };
     return CardViewModel;
 });
