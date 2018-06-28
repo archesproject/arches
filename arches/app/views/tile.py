@@ -55,6 +55,8 @@ class TileData(View):
                     tile.provisionaledits = provisionaledits
                 print reviewer.username
                 tile.save(provisional_edit_log_details={"user": reviewer, "action": "delete edit", "edit": edit, "provisional_editor": provisional_editor})
+                if tile.is_provisional() == True:
+                    tile.delete()
 
     def post(self, request):
         if self.action == 'update_tile':
