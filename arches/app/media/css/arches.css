@@ -5647,6 +5647,20 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     margin-top: 0px;
 }
 
+.edit-message-container {
+    background: #DEF040;
+    height: 50px;
+    margin-top: -15px;
+    margin-bottom: 15px;
+    margin-left: -25px;
+    margin-right: -25px;
+    padding: 15px 25px;
+}
+
+.edit-message-container-user {
+    font-weight: 700;
+}
+
 .new-provisional-edits-list {
     display: flex;
     flex-direction: column;
@@ -11266,7 +11280,7 @@ ul.select2-choices:after {
 }
 
 .card-summary-section .card-summary {
-    margin-bottom:5px;
+    margin-bottom: 10px;
 }
 
 .card-summary-section .tile-summary {
@@ -11277,10 +11291,19 @@ ul.select2-choices:after {
 }
 
 .card-summary-section .tile-summary .tile-summary-label {
-    font-weight: bold;
+    font-weight: 600;
+}
+
+.card-summary-name {
+    margin-bottom: 2px;
+}
+
+.tile-summary-item {
+    padding-left: 5px;
 }
 
 .card-summary-section {
+    padding-left: 0px;
     padding-bottom: 10px;
 }
 

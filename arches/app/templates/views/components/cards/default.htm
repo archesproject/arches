@@ -111,20 +111,22 @@
 
 <!-- ko if: state === 'form' -->
 <div class="card-component">
+
+    <!--ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
+    <div class="edit-message-container">
+        <span>{% trans 'Currently showing edits by' %}</span>
+        <span class="edit-message-container-user" data-bind="text: provisionalTileViewModel.selectedProvisionalEdit().username() + '.'"></span>
+        <!--ko if: provisionalTileViewModel.selectedProvisionalEdit().isfullyprovisional -->
+        <span>{% trans ' This is a new contribution by a provisional editor.' %}</span>
+        <!--/ko-->
+    </div>
+    <!--/ko-->
+
     <!-- ko if: card.parent -->
     <h4 data-bind="text: card.name"></h4>
     <h5 data-bind="text: card.description"></h5>
     <!-- /ko -->
-
-    <!--ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
-    <div>
-    <span>{% trans 'Currently showing edits by' %}</span>
-    <span data-bind="text: provisionalTileViewModel.selectedProvisionalEdit().username() + '.'"></span>
-    <!--ko if: provisionalTileViewModel.selectedProvisionalEdit().isfullyprovisional -->
-    <span>{% trans 'No authoritative data has been saved to this card.' %}</span>
-    <!--/ko-->
-    </div>
-    <!--/ko-->
+    
     <div class="new-provisional-edit-card-container">
         <!--ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 -->
         <div class='new-provisional-edits-list'>
@@ -188,14 +190,14 @@
                         card.canAdd() ? card.selected(true) : card.tiles()[0].selected(true);
                     }
                 }">
-                    <h4>
+                    <h4 class="card-summary-name">
                         <span data-bind="text: card.name"></span>
                         <!-- ko if: card.canAdd() && card.parent.tileid -->
                         <i class="fa fa-plus-circle card-summary-add"></i>
                         <!-- /ko -->
                     </h4>
                 </a>
-                <ul data-bind="foreach: {
+                <ul class="tile-summary-item" data-bind="foreach: {
                         data: card.tiles,
                         as: 'tile'
                     }">
