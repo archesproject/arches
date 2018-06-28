@@ -2916,7 +2916,7 @@ div.dropdown-menu.open {
 }
 
 .ep-edits-body {
-    height: 100%;
+    height: calc(100vh - 50px);
     width: 100%;
     overflow-y: auto;
     display: table-row;
