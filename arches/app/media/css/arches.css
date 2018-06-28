@@ -11157,7 +11157,7 @@ ul.select2-choices:after {
 }
 
 .card-component {
-    padding: 25px;
+    padding: 15px 25px;
 }
 
 .card-component-panel {
@@ -11176,6 +11176,10 @@ ul.select2-choices:after {
 .card-component-panel h4 {
     color: #2f527a;
     font-weight: 400;
+}
+
+.card-component-panel .card-component h4 {
+    margin-top: 5px;
 }
 
 .card-component-panel hr {
@@ -11198,10 +11202,33 @@ ul.select2-choices:after {
 
 .card-breadcrumbs, .card-breadcrumbs a {
     color: #6494cc;
+    margin-top: 15px;
+    font-size: 17px;
+}
+
+.card-breadcrumbs span.dropdown.open .dropdown-menu>li>a {
+    display: block;
+    padding: 10px 20px;
+    margin-top: 5px;
+    clear: both;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.1;
+    color: #333;
+    white-space: nowrap;
+}
+
+.card-breadcrumbs span.dropdown.open .dropdown-menu>li>a:hover {
+    color: #fff;
 }
 
 .current-crumb {
-    font-weight: bold;
+    font-weight: 400;
+}
+
+.jstree-container-ul {
+    overflow-y: scroll;
+    height: 100vh;
 }
 
 .expanded-nav {
