@@ -379,19 +379,22 @@ class Graph(models.GraphModel):
         else:
             raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot delete a Resource Model with instances.".format(self.name)))
 
-    def delete_instances(self):
+    def delete_instances(self, verbose=False):
         """
         deletes all associated resource instances
 
         """
         activestate = self.isactive
         self.isactive = False
-        bar = pyprind.ProgBar(Resource.objects.filter(graph_id=self.graphid).count())
+        if verbose == True:
+            bar = pyprind.ProgBar(Resource.objects.filter(graph_id=self.graphid).count())
         for resource in Resource.objects.filter(graph_id=self.graphid):
             resource.delete()
-            bar.update()
+            if verbose == True:
+                bar.update()
         self.isactive = activestate
-        print(bar)
+        if verbose == True:
+            print(bar)
 
     def get_tree(self, root=None):
         """
