@@ -199,9 +199,10 @@ class TileData(View):
             resource_model_lookup = {str(graph['graphid']): graph for graph in resource_models}
             for k, v in summary.iteritems():
                 if v['lastedittype'] not in ['accept edit', 'delete edit']:
-                    tile = Tile.objects.get(pk=k)
-                    if tile.provisionaledits is not None and str(request.user.id) in tile.provisionaledits:
-                        v['pending'] = True
+                    if models.TileModel.objects.filter(pk=k).exists():
+                        tile = models.TileModel.objects.get(pk=k)
+                        if tile.provisionaledits is not None and str(request.user.id) in tile.provisionaledits:
+                            v['pending'] = True
 
                 v['resourcemodel'] = resource_model_lookup[v['resourcemodelid']]
                 v['card'] = card_lookup[v['nodegroupid']]
