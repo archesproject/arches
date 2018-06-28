@@ -37,16 +37,22 @@ define([
 
     var cards = data.cards;
 
+    var flattenTree = function (parents, flatList) {
+        _.each(ko.unwrap(parents), function(parent) {
+            flatList.push(parent);
+            var childrenKey = parent.tiles ? 'tiles' : 'cards';
+            flattenTree(
+                ko.unwrap(parent[childrenKey]),
+                flatList
+            );
+        });
+        return flatList
+    };
+
     var toggleAll = function(state) {
-        var nodes = _.reduce(
-            tiles,
-            function(nodeList, tile) {
-                nodeList.push(tile);
-                return nodeList.concat(tile.cards);
-            }, [{
-                expanded: vm.rootExpanded
-            }].concat(vm.topCards)
-        );
+        var nodes = flattenTree(vm.topCards, []).concat([{
+            expanded: vm.rootExpanded
+        }]);
         _.each(nodes, function(node) {
             node.expanded(state);
         });

@@ -116,7 +116,50 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <div class="" data-bind="with: graphTree">
                          {% include 'views/graph/graph-designer/graph-tree.htm' %}
                      </div></div>
-                <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }">card</div>
+                <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }">
+                    <div class="jstree jstree-default" data-bind="visible: true, with: cardTree" style="display: none;">
+                        <div class="header">
+                            <div class="list-filter" data-bind="" style="margin-right: 10px;">
+                                <input type="text" class="form-control" style="width: 250px;" placeholder="{% trans 'Find a card...' %}" data-bind="textInput: filter">
+
+                                <!-- Clear Search -->
+                                <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }" style="top: 8px;"><i class="fa fa-times-circle"></i></span>
+                            </div>
+                            <a data-bind="click: expandAll">Expand all</a>
+                            <a data-bind="click: collapseAll" style="padding-left:5px;">Collapse all</a>
+                        </div>
+                        <div class="left-panel-overflow">
+                            <ul class="jstree-container-ul jstree-children" aria-expanded="true">
+                                <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': rootExpanded, 'jstree-closed' : !rootExpanded()}">
+                                    <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}"></i>
+                                    <a class="jstree-anchor" href="#" tabindex="-1">
+                                        <strong>
+                                            <i data-bind="css: graphiconclass" role="presentation"></i>
+                                            <span data-bind="text: graphname"></span>
+                                        </strong>
+                                    </a>
+                                    <!-- ko foreach: { data: [$data], as: 'self' } -->
+                                    <ul class="jstree-children" aria-expanded="true" data-bind="foreach: {
+                                        data: topCards,
+                                        as: 'card'
+                                    }">
+                                        <!-- ko component: {
+                                            name: self.cardComponentLookup[card.component_id].componentname,
+                                            params: {
+                                                state: 'designer-tree',
+                                                card: card,
+                                                tile: null,
+                                                loading: self.loading,
+                                                form: self
+                                            }
+                                        } --> <!-- /ko -->
+                                    </ul>
+                                    <!-- /ko -->
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -173,7 +216,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 datatypes: {{datatypes_json}},
                 graph: {{graph}},
                 ontology_namespaces: {{ontology_namespaces}},
-                branches: {{branches}}
+                branches: {{branches}},
+                cards: {{cards}},
+                cardwidgets: {{cardwidgets}},
+                widgets: {{widgets_json}},
+                cardComponents: {{card_components_json}}
             };
         });{% endautoescape %}
     </script>
