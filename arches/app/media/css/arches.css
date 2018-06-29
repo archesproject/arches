@@ -2172,6 +2172,7 @@ ul.nav.nav-tabs.nav-justified {
 .graph-settings-panel-body .widgets .widget-container div .colorpicker-component {
     max-width: 250px;
     min-width: 250px;
+    padding-left: 5px;
 }
 
 .graph-settings-panel-body .widgets .widget-container div div div div div select .chosen-container {
@@ -5663,6 +5664,11 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     flex-direction: row;
     align-items: baseline;
 }
+
+.new-provisional-edit-card-container .card {
+    width: 100%;
+}
+
 
 .new-provisional-edit-entry {
     display: flex;

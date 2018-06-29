@@ -177,6 +177,7 @@ class NewGraphSettingsView(GraphBaseView):
         node.set_relatable_resources(data.get('relatable_resource_ids'))
         node.ontologyclass = data.get('ontology_class') if data.get('graph').get('ontology_id') is not None else None
         node.name = graph.name
+        graph.root.name = node.name
 
         try:
             with transaction.atomic():
@@ -247,6 +248,7 @@ class GraphManagerView(GraphBaseView):
     def delete(self, request, graphid):
         try:
             graph = Graph.objects.get(graphid=graphid)
+            graph.delete_instances()
             graph.delete()
             return JSONResponse({'success':True})
         except GraphValidationError as e:

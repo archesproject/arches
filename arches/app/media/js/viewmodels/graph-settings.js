@@ -11,22 +11,20 @@ define([
     var GraphSettingsViewModel = function(params) {
 
         var self = this;
-        var resourceJSON;
 
         self.resource_data = ko.observableArray([]);
         self.relatable_resources = ko.computed(function () {
-            resourceJSON = JSON.stringify(self.resource_data());
             return _.each(self.resource_data(), function (resource) {
                 resource.isRelatable = ko.observable(resource.is_relatable);
             });
         })
 
-        var srcJSON = JSON.stringify(koMapping.toJS(params.graph));
         self.designerViewModel = params.designerViewModel;
         self.graph = params.graph;
         self.node = params.node;
         self.graph.name.subscribe(function(val){
             self.node().name(val);
+            self.graph.root.name(val);
         })
 
         self.graphModel = params.graphModel;
@@ -50,9 +48,10 @@ define([
             return JSON.stringify({
                 graph: koMapping.toJS(self.graph),
                 relatable_resource_ids: relatableResourceIds,
-                ontology_class: ontologyClass()
+                ontology_class: ontologyClass(),
             });
         });
+
         self.jsonCache = ko.observable(self.jsonData());
 
         var dirty = ko.computed(function () {
@@ -99,18 +98,19 @@ define([
 
         self.reset = function () {
             var graph = self.graph;
-            var src = JSON.parse(srcJSON);
-            _.each(src, function(value, key) {
+            var src = JSON.parse(self.jsonCache());
+            _.each(src.graph, function(value, key) {
                 if (ko.isObservable(graph[key])) {
                     graph[key](value);
                 };
             });
-            self.ontologyClass(src.root.ontologyclass);
-            JSON.parse(resourceJSON).forEach(function(jsonResource) {
-                var resource = _.find(self.resource_data(), function (resource) {
-                    return resource.id === jsonResource.id;
-                });
-                resource.isRelatable(jsonResource.is_relatable);
+            self.ontologyClass(src.graph.root.ontologyclass);
+            self.relatable_resources().forEach(function(resource) {
+                if (_.contains(src.relatable_resource_ids, resource.id)){
+                    resource.isRelatable(true);
+                } else {
+                    resource.isRelatable(false);
+                };
             });
             self.jsonCache(self.jsonData());
             self.node()._node(JSON.stringify(self.node()))
