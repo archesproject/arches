@@ -6,6 +6,7 @@ define([
     'views/base-manager',
     'viewmodels/alert',
     'models/graph',
+    'views/graph/graph-manager/graph',
     'views/graph/graph-designer/graph-tree',
     'views/graph/graph-designer/node-form',
     'views/graph/graph-manager/branch-list',
@@ -16,7 +17,7 @@ define([
     'view-data',
     'bindings/resizable-sidepanel',
     'datatype-config-components'
-], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, GraphModel, GraphTree, NodeFormView, BranchListView, CardTreeViewModel, data, arches, GraphSettingsViewModel, viewData) {
+], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, GraphModel, GraphView, GraphTree, NodeFormView, BranchListView, CardTreeViewModel, data, arches, GraphSettingsViewModel, viewData) {
     var viewModel = {
         placeholder: ko.observable(''),
         graphid: ko.observable(data.graphid),
@@ -56,6 +57,10 @@ define([
 
     viewModel.graphModel.on('error', function(response){
         viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.title, response.responseJSON.message));
+    });
+
+    viewModel.graphModel.on('select-node', function(node){
+        viewModel.graphView.zoomTo(node);
     });
 
     viewModel.selectedNode = viewModel.graphModel.get('selectedNode');
@@ -146,12 +151,33 @@ define([
       });
     };
 
+
     if (viewModel.activeTab() === 'graph') {
         viewModel.loadGraphSettings();
         // here we might load data/views asyncronously
     }else{
 
     }
+
+    viewModel.viewState.subscribe(function(state){
+        if (state === 'design'){
+
+        }
+        if (state === 'preview'){
+            if(!viewModel.graphView) {
+                viewModel.graphView = new GraphView({
+                    el: $('#graph'),
+                    graphModel: viewModel.graphModel,
+                    nodeSize: 15,
+                    nodeSizeOver: 20,
+                    labelOffset: 10,
+                    loading: this.loading
+                });
+
+                viewModel.graphView.resize();
+            }
+        }
+    })
 
     if (viewModel.viewState() === 'design') {
         // here we might load data/views asyncronously
@@ -164,6 +190,10 @@ define([
     */
     var resize = function(){
         $('.grid').height($(window).height()-208);
+        $('#graph').height($(window).height()-100);
+        if(!!viewModel.graphView) {
+            viewModel.graphView.resize();
+        }
     }
 
     $( window ).resize(resize);

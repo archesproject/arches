@@ -58,7 +58,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </h4>
 
 
-        <div class="btn-group btn-group-toggle">
+        <div class="btn-group btn-group-toggle" data-bind="visible: activeTab() === 'graph'">
             <button class="btn btn-md viewstate-btn" data-bind="css: { active: viewState() === 'design' }, click: function(){viewState('design');}">{% trans "Design" %}</button>
             <button class="btn btn-md viewstate-btn" data-bind="css: { active: viewState() === 'preview' }, click: function(){viewState('preview');}">{% trans "Preview" %}</button>
         </div>
@@ -114,8 +114,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- Summary Card -->
                 <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'graph' }">
                     <div class="" data-bind="with: graphTree">
-                         {% include 'views/graph/graph-designer/graph-tree.htm' %}
-                     </div></div>
+                        {% include 'views/graph/graph-designer/graph-tree.htm' %}
+                    </div>
+                </div>
+
                 <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }">
                     <div class="jstree jstree-default" data-bind="visible: true, with: cardTree" style="display: none;">
                         <div class="header">
@@ -168,7 +170,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div data-bind="css: {'graph-designer-loading-mask': contentLoading }"></div>
             <div class="node-form-container">
                 <!-- Settings, Node Form, and Branch List -->
-                <div class="tab-pane fade in" style="position: relative;" data-bind="css: { active: activeTab() === 'graph' }">
+                <div class="tab-pane fade in" style="position: relative;" data-bind="visible: activeTab() === 'graph' && viewState() === 'design'">
                     <!--ko if: selectedNode() -->
                     <div class="graph-designer-graph-content" data-bind="visible: selectedNode().nodeid == graph.root.nodeid()">
                         {% include 'views/graph/graph-designer/graph-settings.htm' %}
@@ -194,6 +196,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </div>
                     </div>
                 </div>
+
+                <div class="tab-pane fade in" style="position: relative;" data-bind="visible: activeTab() === 'graph' && viewState() === 'preview'">
+                    <div id="graph"></div>
+                </div>
+
                 <!-- Card Manager -->
                 <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }"></div>
             </div>

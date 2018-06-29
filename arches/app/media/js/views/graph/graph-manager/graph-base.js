@@ -39,16 +39,7 @@ define([
 
             this.tree = d3.layout.tree()
                 .children(function (d) {
-                    var nodes = self.nodes();
-                    return self.edges()
-                        .filter(function (edge) {
-                            return edge.domainnode_id === d.nodeid;
-                        })
-                        .map(function (edge) {
-                            return nodes.find(function (node) {
-                                return edge.rangenode_id === node.nodeid;
-                            });
-                        });
+                    return d.childNodes();
                 })
                 .size([360, this.getsize()])
                 .separation(function(a, b) {
@@ -71,7 +62,9 @@ define([
                 .append("g")
 
             this.render();
-            this.resize();
+            setTimeout(function(){
+                self.resize();
+            }, 50);
         },
 
         /**
@@ -186,16 +179,7 @@ define([
                 this.svg.selectAll(".link").remove();
                 this.tree = d3.layout.tree()
                     .children(function (d) {
-                        var nodes = self.nodes();
-                        return self.edges()
-                            .filter(function (edge) {
-                                return edge.domainnode_id === d.nodeid;
-                            })
-                            .map(function (edge) {
-                                return nodes.find(function (node) {
-                                    return edge.rangenode_id === node.nodeid;
-                                });
-                            });
+                        return d.childNodes();
                     })
                     .size([360, this.getsize() * this.currentScale])
                     .separation(function(a, b) {
@@ -229,7 +213,7 @@ define([
             var y = -node.y * Math.sin((node.x - 90) / 180 * Math.PI)*this.currentScale;
 
             var trans = this.zoom
-                .translate([x+117, y]);
+                .translate([x, y]);
             this.svg.transition()
                 .duration(1000)
                 .call(trans.event);

@@ -57,7 +57,7 @@ define([
             var isChildSelected = function (parent) {
                 var childSelected = false;
                 if (!parent.istopnode) {
-                    parent.children().forEach(function(child) {
+                    parent.childNodes().forEach(function(child) {
                         if (child && child.selected() || isChildSelected(child)){
                             childSelected = true;
                         }
