@@ -1,6 +1,7 @@
 *.DS_Store
 *.pyc
 *.xslx
+*.log
 arches.egg-info
 eamena/eamena/settings_local.py
 eamena/eamena/source_data
@@ -8,7 +9,7 @@ eamena/eamena/media/js/views/crypto
 eamena/eamena/elasticsearch
 eamena/eamena/logs
 eamena/eamena/uploadedfiles
-eamena/eamena/bulk_upload
+eamena/eamena/bulk_upload/*
 virtualenv/ENV
 tests/elasticsearch
 tests/logs
