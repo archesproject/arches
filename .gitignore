@@ -1,3 +1,4 @@
+*.DS_Store
 *.pyc
 *.xslx
 *.log
@@ -19,3 +20,5 @@ arches/install/elasticsearch-1.4.1.zip
 
 
 *.jpg
+
+.idea
