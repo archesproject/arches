@@ -177,6 +177,7 @@ class NewGraphSettingsView(GraphBaseView):
         node.set_relatable_resources(data.get('relatable_resource_ids'))
         node.ontologyclass = data.get('ontology_class') if data.get('graph').get('ontology_id') is not None else None
         node.name = graph.name
+        graph.root.name = node.name
 
         try:
             with transaction.atomic():
