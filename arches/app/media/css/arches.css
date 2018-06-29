@@ -5703,8 +5703,8 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .new-provisional-edits-title {
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 16px;
+    font-weight: 400;
     color: #2f527a;
 }
 
@@ -11222,13 +11222,13 @@ ul.select2-choices:after {
 
 .card-breadcrumbs, .card-breadcrumbs a {
     color: #6494cc;
-    margin-top: 15px;
+    margin-top: 17px;
     font-size: 17px;
 }
 
 .card-breadcrumbs span.dropdown.open .dropdown-menu>li>a {
     display: block;
-    padding: 10px 20px;
+    padding: 5px 20px;
     margin-top: 5px;
     clear: both;
     font-size: 13px;
