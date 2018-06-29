@@ -122,12 +122,10 @@
     </div>
     <!--/ko-->
 
-    <!-- ko if: card.parent -->
-    <h4 data-bind="text: card.name"></h4>
-    <h5 data-bind="text: card.description"></h5>
-    <!-- /ko -->
+    
     
     <div class="new-provisional-edit-card-container">
+        
         <!--ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 -->
         <div class='new-provisional-edits-list'>
             <div class='new-provisional-edits-header'>
@@ -157,94 +155,100 @@
         <!--/ko-->
 
 
-    <div class="card">
-        <!-- ko if: card.widgets.length > 0 -->
-        <form class="widgets" style="margin-bottom: 20px;">
-            <div data-bind="foreach: {
-                    data:card.widgets, as: 'widget'
-                }">
-                <div class='' data-bind='component: {
-                    name: self.form.widgetLookup[widget.widget_id].name,
-                    params: {
-                        formData: self.tile.formData,
-                        tile: self.tile,
-                        form: self.form,
-                        config: widget.config,
-                        label: widget.label,
-                        value: self.tile.data[widget.node_id],
-                        node: self.form.nodeLookup[widget.node_id],
-                        expanded: self.expanded,
-                        graph: self.form.graph,
-                        type: "resource-editor"
-                    }
-                }'></div>
-            </div>
-        </form>
-        <!-- /ko -->
-        <!-- ko if: card.widgets.length === 0 -->
-        <ul class="card-summary-section" data-bind="css: {disabled: !tile.tileid}">
-            <!-- ko foreach: { data: tile.cards, as: 'card' } -->
-            <li class="card-summary">
-                <a href="javascript:void(0)" data-bind="click: function () {
-                    if (card.parent.tileid) {
-                        card.canAdd() ? card.selected(true) : card.tiles()[0].selected(true);
-                    }
-                }">
-                    <h4 class="card-summary-name">
-                        <span data-bind="text: card.name"></span>
-                        <!-- ko if: card.canAdd() && card.parent.tileid -->
-                        <i class="fa fa-plus-circle card-summary-add"></i>
-                        <!-- /ko -->
-                    </h4>
-                </a>
-                <ul class="tile-summary-item" data-bind="foreach: {
-                        data: card.tiles,
-                        as: 'tile'
-                    }">
-                    <li class="tile-summary">
-                        <a href="#" data-bind="click: function () { tile.selected(true) }">
-                            <!-- ko if: card.widgets.length > 0 -->
-                            <span data-bind="text: card.widgets[0].label || card.name" class="tile-summary-label"></span>:
-                            <div style="display: inline;" data-bind="component: {
-                                name: self.form.widgetLookup[card.widgets[0].widget_id].name,
-                                params: {
-                                    tile: tile,
-                                    node: self.form.nodeLookup[card.widgets[0].node_id],
-                                    config: self.form.widgetLookup[card.widgets[0].widget_id].config,
-                                    label: self.form.widgetLookup[card.widgets[0].widget_id].label,
-                                    value: tile.data[card.widgets[0].node_id],
-                                    type: 'resource-editor',
-                                    state: 'display_value'
-                                }
-                            }"></div>
-                            <!-- /ko -->
-                            <!-- ko if: card.widgets.length === 0 -->
-                            <span data-bind="text: card.name"></span>
-                            <!-- /ko -->
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <!-- /ko -->
-        </ul>
-        <!-- /ko -->
-        <div class="install-buttons">
-            <!-- ko if: tile.tileid -->
-            <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-trash" data-bind="click: function () { self.form.deleteTile(tile); }">Delete</button>
-            <!-- /ko -->
-            <!-- ko if: tile.dirty() -->
-            <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset">Cancel</button>
-                <!-- ko if: tile.tileid -->
-                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: function () { self.form.saveTile(tile); }">Save</button>
-                <!-- /ko -->
-            <!-- /ko -->
-            <!-- ko if: !tile.tileid -->
-            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: function () { self.form.saveTile(tile); }">Add</button>
-            <!-- /ko -->
-        </div>
+        <div class="card">
 
-    </div>
+            <!-- ko if: card.parent -->
+            <h4 data-bind="text: card.name"></h4>
+            <h5 data-bind="text: card.description"></h5>
+            <!-- /ko -->
+            
+            <!-- ko if: card.widgets.length > 0 -->
+            <form class="widgets" style="margin-bottom: 20px;">
+                <div data-bind="foreach: {
+                        data:card.widgets, as: 'widget'
+                    }">
+                    <div class='' data-bind='component: {
+                        name: self.form.widgetLookup[widget.widget_id].name,
+                        params: {
+                            formData: self.tile.formData,
+                            tile: self.tile,
+                            form: self.form,
+                            config: widget.config,
+                            label: widget.label,
+                            value: self.tile.data[widget.node_id],
+                            node: self.form.nodeLookup[widget.node_id],
+                            expanded: self.expanded,
+                            graph: self.form.graph,
+                            type: "resource-editor"
+                        }
+                    }'></div>
+                </div>
+            </form>
+            <!-- /ko -->
+            <!-- ko if: card.widgets.length === 0 -->
+            <ul class="card-summary-section" data-bind="css: {disabled: !tile.tileid}">
+                <!-- ko foreach: { data: tile.cards, as: 'card' } -->
+                <li class="card-summary">
+                    <a href="javascript:void(0)" data-bind="click: function () {
+                        if (card.parent.tileid) {
+                            card.canAdd() ? card.selected(true) : card.tiles()[0].selected(true);
+                        }
+                    }">
+                        <h4 class="card-summary-name">
+                            <span data-bind="text: card.name"></span>
+                            <!-- ko if: card.canAdd() && card.parent.tileid -->
+                            <i class="fa fa-plus-circle card-summary-add"></i>
+                            <!-- /ko -->
+                        </h4>
+                    </a>
+                    <ul class="tile-summary-item" data-bind="foreach: {
+                            data: card.tiles,
+                            as: 'tile'
+                        }">
+                        <li class="tile-summary">
+                            <a href="#" data-bind="click: function () { tile.selected(true) }">
+                                <!-- ko if: card.widgets.length > 0 -->
+                                <span data-bind="text: card.widgets[0].label || card.name" class="tile-summary-label"></span>:
+                                <div style="display: inline;" data-bind="component: {
+                                    name: self.form.widgetLookup[card.widgets[0].widget_id].name,
+                                    params: {
+                                        tile: tile,
+                                        node: self.form.nodeLookup[card.widgets[0].node_id],
+                                        config: self.form.widgetLookup[card.widgets[0].widget_id].config,
+                                        label: self.form.widgetLookup[card.widgets[0].widget_id].label,
+                                        value: tile.data[card.widgets[0].node_id],
+                                        type: 'resource-editor',
+                                        state: 'display_value'
+                                    }
+                                }"></div>
+                                <!-- /ko -->
+                                <!-- ko if: card.widgets.length === 0 -->
+                                <span data-bind="text: card.name"></span>
+                                <!-- /ko -->
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <!-- /ko -->
+            </ul>
+            <!-- /ko -->
+            <div class="install-buttons">
+                <!-- ko if: tile.tileid -->
+                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-trash" data-bind="click: function () { self.form.deleteTile(tile); }">Delete</button>
+                <!-- /ko -->
+                <!-- ko if: tile.dirty() -->
+                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset">Cancel</button>
+                    <!-- ko if: tile.tileid -->
+                    <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: function () { self.form.saveTile(tile); }">Save</button>
+                    <!-- /ko -->
+                <!-- /ko -->
+                <!-- ko if: !tile.tileid -->
+                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: function () { self.form.saveTile(tile); }">Add</button>
+                <!-- /ko -->
+            </div>
+
         </div>
+    </div>
 </div>
 <!-- /ko -->
 

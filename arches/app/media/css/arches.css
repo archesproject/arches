@@ -5651,7 +5651,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     background: #DEF040;
     height: 50px;
     margin-top: -15px;
-    margin-bottom: 15px;
+    margin-bottom: 0px;
     margin-left: -25px;
     margin-right: -25px;
     padding: 15px 25px;
@@ -5664,8 +5664,10 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 .new-provisional-edits-list {
     display: flex;
     flex-direction: column;
-    margin-top: 0px;
-    width: 165px;
+    top: 0px;
+    position: relative;
+    margin-right: 15px;
+    width: 250px;
     padding: 5px;
     border-color: #ddd;
     border-right-style: solid;
@@ -5712,9 +5714,13 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .new-provisional-edits-header {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+    background: #f9f9f9;
+    height: 40px;
+    margin-left: -30px;
+    margin-right: -5px;
+    margin-top: -5px;
+    padding: 10px 10px;
+
 }
 
 .new-provisional-edit-entry:hover {
@@ -11243,6 +11249,7 @@ ul.select2-choices:after {
 .jstree-container-ul {
     overflow-y: scroll;
     height: 100vh;
+    padding-bottom: 150px;
 }
 
 .expanded-nav {
