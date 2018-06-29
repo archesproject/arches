@@ -35,27 +35,27 @@ class Command(BaseCommand):
         parser.add_argument('-y', '--yes', action='store_true', dest='yes',
             help='used to force a yes answer to any user input "continue? y/n" prompt')
 
-        parser.add_argument('-g', '--graph', action='store', dest='graph', default=False,
+        parser.add_argument('-g', '--graph', action='store', dest='graph',
             help='A graphid of the Resource Model you would like to remove all instances from.')
 
     def handle(self, *args, **options):
         if options['operation'] == 'remove_resources':
             self.remove_resources(force=options['yes'], graphid=options['graph'])
 
-    def remove_resources(self, load_id='', graphid='', force=False):
+    def remove_resources(self, load_id='', graphid=None, force=False):
         """
         Runs the resource_remover command found in data_management.resources
         """
         # resource_remover.delete_resources(load_id)
         if not force:
-            if graphid == '':
+            if graphid == None:
                 if not utils.get_yn_input("all resources will be removed. continue?"):
                     return
             else:
                 if not utils.get_yn_input("All resources associated with the '%s' Resource Model will be removed. continue?" % Graph.objects.get(graphid=graphid).name ):
                     return
 
-        if graphid == '':
+        if graphid == None:
             resource_remover.clear_resources()
         else:
             graph = Graph.objects.get(graphid=graphid)
