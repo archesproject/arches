@@ -15,7 +15,6 @@ define([
     */
     var ProvisionalTileViewModel = function(params) {
         var self = this;
-        self.card = null;
         self.edits = ko.observableArray()
         self.users = []
         self.selectedTile = params.tile;
@@ -37,7 +36,7 @@ define([
                 })
             })
             .fail(function(data) {
-                console.log('User name request failed', data)
+                // console.log('User name request failed', data)
             });
         }
 
@@ -102,18 +101,23 @@ define([
                 data: {'user': koMapping.toJS(val).user, 'tileid': this.selectedTile().tileid }
             })
             .done(function(data) {
-                var user = val.user;
-                var provisionaledits = this.selectedTile().provisionaledits();
-                delete provisionaledits[user]
-                this.selectedTile().provisionaledits(provisionaledits);
-                if (self.selectedProvisionalEdit() === val) {
-                    self.selectedProvisionalEdit(undefined);
-                    self.selectedTile().reset();
-                };
-                self.provisionaledits.remove(val);
-                if (_.keys(this.selectedTile().provisionaledits()).length === 0) {
-                    this.selectedTile().provisionaledits(null);
-                };
+                if (data.result === 'delete') {
+                    this.selectedTile().deleteTile()
+                } else {
+                    var user = val.user;
+                    var provisionaledits = this.selectedTile().provisionaledits();
+                    delete provisionaledits[user]
+                    this.selectedTile().provisionaledits(provisionaledits);
+                    if (self.selectedProvisionalEdit() === val) {
+                        self.selectedProvisionalEdit(undefined);
+                        self.selectedTile().reset();
+                    };
+                    self.provisionaledits.remove(val);
+                    if (_.keys(this.selectedTile().provisionaledits()).length === 0) {
+                        this.selectedTile().provisionaledits(null);
+                    };
+                }
+                self.selectedTile()._tileData.valueHasMutated();
             })
             .fail(function(data) {
                 console.log('request failed', data)
@@ -130,10 +134,14 @@ define([
                 data: {'users': JSON.stringify(users), 'tileid': this.selectedTile().tileid }
             })
             .done(function(data) {
-                self.selectedTile().reset();
-                self.selectedProvisionalEdit(undefined);
-                self.provisionaledits.removeAll();
-                this.selectedTile().provisionaledits(null);
+                if (data.result === 'delete') {
+                    this.selectedTile().deleteTile()
+                } else {
+                    self.selectedTile().reset();
+                    self.selectedProvisionalEdit(undefined);
+                    self.provisionaledits.removeAll();
+                    this.selectedTile().provisionaledits(null);
+                };
             })
             .fail(function(data) {
                 console.log('request failed', data)
