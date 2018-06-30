@@ -58,35 +58,28 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </h4>
 
 
-        <div class="btn-group btn-group-toggle">
+        <div class="btn-group btn-group-toggle" data-bind="visible: activeTab() === 'graph'">
             <button class="btn btn-md viewstate-btn" data-bind="css: { active: viewState() === 'design' }, click: function(){viewState('design');}">{% trans "Design" %}</button>
             <button class="btn btn-md viewstate-btn" data-bind="css: { active: viewState() === 'preview' }, click: function(){viewState('preview');}">{% trans "Preview" %}</button>
         </div>
 
-            <div class="graph-settings-crud">
-                <!-- ko if: graphSettingsVisible() -->
+        <div class="graph-settings-crud">
+
+            <div data-bind="visible: graphSettingsVisible()" style="display: none;">
                 <!-- ko if: graphSettingsViewModel.dirty() -->
                 <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: graphSettingsViewModel.reset">{% trans "Discard Edits" %}</button>
                 <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: graphSettingsViewModel.save">{% trans "Save Edits" %}</button>
                 <!-- /ko -->
-                <!-- /ko -->
+            </div>
 
-
-                <!-- ko if: selectedNode() -->
-                <!-- ko if: selectedNode().dirty() && selectedNode().istopnode == false -->
+            <div data-bind="visible: selectedNode()" style="display: none;">
+                <!-- ko if: selectedNode() && selectedNode().dirty() && selectedNode().istopnode == false -->
                 <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: function(){graphModel.get('selectedNode')().reset()}">{% trans "Discard Edits" %}</button>
                 <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: saveSelectedNode">{% trans "Save Edits" %}</button>
                 <!-- /ko -->
-                <!-- /ko -->
             </div>
-
-        <!-- Tools -->
-        <div class="ep-form-toolbar-tools">
-            <!-- ko if: dirty() -->
-            <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click:placeholder">{% trans "Discard Edits" %}</button>
-            <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click:placeholder">{% trans "Save Edits" %}</button>
-            <!-- /ko -->
         </div>
+
     </div>
 
     <div class="flex">
@@ -114,8 +107,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- Summary Card -->
                 <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'graph' }">
                     <div class="" data-bind="with: graphTree">
-                         {% include 'views/graph/graph-designer/graph-tree.htm' %}
-                     </div></div>
+                        {% include 'views/graph/graph-designer/graph-tree.htm' %}
+                    </div>
+                </div>
+
                 <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }">
                     <div class="jstree jstree-default" data-bind="visible: true, with: cardTree" style="display: none;">
                         <div class="header">
@@ -165,10 +160,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
         <!-- Main Content Panel -->
         <div class="flex" style="background-color: #ffffff; overflow-y: auto" >
-            <div data-bind="css: {'graph-designer-loading-mask': contentLoading }"></div>
             <div class="node-form-container">
                 <!-- Settings, Node Form, and Branch List -->
-                <div class="tab-pane fade in" style="position: relative;" data-bind="css: { active: activeTab() === 'graph' }">
+                <div class="tab-pane fade in" style="position: relative;" data-bind="visible: activeTab() === 'graph' && viewState() === 'design'">
                     <!--ko if: selectedNode() -->
                     <div class="graph-designer-graph-content" data-bind="visible: selectedNode().nodeid == graph.root.nodeid()">
                         {% include 'views/graph/graph-designer/graph-settings.htm' %}
@@ -178,22 +172,28 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         {% include 'views/graph/graph-designer/node-form.htm' %}
                     </div>
                     <!--/ko-->
-                    <!--Branch Library -->
-                    <div id="branch-library" class="middle-column-container graph-designer branch-library" data-bind="visible: graphTree.branchListVisible" style="width: 300px;border-bottom: solid 1px #dddddd;z-index: 10;}">
-                        <div>
-                            <div class="title-block-title" style="margin-bottom: 0px; padding-bottom: 0px;">
-                                <span class="">{{branch_list.title}}</span>
-                            </div>
-                            <div class="relative">
-                                <a id="node-crud-close" href="javascript:void(0)" class="library-close-btn" data-bind="click: graphTree.toggleBranchList.bind(graphTree)"><i class="ion-close"></i></a>
-                            </div>
-                            <div style="padding: 4px 0px 12px 6px">{% trans "Add a branch to your model from the library" %}</div>
+                </div>
+
+                <div class="tab-pane fade in" style="position: relative;" data-bind="visible: activeTab() === 'graph' && viewState() === 'preview'">
+                    <div id="graph"></div>
+                </div>
+
+                <!--Branch Library -->
+                <div id="branch-library" class="middle-column-container graph-designer branch-library" data-bind="visible: graphTree.branchListVisible" style="width: 300px; border-bottom: solid 1px #dddddd; z-index: 10; display:none;">
+                    <div>
+                        <div class="title-block-title" style="margin-bottom: 0px; padding-bottom: 0px;">
+                            <span class="">{{branch_list.title}}</span>
                         </div>
-                        <div data-bind="with: branchListView">
-                            {% include 'views/graph/graph-manager/branch-list.htm' %}
+                        <div class="relative">
+                            <a id="node-crud-close" href="javascript:void(0)" class="library-close-btn" data-bind="click: graphTree.toggleBranchList.bind(graphTree)"><i class="ion-close"></i></a>
                         </div>
+                        <div style="padding: 4px 0px 12px 6px">{% trans "Add a branch to your model from the library" %}</div>
+                    </div>
+                    <div data-bind="with: branchListView">
+                        {% include 'views/graph/graph-manager/branch-list.htm' %}
                     </div>
                 </div>
+                
                 <!-- Card Manager -->
                 <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }"></div>
             </div>
