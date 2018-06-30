@@ -55,25 +55,36 @@ define([
         ontology_namespaces: data.ontology_namespaces
     });
 
-    viewModel.graphModel.on('error', function(response){
-        viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.title, response.responseJSON.message));
+    viewModel.graphModel.on('changed', function(model, response){
+        viewModel.graphView.redraw(true);
+        viewModel.alert(null);
+        viewModel.loading(false);
+        if(response.status != 200){
+            var errorMessageTitle = arches.requestFailed.title
+            var errorMessageText = arches.requestFailed.text
+            viewModel.alert(null);
+            if (response.responseJSON) {
+                errorMessageTitle = response.responseJSON.title
+                errorMessageText = response.responseJSON.message
+            }
+            viewModel.alert(new AlertViewModel('ep-alert-red', errorMessageTitle, errorMessageText));
+        }
     });
 
-    viewModel.graphModel.on('select-node', function(node){
-        viewModel.graphView.zoomTo(node);
+    viewModel.graphModel.on('error', function(response){
+        viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.title, response.responseJSON.message));
     });
 
     viewModel.selectedNode = viewModel.graphModel.get('selectedNode');
 
     viewModel.saveNode = function(node){
-        var self = this;
         if (node) {
-            self.loading(true);
+            viewModel.loading(true);
             node.save(function(data){
                 if (data.responseJSON.success == false){
                     viewModel.alert(new AlertViewModel('ep-alert-red', data.responseJSON.title, data.responseJSON.message));
                 }
-                self.loading(false);
+                viewModel.loading(false);
             });
         };
     }
@@ -175,6 +186,10 @@ define([
                 });
 
                 viewModel.graphView.resize();
+
+                viewModel.graphModel.on('select-node', function(node){
+                    viewModel.graphView.zoomTo(node);
+                });
             }
         }
     })
