@@ -2099,8 +2099,14 @@ ul.nav.nav-tabs.nav-justified {
 }
 
 .settings-panel-heading {
-    height: 45px;
+    height: 50px;
+    background: #f4f4f4;
     margin-top: -10px;
+    margin-bottom: 20px;
+    margin-left: -25px;
+    margin-right: -20px;
+    padding-left: 25px;
+    border-top: 1px solid #ddd;
 }
 
 .graph-designer {
@@ -2164,9 +2170,16 @@ ul.nav.nav-tabs.nav-justified {
     padding: 5px 0px;
 }
 
+
+
 .graph-settings-panel-body .widgets .widget-container div div > input {
     max-width: 500px;
     min-width: 500px;
+}
+
+.graph-settings-panel-body .widgets .widget-container div .crm-selector div .chosen-drop .chosen-search > input {
+    max-width: 490px;
+    min-width: 490px;
 }
 
 .graph-settings-panel-body .widgets .widget-container div .colorpicker-component {
