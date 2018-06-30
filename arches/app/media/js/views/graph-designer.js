@@ -23,7 +23,6 @@ define([
 
         initialize: function(options) {
             var viewModel = options.viewModel;
-            viewModel.contentLoading = ko.observable(false);
             viewModel.placeholder = ko.observable('');
             viewModel.graphid = ko.observable(data.graphid);
             viewModel.activeTab = ko.observable('graph');
@@ -149,7 +148,7 @@ define([
 
             viewModel.loadGraphSettings = function(){
                 var self = this;
-                viewModel.contentLoading(true);
+                viewModel.loading(true);
                 $.ajax({
                     type: "GET",
                     url: arches.urls.new_graph_settings(data.graphid),
@@ -158,9 +157,9 @@ define([
                     self.graphSettingsViewModel.resource_data(data.resources);
                     self.graphSettingsViewModel.icon_data(data.icons);
                     self.graphSettingsViewModel.jsonCache(self.graphSettingsViewModel.jsonData());
-                    self.graphSettingsViewModel.contentLoading = viewModel.contentLoading;
+                    self.graphSettingsViewModel.contentLoading = viewModel.loading;
                     self.graphSettingsVisible(true);
-                    viewModel.contentLoading(false);
+                    viewModel.loading(false);
                 })
                 .fail(function() {
                   console.log( "error" );
