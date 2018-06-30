@@ -327,8 +327,6 @@ class Graph(models.GraphModel):
                 nodegroup.save()
 
             for node in self.nodes.itervalues():
-                if node.datatype =='':
-                    raise GraphValidationError(_("A valid node datatype must be selected"))
                 node.save()
 
             for edge in self.edges.itervalues():
@@ -802,8 +800,7 @@ class Graph(models.GraphModel):
                 edge.domainnode = new_node
             if edge.rangenode_id == new_node.nodeid:
                 edge.rangenode = new_node
-                if 'parentproperty' in node:
-                    edge.ontologyproperty = node.get('parentproperty', None)
+                edge.ontologyproperty = node.get('parentproperty', None)
 
         self.populate_null_nodegroups()
 
@@ -1322,7 +1319,6 @@ class Graph(models.GraphModel):
         self.check_if_resource_is_editable()
 
         # validates that the top node of a resource graph is semantic and a collector
-
         if self.isresource == True:
             if self.root.is_collector == True:
                 raise GraphValidationError(_("The top node of your resource graph: {0} needs to be a collector. Hint: check that nodegroup_id of your resource node(s) are not null.".format(self.root.name)), 997)
@@ -1333,8 +1329,12 @@ class Graph(models.GraphModel):
                 if len(self.nodes) > 1:
                     raise GraphValidationError(_("If your graph contains more than one node and is not a resource the root must be a collector."), 999)
 
-        # validate that nodes in a resource graph belong to the ontology assigned to the resource graph
+        # validate that nodes have a datatype assigned to them
+        for node_id, node in self.nodes.iteritems():
+            if node.datatype == '':
+                raise GraphValidationError(_("A valid node datatype must be selected"))
 
+        # validate that nodes in a resource graph belong to the ontology assigned to the resource graph
         if self.ontology is not None:
             ontology_classes = self.ontology.ontologyclasses.values_list('source', flat=True)
 

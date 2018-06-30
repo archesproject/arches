@@ -40,8 +40,7 @@ from arches.app.models.resource import EditLog
 class TileData(View):
     action = 'update_tile'
 
-    def delete_provisional_edit(self, tileid, user, reviewer=None):
-        tile = Tile.objects.get(tileid = tileid)
+    def delete_provisional_edit(self, tile, user, reviewer=None):
         provisionaledits = None
         if tile.provisionaledits is not None:
             provisionaledits = tile.provisionaledits
@@ -53,10 +52,8 @@ class TileData(View):
                     tile.provisionaledits = None
                 else:
                     tile.provisionaledits = provisionaledits
-                print reviewer.username
                 tile.save(provisional_edit_log_details={"user": reviewer, "action": "delete edit", "edit": edit, "provisional_editor": provisional_editor})
-                if tile.is_provisional() == True:
-                    tile.delete()
+
 
     def post(self, request):
         if self.action == 'update_tile':
@@ -139,16 +136,21 @@ class TileData(View):
             user = request.POST.get('user', None)
             tileid = request.POST.get('tileid', None)
             users = request.POST.get('users', None)
+            tile = Tile.objects.get(tileid = tileid)
+            is_provisional = tile.is_provisional()
+
             if tileid is not None and user is not None:
-                provisionaledits = self.delete_provisional_edit(tileid, user, reviewer=request.user)
-                return JSONResponse(provisionaledits)
+                provisionaledits = self.delete_provisional_edit(tile, user, reviewer=request.user)
 
             elif tileid is not None and users is not None:
                 users = jsonparser.loads(users)
                 for user in users:
-                    self.delete_provisional_edit(tileid, user, reviewer=request.user)
-                return JSONResponse({'result':'success'})
+                    self.delete_provisional_edit(tile, user, reviewer=request.user)
 
+            if is_provisional == True:
+                return JSONResponse({'result':'delete'})
+            else:
+                return JSONResponse({'result':'success'})
 
         return HttpResponseNotFound()
 
