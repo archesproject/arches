@@ -994,7 +994,7 @@ class GraphTests(ArchesTestCase):
         """
 
         graph = Graph.objects.get(graphid=self.rootNode.graph_id)
-        new_node = graph.add_node({'nodeid':uuid.uuid1()}) # A blank node with no ontology class is specified
+        new_node = graph.add_node({'nodeid':uuid.uuid1(), 'datatype': 'semantic'}) # A blank node with no ontology class is specified
         graph.add_edge({'domainnode_id':self.rootNode.pk, 'rangenode_id':new_node.pk, 'ontologyproperty':None})
 
         with self.assertRaises(GraphValidationError) as cm:
@@ -1009,7 +1009,7 @@ class GraphTests(ArchesTestCase):
         """
 
         graph = Graph.objects.get(graphid=self.rootNode.graph_id)
-        new_node = graph.add_node({'nodeid':uuid.uuid1(), 'ontologyclass': 'InvalidOntologyClass'}) # A blank node with an invalid ontology class specified
+        new_node = graph.add_node({'nodeid':uuid.uuid1(), 'datatype': 'semantic', 'ontologyclass': 'InvalidOntologyClass'}) # A blank node with an invalid ontology class specified
         graph.add_edge({'domainnode_id':self.rootNode.pk, 'rangenode_id':new_node.pk, 'ontologyproperty':None})
 
         with self.assertRaises(GraphValidationError) as cm:

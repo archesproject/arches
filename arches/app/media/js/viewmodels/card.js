@@ -79,6 +79,7 @@ define([
                     selection: selection,
                     loading: loading,
                     filter: filter,
+                    userisreviewer: params.userisreviewer,
                     provisionalTileViewModel: params.provisionalTileViewModel,
                     nodes: params.nodes,
                     cardwidgets: params.cardwidgets,

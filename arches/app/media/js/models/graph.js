@@ -96,7 +96,7 @@ define(['arches',
                     this.get('nodes').remove(function (node) {
                         return _.contains(nodes, node);
                     });
-                    parentNode.children.remove(node);
+                    parentNode.childNodes.remove(node);
                     parentNode.selected(true);
                 }else{
                     this.trigger('error', response, 'deleteNode');
@@ -226,11 +226,11 @@ define(['arches',
                         graph: this,
                         ontology_namespaces: this.get('root').ontology_namespaces
                     })
-                    newNode.children = ko.observableArray([]);
+                    newNode.childNodes = ko.observableArray([]);
 
                     this.get('nodes').push(newNode);
                     this.get('edges').push(response.responseJSON.edge);
-                    node.children.unshift(newNode)
+                    node.childNodes.unshift(newNode)
 
                     if(!this.get('isresource')){
                         this.selectNode(newNode);
@@ -490,7 +490,7 @@ define(['arches',
                                 graph: self,
                                 ontology_namespaces: attributes.ontology_namespaces
                             });
-                            nodeModel.children = ko.observableArray([]);
+                            nodeModel.childNodes = ko.observableArray([]);
                             if(node.istopnode){
                                 this.set('root', nodeModel);
                             }
@@ -553,17 +553,17 @@ define(['arches',
             var edges = !!edges ? edges : this.get('edges')();
             nodes.forEach(function(node){
                 node_map[node.id] = node;
-                if(!ko.isObservable(node.children)){
-                    node.children = ko.observableArray([]);
+                if(!ko.isObservable(node.childNodes)){
+                    node.childNodes = ko.observableArray([]);
                 }else{
                     if(!append) {
-                        node.children.removeAll();
+                        node.childNodes.removeAll();
                     }
                 }
             })
 
             edges.forEach(function(edge){
-                node_map[edge.domainnode_id].children.unshift(node_map[edge.rangenode_id])
+                node_map[edge.domainnode_id].childNodes.unshift(node_map[edge.rangenode_id])
             })
 
             return root;
@@ -690,7 +690,7 @@ define(['arches',
         /**
          * getChildNodesAndEdges - given a node, get all the child nodes edges
          * @memberof GraphModel.prototype
-         * @param  {NodeModel} node - the node from which to get the node's children
+         * @param  {NodeModel} node - the node from which to get the node's childNodes
          * @return  {object} - an object with a list of {@link NodeModel} and edges
          */
         getChildNodesAndEdges: function (node) {

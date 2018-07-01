@@ -5661,7 +5661,9 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .edit-message-container {
-    background: #DEF040;
+    background: #F799B9;
+    color: #fff;
+    border-bottom: 1px solid #DF2E6A;
     height: 50px;
     margin-top: -15px;
     margin-bottom: 0px;
@@ -5669,6 +5671,15 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     margin-right: -25px;
     padding: 15px 25px;
 }
+
+.edit-message-container.approved {
+    background: #C8F89A;
+    border-bottom: 1px solid #9CEC4F;
+    border-top: 1px solid #9CEC4F;
+    color: #24B06D;
+}
+
+
 
 .edit-message-container-user {
     font-weight: 700;
@@ -5682,15 +5693,13 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     margin-right: 15px;
     width: 250px;
     padding: 5px;
-    border-color: #ddd;
-    border-right-style: solid;
-    border-width: 1px;
+    border-left: 1px solid #ddd;
     height: 100%;
 }
 
 .new-provisional-edit-card-container {
     display: flex;
-    flex-direction: row;
+    flex-direction: row-reverse;
     align-items: baseline;
 }
 
@@ -5700,12 +5709,9 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 
 .new-provisional-edit-entry {
-    display: flex;
-    flex-direction: column;
-    margin: 2px;
-    border-style: solid;
-    border-width: 1px;
-    border-color: #ddd;
+    border: 1px solid #ddd;
+    margin-left: -5px;
+    margin-right: -45px;
 }
 
 .new-provisional-edit-entry .title {
@@ -5729,8 +5735,8 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 .new-provisional-edits-header {
     background: #f9f9f9;
     height: 40px;
-    margin-left: -30px;
-    margin-right: -5px;
+    margin-left: -5px;
+    margin-right: -40px;
     margin-top: -5px;
     padding: 10px 10px;
 
@@ -11253,6 +11259,10 @@ ul.select2-choices:after {
 
 .card-breadcrumbs span.dropdown.open .dropdown-menu>li>a:hover {
     color: #fff;
+}
+
+.card-breadcrumbs a.toggle-tree {
+    font-size: 13px;
 }
 
 .current-crumb {

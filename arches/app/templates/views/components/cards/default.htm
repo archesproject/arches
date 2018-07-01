@@ -122,8 +122,12 @@
     </div>
     <!--/ko-->
 
-    
-    
+    <!--ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 && !provisionalTileViewModel.selectedProvisionalEdit()-->
+    <div class="edit-message-container approved">
+        <div>{% trans 'Currently showing the most recent approved edits' %}</div>
+    </div>
+    <!--/ko-->
+
     <div class="new-provisional-edit-card-container">
         
         <!--ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 -->
