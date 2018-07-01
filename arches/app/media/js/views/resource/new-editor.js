@@ -201,6 +201,11 @@ define([
     var topCard = vm.topCards[0];
     selection(topCard.tiles().length > 0 ? topCard.tiles()[0] : topCard);
 
+    vm.resourceId.subscribe(function(val){
+        //switches the url from 'create-resource' once the resource id is available
+        history.pushState({}, '', arches.urls.resource_editor + resourceId())
+    })
+
     vm.selectionBreadcrumbs = ko.computed(function () {
         var item = vm.selectedTile()
         var crumbs = [];
