@@ -134,6 +134,7 @@
         <div class='new-provisional-edits-list'>
             <div class='new-provisional-edits-header'>
                 <div class='new-provisional-edits-title'>{% trans 'Provisional Edits' %}</div>
+                <div class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" style="padding: 3px;" data-bind="click: function(){provisionalTileViewModel.deleteAllProvisionalEdits()}">{% trans 'Delete all edits' %}</div>
             </div>
             <!--ko foreach: { data: provisionalTileViewModel.provisionaledits(), as: 'pe' } -->
             <div class='new-provisional-edit-entry' data-bind="css: {'selected': pe === $parent.provisionalTileViewModel.selectedProvisionalEdit()}, click: function(){$parent.provisionalTileViewModel.selectProvisionalEdit(pe)}">
@@ -149,7 +150,7 @@
                 </div>
             </div>
             <!-- /ko -->
-            <div class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" data-bind="click: function(){provisionalTileViewModel.deleteAllProvisionalEdits()}">{% trans 'Delete all edits' %}</div>
+            
         </div>
         <!--/ko-->
 
@@ -233,7 +234,7 @@
             <!-- /ko -->
             <div class="install-buttons">
                 <!-- ko if: tile.tileid -->
-                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-trash" data-bind="click: function () { self.form.deleteTile(tile); }">Delete</button>
+                <button class="btn btn-shim btn-warning btn-labeled btn-lg fa fa-trash pull-right" data-bind="click: function () { self.form.deleteTile(tile); }">Delete this record</button>
                 <!-- /ko -->
                 <!-- ko if: tile.dirty() -->
                 <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset">Cancel</button>
