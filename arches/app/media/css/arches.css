@@ -5709,7 +5709,9 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 
 .new-provisional-edit-entry {
-    border: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    background: #fdfdfd;
+    padding: 5px;
     margin-left: -5px;
     margin-right: -45px;
 }
@@ -5718,7 +5720,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    background-color: #f1f1f1;
 }
 
 .new-provisional-edits-title {
@@ -5734,6 +5735,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .new-provisional-edits-header {
     background: #f9f9f9;
+    border-bottom: 1px solid #ddd;
     height: 40px;
     margin-left: -5px;
     margin-right: -40px;
@@ -5743,14 +5745,12 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .new-provisional-edit-entry:hover {
-    border-color: #111;
-    background-color: #fff;
+    background-color: #f4f4f4;
+    cursor: pointer;
 }
 
 .new-provisional-edit-entry.selected {
-    background-color: #fff;
-    border-color: #729dd2;
-    border-width: 2px;
+    background-color: #f4f4f4;
 }
 
 .new-provisional-edit-entry .field-name {
@@ -5758,7 +5758,15 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .new-provisional-edit-entry .field {
-    padding: 5px
+    padding: 5px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.field.timestamp {
+    font-weight: 500;
+    font-size: 12px;
+    margin-top: -10px;
 }
 
 .new-provisional-edits-delete-all {

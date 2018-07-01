@@ -139,17 +139,12 @@
             <div class='new-provisional-edit-entry' data-bind="css: {'selected': pe === $parent.provisionalTileViewModel.selectedProvisionalEdit()}, click: function(){$parent.provisionalTileViewModel.selectProvisionalEdit(pe)}">
                 <div class='title'>
                     <div class='field'>
-                    <span class='field-name'>{%trans 'User: ' %}</span>
-                    <span data-bind="text : pe.username"></span>
+                        <span data-bind="text : pe.username"></span>
                     </div>
                     <a href='' class='field fa fa-times-circle new-delete-provisional-edit' data-bind="click : function(){$parent.provisionalTileViewModel.rejectProvisionalEdit(pe)}"></a>
                 </div>
-                <div class='field'>
-                    <span class='field-name'>{%trans 'Date: ' %}</span>
-                    <span data-bind="text : pe.displaydate"></span>
-                </div>
-                <div class='field'>
-                    <span class='field-name'>{%trans 'Time: ' %}</span>
+                <div class="field timestamp">
+                    <span data-bind="text : pe.displaydate">@</span>
                     <span data-bind="text : pe.displaytimestamp"></span>
                 </div>
             </div>
