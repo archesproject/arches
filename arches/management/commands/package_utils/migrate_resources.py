@@ -263,7 +263,19 @@ def prune_ontology(settings=None, remove_graph=None):
                     nodes_to_remove = get_list_dict(basepath + '_removed_nodes.csv', ['NodeId'])
                     
                     all_entitytypeids_to_remove = [x['NodeId'] for x in nodes_to_remove]
-                    
+                    ''' Given an initial list of entity ids, it collects all of their child entity ids until the whole hierarchy has been analysed, then returns it all as a a list'''
+                    def collect_leaf_entities_and_rules(relations, entities_to_delete, rule_ids_to_delete,mappings_to_delete,resource_type):
+                        if relations.count() > 0:
+                            entities_to_delete.extend(relations)
+                            collect_leaf_entities_and_rules(models.Relations.objects.filter(entityiddomain__in=list(relations)).values_list('entityidrange', flat=True),entities_to_delete, rule_ids_to_delete,mappings_to_delete, resource_type)
+                        else:
+                            ruleids = models.Relations.objects.filter(Q(entityidrange__in =entities_to_delete) | Q(entityiddomain__in =entities_to_delete)).values_list('ruleid', flat=True).distinct()
+                            entitytypes = models.Entities.objects.filter(entityid__in=entities_to_delete).values_list('entitytypeid', flat=True).distinct()
+                            mappings = models.Mappings.objects.filter(entitytypeidfrom=resource_type, entitytypeidto__in =entitytypes).values_list('mappingid', flat=True)
+                            mappings_to_delete.extend(mappings)
+                            rule_ids_to_delete.extend(ruleids)
+                            return entities_to_delete,rule_ids_to_delete,mappings_to_delete
+                           
                     ### Returns a list of entities to delete which have as top node the name of the name of the csv file containing the nodes to remove
                     def retrieve_entities_to_delete(resource_type, entitytypeids_to_remove, ontology=False):
                         entities_or_ontology = {
@@ -273,35 +285,39 @@ def prune_ontology(settings=None, remove_graph=None):
                         }
                         entities_to_delete = []
                         rule_ids_to_delete = []
+                        mappings_to_delete = []
                         for entitytypeid_to_remove in entitytypeids_to_remove:
                             try:
-                                if not remove_graph:
-                                    mappingid=models.Mappings.objects.get(entitytypeidfrom=resource_type, entitytypeidto =entitytypeid_to_remove)
-                                else:
-                                    mappingid=models.Mappings.objects.filter(entitytypeidfrom=resource_type).values_list('mappingid', flat=True)
+#                                 if not remove_graph:
+                                mappingid=models.Mappings.objects.get(entitytypeidfrom=resource_type, entitytypeidto =entitytypeid_to_remove)
+#                                 else:
+#                                     mappingid=models.Mappings.objects.filter(entitytypeidfrom=resource_type).values_list('mappingid', flat=True)
                             except:
                                 print "No mapping found for %s, moving on" % entitytypeid_to_remove
                                 continue
-                            rule_ids = models.MappingSteps.objects.filter(mappingid=mappingid.pk).values_list('ruleid', flat=True) if not remove_graph else models.MappingSteps.objects.filter(mappingid__in=mappingid).values_list('ruleid', flat=True)
-                            
-                            relations = models.Relations.objects.filter(ruleid__in=list(rule_ids)).values_list('entityidrange', flat=True)
-                            entities_to_delete.extend(relations)
-                            entities_or_ontology['mappings'].append(mappingid.pk) if not remove_graph else entities_or_ontology['mappings'].extend(list(mappingid))
-                            rule_ids_to_delete.extend(rule_ids)
-                        entities_or_ontology['entities_to_delete'].append(list(set(entities_to_delete)))
-                        entities_or_ontology['rule_ids'].append(list(set(rule_ids_to_delete)))
+                            rule_id = models.Rules.objects.get(ruleid__in=models.MappingSteps.objects.filter(mappingid=mappingid.pk).values_list('ruleid', flat=True), entitytyperange=entitytypeid_to_remove)
+                            collect_leaf_entities_and_rules(models.Relations.objects.filter(ruleid=rule_id).values_list('entityidrange', flat=True), entities_to_delete,rule_ids_to_delete,mappings_to_delete,resource_type)                            
+#                             entitytypes_to_delete = models.Entities.objects.filter(entityid__in=entities_to_delete).values_list('entitytypeid', flat=True).distinct()
+#                             for child_entitytype in entitytypes_to_delete:
+#                                 mapping = models.Mappings.objects.get(entitytypeidfrom=resource_type, entitytypeidto =child_entitytype)
+#                                 rule_id = models.Rules.objects.get(ruleid__in=models.MappingSteps.objects.filter(mappingid=mappingid.pk).values_list('ruleid', flat=True), entitytyperange=entitytypeid_to_remove)
+
+                            entities_or_ontology['entities_to_delete'].extend(list(set(entities_to_delete)))
+                            entities_or_ontology['mappings'].extend(list(set(mappings_to_delete)))
+                            entities_or_ontology['rule_ids'].extend(list(set(rule_ids_to_delete)))
                         
                         return entities_or_ontology
                         
                     ### Remove entities and their associated values/relationships
                     entities_to_delete = retrieve_entities_to_delete(name, all_entitytypeids_to_remove)
+
                     if any(entities_to_delete.values()):                
                         print "Deleting %s data entities and associated values and relations" % len(entities_to_delete['entities_to_delete'])
                         # delete any value records for this entity id
                         # dates
 #                         dates = models.Dates.objects.filter(entityid__in=entities_to_delete['entities_to_delete'][0]).values_list('val', flat=True)
 #                         print "DATES to be deleted: %s" % dates
-                        models.Dates.objects.filter(entityid__in=entities_to_delete['entities_to_delete'][0]).delete()
+                        models.Dates.objects.filter(entityid__in=entities_to_delete['entities_to_delete']).delete()
                         # files
 #                         files = models.Files.objects.filter(entityid__in=entities_to_delete['entities_to_delete'][0]).values_list('val', flat=True)
 #                         print "FILES to be deleted: %s" % files
@@ -309,21 +325,21 @@ def prune_ontology(settings=None, remove_graph=None):
                         # strings
 #                         strings = models.Strings.objects.filter(entityid__in=entities_to_delete['entities_to_delete'][0]).values_list('val', flat=True)
 #                         print "STRINGS to be deleted: %s" % strings
-                        models.Strings.objects.filter(entityid__in=entities_to_delete['entities_to_delete'][0]).delete()
+                        models.Strings.objects.filter(entityid__in=entities_to_delete['entities_to_delete']).delete()
                         # geometries
-                        models.Geometries.objects.filter(entityid__in=entities_to_delete['entities_to_delete'][0]).delete()
+                        models.Geometries.objects.filter(entityid__in=entities_to_delete['entities_to_delete']).delete()
                         # numbers
-                        models.Numbers.objects.filter(entityid__in=entities_to_delete['entities_to_delete'][0]).delete()
+                        models.Numbers.objects.filter(entityid__in=entities_to_delete['entities_to_delete']).delete()
                         # domains
 #                         domains = models.Domains.objects.filter(entityid__in=entities_to_delete['entities_to_delete'][0]).values_list('val', flat=True)
 #                         print "DOMAINS to be deleted: %s" % domains
-                        models.Domains.objects.filter(entityid__in=entities_to_delete['entities_to_delete'][0]).delete()
+                        models.Domains.objects.filter(entityid__in=entities_to_delete['entities_to_delete']).delete()
                         # delete any relationships from or to this entity id
-                        models.Relations.objects.filter( Q(entityiddomain__in=entities_to_delete['entities_to_delete'][0]) | Q(entityidrange__in=entities_to_delete['entities_to_delete'][0]) ).delete()
+                        models.Relations.objects.filter( Q(entityiddomain__in=entities_to_delete['entities_to_delete']) | Q(entityidrange__in=entities_to_delete['entities_to_delete']) ).delete()
                         # delete the entity record
 #                         entities = models.Entities.objects.filter(entityid__in=entities_to_delete['entities_to_delete'][0]).values_list('entitytypeid', flat=True)
 #                         print "ENTITIES to be deleted: %s" % entities
-                        models.Entities.objects.filter(entityid__in=entities_to_delete['entities_to_delete'][0]).delete()
+                        models.Entities.objects.filter(entityid__in=entities_to_delete['entities_to_delete']).delete()
                             
                         
                         #### Prune the ontology
