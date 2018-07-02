@@ -10285,14 +10285,47 @@ a.search-facet-item.disabled {
 
 .graph-designer-tab-container {
     background: #e7e7e7;
+    font-weight: 600;
+}
+
+.graph-designer-tab-container .nav-tabs>li.active>a {
+    background: #f4f4f4;
+    border: 1px solid #f4f4f4;
+}
+
+.graph-designer-tab-container .nav-tabs>li:not(.active)>a {
+    color: #999;
+}
+
+.graph-designer-tab-container .nav-tabs>li:not(.active)>a:hover {
+    cursor: pointer;
+    color: #666;
 }
 
 .viewstate-btn {
     width: 100px;
+    height: 40px;
+    background: #fafafa;
+}
+
+.btn-group-toggle .viewstate-btn {
+    border-radius: 3px 0px 0px 3px;
+}
+
+.btn-group-toggle .viewstate-btn:nth-child(2) {
+    margin-left: -1px;
+    border-radius: 0px 3px 3px 0px;
 }
 
 .viewstate-btn.active {
-    background-color: white;
+    background-color: #9490EE;
+    color: #fff;
+    font-weight: 600;
+    cursor: default;
+}
+
+.viewstate-btn:not(.active):hover {
+    background: #f4f4f4;
 }
 
 #identities-card .library-card:not(.selected-card) {
@@ -11281,6 +11314,10 @@ ul.select2-choices:after {
     overflow-y: scroll;
     height: 100vh;
     padding-bottom: 150px;
+}
+
+a.jstree-anchor strong {
+    font-weight: 600;
 }
 
 .expanded-nav {
