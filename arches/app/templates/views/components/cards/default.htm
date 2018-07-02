@@ -234,12 +234,12 @@
             <!-- /ko -->
             <div class="install-buttons">
                 <!-- ko if: tile.tileid -->
-                <button class="btn btn-shim btn-warning btn-labeled btn-lg fa fa-trash pull-right" data-bind="click: function () { self.form.deleteTile(tile); }">Delete this record</button>
+                <button class="btn btn-shim btn-warning btn-labeled btn-lg fa fa-trash" data-bind="click: function () { self.form.deleteTile(tile); }">Delete this record</button>
                 <!-- /ko -->
                 <!-- ko if: tile.dirty() -->
-                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset">Cancel</button>
+                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset">Cancel edit</button>
                     <!-- ko if: tile.tileid -->
-                    <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: function () { self.form.saveTile(tile); }">Save</button>
+                    <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: function () { self.form.saveTile(tile); }">Save edit</button>
                     <!-- /ko -->
                 <!-- /ko -->
                 <!-- ko if: !tile.tileid -->
