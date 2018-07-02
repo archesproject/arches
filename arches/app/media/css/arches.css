@@ -2198,8 +2198,8 @@ ul.nav.nav-tabs.nav-justified {
 }
 
 .graph-settings-panel-body .widgets .widget-container div div .domain-input-item {
-    max-width: 474px;
-    min-width: 474px;
+    max-width: 468px;
+    min-width: 468px;
 }
 
 .edtf-input {
@@ -8584,10 +8584,21 @@ a.clear-geojson-button:hover {
 
 .domain-input {
     height: 32px;
+    margin-bottom: 5px;
 }
 
 .domain-input-item {
     height: 32px;
+}
+
+.domain-drag-handle {
+    background: #f4f4f4;
+    padding-left: 4px;
+    padding-right: 1px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    border: 1px solid #ddd;
+    border-right-width: 0px;
 }
 
 .option-drag-handle {
