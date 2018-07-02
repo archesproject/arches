@@ -871,8 +871,6 @@ class Graph(models.GraphModel):
 
         """
 
-        typeOfGraphToAppend = graphToAppend.is_type()
-
         found = False
         if self.ontology is not None and graphToAppend.ontology is None:
             raise GraphValidationError(_('The graph you wish to append needs to define an ontology'))
@@ -889,46 +887,7 @@ class Graph(models.GraphModel):
 
             if not found:
                 raise GraphValidationError(_('Ontology rules don\'t allow this graph to be appended'))
-        if self.isresource:
-            if typeOfGraphToAppend == 'undefined':
-                raise GraphValidationError(_('Can\'t append an undefined graph to a resource graph'))
-        else: # self graph is a Graph
-            graph_type = self.is_type()
-            if graph_type == 'undefined':
-                raise GraphValidationError(_('Can\'t append any graph to an undefined graph'))
-            elif graph_type == 'card':
-                if typeOfGraphToAppend == 'card':
-                    if nodeToAppendTo == self.root:
-                        if not self.is_group_semantic(nodeToAppendTo):
-                            raise GraphValidationError(_('Can only append a card type graph to a semantic group'))
-                    else:
-                        raise GraphValidationError(_('Can only append to the root of the graph'))
-                elif typeOfGraphToAppend == 'card_collector':
-                    raise GraphValidationError(_('Can\'t append a card collector type graph to a card type graph'))
-            elif graph_type == 'card_collector':
-                if typeOfGraphToAppend == 'card_collector':
-                    raise GraphValidationError(_('Can\'t append a card collector type graph to a card collector type graph'))
-                if self.is_node_in_child_group(nodeToAppendTo):
-                    if typeOfGraphToAppend == 'card':
-                        raise GraphValidationError(_('Can only append an undefined type graph to a child within a card collector type graph'))
         return True
-
-    def is_type(self):
-        """
-        does this graph contain a card, a collection of cards, or no cards
-
-        returns either 'card', 'card_collector', or 'undefined'
-
-        """
-
-        count = self.get_nodegroups()
-
-        if len(count) == 0:
-            return 'undefined'
-        elif len(count) == 1:
-            return 'card'
-        else:
-            return 'card_collector'
 
     def get_parent_node(self, nodeid):
         """

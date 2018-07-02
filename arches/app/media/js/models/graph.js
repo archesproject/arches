@@ -373,30 +373,6 @@ define(['arches',
         },
 
         /**
-         * isType - does this graph contain a card, a collection of cards, or no cards
-         * @memberof GraphModel.prototype
-         * @return  {string} - either 'card', 'card_collector', or 'undefined'
-         */
-        isType: function(){
-            var nodegroups = [];
-            this.get('nodes')().forEach(function (node) {
-                if(node.isCollector()){
-                    nodegroups.push(node);
-                }
-            });
-            switch(nodegroups.length) {
-                case 0:
-                    return 'undefined';
-                    break;
-                case 1:
-                    return 'card'
-                    break;
-                default:
-                    return 'card_collector'
-            }
-        },
-
-        /**
          * canAppend - test to see whether or not a graph can be appened to this graph at a specific location
          * @memberof GraphModel.prototype
          * @param  {object} graphToAppend - the {@link GraphModel} to test appending on to this graph
@@ -405,7 +381,6 @@ define(['arches',
          */
         canAppend: function(graphToAppend, nodeToAppendTo){
             nodeToAppendTo = nodeToAppendTo ? nodeToAppendTo : this.get('selectedNode')();
-            var typeOfGraphToAppend = graphToAppend.isType();
 
             if(!!this.get('ontology_id') && !!graphToAppend.get('ontology_id')){
                 var found = !!_.find(graphToAppend.get('domain_connections'), function(domain_connection){
@@ -415,42 +390,6 @@ define(['arches',
                 }, this);
                 if(!found){
                     return false;
-                }
-            }
-
-            if(this.get('isresource')){
-                if(typeOfGraphToAppend === 'undefined'){
-                    return false;
-                }
-            }else{ // this graph is a Graph
-                switch(this.isType()) {
-                    case 'undefined':
-                        return false;
-                        break;
-                    case 'card':
-                        if(typeOfGraphToAppend === 'card'){
-                            if(nodeToAppendTo.nodeid === this.get('root').nodeid){
-                                if(!(this.isGroupSemantic(nodeToAppendTo))){
-                                    return false;
-                                }
-                            }else{
-                                return false;
-                            }
-                        }
-                        else if(typeOfGraphToAppend === 'card_collector'){
-                            return false;
-                        }
-                        break;
-                    case 'card_collector':
-                        if(typeOfGraphToAppend === 'card_collector'){
-                            return false;
-                        }
-                        if(this.isNodeInChildGroup(nodeToAppendTo)){
-                            if(typeOfGraphToAppend === 'card'){
-                                return false;
-                            }
-                        }
-                        break;
                 }
             }
 
