@@ -88,7 +88,9 @@ define([
             filter: filter
         });
         var topCard = self.topCards[0];
-        selection(topCard.tiles().length > 0 ? topCard.tiles()[0] : topCard);
+        if (topCard != null){
+            selection(topCard.tiles().length > 0 ? topCard.tiles()[0] : topCard);
+        }
     };
     return CardTreeViewModel;
 });
