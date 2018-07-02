@@ -468,53 +468,14 @@ class GraphTests(ArchesTestCase):
         graph.isresource = True
         self.assertIsNotNone(graph.append_branch('http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID))
 
-        # try to append a non-grouped graph
-        with self.assertRaises(GraphValidationError):
-            graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
-
-
-        graph = Graph.objects.get(graphid=self.SINGLE_NODE_GRAPHID)
-        # test that we can't append a single non-grouped node to a graph that is a single non grouped node
-        with self.assertRaises(GraphValidationError):
-            graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
-
         graph = Graph.new()
         graph.root.datatype = 'string'
         graph.update_node(JSONSerializer().serializeToPython(graph.root))
-
-        # test that we can't append a card to a graph that is a card that at it's root is not semantic
-        with self.assertRaises(GraphValidationError):
-            graph.append_branch('http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID)
-
-        # test that we can't append a card as a child to another card
-        graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
-        for node in graph.nodes.itervalues():
-            if node != graph.root:
-                with self.assertRaises(GraphValidationError):
-                    graph.append_branch('http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID, nodeid=node.nodeid)
-
 
         # create card collector graph to use for appending on to other graphs
         collector_graph = Graph.new()
         collector_graph.append_branch('http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID)
         collector_graph.save()
-
-        # test that we can't append a card collector on to a graph that is a card
-        graph = Graph.new()
-        with self.assertRaises(GraphValidationError):
-            graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=collector_graph.graphid)
-
-        # test that we can't append a card collector to another card collector
-
-        collector_copy = collector_graph.copy()['copy']
-        with self.assertRaises(GraphValidationError):
-            collector_copy.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=collector_graph.graphid)
-
-        # test that we can't append a card to a node in a child card within a card collector
-        for node in collector_graph.nodes.itervalues():
-            if node != collector_graph.root:
-                with self.assertRaises(GraphValidationError):
-                    collector_graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=graph.graphid, nodeid=node.nodeid)
 
     def test_node_update(self):
         """
@@ -628,8 +589,6 @@ class GraphTests(ArchesTestCase):
         # test moving a branch to another branch
         # this branch should NOT be grouped with it's new parent nodegroup
         branch_two_rootnodeid = branch_two.root.nodeid
-        with self.assertRaises(GraphValidationError):
-            graph.move_node(branch_one_rootnodeid, 'http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', branch_two_rootnodeid)
         graph.move_node(branch_one_rootnodeid, 'http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', branch_two_rootnodeid, skip_validation=True)
         self.assertEqual(len(graph.edges), 5)
         self.assertEqual(len(graph.nodes), 6)
