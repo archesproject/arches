@@ -82,79 +82,84 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <div class="main-panel card-component-panel" style="display:none;" data-bind="visible: true">
             <!-- ko if: selection() -->
             <div class="card-header">
-                <h4 data-bind="text: selectionBreadcrumbs()[0].name"></h4>
-                <h5 data-bind="text: selectionBreadcrumbs()[0].description"></h5>
-                <hr>
-            </div>
-            <div class="card-breadcrumbs">
-                <!-- ko foreach: { data: selectionBreadcrumbs(), as: 'crumb' } -->
-                    <!-- ko if: crumb.tileid -->
-                    <a href="#" data-bind="click: function () { crumb.selected(true) }">
-                        <!-- ko if: crumb.parent.widgets.length > 0 -->
-                        <span data-bind="text: crumb.parent.widgets[0].label || crumb.parent.name"></span>:
-                        <div style="display: inline;" data-bind="component: {
-                            name: $parent.widgetLookup[crumb.parent.widgets[0].widget_id].name,
-                            params: {
-                                tile: crumb,
-                                node: $parent.nodeLookup[crumb.parent.widgets[0].node_id],
-                                config: $parent.widgetLookup[crumb.parent.widgets[0].widget_id].config,
-                                label: $parent.widgetLookup[crumb.parent.widgets[0].widget_id].label,
-                                value: crumb.data[crumb.parent.widgets[0].node_id],
-                                type: 'resource-editor',
-                                state: 'display_value'
-                            }
-                        }"></div> &gt;
-                        <!-- /ko -->
-                        <!-- ko if: crumb.parent.widgets.length === 0 -->
-                        <span data-bind="text: crumb.parent.name"></span> &gt;
-                        <!-- /ko -->
-                    </a>
-                    <!-- /ko -->
-                <!-- /ko -->
-                <span class="current-crumb">
-                    <!-- ko if: selectedTile().tileid -->
-                        <!-- ko if: selectedCard().widgets.length > 0 -->
-                        <span data-bind="text: selectedCard().widgets[0].label || selectedCard().name"></span>:
-                        <div style="display: inline;" data-bind="component: {
-                            name: widgetLookup[selectedCard().widgets[0].widget_id].name,
-                            params: {
-                                tile: selectedTile(),
-                                node: nodeLookup[selectedCard().widgets[0].node_id],
-                                config: widgetLookup[selectedCard().widgets[0].widget_id].config,
-                                label: widgetLookup[selectedCard().widgets[0].widget_id].label,
-                                value: selectedTile().data[selectedCard().widgets[0].node_id],
-                                type: 'resource-editor',
-                                state: 'display_value'
-                            }
-                        }"></div>
-                        <!-- /ko -->
-                        <!-- ko if: selectedCard().widgets.length === 0 -->
-                        <span data-bind="text: selectedCard().name"></span>
-                        <!-- /ko -->
-                    <!-- /ko -->
-                    <!-- ko if: !selectedTile().tileid -->
-                    New <span data-bind="text: selectedCard().name"></span>
-                    <!-- /ko -->
-                </span>
-                <!-- ko if: selectedTile().tileid && selectedTile().cards.length > 0 -->
-                &gt;
-                <span class="dropdown">
-                    <a class="dropdown-toggle" href="javascript:void(0)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                        Add new... <i class="fa fa-caret-down"></i>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <!-- ko foreach: { data: selectedTile().cards, as: 'card' } -->
-                            <!-- ko if: card.canAdd() -->
-                            <li>
-                                <a href="javascript:void(0)" data-bind="text: card.name, click: function () { card.selected(true) }"></a>
-                            </li>
+                <div class="card-header-title">
+                    
+
+                    <div class="card-breadcrumbs">
+
+                        <a href="" class="toggle-tree"><i class="ion-arrow-left-b"></i></a>
+
+                        <!-- ko foreach: { data: selectionBreadcrumbs(), as: 'crumb' } -->
+                            <!-- ko if: crumb.tileid -->
+                            <a href="#" data-bind="click: function () { crumb.selected(true) }">
+                                <!-- ko if: crumb.parent.widgets.length > 0 -->
+                                <span data-bind="text: crumb.parent.widgets[0].label || crumb.parent.name"></span>:
+                                <div style="display: inline;" data-bind="component: {
+                                    name: $parent.widgetLookup[crumb.parent.widgets[0].widget_id].name,
+                                    params: {
+                                        tile: crumb,
+                                        node: $parent.nodeLookup[crumb.parent.widgets[0].node_id],
+                                        config: $parent.widgetLookup[crumb.parent.widgets[0].widget_id].config,
+                                        label: $parent.widgetLookup[crumb.parent.widgets[0].widget_id].label,
+                                        value: crumb.data[crumb.parent.widgets[0].node_id],
+                                        type: 'resource-editor',
+                                        state: 'display_value'
+                                    }
+                                }"></div> &gt;
+                                <!-- /ko -->
+                                <!-- ko if: crumb.parent.widgets.length === 0 -->
+                                <span data-bind="text: crumb.parent.name"></span> &gt;
+                                <!-- /ko -->
+                            </a>
                             <!-- /ko -->
                         <!-- /ko -->
-                    </ul>
-                </span>
+                        <span class="current-crumb">
+                            <!-- ko if: selectedTile().tileid -->
+                                <!-- ko if: selectedCard().widgets.length > 0 -->
+                                <span data-bind="text: selectedCard().widgets[0].label || selectedCard().name"></span>:
+                                <div style="display: inline;" data-bind="component: {
+                                    name: widgetLookup[selectedCard().widgets[0].widget_id].name,
+                                    params: {
+                                        tile: selectedTile(),
+                                        node: nodeLookup[selectedCard().widgets[0].node_id],
+                                        config: widgetLookup[selectedCard().widgets[0].widget_id].config,
+                                        label: widgetLookup[selectedCard().widgets[0].widget_id].label,
+                                        value: selectedTile().data[selectedCard().widgets[0].node_id],
+                                        type: 'resource-editor',
+                                        state: 'display_value'
+                                    }
+                                }"></div>
+                                <!-- /ko -->
+                                <!-- ko if: selectedCard().widgets.length === 0 -->
+                                <span data-bind="text: selectedCard().name"></span>
+                                <!-- /ko -->
+                            <!-- /ko -->
+                            <!-- ko if: !selectedTile().tileid -->
+                            New <span data-bind="text: selectedCard().name"></span>
+                            <!-- /ko -->
+                        </span>
+                        <!-- ko if: selectedTile().tileid && selectedTile().cards.length > 0 -->
+                        &gt;
+                        <span class="dropdown">
+                            <a class="dropdown-toggle" href="javascript:void(0)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                Add new... <i class="fa fa-caret-down"></i>
+                            </a>
+                            <ul class="dropdown-menu" style="padding-bottom: 5px;">
+                                <!-- ko foreach: { data: selectedTile().cards, as: 'card' } -->
+                                    <!-- ko if: card.canAdd() -->
+                                    <li>
+                                        <a href="javascript:void(0)" data-bind="text: card.name, click: function () { card.selected(true) }"></a>
+                                    </li>
+                                    <!-- /ko -->
+                                <!-- /ko -->
+                            </ul>
+                        </span>
 
-                <!-- /ko -->
+                        <!-- /ko -->
+                    </div>
+                </div>
             </div>
+            
             <div data-bind="component: {
                 name: cardComponentLookup[selectedCard().component_id].componentname,
                 params: {
@@ -168,7 +173,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             }"></div>
             <!-- /ko -->
         </div>
-
     </div>
 </div>
 {% endblock main_content %}

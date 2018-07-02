@@ -1,8 +1,9 @@
 /* jsTree default theme */
 .jstree>.header {
-    height: 60px;
+    height: 70px;
     padding-left: 13px;
-    background-color: #f8f8f8;
+    background-color: #f4f4f4;
+    border-bottom: 1px solid #ddd;
     padding-top: 10px;
     font-size: 11px;
 }
