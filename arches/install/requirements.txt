@@ -1,4 +1,4 @@
-Django==1.11.10
+Django==1.11.13
 psycopg2-binary==2.7.4
 elasticsearch>=5.0.0,<6.0.0
 rdflib==4.2.2
