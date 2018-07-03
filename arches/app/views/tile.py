@@ -26,33 +26,41 @@ from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.decorators import can_edit_resource_instance
 from arches.app.views.tileserver import clean_resource_cache
+from django.contrib.auth.models import User
 from django.http import HttpResponseNotFound
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.views.generic import View
 from django.db import transaction
+from arches.app.models.resource import EditLog
+
 
 @method_decorator(can_edit_resource_instance(), name='dispatch')
 class TileData(View):
     action = 'update_tile'
 
-    def delete_provisional_edit(self, tileid, user):
-        tile = Tile.objects.get(tileid = tileid)
+    def delete_provisional_edit(self, tile, user, reviewer=None):
         provisionaledits = None
         if tile.provisionaledits is not None:
             provisionaledits = tile.provisionaledits
             if user in provisionaledits:
+                provisional_editor = User.objects.get(pk=user)
+                edit = provisionaledits[user]
                 provisionaledits.pop(user)
                 if len(provisionaledits) == 0:
                     tile.provisionaledits = None
                 else:
                     tile.provisionaledits = provisionaledits
-                tile.save(log=False)
+                tile.save(provisional_edit_log_details={"user": reviewer, "action": "delete edit", "edit": edit, "provisional_editor": provisional_editor})
+
 
     def post(self, request):
         if self.action == 'update_tile':
             json = request.POST.get('data', None)
+            accepted_provisional = request.POST.get('accepted_provisional', None)
+            if accepted_provisional != None:
+                accepted_provisional_edit = JSONDeserializer().deserialize(accepted_provisional)
             if json != None:
                 data = JSONDeserializer().deserialize(json)
                 if data['resourceinstance_id'] == '':
@@ -74,7 +82,12 @@ class TileData(View):
                 if tile.filter_by_perm(request.user, 'write_nodegroup'):
                     with transaction.atomic():
                         try:
-                            tile.save(request=request)
+                            if accepted_provisional == None:
+                                tile.save(request=request)
+                            else:
+                                if accepted_provisional is not None:
+                                    provisional_editor = User.objects.get(pk=accepted_provisional_edit["user"])
+                                tile.save(provisional_edit_log_details={"user": request.user, "action": "accept edit", "edit": accepted_provisional_edit, "provisional_editor": provisional_editor})
                             if tile_id == '4345f530-aa90-48cf-b4b3-92d1185ca439':
                                 import couchdb
                                 import json as json_json
@@ -123,14 +136,20 @@ class TileData(View):
             user = request.POST.get('user', None)
             tileid = request.POST.get('tileid', None)
             users = request.POST.get('users', None)
+            tile = Tile.objects.get(tileid = tileid)
+            is_provisional = tile.is_provisional()
+
             if tileid is not None and user is not None:
-                provisionaledits = self.delete_provisional_edit(tileid, user)
-                return JSONResponse(provisionaledits)
+                provisionaledits = self.delete_provisional_edit(tile, user, reviewer=request.user)
 
             elif tileid is not None and users is not None:
                 users = jsonparser.loads(users)
                 for user in users:
-                    self.delete_provisional_edit(tileid, user)
+                    self.delete_provisional_edit(tile, user, reviewer=request.user)
+
+            if is_provisional == True:
+                return JSONResponse({'result':'delete'})
+            else:
                 return JSONResponse({'result':'success'})
 
         return HttpResponseNotFound()
@@ -158,6 +177,46 @@ class TileData(View):
                     return JSONResponse({'status':'false','message': [_('Request Failed'), _('You do not have permissions to delete a tile with authoritative data.')]}, status=500)
 
         return HttpResponseNotFound()
+
+    def get(self, request):
+        if self.action == 'tile_history':
+            edits = EditLog.objects.filter(provisional_userid=request.user.id).order_by('tileinstanceid', 'timestamp')
+            summary = {}
+            for edit in edits:
+                if edit.tileinstanceid not in summary:
+                    summary[edit.tileinstanceid] = {'pending': False, 'tileid': edit.tileinstanceid}
+                summary[edit.tileinstanceid]['lasttimestamp'] = edit.timestamp
+                summary[edit.tileinstanceid]['lastedittype'] = edit.provisional_edittype
+                summary[edit.tileinstanceid]['reviewer'] = ''
+                summary[edit.tileinstanceid]['resourceinstanceid'] = edit.resourceinstanceid
+                summary[edit.tileinstanceid]['resourcemodelid'] = edit.resourceclassid
+                summary[edit.tileinstanceid]['nodegroupid'] = edit.nodegroupid
+                if edit.provisional_edittype in ['accept edit', 'delete edit']:
+                    summary[edit.tileinstanceid]['reviewer'] = edit.user_username
+
+            chronological_summary = []
+            resource_models = models.GraphModel.objects.filter(isresource=True).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).values('iconclass','color','graphid','name')
+            cards = models.CardModel.objects.all().values('name', 'nodegroup_id')
+            card_lookup = {str(card['nodegroup_id']): card for card in cards}
+            resource_model_lookup = {str(graph['graphid']): graph for graph in resource_models}
+            for k, v in summary.iteritems():
+                if v['lastedittype'] not in ['accept edit', 'delete edit']:
+                    if models.TileModel.objects.filter(pk=k).exists():
+                        tile = models.TileModel.objects.get(pk=k)
+                        if tile.provisionaledits is not None and str(request.user.id) in tile.provisionaledits:
+                            v['pending'] = True
+
+                v['resourcemodel'] = resource_model_lookup[v['resourcemodelid']]
+                v['card'] = card_lookup[v['nodegroupid']]
+                if 'graphid' in v['resourcemodel']:
+                    v['resourcemodel'].pop('graphid')
+                if 'nodegroup_id' in v['card']:
+                    v['card'].pop('nodegroup_id')
+                chronological_summary.append(v)
+
+            print sorted(chronological_summary, key=lambda k: k['lasttimestamp'])
+
+            return JSONResponse(JSONSerializer().serialize(sorted(chronological_summary, key=lambda k: k['lasttimestamp'])))
 
 
 

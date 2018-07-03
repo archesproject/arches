@@ -18,9 +18,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid
 import json
+import pyprind
 from copy import copy, deepcopy
 from django.db import transaction
 from arches.app.models import models
+from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.search.mappings import prepare_search_index, delete_search_index
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -375,7 +377,22 @@ class Graph(models.GraphModel):
         else:
             raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot delete a Resource Model with instances.".format(self.name)))
 
+    def delete_instances(self, verbose=False):
+        """
+        deletes all associated resource instances
 
+        """
+        activestate = self.isactive
+        self.isactive = False
+        if verbose == True:
+            bar = pyprind.ProgBar(Resource.objects.filter(graph_id=self.graphid).count())
+        for resource in Resource.objects.filter(graph_id=self.graphid):
+            resource.delete()
+            if verbose == True:
+                bar.update()
+        self.isactive = activestate
+        if verbose == True:
+            print(bar)
 
     def get_tree(self, root=None):
         """
@@ -661,6 +678,9 @@ class Graph(models.GraphModel):
             copy_of_self.root = root_node
             copy_of_self.name = root_node.name
             copy_of_self.isresource = False
+            copy_of_self.subtitle = ''
+            copy_of_self.description = ''
+            copy_of_self.author = ''
 
         # returns a list of node ids sorted by nodes that are collector nodes first and then others last
         node_ids = sorted(copy_of_self.nodes, key=lambda node_id: copy_of_self.nodes[node_id].is_collector, reverse=True)
@@ -780,8 +800,7 @@ class Graph(models.GraphModel):
                 edge.domainnode = new_node
             if edge.rangenode_id == new_node.nodeid:
                 edge.rangenode = new_node
-                if 'parentproperty' in node:
-                    edge.ontologyproperty = node.get('parentproperty', None)
+                edge.ontologyproperty = node.get('parentproperty', None)
 
         self.populate_null_nodegroups()
 
@@ -852,8 +871,6 @@ class Graph(models.GraphModel):
 
         """
 
-        typeOfGraphToAppend = graphToAppend.is_type()
-
         found = False
         if self.ontology is not None and graphToAppend.ontology is None:
             raise GraphValidationError(_('The graph you wish to append needs to define an ontology'))
@@ -870,49 +887,7 @@ class Graph(models.GraphModel):
 
             if not found:
                 raise GraphValidationError(_('Ontology rules don\'t allow this graph to be appended'))
-        if self.isresource:
-            # if(nodeToAppendTo != self.root):
-            #     raise GraphValidationError(_('Can\'t append a graph to a resource except at the root'))
-            # else:
-            if typeOfGraphToAppend == 'undefined':
-                raise GraphValidationError(_('Can\'t append an undefined graph to a resource graph'))
-        else: # self graph is a Graph
-            graph_type = self.is_type()
-            if graph_type == 'undefined':
-                raise GraphValidationError(_('Can\'t append any graph to an undefined graph'))
-            elif graph_type == 'card':
-                if typeOfGraphToAppend == 'card':
-                    if nodeToAppendTo == self.root:
-                        if not self.is_group_semantic(nodeToAppendTo):
-                            raise GraphValidationError(_('Can only append a card type graph to a semantic group'))
-                    else:
-                        raise GraphValidationError(_('Can only append to the root of the graph'))
-                elif typeOfGraphToAppend == 'card_collector':
-                    raise GraphValidationError(_('Can\'t append a card collector type graph to a card type graph'))
-            elif graph_type == 'card_collector':
-                if typeOfGraphToAppend == 'card_collector':
-                    raise GraphValidationError(_('Can\'t append a card collector type graph to a card collector type graph'))
-                if self.is_node_in_child_group(nodeToAppendTo):
-                    if typeOfGraphToAppend == 'card':
-                        raise GraphValidationError(_('Can only append an undefined type graph to a child within a card collector type graph'))
         return True
-
-    def is_type(self):
-        """
-        does this graph contain a card, a collection of cards, or no cards
-
-        returns either 'card', 'card_collector', or 'undefined'
-
-        """
-
-        count = self.get_nodegroups()
-
-        if len(count) == 0:
-            return 'undefined'
-        elif len(count) == 1:
-            return 'card'
-        else:
-            return 'card_collector'
 
     def get_parent_node(self, nodeid):
         """
@@ -1303,7 +1278,6 @@ class Graph(models.GraphModel):
         self.check_if_resource_is_editable()
 
         # validates that the top node of a resource graph is semantic and a collector
-
         if self.isresource == True:
             if self.root.is_collector == True:
                 raise GraphValidationError(_("The top node of your resource graph: {0} needs to be a collector. Hint: check that nodegroup_id of your resource node(s) are not null.".format(self.root.name)), 997)
@@ -1314,37 +1288,18 @@ class Graph(models.GraphModel):
                 if len(self.nodes) > 1:
                     raise GraphValidationError(_("If your graph contains more than one node and is not a resource the root must be a collector."), 999)
 
-
-        # validates that a node group that has child node groups is not itself a child node group
-        # 20160609 can't implement this without changing our default resource graph --REA
-
-        # parentnodegroups = []
-        # for nodegroup in self.get_nodegroups():
-        #     if nodegroup.parentnodegroup:
-        #         parentnodegroups.append(nodegroup)
-
-        # for parent in parentnodegroups:
-        #     for child in parentnodegroups:
-        #         if parent.parentnodegroup_id == child.nodegroupid:
-        #             raise GraphValidationError(_("A parent node group cannot be a child of another node group."))
-
-
-
-        # validates that a all parent node groups that are not root nodegroup only contain semantic nodes.
-
-        # for nodegroup in self.get_nodegroups():
-        #     if nodegroup.parentnodegroup and nodegroup.parentnodegroup_id != self.root.nodeid:
-        #         for node_id, node in self.nodes.iteritems():
-        #             if str(node.nodegroup_id) == str(nodegroup.parentnodegroup_id) and node.datatype != 'semantic':
-        #                 raise GraphValidationError(_("A parent node group must only contain semantic nodes."), 1000)
-
+        # validate that nodes have a datatype assigned to them
+        for node_id, node in self.nodes.iteritems():
+            if node.datatype == '':
+                raise GraphValidationError(_("A valid node datatype must be selected"))
 
         # validate that nodes in a resource graph belong to the ontology assigned to the resource graph
-
         if self.ontology is not None:
             ontology_classes = self.ontology.ontologyclasses.values_list('source', flat=True)
 
             for node_id, node in self.nodes.iteritems():
+                if (node.ontologyclass==''):
+                    raise GraphValidationError(_("A valid {0} ontology class must be selected").format(self.ontology.name), 1000)
                 if node.ontologyclass not in ontology_classes:
                     raise GraphValidationError(_("'{0}' is not a valid {1} ontology class").format(node.ontologyclass, self.ontology.name), 1001)
 
@@ -1361,7 +1316,7 @@ class Graph(models.GraphModel):
                             raise GraphValidationError(_("Your graph isn't semantically valid. Entity domain '{0}' and Entity range '{1}' can not be related via Property '{2}'.").format(edge.domainnode.ontologyclass, edge.rangenode.ontologyclass, edge.ontologyproperty), 1003)
 
                 if not property_found:
-                    raise GraphValidationError(_("'{0}' is not a valid {1} ontology property").format(edge.ontologyproperty, self.ontology.name), 1004)
+                    raise GraphValidationError(_("'{0}' is not found in the {1} ontology or is not a valid ontology property for Entity domain '{2}'.").format(edge.ontologyproperty, self.ontology.name, edge.domainnode.ontologyclass), 1004)
         else:
             for node_id, node in self.nodes.iteritems():
                 if node.ontologyclass is not None:

@@ -26,7 +26,7 @@ define([
             }
             self.loading(false);
         })
-        };
+    };
 
     viewModel.discardEdits = function() {
         if (!this.selectedMobileSurvey().get('id')) {
@@ -67,13 +67,17 @@ define([
             }, function(a){
                 self.loading(true)
                 if (mobilesurvey) {
-                    mobilesurvey.delete(function(){
+                    mobilesurvey.delete(function(data){
+                        if (data.responseJSON.success){
+                            self.mobilesurveys.remove(mobilesurvey);
+                            if (mobilesurvey === self.selectedMobileSurvey()) {
+                                self.selectedMobileSurvey(undefined);
+                            }
+                        } else {
+                            pageView.viewModel.alert(new AlertViewModel('ep-alert-red', data.responseJSON.title, data.responseJSON.message));
+                        }
                         self.loading(false);
-                        self.mobilesurveys.remove(mobilesurvey);
                     });
-                    if (mobilesurvey === self.selectedMobileSurvey()) {
-                        self.selectedMobileSurvey(undefined);
-                    }
                 };
             }));
         }
@@ -82,7 +86,6 @@ define([
     viewModel.deleteSelectedMobileSurvey = function(){
         if (this.selectedMobileSurvey()) {
             this.deleteMobileSurvey(this.selectedMobileSurvey())
-            this.selectedMobileSurvey(undefined)
         };
     }
 

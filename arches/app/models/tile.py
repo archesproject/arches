@@ -96,13 +96,18 @@ class Tile(models.TileModel):
                             tile.parenttile = self
                             self.tiles[key].append(tile)
 
-    def save_edit(self, user={}, note='', edit_type='', old_value=None, new_value=None, newprovisionalvalue=None, oldprovisionalvalue=None):
+    def save_edit(self, user={}, note='', edit_type='', old_value=None, new_value=None, newprovisionalvalue=None, oldprovisionalvalue=None, provisional_edit_log_details=None):
         timestamp = datetime.datetime.now()
         edit = EditLog()
         edit.resourceclassid = self.resourceinstance.graph_id
         edit.resourceinstanceid = self.resourceinstance.resourceinstanceid
         edit.nodegroupid = self.nodegroup_id
         edit.tileinstanceid = self.tileid
+        if provisional_edit_log_details != None:
+            edit.provisional_user_username = getattr(provisional_edit_log_details['provisional_editor'], 'username', '')
+            edit.provisional_userid = getattr(provisional_edit_log_details['provisional_editor'], 'id', '')
+            edit.provisional_edittype = provisional_edit_log_details['action']
+            user = provisional_edit_log_details['user']
         edit.userid = getattr(user, 'id', '')
         edit.user_email = getattr(user, 'email', '')
         edit.user_firstname = getattr(user, 'first_name', '')
@@ -211,6 +216,7 @@ class Tile(models.TileModel):
         request = kwargs.pop('request', None)
         index = kwargs.pop('index', True)
         log = kwargs.pop('log', True)
+        provisional_edit_log_details = kwargs.pop('provisional_edit_log_details', None)
         self.__preSave(request)
         missing_nodes = []
         creating_new_tile = True
@@ -240,11 +246,16 @@ class Tile(models.TileModel):
                     oldprovisionalvalue = oldprovisional['value']
 
                 self.data = existing_model.data
+                if provisional_edit_log_details == None:
+                    provisional_edit_log_details={"user": user, "action": "add edit",  "provisional_editor": user}
+
             if creating_new_tile == True:
                 if self.is_provisional() == False and user_is_reviewer == False:
                     self.apply_provisional_edit(user, data=self.data, action='create')
                     newprovisionalvalue = self.data
                     self.data = {}
+                    if provisional_edit_log_details == None:
+                        provisional_edit_log_details={"user": user, "action": "create tile",  "provisional_editor": user}
 
         super(Tile, self).save(*args, **kwargs)
         #We have to save the edit log record after calling save so that the
@@ -252,9 +263,18 @@ class Tile(models.TileModel):
         if log == True:
             user = {} if user == None else user
             if creating_new_tile == True:
-                self.save_edit(user=user, edit_type=edit_type, old_value={}, new_value=self.data, newprovisionalvalue=newprovisionalvalue)
+                self.save_edit(user=user, edit_type=edit_type, old_value={}, new_value=self.data, newprovisionalvalue=newprovisionalvalue, provisional_edit_log_details=provisional_edit_log_details)
             else:
-                self.save_edit(user=user, edit_type=edit_type, old_value=existing_model.data, new_value=self.data, newprovisionalvalue=newprovisionalvalue, oldprovisionalvalue=oldprovisionalvalue)
+                self.save_edit(
+                    user=user,
+                    edit_type=edit_type,
+                    old_value=existing_model.data,
+                    new_value=self.data,
+                    newprovisionalvalue=newprovisionalvalue,
+                    oldprovisionalvalue=oldprovisionalvalue,
+                    provisional_edit_log_details=provisional_edit_log_details
+                )
+
 
         if index:
             self.index()

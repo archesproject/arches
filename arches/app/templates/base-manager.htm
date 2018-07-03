@@ -124,6 +124,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </a>
                         {% endif %}
 
+                        <!-- Prov edit history-->
+                        {% if user_is_reviewer == False %}
+                        <a href="{% url 'search_home' %}" class="ep-edits-toggle ep-tools ep-tools-right" data-bind="click:function () { getProvisionalHistory(); }">
+                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Recent Edits" %}'>
+                              <i class="ion-clock"></i>
+                            </div>
+                        </a>
+                        {% endif %}
+
                         {% if nav.res_edit and user|can_edit_resource_instance %}
                         <a href="{% url 'resource_editor' resourceid %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'resource_editor' resourceid %}') }">
                             <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Edit Resource" %}'>
@@ -147,6 +156,44 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </div>
                         </a>
                         {% endif %}
+                    </div>
+
+                    <!-- Help Panel -->
+                    <div id="ep-edits-panel" class="ep-edits" style="display:none">
+                        <div class="ep-edits-header" style="padding-right:0px">
+                            <div class="ep-edits-title">
+                            </div>
+                            <a href="javascript:void(0);" class="ep-edits-toggle ep-edits-close ep-tools ep-tools-right" style="border:none;">
+                                <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Close" %}'>
+                                  <i class="fa fa-times-circle fa-lg"></i>
+                                </div>
+                            </a>
+                        </div>
+
+                        <!-- help content loaded from contextually referenced template -->
+                        <div class="ep-edits-body" style="float:left" data-bind="css: {'loading-mask': helploading()}">
+                            <div class="ep-edits-content">
+                            <!-- ko foreach: provisionalEdits -->
+                            <div class='new-provisional-edit-history'>
+                                <div class='entry'><i data-bind="css: $data.resourcemodel.iconclass" style="padding-right: 4px"></i><div class='entry-label' data-bind="text: $data.resourcemodel.name"></div></div>
+                                <div class='entry'><div class='entry-label'>{% trans 'Card: ' %}</div><span data-bind="text: $data.card.name"></span></div>
+                                <div class='entry'><div class='entry-label'>{% trans 'Edited: ' %}</div><span data-bind="text: $data.displaytime"></span></div>
+                                <div class='entry'>
+                                    <div class='entry-label'>{% trans 'Status: ' %}</div>
+                                    <!--ko if: $data.pending -->
+                                    <span style='color: #F5BB25'>{% trans 'Pending Review' %}</span>
+                                    <!--/ko-->
+                                    <!--ko if: $data.lastedittype === 'delete edit' -->
+                                    <div><span style='color: red'>{% trans 'Declined by: ' %}</span><strong data-bind="text: $data.reviewer"></strong></div>
+                                    <!--/ko-->
+                                    <!--ko if: $data.lastedittype === 'accept edit' -->
+                                    <div><span style='color: green'>{% trans 'Approved by: ' %}</span><strong data-bind="text: $data.reviewer"></strong></div>
+                                    <!--/ko-->
+                                </div>
+                            </div>
+                            <!--/ko-->
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Help Panel -->

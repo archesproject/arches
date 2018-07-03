@@ -29,7 +29,7 @@
 <!-- /ko -->
 
 <template id="graph-tree">
-    <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (node.children().length > 0 && node.expanded), 'jstree-closed' : (node.children().length > 0 && !node.expanded()), 'jstree-leaf': node.children().length === 0}">
+    <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (node.childNodes().length > 0 && node.expanded), 'jstree-closed' : (node.childNodes().length > 0 && !node.expanded()), 'jstree-leaf': node.childNodes().length === 0}">
         <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){node.expanded(!node.expanded())}"></i>
         <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: graphTree.selectItem.bind(graphTree), css:{'jstree-clicked': node.selected, 'child-selected': graphTree.isChildSelected(node) }">
             <i data-bind="css: node.iconclass" role="presentation"></i>
@@ -38,7 +38,6 @@
             <i class="jstree-node-action-icon ion-merge" role="presentation" data-bind="click: graphTree.toggleBranchList.bind(graphTree)" data-toggle="tooltip" data-original-title="{% trans "Add Branch" %}"></i>
             <!-- ko if: !node.istopnode -->
             <i class="jstree-node-action-icon fa fa-arrow-right" role="presentation" data-bind="click: graphTree.exportBranch.bind(graphTree)" data-toggle="tooltip" data-original-title="{% trans "Export Branch" %}"></i>
-            <!-- /ko -->
             <!-- /ko -->
             <!-- ko if: !node.istopnode -->
             <i class="jstree-node-action-icon fa fa-trash" role="presentation" data-bind="click: graphTree.deleteNode.bind(graphTree)" data-toggle="tooltip" data-original-title="{% trans "Delete Node" %}"></i>

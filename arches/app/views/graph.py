@@ -177,6 +177,7 @@ class NewGraphSettingsView(GraphBaseView):
         node.set_relatable_resources(data.get('relatable_resource_ids'))
         node.ontologyclass = data.get('ontology_class') if data.get('graph').get('ontology_id') is not None else None
         node.name = graph.name
+        graph.root.name = node.name
 
         try:
             with transaction.atomic():
@@ -247,6 +248,7 @@ class GraphManagerView(GraphBaseView):
     def delete(self, request, graphid):
         try:
             graph = Graph.objects.get(graphid=graphid)
+            graph.delete_instances()
             graph.delete()
             return JSONResponse({'success':True})
         except GraphValidationError as e:
@@ -264,6 +266,14 @@ class GraphDesignerView(GraphBaseView):
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         concept_collections = Concept().concept_tree(mode='collections', lang=lang)
         branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True)
+        cards = self.graph.cardmodel_set.order_by('sortorder').prefetch_related('cardxnodexwidget_set')
+        cardwidgets = [widget for widgets in [card.cardxnodexwidget_set.order_by('sortorder').all() for card in cards] for widget in widgets]
+        widgets = models.Widget.objects.all()
+        card_components = models.CardComponent.objects.all()
+        map_layers = models.MapLayer.objects.all()
+        map_markers = models.MapMarker.objects.all()
+        map_sources = models.MapSource.objects.all()
+        geocoding_providers = models.Geocoder.objects.all()
         if self.graph.ontology is not None:
             branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
         context = self.get_context_data(
@@ -276,6 +286,16 @@ class GraphDesignerView(GraphBaseView):
                 'title': _('Branch Library'),
                 'search_placeholder': _('Find a graph branch')
             },
+            widgets=widgets,
+            widgets_json=JSONSerializer().serialize(widgets),
+            card_components=card_components,
+            card_components_json=JSONSerializer().serialize(card_components),
+            cards=JSONSerializer().serialize(cards),
+            cardwidgets=JSONSerializer().serialize(cardwidgets),
+            map_layers=map_layers,
+            map_markers=map_markers,
+            map_sources=map_sources,
+            geocoding_providers = geocoding_providers,
         )
         context['ontologies'] = JSONSerializer().serialize(ontologies, exclude=['version', 'path'])
         context['ontology_classes'] = JSONSerializer().serialize(ontology_classes)
@@ -425,7 +445,7 @@ class GraphDataView(View):
 
             return JSONResponse(ret)
         except GraphValidationError as e:
-            return JSONResponse({'status':'false','message':e.message, 'title':e.title}, status=500)
+            return JSONResponse({'status':'false','success':False,'message':e.message, 'title':e.title}, status=500)
 
     def delete(self, request, graphid):
         data = JSONDeserializer().deserialize(request.body)

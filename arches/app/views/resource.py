@@ -103,14 +103,24 @@ class NewResourceEditorView(MapBaseManagerView):
 
             provisionaltiles = []
             for tile in tiles:
+                append_tile = True
+                isfullyprovisional = False
                 if tile.provisionaledits is not None:
+                    if len(tile.data) == 0:
+                        isfullyprovisional = True
                     if user_is_reviewer == False:
                         if str(request.user.id) in tile.provisionaledits:
                             tile.provisionaledits = {str(request.user.id): tile.provisionaledits[str(request.user.id)]}
                             tile.data = tile.provisionaledits[str(request.user.id)]['value']
                         else:
-                            tile.provisionaledits = None
-                provisionaltiles.append(tile)
+                            if isfullyprovisional == True:
+                                #if the tile IS fully provisional and the current user is not the owner, we don't send that tile back to the client.
+                                append_tile = False
+                            else:
+                                #if the tile has authoritaive data and the current user is not the owner, we don't send the provisional data of other users back to the client.
+                                tile.provisionaledits = None
+                if append_tile == True:
+                    provisionaltiles.append(tile)
             tiles = provisionaltiles
 
         map_layers = models.MapLayer.objects.all()
@@ -298,7 +308,8 @@ class ResourceEditLogView(BaseManagerView):
                 'delete': _('Resource Deleted'),
                 'tile delete': _('Tile Deleted'),
                 'tile create': _('Tile Created'),
-                'tile edit': _('Tile Updated')
+                'tile edit': _('Tile Updated'),
+                'delete edit': _('Edit Deleted')
             }
             deleted_instances = [e.resourceinstanceid for e in recent_edits if e.edittype == 'delete']
             graph_name_lookup = {str(r.resourceinstanceid): r.graph.name for r in resources}

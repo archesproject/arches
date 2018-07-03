@@ -59,20 +59,31 @@ define([
             var isChildSelected = function (parent) {
                 var childSelected = false;
                 if (!parent.istopnode) {
-                    parent.children().forEach(function(child) {
+                    parent.childNodes().forEach(function(child) {
                         if (child && child.selected() || isChildSelected(child)){
                             childSelected = true;
                         }
                     });
                     return childSelected;
-
-                    };
                 }
+            };
+
             return ko.computed(function() {
                 return isChildSelected(node);
             }, this);
         },
 
+        /**
+        * Expands the parent of the passed in node
+        * @memberof GraphTree.prototype
+        * @param {object} node - the child of the parent node to be expanded
+        */
+        expandParentNode: function(node) {
+            if(node.parent) {
+                node.parent.expanded(true);
+                this.expandParentNode(node.parent);
+            }
+        },
 
         /**
         * Selects the passed in node

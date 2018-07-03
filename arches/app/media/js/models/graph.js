@@ -96,7 +96,7 @@ define(['arches',
                     this.get('nodes').remove(function (node) {
                         return _.contains(nodes, node);
                     });
-                    parentNode.children.remove(node);
+                    parentNode.childNodes.remove(node);
                     parentNode.selected(true);
                 }else{
                     this.trigger('error', response, 'deleteNode');
@@ -226,15 +226,11 @@ define(['arches',
                         graph: this,
                         ontology_namespaces: this.get('root').ontology_namespaces
                     })
-                    newNode.children = ko.observableArray([]);
+                    newNode.childNodes = ko.observableArray([]);
 
                     this.get('nodes').push(newNode);
                     this.get('edges').push(response.responseJSON.edge);
-                    node.children.unshift(newNode)
-
-                    // response.responseJSON.nodegroups.forEach(function(nodegroup){
-                    //     this.get('nodegroups').push(nodegroup);
-                    // }, this);
+                    node.childNodes.unshift(newNode)
 
                     if(!this.get('isresource')){
                         this.selectNode(newNode);
@@ -377,30 +373,6 @@ define(['arches',
         },
 
         /**
-         * isType - does this graph contain a card, a collection of cards, or no cards
-         * @memberof GraphModel.prototype
-         * @return  {string} - either 'card', 'card_collector', or 'undefined'
-         */
-        isType: function(){
-            var nodegroups = [];
-            this.get('nodes')().forEach(function (node) {
-                if(node.isCollector()){
-                    nodegroups.push(node);
-                }
-            });
-            switch(nodegroups.length) {
-                case 0:
-                    return 'undefined';
-                    break;
-                case 1:
-                    return 'card'
-                    break;
-                default:
-                    return 'card_collector'
-            }
-        },
-
-        /**
          * canAppend - test to see whether or not a graph can be appened to this graph at a specific location
          * @memberof GraphModel.prototype
          * @param  {object} graphToAppend - the {@link GraphModel} to test appending on to this graph
@@ -409,7 +381,6 @@ define(['arches',
          */
         canAppend: function(graphToAppend, nodeToAppendTo){
             nodeToAppendTo = nodeToAppendTo ? nodeToAppendTo : this.get('selectedNode')();
-            var typeOfGraphToAppend = graphToAppend.isType();
 
             if(!!this.get('ontology_id') && !!graphToAppend.get('ontology_id')){
                 var found = !!_.find(graphToAppend.get('domain_connections'), function(domain_connection){
@@ -419,46 +390,6 @@ define(['arches',
                 }, this);
                 if(!found){
                     return false;
-                }
-            }
-
-            if(this.get('isresource')){
-                // if(nodeToAppendTo.nodeid !== this.get('root').nodeid){
-                //     return false;
-                // }else{
-                    if(typeOfGraphToAppend === 'undefined'){
-                        return false;
-                    }
-                // }
-            }else{ // this graph is a Graph
-                switch(this.isType()) {
-                    case 'undefined':
-                        return false;
-                        break;
-                    case 'card':
-                        if(typeOfGraphToAppend === 'card'){
-                            if(nodeToAppendTo.nodeid === this.get('root').nodeid){
-                                if(!(this.isGroupSemantic(nodeToAppendTo))){
-                                    return false;
-                                }
-                            }else{
-                                return false;
-                            }
-                        }
-                        else if(typeOfGraphToAppend === 'card_collector'){
-                            return false;
-                        }
-                        break;
-                    case 'card_collector':
-                        if(typeOfGraphToAppend === 'card_collector'){
-                            return false;
-                        }
-                        if(this.isNodeInChildGroup(nodeToAppendTo)){
-                            if(typeOfGraphToAppend === 'card'){
-                                return false;
-                            }
-                        }
-                        break;
                 }
             }
 
@@ -498,7 +429,7 @@ define(['arches',
                                 graph: self,
                                 ontology_namespaces: attributes.ontology_namespaces
                             });
-                            nodeModel.children = ko.observableArray([]);
+                            nodeModel.childNodes = ko.observableArray([]);
                             if(node.istopnode){
                                 this.set('root', nodeModel);
                             }
@@ -561,17 +492,17 @@ define(['arches',
             var edges = !!edges ? edges : this.get('edges')();
             nodes.forEach(function(node){
                 node_map[node.id] = node;
-                if(!ko.isObservable(node.children)){
-                    node.children = ko.observableArray([]);
+                if(!ko.isObservable(node.childNodes)){
+                    node.childNodes = ko.observableArray([]);
                 }else{
                     if(!append) {
-                        node.children.removeAll();
+                        node.childNodes.removeAll();
                     }
                 }
             })
 
             edges.forEach(function(edge){
-                node_map[edge.domainnode_id].children.unshift(node_map[edge.rangenode_id])
+                node_map[edge.domainnode_id].childNodes.unshift(node_map[edge.rangenode_id])
             })
 
             edges.forEach(function(edge){
@@ -704,7 +635,7 @@ define(['arches',
         /**
          * getChildNodesAndEdges - given a node, get all the child nodes edges
          * @memberof GraphModel.prototype
-         * @param  {NodeModel} node - the node from which to get the node's children
+         * @param  {NodeModel} node - the node from which to get the node's childNodes
          * @return  {object} - an object with a list of {@link NodeModel} and edges
          */
         getChildNodesAndEdges: function (node) {

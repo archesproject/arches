@@ -131,6 +131,7 @@ urlpatterns = [
     url(r'^help-templates$', main.help_templates, name="help_templates"),
     url(r'^tile$', TileData.as_view(action='update_tile'), name="tile"),
     url(r'^tiles/reorder_tiles$', TileData.as_view(action='reorder_tiles'), name='reorder_tiles'),
+    url(r'^tiles/tile_history$', TileData.as_view(action='tile_history'), name='tile_history'),
     url(r'^tiles/delete_provisional_tile$', TileData.as_view(action='delete_provisional_tile'), name='delete_provisional_tile'),
     url(r'^templates/(?P<template>[a-zA-Z_\-./]*)', main.templates, name="templates"),
     url(r'^tileserver/*', tileserver.handle_request, name="tileserver"),
