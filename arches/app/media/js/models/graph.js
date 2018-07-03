@@ -505,6 +505,12 @@ define(['arches',
                 node_map[edge.domainnode_id].childNodes.unshift(node_map[edge.rangenode_id])
             })
 
+            edges.forEach(function(edge){
+                node_map[edge.domainnode_id].childNodes.sort(function (left, right) {
+                    return left.attributes.source.sortorder == right.attributes.source.sortorder ? 0 : (left.attributes.source.sortorder < right.attributes.source.sortorder ? -1 : 1) })
+            })
+
+
             return root;
         },
 
