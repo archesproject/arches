@@ -1316,7 +1316,7 @@ class Graph(models.GraphModel):
                             raise GraphValidationError(_("Your graph isn't semantically valid. Entity domain '{0}' and Entity range '{1}' can not be related via Property '{2}'.").format(edge.domainnode.ontologyclass, edge.rangenode.ontologyclass, edge.ontologyproperty), 1003)
 
                 if not property_found:
-                    raise GraphValidationError(_("'{0}' is not a valid {1} ontology property").format(edge.ontologyproperty, self.ontology.name), 1004)
+                    raise GraphValidationError(_("'{0}' is not found in the {1} ontology or is not a valid ontology property for Entity domain '{2}'.").format(edge.ontologyproperty, self.ontology.name, edge.domainnode.ontologyclass), 1004)
         else:
             for node_id, node in self.nodes.iteritems():
                 if node.ontologyclass is not None:

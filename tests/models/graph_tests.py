@@ -1039,3 +1039,34 @@ class GraphTests(ArchesTestCase):
             graph.save()
         the_exception = cm.exception
         self.assertEqual(the_exception.code, 1005)
+
+    def test_appending_a_branch_with_an_invalid_ontology_property(self):
+        graph = Graph.objects.get(graphid=self.NODE_NODETYPE_GRAPHID)
+        graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P43_has_dimension', graphid=self.NODE_NODETYPE_GRAPHID)
+
+        with self.assertRaises(GraphValidationError) as cm:
+            graph.save()
+
+    def test_appending_a_branch_with_an_invalid_ontology_class(self):
+        graph = Graph.new()
+        graph.name = "TEST GRAPH"
+        graph.subtitle = "ARCHES TEST GRAPH"
+        graph.author = "Arches"
+        graph.description = "ARCHES TEST GRAPH"
+        graph.ontology = models.Ontology.objects.get(pk="e6e8db47-2ccf-11e6-927e-b8f6b115d7dd")
+        graph.version = "v1.0.0"
+        graph.isactive = False
+        graph.iconclass = "fa fa-building"
+        graph.nodegroups = []
+
+        graph.root.name = 'ROOT NODE'
+        graph.root.description = 'Test Root Node'
+        graph.root.ontologyclass = 'http://www.cidoc-crm.org/cidoc-crm/E21_Person'
+        graph.root.datatype = 'semantic'
+
+        graph.save()
+
+        graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P43_has_dimension', graphid=self.NODE_NODETYPE_GRAPHID)
+
+        with self.assertRaises(GraphValidationError) as cm:
+            graph.save()
