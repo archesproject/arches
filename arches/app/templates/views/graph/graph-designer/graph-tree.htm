@@ -17,11 +17,11 @@
     <div class="left-panel-overflow">
         <!-- <div data-bind="sortable: $data"> -->
         <ul class="jstree-container-ul jstree-children" aria-expanded="true">
-                <div class="" data-bind="template: {
-                    name: 'graph-tree',
-                    foreach: graphTree.graphModel.tree,
-                    as: 'node'
-                }"></div>
+            <div class="" data-bind="template: {
+                name: 'graph-tree',
+                foreach: graphTree.graphModel.tree,
+                as: 'node'
+            }"></div>
         </ul>
         <!-- </div> -->
     </div>
@@ -43,18 +43,14 @@
             <i class="jstree-node-action-icon fa fa-trash" role="presentation" data-bind="click: graphTree.deleteNode.bind(graphTree)" data-toggle="tooltip" data-original-title="{% trans "Delete Node" %}"></i>
             <!-- /ko -->
         </a>
-        <ul class="jstree-children" aria-expanded="true" data-bind="if: node.children().length > 0">
+        <ul class="jstree-children" aria-expanded="true" data-bind="if: node.childNodes().length > 0">
             <div data-bind="sortable: {
-                data: node.children,
+                template: 'graph-tree',
+                data: node.childNodes,
                 as: 'node',
                 beforeMove: graphTree.beforeMove,
                 afterMove: graphTree.reorderNodes
             }">
-                <div data-bind="template: {
-                    name: 'graph-tree',
-                    data: node,
-                    as: 'node'
-                }"></div>
             </div>
         </ul>
     </li>
