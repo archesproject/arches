@@ -33,7 +33,6 @@ class Command(BaseCommand):
 
         if options['operation'] == 'site_dataset':
             result = self.SiteDataset(options['source'], options['resource_type'], options['dest_dir'],options['append_data'])
-        
         error_path = os.path.join(settings.BULK_UPLOAD_DIR,"_validation_errors.json")
         with open(error_path,'w') as out:
             json.dump(result,out)
@@ -72,13 +71,13 @@ class Command(BaseCommand):
         rows_count  = 0
         ret = []
         offset_max = False
-        errors = {
-            'different_rows': False
-        }
+#         errors_dict = {
+#             'different_rows': False,
+#             'errors': []
+#         }
         errors = []
-
                
-                    
+            
         for sheet_index,sheet in enumerate(workbook.worksheets):
             last_row = list(sheet.rows)[sheet.max_row-1]
             if last_row[0].value is None: #this if cluase is to exclude rows with None values from the row count across worksheets
@@ -94,7 +93,7 @@ class Command(BaseCommand):
                 # raise ValueError("Error: cells in sheet %s do not contain an equal number of semicolon separated values or are empty. Errors are at the following lines: %s" % (workbook.sheetnames[sheet_index], sorted(ret)))
                 errors.append("Error: cells in sheet %s do not contain an equal number of semicolon separated values or are empty. Errors are at the following lines: %s" % (workbook.sheetnames[sheet_index], sorted(ret)))
         if (rows_count/sheet_count).is_integer() is not True:
-            # errors['different_rows'] = True
+#             errors_dict['different_rows'] = True
             errors.append("Error: some sheets in your XLSX file have a different number of rows")
             return errors
             # raise ValueError("Error: some sheets in your XLSX file have a different number of rows")
@@ -207,16 +206,17 @@ class Command(BaseCommand):
         headers_errors = self.validate_headers(wb2,skip_resourceid_col = append)
         rows_values_errors =  self.validate_rows_and_values(wb2)
         if headers_errors:
-            Log['validate_headers']['errors'].append(headers_errors)
+            Log['validate_headers']['errors'].extend(headers_errors)
             Log['validate_headers']['passed'] = False
         if rows_values_errors:
-            if rows_values_errors['different_rows'] == True:
-                Log['validate_rows_and_values']['passed'] = False
-            else:
-                rows_values_errors.pop('different_rows', None)       
-                Log['validate_rows_and_values']['errors'].append(self.validate_rows_and_values(wb2))
-                Log['validate_rows_and_values']['passed'] = False
-        
+            Log['validate_rows_and_values']['errors'].extend(rows_values_errors)
+            Log['validate_rows_and_values']['passed'] = False            
+#             if rows_values_errors['different_rows'] == True:
+#                 Log['validate_rows_and_values']['passed'] = False
+#             else:
+#                 rows_values_errors.pop('different_rows', None)
+#                 Log['validate_rows_and_values']['errors'].append(rows_values_errors['errors'])
+#                 Log['validate_rows_and_values']['passed'] = False
         if headers_errors or rows_values_errors:
             return Log
         
@@ -267,7 +267,7 @@ class Command(BaseCommand):
                                             else:
                                                 concept_list = [str(resourceid),resourcetype,modelinstance.entitytypeid,concept, GroupName]
                                                 ResourceList.append(concept_list)
-                                    
+            
         if Log['validate_geometries']['errors'] or Log['validate_dates']['errors'] or Log['validate_concepts']['errors']:
             return Log
 
