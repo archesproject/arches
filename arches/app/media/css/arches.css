@@ -2109,6 +2109,12 @@ ul.nav.nav-tabs.nav-justified {
     border-top: 1px solid #ddd;
 }
 
+.graph-crm-class {
+    font-size: 15px;
+    color: #888;
+    padding-left: 10px;
+}
+
 .graph-designer {
     background: #fbfbfb;
 }
