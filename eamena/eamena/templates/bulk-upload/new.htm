@@ -60,6 +60,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <button id="load-data-button" class="bulk-upload-btn" type="button" disabled>Load Resources</button>
                     <div id="import-msg" class="upload-msg-box" style="color:red;">Not ready to load...</div>
                 </div>
+                <div class="bulk-upload-step-box">
+                    <h5>5. Select file attachement folder</h5>
+                    <input id="folderupload" type="file" name="files[]" data-url="/bulk-upload/attachments" multiple directory webkitdirectory mozdirectory disabled>
+                    <div id="folder-msg" class="upload-msg-box" style="color:red;">No file yet...</div>
+                </div>
             </div>
             <div class="col-xs-8">
                 <div id="upload-log-output">

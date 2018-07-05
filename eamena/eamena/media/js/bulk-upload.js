@@ -3,6 +3,9 @@ function updateRestype() {
     $('#resource-type-select').change( function() {
         $('#restype-msg').text($('#resource-type-select').val());
     });
+    if (('#restype-msg').text() === "INFORMATION_RESOURCE.E73"){
+        $('#folderupload').removeAttr('disabled')
+    }
 };
 
 function displayResults(result,testName,logEl) {
@@ -139,6 +142,27 @@ $( document ).ready(function() {
             }
         });
     });
+
+    $('#folderupload').fileupload({
+        beforeSend: function(request) {
+            request.setRequestHeader("X-CSRFToken",csrftoken);
+        },
+        dataType: 'json',
+        done: function (e, data) {
+            console.log(data)
+            if (!data.result.filevalid) {
+                // note that invalid file types will not have been uploaded
+                $('#folder-msg').css("color","red");
+                $('#folder-msg').text("Invalid file format rejected for upload.");
+            } else {
+                filepath = data.result.filepath;
+                $('#folder-msg').css("color","green");
+                $('#folder-msg').text(data.result.filename);
+            }
+        }
+    }).prop('disabled', !$.support.fileInput)
+        .parent().addClass($.support.fileInput ? undefined : 'disabled');
+
     updateRestype();
 });
 

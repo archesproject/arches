@@ -136,4 +136,25 @@ def import_archesfile(request):
     )
     
     return HttpResponse(json.dumps({}), content_type="application/json")
-    
+
+def upload_attachments(request):
+    """
+    The log shows the load_id which in turn lets us find the uploaded resource ids.
+    We'll enter this view for each file within the uploaded folder. So for each one we need to find which resource it
+    belongs to (if any) and add that entry. I shouldn't need to save anything to the server, just store the file directly
+    into the resource.
+
+        resources_for_removal = archesmodels.EditLog.objects.filter( Q(note=load_id) )
+        resourceids = set([editlog.resourceid for editlog in resources_for_removal])
+
+
+    :param request:
+    :return:
+    """
+    print("I'm in the view!")
+
+    if request.method == 'POST':
+        print(request.POST)
+        print(request._files['files[]'])
+
+    return HttpResponse(json.dumps({}), content_type="application/json")

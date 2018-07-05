@@ -237,6 +237,7 @@ class Command(BaseCommand):
                                 GroupNo = GroupNo +1 if sheet_name is not 'NOT' else ''
                                 GroupName = " ".join((sheet_name, str(GroupNo))) if sheet_name != 'NOT' else sheet_name
                                 if concept != 'x':
+                                    print("Looking at: %s (%s)" % (modelinstance.entitytypeid, modelinstance.businesstablename))
                                     if modelinstance.businesstablename == 'domains':                                
                                         concepts_in_node = self.collect_concepts(modelinstance.conceptid_id, full_concept_list =[])
                                         valueinstance =  self.validate_concept(concept, concepts_in_node)
