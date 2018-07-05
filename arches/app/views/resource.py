@@ -83,7 +83,6 @@ class NewResourceEditorView(MapBaseManagerView):
             resource_instance = Resource.objects.get(pk=resourceid)
             graph = resource_instance.graph
         nodes = graph.node_set.all()
-        ontologyclass = [node for node in nodes if node.istopnode == True][0].ontologyclass
         nodegroups = [node.nodegroup for node in nodes if node.is_collector and request.user.has_perm('write_nodegroup', node.nodegroup)]
         nodes = nodes.filter(nodegroup__in=nodegroups)
         cards = graph.cardmodel_set.order_by('sortorder').filter(nodegroup__in=nodegroups).prefetch_related('cardxnodexwidget_set')
@@ -136,7 +135,6 @@ class NewResourceEditorView(MapBaseManagerView):
             graphid=graph.graphid,
             graphiconclass=graph.iconclass,
             graphname=graph.name,
-            ontologyclass=ontologyclass,
             widgets=widgets,
             widgets_json=JSONSerializer().serialize(widgets),
             card_components=card_components,
