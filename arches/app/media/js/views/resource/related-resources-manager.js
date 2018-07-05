@@ -39,8 +39,12 @@ define([
             this.paginator = koMapping.fromJS({});
 
             this.selectedOntologyClass.subscribe(function() {
-                self.selectedOntologyClass() ? self.relationshipTypes(self.validproperties[self.selectedOntologyClass()]) : self.relationshipTypes(options.relationship_types.values);
-            })
+                if (self.selectedOntologyClass() && self.validproperties[self.selectedOntologyClass()] !== undefined) {
+                    self.relationshipTypes(self.validproperties[self.selectedOntologyClass()]);
+                } else {
+                    self.relationshipTypes(options.relationship_types.values);
+                }
+            });
 
             this.showGraph.subscribe(function(val){
                 this.graphNodeList([])
@@ -239,7 +243,6 @@ define([
             if (this.resourceEditorContext === true) {
                 this.relationshipTypes = ko.observableArray()
                 if (!this.useSemanticRelationships || !this.ontologyclass) {
-                // if (!this.useSemanticRelationships || !this.graph.root.ontologyclass) {
                     this.relationshipTypes(options.relationship_types.values);
                 }
 
@@ -256,6 +259,7 @@ define([
                         }
                     }, this);
                 }, this);
+
                 _.each(this.validproperties, function(ontology_class) {
                     ontology_class.sort(function(a, b) {
                         if (a.id > b.id) {
