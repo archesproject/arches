@@ -45,8 +45,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!-- Clear Search -->
                         <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }" style="top: 8px;"><i class="fa fa-times-circle"></i></span>
                     </div>
-                    <a data-bind="click: expandAll">{% trans 'Expand all' %}</a>
-                    <a data-bind="click: collapseAll" style="padding-left:5px;">{% trans 'Collapse all' %}</a>
+                    <a data-bind="click: expandAll">Expand all</a>
+                    <a data-bind="click: collapseAll" style="padding-left:5px;">Collapse all</a>
                 </div>
                 <ul class="jstree-container-ul jstree-children" aria-expanded="true">
                     <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': rootExpanded, 'jstree-closed' : !rootExpanded()}">
@@ -75,29 +75,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </ul>
                         <!-- /ko -->
                     </li>
-                    <li role="treeitem" class="jstree-node jstree-open">
-                        <i class="jstree-icon jstree-ocl" role="presentation"></i>
-                        <a class="jstree-anchor" href="#" tabindex="-1">
-                            <strong>
-                                <i class="fa fa-link" role="presentation"></i>
-                                <span>{% trans 'Related Resources' %}</span>
-                            </strong>
-                        </a>
-                        <ul class="jstree-container-ul jstree-children related-resources" aria-expanded="true" data-bind="foreach: {
-                            data: [{'name':'miles'}, {'name':'monk'}],
-                            as: 'rr'
-                        }">
-                            <li role="treeitem card-treeitem" class="jstree-node jstree-leaf">
-                                <i class="jstree-icon jstree-ocl" role="presentation"></i>
-                                <a class="jstree-anchor" href="#" tabindex="0">
-                                    <strong>
-                                        <i class="fa fa-link" role="presentation"></i>
-                                        <span data-bind="text: rr.name"></span>
-                                    </strong>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
                 </ul>
             </div>
         </div>
@@ -106,7 +83,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <!-- ko if: selection() -->
             <div class="card-header">
                 <div class="card-header-title">
-
+                    
 
                     <div class="card-breadcrumbs">
 
@@ -182,7 +159,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
                 </div>
             </div>
-
+            
             <div data-bind="component: {
                 name: cardComponentLookup[selectedCard().component_id].componentname,
                 params: {
