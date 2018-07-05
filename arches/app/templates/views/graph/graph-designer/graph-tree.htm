@@ -44,11 +44,14 @@
             <!-- /ko -->
         </a>
         <ul class="jstree-children" aria-expanded="true" data-bind="if: node.childNodes().length > 0">
-            <div data-bind="template: {
-                name: 'graph-tree',
-                foreach: node.childNodes(),
-                as: 'node'
-            }"></div>
+            <div data-bind="sortable: {
+                template: 'graph-tree',
+                data: node.childNodes,
+                as: 'node',
+                beforeMove: graphTree.beforeMove,
+                afterMove: graphTree.reorderNodes
+            }">
+            </div>
         </ul>
     </li>
 </template>

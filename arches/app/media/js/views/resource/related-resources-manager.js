@@ -103,6 +103,7 @@ define([
                         }
                     }, self);
                 if (self.useSemanticRelationships && self.resourceEditorContext === true) {
+                    // if (res.length > 0 && self.useSemanticRelationships && self.graph.root.ontologyclass) {
                     if (res.length > 0 && self.useSemanticRelationships && self.ontologyclass) {
                         self.selectedOntologyClass(res[0].resource.root_ontology_class)
                         self.resourceRelationships().forEach(function(rr) {
@@ -238,6 +239,7 @@ define([
             if (this.resourceEditorContext === true) {
                 this.relationshipTypes = ko.observableArray()
                 if (!this.useSemanticRelationships || !this.ontologyclass) {
+                // if (!this.useSemanticRelationships || !this.graph.root.ontologyclass) {
                     this.relationshipTypes(options.relationship_types.values);
                 }
 

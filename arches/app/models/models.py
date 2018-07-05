@@ -423,6 +423,7 @@ class Node(models.Model):
     config = JSONField(blank=True, null=True, db_column='config')
     issearchable = models.BooleanField(default=True)
     isrequired = models.BooleanField(default=False)
+    sortorder = models.IntegerField(blank=True, null=True, default=0)
 
     def get_child_nodes_and_edges(self):
         """

@@ -231,6 +231,7 @@ define([
         }
     };
 
+
     vm.selectionBreadcrumbs = ko.computed(function () {
         var item = vm.selectedTile()
         var crumbs = [];
