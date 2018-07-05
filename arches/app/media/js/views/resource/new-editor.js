@@ -75,6 +75,7 @@ define([
         graphname: data.graphname,
         reviewer: data.userisreviewer,
         graphiconclass: data.graphiconclass,
+        relationship_types: data.relationship_types,
         manageRelatedResources: manageRelatedResources,
         graph: {
             graphid: data.graphid,
@@ -214,7 +215,8 @@ define([
     vm.showRelatedResourcesManager = function(){
         if (vm.graph.domain_connections == undefined) {
             $.ajax({
-                url: arches.urls.get_domain_connections(vm.graphid)
+                url: arches.urls.get_domain_connections(vm.graphid),
+                data: {"ontology_class": vm.graph.ontologyclass}
             }).done(function(data){
                 vm.graph.domain_connections = data;
                 vm.relatedResourcesManager = new RelatedResourcesManager({
