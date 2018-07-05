@@ -11208,6 +11208,7 @@ ul.select2-choices:after {
     border-left: solid 1px gainsboro;
     border-right: solid 1px gainsboro;
     height:100%;
+    z-index: 3;
 }
 
 .sidepanel-draggable div {
@@ -11226,6 +11227,7 @@ ul.select2-choices:after {
     width: 270px;
     overflow-x: auto;
     overflow-y: hidden;
+    z-index: 3;
 }
 
 .left-panel-overflow {
