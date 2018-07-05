@@ -83,6 +83,7 @@ class NewResourceEditorView(MapBaseManagerView):
             resource_instance = Resource.objects.get(pk=resourceid)
             graph = resource_instance.graph
         nodes = graph.node_set.all()
+        resource_graphs = models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
         ontologyclass = [node for node in nodes if node.istopnode == True][0].ontologyclass
         nodegroups = [node.nodegroup for node in nodes if node.is_collector and request.user.has_perm('write_nodegroup', node.nodegroup)]
         nodes = nodes.filter(nodegroup__in=nodegroups)
@@ -137,6 +138,7 @@ class NewResourceEditorView(MapBaseManagerView):
             graphiconclass=graph.iconclass,
             graphname=graph.name,
             ontologyclass=ontologyclass,
+            resource_graphs=resource_graphs,
             widgets=widgets,
             widgets_json=JSONSerializer().serialize(widgets),
             card_components=card_components,

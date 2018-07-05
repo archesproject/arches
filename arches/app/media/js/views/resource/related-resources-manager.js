@@ -17,7 +17,9 @@ define([
             this.searchResults = options.searchResults;
             this.editingInstanceId = options.editing_instance_id;
             this.graph = options.graph;
-            this.ontologyclass = options.graph.ontologyclass || options.graph.root.ontologyclass;
+            if (this.graph) {
+                this.ontologyclass = options.graph.ontologyclass || options.graph.root.ontologyclass;
+            }
             this.graphNameLookup = _.indexBy(arches.resources, 'graphid');
             this.currentResource = ko.observable();
             this.currentResourceSubscriptions = [];
@@ -177,6 +179,7 @@ define([
                                 }
                             })
                             .done(function(data) {
+                                self.graphNameLookup = _.indexBy(arches.resources, 'graphid');
                                 this.parse(data, self)
                                 self.newResource(this)
                             })
