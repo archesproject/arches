@@ -253,6 +253,8 @@ Updating a resource descriptor should be reflected in the following subjects.
 
 Assigned to: Cyrus
 
+| Test Subject                                           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
+| ------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
 | Provisional users see indication in a widget that their tile edits were submitted                   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Resource reviewers are able to identify provisional tiles and can approve/discard provisional edits |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
