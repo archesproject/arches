@@ -384,15 +384,12 @@ class Graph(models.GraphModel):
         deletes all associated resource instances
 
         """
-        activestate = self.isactive
-        self.isactive = False
         if verbose == True:
             bar = pyprind.ProgBar(Resource.objects.filter(graph_id=self.graphid).count())
         for resource in Resource.objects.filter(graph_id=self.graphid):
             resource.delete()
             if verbose == True:
                 bar.update()
-        self.isactive = activestate
         if verbose == True:
             print(bar)
 
