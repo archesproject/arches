@@ -9,11 +9,13 @@ define([
     'viewmodels/new-provisional-tile',
     'arches',
     'resource-editor-data',
+    'views/search/search-results',
+    'views/resource/related-resources-manager',
     'bindings/resizable-sidepanel',
     'bindings/sortable',
     'widgets',
     'card-components'
-], function($, _, ko, moment, BaseManagerView, AlertViewModel, CardViewModel, ProvisionalTileViewModel, arches, data) {
+], function($, _, ko, moment, BaseManagerView, AlertViewModel, CardViewModel, ProvisionalTileViewModel, arches, data, searchResults, RelatedResourcesManager) {
     var handlers = {
         'after-update': [],
         'tile-reset': []
@@ -24,6 +26,7 @@ define([
     var selection = ko.observable();
     var displayname = ko.observable(data.displayname);
     var resourceId = ko.observable(data.resourceid);
+    var manageRelatedResources = ko.observable(false);
     var selectedTile = ko.computed(function () {
         var item = selection();
         if (item) {
@@ -72,10 +75,12 @@ define([
         graphname: data.graphname,
         reviewer: data.userisreviewer,
         graphiconclass: data.graphiconclass,
+        manageRelatedResources: manageRelatedResources,
         graph: {
             graphid: data.graphid,
             name: data.graphname,
             iconclass: data.graphiconclass,
+            ontologyclass: data.ontologyclass
         },
         displayname: displayname,
         expandAll: function() {
@@ -204,7 +209,27 @@ define([
     vm.resourceId.subscribe(function(val){
         //switches the url from 'create-resource' once the resource id is available
         history.pushState({}, '', arches.urls.resource_editor + resourceId())
-    })
+    });
+
+    vm.showRelatedResourcesManager = function(){
+        if (vm.graph.domain_connections == undefined) {
+            $.ajax({
+                url: arches.urls.get_domain_connections(vm.graphid)
+            }).done(function(data){
+                vm.graph.domain_connections = data;
+                vm.relatedResourcesManager = new RelatedResourcesManager({
+                    searchResults: new searchResults(),
+                    resourceEditorContext: true,
+                    editing_instance_id: vm.resourceId(),
+                    relationship_types: vm.relationship_types,
+                    graph: vm.graph
+                });
+                vm.manageRelatedResources(true);
+            });
+        } else {
+            vm.manageRelatedResources(!vm.manageRelatedResources());
+        }
+    };
 
     vm.selectionBreadcrumbs = ko.computed(function () {
         var item = vm.selectedTile()

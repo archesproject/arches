@@ -17,6 +17,7 @@ define([
             this.searchResults = options.searchResults;
             this.editingInstanceId = options.editing_instance_id;
             this.graph = options.graph;
+            this.ontologyclass = options.graph.ontologyclass || options.graph.root.ontologyclass;
             this.graphNameLookup = _.indexBy(arches.resources, 'graphid');
             this.currentResource = ko.observable();
             this.currentResourceSubscriptions = [];
@@ -100,7 +101,7 @@ define([
                         }
                     }, self);
                 if (self.useSemanticRelationships && self.resourceEditorContext === true) {
-                    if (res.length > 0 && self.useSemanticRelationships && self.graph.root.ontologyclass) {
+                    if (res.length > 0 && self.useSemanticRelationships && self.ontologyclass) {
                         self.selectedOntologyClass(res[0].resource.root_ontology_class)
                         self.resourceRelationships().forEach(function(rr) {
                             if (rr.resource.root_ontology_class !== self.selectedOntologyClass()) {
@@ -233,7 +234,7 @@ define([
 
             if (this.resourceEditorContext === true) {
                 this.relationshipTypes = ko.observableArray()
-                if (!this.useSemanticRelationships || !this.graph.root.ontologyclass) {
+                if (!this.useSemanticRelationships || !this.ontologyclass) {
                     this.relationshipTypes(options.relationship_types.values);
                 }
 
