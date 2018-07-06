@@ -11395,6 +11395,34 @@ a.jstree-anchor strong {
     padding-bottom: 10px;
 }
 
+.btn-rr {
+    background: #9490EE;
+    color: #fff;
+    border: 1px solid rgba(0,0,0,0.09);
+    margin: 30px;
+}
+
+.rr-splash {
+    text-align: center;
+    margin: 5%;
+    border: 1px solid #e8e8e8;
+    padding: 5%;
+    background: #f4f4f4
+}
+
+.rr-splash-title {
+    font-size: 24px;
+}
+
+.rr-splash-subtitle {
+    font-size: 15px;
+}
+
+.rr-splash-help-link {
+    margin: 10px;
+    font-size: 16px:
+}
+
 @keyframes loader {
     0% {
         background: #ddd;

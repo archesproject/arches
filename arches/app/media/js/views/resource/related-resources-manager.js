@@ -27,6 +27,7 @@ define([
             this.containerBottomMargin = ko.observable(700);
             this.showRelatedProperties = ko.observable(false);
             this.showGraph = ko.observable(this.editingInstanceId === undefined ? true : false);
+            this.displaySplash = ko.observable(true);
             this.graphNodeSelection = ko.observableArray()
             this.graphNodeList = ko.observableArray();
             this.newResource = ko.observableArray();
