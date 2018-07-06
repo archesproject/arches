@@ -100,7 +100,7 @@
         <!-- Target -->
         <div id="rr-manager-content-id" class="relative rr-drag-panel-target" data-bind="style: {'margin-bottom': containerBottomMargin }">
 
-            <!--ko if: resourceRelationships().length > 0 -->
+            <!--ko if: !displaySplash() || resourceRelationships().length > 0-->
             <div class="related-resources-header" data-bind="css: {'open-graph': showGraph() == true}">
                 <div class="related-resources-title">{% trans "Related Resources" %}</div>
 
@@ -331,13 +331,13 @@
             <!--/ko-->
             <!--/ko-->
 
-            <!--ko if: resourceRelationships().length === 0 -->
+            <!--ko if: resourceRelationships().length === 0 && resourceEditorContext && displaySplash -->
             <div id="rr-splash" class="rr-splash">
 
                 <div class="rr-splash-title">{% trans "Related Resources" %}</div>
                 <div class="rr-splash-subtitle">{% trans "Arches allows you to create relationships between your resources" %}</div>
 
-                <button class="btn btn-shim btn-rr btn-labeled btn-lg fa fa-link">Add Related resources</button>
+                <button class="btn btn-shim btn-rr btn-labeled btn-lg fa fa-link" data-bind="click: function(){displaySplash(false)}">Add Related resources</button>
 
                 <div class="rr-splash-description">{% trans "Arches allows you to define relationships between resources so you can better understand the context and interplay between physical objects, events, activities, people and documents. Relating resources lets you build a network of relatinships for your data objects." %}</div>
 
