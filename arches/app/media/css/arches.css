@@ -1090,8 +1090,6 @@ a.select2-search-choice-close {
 }
 
 .branch-library {
-    position: absolute;
-    top: 0px;
     background-color: white;
     height: auto;
 }
@@ -2106,7 +2104,6 @@ ul.nav.nav-tabs.nav-justified {
     margin-left: -25px;
     margin-right: -20px;
     padding-left: 25px;
-    border-top: 1px solid #ddd;
 }
 
 .graph-designer {
@@ -6211,10 +6208,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     padding-right: 5px;
     font-size: 14px;
     font-weight: 600;
-}
-
-.node-form-container {
-    width: 100%;
 }
 
 .node-semantic-description {
