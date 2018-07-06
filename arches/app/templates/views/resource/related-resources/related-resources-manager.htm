@@ -332,13 +332,17 @@
             <!--/ko-->
 
             <!--ko if: resourceRelationships().length === 0 -->
-            Related Resources
-            Arches allows you to create relationships between your resources
-            BTN: Add Related resources (link to Cyrus's work)
+            <div id="rr-splash" class="rr-splash">
 
-            Arches allows you to define relationships between resources so you can better understand the context and interplay between physical objects, events, activities, people and documents. Relating resources lets you build a network of relatinships for your data objects.
+                <div class="rr-splash-title">{% trans "Related Resources" %}</div>
+                <div class="rr-splash-subtitle">{% trans "Arches allows you to create relationships between your resources" %}</div>
 
-            Show Me How (link to help)
+                <button class="btn btn-shim btn-rr btn-labeled btn-lg fa fa-link">Add Related resources</button>
+
+                <div class="rr-splash-description">{% trans "Arches allows you to define relationships between resources so you can better understand the context and interplay between physical objects, events, activities, people and documents. Relating resources lets you build a network of relatinships for your data objects." %}</div>
+
+                <div class="rr-splash-help-link">{% trans "Show Me How" %}</div>
+            </div>
             <!--/ko-->
         </div>
 
