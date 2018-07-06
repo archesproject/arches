@@ -11396,9 +11396,9 @@ a.jstree-anchor strong {
 }
 
 .btn-rr {
-    background: #706BE2;
+    background: #9490EE;
     color: #fff;
-    border: 1px solid #332DC1;
+    border: 1px solid rgba(0,0,0,0.09);
     margin: 30px;
 }
 
