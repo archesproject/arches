@@ -4425,9 +4425,25 @@ a.selected {
     padding: 15px;
 }
 
+.dark-colored-text {
+    color: #25256b;
+}
+
 .panel-section-title {
     font-size: 1.3em;
     font-weight: 400;
+}
+
+.panel-section-subtitle {
+    font-size: 0.7em;
+    font-weight: 400;
+}
+
+.panel-section-heading {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 0px;
+    margin-top: 5px;
 }
 
 .form-divider {
