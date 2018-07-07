@@ -878,8 +878,41 @@ a.select2-search-choice-close {
 }
 
 .btn-display-toggle {
-    width: 40px;
-    height: 34px;
+    height: 40px;
+}
+
+.btn-display-toggle:focus {
+    background: #9490EE;
+    color: #fff;
+}
+
+.time-wheel-display-toggle .btn-display-toggle:last-child {
+    border-left-color: #fff;
+}
+
+.time-filter-clear {
+    margin: 10px 20px 0 8px; 
+    cursor: pointer;
+    background: #54abd9;
+    border: 1px solid #2e6da4;
+    padding: 5px 25px;
+    width: 100px;
+}
+
+.time-filter-clear:hover {
+    background: #3394C8;
+}
+
+.time-filter-clear-link {
+    color: #fff;
+}
+
+.time-filter-clear-link:hover {
+    color: #fff;
+}
+
+.time-filter-clear-link:focus {
+    color: #fff;
 }
 
 .btn-group .btn+.btn {
