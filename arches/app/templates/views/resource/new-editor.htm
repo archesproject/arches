@@ -75,15 +75,46 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </ul>
                         <!-- /ko -->
                     </li>
+                    <li role="treeitem" class="jstree-node jstree-open">
+                        <i class="jstree-icon jstree-ocl" role="presentation"></i>
+                        <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function(){showRelatedResourcesManager()}">
+                            <strong>
+                                <i class="fa fa-link" role="presentation"></i>
+                                <span>{% trans 'Related Resources' %}</span>
+                            </strong>
+                        </a>
+                        <ul class="jstree-container-ul jstree-children related-resources" aria-expanded="true" data-bind="foreach: {
+                            data: [],
+                            as: 'rr'
+                        }">
+                            <li role="treeitem card-treeitem" class="jstree-node jstree-leaf">
+                                <i class="jstree-icon jstree-ocl" role="presentation"></i>
+                                <a class="jstree-anchor" href="#" tabindex="0">
+                                    <strong>
+                                        <i class="fa fa-link" role="presentation"></i>
+                                        <span data-bind="text: rr.name"></span>
+                                    </strong>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </div>
 
         <div class="main-panel card-component-panel" style="display:none;" data-bind="visible: true">
-            <!-- ko if: selection() -->
+
+
+            <!--ko if: manageRelatedResources() === true -->
+            <div class="tab-pane" data-bind="with: relatedResourcesManager">
+                {% include 'views/resource/related-resources/related-resources-manager.htm' %}
+            </div>
+            <!--/ko -->
+            <!-- ko if: selection() && manageRelatedResources() === false -->
+
             <div class="card-header">
                 <div class="card-header-title">
-                    
+
 
                     <div class="card-breadcrumbs">
 
@@ -159,7 +190,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
                 </div>
             </div>
-            
+
             <div data-bind="component: {
                 name: cardComponentLookup[selectedCard().component_id].componentname,
                 params: {
@@ -194,6 +225,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 nodes: {{nodes}},
                 cardwidgets: {{cardwidgets}},
                 widgets: {{widgets_json}},
+                ontologyclass: '{{ontologyclass}}',
+                relationship_types: {{ relationship_types }},
                 datatypes: {{datatypes_json}},
                 cardComponents: {{card_components_json}},
                 nodegroups: {{nodegroups}},

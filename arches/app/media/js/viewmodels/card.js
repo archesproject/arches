@@ -120,13 +120,17 @@ define([
             getAttributes: function () {
                 var tileData = self.data ? koMapping.toJS(self.data) : {};
                 var tileProvisionalEdits = self.provisionaledits ? koMapping.toJS(self.provisionaledits) : {};
+                if (self.tileid === '') {
+                    self.sortorder = self.parent.tiles().length;
+                };
                 return {
                     "tileid": self.tileid,
                     "data": tileData,
                     "nodegroup_id": ko.unwrap(self.nodegroup_id),
                     "parenttile_id": self.parenttile_id,
                     "resourceinstance_id": self.resourceinstance_id,
-                    "provisionaledits": tileProvisionalEdits
+                    "provisionaledits": tileProvisionalEdits,
+                    "sortorder": self.sortorder
                 }
             },
             getData: function () {
@@ -155,7 +159,6 @@ define([
                         self.getData()
                     )
                 );
-
                 $.ajax({
                     type: "POST",
                     url: arches.urls.tile,
@@ -172,7 +175,7 @@ define([
                     self._tileData(koMapping.toJSON(self.data));
                     if (!self.tileid) {
                         self.tileid = tileData.tileid;
-                        self.parent.tiles.unshift(self);
+                        self.parent.tiles.push(self);
                         self.parent.expanded(true);
                         selection(self);
                     }

@@ -1,0 +1,47 @@
+{% load i18n %}
+<!-- ko foreach: { data: [$data], as: 'graphTree' } -->
+<div class="jstree jstree-default">
+    <div class="header">
+        <div class="list-filter" data-bind="" style="text-align: center;">
+            <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a card...' %}" data-bind="textInput: filter">
+
+            <!-- Clear Search -->
+            <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }" style="top: 8px;"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div style="text-align: center;">
+            <a data-bind="click: expandAll" style="cursor:pointer;">Expand all</a>
+            <a data-bind="click: collapseAll" style="padding-left:30px; cursor:pointer;">Collapse all</a>
+        </div>
+    </div>
+    <div class="left-panel-overflow">
+        <ul class="jstree-container-ul jstree-children" aria-expanded="true">
+            <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': rootExpanded, 'jstree-closed' : !rootExpanded()}">
+                <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}"></i>
+                <a class="jstree-anchor" href="#" tabindex="-1">
+                    <strong>
+                        <i data-bind="css: graphiconclass" role="presentation"></i>
+                        <span data-bind="text: graphname"></span>
+                    </strong>
+                </a>
+                <!-- ko foreach: { data: [$data], as: 'self' } -->
+                <ul class="jstree-children" aria-expanded="true" data-bind="foreach: {
+                    data: topCards,
+                    as: 'card'
+                }">
+                    <!-- ko component: {
+                        name: self.cardComponentLookup[card.component_id].componentname,
+                        params: {
+                            state: 'designer-tree',
+                            card: card,
+                            tile: null,
+                            loading: self.loading,
+                            form: self
+                        }
+                    } --> <!-- /ko -->
+                </ul>
+                <!-- /ko -->
+            </li>
+        </ul>
+    </div>
+</div>
+<!-- /ko -->

@@ -248,7 +248,10 @@ class GraphManagerView(GraphBaseView):
     def delete(self, request, graphid):
         try:
             graph = Graph.objects.get(graphid=graphid)
-            graph.delete_instances()
+            if graph.isresource:
+                graph.isactive = False
+                graph.save()
+                graph.delete_instances()
             graph.delete()
             return JSONResponse({'success':True})
         except GraphValidationError as e:
@@ -427,6 +430,21 @@ class GraphDataView(View):
                     ret.copy_functions(graph, [clone_data['nodes'], clone_data['nodegroups']])
                     form_map = ret.copy_forms(graph, clone_data['cards'])
                     ret.copy_reports(graph, [form_map, clone_data['cards'], clone_data['nodes']])
+
+                elif self.action == 'reorder_nodes':
+                    json = request.body
+                    if json != None:
+                        data = JSONDeserializer().deserialize(json)
+
+                        if 'nodes' in data and len(data['nodes']) > 0:
+                            sortorder = 0
+                            with transaction.atomic():
+                                for node in data['nodes']:
+                                    no = models.Node.objects.get(pk=node['nodeid'])
+                                    no.sortorder = sortorder
+                                    no.save()
+                                    sortorder = sortorder + 1
+                            ret = data
 
             return JSONResponse(ret)
         except GraphValidationError as e:

@@ -3,6 +3,8 @@ define([
     'views/tree-view',
     'arches'
 ], function(ko, TreeView, arches) {
+    var loading = ko.observable(false);
+
     var GraphTree = TreeView.extend({
         /**
         * A backbone view to manage a list of graph nodes
@@ -63,14 +65,25 @@ define([
                         }
                     });
                     return childSelected;
-
-                    };
                 }
+            };
+
             return ko.computed(function() {
                 return isChildSelected(node);
             }, this);
         },
 
+        /**
+        * Expands the parent of the passed in node
+        * @memberof GraphTree.prototype
+        * @param {object} node - the child of the parent node to be expanded
+        */
+        expandParentNode: function(node) {
+            if(node.parent) {
+                node.parent.expanded(true);
+                this.expandParentNode(node.parent);
+            }
+        },
 
         /**
         * Selects the passed in node
@@ -115,7 +128,27 @@ define([
                 var url = arches.urls.graph_designer(response.responseJSON.graphid);
                 window.open(url);
             });
-        }
+        },
+
+        beforeMove: function (e) {
+            e.cancelDrop = (e.sourceParent!==e.targetParent);
+        },
+        reorderNodes: function (e) {
+            loading(true);
+            var nodes = _.map(e.sourceParent(), function(node) {
+                return node.attributes.source;
+            });
+            $.ajax({
+                type: "POST",
+                data: JSON.stringify({
+                    nodes: nodes
+                }),
+                url: arches.urls.reorder_nodes,
+                complete: function(response) {
+                    loading(false);
+                }
+            });
+        },
 
     });
     return GraphTree;

@@ -16,9 +16,6 @@ If you can't completely re-install Arches (because you have data in the system t
 ```
 pip install arches --upgrade --no-binary :all:
 python manage.py migrate
-python manage.py es delete_indexes
-python manage.py es setup_indexes
-python manage.py es index_database
 ```
 
 If you have Arches running on a web server such as Apache, be sure to update your static files directory and restart your web server.
@@ -27,14 +24,7 @@ As always the documentation can be found at http://arches.readthedocs.io
 
 #### Upgrading an Arches project
 
-
-
-    ```
-
 #### Changes
-
--
-
 
 
 # Testing Script
@@ -48,7 +38,7 @@ Before Version Release, go through this checklist to confirm that Arches is runn
 | (Test Subject) | (use indicator from list below) | (use indicator from list below) | (use indicator from list below) | (use indicator from list below) | :white_check_mark: (to confirm that the UI has rendered correctly) or :x: (to confirm that the UI failed to render correctly) | (add ticket #, details on bug, etc.) |
 
 When doing a test pass, consider using these status indicators:  
-:white_check_mark: = Tested & Approved (possibly with linked bugs)  
+:white_check_mark: = Tested & Approved  
 :x: = Merge blocking  
 :construction: = Non-blocking bugs  
 :ok: = Issue has been fixed  
@@ -58,6 +48,8 @@ When doing a test pass, consider using these status indicators:
 
 ## Install
 
+Assigned to: Cyrus
+
 | Test Subject                                                   | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
 | Confirm that upgrading from the previous release is issue free |    ?   |    ?   |    ?    |   ?  | ?   | -     |
@@ -66,13 +58,17 @@ When doing a test pass, consider using these status indicators:
 
 ## Future Release Features
 
+Assigned to: Cyrus
+
 | Test Subject                                                                              | Chrome | Safari | Firefox | IE11 |  UI | Notes |
 | ----------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | :-: | ----- |
-| Test that users can't access the Mobile Survey Manager page or the new graph/editor pages |    ?   |    ?   |    ?    |   ?  |  ?  | -     |
+| Test that users can't access the Mobile Survey Manager page |    ?   |    ?   |    ?    |   ?  |  ?  | -     |
 
 * * *
 
 ## Authentication
+
+Assigned to: Alexei
 
 Ensure that all browsers are compatible with Authentication process.
 
@@ -88,14 +84,18 @@ Ensure that all browsers are compatible with Authentication process.
 
 ## System Settings
 
+Assigned to: Cyrus
+
 #### Basic Settings
 
 | Test Subject                                                                                                                 | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
 | Project Name - Updating name updates in index.htm and the page tab                                                           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Web Analytics - String value insterts in base.htm at the location of this template variable:{{GOOGLE_ANALYTICS_TRACKING_ID}} |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Web Analytics - String value inserts in base.htm at the location of this template variable:{{GOOGLE_ANALYTICS_TRACKING_ID}} |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 #### Map Settings
+
+Assigned to: Cyrus
 
 | Test Subject                                                                                                                                                                                    | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
@@ -108,6 +108,8 @@ Ensure that all browsers are compatible with Authentication process.
 | Project Extent - Changes reflected in Card Config Manager                                                                                                                                       |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 #### Search Settings
+
+Assigned to: Cyrus
 
 Basic Search Settings
 
@@ -134,6 +136,8 @@ Saved Searches
 
 ## Map Widget
 
+Assigned to: Cyrus
+
 Test in the Card Configuration Manager.
 
 | Test Subject                                                                                                                                            | Chrome | Safari | Firefox | IE11 | UI  | Notes |
@@ -146,7 +150,11 @@ Test in the Card Configuration Manager.
 
 ## Map Layer Manager
 
+Assigned to: Rob
+
 #### Resource Layers
+
+Assigned to: Rob
 
 | Test Subject                                                                                                                         | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
@@ -160,6 +168,8 @@ Test in the Card Configuration Manager.
 
 #### Clustering (Resource Layers)
 
+Assigned to: Rob
+
 | Test Subject                                                                               | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
 | Increasing cluster distance causes features to cluster at increased distances between them |    ?   |    ?   |    ?    |   ?  | ?   | -     |
@@ -169,6 +179,8 @@ Test in the Card Configuration Manager.
 
 #### Basemaps
 
+Assigned to: Rob
+
 | Test Subject                                                                                    | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ----------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
 | Changing the default search basemap in the basemap settings is reflected on the search page     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
@@ -176,6 +188,8 @@ Test in the Card Configuration Manager.
 | User can delete a basemap and it no longer appears in the map widget's list of basemaps         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 #### Overlays
+
+Assigned to: Rob
 
 | Test Subject                                                                                                        | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
@@ -185,6 +199,8 @@ Test in the Card Configuration Manager.
 * * *
 
 ## Import/Export
+
+Assigned to: Ryan
 
 | Test Subject               | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
@@ -198,9 +214,12 @@ Test in the Card Configuration Manager.
 
 ## Resource Instance Management
 
+Assigned to: Adam
+
 #### Data Types
 
 Confirm that the user is able to edit the following data types. Use the Test model to quickly test all ten data types.
+Note (GeoJson is covered by map widget testing in a different section)
 
 | Test Subject           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
@@ -211,11 +230,12 @@ Confirm that the user is able to edit the following data types. Use the Test mod
 | Dates                  |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Number                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Boolean                |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| GeoJson                |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Resource instance type |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Node data type         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
-#### Function Management
+#### Resource Descriptors
+
+Assigned to: Adam
 
 Updating a resource descriptor should be reflected in the following subjects.
 
@@ -226,12 +246,23 @@ Updating a resource descriptor should be reflected in the following subjects.
 | Report headings                                                                                     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Map popups                                                                                          |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Related resource d3 graph and listings                                                              |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+
+* * *
+
+#### Provisional Edit Management
+
+Assigned to: Cyrus
+
+| Test Subject                                           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
+| ------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
 | Provisional users see indication in a widget that their tile edits were submitted                   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Resource reviewers are able to identify provisional tiles and can approve/discard provisional edits |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
 ## Related Resources
+
+Assigned to: Jeff
 
 #### Resource Editor
 
@@ -258,6 +289,8 @@ Updating a resource descriptor should be reflected in the following subjects.
 
 ## Search
 
+Assigned to: Jeff
+
 | Test Subject                                                                                                                                                                         | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
 | Free text search                                                                                                                                                                     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
@@ -273,6 +306,8 @@ Updating a resource descriptor should be reflected in the following subjects.
 | Map should not zoom to points that a user is not permitted to read, nor should the search aggregation layer (e.g. hexbin or heatmap) indicate that a restricted resource is present. |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
+
+Assigned to: Alexei
 
 ## Graph/Resource Designer
 
@@ -292,6 +327,8 @@ Updating a resource descriptor should be reflected in the following subjects.
 
 ## Permissions Management
 
+Assigned to: Ryan
+
 | Test Subject                                                                                                                                            | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
 | Confirm removing `read` permissions removes that section from the report                                                                                |    ?   |    ?   |    ?    |   ?  | ?   | -     |
@@ -307,6 +344,8 @@ Updating a resource descriptor should be reflected in the following subjects.
 * * *
 
 ## Reports
+
+Assigned to: Adam
 
 #### Headers Rendering
 
@@ -327,13 +366,14 @@ Updating a resource descriptor should be reflected in the following subjects.
 | Dates                  |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Number                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Boolean                |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| GeoJson                |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Resource instance type |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Node instance type     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
 ## RDM
+
+Assigned to: Ryan
 
 #### Thesauri
 

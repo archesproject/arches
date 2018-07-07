@@ -11214,6 +11214,7 @@ ul.select2-choices:after {
     border-left: solid 1px gainsboro;
     border-right: solid 1px gainsboro;
     height:100%;
+    z-index: 3;
 }
 
 .sidepanel-draggable div {
@@ -11232,6 +11233,7 @@ ul.select2-choices:after {
     width: 270px;
     overflow-x: auto;
     overflow-y: hidden;
+    z-index: 3;
 }
 
 .left-panel-overflow {
@@ -11397,6 +11399,34 @@ a.jstree-anchor strong {
 .card-summary-section {
     padding-left: 0px;
     padding-bottom: 10px;
+}
+
+.btn-rr {
+    background: #9490EE;
+    color: #fff;
+    border: 1px solid rgba(0,0,0,0.09);
+    margin: 30px;
+}
+
+.rr-splash {
+    text-align: center;
+    margin: 5%;
+    border: 1px solid #e8e8e8;
+    padding: 5%;
+    background: #f4f4f4
+}
+
+.rr-splash-title {
+    font-size: 24px;
+}
+
+.rr-splash-subtitle {
+    font-size: 15px;
+}
+
+.rr-splash-help-link {
+    margin: 10px;
+    font-size: 16px:
 }
 
 @keyframes loader {

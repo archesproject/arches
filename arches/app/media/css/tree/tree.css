@@ -2,6 +2,7 @@
 .jstree>.header {
     height: 70px;
     padding-left: 13px;
+    padding-right: 13px;
     background-color: #f4f4f4;
     border-bottom: 1px solid #ddd;
     padding-top: 10px;
