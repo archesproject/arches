@@ -36,6 +36,12 @@ $( document ).ready(function() {
 
     'use strict';
     var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+    $(".fileinputs").click(function () {                            
+            $('#files-msg').css("color","red");
+            $('#files-msg').text("No file yet...");
+            $('#progress .progress-bar').width("0");
+        }
+    );
     $('#fileupload').fileupload({
         beforeSend: function(request) {
             request.setRequestHeader("X-CSRFToken",csrftoken);

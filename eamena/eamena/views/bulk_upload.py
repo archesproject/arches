@@ -77,7 +77,6 @@ def validate(request):
 
     fullpath = os.path.join(settings.BULK_UPLOAD_DIR,str(fpath))
     destpath = get_archesfile_path(fullpath)
-
     call_command('Excelreader',
         operation='site_dataset',
         source=fullpath,
@@ -90,7 +89,6 @@ def validate(request):
     with open(errorlog,'r') as readjson:
         data = readjson.read()
         result = json.loads(data)
-
     if 'success' not in result:
         os.remove(fullpath)
 

@@ -219,7 +219,6 @@ class Command(BaseCommand):
 #                 Log['validate_rows_and_values']['passed'] = False
         if headers_errors or rows_values_errors:
             return Log
-        
         for sheet_index,sheet in enumerate(wb2.worksheets):
             sheet_name = wb2.sheetnames[sheet_index]
             for col_index,header in enumerate(sheet.iter_cols(max_row = 1)):
@@ -270,7 +269,6 @@ class Command(BaseCommand):
             
         if Log['validate_geometries']['errors'] or Log['validate_dates']['errors'] or Log['validate_concepts']['errors']:
             return Log
-
         else:
             Log['success'] = True
             with open(destination, 'wb') as archesfile:
