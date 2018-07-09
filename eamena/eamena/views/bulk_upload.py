@@ -71,17 +71,15 @@ def validate(request):
     to the spreadsheet on the server, and the resource type for the spreadsheet
     '''
 
-    fpath = request.POST['filepath']
-    restype = request.POST['restype']
+    fpath = request.POST.get('filepath', '')
+    restype = request.POST.get('restype','')
 
     convert = {'false':False,'true':True}
-    append = convert[request.POST['append']]
+    append = convert[request.POST.get('append', 'false')]
 
-    fullpath = os.path.join(settings.BULK_UPLOAD_DIR,fpath)
+    fullpath = os.path.join(settings.BULK_UPLOAD_DIR,str(fpath))
     destpath = get_archesfile_path(fullpath)
-
     out = StringIO()
-
     call_command('Excelreader',
         operation='site_dataset',
         source=fullpath,
@@ -90,14 +88,14 @@ def validate(request):
         append_data=append,
         stdout=out,
     )
-    
     errorlog = os.path.join(settings.BULK_UPLOAD_DIR,'_validation_errors.json')
+
     with open(errorlog,'r') as readjson:
         data = readjson.read()
         result = json.loads(data)
-
-    if not result['success']:
+    if 'success' not in result:
         os.remove(fullpath)
+
     else:
         result['filepath'] = os.path.basename(destpath)
 
@@ -133,9 +131,9 @@ def import_archesfile(request):
     that is in the BULK_UPLOAD_DIR directory. returns nothing because the load
     results are written to a log file.'''
 
-    fpath = request.POST['filepath']
+    fpath = request.POST.get('filepath','')
     fullpath = os.path.join(settings.BULK_UPLOAD_DIR,fpath)
-    append = request.POST['append']
+    append = request.POST.get('append', 'false')
 
     output = StringIO()
 
