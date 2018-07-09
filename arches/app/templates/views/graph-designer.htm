@@ -121,24 +121,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
         <!-- Main Content Panel -->
         <div class="flex" style="background-color: #ffffff; overflow-y: auto" >
-            <div class="node-form-container">
-                <!-- Settings, Node Form, and Branch List -->
-                <div class="tab-pane fade in" style="position: relative;" data-bind="visible: activeTab() === 'graph' && viewState() === 'design'">
-                    <!--ko if: selectedNode() -->
-                    <div class="graph-designer-graph-content" data-bind="visible: selectedNode().nodeid == graph.root.nodeid()">
-                        {% include 'views/graph/graph-designer/graph-settings.htm' %}
-                    </div>
-
-                    <div class="graph-designer-graph-content" data-bind="visible: selectedNode().nodeid != graph.root.nodeid(), with: nodeForm">
-                        {% include 'views/graph/graph-designer/node-form.htm' %}
-                    </div>
-                    <!--/ko-->
-                </div>
-
-                <div class="tab-pane fade in" style="position: relative;" data-bind="visible: activeTab() === 'graph' && viewState() === 'preview'">
-                    <div id="graph"></div>
-                </div>
-
+            <div class="flex" data-bind="visible: activeTab() === 'graph'">
                 <!--Branch Library -->
                 <div id="branch-library" class="middle-column-container graph-designer branch-library" data-bind="visible: graphTree.branchListVisible" style="width: 300px; border-bottom: solid 1px #dddddd; z-index: 10; display:none;">
                     <div>
@@ -154,9 +137,35 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         {% include 'views/graph/graph-manager/branch-list.htm' %}
                     </div>
                 </div>
-                
+
+                <!-- Settings, Node Form, and Branch List -->
+                <div class="tab-pane fade in flex" style="position: relative;" data-bind="visible: viewState() === 'design'">
+                    <!--ko if: selectedNode() -->
+                    <div class="graph-designer-graph-content" data-bind="visible: selectedNode().nodeid == graph.root.nodeid()">
+                        {% include 'views/graph/graph-designer/graph-settings.htm' %}
+                    </div>
+
+                    <div class="graph-designer-graph-content" data-bind="visible: selectedNode().nodeid != graph.root.nodeid(), with: nodeForm">
+                        {% include 'views/graph/graph-designer/node-form.htm' %}
+                    </div>
+                    <!--/ko-->
+                </div>
+
+                <div class="tab-pane fade in flex" style="position: relative;" data-bind="visible: viewState() === 'preview'">
+                    <div id="graph" class="flex"></div>
+                </div>
+            </div>
+
+            <div class="flex" data-bind="visible: activeTab() === 'card'">
+                <!--Middle Panel -->
+                <div class="middle-column-container graph-designer branch-library" style="width: 300px; border-bottom: solid 1px #dddddd; z-index: 10;">
+                    <div>
+                        {% include 'views/graph/graph-designer/card-configuration.htm' %}
+                    </div>
+                </div>
                 <!-- Card Manager -->
-                <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }"></div>
+                <div class="flex tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }">card</div>
+
             </div>
         </div>
 
