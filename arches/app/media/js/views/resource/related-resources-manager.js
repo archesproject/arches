@@ -27,8 +27,8 @@ define([
             this.containerBottomMargin = ko.observable(700);
             this.showRelatedProperties = ko.observable(false);
             this.showGraph = ko.observable(this.editingInstanceId === undefined ? true : false);
-            this.displaySplash = ko.observable(true);
-            this.graphNodeSelection = ko.observableArray()
+            this.displaySplash = ko.observable(false);
+            this.graphNodeSelection = ko.observableArray();
             this.graphNodeList = ko.observableArray();
             this.newResource = ko.observableArray();
             this.fdgNodeListView = new RelatedResourcesNodeList({
@@ -283,6 +283,9 @@ define([
                 this.getRelatedResources();
                 this.currentResource().resourceRelationships.subscribe(function(val) {
                     this.resourceRelationships(val);
+                    if (val.length === 0){
+                            this.displaySplash(true);
+                        }
                 }, this)
                 this.currentResource().paging.subscribe(function(val) {
                     koMapping.fromJS(val, this.paginator);
