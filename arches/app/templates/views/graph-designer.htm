@@ -65,19 +65,29 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
         <div class="graph-settings-crud">
 
-            <div data-bind="visible: graphSettingsVisible()" style="display: none;">
+            <span data-bind="visible: graphSettingsVisible()" style="display: none;">
                 <!-- ko if: graphSettingsViewModel.dirty() -->
                 <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: graphSettingsViewModel.reset">{% trans "Discard Edits" %}</button>
                 <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: graphSettingsViewModel.save">{% trans "Save Edits" %}</button>
                 <!-- /ko -->
-            </div>
+            </span>
 
-            <div data-bind="visible: selectedNode()" style="display: none;">
+            <span data-bind="visible: selectedNode()" style="display: none;">
                 <!-- ko if: selectedNode() && selectedNode().dirty() && selectedNode().istopnode == false -->
                 <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: function(){graphModel.get('selectedNode')().reset()}">{% trans "Discard Edits" %}</button>
                 <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: saveSelectedNode">{% trans "Save Edits" %}</button>
                 <!-- /ko -->
-            </div>
+            </span>
+
+            <a class="btn btn-sm btn-mint btn-labeled fa fa-mail-reply back-to-designer" data-bind="
+                attr: {
+                    href: '{% url 'graph' '' %}' + (graph.isresource() ? '' : '#branches')
+                },
+                click: function () {
+                    navigate('{% url 'graph' '' %}' + (graph.isresource() ? '' : '#branches'))
+                }">
+                {% trans "Done" %}
+            </a>
         </div>
 
     </div>
