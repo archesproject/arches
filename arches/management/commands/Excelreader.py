@@ -32,13 +32,16 @@ class Command(BaseCommand):
         print 'package: '+ package_name
 
         if options['operation'] == 'site_dataset':
-            result = self.SiteDataset(options['source'], options['resource_type'], options['dest_dir'],options['append_data'])
+            result, filelist = self.SiteDataset(options['source'], options['resource_type'], options['dest_dir'],options['append_data'])
         
         error_path = os.path.join(settings.BULK_UPLOAD_DIR,"_validation_errors.json")
         with open(error_path,'w') as out:
             json.dump(result,out)
         self.stdout.write(error_path)
-        
+
+        if filelist:
+            self.stdout.write("Has attachments")
+
         return
     
     def validatedates(self, date, header = None, row_no = None):
@@ -174,6 +177,19 @@ class Command(BaseCommand):
         except:
             # raise ValueError("The geometry at line %s is not an acceptable GEOSGeometry" % row+2)
             return "The geometry at header %s, line %s is not an acceptable GEOSGeometry" % (header, row+2)
+
+    def validate_files(self, filename, header, row):
+        """
+        Going to validate files here. check they don't contain directory info and are an accepted file format.
+        """
+        name, ext = os.path.splitext(os.path.basename(filename))
+        accepted_extensions = ['.pdf', '.jpg', '.png', '.doc', '.docx', '.txt']
+        if filename != name + ext:
+            return "The file at header %s, line %s looks like it contains a folder name." % (header, row+2)
+        if ext in accepted_extensions:
+            return
+        else:
+            return "Cannot recognise file extension at header %s, line %s. Currently only accept %s" % (header, row+2, accepted_extensions)
     
     def create_resourceid_list(self, workbook):
         ''''Looks for RESOURCEID column and creates a list of resourceids and returns '''
@@ -200,6 +216,7 @@ class Command(BaseCommand):
             'validate_geometries' :  {'errors': [], 'passed': True},
             'validate_dates' : {'errors': [], 'passed': True},
             'validate_concepts' :  {'errors': [], 'passed': True},
+            'validate_files' : {'errors': [], 'passed': True},
         }
         if append:
             resourceids_list = self.create_resourceid_list(wb2)
@@ -219,6 +236,8 @@ class Command(BaseCommand):
         
         if headers_errors or rows_values_errors:
             return Log
+
+        filelist = []
         
         for sheet_index,sheet in enumerate(wb2.worksheets):
             sheet_name = wb2.sheetnames[sheet_index]
@@ -237,7 +256,6 @@ class Command(BaseCommand):
                                 GroupNo = GroupNo +1 if sheet_name is not 'NOT' else ''
                                 GroupName = " ".join((sheet_name, str(GroupNo))) if sheet_name != 'NOT' else sheet_name
                                 if concept != 'x':
-                                    print("Looking at: %s (%s)" % (modelinstance.entitytypeid, modelinstance.businesstablename))
                                     if modelinstance.businesstablename == 'domains':                                
                                         concepts_in_node = self.collect_concepts(modelinstance.conceptid_id, full_concept_list =[])
                                         valueinstance =  self.validate_concept(concept, concepts_in_node)
@@ -268,9 +286,17 @@ class Command(BaseCommand):
                                             else:
                                                 concept_list = [str(resourceid),resourcetype,modelinstance.entitytypeid,concept, GroupName]
                                                 ResourceList.append(concept_list)
+                                    if modelinstance.businesstablename == 'files':
+                                            if self.validate_files(concept, header[0].value, row_index):
+                                                Log['validate_files']['errors'].append(self.validate_files(concept, header[0].value, row_index))
+                                                Log['validate_files']['passed'] = False
+                                            else:
+                                                concept_list = [str(resourceid), resourcetype, modelinstance.entitytypeid, concept, GroupName]
+                                                ResourceList.append(concept_list)
+                                                filelist.append(concept)
                                     
-        if Log['validate_geometries']['errors'] or Log['validate_dates']['errors'] or Log['validate_concepts']['errors']:
-            return Log
+        if Log['validate_geometries']['errors'] or Log['validate_dates']['errors'] or Log['validate_concepts']['errors'] or Log['validate_files']['errors']:
+            return Log, filelist
 
         else:
             Log['success'] = True
@@ -287,5 +313,5 @@ class Command(BaseCommand):
                 writer = csv.writer(rel, delimiter ="|")
                 writer.writerow(['RESOURCEID_FROM','RESOURCEID_TO','START_DATE','END_DATE','RELATION_TYPE','NOTES'])
 
-            return Log
+            return Log, filelist
                                                                         

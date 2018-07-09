@@ -41,6 +41,7 @@ import arches.management.commands.package_utils.update_schema as update_schema
 import arches.management.commands.package_utils.migrate_resources as migrate_resources
 from arches.management.commands.package_utils.resource_graphs import load_graphs
 from arches.management.commands.package_utils.validate_values import validate_values, find_unused_entity_types
+import json
 
 class Command(BaseCommand):
     """
@@ -72,6 +73,8 @@ class Command(BaseCommand):
             help='Select old node name'),
         make_option('-z', '--newtype', action='store', dest='newtype',
             help='select new node name'),
+        make_option('-i', '--internal', action='store_true', default=False, dest='run_internal',
+                    help='print stdout required for internal processes'),
     )
 
     def handle(self, *args, **options):
@@ -101,7 +104,7 @@ class Command(BaseCommand):
             self.build_permissions()
 
         if options['operation'] == 'load_resources':
-            self.load_resources(package_name, options['source'], options['appending'])
+            self.load_resources(package_name, options['source'], options['appending'], options['run_internal'])
             
         if options['operation'] == 'remove_resources':     
             self.remove_resources(options['load_id'])
@@ -342,7 +345,7 @@ class Command(BaseCommand):
                 Permission.objects.get_or_create(codename='read_%s' % entitytype, name='%s - read' % entitytype , content_type=content_type[0])
                 Permission.objects.get_or_create(codename='delete_%s' % entitytype, name='%s - delete' % entitytype , content_type=content_type[0])
 
-    def load_resources(self, package_name, data_source=None, appending = False):
+    def load_resources(self, package_name, data_source=None, appending = False, run_internal=False):
         """
         Runs the setup.py file found in the package root
 
@@ -350,7 +353,9 @@ class Command(BaseCommand):
         data_source = None if data_source == '' else data_source
         module = import_module('%s.setup' % package_name)
         load = getattr(module, 'load_resources')
-        ResourceLoader().load(data_source, appending) 
+        results = ResourceLoader().load(data_source, appending)
+        if run_internal:
+            self.stdout.write(json.dumps(results))
 
     def remove_resources(self, load_id = None):
         """
