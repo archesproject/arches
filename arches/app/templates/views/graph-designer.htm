@@ -79,7 +79,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- /ko -->
             </span>
 
-            <a class="btn btn-sm btn-mint btn-labeled fa fa-mail-reply back-to-designer" href="{% if graph.isresource %}{% url 'graph' '' %}" data-bind="click:function () { navigate('{% url 'graph' '' %}') }{% else %}{% url 'graph' '' %}#branches" data-bind="click:function () { navigate('{% url 'graph' '' %}#branches') }{% endif %}">{% trans "Done" %}</a>
+            <a class="btn btn-sm btn-mint btn-labeled fa fa-mail-reply back-to-designer" data-bind="
+                attr: {
+                    href: '{% url 'graph' '' %}' + (graph.isresource() ? '' : '#branches')
+                },
+                click: function () {
+                    navigate('{% url 'graph' '' %}' + (graph.isresource() ? '' : '#branches'))
+                }">
+                {% trans "Done" %}
+            </a>
         </div>
 
     </div>
