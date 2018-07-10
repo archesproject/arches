@@ -14,6 +14,8 @@ define([
         var filter = ko.observable('');
         var loading = ko.observable(false);
         var selection = ko.observable();
+        var nodes = [];
+        var nodegroups = [];
 
         var flattenTree = function(parents, flatList) {
             _.each(ko.unwrap(parents), function(parent) {

@@ -23,6 +23,7 @@ define(['arches',
             this.widgets = ko.observableArray();
             this.tiles = ko.observableArray();
             this.cardid = ko.observable();
+            this.nodegroup_id = ko.observable();
             this.name = ko.observable();
             this.instructions = ko.observable();
             this.helptext = ko.observable();
@@ -43,6 +44,7 @@ define(['arches',
             this.set('tiles', this.tiles);
 
             this.set('cardid', this.cardid);
+            this.set('nodegroup_id', this.nodegroup_id);
             this.set('name', this.name);
             this.set('instructions', this.instructions);
             this.set('helptext', this.helptext);
@@ -152,6 +154,7 @@ define(['arches',
                     this.get(key)(value);
                     break;
                 case 'name':
+                case 'nodegroup_id':
                 case 'instructions':
                 case 'helptext':
                 case 'helpenabled':

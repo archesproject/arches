@@ -6,7 +6,7 @@
     <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
     <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'jstree-clicked': card.selected, 'child-selected': card.isChildSelected()}, click: function () { card.canAdd() ? card.selected(true) : card.tiles()[0].selected(true) },">
         <i class="fa fa-file-o" role="presentation" data-bind="css:{'has-provisional-edits fa-file': card.doesChildHaveProvisionalEdits()}"></i>
-        <span style="padding-right: 5px;" data-bind="text: card.name, css:{'filtered': card.highlight()}"></span>
+        <span style="padding-right: 5px;" data-bind="text: card.model.name, css:{'filtered': card.highlight()}"></span>
         <!-- ko if: card.canAdd() -->
         <i class="fa fa-plus-circle add-new-tile" role="presentation" data-bind="css:{'jstree-clicked': card.selected}" data-toggle="tooltip" data-original-title="{% trans "Add New" %}"></i>
         <!-- /ko -->
@@ -23,7 +23,7 @@
                     <i class="fa fa-file" role="presentation" data-bind="css:{'has-provisional-edits': doesChildHaveProvisionalEdits() || $data.hasprovisionaledits()}"></i>
                     <strong style="margin-right: 10px;" data-bind="css:{'filtered': card.highlight()}">
                         <!-- ko if: card.widgets.length > 0 -->
-                        <span data-bind="text: card.widgets[0].label || card.name"></span>:
+                        <span data-bind="text: card.widgets[0].label || card.model.name"></span>:
                         <div style="display: inline;" data-bind="component: {
                             name: self.form.widgetLookup[card.widgets[0].widget_id].name,
                             params: {
@@ -38,7 +38,7 @@
                         }"></div>
                         <!-- /ko -->
                         <!-- ko if: card.widgets.length === 0 -->
-                        <span data-bind="text: card.name"></span>
+                        <span data-bind="text: card.model.name"></span>
                         <!-- /ko -->
                     </strong>
                 </a>
@@ -48,7 +48,7 @@
                         as: 'card'
                     }">
                     <!-- ko component: {
-                        name: self.form.cardComponentLookup[card.component_id].componentname,
+                        name: self.form.cardComponentLookup[card.model.component_id()].componentname,
                         params: {
                             state: 'editor-tree',
                             card: card,
@@ -158,8 +158,8 @@
         <div class="card">
 
             <!-- ko if: card.parent -->
-            <h4 data-bind="text: card.name"></h4>
-            <h5 data-bind="text: card.description"></h5>
+            <h4 data-bind="text: card.model.name"></h4>
+            <h5 data-bind="text: card.model.description"></h5>
             <!-- /ko -->
 
             <!-- ko if: card.widgets.length > 0 -->
@@ -195,7 +195,7 @@
                         }
                     }">
                         <h4 class="card-summary-name">
-                            <span data-bind="text: card.name"></span>
+                            <span data-bind="text: card.model.name"></span>
                             <!-- ko if: card.canAdd() && card.parent.tileid -->
                             <i class="fa fa-plus-circle card-summary-add"></i>
                             <!-- /ko -->
@@ -208,7 +208,7 @@
                         <li class="tile-summary">
                             <a href="#" data-bind="click: function () { tile.selected(true) }">
                                 <!-- ko if: card.widgets.length > 0 -->
-                                <span data-bind="text: card.widgets[0].label || card.name" class="tile-summary-label"></span>:
+                                <span data-bind="text: card.widgets[0].label || card.model.name" class="tile-summary-label"></span>:
                                 <div style="display: inline;" data-bind="component: {
                                     name: self.form.widgetLookup[card.widgets[0].widget_id].name,
                                     params: {
@@ -223,7 +223,7 @@
                                 }"></div>
                                 <!-- /ko -->
                                 <!-- ko if: card.widgets.length === 0 -->
-                                <span data-bind="text: card.name"></span>
+                                <span data-bind="text: card.model.name"></span>
                                 <!-- /ko -->
                             </a>
                         </li>

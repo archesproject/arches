@@ -63,7 +63,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             as: 'card'
                         }">
                             <!-- ko component: {
-                                name: self.cardComponentLookup[card.component_id].componentname,
+                                name: self.cardComponentLookup[card.model.component_id()].componentname,
                                 params: {
                                     state: 'editor-tree',
                                     card: card,
@@ -147,7 +147,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <span class="current-crumb">
                             <!-- ko if: selectedTile().tileid -->
                                 <!-- ko if: selectedCard().widgets.length > 0 -->
-                                <span data-bind="text: selectedCard().widgets[0].label || selectedCard().name"></span>:
+                                <span data-bind="text: selectedCard().widgets[0].label || selectedCard().model.name"></span>:
                                 <div style="display: inline;" data-bind="component: {
                                     name: widgetLookup[selectedCard().widgets[0].widget_id].name,
                                     params: {
@@ -162,11 +162,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 }"></div>
                                 <!-- /ko -->
                                 <!-- ko if: selectedCard().widgets.length === 0 -->
-                                <span data-bind="text: selectedCard().name"></span>
+                                <span data-bind="text: selectedCard().model.name"></span>
                                 <!-- /ko -->
                             <!-- /ko -->
                             <!-- ko if: !selectedTile().tileid -->
-                            New <span data-bind="text: selectedCard().name"></span>
+                            New <span data-bind="text: selectedCard().model.name"></span>
                             <!-- /ko -->
                         </span>
                         <!-- ko if: selectedTile().tileid && selectedTile().cards.length > 0 -->
@@ -192,7 +192,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </div>
 
             <div data-bind="component: {
-                name: cardComponentLookup[selectedCard().component_id].componentname,
+                name: cardComponentLookup[selectedCard().model.component_id()].componentname,
                 params: {
                     card: selectedCard(),
                     tile: selectedTile(),
