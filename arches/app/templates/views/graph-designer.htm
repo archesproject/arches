@@ -78,6 +78,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: saveSelectedNode">{% trans "Save Edits" %}</button>
                 <!-- /ko -->
             </div>
+
+            <div data-bind="visible: cardTree.selection()" style="display: none;">
+                <!-- ko if: cardTree.selection().model && cardTree.selection().model.dirty() -->
+                <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: function(){cardTree.selection().model.reset()}">{% trans "Discard Edits" %}</button>
+                <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: function(){cardTree.selection().model.save()}">{% trans "Save Edits" %}</button>
+                <!-- /ko -->
+            </div>
+
         </div>
 
     </div>
@@ -159,8 +167,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="flex" data-bind="visible: activeTab() === 'card'">
                 <!--Middle Panel -->
                 <div class="middle-column-container graph-designer branch-library" style="width: 300px; border-bottom: solid 1px #dddddd; z-index: 10;">
-                    <div>
+                    <div data-bind="visible: cardTree.selection().widget_id == null, with: cardTree.selection()">
                         {% include 'views/graph/graph-designer/card-configuration.htm' %}
+                    </div>
+                    <div data-bind="visible: cardTree.selection().widget_id != null, with: cardTree.selection()">
+                        Widget manager here...
                     </div>
                 </div>
                 <!-- Card Manager -->

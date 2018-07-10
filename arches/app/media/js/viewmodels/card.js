@@ -3,10 +3,11 @@ define([
     'underscore',
     'knockout',
     'knockout-mapping',
+    'models/card',
     'arches',
     'require',
     'viewmodels/tile'
-], function($, _, ko, koMapping, arches, require) {
+], function($, _, ko, koMapping, CardModel, arches, require) {
     /**
     * A viewmodel used for generic cards
     *
@@ -110,7 +111,14 @@ define([
         var nodegroup = _.find(ko.unwrap(params.nodegroups), function(group) {
             return ko.unwrap(group.nodegroupid) === ko.unwrap(params.card.nodegroup_id);
         });
-        _.extend(this, params.card, nodegroup, {
+
+        var cardModel = new CardModel({
+            data: params.card,
+            datatypes: params.datatypes
+        });
+
+        _.extend(this, nodegroup, {
+            model: cardModel,
             widgets: widgets,
             nodes: nodes,
             parent: params.tile,

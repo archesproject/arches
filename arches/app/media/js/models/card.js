@@ -18,25 +18,44 @@ define(['arches',
 
         initialize: function(attributes){
             var self = this;
-            this.set('cards', ko.observableArray());
-            this.set('nodes', ko.observableArray());
-            this.set('widgets', ko.observableArray());
-            this.set('tiles', ko.observableArray());
+            this.cards = ko.observableArray();
+            this.nodes = ko.observableArray();
+            this.widgets = ko.observableArray();
+            this.tiles = ko.observableArray();
+            this.cardid = ko.observable();
+            this.name = ko.observable();
+            this.instructions = ko.observable();
+            this.helptext = ko.observable();
+            this.helpenabled = ko.observable();
+            this.helptitle = ko.observable();
+            this.helpactive = ko.observable(false);
+            this.cardinality = ko.observable();
+            this.visible = ko.observable();
+            this.active = ko.observable();
+            this.ontologyproperty = ko.observable();
+            this.sortorder = ko.observable();
+            this.disabled = ko.observable();
+            this.component_id = ko.observable();
 
-            this.set('cardid', ko.observable());
-            this.set('name', ko.observable());
-            this.set('instructions', ko.observable());
-            this.set('helptext', ko.observable());
-            this.set('helpenabled', ko.observable());
-            this.set('helptitle', ko.observable());
-            this.set('helpactive', ko.observable(false));
-            this.set('cardinality', ko.observable());
-            this.set('visible', ko.observable());
-            this.set('active', ko.observable());
-            this.set('ontologyproperty', ko.observable());
-            this.set('sortorder', ko.observable());
-            this.set('disabled', ko.observable());
+            this.set('cards', this.cards);
+            this.set('nodes', this.nodes);
+            this.set('widgets', this.widgets);
+            this.set('tiles', this.tiles);
 
+            this.set('cardid', this.cardid);
+            this.set('name', this.name);
+            this.set('instructions', this.instructions);
+            this.set('helptext', this.helptext);
+            this.set('helpenabled', this.helpenabled);
+            this.set('helptitle', this.helptitle);
+            this.set('helpactive', this.helpactive);
+            this.set('cardinality', this.cardinality);
+            this.set('visible', this.visible);
+            this.set('active', this.active);
+            this.set('ontologyproperty',this.ontologyproperty);
+            this.set('sortorder', this.sortorder);
+            this.set('disabled', this.disabled);
+            this.set('component_id', this.component_id);
 
             this._card = ko.observable('{}');
 
@@ -143,6 +162,7 @@ define(['arches',
                     case 'active':
                     case 'ontologyproperty':
                     case 'sortorder':
+                    case 'component_id':
                         this.get(key)(value);
                         break;
                     case 'ontology_properties':
