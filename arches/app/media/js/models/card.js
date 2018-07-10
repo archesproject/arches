@@ -18,11 +18,7 @@ define(['arches',
 
         initialize: function(attributes) {
             var self = this;
-            this.cards = ko.observableArray();
-            this.nodes = ko.observableArray();
-            this.widgets = ko.observableArray();
-            this.tiles = ko.observableArray();
-            
+
             this.cardid = ko.observable();
             this.nodegroup_id = ko.observable();
             this.name = ko.observable();
@@ -38,11 +34,6 @@ define(['arches',
             this.sortorder = ko.observable();
             this.disabled = ko.observable();
             this.component_id = ko.observable();
-
-            this.set('cards', this.cards);
-            this.set('nodes', this.nodes);
-            this.set('widgets', this.widgets);
-            this.set('tiles', this.tiles);
 
             this.set('cardid', this.cardid);
             this.set('nodegroup_id', this.nodegroup_id);
@@ -62,24 +53,8 @@ define(['arches',
 
             this._card = ko.observable('{}');
 
-            this.get('cards').subscribe(function(cards) {
-                _.each(cards, function(card, i) {
-                    card.get('sortorder')(i);
-                });
-            });
-
-            this.get('widgets').subscribe(function(widgets) {
-                _.each(widgets, function(widget, i) {
-                    widget.get('sortorder')(i);
-                });
-            });
-
             this.dirty = ko.computed(function() {
                 return JSON.stringify(_.extend(JSON.parse(self._card()), self.toJSON())) !== self._card();
-            });
-
-            this.isContainer = ko.computed(function() {
-                return !!self.get('cards')().length;
             });
 
             this.parse(attributes);
@@ -92,64 +67,11 @@ define(['arches',
          */
         parse: function(attributes) {
             var self = this;
-            var datatypelookup = {};
 
-            attributes = _.extend({datatypes: []}, attributes);
             this._attributes = attributes;
 
-            _.each(attributes.datatypes, function(datatype) {
-                datatypelookup[datatype.datatype] = datatype;
-            }, this);
-            this.set('datatypelookup', datatypelookup);
-
-            var widgets = [];
             _.each(attributes.data, function(value, key) {
                 switch (key) {
-                case 'cards':
-                    var cards = [];
-                    var cardData = _.sortBy(value, 'sortorder');
-                    cardData.forEach(function(card) {
-                        var cardModel = new CardModel({
-                            data: card,
-                            datatypes: attributes.datatypes
-                        });
-                        cards.push(cardModel);
-                    }, this);
-                    this.get('cards')(cards);
-                    break;
-                case 'nodes':
-                    var nodes = [];
-                    value.forEach(function(node, i) {
-                        var nodeModel = new NodeModel({
-                            source: node,
-                            datatypelookup: datatypelookup,
-                            graph: undefined
-                        });
-                        var datatype = _.find(attributes.datatypes, function(datatype) {
-                            return datatype.datatype === node.datatype;
-                        });
-                        if (datatype.defaultwidget_id) {
-                            var cardWidgetData = _.find(attributes.data.widgets, function(widget) {
-                                return widget.node_id === nodeModel.nodeid;
-                            });
-                            nodeModel.widget = new CardWidgetModel(cardWidgetData, {
-                                node: nodeModel,
-                                card: self,
-                                datatype: datatype,
-                                disabled: attributes.data.disabled
-                            });
-                            widgets.push(nodeModel.widget);
-                        }
-                        nodes.push(nodeModel);
-                    }, this);
-                    this.get('nodes')(nodes);
-                    widgets.sort(function(w, ww) {
-                        return w.get('sortorder')() > ww.get('sortorder')();
-                    });
-                    this.get('widgets')(widgets);
-                    break;
-                case 'widgets':
-                    break;
                 case 'cardid':
                     this.set('id', value);
                     this.get(key)(value);
@@ -168,10 +90,6 @@ define(['arches',
                 case 'component_id':
                     this.get(key)(value);
                     break;
-                case 'ontology_properties':
-                case 'tiles':
-                    this.set(key, koMapping.fromJS(value));
-                    break;
                 default:
                     this.set(key, value);
                 }
@@ -188,28 +106,8 @@ define(['arches',
         toJSON: function() {
             var ret = {};
             for (var key in this.attributes) {
-                if (key !== 'datatypelookup' && key !== 'ontology_properties' && key !== 'nodes' &&
-                 key !== 'widgets' && key !== 'datatypes' && key !== 'data') {
-                    if (ko.isObservable(this.attributes[key])) {
-                        if (key === 'cards') {
-                            ret[key] = [];
-                            this.attributes[key]().forEach(function(card) {
-                                ret[key].push(card.toJSON());
-                            }, this);
-                        } else {
-                            ret[key] = this.attributes[key]();
-                        }
-                    } else {
-                        ret[key] = this.attributes[key];
-                    }
-                } else if (key === 'widgets') {
-                    var widgets = this.attributes[key]();
-                    ret[key] = _.map(widgets, function(widget) {
-                        return widget.toJSON();
-                    });
-                    ret['nodes'] = _.map(widgets, function(widget) {
-                        return widget.node.toJSON();
-                    });
+                if (key !== 'data') {
+                    ret[key] = ko.unwrap(this.attributes[key]);
                 }
             }
             return ret;

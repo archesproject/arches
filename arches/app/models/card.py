@@ -83,29 +83,32 @@ class Card(models.CardModel):
                     if key not in ('cards', 'widgets', 'nodes', 'is_editable'):
                         setattr(self, key, value)
 
-                for card in args[0]["cards"]:
-                    self.cards.append(Card(card))
+                if 'cards' in args[0]:
+                    for card in args[0]["cards"]:
+                        self.cards.append(Card(card))
 
-                for widget in args[0]["widgets"]:
-                    widget_model = models.CardXNodeXWidget()
-                    widget_model.pk = widget.get('id', None)
-                    widget_model.node_id = widget.get('node_id', None)
-                    widget_model.card_id = widget.get('card_id', None)
-                    widget_model.widget_id = widget.get('widget_id', None)
-                    widget_model.config = widget.get('config', {})
-                    widget_model.label = widget.get('label', '')
-                    widget_model.sortorder = widget.get('sortorder', None)
-                    if widget_model.pk == None:
-                        widget_model.save()
-                    self.widgets.append(widget_model)
+                if 'widgets' in args[0]:
+                    for widget in args[0]["widgets"]:
+                        widget_model = models.CardXNodeXWidget()
+                        widget_model.pk = widget.get('id', None)
+                        widget_model.node_id = widget.get('node_id', None)
+                        widget_model.card_id = widget.get('card_id', None)
+                        widget_model.widget_id = widget.get('widget_id', None)
+                        widget_model.config = widget.get('config', {})
+                        widget_model.label = widget.get('label', '')
+                        widget_model.sortorder = widget.get('sortorder', None)
+                        if widget_model.pk == None:
+                            widget_model.save()
+                        self.widgets.append(widget_model)
 
-                for node in args[0]["nodes"]:
-                    nodeid = node.get('nodeid', None)
-                    if nodeid is not None:
-                        node_model = models.Node.objects.get(nodeid=nodeid)
-                        node_model.config = node.get('config', None)
-                        node_model.isrequired = node.get('isrequired', node_model.isrequired)
-                        self.nodes.append(node_model)
+                if 'nodes' in args[0]:
+                    for node in args[0]["nodes"]:
+                        nodeid = node.get('nodeid', None)
+                        if nodeid is not None:
+                            node_model = models.Node.objects.get(nodeid=nodeid)
+                            node_model.config = node.get('config', None)
+                            node_model.isrequired = node.get('isrequired', node_model.isrequired)
+                            self.nodes.append(node_model)
 
             else:
                 self.widgets = list(self.cardxnodexwidget_set.all())
