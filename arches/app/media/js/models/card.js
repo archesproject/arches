@@ -22,6 +22,7 @@ define(['arches',
             this.nodes = ko.observableArray();
             this.widgets = ko.observableArray();
             this.tiles = ko.observableArray();
+            
             this.cardid = ko.observable();
             this.nodegroup_id = ko.observable();
             this.name = ko.observable();

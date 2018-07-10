@@ -124,7 +124,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <!-- ko if: crumb.tileid -->
                             <a href="#" data-bind="click: function () { crumb.selected(true) }">
                                 <!-- ko if: crumb.parent.widgets.length > 0 -->
-                                <span data-bind="text: crumb.parent.widgets[0].label || crumb.parent.name"></span>:
+                                <span data-bind="text: crumb.parent.widgets[0].label || crumb.parent.model.name"></span>:
                                 <div style="display: inline;" data-bind="component: {
                                     name: $parent.widgetLookup[crumb.parent.widgets[0].widget_id].name,
                                     params: {
@@ -139,7 +139,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 }"></div> &gt;
                                 <!-- /ko -->
                                 <!-- ko if: crumb.parent.widgets.length === 0 -->
-                                <span data-bind="text: crumb.parent.name"></span> &gt;
+                                <span data-bind="text: crumb.parent.model.name"></span> &gt;
                                 <!-- /ko -->
                             </a>
                             <!-- /ko -->
@@ -179,7 +179,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <!-- ko foreach: { data: selectedTile().cards, as: 'card' } -->
                                     <!-- ko if: card.canAdd() -->
                                     <li>
-                                        <a href="javascript:void(0)" data-bind="text: card.name, click: function () { card.selected(true) }"></a>
+                                        <a href="javascript:void(0)" data-bind="text: card.model.name, click: function () { card.selected(true) }"></a>
                                     </li>
                                     <!-- /ko -->
                                 <!-- /ko -->
