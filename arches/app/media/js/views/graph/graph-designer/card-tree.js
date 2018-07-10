@@ -14,10 +14,8 @@ define([
         var filter = ko.observable('');
         var loading = ko.observable(false);
         var selection = ko.observable();
-        var nodes = [];
-        var nodegroups = [];
 
-        var flattenTree = function (parents, flatList) {
+        var flattenTree = function(parents, flatList) {
             _.each(ko.unwrap(parents), function(parent) {
                 flatList.push(parent);
                 flattenTree(
@@ -25,7 +23,7 @@ define([
                     flatList
                 );
             });
-            return flatList
+            return flatList;
         };
 
         var toggleAll = function(state) {
@@ -36,10 +34,10 @@ define([
                 node.expanded(state);
             });
         };
-        var createLookup = function (list, idKey) {
-            return _.reduce(list, function (lookup, item) {
+        var createLookup = function(list, idKey) {
+            return _.reduce(list, function(lookup, item) {
                 lookup[ko.unwrap(item[idKey])] = item;
-                return lookup
+                return lookup;
             }, {});
         };
         _.extend(this, {
@@ -61,9 +59,9 @@ define([
             topCards: _.filter(data.cards, function(card) {
                 var nodegroup = _.find(ko.unwrap(params.graph.nodegroups), function(group) {
                     return ko.unwrap(group.nodegroupid) === card.nodegroup_id;
-                })
+                });
                 return !nodegroup || !ko.unwrap(nodegroup.parentnodegroup_id);
-            }).map(function (card) {
+            }).map(function(card) {
                 return new CardViewModel({
                     card: card,
                     tile: null,
@@ -88,7 +86,7 @@ define([
             filter: filter
         });
         var topCard = self.topCards[0];
-        if (topCard != null){
+        if (topCard != null) {
             selection(topCard.tiles().length > 0 ? topCard.tiles()[0] : topCard);
         }
     };

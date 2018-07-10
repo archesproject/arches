@@ -45,7 +45,7 @@ define([
                     { name: 'Resource Models', items: resources },
                     { name: 'Branches', items: graphs }
                 ]
-            }),
+            });
 
             viewModel.graphid.subscribe(function(graphid) {
                 if (graphid && graphid !== '') {
@@ -65,7 +65,7 @@ define([
                 }
                 viewModel.alert(null);
                 viewModel.loading(false);
-                if (response.status != 200) {
+                if (response.status !== 200) {
                     var errorMessageTitle = arches.requestFailed.title;
                     var errorMessageText = arches.requestFailed.text;
                     viewModel.alert(null);
@@ -87,18 +87,18 @@ define([
                 if (node) {
                     viewModel.loading(true);
                     node.save(function(data) {
-                        if (data.responseJSON.success == false) {
+                        if (data.responseJSON.success === false) {
                             viewModel.alert(new AlertViewModel('ep-alert-red', data.responseJSON.title, data.responseJSON.message));
                         }
                         viewModel.loading(false);
                     });
-                };
+                }
             };
 
             viewModel.saveSelectedNode = function() {
                 if (viewModel.selectedNode()) {
                     viewModel.saveNode(viewModel.selectedNode());
-                };
+                }
             };
 
             viewModel.cardTree = new CardTreeViewModel({
