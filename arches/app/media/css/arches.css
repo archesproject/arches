@@ -813,6 +813,7 @@ a.select2-choice {
 .select2-result.disabled {
     background-color: #eee;
     color: #999;
+    pointer-events: none;
 }
 
 .select2-results {

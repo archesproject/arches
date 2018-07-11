@@ -125,9 +125,7 @@ define([
                 }
             },
             id: function(item) {
-                if (self.disable(item) === false) {
                     return item._id;
-                }
             },
             formatResult: function(item) {
                 if (self.disable(item) === false) {
