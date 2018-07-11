@@ -1023,9 +1023,9 @@ commander@2:
   version "2.13.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.13.0.tgz#6964bca67685df7c1f1430c584f07d7597885b9c"
 
-complex.js@2.0.4:
-  version "2.0.4"
-  resolved "https://registry.yarnpkg.com/complex.js/-/complex.js-2.0.4.tgz#d8e7cfb9652d1e853e723386421c1a0ca7a48373"
+complex.js@2.0.11:
+  version "2.0.11"
+  resolved "https://registry.yarnpkg.com/complex.js/-/complex.js-2.0.11.tgz#09a873fbf15ffd8c18c9c2201ccef425c32b8bf1"
 
 concat-stream@~1.2.1:
   version "1.2.1"
@@ -1122,9 +1122,9 @@ debug@^2.6.3:
   dependencies:
     ms "2.0.0"
 
-decimal.js@9.0.1:
-  version "9.0.1"
-  resolved "https://registry.yarnpkg.com/decimal.js/-/decimal.js-9.0.1.tgz#1cc8b228177da7ab6498c1cc06eb130a290e6e1e"
+decimal.js@10.0.1:
+  version "10.0.1"
+  resolved "https://registry.yarnpkg.com/decimal.js/-/decimal.js-10.0.1.tgz#d04b16b277f0f9af09671cee225c4882e8857c58"
 
 deep-equal@^1.0.0, deep-equal@^1.0.1:
   version "1.0.1"
@@ -1160,6 +1160,10 @@ eonasdan-bootstrap-datetimepicker@~4.17.43:
     jquery "^1.8.3 || ^2.0 || ^3.0"
     moment "^2.10"
     moment-timezone "^0.4.0"
+
+escape-latex@1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/escape-latex/-/escape-latex-1.1.0.tgz#c0a94a51eb8c73c3a67a95cc90fbb626cef54539"
 
 escape-string-regexp@^1.0.2:
   version "1.0.5"
@@ -1244,9 +1248,9 @@ foreach@^2.0.5:
   version "2.0.5"
   resolved "https://registry.yarnpkg.com/foreach/-/foreach-2.0.5.tgz#0bee005018aeb260d0a3af3ae658dd0136ec1b99"
 
-fraction.js@4.0.4:
-  version "4.0.4"
-  resolved "https://registry.yarnpkg.com/fraction.js/-/fraction.js-4.0.4.tgz#04e567110718adf7b52974a10434ab4c67a5183e"
+fraction.js@4.0.8:
+  version "4.0.8"
+  resolved "https://registry.yarnpkg.com/fraction.js/-/fraction.js-4.0.8.tgz#e53618112e3b36b348c61a81323173bceb01e418"
 
 function-bind@^1.1.1:
   version "1.1.1"
@@ -1571,17 +1575,18 @@ marchingsquares@1.2.0, marchingsquares@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/marchingsquares/-/marchingsquares-1.2.0.tgz#36ae2dcc170be576d42579aac3c46da89ab650e6"
 
-mathjs@^3.11.4:
-  version "3.20.1"
-  resolved "https://registry.yarnpkg.com/mathjs/-/mathjs-3.20.1.tgz#cdefb0059ef897fe63fea39828e12041ac242765"
+mathjs@^5.0.2:
+  version "5.0.2"
+  resolved "https://registry.yarnpkg.com/mathjs/-/mathjs-5.0.2.tgz#ed23dcfb40e886697447bcfe43e5dc5d92dd8eb0"
   dependencies:
-    complex.js "2.0.4"
-    decimal.js "9.0.1"
-    fraction.js "4.0.4"
+    complex.js "2.0.11"
+    decimal.js "10.0.1"
+    escape-latex "1.1.0"
+    fraction.js "4.0.8"
     javascript-natural-sort "0.7.1"
     seed-random "2.2.0"
     tiny-emitter "2.0.2"
-    typed-function "0.10.6"
+    typed-function "1.0.4"
 
 merge-source-map@1.0.4:
   version "1.0.4"
@@ -2068,9 +2073,9 @@ type-check@~0.3.2:
   dependencies:
     prelude-ls "~1.1.2"
 
-typed-function@0.10.6:
-  version "0.10.6"
-  resolved "https://registry.yarnpkg.com/typed-function/-/typed-function-0.10.6.tgz#314aa0ea72bd586de5920095559683e20b01688b"
+typed-function@1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/typed-function/-/typed-function-1.0.4.tgz#6b25993b8587b0a5c3356585d6ef99aa63f6d317"
 
 typedarray@^0.0.6, typedarray@~0.0.5:
   version "0.0.6"
