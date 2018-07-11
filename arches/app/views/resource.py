@@ -600,6 +600,12 @@ class RelatedResourcesView(BaseManagerView):
                 ret.append(res)
             return JSONResponse(ret)
 
+        if self.action == 'get_relatable_resources':
+            graphid = request.GET.get('graphid', None)
+            nodes = models.Node.objects.filter(graph=graphid).exclude(istopnode=False)[0].get_relatable_resources()
+            ret = set([str(node.graph_id) for node in nodes])
+            return JSONResponse(ret)
+
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         start = request.GET.get('start', 0)
         ret = []
@@ -708,13 +714,3 @@ class RelatedResourcesView(BaseManagerView):
             ret = self.paginate_related_resources(related_resources, page, request)
 
         return JSONResponse(ret, indent=4)
-
-class RelatedResourceCandidates():
-    def get(self, request, resourceids=[]):
-        ret = {}
-        if candidates == True:
-            try:
-                resource = Resource.objects.get(resourceinstanceid_in=resourceids)
-            except ObjectDoesNotExist:
-                resource = Resource()
-        return JSONResponse(ret)

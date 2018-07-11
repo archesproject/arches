@@ -37,9 +37,10 @@ define([
             });
 
             this.disableSearchResults = function() {
-                var resourceinstanceid = this.editingInstanceId
+                var resourceinstanceid = this.editingInstanceId;
+                var graph = this.graph;
                 return function(result) {
-                    if (result._id == resourceinstanceid) {
+                    if (result._id == resourceinstanceid || _.contains(graph.relatable_resources, result._type) === false ) {
                         return true;
                     } else {
                         return false;
