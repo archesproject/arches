@@ -114,6 +114,7 @@ urlpatterns = [
     url(r'^resource/(?P<resourceid>%s)/cards$' % uuid_regex, ResourceCards.as_view(), name='resource_cards'),
     url(r'^resource/history$', ResourceEditLogView.as_view(), name="edit_history"),
     url(r'^resource/related/(?P<resourceid>%s|())$' % uuid_regex, RelatedResourcesView.as_view(), name="related_resources"),
+    url(r'^resource/related', RelatedResourcesView.as_view(action="get_candidates"), name="related_resource_candidates"),
     url(r'^resource/descriptors/(?P<resourceid>%s|())$' % uuid_regex, ResourceDescriptors.as_view(), name="resource_descriptors"),
     url(r'^resource/(?P<resourceid>%s)/tiles$' % uuid_regex, ResourceTiles.as_view(), name='resource_tiles'),
     url(r'^report/(?P<resourceid>%s)$' % uuid_regex, ResourceReportView.as_view(), name='resource_report'),

@@ -810,6 +810,11 @@ a.select2-choice {
     box-shadow: none;
 }
 
+.select2-result.disabled {
+    background-color: #eee;
+    color: #999;
+}
+
 .select2-results {
     padding: 0px;
     margin: 0px;
@@ -3261,6 +3266,20 @@ ul .collapse li:last-of-type {
 
 .related-resources-editor-container .content-panel {
     height: calc(100vh - 100px);
+}
+
+.resource-search-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 375px;
+    position: absolute;
+    top: -13px;
+}
+
+.resource-search-container .row.widget-wrapper {
+    width: 350px;
+    padding: 5px 5px 10px 5px;
 }
 
 .edit-panel {
@@ -9357,16 +9376,20 @@ ul.pagination {
 }
 
 .related-resources-relationship {
-    margin-top: -25px;
-    margin-right: 10px;
-    float: right;
+    position: absolute;
+    right: 0px;
+    top: 6px;
+}
+
+.related-resources-relationship .dropdown-menu {
+    left: auto;
+    width: 600px;
 }
 
 .related-resources-delete {
     position: absolute;
-    top: -37px;
-    left: 180px;
-    height: 33px;
+    right: 270px;
+    bottom: 9px;
 }
 
 .selected-resource-list {
@@ -9578,7 +9601,7 @@ table.table.dataTable {
     float: left;
     height: 35px;
     width:100%;
-    z-index: 0;
+    z-index: 2;
 }
 
 .related-resources-header .btn-group>.btn:hover {

@@ -9,6 +9,9 @@ define([
         var self = this;
         params.configKeys = ['placeholder'];
         this.multiple = params.multiple || false;
+        this.value = params.value || undefined;
+        this.disable = params.disable || function(){return false};
+        this.disableMessage = params.disableMessage || '';
 
         WidgetViewModel.apply(this, [params]);
 
@@ -84,7 +87,7 @@ define([
                 dataType: 'json',
                 quietMillis: 250,
                 data: function (term, page) {
-                    var graphid = ko.unwrap(params.node.config.graphid);
+                    var graphid = params.node ? ko.unwrap(params.node.config.graphid) : undefined;
                     var data = {
                         no_filters: true,
                         page: page
@@ -122,10 +125,23 @@ define([
                 }
             },
             id: function(item) {
-                return item._id;
+                if (self.disable(item) === false) {
+                    return item._id;
+                }
             },
             formatResult: function(item) {
-                return item._source.displayname;
+                if (self.disable(item) === false) {
+                    return item._source.displayname;
+                } else {
+                    return '<span>' + item._source.displayname + ' ' + self.disableMessage + '</span>'
+                }
+            },
+            formatResultCssClass: function(item) {
+                if (self.disable(item) === false) {
+                    return '';
+                } else {
+                    return 'disabled'
+                }
             },
             formatSelection: function(item) {
                 return item._source.displayname;

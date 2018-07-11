@@ -4,12 +4,13 @@ define([
     'knockout',
     'knockout-mapping',
     'arches',
+    'views/components/widgets/resource-instance-multiselect',
     'views/resource/related-resources-node-list',
     'bindings/related-resources-graph',
     'plugins/knockout-select2',
     'bindings/datepicker',
-    'bindings/datatable'
-], function($, Backbone, ko, koMapping, arches, RelatedResourcesNodeList) {
+    'bindings/datatable',
+], function($, Backbone, ko, koMapping, arches, ResourceInstanceSelect, RelatedResourcesNodeList) {
     return Backbone.View.extend({
         initialize: function(options) {
             var self = this;
@@ -34,10 +35,36 @@ define([
             this.fdgNodeListView = new RelatedResourcesNodeList({
                 items: self.graphNodeList
             });
+
+            this.disableSearchResults = function() {
+                var resourceinstanceid = this.editingInstanceId
+                return function(result) {
+                    if (result._id == resourceinstanceid) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                };
+            }
+
+            this.relationshipCandidates = ko.observableArray([]);
+            this.relationshipCandidateIds = ko.observable([]);
             this.useSemanticRelationships = arches.useSemanticRelationships;
             this.selectedOntologyClass = ko.observable();
             this.resourceRelationships = ko.observableArray();
             this.paginator = koMapping.fromJS({});
+
+            this.relateResources = function() {
+                var self = this;
+                $.ajax(arches.urls.related_resource_candidates, {
+                    dataType: "json",
+                    data: {resourceids: JSON.stringify(this.relationshipCandidateIds())}
+                }).done(function(data) {
+                    self.relationshipCandidates(data);
+                    self.saveRelationships();
+                    self.relationshipCandidateIds(undefined);
+                });
+            };
 
             this.selectedOntologyClass.subscribe(function() {
                 if (self.selectedOntologyClass() && self.validproperties[self.selectedOntologyClass()] !== undefined) {
@@ -333,10 +360,10 @@ define([
         },
 
         saveRelationships: function() {
-            var candidateIds = _.pluck(this.searchResults.relationshipCandidates(), 'resourceinstanceid');
+            var candidateIds = _.pluck(this.relationshipCandidates(), 'resourceinstanceid');
             var selectedResourceXids = _.pluck(this.selected(), 'resourcexid')
             var resource = this.currentResource()
-            this.searchResults.relationshipCandidates().forEach(function(rr) {
+            this.relationshipCandidates().forEach(function(rr) {
                 if (!this.relatedProperties.relationship_type() && rr.ontologyclass && this.validproperties[rr.ontologyclass]) {
                     this.relatedProperties.relationship_type(this.validproperties[rr.ontologyclass][0].id)
                 } else {
@@ -346,7 +373,7 @@ define([
             if (candidateIds.length > 0 || selectedResourceXids.length > 0) {
                 resource.save(candidateIds, koMapping.toJS(this.relatedProperties), selectedResourceXids);
                 if (candidateIds.length > 0) {
-                    this.searchResults.relationshipCandidates.removeAll()
+                    this.relationshipCandidates.removeAll()
                 }
                 this.propertiesDialogOpen(false);
             };

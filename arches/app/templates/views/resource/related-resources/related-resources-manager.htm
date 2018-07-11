@@ -102,17 +102,34 @@
 
             <!--ko if: !displaySplash() || resourceRelationships().length > 0-->
             <div class="related-resources-header" data-bind="css: {'open-graph': showGraph() == true}">
-                <div class="related-resources-title">{% trans "Related Resources" %}</div>
-
                 <div class="btn-group rr-display-toggle" data-bind="css: {'open-graph': showGraph() == true}">
                     <button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="grid" data-bind="click: function () { showGraph(false); }, css: {'selected': !showGraph()}"><i class="ion-grid"></i></button>
                     <button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="graph" data-bind="click: function () { if (currentResource()){showGraph(true)}; }, css: {'selected': showGraph()}"><i class="ion-asterisk"></i></button>
                 </div>
+                <!--ko if: resourceEditorContext -->
+                <!--ko if: !showGraph() -->
+                <div class="resource-search-container">
+                    <!-- ko component: {
+                    name: 'resource-instance-multiselect-widget',
+                    params: {
+                    placeholder: '{% trans "Search for resources" %}',
+                    value: relationshipCandidateIds,
+                    disable: disableSearchResults(),
+                    disableMessage: '{% trans "Cannot be related" %}'
+                },
+                } -->
+                    <!-- /ko -->
+                    <a href="#" class="btn btn-mint btn-labeled fa fa-plus" style="overflow: visible; margin-bottom: 5px;" data-bind="click: function(){relateResources()}, text: '{% trans 'Add' %}', css: {'disabled': relationshipCandidateIds() === undefined || relationshipCandidateIds().length === 0}"></a>
+                </div>
+                <button class="btn btn-mint btn-labeled fa fa-code-fork related-resources-delete" data-bind="click: function(){deleteRelationships()}, visible: selected().length > 0">{% trans "Delete Selected" %}</button>
+                <!--/ko-->
+                <!--/ko-->
 
                 <div class="relative">
 
-                    <!--Documentation dropdown-->
                     <!--ko if: resourceEditorContext -->
+
+
                     <div class="related-resources-relationship">
 
                         <div class="mega-dropdown related-reources-crud-link" data-bind="visible: showGraph() == false">
@@ -218,9 +235,6 @@
                             <!--/ko-->
                         </div>
                     </div>
-
-                    <button class="btn btn-sm btn-mint btn-labeled fa fa-code-fork related-resources-delete" data-bind="click: function(){deleteRelationships()}, visible: selected().length > 0">{% trans "Delete Selected" %}</button>
-
                     <!-- /ko -->
                     <!--Documentation dropdown-->
                 </div>
