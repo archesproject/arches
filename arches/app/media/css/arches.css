@@ -1123,8 +1123,6 @@ a.select2-search-choice-close {
 }
 
 .branch-library {
-    position: absolute;
-    top: 0px;
     background-color: white;
     height: auto;
 }
@@ -2139,7 +2137,6 @@ ul.nav.nav-tabs.nav-justified {
     margin-left: -25px;
     margin-right: -20px;
     padding-left: 25px;
-    border-top: 1px solid #ddd;
 }
 
 .graph-crm-class {
@@ -4467,9 +4464,25 @@ a.selected {
     padding: 15px;
 }
 
+.dark-colored-text {
+    color: #25256b;
+}
+
 .panel-section-title {
     font-size: 1.3em;
     font-weight: 400;
+}
+
+.panel-section-subtitle {
+    font-size: 0.7em;
+    font-weight: 400;
+}
+
+.panel-section-heading {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 0px;
+    margin-top: 5px;
 }
 
 .form-divider {
@@ -6250,10 +6263,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     padding-right: 5px;
     font-size: 14px;
     font-weight: 600;
-}
-
-.node-form-container {
-    width: 100%;
 }
 
 .node-semantic-description {

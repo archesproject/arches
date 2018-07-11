@@ -348,20 +348,9 @@ class GraphModel(models.Model):
     def disable_instance_creation(self):
         if not self.isresource:
             return _('Only resource models may be edited - branches are not editable')
-        msg = []
-        forms = Form.objects.filter(graph_id=self.pk)
         if not self.isactive:
-            msg.append(_('change resource model status in graph manager'))
-        if forms.count() == 0:
-            msg.append(_('add menu(s)'))
-        else:
-            if FormXCard.objects.filter(form__in=forms).count() == 0:
-                msg.append(_('add card(s) to menu(s)'))
-            if forms.filter(visible=True).count() == 0:
-                msg.append(_('make menu(s) visible'))
-        if len(msg) == 0:
-            return False
-        return _('To make this resource editable: ') + ', '.join(msg)
+            return _('Set resource model status to Active in Graph Designer')
+        return False
 
     def is_editable(self):
         result = True

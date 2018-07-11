@@ -331,8 +331,8 @@
             <!--/ko-->
             <!--/ko-->
 
-            <!--ko if: resourceRelationships().length === 0 && resourceEditorContext && displaySplash -->
-            <div id="rr-splash" class="rr-splash">
+            <!--ko if: resourceRelationships().length === 0 && resourceEditorContext && displaySplash() -->
+            <div id="rr-splash" class="rr-splash" data-bind="visible: displaySplash()" style="display: none;">
 
                 <div class="rr-splash-title">{% trans "Related Resources" %}</div>
                 <div class="rr-splash-subtitle">{% trans "Arches allows you to create relationships between your resources" %}</div>
@@ -346,7 +346,7 @@
             <!--/ko-->
         </div>
 
-        <!-- ko if: resourceEditorContext -->
+        <!-- ko if: resourceEditorContext && !displaySplash() -->
         <div id="report-image-grid" class="report-image-grid rr-grid rr-image-grid">
             <!-- ko foreach: { data: searchResults.relationshipCandidates, as: 'candidate' } -->
             <div class="rr-grid-item" data-bind="">
