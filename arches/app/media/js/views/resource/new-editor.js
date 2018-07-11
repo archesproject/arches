@@ -122,6 +122,7 @@ define([
         selectedCard: ko.computed(function () {
             var item = selection();
             if (item) {
+                manageRelatedResources(false);
                 if (item.tileid) {
                     return item.parent;
                 }
@@ -227,9 +228,11 @@ define([
                     graph: vm.graph
                 });
                 vm.manageRelatedResources(true);
+                vm.selection(undefined);
             });
         } else {
-            vm.manageRelatedResources(!vm.manageRelatedResources());
+            vm.manageRelatedResources(true);
+            vm.selection(undefined);
         }
     };
 
