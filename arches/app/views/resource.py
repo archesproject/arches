@@ -560,6 +560,7 @@ class ResourceReportView(MapBaseManagerView):
 
 @method_decorator(can_read_resource_instance(), name='dispatch')
 class RelatedResourcesView(BaseManagerView):
+    action=None
 
     def paginate_related_resources(self, related_resources, page, request):
         total=related_resources['total']
@@ -589,6 +590,22 @@ class RelatedResourcesView(BaseManagerView):
         return ret
 
     def get(self, request, resourceid=None):
+        if self.action == 'get_candidates':
+            resourceids = json.loads(request.GET.get('resourceids', '[]'))
+            resources = Resource.objects.filter(resourceinstanceid__in=resourceids)
+            ret = []
+            for rr in resources:
+                res = JSONSerializer().serializeToPython(rr)
+                res['ontologyclass'] = rr.get_root_ontology()
+                ret.append(res)
+            return JSONResponse(ret)
+
+        if self.action == 'get_relatable_resources':
+            graphid = request.GET.get('graphid', None)
+            nodes = models.Node.objects.filter(graph=graphid).exclude(istopnode=False)[0].get_relatable_resources()
+            ret = set([str(node.graph_id) for node in nodes])
+            return JSONResponse(ret)
+
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         start = request.GET.get('start', 0)
         ret = []
