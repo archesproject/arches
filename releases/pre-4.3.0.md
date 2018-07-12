@@ -223,7 +223,7 @@ Note (GeoJson is covered by map widget testing in a different section)
 
 | Test Subject           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| String                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| String                 | :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 | Concepts               |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Domains                |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Images                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
