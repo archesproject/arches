@@ -891,7 +891,7 @@ a.select2-search-choice-close {
 }
 
 .time-filter-clear {
-    margin: 10px 20px 0 8px; 
+    margin: 10px 20px 0 8px;
     cursor: pointer;
     background: #54abd9;
     border: 1px solid #2e6da4;
@@ -2147,6 +2147,10 @@ ul.nav.nav-tabs.nav-justified {
 
 .graph-designer {
     background: #fbfbfb;
+}
+
+.graph-designer.resource-editor .jstree {
+    height: 100%;
 }
 
 .graph-designer-graph-content .graph-designer-title {
@@ -11371,10 +11375,9 @@ ul.select2-choices:after {
     font-weight: 400;
 }
 
-.jstree-container-ul {
-    overflow-y: scroll;
-    height: 100vh;
-    padding-bottom: 150px;
+.resource-editor-tree {
+    overflow-y: auto;
+    height: 100%;
 }
 
 a.jstree-anchor strong {
