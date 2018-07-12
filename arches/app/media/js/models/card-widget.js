@@ -17,11 +17,17 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                 'sortorder': null,
                 'disabled': false
             };
+            var self = this;
             this.widgetLookup = widgets;
-            this.widgetList = Object.keys(widgets).map(function(key){
-                widgets[key].id = key; 
-                return widgets[key];
-            });
+            this.widgetList = function() {
+                var widgets = _.map(self.widgetLookup, function(widget, id) {
+                    widget.id = id;
+                    return widget;
+                });
+                return _.filter(widgets, function(widget) {
+                    return widget.datatype === self.datatype.datatype;
+                });
+            };
             options || (options = {});
             attributes || (attributes = {});
             options.parse = true;
@@ -111,7 +117,7 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                             var currentConfig = this.get('config');
                             this.set('config', _.defaults(currentConfig, defaultConfig));
                             for (key in defaultConfig) {
-                                self.configKeys.push(key)
+                                self.configKeys.push(key);
                             }
                             widgetId(value);
                         },
@@ -131,7 +137,7 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
          */
         toJSON: function () {
             var ret = {};
-            for(key in this.attributes){
+            for (key in this.attributes){
                 if (key !== 'config') {
                     ret[key] = this.attributes[key]();
                 } else {
