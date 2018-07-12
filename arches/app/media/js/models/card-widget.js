@@ -31,11 +31,11 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
             }
             if (this.datatype && this.datatype.defaultwidget_id) {
                 defaults.widget_id = this.datatype.defaultwidget_id;
-                defaults.config = widgets[defaults.widget_id].defaultconfig;
+                defaults.config = JSON.parse(widgets[defaults.widget_id].defaultconfig);
             }
             if (this.node) {
                 defaults.node_id = this.node.nodeid;
-                defaults.label = this.node.name();
+                defaults.label = ko.unwrap(this.node.name);
             }
             if (this.card) {
                 defaults.card_id = this.card.get('id');
@@ -115,6 +115,7 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                     }));
                 } else {
                     this.set(key, ko.observable(value));
+                    this[key] = this.get(key);
                 }
             }, this);
         },

@@ -36,6 +36,7 @@ define([
                 node.expanded(state);
             });
         };
+
         var createLookup = function(list, idKey) {
             return _.reduce(list, function(lookup, item) {
                 lookup[ko.unwrap(item[idKey])] = item;
@@ -66,6 +67,7 @@ define([
             }).map(function(card) {
                 return new CardViewModel({
                     card: card,
+                    graphModel: params.graphModel,
                     tile: null,
                     resourceId: ko.observable(),
                     displayname: ko.observable(),
@@ -76,11 +78,11 @@ define([
                     loading: loading,
                     filter: filter,
                     provisionalTileViewModel: null,
-                    nodes: params.graph.nodes,
+                    //nodes: params.graph.nodes,
                     cardwidgets: data.cardwidgets,
                     datatypes: data.datatypes,
                     widgets: data.widgets,
-                    nodegroups: params.graph.nodegroups,
+                    //nodegroups: params.graph.nodegroups,
                     userisreviewer: true
                 });
             }),

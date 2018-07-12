@@ -4,10 +4,11 @@ define([
     'knockout',
     'knockout-mapping',
     'models/card',
+    'models/card-widget',
     'arches',
     'require',
     'viewmodels/tile'
-], function($, _, ko, koMapping, CardModel, arches, require) {
+], function($, _, ko, koMapping, CardModel, CardWidgetModel, arches, require) {
     /**
     * A viewmodel used for generic cards
     *
@@ -53,46 +54,58 @@ define([
         var selection = params.selection || ko.observable();
         var filter = params.filter || ko.observable();
         var loading = params.loading || ko.observable();
-        var nodes = _.filter(ko.unwrap(params.nodes), function(node) {
+        var nodes = _.filter(ko.unwrap(params.graphModel.get('nodes')), function(node) {
             return ko.unwrap(node.nodegroup_id) === ko.unwrap(params.card.nodegroup_id);
-        }).map(function(node) {
-            node.configKeys = ko.observableArray(
-                _.map(node.config, function(val, key) {
-                    return key;
-                })
-            );
-            node.config = koMapping.fromJS(node.config);
-            return node;
         });
-        var widgets = _.filter(params.cardwidgets, function(widget) {
+        // .map(function(node) {
+        //     node.configKeys = ko.observableArray(
+        //         _.map(node.config, function(val, key) {
+        //             return key;
+        //         })
+        //     );
+        //     node.config = koMapping.fromJS(node.config);
+        //     return node;
+        // });
+        var widgets = ko.observableArray(_.filter(params.cardwidgets, function(widget) {
             return widget.card_id === params.card.cardid;
-        });
+        }));
+        // var widgets = ko.observableArray();
+
+        // cardwidgets().forEach(function(widgetdata){
+        //     widgets.push(new CardWidgetModel(widgetdata, {
+        //         //node: nodeModel,
+        //         //card: self,
+        //         //datatype: datatype,
+        //         //disabled: attributes.data.disabled
+        //     }));
+        // }, this);
+
         _.each(ko.unwrap(nodes), function(node) {
-            var widget = _.find(widgets, function(widget) {
+            var widget = _.find(widgets(), function(widget) {
                 return widget.node_id === ko.unwrap(node.nodeid);
             });
-            if (!widget) {
-                var datatype = _.find(params.datatypes, function(datatype) {
-                    return datatype.datatype === ko.unwrap(node.datatype);
-                });
-                if (datatype.defaultwidget_id) {
-                    var widgetData = _.find(params.widgets, function(widget) {
-                        return widget.widgetid === datatype.defaultwidget_id;
-                    });
-                    widget = {
-                        widget_id: datatype.defaultwidget_id,
-                        config: _.extend({
-                            label: ko.unwrap(node.name)
-                        }, widgetData.defaultconfig),
-                        label: ko.unwrap(node.name),
-                        node_id: ko.unwrap(node.nodeid),
-                        card_id: params.card.cardid,
-                        id: '',
-                        sortorder: ''
-                    };
-                    widgets.push(widget);
-                }
-            }
+            // if (!widget) {
+            //     var datatype = _.find(params.datatypes, function(datatype) {
+            //         return datatype.datatype === ko.unwrap(node.datatype);
+            //     });
+            //     if (datatype.defaultwidget_id) {
+            //         var widgetData = _.find(params.widgets, function(widget) {
+            //             return widget.widgetid === datatype.defaultwidget_id;
+            //         });
+            //         widget = {
+            //             widget_id: ko.observable(datatype.defaultwidget_id),
+            //             config: _.extend({
+            //                 label: ko.unwrap(node.name)
+            //             }, widgetData.defaultconfig),
+            //             label: ko.unwrap(node.name),
+            //             node_id: ko.unwrap(node.nodeid),
+            //             card_id: params.card.cardid,
+            //             id: '',
+            //             sortorder: ''
+            //         };
+            //         widgets.push(widget);
+            //     }
+            // }
             if (widget) {
                 widget.selected = ko.pureComputed({
                     read: function() {
@@ -108,18 +121,24 @@ define([
             }
         });
 
-        var nodegroup = _.find(ko.unwrap(params.nodegroups), function(group) {
-            return ko.unwrap(group.nodegroupid) === ko.unwrap(params.card.nodegroup_id);
-        });
+        var nodegroups = params.graphModel.get('nodegroups');
 
         var cardModel = new CardModel({
-            data: params.card,
-            datatypes: params.datatypes
+            data: _.extend({
+                widgets: params.cardwidgets,
+                nodes: params.graphModel.get('nodes')
+            }, params.card),
+            datatypes: params.datatypes,
+            widgetList: params.widgets
+        });
+
+        var nodegroup = _.find(ko.unwrap(nodegroups), function(group) {
+            return ko.unwrap(group.nodegroupid) === ko.unwrap(params.card.nodegroup_id);
         });
 
         _.extend(this, nodegroup, {
             model: cardModel,
-            widgets: widgets,
+            widgets: cardModel.widgets,
             nodes: nodes,
             parent: params.tile,
             expanded: ko.observable(true),
@@ -156,18 +175,19 @@ define([
                         cardwidgets: params.cardwidgets,
                         datatypes: params.datatypes,
                         widgets: params.widgets,
-                        nodegroups: ko.unwrap(params.nodegroups)
+                        nodegroups: ko.unwrap(nodegroups)
                     });
                 })
             ),
             cards: _.filter(params.cards, function(card) {
-                var nodegroup = _.find(ko.unwrap(params.nodegroups), function(group) {
+                var nodegroup = _.find(ko.unwrap(nodegroups), function(group) {
                     return ko.unwrap(group.nodegroupid) === ko.unwrap(card.nodegroup_id);
                 });
                 return ko.unwrap(nodegroup.parentnodegroup_id) === ko.unwrap(params.card.nodegroup_id);
             }).map(function(card) {
                 return new CardViewModel({
                     card: _.clone(card),
+                    graphModel: params.graphModel,
                     tile: null,
                     resourceId: params.resourceId,
                     displayname: params.displayname,
@@ -178,11 +198,11 @@ define([
                     loading: loading,
                     filter: filter,
                     provisionalTileViewModel: params.provisionalTileViewModel,
-                    nodes: params.nodes,
+                    //nodes: params.nodes,
                     cardwidgets: params.cardwidgets,
                     datatypes: params.datatypes,
                     widgets: params.widgets,
-                    nodegroups: ko.unwrap(params.nodegroups)
+                    //nodegroups: ko.unwrap(nodegroups)
                 });
             }),
             hasprovisionaledits: ko.computed(function() {
@@ -253,7 +273,7 @@ define([
                     cardwidgets: params.cardwidgets,
                     datatypes: params.datatypes,
                     widgets: params.widgets,
-                    nodegroups: ko.unwrap(params.nodegroups)
+                    nodegroups: ko.unwrap(nodegroups)
                 });
             }
         });
