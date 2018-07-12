@@ -166,6 +166,13 @@ class NewResourceEditorView(MapBaseManagerView):
 
         return render(request, view_template, context)
 
+    def delete(self, request, resourceid=None):
+        if resourceid is not None:
+            ret = Resource.objects.get(pk=resourceid)
+            ret.delete(user=request.user)
+            return JSONResponse(ret)
+        return HttpResponseNotFound()
+
 
 @method_decorator(can_edit_resource_instance(), name='dispatch')
 class ResourceEditorView(MapBaseManagerView):
@@ -272,6 +279,7 @@ class ResourceEditorView(MapBaseManagerView):
         return HttpResponseNotFound()
 
     def delete(self, request, resourceid=None):
+
         if resourceid is not None:
             ret = Resource.objects.get(pk=resourceid)
             ret.delete(user=request.user)
