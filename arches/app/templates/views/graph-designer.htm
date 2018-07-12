@@ -176,13 +176,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="flex" data-bind="visible: activeTab() === 'card'">
                 <!--Middle Panel -->
                 <div class="middle-column-container graph-designer branch-library" style="width: 300px; border-bottom: solid 1px #dddddd; z-index: 10;">
-                    <!-- ko if: !('widget_id' in cardTree.selection()) -->
+                    <!-- ko if: cardTree.selection().constructor.name === 'CardViewModel' -->
                     <div data-bind="with: cardTree.selection()">
                         {% include 'views/graph/graph-designer/card-configuration.htm' %}
                     </div>
                     <!-- /ko -->
-                    <!-- ko if: ('widget_id' in cardTree.selection()) -->
-                    <div data-bind="with: cardTree.selection()" style="display: none;">
+                    <!-- ko if: cardTree.selection().constructor.name !== 'CardViewModel' -->
+                    <div data-bind="with: cardTree.selection()">
                         {% include 'views/graph/graph-designer/widget-configuration.htm' %}
                     </div>
                     <!-- /ko -->

@@ -197,7 +197,8 @@ define(['arches',
                             node: node,
                             card: this,
                             datatype: datatype,
-                            disabled: attributes.data.disabled
+                            disabled: attributes.data.disabled,
+                            widgetList: attributes.widgetList
                         });
                         widgets.push(widget);
                     }

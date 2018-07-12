@@ -18,6 +18,10 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                 'disabled': false
             };
             this.widgetLookup = widgets;
+            this.widgetList = Object.keys(widgets).map(function(key){
+                widgets[key].id = key; 
+                return widgets[key];
+            });
             options || (options = {});
             attributes || (attributes = {});
             options.parse = true;
@@ -115,8 +119,8 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                     }));
                 } else {
                     this.set(key, ko.observable(value));
-                    this[key] = this.get(key);
                 }
+                this[key] = this.get(key);
             }, this);
         },
 

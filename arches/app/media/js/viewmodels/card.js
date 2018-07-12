@@ -106,19 +106,19 @@ define([
             //         widgets.push(widget);
             //     }
             // }
-            if (widget) {
-                widget.selected = ko.pureComputed({
-                    read: function() {
-                        return selection() === this;
-                    },
-                    write: function(value) {
-                        if (value) {
-                            selection(this);
-                        }
-                    },
-                    owner: widget
-                });
-            }
+            // if (widget) {
+            //     widget.selected = ko.pureComputed({
+            //         read: function() {
+            //             return selection() === this;
+            //         },
+            //         write: function(value) {
+            //             if (value) {
+            //                 selection(this);
+            //             }
+            //         },
+            //         owner: widget
+            //     });
+            // }
         });
 
         var nodegroups = params.graphModel.get('nodegroups');
@@ -126,10 +126,24 @@ define([
         var cardModel = new CardModel({
             data: _.extend({
                 widgets: params.cardwidgets,
-                nodes: params.graphModel.get('nodes')
+                nodes: params.graphModel.get('nodes'),
+                widgetList: params.widgets
             }, params.card),
             datatypes: params.datatypes,
-            widgetList: params.widgets
+        });
+
+        cardModel.widgets().forEach(function(widget){
+            widget.selected = ko.pureComputed({
+                read: function() {
+                    return selection() === this;
+                },
+                write: function(value) {
+                    if (value) {
+                        selection(this);
+                    }
+                },
+                owner: widget
+            });
         });
 
         var nodegroup = _.find(ko.unwrap(nodegroups), function(group) {
