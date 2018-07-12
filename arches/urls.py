@@ -108,7 +108,7 @@ urlpatterns = [
     url(r'^resource-old/(?P<resourceid>%s)$' % uuid_regex, ResourceEditorView.as_view(), name='old_resource_editor'),
     url(r'^resource/(?P<resourceid>%s)$' % uuid_regex, NewResourceEditorView.as_view(), name='resource_editor'),
     url(r'^add-resource/(?P<graphid>%s)$' % uuid_regex, NewResourceEditorView.as_view(), name='add_resource'),
-    url(r'^resource/(?P<resourceid>%s)/copy$' % uuid_regex, ResourceEditorView.as_view(action='copy'), name='resource_copy'),
+    url(r'^resource/(?P<resourceid>%s)/copy$' % uuid_regex, NewResourceEditorView.as_view(action='copy'), name='resource_copy'),
     url(r'^resource/(?P<resourceid>%s)/history$' % uuid_regex, ResourceEditLogView.as_view(), name='resource_edit_log'),
     url(r'^resource/(?P<resourceid>%s)/data/(?P<formid>%s)$' % (uuid_regex, uuid_regex), ResourceData.as_view(), name='resource_data'),
     url(r'^resource/(?P<resourceid>%s)/cards$' % uuid_regex, ResourceCards.as_view(), name='resource_cards'),
