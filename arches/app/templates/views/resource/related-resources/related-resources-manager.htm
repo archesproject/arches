@@ -112,11 +112,11 @@
                     <!-- ko component: {
                     name: 'resource-instance-multiselect-widget',
                     params: {
-                    placeholder: '{% trans "Search for resources" %}',
-                    value: relationshipCandidateIds,
-                    disable: disableSearchResults(),
-                    disableMessage: '{% trans "Cannot be related" %}'
-                },
+                        placeholder: '{% trans "Search for resources" %}',
+                        value: relationshipCandidateIds,
+                        disable: disableSearchResults(),
+                        disableMessage: '{% trans "Cannot be related" %}'
+                    },
                 } -->
                     <!-- /ko -->
                     <a href="#" class="btn btn-mint btn-labeled fa fa-plus" style="overflow: visible; margin-bottom: 5px;" data-bind="click: function(){relateResources()}, text: '{% trans 'Add' %}', css: {'disabled': relationshipCandidateIds() === undefined || relationshipCandidateIds().length === 0}"></a>

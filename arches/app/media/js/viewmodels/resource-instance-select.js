@@ -62,6 +62,7 @@ define([
             });
         }
         this.value.subscribe(updateName);
+
         this.displayValue = ko.computed(function() {
             var val = self.value();
             var name = displayName();
@@ -75,6 +76,8 @@ define([
         });
         updateName();
 
+        var url = ko.observable(arches.urls.search_results)
+        this.url = url
         this.select2Config = {
             value: this.value,
             clickBubble: true,
@@ -83,39 +86,50 @@ define([
             allowClear: true,
             disabled: this.disabled,
             ajax: {
-                url: arches.urls.search_results,
+                url: function(){return url()},
                 dataType: 'json',
                 quietMillis: 250,
                 data: function (term, page) {
-                    var graphid = params.node ? ko.unwrap(params.node.config.graphid) : undefined;
-                    var data = {
-                        no_filters: true,
-                        page: page
-                    };
-                    if (graphid && graphid.length > 0) {
-                        data.no_filters = false;
-                        data.typeFilter = JSON.stringify(
-                            graphid.map(function(id) {
-                                return {
-                                    "graphid": id,
-                                    "inverted": false
-                                }
-                            })
-                        );
+                    //TODO This regex isn't working, but it would nice fix it so that we can do more robust url checking
+                    // var expression = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
+                    // var regex = new RegExp(expression);
+                    // var isUrl = val.target.value.match(regex)
+                    var isUrl = term.startsWith('http');
+                    if (isUrl) {
+                        url(term.replace('search', 'search/resources'))
+                        return {}
+                    } else {
+                        url(arches.urls.search_results)
+                        var graphid = params.node ? ko.unwrap(params.node.config.graphid) : undefined;
+                        var data = {
+                            no_filters: true,
+                            page: page
+                        };
+                        if (graphid && graphid.length > 0) {
+                            data.no_filters = false;
+                            data.typeFilter = JSON.stringify(
+                                graphid.map(function(id) {
+                                    return {
+                                        "graphid": id,
+                                        "inverted": false
+                                    }
+                                })
+                            );
+                        }
+                        if (term) {
+                            data.no_filters = false;
+                            data.termFilter = JSON.stringify([{
+                                "inverted": false,
+                                "type": "string",
+                                "context": "",
+                                "context_label": "",
+                                "id": term,
+                                "text": term,
+                                "value": term
+                            }]);
+                        }
+                        return data;
                     }
-                    if (term) {
-                        data.no_filters = false;
-                        data.termFilter = JSON.stringify([{
-                            "inverted": false,
-                            "type": "string",
-                            "context": "",
-                            "context_label": "",
-                            "id": term,
-                            "text": term,
-                            "value": term
-                        }]);
-                    }
-                    return data;
                 },
                 results: function (data, page) {
                     return {
