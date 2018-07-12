@@ -2149,6 +2149,10 @@ ul.nav.nav-tabs.nav-justified {
     background: #fbfbfb;
 }
 
+.graph-designer.resource-editor .jstree {
+    height: 100%;
+}
+
 .graph-designer-graph-content .graph-designer-title {
     font-size: 17px;
     font-weight: 500;
@@ -11369,6 +11373,11 @@ ul.select2-choices:after {
 
 .current-crumb {
     font-weight: 400;
+}
+
+.resource-editor-tree {
+    overflow-y: auto;
+    height: 100%;
 }
 
 a.jstree-anchor strong {
