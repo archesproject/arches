@@ -173,6 +173,8 @@ define(['arches',
                         this.parseNodes(attributes);
                         this._card(JSON.stringify(this.toJSON()));
                     }, this);
+                    node.config = koMapping.fromJS(node.config);
+                    
                     if (datatype.defaultwidget_id) {
                         var cardWidgetData = _.find(attributes.data.widgets, function(widget) {
                             return widget.node_id === node.nodeid;

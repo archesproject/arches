@@ -77,7 +77,7 @@ define([
         loading: loading,
         widgetLookup: createLookup(data.widgets, 'widgetid'),
         cardComponentLookup: createLookup(data.cardComponents, 'componentid'),
-        nodeLookup: createLookup(data.nodes, 'nodeid'),
+        nodeLookup: createLookup(graphModel.get('nodes')(), 'nodeid'),
         graphid: data.graphid,
         graphname: data.graphname,
         reviewer: data.userisreviewer,

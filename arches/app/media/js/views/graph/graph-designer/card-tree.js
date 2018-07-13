@@ -47,7 +47,7 @@ define([
             loading: loading,
             widgetLookup: createLookup(data.widgets, 'widgetid'),
             cardComponentLookup: createLookup(data.cardComponents, 'componentid'),
-            nodeLookup: createLookup(ko.unwrap(params.graph.nodes), 'nodeid'),
+            nodeLookup: createLookup(params.graphModel.get('nodes')(), 'nodeid'),
             graphid: params.graph.graphid,
             graphname: params.graph.name,
             graphiconclass: params.graph.iconclass,
