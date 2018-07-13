@@ -42,7 +42,7 @@ define([
 
         self.updateProvisionalEdits = function(tile) {
             var isfullyprovisional;
-            if (tile.data) {
+            if (tile && tile.data) {
                 var users = [];
                 var data = koMapping.toJS(tile.data);
                 var provisionaleditlist = _.map(tile.provisionaledits(), function(edit, key){

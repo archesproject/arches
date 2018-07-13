@@ -130,6 +130,7 @@ define([
         selectedCard: ko.computed(function () {
             var item = selection();
             if (item) {
+                manageRelatedResources(false);
                 if (item.tileid) {
                     return item.parent;
                 }
@@ -223,21 +224,30 @@ define([
     vm.showRelatedResourcesManager = function(){
         if (vm.graph.domain_connections == undefined) {
             $.ajax({
-                url: arches.urls.get_domain_connections(vm.graphid),
-                data: {"ontology_class": vm.graph.ontologyclass}
-            }).done(function(data){
-                vm.graph.domain_connections = data;
-                vm.relatedResourcesManager = new RelatedResourcesManager({
-                    searchResults: new searchResults(),
-                    resourceEditorContext: true,
-                    editing_instance_id: vm.resourceId(),
-                    relationship_types: vm.relationship_types,
-                    graph: vm.graph
+                url: arches.urls.relatable_resources,
+                data: {graphid: vm.graphid}
+            }).done(function(relatable){
+                vm.graph.relatable_resources = relatable;
+                $.ajax({
+                    url: arches.urls.get_domain_connections(vm.graphid),
+                    data: {"ontology_class": vm.graph.ontologyclass}
+                }).done(function(data){
+                    vm.graph.domain_connections = data;
+                    vm.relatedResourcesManager = new RelatedResourcesManager({
+                        searchResults: new searchResults(),
+                        resourceEditorContext: true,
+                        editing_instance_id: vm.resourceId(),
+                        relationship_types: vm.relationship_types,
+                        graph: vm.graph
+                    });
+                    vm.manageRelatedResources(true);
+                    vm.selection(undefined);
                 });
-                vm.manageRelatedResources(true);
             });
+
         } else {
-            vm.manageRelatedResources(!vm.manageRelatedResources());
+            vm.manageRelatedResources(true);
+            vm.selection(undefined);
         }
     };
 
