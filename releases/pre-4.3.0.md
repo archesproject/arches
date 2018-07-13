@@ -223,15 +223,15 @@ Note (GeoJson is covered by map widget testing in a different section)
 
 | Test Subject           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| String                 | :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Concepts               | :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Domains                | :x:   |    ?   |    ?    |   ?  | ?   | Selected value not saving |
-| Images                 | :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| String                 | :white_check_mark:   |    ?   |    ?    |   :white_check_mark:  | ?   | -     |
+| Concepts               | :white_check_mark:   |    ?   |    ?    |   :white_check_mark:  | ?   | -     |
+| Domains                | :x:   |    ?   |    ?    |   :x:  | ?   | Selected value not saving |
+| Images                 | :white_check_mark:   |    ?   |    ?    |   :x:  | ?   | Image doesnt upload in IE |
 | Dates                  | :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 | Number                 | :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 | Boolean                | :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 | Resource instance type | :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Node data type         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Node data type         | :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 
 #### Resource Descriptors
 
