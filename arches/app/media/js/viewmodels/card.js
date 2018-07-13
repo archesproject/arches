@@ -175,6 +175,7 @@ define([
                     return new TileViewModel({
                         tile: tile,
                         card: self,
+                        graphModel: params.graphModel,
                         resourceId: params.resourceId,
                         displayname: params.displayname,
                         handlers: params.handlers,
@@ -273,6 +274,7 @@ define([
                         }, {})
                     },
                     card: self,
+                    graphModel: params.graphModel,
                     resourceId: params.resourceId,
                     displayname: params.displayname,
                     handlers: params.handlers,

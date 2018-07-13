@@ -5,6 +5,7 @@ define([
     'moment',
     'views/base-manager',
     'viewmodels/alert',
+    'models/graph',
     'viewmodels/card',
     'viewmodels/new-provisional-tile',
     'arches',
@@ -15,7 +16,7 @@ define([
     'bindings/sortable',
     'widgets',
     'card-components'
-], function($, _, ko, moment, BaseManagerView, AlertViewModel, CardViewModel, ProvisionalTileViewModel, arches, data, searchResults, RelatedResourcesManager) {
+], function($, _, ko, moment, BaseManagerView, AlertViewModel, GraphModel, CardViewModel, ProvisionalTileViewModel, arches, data, searchResults, RelatedResourcesManager) {
     var handlers = {
         'after-update': [],
         'tile-reset': []
@@ -66,6 +67,12 @@ define([
             return lookup
         }, {});
     };
+
+    var graphModel = new GraphModel({
+        data: {nodes: data.nodes, nodegroups: data.nodegroups, edges: []},
+        datatypes: data.datatypes
+    });
+
     var vm = {
         loading: loading,
         widgetLookup: createLookup(data.widgets, 'widgetid'),
@@ -99,6 +106,7 @@ define([
         }).map(function (card) {
             return new CardViewModel({
                 card: card,
+                graphModel: graphModel,
                 tile: null,
                 resourceId: resourceId,
                 displayname: displayname,
@@ -109,11 +117,11 @@ define([
                 loading: loading,
                 filter: filter,
                 provisionalTileViewModel: provisionalTileViewModel,
-                nodes: data.nodes,
+                //nodes: data.nodes,
                 cardwidgets: data.cardwidgets,
                 datatypes: data.datatypes,
                 widgets: data.widgets,
-                nodegroups: data.nodegroups,
+                //nodegroups: data.nodegroups,
                 userisreviewer: data.userisreviewer
             });
         }),

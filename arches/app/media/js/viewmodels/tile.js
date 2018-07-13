@@ -66,7 +66,7 @@ define([
         _.extend(this, {
             parent: params.card,
             cards: _.filter(params.cards, function(card) {
-                var nodegroup = _.find(ko.unwrap(params.nodegroups), function(group) {
+                var nodegroup = _.find(ko.unwrap(params.graphModel.get('nodegroups')), function(group) {
                     return ko.unwrap(group.nodegroupid) === ko.unwrap(card.nodegroup_id);
                 })
                 return ko.unwrap(nodegroup.parentnodegroup_id) === ko.unwrap(self.nodegroup_id);
@@ -74,6 +74,7 @@ define([
                 return new CardViewModel({
                     card: _.clone(card),
                     tile: self,
+                    graphModel: params.graphModel,
                     resourceId: params.resourceId,
                     displayname: params.displayname,
                     handlers: params.handlers,
@@ -84,11 +85,11 @@ define([
                     filter: filter,
                     userisreviewer: params.userisreviewer,
                     provisionalTileViewModel: params.provisionalTileViewModel,
-                    nodes: params.nodes,
+                    //nodes: params.nodes,
                     cardwidgets: params.cardwidgets,
                     datatypes: params.datatypes,
                     widgets: params.widgets,
-                    nodegroups: ko.unwrap(params.nodegroups)
+                    //nodegroups: ko.unwrap(params.nodegroups)
                 });
             }),
             expanded: ko.observable(true),
