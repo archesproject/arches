@@ -762,7 +762,7 @@ class Command(BaseCommand):
 
         truncate_db.create_sqlfile(db_settings, truncate_path)
 
-        os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d postgres -f "%(truncate_path)s"' % db_settings)
+        os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d %(USER)s -f "%(truncate_path)s"' % db_settings)
 
         self.delete_indexes()
         prepare_term_index(create=True)
