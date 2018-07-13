@@ -268,8 +268,8 @@ define([
                         resourceinstance_id: params.resourceId(),
                         nodegroup_id: ko.unwrap(self.model.nodegroup_id),
                         parenttile_id: self.parent ? self.parent.tileid : null,
-                        data: _.reduce(self.widgets, function(data, widget) {
-                            data[widget.node_id] = null;
+                        data: _.reduce(self.widgets(), function(data, widget) {
+                            data[widget.node_id()] = null;
                             return data;
                         }, {})
                     },
