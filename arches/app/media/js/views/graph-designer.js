@@ -122,6 +122,10 @@ define([
                 })
             });
 
+            viewModel.permissionsDesigner = new PermissionDesigner({
+                cardTree: viewModel.cardTree
+            });
+
             viewModel.graphSettingsViewModel = new GraphSettingsViewModel({
                 designerViewModel: viewModel,
                 graph: viewModel.graph,
@@ -170,9 +174,15 @@ define([
             if (viewModel.activeTab() === 'graph') {
                 viewModel.loadGraphSettings();
                 // here we might load data/views asyncronously
-            }else{
+            };
 
-            }
+            var loadPermissionData = viewModel.activeTab.subscribe(function(tab) {
+                // Loads identities and nodegroup permissions when the permissions tab is opened and then disposes the ko.subscribe.
+                if (tab === 'permissions') {
+                    viewModel.permissionsDesigner.getPermissionManagerData();
+                };
+                loadPermissionData.dispose();
+            });
 
             viewModel.viewState.subscribe(function(state){
                 if (state === 'design'){

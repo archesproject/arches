@@ -17,14 +17,14 @@ define([
         var nodes = [];
         var nodegroups = [];
 
-        var flattenTree = function (parents, flatList) {
+        this.flattenTree = function (parents, flatList) {
             _.each(ko.unwrap(parents), function(parent) {
                 flatList.push(parent);
-                flattenTree(
+                this.flattenTree(
                     ko.unwrap(parent.cards),
                     flatList
                 );
-            });
+            }, this);
             return flatList
         };
 
@@ -81,7 +81,9 @@ define([
                     datatypes: data.datatypes,
                     widgets: data.widgets,
                     nodegroups: params.graph.nodegroups,
-                    userisreviewer: true
+                    userisreviewer: true,
+                    perms: ko.observableArray(),
+                    permsLiteral: ko.observableArray()
                 });
             }),
             selection: selection,
