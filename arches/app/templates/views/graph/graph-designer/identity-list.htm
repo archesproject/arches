@@ -4,20 +4,18 @@
 
 {% block title %}{% trans "Groups/Accounts" %}{% endblock %}
 
+{% block filter %}
 <!-- ko if:  permissionsDesigner.identityList.filter_function -->
 <div class="list-filter" style="display:none" data-bind="visible:  permissionsDesigner.identityList.filter_function">
-    <input type="text" class="form-control" style="" placeholder="{% block search_placeholder %}{% endblock %}" data-bind="value:  permissionsDesigner.identityList.filter, valueUpdate: 'afterkeydown'">
+    <input type="text" class="form-control" style="" placeholder="{% block search_placeholder %}{% endblock %}" data-bind="value: permissionsDesigner.identityList.filter, valueUpdate: 'afterkeydown'">
 
     <!-- Clear Search -->
-    <span class="clear-node-search" data-bind="click:  permissionsDesigner.identityList.clearSearch"><i class="fa fa-times-circle"></i></span>
+    <span class="clear-node-search" data-bind="click: permissionsDesigner.identityList.clearSearch()"><i class="fa fa-times-circle"></i></span>
 
-    <!-- ko if:  permissionsDesigner.identityList.single_select == false -->
-    <div class="pad-rgt pad-btm clear-selection" style="position: absolute; top: -29px; right: 100px;">
-        <a class="clear-selection-link" style="" data-bind="click: clearSelection">{% trans "Clear" %}</a>
-    </div>
-    <!-- /ko -->
+
 </div>
 <!-- /ko -->
+{% endblock %}
 
 {% block list_wrapper %}
 <div class="list-wrapper">
