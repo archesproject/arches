@@ -30,6 +30,7 @@ define([
         self.identityList.selectedItems.subscribe(function(item) {
             self.updatePermissions();
         });
+        self.showPermissionsForm = ko.observable(false);
         self.cardTree = params.cardTree;
         self.cardList = null;
         self.getPermissionManagerData = function() {
@@ -50,8 +51,11 @@ define([
                         identityList: self.identityList,
                         selectedIdentities: self.identityList.selectedItems,
                         selectedCards: ko.observableArray(),
-                        nodegroupPermissions: data.permissions
+                        nodegroupPermissions: data.permissions,
+                        cardList: self.cardList
                     });
+
+                    self.showPermissionsForm(true);
 
                     self.permissionSettingsForm.on('save', function() {
                         self.updatePermissions();

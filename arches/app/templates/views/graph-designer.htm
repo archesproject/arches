@@ -196,7 +196,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
                 </div>
                 <!-- Card Manager -->
-                <div class="flex tab-pane fade in" data-bind="css: { active: activeTab() === 'permissions' }">card</div>
+                <div class="flex tab-pane fade in" data-bind="css: { active: activeTab() === 'permissions' }">
+                    {% include 'views/graph/graph-designer/permission-settings-form.htm' %}
+                </div>
             </div>
 
         </div>
