@@ -6116,7 +6116,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 .clear-node-search {
     position: absolute;
     top: 6px;
-    right: 10px;
+    right: 0px;
     font-size: 14px;
 }
 
@@ -8017,7 +8017,7 @@ div.row.widget-wrapper.report-header:hover {
 .expanded-edit-map {
     position: fixed;
     border-width: 0px;
-    top: 105px;
+    top: 0px;
     left: 50px;
     bottom: 0px;
     right: 0px;
@@ -8025,7 +8025,7 @@ div.row.widget-wrapper.report-header:hover {
 }
 
 .map-search-container.expanded-edit-map {
-    top: 112px;
+    top: 51px;
 }
 
 .iiif-wrapper {
