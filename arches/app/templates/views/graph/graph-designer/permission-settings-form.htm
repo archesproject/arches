@@ -47,7 +47,7 @@
                     <div class="row">
 
                         <!-- Available Cards -->
-                        <div class="col-xs-6">
+                        <div>
                             <div class="mpm-selector-header">
                                 <div class="mpm-selector-header-txt">
                                     <strong>Set Permissions</strong>
@@ -62,12 +62,8 @@
                             <!-- Selection Summary -->
                             <div>
                             <div class="control-panel">
-
-                                <!-- Groups/Users -->
                                 <div class="permissions-list">
-
-                                    <!-- Nodes -->
-                                    <!-- <div class="node-list-panel">
+                                    <div class="node-list-panel">
                                         <span class="permissions-title">{% trans "Selected Cards" %}</span>
                                         <ul class="permissions-selected" data-bind="visible: permissionsDesigner.permissionSettingsForm.selectedCards().length === 0">
                                             <li>
@@ -80,7 +76,7 @@
                                                 <span class="permissions-readout" data-bind="text: $data.permsLiteral()"></span>
                                             </li>
                                         </ul>
-                                    </div> -->
+                                    </div>
                                 </div>
                             </div>
 
@@ -112,7 +108,7 @@
                             </div>
 
                             <!-- Buttons -->
-                            <div class="permission-buttons pull-right mar-btm">
+                            <div class="permission-buttons mar-btm">
                                 <button id="cc-delete-btn" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt disabled" data-bind="click: permissionsDesigner.permissionSettingsForm.revert, css: {'disabled': permissionsDesigner.permissionSettingsForm.selectedCards().length === 0 || permissionsDesigner.permissionSettingsForm.selectedIdentities().length === 0}">{% trans "Revert Permissions" %}
                                 </button>
                                 <button id="cc-save-btn" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-check disabled" data-bind="click: permissionsDesigner.permissionSettingsForm.save, css: {'disabled': permissionsDesigner.permissionSettingsForm.selectedCards().length === 0 || permissionsDesigner.permissionSettingsForm.selectedIdentities().length === 0}">{% trans "Apply Permissions" %}</button>
