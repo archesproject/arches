@@ -379,7 +379,7 @@ Assigned to: Ryan
 
 | Test Subject       | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| Add scheme         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Add scheme         |    :white_check_mark:   |    ?   |    :white_check_mark:    |   ?  | ?   | -     |
 | Delete scheme      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Import scheme      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Export scheme      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
