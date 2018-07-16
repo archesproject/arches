@@ -11422,6 +11422,10 @@ a.jstree-anchor strong {
     display:inline;
 }
 
+a.jstree-anchor.disabled {
+    color: #ccc;
+}
+
 .card-summary-section li {
     list-style: none;
 }
