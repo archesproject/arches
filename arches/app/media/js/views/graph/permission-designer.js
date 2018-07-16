@@ -34,7 +34,6 @@ define([
         self.cardTree = params.cardTree;
         self.cardList = null;
 
-
         self.selectedCards = ko.pureComputed(function() {
             return [self.cardTree.selection()];
         });

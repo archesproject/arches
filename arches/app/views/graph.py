@@ -992,7 +992,7 @@ class PermissionDataView(View):
                     identityModel = User.objects.get(pk=identity['id'])
 
                 for card in data['selectedCards']:
-                    nodegroup = models.NodeGroup.objects.get(pk=card['nodegroup'])
+                    nodegroup = models.NodeGroup.objects.get(pk=card['nodegroup_id'])
 
                     # first remove all the current permissions
                     for perm in get_perms(identityModel, nodegroup):
