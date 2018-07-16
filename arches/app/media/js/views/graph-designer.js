@@ -180,8 +180,8 @@ define([
                 // Loads identities and nodegroup permissions when the permissions tab is opened and then disposes the ko.subscribe.
                 if (tab === 'permissions') {
                     viewModel.permissionsDesigner.getPermissionManagerData();
+                    loadPermissionData.dispose();
                 };
-                loadPermissionData.dispose();
             });
 
             viewModel.viewState.subscribe(function(state){
