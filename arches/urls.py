@@ -76,6 +76,7 @@ urlpatterns = [
     url(r'^graph/import/', GraphDataView.as_view(action='import_graph'), name='import_graph'),
     url(r'^graph/reorder_nodes$', GraphDataView.as_view(action='reorder_nodes'), name='reorder_nodes'),
     url(r'^graph/permissions$', PermissionDataView.as_view(), name='permission_data'),
+    url(r'^graph/permissions/permission_manager_data$', PermissionDataView.as_view(action='get_permission_manager_data'), name='permission_manager_data'),
     url(r'^graph/(?P<graphid>%s|())$' % uuid_regex, GraphManagerView.as_view(), name='graph'),
     url(r'^graph/(?P<graphid>%s)/settings$' % uuid_regex, GraphSettingsView.as_view(), name='graph_settings'),
     url(r'^graph/(?P<graphid>%s)/card_manager$' % uuid_regex, CardManagerView.as_view(), name='card_manager'),

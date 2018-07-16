@@ -11,14 +11,15 @@ define([
     'views/graph/graph-designer/node-form',
     'views/graph/graph-manager/branch-list',
     'views/graph/graph-designer/card-tree',
+    'views/graph/permission-designer',
     'graph-designer-data',
     'arches',
     'viewmodels/graph-settings',
     'view-data',
     'bindings/resizable-sidepanel',
     'datatype-config-components'
-], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, GraphModel, GraphView, GraphTree, NodeFormView, BranchListView, CardTreeViewModel, data, arches, GraphSettingsViewModel, viewData) {
-    
+], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, GraphModel, GraphView, GraphTree, NodeFormView, BranchListView, CardTreeViewModel, PermissionDesigner, data, arches, GraphSettingsViewModel, viewData) {
+
     var GraphDesignerView = BaseManagerView.extend({
 
         initialize: function(options) {
@@ -121,6 +122,10 @@ define([
                 })
             });
 
+            viewModel.permissionsDesigner = new PermissionDesigner({
+                cardTree: viewModel.cardTree
+            });
+
             viewModel.graphSettingsViewModel = new GraphSettingsViewModel({
                 designerViewModel: viewModel,
                 graph: viewModel.graph,
@@ -169,9 +174,15 @@ define([
             if (viewModel.activeTab() === 'graph') {
                 viewModel.loadGraphSettings();
                 // here we might load data/views asyncronously
-            }else{
+            };
 
-            }
+            var loadPermissionData = viewModel.activeTab.subscribe(function(tab) {
+                // Loads identities and nodegroup permissions when the permissions tab is opened and then disposes the ko.subscribe.
+                if (tab === 'permissions') {
+                    viewModel.permissionsDesigner.getPermissionManagerData();
+                    loadPermissionData.dispose();
+                };
+            });
 
             viewModel.viewState.subscribe(function(state){
                 if (state === 'design'){
