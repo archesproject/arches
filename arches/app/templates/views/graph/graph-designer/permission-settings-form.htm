@@ -61,29 +61,6 @@
                                 </div>
                             </div>
 
-                            <!-- Selection Summary -->
-                            <div>
-                            <div class="control-panel">
-                                <div class="permissions-list">
-                                    <div class="node-list-panel">
-                                        <span class="permissions-title">{% trans "Selected Cards" %}</span>
-                                        <ul class="permissions-selected" data-bind="visible: permissionsDesigner.permissionSettingsForm.selectedCards().length === 0">
-                                            <li>
-                                                <i class="confirmation ion-information-circled"></i> <span>{% trans "No cards selected" %}</span>
-                                            </li>
-                                        </ul>
-                                        <ul class="permissions-selected" style="display:none;" data-bind="foreach: permissionsDesigner.permissionSettingsForm.selectedCards, visible: permissionsDesigner.permissionSettingsForm.selectedCards().length !== 0">
-                                            <!-- ko if $data.permsLiteral: -->
-                                            <li class="permissions-node-row">
-                                                <span class="permissions-node" data-bind="text: $data.name"></span>
-                                                <span class="permissions-readout" data-bind="text: $data.permsLiteral"></span>
-                                            </li>
-                                            <!--/ko -->
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-
                             <!-- Permissions Selector -->
                             <div id="" class="permission-selector" style="">
                                 <div class="row widget-container" style="">
@@ -111,6 +88,30 @@
                                 </div>
                             </div>
 
+                            <!-- Selection Summary -->
+                            <div>
+                            <div class="control-panel">
+                                <div class="permissions-list">
+                                    <div class="node-list-panel">
+                                        <span class="permissions-title">{% trans "Selected Cards" %}</span>
+                                        <ul class="permissions-selected" data-bind="visible: permissionsDesigner.permissionSettingsForm.selectedCards().length === 0">
+                                            <li>
+                                                <i class="confirmation ion-information-circled"></i> <span>{% trans "No cards selected" %}</span>
+                                            </li>
+                                        </ul>
+                                        <ul class="permissions-selected" style="display:none;" data-bind="foreach: permissionsDesigner.permissionSettingsForm.selectedCards, visible: permissionsDesigner.permissionSettingsForm.selectedCards().length !== 0">
+                                            <!-- ko if $data.permsLiteral: -->
+                                            <li class="permissions-node-row">
+                                                <span class="permissions-node" data-bind="text: $data.name"></span>
+                                                <span class="permissions-readout" data-bind="text: $data.permsLiteral"></span>
+                                            </li>
+                                            <!--/ko -->
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+
                             <!-- Buttons -->
                             <!-- ko with: permissionsDesigner.permissionSettingsForm -->
                             <div class="permission-buttons mar-btm">
@@ -119,7 +120,6 @@
                                 <button id="cc-save-btn" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-check disabled" data-bind="click: save, css: {'disabled': selectedCards().length === 0 || selectedIdentities().length === 0}">{% trans "Apply Permissions" %}</button>
                             </div>
                             <!--/ko-->
-                            </div>
 
                         </div>
                     </div>
