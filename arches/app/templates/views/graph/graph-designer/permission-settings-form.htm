@@ -20,9 +20,11 @@
                             </span>
                             <div class="permissions-title-panel">
                                 <span class="permissions-title" data-bind="text: $data.name"></span>
-                                <div class="confirmation-permissions">{% trans "Default Permissions" %}
-                                    <span data-bind="text: $data.permsLiteral"></span>
-                                </div>
+                                <!-- ko if $data.permsLiteral: -->
+                                    <!-- <div class="confirmation-permissions">{% trans "Default Permissions" %}
+                                        <span data-bind="text: $data.permsLiteral"></span>
+                                    </div> -->
+                                <!-- /ko -->
                             </div>
                         </div>
                     </li>
@@ -71,10 +73,12 @@
                                             </li>
                                         </ul>
                                         <ul class="permissions-selected" style="display:none;" data-bind="foreach: permissionsDesigner.permissionSettingsForm.selectedCards, visible: permissionsDesigner.permissionSettingsForm.selectedCards().length !== 0">
+                                            <!-- ko if $data.permsLiteral: -->
                                             <li class="permissions-node-row">
                                                 <span class="permissions-node" data-bind="text: $data.name"></span>
-                                                <span class="permissions-readout" data-bind="text: $data.permsLiteral()"></span>
+                                                <span class="permissions-readout" data-bind="text: $data.permsLiteral"></span>
                                             </li>
+                                            <!--/ko -->
                                         </ul>
                                     </div>
                                 </div>
