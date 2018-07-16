@@ -227,11 +227,11 @@ Note (GeoJson is covered by map widget testing in a different section)
 | Concepts               | :white_check_mark:   |    ?   |    ?    |   :white_check_mark:  | ?   | -     |
 | Domains                | :x:   |    ?   |    ?    |   :x:  | ?   | Selected value not saving |
 | Images                 | :white_check_mark:   |    ?   |    ?    |   :x:  | ?   | Image doesnt upload in IE |
-| Dates                  | :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Number                 | :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Boolean                | :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Resource instance type | :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Node data type         | :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Dates                  | :white_check_mark:   |    ?   |    ?    |   :white_check_mark:  | ?   | -     |
+| Number                 | :white_check_mark:   |    ?   |    ?    |   :white_check_mark:  | ?   | -     |
+| Boolean                | :white_check_mark:   |    ?   |    ?    |   :white_check_mark:  | ?   | -     |
+| Resource instance type | :white_check_mark:   |    ?   |    ?    |   :white_check_mark:  | ?   | -     |
+| Node data type         | :white_check_mark:   |    ?   |    ?    |   :white_check_mark:  | ?   | -     |
 
 #### Resource Descriptors
 
