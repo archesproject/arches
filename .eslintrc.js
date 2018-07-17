@@ -1,5 +1,5 @@
 module.exports = {
-    "extends": "standard",
+    "extends": "eslint:recommended",
     // add your custom rules here
     rules: {
         "semi": ["error", "always"],
@@ -14,6 +14,5 @@ module.exports = {
     "globals": {
         "define": false,
         "require": false
-    },
-    "plugins": ["standard"]
+    }
 };
