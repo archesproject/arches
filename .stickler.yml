@@ -1,12 +1,13 @@
 linters:
-  flake8:
-    fixer: true
-  csslint: {  }
-  shellcheck:
-    shell: bash
+    pep8:
+        python: 2
+        max-line-length: 119
+        fixer: false
+    eslint:
+        config: './eslint.config'
 files:
   ignore:
-    - 'bower_components/*'
+    - 'arches/app/media/packages/*'
     - 'node_modules/*'
 fixers:
-  enable: true
+  enable: false
