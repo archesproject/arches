@@ -132,18 +132,26 @@ define([
             datatypes: params.datatypes,
         });
 
-        cardModel.widgets().forEach(function(widget){
-            widget.selected = ko.pureComputed({
-                read: function() {
-                    return selection() === this;
-                },
-                write: function(value) {
-                    if (value) {
-                        selection(this);
-                    }
-                },
-                owner: widget
+        var applySelectedComputed = function(widgets){
+            widgets.forEach(function(widget){
+                widget.selected = ko.pureComputed({
+                    read: function() {
+                        return selection() === this;
+                    },
+                    write: function(value) {
+                        if (value) {
+                            selection(this);
+                        }
+                    },
+                    owner: widget
+                });
             });
+        };
+
+        applySelectedComputed(cardModel.widgets());
+
+        cardModel.widgets.subscribe(function(widgets){
+            applySelectedComputed(widgets);
         });
 
         var nodegroup = _.find(ko.unwrap(nodegroups), function(group) {
@@ -186,11 +194,11 @@ define([
                         selection: selection,
                         loading: loading,
                         filter: filter,
-                        nodes: params.nodes,
+                        //nodes: params.nodes,
                         cardwidgets: params.cardwidgets,
                         datatypes: params.datatypes,
                         widgets: params.widgets,
-                        nodegroups: ko.unwrap(nodegroups)
+                        //nodegroups: ko.unwrap(nodegroups)
                     });
                 })
             ),
@@ -285,11 +293,11 @@ define([
                     filter: filter,
                     provisionalTileViewModel: params.provisionalTileViewModel,
                     loading: loading,
-                    nodes: params.nodes,
+                    //nodes: params.nodes,
                     cardwidgets: params.cardwidgets,
                     datatypes: params.datatypes,
                     widgets: params.widgets,
-                    nodegroups: ko.unwrap(nodegroups)
+                    //nodegroups: ko.unwrap(nodegroups)
                 });
             }
         });
