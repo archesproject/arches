@@ -14,5 +14,6 @@ module.exports = {
     "globals": {
         "define": false,
         "require": false
-    }
+    },
+    "plugins": ["eslint-config-standard"]
 };
