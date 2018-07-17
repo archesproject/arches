@@ -810,6 +810,12 @@ a.select2-choice {
     box-shadow: none;
 }
 
+.select2-result.disabled {
+    background-color: #eee;
+    color: #999;
+    pointer-events: none;
+}
+
 .select2-results {
     padding: 0px;
     margin: 0px;
@@ -891,7 +897,7 @@ a.select2-search-choice-close {
 }
 
 .time-filter-clear {
-    margin: 10px 20px 0 8px; 
+    margin: 10px 20px 0 8px;
     cursor: pointer;
     background: #54abd9;
     border: 1px solid #2e6da4;
@@ -2149,6 +2155,10 @@ ul.nav.nav-tabs.nav-justified {
     background: #fbfbfb;
 }
 
+.graph-designer.resource-editor .jstree {
+    height: 100%;
+}
+
 .graph-designer-graph-content .graph-designer-title {
     font-size: 17px;
     font-weight: 500;
@@ -3300,6 +3310,20 @@ ul .collapse li:last-of-type {
 
 .related-resources-editor-container .content-panel {
     height: calc(100vh - 100px);
+}
+
+.resource-search-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 375px;
+    position: absolute;
+    top: -13px;
+}
+
+.resource-search-container .row.widget-wrapper {
+    width: 350px;
+    padding: 5px 5px 10px 5px;
 }
 
 .edit-panel {
@@ -9396,16 +9420,20 @@ ul.pagination {
 }
 
 .related-resources-relationship {
-    margin-top: -25px;
-    margin-right: 10px;
-    float: right;
+    position: absolute;
+    right: 0px;
+    top: 6px;
+}
+
+.related-resources-relationship .dropdown-menu {
+    left: auto;
+    width: 600px;
 }
 
 .related-resources-delete {
     position: absolute;
-    top: -37px;
-    left: 180px;
-    height: 33px;
+    right: 270px;
+    bottom: 9px;
 }
 
 .selected-resource-list {
@@ -9617,7 +9645,7 @@ table.table.dataTable {
     float: left;
     height: 35px;
     width:100%;
-    z-index: 0;
+    z-index: 2;
 }
 
 .related-resources-header .btn-group>.btn:hover {
@@ -10339,7 +10367,7 @@ a.search-facet-item.disabled {
 }
 
 .nav-tabs li a.graph-designer-tab {
-    padding: 15px 25px 15px 25px;
+    padding: 15px 10px 15px 10px;
 }
 
 .graph-designer-tab-container {
@@ -11371,10 +11399,9 @@ ul.select2-choices:after {
     font-weight: 400;
 }
 
-.jstree-container-ul {
-    overflow-y: scroll;
-    height: 100vh;
-    padding-bottom: 150px;
+.resource-editor-tree {
+    overflow-y: auto;
+    height: 100%;
 }
 
 a.jstree-anchor strong {
@@ -11393,6 +11420,10 @@ a.jstree-anchor strong {
 
 .jstree-anchor:hover .add-new-tile, .add-new-tile.jstree-clicked {
     display:inline;
+}
+
+a.jstree-anchor.disabled {
+    color: #ccc;
 }
 
 .card-summary-section li {

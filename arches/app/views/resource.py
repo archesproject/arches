@@ -74,7 +74,12 @@ def get_resource_relationship_types():
 
 @method_decorator(can_edit_resource_instance(), name='dispatch')
 class NewResourceEditorView(MapBaseManagerView):
+    action = None
+
     def get(self, request, graphid=None, resourceid=None, view_template='views/resource/new-editor.htm', main_script='views/resource/new-editor', nav_menu=True):
+        if self.action == 'copy':
+            return self.copy(request, resourceid)
+
         if resourceid is None:
             resource_instance = None
             graph = models.GraphModel.objects.get(pk=graphid)
@@ -84,7 +89,7 @@ class NewResourceEditorView(MapBaseManagerView):
             graph = resource_instance.graph
         nodes = graph.node_set.all()
         resource_graphs = models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
-        ontologyclass = [node for node in nodes if node.istopnode == True][0].ontologyclass
+        ontologyclass = [node for node in nodes if node.istopnode is True][0].ontologyclass
         relationship_type_values = get_resource_relationship_types()
         nodegroups = [node.nodegroup for node in nodes if node.is_collector and request.user.has_perm('write_nodegroup', node.nodegroup)]
         nodes = nodes.filter(nodegroup__in=nodegroups)
@@ -161,10 +166,21 @@ class NewResourceEditorView(MapBaseManagerView):
 
         context['nav']['title'] = ''
         context['nav']['menu'] = nav_menu
-        context['nav']['help'] = (_('Using the Resource Editor'),'help/base-help.htm')
+        context['nav']['help'] = (_('Using the Resource Editor'), 'help/base-help.htm')
         context['help'] = 'resource-editor-help'
 
         return render(request, view_template, context)
+
+    def delete(self, request, resourceid=None):
+        if resourceid is not None:
+            ret = Resource.objects.get(pk=resourceid)
+            ret.delete(user=request.user)
+            return JSONResponse(ret)
+        return HttpResponseNotFound()
+
+    def copy(self, request, resourceid=None):
+        resource_instance = Resource.objects.get(pk=resourceid)
+        return JSONResponse(resource_instance.copy())
 
 
 @method_decorator(can_edit_resource_instance(), name='dispatch')
@@ -272,6 +288,7 @@ class ResourceEditorView(MapBaseManagerView):
         return HttpResponseNotFound()
 
     def delete(self, request, resourceid=None):
+
         if resourceid is not None:
             ret = Resource.objects.get(pk=resourceid)
             ret.delete(user=request.user)
@@ -560,6 +577,7 @@ class ResourceReportView(MapBaseManagerView):
 
 @method_decorator(can_read_resource_instance(), name='dispatch')
 class RelatedResourcesView(BaseManagerView):
+    action=None
 
     def paginate_related_resources(self, related_resources, page, request):
         total=related_resources['total']
@@ -589,6 +607,22 @@ class RelatedResourcesView(BaseManagerView):
         return ret
 
     def get(self, request, resourceid=None):
+        if self.action == 'get_candidates':
+            resourceids = json.loads(request.GET.get('resourceids', '[]'))
+            resources = Resource.objects.filter(resourceinstanceid__in=resourceids)
+            ret = []
+            for rr in resources:
+                res = JSONSerializer().serializeToPython(rr)
+                res['ontologyclass'] = rr.get_root_ontology()
+                ret.append(res)
+            return JSONResponse(ret)
+
+        if self.action == 'get_relatable_resources':
+            graphid = request.GET.get('graphid', None)
+            nodes = models.Node.objects.filter(graph=graphid).exclude(istopnode=False)[0].get_relatable_resources()
+            ret = set([str(node.graph_id) for node in nodes])
+            return JSONResponse(ret)
+
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         start = request.GET.get('start', 0)
         ret = []

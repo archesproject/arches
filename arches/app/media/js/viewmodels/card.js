@@ -52,6 +52,8 @@ define([
         var selection = params.selection || ko.observable();
         var filter = params.filter || ko.observable();
         var loading = params.loading || ko.observable();
+        var perms = ko.observableArray();
+        var permsLiteral = ko.observableArray();
         var nodes = _.filter(ko.unwrap(params.nodes), function (node) {
             return ko.unwrap(node.nodegroup_id) === ko.unwrap(params.card.nodegroup_id);
         }).map(function (node) {
@@ -115,6 +117,8 @@ define([
             nodes: nodes,
             parent: params.tile,
             expanded: ko.observable(true),
+            perms: perms,
+            permsLiteral: permsLiteral,
             highlight: ko.computed(function() {
                 var filterText = filter();
                 if (!filterText) {
@@ -174,7 +178,9 @@ define([
                     cardwidgets: params.cardwidgets,
                     datatypes: params.datatypes,
                     widgets: params.widgets,
-                    nodegroups: ko.unwrap(params.nodegroups)
+                    nodegroups: ko.unwrap(params.nodegroups),
+                    perms: perms,
+                    permsLiteral: permsLiteral
                 });
             }),
             hasprovisionaledits: ko.computed(function(){

@@ -49,8 +49,6 @@ require([
         perm.icon = perm_icons[perm.codename];
     });
 
-
-
     var updatePermissions = function(){
         var item = identityList.selectedItems()[0];
         var nodegroupIds = [];
