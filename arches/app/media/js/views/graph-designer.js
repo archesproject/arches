@@ -55,7 +55,7 @@ define([
                 data: data.graph,
                 datatypes: data.datatypes,
                 ontology_namespaces: data.ontology_namespaces
-            });
+            })
 
             viewModel.graphModel.on('changed', function(model, response) {
                 if (viewModel.graphView) {
