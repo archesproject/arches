@@ -992,7 +992,14 @@ class PermissionDataView(View):
                     identityModel = User.objects.get(pk=identity['id'])
 
                 for card in data['selectedCards']:
-                    nodegroup = models.NodeGroup.objects.get(pk=card['nodegroup_id'])
+                    # TODO The following try block is here because the key for the nodegroupid in the new permission manager
+                    # is 'nodegroup_id' where it was 'nodegroup' in the old permission manager. Once the old permission manager is deleted
+                    # we can replace it with `nodegroupid = card['nodegroup_id']`
+                    try:
+                        nodegroupid = card['nodegroup_id']
+                    except KeyError as e:
+                        nodegroupid = card['nodegroup']
+                    nodegroup = models.NodeGroup.objects.get(pk=nodegroupid)
 
                     # first remove all the current permissions
                     for perm in get_perms(identityModel, nodegroup):
