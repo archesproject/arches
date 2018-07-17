@@ -1337,7 +1337,6 @@ a.select2-search-choice-close {
 
 .permission-manager {
     background-color: #f4f4f4;
-    margin-left: 1px;
 }
 
 .permission-manager-item-list {
@@ -1347,7 +1346,6 @@ a.select2-search-choice-close {
 .permission-manager.header {
     position: relative;
     height: 100px;
-    margin-left: 2px;
     padding-left: 10px;
     color: #2b425b;
     background: #fff;
