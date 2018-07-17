@@ -5874,6 +5874,15 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     font-size:13px;
 }
 
+.new-provisional-edit-history.footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: inherit;
+    border-bottom: 0px;
+    padding: 0px;
+}
+
 .provisional-edits-list-header {
     display: inline-flex;
     width: 100%;

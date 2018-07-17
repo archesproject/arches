@@ -171,12 +171,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </a>
                         </div>
 
-                        <!-- help content loaded from contextually referenced template -->
                         <div class="ep-edits-body" style="float:left" data-bind="css: {'loading-mask': helploading()}">
                             <div class="ep-edits-content">
                             <!-- ko foreach: provisionalEdits -->
                             <div class='new-provisional-edit-history'>
-                                <div class='entry'><i data-bind="css: $data.resourcemodel.iconclass" style="padding-right: 4px"></i><div class='entry-label' data-bind="text: $data.resourcemodel.name"></div></div>
+                                <div class='entry'><i data-bind="css: $data.resourcemodel.iconclass" style="padding-right: 4px"></i><div class='entry-label' data-bind="text: $data.resourcemodel.name + ' - '"></div><div class='entry-label' data-bind="text: $data.name || '(name pending approval)'"></div></div>
                                 <div class='entry'><div class='entry-label'>{% trans 'Card: ' %}</div><span data-bind="text: $data.card.name"></span></div>
                                 <div class='entry'><div class='entry-label'>{% trans 'Edited: ' %}</div><span data-bind="text: $data.displaytime"></span></div>
                                 <div class='entry'>
@@ -191,10 +190,21 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <div><span style='color: green'>{% trans 'Approved by: ' %}</span><strong data-bind="text: $data.reviewer"></strong></div>
                                     <!--/ko-->
                                 </div>
+                            <div class='new-provisional-edit-history footer'>
+                                <div>
+                                    <a data-bind="attr: {'href': $parent.urls.resource_editor + $data.resourceinstanceid}">{% trans 'Edit' %}</a>
+                                </div>
+                                <div>
+                                    <a data-bind="attr: {'href': $parent.urls.resource_report + $data.resourceinstanceid}">{% trans 'Report' %}</a>
+                                </div>
+                            </div>
                             </div>
                             <!--/ko-->
                             </div>
                         </div>
+
+
+
                     </div>
 
                     <!-- Help Panel -->

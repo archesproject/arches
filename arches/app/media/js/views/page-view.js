@@ -49,6 +49,7 @@ define([
                 showConfirmNav: ko.observable(false),
                 navDestination: ko.observable(''),
                 provisionalEdits: ko.observableArray(),
+                urls: arches.urls,
                 navigate: function(url, bypass) {
                     if (!bypass && self.viewModel.dirty()) {
                         self.viewModel.navDestination(url);
@@ -63,7 +64,7 @@ define([
                     self.viewModel.loading(true);
                     window.location = url;
                 },
-                getHelp: function(template){
+                getHelp: function(template) {
                     if (!self.viewModel.helploaded()) {
                         self.viewModel.helploading(true);
                         var el = $('.ep-help-content');
@@ -75,7 +76,7 @@ define([
                                 el.html(data);
                                 self.viewModel.helploaded(true);
                                 self.viewModel.helploading(false);
-                                $('.ep-help-topic-toggle').click(function (){
+                                $('.ep-help-topic-toggle').click(function () {
                                     var sectionEl = $(this).closest('div');
                                     contentEl = $(sectionEl).find('.ep-help-topic-content').first();
                                     contentEl.slideToggle();
@@ -87,25 +88,24 @@ define([
                         });
                     }
                 },
-                getProvisionalHistory: function(){
+                getProvisionalHistory: function() {
                     self.viewModel.helploading(true);
                     self.viewModel.provisionalEdits.removeAll();
                     $.ajax({
-                        type: "GET",
-                        url: arches.urls.tile_history,
-                        success : function(data) {
-                            self.viewModel.helploaded(true);
-                            self.viewModel.helploading(false);
-                            self.viewModel.provisionalEdits(_.map(data, function(edit){
-                                edit.displaytime = moment(edit.lasttimestamp).format('DD-MM-YYYY hh:mm a');
-                                return edit;
-                            }))
-                        }
+                        type: 'GET',
+                        url: arches.urls.tile_history
+                    }).done(function(data) {
+                        self.viewModel.helploaded(true);
+                        self.viewModel.helploading(false);
+                        self.viewModel.provisionalEdits(_.map(data, function(edit) {
+                            edit.displaytime = moment(edit.lasttimestamp).format('DD-MM-YYYY hh:mm a');
+                            return edit;
+                        }));
                     });
                 }
             });
 
-            window.addEventListener("beforeunload", function (event) {
+            window.addEventListener('beforeunload', function(event) {
                 self.viewModel.loading(true);
             });
 
