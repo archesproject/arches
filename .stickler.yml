@@ -4,7 +4,7 @@ linters:
     max-line-length: 119
     fixer: false
   eslint:
-    config: './eslint.config'
+    config: './.eslintrc.js'
 files:
   ignore:
     - 'arches/app/media/packages/*'
