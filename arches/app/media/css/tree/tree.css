@@ -18,8 +18,36 @@
 }
 
 .filtered {
-    font-weight: bold;
-    color: steelblue;
+    font-weight: 600;
+    color: #fff;
+    background: #3acaa1;
+}
+
+.filtered-leaf {
+    font-weight: 600;
+    color: #fff;
+    background: #3acaa1;
+}
+
+.filtered-leaf strong span {
+    color: #fff;
+}
+
+.filtered-leaf strong span:hover {
+    color: #7a878e;
+}
+
+
+.filtered-leaf i {
+    color: #fff;
+}
+
+a.filtered > span {
+    color: #fff;
+}
+
+a.filtered > span:hover {
+    color: #7a878e;
 }
 
 .jstree-node,
@@ -155,11 +183,17 @@
     color: #425965;
 }
 
+.jstree-default .child-selected.filtered {
+    background: #3acaa1;
+    color: #fff;
+}
+
 .jstree-default .jstree-context {
     background: #e7f4f9;
     border-radius: 2px;
     box-shadow: inset 0 0 1px #cccccc;
 }
+
 
 .jstree-default .jstree-clicked {
     background: #25476a;
