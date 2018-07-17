@@ -83,6 +83,7 @@ define([
             clickBubble: true,
             multiple: this.multiple,
             placeholder: this.placeholder,
+            closeOnSelect: false,
             allowClear: true,
             disabled: this.disabled,
             ajax: {
@@ -139,7 +140,7 @@ define([
                 }
             },
             id: function(item) {
-                    return item._id;
+                return item._id;
             },
             formatResult: function(item) {
                 if (self.disable(item) === false) {
