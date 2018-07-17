@@ -47,7 +47,7 @@ define([
                     self.form.loadForm(self.selectedForm());
                 })
                 .fail(function(data) {
-                    console.log('Related resource request failed', data);
+                    console.log('Delete provisional tile request failed', data);
                 });
         };
 
@@ -65,7 +65,7 @@ define([
                     self.form.loadForm(self.selectedForm());
                 })
                 .fail(function(data) {
-                    console.log('Related resource request failed', data);
+                    console.log('Delete provisional tiles request failed', data);
                 });
         };
 
