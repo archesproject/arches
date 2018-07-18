@@ -204,7 +204,7 @@ Assigned to: Ryan
 
 | Test Subject               | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Create_mapping_file        |    :white_check_mark:   |    ?   |    :x:    |   ?  | ?   | -     |
+| Create_mapping_file        |    :white_check_mark:   |    ?   |    :x:    |   ?  | ?   | In some cases mapping file is not downloaded correctly when using firefox.     |
 | Import business data (cli) |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 | Export business data (cli) |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 | Load package (cli)         |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
@@ -373,7 +373,7 @@ Assigned to: Adam
 
 ## RDM
 
-Assigned to: Ryan
+Assigned to: Ryan (1)
 
 #### Thesauri
 
