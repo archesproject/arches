@@ -177,15 +177,15 @@ define(['arches',
          */
         parse: function(attributes) {
             var self = this;
-            var datatypelookup = {};
+            //var datatypelookup = {};
 
-            attributes = _.extend({datatypes: []}, attributes);
+            //attributes = _.extend({datatypes: []}, attributes);
             this._attributes = attributes;
 
-            _.each(attributes.datatypes, function(datatype) {
-                datatypelookup[datatype.datatype] = datatype;
-            }, this);
-            this.set('datatypelookup', datatypelookup);
+            // _.each(attributes.datatypes, function(datatype) {
+            //     datatypelookup[datatype.datatype] = datatype;
+            // }, this);
+            // this.set('datatypelookup', datatypelookup);
 
             _.each(attributes.data, function(value, key) {
                 switch (key) {
@@ -195,7 +195,7 @@ define(['arches',
                     cardData.forEach(function(card) {
                         var cardModel = new CardModel({
                             data: card,
-                            datatypes: attributes.datatypes
+                            datatypes: attributes.datatypelookup
                         });
                         cards.push(cardModel);
                     }, this);
@@ -243,9 +243,10 @@ define(['arches',
             //this.get('widgets').removeAll();
             ko.unwrap(this.nodes).forEach(function(node, i) {
                 if(ko.unwrap(node.nodeGroupId) === ko.unwrap(attributes.data.nodegroup_id)){
-                    var datatype = _.find(attributes.datatypes, function(datatype) {
-                        return datatype.datatype === ko.unwrap(node.datatype);
-                    });
+                    // var datatype = _.find(attributes.datatypes, function(datatype) {
+                    //     return datatype.datatype === ko.unwrap(node.datatype);
+                    // });
+                    var datatype = attributes.datatypelookup[ko.unwrap(node.datatype)];
                     node.datatype.subscribe(function(){
                         this.parseNodes(attributes);
                         this._card(JSON.stringify(this.toJSON()));

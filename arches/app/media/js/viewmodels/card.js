@@ -128,7 +128,7 @@ define([
                 widgets: params.cardwidgets,
                 nodes: params.graphModel.get('nodes')
             }, params.card),
-            datatypes: params.graphModel.get('datatypelookup'),
+            datatypelookup: params.graphModel.get('datatypelookup'),
         });
 
         var applySelectedComputed = function(widgets){
@@ -195,7 +195,7 @@ define([
                         filter: filter,
                         //nodes: params.nodes,
                         cardwidgets: params.cardwidgets,
-                        datatypes: params.datatypes,
+                        //datatypes: params.datatypes,
                         //widgets: params.widgets,
                         //nodegroups: ko.unwrap(nodegroups)
                     });
@@ -222,7 +222,7 @@ define([
                     provisionalTileViewModel: params.provisionalTileViewModel,
                     //nodes: params.nodes,
                     cardwidgets: params.cardwidgets,
-                    datatypes: params.datatypes,
+                    //datatypes: params.datatypes,
                     //widgets: params.widgets,
                     //nodegroups: ko.unwrap(nodegroups)
                 });
@@ -294,7 +294,7 @@ define([
                     loading: loading,
                     //nodes: params.nodes,
                     cardwidgets: params.cardwidgets,
-                    datatypes: params.datatypes,
+                    //datatypes: params.datatypes,
                     //widgets: params.widgets,
                     //nodegroups: ko.unwrap(nodegroups)
                 });

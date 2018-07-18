@@ -80,7 +80,7 @@ define([
                     provisionalTileViewModel: null,
                     //nodes: params.graph.nodes,
                     cardwidgets: data.cardwidgets,
-                    datatypes: data.datatypes,
+                    //datatypes: data.datatypes,
                     //widgets: data.widgets,
                     //nodegroups: params.graph.nodegroups,
                     userisreviewer: true

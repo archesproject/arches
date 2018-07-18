@@ -119,7 +119,7 @@ define([
                 provisionalTileViewModel: provisionalTileViewModel,
                 //nodes: data.nodes,
                 cardwidgets: data.cardwidgets,
-                datatypes: data.datatypes,
+                //datatypes: data.datatypes,
                 //widgets: data.widgets,
                 //nodegroups: data.nodegroups,
                 userisreviewer: data.userisreviewer
