@@ -38,11 +38,11 @@ Before Version Release, go through this checklist to confirm that Arches is runn
 | (Test Subject) | (use indicator from list below) | (use indicator from list below) | (use indicator from list below) | (use indicator from list below) | :white_check_mark: (to confirm that the UI has rendered correctly) or :x: (to confirm that the UI failed to render correctly) | (add ticket #, details on bug, etc.) |
 
 When doing a test pass, consider using these status indicators:  
-:white_check_mark: = Tested & Approved  
-:x: = Merge blocking  
-:construction: = Non-blocking bugs  
-:ok: = Issue has been fixed  
-:question: = Open question  
+:white_check_mark: = Tested & Approved
+:x: = Release blocking issue
+:construction: = Non-blocking issue
+:ok: = Issue has been fixed
+:question: = Open question
 
 * * *
 
