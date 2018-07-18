@@ -3,9 +3,82 @@ define(['arches',
     'models/node',
     'models/card-widget',
     'knockout',
-    'knockout-mapping',
-    'underscore'
-], function(arches, AbstractModel, NodeModel, CardWidgetModel, ko, koMapping, _) {
+    'knockout-mapping'
+], function(arches, AbstractModel, NodeModel, CardWidgetModel, ko, koMapping) {
+    var deepDiffMapper = function() {
+    return {
+        VALUE_CREATED: 'created',
+        VALUE_UPDATED: 'updated',
+        VALUE_DELETED: 'deleted',
+        VALUE_UNCHANGED: 'unchanged',
+        map: function(obj1, obj2) {
+            if (this.isFunction(obj1) || this.isFunction(obj2)) {
+                //throw 'Invalid argument. Function given, object expected.';
+            }
+            if (this.isValue(obj1) || this.isValue(obj2)) {
+                return {
+                    type: this.compareValues(obj1, obj2),
+                    data: (obj1 === undefined) ? obj2 : obj1
+                };
+            }
+
+            var diff = {};
+            for (var key in obj1) {
+                if (this.isFunction(obj1[key])) {
+                    continue;
+                }
+
+                var value2 = undefined;
+                if ('undefined' != typeof(obj2[key])) {
+                    value2 = obj2[key];
+                }
+
+                diff[key] = this.map(obj1[key], value2);
+            }
+            for (var key in obj2) {
+                if (this.isFunction(obj2[key]) || ('undefined' != typeof(diff[key]))) {
+                    continue;
+                }
+
+                diff[key] = this.map(undefined, obj2[key]);
+            }
+
+            return diff;
+
+        },
+        compareValues: function(value1, value2) {
+            if (value1 === value2) {
+                return this.VALUE_UNCHANGED;
+            }
+            if (this.isDate(value1) && this.isDate(value2) && value1.getTime() === value2.getTime()) {
+                return this.VALUE_UNCHANGED;
+            }
+            if ('undefined' == typeof(value1)) {
+                return this.VALUE_CREATED;
+            }
+            if ('undefined' == typeof(value2)) {
+                return this.VALUE_DELETED;
+            }
+
+            return this.VALUE_UPDATED;
+        },
+        isFunction: function(obj) {
+            return {}.toString.apply(obj) === '[object Function]';
+        },
+        isArray: function(obj) {
+            return {}.toString.apply(obj) === '[object Array]';
+        },
+        isDate: function(obj) {
+            return {}.toString.apply(obj) === '[object Date]';
+        },
+        isObject: function(obj) {
+            return {}.toString.apply(obj) === '[object Object]';
+        },
+        isValue: function(obj) {
+            return !this.isObject(obj) && !this.isArray(obj);
+        }
+        }
+    }();
     var CardModel = AbstractModel.extend({
         /**
         * A backbone model to manage card data
@@ -19,7 +92,7 @@ define(['arches',
         initialize: function(attributes) {
             var self = this;
             this.cards = ko.observableArray();
-            this.nodes = ko.observableArray();
+            this.nodes = attributes.data.nodes;
             this.widgets = ko.observableArray();
             this.tiles = ko.observableArray();
             
@@ -75,6 +148,12 @@ define(['arches',
             });
 
             this.dirty = ko.computed(function() {
+                // console.log('current')
+                // console.log(_.extend(JSON.parse(self._card()), self.toJSON()))
+                // console.log('old')
+                // console.log(JSON.parse(self._card()))
+                //console.log(deepDiffMapper.map(_.extend(JSON.parse(self._card()), self.toJSON()), JSON.parse(self._card())));
+                console.log(deepDiffMapper.map(JSON.parse(self._card()), _.extend(JSON.parse(self._card()), self.toJSON())));
                 return JSON.stringify(_.extend(JSON.parse(self._card()), self.toJSON())) !== self._card();
             });
 
@@ -87,6 +166,7 @@ define(['arches',
 
             attributes.data.nodes.subscribe(function(){
                 this.parseNodes(attributes);
+                this._card(JSON.stringify(this.toJSON()));
             }, this);
         },
 
@@ -122,7 +202,7 @@ define(['arches',
                     this.get('cards')(cards);
                     break;
                 // case 'nodes':
-                //     this.parseNodes.call(this, value, attributes);
+                //     this.parseNodes(attributes);
                 //     break;
                 case 'widgets':
                     break;
@@ -157,15 +237,12 @@ define(['arches',
         },
 
         parseNodes: function(attributes) {
+            console.log('in parse nodes');
             var widgets = [];
             var nodeArray = [];
-            attributes.data.nodes().forEach(function(node, i) {
+            //this.get('widgets').removeAll();
+            ko.unwrap(this.nodes).forEach(function(node, i) {
                 if(ko.unwrap(node.nodeGroupId) === ko.unwrap(attributes.data.nodegroup_id)){
-                    // var nodeModel = new NodeModel({
-                    //     source: node,
-                    //     datatypelookup: this.get('datatypelookup'),
-                    //     graph: undefined
-                    // });
                     var datatype = _.find(attributes.datatypes, function(datatype) {
                         return datatype.datatype === ko.unwrap(node.datatype);
                     });
@@ -179,22 +256,6 @@ define(['arches',
                         var cardWidgetData = _.find(attributes.data.widgets, function(widget) {
                             return widget.node_id === node.nodeid;
                         });
-                        // if (!cardWidgetData) {
-                        //     var widgetData = _.find(attributes.widgetList, function(widget) {
-                        //         return widget.widgetid === datatype.defaultwidget_id;
-                        //     });
-                        //     cardWidgetData = {
-                        //         widget_id: datatype.defaultwidget_id,
-                        //         config: _.extend ({
-                        //             label: ko.unwrap(node.name)
-                        //         }, widgetData.defaultconfig),
-                        //         label: ko.unwrap(node.name),
-                        //         node_id: ko.unwrap(node.nodeid),
-                        //         card_id: this.cardid,
-                        //         id: '',
-                        //         sortorder: ''
-                        //     };
-                        // }
                         var widget = new CardWidgetModel(cardWidgetData, {
                             node: node,
                             card: this,
@@ -202,20 +263,32 @@ define(['arches',
                             disabled: attributes.data.disabled,
                             widgetList: attributes.widgetList
                         });
-                        widgets.push(widget);
+                        //widgets.push(widget);
+                        this.get('widgets').push(widget);
                     }
-                    //nodeArray.push(nodeModel);
+                    //nodeArray.push(node);
                 }
             }, this);
             //this.get('nodes')(nodeArray);
-            widgets.sort(function(w, ww) {
+            this.get('widgets').sort(function(w, ww) {
                 return w.get('sortorder')() > ww.get('sortorder')();
             });
-            this.get('widgets')(widgets);
+            //this.get('widgets')(widgets);
         },
 
         reset: function() {
             this._attributes.data = JSON.parse(this._card());
+            this.get('widgets')().forEach(function(widget){
+                var origData = _.find(this._attributes.data.widgets, function(origwidget){
+                    return widget.widget_id() === origwidget.widget_id;
+                });
+                if (origData) {
+                    console.log(widget.configKeys())
+                    widget.configKeys().forEach(function(configKey){
+                        widget.config[configKey](origData.config[configKey]);
+                    })
+                }
+            }, this);
             this.parse(this._attributes);
         },
 
@@ -241,9 +314,9 @@ define(['arches',
                     ret[key] = _.map(widgets, function(widget) {
                         return widget.toJSON();
                     });
-                    ret['nodes'] = _.map(widgets, function(widget) {
-                        return widget.node.toJSON();
-                    });
+                    // ret['nodes'] = _.map(widgets, function(widget) {
+                    //     return widget.node.toJSON();
+                    // });
                 }
             }
             return ret;

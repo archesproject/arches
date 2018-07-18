@@ -79,6 +79,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- /ko -->
             </span>
 
+            <!-- ko if: cardTree.selection -->
             <span data-bind="visible: cardTree.selection() && activeTab() === 'card'" style="display: none;">
                 <!-- ko with: cardTree.selection().model ? cardTree.selection().model : cardTree.selection().card -->
                 <!-- ko if: $data.dirty() -->
@@ -87,6 +88,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- /ko -->
                 <!-- /ko -->
             </span>
+            <!-- /ko -->
 
             <a class="btn btn-sm btn-mint btn-labeled fa fa-mail-reply back-to-designer" data-bind="
                 attr: {
@@ -177,6 +179,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             <div class="flex" data-bind="visible: activeTab() === 'card'">
                 <!--Middle Panel -->
+                <!-- ko if: cardTree.selection -->
                 <div class="middle-column-container graph-designer branch-library" style="width: 300px; border-bottom: solid 1px #dddddd; z-index: 10;">
                     <!-- ko if: cardTree.selection().constructor.name === 'CardViewModel' -->
                     <div data-bind="with: cardTree.selection()">
@@ -191,7 +194,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
                 <!-- Card Manager -->
                 <div class="flex tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }">card</div>
-
+                <!-- /ko -->
             </div>
         </div>
 
