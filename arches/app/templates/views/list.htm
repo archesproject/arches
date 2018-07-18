@@ -29,13 +29,11 @@
 <div class="list-wrapper">
 <div class="grid" class="grid-list">
 
-    <!-- Card -->
     <!-- ko foreach: $data.items -->
         <div class="library-card" data-bind="visible: $data.filtered() == false, click: $parent.selectItem.bind($parent), css:{ 'selected selected-card': $data.selected }">
             {% block listitem %}{% endblock %}
         </div>
     <!-- /ko -->
-
 
 </div>
 </div>
