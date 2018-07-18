@@ -151,7 +151,7 @@ dl.inline-flex dd {
     background-color: rgba(0, 0, 0, 0.05);
 }
 
-.list-group.bg-trans a.list-group-item:hover:(.active) {
+.list-group.bg-trans a.list-group-item.active:hover {
     background-color: #fff;
 }
 
@@ -523,7 +523,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     opacity: 1.0;
     height: 200px;
     width: 200px;
-    --border: 1px solid #266fb0;
+    /* border: 1px solid #266fb0; */
 }
 
 .tile-grid-container {
@@ -4054,7 +4054,7 @@ ul.jqtree-tree div.jqtree_common {
     border: 1px solid #ccc;
     text-decoration: none;
     font-weight: 700;
-    background: linear-gradient(top, #fafafa0%, #eee100%);
+    background: linear-gradient(top, #fafafa0, #eee100);
     -webkit-border-radius: 3px!important;
     border-radius: 3px!important;
     box-sizing: border-box;
@@ -9960,7 +9960,8 @@ table.table.dataTable {
     transition: stroke-width 250ms linear;
     -moz-transition: stroke-width 250ms linear;
     -webkit-transition: stroke-width 250ms linear;
-    transition-delay: 250ms -moz-transition-delay: 250ms;
+    transition-delay: 250ms;
+    -moz-transition-delay: 250ms;
     -webkit-transition-delay: 250ms;
 }
 
@@ -11497,7 +11498,7 @@ a.jstree-anchor.disabled {
 
 .rr-splash-help-link {
     margin: 10px;
-    font-size: 16px:
+    font-size: 16px;
 }
 
 @keyframes loader {
