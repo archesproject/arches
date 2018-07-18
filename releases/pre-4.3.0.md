@@ -90,7 +90,7 @@ Assigned to: Cyrus
 
 | Test Subject                                                                                                                 | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Project Name - Updating name updates in index.htm and the page tab                                                           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Project Name - Updating name updates in index.htm and the page tab                                                           | :construction: |    ?   |    ?    |   ?  | ?   | #3696, #3697    |
 | Web Analytics - String value inserts in base.htm at the location of this template variable:{{GOOGLE_ANALYTICS_TRACKING_ID}} |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 #### Map Settings
@@ -255,8 +255,8 @@ Assigned to: Cyrus
 
 | Test Subject                                           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| Provisional users see indication in a widget that their tile edits were submitted                   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Resource reviewers are able to identify provisional tiles and can approve/discard provisional edits |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Provisional users see indication in a widget that their tile edits were submitted                   |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Resource reviewers are able to identify provisional tiles and can approve/discard provisional edits |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
