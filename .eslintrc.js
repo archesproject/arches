@@ -13,6 +13,8 @@ module.exports = {
     },
     "globals": {
         "define": false,
-        "require": false
+        "require": false,
+        "window": false,
+        "console": false
     }
 };

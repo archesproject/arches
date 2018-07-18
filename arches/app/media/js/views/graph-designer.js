@@ -90,13 +90,13 @@ define([
                         }
                         viewModel.loading(false);
                     });
-                };
+                }
             };
 
             viewModel.saveSelectedNode = function() {
                 if (viewModel.selectedNode()) {
                     viewModel.saveNode(viewModel.selectedNode());
-                };
+                }
             };
 
             viewModel.cardTree = new CardTreeViewModel({
@@ -165,27 +165,24 @@ define([
                         viewModel.loading(false);
                     })
                     .fail(function() {
-                        console.log('error');
+                        throw 'error loading graph settings';
                     });
             };
 
             if (viewModel.activeTab() === 'graph') {
                 viewModel.loadGraphSettings();
                 // here we might load data/views asyncronously
-            };
+            }
 
             var loadPermissionData = viewModel.activeTab.subscribe(function(tab) {
                 // Loads identities and nodegroup permissions when the permissions tab is opened and then disposes the ko.subscribe.
                 if (tab === 'permissions') {
                     viewModel.permissionsDesigner.getPermissionManagerData();
                     loadPermissionData.dispose();
-                };
+                }
             });
 
             viewModel.viewState.subscribe(function(state) {
-                if (state === 'design') {
-
-                }
                 if (state === 'preview') {
                     if (!viewModel.graphView) {
                         viewModel.graphView = new GraphView({
@@ -207,11 +204,6 @@ define([
                 }
             });
 
-            if (viewModel.viewState() === 'design') {
-                // here we might load data/views asyncronously
-            } else {
-
-            }
 
             /**
             * update the sizing of elements on window resize
