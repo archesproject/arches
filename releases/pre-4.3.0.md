@@ -62,7 +62,7 @@ Assigned to: Cyrus
 
 | Test Subject                                                                              | Chrome | Safari | Firefox | IE11 |  UI | Notes |
 | ----------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | :-: | ----- |
-| Test that users can't access the Mobile Survey Manager page |    ?   |    ?   |    ?    |   ?  |  ?  | -     |
+| Test that users can't access the Mobile Survey Manager page | :construction: |    ?   |    ?    |   ?  |  ?  |  #3698    |
 
 * * *
 
