@@ -214,7 +214,7 @@ class TileData(View):
                     v['card'].pop('nodegroup_id')
                 chronological_summary.append(v)
 
-            print sorted(chronological_summary, key=lambda k: k['lasttimestamp'])
+            sorted(chronological_summary, key=lambda k: k['lasttimestamp'])
 
             return JSONResponse(JSONSerializer().serialize(sorted(chronological_summary, key=lambda k: k['lasttimestamp'])))
 
