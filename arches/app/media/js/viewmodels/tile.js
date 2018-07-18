@@ -88,7 +88,7 @@ define([
                     //nodes: params.nodes,
                     cardwidgets: params.cardwidgets,
                     datatypes: params.datatypes,
-                    widgets: params.widgets,
+                    //widgets: params.widgets,
                     //nodegroups: ko.unwrap(params.nodegroups)
                 });
             }),

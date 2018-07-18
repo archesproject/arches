@@ -260,8 +260,7 @@ define(['arches',
                             node: node,
                             card: this,
                             datatype: datatype,
-                            disabled: attributes.data.disabled,
-                            widgetList: attributes.widgetList
+                            disabled: attributes.data.disabled
                         });
                         //widgets.push(widget);
                         this.get('widgets').push(widget);
@@ -296,7 +295,7 @@ define(['arches',
             var ret = {};
             for (var key in this.attributes) {
                 if (key !== 'datatypelookup' && key !== 'ontology_properties' && key !== 'nodes' &&
-                 key !== 'widgets' && key !== 'datatypes' && key !== 'data' && key !== 'widgetList') {
+                 key !== 'widgets' && key !== 'datatypes' && key !== 'data') {
                     if (ko.isObservable(this.attributes[key])) {
                         if (key === 'cards') {
                             ret[key] = [];

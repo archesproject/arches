@@ -126,10 +126,9 @@ define([
         var cardModel = new CardModel({
             data: _.extend({
                 widgets: params.cardwidgets,
-                nodes: params.graphModel.get('nodes'),
-                widgetList: params.widgets
+                nodes: params.graphModel.get('nodes')
             }, params.card),
-            datatypes: params.datatypes,
+            datatypes: params.graphModel.get('datatypelookup'),
         });
 
         var applySelectedComputed = function(widgets){
@@ -197,7 +196,7 @@ define([
                         //nodes: params.nodes,
                         cardwidgets: params.cardwidgets,
                         datatypes: params.datatypes,
-                        widgets: params.widgets,
+                        //widgets: params.widgets,
                         //nodegroups: ko.unwrap(nodegroups)
                     });
                 })
@@ -224,7 +223,7 @@ define([
                     //nodes: params.nodes,
                     cardwidgets: params.cardwidgets,
                     datatypes: params.datatypes,
-                    widgets: params.widgets,
+                    //widgets: params.widgets,
                     //nodegroups: ko.unwrap(nodegroups)
                 });
             }),
@@ -296,7 +295,7 @@ define([
                     //nodes: params.nodes,
                     cardwidgets: params.cardwidgets,
                     datatypes: params.datatypes,
-                    widgets: params.widgets,
+                    //widgets: params.widgets,
                     //nodegroups: ko.unwrap(nodegroups)
                 });
             }

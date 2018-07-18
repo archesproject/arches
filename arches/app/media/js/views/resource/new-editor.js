@@ -120,7 +120,7 @@ define([
                 //nodes: data.nodes,
                 cardwidgets: data.cardwidgets,
                 datatypes: data.datatypes,
-                widgets: data.widgets,
+                //widgets: data.widgets,
                 //nodegroups: data.nodegroups,
                 userisreviewer: data.userisreviewer
             });

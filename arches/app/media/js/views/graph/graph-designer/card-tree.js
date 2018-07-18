@@ -81,7 +81,7 @@ define([
                     //nodes: params.graph.nodes,
                     cardwidgets: data.cardwidgets,
                     datatypes: data.datatypes,
-                    widgets: data.widgets,
+                    //widgets: data.widgets,
                     //nodegroups: params.graph.nodegroups,
                     userisreviewer: true
                 });
