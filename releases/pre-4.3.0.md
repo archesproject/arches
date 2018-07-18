@@ -200,7 +200,7 @@ Assigned to: Rob
 
 ## Import/Export
 
-Assigned to: Ryan
+Assigned to: Ryan (0.5)
 
 | Test Subject               | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
@@ -327,7 +327,7 @@ Assigned to: Alexei
 
 ## Permissions Management
 
-Assigned to: Ryan
+Assigned to: Ryan (1)
 
 | Test Subject                                                                                                                                            | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
