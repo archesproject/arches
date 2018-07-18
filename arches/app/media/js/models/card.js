@@ -279,14 +279,16 @@ define(['arches',
         reset: function() {
             this._attributes.data = JSON.parse(this._card());
             this.get('widgets')().forEach(function(widget){
-                var origData = _.find(this._attributes.data.widgets, function(origwidget){
-                    return widget.widget_id() === origwidget.widget_id;
+                var originalWidgetData = _.find(this._attributes.data.widgets, function(origwidget){
+                    return widget.node_id() === origwidget.node_id;
                 });
-                if (origData) {
-                    console.log(widget.configKeys())
+                if (originalWidgetData) {
+                    console.log(widget.configKeys());
                     widget.configKeys().forEach(function(configKey){
-                        widget.config[configKey](origData.config[configKey]);
-                    })
+                        widget.config[configKey](originalWidgetData.config[configKey]);
+                    });
+                    widget.label(originalWidgetData.label);
+                    widget.widget_id(originalWidgetData.widget_id);
                 }
             }, this);
             this.parse(this._attributes);
