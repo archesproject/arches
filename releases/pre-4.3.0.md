@@ -74,11 +74,11 @@ Ensure that all browsers are compatible with Authentication process.
 
 | Test Subject                                                             | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| User can sign themselves up for a new Arches account                     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User is added to default group (Crowdsource Editor)                      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can log in with their email address                                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can reset their password                                            |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can edit their profile (First and Last name, email address, etc...) |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| User can sign themselves up for a new Arches account                     | :white_check_mark: |    ?   |    ?    |   ?  | ?   | -     |
+| User is added to default group (Crowdsource Editor)                      | :white_check_mark: |    ?   |    ?    |   ?  | ?   | -     |
+| User can log in with their email address                                 | :white_check_mark: |    ?   |    ?    |   ?  | ?   | -     |
+| User can reset their password                                            | :white_check_mark: |    ?   |    ?    |   ?  | ?   | -     |
+| User can edit their profile (First and Last name, email address, etc...) | :white_check_mark: |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -313,15 +313,15 @@ Assigned to: Alexei
 
 | Test Subject     | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Export graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Import graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Create branch    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Create resource  |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add/Edit cards   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add/Edit menus   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add/Edit reports |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| delete graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| clone graph      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Export graph     |  :white_check_mark: |    ?   |    ?    |   ?  | ?   | -     |
+| Import graph     | :x: |    ?   |    ?    |   ?  | ?   | IntegrityError at /graph/import/insert or update on table "reports" violates foreign key constraint "reports_graphid_965cb0fa_fk_graphs_graphid" DETAIL:  Key (graphid)=(acea1ade-8abc-11e8-8b1d-14109fd34195) is not present in table "graphs".|
+| Create branch    | :white_check_mark: |    ?   |    ?    |   ?  | ?   | -     |
+| Create resource  | :white_check_mark: |    ?   |    ?    |   ?  | ?   | -     |
+| Add/Edit cards   | :construction: |    ?   |    ?    |   ?  | ?   | -     |
+| Add/Edit menus   | :question: |    ?   |    ?    |   ?  | ?   | -     |
+| Add/Edit reports | :construction: |    ?   |    ?    |   ?  | ?   | -     |
+| delete graph     | :white_check_mark: |    ?   |    ?    |   ?  | ?   | -     |
+| clone graph      | :white_check_mark: |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
