@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import re
+import math
 from django.template import RequestContext
 from django.shortcuts import render_to_response, redirect
 from django.views.decorators.csrf import csrf_exempt
@@ -35,6 +36,7 @@ from django.http import HttpResponseNotFound
 from django.contrib.gis.geos import GEOSGeometry
 from django.db.models import Max, Min
 from django.contrib.auth.decorators import user_passes_test
+from django.contrib import messages
 
 def report(request, resourceid):
     raise NotImplementedError('Reports are not yet implemented.')
@@ -67,6 +69,13 @@ def resource_manager(request, resourcetypeid='', form_id='default', resourceid='
         data = JSONDeserializer().deserialize(request.POST.get('formdata', {}))
         form.set_user(request.user)
         form.update(data, request.FILES)
+
+        # Will check that this resource doesn't already exist!
+        existing = check_existing(data, resourcetypeid, resource.entityid)
+        if existing:
+            # existing contains the JSON response
+            messages.add_message(request, messages.INFO, "Found %s existing resources nearby" % existing)
+            pass
 
         with transaction.atomic():
             if resourceid != '':
@@ -258,4 +267,65 @@ def debug_view(request, resourceid=''):
     resource_dict = resource.dictify()
     
     return JSONResponse(resource_dict, indent=4)
-    
+
+def check_existing(data, resourcetype, resourceentityid=None):
+    geomentities = ["SPATIAL_COORDINATES.E47", "GEOMETRIC_PLACE_EXPRESSION.SP5", "SPATIAL_COORDINATES_GEOMETRY.E47"]
+    print("Has data! %s" % data)
+    nearbyres = {}
+    for geoment in geomentities:
+        if geoment in data:
+            for n in data[geoment]:
+                nodes = n['nodes']
+                print ("Nodes: %s" % nodes)
+                values = [d['value'] for d in nodes if d['entitytypeid'] == geoment]
+                srefs = [d['value'] for d in nodes if d['entitytypeid'] == "SPATIAL_COORDINATES_REF_SYSTEM.SP4"]
+                print("Values: %s" % values)
+                print("Srefs: %s" % srefs)
+                for i, v in enumerate(values):
+                    if len(srefs):
+                        target = GEOSGeometry(v, srid=srefs[i])
+                    else:
+                        target = GEOSGeometry(v)
+                    print("Target: %s" % target)
+                    mindistance = settings.METER_RADIUS
+                    nearbygeos = models.Geometries.objects.filter(val__dwithin=(target, getDegrees(mindistance, target)))
+                    print("Nearby: %s" % [g.entityid for g in nearbygeos])
+                    for g in nearbygeos:
+                        print("Child: %s" % g)
+                        parent = get_parent_id(g.entityid)
+                        while True:
+                            if get_parent_id(parent.entityid):
+                                parent = get_parent_id(parent.entityid)
+                            else:
+                                break
+                        print("Parent: %s" % parent)
+                        print(resourceentityid, str(parent.entitytypeid), resourcetype)
+                        if str(parent.entityid) != resourceentityid and str(parent.entitytypeid) == resourcetype:
+                            if parent.entityid not in nearbyres:
+                                res = Resource().get(parent.entityid)
+                                nearbyres[parent.entityid] = {'Primary_Name': res.get_primary_name(),
+                                                              'Resource_Type': res.entitytypeid}
+                                print("Added")
+    print("Nearby Resources: %s" % nearbyres)
+
+    if nearbyres:
+        return JSONResponse(nearbyres)
+    else:
+        return False
+
+
+def get_parent_id(entityid):
+    if models.Relations.objects.filter(entityidrange=entityid):
+        return models.Relations.objects.get(entityidrange=entityid).entityiddomain
+    else:
+        return False
+
+def getDegrees(meters, target):
+    diffy = target.extent[3] - target.extent[1]
+    midpoint = target.extent[1] + diffy
+    return metersToDegrees(meters, midpoint)
+
+def metersToDegrees(meters, latitude):
+    """Based on the C# function described in
+    https://stackoverflow.com/questions/25237356/convert-meters-to-decimal-degrees"""
+    return meters / (111319.9 * math.cos(latitude * (math.pi / 180)))
