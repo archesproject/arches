@@ -5,8 +5,8 @@
 {% block title %}{% trans "Groups/Accounts" %}{% endblock %}
 
 {% block filter %}
-<!-- ko if:  permissionsDesigner.identityList.filter_function -->
-<div class="list-filter" style="display:none" data-bind="visible:  permissionsDesigner.identityList.filter_function">
+<!-- ko if:  permissionsDesigner.identityList.filterFunction -->
+<div class="list-filter" style="display:none" data-bind="visible:  permissionsDesigner.identityList.filterFunction">
     <input type="text" class="form-control" style="" placeholder="{% block search_placeholder %}{% endblock %}" data-bind="value: permissionsDesigner.identityList.filter, valueUpdate: 'afterkeydown'">
 
     <!-- Clear Search -->

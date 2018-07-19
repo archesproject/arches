@@ -11,7 +11,7 @@ define([
         * @name IdentityList
         */
 
-        single_select: true,
+        singleSelect: true,
 
         /**
         * initializes the view with optional parameters

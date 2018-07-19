@@ -48,10 +48,10 @@ define([
             this.items.subscribe(function (items) {
                 items.forEach(initializeItem, this);
             }, this);
-            if(this.filter_function){
+            if(this.filterFunction){
                 this.filter = ko.observable('');
-                this.filter.subscribe(this.filter_function, this, 'change');
-                this.filter_function();
+                this.filter.subscribe(this.filterFunction, this, 'change');
+                this.filterFunction();
             }
             this.scrollContainerSelector = '.related-resources-nodes'
             this.selectNode = function(e) {
