@@ -6,9 +6,10 @@ define([
     'moment',
     'arches',
     'viewmodels/alert',
+    'views/provisional-history-list',
     'bindings/scrollTo',
     'bootstrap'
-], function($, _, Backbone, ko, moment, arches,  AlertViewModel) {
+], function($, _, Backbone, ko, moment, arches,  AlertViewModel, ProvisionalHistoryList) {
     /**
     * A backbone view representing a basic page in arches.  It sets up the
     * viewModel defaults, optionally accepts additional view model data and
@@ -35,12 +36,17 @@ define([
         constructor: function (options) {
             var self = this;
             this.viewModel = (options && options.viewModel) ? options.viewModel : {};
+            this.viewModel.helploaded = ko.observable(false);
+            this.viewModel.helploading = ko.observable(false);
+            this.viewModel.provisionalHistoryList = new ProvisionalHistoryList({
+                items: ko.observableArray(),
+                helploaded: this.viewModel.helploaded,
+                helploading: this.viewModel.helploading
+            });
 
             _.defaults(this.viewModel, {
                 alert: ko.observable(null),
                 loading: ko.observable(false),
-                helploaded: ko.observable(false),
-                helploading: ko.observable(false),
                 showTabs: ko.observable(false),
                 tabsActive: ko.observable(false),
                 menuActive: ko.observable(false),
@@ -48,11 +54,11 @@ define([
                 dirty: ko.observable(false),
                 showConfirmNav: ko.observable(false),
                 navDestination: ko.observable(''),
-                provisionalEdits: ko.observableArray(),
+                urls: arches.urls,
                 navigate: function(url, bypass) {
                     if (!bypass && self.viewModel.dirty()) {
                         self.viewModel.navDestination(url);
-                        self.viewModel.alert(new AlertViewModel('ep-alert-blue', arches.confirmNav.title, arches.confirmNav.text, function(){
+                        self.viewModel.alert(new AlertViewModel('ep-alert-blue', arches.confirmNav.title, arches.confirmNav.text, function() {
                             self.viewModel.showConfirmNav(false);
                         }, function() {
                             self.viewModel.navigate(self.viewModel.navDestination(), true);
@@ -63,7 +69,7 @@ define([
                     self.viewModel.loading(true);
                     window.location = url;
                 },
-                getHelp: function(template){
+                getHelp: function(template) {
                     if (!self.viewModel.helploaded()) {
                         self.viewModel.helploading(true);
                         var el = $('.ep-help-content');
@@ -75,7 +81,7 @@ define([
                                 el.html(data);
                                 self.viewModel.helploaded(true);
                                 self.viewModel.helploading(false);
-                                $('.ep-help-topic-toggle').click(function (){
+                                $('.ep-help-topic-toggle').click(function () {
                                     var sectionEl = $(this).closest('div');
                                     contentEl = $(sectionEl).find('.ep-help-topic-content').first();
                                     contentEl.slideToggle();
@@ -87,25 +93,12 @@ define([
                         });
                     }
                 },
-                getProvisionalHistory: function(){
-                    self.viewModel.helploading(true);
-                    self.viewModel.provisionalEdits.removeAll();
-                    $.ajax({
-                        type: "GET",
-                        url: arches.urls.tile_history,
-                        success : function(data) {
-                            self.viewModel.helploaded(true);
-                            self.viewModel.helploading(false);
-                            self.viewModel.provisionalEdits(_.map(data, function(edit){
-                                edit.displaytime = moment(edit.lasttimestamp).format('DD-MM-YYYY hh:mm a');
-                                return edit;
-                            }))
-                        }
-                    });
+                getProvisionalHistory: function() {
+                    self.viewModel.provisionalHistoryList.updateList();
                 }
             });
 
-            window.addEventListener("beforeunload", function (event) {
+            window.addEventListener('beforeunload', function(event) {
                 self.viewModel.loading(true);
             });
 
