@@ -85,11 +85,7 @@ define([
                     filter: filter,
                     userisreviewer: params.userisreviewer,
                     provisionalTileViewModel: params.provisionalTileViewModel,
-                    //nodes: params.nodes,
-                    cardwidgets: params.cardwidgets,
-                    datatypes: params.datatypes,
-                    //widgets: params.widgets,
-                    //nodegroups: ko.unwrap(params.nodegroups)
+                    cardwidgets: params.cardwidgets
                 });
             }),
             expanded: ko.observable(true),

@@ -78,11 +78,7 @@ define([
                     loading: loading,
                     filter: filter,
                     provisionalTileViewModel: null,
-                    //nodes: params.graph.nodes,
                     cardwidgets: data.cardwidgets,
-                    //datatypes: data.datatypes,
-                    //widgets: data.widgets,
-                    //nodegroups: params.graph.nodegroups,
                     userisreviewer: true,
                     perms: ko.observableArray(),
                     permsLiteral: ko.observableArray()

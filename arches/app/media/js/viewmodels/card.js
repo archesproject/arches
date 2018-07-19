@@ -56,74 +56,11 @@ define([
         var loading = params.loading || ko.observable();
         var perms = ko.observableArray();
         var permsLiteral = ko.observableArray();
-        var nodes = _.filter(ko.unwrap(params.graphModel.get('nodes')), function(node) {
-            return ko.unwrap(node.nodegroup_id) === ko.unwrap(params.card.nodegroup_id);
-        });
-        // .map(function(node) {
-        //     node.configKeys = ko.observableArray(
-        //         _.map(node.config, function(val, key) {
-        //             return key;
-        //         })
-        //     );
-        //     node.config = koMapping.fromJS(node.config);
-        //     return node;
-        // });
-        var widgets = ko.observableArray(_.filter(params.cardwidgets, function(widget) {
-            return widget.card_id === params.card.cardid;
-        }));
-        // var widgets = ko.observableArray();
-
-        // cardwidgets().forEach(function(widgetdata){
-        //     widgets.push(new CardWidgetModel(widgetdata, {
-        //         //node: nodeModel,
-        //         //card: self,
-        //         //datatype: datatype,
-        //         //disabled: attributes.data.disabled
-        //     }));
-        // }, this);
-
-        _.each(ko.unwrap(nodes), function(node) {
-            var widget = _.find(widgets(), function(widget) {
-                return widget.node_id === ko.unwrap(node.nodeid);
-            });
-            // if (!widget) {
-            //     var datatype = _.find(params.datatypes, function(datatype) {
-            //         return datatype.datatype === ko.unwrap(node.datatype);
-            //     });
-            //     if (datatype.defaultwidget_id) {
-            //         var widgetData = _.find(params.widgets, function(widget) {
-            //             return widget.widgetid === datatype.defaultwidget_id;
-            //         });
-            //         widget = {
-            //             widget_id: ko.observable(datatype.defaultwidget_id),
-            //             config: _.extend({
-            //                 label: ko.unwrap(node.name)
-            //             }, widgetData.defaultconfig),
-            //             label: ko.unwrap(node.name),
-            //             node_id: ko.unwrap(node.nodeid),
-            //             card_id: params.card.cardid,
-            //             id: '',
-            //             sortorder: ''
-            //         };
-            //         widgets.push(widget);
-            //     }
-            // }
-            // if (widget) {
-            //     widget.selected = ko.pureComputed({
-            //         read: function() {
-            //             return selection() === this;
-            //         },
-            //         write: function(value) {
-            //             if (value) {
-            //                 selection(this);
-            //             }
-            //         },
-            //         owner: widget
-            //     });
-            // }
-        });
-
         var nodegroups = params.graphModel.get('nodegroups');
+        
+        var nodegroup = _.find(ko.unwrap(nodegroups), function(group) {
+            return ko.unwrap(group.nodegroupid) === ko.unwrap(params.card.nodegroup_id);
+        });
 
         var cardModel = new CardModel({
             data: _.extend({
@@ -155,14 +92,9 @@ define([
             applySelectedComputed(widgets);
         });
 
-        var nodegroup = _.find(ko.unwrap(nodegroups), function(group) {
-            return ko.unwrap(group.nodegroupid) === ko.unwrap(params.card.nodegroup_id);
-        });
-
         _.extend(this, nodegroup, {
             model: cardModel,
             widgets: cardModel.widgets,
-            nodes: nodes,
             parent: params.tile,
             expanded: ko.observable(true),
             perms: perms,
@@ -197,11 +129,7 @@ define([
                         selection: selection,
                         loading: loading,
                         filter: filter,
-                        //nodes: params.nodes,
                         cardwidgets: params.cardwidgets,
-                        //datatypes: params.datatypes,
-                        //widgets: params.widgets,
-                        //nodegroups: ko.unwrap(nodegroups)
                     });
                 })
             ),
@@ -224,11 +152,7 @@ define([
                     loading: loading,
                     filter: filter,
                     provisionalTileViewModel: params.provisionalTileViewModel,
-                    //nodes: params.nodes,
                     cardwidgets: params.cardwidgets,
-                    //datatypes: params.datatypes,
-                    //widgets: params.widgets,
-                    //nodegroups: ko.unwrap(params.nodegroups),
                     perms: perms,
                     permsLiteral: permsLiteral
                 });
@@ -298,11 +222,7 @@ define([
                     filter: filter,
                     provisionalTileViewModel: params.provisionalTileViewModel,
                     loading: loading,
-                    //nodes: params.nodes,
                     cardwidgets: params.cardwidgets,
-                    //datatypes: params.datatypes,
-                    //widgets: params.widgets,
-                    //nodegroups: ko.unwrap(nodegroups)
                 });
             }
         });

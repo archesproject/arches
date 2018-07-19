@@ -5,80 +5,6 @@ define(['arches',
     'knockout',
     'knockout-mapping'
 ], function(arches, AbstractModel, NodeModel, CardWidgetModel, ko, koMapping) {
-    var deepDiffMapper = function() {
-    return {
-        VALUE_CREATED: 'created',
-        VALUE_UPDATED: 'updated',
-        VALUE_DELETED: 'deleted',
-        VALUE_UNCHANGED: 'unchanged',
-        map: function(obj1, obj2) {
-            if (this.isFunction(obj1) || this.isFunction(obj2)) {
-                //throw 'Invalid argument. Function given, object expected.';
-            }
-            if (this.isValue(obj1) || this.isValue(obj2)) {
-                return {
-                    type: this.compareValues(obj1, obj2),
-                    data: (obj1 === undefined) ? obj2 : obj1
-                };
-            }
-
-            var diff = {};
-            for (var key in obj1) {
-                if (this.isFunction(obj1[key])) {
-                    continue;
-                }
-
-                var value2 = undefined;
-                if ('undefined' != typeof(obj2[key])) {
-                    value2 = obj2[key];
-                }
-
-                diff[key] = this.map(obj1[key], value2);
-            }
-            for (var key in obj2) {
-                if (this.isFunction(obj2[key]) || ('undefined' != typeof(diff[key]))) {
-                    continue;
-                }
-
-                diff[key] = this.map(undefined, obj2[key]);
-            }
-
-            return diff;
-
-        },
-        compareValues: function(value1, value2) {
-            if (value1 === value2) {
-                return this.VALUE_UNCHANGED;
-            }
-            if (this.isDate(value1) && this.isDate(value2) && value1.getTime() === value2.getTime()) {
-                return this.VALUE_UNCHANGED;
-            }
-            if ('undefined' == typeof(value1)) {
-                return this.VALUE_CREATED;
-            }
-            if ('undefined' == typeof(value2)) {
-                return this.VALUE_DELETED;
-            }
-
-            return this.VALUE_UPDATED;
-        },
-        isFunction: function(obj) {
-            return {}.toString.apply(obj) === '[object Function]';
-        },
-        isArray: function(obj) {
-            return {}.toString.apply(obj) === '[object Array]';
-        },
-        isDate: function(obj) {
-            return {}.toString.apply(obj) === '[object Date]';
-        },
-        isObject: function(obj) {
-            return {}.toString.apply(obj) === '[object Object]';
-        },
-        isValue: function(obj) {
-            return !this.isObject(obj) && !this.isArray(obj);
-        }
-        }
-    }();
     var CardModel = AbstractModel.extend({
         /**
         * A backbone model to manage card data
@@ -148,12 +74,6 @@ define(['arches',
             });
 
             this.dirty = ko.computed(function() {
-                // console.log('current')
-                // console.log(_.extend(JSON.parse(self._card()), self.toJSON()))
-                // console.log('old')
-                // console.log(JSON.parse(self._card()))
-                //console.log(deepDiffMapper.map(_.extend(JSON.parse(self._card()), self.toJSON()), JSON.parse(self._card())));
-                console.log(deepDiffMapper.map(JSON.parse(self._card()), _.extend(JSON.parse(self._card()), self.toJSON())));
                 return JSON.stringify(_.extend(JSON.parse(self._card()), self.toJSON())) !== self._card();
             });
 
@@ -176,16 +96,7 @@ define(['arches',
          * @param  {object} attributes - the properties to seed a {@link CardModel} with
          */
         parse: function(attributes) {
-            var self = this;
-            //var datatypelookup = {};
-
-            //attributes = _.extend({datatypes: []}, attributes);
             this._attributes = attributes;
-
-            // _.each(attributes.datatypes, function(datatype) {
-            //     datatypelookup[datatype.datatype] = datatype;
-            // }, this);
-            // this.set('datatypelookup', datatypelookup);
 
             _.each(attributes.data, function(value, key) {
                 switch (key) {
@@ -201,9 +112,6 @@ define(['arches',
                     }, this);
                     this.get('cards')(cards);
                     break;
-                // case 'nodes':
-                //     this.parseNodes(attributes);
-                //     break;
                 case 'widgets':
                     break;
                 case 'cardid':
@@ -237,15 +145,9 @@ define(['arches',
         },
 
         parseNodes: function(attributes) {
-            console.log('in parse nodes');
-            var widgets = [];
-            var nodeArray = [];
-            //this.get('widgets').removeAll();
             ko.unwrap(this.nodes).forEach(function(node, i) {
                 if(ko.unwrap(node.nodeGroupId) === ko.unwrap(attributes.data.nodegroup_id)){
-                    // var datatype = _.find(attributes.datatypes, function(datatype) {
-                    //     return datatype.datatype === ko.unwrap(node.datatype);
-                    // });
+
                     var datatype = attributes.datatypelookup[ko.unwrap(node.datatype)];
                     node.datatype.subscribe(function(){
                         this.parseNodes(attributes);
@@ -263,17 +165,13 @@ define(['arches',
                             datatype: datatype,
                             disabled: attributes.data.disabled
                         });
-                        //widgets.push(widget);
                         this.get('widgets').push(widget);
                     }
-                    //nodeArray.push(node);
                 }
             }, this);
-            //this.get('nodes')(nodeArray);
             this.get('widgets').sort(function(w, ww) {
                 return w.get('sortorder')() > ww.get('sortorder')();
             });
-            //this.get('widgets')(widgets);
         },
 
         reset: function() {
@@ -283,7 +181,6 @@ define(['arches',
                     return widget.node_id() === origwidget.node_id;
                 });
                 if (originalWidgetData) {
-                    console.log(widget.configKeys());
                     widget.configKeys().forEach(function(configKey){
                         widget.config[configKey](originalWidgetData.config[configKey]);
                     });
@@ -316,9 +213,6 @@ define(['arches',
                     ret[key] = _.map(widgets, function(widget) {
                         return widget.toJSON();
                     });
-                    // ret['nodes'] = _.map(widgets, function(widget) {
-                    //     return widget.node.toJSON();
-                    // });
                 }
             }
             return ret;
