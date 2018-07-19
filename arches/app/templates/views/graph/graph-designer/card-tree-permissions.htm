@@ -29,7 +29,7 @@
                     as: 'card'
                 }">
                     <!-- ko component: {
-                        name: self.cardComponentLookup[card.component_id].componentname,
+                        name: self.cardComponentLookup[card.model.component_id()].componentname,
                         params: {
                             state: 'permissions-tree',
                             card: card,

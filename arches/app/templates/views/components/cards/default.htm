@@ -6,7 +6,7 @@
     <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
     <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected()}, click: function () { card.canAdd() ? card.selected(true) : card.tiles()[0].selected(true) },">
         <i class="fa fa-file-o" role="presentation" data-bind="css:{'filtered': card.highlight(), 'has-provisional-edits fa-file': card.doesChildHaveProvisionalEdits()}"></i>
-        <span style="padding-right: 5px;" data-bind="text: card.name"></span>
+        <span style="padding-right: 5px;" data-bind="text: card.model.name"></span>
         <!-- ko if: card.canAdd() -->
         <i class="fa fa-plus-circle add-new-tile" role="presentation" data-bind="css:{'jstree-clicked': card.selected}" data-toggle="tooltip" data-original-title="{% trans "Add New" %}"></i>
         <!-- /ko -->
@@ -22,23 +22,23 @@
                 <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { self.form.selection($data) }, css:{'jstree-clicked': selected, 'child-selected': isChildSelected(), 'filtered-leaf': card.highlight()}">
                     <i class="fa fa-file" role="presentation" data-bind="css:{'has-provisional-edits': doesChildHaveProvisionalEdits() || $data.hasprovisionaledits()}"></i>
                     <strong style="margin-right: 10px;">
-                        <!-- ko if: card.widgets.length > 0 -->
-                        <span data-bind="text: card.widgets[0].label || card.name"></span>:
+                        <!-- ko if: card.widgets().length > 0 -->
+                        <span data-bind="text: card.widgets()[0].label || card.model.name"></span>:
                         <div style="display: inline;" data-bind="component: {
-                            name: self.form.widgetLookup[card.widgets[0].widget_id].name,
+                            name: self.form.widgetLookup[card.widgets()[0].widget_id()].name,
                             params: {
                                 tile: $data,
-                                node: self.form.nodeLookup[card.widgets[0].node_id],
-                                config: self.form.widgetLookup[card.widgets[0].widget_id].config,
-                                label: self.form.widgetLookup[card.widgets[0].widget_id].label,
-                                value: $data.data[card.widgets[0].node_id],
+                                node: self.form.nodeLookup[card.widgets()[0].node_id()],
+                                config: self.form.widgetLookup[card.widgets()[0].widget_id()].config,
+                                label: self.form.widgetLookup[card.widgets()[0].widget_id()].label,
+                                value: $data.data[card.widgets()[0].node_id()],
                                 type: 'resource-editor',
                                 state: 'display_value'
                             }
                         }"></div>
                         <!-- /ko -->
-                        <!-- ko if: card.widgets.length === 0 -->
-                        <span data-bind="text: card.name"></span>
+                        <!-- ko if: card.widgets().length === 0 -->
+                        <span data-bind="text: card.model.name"></span>
                         <!-- /ko -->
                     </strong>
                 </a>
@@ -48,7 +48,7 @@
                         as: 'card'
                     }">
                     <!-- ko component: {
-                        name: self.form.cardComponentLookup[card.component_id].componentname,
+                        name: self.form.cardComponentLookup[card.model.component_id()].componentname,
                         params: {
                             state: 'editor-tree',
                             card: card,
@@ -67,24 +67,24 @@
 <!-- /ko -->
 
 <!-- ko if: state === 'designer-tree' -->
-<li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards.length > 0 || card.widgets.length > 0) && card.expanded()), 'jstree-closed' : ((card.cards.length > 0 || card.widgets.length > 0) && !card.expanded()), 'jstree-leaf': card.cards.length === 0 && card.widgets.length === 0}">
+<li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards.length > 0 || card.widgets().length > 0) && card.expanded()), 'jstree-closed' : ((card.cards.length > 0 || card.widgets().length > 0) && !card.expanded()), 'jstree-leaf': card.cards.length === 0 && card.widgets().length === 0}">
     <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
     <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected()}, click: function () { card.selected(true) },">
         <i class="fa fa-file-o" role="presentation"></i>
-        <span style="padding-right: 5px;" data-bind="text: card.name"></span>
+        <span style="padding-right: 5px;" data-bind="text: card.model.name"></span>
     </a>
-    <!-- ko if: card.cards.length > 0 || card.widgets.length > 0 -->
+    <!-- ko if: card.cards.length > 0 || card.widgets().length > 0 -->
     <ul class="jstree-children" aria-expanded="true">
         <div data-bind="foreach: {
-                data: card.widgets,
+                data: card.widgets(),
                 as: 'widget'
             }">
             <li role="treeitem" class="jstree-node jstree-leaf">
                 <i class="jstree-icon jstree-ocl" role="presentation"></i>
                 <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { widget.selected(true) }, css:{'jstree-clicked': widget.selected}">
                     <i class="fa fa-file" role="presentation" ></i>
-                    <strong style="margin-right: 10px;" data-bind="css:{'filtered': card.highlight()}">
-                        <span data-bind="text: widget.label || card.name"></span>
+                    <strong style="margin-right: 10px;" >
+                        <span data-bind="text: !!(widget.label()) ? widget.label() : widget.node.name"></span>
                     </strong>
                 </a>
             </li>
@@ -94,7 +94,7 @@
                 as: 'card'
             }">
             <!-- ko component: {
-                name: self.form.cardComponentLookup[card.component_id].componentname,
+                name: self.form.cardComponentLookup[card.model.component_id()].componentname,
                 params: {
                     state: 'designer-tree',
                     card: card,
@@ -111,11 +111,11 @@
 
 
 <!-- ko if: state === 'permissions-tree' -->
-<li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards.length > 0 || card.widgets.length > 0) && card.expanded()), 'jstree-closed' : ((card.cards.length > 0 || card.widgets.length > 0) && !card.expanded()), 'jstree-leaf': card.cards.length === 0 && card.widgets.length === 0}">
+<li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards.length > 0 || card.widgets().length > 0) && card.expanded()), 'jstree-closed' : ((card.cards.length > 0 || card.widgets().length > 0) && !card.expanded()), 'jstree-leaf': card.cards.length === 0 && card.widgets().length === 0}">
     <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
     <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'jstree-clicked': card.selected, 'child-selected': card.isChildSelected()}, click: function () { card.selected(true) },">
         <i class="fa fa-file-o" role="presentation"></i>
-        <span style="padding-right: 5px;" data-bind="text: card.name, css:{'filtered': card.highlight()}">
+        <span style="padding-right: 5px;" data-bind="text: card.model.name, css:{'filtered': card.highlight()}">
         </span>
         <span class="node-permissions">
             <!--ko if: card.perms -->
@@ -125,14 +125,14 @@
             <!-- /ko -->
         </span>
     </a>
-    <!-- ko if: card.cards.length > 0 || card.widgets.length > 0 -->
+    <!-- ko if: card.cards.length > 0 || card.widgets().length > 0 -->
     <ul class="jstree-children" aria-expanded="true">
         <div data-bind="foreach: {
                 data: card.cards,
                 as: 'card'
             }">
             <!-- ko component: {
-                name: self.form.cardComponentLookup[card.component_id].componentname,
+                name: self.form.cardComponentLookup[card.model.component_id()].componentname,
                 params: {
                     state: 'permissions-tree',
                     card: card,
@@ -197,25 +197,25 @@
         <div class="card">
 
             <!-- ko if: card.parent -->
-            <h4 data-bind="text: card.name"></h4>
-            <h5 data-bind="text: card.description"></h5>
+            <h4 data-bind="text: card.model.name"></h4>
+            <h5 data-bind="text: card.model.instructions"></h5>
             <!-- /ko -->
 
-            <!-- ko if: card.widgets.length > 0 -->
+            <!-- ko if: card.widgets().length > 0 -->
             <form class="widgets" style="margin-bottom: 20px;">
                 <div data-bind="foreach: {
                         data:card.widgets, as: 'widget'
                     }">
                     <div class='' data-bind='component: {
-                        name: self.form.widgetLookup[widget.widget_id].name,
+                        name: self.form.widgetLookup[widget.widget_id()].name,
                         params: {
                             formData: self.tile.formData,
                             tile: self.tile,
                             form: self.form,
-                            config: widget.config,
-                            label: widget.label,
-                            value: self.tile.data[widget.node_id],
-                            node: self.form.nodeLookup[widget.node_id],
+                            config: widget.configJSON(),
+                            label: widget.label(),
+                            value: self.tile.data[widget.node_id()],
+                            node: self.form.nodeLookup[widget.node_id()],
                             expanded: self.expanded,
                             graph: self.form.graph,
                             type: "resource-editor"
@@ -224,7 +224,7 @@
                 </div>
             </form>
             <!-- /ko -->
-            <!-- ko if: card.widgets.length === 0 -->
+            <!-- ko if: card.widgets().length === 0 -->
             <ul class="card-summary-section" data-bind="css: {disabled: !tile.tileid}">
                 <!-- ko foreach: { data: tile.cards, as: 'card' } -->
                 <li class="card-summary">
@@ -234,7 +234,7 @@
                         }
                     }">
                         <h4 class="card-summary-name">
-                            <span data-bind="text: card.name"></span>
+                            <span data-bind="text: card.model.name"></span>
                             <!-- ko if: card.canAdd() && card.parent.tileid -->
                             <i class="fa fa-plus-circle card-summary-add"></i>
                             <!-- /ko -->
@@ -246,23 +246,23 @@
                         }">
                         <li class="tile-summary">
                             <a href="#" data-bind="click: function () { tile.selected(true) }">
-                                <!-- ko if: card.widgets.length > 0 -->
-                                <span data-bind="text: card.widgets[0].label || card.name" class="tile-summary-label"></span>:
+                                <!-- ko if: card.widgets().length > 0 -->
+                                <span data-bind="text: card.widgets()[0].label || card.model.name" class="tile-summary-label"></span>:
                                 <div style="display: inline;" data-bind="component: {
-                                    name: self.form.widgetLookup[card.widgets[0].widget_id].name,
+                                    name: self.form.widgetLookup[card.widgets()[0].widget_id()].name,
                                     params: {
                                         tile: tile,
-                                        node: self.form.nodeLookup[card.widgets[0].node_id],
-                                        config: self.form.widgetLookup[card.widgets[0].widget_id].config,
-                                        label: self.form.widgetLookup[card.widgets[0].widget_id].label,
-                                        value: tile.data[card.widgets[0].node_id],
+                                        node: self.form.nodeLookup[card.widgets()[0].node_id()],
+                                        config: self.form.widgetLookup[card.widgets()[0].widget_id()].config,
+                                        label: self.form.widgetLookup[card.widgets()[0].widget_id()].label,
+                                        value: tile.data[card.widgets()[0].node_id()],
                                         type: 'resource-editor',
                                         state: 'display_value'
                                     }
                                 }"></div>
                                 <!-- /ko -->
-                                <!-- ko if: card.widgets.length === 0 -->
-                                <span data-bind="text: card.name"></span>
+                                <!-- ko if: card.widgets().length === 0 -->
+                                <span data-bind="text: card.model.name"></span>
                                 <!-- /ko -->
                             </a>
                         </li>

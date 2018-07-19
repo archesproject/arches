@@ -19,7 +19,7 @@
                 <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}"></i>
                 <a class="jstree-anchor" href="#" tabindex="-1">
                     <strong>
-                        <i data-bind="css: graphiconclass" role="presentation"></i>
+                        <i data-bind="css: (graphiconclass() != (null || '') ? graphiconclass() : 'fa fa-question')" role="presentation"></i>
                         <span data-bind="text: graphname"></span>
                     </strong>
                 </a>
@@ -29,7 +29,7 @@
                     as: 'card'
                 }">
                     <!-- ko component: {
-                        name: self.cardComponentLookup[card.component_id].componentname,
+                        name: self.cardComponentLookup[card.model.component_id()].componentname,
                         params: {
                             state: 'designer-tree',
                             card: card,

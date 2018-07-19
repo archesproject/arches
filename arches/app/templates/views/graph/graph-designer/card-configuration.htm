@@ -13,7 +13,6 @@
 <!-- Tabs Content -->
 <div class="tab-content listing-container form-divider">
 
-    <!-- ko if: false -->
     <!-- Card Container Base Settings Form -->
     <div id="card-crud-settings" class="tab-pane fade in active">
         <div class="panel-section-heading dark-colored-text">
@@ -24,7 +23,7 @@
                 {% trans "Card Type" %}
             </div>
             <div>
-                <select class="resources" data-bind="value: card().get('ontologyproperty'), options: $root.ontology_properties, valueAllowUnset: true, optionsCaption: '{% trans "Choose a relation..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                <select class="resources" data-bind="value: model.component_id, options: $parent.cardComponents, optionsText: 'name', optionsValue: 'componentid', optionsCaption: '{% trans "Choose a card component..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
 
@@ -38,7 +37,7 @@
                     {% trans "Card Tab Title" %}
                 </div>
                 <div>
-                    <input type="" placeholder="{% trans "Card name" %}" class="form-control input-md widget-input" data-bind="textInput: card().get('name')">
+                    <input type="" placeholder="{% trans "Card name" %}" class="form-control input-md widget-input" data-bind="textInput: model.name">
                 </div>
             </div>
 
@@ -47,7 +46,7 @@
                     {% trans "Subtitle" %}
                 </div>
                 <div>
-                    <input type="" placeholder="{% trans " " %}" class="form-control input-md widget-input" data-bind="textInput: card().get('instructions'), valueUpdate: 'keyup'">
+                    <input type="" placeholder="{% trans " " %}" class="form-control input-md widget-input" data-bind="textInput: model.instructions">
                 </div>
             </div>
 
@@ -67,20 +66,20 @@
             <div class="panel-section-heading dark-colored-text"> {% trans "Settings" %} </div>
             
             <!-- Card Visibility -->
-            <div data-bind="component: { name: 'views/components/simple-switch', params: {value: card().get('visible'), config:{label: '{% trans "Make Card Visible" %}', subtitle: '{% trans "Show this card by default" %}'}}}"></div>
+            <div data-bind="component: { name: 'views/components/simple-switch', params: {value: model.visible, config:{label: '{% trans "Make Card Visible" %}', subtitle: '{% trans "Show this card by default" %}'}}}"></div>
 
             <!-- Set Cardinaltiy -->
-            <div data-bind="component: { name: 'views/components/simple-switch', params: {value: card().get('cardinality'), config:{on: 'n', off: '1', label: '{% trans "Allow multiple values" %}', subtitle: '{% trans "Let users enter multiple values for this data entry card" %}'}}}"></div>
+            <div data-bind="component: { name: 'views/components/simple-switch', params: {value: model.cardinality, config:{on: 'n', off: '1', label: '{% trans "Allow multiple values" %}', subtitle: '{% trans "Let users enter multiple values for this data entry card" %}'}}}"></div>
 
             <!-- Multiple values tools -->
-            <div class="cardinality-form" data-bind="visible: card().get('cardinality')() === 'n'" style="display: none;">
+            <div class="cardinality-form" data-bind="visible: model.cardinality() === 'n'" style="display: none;">
             </div>
 
             <!-- Enable help -->
-            <div data-bind="component: { name: 'views/components/simple-switch', params: {value: card().get('helpenabled'), config:{label: '{% trans "Enable Card-level help" %}', subtitle: '{% trans "Provide specific user guidance for this card" %}'}}}"></div>
+            <div data-bind="component: { name: 'views/components/simple-switch', params: {value: model.helpenabled, config:{label: '{% trans "Enable Card-level help" %}', subtitle: '{% trans "Provide specific user guidance for this card" %}'}}}"></div>
 
             <!-- Tertiary Panel For Card Help Text-->
-            <div class="tertiary-panel help-text-crud" style="display: none;" data-bind="visible: card().get('helpenabled')">
+            <div class="tertiary-panel help-text-crud" style="display: none;" data-bind="visible: model.helpenabled">
                 <div class="tertiary-panel-content">
                     <div class="">
                         <h4 class="title-block-title"> {% trans "Card-Level Help" %} </h4>
@@ -93,7 +92,7 @@
                                 {% trans "Help Panel Title" %}
                             </div>
                             <div class="col-sm-12 pad-no crud-widget-container">
-                                <input type="" placeholder="{% trans "Help title" %}" class="form-control input-md widget-input" data-bind='value: card().get("helptitle")'>
+                                <input type="" placeholder="{% trans "Help title" %}" class="form-control input-md widget-input" data-bind='value: model.helptitle'>
                             </div>
                         </div>
 
@@ -102,20 +101,13 @@
                             <div class="control-label">
                                 {% trans "Help Content" %}
                             </div>
-                            <textarea rows="10" cols="80" data-bind="ckeditor: card().get('helptext'), ckeditorOptions: {}, valueUpdate: 'afterkeydown'"></textarea>
+                            <textarea rows="10" cols="80" data-bind="ckeditor: model.helptext, ckeditorOptions: {}, valueUpdate: 'afterkeydown'"></textarea>
                         </div>
 
-                        <!-- Preview help -->
-                        <div data-bind="component: { name: 'switch-widget', params: {value: helpPreviewActive, config:{label: '{% trans "Preview Help Panel" %}', subtitle: '{% trans "Display help panel, confirm content" %}'}}}"></div>
-                        <div class="toggle-container">
-                            <input id="preview-card-help" class="arches-switch" type="checkbox" data-switchery="true" style="display: none;">
-                        </div>
+                        
                     </div>
                 </div>
             </div>
         </div>
-
-
     </div>
-    <!-- /ko -->
 </div>

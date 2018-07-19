@@ -17,7 +17,7 @@ define([
         var nodes = [];
         var nodegroups = [];
 
-        this.flattenTree = function (parents, flatList) {
+        this.flattenTree = function(parents, flatList) {
             _.each(ko.unwrap(parents), function(parent) {
                 flatList.push(parent);
                 this.flattenTree(
@@ -25,7 +25,7 @@ define([
                     flatList
                 );
             }, this);
-            return flatList
+            return flatList;
         };
 
         var toggleAll = function(state) {
@@ -36,17 +36,18 @@ define([
                 node.expanded(state);
             });
         };
-        var createLookup = function (list, idKey) {
-            return _.reduce(list, function (lookup, item) {
+
+        var createLookup = function(list, idKey) {
+            return _.reduce(list, function(lookup, item) {
                 lookup[ko.unwrap(item[idKey])] = item;
-                return lookup
+                return lookup;
             }, {});
         };
         _.extend(this, {
             loading: loading,
             widgetLookup: createLookup(data.widgets, 'widgetid'),
             cardComponentLookup: createLookup(data.cardComponents, 'componentid'),
-            nodeLookup: createLookup(ko.unwrap(params.graph.nodes), 'nodeid'),
+            nodeLookup: createLookup(params.graphModel.get('nodes')(), 'nodeid'),
             graphid: params.graph.graphid,
             graphname: params.graph.name,
             graphiconclass: params.graph.iconclass,
@@ -61,11 +62,12 @@ define([
             topCards: _.filter(data.cards, function(card) {
                 var nodegroup = _.find(ko.unwrap(params.graph.nodegroups), function(group) {
                     return ko.unwrap(group.nodegroupid) === card.nodegroup_id;
-                })
+                });
                 return !nodegroup || !ko.unwrap(nodegroup.parentnodegroup_id);
-            }).map(function (card) {
+            }).map(function(card) {
                 return new CardViewModel({
                     card: card,
+                    graphModel: params.graphModel,
                     tile: null,
                     resourceId: ko.observable(),
                     displayname: ko.observable(),
@@ -76,11 +78,7 @@ define([
                     loading: loading,
                     filter: filter,
                     provisionalTileViewModel: null,
-                    nodes: params.graph.nodes,
                     cardwidgets: data.cardwidgets,
-                    datatypes: data.datatypes,
-                    widgets: data.widgets,
-                    nodegroups: params.graph.nodegroups,
                     userisreviewer: true,
                     perms: ko.observableArray(),
                     permsLiteral: ko.observableArray()
@@ -90,7 +88,7 @@ define([
             filter: filter
         });
         var topCard = self.topCards[0];
-        if (topCard != null){
+        if (topCard != null) {
             selection(topCard.tiles().length > 0 ? topCard.tiles()[0] : topCard);
         }
     };
