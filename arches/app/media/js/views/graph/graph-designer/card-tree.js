@@ -17,7 +17,7 @@ define([
         var nodes = [];
         var nodegroups = [];
 
-        this.flattenTree = function (parents, flatList) {
+        this.flattenTree = function(parents, flatList) {
             _.each(ko.unwrap(parents), function(parent) {
                 flatList.push(parent);
                 this.flattenTree(
@@ -25,7 +25,7 @@ define([
                     flatList
                 );
             }, this);
-            return flatList
+            return flatList;
         };
 
         var toggleAll = function(state) {
