@@ -80,7 +80,7 @@ define([
 
             if (item) {
                 self.cardList.forEach(function(item) {
-                    nodegroupIds.push(item.nodegroupid());
+                    nodegroupIds.push(item.model.nodegroup_id());
                 });
                 $.ajax({
                     type: 'GET',
@@ -89,7 +89,7 @@ define([
                     success: function(res) {
                         res.forEach(function(nodegroup) {
                             var card = _.find(self.cardList, function(card) {
-                                return card.nodegroupid() === nodegroup.nodegroup_id;
+                                return card.model.nodegroup_id() === nodegroup.nodegroup_id;
                             });
 
                             if (nodegroup.perms.length === 0) {

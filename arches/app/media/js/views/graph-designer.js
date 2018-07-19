@@ -15,10 +15,12 @@ define([
     'graph-designer-data',
     'arches',
     'viewmodels/graph-settings',
+    'viewmodels/card',
     'view-data',
     'bindings/resizable-sidepanel',
-    'datatype-config-components'
-], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, GraphModel, GraphView, GraphTree, NodeFormView, BranchListView, CardTreeViewModel, PermissionDesigner, data, arches, GraphSettingsViewModel, viewData) {
+    'datatype-config-components',
+    'views/components/simple-switch'
+], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, GraphModel, GraphView, GraphTree, NodeFormView, BranchListView, CardTreeViewModel, PermissionDesigner, data, arches, GraphSettingsViewModel, CardViewModel, viewData) {
     var GraphDesignerView = BaseManagerView.extend({
 
         initialize: function(options) {
@@ -30,6 +32,7 @@ define([
             viewModel.graph = koMapping.fromJS(data['graph']);
             viewModel.ontologies = ko.observable(data['ontologies']);
             viewModel.ontologyClasses = ko.observable(data['ontologyClasses']);
+            viewModel.cardComponents = data.cardComponents;
 
             var resources = ko.utils.arrayFilter(viewData.graphs, function(graph) {
                 return graph.isresource;
