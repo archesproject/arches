@@ -1,0 +1,87 @@
+{% load staticfiles %}
+{% load i18n %}
+{% block header %}
+
+<!-- Title -->
+<span>
+    <h4 class="title-block-title">{% block title %}{% endblock %}</h4>
+    <!--ko with: provisionalHistoryList -->
+    <!-- ko if: $data.filter_function -->
+    <!-- Date Selector -->
+    <div class="provisional-edit-history-filter">
+    <div class="calendar">
+        <div class="calendar-label">{% trans "Within" %}</div>
+        <select id="" class="resources" placeholder="Select" tabindex="-1" data-bind="value: dateRangeType, chosen:{ width: '100%' }">
+            <!-- <option value="custom">{% trans "Custom date range" %}</option> -->
+            <option value="today">{% trans "Today" %}</option>
+            <option value="last-7">{% trans "Last 7 days" %}</option>
+            <option value="last-30">{% trans "Last 30 days" %}</option>
+            <option value="this-week">{% trans "This week" %}</option>
+            <option value="this-month">{% trans "This month" %}</option>
+            <option value="this-quarter">{% trans "This quarter" %}</option>
+            <option value="this-year">{% trans "This year" %}</option>
+        </select>
+    </div>
+
+    <div data-bind="component: { name: 'views/components/simple-switch', params: {value: sortAscending, config:{ label: '{% trans "Sorted Ascending" %}', subtitle: ''}}}"></div>
+    </div>
+    <!-- <div class="calendar">
+        <h3 class="search-label">{% trans "From" %}</h3>
+        <div id="search-from-c">
+            <input placeholder="" class="form-control input-lg" data-bind="value: fromDate, datepicker: {format: format, keepInvalid: true}, attr:{'placeholder': format}, disable: dateRangeType() !== 'custom'">
+        </div>
+    </div>
+
+    <div class="calendar">
+        <h3 class="search-label">{% trans "To" %}</h3>
+        <div id="search-from-b">
+            <input placeholder="" class="form-control input-lg" data-bind="value: toDate, datepicker: {format: format, keepInvalid: true}, attr:{'placeholder': format}, disable: dateRangeType() !== 'custom'">
+        </div>
+    </div> -->
+    <!-- /ko -->
+    <!-- /ko -->
+    {% endblock %}
+
+    {% block filter %}
+    {% endblock %}
+</span>
+
+{% block list_wrapper %}
+<div class="list-wrapper">
+<div class="grid" class="grid-list">
+    <!--ko with: provisionalHistoryList -->
+    <!-- ko foreach: items -->
+    <div class="new-provisional-edit-history" data-bind="visible: $data.filtered() == false, click: $parent.selectItem.bind($parent), css:{ 'selected selected-card': $data.selected }">
+            {% block listitem %}
+                <div class='entry'><i data-bind="css: $data.resourcemodel.iconclass" style="padding-right: 4px"></i><div class='entry-label' data-bind="text: $data.resourcemodel.name"></div></div>
+                <div class='entry'><div class='entry-label'>{% trans 'Resource: ' %}</div><span data-bind="text: $data.resourcedisplayname"></span></div>
+                <div class='entry'><div class='entry-label'>{% trans 'Card: ' %}</div><span data-bind="text: $data.card.name"></span></div>
+                <div class='entry'><div class='entry-label'>{% trans 'Edited: ' %}</div><span data-bind="text: $data.displaytime"></span></div>
+                <div class='entry'>
+                    <div class='entry-label'>{% trans 'Status: ' %}</div>
+                    <!--ko if: $data.pending -->
+                    <span style='color: #F5BB25'>{% trans 'Pending Review' %}</span>
+                    <!--/ko-->
+                    <!--ko if: $data.lastedittype === 'delete edit' -->
+                    <div><span style='color: red'>{% trans 'Declined by: ' %}</span><strong data-bind="text: $data.reviewer"></strong></div>
+                    <!--/ko-->
+                    <!--ko if: $data.lastedittype === 'accept edit' -->
+                    <div><span style='color: green'>{% trans 'Approved by: ' %}</span><strong data-bind="text: $data.reviewer"></strong></div>
+                    <!--/ko-->
+                </div>
+            <div class='new-provisional-edit-history footer'>
+                <div>
+                    <a data-bind="attr: {'href': $root.urls.resource_editor + $data.resourceinstanceid}">{% trans 'Edit' %}</a>
+                </div>
+                <div>
+                    <a data-bind="attr: {'href': $root.urls.resource_report + $data.resourceinstanceid}">{% trans 'Report' %}</a>
+                </div>
+            </div>
+            {% endblock %}
+        </div>
+        <!-- /ko -->
+    <!-- /ko -->
+
+</div>
+</div>
+{% endblock list_wrapper %}

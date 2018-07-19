@@ -180,7 +180,9 @@ class TileData(View):
 
     def get(self, request):
         if self.action == 'tile_history':
-            edits = EditLog.objects.filter(provisional_userid=request.user.id).order_by('tileinstanceid', 'timestamp')
+            start = request.GET.get('start')
+            end = request.GET.get('end')
+            edits = EditLog.objects.filter(provisional_userid=request.user.id).filter(timestamp__range=[start, end]).order_by('tileinstanceid', 'timestamp')
             summary = {}
             for edit in edits:
                 if edit.tileinstanceid not in summary:
@@ -189,6 +191,7 @@ class TileData(View):
                 summary[edit.tileinstanceid]['lastedittype'] = edit.provisional_edittype
                 summary[edit.tileinstanceid]['reviewer'] = ''
                 summary[edit.tileinstanceid]['resourceinstanceid'] = edit.resourceinstanceid
+                summary[edit.tileinstanceid]['resourcedisplayname'] = edit.resourcedisplayname
                 summary[edit.tileinstanceid]['resourcemodelid'] = edit.resourceclassid
                 summary[edit.tileinstanceid]['nodegroupid'] = edit.nodegroupid
                 if edit.provisional_edittype in ['accept edit', 'delete edit']:
