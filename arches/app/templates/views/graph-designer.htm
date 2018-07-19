@@ -121,11 +121,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             {% trans 'Cards' %}
                         </a>
                     </li>
+                    <li data-bind="css: { active: activeTab() === 'permissions' }, click: function(){activeTab('permissions');}">
+                        <a class="graph-designer-tab ion-android-folder" aria-expanded="false">
+                            {% trans 'Permissions' %}
+                        </a>
+                    </li>
                 </ul>
             </div>
 
             <div class="tab-content" >
-                <!-- Summary Card -->
                 <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'graph' }">
                     <div class="" data-bind="with: graphTree">
                         {% include 'views/graph/graph-designer/graph-tree.htm' %}
@@ -135,6 +139,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }">
                     <div class="jstree jstree-default" data-bind="visible: true, with: cardTree" style="display: none;">
                         {% include 'views/graph/graph-designer/card-tree.htm' %}
+                    </div>
+                </div>
+
+                <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'permissions' }">
+                    <div class="jstree jstree-default" data-bind="visible: true, with: cardTree" style="display: none;">
+                        {% include 'views/graph/graph-designer/card-tree-permissions.htm' %}
                     </div>
                 </div>
             </div>
@@ -196,6 +206,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="flex tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }">card</div>
                 <!-- /ko -->
             </div>
+
+            <div class="flex" data-bind="visible: activeTab() === 'permissions'">
+                <!--Middle Panel -->
+                <div class="middle-column-container graph-designer branch-library" style="width: 300px; border-bottom: solid 1px #dddddd; z-index: 10;">
+                    <div>
+                        {% include 'views/graph/graph-designer/identity-list.htm' %}
+                    </div>
+                </div>
+                <!-- Card Manager -->
+                <div class="flex tab-pane fade in" data-bind="css: { active: activeTab() === 'permissions' }">
+                    {% include 'views/graph/graph-designer/permission-settings-form.htm' %}
+                </div>
+            </div>
+
         </div>
 
     </div>

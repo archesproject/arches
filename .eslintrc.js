@@ -1,5 +1,5 @@
 module.exports = {
-    "extends": "standard",
+    "extends": "eslint:recommended",
     // add your custom rules here
     rules: {
         "semi": ["error", "always"],
@@ -10,5 +10,9 @@ module.exports = {
         'generator-star-spacing': 'off',
         // allow debugger during development
         'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
+    },
+    "globals": {
+        "define": false,
+        "require": false
     }
 };

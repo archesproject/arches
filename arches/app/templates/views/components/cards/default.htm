@@ -4,9 +4,9 @@
 <!-- ko if: state === 'editor-tree' -->
 <li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.tiles().length > 0 && card.expanded()), 'jstree-closed' : (card.tiles().length > 0 && !card.expanded()), 'jstree-leaf': card.tiles().length === 0}">
     <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
-    <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'jstree-clicked': card.selected, 'child-selected': card.isChildSelected()}, click: function () { card.canAdd() ? card.selected(true) : card.tiles()[0].selected(true) },">
-        <i class="fa fa-file-o" role="presentation" data-bind="css:{'has-provisional-edits fa-file': card.doesChildHaveProvisionalEdits()}"></i>
-        <span style="padding-right: 5px;" data-bind="text: card.model.name, css:{'filtered': card.highlight()}"></span>
+    <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected()}, click: function () { card.canAdd() ? card.selected(true) : card.tiles()[0].selected(true) },">
+        <i class="fa fa-file-o" role="presentation" data-bind="css:{'filtered': card.highlight(), 'has-provisional-edits fa-file': card.doesChildHaveProvisionalEdits()}"></i>
+        <span style="padding-right: 5px;" data-bind="text: card.model.name"></span>
         <!-- ko if: card.canAdd() -->
         <i class="fa fa-plus-circle add-new-tile" role="presentation" data-bind="css:{'jstree-clicked': card.selected}" data-toggle="tooltip" data-original-title="{% trans "Add New" %}"></i>
         <!-- /ko -->
@@ -19,9 +19,9 @@
         }">
             <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (cards.length > 0 && expanded), 'jstree-closed' : (cards.length > 0 && !expanded()), 'jstree-leaf': cards.length === 0}">
                 <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){expanded(!expanded())}"></i>
-                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { self.form.selection($data) }, css:{'jstree-clicked': selected, 'child-selected': isChildSelected()}">
+                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { self.form.selection($data) }, css:{'jstree-clicked': selected, 'child-selected': isChildSelected(), 'filtered-leaf': card.highlight()}">
                     <i class="fa fa-file" role="presentation" data-bind="css:{'has-provisional-edits': doesChildHaveProvisionalEdits() || $data.hasprovisionaledits()}"></i>
-                    <strong style="margin-right: 10px;" data-bind="css:{'filtered': card.highlight()}">
+                    <strong style="margin-right: 10px;">
                         <!-- ko if: card.widgets().length > 0 -->
                         <span data-bind="text: card.widgets()[0].label || card.model.name"></span>:
                         <div style="display: inline;" data-bind="component: {
@@ -69,9 +69,9 @@
 <!-- ko if: state === 'designer-tree' -->
 <li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards.length > 0 || card.widgets().length > 0) && card.expanded()), 'jstree-closed' : ((card.cards.length > 0 || card.widgets().length > 0) && !card.expanded()), 'jstree-leaf': card.cards.length === 0 && card.widgets().length === 0}">
     <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
-    <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'jstree-clicked': card.selected, 'child-selected': card.isChildSelected()}, click: function () { card.selected(true) },">
+    <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected()}, click: function () { card.selected(true) },">
         <i class="fa fa-file-o" role="presentation"></i>
-        <span style="padding-right: 5px;" data-bind="text: card.model.name, css:{'filtered': card.highlight()}"></span>
+        <span style="padding-right: 5px;" data-bind="text: card.model.name"></span>
     </a>
     <!-- ko if: card.cards.length > 0 || card.widgets().length > 0 -->
     <ul class="jstree-children" aria-expanded="true">
@@ -109,6 +109,45 @@
 </li>
 <!-- /ko -->
 
+
+<!-- ko if: state === 'permissions-tree' -->
+<li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards.length > 0 || card.widgets().length > 0) && card.expanded()), 'jstree-closed' : ((card.cards.length > 0 || card.widgets().length > 0) && !card.expanded()), 'jstree-leaf': card.cards.length === 0 && card.widgets().length === 0}">
+    <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
+    <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'jstree-clicked': card.selected, 'child-selected': card.isChildSelected()}, click: function () { card.selected(true) },">
+        <i class="fa fa-file-o" role="presentation"></i>
+        <span style="padding-right: 5px;" data-bind="text: card.model.name, css:{'filtered': card.highlight()}">
+        </span>
+        <span class="node-permissions">
+            <!--ko if: card.perms -->
+            <!-- ko foreach: card.perms() -->
+            <i class="node-permission-icon" data-bind="css: $data.icon"></i>
+            <!-- /ko -->
+            <!-- /ko -->
+        </span>
+    </a>
+    <!-- ko if: card.cards.length > 0 || card.widgets().length > 0 -->
+    <ul class="jstree-children" aria-expanded="true">
+        <div data-bind="foreach: {
+                data: card.cards,
+                as: 'card'
+            }">
+            <!-- ko component: {
+                name: self.form.cardComponentLookup[card.model.component_id()].componentname,
+                params: {
+                    state: 'permissions-tree',
+                    card: card,
+                    tile: null,
+                    loading: self.loading,
+                    form: self.form
+                }
+            } --> <!-- /ko -->
+        </div>
+    </ul>
+    <!-- /ko -->
+</li>
+<!-- /ko -->
+
+
 <!-- ko if: state === 'form' -->
 <div class="card-component">
 
@@ -129,7 +168,7 @@
     <!--/ko-->
 
     <div class="new-provisional-edit-card-container">
-        
+
         <!--ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 -->
         <div class='new-provisional-edits-list'>
             <div class='new-provisional-edits-header'>
@@ -150,7 +189,7 @@
                 </div>
             </div>
             <!-- /ko -->
-            
+
         </div>
         <!--/ko-->
 

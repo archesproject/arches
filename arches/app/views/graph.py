@@ -914,6 +914,7 @@ class PermissionManagerView(GraphBaseView):
 @method_decorator(group_required('Graph Editor'), name='dispatch')
 class PermissionDataView(View):
     perm_cache = {}
+    action = None
 
     def get_perm_name(self, codename):
         if codename not in self.perm_cache:
@@ -926,6 +927,28 @@ class PermissionDataView(View):
         return self.perm_cache[codename]
 
     def get(self, request):
+        if self.action == 'get_permission_manager_data':
+            identities = []
+            for group in Group.objects.all():
+                identities.append({
+                    'name': group.name,
+                    'type': 'group',
+                    'id': group.pk,
+                    'default_permissions': group.permissions.all()
+                })
+            for user in User.objects.filter(is_superuser=False):
+                groups = []
+                default_perms = []
+                for group in user.groups.all():
+                    groups.append(group.name)
+                    default_perms = default_perms + list(group.permissions.all())
+                identities.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions': set(default_perms)})
+
+            content_type = ContentType.objects.get_for_model(models.NodeGroup)
+            nodegroup_permissions = Permission.objects.filter(content_type=content_type)
+            ret = {'identities': identities, 'permissions': nodegroup_permissions}
+            return JSONResponse(ret)
+
         nodegroup_ids = JSONDeserializer().deserialize(request.GET.get('nodegroupIds'))
         identityId = request.GET.get('identityId')
         identityType = request.GET.get('identityType')
@@ -969,7 +992,14 @@ class PermissionDataView(View):
                     identityModel = User.objects.get(pk=identity['id'])
 
                 for card in data['selectedCards']:
-                    nodegroup = models.NodeGroup.objects.get(pk=card['nodegroup'])
+                    # TODO The following try block is here because the key for the nodegroupid in the new permission manager
+                    # is 'nodegroupid' where it was 'nodegroup' in the old permission manager. Once the old permission manager is deleted
+                    # we can replace it with `nodegroupid = card['nodegroupid']`
+                    try:
+                        nodegroupid = card['nodegroupid']
+                    except KeyError as e:
+                        nodegroupid = card['nodegroup']
+                    nodegroup = models.NodeGroup.objects.get(pk=nodegroupid)
 
                     # first remove all the current permissions
                     for perm in get_perms(identityModel, nodegroup):

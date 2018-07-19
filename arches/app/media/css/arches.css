@@ -151,7 +151,7 @@ dl.inline-flex dd {
     background-color: rgba(0, 0, 0, 0.05);
 }
 
-.list-group.bg-trans a.list-group-item:hover:(.active) {
+.list-group.bg-trans a.list-group-item.active:hover {
     background-color: #fff;
 }
 
@@ -523,7 +523,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     opacity: 1.0;
     height: 200px;
     width: 200px;
-    --border: 1px solid #266fb0;
+    /* border: 1px solid #266fb0; */
 }
 
 .tile-grid-container {
@@ -1337,7 +1337,6 @@ a.select2-search-choice-close {
 
 .permission-manager {
     background-color: #f4f4f4;
-    margin-left: 1px;
 }
 
 .permission-manager-item-list {
@@ -1347,7 +1346,6 @@ a.select2-search-choice-close {
 .permission-manager.header {
     position: relative;
     height: 100px;
-    margin-left: 2px;
     padding-left: 10px;
     color: #2b425b;
     background: #fff;
@@ -4056,7 +4054,7 @@ ul.jqtree-tree div.jqtree_common {
     border: 1px solid #ccc;
     text-decoration: none;
     font-weight: 700;
-    background: linear-gradient(top, #fafafa0%, #eee100%);
+    background: linear-gradient(top, #fafafa0, #eee100);
     -webkit-border-radius: 3px!important;
     border-radius: 3px!important;
     box-sizing: border-box;
@@ -6140,7 +6138,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 .clear-node-search {
     position: absolute;
     top: 6px;
-    right: 10px;
+    right: 0px;
     font-size: 14px;
 }
 
@@ -8041,7 +8039,7 @@ div.row.widget-wrapper.report-header:hover {
 .expanded-edit-map {
     position: fixed;
     border-width: 0px;
-    top: 105px;
+    top: 0px;
     left: 50px;
     bottom: 0px;
     right: 0px;
@@ -8049,7 +8047,7 @@ div.row.widget-wrapper.report-header:hover {
 }
 
 .map-search-container.expanded-edit-map {
-    top: 112px;
+    top: 51px;
 }
 
 .iiif-wrapper {
@@ -9962,7 +9960,8 @@ table.table.dataTable {
     transition: stroke-width 250ms linear;
     -moz-transition: stroke-width 250ms linear;
     -webkit-transition: stroke-width 250ms linear;
-    transition-delay: 250ms -moz-transition-delay: 250ms;
+    transition-delay: 250ms;
+    -moz-transition-delay: 250ms;
     -webkit-transition-delay: 250ms;
 }
 
@@ -10367,7 +10366,7 @@ a.search-facet-item.disabled {
 }
 
 .nav-tabs li a.graph-designer-tab {
-    padding: 15px 25px 15px 25px;
+    padding: 15px 10px 15px 10px;
 }
 
 .graph-designer-tab-container {
@@ -11422,6 +11421,10 @@ a.jstree-anchor strong {
     display:inline;
 }
 
+a.jstree-anchor.disabled {
+    color: #ccc;
+}
+
 .card-summary-section li {
     list-style: none;
 }
@@ -11495,7 +11498,7 @@ a.jstree-anchor strong {
 
 .rr-splash-help-link {
     margin: 10px;
-    font-size: 16px:
+    font-size: 16px;
 }
 
 @keyframes loader {

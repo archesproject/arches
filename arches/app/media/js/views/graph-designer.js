@@ -11,6 +11,7 @@ define([
     'views/graph/graph-designer/node-form',
     'views/graph/graph-manager/branch-list',
     'views/graph/graph-designer/card-tree',
+    'views/graph/permission-designer',
     'graph-designer-data',
     'arches',
     'viewmodels/graph-settings',
@@ -19,7 +20,7 @@ define([
     'bindings/resizable-sidepanel',
     'datatype-config-components',
     'views/components/simple-switch'
-], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, GraphModel, GraphView, GraphTree, NodeFormView, BranchListView, CardTreeViewModel, data, arches, GraphSettingsViewModel, CardViewModel, viewData) {
+], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, GraphModel, GraphView, GraphTree, NodeFormView, BranchListView, CardTreeViewModel, PermissionDesigner, data, arches, GraphSettingsViewModel, CardViewModel, viewData) {
     var GraphDesignerView = BaseManagerView.extend({
 
         initialize: function(options) {
@@ -87,18 +88,18 @@ define([
                 if (node) {
                     viewModel.loading(true);
                     node.save(function(data) {
-                        if (data.responseJSON.success === false) {
+                        if (!data.responseJSON.success) {
                             viewModel.alert(new AlertViewModel('ep-alert-red', data.responseJSON.title, data.responseJSON.message));
                         }
                         viewModel.loading(false);
                     });
-                }
+                };
             };
 
             viewModel.saveSelectedNode = function() {
                 if (viewModel.selectedNode()) {
                     viewModel.saveNode(viewModel.selectedNode());
-                }
+                };
             };
 
             viewModel.cardTree = new CardTreeViewModel({
@@ -121,6 +122,10 @@ define([
                 disableAppendButton: ko.computed(function() {
                     // self.node() && self.node().dirty();
                 })
+            });
+
+            viewModel.permissionsDesigner = new PermissionDesigner({
+                cardTree: viewModel.cardTree
             });
 
             viewModel.graphSettingsViewModel = new GraphSettingsViewModel({
@@ -170,9 +175,15 @@ define([
             if (viewModel.activeTab() === 'graph') {
                 viewModel.loadGraphSettings();
                 // here we might load data/views asyncronously
-            } else {
+            };
 
-            }
+            var loadPermissionData = viewModel.activeTab.subscribe(function(tab) {
+                // Loads identities and nodegroup permissions when the permissions tab is opened and then disposes the ko.subscribe.
+                if (tab === 'permissions') {
+                    viewModel.permissionsDesigner.getPermissionManagerData();
+                    loadPermissionData.dispose();
+                };
+            });
 
             viewModel.viewState.subscribe(function(state) {
                 if (state === 'design') {
