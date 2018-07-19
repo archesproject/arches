@@ -195,7 +195,7 @@ Assigned to: Rob
 | ------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
 | Settings - changes to the name and icon of a layer are reflected in the map widget overlay list and overlay library |    :white_check_mark:    |    ?   |    ?    |   ?  | ?   | -     |
 | User can delete an overlay and it no longer appears in the map widget overlay library                               |    :white_check_mark:    |    ?   |    ?    |   ?  | ?   | -     |
-
+| Overlays support custom popups                                                                                                         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 * * *
 
 ## Import/Export
@@ -278,12 +278,12 @@ Assigned to: Jeff
 
 | Test Subject                                                                                                                           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Hovering over a link in the force directed graph opens a panel with source and target node info and list each unique relationship type |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Hovering over a node highlights the adjacent links and the corresponding entry in the node list                                        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Hovering over a node list entry highlights the corresponding node and its adjacent links                                               |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can switch between table and force directed graph                                                                                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Entering text in the search field filters the list of list entries                                                                     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Overlays support custom popups                                                                                                         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Hovering over a link in the force directed graph opens a panel with source and target node info and list each unique relationship type |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Hovering over a node highlights the adjacent links and the corresponding entry in the node list                                        |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Hovering over a node list entry highlights the corresponding node and its adjacent links                                               |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| User can switch between table and force directed graph                                                                                 |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Entering text in the search field filters the list of list entries                                                                     |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+
 
 * * *
 
@@ -293,15 +293,15 @@ Assigned to: Jeff
 
 | Test Subject                                                                                                                                                                         | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| Free text search                                                                                                                                                                     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Concept search                                                                                                                                                                       |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Map search                                                                                                                                                                           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Time range based search                                                                                                                                                              |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Time wheel search                                                                                                                                                                    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Advanced search                                                                                                                                                                      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Related resource table search                                                                                                                                                        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Related resource graph search                                                                                                                                                        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Resource type search                                                                                                                                                                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Free text search                                                                                                                                                                     |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Concept search                                                                                                                                                                       |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Map search                                                                                                                                                                           |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Time range based search                                                                                                                                                              |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Time wheel search                                                                                                                                                                    |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Advanced search                                                                                                                                                                      |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | Should a Tag show up in the main Search Bar?     |
+| Related resource table search                                                                                                                                                        |    :construction:   |    ?   |    ?    |   ?  | ?   | [Ticket to Implement](https://github.com/archesproject/arches/issues/1567)     |
+| Related resource graph list filter graph                                                                                                                                                       |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Resource type search                                                                                                                                                                 |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 | Edit status search (provisional, authoritative, or both). Confirm that only resource reviewers are able to see provisional tile data                                                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Map should not zoom to points that a user is not permitted to read, nor should the search aggregation layer (e.g. hexbin or heatmap) indicate that a restricted resource is present. |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
