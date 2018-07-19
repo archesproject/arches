@@ -16,21 +16,18 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import itertools
 import zipfile
 import json
 import uuid
 from django.db import transaction
-from django.core.urlresolvers import reverse
 from django.shortcuts import redirect, render
 from django.db.models import Q
 from django.utils.translation import ugettext as _
-from django.utils.decorators import method_decorator, classonlymethod
-from django.http import HttpResponseNotFound, QueryDict, HttpResponse
+from django.utils.decorators import method_decorator
+from django.http import HttpResponseNotFound, HttpResponse
 from django.views.generic import View, TemplateView
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
-from django.template.loader import render_to_string
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.response import JSONResponse
@@ -42,10 +39,9 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.data_management.resource_graphs.exporter import get_graphs_for_export, create_mapping_configuration_file
 from arches.app.utils.data_management.resource_graphs import importer as GraphImporter
 from arches.app.utils.system_metadata import system_metadata
-from arches.app.views.base import BaseManagerView, MapBaseManagerView
-from tempfile import NamedTemporaryFile
-from guardian.shortcuts import get_perms_for_model, assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
-from rdflib import Graph as RDFGraph, RDF, RDFS
+from arches.app.views.base import BaseManagerView
+from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
+from rdflib import Graph as RDFGraph
 
 try:
     from cStringIO import StringIO
@@ -161,8 +157,6 @@ class NewGraphSettingsView(GraphBaseView):
                     'graph': res,
                     'is_relatable': (node_model in relatable_resources)
                 })
-        # ontology_classes = models.OntologyClass.objects.values('source', 'ontology_id')
-        node_count = models.Node.objects.filter(graph=self.graph).count()
         data = {
             'icons': JSONSerializer().serializeToPython(icons),
             'node_count': models.Node.objects.filter(graph=self.graph).count(),
@@ -276,8 +270,6 @@ class GraphDesignerView(GraphBaseView):
         ontology_classes = models.OntologyClass.objects.values('source', 'ontology_id')
         datatypes = models.DDataType.objects.all()
         datatypes_json = JSONSerializer().serialize(datatypes, exclude=['modulename', 'isgeometric'])
-        lang = request.GET.get('lang', settings.LANGUAGE_CODE)
-        concept_collections = Concept().concept_tree(mode='collections', lang=lang)
         branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True)
         cards = self.graph.cardmodel_set.order_by('sortorder').prefetch_related('cardxnodexwidget_set')
         cardwidgets = [widget for widgets in [card.cardxnodexwidget_set.order_by(
@@ -316,8 +308,9 @@ class GraphDesignerView(GraphBaseView):
         context['ontology_classes'] = JSONSerializer().serialize(ontology_classes)
         context['nav']['title'] = self.graph.name
         #context['nav']['menu'] = True
-        context['graph'] = JSONSerializer().serialize(self.graph, exclude=['functions', 'cards',
-                                                                           'deploymentfile', 'deploymentdate', '_nodegroups_to_delete', '_functions'])
+        context['graph'] = JSONSerializer().serialize(self.graph, exclude=['functions', 'cards', 'deploymentfile',
+                                                                           'deploymentdate', '_nodegroups_to_delete',
+                                                                           '_functions'])
         context['graph_models'] = models.GraphModel.objects.all().exclude(
             graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         context['graphs'] = JSONSerializer().serialize(context['graph_models'], exclude=['functions'])
@@ -448,7 +441,7 @@ class GraphDataView(View):
 
                 elif self.action == 'reorder_nodes':
                     json = request.body
-                    if json != None:
+                    if json is not None:
                         data = JSONDeserializer().deserialize(json)
 
                         if 'nodes' in data and len(data['nodes']) > 0:
@@ -483,7 +476,7 @@ class CardManagerView(GraphBaseView):
 
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
-        if self.graph.isresource == False:
+        if self.graph.isresource is False:
             card = Card.objects.get(cardid=Graph.objects.get(graphid=graphid).get_root_card().cardid)
             cardid = card.cardid
             return redirect('card', cardid=cardid)
@@ -515,7 +508,7 @@ class CardView(GraphBaseView):
             # assume the cardid is actually a graph id
             card = Card.objects.get(cardid=Graph.objects.get(graphid=cardid).get_root_card().cardid)
             self.graph = Graph.objects.get(graphid=card.graph_id)
-            if self.graph.isresource == True:
+            if self.graph.isresource is True:
                 return redirect('card_manager', graphid=cardid)
 
         card.confirm_enabled_state(request.user, card.nodegroup)
@@ -585,7 +578,7 @@ class FormManagerView(GraphBaseView):
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
 
-        if self.graph.isresource == True:
+        if self.graph.isresource is True:
             context = self.get_context_data(
                 main_script='views/graph/form-manager',
                 forms=JSONSerializer().serialize(self.graph.form_set.all().order_by('sortorder')),
@@ -654,7 +647,7 @@ class FormView(GraphBaseView):
         except(models.Form.DoesNotExist):
             # assume the formid is a graph id
             graph = Graph.objects.get(graphid=formid)
-            if graph.isresource == False:
+            if graph.isresource is False:
                 return redirect('graph_settings', graphid=graph.graphid)
             else:
                 return redirect('form_manager', graphid=graph.graphid)
@@ -787,7 +780,7 @@ class ReportEditorView(GraphBaseView):
         except(models.Report.DoesNotExist):
             # assume the reportid is a graph id
             graph = Graph.objects.get(graphid=reportid)
-            if graph.isresource == False:
+            if graph.isresource is False:
                 return redirect('graph_settings', graphid=graph.graphid)
             else:
                 return redirect('report_manager', graphid=graph.graphid)
@@ -895,6 +888,7 @@ class PermissionManagerView(GraphBaseView):
             cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
 
             root = {'children': []}
+
             def extract_card_info(cards, root):
                 for card in cards:
                     d = {
@@ -924,7 +918,6 @@ class PermissionManagerView(GraphBaseView):
                 identities=JSONSerializer().serialize(identities),
                 cards=JSONSerializer().serialize(root),
                 datatypes=JSONSerializer().serialize(models.DDataType.objects.all()),
-                # JSONSerializer().serialize([{'codename': permission.codename, 'name': permission.name} for permission in get_perms_for_model(card.nodegroup)])
                 nodegroupPermissions=JSONSerializer().serialize(nodegroupPermissions)
             )
 
@@ -1029,7 +1022,7 @@ class PermissionDataView(View):
                     # we can replace it with `nodegroupid = card['nodegroupid']`
                     try:
                         nodegroupid = card['nodegroupid']
-                    except KeyError as e:
+                    except KeyError:
                         nodegroupid = card['nodegroup']
                     nodegroup = models.NodeGroup.objects.get(pk=nodegroupid)
 
