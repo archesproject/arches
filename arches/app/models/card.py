@@ -15,11 +15,12 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
-import uuid
+
 from django.db import transaction
 from arches.app.models import models
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.betterJSONSerializer import JSONSerializer
 from django.forms import ModelForm
+
 
 class Card(models.CardModel):
     """
@@ -97,7 +98,7 @@ class Card(models.CardModel):
                         widget_model.config = widget.get('config', {})
                         widget_model.label = widget.get('label', '')
                         widget_model.sortorder = widget.get('sortorder', None)
-                        if widget_model.pk == None:
+                        if widget_model.pk is None:
                             widget_model.save()
                         self.widgets.append(widget_model)
 
@@ -144,7 +145,7 @@ class Card(models.CardModel):
         return self
 
     def confirm_enabled_state(self, user, nodegroup):
-        if user.has_perms(['write_nodegroup'], self.nodegroup) == False:
+        if user.has_perms(['write_nodegroup'], self.nodegroup) is False:
             self.disabled = True
 
     def get_edge_to_parent(self):
@@ -182,7 +183,7 @@ class Card(models.CardModel):
 
         """
 
-        exclude = [] if exclude == None else exclude
+        exclude = [] if exclude is None else exclude
         ret = JSONSerializer().handle_model(self, fields, exclude)
 
         ret['cardinality'] = self.cardinality if 'cardinality' not in exclude else ret.pop('cardinality', None)
@@ -191,7 +192,8 @@ class Card(models.CardModel):
         ret['visible'] = self.visible if 'visible' not in exclude else ret.pop('visible', None)
         ret['active'] = self.active if 'active' not in exclude else ret.pop('active', None)
         ret['is_editable'] = self.is_editable() if 'is_editable' not in exclude else ret.pop('is_editable', None)
-        ret['ontologyproperty'] = self.ontologyproperty if 'ontologyproperty' not in exclude else ret.pop('ontologyproperty', None)
+        ret['ontologyproperty'] = self.ontologyproperty if 'ontologyproperty' not in exclude else ret.pop(
+            'ontologyproperty', None)
         ret['disabled'] = self.disabled if 'disabled' not in exclude else ret.pop('disabled', None)
 
         if self.graph and self.graph.ontology and self.graph.isresource:
@@ -224,6 +226,7 @@ class Card(models.CardModel):
 
 
 class CardXNodeXWidgetForm(ModelForm):
+
     class Meta:
         model = models.CardXNodeXWidget
         fields = '__all__'
