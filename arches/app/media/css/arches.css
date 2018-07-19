@@ -5853,8 +5853,13 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     display: flex;
     flex-direction: column;
     border-bottom: solid #f0f0f0 1px;
-    padding: 5px;
-    background-color: #f5f5f5;
+    padding: 5px 15px;
+    background-color: #fcfcfc;
+}
+
+.new-provisional-edit-history.selected-card {
+    color: #454545;
+    background-color: #f0f0f0;
 }
 
 .new-provisional-edit-history:hover {
@@ -5874,6 +5879,15 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     font-size:13px;
 }
 
+.new-provisional-edit-history.footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: inherit;
+    border-bottom: 0px;
+    padding: 0px;
+}
+
 .provisional-edits-list-header {
     display: inline-flex;
     width: 100%;
@@ -5882,6 +5896,31 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     height: 35px;
     margin-top: 0px;
     margin-bottom:1px;
+}
+
+.provisional-edit-history-filter {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.provisional-edit-history-filter .calendar {
+    display: flex;
+    width: 220px;
+    padding-left: 10px;
+    align-items: baseline;
+    justify-content: space-between;
+}
+
+.provisional-edit-history-filter .calendar-label {
+    font-size: 12px;
+    color: inherit;
+    padding: 5px;
+}
+
+
+.ep-edits-body.provisional-edit-history {
+    height: 100%;
 }
 
 .provisional-edits-list-header span {

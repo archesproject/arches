@@ -46,7 +46,6 @@ define([
         );
     };
 
-
     var TileViewModel = function(params) {
         var CardViewModel = require('viewmodels/card');
         var self = this;
@@ -154,6 +153,7 @@ define([
                 loading(true);
                 delete self.formData.data;
                 if (params.provisionalTileViewModel.selectedProvisionalEdit()) {
+                    self.formData.append('accepted_provisional', JSON.stringify(params.provisionalTileViewModel.selectedProvisionalEdit()));
                     params.provisionalTileViewModel.acceptProvisionalEdit();
                 };
                 self.formData.append(
@@ -163,7 +163,7 @@ define([
                     )
                 );
                 $.ajax({
-                    type: "POST",
+                    type: 'POST',
                     url: arches.urls.tile,
                     processData: false,
                     contentType: false,
@@ -183,7 +183,7 @@ define([
                         selection(self);
                     }
                     if (params.userisreviewer === false && !self.provisionaledits()) {
-                        //If the user is provisional ensure their edits are provisional
+                        // If the user is provisional ensure their edits are provisional
                         self.provisionaledits(self.data);
                     };
                     if (params.userisreviewer === true && params.provisionalTileViewModel.selectedProvisionalEdit()) {
