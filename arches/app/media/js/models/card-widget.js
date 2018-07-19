@@ -28,8 +28,8 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function(_, ko,
                     return widget.datatype === self.datatype.datatype;
                 });
             };
-            options || (options = {});
-            attributes || (attributes = {});
+            options = options ? options : {};
+            attributes = attributes ? attributes : {};
             options.parse = true;
             this.node = (options.node || null);
             this.card = (options.card || null);
@@ -67,7 +67,7 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function(_, ko,
                 },
                 write: function(value) {
                     var config = this.get('config');
-                    for (key in value) {
+                    for (var key in value) {
                         if (key === 'label') {
                             this.get('label')(value[key]);
                         }
@@ -110,6 +110,7 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function(_, ko,
                             return widgetId();
                         },
                         write: function(value) {
+                            var key;
                             var defaultConfig = JSON.parse(widgets[value].defaultconfig);
                             for (key in defaultConfig) {
                                 defaultConfig[key] = ko.observable(defaultConfig[key]);
@@ -137,7 +138,7 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function(_, ko,
          */
         toJSON: function() {
             var ret = {};
-            for (key in this.attributes){
+            for (var key in this.attributes){
                 if (key !== 'config') {
                     ret[key] = this.attributes[key]();
                 } else {
