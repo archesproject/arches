@@ -83,7 +83,7 @@ define([
             $.when(...domainConnections)
             .then(function(){
                 self.loadingBranchDomains(false);
-                self.filter_function();
+                self.filterFunction();
             });
 
         },
@@ -92,7 +92,7 @@ define([
         * Callback function called every time a user types into the filter input box
         * @memberof ListView.prototype
         */
-        filter_function: function(){
+        filterFunction: function(){
             var filter = this.filter().toLowerCase();
             this.items().forEach(function(item){
                 var name = typeof item.name === 'string' ? item.name : item.name();

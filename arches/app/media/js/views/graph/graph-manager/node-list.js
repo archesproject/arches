@@ -9,7 +9,7 @@ define([
         * @name NodeList
         */
 
-        filter_function: function(newValue){
+        filterFunction: function(newValue){
             var filter = this.filter().toLowerCase();
             this.items().forEach(function(item){
                 item.filtered(true);

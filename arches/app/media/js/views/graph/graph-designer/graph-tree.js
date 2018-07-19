@@ -1,8 +1,10 @@
 define([
+    'jquery',
     'knockout',
+    'underscore',
     'views/tree-view',
     'arches'
-], function(ko, TreeView, arches) {
+], function($, ko, _, TreeView, arches) {
     var loading = ko.observable(false);
 
     var GraphTree = TreeView.extend({
@@ -13,7 +15,7 @@ define([
         * @name GraphTree
         */
 
-        filter_function: function(newValue){
+        filterFunction: function(){
             var filter = this.filter().toLowerCase();
             this.items().forEach(function(item){
                 item.filtered(true);
@@ -56,7 +58,7 @@ define([
         * @param {object} node - a node in the tree
         */
         isChildSelected: function(node) {
-            var isChildSelected = function (parent) {
+            var isChildSelected = function(parent) {
                 var childSelected = false;
                 if (!parent.istopnode) {
                     parent.childNodes().forEach(function(child) {
@@ -91,7 +93,7 @@ define([
         * @param {object} node - the node to be selected via {@link GraphModel#selectNode}
         * @param {object} e - click event object
         */
-        selectItem: function(node, e){
+        selectItem: function(node){
             if (!this.graphSettings.dirty()) {
                 this.graphModel.selectNode(node);
                 this.trigger('node-selected', node);
@@ -118,7 +120,6 @@ define([
 
         deleteNode: function(node, e) {
             e.stopImmediatePropagation();
-            var parentNode = this.graphModel.getParentNode(node);
             this.graphModel.deleteNode(node);
         },
 
@@ -130,10 +131,10 @@ define([
             });
         },
 
-        beforeMove: function (e) {
+        beforeMove: function(e) {
             e.cancelDrop = (e.sourceParent!==e.targetParent);
         },
-        reorderNodes: function (e) {
+        reorderNodes: function(e) {
             loading(true);
             var nodes = _.map(e.sourceParent(), function(node) {
                 return node.attributes.source;
@@ -144,7 +145,7 @@ define([
                     nodes: nodes
                 }),
                 url: arches.urls.reorder_nodes,
-                complete: function(response) {
+                complete: function() {
                     loading(false);
                 }
             });

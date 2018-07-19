@@ -29,7 +29,7 @@ define([
         * Callback function called every time a user types into the filter input box
         * @memberof ListView.prototype
         */
-        filter_function: function(newValue){
+        filterFunction: function(newValue){
             var filter = this.filter().toLowerCase();
             this.items().forEach(function(item){
                 var name = typeof item.name === 'string' ? item.name : item.name();
@@ -59,10 +59,10 @@ define([
             this.items.subscribe(function (items) {
                 items.forEach(this._initializeItem, this);
             }, this);
-            if(this.filter_function){
+            if(this.filterFunction){
                 this.filter = ko.observable('');
-                this.filter.subscribe(this.filter_function, this, 'change');
-                this.filter_function();
+                this.filter.subscribe(this.filterFunction, this, 'change');
+                this.filterFunction();
             }
 
             this.selectedItems = ko.computed(function(){

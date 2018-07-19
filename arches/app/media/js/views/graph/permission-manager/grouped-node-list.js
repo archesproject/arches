@@ -17,9 +17,9 @@ define([
         * Callback function called every time a user types into the filter input box
         * @memberof ListView.prototype
         */
-        filter_function: function(newValue){
+        filterFunction: function(newValue){
             // first run the standard filter
-            ListView.prototype.filter_function.apply(this, arguments);
+            ListView.prototype.filterFunction.apply(this, arguments);
 
             // next bring back and any card containers that were filtered that have children that were not
             this.items().forEach(function(item){
