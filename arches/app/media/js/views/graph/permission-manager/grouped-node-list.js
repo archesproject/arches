@@ -11,26 +11,25 @@ define([
         * @name GroupedNodeList
         */
 
-        single_select: false,
+        singleSelect: false,
 
         /**
         * Callback function called every time a user types into the filter input box
         * @memberof ListView.prototype
         */
-        filter_function: function(newValue){
+        filterFunction: function(){
             // first run the standard filter
-            ListView.prototype.filter_function.apply(this, arguments);
+            ListView.prototype.filterFunction.apply(this, arguments);
 
             // next bring back and any card containers that were filtered that have children that were not
             this.items().forEach(function(item){
                 if (item.type === 'card_container'){
-                    var filtered = false;
                     item.children.forEach(function(childItem){
                         if (!childItem.filtered()){
                             item.filtered(false);
                         }
-                    })
-                  }
+                    });
+                }
             }, this);
         },
 
@@ -55,10 +54,10 @@ define([
                     item.filtered = ko.observable(false);
                 }
                 item.children.forEach(parseData, this);
-                item.children.sort(function (a, b) {
+                item.children.sort(function(a, b) {
                     return ko.unwrap(a.name).localeCompare(ko.unwrap(b.name));
                 });
-            }
+            };
 
             parseData.call(this, options.cards);
 
@@ -80,7 +79,7 @@ define([
         },
 
         /**
-        * Toggles the selected status of a single list item, if {@link ListView#single_select} is
+        * Toggles the selected status of a single list item, if {@link ListView#singleSelect} is
         *   true clear the selected status of all other list items
         * @memberof ListView.prototype
         * @param {object} item - the item to be selected or unselected
@@ -90,17 +89,17 @@ define([
             var self = this;
             if(!!item.selectable){
                 var selectedStatus = item.selected();
-                if(this.single_select){
+                if(this.singleSelect){
                     this.clearSelection();
                 }
                 item.selected(parentItem ? parentItem.selected() : !selectedStatus);
                 this.trigger('item-clicked', item, evt);
                 item.children.forEach(function(childItem){
                     self.selectItem(childItem, evt, item);
-                })
+                });
             }else{
                 if (parentItem){
-                   item.active(parentItem.selected());
+                    item.active(parentItem.selected());
                 }
             }
         },
@@ -113,10 +112,10 @@ define([
             this.items().forEach(function(item){
                 item.selected(false);
                 item.children.forEach(function(child) {
-                  if (child.type === 'node') {
-                    child.active(false);
-                  }
-                })
+                    if (child.type === 'node') {
+                        child.active(false);
+                    }
+                });
             }, this);
         },
 
