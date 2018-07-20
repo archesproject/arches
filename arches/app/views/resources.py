@@ -36,7 +36,6 @@ from django.http import HttpResponseNotFound
 from django.contrib.gis.geos import GEOSGeometry
 from django.db.models import Max, Min
 from django.contrib.auth.decorators import user_passes_test
-from django.contrib import messages
 
 def report(request, resourceid):
     raise NotImplementedError('Reports are not yet implemented.')
@@ -75,7 +74,7 @@ def resource_manager(request, resourcetypeid='', form_id='default', resourceid='
             existing = check_existing(data, resourcetypeid, resource.entityid)
             if existing:
                 # existing contains the JSON response
-                messages.add_message(request, messages.INFO, "Found %s existing resources nearby" % existing)
+                print(existing)
 
         with transaction.atomic():
             if resourceid != '':
