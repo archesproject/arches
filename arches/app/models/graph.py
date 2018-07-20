@@ -312,14 +312,18 @@ class Graph(models.GraphModel):
 
         return old, new
 
-    def save(self):
+    def save(self, validate=True):
         """
         Saves an a graph and its nodes, edges, and nodegroups back to the db
         creates associated card objects if any of the nodegroups don't already have a card
 
+        Arguments:
+        validate -- True to validate the graph before saving, defaults to True
+
         """
 
-        self.validate()
+        if validate:
+            self.validate()
 
         with transaction.atomic():
             super(Graph, self).save()
