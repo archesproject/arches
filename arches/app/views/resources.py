@@ -71,11 +71,11 @@ def resource_manager(request, resourcetypeid='', form_id='default', resourceid='
         form.update(data, request.FILES)
 
         # Will check that this resource doesn't already exist!
-        existing = check_existing(data, resourcetypeid, resource.entityid)
-        if existing:
-            # existing contains the JSON response
-            messages.add_message(request, messages.INFO, "Found %s existing resources nearby" % existing)
-            pass
+        if form_id in ['location', 'location-component', 'coverage']:
+            existing = check_existing(data, resourcetypeid, resource.entityid)
+            if existing:
+                # existing contains the JSON response
+                messages.add_message(request, messages.INFO, "Found %s existing resources nearby" % existing)
 
         with transaction.atomic():
             if resourceid != '':
@@ -268,50 +268,49 @@ def debug_view(request, resourceid=''):
     
     return JSONResponse(resource_dict, indent=4)
 
+
 def check_existing(data, resourcetype, resourceentityid=None):
     geomentities = ["SPATIAL_COORDINATES.E47", "GEOMETRIC_PLACE_EXPRESSION.SP5", "SPATIAL_COORDINATES_GEOMETRY.E47"]
-    print("Has data! %s" % data)
     nearbyres = {}
     for geoment in geomentities:
-        if geoment in data:
-            for n in data[geoment]:
-                nodes = n['nodes']
-                print ("Nodes: %s" % nodes)
-                values = [d['value'] for d in nodes if d['entitytypeid'] == geoment]
-                srefs = [d['value'] for d in nodes if d['entitytypeid'] == "SPATIAL_COORDINATES_REF_SYSTEM.SP4"]
-                print("Values: %s" % values)
-                print("Srefs: %s" % srefs)
-                for i, v in enumerate(values):
-                    if len(srefs):
-                        target = GEOSGeometry(v, srid=srefs[i])
-                    else:
-                        target = GEOSGeometry(v)
-                    print("Target: %s" % target)
-                    mindistance = settings.METER_RADIUS
-                    nearbygeos = models.Geometries.objects.filter(val__dwithin=(target, getDegrees(mindistance, target)))
-                    print("Nearby: %s" % [g.entityid for g in nearbygeos])
-                    for g in nearbygeos:
-                        print("Child: %s" % g)
-                        parent = get_parent_id(g.entityid)
-                        while True:
-                            if get_parent_id(parent.entityid):
-                                parent = get_parent_id(parent.entityid)
-                            else:
-                                break
-                        print("Parent: %s" % parent)
-                        print(resourceentityid, str(parent.entitytypeid), resourcetype)
-                        if str(parent.entityid) != resourceentityid and str(parent.entitytypeid) == resourcetype:
-                            if parent.entityid not in nearbyres:
-                                res = Resource().get(parent.entityid)
-                                nearbyres[parent.entityid] = {'Primary_Name': res.get_primary_name(),
-                                                              'Resource_Type': res.entitytypeid}
-                                print("Added")
-    print("Nearby Resources: %s" % nearbyres)
+        if geoment not in data:
+            continue
+        for n in data[geoment]:
+            values = [d['value'] for d in n['nodes'] if d['entitytypeid'] == geoment]
+            srefs = [d['value'] for d in n['nodes'] if d['entitytypeid'] == "SPATIAL_COORDINATES_REF_SYSTEM.SP4"]
+            for i, v in enumerate(values):
+                if srefs:
+                    target = GEOSGeometry(v, srid=srefs[i])
+                else:
+                    target = GEOSGeometry(v)
+                mindistance = settings.METER_RADIUS
+                if not mindistance:
+                    mindistance = 1000  # if settings.METER_RADIUS isn't set, default to 1Km
+                nearbygeos = models.Geometries.objects.filter(val__dwithin=(target, getDegrees(mindistance, target)))
+                for g in nearbygeos:
+                    parent = get_root_id(g.entityid)
+                    # check that it's a new resource with the same resource type.
+                    if str(parent.entityid) != resourceentityid and str(parent.entitytypeid) == resourcetype:
+                        if parent.entityid not in nearbyres:
+                            # create a class instance to get the primary_name
+                            # this can be slow so if the primary_name isn't needed it could be worth skipping
+                            res = Resource().get(parent.entityid)
+                            nearbyres[parent.entityid] = {'Primary_Name': res.get_primary_name(),
+                                                          'Resource_Type': res.entitytypeid}
 
     if nearbyres:
         return JSONResponse(nearbyres)
-    else:
-        return False
+    return False
+
+
+def get_root_id(entityid):
+    parent = get_parent_id(entityid)
+    while True:
+        if get_parent_id(parent.entityid):
+            parent = get_parent_id(parent.entityid)
+        else:
+            break
+    return parent
 
 
 def get_parent_id(entityid):
@@ -320,10 +319,12 @@ def get_parent_id(entityid):
     else:
         return False
 
+
 def getDegrees(meters, target):
     diffy = target.extent[3] - target.extent[1]
     midpoint = target.extent[1] + diffy
     return metersToDegrees(meters, midpoint)
+
 
 def metersToDegrees(meters, latitude):
     """Based on the C# function described in
