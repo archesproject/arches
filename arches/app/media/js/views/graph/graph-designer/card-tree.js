@@ -14,13 +14,11 @@ define([
         var filter = ko.observable('');
         var loading = ko.observable(false);
         var selection = ko.observable();
-        var nodes = [];
-        var nodegroups = [];
 
         this.flattenTree = function(parents, flatList) {
             _.each(ko.unwrap(parents), function(parent) {
                 flatList.push(parent);
-                this.flattenTree(
+                self.flattenTree(
                     ko.unwrap(parent.cards),
                     flatList
                 );
@@ -29,7 +27,7 @@ define([
         };
 
         var toggleAll = function(state) {
-            var nodes = flattenTree(self.topCards, []).concat([{
+            var nodes = self.flattenTree(self.topCards, []).concat([{
                 expanded: self.rootExpanded
             }]);
             _.each(nodes, function(node) {
@@ -59,6 +57,9 @@ define([
                 toggleAll(false);
             },
             rootExpanded: ko.observable(true),
+            on: function() {
+                return;
+            },
             topCards: _.filter(data.cards, function(card) {
                 var nodegroup = _.find(ko.unwrap(params.graph.nodegroups), function(group) {
                     return ko.unwrap(group.nodegroupid) === card.nodegroup_id;
