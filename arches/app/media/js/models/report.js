@@ -18,8 +18,8 @@ define(['arches',
 
         initialize: function(options) {
             var self = this;
-
             var forms = [];
+
             options.forms.forEach(function(formData) {
                 form = _.clone(formData);
                 form.cards = [];
@@ -29,13 +29,15 @@ define(['arches',
                             return card.cardid === form_x_card.card_id;
                         });
                         var cardModel = new CardModel({
-                            data: card,
-                            datatypes: options.datatypes
+                            data: _.extend(card, {
+                                nodes: options.graphModel.get('nodes')
+                            }),
+                            datatypelookup: options.graphModel.get('datatypelookup'),
                         });
                         cardModel.formId = form.formid;
                         form.cards.push(cardModel);
                     }
-                })
+                });
                 form.sortorder = Infinity;
                 form.active = ko.observable(true);
                 form.label = ko.observable(form.title);
@@ -73,7 +75,7 @@ define(['arches',
                 },
                 write: function (value) {
                     var config = this.get('config');
-                    for (key in value) {
+                    for (var key in value) {
                         if (config[key] && config[key]() !== value[key]) {
                             config[key](value[key]);
                         }
@@ -110,12 +112,13 @@ define(['arches',
                         parseCardConfig(cardId, cardConfig, card.get('cards')());
                     });
                 }
-            }
+            };
 
             _.each(attributes, function(value, key) {
                 switch (key) {
                     case 'reportid':
                         this.set('id', value);
+                        break;
                     case 'name':
                     case 'template_id':
                     case 'graph':
@@ -148,9 +151,11 @@ define(['arches',
                                 form.label(formconfig.label);
                                 _.each(formconfig.cards, function(cardConfig, cardId) {
                                     parseCardConfig(cardId, cardConfig, form.cards);
-                                })
+                                });
                             }
                         });
+                        this.set(key, value);
+                        break;
                     default:
                         this.set(key, value);
                 }
@@ -160,25 +165,25 @@ define(['arches',
                 return f1.sortorder > f2.sortorder;
             });
 
-            this.related_resources = []
+            this.related_resources = [];
 
             this.sort_related = function(anArray, property) {
                 anArray.sort(function(a, b){
                     if (a[property] > b[property]) return 1;
                     if (b[property] > a[property]) return -1;
                     return 0;
-                })
-            }
+                });
+            };
             _.each(this.get('related_resources'), function(rr){
-                var res = {'graph_name': rr.name, 'related':[]}
+                var res = {'graph_name': rr.name, 'related':[]};
                 _.each(rr.resources, function(resource) {
                     _.each(resource.relationships, function(relationship){
-                        res.related.push({'displayname':resource.displayname,'link': arches.urls.resource_report + resource.instance_id, 'relationship': relationship})
-                    })
-                })
-                this.sort_related(res.related, 'displayname')
+                        res.related.push({'displayname':resource.displayname,'link': arches.urls.resource_report + resource.instance_id, 'relationship': relationship});
+                    });
+                });
+                this.sort_related(res.related, 'displayname');
                 this.related_resources.push(res);
-            }, this)
+            }, this);
 
             this.sort_related(this.related_resources, 'graph_name');
 
@@ -229,12 +234,12 @@ define(['arches',
                     cards: cardsConfig,
                     nodes: nodesConfig
                 };
-            }
+            };
             this.forms().forEach(function(form, i) {
                 var cardsConfig = {};
                 form.cards.forEach(function(card) {
                     cardsConfig[card.get('id')] = getCardConfig(card);
-                })
+                });
                 ret.formsconfig[form.formid] = {
                     sortorder: i,
                     active: form.active(),

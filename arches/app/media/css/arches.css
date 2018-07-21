@@ -7310,7 +7310,7 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .rp-report-section {
-    padding: 0px 0px 35px 0px;
+    padding: 0px 0px 35px 40px;
     background: #fff;
 }
 
@@ -7325,7 +7325,7 @@ a.mega-dropdown-toggle.disabled {
     margin-bottom: 5px;
     color: #666;
     padding-bottom: 0px;
-    padding-left: 40px;
+    /* padding-left: 40px; */
     background: #fff;
 }
 
@@ -7334,7 +7334,7 @@ a.mega-dropdown-toggle.disabled {
     font-weight: 500;
     margin-top: 2px;
     margin-bottom: 5px;
-    padding: 14px 0 5px 5px;
+    padding: 14px 0 5px 0px;
     color: #666;
 }
 
@@ -7342,13 +7342,20 @@ a.mega-dropdown-toggle.disabled {
     padding-bottom: 10px;
     padding-top: 15px;
     position: relative;
+    padding-left: 15px;
+}
+
+@media (min-width: 992px){
+    .rp-card-section {
+        padding-left: 60px;
+    }
 }
 
 .rp-tile-title {
-    position: absolute;
-    top: 0px;
-    left: 45px;
-    width: 250px;
+    /* position: absolute; */
+    /* top: 0px; */
+    /* left: 45px; */
+    /* width: 250px; */
     font-size: 15px;
     font-weight: 500;
     margin-top: 2px;
@@ -11561,9 +11568,6 @@ a.jstree-anchor.disabled {
     .rp-report-section {
         padding: 0px 0px 35px 140px;
         background: #fff;
-    }
-    .rp-section-title {
-        margin-left: -100px;
     }
     .dl-horizontal dd {
         margin-left: 280px;

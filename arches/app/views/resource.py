@@ -551,7 +551,7 @@ class ResourceReportView(MapBaseManagerView):
             forms=JSONSerializer().serialize(forms, sort_keys=False, exclude=['iconclass', 'subtitle']),
             tiles=JSONSerializer().serialize(permitted_tiles, sort_keys=False),
             forms_x_cards=JSONSerializer().serialize(forms_x_cards, sort_keys=False),
-            cards=JSONSerializer().serialize(permitted_cards, sort_keys=False, exclude=['is_editable', 'description', 'instructions', 'helpenabled', 'helptext', 'helptitle', 'ontologyproperty', 'widgets']),
+            cards=JSONSerializer().serialize(permitted_cards, sort_keys=False, exclude=['is_editable', 'description', 'instructions', 'helpenabled', 'helptext', 'helptitle', 'ontologyproperty']),
             datatypes_json=JSONSerializer().serialize(datatypes, exclude=['modulename', 'issearchable', 'configcomponent','configname', 'iconclass']),
             geocoding_providers = geocoding_providers,
             related_resources=JSONSerializer().serialize(related_resource_summary, sort_keys=False),

@@ -5,11 +5,12 @@ require([
     'views/graph/report-editor/report-editor-form',
     'views/graph/report-editor/report-editor-preview',
     'models/report',
+    'models/graph',
     'models/card',
     'report-editor-data',
     'arches',
     'bindings/sortable'
-], function(ko, PageView, ReportEditorTree, ReportEditorForm, ReportEditorPreview, ReportModel, CardModel, data, arches) {
+], function(ko, PageView, ReportEditorTree, ReportEditorForm, ReportEditorPreview, ReportModel, GraphModel, CardModel, data, arches) {
     var viewModel = {
         selectedReportId: ko.observable(data.report.reportid),
         reports: ko.observableArray(data.reports)
@@ -34,7 +35,13 @@ require([
     };
     data.cards.forEach(setupTiles);
 
-    viewModel.report = new ReportModel(data);
+    var graphModel = new GraphModel({
+        data: data.graph,
+        datatypes: data.datatypes,
+        ontology_namespaces: data.ontology_namespaces
+    });
+
+    viewModel.report = new ReportModel(_.extend({graphModel: graphModel}, data));
 
     viewModel.reset = function () {
         viewModel.report.reset();

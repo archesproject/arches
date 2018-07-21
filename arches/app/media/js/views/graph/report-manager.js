@@ -5,15 +5,21 @@ require([
     'views/list',
     'viewmodels/alert',
     'models/report',
+    'models/graph',
     'report-manager-data',
     'arches',
     'bindings/dragDrop'
-], function(_, ko, PageView, ListView, AlertViewModel, ReportModel, data, arches) {
+], function(_, ko, PageView, ListView, AlertViewModel, ReportModel, GraphModel, data, arches) {
     var showTemplateLibrary = ko.observable(false);
 
-    var reportModels = []
+    var reportModels = [];
+    var graphModel = new GraphModel({
+        data: data.graph,
+        datatypes: data.datatypes,
+        ontology_namespaces: data.ontology_namespaces
+    });
     data.reports.forEach(function(report) {
-        var reportModel = new ReportModel(_.extend({report: report}, data))
+        var reportModel = new ReportModel(_.extend({report: report, graphModel: graphModel}, data));
         reportModel.template = _.find(data.templates, function(template) {
             return report.template_id === template.templateid;
         });
@@ -50,7 +56,7 @@ require([
                 template_id: newReportData.templateid
             }),
             success: function(response) {
-                var reportModel = new ReportModel(_.extend({report: response}, data))
+                var reportModel = new ReportModel(_.extend({report: response, graphModel: graphModel}, data));
                 reportModel.template = _.find(data.templates, function(template) {
                     return response.template_id === template.templateid;
                 });
@@ -95,7 +101,7 @@ require([
             name: null,
             reportid: null,
             disabled: true
-        }]
+        }];
         var reports = _.map(viewModel.reports(), function (reportModel) {
             return {
                 name: reportModel.get('name'),

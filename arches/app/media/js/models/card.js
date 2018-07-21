@@ -105,8 +105,10 @@ define(['arches',
                     var cardData = _.sortBy(value, 'sortorder');
                     cardData.forEach(function(card) {
                         var cardModel = new CardModel({
-                            data: card,
-                            datatypes: attributes.datatypelookup
+                            data: _.extend(card, {
+                                nodes: attributes.data.nodes
+                            }),
+                            datatypelookup: attributes.datatypelookup
                         });
                         cards.push(cardModel);
                     }, this);
@@ -146,7 +148,8 @@ define(['arches',
 
         parseNodes: function(attributes) {
             ko.unwrap(this.nodes).forEach(function(node, i) {
-                if(ko.unwrap(node.nodeGroupId) === ko.unwrap(attributes.data.nodegroup_id)){
+                // TODO: it would be nice to normalize the nodegroup_id names (right now we have several different versions)
+                if((ko.unwrap(node.nodeGroupId) || ko.unwrap(node.nodegroup_id)) === ko.unwrap(attributes.data.nodegroup_id)){
 
                     var datatype = attributes.datatypelookup[ko.unwrap(node.datatype)];
                     node.datatype.subscribe(function(){
@@ -154,7 +157,7 @@ define(['arches',
                         this._card(JSON.stringify(this.toJSON()));
                     }, this);
                     node.config = koMapping.fromJS(node.config);
-                    
+
                     if (datatype.defaultwidget_id) {
                         var cardWidgetData = _.find(attributes.data.widgets, function(widget) {
                             return widget.node_id === node.nodeid;
