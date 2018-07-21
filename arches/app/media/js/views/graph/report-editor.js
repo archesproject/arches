@@ -21,7 +21,7 @@ require([
         card.nodes.forEach(function (node) {
             tileData[node.nodeid] = ko.observable(null);
         });
-        var children = []
+        var children = [];
         card.cards.forEach(function (childCard) {
             children = children.concat(setupTiles(childCard));
         });
@@ -67,7 +67,7 @@ require([
             name: null,
             reportid: null,
             disabled: true
-        }]
+        }];
         return options.concat(viewModel.reports());
     });
 
