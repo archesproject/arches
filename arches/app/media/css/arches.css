@@ -2979,7 +2979,7 @@ div.dropdown-menu.open {
     overflow-y: auto;
     display: table-row;
     float: left;
-    padding: 0px 15px;
+    padding: 0px;
 }
 
 .ep-edits-body img {
@@ -5852,8 +5852,8 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 .new-provisional-edit-history {
     display: flex;
     flex-direction: column;
-    border-bottom: solid #f0f0f0 1px;
-    padding: 5px 15px;
+    border-bottom: solid #e4e4e4 1px;
+    padding: 8px 25px 15px 25px;
     background-color: #fcfcfc;
 }
 
@@ -5871,6 +5871,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     display: flex;
     align-items: baseline;
     justify-content: left;
+    width: 400px;
 }
 
 .new-provisional-edit-history .entry-label {
@@ -5879,13 +5880,19 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     font-size:13px;
 }
 
-.new-provisional-edit-history.footer {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    background-color: inherit;
-    border-bottom: 0px;
-    padding: 0px;
+.new-provisional-edit-history .entry-label-resource {
+    padding-right: 5px;
+    font-weight: 600;
+    font-size:15px;
+    color: #6494cc;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.new-provisional-edit-history .entry .resource-edit-link {
+    font-size: 11px;
+    padding-right: 5px;
 }
 
 .provisional-edits-list-header {
@@ -5902,6 +5909,9 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
+    padding-left: 5px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #ddd;
 }
 
 .provisional-edit-history-filter .calendar {
@@ -5912,12 +5922,36 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     justify-content: space-between;
 }
 
+.provisional-edit-history-filter .toggle-container {
+    padding-bottom: 0px;
+}
+
 .provisional-edit-history-filter .calendar-label {
     font-size: 12px;
     color: inherit;
     padding: 5px;
 }
 
+.provisional-review-pending {
+    padding: 2px 10px 3px 10px;
+    background: #F5BB25;
+    color: #fff;
+    font-size: 12px;
+}
+
+.provisional-review-declined {
+    padding: 2px 10px 3px 10px;
+    background: red;
+    color: #fff;
+    font-size: 12px;
+}
+
+.provisional-review-accepted {
+    padding: 2px 10px 3px 10px;
+    background: #64bd63;
+    color: #fff;
+    font-size: 12px;
+}
 
 .ep-edits-body.provisional-edit-history {
     height: 100%;
