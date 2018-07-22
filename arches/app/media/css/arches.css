@@ -6211,7 +6211,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 .clear-node-search {
     position: absolute;
     top: 6px;
-    right: 0px;
+    right: 10px;
     font-size: 14px;
 }
 
@@ -10445,6 +10445,7 @@ a.search-facet-item.disabled {
 .graph-designer-tab-container {
     background: #e7e7e7;
     font-weight: 600;
+    min-width: 400px;
 }
 
 .graph-designer-tab-container .nav-tabs>li.active>a {
