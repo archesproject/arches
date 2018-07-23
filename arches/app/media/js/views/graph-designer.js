@@ -107,6 +107,14 @@ define([
                 graphModel: viewModel.graphModel
             });
 
+            viewModel.selectedCard = ko.computed(function() {
+                var selection = viewModel.cardTree.selection();
+                if (selection.widgets) {
+                    return selection;
+                }
+                return selection.parent;
+            });
+
             viewModel.nodeForm = new NodeFormView({
                 graph: viewModel.graph,
                 graphModel: viewModel.graphModel,

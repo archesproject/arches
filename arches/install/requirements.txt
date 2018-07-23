@@ -4,7 +4,6 @@ elasticsearch>=5.0.0,<6.0.0
 rdflib==4.2.2
 unicodecsv==0.14.1
 PyYAML==3.12
-pycrypto==2.6.1
 django-guardian==1.4.9
 TileStache==1.51.8
 python-memcached==1.59

@@ -11398,6 +11398,15 @@ ul.select2-choices:after {
     display: inline;
 }
 
+.graph-designer .card-component {
+    width: 100%;
+    background-color: white;
+}
+
+.graph-designer .card-component .install-buttons {
+    display: none;
+}
+
 .card-component {
     padding: 15px 25px;
 }

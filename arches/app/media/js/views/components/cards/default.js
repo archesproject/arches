@@ -1,6 +1,5 @@
-define(['knockout'], function (ko) {
+define(['knockout'], function(ko) {
     var viewModel = function(params) {
-        var self = this;
         this.state = params.state || 'form';
         this.loading = params.loading || ko.observable(false);
         this.card = params.card;
@@ -9,7 +8,7 @@ define(['knockout'], function (ko) {
         this.provisionalTileViewModel = params.provisionalTileViewModel;
         this.reviewer = params.reviewer;
         this.expanded = ko.observable(true);
-        this.beforeMove = function (e) {
+        this.beforeMove = function(e) {
             e.cancelDrop = (e.sourceParent!==e.targetParent);
         };
     };
