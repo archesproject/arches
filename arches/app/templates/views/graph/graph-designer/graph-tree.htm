@@ -3,13 +3,13 @@
 <div class="jstree jstree-default">
     <div class="header" style="padding-bottom: 55px">
         <!-- Layer Filter -->
-        <div class="list-filter" data-bind="" style="margin-right: 10px;">
-            <input type="text" class="form-control" style="width: 250px;" placeholder="{% trans 'Find a node, datatype, card...' %}" data-bind="textInput: graphTree.filter">
+        <div class="list-filter" data-bind="">
+            <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a node, datatype, card...' %}" data-bind="textInput: graphTree.filter">
 
             <!-- Clear Search -->
-            <span class="clear-node-search" data-bind="visible: graphTree.filter().length > 0, click: function() { graphTree.filter(''); }" style="top: 8px;"><i class="fa fa-times-circle"></i></span>
+            <span class="clear-node-search" data-bind="visible: graphTree.filter().length > 0, click: function() { graphTree.filter(''); }"><i class="fa fa-times-circle"></i></span>
         </div>
-        <div style="text-align: center;">
+        <div style="min-width: 200px;">
             <a data-bind="click: expandAll" style="cursor:pointer;">{% trans 'Expand all' %}</a>
             <a data-bind="click: collapseAll" style="padding-left:30px; cursor:pointer;">{% trans 'Collapse all' %}</a>
         </div>

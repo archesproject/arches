@@ -127,7 +127,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!-- Prov edit history-->
                         {% if user_is_reviewer == False %}
                         <a href="{% url 'search_home' %}" class="ep-edits-toggle ep-tools ep-tools-right" data-bind="click:function () { getProvisionalHistory(); }">
-                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Recent Edits" %}'>
+                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "My Recent Edits" %}'>
                               <i class="ion-clock"></i>
                             </div>
                         </a>
@@ -162,7 +162,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <div id="ep-edits-panel" class="ep-edits" style="display:none">
                         <div class="ep-edits-header" style="padding-right:0px">
                             <div class="ep-edits-title">
-                                <span>{% trans 'Edit History' %}</span>
+                                <span>{% trans 'My Edit History' %}</span>
                             </div>
                             <a href="javascript:void(0);" class="ep-edits-toggle ep-edits-close ep-tools ep-tools-right" style="border:none;">
                                 <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Close" %}'>
