@@ -94,8 +94,7 @@
     </div>
     <!--/ko-->
 
-    <!-- Drag Panel -->
-    <div class="relative">
+    <div>
 
         <!-- Target -->
         <div id="rr-manager-content-id" class="relative rr-drag-panel-target" data-bind="style: {'margin-bottom': containerBottomMargin }">
@@ -359,19 +358,5 @@
             </div>
             <!--/ko-->
         </div>
-
-        <!-- ko if: resourceEditorContext && !displaySplash() -->
-        <div id="report-image-grid" class="report-image-grid rr-grid rr-image-grid">
-            <!-- ko foreach: { data: searchResults.relationshipCandidates, as: 'candidate' } -->
-            <div class="rr-grid-item" data-bind="">
-                <div class="rr-listing">
-                    <h3 class="search-listing-title"><i class="search-listing-icon" data-bind="css: iconclass"></i><span data-bind="text: displayname"></span></h3>
-                    <div class="search-listing-body">TODO: Primary description goes here</div>
-                    <div class="search-listing-footer">Footer details here</div>
-                </div>
-            </div>
-            <!-- /ko -->
-        </div>
-        <!-- /ko -->
     </div>
 </div>
