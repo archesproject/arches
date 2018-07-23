@@ -69,13 +69,6 @@ def resource_manager(request, resourcetypeid='', form_id='default', resourceid='
         form.set_user(request.user)
         form.update(data, request.FILES)
 
-        # Will check that this resource doesn't already exist!
-        if form_id in ['location', 'location-component', 'coverage']:
-            existing = check_existing(data, resourcetypeid, resource.entityid)
-            if existing:
-                # existing contains the JSON response
-                print(existing)
-
         with transaction.atomic():
             if resourceid != '':
                 resource.delete_index()
@@ -94,6 +87,7 @@ def resource_manager(request, resourcetypeid='', form_id='default', resourceid='
             geom = JSONSerializer().serialize(resource.get_geom())
             
             lang = request.GET.get('lang', request.LANGUAGE_CODE)
+            form.data['NearbyRes'] = check_existing(resource)
             form.load(lang)
             return render_to_response('resource-manager.htm', {
                     'form': form,
@@ -268,37 +262,28 @@ def debug_view(request, resourceid=''):
     return JSONResponse(resource_dict, indent=4)
 
 
-def check_existing(data, resourcetype, resourceentityid=None):
-    geomentities = ["SPATIAL_COORDINATES.E47", "GEOMETRIC_PLACE_EXPRESSION.SP5", "SPATIAL_COORDINATES_GEOMETRY.E47"]
+def check_existing(resource):
     nearbyres = {}
-    for geoment in geomentities:
-        if geoment not in data:
-            continue
-        for n in data[geoment]:
-            values = [d['value'] for d in n['nodes'] if d['entitytypeid'] == geoment]
-            srefs = [d['value'] for d in n['nodes'] if d['entitytypeid'] == "SPATIAL_COORDINATES_REF_SYSTEM.SP4"]
-            for i, v in enumerate(values):
-                if srefs:
-                    target = GEOSGeometry(v, srid=srefs[i])
-                else:
-                    target = GEOSGeometry(v)
-                mindistance = settings.METER_RADIUS
-                if not mindistance:
-                    mindistance = 1000  # if settings.METER_RADIUS isn't set, default to 1Km
-                nearbygeos = models.Geometries.objects.filter(val__dwithin=(target, getDegrees(mindistance, target)))
-                for g in nearbygeos:
-                    parent = get_root_id(g.entityid)
-                    # check that it's a new resource with the same resource type.
-                    if str(parent.entityid) != resourceentityid and str(parent.entitytypeid) == resourcetype:
-                        if parent.entityid not in nearbyres:
-                            # create a class instance to get the primary_name
-                            # this can be slow so if the primary_name isn't needed it could be worth skipping
-                            res = Resource().get(parent.entityid)
-                            nearbyres[parent.entityid] = {'Primary_Name': res.get_primary_name(),
-                                                          'Resource_Type': res.entitytypeid}
+    geomentities = ["SPATIAL_COORDINATES.E47", "GEOMETRIC_PLACE_EXPRESSION.SP5", "SPATIAL_COORDINATES_GEOMETRY.E47"]
+    geoms = [ent for ent in resource.flatten() if ent.entitytypeid in geomentities]
+    for geom in geoms:
+        target = GEOSGeometry(geom.value, srid=4326)
+        mindistance = settings.METER_RADIUS
+        if not mindistance:
+            mindistance = 1000  # if settings.METER_RADIUS isn't set, default to 1Km
+        nearbygeos = models.Geometries.objects.filter(val__dwithin=(target, getDegrees(mindistance, target)))
+        for g in nearbygeos:
+            parent = get_root_id(g.entityid)
+            # check that it's a new resource with the same resource type.
+            if str(parent.entityid) != resource.entityid and str(parent.entitytypeid) == resource.entitytypeid:
+                if parent.entityid not in nearbyres:
+                    # create a class instance to get the primary_name
+                    # this can be slow so if the primary_name isn't needed it could be worth skipping
+                    res = Resource().get(parent.entityid)
+                    nearbyres[parent.entityid] = res.get_primary_name()
 
     if nearbyres:
-        return JSONResponse(nearbyres)
+        return nearbyres
     return False
 
 
