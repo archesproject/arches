@@ -274,7 +274,7 @@ Assigned to: Jeff
 | User can switch between table and force directed graph |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | User can page through related resources in table       |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
-#### Resource Search
+#### Resource Search (.5)
 
 | Test Subject                                                                                                                           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
@@ -289,7 +289,7 @@ Assigned to: Jeff
 
 ## Search
 
-Assigned to: Jeff
+Assigned to: Jeff (.5)
 
 | Test Subject                                                                                                                                                                         | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
