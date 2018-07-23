@@ -203,8 +203,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <!-- /ko -->
                 </div>
                 <!-- Card Manager -->
-                <div class="flex tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }">
-                    <div data-bind="component: {
+                <div class="flex tab-pane fade in graph-designer" data-bind="css: { active: activeTab() === 'card' }">
+                    <!-- ko component: {
                         name: cardTree.cardComponentLookup[selectedCard().model.component_id()].componentname,
                         params: {
                             card: selectedCard(),
@@ -214,7 +214,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             loading: loading,
                             form: cardTree
                         }
-                    }"></div>
+                    } --><!-- /ko -->
                 </div>
                 <!-- /ko -->
             </div>
