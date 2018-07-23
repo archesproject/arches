@@ -42,7 +42,6 @@
         <!-- ko foreach: { data: card.get('tiles'), as: 'tile' } -->
         <div class="rp-card-section">
             <span class="rp-tile-title" data-bind="text: card.get('name')"></span>
-        
 
             <!-- ko if: (Object.keys(tile.data).length !== 0) -->
             <div class="rp-report-tile" data-bind="attr: { id: tile.tileid }">
@@ -62,23 +61,11 @@
                 </dl>
             </div>
             <!-- /ko -->
-
+        
             <!-- ko foreach: {
                     data: card.get('cards'),
                     as: 'card'
                 } -->
-
-                <div class="rp-report-container-tile" data-bind="visible: card.get('cards')().length > 0">
-                        <!-- ko let: { tiles: card.tiles() } -->
-                            <!-- ko if: card.get('cards')().length > 0 -->
-                            <!-- ko foreach: { data: card.cards, as: 'card' } -->
-                            <div class="rp-card-section">
-                                <!-- ko template: 'card-report' --> <!-- /ko -->
-                            </div>
-                            <!-- /ko -->
-                            <!-- /ko -->
-                        <!-- /ko -->
-                </div>
 
                 <div class="rp-card-section">
                     <span class="rp-tile-title" data-bind="text: card.get('name')"></span>
@@ -105,6 +92,19 @@
                     <!-- /ko -->
                     <!-- /ko -->
                 </div>
+
+                <div class="rp-report-container-tile" data-bind="visible: card.get('cards')().length > 0">
+                        <!-- ko let: { tiles: card.tiles() } -->
+                            <!-- ko if: card.get('cards')().length > 0 -->
+                            <!-- ko foreach: { data: card.cards, as: 'card' } -->
+                            <div class="rp-card-section">
+                                <!-- ko template: 'card-report' --> <!-- /ko -->
+                            </div>
+                            <!-- /ko -->
+                            <!-- /ko -->
+                        <!-- /ko -->
+                </div>
+
 
             <!-- /ko -->
       
