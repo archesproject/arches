@@ -171,6 +171,18 @@ class Resources(APIBase):
 
         return JSONResponse(self.get(request, resourceid))
 
+    def delete(self, request, resourceid):
+        if user_can_edit_resources(user=request.user):
+            try:
+                resource_instance = Resource.objects.get(pk=resourceid)
+                resource_instance.delete()
+            except models.ResourceInstance.DoesNotExist:
+                return JSONResponse(status=404)
+        else:
+            return JSONResponse(status=500)
+
+        return JSONResponse(status=200)
+
 @method_decorator(csrf_exempt, name='dispatch')
 class Concepts(APIBase):
 
