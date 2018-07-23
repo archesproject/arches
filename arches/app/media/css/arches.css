@@ -2157,6 +2157,10 @@ ul.nav.nav-tabs.nav-justified {
     height: 100%;
 }
 
+.graph-designer-graph-content {
+    width: 100%;
+}
+
 .graph-designer-graph-content .graph-designer-title {
     font-size: 17px;
     font-weight: 500;
@@ -2230,6 +2234,7 @@ ul.nav.nav-tabs.nav-justified {
     max-width: 250px;
     min-width: 250px;
     padding-left: 5px;
+    height: 32px;
 }
 
 .graph-settings-panel-body .widgets .widget-container div div div div div select .chosen-container {
@@ -5398,7 +5403,7 @@ ul.jqtree_common li.jqtree-folder {
     align-items: center;
     width: 100%;
     min-height: 55px;
-    background: #f8f8f8;
+    background: #fafafa;
     border-bottom: 1px solid #e9e9e9;
 }
 
@@ -10442,6 +10447,11 @@ a.search-facet-item.disabled {
     padding: 15px 10px 15px 10px;
 }
 
+.graph-selector {
+    width: 350px;
+    margin-right: 10px;
+}
+
 .graph-designer-tab-container {
     background: #e7e7e7;
     font-weight: 600;
@@ -10464,7 +10474,8 @@ a.search-facet-item.disabled {
 
 .viewstate-btn {
     width: 100px;
-    height: 40px;
+    height: 30px;
+    padding-top: 3px;
     background: #fafafa;
 }
 
