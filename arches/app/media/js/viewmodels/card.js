@@ -57,7 +57,7 @@ define([
         var perms = ko.observableArray();
         var permsLiteral = ko.observableArray();
         var nodegroups = params.graphModel.get('nodegroups');
-        
+
         var nodegroup = _.find(ko.unwrap(nodegroups), function(group) {
             return ko.unwrap(group.nodegroupid) === ko.unwrap(params.card.nodegroup_id);
         });
@@ -72,6 +72,7 @@ define([
 
         var applySelectedComputed = function(widgets){
             widgets.forEach(function(widget){
+                widget.parent = self;
                 widget.selected = ko.pureComputed({
                     read: function() {
                         return selection() === this;

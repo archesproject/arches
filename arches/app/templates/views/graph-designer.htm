@@ -203,7 +203,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <!-- /ko -->
                 </div>
                 <!-- Card Manager -->
-                <div class="flex tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }">card</div>
+                <div class="flex tab-pane fade in graph-designer" data-bind="css: { active: activeTab() === 'card' }">
+                    <!-- ko component: {
+                        name: cardTree.cardComponentLookup[selectedCard().model.component_id()].componentname,
+                        params: {
+                            card: selectedCard(),
+                            tile: selectedCard().getNewTile(),
+                            provisionalTileViewModel: null,
+                            reviewer: null,
+                            loading: loading,
+                            form: cardTree
+                        }
+                    } --><!-- /ko -->
+                </div>
                 <!-- /ko -->
             </div>
 
