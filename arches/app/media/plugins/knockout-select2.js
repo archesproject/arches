@@ -1,7 +1,6 @@
 define(['jquery', 'knockout', 'underscore', 'select2'], function($, ko, _) {
     ko.bindingHandlers.select2 = {
         init: function(el, valueAccessor, allBindingsAccessor, viewmodel, bindingContext) {
-            var self = this;
             var allBindings = allBindingsAccessor().select2;
             var select2Config = ko.utils.unwrapObservable(allBindings.select2Config);
             var value = select2Config.value;
@@ -36,7 +35,7 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function($, ko, _) {
                 formatData(newItems);
                 select2Config.data = newItems;
                 $(el).select2("destroy").select2(select2Config);
-                $(el).select2("val", select2Config.value)
+                $(el).select2("val", select2Config.value);
             });
 
             select2Config.data = select2Config.data();
@@ -45,19 +44,19 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function($, ko, _) {
 
             select2Config.createSearchChoice = function(term, data) {
                 if ($(data).filter(function() {
-                        return ko.unwrap(this.text).localeCompare(term) === 0;
-                    }).length === 0) {
+                    return ko.unwrap(this.text).localeCompare(term) === 0;
+                }).length === 0) {
                     return {
                         id: term,
                         text: term
                     };
                 }
-            }
+            };
 
-            select2Config.getConceptPath = function(root_conceptid) {
+            select2Config.getConceptPath = function(rootConceptid) {
                 var root = {
                     'children': select2Config.data
-                }
+                };
                 var result = [];
                 var isParent = false;
 
@@ -66,7 +65,7 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function($, ko, _) {
                     _.each(obj.children, function(item) {
                         if (item.conceptid === conceptid) {
                             isParent = true;
-                            result.push(obj)
+                            result.push(obj);
                         }
                     });
 
@@ -77,12 +76,12 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function($, ko, _) {
                     } else {
                         lookForChild(root, obj.conceptid);
                     }
-                };
+                }
 
-                lookForChild(root, root_conceptid)
+                lookForChild(root, rootConceptid);
 
                 return result;
-            }
+            };
 
             select2Config.formatSelection = function(item) {
                 var path = [];
@@ -93,7 +92,7 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function($, ko, _) {
                         result = ko.unwrap(path[0].text) + ": " + ko.unwrap(item.text);
                     }
                 }
-                return result
+                return result;
             };
 
 
@@ -102,16 +101,16 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function($, ko, _) {
             $(el).select2("val", value());
             $(el).on("change", function(val) {
                 if (val.val === "") {
-                  val.val = null
+                    val.val = null;
                 }
                 return value(val.val);
             });
 
             if (ko.unwrap(select2Config.disabled)) {
                 $(el).select2("disable");
-            };
+            }
 
-            $(el).on("select2-opening", function(val) {
+            $(el).on("select2-opening", function() {
                 if (select2Config.clickBubble) {
                     $(el).parent().trigger('click');
                 }
