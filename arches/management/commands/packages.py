@@ -22,6 +22,7 @@ import urllib, uuid, glob
 from datetime import datetime
 from django.core import management
 from django.core.management.base import BaseCommand, CommandError
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils.module_loading import import_string
 from django.db import transaction, connection
 from django.db.utils import IntegrityError
@@ -55,7 +56,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
-            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'load_concept_scheme', 'export_business_data', 'export_graphs', 'add_tileserver_layer', 'delete_tileserver_layer',
+            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'load_concept_scheme', 'export_business_data', 'export_graphs', 'add_tileserver_layer', 'delete_tileserver_layer','delete_mapbox_layer',
             'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data','import_business_data_relations', 'import_mapping_file', 'save_system_settings', 'add_mapbox_layer', 'seed_resource_tile_cache', 'update_project_templates','load_package', 'create_package', 'update_package', 'export_package_configs', 'import_node_value_data'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
@@ -194,6 +195,9 @@ class Command(BaseCommand):
 
         if options['operation'] == 'delete_tileserver_layer':
             self.delete_tileserver_layer(options['layer_name'])
+            
+        if options['operation'] == 'delete_mapbox_layer':
+            self.delete_mapbox_layer(options['layer_name'])
 
         if options['operation'] == 'create_mapping_file':
             self.create_mapping_file(options['dest_dir'], options['graphs'])
@@ -1088,7 +1092,22 @@ class Command(BaseCommand):
                 tileserver_layer.map_layer.delete()
                 tileserver_layer.map_source.delete()
                 tileserver_layer.delete()
-
+    
+    def delete_mapbox_layer(self, layer_name=False):
+        if layer_name != False:
+            try:
+                mapbox_layer = models.MapLayer.objects.get(name=layer_name)
+            except ObjectDoesNotExist:
+                print "error: no mapbox layer named \"{}\"".format(layer_name)
+                return
+            all_sources = [i.get('source') for i in mapbox_layer.layerdefinitions]
+            ## remove duplicates and None
+            sources = set([i for i in all_sources if i])
+            with transaction.atomic():
+                for source in sources:
+                    src = models.MapSource.objects.get(name=source)
+                    src.delete()
+                mapbox_layer.delete()
 
     def create_mapping_file(self, dest_dir=None, graphs=None):
         if graphs != False:
