@@ -30,6 +30,7 @@ define([
         }
 
         var flattenOptions = function(opt, allOpts) {
+            var opt = _.each(opt, function(v, k){ opt[k] = ko.unwrap(v)});
             if (opt['id'] !== undefined) {
                 allOpts.push(opt);
             }
