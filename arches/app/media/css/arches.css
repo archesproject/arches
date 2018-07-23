@@ -4644,6 +4644,10 @@ span.editable-card i.fa.fa-align-justify:hover {
     margin: 3px;
 }
 
+.report-section-indent {
+    padding-left: 20px;
+}
+
 .navbar-top-links .dropdown-menu .recent-additions-container {
     margin-top: 10px;
     padding: 0 30px;
@@ -7340,14 +7344,14 @@ a.mega-dropdown-toggle.disabled {
 
 .rp-card-section {
     padding-bottom: 10px;
-    padding-top: 15px;
+    padding-top: 0px;
     position: relative;
     padding-left: 15px;
 }
 
 @media (min-width: 992px){
     .rp-card-section {
-        padding-left: 60px;
+        padding-left: 20px;
     }
 }
 
@@ -7365,10 +7369,6 @@ a.mega-dropdown-toggle.disabled {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-}
-
-.rp-tile-title-float {
-    float: left;
 }
 
 .rp-report-tile {
