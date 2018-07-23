@@ -48,19 +48,20 @@ define([
 
         this.setOptionSelection = function (opt, selected) {
             if (ko.unwrap(self.disabled) === false) {
+                var optid = ko.unwrap(opt.id);
                 if (self.multiple) {
                     var val = value();
                     value(
                         selected ?
                         _.union([opt.id], val) :
-                        _.without(val ? val : [], opt.id)
+                        _.without(val ? val : [], optid)
                     );
                 } else if (selected) {
-                  if (value() === opt.id) {
+                  if (value() === optid) {
                       value(null)
                     }
                   else {
-                      value(opt.id);
+                      value(optid);
                   }
                 }
             }
@@ -70,7 +71,7 @@ define([
             var selected = false;
             var val = value();
             if (val && val.indexOf) {
-                selected = val.indexOf(opt.id) >= 0;
+                selected = val.indexOf(ko.unwrap(opt.id)) >= 0;
             }
             return selected;
         };
