@@ -167,9 +167,11 @@
     </div>
     <!--/ko-->
 
-    <div class="new-provisional-edit-card-container">
 
+
+    <div class="new-provisional-edit-card-container">
         <!--ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 -->
+        <!--ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
         <div class='new-provisional-edits-list'>
             <div class='new-provisional-edits-header'>
                 <div class='new-provisional-edits-title'>{% trans 'Provisional Edits' %}</div>
@@ -189,8 +191,8 @@
                 </div>
             </div>
             <!-- /ko -->
-
         </div>
+        <!--/ko-->
         <!--/ko-->
 
 

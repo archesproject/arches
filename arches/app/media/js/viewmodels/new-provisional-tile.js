@@ -89,6 +89,10 @@ define([
             };
         };
 
+        self.tileIsFullyProvisional = ko.computed(function() {
+            return self.selectedProvisionalEdit() && self.selectedProvisionalEdit().isfullyprovisional() === true;
+        });
+
         self.updateProvisionalEdits(self.selectedTile);
         self.selectedTile.subscribe(self.updateProvisionalEdits, this);
 
