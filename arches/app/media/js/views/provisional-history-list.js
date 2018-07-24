@@ -72,6 +72,10 @@ define([
                 });
             };
 
+            this.editResource = function(resourceinstanceid){
+                window.open(arches.urls.resource_editor + resourceinstanceid);
+            },
+
             this.sortDescending.subscribe(function(val) {
                 if (val === true) {
                     self.sortDesc();

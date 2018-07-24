@@ -45,7 +45,7 @@
         <div class="new-provisional-edit-history" data-bind="visible: $data.filtered() == false, click: $parent.selectItem.bind($parent), css:{ 'selected selected-card': $data.selected }">
             {% block listitem %}
             <div class='entry'>
-                <a class="resource-edit-link" data-bind="attr: {'href': $root.urls.resource_editor + $data.resourceinstanceid}">{% trans 'Edit' %}</a>
+                <a class="resource-edit-link" href='' data-bind="text: '{% trans "Edit" %}', click: function(){$parent.editResource($data.resourceinstanceid)}"></a>
                 <div class="entry-label-resource" data-bind="text: $data.resourcedisplayname"></div>
             </div>
 
