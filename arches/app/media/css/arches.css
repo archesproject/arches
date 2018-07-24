@@ -3312,13 +3312,12 @@ ul .collapse li:last-of-type {
 
 .resource-search-container {
     display: flex;
-    max-width: 450px;
 }
 
 .resource-search-container .row.widget-wrapper {
     padding: 0px;
     min-width: 250px;
-    max-width: 400px;
+    max-width: 550px;
 }
 
 .edit-panel {
