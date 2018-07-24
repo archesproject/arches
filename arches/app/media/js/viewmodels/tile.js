@@ -63,6 +63,7 @@ define([
         this.provisionaledits = ko.observable(params.tile.provisionaledits);
 
         _.extend(this, {
+            filter: filter,
             parent: params.card,
             cards: _.filter(params.cards, function(card) {
                 var nodegroup = _.find(ko.unwrap(params.graphModel.get('nodegroups')), function(group) {

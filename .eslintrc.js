@@ -16,6 +16,7 @@ module.exports = {
         "define": false,
         "require": false,
         "window": false,
-        "console": false
+        "console": false,
+        "history": false
     }
 };
