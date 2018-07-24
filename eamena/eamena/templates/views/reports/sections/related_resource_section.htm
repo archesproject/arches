@@ -32,13 +32,13 @@
     
 
 
-                        <!-- Related Heritage Resources E27 -->
+                        <!-- Related Heritage Places -->
                         <div class="row">
 
                             <!-- Section Header -->
                             <div class="col-sm-4">
                                 <h3 class="arches-report-subsection">
-                                    {% trans "Related Heritage Resources E27" %}
+                                    {% trans "Related Heritage Places" %}
                                     {% if 'HERITAGE_RESOURCE_GROUP' in related_resource_dict %}
                                         {% if related_resource_dict.HERITAGE_RESOURCE_GROUP|length > 0 %}({{related_resource_dict.HERITAGE_RESOURCE_GROUP|length}}){% endif %}
                                     {% endif %}
@@ -102,16 +102,166 @@
                             <!-- End Section Content-->
                             
                         </div>
-                        <!-- End Related Heritage Resources E27 Section -->
+                        <!-- End Related Heritage Places -->
                         
 
                         
 
                         <hr class="devider margin-top-10" style="margin-bottom: 5px;">
 
+                        <!-- Related Heritage Features -->
+                        <div class="row">
 
+                            <!-- Section Header -->
+                            <div class="col-sm-4">
+                                <h3 class="arches-report-subsection">
+                                    {% trans "Related Heritage Features" %}
+                                    {% if 'HERITAGE_FEATURE' in related_resource_dict %}
+                                        {% if related_resource_dict.HERITAGE_FEATURE|length > 0 %}({{related_resource_dict.HERITAGE_FEATURE|length}}){% endif %}
+                                    {% endif %}
+                                </h3>
+                            </div>
+                        
+                            <!-- End Section Header -->
 
+                            <!-- Section Content -->
+                            <div class="col-sm-8 arches-report-group-spacer">
 
+                                <!-- Spacer -->
+                                <div class="arches-report-spacer hidden-xs"></div>
+                            
+                                <!-- resource groups -->
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <dl>                               
+                                            
+                                            {% for related_resource in related_resource_dict.HERITAGE_FEATURE|dictsort:"primaryname" %}
+                                                <dd class="arches-report-subsection-item">
+                                                    <a href={% if 'edit' in user.user_groups %}"{% url 'report' related_resource.entityid %}" class="" title="{% trans "View Report" %}"> {% else %} "#" > {% endif %}
+                                                        {{related_resource.primaryname}}
+                                                    </a>
+                                                    <span class="arches-report-subsection-item-type">
+                                                        {% if related_resource.relationship|length > 0 %}
+                                                            ({{related_resource.relationship|join:", "}})
+                                                        {% endif %}
+                                                    </span>
+                                                </dd> 
+
+                                                {% empty %}
+                                                    <dd class="arches-report-subsection-item">
+                                                        {% trans "None" %}
+                                                    </dd>                                                        
+                                            {% endfor %} 
+                                        
+                                        </dl>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+<!--                                 <div class="row">
+                                    <div class="col-xs-12">
+                                            <span class="step-links">
+                                                {% if related_resource_tuple.has_previous %}
+                                                    <a href="?page={{ related_resource_dict.previous_page_number }}">previous</a>
+                                                {% endif %}
+                                        
+                                                <span class="current">
+                                                    Page {{ related_resource_tuple.number }} of {{ related_resource_tuple.paginator.num_pages }}.
+                                                </span>
+                                        
+                                                {% if related_resource_tuple.has_next %}
+                                                    <a href="?page={{ related_resource_dict.next_page_number }}">next</a>
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div> -->
+                            <!-- End Section Content-->
+                            
+                        </div>
+                        <!-- End Related Heritage Features -->
+                        
+
+                        
+
+                        <hr class="devider margin-top-10" style="margin-bottom: 5px;">
+
+                        <!-- Related Heritage Components -->
+                        <div class="row">
+
+                            <!-- Section Header -->
+                            <div class="col-sm-4">
+                                <h3 class="arches-report-subsection">
+                                    {% trans "Related Heritage Components" %}
+                                    {% if 'HERITAGE_COMPONENT' in related_resource_dict %}
+                                        {% if related_resource_dict.HERITAGE_COMPONENT|length > 0 %}({{related_resource_dict.HERITAGE_COMPONENT|length}}){% endif %}
+                                    {% endif %}
+                                </h3>
+                            </div>
+                        
+                            <!-- End Section Header -->
+
+                            <!-- Section Content -->
+                            <div class="col-sm-8 arches-report-group-spacer">
+
+                                <!-- Spacer -->
+                                <div class="arches-report-spacer hidden-xs"></div>
+                            
+                                <!-- resource groups -->
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <dl>                               
+                                            
+                                            {% for related_resource in related_resource_dict.HERITAGE_COMPONENT|dictsort:"primaryname" %}
+                                                <dd class="arches-report-subsection-item">
+                                                    <a href={% if 'edit' in user.user_groups %}"{% url 'report' related_resource.entityid %}" class="" title="{% trans "View Report" %}"> {% else %} "#" > {% endif %}
+                                                        {{related_resource.primaryname}}
+                                                    </a>
+                                                    <span class="arches-report-subsection-item-type">
+                                                        {% if related_resource.relationship|length > 0 %}
+                                                            ({{related_resource.relationship|join:", "}})
+                                                        {% endif %}
+                                                    </span>
+                                                </dd> 
+
+                                                {% empty %}
+                                                    <dd class="arches-report-subsection-item">
+                                                        {% trans "None" %}
+                                                    </dd>                                                        
+                                            {% endfor %} 
+                                        
+                                        </dl>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+<!--                                 <div class="row">
+                                    <div class="col-xs-12">
+                                            <span class="step-links">
+                                                {% if related_resource_tuple.has_previous %}
+                                                    <a href="?page={{ related_resource_dict.previous_page_number }}">previous</a>
+                                                {% endif %}
+                                        
+                                                <span class="current">
+                                                    Page {{ related_resource_tuple.number }} of {{ related_resource_tuple.paginator.num_pages }}.
+                                                </span>
+                                        
+                                                {% if related_resource_tuple.has_next %}
+                                                    <a href="?page={{ related_resource_dict.next_page_number }}">next</a>
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div> -->
+                            <!-- End Section Content-->
+                            
+                        </div>
+                        <!-- End Related Heritage Features -->
+                        
+
+                        
+
+                        <hr class="devider margin-top-10" style="margin-bottom: 5px;">
 
                         <!-- Related Actors -->
                         <div class="row">
