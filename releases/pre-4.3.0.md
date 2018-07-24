@@ -150,7 +150,7 @@ Test in the Card Configuration Manager.
 
 ## Map Layer Manager
 
-Assigned to: Rob
+Assigned to: Rob (1.5)
 
 #### Resource Layers
 
