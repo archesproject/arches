@@ -1,4 +1,5 @@
 require([
+    'underscore',
     'knockout',
     'views/graph/graph-page-view',
     'views/graph/report-editor/report-editor-tree',
@@ -10,7 +11,7 @@ require([
     'report-editor-data',
     'arches',
     'bindings/sortable'
-], function(ko, PageView, ReportEditorTree, ReportEditorForm, ReportEditorPreview, ReportModel, GraphModel, CardModel, data, arches) {
+], function(_, ko, PageView, ReportEditorTree, ReportEditorForm, ReportEditorPreview, ReportModel, GraphModel, CardModel, data, arches) {
     var viewModel = {
         selectedReportId: ko.observable(data.report.reportid),
         reports: ko.observableArray(data.reports)

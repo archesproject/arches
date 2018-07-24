@@ -14,14 +14,14 @@ define(['arches',
          * @name ReportModel
          */
 
-         url: arches.urls.report_editor,
+        url: arches.urls.report_editor,
 
         initialize: function(options) {
             var self = this;
             var forms = [];
 
             options.forms.forEach(function(formData) {
-                form = _.clone(formData);
+                var form = _.clone(formData);
                 form.cards = [];
                 options.forms_x_cards.forEach(function(form_x_card) {
                     if (form_x_card.form_id === form.formid) {
@@ -65,7 +65,7 @@ define(['arches',
             });
 
             this.configJSON = ko.computed({
-                read: function () {
+                read: function() {
                     var configJSON = {};
                     var config = this.get('config');
                     _.each(this.configKeys(), function(key) {
@@ -73,7 +73,7 @@ define(['arches',
                     });
                     return configJSON;
                 },
-                write: function (value) {
+                write: function(value) {
                     var config = this.get('config');
                     for (var key in value) {
                         if (config[key] && config[key]() !== value[key]) {
@@ -116,48 +116,48 @@ define(['arches',
 
             _.each(attributes, function(value, key) {
                 switch (key) {
-                    case 'reportid':
-                        this.set('id', value);
-                        break;
-                    case 'name':
-                    case 'template_id':
-                    case 'graph':
-                    case 'active':
-                        this.get(key)(value);
-                        break;
-                    case 'config':
-                        var config = {};
-                        var configKeys = [];
-                        self.configKeys.removeAll();
-                        _.each(value, function(configVal, configKey) {
-                            if (!ko.isObservable(configVal)) {
-                                configVal = ko.observable(configVal);
-                            }
-                            config[configKey] = configVal;
-                            configKeys.push(configKey);
+                case 'reportid':
+                    this.set('id', value);
+                    break;
+                case 'name':
+                case 'template_id':
+                case 'graph':
+                case 'active':
+                    this.get(key)(value);
+                    break;
+                case 'config':
+                    var config = {};
+                    var configKeys = [];
+                    self.configKeys.removeAll();
+                    _.each(value, function(configVal, configKey) {
+                        if (!ko.isObservable(configVal)) {
+                            configVal = ko.observable(configVal);
+                        }
+                        config[configKey] = configVal;
+                        configKeys.push(configKey);
+                    });
+                    this.set(key, config);
+                    self.configKeys(configKeys);
+                    break;
+                case 'formsconfig':
+                    var forms = self.forms();
+                    _.each(value, function(formconfig, formid) {
+                        var form = _.find(forms, function(form) {
+                            return form.formid === formid;
                         });
-                        this.set(key, config);
-                        self.configKeys(configKeys);
-                        break;
-                    case 'formsconfig':
-                        var forms = self.forms();
-                        _.each(value, function(formconfig, formid) {
-                            var form = _.find(forms, function(form) {
-                                return form.formid === formid;
+                        if (form) {
+                            _.extend(form, _.pick(formconfig, 'sortorder'));
+                            form.active(formconfig.active);
+                            form.label(formconfig.label);
+                            _.each(formconfig.cards, function(cardConfig, cardId) {
+                                parseCardConfig(cardId, cardConfig, form.cards);
                             });
-                            if (form) {
-                                _.extend(form, _.pick(formconfig, 'sortorder'));
-                                form.active(formconfig.active);
-                                form.label(formconfig.label);
-                                _.each(formconfig.cards, function(cardConfig, cardId) {
-                                    parseCardConfig(cardId, cardConfig, form.cards);
-                                });
-                            }
-                        });
-                        this.set(key, value);
-                        break;
-                    default:
-                        this.set(key, value);
+                        }
+                    });
+                    this.set(key, value);
+                    break;
+                default:
+                    this.set(key, value);
                 }
             }, this);
 

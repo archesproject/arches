@@ -1,10 +1,12 @@
-define(['arches',
+define([
+    'underscore',
+    'arches',
     'models/abstract',
     'models/node',
     'models/card-widget',
     'knockout',
     'knockout-mapping'
-], function(arches, AbstractModel, NodeModel, CardWidgetModel, ko, koMapping) {
+], function(_, arches, AbstractModel, NodeModel, CardWidgetModel, ko, koMapping) {
     var CardModel = AbstractModel.extend({
         /**
         * A backbone model to manage card data
