@@ -5843,6 +5843,10 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     margin-top: -10px;
 }
 
+.ep-edits-body.provisional-edit-history {
+    overflow: visible;
+}
+
 .new-provisional-edits-header .new-provisional-edits-delete-all {
     width: 100%;
     padding: 3px 0px;
