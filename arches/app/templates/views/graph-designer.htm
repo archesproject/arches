@@ -42,7 +42,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
         <h4 class="ep-form-toolbar-title">
             <!-- Menu Item -->
-            <div class="graph-selector" data-bind="" style="margin-right: 10px;">
+            <div class="graph-selector" data-bind="">
                 <!-- ko if: groupedGraphs -->
                 <select data-bind="template: { name: 'selectGraphTemplate', data: groupedGraphs }, chosen: {width: '100%'}, value: graphid"></select>
                 <!-- /ko -->
@@ -151,7 +151,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </div>
 
         <!-- Main Content Panel -->
-        <div class="flex" style="background-color: #ffffff; overflow-y: auto" >
+        <div class="flex node-configuration">
             <div class="flex" data-bind="visible: activeTab() === 'graph'">
                 <!--Branch Library -->
                 <div id="branch-library" class="middle-column-container graph-designer branch-library" data-bind="visible: graphTree.branchListVisible" style="width: 300px; border-bottom: solid 1px #dddddd; z-index: 10; display:none;">

@@ -1057,14 +1057,14 @@ a.select2-search-choice-close {
 
 .library-card {
     height: 60px;
-    /*margin: 0px -7px;*/
+    margin-left: -1px;
     position: relative;
     padding: 5px;
     color: #666;
     border-bottom: 1px solid #ddd;
     /*border-right: 1px solid #e9e9e9;*/
     background: #f8f8f8;
-    border-left: 5px solid #fdfdfd;
+    border-left: 5px solid #f8f8f8;
 }
 
 .related-resources-nodes .library-card {
@@ -1133,6 +1133,10 @@ a.select2-search-choice-close {
     height: auto;
 }
 
+.branch-library-icon {
+    font-size: 15px;
+}
+
 #branch-library, #card-crud-permissions .library-card {
     width: 100%;
     margin-left: 1px;
@@ -1151,9 +1155,9 @@ a.select2-search-choice-close {
 }
 
 .library-card-main {
-    width: 175px;
+    width: 255px;
     position: absolute;
-    left: 55px;
+    left: 58px;
     top: 12px;
     white-space: nowrap;
     overflow: hidden;
@@ -1167,9 +1171,9 @@ a.select2-search-choice-close {
 
 .library-card-subtitle {
     text-transform: capitalize;
-    width: 135px;
+    width: 225px;
     position: absolute;
-    left: 55px;
+    left: 58px;
     top: 25px;
     color: #888;
     font-size: 11px;
@@ -2129,6 +2133,12 @@ ul.nav.nav-tabs.nav-justified {
     padding: 15px 0 5px 5px;
 }
 
+.node-configuration {
+    background-color: #ffffff; 
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
 .settings-panel {
     padding: 10px 20px 25px 25px;
 }
@@ -2155,6 +2165,10 @@ ul.nav.nav-tabs.nav-justified {
 
 .graph-designer.resource-editor .jstree {
     height: 100%;
+}
+
+.graph-designer-graph-content {
+    width: 100%;
 }
 
 .graph-designer-graph-content .graph-designer-title {
@@ -2230,6 +2244,7 @@ ul.nav.nav-tabs.nav-justified {
     max-width: 250px;
     min-width: 250px;
     padding-left: 5px;
+    height: 32px;
 }
 
 .graph-settings-panel-body .widgets .widget-container div div div div div select .chosen-container {
@@ -5398,7 +5413,7 @@ ul.jqtree_common li.jqtree-folder {
     align-items: center;
     width: 100%;
     min-height: 55px;
-    background: #f8f8f8;
+    background: #fafafa;
     border-bottom: 1px solid #e9e9e9;
 }
 
@@ -6015,9 +6030,9 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .middle-column-container {
-    -ms-flex: 0 0 250px;
-    -webkit-flex: 0 0 250px;
-    flex: 0 0 250px;
+    -ms-flex: 0 0 300px;
+    -webkit-flex: 0 0 300px;
+    flex: 0 0 300px;
     background: #fbfbfb;
     padding: 4px 7px 44px 7px;
     color: #666;
@@ -10442,6 +10457,11 @@ a.search-facet-item.disabled {
     padding: 15px 10px 15px 10px;
 }
 
+.graph-selector {
+    width: 350px;
+    margin-right: 10px;
+}
+
 .graph-designer-tab-container {
     background: #e7e7e7;
     font-weight: 600;
@@ -10464,17 +10484,18 @@ a.search-facet-item.disabled {
 
 .viewstate-btn {
     width: 100px;
-    height: 40px;
-    background: #fafafa;
+    height: 30px;
+    padding-top: 3px;
+    background: #fcfcfc;
 }
 
 .btn-group-toggle .viewstate-btn {
-    border-radius: 3px 0px 0px 3px;
+    border-radius: 2px 0px 0px 2px;
 }
 
 .btn-group-toggle .viewstate-btn:nth-child(2) {
     margin-left: -1px;
-    border-radius: 0px 3px 3px 0px;
+    border-radius: 0px 2px 2px 0px;
 }
 
 .viewstate-btn.active {
