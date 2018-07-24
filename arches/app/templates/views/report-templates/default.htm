@@ -29,9 +29,7 @@
 
             <!-- ko foreach: { data: form.cards, as: 'card' } -->
             <div class="rp-card-section">
-                <!-- ko let: { tiles: card.get('tiles')() } -->
-                    <!-- ko template: 'card-report' --> <!-- /ko -->
-                 <!-- /ko -->
+                <!-- ko template: 'card-report' --> <!-- /ko -->
             </div>
             <!-- /ko -->
         </div>
@@ -94,15 +92,13 @@
                 </div>
 
                 <div class="rp-report-container-tile" data-bind="visible: card.get('cards')().length > 0">
-                        <!-- ko let: { tiles: card.tiles() } -->
-                            <!-- ko if: card.get('cards')().length > 0 -->
-                            <!-- ko foreach: { data: card.cards, as: 'card' } -->
-                            <div class="rp-card-section">
-                                <!-- ko template: 'card-report' --> <!-- /ko -->
-                            </div>
-                            <!-- /ko -->
-                            <!-- /ko -->
+                    <!-- ko if: card.get('cards')().length > 0 -->
+                        <!-- ko foreach: { data: card.cards, as: 'card' } -->
+                        <div class="rp-card-section">
+                            <!-- ko template: 'card-report' --> <!-- /ko -->
+                        </div>
                         <!-- /ko -->
+                    <!-- /ko -->
                 </div>
 
 
