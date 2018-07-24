@@ -5,10 +5,11 @@ require([
     'arches',
     'views/base-manager',
     'models/report',
+    'models/graph',
     'resource-report-data',
     'report-templates',
     'bindings/chosen'
-], function($, _, ko, arches, BaseManagerView, ReportModel, data, reportLookup) {
+], function($, _, ko, arches, BaseManagerView, ReportModel, GraphModel, data, reportLookup) {
     var ResourceReportView = BaseManagerView.extend({
         initialize: function(options){
             var self = this;
@@ -25,9 +26,15 @@ require([
                 card.cards.forEach(setupTiles);
             };
 
+            var graphModel = new GraphModel({
+                data: data.graph,
+                datatypes: data.datatypes,
+                ontology_namespaces: data.ontology_namespaces
+            });
+
             if (data.report) {
                 data.cards.forEach(setupTiles);
-                report =  new ReportModel(data);
+                report =  new ReportModel(_.extend({graphModel: graphModel}, data));
             }
 
             this.viewModel.reportLookup = reportLookup;
