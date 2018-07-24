@@ -5746,6 +5746,12 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     padding: 15px 25px;
 }
 
+.edit-message-container .reset-authoritative {
+    float: right;
+    color: white;
+}
+
+
 .edit-message-container.approved {
     background: #C8F89A;
     border-bottom: 1px solid #9CEC4F;

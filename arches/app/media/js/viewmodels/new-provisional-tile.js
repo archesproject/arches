@@ -91,6 +91,11 @@ define([
             }
         };
 
+        self.resetAuthoritative = function(){
+            self.selectedProvisionalEdit(undefined);
+            self.selectedTile().reset();
+        };
+
         self.tileIsFullyProvisional = ko.computed(function() {
             return self.selectedProvisionalEdit() && self.selectedProvisionalEdit().isfullyprovisional() === true;
         });
