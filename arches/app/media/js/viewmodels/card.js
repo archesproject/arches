@@ -52,6 +52,7 @@ define([
         var TileViewModel = require('viewmodels/tile');
         var self = this;
         var selection = params.selection || ko.observable();
+        var scrollTo = params.scrollTo || ko.observable();
         var filter = params.filter || ko.observable();
         var loading = params.loading || ko.observable();
         var perms = ko.observableArray();
@@ -100,6 +101,9 @@ define([
             expanded: ko.observable(true),
             perms: perms,
             permsLiteral: permsLiteral,
+            scrollTo: ko.pureComputed(function() {
+                return scrollTo() === this;
+            }, this),
             highlight: ko.computed(function() {
                 var filterText = filter();
                 if (!filterText) {
@@ -128,6 +132,7 @@ define([
                         tiles: params.tiles,
                         provisionalTileViewModel: params.provisionalTileViewModel,
                         selection: selection,
+                        scrollTo: scrollTo,
                         loading: loading,
                         filter: filter,
                         cardwidgets: params.cardwidgets,
@@ -150,6 +155,7 @@ define([
                     cards: params.cards,
                     tiles: params.tiles,
                     selection: selection,
+                    scrollTo: scrollTo,
                     loading: loading,
                     filter: filter,
                     provisionalTileViewModel: params.provisionalTileViewModel,
@@ -220,6 +226,7 @@ define([
                     cards: params.cards,
                     tiles: params.tiles,
                     selection: selection,
+                    scrollTo: scrollTo,
                     filter: filter,
                     provisionalTileViewModel: params.provisionalTileViewModel,
                     loading: loading,

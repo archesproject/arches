@@ -2134,7 +2134,7 @@ ul.nav.nav-tabs.nav-justified {
 }
 
 .node-configuration {
-    background-color: #ffffff; 
+    background-color: #ffffff;
     overflow-y: auto;
     overflow-x: hidden;
 }
@@ -11406,7 +11406,7 @@ ul.select2-choices:after {
 }
 
 .left-panel-overflow {
-    height: calc(90vh - 100px);
+    height: calc(100vh - 225px);
     overflow-y: auto;
 }
 

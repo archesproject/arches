@@ -50,6 +50,7 @@ define([
         var CardViewModel = require('viewmodels/card');
         var self = this;
         var selection = params.selection || ko.observable();
+        var scrollTo = params.scrollTo || ko.observable();
         var filter = params.filter || ko.observable();
         var loading = params.loading || ko.observable();
 
@@ -81,6 +82,7 @@ define([
                     cards: params.cards,
                     tiles: params.tiles,
                     selection: selection,
+                    scrollTo: scrollTo,
                     loading: loading,
                     filter: filter,
                     userisreviewer: params.userisreviewer,

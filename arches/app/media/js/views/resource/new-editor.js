@@ -25,6 +25,7 @@ define([
     var filter = ko.observable('');
     var loading = ko.observable(false);
     var selection = ko.observable();
+    var scrollTo = ko.observable();
     var displayname = ko.observable(data.displayname);
     var resourceId = ko.observable(data.resourceid);
     var manageRelatedResources = ko.observable(false);
@@ -71,8 +72,30 @@ define([
         datatypes: data.datatypes
     });
 
+
+
     var vm = {
         loading: loading,
+        scrollTo: scrollTo,
+        filterEnterKeyHandler: function(context, e) {
+            if (e.keyCode === 13) {
+                var highlightedItems = _.filter(flattenTree(vm.topCards, []), function(item) {
+                    return item.highlight && item.highlight();
+                });
+                var previousItem = scrollTo();
+                scrollTo(null);
+                if (highlightedItems.length > 0) {
+                    var scrollIndex = 0;
+                    var previousIndex = highlightedItems.indexOf(previousItem);
+                    if (previousItem && highlightedItems[previousIndex+1]) {
+                        scrollIndex = previousIndex + 1;
+                    }
+                    scrollTo(highlightedItems[scrollIndex]);
+                }
+                return false;
+            }
+            return true;
+        },
         widgetLookup: createLookup(data.widgets, 'widgetid'),
         cardComponentLookup: createLookup(data.cardComponents, 'componentid'),
         nodeLookup: createLookup(graphModel.get('nodes')(), 'nodeid'),
@@ -112,6 +135,7 @@ define([
                 cards: data.cards,
                 tiles: tiles,
                 selection: selection,
+                scrollTo: scrollTo,
                 loading: loading,
                 filter: filter,
                 provisionalTileViewModel: provisionalTileViewModel,

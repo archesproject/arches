@@ -3,7 +3,7 @@
 <div class="jstree jstree-default">
     <div class="header">
         <div class="list-filter" data-bind="" style="text-align: center;">
-            <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a card...' %}" data-bind="textInput: filter">
+            <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a card...' %}" data-bind="textInput: filter, event: {keypress: filterEnterKeyHandler}">
 
             <!-- Clear Search -->
             <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }" style="top: 8px;"><i class="fa fa-times-circle"></i></span>
@@ -13,7 +13,7 @@
             <a data-bind="click: collapseAll" style="padding-left: 10px; cursor:pointer;">{% trans 'Collapse all' %}</a>
         </div>
     </div>
-    <div class="left-panel-overflow">
+    <div class="left-panel-overflow designer-card-tree">
         <ul class="jstree-container-ul jstree-children" aria-expanded="true">
             <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': rootExpanded, 'jstree-closed' : !rootExpanded()}">
                 <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}"></i>
