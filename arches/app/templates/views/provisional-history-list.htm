@@ -10,7 +10,7 @@
     <!-- Date Selector -->
     <div class="provisional-edit-history-filter">
         <div class="calendar">
-            <select id="" class="resources" placeholder="Select" tabindex="-1" data-bind="value: dateRangeType, chosen:{ width: '100%', disabled: items().length > 0}">
+            <select id="" class="resources" placeholder="Select" tabindex="-1" data-bind="value: dateRangeType, chosen:{ width: '100%'}">
                 <!-- <option value="custom">{% trans "Custom date range" %}</option> -->
                 <option value="today">{% trans "Today" %}</option>
                 <option value="last-7">{% trans "Last 7 days" %}</option>
@@ -22,7 +22,7 @@
             </select>
         </div>
 
-        <div data-bind="css: {'disabled': items().length === 0}, component: { name: 'views/components/simple-switch', params: {value: sortDescending, config:{ label: '{% trans "Youngest to oldest" %}', subtitle: '', disabled: items().length === 0}}}"></div>
+        <div data-bind="component: { name: 'views/components/simple-switch', params: {value: sortDescending, config:{ label: '{% trans "Youngest to oldest" %}', subtitle: ''}}}"></div>
     </div>
     <!-- /ko -->
     {% endblock %}
@@ -33,7 +33,7 @@
 
 {% block list_wrapper %}
 <div class="list-wrapper">
-    <div class="grid-list">
+    <div class="grid-list provisional-edit-history">
         <!--ko with: provisionalHistoryList -->
         <!-- ko if: items().length === 0 -->
         <div class="new-provisional-edit-history">

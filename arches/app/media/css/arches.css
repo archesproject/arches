@@ -5909,6 +5909,13 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     margin-bottom:1px;
 }
 
+.grid-list.provisional-edit-history {
+    height: 100%;
+    position: absolute;
+    width: 100%;
+    overflow-y: scroll;
+}
+
 .provisional-edit-history-filter {
     display: flex;
     justify-content: space-between;
