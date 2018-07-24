@@ -1,4 +1,4 @@
-define(['knockout'], function(ko) {
+define(['knockout', 'bindings/scrollTo'], function(ko) {
     var viewModel = function(params) {
         this.state = params.state || 'form';
         this.loading = params.loading || ko.observable(false);

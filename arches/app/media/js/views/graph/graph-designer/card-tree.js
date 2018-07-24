@@ -6,6 +6,7 @@ define([
     'arches',
     'graph-designer-data',
     'bindings/sortable',
+    'bindings/scrollTo',
     'widgets',
     'card-components'
 ], function($, _, ko, CardViewModel, arches, data) {
@@ -14,6 +15,7 @@ define([
         var filter = ko.observable('');
         var loading = ko.observable(false);
         var selection = ko.observable();
+        var scrollTo = ko.observable();
 
         this.flattenTree = function(parents, flatList) {
             _.each(ko.unwrap(parents), function(parent) {
@@ -42,6 +44,25 @@ define([
             }, {});
         };
         _.extend(this, {
+            filterEnterKeyHandler: function(context, e) {
+                if (e.keyCode === 13) {
+                    var highlightedItems = _.filter(self.flattenTree(self.topCards, []), function(item) {
+                        return item.highlight && item.highlight();
+                    });
+                    var previousItem = scrollTo();
+                    scrollTo(null);
+                    if (highlightedItems.length > 0) {
+                        var scrollIndex = 0;
+                        var previousIndex = highlightedItems.indexOf(previousItem);
+                        if (previousItem && highlightedItems[previousIndex+1]) {
+                            scrollIndex = previousIndex + 1;
+                        }
+                        scrollTo(highlightedItems[scrollIndex]);
+                    }
+                    return false;
+                }
+                return true;
+            },
             loading: loading,
             widgetLookup: createLookup(data.widgets, 'widgetid'),
             cardComponentLookup: createLookup(data.cardComponents, 'componentid'),
@@ -76,6 +97,7 @@ define([
                     cards: data.cards,
                     tiles: [],
                     selection: selection,
+                    scrollTo: scrollTo,
                     loading: loading,
                     filter: filter,
                     provisionalTileViewModel: null,

@@ -4,7 +4,7 @@
     <div class="header" style="padding-bottom: 55px">
         <!-- Layer Filter -->
         <div class="list-filter" data-bind="">
-            <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a node, datatype, card...' %}" data-bind="textInput: graphTree.filter">
+            <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a node, datatype, card...' %}" data-bind="textInput: graphTree.filter, event: {keypress: graphTree.filterEnterKeyHandler}">
 
             <!-- Clear Search -->
             <span class="clear-node-search" data-bind="visible: graphTree.filter().length > 0, click: function() { graphTree.filter(''); }"><i class="fa fa-times-circle"></i></span>
@@ -14,7 +14,7 @@
             <a data-bind="click: collapseAll" style="padding-left: 10px; cursor:pointer;">{% trans 'Collapse all' %}</a>
         </div>
     </div>
-    <div class="left-panel-overflow">
+    <div class="left-panel-overflow graph-designer-node-tree">
         <!-- <div data-bind="sortable: $data"> -->
         <ul class="jstree-container-ul jstree-children" aria-expanded="true">
             <div class="" data-bind="template: {
@@ -29,7 +29,7 @@
 <!-- /ko -->
 
 <template id="graph-tree">
-    <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (node.childNodes().length > 0 && node.expanded), 'jstree-closed' : (node.childNodes().length > 0 && !node.expanded()), 'jstree-leaf': node.childNodes().length === 0}">
+    <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (node.childNodes().length > 0 && node.expanded), 'jstree-closed' : (node.childNodes().length > 0 && !node.expanded()), 'jstree-leaf': node.childNodes().length === 0}, scrollTo: graphTree.scrollTo() == node, container: '.graph-designer-node-tree'">
         <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){node.expanded(!node.expanded())}"></i>
         <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: graphTree.selectItem.bind(graphTree), css:{'jstree-clicked': node.selected, 'child-selected': graphTree.isChildSelected(node) }">
             <i data-bind="css: node.iconclass" role="presentation"></i>
