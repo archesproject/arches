@@ -42,8 +42,8 @@ define([
                         edit.displaytime = moment(edit.lasttimestamp).format('DD-MM-YYYY hh:mm a');
                         return edit;
                     }));
-                    if (self.sortAscending() === false) {
-                        self.sortDesc();
+                    if (self.sortDescending() === false) {
+                        self.sortAsc();
                     }
                 });
             };
@@ -58,7 +58,7 @@ define([
             this.dateRangeType = ko.observable();
             this.fromDate = ko.observable();
             this.toDate = ko.observable();
-            this.sortAscending = ko.observable(true);
+            this.sortDescending = ko.observable(true);
 
             this.sortAsc = function() {
                 self.items.sort(function(a, b) {
@@ -72,9 +72,8 @@ define([
                 });
             };
 
-            this.sortAscending.subscribe(function(val) {
-                console.log(val);
-                if (val === false) {
+            this.sortDescending.subscribe(function(val) {
+                if (val === true) {
                     self.sortDesc();
                 } else {
                     self.sortAsc();

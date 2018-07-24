@@ -35,7 +35,6 @@ from django.views.generic import View
 from django.db import transaction
 from arches.app.models.resource import EditLog
 
-
 @method_decorator(can_edit_resource_instance(), name='dispatch')
 class TileData(View):
     action = 'update_tile'
@@ -217,9 +216,7 @@ class TileData(View):
                     v['card'].pop('nodegroup_id')
                 chronological_summary.append(v)
 
-            sorted(chronological_summary, key=lambda k: k['lasttimestamp'])
-
-            return JSONResponse(JSONSerializer().serialize(sorted(chronological_summary, key=lambda k: k['lasttimestamp'])))
+            return JSONResponse(JSONSerializer().serialize(sorted(chronological_summary, key=lambda k: k['lasttimestamp'], reverse=True)))
 
 
 
