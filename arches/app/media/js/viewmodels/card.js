@@ -182,7 +182,7 @@ define([
                 },
                 owner: this
             }),
-            reorderTiles: function(e) {
+            reorderTiles: function() {
                 loading(true);
                 var tiles = _.map(self.tiles(), function(tile) {
                     return tile.getAttributes();
@@ -193,7 +193,7 @@ define([
                         tiles: tiles
                     }),
                     url: arches.urls.reorder_tiles,
-                    complete: function(response) {
+                    complete: function() {
                         loading(false);
                         updateDisplayName(params.resourceId, params.displayname);
                     }
@@ -232,6 +232,19 @@ define([
         }, this);
         this.doesChildHaveProvisionalEdits = ko.computed(function() {
             return doesChildHaveProvisionalEdits(this);
+        }, this);
+
+        var expandParents = function(item) {
+            if (item.parent) {
+                item.parent.expanded(true);
+                expandParents(item.parent);
+            }
+        };
+        this.highlight.subscribe(function(highlight) {
+            if (highlight) {
+                this.expanded(true);
+                expandParents(this);
+            }
         }, this);
     };
     return CardViewModel;

@@ -19,10 +19,13 @@ define([
             var filter = this.filter().toLowerCase();
             this.items().forEach(function(item){
                 item.filtered(true);
-                if (item.name().toLowerCase().indexOf(filter) !== -1 ||
-                    item.datatype().toLowerCase().indexOf(filter) !== -1 ||
-                    (!!(item.ontologyclass()) ? item.ontologyclass().toLowerCase().indexOf(filter) !== -1 : false)){
-                    item.filtered(false);
+                if (filter.length > 2) {
+                    if (item.name().toLowerCase().indexOf(filter) !== -1 ||
+                            item.datatype().toLowerCase().indexOf(filter) !== -1 ||
+                            (!!(item.ontologyclass()) ? item.ontologyclass().toLowerCase().indexOf(filter) !== -1 : false)){
+                        item.filtered(false);
+                        this.expandParentNode(item);
+                    }
                 }
             }, this);
         },

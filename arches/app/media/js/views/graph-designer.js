@@ -193,25 +193,23 @@ define([
                 }
             });
 
+            viewModel.graphView = new GraphView({
+                el: $('#graph'),
+                graphModel: viewModel.graphModel,
+                nodeSize: 15,
+                nodeSizeOver: 20,
+                labelOffset: 10,
+                loading: this.loading
+            });
+
+            viewModel.graphModel.on('select-node', function(node) {
+                viewModel.graphView.zoomTo(node);
+                viewModel.graphTree.expandParentNode(node);
+            });
+
             viewModel.viewState.subscribe(function(state) {
                 if (state === 'preview') {
-                    if (!viewModel.graphView) {
-                        viewModel.graphView = new GraphView({
-                            el: $('#graph'),
-                            graphModel: viewModel.graphModel,
-                            nodeSize: 15,
-                            nodeSizeOver: 20,
-                            labelOffset: 10,
-                            loading: this.loading
-                        });
-
-                        viewModel.graphView.resize();
-
-                        viewModel.graphModel.on('select-node', function(node) {
-                            viewModel.graphView.zoomTo(node);
-                            viewModel.graphTree.expandParentNode(node);
-                        });
-                    }
+                    viewModel.graphView.resize();
                 }
             });
 
