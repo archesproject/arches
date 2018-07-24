@@ -1057,14 +1057,14 @@ a.select2-search-choice-close {
 
 .library-card {
     height: 60px;
-    /*margin: 0px -7px;*/
+    margin-left: -1px;
     position: relative;
     padding: 5px;
     color: #666;
     border-bottom: 1px solid #ddd;
     /*border-right: 1px solid #e9e9e9;*/
     background: #f8f8f8;
-    border-left: 5px solid #fdfdfd;
+    border-left: 5px solid #f8f8f8;
 }
 
 .related-resources-nodes .library-card {
@@ -1133,6 +1133,10 @@ a.select2-search-choice-close {
     height: auto;
 }
 
+.branch-library-icon {
+    font-size: 15px;
+}
+
 #branch-library, #card-crud-permissions .library-card {
     width: 100%;
     margin-left: 1px;
@@ -1151,9 +1155,9 @@ a.select2-search-choice-close {
 }
 
 .library-card-main {
-    width: 175px;
+    width: 255px;
     position: absolute;
-    left: 55px;
+    left: 58px;
     top: 12px;
     white-space: nowrap;
     overflow: hidden;
@@ -1167,9 +1171,9 @@ a.select2-search-choice-close {
 
 .library-card-subtitle {
     text-transform: capitalize;
-    width: 135px;
+    width: 225px;
     position: absolute;
-    left: 55px;
+    left: 58px;
     top: 25px;
     color: #888;
     font-size: 11px;
@@ -2127,6 +2131,12 @@ ul.nav.nav-tabs.nav-justified {
     margin-bottom: 5px;
     color: #666;
     padding: 15px 0 5px 5px;
+}
+
+.node-configuration {
+    background-color: #ffffff; 
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .settings-panel {
@@ -6020,9 +6030,9 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .middle-column-container {
-    -ms-flex: 0 0 250px;
-    -webkit-flex: 0 0 250px;
-    flex: 0 0 250px;
+    -ms-flex: 0 0 300px;
+    -webkit-flex: 0 0 300px;
+    flex: 0 0 300px;
     background: #fbfbfb;
     padding: 4px 7px 44px 7px;
     color: #666;
@@ -10476,16 +10486,16 @@ a.search-facet-item.disabled {
     width: 100px;
     height: 30px;
     padding-top: 3px;
-    background: #fafafa;
+    background: #fcfcfc;
 }
 
 .btn-group-toggle .viewstate-btn {
-    border-radius: 3px 0px 0px 3px;
+    border-radius: 2px 0px 0px 2px;
 }
 
 .btn-group-toggle .viewstate-btn:nth-child(2) {
     margin-left: -1px;
-    border-radius: 0px 3px 3px 0px;
+    border-radius: 0px 2px 2px 0px;
 }
 
 .viewstate-btn.active {
