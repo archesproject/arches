@@ -884,7 +884,7 @@ a.select2-search-choice-close {
 }
 
 .btn-display-toggle {
-    height: 40px;
+    height: 35px;
 }
 
 .btn-display-toggle:focus {
@@ -3312,16 +3312,13 @@ ul .collapse li:last-of-type {
 
 .resource-search-container {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 375px;
-    position: absolute;
-    top: -13px;
+    max-width: 450px;
 }
 
 .resource-search-container .row.widget-wrapper {
-    width: 350px;
-    padding: 5px 5px 10px 5px;
+    padding: 0px;
+    min-width: 250px;
+    max-width: 400px;
 }
 
 .edit-panel {
@@ -7105,7 +7102,7 @@ div.row.widget-wrapper {
     width: 275px;
     top: -50px;
     right: 0px;
-    height: 100vh;
+    height: calc(100vh - 50px);
     background: #fff;
     z-index: 3;
     opacity: 0.9;
@@ -7279,7 +7276,8 @@ a.mega-dropdown-toggle.disabled {
 .rr-text-notes {}
 
 .rr-result-grid-container {
-    margin-top: 30px;
+    position: relative;
+    margin-top: 15px;
     width: 100%;
     font-size: 16px;
     padding-left: 0px;
@@ -9476,9 +9474,8 @@ ul.pagination {
 }
 
 .rr-display-toggle {
-    position: absolute;
-    top: -7px;
-    right: 170px;
+    padding-left: 15px;
+    width: 100px;
 }
 
 .rr-display-toggle.open-graph {
@@ -9491,9 +9488,6 @@ ul.pagination {
 }
 
 .related-resources-relationship {
-    position: absolute;
-    right: 0px;
-    top: 6px;
 }
 
 .related-resources-relationship .dropdown-menu {
@@ -9502,9 +9496,7 @@ ul.pagination {
 }
 
 .related-resources-delete {
-    position: absolute;
-    right: 270px;
-    bottom: 9px;
+    padding-right: 12px;
 }
 
 .selected-resource-list {
@@ -9523,12 +9515,12 @@ ul.pagination {
     margin-bottom: 3px;
 }
 
-.related-reources-crud-link {
+.related-resources-crud-link {
     background: #ddd;
     border: 1px solid #ccc;
     height: 33px;
     padding: 5px 8px;
-    margin-top: -11px;
+    margin-left: 15px;
 }
 
 .search-filter {
@@ -9709,11 +9701,29 @@ table.table.dataTable {
     z-index: 1;
 }
 
+.related-resource-management {
+    display: flex;
+    justify-content: space-between;
+}
+
 .related-resources-header {
+    display: flex;
+    justify-content: space-between;
     position: relative;
     top: 0;
     margin-top: 15px;
-    float: left;
+    height: 40px;
+    margin-bottom: 12px;
+    width:100%;
+    z-index: 2;
+}
+
+.related-resources-header .editor-elements {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    top: 0;
+    margin-top: 0px;
     height: 35px;
     width:100%;
     z-index: 2;
