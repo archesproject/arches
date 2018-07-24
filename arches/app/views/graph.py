@@ -253,7 +253,7 @@ class GraphManagerView(GraphBaseView):
             graph = Graph.objects.get(graphid=graphid)
             if graph.isresource:
                 graph.isactive = False
-                graph.save()
+                graph.save(validate=False)
                 graph.delete_instances()
             graph.delete()
             return JSONResponse({'success': True})
