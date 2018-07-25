@@ -2,8 +2,8 @@
 
 <!-- Title Block -->
 <div>
-    <div class="">
-        <h4 class="title-block-title" style=""> {% trans "Widget Manager" %} </h4>
+    <div class="panel-section-title dark-colored-text">
+        {% trans "Widget Manager" %}
     </div>
 </div>
 
@@ -12,7 +12,7 @@
 
     <div id="widget-crud-settings" class="tab-pane fade in active">
 
-        <div class="node-widget-label" style="">
+        <div class="node-config-item" style="">
             <div class="control-label">
                 {% trans "Widget Label" %}
             </div>
@@ -21,8 +21,17 @@
             </div>
         </div>
 
+        <div class="node-config-item" style="">
+            <div class="control-label">
+                {% trans "Template" %}
+            </div>
+            <div class="pad-no">
+                <select class="design" data-bind="value: widget_id, options: widgetList(), optionsText: 'name', optionsValue: 'id', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+            </div>
+        </div>
 
-        <div data-bind='component: {
+
+        <div style="margin-top: 5px;" data-bind='component: {
             name: widgetLookup[widget_id()].name,
             params: {
                 config: configJSON,
@@ -40,18 +49,8 @@
         }'></div>
         <!-- /ko -->
 
-
-        <div class="node-widget-label" style="">
-            <div class="control-label">
-                {% trans "Template" %}
-            </div>
-            <div class="pad-no">
-                <select class="design" data-bind="value: widget_id, options: widgetList(), optionsText: 'name', optionsValue: 'id', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
-            </div>
-        </div>
-
         <!-- ko if: ko.isObservable(card) -->
-        <div class="node-widget-label switch-panel" data-bind="css: {'disabled': checkIfImmutable() }">
+        <div class="node-config-item switch-panel" data-bind="css: {'disabled': checkIfImmutable() }">
 
             <span class="switch switch-small arches-switch" data-bind="css: {'on': node.isrequired(), 'disabled': checkIfImmutable() }, click: toggleRequired"><small></small></span>
 
