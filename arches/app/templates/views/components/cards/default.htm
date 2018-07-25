@@ -155,6 +155,9 @@
     <div class="edit-message-container">
         <span>{% trans 'Currently showing edits by' %}</span>
         <span class="edit-message-container-user" data-bind="text: provisionalTileViewModel.selectedProvisionalEdit().username() + '.'"></span>
+        <!--ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
+        <a class="reset-authoritative" href='' data-bind="click: function(){provisionalTileViewModel.resetAuthoritative();}">{% trans 'Return to approved edits' %}</a>
+        <!--/ko-->
         <!--ko if: provisionalTileViewModel.selectedProvisionalEdit().isfullyprovisional -->
         <span>{% trans ' This is a new contribution by a provisional editor.' %}</span>
         <!--/ko-->
@@ -167,9 +170,11 @@
     </div>
     <!--/ko-->
 
-    <div class="new-provisional-edit-card-container">
 
+
+    <div class="new-provisional-edit-card-container">
         <!--ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 -->
+        <!--ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
         <div class='new-provisional-edits-list'>
             <div class='new-provisional-edits-header'>
                 <div class='new-provisional-edits-title'>{% trans 'Provisional Edits' %}</div>
@@ -189,8 +194,8 @@
                 </div>
             </div>
             <!-- /ko -->
-
         </div>
+        <!--/ko-->
         <!--/ko-->
 
 
@@ -276,7 +281,9 @@
                 <button class="btn btn-shim btn-warning btn-labeled btn-lg fa fa-trash" data-bind="click: function () { self.form.deleteTile(tile); }">{% trans 'Delete this record' %}</button>
                 <!-- /ko -->
                 <!-- ko if: tile.dirty() -->
+                <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
                 <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset">{% trans 'Cancel edit' %}</button>
+                <!-- /ko -->
                     <!-- ko if: tile.tileid -->
                     <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: function () { self.form.saveTile(tile); }">{% trans 'Save edit' %}</button>
                     <!-- /ko -->

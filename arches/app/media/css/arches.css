@@ -5765,6 +5765,12 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     padding: 15px 25px;
 }
 
+.edit-message-container .reset-authoritative {
+    float: right;
+    color: white;
+}
+
+
 .edit-message-container.approved {
     background: #C8F89A;
     border-bottom: 1px solid #9CEC4F;
@@ -5862,6 +5868,10 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     margin-top: -10px;
 }
 
+.ep-edits-body.provisional-edit-history {
+    overflow: visible;
+}
+
 .new-provisional-edits-header .new-provisional-edits-delete-all {
     width: 100%;
     padding: 3px 0px;
@@ -5922,6 +5932,13 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     height: 35px;
     margin-top: 0px;
     margin-bottom:1px;
+}
+
+.grid-list.provisional-edit-history {
+    height: 100%;
+    position: absolute;
+    width: 100%;
+    overflow-y: scroll;
 }
 
 .provisional-edit-history-filter {

@@ -1,10 +1,12 @@
 define([
+    'jquery',
+    'underscore',
     'knockout',
     'knockout-mapping',
     'moment',
     'arches',
     'views/components/simple-switch'
-], function (ko, koMapping, moment, arches) {
+], function($, _, ko, koMapping, moment, arches) {
     /**
     * A viewmodel for managing provisional edits
     *
@@ -15,8 +17,8 @@ define([
     */
     var ProvisionalTileViewModel = function(params) {
         var self = this;
-        self.edits = ko.observableArray()
-        self.users = []
+        self.edits = ko.observableArray();
+        self.users = [];
         self.selectedTile = params.tile;
         self.provisionaledits = ko.observableArray();
         self.declineUnacceptedEdits = ko.observable(true);
@@ -30,15 +32,15 @@ define([
                 data: { userids: JSON.stringify(users) },
                 dataType: 'json'
             })
-            .done(function(data) {
-                _.each(this.provisionaledits(), function(edit) {
-                    edit.username(data[edit.user]);
+                .done(function(data) {
+                    _.each(this.provisionaledits(), function(edit) {
+                        edit.username(data[edit.user]);
+                    });
                 })
-            })
-            .fail(function(data) {
-                // console.log('User name request failed', data)
-            });
-        }
+                .fail(function() {
+                    // console.log('User name request failed', data)
+                });
+        };
 
         self.updateProvisionalEdits = function(tile) {
             var isfullyprovisional;
@@ -53,15 +55,15 @@ define([
                     edit['user'] = key;
                     if (edit.isfullyprovisional === undefined) {
                         edit['isfullyprovisional'] = ko.observable(false);
-                    };
+                    }
                     return edit;
                 }, this);
-                this.provisionaledits(_.sortBy(provisionaleditlist, function(pe){return moment(pe.timestamp)}));
+                this.provisionaledits(_.sortBy(provisionaleditlist, function(pe){return moment(pe.timestamp);}));
                 if (this.provisionaledits().length > 0) {
                     if (ko.unwrap(this.provisionaledits()[0].isfullyprovisional) === true) {
                         isfullyprovisional = true;
-                    };
-                };
+                    }
+                }
                 if ((data && _.keys(data).length === 0 && tile.provisionaledits()) ||  isfullyprovisional) {
                     self.selectedProvisionalEdit(undefined);
                     this.provisionaledits()[0].isfullyprovisional(true);
@@ -71,9 +73,9 @@ define([
                 } else {
                     self.selectedProvisionalEdit(undefined);
                     self.selectedTile().reset();
-                };
+                }
                 this.getUserNames(this.provisionaleditlist, users);
-            };
+            }
         };
 
         self.removeSelectedProvisionalEdit = function() {
@@ -85,9 +87,18 @@ define([
             if (self.selectedProvisionalEdit() != val) {
                 self.selectedProvisionalEdit(val);
                 koMapping.fromJS(val['value'], self.selectedTile().data);
-                self.selectedTile()._tileData.valueHasMutated()
-            };
+                self.selectedTile()._tileData.valueHasMutated();
+            }
         };
+
+        self.resetAuthoritative = function(){
+            self.selectedProvisionalEdit(undefined);
+            self.selectedTile().reset();
+        };
+
+        self.tileIsFullyProvisional = ko.computed(function() {
+            return self.selectedProvisionalEdit() && self.selectedProvisionalEdit().isfullyprovisional() === true;
+        });
 
         self.updateProvisionalEdits(self.selectedTile);
         self.selectedTile.subscribe(self.updateProvisionalEdits, this);
@@ -100,32 +111,32 @@ define([
                 dataType: 'json',
                 data: {'user': koMapping.toJS(val).user, 'tileid': this.selectedTile().tileid }
             })
-            .done(function(data) {
-                if (data.result === 'delete') {
-                    this.selectedTile().deleteTile()
-                } else {
-                    var user = val.user;
-                    var provisionaledits = this.selectedTile().provisionaledits();
-                    delete provisionaledits[user]
-                    this.selectedTile().provisionaledits(provisionaledits);
-                    if (self.selectedProvisionalEdit() === val) {
-                        self.selectedProvisionalEdit(undefined);
-                        self.selectedTile().reset();
-                    };
-                    self.provisionaledits.remove(val);
-                    if (_.keys(this.selectedTile().provisionaledits()).length === 0) {
-                        this.selectedTile().provisionaledits(null);
-                    };
-                }
-                self.selectedTile()._tileData.valueHasMutated();
-            })
-            .fail(function(data) {
-                console.log('request failed', data)
-            });
-        }
+                .done(function(data) {
+                    if (data.result === 'delete') {
+                        this.selectedTile().deleteTile();
+                    } else {
+                        var user = val.user;
+                        var provisionaledits = this.selectedTile().provisionaledits();
+                        delete provisionaledits[user];
+                        this.selectedTile().provisionaledits(provisionaledits);
+                        if (self.selectedProvisionalEdit() === val) {
+                            self.selectedProvisionalEdit(undefined);
+                            self.selectedTile().reset();
+                        }
+                        self.provisionaledits.remove(val);
+                        if (_.keys(this.selectedTile().provisionaledits()).length === 0) {
+                            this.selectedTile().provisionaledits(null);
+                        }
+                    }
+                    self.selectedTile()._tileData.valueHasMutated();
+                })
+                .fail(function(data) {
+                    console.log('request failed', data);
+                });
+        };
 
         self.deleteAllProvisionalEdits = function() {
-            var users = _.map(self.provisionaledits(), function(edit){return edit.user});
+            var users = _.map(self.provisionaledits(), function(edit){return edit.user;});
             $.ajax({
                 url: arches.urls.delete_provisional_tile,
                 context: this,
@@ -133,27 +144,27 @@ define([
                 dataType: 'json',
                 data: {'users': JSON.stringify(users), 'tileid': this.selectedTile().tileid }
             })
-            .done(function(data) {
-                if (data.result === 'delete') {
-                    this.selectedTile().deleteTile()
-                } else {
-                    self.selectedTile().reset();
-                    self.selectedProvisionalEdit(undefined);
-                    self.provisionaledits.removeAll();
-                    this.selectedTile().provisionaledits(null);
-                };
-            })
-            .fail(function(data) {
-                console.log('request failed', data)
-            });
-        }
+                .done(function(data) {
+                    if (data.result === 'delete') {
+                        this.selectedTile().deleteTile();
+                    } else {
+                        self.selectedTile().reset();
+                        self.selectedProvisionalEdit(undefined);
+                        self.provisionaledits.removeAll();
+                        this.selectedTile().provisionaledits(null);
+                    }
+                })
+                .fail(function(data) {
+                    console.log('request failed', data);
+                });
+        };
 
 
         self.acceptProvisionalEdit = function(){
             var provisionaledits = this.selectedTile().provisionaledits();
-            var user = this.selectedProvisionalEdit().user
+            var user = this.selectedProvisionalEdit().user;
             if (provisionaledits) {
-                delete provisionaledits[user]
+                delete provisionaledits[user];
                 if (_.keys(this.selectedTile().provisionaledits()).length === 0) {
                     this.selectedTile().provisionaledits(null);
                 }
@@ -164,7 +175,7 @@ define([
 
         self.rejectProvisionalEdit = function(val){
             self.deleteProvisionalEdit(val);
-        }
+        };
 
     };
 
