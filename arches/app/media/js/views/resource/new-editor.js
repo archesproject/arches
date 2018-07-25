@@ -25,6 +25,7 @@ define([
     var filter = ko.observable('');
     var loading = ko.observable(false);
     var selection = ko.observable();
+    var scrollTo = ko.observable();
     var displayname = ko.observable(data.displayname);
     var resourceId = ko.observable(data.resourceid);
     var manageRelatedResources = ko.observable(false);
@@ -38,8 +39,6 @@ define([
         }
     });
     var provisionalTileViewModel = new ProvisionalTileViewModel({tile: selectedTile, reviewer: data.user_is_reviewer});
-
-    var cards = data.cards;
 
     var flattenTree = function(parents, flatList) {
         _.each(ko.unwrap(parents), function(parent) {
@@ -73,8 +72,30 @@ define([
         datatypes: data.datatypes
     });
 
+
+
     var vm = {
         loading: loading,
+        scrollTo: scrollTo,
+        filterEnterKeyHandler: function(context, e) {
+            if (e.keyCode === 13) {
+                var highlightedItems = _.filter(flattenTree(vm.topCards, []), function(item) {
+                    return item.highlight && item.highlight();
+                });
+                var previousItem = scrollTo();
+                scrollTo(null);
+                if (highlightedItems.length > 0) {
+                    var scrollIndex = 0;
+                    var previousIndex = highlightedItems.indexOf(previousItem);
+                    if (previousItem && highlightedItems[previousIndex+1]) {
+                        scrollIndex = previousIndex + 1;
+                    }
+                    scrollTo(highlightedItems[scrollIndex]);
+                }
+                return false;
+            }
+            return true;
+        },
         widgetLookup: createLookup(data.widgets, 'widgetid'),
         cardComponentLookup: createLookup(data.cardComponents, 'componentid'),
         nodeLookup: createLookup(graphModel.get('nodes')(), 'nodeid'),
@@ -114,6 +135,7 @@ define([
                 cards: data.cards,
                 tiles: tiles,
                 selection: selection,
+                scrollTo: scrollTo,
                 loading: loading,
                 filter: filter,
                 provisionalTileViewModel: provisionalTileViewModel,
@@ -148,13 +170,13 @@ define([
                 $.ajax({
                     type: "GET",
                     url: arches.urls.resource_copy.replace('//', '/' + resourceId() + '/'),
-                    success: function(response) {
+                    success: function() {
                         vm.alert(new AlertViewModel('ep-alert-blue', arches.resourceCopySuccess.title, '', null, function(){}));
                     },
-                    error: function(response) {
+                    error: function() {
                         vm.alert(new AlertViewModel('ep-alert-red', arches.resourceCopyFailed.title, arches.resourceCopyFailed.text, null, function(){}));
                     },
-                    complete: function(request, status) {
+                    complete: function() {
                         loading(false);
                     },
                 });
@@ -170,12 +192,6 @@ define([
                     $.ajax({
                         type: "DELETE",
                         url: arches.urls.resource_editor + resourceId(),
-                        success: function(response) {
-
-                        },
-                        error: function(response) {
-
-                        },
                         complete: function(request, status) {
                             loading(false);
                             if (status === 'success') {
@@ -212,7 +228,7 @@ define([
     var topCard = vm.topCards[0];
     selection(topCard.tiles().length > 0 ? topCard.tiles()[0] : topCard);
 
-    vm.resourceId.subscribe(function(val){
+    vm.resourceId.subscribe(function(){
         //switches the url from 'create-resource' once the resource id is available
         history.pushState({}, '', arches.urls.resource_editor + resourceId());
     });

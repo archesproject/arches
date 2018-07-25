@@ -19,6 +19,10 @@ define([
             var defaults = {
                 search_contains: true
             };
+            
+            if (options.disabled === true) {
+                $element.attr('disabled', true);
+            }
 
             if (allBindings.has('placeholder')){
                 var prop = allBindings.get('placeholder');

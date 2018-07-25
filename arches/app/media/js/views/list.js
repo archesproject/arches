@@ -60,7 +60,15 @@ define([
             }, this);
             if(this.filterFunction){
                 this.filter = ko.observable('');
-                this.filter.subscribe(this.filterFunction, this, 'change');
+                ko.computed(function() {
+                    return this.filter();
+                }, this).extend({
+                    throttle: 100
+                }).subscribe(
+                    this.filterFunction,
+                    this,
+                    'change'
+                );
                 this.filterFunction();
             }
 

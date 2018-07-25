@@ -19,12 +19,36 @@ define([
             var filter = this.filter().toLowerCase();
             this.items().forEach(function(item){
                 item.filtered(true);
-                if (item.name().toLowerCase().indexOf(filter) !== -1 ||
-                    item.datatype().toLowerCase().indexOf(filter) !== -1 ||
-                    (!!(item.ontologyclass()) ? item.ontologyclass().toLowerCase().indexOf(filter) !== -1 : false)){
-                    item.filtered(false);
+                if (filter.length > 2) {
+                    if (item.name().toLowerCase().indexOf(filter) !== -1 ||
+                            item.datatype().toLowerCase().indexOf(filter) !== -1 ||
+                            (!!(item.ontologyclass()) ? item.ontologyclass().toLowerCase().indexOf(filter) !== -1 : false)){
+                        item.filtered(false);
+                        this.expandParentNode(item);
+                    }
                 }
             }, this);
+        },
+
+        filterEnterKeyHandler: function(context, e) {
+            var self = this;
+            if (e.keyCode === 13) {
+                var highlightedItems = _.filter(this.items(), function(item) {
+                    return !item.filtered();
+                });
+                var previousItem = self.scrollTo();
+                self.scrollTo(null);
+                if (highlightedItems.length > 0) {
+                    var scrollIndex = 0;
+                    var previousIndex = highlightedItems.indexOf(previousItem);
+                    if (previousItem && highlightedItems[previousIndex+1]) {
+                        scrollIndex = previousIndex + 1;
+                    }
+                    self.scrollTo(highlightedItems[scrollIndex]);
+                }
+                return false;
+            }
+            return true;
         },
 
         /**
@@ -38,6 +62,7 @@ define([
             this.graphSettings = options.graphSettings;
             this.items = this.graphModel.get('nodes');
             this.branchListVisible = ko.observable(false);
+            this.scrollTo = ko.observable();
             TreeView.prototype.initialize.apply(this, arguments);
         },
 

@@ -52,6 +52,7 @@ define([
         var TileViewModel = require('viewmodels/tile');
         var self = this;
         var selection = params.selection || ko.observable();
+        var scrollTo = params.scrollTo || ko.observable();
         var filter = params.filter || ko.observable();
         var loading = params.loading || ko.observable();
         var perms = ko.observableArray();
@@ -100,6 +101,9 @@ define([
             expanded: ko.observable(true),
             perms: perms,
             permsLiteral: permsLiteral,
+            scrollTo: ko.pureComputed(function() {
+                return scrollTo() === this;
+            }, this),
             highlight: ko.computed(function() {
                 var filterText = filter();
                 if (!filterText) {
@@ -128,6 +132,7 @@ define([
                         tiles: params.tiles,
                         provisionalTileViewModel: params.provisionalTileViewModel,
                         selection: selection,
+                        scrollTo: scrollTo,
                         loading: loading,
                         filter: filter,
                         cardwidgets: params.cardwidgets,
@@ -150,6 +155,7 @@ define([
                     cards: params.cards,
                     tiles: params.tiles,
                     selection: selection,
+                    scrollTo: scrollTo,
                     loading: loading,
                     filter: filter,
                     provisionalTileViewModel: params.provisionalTileViewModel,
@@ -182,7 +188,7 @@ define([
                 },
                 owner: this
             }),
-            reorderTiles: function(e) {
+            reorderTiles: function() {
                 loading(true);
                 var tiles = _.map(self.tiles(), function(tile) {
                     return tile.getAttributes();
@@ -193,7 +199,7 @@ define([
                         tiles: tiles
                     }),
                     url: arches.urls.reorder_tiles,
-                    complete: function(response) {
+                    complete: function() {
                         loading(false);
                         updateDisplayName(params.resourceId, params.displayname);
                     }
@@ -220,6 +226,7 @@ define([
                     cards: params.cards,
                     tiles: params.tiles,
                     selection: selection,
+                    scrollTo: scrollTo,
                     filter: filter,
                     provisionalTileViewModel: params.provisionalTileViewModel,
                     loading: loading,
@@ -232,6 +239,19 @@ define([
         }, this);
         this.doesChildHaveProvisionalEdits = ko.computed(function() {
             return doesChildHaveProvisionalEdits(this);
+        }, this);
+
+        var expandParents = function(item) {
+            if (item.parent) {
+                item.parent.expanded(true);
+                expandParents(item.parent);
+            }
+        };
+        this.highlight.subscribe(function(highlight) {
+            if (highlight) {
+                this.expanded(true);
+                expandParents(this);
+            }
         }, this);
     };
     return CardViewModel;
