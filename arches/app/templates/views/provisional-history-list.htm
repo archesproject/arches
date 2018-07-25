@@ -4,13 +4,13 @@
 
 <!-- Title -->
 <span>
-    
+
     <!--ko with: provisionalHistoryList -->
-    
+
     <!-- Date Selector -->
     <div class="provisional-edit-history-filter">
         <div class="calendar">
-            <select id="" class="resources" placeholder="Select" tabindex="-1" data-bind="value: dateRangeType, chosen:{ width: '100%' }">
+            <select id="" class="resources" placeholder="Select" tabindex="-1" data-bind="value: dateRangeType, chosen:{ width: '100%'}">
                 <!-- <option value="custom">{% trans "Custom date range" %}</option> -->
                 <option value="today">{% trans "Today" %}</option>
                 <option value="last-7">{% trans "Last 7 days" %}</option>
@@ -22,22 +22,8 @@
             </select>
         </div>
 
-        <div data-bind="component: { name: 'views/components/simple-switch', params: {value: sortAscending, config:{ label: '{% trans "Oldest to youngest" %}', subtitle: ''}}}"></div>
+        <div data-bind="component: { name: 'views/components/simple-switch', params: {value: sortDescending, config:{ label: '{% trans "Youngest to oldest" %}', subtitle: ''}}}"></div>
     </div>
-    <!-- <div class="calendar">
-        <h3 class="search-label">{% trans "From" %}</h3>
-        <div id="search-from-c">
-            <input placeholder="" class="form-control input-lg" data-bind="value: fromDate, datepicker: {format: format, keepInvalid: true}, attr:{'placeholder': format}, disable: dateRangeType() !== 'custom'">
-        </div>
-    </div>
-
-    <div class="calendar">
-        <h3 class="search-label">{% trans "To" %}</h3>
-        <div id="search-from-b">
-            <input placeholder="" class="form-control input-lg" data-bind="value: toDate, datepicker: {format: format, keepInvalid: true}, attr:{'placeholder': format}, disable: dateRangeType() !== 'custom'">
-        </div>
-    </div> -->
-    
     <!-- /ko -->
     {% endblock %}
 
@@ -47,30 +33,36 @@
 
 {% block list_wrapper %}
 <div class="list-wrapper">
-    <div class="grid-list">
+    <div class="grid-list provisional-edit-history">
         <!--ko with: provisionalHistoryList -->
+        <!-- ko if: items().length === 0 -->
+        <div class="new-provisional-edit-history">
+            {% trans 'You have not yet edited any data within the specified time period. Once you edit a resource, your edit history will display here.' %}
+        </div>
+        <!-- /ko -->
+        <!-- ko if: items().length > 0 -->
         <!-- ko foreach: items -->
         <div class="new-provisional-edit-history" data-bind="visible: $data.filtered() == false, click: $parent.selectItem.bind($parent), css:{ 'selected selected-card': $data.selected }">
             {% block listitem %}
             <div class='entry'>
-                <a class="resource-edit-link" data-bind="attr: {'href': $root.urls.resource_editor + $data.resourceinstanceid}">{% trans 'Edit' %}</a>
+                <a class="resource-edit-link" href='' data-bind="text: '{% trans "Edit" %}', click: function(){$parent.editResource($data.resourceinstanceid)}"></a>
                 <div class="entry-label-resource" data-bind="text: $data.resourcedisplayname"></div>
             </div>
-            
+
             <div class='entry'><i data-bind="css: $data.resourcemodel.iconclass" style="padding-right: 4px"></i>
                 <div class='entry-label' data-bind="text: $data.resourcemodel.name"></div>
             </div>
-            
+
             <div class='entry'>
                 <div class='entry-label'>{% trans 'Card: ' %}</div>
                 <span data-bind="text: $data.card.name"></span>
             </div>
-            
+
             <div class='entry'>
                 <div class='entry-label'>{% trans 'Edited: ' %}</div>
                 <span data-bind="text: $data.displaytime"></span>
             </div>
-            
+
             <div class='entry'>
                 <!--ko if: $data.pending -->
                 <span class="provisional-review-pending">{% trans 'pending review' %}</span>
@@ -85,6 +77,7 @@
 
             {% endblock %}
         </div>
+        <!-- /ko -->
         <!-- /ko -->
         <!-- /ko -->
 

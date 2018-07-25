@@ -85,7 +85,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
             <!--ko if: manageRelatedResources() === true -->
-            <div class="tab-pane" data-bind="with: relatedResourcesManager">
+            <div data-bind="with: relatedResourcesManager">
                 {% include 'views/resource/related-resources/related-resources-manager.htm' %}
             </div>
             <!--/ko -->
