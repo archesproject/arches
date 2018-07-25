@@ -2305,7 +2305,9 @@ ul.nav.nav-tabs.nav-justified {
     padding: 5px 0px 12px 0px;
 }
 
-
+.node-config-item.pad-top {
+    padding: 15px 0px 12px 0px;
+}
 
 
 .concept-label {
@@ -8754,13 +8756,23 @@ a.clear-geojson-button:hover {
     width: 500px;
 }
 
+#widget-crud-settings div div .domain-container .domain-input {
+    width: 254px;
+}
+
+#widget-crud-settings div div .domain-container {
+    width: 270px;
+}
+
 .domain-input {
     height: 32px;
     margin-bottom: 5px;
+    padding-left: 5px;
 }
 
 .domain-input-item {
     height: 32px;
+    padding-left: 5px;
 }
 
 .domain-drag-handle {
@@ -10464,7 +10476,13 @@ a.search-facet-item.disabled {
 }
 
 .msm-data-selection .form-text.form-checkbox:not(.btn), .form-text.form-radio:not(.btn) {
-    margin-top: 10px;
+    margin-top: 1px;
+}
+
+
+
+.form-checkbox:not(.btn):last-child, .form-radio:not(.btn):last-child {
+    margin-bottom: 10px;
 }
 
 .nav-tabs li a.graph-designer-tab {
