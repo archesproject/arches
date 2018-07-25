@@ -7066,14 +7066,6 @@ div.row.widget-wrapper {
     padding: 5px 25px;
 }
 
-.rr-drag-panel-target {
-    height: 100vh;
-    background: #f4f4f4;
-    border: 1px solid #ddd;
-    border-radius: 2px;
-    padding: 0px 25px;
-}
-
 .card-listing-panel {
     position: absolute;
     top: -20px;
@@ -7193,9 +7185,10 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .rr-drag-panel-target {
-    background: #ebeef0;
-    border: 1px solid #ddd;
     border-bottom-width: 0px;
+    height: 100vh;
+    background: #f4f4f4;
+    border: 1px solid #ddd;
     border-radius: 2px;
     padding: 0px 25px;
 }
@@ -10318,7 +10311,7 @@ a.search-facet-item.disabled {
     z-index: 1000;
 }
 
-.resource-instance-search .resource-instance-wrapper {
+.related-resources-header .resource-instance-wrapper {
     padding: 0;
 }
 
