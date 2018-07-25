@@ -8764,6 +8764,11 @@ a.clear-geojson-button:hover {
     width: 270px;
 }
 
+.new-option-field {
+    position: relative;
+    top: 20px;
+}
+
 .domain-input {
     height: 32px;
     margin-bottom: 5px;
