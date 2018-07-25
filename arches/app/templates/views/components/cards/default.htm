@@ -281,7 +281,7 @@
                 <button class="btn btn-shim btn-warning btn-labeled btn-lg fa fa-trash" data-bind="click: function () { self.form.deleteTile(tile); }">{% trans 'Delete this record' %}</button>
                 <!-- /ko -->
                 <!-- ko if: tile.dirty() -->
-                <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
+                <!-- ko if: provisionalTileViewModel && !provisionalTileViewModel.tileIsFullyProvisional() -->
                 <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset">{% trans 'Cancel edit' %}</button>
                 <!-- /ko -->
                     <!-- ko if: tile.tileid -->
