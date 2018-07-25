@@ -109,10 +109,14 @@ define([
 
             viewModel.selectedCard = ko.computed(function() {
                 var selection = viewModel.cardTree.selection();
-                if (selection.widgets) {
-                    return selection;
+                if (selection) {
+                    if (selection.widgets) {
+                        return selection;
+                    }
+                    return selection.parent;
+                } else {
+                    return null;
                 }
-                return selection.parent;
             });
 
             viewModel.nodeForm = new NodeFormView({
