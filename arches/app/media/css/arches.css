@@ -1128,6 +1128,7 @@ a.select2-search-choice-close {
     opacity: 1.0;
 }
 
+
 .branch-library {
     background-color: white;
     height: auto;
@@ -1141,6 +1142,11 @@ a.select2-search-choice-close {
     width: 100%;
     margin-left: 1px;
 }
+
+.middle-column-container.card-configuration {
+    padding: 10px 15px;
+}
+
 
 .library-icon {
     width: 30px;
@@ -2295,9 +2301,12 @@ ul.nav.nav-tabs.nav-justified {
     padding: 0;
 }
 
-.node-widget-label {
-    padding: 20px 0px 10px 0px;
+.node-config-item {
+    padding: 5px 0px 12px 0px;
 }
+
+
+
 
 .concept-label {
     padding-top: 0px;
