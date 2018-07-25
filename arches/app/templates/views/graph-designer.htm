@@ -154,7 +154,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <div class="flex node-configuration">
             <div class="flex" data-bind="visible: activeTab() === 'graph'">
                 <!--Branch Library -->
-                <div id="branch-library" class="middle-column-container graph-designer branch-library" data-bind="visible: graphTree.branchListVisible" style="width: 300px; border-bottom: solid 1px #dddddd; z-index: 10; display:none;">
+                <div id="branch-library" class="middle-column-container graph-designer branch-library" data-bind="visible: graphTree.branchListVisible" style="display: none;">
                     <div>
                         <div class="title-block-title" style="margin-bottom: 0px; padding-bottom: 0px;">
                             <span class="">{{branch_list.title}}</span>
@@ -190,7 +190,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="flex" data-bind="visible: activeTab() === 'card'">
                 <!--Middle Panel -->
                 <!-- ko if: cardTree.selection -->
-                <div class="middle-column-container graph-designer branch-library" style="width: 300px; border-bottom: solid 1px #dddddd; z-index: 10;">
+                <div class="middle-column-container graph-designer branch-library card-configuration" style="">
                     <!-- ko if: cardTree.selection().constructor.name === 'CardViewModel' -->
                     <div data-bind="with: cardTree.selection()">
                         {% include 'views/graph/graph-designer/card-configuration.htm' %}
