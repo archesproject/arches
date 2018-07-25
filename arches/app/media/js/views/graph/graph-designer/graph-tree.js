@@ -177,8 +177,10 @@ define([
         },
 
         _initializeItem: function(item){
+            if (!item.expanded) {
+                item.expanded = ko.observable(item.istopnode);
+            }
             TreeView.prototype._initializeItem.apply(this, arguments);
-            item.expanded(item.istopnode);
         },
 
         collapseAll: function(){
