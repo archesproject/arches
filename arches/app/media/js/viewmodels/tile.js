@@ -90,7 +90,7 @@ define([
                     cardwidgets: params.cardwidgets
                 });
             }),
-            expanded: ko.observable(true),
+            expanded: ko.observable(false),
             hasprovisionaledits: ko.computed(function() {
                 return !!self.provisionaledits();
             }, this),

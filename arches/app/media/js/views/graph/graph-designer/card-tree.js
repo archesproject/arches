@@ -29,12 +29,13 @@ define([
         };
 
         var toggleAll = function(state) {
-            var nodes = self.flattenTree(self.topCards, []).concat([{
-                expanded: self.rootExpanded
-            }]);
+            var nodes = self.flattenTree(self.topCards, []);
             _.each(nodes, function(node) {
                 node.expanded(state);
             });
+            if (state) {
+                self.rootExpanded(true);
+            }
         };
 
         var createLookup = function(list, idKey) {
