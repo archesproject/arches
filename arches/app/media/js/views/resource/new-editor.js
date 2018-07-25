@@ -53,12 +53,13 @@ define([
     };
 
     var toggleAll = function(state) {
-        var nodes = flattenTree(vm.topCards, []).concat([{
-            expanded: vm.rootExpanded
-        }]);
+        var nodes = flattenTree(vm.topCards, []);
         _.each(nodes, function(node) {
             node.expanded(state);
         });
+        if (state) {
+            vm.rootExpanded(true);
+        }
     };
     var createLookup = function(list, idKey) {
         return _.reduce(list, function(lookup, item) {

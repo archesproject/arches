@@ -176,6 +176,18 @@ define([
             });
         },
 
+        _initializeItem: function(item){
+            TreeView.prototype._initializeItem.apply(this, arguments);
+            item.expanded(item.istopnode);
+        },
+
+        collapseAll: function(){
+            this.items().forEach(function(item){
+                if (!item.istopnode) {
+                    item.expanded(false);
+                }
+            }, this);
+        }
     });
     return GraphTree;
 });

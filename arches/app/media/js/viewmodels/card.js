@@ -98,7 +98,7 @@ define([
             model: cardModel,
             widgets: cardModel.widgets,
             parent: params.tile,
-            expanded: ko.observable(true),
+            expanded: ko.observable(false),
             perms: perms,
             permsLiteral: permsLiteral,
             scrollTo: ko.pureComputed(function() {
