@@ -98,18 +98,15 @@ def import_graph(graphs, overwrite_graphs=True):
                 if not hasattr(graph, 'cards'):
                     errors.append('{0} graph has no attribute cards'.format(graph.name))
                 else:
-                    if graph.cards == [] or graph.cards == {}:
-                        errors.append('{0} graph has no cards'.format(graph.name))
+                    if len(Graph.objects.filter(pk=graph.graphid)) == 0 or overwrite_graphs is True:
+                        graph.save()
+                        reporter.update_graphs_saved()
                     else:
-                        if len(Graph.objects.filter(pk=graph.graphid)) == 0 or overwrite_graphs is True:
+                        overwrite_input = raw_input('Overwrite {0} (Y/N) ? '.format(graph.name))
+                        if overwrite_input.lower() in ('t', 'true', 'y', 'yes'):
                             graph.save()
-                            reporter.update_graphs_saved()
                         else:
-                            overwrite_input = raw_input('Overwrite {0} (Y/N) ? '.format(graph.name))
-                            if overwrite_input.lower() in ('t', 'true', 'y', 'yes'):
-                                graph.save()
-                            else:
-                                raise GraphImportException('{0} - already exists. Skipping import.'.format(graph.name))
+                            raise GraphImportException('{0} - already exists. Skipping import.'.format(graph.name))
 
                 if not hasattr(graph, 'cards_x_nodes_x_widgets'):
                     errors.append('{0} graph has no attribute cards_x_nodes_x_widgets'.format(graph.name))
