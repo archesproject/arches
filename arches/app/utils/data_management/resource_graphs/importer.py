@@ -66,7 +66,7 @@ def import_graph(graphs, overwrite_graphs=True):
                 configs = {}
             else:
                 try:
-                    configs.has_key('')  # Checking if configs is a dict-like object
+                    '' in configs  # Checking if configs is a dict-like object
                 except AttributeError:
                     configs = JSONDeserializer().deserialize(configs)
             for default_key in default_configs:
