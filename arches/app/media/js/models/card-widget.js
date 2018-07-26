@@ -98,7 +98,11 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function(_, ko,
                     }
                     var configKeys = [];
                     _.each(value, function(configVal, configKey) {
-                        value[configKey] = ko.observable(configVal);
+                        if (!ko.isObservable(configVal)) {
+                            value[configKey] = ko.observable(configVal);
+                        } else {
+                            value[configKey] = configVal;
+                        }
                         configKeys.push(configKey);
                     });
                     this.set(key, value);
