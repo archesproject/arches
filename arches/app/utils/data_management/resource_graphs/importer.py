@@ -19,10 +19,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import sys
 import uuid
 from arches.app.models.graph import Graph
-from arches.app.models.models import CardXNodeXWidget, Form, FormXCard, Report, NodeGroup, DDataType, Widget, ReportTemplate, Function, Ontology, OntologyClass
+from arches.app.models.models import (CardXNodeXWidget, Form, FormXCard, Report, NodeGroup, DDataType, Widget,
+                                      ReportTemplate, Function, Ontology, OntologyClass)
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.models.models import GraphXMapping
 from django.db import transaction
+
 
 class GraphImportReporter:
     def __init__(self, graphs):
@@ -43,7 +45,7 @@ class GraphImportReporter:
         self.reports_saved += count
 
     def report_results(self):
-        if self.resource_model == True:
+        if self.resource_model is True:
             result = "Saved Resource Model: {0}, Forms: {1}, Reports: {2}"
         else:
             result = "Saved Branch: {0}"
@@ -57,13 +59,14 @@ class GraphImportException(Exception):
 
 def import_graph(graphs, overwrite_graphs=True):
     reporter = GraphImportReporter(graphs)
+
     def check_default_configs(default_configs, configs):
-        if default_configs != None:
-            if configs == None:
+        if default_configs is not None:
+            if configs is None:
                 configs = {}
             else:
                 try:
-                    configs.has_key('') #Checking if configs is a dict-like object
+                    configs.has_key('')  # Checking if configs is a dict-like object
                 except AttributeError:
                     configs = JSONDeserializer().deserialize(configs)
             for default_key in default_configs:
@@ -71,12 +74,11 @@ def import_graph(graphs, overwrite_graphs=True):
                     configs[default_key] = default_configs[default_key]
         return configs
 
-
     with transaction.atomic():
         errors = []
         for resource in graphs:
             try:
-                if resource['ontology_id'] != None:
+                if resource['ontology_id'] is not None:
                     if resource['ontology_id'] not in [str(f['ontologyid']) for f in Ontology.objects.all().values('ontologyid')]:
                         errors.append('The ontologyid of the graph you\'re trying to load does not exist in Arches.')
 
@@ -86,7 +88,7 @@ def import_graph(graphs, overwrite_graphs=True):
                 ontology_classes = [str(f['source']) for f in OntologyClass.objects.all().values('source')]
 
                 for node in graph.nodes.values():
-                    if resource['ontology_id'] != None:
+                    if resource['ontology_id'] is not None:
                         if node.ontologyclass not in ontology_classes:
                             errors.append('The ontology class of this node does not exist in the indicated ontology scheme.')
                     node_config = node.config
@@ -99,7 +101,7 @@ def import_graph(graphs, overwrite_graphs=True):
                     if graph.cards == [] or graph.cards == {}:
                         errors.append('{0} graph has no cards'.format(graph.name))
                     else:
-                        if len(Graph.objects.filter(pk=graph.graphid)) == 0 or overwrite_graphs == True:
+                        if len(Graph.objects.filter(pk=graph.graphid)) == 0 or overwrite_graphs is True:
                             graph.save()
                             reporter.update_graphs_saved()
                         else:
@@ -154,6 +156,7 @@ def import_graph(graphs, overwrite_graphs=True):
                 print e
 
         return errors, reporter
+
 
 def import_mapping_file(mapping_file):
     resource_model_id = mapping_file['resource_model_id']
