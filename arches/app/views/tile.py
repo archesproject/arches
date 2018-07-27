@@ -170,7 +170,8 @@ class TileData(View):
                             provisional_editor_id = tile.provisionaledits.keys()[0]
                             edit = tile.provisionaledits[provisional_editor_id]
                             provisional_editor = User.objects.get(pk=provisional_editor_id)
-                            tile.delete(request=request, provisional_edit_log_details={"user": request.user.id, "action": "delete edit", "edit": edit, "provisional_editor": provisional_editor})
+                            reviewer = request.user
+                            tile.delete(request=request, provisional_edit_log_details={"user": reviewer, "action": "delete edit", "edit": edit, "provisional_editor": provisional_editor})
                         else:
                             tile.delete(request=request)
                         tile.after_update_all()
