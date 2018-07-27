@@ -75,8 +75,11 @@ class TileData(View):
                     resource.index()
                 tile_id = data['tileid']
                 if tile_id != None and tile_id != '':
-                    old_tile = Tile.objects.get(pk=tile_id)
-                    clean_resource_cache(old_tile)
+                    try:
+                        old_tile = Tile.objects.get(pk=tile_id)
+                        clean_resource_cache(old_tile)
+                    except ObjectDoesNotExist:
+                        return JSONResponse({'status':'false','message': [_('This tile is no longer available'), _('It was likely deleted by another user')]}, status=500)
                 tile = Tile(data)
                 if tile.filter_by_perm(request.user, 'write_nodegroup'):
                     with transaction.atomic():
@@ -160,7 +163,10 @@ class TileData(View):
             data = JSONDeserializer().deserialize(json)
 
             with transaction.atomic():
-                tile = Tile.objects.get(tileid = data['tileid'])
+                try:
+                    tile = Tile.objects.get(tileid = data['tileid'])
+                except ObjectDoesNotExist:
+                    return JSONResponse({'status':'false','message': [_('This tile is no longer available'), _('It was likely already deleted by another user')]}, status=500)
                 user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
                 if user_is_reviewer or tile.is_provisional() == True:
                     if tile.filter_by_perm(request.user, 'delete_nodegroup'):
