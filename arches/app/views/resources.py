@@ -116,7 +116,6 @@ def resource_manager(request, resourcetypeid='', form_id='default', resourceid='
             geom = JSONSerializer().serialize(resource.get_geom())
             
             lang = request.GET.get('lang', request.LANGUAGE_CODE)
-            form.data['NearbyRes'] = check_existing(resource)
             form.load(lang)
             return render_to_response('resource-manager.htm', {
                     'form': form,
