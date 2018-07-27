@@ -166,7 +166,13 @@ class TileData(View):
                     if tile.filter_by_perm(request.user, 'delete_nodegroup'):
                         nodegroup = models.NodeGroup.objects.get(pk=tile.nodegroup_id)
                         clean_resource_cache(tile)
-                        tile.delete(request=request)
+                        if tile.is_provisional() is True and len(tile.provisionaledits.keys()) == 1:
+                            provisional_editor_id = tile.provisionaledits.keys()[0]
+                            edit = tile.provisionaledits[provisional_editor_id]
+                            provisional_editor = User.objects.get(pk=provisional_editor_id)
+                            tile.delete(request=request, provisional_edit_log_details={"user": request.user.id, "action": "delete edit", "edit": edit, "provisional_editor": provisional_editor})
+                        else:
+                            tile.delete(request=request)
                         tile.after_update_all()
                         update_system_settings_cache(tile)
                         return JSONResponse(tile)

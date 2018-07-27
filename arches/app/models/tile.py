@@ -289,6 +289,7 @@ class Tile(models.TileModel):
     def delete(self, *args, **kwargs):
         se = SearchEngineFactory().create()
         request = kwargs.pop('request', None)
+        provisional_edit_log_details = kwargs.pop('provisional_edit_log_details', None)
         for tiles in self.tiles.itervalues():
             for tile in tiles:
                 tile.delete(*args, request=request, **kwargs)
@@ -309,7 +310,11 @@ class Tile(models.TileModel):
                 se.delete(index='strings', doc_type='term', id=result['_id'])
 
             self.__preDelete(request)
-            self.save_edit(user=request.user, edit_type='tile delete', old_value=self.data)
+            self.save_edit(
+                user=request.user,
+                edit_type='tile delete',
+                old_value=self.data,
+                provisional_edit_log_details=provisional_edit_log_details)
             super(Tile, self).delete(*args, **kwargs)
             resource = Resource.objects.get(resourceinstanceid=self.resourceinstance.resourceinstanceid)
             resource.index()
