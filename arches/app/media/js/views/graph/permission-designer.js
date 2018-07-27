@@ -111,9 +111,6 @@ define([
                                 }
                             }
                         });
-                    },
-                    complete: function() {
-                        console.log('complete!');
                     }
                 });
             }
