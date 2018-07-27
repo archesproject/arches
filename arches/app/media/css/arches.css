@@ -11585,13 +11585,13 @@ a.jstree-anchor.disabled {
     color: #ccc;
 }
 
-.designer-card-tree .jstree-default li {
+.jstree-default .card-designer-tree li {
     background-image: url("tree/32px.png");
     background-position: -292px -4px;
     background-repeat: repeat-y;
 }
 
-.designer-card-tree .jstree-default li.jstree-last, .designer-card-tree .jstree-default .jstree-last > li {
+.jstree-default .card-designer-tree li.jstree-last, .jstree-default .card-designer-tree .jstree-last > li {
     background: transparent;
 }
 

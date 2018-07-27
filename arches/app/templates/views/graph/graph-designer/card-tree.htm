@@ -24,7 +24,7 @@
                     </strong>
                 </a>
                 <!-- ko foreach: { data: [$data], as: 'self' } -->
-                <ul class="jstree-children" aria-expanded="true" data-bind="sortable: {
+                <ul class="jstree-children card-designer-tree" aria-expanded="true" data-bind="sortable: {
                     data: topCards,
                     as: 'card',
                     beforeMove: beforeMove,
@@ -39,6 +39,8 @@
                             loading: self.loading,
                             form: self
                         }
+                    }, css: {
+                        'jstree-last': $index() === ($parent.topCards().length - 1)
                     }"></div>
                 </ul>
                 <!-- /ko -->
