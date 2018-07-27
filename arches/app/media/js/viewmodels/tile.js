@@ -172,8 +172,6 @@ define([
                     if (self.tileid) {
                         koMapping.fromJS(tileData.data, self.data);
                         koMapping.fromJS(tileData.provisionaledits, self.provisionaledits);
-                    } else {
-                        self.data = koMapping.fromJS(tileData.data);
                     }
                     self._tileData(koMapping.toJSON(self.data));
                     if (!self.tileid) {
