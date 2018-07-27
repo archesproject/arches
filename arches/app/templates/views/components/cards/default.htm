@@ -67,19 +67,22 @@
 <!-- /ko -->
 
 <!-- ko if: state === 'designer-tree' -->
-<li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards.length > 0 || card.widgets().length > 0) && card.expanded()), 'jstree-closed' : ((card.cards.length > 0 || card.widgets().length > 0) && !card.expanded()), 'jstree-leaf': card.cards.length === 0 && card.widgets().length === 0}, scrollTo: card.scrollTo, container: '.designer-card-tree'">
+<li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards().length > 0 || card.widgets().length > 0) && card.expanded()), 'jstree-closed' : ((card.cards().length > 0 || card.widgets().length > 0) && !card.expanded()), 'jstree-leaf': card.cards().length === 0 && card.widgets().length === 0}, scrollTo: card.scrollTo, container: '.designer-card-tree'">
     <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
     <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected()}, click: function () { card.selected(true) },">
         <i class="fa fa-file-o" role="presentation"></i>
         <span style="padding-right: 5px;" data-bind="text: card.model.name"></span>
     </a>
-    <!-- ko if: card.cards.length > 0 || card.widgets().length > 0 -->
-    <ul class="jstree-children" aria-expanded="true">
-        <div data-bind="foreach: {
-                data: card.widgets(),
-                as: 'widget'
+    <!-- ko if: card.cards().length > 0 || card.widgets().length > 0 -->
+    <ul class="jstree-children card-designer-tree" aria-expanded="true">
+        <div data-bind="sortable: {
+                data: card.widgets,
+                as: 'widget',
+                beforeMove: self.beforeMove
             }">
-            <li role="treeitem" class="jstree-node jstree-leaf">
+            <li role="treeitem" class="jstree-node jstree-leaf" data-bind="css: {
+                    'jstree-last': $index() === (card.widgets().length - 1) && card.cards().length === 0
+                }">
                 <i class="jstree-icon jstree-ocl" role="presentation"></i>
                 <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { widget.selected(true) }, css:{'jstree-clicked': widget.selected}">
                     <i class="fa fa-file" role="presentation" ></i>
@@ -89,20 +92,25 @@
                 </a>
             </li>
         </div>
-        <div data-bind="foreach: {
+        <div data-bind="sortable: {
                 data: card.cards,
-                as: 'card'
+                as: 'childCard',
+                beforeMove: self.beforeMove
             }">
-            <!-- ko component: {
-                name: self.form.cardComponentLookup[card.model.component_id()].componentname,
-                params: {
-                    state: 'designer-tree',
-                    card: card,
-                    tile: null,
-                    loading: self.loading,
-                    form: self.form
-                }
-            } --> <!-- /ko -->
+            <div data-bind="css: {
+                    'jstree-last': ($index() === (card.cards().length - 1))
+                }">
+                <!-- ko component: {
+                        name: self.form.cardComponentLookup[childCard.model.component_id()].componentname,
+                        params: {
+                        state: 'designer-tree',
+                        card: childCard,
+                        tile: null,
+                        loading: self.loading,
+                        form: self.form
+                    }
+                } --> <!-- /ko -->
+            </div>
         </div>
     </ul>
     <!-- /ko -->
@@ -111,7 +119,7 @@
 
 
 <!-- ko if: state === 'permissions-tree' -->
-<li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards.length > 0 || card.widgets().length > 0) && card.expanded()), 'jstree-closed' : ((card.cards.length > 0 || card.widgets().length > 0) && !card.expanded()), 'jstree-leaf': card.cards.length === 0 && card.widgets().length === 0}">
+<li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards().length > 0 || card.widgets().length > 0) && card.expanded()), 'jstree-closed' : ((card.cards().length > 0 || card.widgets().length > 0) && !card.expanded()), 'jstree-leaf': card.cards().length === 0 && card.widgets().length === 0}">
     <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
     <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'jstree-clicked': card.selected, 'child-selected': card.isChildSelected()}, click: function () { card.selected(true) },">
         <i class="fa fa-file-o" role="presentation"></i>
@@ -125,7 +133,7 @@
             <!-- /ko -->
         </span>
     </a>
-    <!-- ko if: card.cards.length > 0 || card.widgets().length > 0 -->
+    <!-- ko if: card.cards().length > 0 || card.widgets().length > 0 -->
     <ul class="jstree-children" aria-expanded="true">
         <div data-bind="foreach: {
                 data: card.cards,

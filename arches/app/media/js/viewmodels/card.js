@@ -139,7 +139,7 @@ define([
                     });
                 })
             ),
-            cards: _.filter(params.cards, function(card) {
+            cards: ko.observableArray(_.filter(params.cards, function(card) {
                 var nodegroup = _.find(ko.unwrap(nodegroups), function(group) {
                     return ko.unwrap(group.nodegroupid) === ko.unwrap(card.nodegroup_id);
                 });
@@ -163,7 +163,7 @@ define([
                     perms: perms,
                     permsLiteral: permsLiteral
                 });
-            }),
+            })),
             hasprovisionaledits: ko.computed(function() {
                 return _.filter(params.tiles, function(tile) {
                     return (

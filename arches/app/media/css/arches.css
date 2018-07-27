@@ -11585,6 +11585,19 @@ a.jstree-anchor.disabled {
     color: #ccc;
 }
 
+.jstree-default .card-designer-tree li:last-child {
+    background-image: url("tree/32px.png");
+}
+
+.jstree-default .card-designer-tree li:last-child {
+    background-position: -292px -4px;
+    background-repeat: repeat-y;
+}
+
+.jstree-default .card-designer-tree li.jstree-last:last-child, .jstree-default .card-designer-tree .jstree-last > li:last-child {
+    background: transparent;
+}
+
 .card-summary-section li {
     list-style: none;
 }
