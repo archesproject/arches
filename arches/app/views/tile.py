@@ -188,6 +188,9 @@ class TileData(View):
             start = request.GET.get('start')
             end = request.GET.get('end')
             edits = EditLog.objects.filter(provisional_userid=request.user.id).filter(timestamp__range=[start, end]).order_by('tileinstanceid', 'timestamp')
+            resourceinstanceids = [e['resourceinstanceid'] for e in edits.values('resourceinstanceid')]
+            deleted_resource_edits = EditLog.objects.filter(resourceinstanceid__in=resourceinstanceids).filter(edittype='delete')
+            deleted_resource_instances = [e['resourceinstanceid'] for e in deleted_resource_edits.values('resourceinstanceid')]
             summary = {}
             for edit in edits:
                 if edit.tileinstanceid not in summary:
@@ -199,6 +202,7 @@ class TileData(View):
                 summary[edit.tileinstanceid]['resourcedisplayname'] = edit.resourcedisplayname
                 summary[edit.tileinstanceid]['resourcemodelid'] = edit.resourceclassid
                 summary[edit.tileinstanceid]['nodegroupid'] = edit.nodegroupid
+                summary[edit.tileinstanceid]['resource_deleted'] = True if edit.resourceinstanceid in deleted_resource_instances else False
                 if edit.provisional_edittype in ['accept edit', 'delete edit']:
                     summary[edit.tileinstanceid]['reviewer'] = edit.user_username
 
