@@ -23,7 +23,7 @@ define([
             this.nodes = attributes.data.nodes;
             this.widgets = ko.observableArray();
             this.tiles = ko.observableArray();
-            
+
             this.cardid = ko.observable();
             this.nodegroup_id = ko.observable();
             this.name = ko.observable();
@@ -63,6 +63,17 @@ define([
 
             this._card = ko.observable('{}');
 
+            this.dirty = ko.computed(function() {
+                return JSON.stringify(_.extend(JSON.parse(self._card()), self.toJSON())) !== self._card();
+            });
+
+            this.isContainer = ko.computed(function() {
+                return !!self.get('cards')().length;
+            });
+
+            this.parse(attributes);
+            this.parseNodes.call(this, attributes);
+
             this.get('cards').subscribe(function(cards) {
                 _.each(cards, function(card, i) {
                     card.get('sortorder')(i);
@@ -74,17 +85,6 @@ define([
                     widget.get('sortorder')(i);
                 });
             });
-
-            this.dirty = ko.computed(function() {
-                return JSON.stringify(_.extend(JSON.parse(self._card()), self.toJSON())) !== self._card();
-            });
-
-            this.isContainer = ko.computed(function() {
-                return !!self.get('cards')().length;
-            });
-
-            this.parse(attributes);
-            this.parseNodes.call(this, attributes);
 
             attributes.data.nodes.subscribe(function(){
                 this.parseNodes(attributes);
@@ -149,7 +149,8 @@ define([
         },
 
         parseNodes: function(attributes) {
-            ko.unwrap(this.nodes).forEach(function(node, i) {
+            var widgets = [];
+            ko.unwrap(this.nodes).forEach(function(node) {
                 // TODO: it would be nice to normalize the nodegroup_id names (right now we have several different versions)
                 if((ko.unwrap(node.nodeGroupId) || ko.unwrap(node.nodegroup_id)) === ko.unwrap(attributes.data.nodegroup_id)){
 
@@ -170,13 +171,14 @@ define([
                             datatype: datatype,
                             disabled: attributes.data.disabled
                         });
-                        this.get('widgets').push(widget);
+                        widgets.push(widget);
                     }
                 }
             }, this);
-            this.get('widgets').sort(function(w, ww) {
+            widgets.sort(function(w, ww) {
                 return w.get('sortorder')() > ww.get('sortorder')();
             });
+            this.get('widgets')(widgets);
         },
 
         reset: function() {

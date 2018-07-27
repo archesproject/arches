@@ -29,7 +29,7 @@ define([
         };
 
         var toggleAll = function(state) {
-            var nodes = self.flattenTree(self.topCards, []);
+            var nodes = self.flattenTree(self.topCards(), []);
             _.each(nodes, function(node) {
                 node.expanded(state);
             });
@@ -47,7 +47,7 @@ define([
         _.extend(this, {
             filterEnterKeyHandler: function(context, e) {
                 if (e.keyCode === 13) {
-                    var highlightedItems = _.filter(self.flattenTree(self.topCards, []), function(item) {
+                    var highlightedItems = _.filter(self.flattenTree(self.topCards(), []), function(item) {
                         return item.highlight && item.highlight();
                     });
                     var previousItem = scrollTo();
@@ -82,7 +82,7 @@ define([
             on: function() {
                 return;
             },
-            topCards: _.filter(data.cards, function(card) {
+            topCards: ko.observableArray(_.filter(data.cards, function(card) {
                 var nodegroup = _.find(ko.unwrap(params.graph.nodegroups), function(group) {
                     return ko.unwrap(group.nodegroupid) === card.nodegroup_id;
                 });
@@ -107,11 +107,35 @@ define([
                     perms: ko.observableArray(),
                     permsLiteral: ko.observableArray()
                 });
-            }),
+            })),
+            beforeMove: function(e) {
+                e.cancelDrop = (e.sourceParent!==e.targetParent);
+            },
+            reorderCards: function() {
+                loading(true);
+                var cards = _.map(self.topCards(), function(card, i) {
+                    card.model.get('sortorder')(i);
+                    return {
+                        id: card.model.id,
+                        name: card.model.get('name')(),
+                        sortorder: i
+                    };
+                });
+                $.ajax({
+                    type: 'POST',
+                    data: JSON.stringify({
+                        cards: cards
+                    }),
+                    url: arches.urls.reorder_cards,
+                    complete: function() {
+                        loading(false);
+                    }
+                });
+            },
             selection: selection,
             filter: filter
         });
-        var topCard = self.topCards[0];
+        var topCard = self.topCards()[0];
         if (topCard != null) {
             selection(topCard.tiles().length > 0 ? topCard.tiles()[0] : topCard);
         }

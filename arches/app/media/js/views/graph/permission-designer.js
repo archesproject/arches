@@ -39,7 +39,7 @@ define([
         });
 
         self.getPermissionManagerData = function() {
-            self.cardList = self.cardTree.flattenTree(self.cardTree.topCards, []);
+            self.cardList = self.cardTree.flattenTree(ko.unwrap(self.cardTree.topCards), []);
             $.ajax({
                 url: arches.urls.permission_manager_data
             })
@@ -111,9 +111,6 @@ define([
                                 }
                             }
                         });
-                    },
-                    complete: function() {
-                        console.log('complete!')
                     }
                 });
             }

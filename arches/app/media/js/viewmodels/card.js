@@ -139,7 +139,7 @@ define([
                     });
                 })
             ),
-            cards: _.filter(params.cards, function(card) {
+            cards: ko.observableArray(_.filter(params.cards, function(card) {
                 var nodegroup = _.find(ko.unwrap(nodegroups), function(group) {
                     return ko.unwrap(group.nodegroupid) === ko.unwrap(card.nodegroup_id);
                 });
@@ -163,7 +163,7 @@ define([
                     perms: perms,
                     permsLiteral: permsLiteral
                 });
-            }),
+            })),
             hasprovisionaledits: ko.computed(function() {
                 return _.filter(params.tiles, function(tile) {
                     return (
@@ -202,6 +202,27 @@ define([
                     complete: function() {
                         loading(false);
                         updateDisplayName(params.resourceId, params.displayname);
+                    }
+                });
+            },
+            reorderCards: function() {
+                loading(true);
+                var cards = _.map(self.cards(), function(card, i) {
+                    card.model.get('sortorder')(i);
+                    return {
+                        id: card.model.id,
+                        name: card.model.get('name')(),
+                        sortorder: i
+                    };
+                });
+                $.ajax({
+                    type: 'POST',
+                    data: JSON.stringify({
+                        cards: cards
+                    }),
+                    url: arches.urls.reorder_cards,
+                    complete: function() {
+                        loading(false);
                     }
                 });
             },
