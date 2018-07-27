@@ -94,6 +94,10 @@ define([
             applySelectedComputed(widgets);
         });
 
+        cardModel.get('widgets').sort(function(w, ww) {
+            return w.get('sortorder')() > ww.get('sortorder')();
+        });
+
         _.extend(this, nodegroup, {
             model: cardModel,
             widgets: cardModel.widgets,

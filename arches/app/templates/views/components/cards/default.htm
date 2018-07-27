@@ -78,7 +78,8 @@
         <div data-bind="sortable: {
                 data: card.widgets,
                 as: 'widget',
-                beforeMove: self.beforeMove
+                beforeMove: self.beforeMove,
+                afterMove: function () { card.model.save() }
             }">
             <li role="treeitem" class="jstree-node jstree-leaf" data-bind="css: {
                     'jstree-last': $index() === (card.widgets().length - 1) && card.cards().length === 0
