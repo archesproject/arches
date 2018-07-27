@@ -94,10 +94,6 @@ define([
             applySelectedComputed(widgets);
         });
 
-        cardModel.get('widgets').sort(function(w, ww) {
-            return w.get('sortorder')() > ww.get('sortorder')();
-        });
-
         _.extend(this, nodegroup, {
             model: cardModel,
             widgets: cardModel.widgets,
@@ -206,6 +202,27 @@ define([
                     complete: function() {
                         loading(false);
                         updateDisplayName(params.resourceId, params.displayname);
+                    }
+                });
+            },
+            reorderCards: function() {
+                loading(true);
+                var cards = _.map(self.cards(), function(card, i) {
+                    card.model.get('sortorder')(i);
+                    return {
+                        id: card.model.id,
+                        name: card.model.get('name')(),
+                        sortorder: i
+                    };
+                });
+                $.ajax({
+                    type: 'POST',
+                    data: JSON.stringify({
+                        cards: cards
+                    }),
+                    url: arches.urls.reorder_cards,
+                    complete: function(r) {
+                        loading(false);
                     }
                 });
             },

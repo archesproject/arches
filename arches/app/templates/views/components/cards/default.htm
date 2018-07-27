@@ -79,13 +79,13 @@
                 data: card.widgets,
                 as: 'widget',
                 beforeMove: self.beforeMove,
-                afterMove: function () { card.model.save() }
+                afterMove: function() { card.model.save() }
             }">
             <li role="treeitem" class="jstree-node jstree-leaf" data-bind="css: {
                     'jstree-last': $index() === (card.widgets().length - 1) && card.cards().length === 0
                 }">
                 <i class="jstree-icon jstree-ocl" role="presentation"></i>
-                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { widget.selected(true) }, css:{'jstree-clicked': widget.selected}">
+                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function() { widget.selected(true) }, css:{'jstree-clicked': widget.selected}">
                     <i class="fa fa-file" role="presentation" ></i>
                     <strong style="margin-right: 10px;" >
                         <span data-bind="text: !!(widget.label()) ? widget.label() : widget.node.name"></span>
@@ -96,7 +96,10 @@
         <div data-bind="sortable: {
                 data: card.cards,
                 as: 'childCard',
-                beforeMove: self.beforeMove
+                beforeMove: self.beforeMove,
+                afterMove: function() {
+                    card.reorderCards();
+                }
             }">
             <div data-bind="css: {
                     'jstree-last': ($index() === (card.cards().length - 1))

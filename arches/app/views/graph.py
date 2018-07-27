@@ -499,6 +499,7 @@ class CardManagerView(GraphBaseView):
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
 class CardView(GraphBaseView):
+    action = 'update_card'
 
     def get(self, request, cardid):
         try:
@@ -561,12 +562,23 @@ class CardView(GraphBaseView):
 
         return render(request, 'views/graph/card-configuration-manager.htm', context)
 
-    def post(self, request, cardid):
+    def post(self, request, cardid=None):
         data = JSONDeserializer().deserialize(request.body)
-        if data:
-            card = Card(data)
-            card.save()
-            return JSONResponse(card)
+        if self.action == 'update_card':
+            if data:
+                card = Card(data)
+                card.save()
+                return JSONResponse(card)
+
+        if self.action == 'reorder_cards':
+            if 'cards' in data and len(data['cards']) > 0:
+                with transaction.atomic():
+                    for card_data in data['cards']:
+                        card = models.CardModel.objects.get(pk=card_data['id'])
+                        card.sortorder = card_data['sortorder']
+                        card.save()
+
+                return JSONResponse(data['cards'])
 
         return HttpResponseNotFound()
 
