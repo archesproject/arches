@@ -24,11 +24,13 @@
                     </strong>
                 </a>
                 <!-- ko foreach: { data: [$data], as: 'self' } -->
-                <ul class="jstree-children" aria-expanded="true" data-bind="foreach: {
+                <ul class="jstree-children" aria-expanded="true" data-bind="sortable: {
                     data: topCards,
-                    as: 'card'
+                    as: 'card',
+                    beforeMove: beforeMove,
+                    afterMove: reorderCards
                 }">
-                    <!-- ko component: {
+                    <div data-bind="component: {
                         name: self.cardComponentLookup[card.model.component_id()].componentname,
                         params: {
                             state: 'designer-tree',
@@ -37,7 +39,7 @@
                             loading: self.loading,
                             form: self
                         }
-                    } --> <!-- /ko -->
+                    }"></div>
                 </ul>
                 <!-- /ko -->
             </li>

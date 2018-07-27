@@ -221,7 +221,7 @@ define([
                         cards: cards
                     }),
                     url: arches.urls.reorder_cards,
-                    complete: function(r) {
+                    complete: function() {
                         loading(false);
                     }
                 });

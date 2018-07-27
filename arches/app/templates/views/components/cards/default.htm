@@ -74,7 +74,7 @@
         <span style="padding-right: 5px;" data-bind="text: card.model.name"></span>
     </a>
     <!-- ko if: card.cards().length > 0 || card.widgets().length > 0 -->
-    <ul class="jstree-children card-designer-tree" aria-expanded="true">
+    <ul class="jstree-children" aria-expanded="true">
         <div data-bind="sortable: {
                 data: card.widgets,
                 as: 'widget',
