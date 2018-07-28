@@ -23,6 +23,7 @@
     background: #3acaa1;
 }
 
+
 .filtered-leaf {
     font-weight: 600;
     color: #fff;
@@ -292,6 +293,14 @@ a.filtered > span:hover {
     line-height: 28px;
     margin-left: 28px;
     min-width: 28px;
+}
+
+ul.jstree-container-ul > li.jstree-node.jstree-open {
+    margin-left: 4px;
+}
+
+ul.jstree-container-ul > li.jstree-node.jstree-closed {
+    margin-left: 4px;
 }
 
 .jstree-default .jstree-anchor {
