@@ -75,8 +75,11 @@ class TileData(View):
                     resource.index()
                 tile_id = data['tileid']
                 if tile_id != None and tile_id != '':
-                    old_tile = Tile.objects.get(pk=tile_id)
-                    clean_resource_cache(old_tile)
+                    try:
+                        old_tile = Tile.objects.get(pk=tile_id)
+                        clean_resource_cache(old_tile)
+                    except ObjectDoesNotExist:
+                        return JSONResponse({'status':'false','message': [_('This tile is no longer available'), _('It was likely deleted by another user')]}, status=500)
                 tile = Tile(data)
                 if tile.filter_by_perm(request.user, 'write_nodegroup'):
                     with transaction.atomic():
@@ -160,13 +163,23 @@ class TileData(View):
             data = JSONDeserializer().deserialize(json)
 
             with transaction.atomic():
-                tile = Tile.objects.get(tileid = data['tileid'])
+                try:
+                    tile = Tile.objects.get(tileid = data['tileid'])
+                except ObjectDoesNotExist:
+                    return JSONResponse({'status':'false','message': [_('This tile is no longer available'), _('It was likely already deleted by another user')]}, status=500)
                 user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
                 if user_is_reviewer or tile.is_provisional() == True:
                     if tile.filter_by_perm(request.user, 'delete_nodegroup'):
                         nodegroup = models.NodeGroup.objects.get(pk=tile.nodegroup_id)
                         clean_resource_cache(tile)
-                        tile.delete(request=request)
+                        if tile.is_provisional() is True and len(tile.provisionaledits.keys()) == 1:
+                            provisional_editor_id = tile.provisionaledits.keys()[0]
+                            edit = tile.provisionaledits[provisional_editor_id]
+                            provisional_editor = User.objects.get(pk=provisional_editor_id)
+                            reviewer = request.user
+                            tile.delete(request=request, provisional_edit_log_details={"user": reviewer, "action": "delete edit", "edit": edit, "provisional_editor": provisional_editor})
+                        else:
+                            tile.delete(request=request)
                         tile.after_update_all()
                         update_system_settings_cache(tile)
                         return JSONResponse(tile)
@@ -182,6 +195,9 @@ class TileData(View):
             start = request.GET.get('start')
             end = request.GET.get('end')
             edits = EditLog.objects.filter(provisional_userid=request.user.id).filter(timestamp__range=[start, end]).order_by('tileinstanceid', 'timestamp')
+            resourceinstanceids = [e['resourceinstanceid'] for e in edits.values('resourceinstanceid')]
+            deleted_resource_edits = EditLog.objects.filter(resourceinstanceid__in=resourceinstanceids).filter(edittype='delete')
+            deleted_resource_instances = [e['resourceinstanceid'] for e in deleted_resource_edits.values('resourceinstanceid')]
             summary = {}
             for edit in edits:
                 if edit.tileinstanceid not in summary:
@@ -193,6 +209,7 @@ class TileData(View):
                 summary[edit.tileinstanceid]['resourcedisplayname'] = edit.resourcedisplayname
                 summary[edit.tileinstanceid]['resourcemodelid'] = edit.resourceclassid
                 summary[edit.tileinstanceid]['nodegroupid'] = edit.nodegroupid
+                summary[edit.tileinstanceid]['resource_deleted'] = True if edit.resourceinstanceid in deleted_resource_instances else False
                 if edit.provisional_edittype in ['accept edit', 'delete edit']:
                     summary[edit.tileinstanceid]['reviewer'] = edit.user_username
 
