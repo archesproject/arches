@@ -8,7 +8,8 @@ define([
     'viewmodels/alert',
     'views/provisional-history-list',
     'bindings/scrollTo',
-    'bootstrap'
+    'bootstrap',
+    'bindings/slide'
 ], function($, _, Backbone, ko, moment, arches,  AlertViewModel, ProvisionalHistoryList) {
     /**
     * A backbone view representing a basic page in arches.  It sets up the
@@ -33,11 +34,12 @@ define([
         *                 bound to the page
         * @return {object} an instance of PageView
         */
-        constructor: function (options) {
+        constructor: function(options) {
             var self = this;
             this.viewModel = (options && options.viewModel) ? options.viewModel : {};
             this.viewModel.helploaded = ko.observable(false);
             this.viewModel.helploading = ko.observable(false);
+            this.viewModel.helpOpen = ko.observable(false);
             this.viewModel.provisionalHistoryList = new ProvisionalHistoryList({
                 items: ko.observableArray(),
                 helploaded: this.viewModel.helploaded,
@@ -45,6 +47,7 @@ define([
             });
 
             _.defaults(this.viewModel, {
+                helpTemplate: ko.observable(),
                 alert: ko.observable(null),
                 loading: ko.observable(false),
                 showTabs: ko.observable(false),
@@ -65,31 +68,30 @@ define([
                         }));
                         return;
                     }
-                    self.viewModel.alert(null)
+                    self.viewModel.alert(null);
                     self.viewModel.loading(true);
                     window.location = url;
                 },
-                getHelp: function(template) {
-                    if (!self.viewModel.helploaded()) {
+                getHelp: function() {
+                    if (self.viewModel.helploaded()) {
                         self.viewModel.helploading(true);
                         var el = $('.ep-help-content');
                         $.ajax({
                             type: "GET",
                             url: arches.urls.help_template,
-                            data: {'template': template},
-                            success : function(data) {
-                                el.html(data);
-                                self.viewModel.helploaded(true);
-                                self.viewModel.helploading(false);
-                                $('.ep-help-topic-toggle').click(function () {
-                                    var sectionEl = $(this).closest('div');
-                                    contentEl = $(sectionEl).find('.ep-help-topic-content').first();
-                                    contentEl.slideToggle();
-                                });
-                                $('.reloadable-img').click(function(){
-                                    $(this).attr('src', $(this).attr('src'));
-                                });
-                            }
+                            data: {'template': self.viewModel.helpTemplate()}
+                        }).done(function(data) {
+                            el.html(data);
+                            self.viewModel.helploaded(true);
+                            self.viewModel.helploading(false);
+                            $('.ep-help-topic-toggle').click(function() {
+                                var sectionEl = $(this).closest('div');
+                                var contentEl = $(sectionEl).find('.ep-help-topic-content').first();
+                                contentEl.slideToggle();
+                            });
+                            $('.reloadable-img').click(function(){
+                                $(this).attr('src', $(this).attr('src'));
+                            });
                         });
                     }
                 },
@@ -98,7 +100,7 @@ define([
                 }
             });
 
-            window.addEventListener('beforeunload', function(event) {
+            window.addEventListener('beforeunload', function() {
                 self.viewModel.loading(true);
             });
 
@@ -106,15 +108,11 @@ define([
             return this;
         },
 
-        initialize: function(options) {
+        initialize: function() {
             ko.applyBindings(this.viewModel);
             $('[data-toggle="tooltip"]').tooltip();
 
-            $('.ep-help-toggle').click(function (){
-                $('#ep-help-panel').toggle('slide', { direction: 'right' });
-            });
-
-            $('.ep-edits-toggle').click(function (){
+            $('.ep-edits-toggle').click(function(){
                 $('#ep-edits-panel').toggle('slide', { direction: 'right' });
             });
         }

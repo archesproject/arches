@@ -12,11 +12,12 @@ define([
     'resource-editor-data',
     'views/search/search-results',
     'views/resource/related-resources-manager',
+    'view-data',
     'bindings/resizable-sidepanel',
     'bindings/sortable',
     'widgets',
     'card-components'
-], function($, _, ko, moment, BaseManagerView, AlertViewModel, GraphModel, CardViewModel, ProvisionalTileViewModel, arches, data, searchResults, RelatedResourcesManager) {
+], function($, _, ko, moment, BaseManagerView, AlertViewModel, GraphModel, CardViewModel, ProvisionalTileViewModel, arches, data, searchResults, RelatedResourcesManager, viewData) {
     var handlers = {
         'after-update': [],
         'tile-reset': []
@@ -78,6 +79,7 @@ define([
     var vm = {
         loading: loading,
         scrollTo: scrollTo,
+        helpTemplate: ko.observable(viewData.help),
         filterEnterKeyHandler: function(context, e) {
             if (e.keyCode === 13) {
                 var highlightedItems = _.filter(flattenTree(vm.topCards, []), function(item) {

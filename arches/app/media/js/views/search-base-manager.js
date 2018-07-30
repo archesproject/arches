@@ -42,7 +42,7 @@ define([
         initialize: function(options) {
             this.isNewQuery = true;
             this.viewModel.resultsExpanded = ko.observable(true);
-
+            this.viewModel.helpTemplate(viewData.help);
             this.aggregations = ko.observable();
             this.searchBuffer = ko.observable();
             this.filters = {};
