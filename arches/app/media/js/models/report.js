@@ -118,6 +118,7 @@ define(['arches',
                 switch (key) {
                 case 'reportid':
                     this.set('id', value);
+                    this.get('reportid')(value);
                     break;
                 case 'name':
                 case 'template_id':
