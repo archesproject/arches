@@ -112,6 +112,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 {% include 'views/resource/related-resources/related-resources-manager.htm' %}
             </div>
             <!--/ko -->
+            <!-- ko if: !selection() && topCards.length == 0 -->
+            <div class="card-header">{% trans "No cards are available for this model." %}</div>
+            <!-- /ko -->
             <!-- ko if: selection() && manageRelatedResources() === false -->
 
             <div class="card-header">
