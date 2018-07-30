@@ -227,7 +227,9 @@ define([
         }
     };
     var topCard = vm.topCards[0];
-    selection(topCard.tiles().length > 0 ? topCard.tiles()[0] : topCard);
+    if (topCard) {
+        selection(topCard.tiles().length > 0 ? topCard.tiles()[0] : topCard);
+    }
 
     vm.resourceId.subscribe(function(){
         //switches the url from 'create-resource' once the resource id is available
