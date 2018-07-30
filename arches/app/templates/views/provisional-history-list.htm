@@ -45,8 +45,13 @@
         <div class="new-provisional-edit-history" data-bind="visible: $data.filtered() == false, click: $parent.selectItem.bind($parent), css:{ 'selected selected-card': $data.selected }">
             {% block listitem %}
             <div class='entry'>
+                <!--ko if: $data.resource_deleted == false -->
                 <a class="resource-edit-link" href='' data-bind="text: '{% trans "Edit" %}', click: function(){$parent.editResource($data.resourceinstanceid)}"></a>
                 <div class="entry-label-resource" data-bind="text: $data.resourcedisplayname"></div>
+                <!--/ko-->
+                <!--ko if: $data.resource_deleted == true -->
+                <div><span class="resource-edit-link" data-bind="text: '{% trans 'Resource has been deleted' %}'"></span></div>
+                <!--/ko-->
             </div>
 
             <div class='entry'><i data-bind="css: $data.resourcemodel.iconclass" style="padding-right: 4px"></i>

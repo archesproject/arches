@@ -6946,10 +6946,11 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
     font-size: 19px;
 }
 
+
 div.row.widget-wrapper {
     margin: 0;
     margin-right: 10px;
-    padding: 5px 5px 15px 5px;
+    padding: 0px 5px 25px 5px;
     position: relative;
 }
 
@@ -8771,10 +8772,7 @@ a.clear-geojson-button:hover {
     width: 270px;
 }
 
-.new-option-field {
-    position: relative;
-    top: 20px;
-}
+
 
 .domain-input {
     height: 32px;
@@ -10341,6 +10339,17 @@ a.search-facet-item.disabled {
     padding: 0;
 }
 
+#widget-crud-settings div.row.widget-wrapper {
+    padding-left: 0px;
+    padding-right: 0px;
+    margin-right: -5px;
+    margin-left: -5px;
+}
+
+#widget-crud-settings div.row.widget-wrapper div div .select2-container {
+    height: 32px;
+}
+
 .resource-instance-search .row.widget-wrapper {
     padding-top: 0;
     padding-left: 0;
@@ -10504,10 +10513,6 @@ a.search-facet-item.disabled {
 }
 
 
-
-.form-checkbox:not(.btn):last-child, .form-radio:not(.btn):last-child {
-    margin-bottom: 10px;
-}
 
 .nav-tabs li a.graph-designer-tab {
     padding: 15px 10px 15px 10px;
