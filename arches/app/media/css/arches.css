@@ -11498,6 +11498,7 @@ ul.select2-choices:after {
     flex: 1 0 250px;
     width: 250px;
     overflow-y: auto;
+    background-color: white;
 }
 
 .card-component-panel h3 {
