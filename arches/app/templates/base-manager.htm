@@ -127,7 +127,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!-- Prov edit history-->
                         {% if user_is_reviewer == False %}
                         <a href="{% url 'search_home' %}" class="ep-edits-toggle ep-tools ep-tools-right" data-bind="click:function () { getProvisionalHistory(); }">
-                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Recent Edits" %}'>
+                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "My Recent Edits" %}'>
                               <i class="ion-clock"></i>
                             </div>
                         </a>
@@ -150,7 +150,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         {% endif %}
 
                         {% if nav.help.0 != '' %}
-                        <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right" data-bind="click: function(){ getHelp('{{ help }}') }">
+                        <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right" data-bind="click: function(){ getHelp('{{ help }}'); helpOpen(!helpOpen()) }">
                             <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Help" %}'>
                               <i class="ion-help"></i>
                             </div>
@@ -162,6 +162,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <div id="ep-edits-panel" class="ep-edits" style="display:none">
                         <div class="ep-edits-header" style="padding-right:0px">
                             <div class="ep-edits-title">
+                                <span>{% trans 'My Edit History' %}</span>
                             </div>
                             <a href="javascript:void(0);" class="ep-edits-toggle ep-edits-close ep-tools ep-tools-right" style="border:none;">
                                 <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Close" %}'>
@@ -170,39 +171,23 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </a>
                         </div>
 
-                        <!-- help content loaded from contextually referenced template -->
-                        <div class="ep-edits-body" style="float:left" data-bind="css: {'loading-mask': helploading()}">
+                        <div class="ep-edits-body provisional-edit-history" style="float:left" data-bind="css: {'loading-mask': helploading()}">
                             <div class="ep-edits-content">
-                            <!-- ko foreach: provisionalEdits -->
-                            <div class='new-provisional-edit-history'>
-                                <div class='entry'><i data-bind="css: $data.resourcemodel.iconclass" style="padding-right: 4px"></i><div class='entry-label' data-bind="text: $data.resourcemodel.name"></div></div>
-                                <div class='entry'><div class='entry-label'>{% trans 'Card: ' %}</div><span data-bind="text: $data.card.name"></span></div>
-                                <div class='entry'><div class='entry-label'>{% trans 'Edited: ' %}</div><span data-bind="text: $data.displaytime"></span></div>
-                                <div class='entry'>
-                                    <div class='entry-label'>{% trans 'Status: ' %}</div>
-                                    <!--ko if: $data.pending -->
-                                    <span style='color: #F5BB25'>{% trans 'Pending Review' %}</span>
-                                    <!--/ko-->
-                                    <!--ko if: $data.lastedittype === 'delete edit' -->
-                                    <div><span style='color: red'>{% trans 'Declined by: ' %}</span><strong data-bind="text: $data.reviewer"></strong></div>
-                                    <!--/ko-->
-                                    <!--ko if: $data.lastedittype === 'accept edit' -->
-                                    <div><span style='color: green'>{% trans 'Approved by: ' %}</span><strong data-bind="text: $data.reviewer"></strong></div>
-                                    <!--/ko-->
-                                </div>
-                            </div>
-                            <!--/ko-->
+                                {% include 'views/provisional-history-list.htm' %}
                             </div>
                         </div>
+
+
+
                     </div>
 
                     <!-- Help Panel -->
-                    <div id="ep-help-panel" class="ep-help" style="display:none">
+                    <div id="ep-help-panel" class="ep-help" data-bind="slide: helpOpen, duration: 400, direction: {direction: 'right'}, easing: 'slide'">
                         <div class="ep-help-header" style="padding-right:0px">
                             <div class="ep-help-title">
                                 <span>{% trans nav.help.0 %}</span>
                             </div>
-                            <a href="javascript:void(0);" class="ep-help-toggle ep-help-close ep-tools ep-tools-right" style="border:none;">
+                            <a href="javascript:void(0);" class="ep-help-toggle ep-help-close ep-tools ep-tools-right" style="border:none;" data-bind="click: function(){helpOpen(!helpOpen())}">
                                 <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Close Help" %}'>
                                   <i class="fa fa-times-circle fa-lg"></i>
                                 </div>
@@ -250,7 +235,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     <a class="link-submenu" href="{% url 'config' %}" data-bind="click: navigate.bind(this, '{% url 'config' %}')">{% trans "System Settings" %}</a>
                                                 </li>
                                                 <li class="link-submenu-item">
-                                                    <a class="link-submenu" href="{% url 'graph' system_settings_graphid %}" data-bind="click: navigate.bind(this, '{% url 'graph' system_settings_graphid %}')">{% trans "System Settings Graph" %}</a>
+                                                    <a class="link-submenu" href="{% url 'graph' system_settings_graphid %}" data-bind="click: navigate.bind(this, '{% url 'graph_designer' system_settings_graphid %}')">{% trans "System Settings Graph" %}</a>
                                                 </li>
                                             </ul>
                                         </li>
@@ -400,7 +385,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         define('view-data', [], function () {
             return {
                 graphs: {{graphs}},
-                createableResources: {{createable_resources}}
+                createableResources: {{createable_resources}},
+                help: "{{help}}",
             };
         });
         {% endautoescape %}

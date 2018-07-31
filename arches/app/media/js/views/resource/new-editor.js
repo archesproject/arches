@@ -5,6 +5,7 @@ define([
     'moment',
     'views/base-manager',
     'viewmodels/alert',
+    'models/graph',
     'viewmodels/card',
     'viewmodels/new-provisional-tile',
     'arches',
@@ -15,7 +16,7 @@ define([
     'bindings/sortable',
     'widgets',
     'card-components'
-], function($, _, ko, moment, BaseManagerView, AlertViewModel, CardViewModel, ProvisionalTileViewModel, arches, data, searchResults, RelatedResourcesManager) {
+], function($, _, ko, moment, BaseManagerView, AlertViewModel, GraphModel, CardViewModel, ProvisionalTileViewModel, arches, data, searchResults, RelatedResourcesManager) {
     var handlers = {
         'after-update': [],
         'tile-reset': []
@@ -24,10 +25,11 @@ define([
     var filter = ko.observable('');
     var loading = ko.observable(false);
     var selection = ko.observable();
+    var scrollTo = ko.observable();
     var displayname = ko.observable(data.displayname);
     var resourceId = ko.observable(data.resourceid);
     var manageRelatedResources = ko.observable(false);
-    var selectedTile = ko.computed(function () {
+    var selectedTile = ko.computed(function() {
         var item = selection();
         if (item) {
             if (item.tileid) {
@@ -38,9 +40,7 @@ define([
     });
     var provisionalTileViewModel = new ProvisionalTileViewModel({tile: selectedTile, reviewer: data.user_is_reviewer});
 
-    var cards = data.cards;
-
-    var flattenTree = function (parents, flatList) {
+    var flattenTree = function(parents, flatList) {
         _.each(ko.unwrap(parents), function(parent) {
             flatList.push(parent);
             var childrenKey = parent.tiles ? 'tiles' : 'cards';
@@ -49,28 +49,55 @@ define([
                 flatList
             );
         });
-        return flatList
+        return flatList;
     };
 
     var toggleAll = function(state) {
-        var nodes = flattenTree(vm.topCards, []).concat([{
-            expanded: vm.rootExpanded
-        }]);
+        var nodes = flattenTree(vm.topCards, []);
         _.each(nodes, function(node) {
             node.expanded(state);
         });
+        if (state) {
+            vm.rootExpanded(true);
+        }
     };
-    var createLookup = function (list, idKey) {
-        return _.reduce(list, function (lookup, item) {
+    var createLookup = function(list, idKey) {
+        return _.reduce(list, function(lookup, item) {
             lookup[item[idKey]] = item;
-            return lookup
+            return lookup;
         }, {});
     };
+
+    var graphModel = new GraphModel({
+        data: {nodes: data.nodes, nodegroups: data.nodegroups, edges: []},
+        datatypes: data.datatypes
+    });
+
     var vm = {
         loading: loading,
+        scrollTo: scrollTo,
+        filterEnterKeyHandler: function(context, e) {
+            if (e.keyCode === 13) {
+                var highlightedItems = _.filter(flattenTree(vm.topCards, []), function(item) {
+                    return item.highlight && item.highlight();
+                });
+                var previousItem = scrollTo();
+                scrollTo(null);
+                if (highlightedItems.length > 0) {
+                    var scrollIndex = 0;
+                    var previousIndex = highlightedItems.indexOf(previousItem);
+                    if (previousItem && highlightedItems[previousIndex+1]) {
+                        scrollIndex = previousIndex + 1;
+                    }
+                    scrollTo(highlightedItems[scrollIndex]);
+                }
+                return false;
+            }
+            return true;
+        },
         widgetLookup: createLookup(data.widgets, 'widgetid'),
         cardComponentLookup: createLookup(data.cardComponents, 'componentid'),
-        nodeLookup: createLookup(data.nodes, 'nodeid'),
+        nodeLookup: createLookup(graphModel.get('nodes')(), 'nodeid'),
         graphid: data.graphid,
         graphname: data.graphname,
         reviewer: data.userisreviewer,
@@ -94,11 +121,12 @@ define([
         topCards: _.filter(data.cards, function(card) {
             var nodegroup = _.find(data.nodegroups, function(group) {
                 return group.nodegroupid === card.nodegroup_id;
-            })
+            });
             return !nodegroup || !nodegroup.parentnodegroup_id;
-        }).map(function (card) {
+        }).map(function(card) {
             return new CardViewModel({
                 card: card,
+                graphModel: graphModel,
                 tile: null,
                 resourceId: resourceId,
                 displayname: displayname,
@@ -106,20 +134,17 @@ define([
                 cards: data.cards,
                 tiles: tiles,
                 selection: selection,
+                scrollTo: scrollTo,
                 loading: loading,
                 filter: filter,
                 provisionalTileViewModel: provisionalTileViewModel,
-                nodes: data.nodes,
                 cardwidgets: data.cardwidgets,
-                datatypes: data.datatypes,
-                widgets: data.widgets,
-                nodegroups: data.nodegroups,
                 userisreviewer: data.userisreviewer
             });
         }),
         selection: selection,
         selectedTile: selectedTile,
-        selectedCard: ko.computed(function () {
+        selectedCard: ko.computed(function() {
             var item = selection();
             if (item) {
                 manageRelatedResources(false);
@@ -131,32 +156,32 @@ define([
         }),
         provisionalTileViewModel: provisionalTileViewModel,
         filter: filter,
-        on: function (eventName, handler) {
+        on: function(eventName, handler) {
             if (handlers[eventName]) {
                 handlers[eventName].push(handler);
             }
         },
         resourceId: resourceId,
-        copyResource: function () {
+        copyResource: function() {
             if (resourceId()) {
                 vm.menuActive(false);
                 loading(true);
                 $.ajax({
                     type: "GET",
                     url: arches.urls.resource_copy.replace('//', '/' + resourceId() + '/'),
-                    success: function(response) {
+                    success: function() {
                         vm.alert(new AlertViewModel('ep-alert-blue', arches.resourceCopySuccess.title, '', null, function(){}));
                     },
-                    error: function(response) {
+                    error: function() {
                         vm.alert(new AlertViewModel('ep-alert-red', arches.resourceCopyFailed.title, arches.resourceCopyFailed.text, null, function(){}));
                     },
-                    complete: function (request, status) {
+                    complete: function() {
                         loading(false);
                     },
                 });
             }
         },
-        deleteResource: function () {
+        deleteResource: function() {
             if (resourceId()) {
                 vm.menuActive(false);
                 vm.alert(new AlertViewModel('ep-alert-red', arches.confirmResourceDelete.title, arches.confirmResourceDelete.text, function() {
@@ -166,13 +191,7 @@ define([
                     $.ajax({
                         type: "DELETE",
                         url: arches.urls.resource_editor + resourceId(),
-                        success: function(response) {
-
-                        },
-                        error: function(response) {
-
-                        },
-                        complete: function (request, status) {
+                        complete: function(request, status) {
                             loading(false);
                             if (status === 'success') {
                                 vm.navigate(arches.urls.resource);
@@ -182,23 +201,23 @@ define([
                 }));
             }
         },
-        deleteTile: function (tile) {
-            tile.deleteTile(function (response) {
+        deleteTile: function(tile) {
+            tile.deleteTile(function(response) {
                 vm.alert(new AlertViewModel('ep-alert-red', response.responseJSON.message[0], response.responseJSON.message[1], null, function(){}));
             });
         },
-        saveTile: function (tile) {
-            tile.save(function (response) {
+        saveTile: function(tile) {
+            tile.save(function(response) {
                 vm.alert(new AlertViewModel('ep-alert-red', response.responseJSON.message[0], response.responseJSON.message[1], null, function(){}));
             });
         },
-        viewEditHistory: function () {
+        viewEditHistory: function() {
             if (resourceId()) {
                 vm.menuActive(false);
                 vm.navigate(arches.urls.get_resource_edit_log(resourceId()));
             }
         },
-        viewReport: function () {
+        viewReport: function() {
             if (resourceId()) {
                 vm.menuActive(false);
                 vm.navigate(arches.urls.resource_report + resourceId());
@@ -206,11 +225,13 @@ define([
         }
     };
     var topCard = vm.topCards[0];
-    selection(topCard.tiles().length > 0 ? topCard.tiles()[0] : topCard);
+    if (topCard) {
+        selection(topCard.tiles().length > 0 ? topCard.tiles()[0] : topCard);
+    }
 
-    vm.resourceId.subscribe(function(val){
+    vm.resourceId.subscribe(function(){
         //switches the url from 'create-resource' once the resource id is available
-        history.pushState({}, '', arches.urls.resource_editor + resourceId())
+        history.pushState({}, '', arches.urls.resource_editor + resourceId());
     });
 
     vm.showRelatedResourcesManager = function(){
@@ -244,8 +265,8 @@ define([
     };
 
 
-    vm.selectionBreadcrumbs = ko.computed(function () {
-        var item = vm.selectedTile()
+    vm.selectionBreadcrumbs = ko.computed(function() {
+        var item = vm.selectedTile();
         var crumbs = [];
         if (item) {
             while (item.parent) {

@@ -1,4 +1,4 @@
-define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko, AbstractModel, widgets) {
+define(['underscore', 'knockout', 'models/abstract', 'widgets'], function(_, ko, AbstractModel, widgets) {
     return AbstractModel.extend({
         /**
         * A backbone model to manage cards_x_nodes_x_widgets records
@@ -17,9 +17,19 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                 'sortorder': null,
                 'disabled': false
             };
+            var self = this;
             this.widgetLookup = widgets;
-            options || (options = {});
-            attributes || (attributes = {});
+            this.widgetList = function() {
+                var widgets = _.map(self.widgetLookup, function(widget, id) {
+                    widget.id = id;
+                    return widget;
+                });
+                return _.filter(widgets, function(widget) {
+                    return widget.datatype === self.datatype.datatype;
+                });
+            };
+            options = options ? options : {};
+            attributes = attributes ? attributes : {};
             options.parse = true;
             this.node = (options.node || null);
             this.card = (options.card || null);
@@ -31,11 +41,11 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
             }
             if (this.datatype && this.datatype.defaultwidget_id) {
                 defaults.widget_id = this.datatype.defaultwidget_id;
-                defaults.config = widgets[defaults.widget_id].defaultconfig;
+                defaults.config = JSON.parse(widgets[defaults.widget_id].defaultconfig);
             }
             if (this.node) {
                 defaults.node_id = this.node.nodeid;
-                defaults.label = this.node.name();
+                defaults.label = ko.unwrap(this.node.name);
             }
             if (this.card) {
                 defaults.card_id = this.card.get('id');
@@ -46,7 +56,7 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
             AbstractModel.prototype.constructor.call(this, attributes, options);
 
             this.configJSON = ko.computed({
-                read: function () {
+                read: function() {
                     var configJSON = {};
                     var config = this.get('config');
                     _.each(this.configKeys(), function(key) {
@@ -55,9 +65,9 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                     configJSON.label = this.get('label')();
                     return configJSON;
                 },
-                write: function (value) {
+                write: function(value) {
                     var config = this.get('config');
-                    for (key in value) {
+                    for (var key in value) {
                         if (key === 'label') {
                             this.get('label')(value[key]);
                         }
@@ -68,7 +78,7 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                 },
                 owner: this
             });
-            this.configJSON.extend({ rateLimit: { timeout: 100, method: "notifyWhenChangesStop" } })
+            this.configJSON.extend({ rateLimit: { timeout: 100, method: "notifyWhenChangesStop" } });
 
             return this;
         },
@@ -88,7 +98,11 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                     }
                     var configKeys = [];
                     _.each(value, function(configVal, configKey) {
-                        value[configKey] = ko.observable(configVal);
+                        if (!ko.isObservable(configVal)) {
+                            value[configKey] = ko.observable(configVal);
+                        } else {
+                            value[configKey] = configVal;
+                        }
                         configKeys.push(configKey);
                     });
                     this.set(key, value);
@@ -96,10 +110,11 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                 } else if (key==='widget_id') {
                     var widgetId = ko.observable(value);
                     this.set(key, ko.computed({
-                        read: function () {
+                        read: function() {
                             return widgetId();
                         },
-                        write: function (value) {
+                        write: function(value) {
+                            var key;
                             var defaultConfig = JSON.parse(widgets[value].defaultconfig);
                             for (key in defaultConfig) {
                                 defaultConfig[key] = ko.observable(defaultConfig[key]);
@@ -107,7 +122,7 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                             var currentConfig = this.get('config');
                             this.set('config', _.defaults(currentConfig, defaultConfig));
                             for (key in defaultConfig) {
-                                self.configKeys.push(key)
+                                self.configKeys.push(key);
                             }
                             widgetId(value);
                         },
@@ -116,6 +131,7 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                 } else {
                     this.set(key, ko.observable(value));
                 }
+                this[key] = this.get(key);
             }, this);
         },
 
@@ -124,13 +140,13 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
          * toJSON - casts the model as a JSON object
          * @return {object} a JSON object representation of the model
          */
-        toJSON: function () {
+        toJSON: function() {
             var ret = {};
-            for(key in this.attributes){
+            for (var key in this.attributes){
                 if (key !== 'config') {
                     ret[key] = this.attributes[key]();
                 } else {
-                    ret[key] = this.configJSON()
+                    ret[key] = this.configJSON();
                 }
             }
             return ret;

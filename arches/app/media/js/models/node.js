@@ -230,7 +230,7 @@ define([
         parse: function(source) {
             var self = this;
             self._node(JSON.stringify(source));
-            self.name(source.name);
+            self.name(ko.unwrap(source.name));
             self.nodeGroupId(source.nodegroup_id);
             self.datatype(source.datatype);
             self.ontologyclass(source.ontologyclass);

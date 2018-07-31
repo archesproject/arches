@@ -3,8 +3,8 @@ define([
     'underscore',
     'arches',
     'backbone',
-    'knockout',
-], function($, _, arches, Backbone,  ko) {
+    'knockout'
+], function($, _, arches, Backbone, ko) {
     var PermissionSettingsForm = Backbone.View.extend({
         /**
         * A backbone view representing a card component form
@@ -26,62 +26,62 @@ define([
             this.whiteListPerms = [];
             this.groupedNodeList = options.groupedNodeList;
 
-            options.nodegroupPermissions.forEach(function(perm){
+            options.nodegroupPermissions.forEach(function(perm) {
                 perm.selected = ko.observable(false);
-                if(perm.codename === 'no_access_to_nodegroup'){
+                if (perm.codename === 'no_access_to_nodegroup') {
                     this.noAccessPerm = perm;
-                    perm.selected.subscribe(function(selected){
-                        if (selected){
-                            this.whiteListPerms.forEach(function(perm){
+                    perm.selected.subscribe(function(selected) {
+                        if (selected) {
+                            this.whiteListPerms.forEach(function(perm) {
                                 perm.selected(false);
                             }, this);
                         }
                     }, this);
-                }else{
-                    this.whiteListPerms.push(perm)
-                    perm.selected.subscribe(function(selected){
-                        if (selected){
+                } else {
+                    this.whiteListPerms.push(perm);
+                    perm.selected.subscribe(function(selected) {
+                        if (selected) {
                             this.noAccessPerm.selected(false);
                         }
                     }, this);
                 }
-            }, this)
+            }, this);
             this.nodegroupPermissions = ko.observableArray(options.nodegroupPermissions);
             this.identityList.items()[0].selected(true);
         },
 
-        save: function(){
+        save: function() {
             var self = this;
             var postData = {
                 'selectedIdentities': this.selectedIdentities(),
                 'selectedCards': this.selectedCards(),
-                'selectedPermissions': _.filter(this.nodegroupPermissions(), function(perm){
+                'selectedPermissions': _.filter(this.nodegroupPermissions(), function(perm) {
                     return perm.selected();
                 })
-            }
+            };
 
             $.ajax({
                 type: 'POST',
                 url: arches.urls.permission_data,
                 data: JSON.stringify(postData),
-                success: function(res){
+                success: function(res) {
                     self.trigger('save');
                 }
             });
         },
 
-        revert: function(){
+        revert: function() {
             var self = this;
             var postData = {
                 'selectedIdentities': this.selectedIdentities(),
                 'selectedCards': this.selectedCards()
-            }
+            };
 
             $.ajax({
                 type: 'DELETE',
                 url: arches.urls.permission_data,
                 data: JSON.stringify(postData),
-                success: function(res){
+                success: function(res) {
                     self.trigger('revert');
                 }
             });

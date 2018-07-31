@@ -448,7 +448,10 @@ FUNCTION_LOCATIONS = ['arches.app.functions',]
 # The following settings control the extent and max zoom level to which tiles
 # will be seeded.  Be aware, seeding tiles at high zoom levels (more zoomed in)
 # will take a long time
-CACHE_SEED_BOUNDS = (-122.0, -52.0, 128.0, 69.0)
+CACHE_SEED_BOUNDS = (
+    52.0, -122.0,
+    69.0,  128.0,
+)
 CACHE_SEED_MAX_ZOOM = 5
 
 # configure where the tileserver should store its cache

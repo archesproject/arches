@@ -16,6 +16,12 @@ If you can't completely re-install Arches (because you have data in the system t
 ```
 pip install arches --upgrade --no-binary :all:
 python manage.py migrate
+pip uninstall pycrypto
+pip uninstall pycryptodome
+pip install pycryptodome
+python manage.py es delete_indexes
+python manage.py es setup_indexes
+python manage.py es index_database
 ```
 
 If you have Arches running on a web server such as Apache, be sure to update your static files directory and restart your web server.

@@ -27,7 +27,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <!-- Page Title and Icon -->
 <div class="ep-tools-title">
     <h1 class="page-header text-overflow ep-graph-title">
-        <i class="fa text-center icon-wrap bg-gray ep-graph-title-icon" data-bind="css: graphiconclass"></i>
+        <i class="fa text-center icon-wrap bg-gray ep-graph-title-icon" data-bind="css: graphiconclass != (null || '') ? graphiconclass : 'fa fa-question'"></i>
         <span data-bind="text: displayname"></span>
     </h1>
 </div>
@@ -40,13 +40,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="jstree jstree-default" data-bind="visible: true" style="display: none;">
                 <div class="header">
                     <div class="list-filter" data-bind="" style="margin-right: 10px;">
-                        <input type="text" class="form-control" style="width: 250px;" placeholder="{% trans 'Find a card...' %}" data-bind="textInput: filter">
+                        <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a card...' %}" data-bind="textInput: filter, event: {keypress: filterEnterKeyHandler}">
 
                         <!-- Clear Search -->
-                        <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }" style="top: 8px;"><i class="fa fa-times-circle"></i></span>
+                        <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
                     </div>
-                    <a data-bind="click: expandAll">Expand all</a>
-                    <a data-bind="click: collapseAll" style="padding-left:5px;">Collapse all</a>
+                    <a data-bind="click: expandAll">{% trans 'Expand all' %}</a>
+                    <a data-bind="click: collapseAll" style="padding-left: 10px;">{% trans 'Collapse all' %}</a>
                 </div>
                 <div class="resource-editor-tree">
                     <ul class="jstree-container-ul jstree-children" aria-expanded="true">
@@ -54,7 +54,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}"></i>
                         <a class="jstree-anchor" href="#" tabindex="-1">
                             <strong>
-                                <i data-bind="css: graphiconclass" role="presentation"></i>
+                                <i data-bind="css: graphiconclass != (null || '') ? graphiconclass : 'fa fa-question'" role="presentation"></i>
                                 <span data-bind="text: displayname"></span> (<span data-bind="text: graphname"></span>)
                             </strong>
                         </a>
@@ -64,7 +64,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             as: 'card'
                         }">
                             <!-- ko component: {
-                                name: self.cardComponentLookup[card.component_id].componentname,
+                                name: self.cardComponentLookup[card.model.component_id()].componentname,
                                 params: {
                                     state: 'editor-tree',
                                     card: card,
@@ -76,9 +76,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </ul>
                         <!-- /ko -->
                     </li>
-                    <li role="treeitem" class="jstree-node jstree-open">
+                    <li role="treeitem" class="jstree-node jstree-open" data-bind="css: {'disabled': resourceId()}">
                         <i class="jstree-icon jstree-ocl" role="presentation"></i>
-                        <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function(){showRelatedResourcesManager()}, css: {'jstree-clicked': manageRelatedResources}">
+                        <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function(){if (resourceId()){showRelatedResourcesManager()}}, css: {'jstree-clicked': manageRelatedResources, 'disabled': resourceId() === ''}">
                             <strong>
                                 <i class="fa fa-link" role="presentation"></i>
                                 <span>{% trans 'Related Resources' %}</span>
@@ -108,10 +108,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
             <!--ko if: manageRelatedResources() === true -->
-            <div class="tab-pane" data-bind="with: relatedResourcesManager">
+            <div data-bind="with: relatedResourcesManager">
                 {% include 'views/resource/related-resources/related-resources-manager.htm' %}
             </div>
             <!--/ko -->
+            <!-- ko if: !selection() && topCards.length == 0 -->
+            <div class="card-header">{% trans "No cards are available for this model." %}</div>
+            <!-- /ko -->
             <!-- ko if: selection() && manageRelatedResources() === false -->
 
             <div class="card-header">
@@ -126,7 +129,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <!-- ko if: crumb.tileid -->
                             <a href="#" data-bind="click: function () { crumb.selected(true) }">
                                 <!-- ko if: crumb.parent.widgets.length > 0 -->
-                                <span data-bind="text: crumb.parent.widgets[0].label || crumb.parent.name"></span>:
+                                <span data-bind="text: crumb.parent.widgets[0].label || crumb.parent.model.name"></span>:
                                 <div style="display: inline;" data-bind="component: {
                                     name: $parent.widgetLookup[crumb.parent.widgets[0].widget_id].name,
                                     params: {
@@ -141,7 +144,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 }"></div> &gt;
                                 <!-- /ko -->
                                 <!-- ko if: crumb.parent.widgets.length === 0 -->
-                                <span data-bind="text: crumb.parent.name"></span> &gt;
+                                <span data-bind="text: crumb.parent.model.name"></span> &gt;
                                 <!-- /ko -->
                             </a>
                             <!-- /ko -->
@@ -149,7 +152,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <span class="current-crumb">
                             <!-- ko if: selectedTile().tileid -->
                                 <!-- ko if: selectedCard().widgets.length > 0 -->
-                                <span data-bind="text: selectedCard().widgets[0].label || selectedCard().name"></span>:
+                                <span data-bind="text: selectedCard().widgets[0].label || selectedCard().model.name"></span>:
                                 <div style="display: inline;" data-bind="component: {
                                     name: widgetLookup[selectedCard().widgets[0].widget_id].name,
                                     params: {
@@ -164,11 +167,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 }"></div>
                                 <!-- /ko -->
                                 <!-- ko if: selectedCard().widgets.length === 0 -->
-                                <span data-bind="text: selectedCard().name"></span>
+                                <span data-bind="text: selectedCard().model.name"></span>
                                 <!-- /ko -->
                             <!-- /ko -->
                             <!-- ko if: !selectedTile().tileid -->
-                            New <span data-bind="text: selectedCard().name"></span>
+                            New <span data-bind="text: selectedCard().model.name"></span>
                             <!-- /ko -->
                         </span>
                         <!-- ko if: selectedTile().tileid && selectedTile().cards.length > 0 -->
@@ -181,7 +184,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <!-- ko foreach: { data: selectedTile().cards, as: 'card' } -->
                                     <!-- ko if: card.canAdd() -->
                                     <li>
-                                        <a href="javascript:void(0)" data-bind="text: card.name, click: function () { card.selected(true) }"></a>
+                                        <a href="javascript:void(0)" data-bind="text: card.model.name, click: function () { card.selected(true) }"></a>
                                     </li>
                                     <!-- /ko -->
                                 <!-- /ko -->
@@ -194,7 +197,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </div>
 
             <div data-bind="component: {
-                name: cardComponentLookup[selectedCard().component_id].componentname,
+                name: cardComponentLookup[selectedCard().model.component_id()].componentname,
                 params: {
                     card: selectedCard(),
                     tile: selectedTile(),

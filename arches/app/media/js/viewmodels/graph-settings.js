@@ -34,7 +34,7 @@ define([
             return self.nodes().length
         });
 
-        var ontologyClass = params.node().ontologyclass;
+        var ontologyClass = self.graphModel.get('root').ontologyclass;
 
         self.jsonData = ko.computed(function() {
             var relatableResourceIds = _.filter(self.resource_data(), function(resource){

@@ -29,7 +29,8 @@ define([
             this.node.configKeys.valueHasMutated();
         }
 
-        var flattenOptions = function(opt, allOpts) {
+        var flattenOptions = function(option, allOpts) {
+            var opt = _.each(option, function(v, k){ option[k] = ko.unwrap(v);});
             if (opt['id'] !== undefined) {
                 allOpts.push(opt);
             }
@@ -41,36 +42,37 @@ define([
             return allOpts;
         };
 
-        this.toggleOptionSelection = function (opt) {
+        this.toggleOptionSelection = function(opt) {
             var selected = !self.isOptionSelected(opt);
             self.setOptionSelection(opt, selected);
         };
 
-        this.setOptionSelection = function (opt, selected) {
+        this.setOptionSelection = function(opt, selected) {
             if (ko.unwrap(self.disabled) === false) {
+                var optid = ko.unwrap(opt.id);
                 if (self.multiple) {
                     var val = value();
                     value(
                         selected ?
-                        _.union([opt.id], val) :
-                        _.without(val ? val : [], opt.id)
+                            _.union([optid], val) :
+                            _.without(val ? val : [], optid)
                     );
                 } else if (selected) {
-                  if (value() === opt.id) {
-                      value(null)
+                    if (value() === optid) {
+                        value(null);
                     }
-                  else {
-                      value(opt.id);
-                  }
+                    else {
+                        value(optid);
+                    }
                 }
             }
         };
 
-        this.isOptionSelected = function (opt) {
+        this.isOptionSelected = function(opt) {
             var selected = false;
             var val = value();
             if (val && val.indexOf) {
-                selected = val.indexOf(opt.id) >= 0;
+                selected = val.indexOf(ko.unwrap(opt.id)) >= 0;
             }
             return selected;
         };
