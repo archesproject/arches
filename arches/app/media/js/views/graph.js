@@ -46,8 +46,8 @@ require([
                 });
             };
 
-            this.viewModel.leaveDropdown = function(e){
-                $('.dropdown').dropdown('toggle')
+            this.viewModel.leaveDropdown = function(){
+                $('.dropdown').dropdown('toggle');
             };
 
             this.viewModel.allGraphs().forEach(function(graph) {

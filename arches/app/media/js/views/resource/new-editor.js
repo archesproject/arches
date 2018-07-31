@@ -12,12 +12,11 @@ define([
     'resource-editor-data',
     'views/search/search-results',
     'views/resource/related-resources-manager',
-    'view-data',
     'bindings/resizable-sidepanel',
     'bindings/sortable',
     'widgets',
     'card-components'
-], function($, _, ko, moment, BaseManagerView, AlertViewModel, GraphModel, CardViewModel, ProvisionalTileViewModel, arches, data, searchResults, RelatedResourcesManager, viewData) {
+], function($, _, ko, moment, BaseManagerView, AlertViewModel, GraphModel, CardViewModel, ProvisionalTileViewModel, arches, data, searchResults, RelatedResourcesManager) {
     var handlers = {
         'after-update': [],
         'tile-reset': []
