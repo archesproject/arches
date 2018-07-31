@@ -115,42 +115,36 @@ Assigned to: Cyrus
 
 #### Search Settings
 
-Assigned to: Cyrus
+Assigned to: Cyrus (0.25)
 
 Basic Search Settings
 
 | Test Subject                                                   | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Searches per page updates properly in Search                   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Number of search suggestions is reflected in search term input |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-
-Temporal Search Settings (not in use)
-
-| Test Subject                                                                                       | Chrome | Safari | Firefox | IE11 | UI  | Notes |
-| -------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Changes in time wheel color ramp are reflected in time wheel change time wheel colors (not in use) |    -   |    -   |    -    |   -  | -   | -     |
-| Changes in time wheel config are reflected in time wheel (not in use)                              |    -   |    -   |    -    |   -  | -   | -     |
+| Searches per page updates properly in Search                   | :white_check_mark: |    ?   |    ?    |   ?  | ?   | -     |
+| Number of search suggestions is reflected in search term input | :white_check_mark: |    ?   |    ?    |   ?  | ?   | -     |
 
 Saved Searches
 
 | Test Subject                                                                                                       | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| A new search saves with a name, search url, description, and image and displays properly in the saved search page. |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Users can delete a saved search                                                                                    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| A new search saves with a name, search url, description, and image and displays properly in the saved search page. | :white_check_mark: |    ?   |    ?    |   ?  | ?   | -     |
+| Users can delete a saved search                                                                                    | :white_check_mark: |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
 ## Map Widget
 
-Assigned to: Cyrus
+Assigned to: Cyrus (0.5)
 
 Test in the Card Configuration Manager.
 
 | Test Subject                                                                                                                                            | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Point line and poly geoms can be created, edited, and deleted                                                                                           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| XY widget is working properly                                                                                                                           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Valid geojson entered in the geojson input adds features to the map and pans to those features. If geojson is invalid user has a chance to update data. |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Point line and poly geoms can be created, edited, and deleted                                                                                           | :white_check_mark: |    ?   |    ?    |   ?  | ?   | -     |
+| XY widget is working properly                                                                                                                           | :white_check_mark: |    ?   |    ?    |   ?  | ?   | -     |
+| Valid geojson entered in the geojson input adds features to the map and pans to those features. If geojson is invalid user has a chance to update data. | :white_check_mark: |    ?   |    ?    |   ?  | ?   | -     |
+| Widget configs (maxzoom, tilt, etc) update when the map changes and the map changes when the properties change                                          | :construction: |    ?   |    ?    |   ?  | ?   | #3797 |
 
 * * *
 
@@ -259,8 +253,8 @@ Updating a resource descriptor should be reflected in the following subjects.
 
 Assigned to: Cyrus
 
-| Test Subject                                           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
-| ------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
+| Test Subject                                                                                        | Chrome | Safari | Firefox | IE11 | UI  | Notes |
+| --------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
 | Provisional users see indication in a widget that their tile edits were submitted                   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Resource reviewers are able to identify provisional tiles and can approve/discard provisional edits |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
