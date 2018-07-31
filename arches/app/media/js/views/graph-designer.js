@@ -198,14 +198,14 @@ define([
                 }
             });
 
+            var helpContentLookup = {
+                permissions: 'permissions-manager-help',
+                graph: 'graph-designer-help',
+                card: 'card-manager-help'
+            };
+
             viewModel.activeTab.subscribe(function(tab) {
-                if (tab === 'permissions') {
-                    viewModel.helpTemplate('permissions-manager-help');
-                } else if (tab === 'graph') {
-                    viewModel.helpTemplate('graph-designer-help');
-                } else if (tab === 'card') {
-                    viewModel.helpTemplate('card-manager-help');
-                }
+                viewModel.helpTemplate(helpContentLookup[tab]);
                 viewModel.getHelp();
             });
 
