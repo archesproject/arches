@@ -255,8 +255,9 @@ Assigned to: Cyrus
 
 | Test Subject                                                                                        | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | --------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Provisional users see indication in a widget that their tile edits were submitted                   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Resource reviewers are able to identify provisional tiles and can approve/discard provisional edits |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Provisional users see indication in a widget that their tile edits were submitted                   | :construction: |    ?   |    ?    |   ?  | ?   | #3798   |
+| Resource reviewers are able to identify provisional tiles and can approve/discard provisional edits | :white_check_mark: |    ?   |    ?    |   ?  | ?   | -     |
+| Provisional edit history properly shows the status of a tile: pending, approved, or declined        | :white_check_mark: |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
