@@ -64,11 +64,11 @@ Assigned to: Cyrus
 
 ## Future Release Features
 
-Assigned to: Cyrus
+Assigned to: Cyrus (.1)
 
 | Test Subject                                                                              | Chrome | Safari | Firefox | IE11 |  UI | Notes |
 | ----------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | :-: | ----- |
-| Test that users can't access the Mobile Survey Manager page                               |    ?   |    ?   |    ?    |   ?  |  ?  |  -    |
+| Test that users can't access the Mobile Survey Manager page                               | :white_check_mark: |    ?   |    ?    |   ?  |  ?  |  -    |
 
 * * *
 
@@ -96,8 +96,8 @@ Assigned to: Cyrus
 
 | Test Subject                                                                                                                 | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Project Name - Updating name updates in index.htm and the page tab                                                           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Web Analytics - String value inserts in base.htm at the location of this template variable:{{GOOGLE_ANALYTICS_TRACKING_ID}}  |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Project Name - Updating name updates and the page tab                                                                        | :construction: |    ?   |    ?    |   ?  | ?   | #3792 |
+| Web Analytics - String value inserts in base.htm at the location of this template variable:{{GOOGLE_ANALYTICS_TRACKING_ID}}  | :white_check_mark: |    ?   |    ?    |   ?  | ?   | -     |
 
 #### Map Settings
 
@@ -105,13 +105,13 @@ Assigned to: Cyrus
 
 | Test Subject                                                                                                                                                                                    | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| API Key - Key saves and API calls are successful                                                                                                                                                |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Hex Grid Precision - Saves properly, but errors if precision is too high (\`Exception detail: TransportError(400, u'parsing_exception', u'[geohash_grid] failed to parse field [precision]')``) |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Hex Cell Size - Changes reflected in Search results                                                                                                                                             |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Default Zoom - Changes reflected in Card Config Manager                                                                                                                                         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Min Zoom - Changes reflected in Card Config Manager                                                                                                                                             |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Max Zoom - Changes reflected in Card Config Manager                                                                                                                                             |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Project Extent - Changes reflected in Card Config Manager                                                                                                                                       |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| API Key - Key saves and API calls are successful                                                                                                                                                | :white_check_mark: |    ?   |    ?    |   ?  | ?   | -     |
+| Hex Grid Precision - Saves properly, but errors if precision is too high (\`Exception detail: TransportError(400, u'parsing_exception', u'[geohash_grid] failed to parse field [precision]')``) | :white_check_mark: |    ?   |    ?    |   ?  | ?   | -     |
+| Hex Cell Size - Changes reflected in Search results                                                                                                                                             | :white_check_mark: |    ?   |    ?    |   ?  | ?   | -     |
+| Default Zoom  Changes reflected in Card Config Manager                                                                                                                                         |:construction:|    ?   |    ?    |   ?  | ?   | #3796     |
+| Min Zoom  Changes reflected in Card Config Manager                                                                                                                                             |:construction:|    ?   |    ?    |   ?  | ?   | #3796     |
+| Max Zoom  Changes reflected in Card Config Manager                                                                                                                                             |:construction:|    ?   |    ?    |   ?  | ?   | #3796     |
+| Project Extent - Changes reflected in Card Config Manager                                                                                                                                       |:construction:|    ?   |    ?    |   ?  | ?   | #3796     |
 
 #### Search Settings
 
