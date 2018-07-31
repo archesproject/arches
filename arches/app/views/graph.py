@@ -307,6 +307,8 @@ class GraphDesignerView(GraphBaseView):
         context['ontologies'] = JSONSerializer().serialize(ontologies, exclude=['version', 'path'])
         context['ontology_classes'] = JSONSerializer().serialize(ontology_classes)
         context['nav']['title'] = self.graph.name
+        context['nav']['help'] = (_('Using the Graph Designer'), 'help/graph-designer-help.htm')
+        context['help'] = 'graph-designer-help'
         #context['nav']['menu'] = True
         context['graph'] = JSONSerializer().serialize(self.graph, exclude=['functions', 'cards', 'deploymentfile',
                                                                            'deploymentdate', '_nodegroups_to_delete',

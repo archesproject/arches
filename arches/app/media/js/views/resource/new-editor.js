@@ -73,8 +73,6 @@ define([
         datatypes: data.datatypes
     });
 
-
-
     var vm = {
         loading: loading,
         scrollTo: scrollTo,

@@ -28,6 +28,7 @@ define([
             viewModel.graphid = ko.observable(data.graphid);
             viewModel.activeTab = ko.observable('graph');
             viewModel.viewState = ko.observable('design');
+            viewModel.helpTemplate(viewData.help);
             viewModel.graphSettingsVisible = ko.observable(false);
             viewModel.graph = koMapping.fromJS(data['graph']);
             viewModel.ontologies = ko.observable(data['ontologies']);
@@ -195,6 +196,17 @@ define([
                     viewModel.permissionsDesigner.getPermissionManagerData();
                     loadPermissionData.dispose();
                 }
+            });
+
+            var helpContentLookup = {
+                permissions: 'permissions-manager-help',
+                graph: 'graph-designer-help',
+                card: 'card-manager-help'
+            };
+
+            viewModel.activeTab.subscribe(function(tab) {
+                viewModel.helpTemplate(helpContentLookup[tab]);
+                viewModel.getHelp();
             });
 
             viewModel.graphView = new GraphView({
