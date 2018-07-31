@@ -74,12 +74,9 @@ define([
         datatypes: data.datatypes
     });
 
-
-
     var vm = {
         loading: loading,
         scrollTo: scrollTo,
-        helpTemplate: ko.observable(viewData.help),
         filterEnterKeyHandler: function(context, e) {
             if (e.keyCode === 13) {
                 var highlightedItems = _.filter(flattenTree(vm.topCards, []), function(item) {

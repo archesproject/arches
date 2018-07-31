@@ -6,10 +6,8 @@ define([
     'arches',
     'viewmodels/mobile-survey-manager',
     'views/base-manager',
-    'profile-manager-data',
-    'view-data',
-    'bindings/slide-toggle'
-], function($, _, ko, koMapping, arches, MobileSurveyManagerViewModel, BaseManagerView, data, viewData) {
+    'profile-manager-data'
+], function($, _, ko, koMapping, arches, MobileSurveyManagerViewModel, BaseManagerView, data) {
 
     var UserProfileManager = BaseManagerView.extend({
         initialize: function(options) {
@@ -21,7 +19,6 @@ define([
             self.viewModel.invalidPassword = ko.observable();
             self.viewModel.mismatchedPasswords = ko.observable();
             self.viewModel.changePasswordSuccess = ko.observable();
-            self.viewModel.helpTemplate(viewData.help);
 
             self.viewModel.toggleChangePasswordForm = function() {
                 this.showChangePasswordForm(!this.showChangePasswordForm());

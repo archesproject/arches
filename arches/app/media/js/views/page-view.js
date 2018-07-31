@@ -7,10 +7,11 @@ define([
     'arches',
     'viewmodels/alert',
     'views/provisional-history-list',
+    'view-data',
     'bindings/scrollTo',
     'bootstrap',
     'bindings/slide'
-], function($, _, Backbone, ko, moment, arches,  AlertViewModel, ProvisionalHistoryList) {
+], function($, _, Backbone, ko, moment, arches,  AlertViewModel, ProvisionalHistoryList, viewData) {
     /**
     * A backbone view representing a basic page in arches.  It sets up the
     * viewModel defaults, optionally accepts additional view model data and
@@ -47,7 +48,7 @@ define([
             });
 
             _.defaults(this.viewModel, {
-                helpTemplate: ko.observable(),
+                helpTemplate: ko.observable(viewData.help),
                 alert: ko.observable(null),
                 loading: ko.observable(false),
                 showTabs: ko.observable(false),

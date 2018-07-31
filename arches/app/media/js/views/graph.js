@@ -50,8 +50,6 @@ require([
                 $('.dropdown').dropdown('toggle')
             };
 
-            this.viewModel.helpTemplate(data.help);
-
             this.viewModel.allGraphs().forEach(function(graph) {
                 graph.root = null;
                 graph.isCard = false;
