@@ -493,112 +493,112 @@ class CardView(GraphBaseView):
 
         return HttpResponseNotFound()
 
+#
+# @method_decorator(group_required('Graph Editor'), name='dispatch')
+# class FormManagerView(GraphBaseView):
+#     action = 'add_form'
+#
+#     def get(self, request, graphid):
+#         self.graph = Graph.objects.get(graphid=graphid)
+#
+#         if self.graph.isresource is True:
+#             context = self.get_context_data(
+#                 main_script='views/graph/form-manager',
+#                 forms=JSONSerializer().serialize(self.graph.form_set.all().order_by('sortorder')),
+#                 cards=JSONSerializer().serialize(models.CardModel.objects.filter(graph=self.graph)),
+#                 forms_x_cards=JSONSerializer().serialize(models.FormXCard.objects.filter(
+#                     form__in=self.graph.form_set.all()).order_by('sortorder')),
+#             )
+#
+#             context['nav']['title'] = self.graph.name
+#             context['nav']['menu'] = True
+#             context['nav']['help'] = (_('Using the Menu Manager'), 'help/base-help.htm')
+#             context['help'] = 'menu-manager-help'
+#
+#             return render(request, 'views/graph/form-manager.htm', context)
+#         else:
+#             return redirect('graph_settings', graphid=graphid)
+#
+#     def post(self, request, graphid):
+#         graph = models.GraphModel.objects.get(graphid=graphid)
+#         ret = None
+#         with transaction.atomic():
+#             if self.action == 'reorder_forms':
+#                 data = JSONDeserializer().deserialize(request.body)
+#                 for i, form in enumerate(data['forms']):
+#                     formModel = models.Form.objects.get(formid=form['formid'])
+#                     formModel.sortorder = i
+#                     formModel.save()
+#                 ret = data['forms']
+#             if self.action == 'add_form':
+#                 form = models.Form(title=_('New Menu'), graph=graph)
+#                 form.sortorder = len(graph.form_set.all())
+#                 form.save()
+#                 ret = form
+#
+#         return JSONResponse(ret)
 
-@method_decorator(group_required('Graph Editor'), name='dispatch')
-class FormManagerView(GraphBaseView):
-    action = 'add_form'
-
-    def get(self, request, graphid):
-        self.graph = Graph.objects.get(graphid=graphid)
-
-        if self.graph.isresource is True:
-            context = self.get_context_data(
-                main_script='views/graph/form-manager',
-                forms=JSONSerializer().serialize(self.graph.form_set.all().order_by('sortorder')),
-                cards=JSONSerializer().serialize(models.CardModel.objects.filter(graph=self.graph)),
-                forms_x_cards=JSONSerializer().serialize(models.FormXCard.objects.filter(
-                    form__in=self.graph.form_set.all()).order_by('sortorder')),
-            )
-
-            context['nav']['title'] = self.graph.name
-            context['nav']['menu'] = True
-            context['nav']['help'] = (_('Using the Menu Manager'), 'help/base-help.htm')
-            context['help'] = 'menu-manager-help'
-
-            return render(request, 'views/graph/form-manager.htm', context)
-        else:
-            return redirect('graph_settings', graphid=graphid)
-
-    def post(self, request, graphid):
-        graph = models.GraphModel.objects.get(graphid=graphid)
-        ret = None
-        with transaction.atomic():
-            if self.action == 'reorder_forms':
-                data = JSONDeserializer().deserialize(request.body)
-                for i, form in enumerate(data['forms']):
-                    formModel = models.Form.objects.get(formid=form['formid'])
-                    formModel.sortorder = i
-                    formModel.save()
-                ret = data['forms']
-            if self.action == 'add_form':
-                form = models.Form(title=_('New Menu'), graph=graph)
-                form.sortorder = len(graph.form_set.all())
-                form.save()
-                ret = form
-
-        return JSONResponse(ret)
-
-
-@method_decorator(group_required('Graph Editor'), name='dispatch')
-class FormView(GraphBaseView):
-
-    def get(self, request, formid):
-
-        try:
-            form = models.Form.objects.get(formid=formid)
-            self.graph = Graph.objects.get(graphid=form.graph_id)
-            icons = models.Icon.objects.order_by('name')
-            cards = models.CardModel.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
-
-            context = self.get_context_data(
-                main_script='views/graph/form-configuration',
-                graph_id=self.graph.graphid,
-                icons=JSONSerializer().serialize(icons),
-                form=JSONSerializer().serialize(form),
-                forms=JSONSerializer().serialize(self.graph.form_set.all()),
-                cards=JSONSerializer().serialize(cards),
-                forms_x_cards=JSONSerializer().serialize(models.FormXCard.objects.filter(form=form).order_by('sortorder')),
-            )
-
-            context['nav']['title'] = self.graph.name
-            context['nav']['menu'] = True
-            context['nav']['help'] = (_('Configuring Menus'), 'help/base-help.htm')
-            context['help'] = 'menu-designer-help'
-
-            return render(request, 'views/graph/form-configuration.htm', context)
-
-        except(models.Form.DoesNotExist):
-            # assume the formid is a graph id
-            graph = Graph.objects.get(graphid=formid)
-            if graph.isresource is False:
-                return redirect('graph_settings', graphid=graph.graphid)
-            else:
-                return redirect('form_manager', graphid=graph.graphid)
-
-    def post(self, request, formid):
-        data = JSONDeserializer().deserialize(request.body)
-        form = models.Form.objects.get(formid=formid)
-        form.title = data['title']
-        form.subtitle = data['subtitle']
-        form.iconclass = data['iconclass']
-        form.visible = data['visible']
-        forms_x_cards = models.FormXCard.objects.filter(form=form)
-        with transaction.atomic():
-            forms_x_cards.delete()
-            for sortorder, card in enumerate(data['cards']):
-                form_x_card = models.FormXCard(
-                    form=form,
-                    card_id=card['cardid'],
-                    sortorder=sortorder
-                )
-                form_x_card.save()
-            form.save()
-        return JSONResponse(data)
-
-    def delete(self, request, formid):
-        form = models.Form.objects.get(formid=formid)
-        form.delete()
-        return JSONResponse({'succces': True})
+#
+# @method_decorator(group_required('Graph Editor'), name='dispatch')
+# class FormView(GraphBaseView):
+#
+#     def get(self, request, formid):
+#
+#         try:
+#             form = models.Form.objects.get(formid=formid)
+#             self.graph = Graph.objects.get(graphid=form.graph_id)
+#             icons = models.Icon.objects.order_by('name')
+#             cards = models.CardModel.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
+#
+#             context = self.get_context_data(
+#                 main_script='views/graph/form-configuration',
+#                 graph_id=self.graph.graphid,
+#                 icons=JSONSerializer().serialize(icons),
+#                 form=JSONSerializer().serialize(form),
+#                 forms=JSONSerializer().serialize(self.graph.form_set.all()),
+#                 cards=JSONSerializer().serialize(cards),
+#                 forms_x_cards=JSONSerializer().serialize(models.FormXCard.objects.filter(form=form).order_by('sortorder')),
+#             )
+#
+#             context['nav']['title'] = self.graph.name
+#             context['nav']['menu'] = True
+#             context['nav']['help'] = (_('Configuring Menus'), 'help/base-help.htm')
+#             context['help'] = 'menu-designer-help'
+#
+#             return render(request, 'views/graph/form-configuration.htm', context)
+#
+#         except(models.Form.DoesNotExist):
+#             # assume the formid is a graph id
+#             graph = Graph.objects.get(graphid=formid)
+#             if graph.isresource is False:
+#                 return redirect('graph_settings', graphid=graph.graphid)
+#             else:
+#                 return redirect('form_manager', graphid=graph.graphid)
+# 
+#     def post(self, request, formid):
+#         data = JSONDeserializer().deserialize(request.body)
+#         form = models.Form.objects.get(formid=formid)
+#         form.title = data['title']
+#         form.subtitle = data['subtitle']
+#         form.iconclass = data['iconclass']
+#         form.visible = data['visible']
+#         forms_x_cards = models.FormXCard.objects.filter(form=form)
+#         with transaction.atomic():
+#             forms_x_cards.delete()
+#             for sortorder, card in enumerate(data['cards']):
+#                 form_x_card = models.FormXCard(
+#                     form=form,
+#                     card_id=card['cardid'],
+#                     sortorder=sortorder
+#                 )
+#                 form_x_card.save()
+#             form.save()
+#         return JSONResponse(data)
+#
+#     def delete(self, request, formid):
+#         form = models.Form.objects.get(formid=formid)
+#         form.delete()
+#         return JSONResponse({'succces': True})
 
 
 class DatatypeTemplateView(TemplateView):
