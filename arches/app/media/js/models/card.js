@@ -90,6 +90,15 @@ define([
                 this.parseNodes(attributes);
                 this._card(JSON.stringify(this.toJSON()));
             }, this);
+
+            if (attributes.cardComponents) {
+                this.cardComponentLookup = _.reduce(attributes.cardComponents, function(lookup, item) {
+                    lookup[ko.unwrap(item['componentid'])] = item;
+                    return lookup;
+                }, {});
+            } else {
+                this.cardComponentLookup = {};
+            }
         },
 
         /**
@@ -110,7 +119,8 @@ define([
                             data: _.extend(card, {
                                 nodes: attributes.data.nodes
                             }),
-                            datatypelookup: attributes.datatypelookup
+                            datatypelookup: attributes.datatypelookup,
+                            cardComponents: attributes.cardComponents
                         });
                         cards.push(cardModel);
                     }, this);

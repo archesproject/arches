@@ -22,95 +22,28 @@
     {% endblock header %}
 
     {% block body %}
-    
+
     <!-- ko foreach: { data: report.activeForms, as: 'form' } -->
     <div class="rp-report-section relative">
         <div class="rp-report-section-title">
             <h4 class="rp-section-title" data-bind="text: form.label"></h4>
-            
+
             <!-- ko foreach: { data: form.cards, as: 'card' } -->
                 <div class="rp-card-section">
-                    <!-- ko template: 'card-report' --> <!-- /ko -->
+                    <!-- ko component: {
+                        name: card.cardComponentLookup[card.component_id()].componentname,
+                        params: {
+                            state: 'report',
+                            card: card
+                        }
+                    } --> <!-- /ko -->
                 </div>
             <!-- /ko -->
         </div>
     </div>
     <!-- /ko -->
 
-    <template id="card-report">
-        <!-- ko foreach: { data: card.get('tiles'), as: 'tile' } -->
-            <div class="rp-card-section">
-                <span class="rp-tile-title" data-bind="text: card.get('name')"></span>
 
-                <!-- ko if: (Object.keys(tile.data).length !== 0) -->
-                    <div class="rp-report-tile" data-bind="attr: { id: tile.tileid }">
-                        <dl class="dl-horizontal">
-                            <!-- ko foreach: { data: card.get('widgets'), as: 'widget' } -->
-                                <!-- ko component: {
-                                    name: widget.widgetLookup[widget.get("widget_id")()].name,
-                                    params: {
-                                        config: configJSON,
-                                        label: widget.get("label")(),
-                                        node: widget.node,
-                                        value: tile.data[widget.node.nodeid],
-                                        state: "report"
-                                    }
-                                } --><!-- /ko -->
-                            <!-- /ko -->
-                        </dl>
-                    </div>
-                <!-- /ko -->
-            
-                <!-- ko foreach: {data: card.get('cards'),as: 'card'} -->
-                    <div class="rp-card-section">
-                        <span class="rp-tile-title" data-bind="text: card.get('name')"></span>
-
-                        <!-- ko foreach: {data: card.get('tiles'), as: 'child_tile'} -->
-                            <!-- ko if: child_tile.parenttile_id() === tile.tileid() -->
-                            <div class="rp-report-tile" data-bind="attr: { id: tile.tileid }">
-                                <dl class="dl-horizontal">
-                                    <!-- ko foreach: { data: card.get('widgets'), as: 'widget' } -->
-                                        <!-- ko component: {
-                                            name: widget.widgetLookup[widget.get("widget_id")()].name,
-                                            params: {
-                                                config: configJSON,
-                                                label: widget.get("label")(),
-                                                node: widget.node,
-                                                value: child_tile.data[widget.node.nodeid],
-                                                state: "report"
-                                            }
-                                        } --><!-- /ko -->
-                                    <!-- /ko -->
-                                </dl>
-                            </div>
-                            <!-- /ko -->
-                        <!-- /ko -->
-                    </div>
-
-                    <div class="rp-report-container-tile" data-bind="visible: card.get('cards')().length > 0">
-                        <!-- ko foreach: { data: card.cards, as: 'card' } -->
-                            <div class="rp-card-section">
-                                <!-- ko template: 'card-report' --> <!-- /ko -->
-                            </div>
-                        <!-- /ko -->
-                    </div>
-                <!-- /ko -->
-          
-
-                <!-- ko if: card.get('tiles')().length === 0 -->
-                    <div class="row rp-report-tile rp-no-data">
-                        <!-- ko ifnot: card.get('cardid') -->
-                            {% trans "Sorry, you don't have access to this information" %}
-                        <!-- /ko -->
-                        <!-- ko if: card.get('cardid') -->
-                            {% trans "No data added yet for" %} "<span data-bind="text: card.get('name')"></span>"
-                        <!-- /ko -->
-                    </div>
-                <!-- /ko -->
-
-            </div>
-        <!-- /ko -->
-    </template> 
 
 
     {% endblock body %}

@@ -10,7 +10,8 @@ require([
     'models/card',
     'report-editor-data',
     'arches',
-    'bindings/sortable'
+    'bindings/sortable',
+    'card-components'
 ], function(_, ko, PageView, ReportEditorTree, ReportEditorForm, ReportEditorPreview, ReportModel, GraphModel, CardModel, data, arches) {
     var viewModel = {
         selectedReportId: ko.observable(data.report.reportid),
@@ -19,11 +20,11 @@ require([
 
     var setupTiles = function(card) {
         var tileData = {};
-        card.nodes.forEach(function (node) {
+        card.nodes.forEach(function(node) {
             tileData[node.nodeid] = ko.observable(null);
         });
         var children = [];
-        card.cards.forEach(function (childCard) {
+        card.cards.forEach(function(childCard) {
             children = children.concat(setupTiles(childCard));
         });
         card.tiles = [{
@@ -44,7 +45,7 @@ require([
 
     viewModel.report = new ReportModel(_.extend({graphModel: graphModel}, data));
 
-    viewModel.reset = function () {
+    viewModel.reset = function() {
         viewModel.report.reset();
         viewModel.selection('header');
     };
@@ -53,7 +54,7 @@ require([
 
     viewModel.selection = ko.observable('header');
 
-    viewModel.openReport = function (reportId) {
+    viewModel.openReport = function(reportId) {
         pageView.viewModel.navigate(arches.urls.report_editor + reportId);
     };
 
@@ -63,7 +64,7 @@ require([
         }
     });
 
-    viewModel.reportOptions = ko.computed(function () {
+    viewModel.reportOptions = ko.computed(function() {
         var options = [{
             name: null,
             reportid: null,
