@@ -81,17 +81,17 @@ Assigned to: Cyrus (0.1)
 
 ## Authentication
 
-Assigned to: Alexei (1)
+Assigned to: Alexei (.5)
 
 Ensure that all browsers are compatible with Authentication process.
 
 | Test Subject                                                             | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| User can sign themselves up for a new Arches account                     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User is added to default group (Crowdsource Editor)                      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can log in with their email address                                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can reset their password                                            |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can edit their profile (First and Last name, email address, etc...) |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| User can sign themselves up for a new Arches account                     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| User is added to default group (Crowdsource Editor)                      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| User can log in with their email address                                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| User can reset their password                                            |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| User can edit their profile (First and Last name, email address, etc...) |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -321,15 +321,15 @@ Assigned to: Alexei (1.5)
 
 | Test Subject     | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Export graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Import graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Create branch    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Create resource  |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add/Edit cards   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add/Edit menus   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add/Edit reports |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| delete graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| clone graph      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Export graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Import graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Create branch    |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Create resource  |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Add/Edit cards   |:construction:|    ?   |    ?    |   ?  | ?   |Cards created in the graph aren't immediately visible in the card manager|
+| Add/Edit menus   |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Add/Edit reports |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| delete graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| clone graph      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
