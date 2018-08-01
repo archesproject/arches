@@ -325,7 +325,7 @@ Assigned to: Alexei (1.5)
 | Import graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 | Create branch    |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 | Create resource  |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
-| Add/Edit cards   |:construction:|    ?   |    ?    |   ?  | ?   |Cards created in the graph aren't immediately visible in the card manager|
+| Add/Edit cards   |:construction:|    ?   |    ?    |   ?  | ?   |Cards created in the graph aren't immediately visible in the card manager see: https://github.com/archesproject/arches/issues/3803|
 | Add/Edit menus   |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 | Add/Edit reports |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 | delete graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
