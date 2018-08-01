@@ -35,125 +35,126 @@ class GraphManagerViewTests(ArchesTestCase):
     def setUp(self):
         self.NODE_NODETYPE_GRAPHID = '22000000-0000-0000-0000-000000000001'
 
-        # Node Branch
-        graph_dict = {
-            "author": "Arches",
-            "color": None,
-            "deploymentdate": None,
-            "deploymentfile": None,
-            "description": "Represents a single node in a graph",
-            "graphid": "22000000-0000-0000-0000-000000000000",
-            "iconclass": "fa fa-circle",
-            "isactive": True,
-            "isresource": False,
-            "name": "Node",
-            "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
-            "subtitle": "Represents a single node in a graph.",
-            "version": "v1"
-        }
-        GraphModel.objects.create(**graph_dict).save()
+        if len(Graph.objects.filter(graphid=self.NODE_NODETYPE_GRAPHID)) == 0:
+            # Node Branch
+            graph_dict = {
+                "author": "Arches",
+                "color": None,
+                "deploymentdate": None,
+                "deploymentfile": None,
+                "description": "Represents a single node in a graph",
+                "graphid": "22000000-0000-0000-0000-000000000000",
+                "iconclass": "fa fa-circle",
+                "isactive": True,
+                "isresource": False,
+                "name": "Node",
+                "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
+                "subtitle": "Represents a single node in a graph.",
+                "version": "v1"
+            }
+            GraphModel.objects.create(**graph_dict).save()
 
-        node_dict = {
-            "config": None,
-            "datatype": "semantic",
-            "description": "Represents a single node in a graph",
-            "graph_id": "22000000-0000-0000-0000-000000000000",
-            "isrequired": False,
-            "issearchable": True,
-            "istopnode": True,
-            "name": "Node",
-            "nodegroup_id": None,
-            "nodeid": "20000000-0000-0000-0000-100000000000",
-            "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity",
-        }
-        Node.objects.create(**node_dict).save()
-
-        # Node/Node Type Branch
-        graph_dict = {
-            "author": "Arches",
-            "color": None,
-            "deploymentdate": None,
-            "deploymentfile": None,
-            "description": "Represents a node and node type pairing",
-            "graphid": "22000000-0000-0000-0000-000000000001",
-            "iconclass": "fa fa-angle-double-down",
-            "isactive": True,
-            "isresource": False,
-            "name": "Node/Node Type",
-            "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
-            "subtitle": "Represents a node and node type pairing",
-            "version": "v1"
-        }
-        GraphModel.objects.create(**graph_dict).save()
-
-        nodegroup_dict = {
-            "cardinality": "n",
-            "legacygroupid": "",
-            "nodegroupid": "20000000-0000-0000-0000-100000000001",
-            "parentnodegroup_id": None
-        }
-        NodeGroup.objects.create(**nodegroup_dict).save()
-
-        card_dict = {
-            "active": True,
-            "cardid": "bf9ea150-3eaa-11e8-8b2b-c3a348661f61",
-            "description": "Represents a node and node type pairing",
-            "graph_id": "22000000-0000-0000-0000-000000000001",
-            "helpenabled": False,
-            "helptext": None,
-            "helptitle": None,
-            "instructions": "",
-            "name": "Node/Node Type",
-            "nodegroup_id": "20000000-0000-0000-0000-100000000001",
-            "sortorder": None,
-            "visible": True
-        }
-        CardModel.objects.create(**card_dict).save()
-
-        nodes = [
-            {
+            node_dict = {
                 "config": None,
-                "datatype": "string",
-                "description": "",
-                "graph_id": "22000000-0000-0000-0000-000000000001",
+                "datatype": "semantic",
+                "description": "Represents a single node in a graph",
+                "graph_id": "22000000-0000-0000-0000-000000000000",
                 "isrequired": False,
                 "issearchable": True,
                 "istopnode": True,
                 "name": "Node",
-                "nodegroup_id": "20000000-0000-0000-0000-100000000001",
-                "nodeid": "20000000-0000-0000-0000-100000000001",
-                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"
-            },
-            {
-                "config": {
-                    "rdmCollection": None
-                },
-                "datatype": "concept",
-                "description": "",
-                "graph_id": "22000000-0000-0000-0000-000000000001",
-                "isrequired": False,
-                "issearchable": True,
-                "istopnode": False,
-                "name": "Node Type",
-                "nodegroup_id": "20000000-0000-0000-0000-100000000001",
-                "nodeid": "20000000-0000-0000-0000-100000000002",
-                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E55_Type"
+                "nodegroup_id": None,
+                "nodeid": "20000000-0000-0000-0000-100000000000",
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity",
             }
-        ]
+            Node.objects.create(**node_dict).save()
 
-        for node in nodes:
-            Node.objects.create(**node).save()
+            # Node/Node Type Branch
+            graph_dict = {
+                "author": "Arches",
+                "color": None,
+                "deploymentdate": None,
+                "deploymentfile": None,
+                "description": "Represents a node and node type pairing",
+                "graphid": "22000000-0000-0000-0000-000000000001",
+                "iconclass": "fa fa-angle-double-down",
+                "isactive": True,
+                "isresource": False,
+                "name": "Node/Node Type",
+                "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
+                "subtitle": "Represents a node and node type pairing",
+                "version": "v1"
+            }
+            GraphModel.objects.create(**graph_dict).save()
 
-        edges_dict = {
-            "description": None,
-            "domainnode_id": "20000000-0000-0000-0000-100000000001",
-            "edgeid": "22200000-0000-0000-0000-000000000001",
-            "graph_id": "22000000-0000-0000-0000-000000000001",
-            "name": None,
-            "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type",
-            "rangenode_id": "20000000-0000-0000-0000-100000000002"
-        }
-        Edge.objects.create(**edges_dict).save()
+            nodegroup_dict = {
+                "cardinality": "n",
+                "legacygroupid": "",
+                "nodegroupid": "20000000-0000-0000-0000-100000000001",
+                "parentnodegroup_id": None
+            }
+            NodeGroup.objects.create(**nodegroup_dict).save()
+
+            card_dict = {
+                "active": True,
+                "cardid": "bf9ea150-3eaa-11e8-8b2b-c3a348661f61",
+                "description": "Represents a node and node type pairing",
+                "graph_id": "22000000-0000-0000-0000-000000000001",
+                "helpenabled": False,
+                "helptext": None,
+                "helptitle": None,
+                "instructions": "",
+                "name": "Node/Node Type",
+                "nodegroup_id": "20000000-0000-0000-0000-100000000001",
+                "sortorder": None,
+                "visible": True
+            }
+            CardModel.objects.create(**card_dict).save()
+
+            nodes = [
+                {
+                    "config": None,
+                    "datatype": "string",
+                    "description": "",
+                    "graph_id": "22000000-0000-0000-0000-000000000001",
+                    "isrequired": False,
+                    "issearchable": True,
+                    "istopnode": True,
+                    "name": "Node",
+                    "nodegroup_id": "20000000-0000-0000-0000-100000000001",
+                    "nodeid": "20000000-0000-0000-0000-100000000001",
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"
+                },
+                {
+                    "config": {
+                        "rdmCollection": None
+                    },
+                    "datatype": "concept",
+                    "description": "",
+                    "graph_id": "22000000-0000-0000-0000-000000000001",
+                    "isrequired": False,
+                    "issearchable": True,
+                    "istopnode": False,
+                    "name": "Node Type",
+                    "nodegroup_id": "20000000-0000-0000-0000-100000000001",
+                    "nodeid": "20000000-0000-0000-0000-100000000002",
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E55_Type"
+                }
+            ]
+
+            for node in nodes:
+                Node.objects.create(**node).save()
+
+            edges_dict = {
+                "description": None,
+                "domainnode_id": "20000000-0000-0000-0000-100000000001",
+                "edgeid": "22200000-0000-0000-0000-000000000001",
+                "graph_id": "22000000-0000-0000-0000-000000000001",
+                "name": None,
+                "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type",
+                "rangenode_id": "20000000-0000-0000-0000-100000000002"
+            }
+            Edge.objects.create(**edges_dict).save()
 
         graph = Graph.new()
         graph.name = "TEST GRAPH"
