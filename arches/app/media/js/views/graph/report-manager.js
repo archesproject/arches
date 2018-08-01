@@ -19,7 +19,7 @@ require([
         ontology_namespaces: data.ontology_namespaces
     });
     data.reports.forEach(function(report) {
-        var reportModel = new ReportModel(_.extend({report: report, graphModel: graphModel}, data));
+        var reportModel = new ReportModel(_.extend({report: report, graphModel: graphModel, cardComponents: []}, data));
         reportModel.template = _.find(data.templates, function(template) {
             return report.template_id === template.templateid;
         });
@@ -43,7 +43,7 @@ require([
         items: viewModel.templates
     });
 
-    var alertFailure = function () {
+    var alertFailure = function() {
         pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, arches.requestFailed.text));
     };
 
@@ -70,7 +70,7 @@ require([
         });
     };
 
-    viewModel.deleteReport = function (report) {
+    viewModel.deleteReport = function(report) {
         this.loading(true);
         $.ajax({
             type: "DELETE",
@@ -86,7 +86,7 @@ require([
         });
     };
 
-    viewModel.openReport = function (reportId) {
+    viewModel.openReport = function(reportId) {
         pageView.viewModel.navigate(arches.urls.report_editor + reportId);
     };
 
@@ -96,13 +96,13 @@ require([
         }
     });
 
-    viewModel.reportOptions = ko.computed(function () {
+    viewModel.reportOptions = ko.computed(function() {
         var options = [{
             name: null,
             reportid: null,
             disabled: true
         }];
-        var reports = _.map(viewModel.reports(), function (reportModel) {
+        var reports = _.map(viewModel.reports(), function(reportModel) {
             return {
                 name: reportModel.get('name'),
                 reportid: reportModel.get('reportid')

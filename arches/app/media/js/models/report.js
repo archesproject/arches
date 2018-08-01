@@ -33,6 +33,7 @@ define(['arches',
                                 nodes: options.graphModel.get('nodes')
                             }),
                             datatypelookup: options.graphModel.get('datatypelookup'),
+                            cardComponents: options.cardComponents
                         });
                         cardModel.formId = form.formid;
                         form.cards.push(cardModel);

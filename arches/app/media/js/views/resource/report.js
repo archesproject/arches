@@ -8,7 +8,8 @@ require([
     'models/graph',
     'resource-report-data',
     'report-templates',
-    'bindings/chosen'
+    'bindings/chosen',
+    'card-components'
 ], function($, _, ko, arches, BaseManagerView, ReportModel, GraphModel, data, reportLookup) {
     var ResourceReportView = BaseManagerView.extend({
         initialize: function(options){

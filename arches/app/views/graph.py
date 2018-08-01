@@ -697,7 +697,6 @@ class DatatypeTemplateView(TemplateView):
     def get(sefl, request, template='text'):
         return render(request, 'views/components/datatypes/%s.htm' % template)
 
-
 @method_decorator(group_required('Graph Editor'), name='dispatch')
 class ReportManagerView(GraphBaseView):
 
@@ -759,13 +758,15 @@ class ReportEditorView(GraphBaseView):
             geocoding_providers = models.Geocoder.objects.all()
             templates = models.ReportTemplate.objects.all()
             map_sources = models.MapSource.objects.all()
-
+            card_components = models.CardComponent.objects.all()
             context = self.get_context_data(
                 main_script='views/graph/report-editor',
                 report=JSONSerializer().serialize(report),
                 reports=JSONSerializer().serialize(self.graph.report_set.all()),
                 report_templates=templates,
                 templates_json=JSONSerializer().serialize(templates),
+                card_components=card_components,
+                card_components_json=JSONSerializer().serialize(card_components),
                 forms=JSONSerializer().serialize(forms),
                 forms_x_cards=JSONSerializer().serialize(forms_x_cards),
                 cards=JSONSerializer().serialize(cards),

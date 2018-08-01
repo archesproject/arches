@@ -574,12 +574,15 @@ class ResourceReportView(MapBaseManagerView):
             raise Http404(_("No active report template is available for this resource."))
 
         templates = models.ReportTemplate.objects.all()
+        card_components = models.CardComponent.objects.all()
 
         context = self.get_context_data(
             main_script='views/resource/report',
             report=JSONSerializer().serialize(report),
             report_templates=templates,
             templates_json=JSONSerializer().serialize(templates, sort_keys=False, exclude=['name', 'description']),
+            card_components=card_components,
+            card_components_json=JSONSerializer().serialize(card_components),
             forms=JSONSerializer().serialize(forms, sort_keys=False, exclude=['iconclass', 'subtitle']),
             tiles=JSONSerializer().serialize(permitted_tiles, sort_keys=False),
             forms_x_cards=JSONSerializer().serialize(forms_x_cards, sort_keys=False),
