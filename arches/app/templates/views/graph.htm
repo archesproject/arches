@@ -108,10 +108,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <ul class="dropdown-menu dropdown-menu-right manage-menu" data-bind="event: {mouseleave: $parent.leaveDropdown}">
                             <li><a href="#" data-bind="click:function() { $parent.navigate($parent.arches.urls.graph_designer(graphid)) }, attr: { href: $parent.arches.urls.graph_designer(graphid) }"><i class="fa fa-sitemap"></i> {% trans "Manage Graph" %}</a>
                             </li>
-                            <!-- ko if: isresource || isCard -->
-                            <li><a href="#" data-bind="click:function() { isresource ? $parent.navigate($parent.arches.urls.card_manager(graphid)) : $parent.navigate($parent.arches.urls.card + graphid); }, attr: { href: isresource ? ($parent.arches.urls.card_manager(graphid)) : ($parent.arches.urls.card + graphid) }"><i class="fa fa-file-o"></i> {% trans "Manage Cards" %}</a>
-                            </li>
-                            <!-- /ko -->
                             <!-- ko if: $parent.showResources() -->
                             <li><a href="#" data-bind="click:function () { $parent.navigate($parent.arches.urls.form_manager(graphid)) }, attr: { href: $parent.arches.urls.form_manager(graphid)}"><i class="fa fa-files-o"></i> {% trans "Manage Menus" %}</a>
                             </li>

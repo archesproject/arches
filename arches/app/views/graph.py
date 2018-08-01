@@ -409,32 +409,6 @@ class GraphDataView(View):
 
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
-class CardManagerView(GraphBaseView):
-
-    def get(self, request, graphid):
-        self.graph = Graph.objects.get(graphid=graphid)
-        if self.graph.isresource is False:
-            card = Card.objects.get(cardid=Graph.objects.get(graphid=graphid).get_root_card().cardid)
-            cardid = card.cardid
-            return redirect('card', cardid=cardid)
-
-        branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True)
-        if self.graph.ontology is not None:
-            branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
-
-        context = self.get_context_data(
-            main_script='views/graph/card-manager',
-            branches=JSONSerializer().serialize(branch_graphs, exclude=[
-                'functions', 'relatable_resource_model_ids', 'edges']),
-        )
-        context['nav']['title'] = self.graph.name
-        context['nav']['menu'] = True
-        context['nav']['help'] = (_('Managing Cards'), 'help/base-help.htm')
-        context['help'] = 'card-manager-help'
-        return render(request, 'views/graph/card-manager.htm', context)
-
-
-@method_decorator(group_required('Graph Editor'), name='dispatch')
 class CardView(GraphBaseView):
     action = 'update_card'
 
