@@ -244,39 +244,40 @@ def insert_actors(settings=None):
 
 def remove_entitytypes_and_concepts(all_entitytypeids_to_remove, only_entitytypes = False):
     # if the entity_types are no longer associated to any resource graph, then delete the entity_types themselves and then proceed with pruning concepts
-
-    still_linked = False if not models.Mappings.objects.filter(entitytypeidto__in = all_entitytypeids_to_remove) else True
-    if not still_linked: 
-        entity_types = models.EntityTypes.objects.filter(entitytypeid__in=all_entitytypeids_to_remove)
-        
-        
-        #### Prune the concepts
-        concepts_to_delete = []
-        
-        for entity_type in entity_types:
-            # Find the root concept
-            concept = entity_type.conceptid
+    if not isinstance(all_entitytypeids_to_remove, list):
+        all_entitytypeids_to_remove = [all_entitytypeids_to_remove]
+    for entity_to_remove in all_entitytypeids_to_remove:
+        still_linked = False if not models.Mappings.objects.filter(entitytypeidto = entity_to_remove) else True
+        if not still_linked: 
+            entity_types = models.EntityTypes.objects.filter(entitytypeid=entity_to_remove)
+            print len(entity_types)
+            #### Prune the concepts
+            concepts_to_delete = []
             
-            # only add this for deletion if the concept isn't used by any other entitytypes
-            relations = models.EntityTypes.objects.filter(conceptid=concept.pk)
-            if len(relations) <= 1:
-                concepts_to_delete.append(entity_type.conceptid)
-            else:
-                logging.warning("Concept type for entity in use (perhaps because this node was mapped to a new one). Not deleting. %s", entity_type)
+            for entity_type in entity_types:
+                # Find the root concept
+                concept = entity_type.conceptid
+                
+                # only add this for deletion if the concept isn't used by any other entitytypes
+                relations = models.EntityTypes.objects.filter(conceptid=concept.pk)
+                if len(relations) <= 1:
+                    concepts_to_delete.append(entity_type.conceptid)
+                else:
+                    logging.warning("Concept type for entity in use (perhaps because this node was mapped to a new one). Not deleting. %s", entity_type)
+                
+            # delete the entity types, and then their concepts
+            entity_types.delete()
             
-        # delete the entity types, and then their concepts
-        entity_types.delete()
-        
-        for concept_model in concepts_to_delete:
-            # remove it and all of its relations and their values
-            logging.warning("Removing concept and children/values/relationships for %s", concept_model.legacyoid)
-            concept = Concept()
-            concept.get(concept_model.pk, semantic=False, include_subconcepts=True)
+            for concept_model in concepts_to_delete:
+                # remove it and all of its relations and their values
+                logging.warning("Removing concept and children/values/relationships for %s", concept_model.legacyoid)
+                concept = Concept()
+                concept.get(concept_model.pk, semantic=False, include_subconcepts=True)
+                
+                concept.delete(delete_self=True)
+                concept_model.delete()
             
-            concept.delete(delete_self=True)
-            concept_model.delete()
-        
-        logging.warning("Removed all entities and ontology data related to the following entity types: %s", all_entitytypeids_to_remove)                    
+            logging.warning("Removed all entities and ontology data related to the following entity types: %s", entity_to_remove)                    
 
 def prune_ontology(settings=None, only_concepts=False):
     
@@ -514,12 +515,36 @@ def convert_resource(resourceid, target_entitytypeid):
 
 def rename_entity_type(old_entitytype_id, new_entitytype_id):
     logging.warning("renaming entitytype from %s to %s", old_entitytype_id, new_entitytype_id)
+    
+
+        
     # update the entity_type model and save
     newentitytype = models.EntityTypes.objects.get(entitytypeid=old_entitytype_id)
     newentitytype.entitytypeid=new_entitytype_id
     newentitytype.save()
     
     # update the Rules
+    #First find if Rules with the new entitytypeid already exist, if so, delete them and replace their ruleid into mapping_steps with that of the old entitytypeid rule, then rename the rules
+    pre_existing_ruleout = models.Rules.objects.filter(entitytypedomain=new_entitytype_id)
+    pre_existing_rulein = models.Rules.objects.filter(entitytyperange=new_entitytype_id)
+    if pre_existing_ruleout:
+        ruleid_to_replace_with = models.Rules.objects.filter(entitytypedomain=old_entitytype_id)
+        steps = models.MappingSteps.objects.filter(ruleid= pre_existing_ruleout)
+        pre_existing_ruleout.delete()
+        for step in steps:
+            step.ruleid_id = ruleid_to_replace_with.ruleid
+            step.save()
+        
+    
+    if pre_existing_rulein:
+        ruleid_to_replace_with = models.Rules.objects.filter(entitytyperange=old_entitytype_id)
+        steps = models.MappingSteps.objects.filter(ruleid= pre_existing_rulein)
+        pre_existing_rulein.delete()
+        for step in steps:
+            step.ruleid_id = ruleid_to_replace_with.ruleid
+            step.save()
+        
+        
     rulesout = models.Rules.objects.filter(entitytypedomain=old_entitytype_id)
     for r in rulesout:
         r.entitytypedomain=newentitytype
@@ -555,7 +580,8 @@ def rename_entity_type(old_entitytype_id, new_entitytype_id):
         e.save()
 
     # delete the original entity type (saving the old one with a new pk actually duplicates it)
-    models.EntityTypes.objects.get(entitytypeid=old_entitytype_id).delete()
+#     models.EntityTypes.objects.get(entitytypeid=old_entitytype_id).delete()
+    remove_entitytypes_and_concepts([old_entitytype_id,new_entitytype_id])
 
 def add_resource_relation(entityid1, entityid2, relationship_type_string):
     # find the relationship type
