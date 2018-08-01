@@ -82,7 +82,7 @@ define([
             self.contentLoading(true);
             $.ajax({
                 type: "POST",
-                url: arches.urls.new_graph_settings(self.graph.graphid()),
+                url: arches.urls.graph_settings(self.graph.graphid()),
                 data: self.jsonData()})
                 .done(function(response) {
                     self.jsonCache(self.jsonData());

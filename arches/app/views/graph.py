@@ -73,73 +73,8 @@ class GraphBaseView(BaseManagerView):
             pass
         return context
 
-
 @method_decorator(group_required('Graph Editor'), name='dispatch')
 class GraphSettingsView(GraphBaseView):
-
-    def get(self, request, graphid):
-        self.graph = Graph.objects.get(graphid=graphid)
-        icons = models.Icon.objects.order_by('name')
-        resource_graphs = models.GraphModel.objects.filter(Q(isresource=True)).exclude(
-            graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-        resource_data = []
-        node = models.Node.objects.get(graph_id=graphid, istopnode=True)
-        relatable_resources = node.get_relatable_resources()
-        for res in resource_graphs:
-            if models.Node.objects.filter(graph=res, istopnode=True).count() > 0:
-                node_model = models.Node.objects.get(graph=res, istopnode=True)
-                resource_data.append({
-                    'id': node_model.nodeid,
-                    'graph': res,
-                    'is_relatable': (node_model in relatable_resources)
-                })
-
-        ontologies = models.Ontology.objects.filter(parentontology=None)
-        ontology_classes = models.OntologyClass.objects.values('source', 'ontology_id')
-
-        context = self.get_context_data(
-            main_script='views/graph/graph-settings',
-            icons=JSONSerializer().serialize(icons),
-            node_json=JSONSerializer().serialize(node),
-            ontologies=JSONSerializer().serialize(ontologies),
-            ontology_classes=JSONSerializer().serialize(ontology_classes),
-            resource_data=JSONSerializer().serialize(resource_data),
-            node_count=models.Node.objects.filter(graph=self.graph).count(),
-            ontology_namespaces=get_ontology_namespaces()
-        )
-
-        context['nav']['title'] = self.graph.name
-        context['nav']['menu'] = True
-        context['nav']['help'] = (_('Defining Settings'), 'help/base-help.htm')
-        context['help'] = 'settings-help'
-
-        return render(request, 'views/graph/graph-settings.htm', context)
-
-    def post(self, request, graphid):
-        graph = Graph.objects.get(graphid=graphid)
-        data = JSONDeserializer().deserialize(request.body)
-        for key, value in data.get('graph').iteritems():
-            if key in ['iconclass', 'name', 'author', 'description', 'isresource',
-                       'ontology_id', 'version',  'subtitle', 'isactive', 'color', 'jsonldcontext']:
-                setattr(graph, key, value)
-
-        node = models.Node.objects.get(graph_id=graphid, istopnode=True)
-        node.set_relatable_resources(data.get('relatable_resource_ids'))
-        node.ontologyclass = data.get('ontology_class') if data.get('graph').get('ontology_id') is not None else None
-
-        with transaction.atomic():
-            graph.save()
-            node.save()
-
-        return JSONResponse({
-            'success': True,
-            'graph': graph,
-            'relatable_resource_ids': [res.nodeid for res in node.get_relatable_resources()]
-        })
-
-
-@method_decorator(group_required('Graph Editor'), name='dispatch')
-class NewGraphSettingsView(GraphBaseView):
 
     def get(self, request, graphid):
         self.graph = models.GraphModel.objects.get(graphid=graphid)
@@ -210,55 +145,44 @@ class GraphManagerView(GraphBaseView):
             context['nav']['icon'] = 'fa-bookmark'
             context['nav']['help'] = (_('About the Arches Designer'), 'help/base-help.htm')
             context['help'] = 'arches-designer-help'
+            print 'returning', context
             return render(request, 'views/graph.htm', context)
 
-        self.graph = Graph.objects.get(graphid=graphid)
-        datatypes = models.DDataType.objects.all()
-        branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True)
-        if self.graph.ontology is not None:
-            branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
-        lang = request.GET.get('lang', settings.LANGUAGE_CODE)
-        concept_collections = Concept().concept_tree(mode='collections', lang=lang)
-        datatypes_json = JSONSerializer().serialize(datatypes, exclude=['modulename', 'isgeometric'])
-        context = self.get_context_data(
-            main_script='views/graph/graph-manager',
-            branches=JSONSerializer().serialize(branch_graphs, exclude=[
-                'cards', 'domain_connections', 'functions', 'cards', 'deploymentfile', 'deploymentdate']),
-            datatypes_json=datatypes_json,
-            datatypes=json.loads(datatypes_json),
-            concept_collections=concept_collections,
-            node_list={
-                'title': _('Node List'),
-                'search_placeholder': _('Find a node...')
-            },
-            permissions_list={
-                'title': _('Permissions'),
-                'search_placeholder': _('Find a group or user account')
-            },
-            branch_list={
-                'title': _('Branch Library'),
-                'search_placeholder': _('Find a graph branch')
-            },
-            ontology_namespaces=get_ontology_namespaces()
-        )
-        context['nav']['title'] = self.graph.name
-        context['nav']['help'] = (_('Using the Graph Manager'), 'help/base-help.htm')
-        context['nav']['menu'] = True
-        context['help'] = 'graph-designer-help'
-
-        return render(request, 'views/graph/graph-manager.htm', context)
-
-    def delete(self, request, graphid):
-        try:
-            graph = Graph.objects.get(graphid=graphid)
-            if graph.isresource:
-                graph.isactive = False
-                graph.save(validate=False)
-                graph.delete_instances()
-            graph.delete()
-            return JSONResponse({'success': True})
-        except GraphValidationError as e:
-            return JSONResponse({'status': 'false', 'message': e.message, 'title': e.title}, status=500)
+        # self.graph = Graph.objects.get(graphid=graphid)
+        # datatypes = models.DDataType.objects.all()
+        # branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True)
+        # if self.graph.ontology is not None:
+        #     branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
+        # lang = request.GET.get('lang', settings.LANGUAGE_CODE)
+        # concept_collections = Concept().concept_tree(mode='collections', lang=lang)
+        # datatypes_json = JSONSerializer().serialize(datatypes, exclude=['modulename', 'isgeometric'])
+        # context = self.get_context_data(
+        #     main_script='views/graph/graph-manager',
+        #     branches=JSONSerializer().serialize(branch_graphs, exclude=[
+        #         'cards', 'domain_connections', 'functions', 'cards', 'deploymentfile', 'deploymentdate']),
+        #     datatypes_json=datatypes_json,
+        #     datatypes=json.loads(datatypes_json),
+        #     concept_collections=concept_collections,
+        #     node_list={
+        #         'title': _('Node List'),
+        #         'search_placeholder': _('Find a node...')
+        #     },
+        #     permissions_list={
+        #         'title': _('Permissions'),
+        #         'search_placeholder': _('Find a group or user account')
+        #     },
+        #     branch_list={
+        #         'title': _('Branch Library'),
+        #         'search_placeholder': _('Find a graph branch')
+        #     },
+        #     ontology_namespaces=get_ontology_namespaces()
+        # )
+        # context['nav']['title'] = self.graph.name
+        # context['nav']['help'] = (_('Using the Graph Manager'), 'help/base-help.htm')
+        # context['nav']['menu'] = True
+        # context['help'] = 'graph-designer-help'
+        #
+        # return render(request, 'views/graph/graph-manager.htm', context)
 
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
@@ -461,12 +385,23 @@ class GraphDataView(View):
             return JSONResponse({'status': 'false', 'success': False, 'message': e.message, 'title': e.title}, status=500)
 
     def delete(self, request, graphid):
-        data = JSONDeserializer().deserialize(request.body)
-        if data and self.action == 'delete_node':
+        if self.action == 'delete_node':
+            data = JSONDeserializer().deserialize(request.body)
             try:
                 graph = Graph.objects.get(graphid=graphid)
                 graph.delete_node(node=data.get('nodeid', None))
                 return JSONResponse({})
+            except GraphValidationError as e:
+                return JSONResponse({'status': 'false', 'message': e.message, 'title': e.title}, status=500)
+        elif self.action == 'delete_graph':
+            try:
+                graph = Graph.objects.get(graphid=graphid)
+                if graph.isresource:
+                    graph.isactive = False
+                    graph.save(validate=False)
+                    graph.delete_instances()
+                graph.delete()
+                return JSONResponse({'success': True})
             except GraphValidationError as e:
                 return JSONResponse({'status': 'false', 'message': e.message, 'title': e.title}, status=500)
 

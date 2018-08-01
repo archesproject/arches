@@ -170,7 +170,7 @@ define([
                 viewModel.loading(true);
                 $.ajax({
                     type: 'GET',
-                    url: arches.urls.new_graph_settings(data.graphid),
+                    url: arches.urls.graph_settings(data.graphid),
                     data: {'search': true, 'csrfmiddlewaretoken': '{{ csrf_token }}'}})
                     .done(function(data) {
                         self.graphSettingsViewModel.resource_data(data.resources);
