@@ -93,7 +93,7 @@ class SummaryForm(ResourceForm):
     def update(self, data, files):
         self.update_nodes('NAME.E41', data)
         self.update_nodes('HERITAGE_PLACE_TYPE.E55', data)
-        self.update_nodes('RIGHT_NEW.E30', data)
+        self.update_nodes('RIGHT.E30', data)
         self.update_nodes('DESCRIPTION_ASSIGNMENT.E13', data)
         return
 
@@ -108,8 +108,8 @@ class SummaryForm(ResourceForm):
                 'domains': {'HERITAGE_PLACE_TYPE.E55' : Concept().get_e55_domain('HERITAGE_PLACE_TYPE.E55')}
             }            
             
-            self.data['RIGHT_NEW.E30'] = {
-                'branch_lists': datetime_nodes_to_dates(self.get_nodes('RIGHT_NEW.E30')),
+            self.data['RIGHT.E30'] = {
+                'branch_lists': datetime_nodes_to_dates(self.get_nodes('RIGHT.E30')),
                 'domains': {'DESIGNATION_TYPE.E55' : Concept().get_e55_domain('DESIGNATION_TYPE.E55')}
             }
             self.data['DESCRIPTION_ASSIGNMENT.E13'] = {
@@ -1218,15 +1218,8 @@ class LocationForm(ResourceForm):
         self.update_nodes('GEOMETRIC_PLACE_EXPRESSION.SP5', data)
         self.update_nodes('GEOMETRY_EXTENT_CERTAINTY.I6', data)
 
-        
-        if self.resource.entitytypeid == 'HERITAGE_FEATURE.E24':
-            siteshape_node = 'SITE_OVERALL_SHAPE_TYPE.E55'
-            grid_node = 'GRID_ID.E42'
-        else:
-            siteshape_node = 'SITE_OVERALL_SHAPE_TYPE_NEW.E55'
-            grid_node = 'GRID_ID_NEW.E42'
-        self.update_nodes(grid_node, data)
-        self.update_nodes(siteshape_node, data)
+        self.update_nodes('GRID_ID.E42', data)
+        self.update_nodes('SITE_OVERALL_SHAPE_TYPE.E55', data)
         
         self.update_nodes('TOPOGRAPHY_TYPE.E55', data)
         self.update_nodes('COUNTRY_TYPE.E55', data)
@@ -1257,25 +1250,15 @@ class LocationForm(ResourceForm):
             }
         }
         
-        if self.resource.entitytypeid == 'HERITAGE_FEATURE.E24':
-            siteshape_node = 'SITE_OVERALL_SHAPE_TYPE.E55'
-            grid_node = 'GRID_ID.E42'
-        else:
-            siteshape_node = 'SITE_OVERALL_SHAPE_TYPE_NEW.E55'
-            grid_node = 'GRID_ID_NEW.E42'
-            
-            
-        self.data[grid_node] = {
-                'branch_lists': self.get_nodes('GRID_ID_NEW.E42'),
+        self.data['GRID_ID.E42'] = {
+                'branch_lists': self.get_nodes('GRID_ID.E42'),
                 'domains': {}
-            }
-        
-
+        }
             
-        self.data[siteshape_node] = {
-            'branch_lists': self.get_nodes(siteshape_node),
+        self.data['SITE_OVERALL_SHAPE_TYPE.E55'] = {
+            'branch_lists': self.get_nodes('SITE_OVERALL_SHAPE_TYPE.E55'),
             'domains': {
-                siteshape_node: Concept().get_e55_domain(siteshape_node)
+                'SITE_OVERALL_SHAPE_TYPE.E55': Concept().get_e55_domain('SITE_OVERALL_SHAPE_TYPE.E55')
             }
         }
         
