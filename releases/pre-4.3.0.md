@@ -15,13 +15,20 @@ If you can't completely re-install Arches (because you have data in the system t
 
 ```
 pip install arches --upgrade --no-binary :all:
+pip uninstall pycryptodome, rdflib-jsonld
+pip install pycryptodome django-oauth-toolkit==1.1.2 PyLD[requests]==1.0.3 pyprind==2.11.2
+
 python manage.py migrate
-pip uninstall pycrypto
-pip uninstall pycryptodome
-pip install pycryptodome
 python manage.py es delete_indexes
 python manage.py es setup_indexes
 python manage.py es index_database
+
+cd into your project's root directory (where yarn.lock is located) and run the following:
+yarn add core-js@2.5.7
+yarn add dom4@2.0.1
+yarn install
+yarn upgrade mapbox-gl@0.46.0
+yarn upgrade underscore@1.9.1
 ```
 
 If you have Arches running on a web server such as Apache, be sure to update your static files directory and restart your web server.
@@ -54,17 +61,17 @@ When doing a test pass, consider using these status indicators:
 
 ## Install
 
-Assigned to: Cyrus
+Assigned to: Cyrus (0.5)
 
 | Test Subject                                                   | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Confirm that upgrading from the previous release is issue free |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Confirm that upgrading from the previous release is issue free | :white_check_mark: |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
 ## Future Release Features
 
-Assigned to: Cyrus (.1)
+Assigned to: Cyrus (0.1)
 
 | Test Subject                                                                              | Chrome | Safari | Firefox | IE11 |  UI | Notes |
 | ----------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | :-: | ----- |
@@ -90,7 +97,7 @@ Ensure that all browsers are compatible with Authentication process.
 
 ## System Settings
 
-Assigned to: Cyrus
+Assigned to: Cyrus (0.25)
 
 #### Basic Settings
 
@@ -101,7 +108,7 @@ Assigned to: Cyrus
 
 #### Map Settings
 
-Assigned to: Cyrus
+Assigned to: Cyrus (1.0)
 
 | Test Subject                                                                                                                                                                                    | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
@@ -251,7 +258,7 @@ Updating a resource descriptor should be reflected in the following subjects.
 
 #### Provisional Edit Management
 
-Assigned to: Cyrus
+Assigned to: Cyrus (0.5)
 
 | Test Subject                                                                                        | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | --------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
