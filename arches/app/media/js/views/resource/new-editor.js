@@ -28,10 +28,9 @@ define([
     var scrollTo = ko.observable();
     var displayname = ko.observable(data.displayname);
     var resourceId = ko.observable(data.resourceid);
-    var manageRelatedResources = ko.observable(false);
     var selectedTile = ko.computed(function() {
         var item = selection();
-        if (item) {
+        if (item && typeof item !== 'string') {
             if (item.tileid) {
                 return item;
             }
@@ -103,7 +102,6 @@ define([
         reviewer: data.userisreviewer,
         graphiconclass: data.graphiconclass,
         relationship_types: data.relationship_types,
-        manageRelatedResources: manageRelatedResources,
         graph: {
             graphid: data.graphid,
             name: data.graphname,
@@ -146,8 +144,7 @@ define([
         selectedTile: selectedTile,
         selectedCard: ko.computed(function() {
             var item = selection();
-            if (item) {
-                manageRelatedResources(false);
+            if (item && typeof item !== 'string') {
                 if (item.tileid) {
                     return item.parent;
                 }
@@ -253,14 +250,12 @@ define([
                         relationship_types: vm.relationship_types,
                         graph: vm.graph
                     });
-                    vm.manageRelatedResources(true);
-                    vm.selection(undefined);
+                    vm.selection('related-resources');
                 });
             });
 
         } else {
-            vm.manageRelatedResources(true);
-            vm.selection(undefined);
+            vm.selection('related-resources');
         }
     };
 

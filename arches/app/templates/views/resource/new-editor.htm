@@ -52,7 +52,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <ul class="jstree-container-ul jstree-children" aria-expanded="true">
                     <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': rootExpanded, 'jstree-closed' : !rootExpanded()}">
                         <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}"></i>
-                        <a class="jstree-anchor" href="#" tabindex="-1">
+                        <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { selection('root'); }">
                             <strong>
                                 <i data-bind="css: graphiconclass != (null || '') ? graphiconclass : 'fa fa-question'" role="presentation"></i>
                                 <span data-bind="text: displayname"></span> (<span data-bind="text: graphname"></span>)
@@ -78,7 +78,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </li>
                     <li role="treeitem" class="jstree-node jstree-open" data-bind="css: {'disabled': resourceId()}">
                         <i class="jstree-icon jstree-ocl" role="presentation"></i>
-                        <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function(){if (resourceId()){showRelatedResourcesManager()}}, css: {'jstree-clicked': manageRelatedResources, 'disabled': resourceId() === ''}">
+                        <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function(){if (resourceId()){showRelatedResourcesManager()}}, css: {'jstree-clicked': selection() === 'related-resources', 'disabled': resourceId() === ''}">
                             <strong>
                                 <i class="fa fa-link" role="presentation"></i>
                                 <span>{% trans 'Related Resources' %}</span>
@@ -107,16 +107,23 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <div class="main-panel card-component-panel" style="display:none;" data-bind="visible: true">
 
 
-            <!--ko if: manageRelatedResources() === true -->
+            <!--ko if: selection() === 'related-resources' -->
             <div data-bind="with: relatedResourcesManager">
                 {% include 'views/resource/related-resources/related-resources-manager.htm' %}
             </div>
             <!--/ko -->
+
+            <!--ko if: selection() === 'root' -->
+            <div>
+                Report here...
+            </div>
+            <!--/ko -->
+
             <!-- ko if: !selection() && topCards.length == 0 -->
             <div class="card-header">{% trans "No cards are available for this model." %}</div>
             <!-- /ko -->
-            <!-- ko if: selection() && manageRelatedResources() === false -->
 
+            <!-- ko if: selectedTile() && selectedCard() -->
             <div class="card-header">
                 <div class="card-header-title">
 
