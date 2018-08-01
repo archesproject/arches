@@ -4,28 +4,26 @@ define([
   'jquery',
   'knockout',
 ], function ($, ko) {
-    ko.bindingHandlers.slideToggle = {
+    ko.bindingHandlers.slide = {
         init: function(element, valueAccessor,allBindingsAccessor, viewModel, bindingContent) {
             var value = valueAccessor();
             var bindings = allBindingsAccessor();
             var value = valueAccessor();
-            if (value()) {
-                $(element).slideToggle( "slow", function() {console.log('expanding')});
-            }
         },
         update: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContent) {
             var value = valueAccessor();
             var bindings = allBindingsAccessor();
             var duration = bindings.duration;
+            var direction = bindings.direction;
             var easing = bindings.easing;
             var callback = bindings.callback;
 
             if (value() === true) {
-                $(element).slideToggle( duration, easing, callback);
+                $(element).toggle(easing, direction);
             } else {
-                $(element).slideToggle( duration, easing, callback);
+                $(element).toggle(easing, direction);
             }
         }
     };
-    return ko.bindingHandlers.slideToggle;
+    return ko.bindingHandlers.slide;
 });
