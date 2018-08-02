@@ -7,13 +7,12 @@
             <div class="settings-panel-heading">
                 <div class="graph-designer-title">
                     <i data-bind='css: graph.iconclass'></i><div class="name" data-bind='text: graph.name'></div>
-                    <span class="graph-crm-class">
+                    <span class="graph-crm-class" data-bind="if: graph.ontology_id()">
                         (
-                        <!-- ko if: graph.ontology_id() -->
                         <span data-bind="text: graph.ontology.name"></span>,
-                        <!-- /ko -->
                         <span data-bind="text: graphSettingsViewModel.ontologyClassFriendlyName"></span>
                         )
+                    </span>
                 </div>
             </div>
 
