@@ -7,7 +7,13 @@
             <div class="settings-panel-heading">
                 <div class="graph-designer-title">
                     <i data-bind='css: graph.iconclass'></i><div class="name" data-bind='text: graph.name'></div>
-                    <span class="graph-crm-class"> (CIDOC CRM v6.2, E22 Man Made Object)</span>
+                    <span class="graph-crm-class">
+                        (
+                        <!-- ko if: graph.ontology_id() -->
+                        <span data-bind="text: graph.ontology.name"></span>,
+                        <!-- /ko -->
+                        <span data-bind="text: graphSettingsViewModel.ontologyClassFriendlyName"></span>
+                        )
                 </div>
             </div>
 

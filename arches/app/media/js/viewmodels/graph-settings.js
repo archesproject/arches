@@ -35,6 +35,7 @@ define([
         });
 
         var ontologyClass = self.graphModel.get('root').ontologyclass;
+        var ontologyClassFriendlyName = self.graphModel.get('root').ontologyclass_friendlyname;
 
         self.jsonData = ko.computed(function() {
             var relatableResourceIds = _.filter(self.resource_data(), function(resource){
@@ -71,6 +72,7 @@ define([
 
         self.ontologies = params.ontologies;
         self.ontologyClass = ontologyClass;
+        self.ontologyClassFriendlyName = ontologyClassFriendlyName;
         self.ontologyClasses = ko.computed(function() {
             return _.filter(params.ontologyClasses(), function(ontologyClass) {
                 ontologyClass.display = ontologyClass.source;
