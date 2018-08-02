@@ -79,7 +79,7 @@ def get_resource_relationship_types():
 class NewResourceEditorView(MapBaseManagerView):
     action = None
 
-    def get(self, request, graphid=None, resourceid=None, view_template='views/resource/new-editor.htm', main_script='views/resource/new-editor', nav_menu=True):
+    def get(self, request, graphid=None, resourceid=None, view_template='views/resource/editor.htm', main_script='views/resource/editor', nav_menu=True):
         if self.action == 'copy':
             return self.copy(request, resourceid)
 
