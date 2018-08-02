@@ -362,8 +362,7 @@ class GraphDataView(View):
                     ret = clone_data['copy']
                     ret.save()
                     ret.copy_functions(graph, [clone_data['nodes'], clone_data['nodegroups']])
-                    form_map = ret.copy_forms(graph, clone_data['cards'])
-                    ret.copy_reports(graph, [form_map, clone_data['cards'], clone_data['nodes']])
+                    ret.copy_reports(graph, [clone_data['cards'], clone_data['nodes']])
 
                 elif self.action == 'reorder_nodes':
                     json = request.body

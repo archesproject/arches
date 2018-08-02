@@ -591,14 +591,12 @@ class Graph(models.GraphModel):
 
     def copy_reports(self, other_graph, id_maps=[]):
         for report in other_graph.report_set.all():
-            forms_config_copy = self.replace_config_ids(report.formsconfig, id_maps)
             config_copy = self.replace_config_ids(report.config, id_maps)
             models.Report(
                 name=report.name,
                 template=report.template,
                 graph=self,
                 config=report.config,
-                formsconfig=forms_config_copy,
                 active=report.active
             ).save()
 
