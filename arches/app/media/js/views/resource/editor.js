@@ -1,283 +1,196 @@
-define([
+require([
     'jquery',
     'underscore',
     'knockout',
-    'moment',
-    'views/base-manager',
-    'viewmodels/alert',
-    'models/graph',
-    'viewmodels/card',
-    'viewmodels/provisional-tile',
     'arches',
+    'views/search-base-manager',
+    'views/resource/editor/form-list',
+    'viewmodels/provisional-tile',
+    'views/resource/editor/form',
+    'models/card',
+    'viewmodels/alert',
     'resource-editor-data',
-    'views/search/search-results',
-    'views/resource/related-resources-manager',
-    'bindings/resizable-sidepanel',
     'bindings/sortable',
-    'widgets',
-    'card-components'
-], function($, _, ko, moment, BaseManagerView, AlertViewModel, GraphModel, CardViewModel, ProvisionalTileViewModel, arches, data, searchResults, RelatedResourcesManager) {
-    var handlers = {
-        'after-update': [],
-        'tile-reset': []
-    };
-    var tiles = data.tiles;
-    var filter = ko.observable('');
+    'bindings/let'
+], function($, _, ko, arches, SearchBaseManagerView, FormList, ProvisionalTileViewModel, FormView, CardModel, AlertViewModel, data) {
+    var self = this;
     var loading = ko.observable(false);
-    var selection = ko.observable();
-    var scrollTo = ko.observable();
-    var displayname = ko.observable(data.displayname);
-    var resourceId = ko.observable(data.resourceid);
-    var manageRelatedResources = ko.observable(false);
-    var selectedTile = ko.computed(function() {
-        var item = selection();
-        if (item) {
-            if (item.tileid) {
-                return item;
+    var cardLoading = ko.observable(false);
+    var provisionalLoading = ko.observable(false);
+    var selectedForm = ko.observable();
+    var displayName = ko.observable(data.displayName);
+    var resourceInstanceExists = ko.observable(data.resourceInstanceExists === "True" || false)
+    var formList = new FormList({
+        forms: ko.observableArray(data.forms)
+    });
+    formList.selectItem(formList.items()[0]);
+
+    var selectedProvisionalTile = ko.observable()
+
+    var provisionalTileViewModel = new ProvisionalTileViewModel(
+        {
+            selectedProvisionalTile: selectedProvisionalTile,
+            cardModel: CardModel,
+            selectedForm: selectedForm,
+            loading: provisionalLoading
+        }
+    );
+
+    var formView = new FormView({
+        formid: formList.items()[0].formid,
+        resourceid: data.resourceid,
+        tiles: data.tiles,
+        blanks: data.blanks,
+        resourceexists: resourceInstanceExists,
+        selectedProvisionalTile: selectedProvisionalTile,
+        provisionalTileViewModel: provisionalTileViewModel
+    });
+
+    var loadForm = function(form) {
+        cardLoading(true);
+        selectedForm(form.formid)
+        formView.loadForm(form.formid, function(){
+            cardLoading(false);
+        });
+    };
+
+    formList.on('item-clicked', function(form){
+        if (pageView.viewModel.dirty()) {
+            pageView.viewModel.alert(new AlertViewModel('ep-alert-blue', arches.confirmNav.title, arches.confirmNav.text, function(){
+                pageView.viewModel.showConfirmNav(false);
+            }, function() {
+                loadForm(form);
+            }));
+        } else {
+            loadForm(form);
+        }
+    });
+
+    formView.on('before-update', function(){
+        cardLoading(true);
+    });
+
+    formView.on('after-update', function(response){
+        cardLoading(false);
+        var updateDisplayName = function(){
+            var name = displayName;
+            return function(val) {
+                name(val.displayname)
             }
-            return item.getNewTile();
+        }
+        var errorMessageTitle = arches.requestFailed.title
+        var errorMessageText = arches.requestFailed.text
+        pageView.viewModel.alert(null);
+        if(response.status != 200){
+            if (response.responseJSON) {
+              errorMessageTitle = response.responseJSON.message[0]
+              errorMessageText = response.responseJSON.message[1]
+            }
+            pageView.viewModel.alert(new AlertViewModel('ep-alert-red', errorMessageTitle, errorMessageText));
+        } else {
+            $.get(arches.urls.resource_descriptors + this.resourceid, updateDisplayName());
         }
     });
-    var provisionalTileViewModel = new ProvisionalTileViewModel({tile: selectedTile, reviewer: data.user_is_reviewer});
 
-    var flattenTree = function(parents, flatList) {
-        _.each(ko.unwrap(parents), function(parent) {
-            flatList.push(parent);
-            var childrenKey = parent.tiles ? 'tiles' : 'cards';
-            flattenTree(
-                ko.unwrap(parent[childrenKey]),
-                flatList
-            );
-        });
-        return flatList;
-    };
-
-    var toggleAll = function(state) {
-        var nodes = flattenTree(vm.topCards, []);
-        _.each(nodes, function(node) {
-            node.expanded(state);
-        });
-        if (state) {
-            vm.rootExpanded(true);
-        }
-    };
-    var createLookup = function(list, idKey) {
-        return _.reduce(list, function(lookup, item) {
-            lookup[item[idKey]] = item;
-            return lookup;
-        }, {});
-    };
-
-    var graphModel = new GraphModel({
-        data: {nodes: data.nodes, nodegroups: data.nodegroups, edges: []},
-        datatypes: data.datatypes
-    });
-
-    var vm = {
-        loading: loading,
-        scrollTo: scrollTo,
-        filterEnterKeyHandler: function(context, e) {
-            if (e.keyCode === 13) {
-                var highlightedItems = _.filter(flattenTree(vm.topCards, []), function(item) {
-                    return item.highlight && item.highlight();
-                });
-                var previousItem = scrollTo();
-                scrollTo(null);
-                if (highlightedItems.length > 0) {
-                    var scrollIndex = 0;
-                    var previousIndex = highlightedItems.indexOf(previousItem);
-                    if (previousItem && highlightedItems[previousIndex+1]) {
-                        scrollIndex = previousIndex + 1;
+    /**
+    * a PageView representing the resource listing and recent edits page
+    */
+    var pageView = new SearchBaseManagerView({
+        viewModel:{
+            loading: loading,
+            loadingSearch: ko.observable(false),
+            cardLoading: cardLoading,
+            provisionalLoading: provisionalLoading,
+            displayName: displayName,
+            resourceEditorContext: true,
+            resourceInstanceExists: resourceInstanceExists,
+            editingInstanceId: data.resourceid,
+            relationship_types: data.relationship_types,
+            graph: data.graph,
+            formList: formList,
+            provisionalTileViewModel: provisionalTileViewModel,
+            formView: formView,
+            openRelatedResources: ko.observable(false),
+            rrLoaded: ko.observable(false),
+            dirty: ko.computed(function() {
+                var dirty = false;
+                _.each(formView.formTiles(), function (tile) {
+                    if (tile.dirty()) {
+                        dirty = true;
                     }
-                    scrollTo(highlightedItems[scrollIndex]);
-                }
-                return false;
-            }
-            return true;
-        },
-        widgetLookup: createLookup(data.widgets, 'widgetid'),
-        cardComponentLookup: createLookup(data.cardComponents, 'componentid'),
-        nodeLookup: createLookup(graphModel.get('nodes')(), 'nodeid'),
-        graphid: data.graphid,
-        graphname: data.graphname,
-        reviewer: data.userisreviewer,
-        graphiconclass: data.graphiconclass,
-        relationship_types: data.relationship_types,
-        manageRelatedResources: manageRelatedResources,
-        graph: {
-            graphid: data.graphid,
-            name: data.graphname,
-            iconclass: data.graphiconclass,
-            ontologyclass: data.ontologyclass
-        },
-        displayname: displayname,
-        expandAll: function() {
-            toggleAll(true);
-        },
-        collapseAll: function() {
-            toggleAll(false);
-        },
-        rootExpanded: ko.observable(true),
-        topCards: _.filter(data.cards, function(card) {
-            var nodegroup = _.find(data.nodegroups, function(group) {
-                return group.nodegroupid === card.nodegroup_id;
-            });
-            return !nodegroup || !nodegroup.parentnodegroup_id;
-        }).map(function(card) {
-            return new CardViewModel({
-                card: card,
-                graphModel: graphModel,
-                tile: null,
-                resourceId: resourceId,
-                displayname: displayname,
-                handlers: handlers,
-                cards: data.cards,
-                tiles: tiles,
-                selection: selection,
-                scrollTo: scrollTo,
-                loading: loading,
-                filter: filter,
-                provisionalTileViewModel: provisionalTileViewModel,
-                cardwidgets: data.cardwidgets,
-                userisreviewer: data.userisreviewer
-            });
-        }),
-        selection: selection,
-        selectedTile: selectedTile,
-        selectedCard: ko.computed(function() {
-            var item = selection();
-            if (item) {
-                manageRelatedResources(false);
-                if (item.tileid) {
-                    return item.parent;
-                }
-                return item;
-            }
-        }),
-        provisionalTileViewModel: provisionalTileViewModel,
-        filter: filter,
-        on: function(eventName, handler) {
-            if (handlers[eventName]) {
-                handlers[eventName].push(handler);
-            }
-        },
-        resourceId: resourceId,
-        copyResource: function() {
-            if (resourceId()) {
-                vm.menuActive(false);
-                loading(true);
-                $.ajax({
-                    type: "GET",
-                    url: arches.urls.resource_copy.replace('//', '/' + resourceId() + '/'),
-                    success: function() {
-                        vm.alert(new AlertViewModel('ep-alert-blue', arches.resourceCopySuccess.title, '', null, function(){}));
-                    },
-                    error: function() {
-                        vm.alert(new AlertViewModel('ep-alert-red', arches.resourceCopyFailed.title, arches.resourceCopyFailed.text, null, function(){}));
-                    },
-                    complete: function() {
-                        loading(false);
-                    },
                 });
-            }
-        },
-        deleteResource: function() {
-            if (resourceId()) {
-                vm.menuActive(false);
-                vm.alert(new AlertViewModel('ep-alert-red', arches.confirmResourceDelete.title, arches.confirmResourceDelete.text, function() {
+                return dirty;
+            }),
+            deleteResource: function(){
+                pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmResourceDelete.title, arches.confirmResourceDelete.text, function() {
                     return;
                 }, function(){
                     loading(true);
                     $.ajax({
                         type: "DELETE",
-                        url: arches.urls.resource_editor + resourceId(),
-                        complete: function(request, status) {
+                        url: arches.urls.resource_editor + data.resourceid,
+                        success: function(response) {
+
+                        },
+                        error: function(response) {
+
+                        },
+                        complete: function (request, status) {
                             loading(false);
                             if (status === 'success') {
-                                vm.navigate(arches.urls.resource);
+                                pageView.viewModel.navigate(arches.urls.resource);
                             }
                         },
                     });
                 }));
-            }
-        },
-        deleteTile: function(tile) {
-            tile.deleteTile(function(response) {
-                vm.alert(new AlertViewModel('ep-alert-red', response.responseJSON.message[0], response.responseJSON.message[1], null, function(){}));
-            });
-        },
-        saveTile: function(tile) {
-            tile.save(function(response) {
-                vm.alert(new AlertViewModel('ep-alert-red', response.responseJSON.message[0], response.responseJSON.message[1], null, function(){}));
-            });
-        },
-        viewEditHistory: function() {
-            if (resourceId()) {
-                vm.menuActive(false);
-                vm.navigate(arches.urls.get_resource_edit_log(resourceId()));
-            }
-        },
-        viewReport: function() {
-            if (resourceId()) {
-                vm.menuActive(false);
-                vm.navigate(arches.urls.resource_report + resourceId());
-            }
-        }
-    };
-    var topCard = vm.topCards[0];
-    if (topCard) {
-        selection(topCard.tiles().length > 0 ? topCard.tiles()[0] : topCard);
-    }
-
-    vm.resourceId.subscribe(function(){
-        //switches the url from 'create-resource' once the resource id is available
-        history.pushState({}, '', arches.urls.resource_editor + resourceId());
-    });
-
-    vm.showRelatedResourcesManager = function(){
-        if (vm.graph.domain_connections == undefined) {
-            $.ajax({
-                url: arches.urls.relatable_resources,
-                data: {graphid: vm.graphid}
-            }).done(function(relatable){
-                vm.graph.relatable_resources = relatable;
+            },
+            copyResource: function(){
+                loading(true);
                 $.ajax({
-                    url: arches.urls.get_domain_connections(vm.graphid),
-                    data: {"ontology_class": vm.graph.ontologyclass}
-                }).done(function(data){
-                    vm.graph.domain_connections = data;
-                    vm.relatedResourcesManager = new RelatedResourcesManager({
-                        searchResults: new searchResults(),
-                        resourceEditorContext: true,
-                        editing_instance_id: vm.resourceId(),
-                        relationship_types: vm.relationship_types,
-                        graph: vm.graph
-                    });
-                    vm.manageRelatedResources(true);
-                    vm.selection(undefined);
+                    type: "GET",
+                    url: arches.urls.resource_copy.replace('//', '/' + data.resourceid + '/'),
+                    success: function(response) {
+                        pageView.viewModel.alert(new AlertViewModel('ep-alert-blue', arches.resourceCopySuccess.title, '', null, function(){}));
+                    },
+                    error: function(response) {
+                        pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.resourceCopyFailed.title, arches.resourceCopyFailed.text, null, function(){}));
+                    },
+                    complete: function (request, status) {
+                        loading(false);
+                    },
                 });
-            });
-
-        } else {
-            vm.manageRelatedResources(true);
-            vm.selection(undefined);
-        }
-    };
-
-
-    vm.selectionBreadcrumbs = ko.computed(function() {
-        var item = vm.selectedTile();
-        var crumbs = [];
-        if (item) {
-            while (item.parent) {
-                item = item.parent;
-                crumbs.unshift(item);
+            },
+            renderSearch: function() {
+                var self = this;
+                var el = $('.related-resources-editor-container');
+                self.loadingSearch(true);
+                $.ajax({
+                    type: "GET",
+                    url: arches.urls.resource_editor + data.resourceid,
+                    data: {'search': true, 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+                    success : function(data) {
+                         self.loadingSearch(false);
+                         el.html(data);
+                         ko.applyBindings(self, el[0]);
+                     }
+                });
             }
         }
-        return crumbs;
     });
 
-    return new BaseManagerView({
-        viewModel: vm
+    pageView.viewModel.openRelatedResources.subscribe(function(val){
+        if (pageView.viewModel.rrLoaded() === false) {
+            pageView.viewModel.rrLoaded(true)
+            pageView.viewModel.renderSearch()
+        }
+    })
+
+    pageView.viewModel.searchResults.relationshipCandidates.subscribe(function () {
+        if (!pageView.viewModel.openRelatedResources()) {
+            pageView.viewModel.openRelatedResources(true);
+        }
+        if (pageView.viewModel.selectedTab() !== pageView.viewModel.relatedResourcesManager) {
+            pageView.viewModel.selectedTab(pageView.viewModel.relatedResourcesManager);
+        }
     });
 });
