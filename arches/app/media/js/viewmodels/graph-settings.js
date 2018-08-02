@@ -7,17 +7,17 @@ define([
     'viewmodels/alert',
     'arches',
     'bindings/chosen'
-], function ($, _, ko, koMapping, colorPicker, AlertViewModel, arches) {
+], function($, _, ko, koMapping, colorPicker, AlertViewModel, arches) {
     var GraphSettingsViewModel = function(params) {
 
         var self = this;
 
         self.resource_data = ko.observableArray([]);
-        self.relatable_resources = ko.computed(function () {
-            return _.each(self.resource_data(), function (resource) {
+        self.relatable_resources = ko.computed(function() {
+            return _.each(self.resource_data(), function(resource) {
                 resource.isRelatable = ko.observable(resource.is_relatable);
             });
-        })
+        });
 
         self.designerViewModel = params.designerViewModel;
         self.graph = params.graph;
@@ -25,13 +25,13 @@ define([
         self.graph.name.subscribe(function(val){
             self.node().name(val);
             self.graph.root.name(val);
-        })
+        });
 
         self.graphModel = params.graphModel;
         self.nodes = self.graphModel.get('nodes');
 
         self.nodeCount = ko.computed(function(){
-            return self.nodes().length
+            return self.nodes().length;
         });
 
         var ontologyClass = self.graphModel.get('root').ontologyclass;
@@ -40,7 +40,7 @@ define([
             var relatableResourceIds = _.filter(self.resource_data(), function(resource){
                 return resource.isRelatable();
             }).map(function(resource){
-                return resource.id
+                return resource.id;
             });
             if (self.graph.ontology_id() === undefined) {
                 self.graph.ontology_id(null);
@@ -54,31 +54,31 @@ define([
 
         self.jsonCache = ko.observable(self.jsonData());
 
-        var dirty = ko.computed(function () {
+        var dirty = ko.computed(function() {
             var dirty = self.jsonData() !== self.jsonCache();
-            return dirty
+            return dirty;
         });
 
         self.dirty = dirty;
 
         self.icon_data = ko.observableArray([]);
         self.iconFilter = params.iconFilter;
-        self.icons = ko.computed(function () {
-            return _.filter(self.icon_data(), function (icon) {
+        self.icons = ko.computed(function() {
+            return _.filter(self.icon_data(), function(icon) {
                 return icon.name.indexOf(self.iconFilter()) >= 0;
             });
         });
 
         self.ontologies = params.ontologies;
         self.ontologyClass = ontologyClass;
-        self.ontologyClasses = ko.computed(function () {
-            return _.filter(params.ontologyClasses(), function (ontologyClass) {
+        self.ontologyClasses = ko.computed(function() {
+            return _.filter(params.ontologyClasses(), function(ontologyClass) {
                 ontologyClass.display = ontologyClass.source;
                 return ontologyClass.ontology_id === self.graph.ontology_id();
             });
         });
 
-        self.save = function () {
+        self.save = function() {
             self.contentLoading(true);
             $.ajax({
                 type: "POST",
@@ -86,23 +86,23 @@ define([
                 data: self.jsonData()})
                 .done(function(response) {
                     self.jsonCache(self.jsonData());
-                    self.node()._node(JSON.stringify(self.node()))
+                    self.node()._node(JSON.stringify(self.node()));
                 })
                 .fail(function(response) {
                     self.designerViewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.title, response.responseJSON.message));
                 })
                 .always(function(){
                     self.contentLoading(false);
-                })
+                });
         };
 
-        self.reset = function () {
+        self.reset = function() {
             var graph = self.graph;
             var src = JSON.parse(self.jsonCache());
             _.each(src.graph, function(value, key) {
                 if (ko.isObservable(graph[key])) {
                     graph[key](value);
-                };
+                }
             });
             self.ontologyClass(src.graph.root.ontologyclass);
             self.relatable_resources().forEach(function(resource) {
@@ -110,10 +110,10 @@ define([
                     resource.isRelatable(true);
                 } else {
                     resource.isRelatable(false);
-                };
+                }
             });
             self.jsonCache(self.jsonData());
-            self.node()._node(JSON.stringify(self.node()))
+            self.node()._node(JSON.stringify(self.node()));
         };
 
     };
