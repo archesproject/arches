@@ -8,7 +8,7 @@ import zipfile
 from arches.app.models.graph import Graph
 from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
-from arches.app.models.models import CardXNodeXWidget, Form, FormXCard, Report, Node, Resource2ResourceConstraint, FunctionXGraph, Value
+from arches.app.models.models import CardXNodeXWidget, Report, Node, Resource2ResourceConstraint, FunctionXGraph, Value
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from pprint import pprint as pp
 from collections import OrderedDict
@@ -67,16 +67,6 @@ def get_card_x_node_x_widget_data_for_export(resource_graph):
     nodeids = [node['nodeid'] for node in resource_graph['nodes']]
     cards_x_nodes_x_widgets = CardXNodeXWidget.objects.filter(node_id__in=nodeids)
     return cards_x_nodes_x_widgets
-
-def get_forms_for_export(resource_graph):
-    forms = Form.objects.filter(graph_id=resource_graph['graphid'])
-    return forms
-
-def get_form_x_card_data_for_export(resource_graph):
-    forms_x_cards = []
-    for form in resource_graph['forms']:
-        forms_x_cards = forms_x_cards + list(FormXCard.objects.filter(form_id=form.formid))
-    return forms_x_cards
 
 def get_report_data_for_export(resource_graph):
     reports = []

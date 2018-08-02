@@ -251,32 +251,6 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
         except Exception:
             return False
 
-
-class Form(models.Model):
-    formid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    title = models.TextField(blank=True, null=True)
-    subtitle = models.TextField(blank=True, null=True)
-    iconclass = models.TextField(blank=True, null=True)
-    visible = models.BooleanField(default=True)
-    sortorder = models.IntegerField(blank=True, null=True, default=None)
-    graph = models.ForeignKey('GraphModel', db_column='graphid', blank=False, null=False)
-
-    class Meta:
-        managed = True
-        db_table = 'forms'
-
-
-class FormXCard(models.Model):
-    id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
-    card = models.ForeignKey('CardModel', db_column='cardid')
-    form = models.ForeignKey('Form', db_column='formid')
-    sortorder = models.IntegerField(blank=True, null=True, default=None)
-
-    class Meta:
-        managed = True
-        db_table = 'forms_x_cards'
-
-
 class Function(models.Model):
     functionid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField(blank=True, null=True)

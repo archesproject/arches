@@ -29,7 +29,6 @@ from django.views.generic import View
 from django.forms.models import model_to_dict
 from django.template.loader import render_to_string
 from arches.app.models import models
-from arches.app.models.forms import Form
 from arches.app.models.card import Card
 from arches.app.models.graph import Graph
 from arches.app.models.tile import Tile
@@ -223,21 +222,13 @@ class ResourceEditorView(MapBaseManagerView):
                 pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
             graph = Graph.objects.get(graphid=graphid)
             relationship_type_values = get_resource_relationship_types()
-            form = Form(resource_instance.pk)
             datatypes = models.DDataType.objects.all()
             widgets = models.Widget.objects.all()
             map_layers = models.MapLayer.objects.all()
             map_markers = models.MapMarker.objects.all()
             map_sources = models.MapSource.objects.all()
             geocoding_providers = models.Geocoder.objects.all()
-            forms = graph.form_set.filter(visible=True)
-            forms_x_cards = models.FormXCard.objects.filter(form__in=forms)
-            forms_w_cards = []
             required_widgets = []
-
-            for form_x_card in forms_x_cards:
-                if request.user.has_perm('read_nodegroup', form_x_card.card.nodegroup):
-                    forms_w_cards.append(form_x_card.form)
 
             widget_datatypes = [v.datatype for k, v in graph.nodes.iteritems()]
             widgets = widgets.filter(datatype__in=widget_datatypes)
@@ -259,8 +250,6 @@ class ResourceEditorView(MapBaseManagerView):
                 resource_type=graph.name,
                 relationship_types=relationship_type_values,
                 iconclass=graph.iconclass,
-                form=JSONSerializer().serialize(form),
-                forms=JSONSerializer().serialize(forms_w_cards),
                 datatypes_json=JSONSerializer().serialize(datatypes, exclude=['iconclass', 'modulename', 'classname']),
                 datatypes=datatypes,
                 widgets=widgets,
@@ -428,7 +417,6 @@ class ResourceData(View):
 
         return HttpResponseNotFound()
 
-
 @method_decorator(can_read_resource_instance(), name='dispatch')
 class ResourceTiles(View):
 
@@ -540,22 +528,18 @@ class ResourceReportView(MapBaseManagerView):
             report = None
 
         graph = Graph.objects.get(graphid=resource.graph_id)
-        forms = graph.form_set.filter(visible=True)
-        forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=graph)
         permitted_cards = []
-        permitted_forms_x_cards = []
-        permitted_forms = []
         permitted_tiles = []
 
         perm = 'read_nodegroup'
 
-        for card in cards:
-            if request.user.has_perm(perm, card.nodegroup):
-                matching_forms_x_card = filter(lambda forms_x_card: card.nodegroup_id ==
-                                               forms_x_card.card.nodegroup_id, forms_x_cards)
-                card.filter_by_perm(request.user, perm)
-                permitted_cards.append(card)
+        # for card in cards:
+        #     if request.user.has_perm(perm, card.nodegroup):
+        #         matching_forms_x_card = filter(lambda forms_x_card: card.nodegroup_id ==
+        #                                        forms_x_card.card.nodegroup_id, forms_x_cards)
+        #         card.filter_by_perm(request.user, perm)
+        #         permitted_cards.append(card)
 
         for tile in tiles:
             if request.user.has_perm(perm, tile.nodegroup):
