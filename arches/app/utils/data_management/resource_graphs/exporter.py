@@ -103,8 +103,6 @@ def get_graphs_for_export(graphids=None):
         del resource_graph['functions']
         del resource_graph['domain_connections']
         resource_graph['cards_x_nodes_x_widgets'] = get_card_x_node_x_widget_data_for_export(resource_graph)
-        resource_graph['forms'] = get_forms_for_export(resource_graph)
-        resource_graph['forms_x_cards'] = get_form_x_card_data_for_export(resource_graph)
         resource_graph['reports'] = get_report_data_for_export(resource_graph)
         resource_graph['resource_2_resource_constraints'] = r2r_constraints_for_export(resource_graph)
         graphs['graph'].append(resource_graph)
