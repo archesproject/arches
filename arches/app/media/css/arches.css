@@ -11597,6 +11597,9 @@ a.jstree-anchor.permissions-widget {
     pointer-events: none;
 }
 
+a.jstree-anchor.permissions-card {
+    overflow-x: auto;
+}
 
 .jstree-default .card-designer-tree li {
     background-image: url("tree/32px.png");
