@@ -9,7 +9,7 @@
                     <i data-bind='css: graph.iconclass'></i><div class="name" data-bind='text: graph.name'></div>
                     <span class="graph-crm-class" data-bind="if: graph.ontology_id()">
                         (
-                        <span data-bind="text: graph.ontology.name"></span>,
+                        <span data-bind="text: graph.ontology().name"></span>,
                         <span data-bind="text: graphSettingsViewModel.ontologyClassFriendlyName"></span>
                         )
                     </span>
