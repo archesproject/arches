@@ -42,7 +42,11 @@ define([
                 return !graph.isresource;
             });
 
-            viewModel.graph.ontology = viewModel.ontologies().find(function(obj) { return obj.ontologyid === viewModel.graph.ontology_id(); });
+            viewModel.graph.ontology = ko.computed(function() {
+                return viewModel.ontologies().find(function(obj) {
+                    return obj.ontologyid === viewModel.graph.ontology_id();
+                });
+            });
             viewModel.groupedGraphs = ko.observable({
                 groups: [
                     { name: 'Resource Models', items: resources },
