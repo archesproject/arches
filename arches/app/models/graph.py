@@ -589,43 +589,14 @@ class Graph(models.GraphModel):
                 )
             function_copy.save()
 
-    def copy_forms(self, other_graph, card_map):
-        """
-        Copies the forms and card relationships from a different graph and relates them to this graph.
-
-        """
-        form_map = {}
-        for form in other_graph.form_set.all():
-            form_copy = models.Form(
-                title=form.title,
-                subtitle=form.subtitle,
-                iconclass=form.iconclass,
-                visible=form.visible,
-                sortorder=form.sortorder,
-                graph=self
-                )
-            form_copy.save()
-            form_map[form.formid] = form_copy.formid
-            for form_x_card in form.formxcard_set.all():
-                card = models.CardModel.objects.get(pk=card_map[form_x_card.card_id])
-                form_x_card_copy = models.FormXCard(
-                    form=form_copy,
-                    card=card,
-                    sortorder=form_x_card.sortorder
-                )
-                form_x_card_copy.save()
-        return form_map
-
     def copy_reports(self, other_graph, id_maps=[]):
         for report in other_graph.report_set.all():
-            forms_config_copy = self.replace_config_ids(report.formsconfig, id_maps)
             config_copy = self.replace_config_ids(report.config, id_maps)
             models.Report(
                 name=report.name,
                 template=report.template,
                 graph=self,
                 config=report.config,
-                formsconfig=forms_config_copy,
                 active=report.active
             ).save()
 
