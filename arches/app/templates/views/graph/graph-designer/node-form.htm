@@ -4,7 +4,18 @@
         <div class="settings-panel">
 
             <div class="settings-panel-heading">
-                <div class="graph-designer-title"><div data-bind="text: (node() && node().name()) ? node().name() : '{% trans "Unnamed node" %}'"></div></div>
+                <div class="graph-designer-title">
+                    <div data-bind="text: (node() && node().name()) ? node().name() : '{% trans "Unnamed node" %}'"></div>
+                    <span class="graph-crm-class">
+                        (
+                        <!-- ko if: hasOntology -->
+                        <span data-bind="text: node().ontologyclass_friendlyname()"></span> -
+                        <!-- /ko -->
+                        <span data-bind="text: node().datatype()"></span>
+                        )
+                    </span>
+
+                </div>
             </div>
 
             <!-- Settings Forms -->
