@@ -145,44 +145,7 @@ class GraphManagerView(GraphBaseView):
             context['nav']['icon'] = 'fa-bookmark'
             context['nav']['help'] = (_('About the Arches Designer'), 'help/base-help.htm')
             context['help'] = 'arches-designer-help'
-            print 'returning', context
             return render(request, 'views/graph.htm', context)
-
-        # self.graph = Graph.objects.get(graphid=graphid)
-        # datatypes = models.DDataType.objects.all()
-        # branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True)
-        # if self.graph.ontology is not None:
-        #     branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
-        # lang = request.GET.get('lang', settings.LANGUAGE_CODE)
-        # concept_collections = Concept().concept_tree(mode='collections', lang=lang)
-        # datatypes_json = JSONSerializer().serialize(datatypes, exclude=['modulename', 'isgeometric'])
-        # context = self.get_context_data(
-        #     main_script='views/graph/graph-manager',
-        #     branches=JSONSerializer().serialize(branch_graphs, exclude=[
-        #         'cards', 'domain_connections', 'functions', 'cards', 'deploymentfile', 'deploymentdate']),
-        #     datatypes_json=datatypes_json,
-        #     datatypes=json.loads(datatypes_json),
-        #     concept_collections=concept_collections,
-        #     node_list={
-        #         'title': _('Node List'),
-        #         'search_placeholder': _('Find a node...')
-        #     },
-        #     permissions_list={
-        #         'title': _('Permissions'),
-        #         'search_placeholder': _('Find a group or user account')
-        #     },
-        #     branch_list={
-        #         'title': _('Branch Library'),
-        #         'search_placeholder': _('Find a graph branch')
-        #     },
-        #     ontology_namespaces=get_ontology_namespaces()
-        # )
-        # context['nav']['title'] = self.graph.name
-        # context['nav']['help'] = (_('Using the Graph Manager'), 'help/base-help.htm')
-        # context['nav']['menu'] = True
-        # context['help'] = 'graph-designer-help'
-        #
-        # return render(request, 'views/graph/graph-manager.htm', context)
 
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
