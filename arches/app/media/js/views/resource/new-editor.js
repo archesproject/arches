@@ -7,7 +7,7 @@ define([
     'viewmodels/alert',
     'models/graph',
     'viewmodels/card',
-    'viewmodels/new-provisional-tile',
+    'viewmodels/provisional-tile',
     'arches',
     'resource-editor-data',
     'views/search/search-results',

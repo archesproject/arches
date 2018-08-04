@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import sys
 import uuid
 from arches.app.models.graph import Graph
-from arches.app.models.models import (CardXNodeXWidget, Form, FormXCard, Report, NodeGroup, DDataType, Widget,
+from arches.app.models.models import (CardXNodeXWidget, Report, NodeGroup, DDataType, Widget,
                                       ReportTemplate, Function, Ontology, OntologyClass)
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.models.models import GraphXMapping
@@ -33,24 +33,20 @@ class GraphImportReporter:
         self.graphs = len(graphs)
         self.graphs_saved = 0
         self.reports_saved = 0
-        self.forms_saved = 0
 
     def update_graphs_saved(self, count=1):
         self.graphs_saved += count
-
-    def update_forms_saved(self, count=1):
-        self.forms_saved += count
 
     def update_reports_saved(self, count=1):
         self.reports_saved += count
 
     def report_results(self):
         if self.resource_model is True:
-            result = "Saved Resource Model: {0}, Forms: {1}, Reports: {2}"
+            result = "Saved Resource Model: {0}, Reports: {2}"
         else:
             result = "Saved Branch: {0}"
 
-        print result.format(self.name, self.forms_saved, self.reports_saved)
+        print result.format(self.name, self.reports_saved)
 
 
 class GraphImportException(Exception):
@@ -116,19 +112,6 @@ def import_graph(graphs, overwrite_graphs=True):
                         default_config = Widget.objects.get(widgetid=card_x_node_x_widget['widget_id']).defaultconfig
                         card_x_node_x_widget['config'] = check_default_configs(default_config, card_x_node_x_widget_config)
                         cardxnodexwidget = CardXNodeXWidget.objects.update_or_create(**card_x_node_x_widget)
-
-                if not hasattr(graph, 'forms'):
-                    errors.append('{0} graph has no attribute forms'.format)
-                else:
-                    for form in graph.forms:
-                        form = Form.objects.update_or_create(**form)
-                        reporter.update_forms_saved()
-
-                if not hasattr(graph, 'forms_x_cards'):
-                    errors.append('{0} graph has no attribute forms_x_cards'.format(graph.name))
-                else:
-                    for form_x_card in graph.forms_x_cards:
-                        formxcard = FormXCard.objects.update_or_create(**form_x_card)
 
                 if not hasattr(graph, 'reports'):
                     errors.append('{0} graph has no attribute reports'.format(graph.name))

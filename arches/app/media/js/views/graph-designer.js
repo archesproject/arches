@@ -42,6 +42,11 @@ define([
                 return !graph.isresource;
             });
 
+            viewModel.graph.ontology = ko.computed(function() {
+                return viewModel.ontologies().find(function(obj) {
+                    return obj.ontologyid === viewModel.graph.ontology_id();
+                });
+            });
             viewModel.groupedGraphs = ko.observable({
                 groups: [
                     { name: 'Resource Models', items: resources },
@@ -170,7 +175,7 @@ define([
                 viewModel.loading(true);
                 $.ajax({
                     type: 'GET',
-                    url: arches.urls.new_graph_settings(data.graphid),
+                    url: arches.urls.graph_settings(data.graphid),
                     data: {'search': true, 'csrfmiddlewaretoken': '{{ csrf_token }}'}})
                     .done(function(data) {
                         self.graphSettingsViewModel.resource_data(data.resources);

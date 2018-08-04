@@ -11591,6 +11591,16 @@ a.jstree-anchor.disabled {
     color: #ccc;
 }
 
+a.jstree-anchor.permissions-widget {
+    color: #ccc;
+    cursor: default;
+    pointer-events: none;
+}
+
+a.jstree-anchor.permissions-card {
+    overflow-x: auto;
+}
+
 .jstree-default .card-designer-tree li {
     background-image: url("tree/32px.png");
     background-position: -292px -4px;
