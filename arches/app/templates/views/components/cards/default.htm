@@ -85,7 +85,7 @@
                     'jstree-last': $index() === (card.widgets().length - 1) && card.cards().length === 0
                 }">
                 <i class="jstree-icon jstree-ocl" role="presentation"></i>
-                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function() { widget.selected(true) }, css:{'jstree-clicked': widget.selected}">
+                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function() { widget.selected(true) }, css:{'jstree-clicked': widget.selected, 'hover': widget.hovered}, event: { mouseover: function(){ widget.hovered(true) }, mouseout: function(){ widget.hovered(null) } }">
                     <i data-bind="css: widget.datatype.iconclass" role="presentation"></i>
                     <strong style="margin-right: 10px;" >
                         <span data-bind="text: !!(widget.label()) ? widget.label() : widget.node.name"></span>
@@ -239,7 +239,7 @@
                 <div data-bind="foreach: {
                         data:card.widgets, as: 'widget'
                     }">
-                    <div class='' data-bind='component: {
+                    <div class='widget-preview' data-bind='component: {
                         name: self.form.widgetLookup[widget.widget_id()].name,
                         params: {
                             formData: self.tile.formData,
@@ -253,7 +253,9 @@
                             graph: self.form.graph,
                             type: "resource-editor"
                         }
-                    }'></div>
+                    }, css:{ "active": widget.selected, "hover": widget.hovered
+                    }, click: function() { widget.selected(true)
+                    }, event: { mouseover: function(){ widget.hovered(true) }, mouseout: function(){ widget.hovered(null) } }'></div>
                 </div>
             </form>
             <!-- /ko -->

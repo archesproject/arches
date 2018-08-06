@@ -52,6 +52,7 @@ define([
         var TileViewModel = require('viewmodels/tile');
         var self = this;
         var selection = params.selection || ko.observable();
+        var hover = params.hover || ko.observable();
         var scrollTo = params.scrollTo || ko.observable();
         var filter = params.filter || ko.observable();
         var loading = params.loading || ko.observable();
@@ -81,6 +82,20 @@ define([
                     write: function(value) {
                         if (value) {
                             selection(this);
+                        }
+                    },
+                    owner: widget
+                });
+                widget.hovered = ko.pureComputed({
+                    read: function() {
+                        return hover() === this;
+                    },
+                    write: function(value) {
+                        if (value === true) {
+                            hover(this);
+                        }
+                        if (value === null) {
+                            hover(null);
                         }
                     },
                     owner: widget
