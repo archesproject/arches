@@ -239,7 +239,7 @@
                 <div data-bind="foreach: {
                         data:card.widgets, as: 'widget'
                     }">
-                    <div class='' data-bind='component: {
+                    <div class='widget-preview' data-bind='component: {
                         name: self.form.widgetLookup[widget.widget_id()].name,
                         params: {
                             formData: self.tile.formData,
@@ -253,7 +253,9 @@
                             graph: self.form.graph,
                             type: "resource-editor"
                         }
-                    }'></div>
+                    }, css:{
+                        "active": widget.selected
+                    }, click: function() { widget.selected(true) }'></div>
                 </div>
             </form>
             <!-- /ko -->
