@@ -15,6 +15,7 @@ define([
         var filter = ko.observable('');
         var loading = ko.observable(false);
         var selection = ko.observable();
+        var hover = ko.observable();
         var scrollTo = ko.observable();
 
         this.flattenTree = function(parents, flatList) {
@@ -98,6 +99,7 @@ define([
                     cards: data.cards,
                     tiles: [],
                     selection: selection,
+                    hover: hover,
                     scrollTo: scrollTo,
                     loading: loading,
                     filter: filter,

@@ -253,9 +253,9 @@
                             graph: self.form.graph,
                             type: "resource-editor"
                         }
-                    }, css:{
-                        "active": widget.selected
-                    }, click: function() { widget.selected(true) }'></div>
+                    }, css:{ "active": widget.selected, "hover": widget.hovered
+                    }, click: function() { widget.selected(true)
+                    }, event: { mouseover: function(){ widget.hovered(true) }}'></div>
                 </div>
             </form>
             <!-- /ko -->
