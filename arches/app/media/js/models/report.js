@@ -18,39 +18,30 @@ define(['arches',
 
         initialize: function(options) {
             var self = this;
-            var forms = [];
 
-            options.forms.forEach(function(formData) {
-                var form = _.clone(formData);
-                form.cards = [];
-                options.forms_x_cards.forEach(function(form_x_card) {
-                    if (form_x_card.form_id === form.formid) {
-                        var card = _.find(options.cards, function(card) {
-                            return card.cardid === form_x_card.card_id;
-                        });
-                        var cardModel = new CardModel({
-                            data: _.extend(card, {
-                                nodes: options.graphModel.get('nodes')
-                            }),
-                            datatypelookup: options.graphModel.get('datatypelookup'),
-                            cardComponents: options.cardComponents
-                        });
-                        cardModel.formId = form.formid;
-                        form.cards.push(cardModel);
-                    }
+            var setupTiles = function(card) {
+                card.tiles = _.filter(options.tiles, function(tile) {
+                    return tile.nodegroup_id === card.nodegroup_id;
                 });
-                form.sortorder = Infinity;
-                form.active = ko.observable(true);
-                form.label = ko.observable(form.title);
-                forms.push(form);
-            });
-            this.forms = ko.observableArray(forms);
-            this.activeForms = ko.computed(function() {
-                return _.filter(self.forms(), function(form) {
-                    return form.active();
+                card.tiles.forEach(function(t1) {
+                    t1.tiles = _.filter(options.tiles, function(t2) {
+                        return t1.tileid === t2.parenttile_id;
+                    });
                 });
+                card.cards.forEach(setupTiles);
+            };
+            options.cards.forEach(setupTiles);
+
+            this.cards = _.map(options.cards, function(card) {
+                var cardModel = new CardModel({
+                    data: _.extend(card, {
+                        nodes: options.graphModel.get('nodes')
+                    }),
+                    datatypelookup: options.graphModel.get('datatypelookup'),
+                    cardComponents: options.cardComponents
+                });
+                return cardModel;
             });
-            this.graph = new GraphModel({data: options.graph});
 
             this.set('reportid', ko.observable());
             this.set('name', ko.observable());
@@ -97,24 +88,6 @@ define(['arches',
             var self = this;
             this._attributes = attributes;
 
-            var parseCardConfig = function(cardId, cardConfig, cards) {
-                var card = _.find(cards, function(card) {
-                    return card.get('id') === cardId;
-                });
-                if (card) {
-                    card.get('name')(cardConfig.label);
-                    _.each(cardConfig.nodes, function(nodeConfig, nodeId) {
-                        var widget = _.find(card.get('widgets')(), function(widget) {
-                            return widget.node.nodeid === nodeId;
-                        });
-                        widget.get('label')(nodeConfig.label);
-                    });
-                    _.each(cardConfig.cards, function(cardConfig, cardId) {
-                        parseCardConfig(cardId, cardConfig, card.get('cards')());
-                    });
-                }
-            };
-
             _.each(attributes, function(value, key) {
                 switch (key) {
                 case 'reportid':
@@ -141,31 +114,10 @@ define(['arches',
                     this.set(key, config);
                     self.configKeys(configKeys);
                     break;
-                case 'formsconfig':
-                    var forms = self.forms();
-                    _.each(value, function(formconfig, formid) {
-                        var form = _.find(forms, function(form) {
-                            return form.formid === formid;
-                        });
-                        if (form) {
-                            _.extend(form, _.pick(formconfig, 'sortorder'));
-                            form.active(formconfig.active);
-                            form.label(formconfig.label);
-                            _.each(formconfig.cards, function(cardConfig, cardId) {
-                                parseCardConfig(cardId, cardConfig, form.cards);
-                            });
-                        }
-                    });
-                    this.set(key, value);
-                    break;
                 default:
                     this.set(key, value);
                 }
             }, this);
-
-            this.forms.sort(function(f1, f2) {
-                return f1.sortorder > f2.sortorder;
-            });
 
             this.related_resources = [];
 
@@ -217,38 +169,6 @@ define(['arches',
                     ret[key] = this.attributes[key];
                 }
             }
-            ret.formsconfig = {};
-            var getCardConfig = function(card) {
-                var cards = card.get('cards')();
-                var widgets = card.get('widgets')();
-                var cardsConfig = {};
-                var nodesConfig = {};
-                cards.forEach(function(childCard) {
-                    cardsConfig[childCard.get('id')] = getCardConfig(childCard);
-                });
-                widgets.forEach(function(widget) {
-                    nodesConfig[widget.node.nodeid] = {
-                        label: widget.get('label')()
-                    };
-                });
-                return {
-                    label: card.get('name')(),
-                    cards: cardsConfig,
-                    nodes: nodesConfig
-                };
-            };
-            this.forms().forEach(function(form, i) {
-                var cardsConfig = {};
-                form.cards.forEach(function(card) {
-                    cardsConfig[card.get('id')] = getCardConfig(card);
-                });
-                ret.formsconfig[form.formid] = {
-                    sortorder: i,
-                    active: form.active(),
-                    label: form.label(),
-                    cards: cardsConfig
-                };
-            });
             return ret;
         },
 

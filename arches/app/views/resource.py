@@ -534,12 +534,10 @@ class ResourceReportView(MapBaseManagerView):
 
         perm = 'read_nodegroup'
 
-        # for card in cards:
-        #     if request.user.has_perm(perm, card.nodegroup):
-        #         matching_forms_x_card = filter(lambda forms_x_card: card.nodegroup_id ==
-        #                                        forms_x_card.card.nodegroup_id, forms_x_cards)
-        #         card.filter_by_perm(request.user, perm)
-        #         permitted_cards.append(card)
+        for card in cards:
+            if request.user.has_perm(perm, card.nodegroup):
+                card.filter_by_perm(request.user, perm)
+                permitted_cards.append(card)
 
         for tile in tiles:
             if request.user.has_perm(perm, tile.nodegroup):
@@ -567,9 +565,7 @@ class ResourceReportView(MapBaseManagerView):
             templates_json=JSONSerializer().serialize(templates, sort_keys=False, exclude=['name', 'description']),
             card_components=card_components,
             card_components_json=JSONSerializer().serialize(card_components),
-            forms=JSONSerializer().serialize(forms, sort_keys=False, exclude=['iconclass', 'subtitle']),
             tiles=JSONSerializer().serialize(permitted_tiles, sort_keys=False),
-            forms_x_cards=JSONSerializer().serialize(forms_x_cards, sort_keys=False),
             cards=JSONSerializer().serialize(permitted_cards, sort_keys=False, exclude=[
                 'is_editable', 'description', 'instructions', 'helpenabled', 'helptext', 'helptitle', 'ontologyproperty']),
             datatypes_json=JSONSerializer().serialize(

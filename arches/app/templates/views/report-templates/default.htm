@@ -23,12 +23,9 @@
 
     {% block body %}
 
-    <!-- ko foreach: { data: report.activeForms, as: 'form' } -->
-    <div class="rp-report-section relative">
+    <div class="rp-report-section relative rp-report-section-root">
         <div class="rp-report-section-title">
-            <h4 class="rp-section-title" data-bind="text: form.label"></h4>
-
-            <!-- ko foreach: { data: form.cards, as: 'card' } -->
+            <!-- ko foreach: { data: report.cards, as: 'card' } -->
                 <div class="rp-card-section">
                     <!-- ko component: {
                         name: card.cardComponentLookup[card.component_id()].componentname,
@@ -41,7 +38,6 @@
             <!-- /ko -->
         </div>
     </div>
-    <!-- /ko -->
 
 
 

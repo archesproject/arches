@@ -350,47 +350,19 @@
                 </div>
             <!-- /ko -->
 
-            <!-- ko foreach: {data: card.get('cards'),as: 'card'} -->
-                <div class="rp-card-section">
-                    <span class="rp-tile-title" data-bind="text: card.get('name')"></span>
-
-                    <!-- ko foreach: {data: card.get('tiles'), as: 'child_tile'} -->
-                        <!-- ko if: child_tile.parenttile_id() === tile.tileid() -->
-                        <div class="rp-report-tile" data-bind="attr: { id: tile.tileid }">
-                            <dl class="dl-horizontal">
-                                <!-- ko foreach: { data: card.get('widgets'), as: 'widget' } -->
-                                    <!-- ko component: {
-                                        name: widget.widgetLookup[widget.get("widget_id")()].name,
-                                        params: {
-                                            config: configJSON,
-                                            label: widget.get("label")(),
-                                            node: widget.node,
-                                            value: child_tile.data[widget.node.nodeid],
-                                            state: "report"
-                                        }
-                                    } --><!-- /ko -->
-                                <!-- /ko -->
-                            </dl>
-                        </div>
-                        <!-- /ko -->
-                    <!-- /ko -->
-                </div>
-
-                <div class="rp-report-container-tile" data-bind="visible: card.get('cards')().length > 0">
-                    <!-- ko foreach: { data: card.cards, as: 'card' } -->
-                        <div class="rp-card-section">
-                            <!-- ko component: {
-                                name: self.form.cardComponentLookup[card.component_id()].componentname,
-                                params: {
-                                    state: 'report',
-                                    card: card,
-                                    form: self.form
-                                }
-                            } --> <!-- /ko -->
-                        </div>
-                    <!-- /ko -->
-                </div>
-            <!-- /ko -->
+            <div class="rp-report-container-tile" data-bind="visible: card.get('cards')().length > 0">
+                <!-- ko foreach: { data: card.cards, as: 'card' } -->
+                    <div class="rp-card-section">
+                        <!-- ko component: {
+                            name: card.cardComponentLookup[card.component_id()].componentname,
+                            params: {
+                                state: 'report',
+                                card: card
+                            }
+                        } --> <!-- /ko -->
+                    </div>
+                <!-- /ko -->
+            </div>
 
 
             <!-- ko if: card.get('tiles')().length === 0 -->

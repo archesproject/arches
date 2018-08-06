@@ -60,14 +60,13 @@ define('resource-report-data', [], function () {
         templates: {{templates_json}},
         report: {{report}},
         datatypes: {{ datatypes_json }},
-        forms: {{forms}},
-        forms_x_cards: {{forms_x_cards}},
         cards: {{cards}},
         tiles: {{tiles}},
         graph: {{graph_json}},
         related_resources: {{related_resources}},
         displayname: "{{displayname | escapejs}}",
-        cardComponents: {{card_components_json}}
+        cardComponents: {{card_components_json}},
+        resourceid: '{{resourceid}}'
     };
 });
 {% endautoescape %}</script>

@@ -7377,6 +7377,10 @@ a.mega-dropdown-toggle.disabled {
     background-color: white;
 }
 
+.rp-report-section-root {
+    margin-top: 30px;
+}
+
 .rp-report-header {
     height: 500px;
     border-bottom: 1px solid #ddd;

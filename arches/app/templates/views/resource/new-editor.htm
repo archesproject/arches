@@ -231,7 +231,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 graphid: '{{graphid}}',
                 graphiconclass: '{{graphiconclass}}',
                 graphname: '{{graphname}}',
-                displayname: '{{displayname}}',
+                displayname: '{{displayname | escapejs}}',
                 tiles: {{tiles}},
                 cards: {{cards}},
                 nodes: {{nodes}},
@@ -243,6 +243,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 cardComponents: {{card_components_json}},
                 nodegroups: {{nodegroups}},
                 userisreviewer:  JSON.parse('{{ user_is_reviewer }}'.toLowerCase()),
+
+                templates: {{templates_json}},
+                report: {{report}},
+                graph: {{graph_json}}
             };
         });{% endautoescape %}
     </script>
