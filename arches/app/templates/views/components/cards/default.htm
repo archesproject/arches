@@ -86,7 +86,7 @@
                 }">
                 <i class="jstree-icon jstree-ocl" role="presentation"></i>
                 <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function() { widget.selected(true) }, css:{'jstree-clicked': widget.selected}">
-                    <i class="fa fa-file" role="presentation" ></i>
+                    <i data-bind="css: widget.datatype.iconclass" role="presentation"></i>
                     <strong style="margin-right: 10px;" >
                         <span data-bind="text: !!(widget.label()) ? widget.label() : widget.node.name"></span>
                     </strong>
