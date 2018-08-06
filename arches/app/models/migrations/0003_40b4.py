@@ -228,7 +228,7 @@ class Migration(migrations.Migration):
             DELETE FROM public.geocoders WHERE name = 'Mapzen';
         """),
         migrations.RunSQL("""
-            UPDATE report_templates SET (defaultconfig) = ('{
+            UPDATE report_templates SET defaultconfig = '{
                 "basemap": "streets",
                 "geometryTypes": [{"text":"Point", "id":"Point"}, {"text":"Line", "id":"Line"}, {"text":"Polygon", "id":"Polygon"}],
                 "overlayConfigs": [],
@@ -248,9 +248,9 @@ class Migration(migrations.Migration):
                 "featurePointSize": 3,
                 "featureEditingDisabled": true,
                 "mapControlsHidden": false
-            }') WHERE templateid = '50000000-0000-0000-0000-000000000002';
+            }' WHERE templateid = '50000000-0000-0000-0000-000000000002';
 
-            UPDATE widgets SET (defaultconfig) = ('{
+            UPDATE widgets SET defaultconfig = '{
                     "basemap": "streets",
                     "geometryTypes": [{"text":"Point", "id":"Point"}, {"text":"Line", "id":"Line"}, {"text":"Polygon", "id":"Polygon"}],
                     "overlayConfigs": [],
@@ -268,10 +268,10 @@ class Migration(migrations.Migration):
                     "featureColor": "#FF0000",
                     "featureLineWidth": 1,
                     "featurePointSize": 3
-                }') WHERE widgetid = '10000000-0000-0000-0000-000000000007';
+                }' WHERE widgetid = '10000000-0000-0000-0000-000000000007';
         """,
         """
-            UPDATE report_templates SET (defaultconfig) = ('{
+            UPDATE report_templates SET defaultconfig = '{
                 "basemap": "streets",
                 "geometryTypes": [{"text":"Point", "id":"Point"}, {"text":"Line", "id":"Line"}, {"text":"Polygon", "id":"Polygon"}],
                 "overlayConfigs": [],
@@ -291,8 +291,8 @@ class Migration(migrations.Migration):
                 "featurePointSize": null,
                 "featureEditingDisabled": true,
                 "mapControlsHidden": false
-            }') WHERE templateid = '50000000-0000-0000-0000-000000000002';
-            UPDATE widgets SET (defaultconfig) = ('{
+            }' WHERE templateid = '50000000-0000-0000-0000-000000000002';
+            UPDATE widgets SET defaultconfig = '{
                 "basemap": "streets",
                 "geometryTypes": [{"text":"Point", "id":"Point"}, {"text":"Line", "id":"Line"}, {"text":"Polygon", "id":"Polygon"}],
                 "overlayConfigs": [],
@@ -310,7 +310,7 @@ class Migration(migrations.Migration):
                 "featureColor": null,
                 "featureLineWidth": null,
                 "featurePointSize": null
-            }') WHERE widgetid = '10000000-0000-0000-0000-000000000007';
+            }' WHERE widgetid = '10000000-0000-0000-0000-000000000007';
         """),
 
 
