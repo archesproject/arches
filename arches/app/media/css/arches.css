@@ -6954,6 +6954,10 @@ div.row.widget-wrapper {
     position: relative;
 }
 
+.map-filter-panel div.row.widget-wrapper {
+    padding: 5px 5px 25px 5px;
+}
+
 .input-group .form-control {
     position: relative;
     z-index: 0;
