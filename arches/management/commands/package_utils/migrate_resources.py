@@ -13,7 +13,7 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from django.forms.models import model_to_dict
 from .. import utils
 import datetime
-
+import csv
 
 
 from itertools import groupby
@@ -250,10 +250,8 @@ def remove_entitytypes_and_concepts(all_entitytypeids_to_remove, only_entitytype
         still_linked = False if not models.Mappings.objects.filter(entitytypeidto = entity_to_remove) else True
         if not still_linked: 
             entity_types = models.EntityTypes.objects.filter(entitytypeid=entity_to_remove)
-            print len(entity_types)
             #### Prune the concepts
             concepts_to_delete = []
-            
             for entity_type in entity_types:
                 # Find the root concept
                 concept = entity_type.conceptid
@@ -264,7 +262,7 @@ def remove_entitytypes_and_concepts(all_entitytypeids_to_remove, only_entitytype
                     concepts_to_delete.append(entity_type.conceptid)
                 else:
                     logging.warning("Concept type for entity in use (perhaps because this node was mapped to a new one). Not deleting. %s", entity_type)
-                
+
             # delete the entity types, and then their concepts
             entity_types.delete()
             
@@ -272,12 +270,11 @@ def remove_entitytypes_and_concepts(all_entitytypeids_to_remove, only_entitytype
                 # remove it and all of its relations and their values
                 logging.warning("Removing concept and children/values/relationships for %s", concept_model.legacyoid)
                 concept = Concept()
-                concept.get(concept_model.pk, semantic=False, include_subconcepts=True)
-                
+                concept.get(concept_model.pk, semantic=False, include_subconcepts=False)
                 concept.delete(delete_self=True)
-                concept_model.delete()
+#                 concept_model.delete()
             
-            logging.warning("Removed all entities and ontology data related to the following entity types: %s", entity_to_remove)                    
+#             logging.warning("Removed all entities and ontology data related to the following entity types: %s", entity_to_remove)                    
 
 def prune_ontology(settings=None, only_concepts=False):
     
@@ -413,22 +410,28 @@ def prune_ontology(settings=None, only_concepts=False):
 
 def prune_resource_graph(resource_type):
     print "Deleting resource graph %s" % resource_type
-    mappings = models.Mappings.objects.filter(entitytypeidfrom=resource_type).values_list("mappingid", flat= True)
+    mappings_for_resource = models.Mappings.objects.filter(entitytypeidfrom=resource_type).values_list("mappingid", flat= True)
     entity_types = models.Mappings.objects.filter(entitytypeidfrom=resource_type).values_list("entitytypeidto", flat= True)
-    rule_ids = models.MappingSteps.objects.filter(mappingid__in=mappings).values_list('ruleid', flat=True)
-    relations = models.Relations.objects.filter(ruleid__in=rule_ids).values_list('entityidrange', flat=True)
+    mappings_with_other_res = models.Mappings.objects.filter(entitytypeidto__in=entity_types).exclude(entitytypeidfrom=resource_type).values_list("entitytypeidto", flat= True)   
+    steps = models.MappingSteps.objects.filter(mappingid__in= mappings_for_resource).values_list('ruleid', flat=True)
+    if mappings_with_other_res.count()>0:
+        cleaned_entity_list = [x for x in entity_types if x not in mappings_with_other_res]
+        rule_ids =  models.Rules.objects.filter(ruleid__in=steps, entitytyperange__in=cleaned_entity_list).values_list('ruleid', flat=True)
+        entity_types = cleaned_entity_list
+    else:
+        rule_ids =  models.Rules.objects.filter(ruleid__in=steps, entitytyperange__in=entity_types).values_list('ruleid', flat=True)
+    
+    relations = models.Relations.objects.filter(ruleid__in=rule_ids).values_list('ruleid', flat=True)
     if relations.count() >0:
         print "There are still %s entities connected to this graph!" % relations.count()
-        entitytypes = models.Entities.objects.filter(entityid__in=relations).values_list('entitytypeid', flat=True).distinct()
-        print entitytypes
         return
     else:
-        # remove mappings to these entitytype if there is one               
-        models.Mappings.objects.filter(mappingid__in=mappings).delete()
+        # remove mappings to these entitytype if there is one
+        models.Mappings.objects.filter(mappingid__in=mappings_for_resource).delete()
         # remove mapping steps associated to the relevant rules
-        models.MappingSteps.objects.filter(ruleid__in=rule_ids, mappingid__in =mappings).delete()
+        models.MappingSteps.objects.filter(mappingid__in =mappings_for_resource).delete()
         # remove the rules
-        models.Rules.objects.filter(ruleid__in=mappings).delete()        
+        models.Rules.objects.filter(ruleid__in=rule_ids).delete()        
         remove_entitytypes_and_concepts(entity_types)
 
 def log_entity(entity):
@@ -613,3 +616,34 @@ def get_list_dict(pathtofile, fieldnames):
         for row in rows:  
             ret.append(row)
     return ret
+
+def remove_concept_list(concepts):
+    with open(concepts, 'rb') as csvfile:
+        try:
+            dialect = csv.Sniffer().sniff(csvfile.read(1024))
+            csvfile.seek(0)
+        except csv.Error:
+            print "The source data is not a CSV file"
+    
+        concept_list = csv.reader(csvfile, delimiter = ',')
+        print "There are",sum(1 for line in open(concepts))," concepts that will be deleted"
+        concepts_to_delete = []
+        for c in concept_list:
+
+            relations = models.EntityTypes.objects.filter(conceptid=c[0])
+            if len(relations) <= 1:
+                concepts_to_delete.append(c[0])
+            else:
+                logging.warning("Concept type for entity in use (perhaps because this node was mapped to a new one). Not deleting. %s", c[0])
+            
+            for concept_model in concepts_to_delete:
+                # remove it and all of its relations and their values
+                logging.warning("Removing concept and children/values/relationships for %s", concept_model)
+                concept = Concept()
+                try:
+                    concept.get(concept_model, semantic=False, include_subconcepts=True)
+                    concept.delete(delete_self=True)
+                    concept_model.delete()
+                except:
+                    print "Conceptid %s does not exist" % concept_model
+        
