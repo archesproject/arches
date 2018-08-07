@@ -329,10 +329,10 @@
 <!-- /ko -->
 
 <!-- ko if: state === 'report' -->
+<div class="rp-card-section">
+    <span class="rp-tile-title" data-bind="text: card.model.get('name')"></span>
     <!-- ko foreach: { data: card.tiles, as: 'tile' } -->
         <div class="rp-card-section">
-            <span class="rp-tile-title" data-bind="text: card.model.get('name')"></span>
-
             <!-- ko if: card.model.get('widgets')().length > 0 -->
                 <div class="rp-report-tile" data-bind="attr: { id: tile.tileid }">
                     <dl class="dl-horizontal">
@@ -363,21 +363,20 @@
                         } --> <!-- /ko -->
                 <!-- /ko -->
             </div>
-
-
-            <!-- ko if: card.tiles().length === 0 -->
-                <div class="row rp-report-tile rp-no-data">
-                    <!-- ko ifnot: card.model.get('cardid') -->
-                        {% trans "Sorry, you don't have access to this information" %}
-                    <!-- /ko -->
-                    <!-- ko if: card.model.get('cardid') -->
-                        {% trans "No data added yet for" %} "<span data-bind="text: card.model.get('name')"></span>"
-                    <!-- /ko -->
-                </div>
-            <!-- /ko -->
-
         </div>
     <!-- /ko -->
+
+    <!-- ko if: card.tiles().length === 0 -->
+    <div class="row rp-report-tile rp-no-data">
+        <!-- ko ifnot: card.model.get('cardid') -->
+        {% trans "Sorry, you don't have access to this information" %}
+        <!-- /ko -->
+        <!-- ko if: card.model.get('cardid') -->
+        {% trans "No data added yet for" %} "<span data-bind="text: card.model.get('name')"></span>"
+        <!-- /ko -->
+    </div>
+    <!-- /ko -->
+</div>
 <!-- /ko -->
 
 <!-- /ko -->
