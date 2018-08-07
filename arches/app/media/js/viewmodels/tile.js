@@ -17,9 +17,9 @@ define([
     */
     var isChildSelected = function(parent) {
         var childSelected = false;
-        var childrenKey = parent.tiles ? 'tiles' : 'cards';
+        var childrenKey = 'tileid' in parent ? 'cards': 'tiles';
         ko.unwrap(parent[childrenKey]).forEach(function(child) {
-            if (child.selected() || isChildSelected(child)){
+            if (child.selected && child.selected() || isChildSelected(child)){
                 childSelected = true;
             }
         });
@@ -28,9 +28,9 @@ define([
 
     var doesChildHaveProvisionalEdits = function(parent) {
         var hasEdits = false;
-        var childrenKey = parent.tiles ? 'tiles' : 'cards';
+        var childrenKey = 'tileid' in parent ? 'cards': 'tiles';
         ko.unwrap(parent[childrenKey]).forEach(function(child) {
-            if (child.hasprovisionaledits() || doesChildHaveProvisionalEdits(child)){
+            if (child.hasprovisionaledits && child.hasprovisionaledits() || doesChildHaveProvisionalEdits(child)){
                 hasEdits = true;
             }
         });

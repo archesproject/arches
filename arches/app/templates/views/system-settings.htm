@@ -83,14 +83,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
         <div class="main-panel card-component-panel" style="display:none;" data-bind="visible: true">
 
-
-            <!--ko if: manageRelatedResources() === true -->
+            <!--ko if: selection() === 'related-resources' -->
             <div data-bind="with: relatedResourcesManager">
                 {% include 'views/resource/related-resources/related-resources-manager.htm' %}
             </div>
             <!--/ko -->
-            <!-- ko if: selection() && manageRelatedResources() === false -->
 
+            <!-- ko if: selection() && typeof selection() !== 'string' -->
             <div class="card-header">
                 <div class="card-header-title">
 
