@@ -254,8 +254,8 @@
                             type: "resource-editor"
                         }
                     }, css:{ "active": widget.selected, "hover": widget.hovered
-                }, click: function(data, e) { if (!widget.selected()) {widget.selected(true);}
-                }, event: { mouseover: function(){ widget.hovered(true) }, mouseout: function(){ widget.hovered(null) } }'></div>
+                }, click: function(data, e) { if (!widget.selected() && self.preview) {widget.selected(true);}
+            }, event: { mouseover: function(){ if (self.preview){widget.hovered(true) } }, mouseout: function(){ if (self.preview){widget.hovered(null)} } }'></div>
                 </div>
             </form>
             <!-- /ko -->
