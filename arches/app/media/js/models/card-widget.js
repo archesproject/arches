@@ -60,6 +60,7 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function(_, ko,
                     var configJSON = {};
                     var config = this.get('config');
                     _.each(this.configKeys(), function(key) {
+                        console.log('editing config value')
                         configJSON[key] = config[key]();
                     });
                     configJSON.label = this.get('label')();
