@@ -333,7 +333,6 @@
     <span class="rp-tile-title" data-bind="text: card.model.get('name')"></span>
     <!-- ko foreach: { data: card.tiles, as: 'tile' } -->
         <div class="rp-card-section">
-
             <!-- ko if: card.model.get('widgets')().length > 0 -->
                 <div class="rp-report-tile" data-bind="attr: { id: tile.tileid }">
                     <dl class="dl-horizontal">
@@ -364,9 +363,6 @@
                         } --> <!-- /ko -->
                 <!-- /ko -->
             </div>
-
-
-
         </div>
     <!-- /ko -->
 
