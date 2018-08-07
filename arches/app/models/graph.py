@@ -519,7 +519,8 @@ class Graph(models.GraphModel):
 
         tile_count = models.TileModel.objects.filter(nodegroup_id=nodeToAppendTo.nodegroup_id).count()
         if tile_count > 0:
-            raise GraphValidationError(_('Cant append a node to a node with data'))
+            raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot modify a Resource Model with instances.".format(self.name)), 1006)
+
 
         newNode = models.Node(
             nodeid=uuid.uuid1(),
