@@ -6970,10 +6970,6 @@ div.row.widget-wrapper {
     margin-top: 2px;
 }
 
-.widget-preview div.row.widget-wrapper:hover {
-    background: #fafafa;
-}
-
 .widget-preview {
     border: 1px solid transparent;
 }
@@ -6986,6 +6982,10 @@ div.row.widget-wrapper {
     background: #fcfcfc;
     border: 1px solid #ddd;
     margin-right: 11px;
+}
+
+.widget-preview.hover {
+    background: #fafafa;
 }
 
 .panel-heading.note-toolbar {

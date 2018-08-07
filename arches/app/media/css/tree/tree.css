@@ -91,7 +91,8 @@ a.filtered > span:hover {
     color: #7a878e;
 }
 
-.jstree-anchor:hover {
+.jstree-anchor:hover,
+.jstree-anchor.hover {
     background-color: rgba(105,132,160,0.15);
     color: #425965;
 }
