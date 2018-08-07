@@ -310,7 +310,6 @@ class Graph(models.GraphModel):
                     new.update({k: d2[k]})
             except KeyError:
                 old.update({k: v})
-
         return old, new
 
     def save(self, validate=True):
@@ -517,6 +516,11 @@ class Graph(models.GraphModel):
                 temp_node_name = 'New Node_%s' % i
 
         nodeToAppendTo = self.nodes[uuid.UUID(str(nodeid))] if nodeid else self.root
+
+        tile_count = models.TileModel.objects.filter(nodegroup_id=nodeToAppendTo.nodegroup_id).count()
+        if tile_count > 0:
+            raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot modify a Resource Model with instances.".format(self.name)), 1006)
+
 
         newNode = models.Node(
             nodeid=uuid.uuid1(),
@@ -815,7 +819,6 @@ class Graph(models.GraphModel):
 
             tree = self.get_tree(root=node)
             tile_count = models.TileModel.objects.filter(nodegroup=node.nodegroup).count()
-
             if self.is_editable() is False and tile_count > 0:
                 raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot delete nodes from a Resource Model with instances.".format(self.name)), 1006)
 
@@ -1205,21 +1208,15 @@ class Graph(models.GraphModel):
 
     def check_if_resource_is_editable(self):
 
-        def find_unpermitted_edits(obj_a, obj_b, ignore_list):
+        def find_unpermitted_edits(obj_a, obj_b, ignore_list, obj_type):
+            # if node_tile_count > 0:
             res = None
             pre_diff = self._compare(obj_a, obj_b, ignore_list)
             diff = filter(lambda x: len(x.keys()) > 0, pre_diff)
             if len(diff) > 0:
-                res = diff
-                if len(diff) == 2:
-                    #Allowing edit if user is adding cards:
-                    if 'cards' in diff[0] and 'cards' in diff[1]:
-                        if len(diff[0]['cards']) > len(diff[1]['cards']):
-                            res = None
-                    if 'datatype' in diff[0] and 'datatype' in diff[1]:
-                        res = None
-                    if 'config' in diff[0] and 'config' in diff[1]:
-                        res = None
+                if obj_type == 'node':
+                    tile_count = models.TileModel.objects.filter(nodegroup_id=db_node.nodegroup_id).count()
+                    res = diff if tile_count > 0 else None #If your node has no data, you can change any property
             return res
 
         if self.isresource is True:
@@ -1227,14 +1224,13 @@ class Graph(models.GraphModel):
                 unpermitted_edits = []
                 db_nodes = models.Node.objects.filter(graph=self)
                 for db_node in db_nodes:
-                    unpermitted_node_edits = find_unpermitted_edits(db_node, self.nodes[db_node.nodeid], ['name', 'issearchable', 'ontologyclass', 'description', 'isrequired'])
+                    unpermitted_node_edits = find_unpermitted_edits(db_node, self.nodes[db_node.nodeid], ['name', 'issearchable', 'ontologyclass', 'description', 'isrequired'], 'node')
                     if unpermitted_node_edits is not None:
                         unpermitted_edits.append(unpermitted_node_edits)
                 db_graph = Graph.objects.get(pk=self.graphid)
-                unpermitted_graph_edits = find_unpermitted_edits(self, db_graph, ['name', 'ontology_id', 'subtitle', 'iconclass', 'author', 'description', 'isactive', 'color'])
+                unpermitted_graph_edits = find_unpermitted_edits(db_graph, self, ['name', 'ontology_id', 'subtitle', 'iconclass', 'author', 'description', 'isactive', 'color', 'nodes', 'edges', 'cards', 'nodegroup_id'], 'graph')
                 if unpermitted_graph_edits is not None:
                     unpermitted_edits.append(unpermitted_graph_edits)
-
                 if len(unpermitted_edits) > 0:
                     raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot modify a Resource Model with instances.".format(self.name)), 1006)
 
