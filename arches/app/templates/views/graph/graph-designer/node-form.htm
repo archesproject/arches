@@ -24,7 +24,7 @@
                 <div class="graph-designer-header">{% trans 'Node Identifiers' %}</div>
                 <!-- ko if: node() -->
                 <div class="graph-settings-panel-body fade in">
-                    
+
                     <form class="widgets">
                         <div class="row widget-container">
                             <div class="form-group">
@@ -96,7 +96,7 @@
                         <!-- /ko -->
                     </form>
                 </div>
-                
+
                 <div class="graph-designer-header">{% trans 'Node Data Type and Settings' %}</div>
                 <div class="graph-settings-panel-body fade in">
 
@@ -121,7 +121,7 @@
                                 <div class="col-xs-12 crm-selector">
                                     <div data-bind='component: {
                                         name: node().datatypeConfigComponent,
-                                        params: node()}' style="width: 500px;">    
+                                        params: node()}' style="width: 500px;">
                                     </div>
                                 </div>
                             </div>
@@ -149,7 +149,6 @@
                         </div>
                         <!-- /ko -->
 
-                        <!-- ko if: node().datatypeIsSearchable() -->
                         <div class="row widget-container graph-settings-switch">
                             <div class="form-group">
                                 <div class="relative">
@@ -169,8 +168,7 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- /ko -->
-                            
+
                         <!-- ko if: node() && !isResourceTopNode() -->
                         <div class="row widget-container graph-settings-switch">
                             <div class="form-group">
