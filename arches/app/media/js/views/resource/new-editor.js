@@ -6,17 +6,19 @@ define([
     'views/base-manager',
     'viewmodels/alert',
     'models/graph',
+    'models/report',
     'viewmodels/card',
     'viewmodels/provisional-tile',
     'arches',
     'resource-editor-data',
     'views/search/search-results',
     'views/resource/related-resources-manager',
+    'report-templates',
     'bindings/resizable-sidepanel',
     'bindings/sortable',
     'widgets',
     'card-components'
-], function($, _, ko, moment, BaseManagerView, AlertViewModel, GraphModel, CardViewModel, ProvisionalTileViewModel, arches, data, searchResults, RelatedResourcesManager) {
+], function($, _, ko, moment, BaseManagerView, AlertViewModel, GraphModel, ReportModel, CardViewModel, ProvisionalTileViewModel, arches, data, searchResults, RelatedResourcesManager, reportLookup) {
     var handlers = {
         'after-update': [],
         'tile-reset': []
@@ -159,6 +161,7 @@ define([
             }
         },
         resourceId: resourceId,
+        reportLookup: reportLookup,
         copyResource: function() {
             if (resourceId()) {
                 vm.menuActive(false);
@@ -224,6 +227,11 @@ define([
     var topCard = vm.topCards[0];
     if (topCard) {
         selection(topCard.tiles().length > 0 ? topCard.tiles()[0] : topCard);
+    }
+
+    vm.report = null;
+    if (data.report) {
+        vm.report = new ReportModel(_.extend(data, {graphModel: graphModel, cards: vm.topCards}));
     }
 
     vm.resourceId.subscribe(function(){

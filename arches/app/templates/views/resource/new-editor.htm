@@ -52,7 +52,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <ul class="jstree-container-ul jstree-children" aria-expanded="true">
                     <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': rootExpanded, 'jstree-closed' : !rootExpanded()}">
                         <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}"></i>
-                        <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { selection('root'); }">
+                        <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { selection('root'); }, css: {'jstree-clicked': selection() === 'root'}">
                             <strong>
                                 <i data-bind="css: graphiconclass != (null || '') ? graphiconclass : 'fa fa-question'" role="presentation"></i>
                                 <span data-bind="text: displayname"></span> (<span data-bind="text: graphname"></span>)
@@ -114,9 +114,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <!--/ko -->
 
             <!--ko if: selection() === 'root' -->
-            <div>
-                Report here...
-            </div>
+                <!-- ko if: report -->
+                <div class='resource-report editor-report' data-bind='component: {
+                    name: reportLookup[report.get("template_id")()].componentname,
+                    params: {
+                        report: report
+                    }
+                }'></div>
+                <!-- /ko -->
+                <div style="display: none;" class="report-undefined" data-bind="visible: !report">
+                    {% trans "No report defined for" %} "{{graphname}}"...
+                </div>
             <!--/ko -->
 
             <!-- ko if: !selection() && topCards.length == 0 -->
@@ -243,10 +251,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 cardComponents: {{card_components_json}},
                 nodegroups: {{nodegroups}},
                 userisreviewer:  JSON.parse('{{ user_is_reviewer }}'.toLowerCase()),
-
                 templates: {{templates_json}},
-                report: {{report}},
-                graph: {{graph_json}}
+                report: {{report}}
             };
         });{% endautoescape %}
     </script>

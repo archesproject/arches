@@ -10691,6 +10691,14 @@ a.search-facet-item.disabled {
 .number-suffix {
     padding-left: 1px;
 }
+.report-title-bar {
+    display: block;
+}
+
+
+.editor-report .report-related-resources, .editor-report .report-title-bar {
+    display: none;
+}
 
 .msm-item-status {
     position: absolute;

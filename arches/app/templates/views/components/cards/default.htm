@@ -329,14 +329,14 @@
 <!-- /ko -->
 
 <!-- ko if: state === 'report' -->
-    <!-- ko foreach: { data: card.get('tiles'), as: 'tile' } -->
+    <!-- ko foreach: { data: card.tiles, as: 'tile' } -->
         <div class="rp-card-section">
-            <span class="rp-tile-title" data-bind="text: card.get('name')"></span>
+            <span class="rp-tile-title" data-bind="text: card.model.get('name')"></span>
 
-            <!-- ko if: (Object.keys(tile.data).length !== 0) -->
+            <!-- ko if: card.model.get('widgets')().length > 0 -->
                 <div class="rp-report-tile" data-bind="attr: { id: tile.tileid }">
                     <dl class="dl-horizontal">
-                        <!-- ko foreach: { data: card.get('widgets'), as: 'widget' } -->
+                        <!-- ko foreach: { data: card.model.get('widgets'), as: 'widget' } -->
                             <!-- ko component: {
                                 name: widget.widgetLookup[widget.get("widget_id")()].name,
                                 params: {
@@ -352,28 +352,26 @@
                 </div>
             <!-- /ko -->
 
-            <div class="rp-report-container-tile" data-bind="visible: card.get('cards')().length > 0">
-                <!-- ko foreach: { data: card.cards, as: 'card' } -->
-                    <div class="rp-card-section">
+            <div class="rp-report-container-tile" data-bind="visible: card.cards().length > 0">
+                <!-- ko foreach: { data: tile.cards, as: 'card' } -->
                         <!-- ko component: {
-                            name: card.cardComponentLookup[card.component_id()].componentname,
+                            name: card.model.cardComponentLookup[card.model.component_id()].componentname,
                             params: {
                                 state: 'report',
                                 card: card
                             }
                         } --> <!-- /ko -->
-                    </div>
                 <!-- /ko -->
             </div>
 
 
-            <!-- ko if: card.get('tiles')().length === 0 -->
+            <!-- ko if: card.tiles().length === 0 -->
                 <div class="row rp-report-tile rp-no-data">
-                    <!-- ko ifnot: card.get('cardid') -->
+                    <!-- ko ifnot: card.model.get('cardid') -->
                         {% trans "Sorry, you don't have access to this information" %}
                     <!-- /ko -->
-                    <!-- ko if: card.get('cardid') -->
-                        {% trans "No data added yet for" %} "<span data-bind="text: card.get('name')"></span>"
+                    <!-- ko if: card.model.get('cardid') -->
+                        {% trans "No data added yet for" %} "<span data-bind="text: card.model.get('name')"></span>"
                     <!-- /ko -->
                 </div>
             <!-- /ko -->

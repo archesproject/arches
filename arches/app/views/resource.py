@@ -144,6 +144,11 @@ class NewResourceEditorView(MapBaseManagerView):
         map_markers = models.MapMarker.objects.all()
         map_sources = models.MapSource.objects.all()
         geocoding_providers = models.Geocoder.objects.all()
+        templates = models.ReportTemplate.objects.all()
+        try:
+            report = models.Report.objects.get(graph=graph, active=True)
+        except models.Report.DoesNotExist:
+            report = None
 
         context = self.get_context_data(
             main_script=main_script,
@@ -171,6 +176,9 @@ class NewResourceEditorView(MapBaseManagerView):
             geocoding_providers=geocoding_providers,
             active_report_count=models.Report.objects.filter(graph=graph, active=True).count(),
             user_is_reviewer=json.dumps(user_is_reviewer),
+            report_templates=templates,
+            templates_json=JSONSerializer().serialize(templates, sort_keys=False, exclude=['name', 'description']),
+            report=JSONSerializer().serialize(report),
         )
 
         context['nav']['title'] = ''
@@ -528,7 +536,7 @@ class ResourceReportView(MapBaseManagerView):
             report = None
 
         graph = Graph.objects.get(graphid=resource.graph_id)
-        cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=graph)
+        cards = Card.objects.filter(graph=graph)
         permitted_cards = []
         permitted_tiles = []
 
@@ -544,8 +552,6 @@ class ResourceReportView(MapBaseManagerView):
                 tile.filter_by_perm(request.user, perm)
                 permitted_tiles.append(tile)
 
-        datatypes = models.DDataType.objects.all()
-        widgets = models.Widget.objects.all()
 
         try:
             map_layers = models.MapLayer.objects.all()
@@ -555,6 +561,11 @@ class ResourceReportView(MapBaseManagerView):
         except AttributeError:
             raise Http404(_("No active report template is available for this resource."))
 
+        cardwidgets = [widget for widgets in [card.cardxnodexwidget_set.order_by(
+            'sortorder').all() for card in permitted_cards] for widget in widgets]
+
+        datatypes = models.DDataType.objects.all()
+        widgets = models.Widget.objects.all()
         templates = models.ReportTemplate.objects.all()
         card_components = models.CardComponent.objects.all()
 
@@ -565,6 +576,7 @@ class ResourceReportView(MapBaseManagerView):
             templates_json=JSONSerializer().serialize(templates, sort_keys=False, exclude=['name', 'description']),
             card_components=card_components,
             card_components_json=JSONSerializer().serialize(card_components),
+            cardwidgets=JSONSerializer().serialize(cardwidgets),
             tiles=JSONSerializer().serialize(permitted_tiles, sort_keys=False),
             cards=JSONSerializer().serialize(permitted_cards, sort_keys=False, exclude=[
                 'is_editable', 'description', 'instructions', 'helpenabled', 'helptext', 'helptitle', 'ontologyproperty']),

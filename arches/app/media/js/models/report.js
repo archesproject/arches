@@ -1,11 +1,9 @@
 define(['arches',
     'models/abstract',
-    'models/card',
-    'models/graph',
     'knockout',
     'knockout-mapping',
     'underscore'
-], function(arches, AbstractModel, CardModel, GraphModel, ko, koMapping, _) {
+], function(arches, AbstractModel, ko, koMapping, _) {
     var ReportModel = AbstractModel.extend({
         /**
          * A backbone model to manage report data
@@ -18,30 +16,7 @@ define(['arches',
 
         initialize: function(options) {
             var self = this;
-
-            var setupTiles = function(card) {
-                card.tiles = _.filter(options.tiles, function(tile) {
-                    return tile.nodegroup_id === card.nodegroup_id;
-                });
-                card.tiles.forEach(function(t1) {
-                    t1.tiles = _.filter(options.tiles, function(t2) {
-                        return t1.tileid === t2.parenttile_id;
-                    });
-                });
-                card.cards.forEach(setupTiles);
-            };
-            options.cards.forEach(setupTiles);
-
-            this.cards = _.map(options.cards, function(card) {
-                var cardModel = new CardModel({
-                    data: _.extend(card, {
-                        nodes: options.graphModel.get('nodes')
-                    }),
-                    datatypelookup: options.graphModel.get('datatypelookup'),
-                    cardComponents: options.cardComponents
-                });
-                return cardModel;
-            });
+            this.cards = options.cards || [];
 
             this.set('reportid', ko.observable());
             this.set('name', ko.observable());
