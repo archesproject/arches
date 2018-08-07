@@ -34,7 +34,7 @@
                 <div id="geometry-type" class="row">
                     <div class="col-xs-6 col-xs-offset-1" data-bind="attr: { 'style': getEditedNode('GEOMETRIC_PLACE_EXPRESSION.SP5', 'value')() === '' ? 'opacity:0;' : '' }">
                         <div class="form-group" style="width:80%; float: left;margin-top:-510px; padding-right: 10px; ">       
-                            <input class="geometry-selection" id="geometry-selection" name="" style="width:40%" data-bind="select2: {value: getEditedNode('LOCATION_CERTAINTY.I6', 'value'), placeholder: 'Location Certainty', dataKey: 'LOCATION_CERTAINTY.I6'}"> <input class="geometry-selection2" id="geometry-selection2" name="" style="width:40%" data-bind="select2: {value: getEditedNode('SPATIAL_COORDINATES_REF_SYSTEM.SP4', 'value'), placeholder: 'CRS', dataKey: 'SPATIAL_COORDINATES_REF_SYSTEM.SP4'}"> 
+                            <input class="geometry-selection" id="geometry-selection" name="" style="width:40%" data-bind="select2: {value: getEditedNode('LOCATION_CERTAINTY.I6', 'value'), placeholder: 'Location Certainty', dataKey: 'LOCATION_CERTAINTY.I6'}"> 
                         </div>
                     </div>
                 </div>
@@ -233,7 +233,6 @@
                                 
                                     <span data-bind="text: nodes.get('GEOMETRIC_PLACE_EXPRESSION.SP5', 'value').split('(')[0].toLowerCase(), attr: { 'style': editing() ? 'font-weight:bold;' : '' }"></span><span class="text-muted">{% trans '( Geometry Type )' %}</span>
                                     <span data-bind="text: nodes.get('LOCATION_CERTAINTY.I6', 'label')"></span><span class="text-muted" data-bind="visible: nodes.get('LOCATION_CERTAINTY.I6', 'value').length > 0">{% trans '( Location Certainty )' %}</span>
-                                    <span data-bind="text: nodes.get('SPATIAL_COORDINATES_REF_SYSTEM.SP4', 'label')"></span><span class="text-muted" data-bind="visible: nodes.get('SPATIAL_COORDINATES_REF_SYSTEM.SP4', 'value').length > 0">{% trans '( Coordinate System )' %}</span>
                                 </a>
                             </div>
                         </dd>
