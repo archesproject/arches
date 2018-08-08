@@ -18,7 +18,7 @@
 
             <!-- Settings Forms -->
             <div class="">
-                <div class="graph-designer-header" data-bind="text: graph.isresource ? '{% trans 'Resource Model Identifiers' %}' : '{% trans 'Branch Identifiers' %}' "></div>
+                <div class="graph-designer-header" data-bind="text: graph.isresource() ? '{% trans 'Resource Model Identifiers' %}' : '{% trans 'Branch Identifiers' %}' "></div>
                 <div id="cards" class="graph-settings-panel-body fade in">
                     <form class="widgets">
                         <div class="row widget-container">
