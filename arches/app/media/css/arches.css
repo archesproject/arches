@@ -2159,7 +2159,8 @@ ul.nav.nav-tabs.nav-justified {
     padding-left: 25px;
 }
 
-.graph-crm-class {
+.graph-crm-class,
+.graph-type {
     font-size: 15px;
     color: #888;
     padding-left: 10px;
