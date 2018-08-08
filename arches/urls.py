@@ -38,7 +38,7 @@ from arches.app.utils.forms import ArchesSetPasswordForm
 from django.contrib import admin
 admin.autodiscover()
 
-uuid_regex = '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
+uuid_regex = settings.UUID_REGEX
 
 urlpatterns = [
     url(r'^$', main.index, name='root'),

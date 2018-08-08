@@ -18,8 +18,6 @@ try:
 except ImportError:
     from StringIO import StringIO
 
-uuid_regex = '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
-
 class RdfWriter(Writer):
 
     def __init__(self, **kwargs):
@@ -186,7 +184,7 @@ class JsonLdReader(Reader):
 
         for su,p,ob in g.triples( (None,  RDF.value, None) ):
             print "%s is a %s"%(su,ob)
-            match = re.match(r'.*?/tile/(?P<tileid>%s)/node/(?P<nodeid>%s)' % (uuid_regex, uuid_regex), str(su))
+            match = re.match(r'.*?/tile/(?P<tileid>%s)/node/(?P<nodeid>%s)' % (settings.UUID_REGEX, settings.UUID_REGEX), str(su))
             if match:
                 if match.group('tileid') not in tiles:
                     tiles[match.group('tileid')] = {} 
