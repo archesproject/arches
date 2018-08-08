@@ -29,11 +29,12 @@ from arches.app.utils.decorators import group_required
 
 
 class CouchdbProxy(ProxyView):
-    #check user credentials here
+    # check user credentials here
     upstream = settings.COUCHDB_URL
 
 
 class APIBase(View):
+
     def dispatch(self, request, *args, **kwargs):
         get_params = request.GET.copy()
         accept = request.META.get('HTTP_ACCEPT')
@@ -47,14 +48,15 @@ class APIBase(View):
             get_params['format'] = format_values[accept]
         for key, value in request.META.iteritems():
             if key.startswith('HTTP_X_ARCHES_'):
-                if key.replace('HTTP_X_ARCHES_','').lower() not in request.GET:
-                    get_params[key.replace('HTTP_X_ARCHES_','').lower()] = value
+                if key.replace('HTTP_X_ARCHES_', '').lower() not in request.GET:
+                    get_params[key.replace('HTTP_X_ARCHES_', '').lower()] = value
         get_params._mutable = False
         request.GET = get_params
         return super(APIBase, self).dispatch(request, *args, **kwargs)
 
 
 class Surveys(APIBase):
+
     def get(self, request):
         group_ids = list(request.user.groups.values_list('id', flat=True))
         projects = MobileSurvey.objects.filter(Q(users__in=[request.user]) | Q(groups__in=group_ids), active=True)
@@ -66,11 +68,13 @@ class Surveys(APIBase):
 class Resources(APIBase):
 
     class AmbiguousGraphException(Exception):
+
         def __init__(self):
             # self.expression = expression
             self.message = 'Graph is ambiguous, need to inspect further down the graph to find the right node'
 
     class DataDoesNotMatchGraphException(Exception):
+
         def __init__(self):
             # self.expression = expression
             self.message = 'A node in the supplied data does not match any node in the subject graph'
@@ -91,83 +95,86 @@ class Resources(APIBase):
 
         return keys
 
-
-    def findBranch(self, node, ontology_property, jsonld):
+    def findBranch(self, nodes, ontology_property, jsonld):
+        """
+            EXAMPLE JSONLD GRAPH:
+            --------------------
+            {
+                "@id": "http://localhost:8000/tile/eed92cf9-b9cd-4e99-9e88-8fb34a0be257/node/e456023d-fa36-11e6-9e3e-026d961c88e6",
+                "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production",
+                "http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as": [
+                    {
+                        "@id": "http://localhost:8000/tile/9fcd9141-930c-4303-b176-78480efbd3d9/node/e4560237-fa36-11e6-9e3e-026d961c88e6",
+                        "@type": "http://www.cidoc-crm.org/cidoc-crm/E17_Type_Assignment",
+                        "http://www.cidoc-crm.org/cidoc-crm/P42_assigned": [
+                            {
+                                "@id": "http://localhost:8000/tile/9fcd9141-930c-4303-b176-78480efbd3d9/node/e456024f-fa36-11e6-9e3e-026d961c88e6",
+                                "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type",
+                                "http://www.w3.org/1999/02/22-rdf-syntax-ns#value": "[u'dfc1fa9b-e3c8-459d-a3fa-d65e1443b9e7']"
+                            },
+                            {
+                                "@id": "http://localhost:8000/tile/9fcd9141-930c-4303-b176-78480efbd3d9/node/e4560246-fa36-11e6-9e3e-026d961c88e6",
+                                "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type",
+                                "http://www.w3.org/1999/02/22-rdf-syntax-ns#value": "a18ed9a3-4924-4cf0-a9a7-82d8c3aefbe0"
+                            }
+                        ],
+                    }
+                ]
+            }
+        """
         if not isinstance(jsonld, list):
             jsonld = [jsonld]
 
         for jsonld_graph in jsonld:
-            print "self.findBranch(%s, %s, %s)" % (node['node'].ontologyclass, ontology_property, jsonld_graph)
-            """
-                EXAMPLE JSONLD GRAPH:
-                --------------------
-                {
-                    "@id": "http://localhost:8000/tile/eed92cf9-b9cd-4e99-9e88-8fb34a0be257/node/e456023d-fa36-11e6-9e3e-026d961c88e6",
-                    "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production",
-                    "http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as": [
-                        {
-                            "@id": "http://localhost:8000/tile/9fcd9141-930c-4303-b176-78480efbd3d9/node/e4560237-fa36-11e6-9e3e-026d961c88e6",
-                            "@type": "http://www.cidoc-crm.org/cidoc-crm/E17_Type_Assignment",
-                            "http://www.cidoc-crm.org/cidoc-crm/P42_assigned": [
-                                {
-                                    "@id": "http://localhost:8000/tile/9fcd9141-930c-4303-b176-78480efbd3d9/node/e456024f-fa36-11e6-9e3e-026d961c88e6",
-                                    "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type",
-                                    "http://www.w3.org/1999/02/22-rdf-syntax-ns#value": "[u'dfc1fa9b-e3c8-459d-a3fa-d65e1443b9e7']"
-                                },
-                                {
-                                    "@id": "http://localhost:8000/tile/9fcd9141-930c-4303-b176-78480efbd3d9/node/e4560246-fa36-11e6-9e3e-026d961c88e6",
-                                    "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type",
-                                    "http://www.w3.org/1999/02/22-rdf-syntax-ns#value": "a18ed9a3-4924-4cf0-a9a7-82d8c3aefbe0"
-                                }
-                            ],
-                        }
-                    ]
-                }
-            """
+            # print ""
+            # print ""
+            # print "searching for branch %s --> %s" % (ontology_property.split('/')[-1], jsonld_graph['@type'].split('/')[-1])
             found = []
-            for child in node['children']:
-                print child['name']
-                # print 'edge'
-                # print ontology_property
-                # print child['parent_edge'].ontologyproperty
-                if child['parent_edge'].ontologyproperty == ontology_property and child['node'].ontologyclass == jsonld_graph['@type']:
-                    found.append(child)
-
-            if len(found) == 1:
-                print 'branch found'
-                return found[0]
-            elif len(found) > 1:
-                """ now we need to search down both graphs trying to find a unique match """
-                new_found = []
-                for new_child in found:
-                    broke_loop = False
-                    for ontology_prop in self.findOntologyProperties(jsonld_graph):
-                        try:
-                            branch = self.findBranch(new_child, ontology_prop, jsonld_graph[ontology_prop])
-                        except:
-                            #if you can't find a branch with that key for that child and class then this child can't be the one
-                            broke_loop = True
-                            break
-
-                    if broke_loop:
-                        continue
-
-                    else:
-                        new_found.append(new_child)
-
-                if len(new_found) == 1:
-                    print 'branch found'
-                    return new_found[0]
-                elif len(new_found) > 1:
-                    # now check to see if 1 and only one child found a branch
-                    raise self.AmbiguousGraphException()
+            nodes_copy = set()
+            invalid_nodes = set()
+            for node in nodes:
+                if node['parent_edge'].ontologyproperty == ontology_property and node['node'].ontologyclass == jsonld_graph['@type']:
+                    # print "found %s" % node['node'].name
+                    nodes_copy.add((node['node'].name, node['node'].pk))
+                    found.append(node)
                 else:
-                    raise self.DataDoesNotMatchGraphException()
-                # graph is ambiguous, need to inspect further down the graph to find the right node
+                    invalid_nodes.add((node['node'].name, node['node'].pk))
+                    pass
+
+            # print 'found %s branches' % len(found)
+            if len(found) == 0:
+                # print 'branch not found'
+                raise self.DataDoesNotMatchGraphException()
+
+            # if len(self.findOntologyProperties(jsonld_graph)) == 0:
+                # print 'at a leaf -- unwinding'
+
+            for ontology_prop in self.findOntologyProperties(jsonld_graph):
+                for found_node in found:
+                    try:
+                        # print 'now searching children of %s node' % found_node['node'].name
+                        branch = self.findBranch(found_node['children'], ontology_prop, jsonld_graph[ontology_prop])
+                    except self.DataDoesNotMatchGraphException as e:
+                        found_node['remove'] = True
+                        invalid_nodes.add((found_node['node'].name, found_node['node'].pk))
+                    except self.AmbiguousGraphException as e:
+                        # print 'threw AmbiguousGraphException'
+                        # print nodes_copy
+                        pass
+
+            valid_nodes = nodes_copy.difference(invalid_nodes)
+
+            if len(valid_nodes) == 1:
+                # print 'branch found'
+                # print valid_nodes
+                valid_node = valid_nodes.pop()
+                for node in nodes:
+                    if node['node'].pk == valid_node[1]:
+                        return node
+            elif len(valid_nodes) > 1:
+                raise self.AmbiguousGraphException()
             else:
                 raise self.DataDoesNotMatchGraphException()
-                # no node was found
-                # graph and supplied json don't match
 
     # context = [{
     #     "@context": {
@@ -208,7 +215,8 @@ class Resources(APIBase):
         if resourceid:
             try:
                 exporter = ResourceExporter(format=format)
-                output = exporter.writer.write_resources(resourceinstanceids=[resourceid], indent=indent, user=request.user)
+                output = exporter.writer.write_resources(
+                    resourceinstanceids=[resourceid], indent=indent, user=request.user)
                 out = output[0]['outputfile'].getvalue()
             except models.ResourceInstance.DoesNotExist:
                 return JSONResponse(status=404)
@@ -252,10 +260,11 @@ class Resources(APIBase):
             except:
                 page = 1
 
-            start = ((page-1)*page_size) + 1
-            end = start+page_size
+            start = ((page - 1) * page_size) + 1
+            end = start + page_size
 
-            base_url = "%s%s" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, reverse('resources',args=['']).lstrip('/'))
+            base_url = "%s%s" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT,
+                                 reverse('resources', args=['']).lstrip('/'))
             out = {
                 "@context": "https://www.w3.org/ns/ldp/",
                 "@id": "",
@@ -270,7 +279,7 @@ class Resources(APIBase):
     def put(self, request, resourceid):
         if user_can_edit_resources(user=request.user):
             data = JSONDeserializer().deserialize(request.body)
-            #print data
+            # print data
             reader = JsonLdReader()
             reader.read_resource(data)
         else:
@@ -285,52 +294,39 @@ class Resources(APIBase):
             graphtree = graph.get_tree()
 
             def getPaths(jsonld, ontology_prop=None, graph=None, parent_node=None, tileid='0'):
-                #print keys
-                #print "-------------------"
-                # p = root[:]
-                # p.append('%s' % (jsonld['@type']))
+                print "-------------------"
                 if not isinstance(jsonld, list):
                     jsonld = [jsonld]
-
-                #tileid = tileid = 0 if tileid is None else (tileid + 1)
 
                 for jsonld_node in jsonld:
                     if parent_node is not None:
                         try:
-                            print ontology_prop
-                            # print parent_node
-                            # print parent_node['name']
-                            print 'searching for %s' % jsonld_node['@type']
-                            branch = self.findBranch(parent_node, ontology_prop, jsonld_node)
+                            branch = self.findBranch(parent_node['children'], ontology_prop, jsonld_node)
                             if branch['node'].nodegroup != parent_node['node'].nodegroup:
-                                # self.tile_id = self.tile_id + 1
-                                #tileid = ("%s_%s") % (tileid, str(self.tile_id))
                                 tileid = uuid.uuid4()
 
                         except self.DataDoesNotMatchGraphException as e:
-                            print 'ignoring data for now'
+                            print 'DataDoesNotMatchGraphException'
                             branch = None
+                            
                         except self.AmbiguousGraphException as e:
                             print 'AmbiguousGraphException'
                             branch = None
-                        
                     else:
                         branch = graph
-                        
-                    
+
                     ontology_properties = self.findOntologyProperties(jsonld_node)
-                    
+
                     if branch is not None:
-                        jsonld_node['@archesid'] = '%stile/%s/node/%s' % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, tileid, branch['node'].nodeid)
-                        
+                        jsonld_node[
+                            '@archesid'] = '%stile/%s/node/%s' % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, tileid, branch['node'].nodeid)
+
                         if len(ontology_properties) > 0:
                             for ontology_property in ontology_properties:
-                                print ontology_property
-                                getPaths(jsonld_node[ontology_property], ontology_prop=ontology_property, graph=None, parent_node=branch, tileid=tileid)
+                                getPaths(jsonld_node[ontology_property], ontology_prop=ontology_property,
+                                         graph=None, parent_node=branch, tileid=tileid)
                 return jsonld
 
-            # import ipdb
-            # ipdb.set_trace()
             paths = getPaths(data, ontology_prop=None, graph=graphtree, parent_node=None)
 
         try:
@@ -362,7 +358,6 @@ class Resources(APIBase):
             if ret != None:
                 return ret
 
-
     def delete(self, request, resourceid):
         if user_can_edit_resources(user=request.user):
             try:
@@ -374,6 +369,7 @@ class Resources(APIBase):
             return JSONResponse(status=500)
 
         return JSONResponse(status=200)
+
 
 @method_decorator(csrf_exempt, name='dispatch')
 class Concepts(APIBase):
@@ -395,8 +391,8 @@ class Concepts(APIBase):
                 try:
                     ret = []
                     concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
-                        include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
-                        depth_limit=depth_limit, up_depth_limit=None, lang=lang)
+                                                  include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
+                                                  depth_limit=depth_limit, up_depth_limit=None, lang=lang)
 
                     ret.append(concept_graph)
                 except models.Concept.DoesNotExist:
