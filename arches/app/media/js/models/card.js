@@ -183,6 +183,7 @@ define([
                 return w.get('sortorder')() > ww.get('sortorder')();
             });
             this.get('widgets')(widgets);
+            this._card(JSON.stringify(this.toJSON()));
         },
 
         reset: function() {
