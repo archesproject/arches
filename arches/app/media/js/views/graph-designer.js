@@ -28,6 +28,7 @@ define([
             viewModel.graphid = ko.observable(data.graphid);
             viewModel.activeTab = ko.observable('graph');
             viewModel.viewState = ko.observable('design');
+            viewModel.helpTemplate(viewData.help);
             viewModel.graphSettingsVisible = ko.observable(false);
             viewModel.graph = koMapping.fromJS(data['graph']);
             viewModel.ontologies = ko.observable(data['ontologies']);
@@ -41,6 +42,11 @@ define([
                 return !graph.isresource;
             });
 
+            viewModel.graph.ontology = ko.computed(function() {
+                return viewModel.ontologies().find(function(obj) {
+                    return obj.ontologyid === viewModel.graph.ontology_id();
+                });
+            });
             viewModel.groupedGraphs = ko.observable({
                 groups: [
                     { name: 'Resource Models', items: resources },
@@ -107,6 +113,24 @@ define([
                 graphModel: viewModel.graphModel
             });
 
+            viewModel.permissionTree = new CardTreeViewModel({
+                graph: viewModel.graph,
+                graphModel: viewModel.graphModel,
+                multiselect: true
+            });
+
+            viewModel.selectedCards = ko.computed(function() {
+                var selection = viewModel.permissionTree.selection();
+                if (selection) {
+                    if (selection.widgets) {
+                        return selection;
+                    }
+                    return selection.parent;
+                } else {
+                    return null;
+                }
+            });
+
             viewModel.selectedCard = ko.computed(function() {
                 var selection = viewModel.cardTree.selection();
                 if (selection) {
@@ -137,7 +161,7 @@ define([
             });
 
             viewModel.permissionsDesigner = new PermissionDesigner({
-                cardTree: viewModel.cardTree
+                cardTree: viewModel.permissionTree
             });
 
             viewModel.graphSettingsViewModel = new GraphSettingsViewModel({
@@ -169,7 +193,7 @@ define([
                 viewModel.loading(true);
                 $.ajax({
                     type: 'GET',
-                    url: arches.urls.new_graph_settings(data.graphid),
+                    url: arches.urls.graph_settings(data.graphid),
                     data: {'search': true, 'csrfmiddlewaretoken': '{{ csrf_token }}'}})
                     .done(function(data) {
                         self.graphSettingsViewModel.resource_data(data.resources);
@@ -195,6 +219,17 @@ define([
                     viewModel.permissionsDesigner.getPermissionManagerData();
                     loadPermissionData.dispose();
                 }
+            });
+
+            var helpContentLookup = {
+                permissions: 'permissions-manager-help',
+                graph: 'graph-designer-help',
+                card: 'card-manager-help'
+            };
+
+            viewModel.activeTab.subscribe(function(tab) {
+                viewModel.helpTemplate(helpContentLookup[tab]);
+                viewModel.getHelp();
             });
 
             viewModel.graphView = new GraphView({

@@ -121,11 +121,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             {% trans 'Cards' %}
                         </a>
                     </li>
+                    <!--ko if: graph.isresource() -->
                     <li data-bind="css: { active: activeTab() === 'permissions' }, click: function(){activeTab('permissions');}">
                         <a class="graph-designer-tab ion-android-folder" aria-expanded="false">
                             {% trans 'Permissions' %}
                         </a>
                     </li>
+                    <!--/ko-->
                 </ul>
             </div>
 
@@ -143,7 +145,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
 
                 <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'permissions' }">
-                    <div class="jstree jstree-default" data-bind="visible: true, with: cardTree" style="display: none;">
+                    <div class="jstree jstree-default" data-bind="visible: true, with: permissionTree" style="display: none;">
                         {% include 'views/graph/graph-designer/card-tree-permissions.htm' %}
                     </div>
                 </div>
@@ -165,7 +167,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div style="padding: 4px 0px 12px 6px">{% trans "Add a branch to your model from the library" %}</div>
                     </div>
                     <div data-bind="with: branchListView">
-                        {% include 'views/graph/graph-manager/branch-list.htm' %}
+                        {% include 'views/graph/graph-designer/branch-list.htm' %}
                     </div>
                 </div>
 
@@ -204,17 +206,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
                 <!-- Card Manager -->
                 <div class="flex tab-pane fade in graph-designer" data-bind="css: { active: activeTab() === 'card' }">
-                    <!-- ko component: {
+                    <div class="card-component-panel">
+                        <!-- ko component: {
                         name: cardTree.cardComponentLookup[selectedCard().model.component_id()].componentname,
                         params: {
-                            card: selectedCard(),
-                            tile: selectedCard().getNewTile(),
-                            provisionalTileViewModel: null,
-                            reviewer: null,
-                            loading: loading,
-                            form: cardTree
-                        }
-                    } --><!-- /ko -->
+                                card: selectedCard(),
+                                tile: selectedCard().getNewTile(),
+                                provisionalTileViewModel: null,
+                                reviewer: null,
+                                loading: loading,
+                                form: cardTree,
+                                preview: true
+                            }
+                        } --><!-- /ko -->
+                    </div>
                 </div>
                 <!-- /ko -->
             </div>

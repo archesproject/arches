@@ -29,7 +29,6 @@ from django.views.generic import View
 from django.forms.models import model_to_dict
 from django.template.loader import render_to_string
 from arches.app.models import models
-from arches.app.models.forms import Form
 from arches.app.models.card import Card
 from arches.app.models.graph import Graph
 from arches.app.models.tile import Tile
@@ -145,6 +144,11 @@ class NewResourceEditorView(MapBaseManagerView):
         map_markers = models.MapMarker.objects.all()
         map_sources = models.MapSource.objects.all()
         geocoding_providers = models.Geocoder.objects.all()
+        templates = models.ReportTemplate.objects.all()
+        try:
+            report = models.Report.objects.get(graph=graph, active=True)
+        except models.Report.DoesNotExist:
+            report = None
 
         context = self.get_context_data(
             main_script=main_script,
@@ -172,6 +176,9 @@ class NewResourceEditorView(MapBaseManagerView):
             geocoding_providers=geocoding_providers,
             active_report_count=models.Report.objects.filter(graph=graph, active=True).count(),
             user_is_reviewer=json.dumps(user_is_reviewer),
+            report_templates=templates,
+            templates_json=JSONSerializer().serialize(templates, sort_keys=False, exclude=['name', 'description']),
+            report=JSONSerializer().serialize(report),
         )
 
         context['nav']['title'] = ''
@@ -223,21 +230,13 @@ class ResourceEditorView(MapBaseManagerView):
                 pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
             graph = Graph.objects.get(graphid=graphid)
             relationship_type_values = get_resource_relationship_types()
-            form = Form(resource_instance.pk)
             datatypes = models.DDataType.objects.all()
             widgets = models.Widget.objects.all()
             map_layers = models.MapLayer.objects.all()
             map_markers = models.MapMarker.objects.all()
             map_sources = models.MapSource.objects.all()
             geocoding_providers = models.Geocoder.objects.all()
-            forms = graph.form_set.filter(visible=True)
-            forms_x_cards = models.FormXCard.objects.filter(form__in=forms)
-            forms_w_cards = []
             required_widgets = []
-
-            for form_x_card in forms_x_cards:
-                if request.user.has_perm('read_nodegroup', form_x_card.card.nodegroup):
-                    forms_w_cards.append(form_x_card.form)
 
             widget_datatypes = [v.datatype for k, v in graph.nodes.iteritems()]
             widgets = widgets.filter(datatype__in=widget_datatypes)
@@ -259,8 +258,6 @@ class ResourceEditorView(MapBaseManagerView):
                 resource_type=graph.name,
                 relationship_types=relationship_type_values,
                 iconclass=graph.iconclass,
-                form=JSONSerializer().serialize(form),
-                forms=JSONSerializer().serialize(forms_w_cards),
                 datatypes_json=JSONSerializer().serialize(datatypes, exclude=['iconclass', 'modulename', 'classname']),
                 datatypes=datatypes,
                 widgets=widgets,
@@ -428,7 +425,6 @@ class ResourceData(View):
 
         return HttpResponseNotFound()
 
-
 @method_decorator(can_read_resource_instance(), name='dispatch')
 class ResourceTiles(View):
 
@@ -533,27 +529,21 @@ class ResourceReportView(MapBaseManagerView):
                     summary['resources'].append({'instance_id': rr['resourceinstanceid'], 'displayname': rr[
                                                 'displayname'], 'relationships': relationship_summary})
 
-        tiles = Tile.objects.filter(resourceinstance=resource)
+        tiles = Tile.objects.filter(resourceinstance=resource).order_by('sortorder')
         try:
             report = models.Report.objects.get(graph=resource.graph, active=True)
         except models.Report.DoesNotExist:
             report = None
 
         graph = Graph.objects.get(graphid=resource.graph_id)
-        forms = graph.form_set.filter(visible=True)
-        forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
-        cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=graph)
+        cards = Card.objects.filter(graph=graph).order_by('sortorder')
         permitted_cards = []
-        permitted_forms_x_cards = []
-        permitted_forms = []
         permitted_tiles = []
 
         perm = 'read_nodegroup'
 
         for card in cards:
             if request.user.has_perm(perm, card.nodegroup):
-                matching_forms_x_card = filter(lambda forms_x_card: card.nodegroup_id ==
-                                               forms_x_card.card.nodegroup_id, forms_x_cards)
                 card.filter_by_perm(request.user, perm)
                 permitted_cards.append(card)
 
@@ -562,8 +552,6 @@ class ResourceReportView(MapBaseManagerView):
                 tile.filter_by_perm(request.user, perm)
                 permitted_tiles.append(tile)
 
-        datatypes = models.DDataType.objects.all()
-        widgets = models.Widget.objects.all()
 
         try:
             map_layers = models.MapLayer.objects.all()
@@ -573,16 +561,23 @@ class ResourceReportView(MapBaseManagerView):
         except AttributeError:
             raise Http404(_("No active report template is available for this resource."))
 
+        cardwidgets = [widget for widgets in [card.cardxnodexwidget_set.order_by(
+            'sortorder').all() for card in permitted_cards] for widget in widgets]
+
+        datatypes = models.DDataType.objects.all()
+        widgets = models.Widget.objects.all()
         templates = models.ReportTemplate.objects.all()
+        card_components = models.CardComponent.objects.all()
 
         context = self.get_context_data(
             main_script='views/resource/report',
             report=JSONSerializer().serialize(report),
             report_templates=templates,
             templates_json=JSONSerializer().serialize(templates, sort_keys=False, exclude=['name', 'description']),
-            forms=JSONSerializer().serialize(forms, sort_keys=False, exclude=['iconclass', 'subtitle']),
+            card_components=card_components,
+            card_components_json=JSONSerializer().serialize(card_components),
+            cardwidgets=JSONSerializer().serialize(cardwidgets),
             tiles=JSONSerializer().serialize(permitted_tiles, sort_keys=False),
-            forms_x_cards=JSONSerializer().serialize(forms_x_cards, sort_keys=False),
             cards=JSONSerializer().serialize(permitted_cards, sort_keys=False, exclude=[
                 'is_editable', 'description', 'instructions', 'helpenabled', 'helptext', 'helptitle', 'ontologyproperty']),
             datatypes_json=JSONSerializer().serialize(

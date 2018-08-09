@@ -102,7 +102,7 @@
                                         <ul class="permissions-selected" style="display:none;" data-bind="foreach: permissionsDesigner.permissionSettingsForm.selectedCards, visible: permissionsDesigner.permissionSettingsForm.selectedCards().length !== 0">
                                             <!-- ko if $data.permsLiteral: -->
                                             <li class="permissions-node-row">
-                                                <span class="permissions-node" data-bind="text: $data.name"></span>
+                                                <span class="permissions-node" data-bind="text: $data.model.name()"></span>
                                                 <span class="permissions-readout" data-bind="text: $data.permsLiteral"></span>
                                             </li>
                                             <!--/ko -->

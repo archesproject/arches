@@ -664,7 +664,7 @@ class CsvReader(Reader):
 
                         # reset values for next resource instance
                         populated_tiles = []
-                        resourceinstanceid = process_resourceid(row['ResourceID'], overwrite)
+                        f = process_resourceid(row['ResourceID'], overwrite)
                         populated_nodegroups[resourceinstanceid] = []
 
                     source_data = column_names_to_targetids(row, mapping, row_number)

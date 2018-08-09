@@ -22,7 +22,7 @@ from django.conf.urls import include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from arches.app.views import concept, main, map, search, graph, tileserver, api
 from arches.app.views.admin import ReIndexResources
-from arches.app.views.graph import GraphDesignerView, GraphManagerView, GraphSettingsView, NewGraphSettingsView, GraphDataView, DatatypeTemplateView, CardManagerView, CardView, FormManagerView, FormView, ReportManagerView, ReportEditorView, FunctionManagerView, PermissionManagerView, PermissionDataView
+from arches.app.views.graph import GraphDesignerView, GraphSettingsView, GraphDataView, GraphManagerView, DatatypeTemplateView, CardView, ReportManagerView, ReportEditorView, FunctionManagerView, PermissionDataView
 from arches.app.views.resource import ResourceEditorView, ResourceListView, ResourceData, ResourceCards, ResourceReportView, ResourceReportData, RelatedResourcesView, ResourceDescriptors, ResourceEditLogView, ResourceTiles
 from arches.app.views.resource import NewResourceEditorView
 from arches.app.views.concept import RDMView
@@ -78,8 +78,6 @@ urlpatterns = [
     url(r'^graph/permissions$', PermissionDataView.as_view(), name='permission_data'),
     url(r'^graph/permissions/permission_manager_data$', PermissionDataView.as_view(action='get_permission_manager_data'), name='permission_manager_data'),
     url(r'^graph/(?P<graphid>%s|())$' % uuid_regex, GraphManagerView.as_view(), name='graph'),
-    url(r'^graph/(?P<graphid>%s)/settings$' % uuid_regex, GraphSettingsView.as_view(), name='graph_settings'),
-    url(r'^graph/(?P<graphid>%s)/card_manager$' % uuid_regex, CardManagerView.as_view(), name='card_manager'),
     url(r'^graph/(?P<graphid>%s)/append_branch$' % uuid_regex, GraphDataView.as_view(action='append_branch'), name='append_branch'),
     url(r'^graph/(?P<graphid>%s)/append_node$' % uuid_regex, GraphDataView.as_view(action='append_node'), name='append_node'),
     url(r'^graph/(?P<graphid>%s)/move_node$' % uuid_regex, GraphDataView.as_view(action='move_node'), name='move_node'),
@@ -87,22 +85,19 @@ urlpatterns = [
     url(r'^graph/(?P<graphid>%s)/delete_node$' % uuid_regex, GraphDataView.as_view(action='delete_node'), name='delete_node'),
     url(r'^graph/(?P<graphid>%s)/clone$' % uuid_regex, GraphDataView.as_view(action='clone_graph'), name='clone_graph'),
     url(r'^graph/(?P<graphid>%s)/export$' % uuid_regex, GraphDataView.as_view(action='export_graph'), name='export_graph'),
+    url(r'^graph/(?P<graphid>%s)/delete$' % uuid_regex, GraphDataView.as_view(action='delete_graph'), name='delete_graph'),
     url(r'^graph/(?P<graphid>%s)/export_branch$' % uuid_regex, GraphDataView.as_view(action='export_branch'), name='export_branch'),
     url(r'^graph/(?P<graphid>%s)/export_mapping_file$' % uuid_regex, GraphDataView.as_view(action='export_mapping_file'), name='export_mapping_file'),
     url(r'^graph/(?P<graphid>%s)/get_related_nodes/(?P<nodeid>%s)$' % (uuid_regex, uuid_regex), GraphDataView.as_view(action='get_related_nodes'), name='get_related_nodes'),
     url(r'^graph/(?P<graphid>%s)/get_valid_domain_nodes/(?P<nodeid>%s|())$' % (uuid_regex, uuid_regex), GraphDataView.as_view(action='get_valid_domain_nodes'), name='get_valid_domain_nodes'),
     url(r'^graph/(?P<graphid>%s)/get_domain_connections$' % uuid_regex, GraphDataView.as_view(action='get_domain_connections'), name='get_domain_connections'),
-    url(r'^graph/(?P<graphid>%s)/form_manager$' % uuid_regex, FormManagerView.as_view(), name='form_manager'),
-    url(r'^graph/(?P<graphid>%s)/add_form$' % uuid_regex, FormManagerView.as_view(action='add_form'), name='add_form'),
-    url(r'^graph/(?P<graphid>%s)/reorder_forms$' % uuid_regex, FormManagerView.as_view(action='reorder_forms'), name='reorder_forms'),
     url(r'^graph/(?P<graphid>%s)/report_manager$' % uuid_regex, ReportManagerView.as_view(), name='report_manager'),
     url(r'^graph/(?P<graphid>%s)/add_report$' % uuid_regex, ReportManagerView.as_view(), name='add_report'),
     url(r'^graph/(?P<graphid>%s)/function_manager$' % uuid_regex, FunctionManagerView.as_view(), name='function_manager'),
     url(r'^graph/(?P<graphid>%s)/apply_functions$' % uuid_regex, FunctionManagerView.as_view(), name='apply_functions'),
     url(r'^graph/(?P<graphid>%s)/remove_functions$' % uuid_regex, FunctionManagerView.as_view(), name='remove_functions'),
-    url(r'^graph/(?P<graphid>%s)/permissions$' % uuid_regex, PermissionManagerView.as_view(), name='permission_manager'),
     url(r'^graph_designer/(?P<graphid>%s)$' % uuid_regex, GraphDesignerView.as_view(), name='graph_designer'),
-    url(r'^graph_settings/(?P<graphid>%s)$' % uuid_regex, NewGraphSettingsView.as_view(), name='new_graph_settings'),
+    url(r'^graph_settings/(?P<graphid>%s)$' % uuid_regex, GraphSettingsView.as_view(), name='graph_settings'),
     url(r'^components/datatypes/(?P<template>[a-zA-Z_-]*)', DatatypeTemplateView.as_view(), name='datatype_template'),
     url(r'^resource$', ResourceListView.as_view(), name='resource'),
     url(r'^resource/(?P<resourceid>%s)/(?P<graphid>%s)/add_resource$' % (uuid_regex, uuid_regex), ResourceEditorView.as_view(), name='old_add_resource'),
@@ -123,8 +118,6 @@ urlpatterns = [
     url(r'^report/(?P<resourceid>%s)$' % uuid_regex, ResourceReportView.as_view(), name='resource_report'),
     url(r'^card/(?P<cardid>%s|())$' % uuid_regex, CardView.as_view(action='update_card'), name='card'),
     url(r'^reorder_cards/', CardView.as_view(action='reorder_cards'), name='reorder_cards'),
-    url(r'^form/(?P<formid>%s|())$' % uuid_regex, FormView.as_view(), name='form'),
-    url(r'^form/(?P<formid>%s)/delete$' % uuid_regex, FormView.as_view(), name='delete_form'),
     url(r'^report_editor/(?P<reportid>%s|())$' % uuid_regex, ReportEditorView.as_view(), name='report_editor'),
     url(r'^report/data$', ResourceReportData.as_view(), name='report_data'),
     url(r'^node/(?P<graphid>%s)$' % uuid_regex, GraphDataView.as_view(action='update_node'), name='node'),

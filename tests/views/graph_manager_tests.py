@@ -24,7 +24,7 @@ from django.test import Client
 from django.core import management
 from django.core.urlresolvers import reverse
 from arches.app.models.graph import Graph
-from arches.app.models.models import Node, NodeGroup, GraphModel, Edge
+from arches.app.models.models import Node, NodeGroup, GraphModel, CardModel, Edge
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 # these tests can be run from the command line via
@@ -34,6 +34,127 @@ class GraphManagerViewTests(ArchesTestCase):
 
     def setUp(self):
         self.NODE_NODETYPE_GRAPHID = '22000000-0000-0000-0000-000000000001'
+
+        if len(Graph.objects.filter(graphid=self.NODE_NODETYPE_GRAPHID)) == 0:
+            # Node Branch
+            graph_dict = {
+                "author": "Arches",
+                "color": None,
+                "deploymentdate": None,
+                "deploymentfile": None,
+                "description": "Represents a single node in a graph",
+                "graphid": "22000000-0000-0000-0000-000000000000",
+                "iconclass": "fa fa-circle",
+                "isactive": True,
+                "isresource": False,
+                "name": "Node",
+                "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
+                "subtitle": "Represents a single node in a graph.",
+                "version": "v1"
+            }
+            GraphModel.objects.create(**graph_dict).save()
+
+            node_dict = {
+                "config": None,
+                "datatype": "semantic",
+                "description": "Represents a single node in a graph",
+                "graph_id": "22000000-0000-0000-0000-000000000000",
+                "isrequired": False,
+                "issearchable": True,
+                "istopnode": True,
+                "name": "Node",
+                "nodegroup_id": None,
+                "nodeid": "20000000-0000-0000-0000-100000000000",
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity",
+            }
+            Node.objects.create(**node_dict).save()
+
+            # Node/Node Type Branch
+            graph_dict = {
+                "author": "Arches",
+                "color": None,
+                "deploymentdate": None,
+                "deploymentfile": None,
+                "description": "Represents a node and node type pairing",
+                "graphid": "22000000-0000-0000-0000-000000000001",
+                "iconclass": "fa fa-angle-double-down",
+                "isactive": True,
+                "isresource": False,
+                "name": "Node/Node Type",
+                "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
+                "subtitle": "Represents a node and node type pairing",
+                "version": "v1"
+            }
+            GraphModel.objects.create(**graph_dict).save()
+
+            nodegroup_dict = {
+                "cardinality": "n",
+                "legacygroupid": "",
+                "nodegroupid": "20000000-0000-0000-0000-100000000001",
+                "parentnodegroup_id": None
+            }
+            NodeGroup.objects.create(**nodegroup_dict).save()
+
+            card_dict = {
+                "active": True,
+                "cardid": "bf9ea150-3eaa-11e8-8b2b-c3a348661f61",
+                "description": "Represents a node and node type pairing",
+                "graph_id": "22000000-0000-0000-0000-000000000001",
+                "helpenabled": False,
+                "helptext": None,
+                "helptitle": None,
+                "instructions": "",
+                "name": "Node/Node Type",
+                "nodegroup_id": "20000000-0000-0000-0000-100000000001",
+                "sortorder": None,
+                "visible": True
+            }
+            CardModel.objects.create(**card_dict).save()
+
+            nodes = [
+                {
+                    "config": None,
+                    "datatype": "string",
+                    "description": "",
+                    "graph_id": "22000000-0000-0000-0000-000000000001",
+                    "isrequired": False,
+                    "issearchable": True,
+                    "istopnode": True,
+                    "name": "Node",
+                    "nodegroup_id": "20000000-0000-0000-0000-100000000001",
+                    "nodeid": "20000000-0000-0000-0000-100000000001",
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"
+                },
+                {
+                    "config": {
+                        "rdmCollection": None
+                    },
+                    "datatype": "concept",
+                    "description": "",
+                    "graph_id": "22000000-0000-0000-0000-000000000001",
+                    "isrequired": False,
+                    "issearchable": True,
+                    "istopnode": False,
+                    "name": "Node Type",
+                    "nodegroup_id": "20000000-0000-0000-0000-100000000001",
+                    "nodeid": "20000000-0000-0000-0000-100000000002",
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E55_Type"
+                }
+            ]
+
+            for node in nodes:
+                Node.objects.create(**node).save()
+
+            edges_dict = {
+                "description": None,
+                "domainnode_id": "20000000-0000-0000-0000-100000000001",
+                "edgeid": "22200000-0000-0000-0000-000000000001",
+                "graph_id": "22000000-0000-0000-0000-000000000001",
+                "name": None,
+                "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type",
+                "rangenode_id": "20000000-0000-0000-0000-100000000002"
+            }
+            Edge.objects.create(**edges_dict).save()
 
         graph = Graph.new()
         graph.name = "TEST GRAPH"
@@ -52,7 +173,6 @@ class GraphManagerViewTests(ArchesTestCase):
         graph.root.ontologyclass = 'http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity'
         graph.root.datatype = 'semantic'
         graph.root.save()
-
         graph = Graph.objects.get(graphid=graph.pk)
         self.appended_branch_1 = graph.append_branch('http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID)
         self.appended_branch_2 = graph.append_branch('http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID)
@@ -81,7 +201,7 @@ class GraphManagerViewTests(ArchesTestCase):
         graphs = json.loads(response.context['graphs'])
         self.assertEqual(len(graphs), GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).count())
 
-        url = reverse('graph', kwargs={'graphid':self.GRAPH_ID})
+        url = reverse('graph_designer', kwargs={'graphid':self.GRAPH_ID})
         response = self.client.get(url)
         graph = json.loads(response.context['graph_json'])
 
@@ -94,14 +214,12 @@ class GraphManagerViewTests(ArchesTestCase):
     def test_graph_settings(self):
         """
         Test the graph settings view
-
         """
         self.client.login(username='admin', password='admin')
-        url = reverse('graph_settings', kwargs={'graphid':self.GRAPH_ID})
+        url = reverse('graph_settings', kwargs={'graphid': self.GRAPH_ID})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-
-        graph = json.loads(response.context['graph_json'])
+        graph = json.loads(response.content)
 
         graph['name'] = 'new graph name'
         post_data = {'graph':graph, 'relatable_resource_ids': [str(self.ROOT_ID)]}
@@ -193,7 +311,7 @@ class GraphManagerViewTests(ArchesTestCase):
 
         """
         self.client.login(username='admin', password='admin')
-        url = reverse('graph', kwargs={'graphid':self.GRAPH_ID})
+        url = reverse('delete_graph', kwargs={'graphid':self.GRAPH_ID})
         response = self.client.delete(url)
 
         node_count = Node.objects.filter(graph_id=self.GRAPH_ID).count()

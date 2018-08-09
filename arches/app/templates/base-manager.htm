@@ -150,7 +150,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         {% endif %}
 
                         {% if nav.help.0 != '' %}
-                        <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right" data-bind="click: function(){ getHelp('{{ help }}') }">
+                        <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right" data-bind="click: function(){ getHelp('{{ help }}'); helpOpen(true) }">
                             <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Help" %}'>
                               <i class="ion-help"></i>
                             </div>
@@ -159,7 +159,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
 
                     <!-- Help Panel -->
-                    <div id="ep-edits-panel" class="ep-edits" style="display:none">
+                    <div id="ep-edits-panel" class="ep-edits" style="display:none;">
                         <div class="ep-edits-header" style="padding-right:0px">
                             <div class="ep-edits-title">
                                 <span>{% trans 'My Edit History' %}</span>
@@ -182,12 +182,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
 
                     <!-- Help Panel -->
-                    <div id="ep-help-panel" class="ep-help" style="display:none">
+                    <div id="ep-help-panel" class="ep-help" style="display: none" data-bind="slide: helpOpen, duration: 400, direction: {direction: 'right'}, easing: 'slide'">
                         <div class="ep-help-header" style="padding-right:0px">
                             <div class="ep-help-title">
                                 <span>{% trans nav.help.0 %}</span>
                             </div>
-                            <a href="javascript:void(0);" class="ep-help-toggle ep-help-close ep-tools ep-tools-right" style="border:none;">
+                            <a href="javascript:void(0);" class="ep-help-toggle ep-help-close ep-tools ep-tools-right" style="border:none" data-bind="click: function(){helpOpen(false)}">
                                 <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Close Help" %}'>
                                   <i class="fa fa-times-circle fa-lg"></i>
                                 </div>
@@ -393,7 +393,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         define('view-data', [], function () {
             return {
                 graphs: {{graphs}},
-                createableResources: {{createable_resources}}
+                createableResources: {{createable_resources}},
+                help: "{{help}}",
             };
         });
         {% endautoescape %}

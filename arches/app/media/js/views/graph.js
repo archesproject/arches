@@ -21,7 +21,7 @@ require([
         * @param {object} options - additional options to pass to the view
         * @return {object} an instance of GraphView
         */
-        initialize: function (options) {
+        initialize: function(options) {
             var self = this;
             /**
             * creates a request to add a new graph; redirects to the graph settings
@@ -40,14 +40,14 @@ require([
                     success: function(response) {
                         window.location = arches.urls.graph_designer(response.graphid);
                     },
-                    error: function(response) {
+                    error: function() {
                         self.viewModel.loading(false);
                     }
                 });
             };
 
-            this.viewModel.leaveDropdown = function(e){
-              $('.dropdown').dropdown('toggle')
+            this.viewModel.leaveDropdown = function(){
+                $('.dropdown').dropdown('toggle');
             };
 
             this.viewModel.allGraphs().forEach(function(graph) {
@@ -55,7 +55,7 @@ require([
                 graph.isCard = false;
                 if (graphManagerData && typeof graphManagerData.root_nodes === 'object') {
                     graph.root = _.find(graphManagerData.root_nodes, function(node) {
-                        return node.graph_id === graph.graphid
+                        return node.graph_id === graph.graphid;
                     });
                     if (graph.root) {
                         graph.isCard = (graph.root.nodegroup_id === graph.root.nodeid);
@@ -72,22 +72,22 @@ require([
                 graph.exportMappingFile = function(model) {
                     window.open(arches.urls.export_mapping_file(graph.graphid), '_blank');
                 };
-                graph.deleteGraph = function () {
+                graph.deleteGraph = function() {
                     self.viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmGraphDelete.title, arches.confirmGraphDelete.text, function() {
                         return;
                     }, function(){
                         self.viewModel.loading(true);
                         $.ajax({
-                            complete: function (response, status) {
+                            type: "DELETE",
+                            url: arches.urls.delete_graph(graph.graphid),
+                            complete: function(response, status) {
                                 self.viewModel.loading(false);
                                 if (status === 'success') {
-                                  self.viewModel.allGraphs.remove(graph);
+                                    self.viewModel.allGraphs.remove(graph);
                                 } else {
-                                  self.viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.title, response.responseJSON.message));
+                                    self.viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.title, response.responseJSON.message));
                                 }
-                            },
-                            type: "DELETE",
-                            url: graph.graphid
+                            }
                         });
                     }));
                 };

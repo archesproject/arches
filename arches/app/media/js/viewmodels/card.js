@@ -19,9 +19,9 @@ define([
     */
     var isChildSelected = function(parent) {
         var childSelected = false;
-        var childrenKey = parent.tiles ? 'tiles' : 'cards';
+        var childrenKey = 'tileid' in parent ? 'cards': 'tiles';
         ko.unwrap(parent[childrenKey]).forEach(function(child) {
-            if (child.selected() || isChildSelected(child)) {
+            if (child.selected && child.selected() || isChildSelected(child)) {
                 childSelected = true;
             }
         });
@@ -30,9 +30,9 @@ define([
 
     var doesChildHaveProvisionalEdits = function(parent) {
         var hasEdits = false;
-        var childrenKey = parent.tiles ? 'tiles' : 'cards';
+        var childrenKey = 'tileid' in parent ? 'cards': 'tiles';
         ko.unwrap(parent[childrenKey]).forEach(function(child) {
-            if (child.hasprovisionaledits() || doesChildHaveProvisionalEdits(child)) {
+            if (child.hasprovisionaledits && child.hasprovisionaledits() || doesChildHaveProvisionalEdits(child)) {
                 hasEdits = true;
             }
         });
@@ -51,23 +51,29 @@ define([
     var CardViewModel = function(params) {
         var TileViewModel = require('viewmodels/tile');
         var self = this;
-        var selection = params.selection || ko.observable();
+        var hover = params.hover || ko.observable();
         var scrollTo = params.scrollTo || ko.observable();
         var filter = params.filter || ko.observable();
         var loading = params.loading || ko.observable();
         var perms = ko.observableArray();
         var permsLiteral = ko.observableArray();
         var nodegroups = params.graphModel.get('nodegroups');
-
+        var multiselect = params.multiselect || false;
+        var selection;
+        if (params.multiselect) {
+            selection = params.selection || ko.observableArray([]);
+        } else {
+            selection = params.selection || ko.observable();
+        }
         var nodegroup = _.find(ko.unwrap(nodegroups), function(group) {
             return ko.unwrap(group.nodegroupid) === ko.unwrap(params.card.nodegroup_id);
         });
 
         var cardModel = new CardModel({
-            data: _.extend({
+            data: _.extend(params.card, {
                 widgets: params.cardwidgets,
                 nodes: params.graphModel.get('nodes')
-            }, params.card),
+            }),
             datatypelookup: params.graphModel.get('datatypelookup'),
         });
 
@@ -85,6 +91,20 @@ define([
                     },
                     owner: widget
                 });
+                widget.hovered = ko.pureComputed({
+                    read: function() {
+                        return hover() === this;
+                    },
+                    write: function(value) {
+                        if (value === true) {
+                            hover(this);
+                        }
+                        if (value === null) {
+                            hover(null);
+                        }
+                    },
+                    owner: widget
+                });
             });
         };
 
@@ -96,6 +116,7 @@ define([
 
         _.extend(this, nodegroup, {
             model: cardModel,
+            multiselect: params.multiselect,
             widgets: cardModel.widgets,
             parent: params.tile,
             expanded: ko.observable(false),
@@ -155,6 +176,7 @@ define([
                     cards: params.cards,
                     tiles: params.tiles,
                     selection: selection,
+                    multiselect: multiselect,
                     scrollTo: scrollTo,
                     loading: loading,
                     filter: filter,
@@ -173,10 +195,19 @@ define([
             }),
             selected: ko.pureComputed({
                 read: function() {
-                    return selection() === this;
+                    if (self.multiselect) {
+                        return _.contains(selection(), this);
+                    } else {
+                        return selection() === this;
+                    }
                 },
                 write: function(value) {
-                    if (value) {
+                    if (self.multiselect && value && _.contains(selection(), this) === false) {
+                        selection.push(this);
+                    } else if (self.multiselect && value && _.contains(selection(), this) === true) {
+                        selection.remove(this);
+                    }
+                    else if (value) {
                         selection(this);
                     }
                 },
