@@ -175,6 +175,7 @@ define([
                     cards: params.cards,
                     tiles: params.tiles,
                     selection: selection,
+                    multiselect: multiselect,
                     scrollTo: scrollTo,
                     loading: loading,
                     filter: filter,
