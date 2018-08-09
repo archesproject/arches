@@ -15,10 +15,11 @@ define([
         var filter = ko.observable('');
         var loading = ko.observable(false);
         self.multiselect = params.multiselect || false;
+        var selection;
         if (params.multiselect) {
-            var selection = ko.observableArray([]);
+            selection = ko.observableArray([]);
         } else {
-            var selection = ko.observable();
+            selection = ko.observable();
         }
         var hover = ko.observable();
         var scrollTo = ko.observable();
@@ -161,7 +162,7 @@ define([
         var topCard = self.topCards()[0];
         if (topCard != null) {
             if (self.multiselect === true) {
-                selection.push(topCard.tiles().length > 0 ? topCard.tiles()[0] : topCard)
+                selection.push(topCard.tiles().length > 0 ? topCard.tiles()[0] : topCard);
             } else {
                 selection(topCard.tiles().length > 0 ? topCard.tiles()[0] : topCard);
             }

@@ -59,10 +59,11 @@ define([
         var permsLiteral = ko.observableArray();
         var nodegroups = params.graphModel.get('nodegroups');
         var multiselect = params.multiselect || false;
+        var selection;
         if (params.multiselect) {
-            var selection = params.selection || ko.observableArray([]);
+            selection = params.selection || ko.observableArray([]);
         } else {
-            var selection = params.selection || ko.observable();
+            selection = params.selection || ko.observable();
         }
         var nodegroup = _.find(ko.unwrap(nodegroups), function(group) {
             return ko.unwrap(group.nodegroupid) === ko.unwrap(params.card.nodegroup_id);
