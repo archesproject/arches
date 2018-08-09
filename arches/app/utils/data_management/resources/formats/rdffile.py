@@ -4,6 +4,7 @@ import json
 import datetime
 from format import Writer, Reader
 from arches.app.models import models
+from arches.app.models.graph import Graph as GraphProxy
 from arches.app.models.tile import Tile
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
@@ -177,22 +178,49 @@ class JsonLdWriter(RdfWriter):
 
 
 class JsonLdReader(Reader):
+
+    tiles = {}
+
     def read_resource(self, data):
-        rdf = to_rdf(data, {'format': 'application/n-quads'})
-        g = Graph().parse(format='nquads', data=rdf)
-        tiles = {}
+        if not isinstance(data, list):
+            data = [data]
 
-        for su,p,ob in g.triples( (None,  RDF.value, None) ):
-            print "%s is a %s"%(su,ob)
-            match = re.match(r'.*?/tile/(?P<tileid>%s)/node/(?P<nodeid>%s)' % (settings.UUID_REGEX, settings.UUID_REGEX), str(su))
-            if match:
-                if match.group('tileid') not in tiles:
-                    tiles[match.group('tileid')] = {} 
+        def get_graph_id(strs_to_test):
+            if not isinstance(strs_to_test, list):
+                strs_to_test = [strs_to_test]
+            for str_to_test in strs_to_test:
+                match = re.match(r'.*?%sgraph/(?P<graphid>%s)' % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, settings.UUID_REGEX), str_to_test)
+                if match:
+                    return match.group('graphid')
+            return None
 
-                tiles[match.group('tileid')][match.group('nodeid')] = str(ob)
+        for jsonld in data:
+            graphid = get_graph_id(jsonld["@type"])
+            if graphid:
+                graph = GraphProxy.objects.get(graphid=graphid)
+                graphtree = graph.get_tree()
+                self.resolve_node_ids(jsonld, graph=graphtree)
 
-        for tileid, tile_data in tiles.iteritems():
-            Tile.objects.filter(pk=tileid).update(data=tile_data)
+
+        # rdf = to_rdf(data, {'format': 'application/n-quads'})
+        # g = Graph().parse(format='nquads', data=rdf)
+        # tiles = {}
+
+        # for su,p,ob in g.triples( (None,  RDF.value, None) ):
+        #     print "%s is a %s"%(su,ob)
+        #     match = re.match(r'.*?/tile/(?P<tileid>%s)/node/(?P<nodeid>%s)' % (settings.UUID_REGEX, settings.UUID_REGEX), str(su))
+        #     if match:
+        #         if match.group('tileid') not in tiles:
+        #             tiles[match.group('tileid')] = {}
+
+        #         tiles[match.group('tileid')][match.group('nodeid')] = str(ob)
+
+        for tileid, tile_data in self.tiles.iteritems():
+            obj, created = Tile.objects.update_or_create(
+                pk=tileid,
+                data=tile_data,
+            )
+            #Tile.objects.filter(pk=tileid).update(data=tile_data)
             # tile, created = Tile.objects.update_or_create(
             #     tileid = tileid,
             #     defaults = {
@@ -201,3 +229,146 @@ class JsonLdReader(Reader):
             # )
 
         print tiles
+
+    class AmbiguousGraphException(Exception):
+
+        def __init__(self):
+            # self.expression = expression
+            self.message = 'Graph is ambiguous, need to inspect further down the graph to find the right node'
+
+    class DataDoesNotMatchGraphException(Exception):
+
+        def __init__(self):
+            # self.expression = expression
+            self.message = 'A node in the supplied data does not match any node in the subject graph'
+
+            # check that the current json-ld @type is unique among nodes within the graph at that level of depth
+            # if it's unique apply the node id from the graph to the json-ld value
+            # if it's not unique then:
+            #     check the children @types and compare to teh graphs children, repeat until you find a match
+
+    def findOntologyProperties(self, o):
+        keys = []
+        try:
+            for key in o.keys():
+                if key != '@type' and key != '@id' and key != '@archesid' and key != 'http://www.w3.org/1999/02/22-rdf-syntax-ns#value':
+                    keys.append(key)
+        except:
+            pass
+
+        return keys
+
+    def findBranch(self, nodes, ontology_property, jsonld):
+        """
+            EXAMPLE JSONLD GRAPH:
+            --------------------
+            {
+                "@id": "http://localhost:8000/tile/eed92cf9-b9cd-4e99-9e88-8fb34a0be257/node/e456023d-fa36-11e6-9e3e-026d961c88e6",
+                "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production",
+                "http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as": [
+                    {
+                        "@id": "http://localhost:8000/tile/9fcd9141-930c-4303-b176-78480efbd3d9/node/e4560237-fa36-11e6-9e3e-026d961c88e6",
+                        "@type": "http://www.cidoc-crm.org/cidoc-crm/E17_Type_Assignment",
+                        "http://www.cidoc-crm.org/cidoc-crm/P42_assigned": [
+                            {
+                                "@id": "http://localhost:8000/tile/9fcd9141-930c-4303-b176-78480efbd3d9/node/e456024f-fa36-11e6-9e3e-026d961c88e6",
+                                "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type",
+                                "http://www.w3.org/1999/02/22-rdf-syntax-ns#value": "[u'dfc1fa9b-e3c8-459d-a3fa-d65e1443b9e7']"
+                            },
+                            {
+                                "@id": "http://localhost:8000/tile/9fcd9141-930c-4303-b176-78480efbd3d9/node/e4560246-fa36-11e6-9e3e-026d961c88e6",
+                                "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type",
+                                "http://www.w3.org/1999/02/22-rdf-syntax-ns#value": "a18ed9a3-4924-4cf0-a9a7-82d8c3aefbe0"
+                            }
+                        ],
+                    }
+                ]
+            }
+        """
+        if not isinstance(jsonld, list):
+            jsonld = [jsonld]
+
+        for jsonld_graph in jsonld:
+            # print ""
+            # print ""
+            # print "searching for branch %s --> %s" % (ontology_property.split('/')[-1], jsonld_graph['@type'].split('/')[-1])
+            found = []
+            nodes_copy = set()
+            invalid_nodes = set()
+            for node in nodes:
+                if node['parent_edge'].ontologyproperty == ontology_property and node['node'].ontologyclass == jsonld_graph['@type']:
+                    # print "found %s" % node['node'].name
+                    nodes_copy.add((node['node'].name, node['node'].pk))
+                    found.append(node)
+                else:
+                    invalid_nodes.add((node['node'].name, node['node'].pk))
+                    pass
+
+            # print 'found %s branches' % len(found)
+            if len(found) == 0:
+                # print 'branch not found'
+                raise self.DataDoesNotMatchGraphException()
+
+            # if len(self.findOntologyProperties(jsonld_graph)) == 0:
+                # print 'at a leaf -- unwinding'
+
+            for ontology_prop in self.findOntologyProperties(jsonld_graph):
+                for found_node in found:
+                    try:
+                        # print 'now searching children of %s node' % found_node['node'].name
+                        branch = self.findBranch(found_node['children'], ontology_prop, jsonld_graph[ontology_prop])
+                    except self.DataDoesNotMatchGraphException as e:
+                        found_node['remove'] = True
+                        invalid_nodes.add((found_node['node'].name, found_node['node'].pk))
+                    except self.AmbiguousGraphException as e:
+                        # print 'threw AmbiguousGraphException'
+                        # print nodes_copy
+                        pass
+
+            valid_nodes = nodes_copy.difference(invalid_nodes)
+
+            if len(valid_nodes) == 1:
+                # print 'branch found'
+                # print valid_nodes
+                valid_node = valid_nodes.pop()
+                for node in nodes:
+                    if node['node'].pk == valid_node[1]:
+                        return node
+            elif len(valid_nodes) > 1:
+                raise self.AmbiguousGraphException()
+            else:
+                raise self.DataDoesNotMatchGraphException()
+
+    def resolve_node_ids(self, jsonld, ontology_prop=None, graph=None, parent_node=None, tileid=None):
+        #print "-------------------"
+        if not isinstance(jsonld, list):
+            jsonld = [jsonld]
+
+        for jsonld_node in jsonld:
+            if parent_node is not None:
+                try:
+                    branch = self.findBranch(parent_node['children'], ontology_prop, jsonld_node)
+                    if branch['node'].nodegroup != parent_node['node'].nodegroup:
+                        tileid = uuid.uuid4()
+
+                except self.DataDoesNotMatchGraphException as e:
+                    #print 'DataDoesNotMatchGraphException'
+                    branch = None
+
+                except self.AmbiguousGraphException as e:
+                    #print 'AmbiguousGraphException'
+                    branch = None
+            else:
+                branch = graph
+
+            ontology_properties = self.findOntologyProperties(jsonld_node)
+
+            if branch is not None:
+                jsonld_node[
+                    '@archesid'] = '%stile/%s/node/%s' % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, tileid, branch['node'].nodeid)
+
+                if len(ontology_properties) > 0:
+                    for ontology_property in ontology_properties:
+                        self.resolve_node_ids(jsonld_node[ontology_property], ontology_prop=ontology_property,
+                                 graph=None, parent_node=branch, tileid=tileid)
+        return jsonld
