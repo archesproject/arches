@@ -1,5 +1,6 @@
 import json
 import uuid
+import re
 from django.shortcuts import render
 from django.views.generic import View
 from django.views.decorators.csrf import csrf_exempt
@@ -8,9 +9,7 @@ from django.db.models import Q
 from django.http.request import QueryDict
 from django.core.urlresolvers import reverse
 from django.utils.decorators import method_decorator
-
 from revproxy.views import ProxyView
-
 from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.models.graph import Graph
@@ -176,6 +175,40 @@ class Resources(APIBase):
             else:
                 raise self.DataDoesNotMatchGraphException()
 
+    def resolve_node_ids(self, jsonld, ontology_prop=None, graph=None, parent_node=None, tileid=None):
+        #print "-------------------"
+        if not isinstance(jsonld, list):
+            jsonld = [jsonld]
+
+        for jsonld_node in jsonld:
+            if parent_node is not None:
+                try:
+                    branch = self.findBranch(parent_node['children'], ontology_prop, jsonld_node)
+                    if branch['node'].nodegroup != parent_node['node'].nodegroup:
+                        tileid = uuid.uuid4()
+
+                except self.DataDoesNotMatchGraphException as e:
+                    #print 'DataDoesNotMatchGraphException'
+                    branch = None
+
+                except self.AmbiguousGraphException as e:
+                    #print 'AmbiguousGraphException'
+                    branch = None
+            else:
+                branch = graph
+
+            ontology_properties = self.findOntologyProperties(jsonld_node)
+
+            if branch is not None:
+                jsonld_node[
+                    '@archesid'] = '%stile/%s/node/%s' % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, tileid, branch['node'].nodeid)
+
+                if len(ontology_properties) > 0:
+                    for ontology_property in ontology_properties:
+                        self.resolve_node_ids(jsonld_node[ontology_property], ontology_prop=ontology_property,
+                                 graph=None, parent_node=branch, tileid=tileid)
+        return jsonld
+
     # context = [{
     #     "@context": {
     #         "id": "@id",
@@ -290,44 +323,24 @@ class Resources(APIBase):
     def post(self, request, resourceid):
         if user_can_edit_resources(user=request.user):
             data = JSONDeserializer().deserialize(request.body)
-            graph = Graph.objects.get(graphid=resourceid)
-            graphtree = graph.get_tree()
+            if not isinstance(data, list):
+                data = [data]
 
-            def getPaths(jsonld, ontology_prop=None, graph=None, parent_node=None, tileid='0'):
-                print "-------------------"
-                if not isinstance(jsonld, list):
-                    jsonld = [jsonld]
+            def get_graph_id(strs_to_test):
+                if not isinstance(strs_to_test, list):
+                    strs_to_test = [strs_to_test]
+                for str_to_test in strs_to_test:
+                    match = re.match(r'.*?%sgraph/(?P<graphid>%s)' % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, settings.UUID_REGEX), str_to_test)
+                    if match:
+                        return match.group('graphid')
+                return None
 
-                for jsonld_node in jsonld:
-                    if parent_node is not None:
-                        try:
-                            branch = self.findBranch(parent_node['children'], ontology_prop, jsonld_node)
-                            if branch['node'].nodegroup != parent_node['node'].nodegroup:
-                                tileid = uuid.uuid4()
-
-                        except self.DataDoesNotMatchGraphException as e:
-                            print 'DataDoesNotMatchGraphException'
-                            branch = None
-                            
-                        except self.AmbiguousGraphException as e:
-                            print 'AmbiguousGraphException'
-                            branch = None
-                    else:
-                        branch = graph
-
-                    ontology_properties = self.findOntologyProperties(jsonld_node)
-
-                    if branch is not None:
-                        jsonld_node[
-                            '@archesid'] = '%stile/%s/node/%s' % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, tileid, branch['node'].nodeid)
-
-                        if len(ontology_properties) > 0:
-                            for ontology_property in ontology_properties:
-                                getPaths(jsonld_node[ontology_property], ontology_prop=ontology_property,
-                                         graph=None, parent_node=branch, tileid=tileid)
-                return jsonld
-
-            paths = getPaths(data, ontology_prop=None, graph=graphtree, parent_node=None)
+            for jsonld in data:
+                graphid = get_graph_id(jsonld["@type"])
+                if graphid:
+                    graph = Graph.objects.get(graphid=graphid)
+                    graphtree = graph.get_tree()
+                    self.resolve_node_ids(jsonld, graph=graphtree)
 
         try:
             indent = int(request.POST.get('indent', None))
