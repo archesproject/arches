@@ -10703,6 +10703,10 @@ a.search-facet-item.disabled {
     display: block;
 }
 
+.editor-report .rp-report-section {
+    border-bottom: none;
+    padding-bottom: 0;
+}
 
 .editor-report .report-related-resources, .editor-report .report-title-bar {
     display: none;

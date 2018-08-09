@@ -11,7 +11,7 @@ define([
     * A viewmodel used for generic cards
     *
     * @constructor
-    * @name CardViewModel
+    * @name TileViewModel
     *
     * @param  {string} params - a configuration object
     */

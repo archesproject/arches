@@ -529,14 +529,14 @@ class ResourceReportView(MapBaseManagerView):
                     summary['resources'].append({'instance_id': rr['resourceinstanceid'], 'displayname': rr[
                                                 'displayname'], 'relationships': relationship_summary})
 
-        tiles = Tile.objects.filter(resourceinstance=resource)
+        tiles = Tile.objects.filter(resourceinstance=resource).order_by('sortorder')
         try:
             report = models.Report.objects.get(graph=resource.graph, active=True)
         except models.Report.DoesNotExist:
             report = None
 
         graph = Graph.objects.get(graphid=resource.graph_id)
-        cards = Card.objects.filter(graph=graph)
+        cards = Card.objects.filter(graph=graph).order_by('sortorder')
         permitted_cards = []
         permitted_tiles = []
 
