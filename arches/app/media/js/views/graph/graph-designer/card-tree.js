@@ -14,7 +14,12 @@ define([
         var self = this;
         var filter = ko.observable('');
         var loading = ko.observable(false);
-        var selection = ko.observable();
+        self.multiselect = params.multiselect || false;
+        if (params.multiselect) {
+            var selection = ko.observableArray([]);
+        } else {
+            var selection = ko.observable();
+        }
         var hover = ko.observable();
         var scrollTo = ko.observable();
 
@@ -101,6 +106,7 @@ define([
                     selection: selection,
                     hover: hover,
                     scrollTo: scrollTo,
+                    multiselect: self.multiselect,
                     loading: loading,
                     filter: filter,
                     provisionalTileViewModel: null,
@@ -139,7 +145,11 @@ define([
         });
         var topCard = self.topCards()[0];
         if (topCard != null) {
-            selection(topCard.tiles().length > 0 ? topCard.tiles()[0] : topCard);
+            if (self.multiselect === true) {
+                selection.push(topCard.tiles().length > 0 ? topCard.tiles()[0] : topCard)
+            } else {
+                selection(topCard.tiles().length > 0 ? topCard.tiles()[0] : topCard);
+            }
         }
     };
     return CardTreeViewModel;
