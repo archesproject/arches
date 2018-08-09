@@ -200,9 +200,12 @@ define([
                     }
                 },
                 write: function(value) {
-                    if (self.multiselect && value) {
+                    if (self.multiselect && value && _.contains(selection(), this) === false) {
                         selection.push(this);
-                    } else if (value) {
+                    } else if (self.multiselect && value && _.contains(selection(), this) === true) {
+                        selection.remove(this);
+                    }
+                    else if (value) {
                         selection(this);
                     }
                 },
