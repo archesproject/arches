@@ -219,11 +219,9 @@
                         </div>
                     </form>
                 </div>
-
+                <!-- ko if: !graph.isresource() -->
                 <div class="graph-designer-header">{% trans 'Root Node Data Type and Settings' %}</div>
-
                 <div class="graph-settings-panel-body fade in">
-
                     <form class="widgets">
                         <div class="row widget-container">
                             <div class="form-group">
@@ -242,7 +240,7 @@
 
                     </form>
                 </div>
-
+                <!-- /ko -->
             </div>
         </div>
     </div>
