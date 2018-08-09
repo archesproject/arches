@@ -14,7 +14,13 @@ define([
         var self = this;
         var filter = ko.observable('');
         var loading = ko.observable(false);
-        var selection = ko.observable();
+        self.multiselect = params.multiselect || false;
+        var selection;
+        if (params.multiselect) {
+            selection = ko.observableArray([]);
+        } else {
+            selection = ko.observable();
+        }
         var hover = ko.observable();
         var scrollTo = ko.observable();
 
@@ -37,6 +43,15 @@ define([
             if (state) {
                 self.rootExpanded(true);
             }
+        };
+
+        var selectAll = function(state) {
+            var nodes = self.flattenTree(self.topCards(), []);
+            _.each(nodes, function(node) {
+                if (node.selected() !== state) {
+                    node.selected(true);
+                }
+            });
         };
 
         var createLookup = function(list, idKey) {
@@ -79,6 +94,12 @@ define([
             collapseAll: function() {
                 toggleAll(false);
             },
+            selectAllCards: function() {
+                selectAll(true);
+            },
+            clearSelection: function() {
+                selectAll(false);
+            },
             rootExpanded: ko.observable(true),
             on: function() {
                 return;
@@ -101,6 +122,7 @@ define([
                     selection: selection,
                     hover: hover,
                     scrollTo: scrollTo,
+                    multiselect: self.multiselect,
                     loading: loading,
                     filter: filter,
                     provisionalTileViewModel: null,
@@ -139,7 +161,11 @@ define([
         });
         var topCard = self.topCards()[0];
         if (topCard != null) {
-            selection(topCard.tiles().length > 0 ? topCard.tiles()[0] : topCard);
+            if (self.multiselect === true) {
+                selection.push(topCard.tiles().length > 0 ? topCard.tiles()[0] : topCard);
+            } else {
+                selection(topCard.tiles().length > 0 ? topCard.tiles()[0] : topCard);
+            }
         }
     };
     return CardTreeViewModel;

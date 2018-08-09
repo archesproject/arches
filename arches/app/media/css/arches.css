@@ -1408,16 +1408,18 @@ a.select2-search-choice-close {
 }
 
 .permissions-node {
-    font-size: 13px;
+    font-size: 11px;
     color: #777;
 }
 
 .permissions-node-row {
+    display: inline-flex;
     background: #fff;
     padding-top: 6px;
     padding-bottom: 6px;
     padding-left: 10px;
     margin-right: 10px;
+    justify-content: space-between;
 }
 
 .account-card-main {
@@ -1502,6 +1504,8 @@ a.select2-search-choice-close {
 }
 
 .permissions-selected {
+    display: flex;
+    flex-direction: column;
     list-style: none;
     color: #666;
     line-height: 1.2;

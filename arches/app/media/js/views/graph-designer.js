@@ -113,6 +113,24 @@ define([
                 graphModel: viewModel.graphModel
             });
 
+            viewModel.permissionTree = new CardTreeViewModel({
+                graph: viewModel.graph,
+                graphModel: viewModel.graphModel,
+                multiselect: true
+            });
+
+            viewModel.selectedCards = ko.computed(function() {
+                var selection = viewModel.permissionTree.selection();
+                if (selection) {
+                    if (selection.widgets) {
+                        return selection;
+                    }
+                    return selection.parent;
+                } else {
+                    return null;
+                }
+            });
+
             viewModel.selectedCard = ko.computed(function() {
                 var selection = viewModel.cardTree.selection();
                 if (selection) {
@@ -143,7 +161,7 @@ define([
             });
 
             viewModel.permissionsDesigner = new PermissionDesigner({
-                cardTree: viewModel.cardTree
+                cardTree: viewModel.permissionTree
             });
 
             viewModel.graphSettingsViewModel = new GraphSettingsViewModel({
