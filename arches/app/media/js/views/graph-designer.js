@@ -66,6 +66,8 @@ define([
                 ontology_namespaces: data.ontology_namespaces
             });
 
+            viewModel.datatypes = _.keys(viewModel.graphModel.get('datatypelookup'));
+
             viewModel.graphModel.on('changed', function(model, response) {
                 if (viewModel.graphView) {
                     viewModel.graphView.redraw(true);

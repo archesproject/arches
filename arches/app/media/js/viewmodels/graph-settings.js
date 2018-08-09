@@ -48,6 +48,7 @@ define([
             }
             return JSON.stringify({
                 graph: koMapping.toJS(self.graph),
+                root_node_datatype: ko.unwrap(self.node().datatype),
                 relatable_resource_ids: relatableResourceIds,
                 ontology_class: ontologyClass(),
             });

@@ -219,6 +219,30 @@
                         </div>
                     </form>
                 </div>
+
+                <div class="graph-designer-header">{% trans 'Root Node Data Type and Settings' %}</div>
+
+                <div class="graph-settings-panel-body fade in">
+
+                    <form class="widgets">
+                        <div class="row widget-container">
+                            <div class="form-group">
+                                <div class="relative">
+                                    <label class="col-xs-12 control-label widget-input-label">
+                                        {% trans "Data type" %}
+                                    </label>
+                                </div>
+
+                                <div class="col-xs-12 crm-selector">
+                                    <select class="design" data-bind="value: graphSettingsViewModel.node().datatype, options: datatypes, optionsCaption: '{% trans "Choose a data type" %}', chosen: {disable_search_threshold: 10, width: '500px'}"></select>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </form>
+                </div>
+
             </div>
         </div>
     </div>
