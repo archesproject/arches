@@ -35,7 +35,7 @@ define([
         self.cardList = null;
 
         self.selectedCards = ko.pureComputed(function() {
-            return [self.cardTree.selection()];
+            return self.cardTree.selection();
         });
 
         self.getPermissionManagerData = function() {
