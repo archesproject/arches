@@ -44,6 +44,15 @@ define([
             }
         };
 
+        var selectAll = function(state) {
+            var nodes = self.flattenTree(self.topCards(), []);
+            _.each(nodes, function(node) {
+                if (node.selected() !== state) {
+                    node.selected(true);
+                }
+            });
+        };
+
         var createLookup = function(list, idKey) {
             return _.reduce(list, function(lookup, item) {
                 lookup[ko.unwrap(item[idKey])] = item;
@@ -83,6 +92,12 @@ define([
             },
             collapseAll: function() {
                 toggleAll(false);
+            },
+            selectAllCards: function() {
+                selectAll(true);
+            },
+            clearSelection: function() {
+                selectAll(false);
             },
             rootExpanded: ko.observable(true),
             on: function() {
