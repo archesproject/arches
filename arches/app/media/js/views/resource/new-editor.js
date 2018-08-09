@@ -220,7 +220,7 @@ define([
         viewReport: function() {
             if (resourceId()) {
                 vm.menuActive(false);
-                vm.navigate(arches.urls.resource_report + resourceId());
+                window.open(arches.urls.resource_report + resourceId(), "_blank");
             }
         }
     };
