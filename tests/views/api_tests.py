@@ -28,6 +28,7 @@ from tests.base_test import ArchesTestCase
 from django.test.client import RequestFactory, Client
 from arches.app.views.api import APIBase
 from arches.app.models.graph import Graph
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 # these tests can be run from the command line via
 # python manage.py test tests/views/api_tests.py --pattern="*.py" --settings="tests.test_settings"
