@@ -177,35 +177,30 @@ class Resources(APIBase):
 
         return JSONResponse(self.get(request, resourceid))
 
-    def post(self, request, resourceid):
-        if user_can_edit_resources(user=request.user):
-            data = JSONDeserializer().deserialize(request.body)
-            if not isinstance(data, list):
-                data = [data]
-
-            # def get_graph_id(strs_to_test):
-            #     if not isinstance(strs_to_test, list):
-            #         strs_to_test = [strs_to_test]
-            #     for str_to_test in strs_to_test:
-            #         match = re.match(r'.*?%sgraph/(?P<graphid>%s)' % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, settings.UUID_REGEX), str_to_test)
-            #         if match:
-            #             return match.group('graphid')
-            #     return None
-
-            for jsonld in data:
-                # graphid = get_graph_id(jsonld["@type"])
-                # if graphid:
-                #     graph = Graph.objects.get(graphid=graphid)
-                #     graphtree = graph.get_tree()
-                #     self.resolve_node_ids(jsonld, graph=graphtree)
-                reader = JsonLdReader()
-                reader.read_resource(data)
-
+    def post(self, request, resourceid=None):
         try:
             indent = int(request.POST.get('indent', None))
         except:
             indent = None
-        return JSONResponse(data, indent=indent)
+        errors = False
+
+        if user_can_edit_resources(user=request.user):
+            data = JSONDeserializer().deserialize(request.body)
+            reader = JsonLdReader()
+            reader.read_resource(data)
+            if reader.errors:
+                response = []
+                for value in reader.errors.itervalues():
+                    response.append(value.message)
+                return JSONResponse(data, indent=indent, status=400, reason=response)
+            else:
+                response = []
+                for resource in reader.resources:
+                    # resource.save()
+                    # response.append(self.get(request, resource.resourceid))
+                    pass
+
+                return JSONResponse(response, indent=indent)
 
     def traverse_json_ld_graph(self, func, scope=None, **kwargs):
         """
