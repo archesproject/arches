@@ -182,25 +182,27 @@ class Resources(APIBase):
             indent = int(request.POST.get('indent', None))
         except:
             indent = None
-        errors = False
 
-        if user_can_edit_resources(user=request.user):
-            data = JSONDeserializer().deserialize(request.body)
-            reader = JsonLdReader()
-            reader.read_resource(data)
-            if reader.errors:
-                response = []
-                for value in reader.errors.itervalues():
-                    response.append(value.message)
-                return JSONResponse(data, indent=indent, status=400, reason=response)
+        try:
+            if user_can_edit_resources(user=request.user):
+                data = JSONDeserializer().deserialize(request.body)
+                reader = JsonLdReader()
+                reader.read_resource(data)
+                if reader.errors:
+                    response = []
+                    for value in reader.errors.itervalues():
+                        response.append(value.message)
+                    return JSONResponse(data, indent=indent, status=400, reason=response)
+                else:
+                    response = []
+                    for resource in reader.resources:
+                        resource.save()
+                        response.append(JSONDeserializer().deserialize(self.get(request, resource.resourceinstanceid).content))
+                    return JSONResponse(response, indent=indent)
             else:
-                response = []
-                for resource in reader.resources:
-                    # resource.save()
-                    # response.append(self.get(request, resource.resourceid))
-                    pass
-
-                return JSONResponse(response, indent=indent)
+                return JSONResponse(status=403)
+        except Exception as e:
+            return JSONResponse(status=500, reason=e)
 
     def traverse_json_ld_graph(self, func, scope=None, **kwargs):
         """
