@@ -238,7 +238,6 @@ define([
                             return card.nodegroupid === item.node.nodeGroupId();
                         }
                     });
-                    cardTree.expandToRoot(res);
                 }
                 return res;
 
@@ -258,6 +257,7 @@ define([
             var updateGraphSelection = function() {
                 if (viewModel.activeTab() === 'card') {
                     var matchingNode;
+                    viewModel.graphTree.collapseAll();
                     matchingNode = correspondingNode(viewModel.cardTree.selection(), viewModel.graphTree);
                     viewModel.graphTree.selectItem(matchingNode);
                 }
@@ -273,6 +273,7 @@ define([
                         } else {
                             matchingCard = correspondingCard(graphTreeSelection, viewModel.cardTree);
                             viewModel.cardTree.selection(matchingCard);
+                            viewModel.cardTree.collapseAll();
                             viewModel.cardTree.expandToRoot(viewModel.cardTree.selection());
                         }
                     }
@@ -281,6 +282,8 @@ define([
 
             var updatePermissionCardSelection = function() {
                 var matchingCard = correspondingCard(viewModel.cardTree.selection(), viewModel.permissionTree);
+                viewModel.permissionTree.collapseAll();
+                viewModel.permissionTree.expandToRoot(matchingCard);
                 viewModel.permissionTree.selection.removeAll();
                 matchingCard.selected(true);
             };
@@ -293,7 +296,7 @@ define([
             viewModel.graphTree.selectedItems.subscribe(function(){
                 updateCardSelection();
                 updatePermissionCardSelection();
-            })
+            });
 
             if (viewModel.activeTab() === 'graph') {
                 viewModel.loadGraphSettings();
