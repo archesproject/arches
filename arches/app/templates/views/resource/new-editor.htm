@@ -191,20 +191,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </span>
                         <!-- ko if: selectedTile().tileid && selectedTile().cards.length > 0 -->
                         &gt;
+                        <!-- ko if: addableCards().length > 0 -->
                         <span class="dropdown">
                             <a class="dropdown-toggle" href="javascript:void(0)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                                 Add new... <i class="fa fa-caret-down"></i>
                             </a>
                             <ul class="dropdown-menu" style="padding-bottom: 5px;">
-                                <!-- ko foreach: { data: selectedTile().cards, as: 'card' } -->
-                                    <!-- ko if: card.canAdd() -->
+                                <!-- ko foreach: { data: addableCards(), as: 'card' } -->
                                     <li>
                                         <a href="javascript:void(0)" data-bind="text: card.model.name, click: function () { card.selected(true) }"></a>
                                     </li>
-                                    <!-- /ko -->
                                 <!-- /ko -->
                             </ul>
                         </span>
+                        <!-- /ko -->
 
                         <!-- /ko -->
                     </div>
