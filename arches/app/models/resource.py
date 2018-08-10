@@ -91,7 +91,7 @@ class Resource(models.ResourceInstance):
         super(Resource, self).save(*args, **kwargs)
         for tile in self.tiles:
             tile.resourceinstance_id = self.resourceinstanceid
-            saved_tile = tile.save(index=False)
+            saved_tile = tile.save(request=request, index=False)
         if request == '':
             if user == '':
                 user = {}
