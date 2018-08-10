@@ -242,32 +242,34 @@ define([
                 var cardList = cardTree.flattenTree(cardTree.topCards(), []);
                 var res;
                 var matchingWidget;
-                if (item.nodeGroupId) { //if the item is a node in graph tree
-                    var matchingCards = _.filter(cardList, function(card){
-                        return card.nodegroupid === item.nodeGroupId();
-                    });
-                    _.each(matchingCards, function(card){
-                        var match;
-                        match = _.find(card.widgets(), function(widget){
-                            return widget.node_id() === item.nodeid;
+                if (typeof item !== 'string') {
+                    if (item.nodeGroupId) { //if the item is a node in graph tree
+                        var matchingCards = _.filter(cardList, function(card){
+                            return card.nodegroupid === item.nodeGroupId();
                         });
-                        if (match) {
-                            matchingWidget = match;
-                        }
-                    });
-                    if (matchingWidget) {
-                        res = matchingWidget;
-                    } else {
-                        res = matchingCards[0];
-                    }
-                } else { //if the item is a card or widget in the card tree
-                    res = _.find(cardList, function(card){
-                        if (item.nodegroupid) {
-                            return card.nodegroupid === item.nodegroupid;
+                        _.each(matchingCards, function(card){
+                            var match;
+                            match = _.find(card.widgets(), function(widget){
+                                return widget.node_id() === item.nodeid;
+                            });
+                            if (match) {
+                                matchingWidget = match;
+                            }
+                        });
+                        if (matchingWidget) {
+                            res = matchingWidget;
                         } else {
-                            return card.nodegroupid === item.node.nodeGroupId();
+                            res = matchingCards[0];
                         }
-                    });
+                    } else { //if the item is a card or widget in the card tree
+                        res = _.find(cardList, function(card){
+                            if (item.nodegroupid) {
+                                return card.nodegroupid === item.nodegroupid;
+                            } else {
+                                return card.nodegroupid === item.node.nodeGroupId();
+                            }
+                        });
+                    }
                 }
                 return res;
 
@@ -286,10 +288,11 @@ define([
 
             var updateGraphSelection = function() {
                 if (viewModel.activeTab() === 'card') {
-                    var matchingNode;
                     viewModel.graphTree.collapseAll();
-                    matchingNode = correspondingNode(viewModel.cardTree.selection(), viewModel.graphTree);
-                    viewModel.graphTree.selectItem(matchingNode);
+                    var matchingNode = correspondingNode(viewModel.cardTree.selection(), viewModel.graphTree);
+                    if (matchingNode) {
+                        viewModel.graphTree.selectItem(matchingNode);
+                    }
                 }
             };
 
