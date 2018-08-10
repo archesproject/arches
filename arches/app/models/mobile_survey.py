@@ -91,6 +91,7 @@ class MobileSurvey(models.MobileSurveyModel):
                 graph = JSONSerializer().serializeToPython(card.graph, exclude=['functions','disable_instance_creation','deploymentdate','deploymentfile'])
                 graph['color'] = card.graph.color
                 graph['ontology_id']=str(graph['ontology_id'])
+                graph['template_id']=str(graph['template_id'])
                 graphs.append(graph)
         ret['graphs'] = graphs
         ret['cards'] = ordered_cards
