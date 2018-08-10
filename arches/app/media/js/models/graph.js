@@ -173,7 +173,7 @@ define(['arches',
                             source: node,
                             datatypelookup: this.get('datatypelookup'),
                             graph: this,
-                            ontology_namespaces: this.get('root').ontology_namespaces
+                            "ontology_namespaces": this.get('root').ontology_namespaces
                         }));
                     }, this);
                     response.responseJSON.edges.forEach(function(edge){
@@ -224,7 +224,7 @@ define(['arches',
                         source: response.responseJSON.node,
                         datatypelookup: this.get('datatypelookup'),
                         graph: this,
-                        ontology_namespaces: this.get('root').ontology_namespaces
+                        "ontology_namespaces": this.get('root').ontology_namespaces
                     });
                     newNode.childNodes = ko.observableArray([]);
 
@@ -486,12 +486,12 @@ define(['arches',
          * @return {object} a hierchical node listing
          */
         constructTree: function(root, nodes, edges, append){
-            var node_map = {};
+            var nodeMap = {};
             var root = !!root ? root : this.get('root');
             var nodes = !!nodes ? nodes : this.get('nodes')();
             var edges = !!edges ? edges : this.get('edges')();
             nodes.forEach(function(node){
-                node_map[node.id] = node;
+                nodeMap[node.id] = node;
                 if(!ko.isObservable(node.childNodes)){
                     node.childNodes = ko.observableArray([]);
                 }else{
@@ -502,11 +502,11 @@ define(['arches',
             });
 
             edges.forEach(function(edge){
-                node_map[edge.domainnode_id].childNodes.unshift(node_map[edge.rangenode_id]);
+                nodeMap[edge.domainnode_id].childNodes.unshift(nodeMap[edge.rangenode_id]);
             });
 
             edges.forEach(function(edge){
-                node_map[edge.domainnode_id].childNodes.sort(function(left, right) {
+                nodeMap[edge.domainnode_id].childNodes.sort(function(left, right) {
                     return left.attributes.source.sortorder == right.attributes.source.sortorder ? 0 : (left.attributes.source.sortorder < right.attributes.source.sortorder ? -1 : 1); });
             });
 
@@ -568,7 +568,7 @@ define(['arches',
             }
             var parentNodes = this.getParentNodesAndEdges(node).nodes;
             var hasParentGroup = !!parentNodes.find(function(parentNode) {
-                parentNodeGroupId = parentNode.nodeGroupId();
+                var parentNodeGroupId = parentNode.nodeGroupId();
                 return parentNodeGroupId && parentNodeGroupId !== nodeGroupId;
             });
             return hasParentGroup;

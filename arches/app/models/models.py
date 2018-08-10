@@ -317,7 +317,11 @@ class GraphModel(models.Model):
     ontology = models.ForeignKey('Ontology', db_column='ontologyid', related_name='graphs', null=True, blank=True)
     functions = models.ManyToManyField(to='Function', through='FunctionXGraph')
     jsonldcontext = models.TextField(blank=True, null=True)
-    template = models.ForeignKey('ReportTemplate', db_column='templateid', default='50000000-0000-0000-0000-000000000001')
+    template = models.ForeignKey(
+        'ReportTemplate',
+        db_column='templateid',
+        default='50000000-0000-0000-0000-000000000001'
+    )
     config = JSONField(db_column='config', default={})
 
     @property

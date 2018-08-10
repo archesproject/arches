@@ -95,7 +95,9 @@ def import_graph(graphs, overwrite_graphs=True):
                             for report in graph.reports:
                                 if report['active']:
                                     report_config = report['config']
-                                    default_config = ReportTemplate.objects.get(templateid=report['template_id']).defaultconfig
+                                    default_config = ReportTemplate.objects.get(
+                                        templateid=report['template_id']
+                                    ).defaultconfig
                                     graph.config = check_default_configs(default_config, report_config)
                                     graph.template_id = report['template_id']
                         graph.save()

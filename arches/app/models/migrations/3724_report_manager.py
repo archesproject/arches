@@ -22,15 +22,21 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='graphmodel',
             name='template',
-            field=models.ForeignKey(db_column='templateid', default='50000000-0000-0000-0000-000000000001', on_delete=django.db.models.deletion.CASCADE, to='models.ReportTemplate'),
+            field=models.ForeignKey(
+                db_column='templateid',
+                default='50000000-0000-0000-0000-000000000001',
+                on_delete=django.db.models.deletion.CASCADE,
+                to='models.ReportTemplate'
+            ),
         ),
-        migrations.RunSQL("""
-            update graphs
-            set templateid = r.templateid, config = r.config
-            from reports r where r.graphid = graphs.graphid and r.active = true;
-        """,
-        """
-        """),
+        migrations.RunSQL(
+            """
+                update graphs
+                set templateid = r.templateid, config = r.config
+                from reports r where r.graphid = graphs.graphid and r.active = true;
+            """,
+            ""
+        ),
         migrations.DeleteModel(
             name='Report',
         ),
