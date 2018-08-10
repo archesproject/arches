@@ -17,7 +17,7 @@
         <ul class="jstree-container-ul jstree-children" aria-expanded="true">
             <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': rootExpanded, 'jstree-closed' : !rootExpanded()}">
                 <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}"></i>
-                <a class="jstree-anchor" href="#" tabindex="-1">
+                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { selection('root'); }, css: {'jstree-clicked': selection() === 'root'}">
                     <strong>
                         <i data-bind="css: (graphiconclass() != (null || '') ? graphiconclass() : 'fa fa-question')" role="presentation"></i>
                         <span data-bind="text: graphname"></span>

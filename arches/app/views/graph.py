@@ -104,7 +104,8 @@ class GraphSettingsView(GraphBaseView):
         data = JSONDeserializer().deserialize(request.body)
         for key, value in data.get('graph').iteritems():
             if key in ['iconclass', 'name', 'author', 'description', 'isresource',
-                       'ontology_id', 'version',  'subtitle', 'isactive', 'color', 'jsonldcontext']:
+                       'ontology_id', 'version',  'subtitle', 'isactive', 'color',
+                       'jsonldcontext', 'config', 'template_id']:
                 setattr(graph, key, value)
 
         node = models.Node.objects.get(graph_id=graphid, istopnode=True)
@@ -167,6 +168,8 @@ class GraphDesignerView(GraphBaseView):
         map_layers = models.MapLayer.objects.all()
         map_markers = models.MapMarker.objects.all()
         map_sources = models.MapSource.objects.all()
+        templates = models.ReportTemplate.objects.all()
+        card_components = models.CardComponent.objects.all()
         geocoding_providers = models.Geocoder.objects.all()
         if self.graph.ontology is not None:
             branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
@@ -191,6 +194,7 @@ class GraphDesignerView(GraphBaseView):
             map_markers=map_markers,
             map_sources=map_sources,
             geocoding_providers=geocoding_providers,
+            report_templates=templates,
         )
         context['ontologies'] = JSONSerializer().serialize(ontologies, exclude=['version', 'path'])
         context['ontology_classes'] = JSONSerializer().serialize(ontology_classes)

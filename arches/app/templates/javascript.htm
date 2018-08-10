@@ -364,7 +364,8 @@
             '{{ template.pk }}': {
                 'componentname': '{{ template.componentname }}',
                 'component': '{{ template.component }}',
-                'defaultconfig': '{{ template.defaultconfig_json }}'
+                'defaultconfig': '{{ template.defaultconfig_json }}',
+                'name': '{{ template.name }}'
             },
         {% endfor %}{% endautoescape %}};
     });
