@@ -3,7 +3,7 @@ define(['arches',
     'models/node',
     'knockout',
     'underscore'
-], function (arches, AbstractModel, NodeModel, ko, _) {
+], function(arches, AbstractModel, NodeModel, ko, _) {
     return AbstractModel.extend({
         /**
         * A backbone model to manage graph data
@@ -31,7 +31,7 @@ define(['arches',
             if (currentlySelectedNode && currentlySelectedNode.dirty()) {
                 return false;
             }else{
-                this.get('nodes')().forEach(function (node) {
+                this.get('nodes')().forEach(function(node) {
                     if(node !== newly_selected_node){
                         node.selected(false);
                     }
@@ -57,43 +57,43 @@ define(['arches',
             }, function(response, status){
                 if (status === 'success' &&  response.responseJSON) {
                     var parentNode = this.getParentNode(node);
-                    var getEdges = function (node) {
+                    var getEdges = function(node) {
                         var edges = this.get('edges')()
-                            .filter(function (edge) {
+                            .filter(function(edge) {
                                 return edge.domainnode_id === node.nodeid;
                             });
-                        var nodes = edges.map(function (edge) {
-                            return this.get('nodes')().find(function (node) {
+                        var nodes = edges.map(function(edge) {
+                            return this.get('nodes')().find(function(node) {
                                 return edge.rangenode_id === node.nodeid;
                             });
                         }, this);
-                        nodes.forEach(function (node) {
+                        nodes.forEach(function(node) {
                             edges = edges.concat(getEdges.call(this, node));
                         }, this);
-                        return edges
+                        return edges;
                     };
 
                     var edges = getEdges.call(this, node);
-                    var nodes = edges.map(function (edge) {
-                        return this.get('nodes')().find(function (node) {
+                    var nodes = edges.map(function(edge) {
+                        return this.get('nodes')().find(function(node) {
                             return edge.rangenode_id === node.nodeid;
                         });
                     }, this);
                     var edge = this.get('edges')()
-                        .find(function (edge) {
+                        .find(function(edge) {
                             return edge.rangenode_id === node.nodeid;
                         });
                     nodes.push(node);
                     edges.push(edge);
                     if (node.isCollector()) {
-                        this.get('cards').remove(function (card) {
+                        this.get('cards').remove(function(card) {
                             return card.nodegroup_id === node.nodeid;
                         });
                     }
-                    this.get('edges').remove(function (edge) {
+                    this.get('edges').remove(function(edge) {
                         return _.contains(edges, edge);
                     });
-                    this.get('nodes').remove(function (node) {
+                    this.get('nodes').remove(function(node) {
                         return _.contains(nodes, node);
                     });
                     parentNode.childNodes.remove(node);
@@ -118,17 +118,17 @@ define(['arches',
          */
         getParentNode: function(node) {
             var edge = this.get('edges')()
-                .find(function (edge) {
+                .find(function(edge) {
                     return edge.rangenode_id === node.nodeid;
                 });
             if (edge) {
-              return this.get('nodes')()
-                  .find(function (node) {
-                      return edge.domainnode_id === node.nodeid;
+                return this.get('nodes')()
+                    .find(function(node) {
+                        return edge.domainnode_id === node.nodeid;
                     });
-              } else {
-                  return node;
-              };
+            } else {
+                return node;
+            }
         },
 
         /**
@@ -147,7 +147,7 @@ define(['arches',
                     var ontology_connection = _.find(branch_graph.get('domain_connections'), function(domain_connection){
                         return _.find(domain_connection.ontology_classes, function(ontology_class){
                             return ontology_class === this.get('selectedNode')().ontologyclass();
-                        }, this)
+                        }, this);
                     }, this);
                     if(ontology_connection){
                         property = ontology_connection.ontology_property;
@@ -173,7 +173,7 @@ define(['arches',
                             source: node,
                             datatypelookup: this.get('datatypelookup'),
                             graph: this,
-                            ontology_namespaces: this.get('root').ontology_namespaces
+                            "ontology_namespaces": this.get('root').ontology_namespaces
                         }));
                     }, this);
                     response.responseJSON.edges.forEach(function(edge){
@@ -187,7 +187,7 @@ define(['arches',
                     }, this);
 
                     if(!this.get('isresource')){
-                        this.get('nodes')().forEach(function (node) {
+                        this.get('nodes')().forEach(function(node) {
                             node.selected(false);
                             if (node.nodeid === branchroot.nodeid){
                                 node.selected(true);
@@ -224,13 +224,13 @@ define(['arches',
                         source: response.responseJSON.node,
                         datatypelookup: this.get('datatypelookup'),
                         graph: this,
-                        ontology_namespaces: this.get('root').ontology_namespaces
-                    })
+                        "ontology_namespaces": this.get('root').ontology_namespaces
+                    });
                     newNode.childNodes = ko.observableArray([]);
 
                     this.get('nodes').push(newNode);
                     this.get('edges').push(response.responseJSON.edge);
-                    node.childNodes.unshift(newNode)
+                    node.childNodes.unshift(newNode);
 
                     if(!this.get('isresource')){
                         this.selectNode(newNode);
@@ -262,14 +262,14 @@ define(['arches',
                 data: JSON.stringify({nodeid:node.nodeid, property: property, newparentnodeid: newParentNode.nodeid})
             }, function(response, status){
                 if (status === 'success' &&  response.responseJSON) {
-                    this.get('edges')().find(function (edge) {
+                    this.get('edges')().find(function(edge) {
                         if(edge.edgeid === response.responseJSON.edges[0].edgeid){
                             edge.domainnode_id = response.responseJSON.edges[0].domainnode_id;
                             return true;
                         }
                         return false;
                     });
-                    this.get('nodes')().forEach(function (node) {
+                    this.get('nodes')().forEach(function(node) {
                         found_node = response.responseJSON.nodes.find(function(response_node){
                             return response_node.nodeid === node.nodeid;
                         });
@@ -303,7 +303,7 @@ define(['arches',
             }, function(response, status){
                 if (status === 'success' &&  response.responseJSON) {
                     _.each(this.get('nodes')(), function(node){
-                        var nodeJSON = _.find(response.responseJSON.nodes, function (returned_node) {
+                        var nodeJSON = _.find(response.responseJSON.nodes, function(returned_node) {
                             return node.nodeid === returned_node.nodeid;
                         });
                         node.parse(nodeJSON);
@@ -386,7 +386,7 @@ define(['arches',
                 var found = !!_.find(graphToAppend.get('domain_connections'), function(domain_connection){
                     return !!_.find(domain_connection.ontology_classes, function(ontology_class){
                         return ontology_class === nodeToAppendTo.ontologyclass();
-                    }, this)
+                    }, this);
                 }, this);
                 if(!found){
                     return false;
@@ -411,38 +411,38 @@ define(['arches',
 
             _.each(attributes.datatypes, function(datatype){
                 datatypelookup[datatype.datatype] = datatype;
-            }, this)
+            }, this);
             this.set('datatypelookup', datatypelookup);
 
             _.each(attributes.data, function(value, key){
                 switch(key) {
-                    case 'edges':
-                    case 'cards':
-                        this.set(key, ko.observableArray(value));
-                        break;
-                    case 'nodes':
-                        var nodes = [];
-                        attributes.data.nodes.forEach(function (node, i) {
-                            var nodeModel = new NodeModel({
-                                source: node,
-                                datatypelookup: datatypelookup,
-                                graph: self,
-                                ontology_namespaces: attributes.ontology_namespaces
-                            });
-                            nodeModel.childNodes = ko.observableArray([]);
-                            if(node.istopnode){
-                                this.set('root', nodeModel);
-                            }
-                            nodes.push(nodeModel);
-                        }, this);
-                        this.set('nodes', ko.observableArray(nodes));
-                        break;
-                    case 'root':
-                        break;
-                    default:
-                        this.set(key, value)
+                case 'edges':
+                case 'cards':
+                    this.set(key, ko.observableArray(value));
+                    break;
+                case 'nodes':
+                    var nodes = [];
+                    attributes.data.nodes.forEach(function(node, i) {
+                        var nodeModel = new NodeModel({
+                            source: node,
+                            datatypelookup: datatypelookup,
+                            graph: self,
+                            "ontology_namespaces": attributes.ontology_namespaces
+                        });
+                        nodeModel.childNodes = ko.observableArray([]);
+                        if(node.istopnode){
+                            this.set('root', nodeModel);
+                        }
+                        nodes.push(nodeModel);
+                    }, this);
+                    this.set('nodes', ko.observableArray(nodes));
+                    break;
+                case 'root':
+                    break;
+                default:
+                    this.set(key, value);
                 }
-            }, this)
+            }, this);
 
             this.tree = this.constructTree();
 
@@ -469,7 +469,7 @@ define(['arches',
                     }, this).forEach(function(nodegroup){
                         parentCards = parentCards.concat(allCards.filter(function(card){
                             return card.nodegroup_id === nodegroup.nodegroupid;
-                        }, this))
+                        }, this));
                     }, this);
                 }
                 return parentCards;
@@ -486,12 +486,12 @@ define(['arches',
          * @return {object} a hierchical node listing
          */
         constructTree: function(root, nodes, edges, append){
-            var node_map = {};
+            var nodeMap = {};
             var root = !!root ? root : this.get('root');
             var nodes = !!nodes ? nodes : this.get('nodes')();
             var edges = !!edges ? edges : this.get('edges')();
             nodes.forEach(function(node){
-                node_map[node.id] = node;
+                nodeMap[node.id] = node;
                 if(!ko.isObservable(node.childNodes)){
                     node.childNodes = ko.observableArray([]);
                 }else{
@@ -499,16 +499,16 @@ define(['arches',
                         node.childNodes.removeAll();
                     }
                 }
-            })
+            });
 
             edges.forEach(function(edge){
-                node_map[edge.domainnode_id].childNodes.unshift(node_map[edge.rangenode_id])
-            })
+                nodeMap[edge.domainnode_id].childNodes.unshift(nodeMap[edge.rangenode_id]);
+            });
 
             edges.forEach(function(edge){
-                node_map[edge.domainnode_id].childNodes.sort(function (left, right) {
-                    return left.attributes.source.sortorder == right.attributes.source.sortorder ? 0 : (left.attributes.source.sortorder < right.attributes.source.sortorder ? -1 : 1) })
-            })
+                nodeMap[edge.domainnode_id].childNodes.sort(function(left, right) {
+                    return left.attributes.source.sortorder == right.attributes.source.sortorder ? 0 : (left.attributes.source.sortorder < right.attributes.source.sortorder ? -1 : 1); });
+            });
 
 
             return root;
@@ -526,7 +526,7 @@ define(['arches',
                     this.set('domain_connections_loaded', true);
                 }, this);
             } else {
-                return Promise.resolve()
+                return Promise.resolve();
             }
 
         },
@@ -537,11 +537,11 @@ define(['arches',
          * @param  {NodeModel} node - the node to test
          * @return {Boolean} true if the node is in a parent group, false otherwise
          */
-        isNodeInParentGroup: function (node) {
+        isNodeInParentGroup: function(node) {
             var isInParentGroup = false;
             var nodeGroupId = node.nodeGroupId();
             if (nodeGroupId) {
-                var collector = _.find(this.get('nodes')(), function (node) {
+                var collector = _.find(this.get('nodes')(), function(node) {
                     return node.nodeid === nodeGroupId;
                 });
                 var childNodesAndEdges = this.getChildNodesAndEdges(collector);
@@ -561,14 +561,14 @@ define(['arches',
          * @param  {NodeModel} node - the node to test
          * @return {Boolean} true if the node is in a child group, false otherwise
          */
-        isNodeInChildGroup: function (node) {
-            var nodeGroupId = node.nodeGroupId()
+        isNodeInChildGroup: function(node) {
+            var nodeGroupId = node.nodeGroupId();
             if (!nodeGroupId) {
                 return false;
             }
             var parentNodes = this.getParentNodesAndEdges(node).nodes;
-            var hasParentGroup = !!parentNodes.find(function (parentNode) {
-                parentNodeGroupId = parentNode.nodeGroupId()
+            var hasParentGroup = !!parentNodes.find(function(parentNode) {
+                var parentNodeGroupId = parentNode.nodeGroupId();
                 return parentNodeGroupId && parentNodeGroupId !== nodeGroupId;
             });
             return hasParentGroup;
@@ -583,7 +583,7 @@ define(['arches',
         isGroupSemantic: function(node){
             return _.every(this.getGroupedNodes(node), function(node){
                 return node.datatype() === 'semantic';
-            }, this)
+            }, this);
         },
 
         /**
@@ -592,14 +592,14 @@ define(['arches',
          * @param  {NodeModel} node - the node to use as a basis of finding the group
          * @return  {array} - a list of {@link NodeModel}
          */
-        getGroupedNodes: function (node) {
+        getGroupedNodes: function(node) {
             var nodeGroupId = node.nodeGroupId();
             if (!nodeGroupId) {
                 return [node];
             }
             return _.filter(this.get('nodes')(), function(node) {
                 return node.nodeGroupId() && node.nodeGroupId() === nodeGroupId;
-            })
+            });
         },
 
         /**
@@ -608,7 +608,7 @@ define(['arches',
          * @param  {NodeModel} node - the node from which to get the node's parents
          * @return  {object} - an object with a list of {@link NodeModel} and edges
          */
-        getParentNodesAndEdges: function (node) {
+        getParentNodesAndEdges: function(node) {
             var self = this;
             var nodes = [];
             var edges = [];
@@ -629,7 +629,7 @@ define(['arches',
             return {
                 nodes: nodes,
                 edges: edges
-            }
+            };
         },
 
         /**
@@ -638,13 +638,13 @@ define(['arches',
          * @param  {NodeModel} node - the node from which to get the node's childNodes
          * @return  {object} - an object with a list of {@link NodeModel} and edges
          */
-        getChildNodesAndEdges: function (node) {
+        getChildNodesAndEdges: function(node) {
             var self = this;
             var nodes = [];
             var edges = [];
             self.get('edges')().filter(function(edge){
                 return edge.domainnode_id === node.nodeid;
-            }).forEach(function (edge) {
+            }).forEach(function(edge) {
                 var rangenode = self.get('nodes')().find(function(node) {
                     return node.nodeid === edge.rangenode_id;
                 });
@@ -658,7 +658,7 @@ define(['arches',
             return {
                 nodes: nodes,
                 edges: edges
-            }
+            };
         },
 
         /**
@@ -670,10 +670,10 @@ define(['arches',
          * @param  {string} eventname - (optional) the event to trigger upon successfull return of the request
          * @return  {jqXHR} - a Proimise compatible asynchronous request
          */
-        _doRequest: function (config, callback, scope, eventname) {
+        _doRequest: function(config, callback, scope, eventname) {
             var self = this;
             return $.ajax($.extend({
-                complete: function (request, status) {
+                complete: function(request, status) {
                     if (typeof callback === 'function') {
                         callback.call(scope || self, request, status);
                     }

@@ -593,17 +593,6 @@ class Graph(models.GraphModel):
                 )
             function_copy.save()
 
-    def copy_reports(self, other_graph, id_maps=[]):
-        for report in other_graph.report_set.all():
-            config_copy = self.replace_config_ids(report.config, id_maps)
-            models.Report(
-                name=report.name,
-                template=report.template,
-                graph=self,
-                config=report.config,
-                active=report.active
-            ).save()
-
     def copy(self, root=None):
         """
         returns an unsaved copy of self

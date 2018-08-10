@@ -12,16 +12,14 @@ define(['arches',
          * @name ReportModel
          */
 
-        url: arches.urls.report_editor,
+        url: arches.urls.graph,
 
         initialize: function(options) {
             var self = this;
             this.cards = options.cards || [];
 
-            this.set('reportid', ko.observable());
-            this.set('name', ko.observable());
+            this.set('graphid', ko.observable());
             this.set('template_id', ko.observable());
-            this.set('active', ko.observable());
             this.set('config', {});
             self.configKeys = ko.observableArray();
 
@@ -51,7 +49,7 @@ define(['arches',
                 owner: this
             });
 
-            this.parse(options.report);
+            this.parse(options.graph);
         },
 
         /**
@@ -65,14 +63,11 @@ define(['arches',
 
             _.each(attributes, function(value, key) {
                 switch (key) {
-                case 'reportid':
+                case 'graphid':
                     this.set('id', value);
-                    this.get('reportid')(value);
+                    this.get('graphid')(value);
                     break;
-                case 'name':
                 case 'template_id':
-                case 'graph':
-                case 'active':
                     this.get(key)(value);
                     break;
                 case 'config':

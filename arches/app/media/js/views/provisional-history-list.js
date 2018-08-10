@@ -26,6 +26,7 @@ define([
         */
         initialize: function(options) {
             var self = this;
+            var defaultDateRange = "last-30";
             ListView.prototype.initialize.apply(this, arguments);
 
             this.updateList = function() {
@@ -48,43 +49,7 @@ define([
                 });
             };
 
-            this.items = options.items;
-            this.helploading = options.helploading;
-            this.helploaded = options.helploaded;
-            this.start = ko.observable();
-            this.end = ko.observable();
-            this.dateRangeType = ko.observable('custom');
-            this.format = 'YYYY-MM-DD';
-            this.dateRangeType = ko.observable();
-            this.fromDate = ko.observable();
-            this.toDate = ko.observable();
-            this.sortDescending = ko.observable(true);
-
-            this.sortAsc = function() {
-                self.items.sort(function(a, b) {
-                    return a.lasttimestamp === b.lasttimestamp ? 0 : (a.lasttimestamp < b.lasttimestamp ? -1 : 1);
-                });
-            };
-
-            this.sortDesc = function() {
-                self.items.sort(function(a, b) {
-                    return a.lasttimestamp === b.lasttimestamp ? 0 : (a.lasttimestamp > b.lasttimestamp ? -1 : 1);
-                });
-            };
-
-            this.editResource = function(resourceinstanceid){
-                window.open(arches.urls.resource_editor + resourceinstanceid);
-            },
-
-            this.sortDescending.subscribe(function(val) {
-                if (val === true) {
-                    self.sortDesc();
-                } else {
-                    self.sortAsc();
-                }
-            });
-
-            this.dateRangeType.subscribe(function(value) {
+            this.updateRange = function(value) {
                 var today = moment();
                 var from = today.format(this.format);
                 var to = today.add(1, 'days').format(this.format);
@@ -121,12 +86,57 @@ define([
                 default:
                     return;
                 }
-                this.start(from);
-                this.end(to);
+                return {
+                    start: from,
+                    end: to
+                };
+            };
+
+            var dateRange = this.updateRange(defaultDateRange);
+
+            this.items = options.items;
+            this.helploading = options.helploading;
+            this.helploaded = options.helploaded;
+            this.start = ko.observable(dateRange.start);
+            this.end = ko.observable(dateRange.end);
+            this.dateRangeType = ko.observable('custom');
+            this.format = 'YYYY-MM-DD';
+            this.dateRangeType = ko.observable();
+            this.sortDescending = ko.observable(true);
+
+            this.sortAsc = function() {
+                self.items.sort(function(a, b) {
+                    return a.lasttimestamp === b.lasttimestamp ? 0 : (a.lasttimestamp < b.lasttimestamp ? -1 : 1);
+                });
+            };
+
+            this.sortDesc = function() {
+                self.items.sort(function(a, b) {
+                    return a.lasttimestamp === b.lasttimestamp ? 0 : (a.lasttimestamp > b.lasttimestamp ? -1 : 1);
+                });
+            };
+
+            this.editResource = function(resourceinstanceid){
+                window.open(arches.urls.resource_editor + resourceinstanceid);
+            },
+
+            this.sortDescending.subscribe(function(val) {
+                if (val === true) {
+                    self.sortDesc();
+                } else {
+                    self.sortAsc();
+                }
+            });
+
+            this.dateRangeType(defaultDateRange);
+
+            this.dateRangeType.subscribe(function(value){
+                var range = this.updateRange(value);
+                this.start(range.start);
+                this.end(range.end);
                 this.updateList();
             }, this);
 
-            this.dateRangeType('last-30');
         }
 
     });

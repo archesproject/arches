@@ -6,6 +6,7 @@ define([
     'views/base-manager',
     'viewmodels/alert',
     'models/graph',
+    'models/report',
     'views/graph/graph-manager/graph',
     'views/graph/graph-designer/graph-tree',
     'views/graph/graph-designer/node-form',
@@ -17,10 +18,11 @@ define([
     'viewmodels/graph-settings',
     'viewmodels/card',
     'view-data',
+    'report-templates',
     'bindings/resizable-sidepanel',
     'datatype-config-components',
     'views/components/simple-switch'
-], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, GraphModel, GraphView, GraphTree, NodeFormView, BranchListView, CardTreeViewModel, PermissionDesigner, data, arches, GraphSettingsViewModel, CardViewModel, viewData) {
+], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, GraphModel, ReportModel, GraphView, GraphTree, NodeFormView, BranchListView, CardTreeViewModel, PermissionDesigner, data, arches, GraphSettingsViewModel, CardViewModel, viewData, reportLookup) {
     var GraphDesignerView = BaseManagerView.extend({
 
         initialize: function(options) {
@@ -176,7 +178,33 @@ define([
                 iconFilter: ko.observable(''),
                 node: viewModel.selectedNode,
                 rootNodeColor: ko.observable(''),
-                ontology_namespaces: data.ontology_namespaces
+                "ontology_namespaces": data.ontology_namespaces,
+                onReset: function() {
+                    var graph = ko.mapping.toJS(viewModel.graphSettingsViewModel.graph);
+                    viewModel.report.configJSON(graph.config);
+                    viewModel.report.get('template_id')(graph["template_id"]);
+                }
+            });
+
+            viewModel.report = new ReportModel(_.extend(data, {
+                graphModel: viewModel.graphModel,
+                cards: viewModel.cardTree.topCards
+            }));
+
+            viewModel.report.configJSON.subscribe(function(config) {
+                var graph = ko.mapping.toJS(viewModel.graphSettingsViewModel.graph);
+                graph.config = config;
+                ko.mapping.fromJS(graph, viewModel.graphSettingsViewModel.graph);
+            });
+
+            viewModel.report.get('template_id').subscribe(function(val) {
+                viewModel.graphSettingsViewModel.graph["template_id"](val);
+            });
+
+            viewModel.reportLookup = reportLookup;
+            viewModel.reportTemplates = _.map(reportLookup, function(report, id) {
+                report.id = id;
+                return report;
             });
 
             viewModel.graphTree = new GraphTree({
@@ -214,32 +242,34 @@ define([
                 var cardList = cardTree.flattenTree(cardTree.topCards(), []);
                 var res;
                 var matchingWidget;
-                if (item.nodeGroupId) { //if the item is a node in graph tree
-                    var matchingCards = _.filter(cardList, function(card){
-                        return card.nodegroupid === item.nodeGroupId();
-                    });
-                    _.each(matchingCards, function(card){
-                        var match;
-                        match = _.find(card.widgets(), function(widget){
-                            return widget.node_id() === item.nodeid;
+                if (typeof item !== 'string') {
+                    if (item.nodeGroupId) { //if the item is a node in graph tree
+                        var matchingCards = _.filter(cardList, function(card){
+                            return card.nodegroupid === item.nodeGroupId();
                         });
-                        if (match) {
-                            matchingWidget = match;
-                        }
-                    });
-                    if (matchingWidget) {
-                        res = matchingWidget;
-                    } else {
-                        res = matchingCards[0];
-                    }
-                } else { //if the item is a card or widget in the card tree
-                    res = _.find(cardList, function(card){
-                        if (item.nodegroupid) {
-                            return card.nodegroupid === item.nodegroupid;
+                        _.each(matchingCards, function(card){
+                            var match;
+                            match = _.find(card.widgets(), function(widget){
+                                return widget.node_id() === item.nodeid;
+                            });
+                            if (match) {
+                                matchingWidget = match;
+                            }
+                        });
+                        if (matchingWidget) {
+                            res = matchingWidget;
                         } else {
-                            return card.nodegroupid === item.node.nodeGroupId();
+                            res = matchingCards[0];
                         }
-                    });
+                    } else { //if the item is a card or widget in the card tree
+                        res = _.find(cardList, function(card){
+                            if (item.nodegroupid) {
+                                return card.nodegroupid === item.nodegroupid;
+                            } else {
+                                return card.nodegroupid === item.node.nodeGroupId();
+                            }
+                        });
+                    }
                 }
                 return res;
 
@@ -258,10 +288,11 @@ define([
 
             var updateGraphSelection = function() {
                 if (viewModel.activeTab() === 'card') {
-                    var matchingNode;
                     viewModel.graphTree.collapseAll();
-                    matchingNode = correspondingNode(viewModel.cardTree.selection(), viewModel.graphTree);
-                    viewModel.graphTree.selectItem(matchingNode);
+                    var matchingNode = correspondingNode(viewModel.cardTree.selection(), viewModel.graphTree);
+                    if (matchingNode) {
+                        viewModel.graphTree.selectItem(matchingNode);
+                    }
                 }
             };
 

@@ -10704,6 +10704,10 @@ a.search-facet-item.disabled {
     display: block;
 }
 
+.editor-report {
+    background: white;
+}
+
 .editor-report .rp-report-section {
     border-bottom: none;
     padding-bottom: 0;
