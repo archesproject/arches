@@ -47,8 +47,8 @@ define([
                     items.push(card);
                 }
             });
-            return items;
         }
+        return items;
     });
     var provisionalTileViewModel = new ProvisionalTileViewModel({tile: selectedTile, reviewer: data.user_is_reviewer});
 
