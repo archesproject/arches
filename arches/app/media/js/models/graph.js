@@ -427,7 +427,7 @@ define(['arches',
                             source: node,
                             datatypelookup: datatypelookup,
                             graph: self,
-                            ontology_namespaces: attributes.ontology_namespaces
+                            "ontology_namespaces": attributes.ontology_namespaces
                         });
                         nodeModel.childNodes = ko.observableArray([]);
                         if(node.istopnode){
