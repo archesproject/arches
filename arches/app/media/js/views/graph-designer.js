@@ -242,7 +242,7 @@ define([
                 var cardList = cardTree.flattenTree(cardTree.topCards(), []);
                 var res;
                 var matchingWidget;
-                if (typeof item !== 'string') {
+                if (item && typeof item !== 'string') {
                     if (item.nodeGroupId) { //if the item is a node in graph tree
                         var matchingCards = _.filter(cardList, function(card){
                             return card.nodegroupid === item.nodeGroupId();
