@@ -274,9 +274,11 @@ define([
                             viewModel.cardTree.selection(viewModel.cardTree.topCards()[0]);
                         } else {
                             matchingCard = correspondingCard(graphTreeSelection, viewModel.cardTree);
-                            viewModel.cardTree.selection(matchingCard);
-                            viewModel.cardTree.collapseAll();
-                            viewModel.cardTree.expandToRoot(viewModel.cardTree.selection());
+                            if (matchingCard) {
+                                viewModel.cardTree.selection(matchingCard);
+                                viewModel.cardTree.collapseAll();
+                                viewModel.cardTree.expandToRoot(viewModel.cardTree.selection());
+                            }
                         }
                     }
                 }
@@ -284,10 +286,12 @@ define([
 
             var updatePermissionCardSelection = function() {
                 var matchingCard = correspondingCard(viewModel.cardTree.selection(), viewModel.permissionTree);
-                viewModel.permissionTree.collapseAll();
-                viewModel.permissionTree.expandToRoot(matchingCard);
-                viewModel.permissionTree.selection.removeAll();
-                matchingCard.selected(true);
+                if (matchingCard) {
+                    viewModel.permissionTree.collapseAll();
+                    viewModel.permissionTree.expandToRoot(matchingCard);
+                    viewModel.permissionTree.selection.removeAll();
+                    matchingCard.selected(true);
+                }
             };
 
             viewModel.cardTree.selection.subscribe(function(){
