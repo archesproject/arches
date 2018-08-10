@@ -210,6 +210,73 @@ define([
                     });
             };
 
+            var correspondingCard = function(node, cardTree){
+                var cardList = cardTree.flattenTree(cardTree.topCards(), []);
+                var res;
+                var matchingWidget;
+                var matchingCards = _.filter(cardList, function(card){
+                    return card.nodegroupid === node.nodeGroupId();
+                });
+                _.each(matchingCards, function(card){
+                    var match;
+                    match = _.find(card.widgets(), function(widget){
+                        return widget.node_id() === node.nodeid;
+                    });
+                    if (match) {
+                        matchingWidget = match;
+                    }
+                });
+                if (matchingWidget) {
+                    res = matchingWidget;
+                } else {
+                    res = matchingCards[0];
+                }
+                return res;
+
+            };
+
+            var correspondingNode = function(card, graphTree){
+                var nodeMatch = _.find(graphTree.items(), function(node){
+                    if (card.node) {
+                        return node.nodeid === card.node_id();
+                    } else {
+                        return node.nodeGroupId() === card.nodegroupid && node.nodeid === node.nodeGroupId();
+                    }
+                });
+                return nodeMatch;
+            };
+
+            var updateGraphSelection = function() {
+                if (viewModel.activeTab() === 'card') {
+                    var matchingNode;
+                    matchingNode = correspondingNode(viewModel.cardTree.selection(), viewModel.graphTree);
+                    viewModel.graphTree.selectItem(matchingNode);
+                }
+            };
+
+            var updateCardSelection = function() {
+                if (viewModel.activeTab() === 'graph') {
+                    var graphTreeSelection = viewModel.graphTree.selectedItems().length > 0 ? viewModel.graphTree.selectedItems()[0] : null;
+                    var matchingCard;
+                    if (graphTreeSelection) {
+                        if (graphTreeSelection.istopnode === true) {
+                            viewModel.cardTree.selection(viewModel.cardTree.topCards()[0]);
+                        } else {
+                            matchingCard = correspondingCard(graphTreeSelection, viewModel.cardTree);
+                            viewModel.cardTree.selection(matchingCard);
+                            viewModel.cardTree.expandToRoot(viewModel.cardTree.selection());
+                        }
+                    }
+                }
+            };
+
+            viewModel.cardTree.selection.subscribe(function(){
+                updateGraphSelection();
+            });
+            viewModel.graphTree.selectedItems.subscribe(function(){
+                updateCardSelection();
+            })
+
             if (viewModel.activeTab() === 'graph') {
                 viewModel.loadGraphSettings();
                 // here we might load data/views asyncronously
