@@ -40,7 +40,6 @@
                 </li>
 
                 <!-- Menu Item -->
-                {% if active_report_count > 0 %}
                 <li id="report-manager" class="edit-menu-item" data-bind="css: {'disabled': !resourceInstanceExists()}">
                     <a href="#" data-bind="click: function () {window.open('{% url 'resource_report' resourceid %}')}">
                         <div class="media-body">
@@ -49,18 +48,6 @@
                         </div>
                     </a>
                 </li>
-                {% else %}
-                <li id="report-manager" class="edit-menu-item disabled">
-                    <a href="#">
-                        <div class="media-body">
-                            <div class="menu-item-title"><i class="fa fa-book"></i> {% trans "Report Not Available" %}</div>
-                            <span class="text-muted menu-item-subtitle">{% trans "Report template not activated" %}</span>
-                        </div>
-                    </a>
-                </li>
-                {% endif %}
-
-
 
             </ul>
         </div>

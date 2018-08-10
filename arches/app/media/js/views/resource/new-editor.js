@@ -242,9 +242,7 @@ define([
     }
 
     vm.report = null;
-    if (data.report) {
-        vm.report = new ReportModel(_.extend(data, {graphModel: graphModel, cards: vm.topCards}));
-    }
+    vm.report = new ReportModel(_.extend(data, {graphModel: graphModel, cards: vm.topCards}));
 
     vm.resourceId.subscribe(function(){
         //switches the url from 'create-resource' once the resource id is available
