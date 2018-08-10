@@ -18,7 +18,7 @@
 
             <!-- Settings Forms -->
             <div class="">
-                <div class="graph-designer-header">{% trans 'Resource Model Identifiers' %}</div>
+                <div class="graph-designer-header" data-bind="text: graph.isresource() ? '{% trans 'Resource Model Identifiers' %}' : '{% trans 'Branch Identifiers' %}' "></div>
                 <div id="cards" class="graph-settings-panel-body fade in">
                     <form class="widgets">
                         <div class="row widget-container">
@@ -26,7 +26,6 @@
                                 <div class="relative">
                                     <label class="col-xs-12 control-label widget-input-label">
                                         {% trans "Name" %}
-
                                     </label>
                                 </div>
 
@@ -97,7 +96,7 @@
                                 </div>
                             </div>
                         </div>
-
+                        <!-- ko if: graph.isresource() -->
                         <div class="row widget-container">
                             <div class="form-group">
                                 <div class="relative">
@@ -116,6 +115,7 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- /ko -->
                     </form>
                 </div>
 
@@ -164,7 +164,7 @@
                 <div class="graph-settings-panel-body fade in">
 
                     <form class="widgets">
-
+                        <!-- ko if: graph.isresource() -->
                         <div class="row widget-container">
                             <div class="form-group">
 
@@ -179,7 +179,7 @@
 
                             </div>
                         </div>
-
+                        <!-- /ko -->
                         <div class=" row widget-container">
                             <div class="form-group">
 
@@ -219,6 +219,44 @@
                         </div>
                     </form>
                 </div>
+                <!-- ko if: !graph.isresource() -->
+                <div class="graph-designer-header">{% trans 'Root Node Data Type and Settings' %}</div>
+                <div class="graph-settings-panel-body fade in">
+                    <form class="widgets">
+                        <div class="row widget-container">
+                            <div class="form-group">
+                                <div class="relative">
+                                    <label class="col-xs-12 control-label widget-input-label">
+                                        {% trans "Data type" %}
+                                    </label>
+                                </div>
+
+                                <div class="col-xs-12 crm-selector">
+                                    <select class="design" data-bind="value: graphSettingsViewModel.node().datatype, options: datatypes, optionsCaption: '{% trans "Choose a data type" %}', chosen: {disable_search_threshold: 10, width: '500px'}"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="row widget-container graph-settings-switch">
+                    <div class="form-group">
+                        <div class="relative">
+                            <label class="col-xs-12 control-label widget-input-label">
+                                <span class="switch switch-small arches-switch on disabled"><small></small></span>
+                            </label>
+                        </div>
+                        <div class="col-xs-12">
+                            <p class="control-label graph-settings-switch-label">
+                                <span>{% trans "Make card" %}</span>
+                            </p>
+                            <span class="graph-settings-switch-subtitle">
+                                {% trans "Data from nodes not collected in other cards will be collected in the root card's form section" %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <!-- /ko -->
             </div>
         </div>
     </div>

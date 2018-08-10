@@ -54,12 +54,29 @@ define([
             });
         };
 
+        var expandToRoot = function(node) {
+            //expands all nodes up to the root, but does not expand the root.
+            var nodes = self.flattenTree(self.topCards(), []);
+            if (node.parent) {
+                node.parent.expanded(true);
+                expandToRoot(node.parent);
+            } else {
+                node.expanded(true);
+                _.each(nodes, function(n) {
+                    if (node.parentnodegroup_id !== null && node.parentnodegroup_id === n.nodegroupid) {
+                        expandToRoot(n);
+                    }
+                });
+            }
+        };
+
         var createLookup = function(list, idKey) {
             return _.reduce(list, function(lookup, item) {
                 lookup[ko.unwrap(item[idKey])] = item;
                 return lookup;
             }, {});
         };
+
         _.extend(this, {
             filterEnterKeyHandler: function(context, e) {
                 if (e.keyCode === 13) {
@@ -100,6 +117,7 @@ define([
             clearSelection: function() {
                 selectAll(false);
             },
+            expandToRoot: expandToRoot,
             rootExpanded: ko.observable(true),
             on: function() {
                 return;

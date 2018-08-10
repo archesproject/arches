@@ -46,8 +46,10 @@ define([
             if (self.graph.ontology_id() === undefined) {
                 self.graph.ontology_id(null);
             }
+            var rootNodeDatatype = self.node() === undefined ?  ko.unwrap(self.graph.root.datatype) : ko.unwrap(self.node().datatype);
             return JSON.stringify({
                 graph: koMapping.toJS(self.graph),
+                root_node_datatype: rootNodeDatatype,
                 relatable_resource_ids: relatableResourceIds,
                 ontology_class: ontologyClass(),
             });
