@@ -9,7 +9,7 @@ from arches.app.models.resource import Resource
 from arches.app.models.graph import Graph as GraphProxy
 from arches.app.models.tile import Tile
 from arches.app.models.system_settings import settings
-from arches.app.utils.betterJSONSerializer import JSONDeserializer
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from rdflib import Namespace
 from rdflib import URIRef, Literal
 from rdflib import Graph
@@ -95,13 +95,13 @@ class RdfWriter(Writer):
                 graph.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
 
             try:
-                g.add((domainnode, RDF.value, Literal(tile.data[str(edge.domainnode_id)]))) 
+                g.add((domainnode, RDF.value, Literal(JSONSerializer().serialize(tile.data[str(edge.domainnode_id)]))))
             except:
-                pass    
+                pass
             try:
-                g.add((rangenode, RDF.value, Literal(tile.data[str(edge.rangenode_id)]))) 
+                g.add((rangenode, RDF.value, Literal(JSONSerializer().serialize(tile.data[str(edge.rangenode_id)]))))
             except:
-                pass 
+                pass
 
         for resourceinstanceid, tiles in self.resourceinstances.iteritems():
             graph_info = get_graph_parts(self.graph_id)
@@ -181,9 +181,10 @@ class JsonLdWriter(RdfWriter):
 
 class JsonLdReader(Reader):
 
-    tiles = {}
-    errors = {}
-    resources = []
+    def __init__(self):
+        self.tiles = {}
+        self.errors = {}
+        self.resources = []
 
     def get_graph_id(self, strs_to_test):
         if not isinstance(strs_to_test, list):
@@ -385,10 +386,15 @@ class JsonLdReader(Reader):
                         if parent_tileid is None:
                             resource.tiles.append(self.tiles[tileid])
                         else:
-                            self.tiles[parent_tileid].tiles[tileid] = self.tiles[tileid]
+                            self.tiles[parent_tileid].tiles.append(self.tiles[tileid])
 
                     if str(RDF.value) in jsonld_node:
-                        self.tiles[tileid].data[branch['node'].nodeid] = jsonld_node[str(RDF.value)]
+                        value = jsonld_node[str(RDF.value)]
+                        try:
+                            value = JSONDeserializer().deserialize(value)
+                        except:
+                            pass
+                        self.tiles[tileid].data[str(branch['node'].nodeid)] = value
 
                 if len(ontology_properties) > 0:
                     for ontology_property in ontology_properties:
