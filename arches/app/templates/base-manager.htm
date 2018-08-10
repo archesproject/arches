@@ -125,7 +125,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         {% endif %}
 
                         <!-- Prov edit history-->
-                        {% if user_is_reviewer == False %}
+                        {% if user_is_reviewer == False and user|can_edit_resource_instance %}
                         <a href="{% url 'search_home' %}" class="ep-edits-toggle ep-tools ep-tools-right" data-bind="click:function () { getProvisionalHistory(); }">
                             <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "My Recent Edits" %}'>
                               <i class="ion-clock"></i>
