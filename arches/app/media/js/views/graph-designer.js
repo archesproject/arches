@@ -208,26 +208,37 @@ define([
                     });
             };
 
-            var correspondingCard = function(node, cardTree){
+            var correspondingCard = function(item, cardTree){
                 var cardList = cardTree.flattenTree(cardTree.topCards(), []);
                 var res;
                 var matchingWidget;
-                var matchingCards = _.filter(cardList, function(card){
-                    return card.nodegroupid === node.nodeGroupId();
-                });
-                _.each(matchingCards, function(card){
-                    var match;
-                    match = _.find(card.widgets(), function(widget){
-                        return widget.node_id() === node.nodeid;
+                if (item.nodeGroupId) { //if the item is a node in graph tree
+                    var matchingCards = _.filter(cardList, function(card){
+                        return card.nodegroupid === item.nodeGroupId();
                     });
-                    if (match) {
-                        matchingWidget = match;
+                    _.each(matchingCards, function(card){
+                        var match;
+                        match = _.find(card.widgets(), function(widget){
+                            return widget.node_id() === item.nodeid;
+                        });
+                        if (match) {
+                            matchingWidget = match;
+                        }
+                    });
+                    if (matchingWidget) {
+                        res = matchingWidget;
+                    } else {
+                        res = matchingCards[0];
                     }
-                });
-                if (matchingWidget) {
-                    res = matchingWidget;
-                } else {
-                    res = matchingCards[0];
+                } else { //if the item is a card or widget in the card tree
+                    res = _.find(cardList, function(card){
+                        if (item.nodegroupid) {
+                            return card.nodegroupid === item.nodegroupid;
+                        } else {
+                            return card.nodegroupid === item.node.nodeGroupId();
+                        }
+                    });
+                    cardTree.expandToRoot(res);
                 }
                 return res;
 
@@ -268,11 +279,20 @@ define([
                 }
             };
 
+            var updatePermissionCardSelection = function() {
+                var matchingCard = correspondingCard(viewModel.cardTree.selection(), viewModel.permissionTree);
+                viewModel.permissionTree.selection.removeAll();
+                matchingCard.selected(true);
+            };
+
             viewModel.cardTree.selection.subscribe(function(){
                 updateGraphSelection();
+                updatePermissionCardSelection();
             });
+
             viewModel.graphTree.selectedItems.subscribe(function(){
                 updateCardSelection();
+                updatePermissionCardSelection();
             })
 
             if (viewModel.activeTab() === 'graph') {
