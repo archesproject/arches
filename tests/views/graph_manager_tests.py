@@ -16,7 +16,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import os, json
+import os
+import json
 from tests import test_settings
 from arches.app.models.system_settings import settings
 from tests.base_test import ArchesTestCase
@@ -29,6 +30,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 
 # these tests can be run from the command line via
 # python manage.py test tests/views/graph_manager_tests.py --pattern="*.py" --settings="tests.test_settings"
+
 
 class GraphManagerViewTests(ArchesTestCase):
 
@@ -196,12 +198,12 @@ class GraphManagerViewTests(ArchesTestCase):
 
         """
         self.client.login(username='admin', password='admin')
-        url = reverse('graph', kwargs={'graphid':''})
+        url = reverse('graph', kwargs={'graphid': ''})
         response = self.client.get(url)
         graphs = json.loads(response.context['graphs'])
         self.assertEqual(len(graphs), GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).count())
 
-        url = reverse('graph_designer', kwargs={'graphid':self.GRAPH_ID})
+        url = reverse('graph_designer', kwargs={'graphid': self.GRAPH_ID})
         response = self.client.get(url)
         graph = json.loads(response.context['graph_json'])
 
@@ -222,7 +224,7 @@ class GraphManagerViewTests(ArchesTestCase):
         graph = json.loads(response.content)
 
         graph['name'] = 'new graph name'
-        post_data = {'graph':graph, 'relatable_resource_ids': [str(self.ROOT_ID)], 'root_node_datatype': 'semantic'}
+        post_data = {'graph': graph, 'relatable_resource_ids': [str(self.ROOT_ID)], 'root_node_datatype': 'semantic'}
         post_data = JSONSerializer().serialize(post_data)
         content_type = 'application/x-www-form-urlencoded'
         response = self.client.post(url, post_data, content_type)
@@ -238,7 +240,7 @@ class GraphManagerViewTests(ArchesTestCase):
 
         """
         self.client.login(username='admin', password='admin')
-        url = reverse('update_node', kwargs={'graphid':self.GRAPH_ID})
+        url = reverse('update_node', kwargs={'graphid': self.GRAPH_ID})
         node = Node.objects.get(nodeid=str(self.appended_branch_1.root.pk))
         node.name = "new node name"
         nodegroup, created = NodeGroup.objects.get_or_create(pk=str(self.appended_branch_1.root.pk))
@@ -254,7 +256,7 @@ class GraphManagerViewTests(ArchesTestCase):
             if node['nodeid'] == str(self.appended_branch_1.root.pk):
                 self.assertEqual(node['name'], 'new node name')
             if node['nodegroup_id'] == str(self.appended_branch_1.root.pk):
-                node_count =  node_count + 1
+                node_count = node_count + 1
         self.assertEqual(node_count, 2)
 
         node_ = Node.objects.get(nodeid=str(self.appended_branch_1.root.pk))
@@ -269,8 +271,8 @@ class GraphManagerViewTests(ArchesTestCase):
         """
         self.client.login(username='admin', password='admin')
         node = Node.objects.get(nodeid=str(self.appended_branch_1.root.pk))
-        url = reverse('delete_node', kwargs={'graphid':self.GRAPH_ID})
-        post_data = JSONSerializer().serialize({'nodeid':node.nodeid})
+        url = reverse('delete_node', kwargs={'graphid': self.GRAPH_ID})
+        post_data = JSONSerializer().serialize({'nodeid': node.nodeid})
         response = self.client.delete(url, post_data)
         self.assertEqual(response.status_code, 200)
 
@@ -284,7 +286,7 @@ class GraphManagerViewTests(ArchesTestCase):
 
         """
         self.client.login(username='admin', password='admin')
-        url = reverse('clone_graph', kwargs={'graphid':self.GRAPH_ID})
+        url = reverse('clone_graph', kwargs={'graphid': self.GRAPH_ID})
         post_data = {}
         content_type = 'application/x-www-form-urlencoded'
         response = self.client.post(url, post_data, content_type)
@@ -311,13 +313,13 @@ class GraphManagerViewTests(ArchesTestCase):
 
         """
         self.client.login(username='admin', password='admin')
-        url = reverse('delete_graph', kwargs={'graphid':self.GRAPH_ID})
+        url = reverse('delete_graph', kwargs={'graphid': self.GRAPH_ID})
         response = self.client.delete(url)
 
         node_count = Node.objects.filter(graph_id=self.GRAPH_ID).count()
         edge_count = Edge.objects.filter(graph_id=self.GRAPH_ID).count()
-        self.assertEqual(node_count,0)
-        self.assertEqual(edge_count,0)
+        self.assertEqual(node_count, 0)
+        self.assertEqual(edge_count, 0)
 
     def test_graph_export(self):
         """
@@ -326,7 +328,7 @@ class GraphManagerViewTests(ArchesTestCase):
         """
 
         self.client.login(username='admin', password='admin')
-        url = reverse('export_graph', kwargs={'graphid':self.GRAPH_ID})
+        url = reverse('export_graph', kwargs={'graphid': self.GRAPH_ID})
         response = self.client.get(url)
         graph_json = json.loads(response._container[0])
         node_count = len(graph_json['graph'][0]['nodes'])
@@ -346,7 +348,8 @@ class GraphManagerViewTests(ArchesTestCase):
             response = self.client.post(url, {'importedGraph': f})
         self.assertIsNotNone(response.content)
 
-        #Note: If you change the imported_json array to make this test work you should also change the expected response in the import_graph method in arches.app.media.js.views.graph.js
+        # Note: If you change the imported_json array to make this test work you should also change the expected
+        # response in the import_graph method in arches.app.media.js.views.graph.js
         imported_json = JSONDeserializer().deserialize(response.content)
         self.assertEqual(imported_json[0], [])
         self.assertEqual(imported_json[1]['graphs_saved'], 1)
