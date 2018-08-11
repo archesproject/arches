@@ -130,15 +130,13 @@ class Resource(models.ResourceInstance):
         documents = []
         term_list = []
 
-        # flatten out the nested tiles into a single array
-        for resource in resources:
-            for parent_tile in resource.tiles:
-                for child_tile in parent_tile.tiles.itervalues():
-                    if len(child_tile) > 0:
-                        resource.tiles.extend(child_tile)
-                parent_tile.tiles = {}
+        # # flatten out the nested tiles into a single array
+        def flatten_tiles(obj):
+            for tile in obj.tiles:
+                tiles.append(flatten_tiles(tile))
+            return obj
 
-            tiles.extend(resource.tiles)
+        flatten_tiles(resource)
 
         # need to save the models first before getting the documents for index
         Resource.objects.bulk_create(resources)

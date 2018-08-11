@@ -191,7 +191,7 @@ class ArchesFileReader(Reader):
                 if sourcetilegroup[0]['data'][0].keys()[0] not in blanktilecache:
                     blank_tile = Tile.get_blank_tile(tiles[0]['data'][0].keys()[0], resourceid=resourceinstanceid)
                     if blank_tile.data != {}:
-                        for tile in blank_tile.tiles.values():
+                        for tile in blank_tile.tiles:
                             if isinstance(tile, Tile):
                                 for key in tile.data.keys():
                                     blanktilecache[key] = blank_tile
@@ -271,12 +271,13 @@ class ArchesFileReader(Reader):
                                                         source_tile['data'].remove(tiledata)
 
                                         elif target_tile.tiles != None:
+                                            populated_child_tiles = []
                                             populated_child_nodegroups = []
-                                            for nodegroupid, childtile in target_tile.tiles.iteritems():
+                                            for childtile in target_tile.tiles:
                                                 childtile_empty = True
-                                                child_tile_cardinality = target_nodegroup_cardinalities[str(childtile[0].nodegroup_id)]
-                                                if str(childtile[0].nodegroup_id) not in populated_child_nodegroups:
-                                                    prototype_tile = childtile.pop()
+                                                child_tile_cardinality = target_nodegroup_cardinalities[str(childtile.nodegroup_id)]
+                                                if str(childtile.nodegroup_id) not in populated_child_nodegroups:
+                                                    prototype_tile = childtile
                                                     prototype_tile.tileid = None
 
                                                     for source_tile in sourcetilegroup:
@@ -303,9 +304,11 @@ class ArchesFileReader(Reader):
                                                             if prototype_tile_copy.data == {} or childtile_empty:
                                                                 prototype_tile_copy = None
                                                             if prototype_tile_copy is not None:
-                                                                childtile.append(prototype_tile_copy)
+                                                                populated_child_tiles.append(prototype_tile_copy)
                                                         else:
                                                             break
+
+                                            target_tile.tiles = populated_child_tiles
 
                                         if target_tile.data:
                                             if target_tile.data == {} and target_tile.tiles == {}:

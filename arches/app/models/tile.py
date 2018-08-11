@@ -77,7 +77,7 @@ class Tile(models.TileModel):
         # self.nodegroup
         # self.sortorder
         # end from models.TileModel
-        self.tiles = {}
+        self.tiles = []
 
         if args:
             if isinstance(args[0], dict):
@@ -89,12 +89,10 @@ class Tile(models.TileModel):
                     self.tileid = uuid.uuid4()
 
                 if 'tiles' in args[0]:
-                    for key, tiles in args[0]['tiles'].iteritems():
-                        self.tiles[key] = []
-                        for tile_obj in tiles:
-                            tile = Tile(tile_obj)
-                            tile.parenttile = self
-                            self.tiles[key].append(tile)
+                    for tile_obj in args[0]['tiles']:
+                        tile = Tile(tile_obj)
+                        tile.parenttile = self
+                        self.tiles.append(tile)
 
     def save_edit(self, user={}, note='', edit_type='', old_value=None, new_value=None, newprovisionalvalue=None, oldprovisionalvalue=None, provisional_edit_log_details=None):
         timestamp = datetime.datetime.now()
@@ -275,24 +273,22 @@ class Tile(models.TileModel):
                     provisional_edit_log_details=provisional_edit_log_details
                 )
 
-
         if index:
             self.index()
 
-        for tiles in self.tiles.itervalues():
-            for tile in tiles:
-                tile.resourceinstance = self.resourceinstance
-                tile.parenttile = self
-                tile.save(*args, request=request, index=index, **kwargs)
+        for tile in self.tiles:
+            tile.resourceinstance = self.resourceinstance
+            tile.parenttile = self
+            print tile.data
+            tile.save(*args, request=request, index=index, **kwargs)
 
 
     def delete(self, *args, **kwargs):
         se = SearchEngineFactory().create()
         request = kwargs.pop('request', None)
         provisional_edit_log_details = kwargs.pop('provisional_edit_log_details', None)
-        for tiles in self.tiles.itervalues():
-            for tile in tiles:
-                tile.delete(*args, request=request, **kwargs)
+        for tile in self.tiles:
+            tile.delete(*args, request=request, **kwargs)
         try:
             user = request.user
             user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
@@ -338,22 +334,21 @@ class Tile(models.TileModel):
         for node in nodegroup.node_set.all():
             datatype = datatype_factory.get_instance(node.datatype)
             datatype.after_update_all()
-        for key, tile_list in self.tiles.iteritems():
-            for child_tile in tile_list:
-                child_tile.after_update_all()
+        for tile in self.tiles:
+            tile.after_update_all()
 
     def is_blank(self):
-        if self.tiles != {}:
-            for tiles in self.tiles.values():
-                for tile in tiles:
-                    if len([item for item in tile.data.values() if item != None]) > 0:
-                        return False
-        elif self.data != {}:
+        if self.data != {}:
             if len([item for item in self.data.values() if item != None]) > 0:
                 return False
+        
+        child_tiles_are_blank = True
+        for tile in self.tiles:
+            if tile.is_blank() == False:
+                child_tiles_are_blank = False
+                break
 
-        return True
-
+        return child_tiles_are_blank
 
     @staticmethod
     def get_blank_tile(nodeid, resourceid=None):
@@ -367,9 +362,9 @@ class Tile(models.TileModel):
             parent_tile.tileid = None
             parent_tile.nodegroup_id = node.nodegroup.parentnodegroup_id
             parent_tile.resourceinstance_id = resourceid
-            parent_tile.tiles = {}
+            parent_tile.tiles = []
             for nodegroup in models.NodeGroup.objects.filter(parentnodegroup_id=node.nodegroup.parentnodegroup_id):
-                parent_tile.tiles[nodegroup.pk] = [Tile.get_blank_tile_from_nodegroup_id(nodegroup.pk, resourceid=resourceid, parenttile=parent_tile)]
+                parent_tile.tiles.append(Tile.get_blank_tile_from_nodegroup_id(nodegroup.pk, resourceid=resourceid, parenttile=parent_tile))
             return parent_tile
         else:
             return Tile.get_blank_tile_from_nodegroup_id(node.nodegroup_id, resourceid=resourceid)
@@ -413,13 +408,7 @@ class Tile(models.TileModel):
     def filter_by_perm(self, user, perm):
         if user:
             if user.has_perm(perm, self.nodegroup):
-                filtered_tiles = {}
-                for key, tiles in self.tiles.iteritems():
-                    filtered_tiles[key] = []
-                    for tile in tiles:
-                        if user.has_perm(perm, tile.nodegroup):
-                            filtered_tiles[key].append(tile)
-                self.tiles = filtered_tiles
+                self.tiles = filter(lambda tile: tile.filter_by_perm(user, perm), self.tiles)
             else:
                 return None
         return self
