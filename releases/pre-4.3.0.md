@@ -326,7 +326,7 @@ Assigned to: Alexei (1.5)
 | Create branch    |:x:|    ?   |    ?    |   ?  | ?   | #3887    |
 | Create resource  |:x:|    ?   |    ?    |   ?  | ?   | #3887    |
 | Add/Edit cards   |:x:|    ?   |    ?    |   ?  | ?   | #3892    |
-| Add/Edit reports |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Add/Edit reports |:construction:|    ?   |    ?    |   ?  | ?   | #3893     |
 | Edit functions   | :x:|    ?   |    ?    |   ?  | ?   | #3888     |
 | delete graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 | clone graph      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
