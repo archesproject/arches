@@ -113,6 +113,13 @@ class Resource(models.ResourceInstance):
 
         return root_ontology_class
 
+    # # flatten out the nested tiles into a single array
+    def get_flattened_tiles(self):
+        tiles = []
+        for tile in self.tiles:
+            tiles.extend(tile.get_flattened_tiles())
+        return tiles
+
     @staticmethod
     def bulk_save(resources):
         """
@@ -130,13 +137,9 @@ class Resource(models.ResourceInstance):
         documents = []
         term_list = []
 
-        # # flatten out the nested tiles into a single array
-        def flatten_tiles(obj):
-            for tile in obj.tiles:
-                tiles.append(flatten_tiles(tile))
-            return obj
-
-        flatten_tiles(resource)
+        for resource in resources:
+            resource.tiles = resource.get_flattened_tiles()
+            tiles.extend(resource.tiles)
 
         # need to save the models first before getting the documents for index
         Resource.objects.bulk_create(resources)

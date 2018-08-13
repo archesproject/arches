@@ -328,6 +328,16 @@ class Tile(models.TileModel):
 
         Resource.objects.get(pk=self.resourceinstance_id).index()
 
+    # # flatten out the nested tiles into a single array
+    def get_flattened_tiles(self):
+        tiles = []
+        def flatten_tiles(obj):
+            for tile in obj.tiles:
+                tiles.append(flatten_tiles(tile))
+            return obj
+        tiles.append(flatten_tiles(self))
+        return tiles
+
     def after_update_all(self):
         nodegroup = models.NodeGroup.objects.get(pk=self.nodegroup_id)
         datatype_factory = DataTypeFactory()
