@@ -565,8 +565,8 @@ class CsvReader(Reader):
                             if key not in blanktilecache:
                                 blanktilecache[str(key)] = blank_tile
                     else:
-                        for nodegroup, tile in blank_tile.tiles.iteritems():
-                            for key in tile[0].data.keys():
+                        for tile in blank_tile.tiles:
+                            for key in tile.data.keys():
                                 if key not in blanktilecache:
                                     blanktilecache[str(key)] = blank_tile
 
@@ -645,10 +645,8 @@ class CsvReader(Reader):
                                         populated_tiles.pop(populated_tiles.index(parent_tile))
                                     errors.append({'type': 'WARNING', 'message': 'The {0} node is required and must be populated in order to populate the {1} nodes. This data was not imported.'.format(required_nodes[target_k],  ', '.join(all_nodes.filter(nodegroup_id=str(target_tile.nodegroup_id)).values_list('name', flat=True)))})
                         elif bool(tile.tiles):
-                            for tile_k, tile_v in tile.tiles.iteritems():
-                                if len(tile_v) > 0:
-                                    for t in tile_v:
-                                        check_required_nodes(t, parent_tile, required_nodes, all_nodes)
+                            for tile in tile.tiles:
+                                check_required_nodes(tile, parent_tile, required_nodes, all_nodes)
                     if len(errors) > 0:
                         self.errors += errors
 
@@ -740,16 +738,16 @@ class CsvReader(Reader):
 
                                 # Check if we are populating a child tile(s) by inspecting the target_tiles.tiles array.
                                 elif target_tile.tiles != None:
+                                    populated_child_tiles = []
                                     populated_child_nodegroups = []
-                                    for nodegroupid, childtile in target_tile.tiles.iteritems():
-                                        prototype_tile = childtile.pop()
-                                        if str(prototype_tile.nodegroup_id) in single_cardinality_nodegroups:
+                                    for childtile in target_tile.tiles:
+                                        if str(childtile.nodegroup_id) in single_cardinality_nodegroups:
                                             child_tile_cardinality = '1'
                                         else:
                                             child_tile_cardinality = 'n'
 
                                         def populate_child_tiles(source_data):
-                                            prototype_tile_copy = cPickle.loads(cPickle.dumps(prototype_tile, -1))
+                                            prototype_tile_copy = cPickle.loads(cPickle.dumps(childtile, -1))
                                             tileid = row['TileID'] if 'TileID' in row else uuid.uuid4()
                                             prototype_tile_copy.tileid = tileid
                                             prototype_tile_copy.parenttile = target_tile
@@ -777,7 +775,7 @@ class CsvReader(Reader):
                                             if prototype_tile_copy.data != {}:
                                                 if len([item for item in prototype_tile_copy.data.values() if item != None]) > 0:
                                                     if str(prototype_tile_copy.nodegroup_id) not in populated_child_nodegroups:
-                                                        childtile.append(prototype_tile_copy)
+                                                        populated_child_tiles.append(prototype_tile_copy)
 
                                             if prototype_tile_copy != None:
                                                 if child_tile_cardinality == '1' and 'NodeGroupID' not in row:
@@ -786,6 +784,8 @@ class CsvReader(Reader):
                                             source_data[:] = [item for item in source_data if item != {}]
 
                                         populate_child_tiles(source_data)
+
+                                    target_tile.tiles = populated_child_tiles
 
                                 if not target_tile.is_blank():
                                     populated_tiles.append(target_tile)

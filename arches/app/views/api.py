@@ -1,4 +1,6 @@
 import json
+import uuid
+import re
 from django.shortcuts import render
 from django.views.generic import View
 from django.views.decorators.csrf import csrf_exempt
@@ -7,11 +9,10 @@ from django.db.models import Q
 from django.http.request import QueryDict
 from django.core.urlresolvers import reverse
 from django.utils.decorators import method_decorator
-
 from revproxy.views import ProxyView
-
 from arches.app.models import models
 from arches.app.models.concept import Concept
+from arches.app.models.graph import Graph
 from arches.app.models.mobile_survey import MobileSurvey
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
@@ -27,11 +28,12 @@ from arches.app.utils.decorators import group_required
 
 
 class CouchdbProxy(ProxyView):
-    #check user credentials here
+    # check user credentials here
     upstream = settings.COUCHDB_URL
 
 
 class APIBase(View):
+
     def dispatch(self, request, *args, **kwargs):
         get_params = request.GET.copy()
         accept = request.META.get('HTTP_ACCEPT')
@@ -45,14 +47,15 @@ class APIBase(View):
             get_params['format'] = format_values[accept]
         for key, value in request.META.iteritems():
             if key.startswith('HTTP_X_ARCHES_'):
-                if key.replace('HTTP_X_ARCHES_','').lower() not in request.GET:
-                    get_params[key.replace('HTTP_X_ARCHES_','').lower()] = value
+                if key.replace('HTTP_X_ARCHES_', '').lower() not in request.GET:
+                    get_params[key.replace('HTTP_X_ARCHES_', '').lower()] = value
         get_params._mutable = False
         request.GET = get_params
         return super(APIBase, self).dispatch(request, *args, **kwargs)
 
 
 class Surveys(APIBase):
+
     def get(self, request):
         group_ids = list(request.user.groups.values_list('id', flat=True))
         projects = MobileSurvey.objects.filter(Q(users__in=[request.user]) | Q(groups__in=group_ids), active=True)
@@ -62,6 +65,7 @@ class Surveys(APIBase):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class Resources(APIBase):
+
     # context = [{
     #     "@context": {
     #         "id": "@id",
@@ -101,7 +105,8 @@ class Resources(APIBase):
         if resourceid:
             try:
                 exporter = ResourceExporter(format=format)
-                output = exporter.writer.write_resources(resourceinstanceids=[resourceid], indent=indent, user=request.user)
+                output = exporter.writer.write_resources(
+                    resourceinstanceids=[resourceid], indent=indent, user=request.user)
                 out = output[0]['outputfile'].getvalue()
             except models.ResourceInstance.DoesNotExist:
                 return JSONResponse(status=404)
@@ -145,10 +150,11 @@ class Resources(APIBase):
             except:
                 page = 1
 
-            start = ((page-1)*page_size) + 1
-            end = start+page_size
+            start = ((page - 1) * page_size) + 1
+            end = start + page_size
 
-            base_url = "%s%s" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, reverse('resources',args=['']).lstrip('/'))
+            base_url = "%s%s" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT,
+                                 reverse('resources', args=['']).lstrip('/'))
             out = {
                 "@context": "https://www.w3.org/ns/ldp/",
                 "@id": "",
@@ -163,13 +169,63 @@ class Resources(APIBase):
     def put(self, request, resourceid):
         if user_can_edit_resources(user=request.user):
             data = JSONDeserializer().deserialize(request.body)
-            #print data
+            # print data
             reader = JsonLdReader()
             reader.read_resource(data)
         else:
             return JSONResponse(status=500)
 
         return JSONResponse(self.get(request, resourceid))
+
+    def post(self, request, resourceid=None):
+        try:
+            indent = int(request.POST.get('indent', None))
+        except:
+            indent = None
+
+        try:
+            if user_can_edit_resources(user=request.user):
+                data = JSONDeserializer().deserialize(request.body)
+                reader = JsonLdReader()
+                reader.read_resource(data)
+                if reader.errors:
+                    response = []
+                    for value in reader.errors.itervalues():
+                        response.append(value.message)
+                    return JSONResponse(data, indent=indent, status=400, reason=response)
+                else:
+                    response = []
+                    for resource in reader.resources:
+                        resource.save()
+                        response.append(JSONDeserializer().deserialize(self.get(request, resource.resourceinstanceid).content))
+                    return JSONResponse(response, indent=indent)
+            else:
+                return JSONResponse(status=403)
+        except Exception as e:
+            return JSONResponse(status=500, reason=e)
+
+    def traverse_json_ld_graph(self, func, scope=None, **kwargs):
+        """
+        Traverses a concept graph from self to leaf (direction='down') or root (direction='up') calling
+        the given function on each node, passes an optional scope to each function
+
+        Return a value from the function to prematurely end the traversal
+
+        """
+
+        if scope == None:
+            ret = func(self, **kwargs)
+        else:
+            ret = func(self, scope, **kwargs)
+
+        # break out of the traversal if the function returns a value
+        if ret != None:
+            return ret
+
+        for subconcept in self.subconcepts:
+            ret = subconcept.traverse(func, direction, scope, _cache=_cache, **kwargs)
+            if ret != None:
+                return ret
 
     def delete(self, request, resourceid):
         if user_can_edit_resources(user=request.user):
@@ -182,6 +238,7 @@ class Resources(APIBase):
             return JSONResponse(status=500)
 
         return JSONResponse(status=200)
+
 
 @method_decorator(csrf_exempt, name='dispatch')
 class Concepts(APIBase):
@@ -203,8 +260,8 @@ class Concepts(APIBase):
                 try:
                     ret = []
                     concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
-                        include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
-                        depth_limit=depth_limit, up_depth_limit=None, lang=lang)
+                                                  include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
+                                                  depth_limit=depth_limit, up_depth_limit=None, lang=lang)
 
                     ret.append(concept_graph)
                 except models.Concept.DoesNotExist:
