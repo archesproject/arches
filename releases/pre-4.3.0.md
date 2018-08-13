@@ -87,11 +87,11 @@ Ensure that all browsers are compatible with Authentication process.
 
 | Test Subject                                                             | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| User can sign themselves up for a new Arches account                     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User is added to default group (Crowdsource Editor)                      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can log in with their email address                                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can reset their password                                            |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can edit their profile (First and Last name, email address, etc...) |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| User can sign themselves up for a new Arches account                     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| User is added to default group (Crowdsource Editor)                      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| User can log in with their email address                                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| User can reset their password                                            |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| User can edit their profile (First and Last name, email address, etc...) |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -321,15 +321,15 @@ Assigned to: Alexei (1.5)
 
 | Test Subject     | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Export graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Import graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Create branch    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Create resource  |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add/Edit cards   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add/Edit menus   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Export graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Import graph     |:construction:|    ?   |    ?    |   ?  | ?   | #3866     |
+| Create branch    |:x:|    ?   |    ?    |   ?  | ?   | #3887    |
+| Create resource  |:x:|    ?   |    ?    |   ?  | ?   | #3887    |
+| Add/Edit cards   |:x:|    ?   |    ?    |   ?  | ?   | #3892    |
 | Add/Edit reports |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| delete graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| clone graph      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Edit functions   | :x:|    ?   |    ?    |   ?  | ?   | #3888     |
+| delete graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| clone graph      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
