@@ -39,17 +39,6 @@ define([
             return item.getNewTile();
         }
     });
-    var addableCards = ko.computed(function() {
-        var items = [];
-        if (selectedTile()) {
-            _.each(selectedTile().cards, function(card) {
-                if (card && card.canAdd()) {
-                    items.push(card);
-                }
-            });
-        }
-        return items;
-    });
     var provisionalTileViewModel = new ProvisionalTileViewModel({tile: selectedTile, reviewer: data.user_is_reviewer});
 
     var flattenTree = function(parents, flatList) {
@@ -164,7 +153,12 @@ define([
                 return item;
             }
         }),
-        addableCards: addableCards,
+        addableCards: ko.computed(function() {
+            var tile = selectedTile();
+            return _.filter(tile ? tile.cards : [], function(card) {
+                return card.canAdd();
+            });
+        }),
         provisionalTileViewModel: provisionalTileViewModel,
         filter: filter,
         on: function(eventName, handler) {
