@@ -165,13 +165,13 @@ Assigned to: Rob
 
 | Test Subject                                                                                                                         | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| Settings - changes to the name and icon of a layer are reflected in the map widget overlay list and overlay library                  |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Deactivating/Activating a resource layer hides/shows the layer in the map widget overlay list and overlay library                    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Style Settings - changes to the layer style are displayed in the layer                                                               |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Style Settings Advanced - changes to the layer style are displayed in the layer                                                      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Activating caching adds a cache folder for a resource in your projects tileserver directory                                          |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Activating clean cache on edit updates the cache when a geometry is edited                                                           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Setting permissions for a user or group as No Access removes the user and group from the permissions list under the permissions tab. |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Settings - changes to the name and icon of a layer are reflected in the map widget overlay list and overlay library                  |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Deactivating/Activating a resource layer hides/shows the layer in the map widget overlay list and overlay library                    |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Style Settings - changes to the layer style are displayed in the layer                                                               |   :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Style Settings Advanced - changes to the layer style are displayed in the layer                                                      |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Activating caching adds a cache folder for a resource in your projects tileserver directory                                          |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Activating clean cache on edit updates the cache when a geometry is edited                                                           |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Setting permissions for a user or group as No Access removes the user and group from the permissions list under the permissions tab. |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 
 #### Clustering (Resource Layers)
 
@@ -179,10 +179,10 @@ Assigned to: Rob
 
 | Test Subject                                                                               | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| Increasing cluster distance causes features to cluster at increased distances between them |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Increasing cluster max zoom causes clusters to be formed at higher zoom levels             |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Decreasing min points to 2 points causes clusters to form with only 2 points               |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Increasing vector simplification to 0.0 prevents simplification a low zoom levels          |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Increasing cluster distance causes features to cluster at increased distances between them |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Increasing cluster max zoom causes clusters to be formed at higher zoom levels             |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Decreasing min points to 2 points causes clusters to form with only 2 points               |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Increasing vector simplification to 0.0 prevents simplification a low zoom levels          |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 
 #### Basemaps
 
@@ -190,9 +190,9 @@ Assigned to: Rob
 
 | Test Subject                                                                                    | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ----------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Changing the default search basemap in the basemap settings is reflected on the search page     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Settings - changes to the name and icon of a layer are reflected in the map widget basemap list |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can delete a basemap and it no longer appears in the map widget's list of basemaps         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Changing the default search basemap in the basemap settings is reflected on the search page     |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Settings - changes to the name and icon of a layer are reflected in the map widget basemap list |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| User can delete a basemap and it no longer appears in the map widget's list of basemaps         |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 
 #### Overlays
 
@@ -200,9 +200,9 @@ Assigned to: Rob
 
 | Test Subject                                                                                                        | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Settings - changes to the name and icon of a layer are reflected in the map widget overlay list and overlay library |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can delete an overlay and it no longer appears in the map widget overlay library                               |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Overlays support custom popups                                                                                      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Settings - changes to the name and icon of a layer are reflected in the map widget overlay list and overlay library |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| User can delete an overlay and it no longer appears in the map widget overlay library                               |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Overlays support custom popups                                                                                      |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 * * *
 
 ## Import/Export
