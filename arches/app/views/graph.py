@@ -104,11 +104,16 @@ class GraphSettingsView(GraphBaseView):
         data = JSONDeserializer().deserialize(request.body)
         for key, value in data.get('graph').iteritems():
             if key in ['iconclass', 'name', 'author', 'description', 'isresource',
-                       'ontology_id', 'version',  'subtitle', 'isactive', 'color', 'jsonldcontext']:
+                       'ontology_id', 'version',  'subtitle', 'isactive', 'color',
+                       'jsonldcontext', 'config', 'template_id']:
                 setattr(graph, key, value)
 
         node = models.Node.objects.get(graph_id=graphid, istopnode=True)
         node.set_relatable_resources(data.get('relatable_resource_ids'))
+        try:
+            node.datatype = data['graph']['root']['datatype']
+        except KeyError as e:
+            print e, 'Cannot find root node datatype'
         node.ontologyclass = data.get('ontology_class') if data.get('graph').get('ontology_id') is not None else None
         node.name = graph.name
         graph.root.name = node.name
@@ -166,6 +171,8 @@ class GraphDesignerView(GraphBaseView):
         map_layers = models.MapLayer.objects.all()
         map_markers = models.MapMarker.objects.all()
         map_sources = models.MapSource.objects.all()
+        templates = models.ReportTemplate.objects.all()
+        card_components = models.CardComponent.objects.all()
         geocoding_providers = models.Geocoder.objects.all()
         if self.graph.ontology is not None:
             branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
@@ -190,6 +197,7 @@ class GraphDesignerView(GraphBaseView):
             map_markers=map_markers,
             map_sources=map_sources,
             geocoding_providers=geocoding_providers,
+            report_templates=templates,
         )
         context['ontologies'] = JSONSerializer().serialize(ontologies, exclude=['version', 'path'])
         context['ontology_classes'] = JSONSerializer().serialize(ontology_classes)
@@ -325,7 +333,6 @@ class GraphDataView(View):
                     ret = clone_data['copy']
                     ret.save()
                     ret.copy_functions(graph, [clone_data['nodes'], clone_data['nodegroups']])
-                    ret.copy_reports(graph, [clone_data['cards'], clone_data['nodes']])
 
                 elif self.action == 'reorder_nodes':
                     json = request.body
@@ -460,122 +467,6 @@ class DatatypeTemplateView(TemplateView):
 
     def get(sefl, request, template='text'):
         return render(request, 'views/components/datatypes/%s.htm' % template)
-
-@method_decorator(group_required('Graph Editor'), name='dispatch')
-class ReportManagerView(GraphBaseView):
-
-    def get(self, request, graphid):
-        self.graph = Graph.objects.get(graphid=graphid)
-        if self.graph.isresource:
-            cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
-            datatypes = models.DDataType.objects.all()
-            widgets = models.Widget.objects.all()
-            context = self.get_context_data(
-                main_script='views/graph/report-manager',
-                reports=JSONSerializer().serialize(self.graph.report_set.all()),
-                templates_json=JSONSerializer().serialize(models.ReportTemplate.objects.all()),
-                cards=JSONSerializer().serialize(cards),
-                datatypes_json=JSONSerializer().serialize(datatypes),
-                widgets=widgets,
-            )
-
-            context['nav']['title'] = self.graph.name
-            context['nav']['menu'] = True
-            context['nav']['help'] = (_('Managing Reports'), 'help/base-help.htm')
-            context['help'] = 'report-manager-help'
-
-            return render(request, 'views/graph/report-manager.htm', context)
-
-        else:
-            return redirect('graph_settings', graphid=graphid)
-
-    def post(self, request, graphid):
-        data = JSONDeserializer().deserialize(request.body)
-        graph = models.GraphModel.objects.get(graphid=graphid)
-        template = models.ReportTemplate.objects.get(templateid=data['template_id'])
-        report = models.Report(name=_('New Report'), graph=graph, template=template, config=template.defaultconfig)
-        report.save()
-        return JSONResponse(report)
-
-
-@method_decorator(group_required('Graph Editor'), name='dispatch')
-class ReportEditorView(GraphBaseView):
-
-    def get(self, request, reportid):
-        try:
-            report = models.Report.objects.get(reportid=reportid)
-            self.graph = Graph.objects.get(graphid=report.graph_id)
-            cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
-            map_layers = models.MapLayer.objects.all()
-            map_markers = models.MapMarker.objects.all()
-            map_sources = models.MapSource.objects.all()
-            resource_graphs = Graph.objects.exclude(pk=report.graph_id).exclude(
-                pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
-            datatypes = models.DDataType.objects.all()
-            widgets = models.Widget.objects.all()
-            geocoding_providers = models.Geocoder.objects.all()
-            templates = models.ReportTemplate.objects.all()
-            map_sources = models.MapSource.objects.all()
-            card_components = models.CardComponent.objects.all()
-            context = self.get_context_data(
-                main_script='views/graph/report-editor',
-                report=JSONSerializer().serialize(report),
-                reports=JSONSerializer().serialize(self.graph.report_set.all()),
-                report_templates=templates,
-                templates_json=JSONSerializer().serialize(templates),
-                card_components=card_components,
-                card_components_json=JSONSerializer().serialize(card_components),
-                forms=JSONSerializer().serialize(forms),
-                forms_x_cards=JSONSerializer().serialize(forms_x_cards),
-                cards=JSONSerializer().serialize(cards),
-                datatypes_json=JSONSerializer().serialize(datatypes),
-                map_layers=map_layers,
-                map_markers=map_markers,
-                map_sources=map_sources,
-                geocoding_providers=geocoding_providers,
-                resource_graphs=resource_graphs,
-                widgets=widgets,
-                graph_id=self.graph.graphid,
-            )
-
-            context['graphid'] = self.graph.graphid
-            context['graph'] = JSONSerializer().serializeToPython(self.graph)
-            context['graph_json'] = JSONSerializer().serialize(self.graph)
-            context['root_node'] = self.graph.node_set.get(istopnode=True)
-
-            context['nav']['title'] = self.graph.name
-            context['nav']['menu'] = True
-            context['nav']['help'] = (_('Designing Reports'), 'help/base-help.htm')
-            context['help'] = 'report-designer-help'
-
-            return render(request, 'views/graph/report-editor.htm', context)
-
-        except(models.Report.DoesNotExist):
-            # assume the reportid is a graph id
-            graph = Graph.objects.get(graphid=reportid)
-            if graph.isresource is False:
-                return redirect('graph_settings', graphid=graph.graphid)
-            else:
-                return redirect('report_manager', graphid=graph.graphid)
-
-    def post(self, request, reportid):
-        data = JSONDeserializer().deserialize(request.body)
-        report = models.Report.objects.get(reportid=reportid)
-        graph = Graph.objects.get(graphid=report.graph_id)
-        report.name = data['name']
-        report.config = data['config']
-        report.formsconfig = data['formsconfig']
-        report.active = data['active']
-        with transaction.atomic():
-            if report.active:
-                graph.report_set.exclude(reportid=reportid).update(active=False)
-            report.save()
-        return JSONResponse(report)
-
-    def delete(self, request, reportid):
-        report = models.Report.objects.get(reportid=reportid)
-        report.delete()
-        return JSONResponse({'succces': True})
 
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')

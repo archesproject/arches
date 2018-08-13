@@ -16,7 +16,6 @@ require([
     var ResourceReportView = BaseManagerView.extend({
         initialize: function(options){
             var self = this;
-            var report = null;
 
             var graphModel = new GraphModel({
                 data: data.graph,
@@ -41,12 +40,8 @@ require([
                 });
             });
 
-            if (data.report) {
-                report =  new ReportModel(_.extend(data, {graphModel: graphModel, cards: cards}));
-            }
-
             this.viewModel.reportLookup = reportLookup;
-            this.viewModel.report = report;
+            this.viewModel.report = new ReportModel(_.extend(data, {graphModel: graphModel, cards: cards}));
             this.viewModel.graph = data.graph;
 
             var createLookup = function(list, idKey) {

@@ -185,13 +185,11 @@ define([
                         }).done(function(data){
                             popupdata.feature_info_content = data;
                             val(popupdata);
-                        }, this).fail(function(data) {
-                            console.log('failed', data)
-                        })
+                        }, this);
                     }
                 }
             }
-        }
+        };
         this.popupData = ko.computed(function() {
             if (self.hoverData()) {
                 self.getMarkup(self.hoverData);
@@ -215,35 +213,35 @@ define([
         this.geocodeProvider.subscribe(function(geocoderid) {
             var provider = _.findWhere(this.geocodingProviders, {
                 'geocoderid': geocoderid
-            })
+            });
             this.geocodeProviderDetails.api_key(provider.api_key);
             this.geocodeProviderDetails.component(provider.component);
-        }, this)
+        }, this);
 
         this.loadGeometriesIntoDrawLayer = function() {
             self.geojsonInput(false);
             self.xyInput.active(false);
             if (self.draw) {
                 var val = koMapping.toJS(self.value);
-                self.draw.deleteAll()
+                self.draw.deleteAll();
                 if (val) {
                     self.draw.add(val);
                 }
-                self.drawFeaturesOnMap(self.draw.getAll().features.length > 0)
+                self.drawFeaturesOnMap(self.draw.getAll().features.length > 0);
             }
         };
 
         this.zoomToDrawLayer = function(){
-            var allFeatures = self.draw.getAll()
+            var allFeatures = self.draw.getAll();
             if (allFeatures.features.length > 0) {
-                this.map.fitBounds(geojsonExtent(allFeatures), {padding:20})
+                this.map.fitBounds(geojsonExtent(allFeatures), {padding:20});
             }
-        }
+        };
 
-        this.clearGeometries = function(val, key) {
-            if (self.draw !== undefined && val === null) {
-                self.draw.deleteAll()
-            } else if (val !== null && val.features) {
+        this.clearGeometries = function(val) {
+            if (self.draw !== undefined && !val) {
+                self.draw.deleteAll();
+            } else if (val && val.features) {
                 if (val.features.length === 0 && self.context === 'search-filter') {
                     self.searchBuffer(null);
                     self.updateSearchQueryLayer([]);
@@ -252,7 +250,7 @@ define([
         };
 
         if (ko.isObservable(this.value)) {
-            this.value.subscribe(this.clearGeometries)
+            this.value.subscribe(this.clearGeometries);
         }
 
         if (this.form) {
@@ -275,7 +273,7 @@ define([
                 // }
 
                 if (self.draw !== undefined) {
-                    self.draw.changeMode('simple_select')
+                    self.draw.changeMode('simple_select');
                     self.loadGeometriesIntoDrawLayer();
                 }
 
@@ -298,17 +296,17 @@ define([
             if (params.graph.get) {
                 this.resourceIcon = params.graph.get('iconclass');
                 this.resourceName = params.graph.get('name');
-                this.graphId = params.graph.get('graphid')
+                this.graphId = params.graph.get('graphid');
             } else {
                 this.resourceIcon = params.graph.iconclass;
                 this.resourceName = params.graph.name;
                 this.graphId = params.graph.graphid;
             }
-            this.featurePointSize(Number(this.featurePointSize()))
+            this.featurePointSize(Number(this.featurePointSize()));
             this.featureLineWidth(Number(this.featureLineWidth()));
-            this.featureColorCache = this.featureColor()
-            this.featurePointSizeCache = this.featurePointSize()
-            this.featureLineWidthCache = this.featureLineWidth()
+            this.featureColorCache = this.featureColor();
+            this.featurePointSizeCache = this.featurePointSize();
+            this.featureLineWidthCache = this.featureLineWidth();
         }
 
         this.toggleOverlaySelector = function(e) {
@@ -1467,15 +1465,11 @@ define([
                 _.each(style.layers, function(layer) {
                     if (layer.id.endsWith(layerIdSuffix)) {
                         var filter = self.map.getFilter(layer.id);
-                        var filterToUpdate;
-                        var layerIdElements = layer.id.split('-')
-                        var name = layerIdElements.slice(0, layerIdElements.length - 1).join('-')
                         var sourceLayerId = layer.id.startsWith('resources-') ? 'resources-fill-' + layer['source-layer'] : layer['source-layer'];
-                        var sourceLayer = _.findWhere(style.layers, {'id': sourceLayerId})
+                        var sourceLayer = _.findWhere(style.layers, {'id': sourceLayerId});
                         if (filter) {
                             _.each(filter, function(item) {
                                 if (Array.isArray(item) && (item[1] === '_featureid' || item[1] === 'resourceinstanceid') && item[2] != currentFeature) {
-                                    filterToUpdate = item;
                                     item[2] = '';
                                     map.setFilter(layer.id, filter);
                                 }
@@ -1831,7 +1825,7 @@ define([
         };
 
         this.selectBasemap = function(val) {
-            self.basemap(val.name)
+            self.basemap(val.name);
             self.setBasemap(val);
         };
 

@@ -43,18 +43,17 @@ define([
                 }
             }
             var widgets = [];
-            self.report.forms().forEach(function (form) {
-                form.cards.forEach(function(card) {
-                    widgets = widgets.concat(card.get('widgets')());
-                    card.get('cards')().forEach(function(card) {
-                        widgets = widgets.concat(card.get('widgets')());
-                    });
+            var getCardWidgets = function(card) {
+                widgets = widgets.concat(card.model.get('widgets')());
+                card.cards().forEach(function(card) {
+                    getCardWidgets(card);
                 });
-            });
+            };
+            self.report.cards().forEach(getCardWidgets);
             this.nodeOptions = ko.observableArray(
                 widgets.map(function(widget) {
-                    return widget.node
-                }).filter(function (node) {
+                    return widget.node;
+                }).filter(function(node) {
                     return ko.unwrap(node.datatype) === 'file-list';
                 })
             );
