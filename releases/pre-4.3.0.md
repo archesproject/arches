@@ -15,13 +15,20 @@ If you can't completely re-install Arches (because you have data in the system t
 
 ```
 pip install arches --upgrade --no-binary :all:
+pip uninstall pycryptodome, rdflib-jsonld
+pip install pycryptodome django-oauth-toolkit==1.1.2 PyLD[requests]==1.0.3 pyprind==2.11.2
+
 python manage.py migrate
-pip uninstall pycrypto
-pip uninstall pycryptodome
-pip install pycryptodome
 python manage.py es delete_indexes
 python manage.py es setup_indexes
 python manage.py es index_database
+
+cd into your project's root directory (where yarn.lock is located) and run the following:
+yarn add core-js@2.5.7
+yarn add dom4@2.0.1
+yarn install
+yarn upgrade mapbox-gl@0.46.0
+yarn upgrade underscore@1.9.1
 ```
 
 If you have Arches running on a web server such as Apache, be sure to update your static files directory and restart your web server.
@@ -41,20 +48,20 @@ Before Version Release, go through this checklist to confirm that Arches is runn
 
 | Test Subject   |      Chrome     |      Safari     |     Firefox     |       IE11      | UI                        | Notes                                |
 | -------------- | :-------------: | :-------------: | :-------------: | :-------------: | ------------------------- | ------------------------------------ |
-| (Test Subject) | (use indicator from list below) | (use indicator from list below) | (use indicator from list below) | (use indicator from list below) | :white_check_mark: (to confirm that the UI has rendered correctly) or :x: (to confirm that the UI failed to render correctly) | (add ticket #, details on bug, etc.) |
+| (Test Subject) | (use indicator from list below) | (use indicator from list below) | (use indicator from list below) | (use indicator from list below) |:white_check_mark:(to confirm that the UI has rendered correctly) or :x: (to confirm that the UI failed to render correctly) | (add ticket #, details on bug, etc.) |
 
 When doing a test pass, consider using these status indicators:  
-:white_check_mark: = Tested & Approved  
-:x: = Merge blocking  
-:construction: = Non-blocking bugs  
-:ok: = Issue has been fixed  
-:question: = Open question  
+:white_check_mark: = Tested & Approved
+:x: = Release blocking issue
+:construction: = Non-blocking issue
+:ok: = Issue has been fixed
+:question: = Open question
 
 * * *
 
 ## Install
 
-Assigned to: Cyrus
+Assigned to: Cyrus (0.5)
 
 | Test Subject                                                   | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
@@ -64,17 +71,17 @@ Assigned to: Cyrus
 
 ## Future Release Features
 
-Assigned to: Cyrus
+Assigned to: Cyrus (0.1)
 
 | Test Subject                                                                              | Chrome | Safari | Firefox | IE11 |  UI | Notes |
 | ----------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | :-: | ----- |
-| Test that users can't access the Mobile Survey Manager page |    ?   |    ?   |    ?    |   ?  |  ?  | -     |
+| Test that users can't access the Mobile Survey Manager page                               |    ?   |    ?   |    ?    |   ?  |  ?  |  -    |
 
 * * *
 
 ## Authentication
 
-Assigned to: Alexei
+Assigned to: Alexei (.5)
 
 Ensure that all browsers are compatible with Authentication process.
 
@@ -90,32 +97,32 @@ Ensure that all browsers are compatible with Authentication process.
 
 ## System Settings
 
-Assigned to: Cyrus
+Assigned to: Cyrus (0.25)
 
 #### Basic Settings
 
 | Test Subject                                                                                                                 | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Project Name - Updating name updates in index.htm and the page tab                                                           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Web Analytics - String value inserts in base.htm at the location of this template variable:{{GOOGLE_ANALYTICS_TRACKING_ID}} |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Project Name - Updating name updates and the page tab                                                                        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Web Analytics - String value inserts in base.htm at the location of this template variable:{{GOOGLE_ANALYTICS_TRACKING_ID}}  |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 #### Map Settings
 
-Assigned to: Cyrus
+Assigned to: Cyrus (1.0)
 
 | Test Subject                                                                                                                                                                                    | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
 | API Key - Key saves and API calls are successful                                                                                                                                                |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Hex Grid Precision - Saves properly, but errors if precision is too high (\`Exception detail: TransportError(400, u'parsing_exception', u'[geohash_grid] failed to parse field [precision]')``) |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Hex Cell Size - Changes reflected in Search results                                                                                                                                             |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Default Zoom - Changes reflected in Card Config Manager                                                                                                                                         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Min Zoom - Changes reflected in Card Config Manager                                                                                                                                             |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Max Zoom - Changes reflected in Card Config Manager                                                                                                                                             |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Default Zoom  Changes reflected in Card Config Manager                                                                                                                                          |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Min Zoom  Changes reflected in Card Config Manager                                                                                                                                              |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Max Zoom  Changes reflected in Card Config Manager                                                                                                                                              |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Project Extent - Changes reflected in Card Config Manager                                                                                                                                       |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 #### Search Settings
 
-Assigned to: Cyrus
+Assigned to: Cyrus (0.25)
 
 Basic Search Settings
 
@@ -123,13 +130,6 @@ Basic Search Settings
 | -------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
 | Searches per page updates properly in Search                   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Number of search suggestions is reflected in search term input |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-
-Temporal Search Settings (not in use)
-
-| Test Subject                                                                                       | Chrome | Safari | Firefox | IE11 | UI  | Notes |
-| -------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Changes in time wheel color ramp are reflected in time wheel change time wheel colors (not in use) |    -   |    -   |    -    |   -  | -   | -     |
-| Changes in time wheel config are reflected in time wheel (not in use)                              |    -   |    -   |    -    |   -  | -   | -     |
 
 Saved Searches
 
@@ -142,7 +142,7 @@ Saved Searches
 
 ## Map Widget
 
-Assigned to: Cyrus
+Assigned to: Cyrus (0.5)
 
 Test in the Card Configuration Manager.
 
@@ -151,12 +151,13 @@ Test in the Card Configuration Manager.
 | Point line and poly geoms can be created, edited, and deleted                                                                                           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | XY widget is working properly                                                                                                                           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Valid geojson entered in the geojson input adds features to the map and pans to those features. If geojson is invalid user has a chance to update data. |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Widget configs (maxzoom, tilt, etc) update when the map changes and the map changes when the properties change                                          |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
 ## Map Layer Manager
 
-Assigned to: Rob
+Assigned to: Rob (1.5)
 
 #### Resource Layers
 
@@ -201,12 +202,12 @@ Assigned to: Rob
 | ------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
 | Settings - changes to the name and icon of a layer are reflected in the map widget overlay list and overlay library |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | User can delete an overlay and it no longer appears in the map widget overlay library                               |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-
+| Overlays support custom popups                                                                                      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 * * *
 
 ## Import/Export
 
-Assigned to: Ryan
+Assigned to: Ryan (0.5)
 
 | Test Subject               | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
@@ -257,12 +258,13 @@ Updating a resource descriptor should be reflected in the following subjects.
 
 #### Provisional Edit Management
 
-Assigned to: Cyrus
+Assigned to: Cyrus (0.5)
 
-| Test Subject                                           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
-| ------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
+| Test Subject                                                                                        | Chrome | Safari | Firefox | IE11 | UI  | Notes |
+| --------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
 | Provisional users see indication in a widget that their tile edits were submitted                   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Resource reviewers are able to identify provisional tiles and can approve/discard provisional edits |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Provisional edit history properly shows the status of a tile: pending, approved, or declined        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -280,7 +282,7 @@ Assigned to: Jeff
 | User can switch between table and force directed graph |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | User can page through related resources in table       |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
-#### Resource Search
+#### Resource Search (.5)
 
 | Test Subject                                                                                                                           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
@@ -289,13 +291,13 @@ Assigned to: Jeff
 | Hovering over a node list entry highlights the corresponding node and its adjacent links                                               |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | User can switch between table and force directed graph                                                                                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Entering text in the search field filters the list of list entries                                                                     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Overlays support custom popups                                                                                                         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+
 
 * * *
 
 ## Search
 
-Assigned to: Jeff
+Assigned to: Jeff (.5)
 
 | Test Subject                                                                                                                                                                         | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
@@ -306,14 +308,14 @@ Assigned to: Jeff
 | Time wheel search                                                                                                                                                                    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Advanced search                                                                                                                                                                      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Related resource table search                                                                                                                                                        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Related resource graph search                                                                                                                                                        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Related resource graph list filter graph                                                                                                                                             |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Resource type search                                                                                                                                                                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Edit status search (provisional, authoritative, or both). Confirm that only resource reviewers are able to see provisional tile data                                                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Map should not zoom to points that a user is not permitted to read, nor should the search aggregation layer (e.g. hexbin or heatmap) indicate that a restricted resource is present. |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
-Assigned to: Alexei
+Assigned to: Alexei (1.5)
 
 ## Graph/Resource Designer
 
@@ -333,7 +335,7 @@ Assigned to: Alexei
 
 ## Permissions Management
 
-Assigned to: Ryan
+Assigned to: Ryan (1)
 
 | Test Subject                                                                                                                                            | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
@@ -379,7 +381,7 @@ Assigned to: Adam
 
 ## RDM
 
-Assigned to: Ryan
+Assigned to: Ryan (1)
 
 #### Thesauri
 
