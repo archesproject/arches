@@ -78,6 +78,8 @@ require([
                     }, function(){
                         self.viewModel.loading(true);
                         $.ajax({
+                            type: "DELETE",
+                            url: arches.urls.delete_graph(graph.graphid),
                             complete: function(response, status) {
                                 self.viewModel.loading(false);
                                 if (status === 'success') {
@@ -85,9 +87,7 @@ require([
                                 } else {
                                     self.viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.title, response.responseJSON.message));
                                 }
-                            },
-                            type: "DELETE",
-                            url: graph.graphid
+                            }
                         });
                     }));
                 };

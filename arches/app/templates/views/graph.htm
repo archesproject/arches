@@ -106,25 +106,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <div class="btn-group" style="float:right;">
                         <button class="btn btn-sm btn-mint dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false"> {% trans "Manage" %} <i class="ion-ios-more"></i></button>
                         <ul class="dropdown-menu dropdown-menu-right manage-menu" data-bind="event: {mouseleave: $parent.leaveDropdown}">
-                            <li><a href="#" data-bind="click:function() { $parent.navigate($parent.arches.urls.graph_designer(graphid)) }, attr: { href: $parent.arches.urls.graph_designer(graphid) }"><i class="fa fa-sitemap"></i> {% trans "Manage Graph" %}</a>
+                            <li>
+                                <a href="#" data-bind="click:function() { $parent.navigate($parent.arches.urls.graph_designer(graphid)) }, attr: { href: $parent.arches.urls.graph_designer(graphid) }"><i class="fa fa-sitemap"></i> {% trans "Manage Graph" %}</a>
                             </li>
-                            <!-- ko if: isresource || isCard -->
-                            <li><a href="#" data-bind="click:function() { isresource ? $parent.navigate($parent.arches.urls.card_manager(graphid)) : $parent.navigate($parent.arches.urls.card + graphid); }, attr: { href: isresource ? ($parent.arches.urls.card_manager(graphid)) : ($parent.arches.urls.card + graphid) }"><i class="fa fa-file-o"></i> {% trans "Manage Cards" %}</a>
-                            </li>
-                            <!-- /ko -->
                             <!-- ko if: $parent.showResources() -->
-                            <li><a href="#" data-bind="click:function () { $parent.navigate($parent.arches.urls.form_manager(graphid)) }, attr: { href: $parent.arches.urls.form_manager(graphid)}"><i class="fa fa-files-o"></i> {% trans "Manage Menus" %}</a>
+                             <li>
+                                 <a href="#" data-bind="click:function () { $parent.navigate($parent.arches.urls.function_manager(graphid)) }, attr: { href: $parent.arches.urls.function_manager(graphid)}"><i class="fa fa-code"></i> {% trans "Manage Functions" %}</a>
                             </li>
-                            <li><a href="#" data-bind="click:function () { $parent.navigate($parent.arches.urls.report_manager(graphid)) }, attr: { href: $parent.arches.urls.report_manager(graphid)}"><i class="fa fa-book"></i> {% trans "Manage Reports" %}</a>
+                            <li>
+                               <a href="#" data-bind="click:exportMappingFile"><i class="fa fa-file"></i> {% trans "Create Mapping File" %}</a>
                             </li>
-                             <li><a href="#" data-bind="click:function () { $parent.navigate($parent.arches.urls.function_manager(graphid)) }, attr: { href: $parent.arches.urls.function_manager(graphid)}"><i class="fa fa-code"></i> {% trans "Manage Functions" %}</a>
-                            </li>
-                            </li>
-                             <li><a href="#" data-bind="click:function () { $parent.navigate($parent.arches.urls.permission_manager(graphid)) }, attr: { href: $parent.arches.urls.permission_manager(graphid)}"><i class="fa fa-lock"></i> {% trans "Manage Permissions" %}</a>
-                            </li>
-                          </li>
-                           <li><a href="#" data-bind="click:exportMappingFile"><i class="fa fa-file"></i> {% trans "Create Mapping File" %}</a>
-                          </li>
                             <!-- /ko -->
                             <li class="divider"></li>
                             <li><a href="#" data-bind="click:exportGraph">{% trans "Export" %}</a>

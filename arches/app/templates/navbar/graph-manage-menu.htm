@@ -70,17 +70,6 @@
                 </li>
 
                 <!-- Menu Item -->
-                <li id="permission-manager" class="edit-menu-item {% if main_script == "views/graph/permission-manager" %} selected{% endif %}">
-                    <a href="{% url 'permission_manager' graphid %}" data-bind="click:function () { navigate('{% url 'permission_manager' graphid %}') }">
-                        <div class="media-body">
-                            <div class="menu-item-title"><i class="fa fa-lock"></i> {% trans "Permissions" %}</div>
-                            <span class="text-muted menu-item-subtitle">{% trans "Configure node group level permissions" %}</span>
-                        </div>
-                    </a>
-                </li>
-                {% endif %}
-
-                <!-- Menu Item -->
                 <li id="graph-manager" class="edit-menu-item {% if main_script == "views/graph/graph-manager" %} selected{% endif %}">
                     <a href="{% url 'graph' graphid %}" data-bind="click:function () { navigate('{% url 'graph' graphid %}') }">
                         <div class="media-body">

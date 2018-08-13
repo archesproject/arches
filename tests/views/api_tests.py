@@ -23,23 +23,43 @@ when you run "manage.py test".
 Replace this with more appropriate tests for your application.
 """
 
-from tests import test_settings as settings
+import os
 from tests.base_test import ArchesTestCase
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory, Client
+from arches.app.views.api import APIBase
+from arches.app.models.graph import Graph
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.views.api import APIBase, Surveys
 
 # these tests can be run from the command line via
 # python manage.py test tests/views/api_tests.py --pattern="*.py" --settings="tests.test_settings"
 
 
+
 class APITests(ArchesTestCase):
+
     def setUp(self):
         pass
 
     def tearDown(self):
         pass
+
+    @classmethod
+    def setUpClass(cls):
+        with open(os.path.join('tests/fixtures/resource_graphs/unique_graph_shape.json'), 'rU') as f:
+            json = JSONDeserializer().deserialize(f)
+            cls.unique_graph = Graph(json['graph'][0])
+            cls.unique_graph.save()
+
+        with open(os.path.join('tests/fixtures/resource_graphs/ambiguous_graph_shape.json'), 'rU') as f:
+            json = JSONDeserializer().deserialize(f)
+            cls.ambiguous_graph = Graph(json['graph'][0])
+            cls.ambiguous_graph.save()
+
+        with open(os.path.join('tests/fixtures/resource_graphs/phase_type_assignment.json'), 'rU') as f:
+            json = JSONDeserializer().deserialize(f)
+            cls.phase_type_assignment_graph = Graph(json['graph'][0])
+            cls.phase_type_assignment_graph.save()
 
     def test_api_base_view(self):
         """
@@ -49,7 +69,7 @@ class APITests(ArchesTestCase):
 
         factory = RequestFactory(HTTP_X_ARCHES_VER='2.1')
         view = APIBase.as_view()
-        
+
         request = factory.get(reverse('surveys'), {'ver': '2.0'})
         request.user = None
         response = view(request)

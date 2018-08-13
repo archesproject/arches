@@ -28,18 +28,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block main_content %}
 <div class='scroll-y'>
 
-    <!-- ko if: report -->
     <div class='resource-report' data-bind='component: {
         name: reportLookup[report.get("template_id")()].componentname,
         params: {
             report: report
         }
     }'></div>
-    <!-- /ko -->
-
-    <div style="display: none;" class="report-undefined" data-bind="visible: !report">
-        {% trans "No report defined for" %} "{{graph_name}}"...
-    </div>
 
     <footer id="footer" style="background: #fff;">
         <div class="pull-left">
@@ -58,15 +52,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 define('resource-report-data', [], function () {
     return {
         templates: {{templates_json}},
-        report: {{report}},
         datatypes: {{ datatypes_json }},
-        forms: {{forms}},
-        forms_x_cards: {{forms_x_cards}},
         cards: {{cards}},
         tiles: {{tiles}},
         graph: {{graph_json}},
         related_resources: {{related_resources}},
-        displayname: "{{displayname | escapejs}}"
+        displayname: "{{displayname | escapejs}}",
+        cardComponents: {{card_components_json}},
+        resourceid: '{{resourceid}}',
+        cardwidgets: {{cardwidgets}}
     };
 });
 {% endautoescape %}</script>

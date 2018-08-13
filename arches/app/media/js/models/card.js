@@ -5,8 +5,9 @@ define([
     'models/node',
     'models/card-widget',
     'knockout',
-    'knockout-mapping'
-], function(_, arches, AbstractModel, NodeModel, CardWidgetModel, ko, koMapping) {
+    'knockout-mapping',
+    'card-components'
+], function(_, arches, AbstractModel, NodeModel, CardWidgetModel, ko, koMapping, cardComponentLookup) {
     var CardModel = AbstractModel.extend({
         /**
         * A backbone model to manage card data
@@ -90,6 +91,8 @@ define([
                 this.parseNodes(attributes);
                 this._card(JSON.stringify(this.toJSON()));
             }, this);
+
+            this.cardComponentLookup = cardComponentLookup;
         },
 
         /**
@@ -110,7 +113,8 @@ define([
                             data: _.extend(card, {
                                 nodes: attributes.data.nodes
                             }),
-                            datatypelookup: attributes.datatypelookup
+                            datatypelookup: attributes.datatypelookup,
+                            cardComponents: attributes.cardComponents
                         });
                         cards.push(cardModel);
                     }, this);
@@ -179,6 +183,7 @@ define([
                 return w.get('sortorder')() > ww.get('sortorder')();
             });
             this.get('widgets')(widgets);
+            this._card(JSON.stringify(this.toJSON()));
         },
 
         reset: function() {

@@ -85,8 +85,8 @@
                     'jstree-last': $index() === (card.widgets().length - 1) && card.cards().length === 0
                 }">
                 <i class="jstree-icon jstree-ocl" role="presentation"></i>
-                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function() { widget.selected(true) }, css:{'jstree-clicked': widget.selected}">
-                    <i class="fa fa-file" role="presentation" ></i>
+                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function() { widget.selected(true) }, css:{'jstree-clicked': widget.selected, 'hover': widget.hovered}, event: { mouseover: function(){ widget.hovered(true) }, mouseout: function(){ widget.hovered(null) } }">
+                    <i data-bind="css: widget.datatype.iconclass" role="presentation"></i>
                     <strong style="margin-right: 10px;" >
                         <span data-bind="text: !!(widget.label()) ? widget.label() : widget.node.name"></span>
                     </strong>
@@ -125,7 +125,7 @@
 <!-- ko if: state === 'permissions-tree' -->
 <li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards().length > 0 || card.widgets().length > 0) && card.expanded()), 'jstree-closed' : ((card.cards().length > 0 || card.widgets().length > 0) && !card.expanded()), 'jstree-leaf': card.cards().length === 0 && card.widgets().length === 0}">
     <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
-    <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'jstree-clicked': card.selected, 'child-selected': card.isChildSelected()}, click: function () { card.selected(true) },">
+    <a class="jstree-anchor permissions-card" href="#" tabindex="-1" data-bind="css:{'jstree-clicked': card.selected, 'child-selected': card.isChildSelected()}, click: function () { card.selected(true) },">
         <i class="fa fa-file-o" role="presentation"></i>
         <span style="padding-right: 5px;" data-bind="text: card.model.name, css:{'filtered': card.highlight()}">
         </span>
@@ -139,6 +139,24 @@
     </a>
     <!-- ko if: card.cards().length > 0 || card.widgets().length > 0 -->
     <ul class="jstree-children" aria-expanded="true">
+        <div data-bind="sortable: {
+                data: card.widgets,
+                as: 'widget',
+                beforeMove: self.beforeMove,
+                afterMove: function() { card.model.save() }
+            }">
+            <li role="treeitem" class="jstree-node jstree-leaf" data-bind="css: {
+                    'jstree-last': $index() === (card.widgets().length - 1) && card.cards().length === 0
+                }">
+                <i class="jstree-icon jstree-ocl" role="presentation"></i>
+                <a class="jstree-anchor permissions-widget" href="#" tabindex="-1">
+                    <i class="fa fa-file" role="presentation" ></i>
+                    <strong style="margin-right: 10px;" >
+                        <span data-bind="text: !!(widget.label()) ? widget.label() : widget.node.name"></span>
+                    </strong>
+                </a>
+            </li>
+        </div>
         <div data-bind="foreach: {
                 data: card.cards,
                 as: 'card'
@@ -150,7 +168,8 @@
                     card: card,
                     tile: null,
                     loading: self.loading,
-                    form: self.form
+                    form: self.form,
+                    multiselect: true
                 }
             } --> <!-- /ko -->
         </div>
@@ -221,13 +240,13 @@
                 <div data-bind="foreach: {
                         data:card.widgets, as: 'widget'
                     }">
-                    <div class='' data-bind='component: {
+                    <div data-bind='component: {
                         name: self.form.widgetLookup[widget.widget_id()].name,
                         params: {
                             formData: self.tile.formData,
                             tile: self.tile,
                             form: self.form,
-                            config: widget.configJSON(),
+                            config: widget.configJSON,
                             label: widget.label(),
                             value: self.tile.data[widget.node_id()],
                             node: self.form.nodeLookup[widget.node_id()],
@@ -235,7 +254,9 @@
                             graph: self.form.graph,
                             type: "resource-editor"
                         }
-                    }'></div>
+                    }, css:{ "active": widget.selected, "hover": widget.hovered, "widget-preview": self.preview
+                }, click: function(data, e) { if (!widget.selected() && self.preview) {widget.selected(true);}
+            }, event: { mouseover: function(){ if (self.preview){widget.hovered(true) } }, mouseout: function(){ if (self.preview){widget.hovered(null)} } }'></div>
                 </div>
             </form>
             <!-- /ko -->
@@ -305,6 +326,57 @@
 
         </div>
     </div>
+</div>
+<!-- /ko -->
+
+<!-- ko if: state === 'report' -->
+<div class="rp-card-section">
+    <span class="rp-tile-title" data-bind="text: card.model.get('name')"></span>
+    <!-- ko foreach: { data: card.tiles, as: 'tile' } -->
+        <div class="rp-card-section">
+            <!-- ko if: card.model.get('widgets')().length > 0 -->
+                <div class="rp-report-tile" data-bind="attr: { id: tile.tileid }">
+                    <dl class="dl-horizontal">
+                        <!-- ko foreach: { data: card.model.get('widgets'), as: 'widget' } -->
+                            <!-- ko component: {
+                                name: widget.widgetLookup[widget.get("widget_id")()].name,
+                                params: {
+                                    config: configJSON,
+                                    label: widget.get("label")(),
+                                    node: widget.node,
+                                    value: tile.data[widget.node.nodeid],
+                                    state: "report"
+                                }
+                            } --><!-- /ko -->
+                        <!-- /ko -->
+                    </dl>
+                </div>
+            <!-- /ko -->
+
+            <div class="rp-report-container-tile" data-bind="visible: card.cards().length > 0">
+                <!-- ko foreach: { data: tile.cards, as: 'card' } -->
+                        <!-- ko component: {
+                            name: card.model.cardComponentLookup[card.model.component_id()].componentname,
+                            params: {
+                                state: 'report',
+                                card: card
+                            }
+                        } --> <!-- /ko -->
+                <!-- /ko -->
+            </div>
+        </div>
+    <!-- /ko -->
+
+    <!-- ko if: card.tiles().length === 0 -->
+    <div class="row rp-report-tile rp-no-data">
+        <!-- ko ifnot: card.model.get('cardid') -->
+        {% trans "Sorry, you don't have access to this information" %}
+        <!-- /ko -->
+        <!-- ko if: card.model.get('cardid') -->
+        {% trans "No data added yet for" %} "<span data-bind="text: card.model.get('name')"></span>"
+        <!-- /ko -->
+    </div>
+    <!-- /ko -->
 </div>
 <!-- /ko -->
 

@@ -73,7 +73,11 @@ define([
         */
         getDisplayName: function(node) {
             return ko.computed(function(){
-                return node.name() + ' (' + node.ontologyclass_friendlyname().split('_')[0] + ')';
+                var name = node.name();
+                if (node.ontologyclass_friendlyname() != "") {
+                    name = name + ' (' + node.ontologyclass_friendlyname().split('_')[0] + ')';
+                }
+                return name;
             }, this);
         },
 

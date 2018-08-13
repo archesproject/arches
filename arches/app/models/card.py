@@ -128,7 +128,8 @@ class Card(models.CardModel):
         with transaction.atomic():
             if self.graph.ontology and self.graph.isresource:
                 edge = self.get_edge_to_parent()
-                edge.ontologyproperty = self.ontologyproperty
+                if self.ontologyproperty is not None:
+                    edge.ontologyproperty = self.ontologyproperty
                 edge.save()
 
             self.nodegroup.cardinality = self.cardinality

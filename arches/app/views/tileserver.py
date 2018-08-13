@@ -122,9 +122,8 @@ def clean_resource_cache(tile):
 
                 for (offset, count, coord) in coordinates:
                     config.cache.remove(layer, coord, format)
-    for key, tile_list in tile.tiles.iteritems():
-        for child_tile in tile_list:
-            clean_resource_cache(child_tile)
+    for tile in tile.tiles:
+        clean_resource_cache(tile)
 
 def seed_resource_cache():
     datatype_factory = DataTypeFactory()

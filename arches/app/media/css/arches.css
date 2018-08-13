@@ -1408,16 +1408,18 @@ a.select2-search-choice-close {
 }
 
 .permissions-node {
-    font-size: 13px;
+    font-size: 11px;
     color: #777;
 }
 
 .permissions-node-row {
+    display: inline-flex;
     background: #fff;
     padding-top: 6px;
     padding-bottom: 6px;
     padding-left: 10px;
     margin-right: 10px;
+    justify-content: space-between;
 }
 
 .account-card-main {
@@ -1502,6 +1504,8 @@ a.select2-search-choice-close {
 }
 
 .permissions-selected {
+    display: flex;
+    flex-direction: column;
     list-style: none;
     color: #666;
     line-height: 1.2;
@@ -2159,7 +2163,8 @@ ul.nav.nav-tabs.nav-justified {
     padding-left: 25px;
 }
 
-.graph-crm-class {
+.graph-crm-class,
+.graph-type {
     font-size: 15px;
     color: #888;
     padding-left: 10px;
@@ -6954,6 +6959,10 @@ div.row.widget-wrapper {
     position: relative;
 }
 
+.map-filter-panel div.row.widget-wrapper {
+    padding: 5px 5px 25px 5px;
+}
+
 .input-group .form-control {
     position: relative;
     z-index: 0;
@@ -6970,10 +6979,6 @@ div.row.widget-wrapper {
     margin-top: 2px;
 }
 
-.widget-preview div.row.widget-wrapper:hover {
-    background: #fafafa;
-}
-
 .widget-preview {
     border: 1px solid transparent;
 }
@@ -6986,6 +6991,10 @@ div.row.widget-wrapper {
     background: #fcfcfc;
     border: 1px solid #ddd;
     margin-right: 11px;
+}
+
+.widget-preview.hover {
+    background: #fafafa;
 }
 
 .panel-heading.note-toolbar {
@@ -7375,6 +7384,10 @@ a.mega-dropdown-toggle.disabled {
     padding-bottom: 50px;
     transition: all .25s ease;
     background-color: white;
+}
+
+.rp-report-section-root {
+    margin-top: 30px;
 }
 
 .rp-report-header {
@@ -10687,6 +10700,22 @@ a.search-facet-item.disabled {
 .number-suffix {
     padding-left: 1px;
 }
+.report-title-bar {
+    display: block;
+}
+
+.editor-report {
+    background: white;
+}
+
+.editor-report .rp-report-section {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.editor-report .report-related-resources, .editor-report .report-title-bar {
+    display: none;
+}
 
 .msm-item-status {
     position: absolute;
@@ -11589,6 +11618,16 @@ a.jstree-anchor strong {
 
 a.jstree-anchor.disabled {
     color: #ccc;
+}
+
+a.jstree-anchor.permissions-widget {
+    color: #ccc;
+    cursor: default;
+    pointer-events: none;
+}
+
+a.jstree-anchor.permissions-card {
+    overflow-x: auto;
 }
 
 .jstree-default .card-designer-tree li {

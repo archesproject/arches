@@ -161,7 +161,8 @@ def user_can_edit_resources(user):
     """
 
     if user.is_authenticated():
-        return user.is_superuser or len(get_editable_resource_types(user)) > 0
+        return user.is_superuser or (len(get_editable_resource_types(user)) > 0 and
+                user.groups.filter(name='Resource Editor').exists())
     return False
 
 def user_can_read_concepts(user):
