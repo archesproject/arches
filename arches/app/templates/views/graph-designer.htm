@@ -270,12 +270,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </div>
 
             <div class="flex" data-bind="visible: activeTab() === 'permissions'">
-                <!--Middle Panel -->
-                <div class="middle-column-container graph-designer branch-library" style="width: 300px; border-bottom: solid 1px #dddddd; z-index: 10;">
-                    <div>
-                        {% include 'views/graph/graph-designer/identity-list.htm' %}
-                    </div>
-                </div>
                 <!-- Card Manager -->
                 <div class="flex tab-pane fade in" data-bind="css: { active: activeTab() === 'permissions' }">
                     {% include 'views/graph/graph-designer/permission-settings-form.htm' %}
