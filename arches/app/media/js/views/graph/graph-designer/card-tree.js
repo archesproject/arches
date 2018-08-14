@@ -153,6 +153,41 @@ define([
             beforeMove: function(e) {
                 e.cancelDrop = (e.sourceParent!==e.targetParent);
             },
+            updateCards: function(data) {
+                self.topCards.removeAll();
+                self.topCards(_.filter(data.cards, function(card) {
+                    var nodegroup = _.find(ko.unwrap(params.graph.nodegroups), function(group) {
+                        return ko.unwrap(group.nodegroupid) === card.nodegroup_id;
+                    });
+                    if (nodegroup) {
+                        return !nodegroup || !ko.unwrap(nodegroup.parentnodegroup_id);
+                    } else {
+                        return true;
+                    }
+                }).map(function(card) {
+                    return new CardViewModel({
+                        card: card,
+                        graphModel: params.graphModel,
+                        tile: null,
+                        resourceId: ko.observable(),
+                        displayname: ko.observable(),
+                        handlers: {},
+                        cards: data.cards,
+                        tiles: [],
+                        selection: selection,
+                        hover: hover,
+                        scrollTo: scrollTo,
+                        multiselect: self.multiselect,
+                        loading: loading,
+                        filter: filter,
+                        provisionalTileViewModel: null,
+                        cardwidgets: data.cardwidgets,
+                        userisreviewer: true,
+                        perms: ko.observableArray(),
+                        permsLiteral: ko.observableArray()
+                    });
+                }));
+            },
             reorderCards: function() {
                 loading(true);
                 var cards = _.map(self.topCards(), function(card, i) {

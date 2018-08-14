@@ -100,6 +100,8 @@ define([
                     node.save(function(data) {
                         if (data.responseJSON.success === false || data.status === 500) {
                             viewModel.alert(new AlertViewModel('ep-alert-red', data.responseJSON.title, data.responseJSON.message));
+                        } else {
+                            viewModel.cardTree.updateCards(data.responseJSON);
                         }
                         viewModel.loading(false);
                     });

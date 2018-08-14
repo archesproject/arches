@@ -164,7 +164,9 @@ define([
                 var nodegroup = _.find(ko.unwrap(nodegroups), function(group) {
                     return ko.unwrap(group.nodegroupid) === ko.unwrap(card.nodegroup_id);
                 });
-                return ko.unwrap(nodegroup.parentnodegroup_id) === ko.unwrap(params.card.nodegroup_id);
+                if (nodegroup) {
+                    return ko.unwrap(nodegroup.parentnodegroup_id) === ko.unwrap(params.card.nodegroup_id);
+                }
             }).map(function(card) {
                 return new CardViewModel({
                     card: _.clone(card),
