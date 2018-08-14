@@ -102,6 +102,7 @@ define([
                             viewModel.alert(new AlertViewModel('ep-alert-red', data.responseJSON.title, data.responseJSON.message));
                         } else {
                             viewModel.cardTree.updateCards(data.responseJSON);
+                            viewModel.permissionTree.updateCards(data.responseJSON);
                         }
                         viewModel.loading(false);
                     });

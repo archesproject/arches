@@ -105,6 +105,7 @@ define([
             graphname: params.graph.name,
             graphiconclass: params.graph.iconclass,
             graph: params.graph,
+            graphModel: params.graphModel,
             expandAll: function() {
                 toggleAll(true);
             },
@@ -123,7 +124,7 @@ define([
                 return;
             },
             topCards: ko.observableArray(_.filter(data.cards, function(card) {
-                var nodegroup = _.find(ko.unwrap(params.graph.nodegroups), function(group) {
+                var nodegroup = _.find(ko.unwrap(params.graphModel.get('nodegroups')), function(group) {
                     return ko.unwrap(group.nodegroupid) === card.nodegroup_id;
                 });
                 return !nodegroup || !ko.unwrap(nodegroup.parentnodegroup_id);
@@ -155,19 +156,22 @@ define([
             },
             updateCards: function(data) {
                 self.topCards.removeAll();
+                var existingNodegroupIds = _.pluck(self.graphModel.get('nodegroups'), 'nodegroupid');
+                var newNodegroups = _.filter(data.nodegroups, function(ng) {return _.contains(existingNodegroupIds, ng.nodegroupid) === false;});
+                if (newNodegroups.length > 0) {
+                    self.graphModel.set('nodegroups', self.graphModel.get('nodegroups').concat(newNodegroups));
+                }
                 self.topCards(_.filter(data.cards, function(card) {
-                    var nodegroup = _.find(ko.unwrap(params.graph.nodegroups), function(group) {
+                    var nodegroup = _.find(ko.unwrap(self.graphModel.get('nodegroups')), function(group) {
                         return ko.unwrap(group.nodegroupid) === card.nodegroup_id;
                     });
                     if (nodegroup) {
                         return !nodegroup || !ko.unwrap(nodegroup.parentnodegroup_id);
-                    } else {
-                        return true;
                     }
                 }).map(function(card) {
                     return new CardViewModel({
                         card: card,
-                        graphModel: params.graphModel,
+                        graphModel: self.graphModel,
                         tile: null,
                         resourceId: ko.observable(),
                         displayname: ko.observable(),
