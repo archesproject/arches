@@ -21,6 +21,7 @@ try:
 except ImportError:
     from StringIO import StringIO
 
+
 class RdfWriter(Writer):
 
     def __init__(self, **kwargs):
@@ -35,7 +36,7 @@ class RdfWriter(Writer):
         g.serialize(destination=dest, format=self.format)
 
         full_file_name = os.path.join('{0}.{1}'.format(self.file_name, 'rdf'))
-        return [{'name':full_file_name, 'outputfile': dest}]
+        return [{'name': full_file_name, 'outputfile': dest}]
 
     def get_rdf_graph(self):
         archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
@@ -48,6 +49,7 @@ class RdfWriter(Writer):
         def get_nodegroup_edges_by_collector_node(node):
             edges = []
             nodegroup = node.nodegroup
+
             def getchildedges(node):
                 for edge in models.Edge.objects.filter(domainnode=node):
                     if nodegroup == edge.rangenode.nodegroup:
@@ -78,9 +80,12 @@ class RdfWriter(Writer):
                         'inedge': None,
                         'parentnode_nodegroup': None
                     }
-                    graph_cache[graphid]['subgraphs'][nodegroup]['inedge'] = models.Edge.objects.get(rangenode_id=nodegroup.pk)
-                    graph_cache[graphid]['subgraphs'][nodegroup]['parentnode_nodegroup'] = graph_cache[graphid]['subgraphs'][nodegroup]['inedge'].domainnode.nodegroup
-                    graph_cache[graphid]['subgraphs'][nodegroup]['edges'] = get_nodegroup_edges_by_collector_node(models.Node.objects.get(pk=nodegroup.pk))
+                    graph_cache[graphid]['subgraphs'][nodegroup][
+                        'inedge'] = models.Edge.objects.get(rangenode_id=nodegroup.pk)
+                    graph_cache[graphid]['subgraphs'][nodegroup]['parentnode_nodegroup'] = graph_cache[
+                        graphid]['subgraphs'][nodegroup]['inedge'].domainnode.nodegroup
+                    graph_cache[graphid]['subgraphs'][nodegroup][
+                        'edges'] = get_nodegroup_edges_by_collector_node(models.Node.objects.get(pk=nodegroup.pk))
 
             return graph_cache[graphid]
 
@@ -138,7 +143,6 @@ class RdfWriter(Writer):
                     rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
                     add_edge_to_graph(g, domainnode, rangenode, edge, tile)
 
-
         return g
 
 
@@ -148,7 +152,7 @@ class JsonLdWriter(RdfWriter):
         super(RdfWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
         g = self.get_rdf_graph()
         value = g.serialize(format='nt')
-        js = from_rdf(str(value), options={format:'application/nquads'})
+        js = from_rdf(str(value), options={format: 'application/nquads'})
 
         framing = {
             "@omitDefault": True,
@@ -176,7 +180,7 @@ class JsonLdWriter(RdfWriter):
         dest = StringIO(out)
 
         full_file_name = os.path.join('{0}.{1}'.format(self.file_name, 'jsonld'))
-        return [{'name':full_file_name, 'outputfile': dest}]
+        return [{'name': full_file_name, 'outputfile': dest}]
 
 
 class JsonLdReader(Reader):
@@ -185,18 +189,31 @@ class JsonLdReader(Reader):
         self.tiles = {}
         self.errors = {}
         self.resources = []
+        self.use_ids = False
         self.ontologyproperties = models.Edge.objects.values_list('ontologyproperty', flat=True).distinct()
 
     def get_graph_id(self, strs_to_test):
         if not isinstance(strs_to_test, list):
             strs_to_test = [strs_to_test]
         for str_to_test in strs_to_test:
-            match = re.match(r'.*?%sgraph/(?P<graphid>%s)' % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, settings.UUID_REGEX), str_to_test)
+            match = re.match(r'.*?%sgraph/(?P<graphid>%s)' %
+                             (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, settings.UUID_REGEX), str_to_test)
             if match:
                 return match.group('graphid')
         return None
 
-    def read_resource(self, data):
+    def get_resource_id(self, strs_to_test):
+        if not isinstance(strs_to_test, list):
+            strs_to_test = [strs_to_test]
+        for str_to_test in strs_to_test:
+            match = re.match(r'.*?%sresource/(?P<resourceid>%s)' %
+                             (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, settings.UUID_REGEX), str_to_test)
+            if match:
+                return match.group('resourceid')
+        return None
+
+    def read_resource(self, data, use_ids=False):
+        self.use_ids = use_ids
         if not isinstance(data, list):
             data = [data]
 
@@ -206,38 +223,17 @@ class JsonLdReader(Reader):
             if graphid:
                 graph = GraphProxy.objects.get(graphid=graphid)
                 graphtree = graph.get_tree()
-                resource = Resource()
-                resource.graph_id = graphid
+                if use_ids == True:
+                    resourceinstanceid = self.get_resource_id(jsonld["@id"])
+                    if resourceinstanceid is None:
+                        raise Exception(
+                            'The @id of the resource was not supplied, or was null, or the URI was not correctly formatted')
+                    resource = Resource.objects.get(pk=resourceinstanceid)
+                else:
+                    resource = Resource()
+                    resource.graph_id = graphid
                 self.resolve_node_ids(jsonld, graph=graphtree, resource=resource)
                 self.resources.append(resource)
-
-
-        # rdf = to_rdf(data, {'format': 'application/n-quads'})
-        # g = Graph().parse(format='nquads', data=rdf)
-        # tiles = {}
-
-        # for su,p,ob in g.triples( (None,  RDF.value, None) ):
-        #     print "%s is a %s"%(su,ob)
-        #     match = re.match(r'.*?/tile/(?P<tileid>%s)/node/(?P<nodeid>%s)' % (settings.UUID_REGEX, settings.UUID_REGEX), str(su))
-        #     if match:
-        #         if match.group('tileid') not in tiles:
-        #             tiles[match.group('tileid')] = {}
-
-        #         tiles[match.group('tileid')][match.group('nodeid')] = str(ob)
-
-        # for tileid, tile_data in self.tiles.iteritems():
-        #     obj, created = Tile.objects.update_or_create(
-        #         pk=tileid,
-        #         data=tile_data,
-        #     )
-
-            #Tile.objects.filter(pk=tileid).update(data=tile_data)
-            # tile, created = Tile.objects.update_or_create(
-            #     tileid = tileid,
-            #     defaults = {
-            #         'data': tile_data
-            #     }
-            # )
 
         return data
 
@@ -302,10 +298,29 @@ class JsonLdReader(Reader):
         for jsonld_graph in jsonld:
             # print ""
             # print ""
-            # print "searching for branch %s --> %s" % (ontology_property.split('/')[-1], jsonld_graph['@type'].split('/')[-1])
+            # print "searching for branch %s --> %s" %
+            # (ontology_property.split('/')[-1], jsonld_graph['@type'].split('/')[-1])
             found = []
             nodes_copy = set()
             invalid_nodes = set()
+
+            # print jsonld_graph
+            # try:
+            #     nodeid = jsonld_graph['@archesNodeId']
+            #     print "-------"
+            #     print nodeid
+            #     # import ipdb
+            #     # ipdb.set_trace()
+            #     for node in nodes:
+            #         print str(node['node'].pk)
+            #         if str(node['node'].pk) == nodeid:
+            #             valid_nodes = set([(node['node'].name, node['node'].pk)])
+            #             print 'made it'
+
+            # except KeyError:
+
+            # try to find a node in the graph among a bunch of sibling nodes that has the same incoming edge (propertyclass) as
+            # the edge/node combination we're searching for from the json-ld graph
             for node in nodes:
                 if node['parent_edge'].ontologyproperty == ontology_property and node['node'].ontologyclass == jsonld_graph['@type']:
                     # print "found %s" % node['node'].name
@@ -351,25 +366,43 @@ class JsonLdReader(Reader):
                 raise self.DataDoesNotMatchGraphException()
 
     def resolve_node_ids(self, jsonld, ontology_prop=None, graph=None, parent_node=None, tileid=None, parent_tileid=None, resource=None):
-        #print "-------------------"
+        # print "-------------------"
         if not isinstance(jsonld, list):
             jsonld = [jsonld]
+        # print len(jsonld)
 
         parent_tileid = tileid
         for jsonld_node in jsonld:
             if parent_node is not None:
                 try:
-                    branch = self.findBranch(parent_node['children'], ontology_prop, jsonld_node)
-                    if branch['node'].nodegroup != parent_node['node'].nodegroup:
-                        tileid = uuid.uuid4()
+                    # print 'find branch'
+                    # print jsonld_node
+
+                    branch = None
+                    if self.use_ids:
+                        try:
+                            match = re.match(r'.*?/tile/(?P<tileid>%s)/node/(?P<nodeid>%s)' %
+                                             (settings.UUID_REGEX, settings.UUID_REGEX), str(jsonld_node['@id']))
+                            if match:
+                                tileid = match.group('tileid')
+                                for node in parent_node['children']:
+                                    if str(node['node'].pk) == match.group('nodeid'):
+                                        branch = node
+                        except:
+                            pass
+
+                    if branch is None:
+                        branch = self.findBranch(parent_node['children'], ontology_prop, jsonld_node)
+                        if branch['node'].nodegroup != parent_node['node'].nodegroup:
+                            tileid = uuid.uuid4()
 
                 except self.DataDoesNotMatchGraphException as e:
-                    #print 'DataDoesNotMatchGraphException'
+                    # print 'DataDoesNotMatchGraphException'
                     self.errors['DataDoesNotMatchGraphException'] = e
                     branch = None
 
                 except self.AmbiguousGraphException as e:
-                    #print 'AmbiguousGraphException'
+                    # print 'AmbiguousGraphException'
                     self.errors['AmbiguousGraphException'] = e
                     branch = None
             else:
@@ -379,11 +412,11 @@ class JsonLdReader(Reader):
 
             if branch is not None:
                 if branch != graph:
-                    jsonld_node[
-                        '@archesid'] = '%stile/%s/node/%s' % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, tileid, branch['node'].nodeid)
+                    # jsonld_node['@archesid'] = '%stile/%s/node/%s' % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, tileid, branch['node'].nodeid)
 
                     if tileid not in self.tiles:
-                        self.tiles[tileid] = Tile(tileid=tileid, parenttile_id=parent_tileid, nodegroup_id=branch['node'].nodegroup_id, data={})
+                        self.tiles[tileid] = Tile(tileid=tileid, parenttile_id=parent_tileid,
+                                                  nodegroup_id=branch['node'].nodegroup_id, data={})
                         if parent_tileid is None:
                             resource.tiles.append(self.tiles[tileid])
                         else:
@@ -399,6 +432,8 @@ class JsonLdReader(Reader):
 
                 if len(ontology_properties) > 0:
                     for ontology_property in ontology_properties:
+                        # print jsonld_node['@type']
+                        # print ontology_property
                         self.resolve_node_ids(jsonld_node[ontology_property], ontology_prop=ontology_property,
-                            graph=None, parent_node=branch, tileid=tileid, parent_tileid=parent_tileid, resource=resource)
+                                              graph=None, parent_node=branch, tileid=tileid, parent_tileid=parent_tileid, resource=resource)
         return jsonld

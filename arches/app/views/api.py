@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.views.generic import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.db import transaction
 from django.db.models import Q
 from django.http.request import QueryDict
 from django.core.urlresolvers import reverse
@@ -177,15 +178,41 @@ class Resources(APIBase):
             return JSONResponse(status=403)
 
     def put(self, request, resourceid):
-        if user_can_edit_resources(user=request.user):
-            data = JSONDeserializer().deserialize(request.body)
-            # print data
-            reader = JsonLdReader()
-            reader.read_resource(data)
-        else:
-            return JSONResponse(status=403)
+        try:
+            indent = int(request.POST.get('indent', None))
+        except:
+            indent = None
 
-        return JSONResponse(self.get(request, resourceid))
+        try:
+            if user_can_edit_resources(user=request.user):
+                data = JSONDeserializer().deserialize(request.body)
+                reader = JsonLdReader()
+                reader.read_resource(data, use_ids=True)
+                if reader.errors:
+                    response = []
+                    for value in reader.errors.itervalues():
+                        response.append(value.message)
+                    return JSONResponse(data, indent=indent, status=400, reason=response)
+                else:
+                    response = []
+                    for resource in reader.resources:
+                        if resourceid != str(resource.pk):
+                            raise Exception('Resource id in the URI does not match the resource @id supplied in the document')
+                        old_resource = Resource.objects.get(pk=resource.pk)
+                        old_resource.load_tiles()
+                        old_tile_ids = set([str(tile.pk) for tile in old_resource.tiles])
+                        new_tile_ids = set([str(tile.pk) for tile in resource.get_flattened_tiles()])
+                        tileids_to_delete = old_tile_ids.difference(new_tile_ids)
+                        tiles_to_delete = models.TileModel.objects.filter(pk__in=tileids_to_delete)
+                        with transaction.atomic():
+                            tiles_to_delete.delete()
+                            resource.save(request=request)
+                        response.append(JSONDeserializer().deserialize(self.get(request, resource.resourceinstanceid).content))
+                    return JSONResponse(response, indent=indent)
+            else:
+                return JSONResponse(status=403)
+        except Exception as e:
+            return JSONResponse(status=500, reason=e)
 
     def post(self, request, resourceid=None):
         try:
@@ -206,36 +233,14 @@ class Resources(APIBase):
                 else:
                     response = []
                     for resource in reader.resources:
-                        resource.save()
+                        with transaction.atomic():
+                            resource.save(request=request)
                         response.append(JSONDeserializer().deserialize(self.get(request, resource.resourceinstanceid).content))
                     return JSONResponse(response, indent=indent)
             else:
                 return JSONResponse(status=403)
         except Exception as e:
             return JSONResponse(status=500, reason=e)
-
-    def traverse_json_ld_graph(self, func, scope=None, **kwargs):
-        """
-        Traverses a concept graph from self to leaf (direction='down') or root (direction='up') calling
-        the given function on each node, passes an optional scope to each function
-
-        Return a value from the function to prematurely end the traversal
-
-        """
-
-        if scope == None:
-            ret = func(self, **kwargs)
-        else:
-            ret = func(self, scope, **kwargs)
-
-        # break out of the traversal if the function returns a value
-        if ret != None:
-            return ret
-
-        for subconcept in self.subconcepts:
-            ret = subconcept.traverse(func, direction, scope, _cache=_cache, **kwargs)
-            if ret != None:
-                return ret
 
     def delete(self, request, resourceid):
         if user_can_edit_resources(user=request.user):
