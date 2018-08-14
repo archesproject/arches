@@ -185,6 +185,7 @@ class JsonLdReader(Reader):
         self.tiles = {}
         self.errors = {}
         self.resources = []
+        self.ontologyproperties = models.Edge.objects.values_list('ontologyproperty', flat=True).distinct()
 
     def get_graph_id(self, strs_to_test):
         if not isinstance(strs_to_test, list):
@@ -261,7 +262,7 @@ class JsonLdReader(Reader):
         keys = []
         try:
             for key in o.keys():
-                if key != '@type' and key != '@id' and key != '@archesid' and key != str(RDF.value):
+                if key in self.ontologyproperties:
                     keys.append(key)
         except:
             pass
