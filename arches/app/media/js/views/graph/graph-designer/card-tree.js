@@ -154,43 +154,60 @@ define([
             beforeMove: function(e) {
                 e.cancelDrop = (e.sourceParent!==e.targetParent);
             },
-            updateCards: function(data) {
-                self.topCards.removeAll();
-                var existingNodegroupIds = _.pluck(self.graphModel.get('nodegroups'), 'nodegroupid');
-                var newNodegroups = _.filter(data.nodegroups, function(ng) {return _.contains(existingNodegroupIds, ng.nodegroupid) === false;});
-                if (newNodegroups.length > 0) {
-                    self.graphModel.set('nodegroups', self.graphModel.get('nodegroups').concat(newNodegroups));
-                }
-                self.topCards(_.filter(data.cards, function(card) {
-                    var nodegroup = _.find(ko.unwrap(self.graphModel.get('nodegroups')), function(group) {
-                        return ko.unwrap(group.nodegroupid) === card.nodegroup_id;
-                    });
-                    if (nodegroup) {
-                        return !nodegroup || !ko.unwrap(nodegroup.parentnodegroup_id);
+            updateCards: function(action, data) {
+                var cards;
+                var existingNodegroupIds;
+                if (action === 'update') {
+                    self.topCards.removeAll();
+                    existingNodegroupIds = _.pluck(self.graphModel.get('nodegroups'), 'nodegroupid');
+                    var newNodegroups = _.filter(data.nodegroups, function(ng) {return _.contains(existingNodegroupIds, ng.nodegroupid) === false;});
+                    if (newNodegroups.length > 0) {
+                        self.graphModel.set('nodegroups', self.graphModel.get('nodegroups').concat(newNodegroups));
                     }
-                }).map(function(card) {
-                    return new CardViewModel({
-                        card: card,
-                        graphModel: self.graphModel,
-                        tile: null,
-                        resourceId: ko.observable(),
-                        displayname: ko.observable(),
-                        handlers: {},
-                        cards: data.cards,
-                        tiles: [],
-                        selection: selection,
-                        hover: hover,
-                        scrollTo: scrollTo,
-                        multiselect: self.multiselect,
-                        loading: loading,
-                        filter: filter,
-                        provisionalTileViewModel: null,
-                        cardwidgets: data.cardwidgets,
-                        userisreviewer: true,
-                        perms: ko.observableArray(),
-                        permsLiteral: ko.observableArray()
-                    });
-                }));
+                    cards = data.cards;
+                    self.topCards(_.filter(cards, function(card) {
+                        var nodegroup = _.find(ko.unwrap(self.graphModel.get('nodegroups')), function(group) {
+                            return ko.unwrap(group.nodegroupid) === card.nodegroup_id;
+                        });
+                        if (nodegroup) {
+                            return !nodegroup || !ko.unwrap(nodegroup.parentnodegroup_id);
+                        }
+                    }).map(function(card) {
+                        return new CardViewModel({
+                            card: card,
+                            graphModel: self.graphModel,
+                            tile: null,
+                            resourceId: ko.observable(),
+                            displayname: ko.observable(),
+                            handlers: {},
+                            cards: cards,
+                            tiles: [],
+                            selection: selection,
+                            hover: hover,
+                            scrollTo: scrollTo,
+                            multiselect: self.multiselect,
+                            loading: loading,
+                            filter: filter,
+                            provisionalTileViewModel: null,
+                            cardwidgets: data.cardwidgets,
+                            userisreviewer: true,
+                            perms: ko.observableArray(),
+                            permsLiteral: ko.observableArray()
+                        });
+                    }));
+                } else if (action === 'delete') {
+                    var ng = data;
+                    existingNodegroupIds = _.chain(self.graphModel.get('nodes')())
+                        .filter(function(ng){if(ng.nodeGroupId()){return ng;}})
+                        .map(function(ng){return ng.nodeGroupId();})
+                        .value();
+                    _.each(self.topCards(), function(topCard){
+                        if (topCard.nodegroupid === ng) {
+                            console.log('removed', topCard);
+                            self.topCards.remove(topCard);
+                        }
+                    }, self);
+                }
             },
             reorderCards: function() {
                 loading(true);
