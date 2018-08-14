@@ -248,10 +248,10 @@ Updating a resource descriptor should be reflected in the following subjects.
 
 | Test Subject                                                                                        | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | --------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Search results                                                                                      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Form headings                                                                                       |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Search results                                                                                      |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Form headings                                                                                       |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 | Report headings                                                                                     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Map popups                                                                                          |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Map popups                                                                                          |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 | Related resource d3 graph and listings                                                              |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
