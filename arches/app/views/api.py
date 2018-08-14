@@ -94,77 +94,87 @@ class Resources(APIBase):
     #     "@context": "https://linked.art/ns/v1/linked-art.json"
     # }]
 
-    @method_decorator(can_read_resource_instance())
     def get(self, request, resourceid=None):
-        format = request.GET.get('format', 'json-ld')
-        try:
-            indent = int(request.GET.get('indent', None))
-        except:
-            indent = None
+        if user_can_read_resources(user=request.user):
+            allowed_formats = ['json', 'json-ld']
+            format = request.GET.get('format', 'json-ld')
+            if format not in allowed_formats:
+                return JSONResponse(status=406, reason='incorrect format specified, only %s formats allowed' % allowed_formats)
 
-        if resourceid:
             try:
-                exporter = ResourceExporter(format=format)
-                output = exporter.writer.write_resources(
-                    resourceinstanceids=[resourceid], indent=indent, user=request.user)
-                out = output[0]['outputfile'].getvalue()
-            except models.ResourceInstance.DoesNotExist:
-                return JSONResponse(status=404)
+                indent = int(request.GET.get('indent', None))
             except:
-                return JSONResponse(status=500)
+                indent = None
+
+            if resourceid:
+                if format == 'json-ld':
+                    try:
+                        exporter = ResourceExporter(format=format)
+                        output = exporter.writer.write_resources(
+                            resourceinstanceids=[resourceid], indent=indent, user=request.user)
+                        out = output[0]['outputfile'].getvalue()
+                    except models.ResourceInstance.DoesNotExist:
+                        return JSONResponse(status=404)
+                    except:
+                        return JSONResponse(status=500)
+                elif format == 'json':
+                    out = Resource.objects.get(pk=resourceid)
+                    out.load_tiles()
+            else:
+                #
+                # The following commented code would be what you would use if you wanted to use the rdflib module,
+                # the problem with using this is that items in the "ldp:contains" array don't maintain a consistent order
+                #
+
+                # archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
+                # ldp = Namespace('https://www.w3.org/ns/ldp/')
+
+                # g = Graph()
+                # g.bind('archesproject', archesproject, False)
+                # g.add((archesproject['resources'], RDF.type, ldp['BasicContainer']))
+
+                # base_url = "%s%s" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, reverse('resources',args=['']).lstrip('/'))
+                # for resourceid in list(Resource.objects.values_list('pk', flat=True).order_by('pk')[:10]):
+                #     g.add((archesproject['resources'], ldp['contains'], URIRef("%s%s") % (base_url, resourceid) ))
+
+                # value = g.serialize(format='nt')
+                # out = from_rdf(str(value), options={format:'application/nquads'})
+                # framing = {
+                #     "@omitDefault": True
+                # }
+
+                # out = frame(out, framing)
+                # context = {
+                #     "@context": {
+                #         'ldp': 'https://www.w3.org/ns/ldp/',
+                #         'arches': settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT
+                #     }
+                # }
+                # out = compact(out, context, options={'skipExpansion':False, 'compactArrays': False})
+
+                page_size = settings.API_MAX_PAGE_SIZE
+                try:
+                    page = int(request.GET.get('page', None))
+                except:
+                    page = 1
+
+                start = ((page - 1) * page_size) + 1
+                end = start + page_size
+
+                base_url = "%s%s" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT,
+                                     reverse('resources', args=['']).lstrip('/'))
+                out = {
+                    "@context": "https://www.w3.org/ns/ldp/",
+                    "@id": "",
+                    "@type": "ldp:BasicContainer",
+                    # Here we actually mean the name
+                    #"label": str(model.name),
+                    "ldp:contains": ["%s%s" % (base_url, resourceid) for resourceid in list(Resource.objects.values_list('pk', flat=True).order_by('pk')[start:end])]
+                }
+
+            return JSONResponse(out, indent=indent)
         else:
-            #
-            # The following commented code would be what you would use if you wanted to use the rdflib module,
-            # the problem with using this is that items in the "ldp:contains" array don't maintain a consistent order
-            #
-
-            # archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
-            # ldp = Namespace('https://www.w3.org/ns/ldp/')
-
-            # g = Graph()
-            # g.bind('archesproject', archesproject, False)
-            # g.add((archesproject['resources'], RDF.type, ldp['BasicContainer']))
-
-            # base_url = "%s%s" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, reverse('resources',args=['']).lstrip('/'))
-            # for resourceid in list(Resource.objects.values_list('pk', flat=True).order_by('pk')[:10]):
-            #     g.add((archesproject['resources'], ldp['contains'], URIRef("%s%s") % (base_url, resourceid) ))
-
-            # value = g.serialize(format='nt')
-            # out = from_rdf(str(value), options={format:'application/nquads'})
-            # framing = {
-            #     "@omitDefault": True
-            # }
-
-            # out = frame(out, framing)
-            # context = {
-            #     "@context": {
-            #         'ldp': 'https://www.w3.org/ns/ldp/',
-            #         'arches': settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT
-            #     }
-            # }
-            # out = compact(out, context, options={'skipExpansion':False, 'compactArrays': False})
-
-            page_size = settings.API_MAX_PAGE_SIZE
-            try:
-                page = int(request.GET.get('page', None))
-            except:
-                page = 1
-
-            start = ((page - 1) * page_size) + 1
-            end = start + page_size
-
-            base_url = "%s%s" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT,
-                                 reverse('resources', args=['']).lstrip('/'))
-            out = {
-                "@context": "https://www.w3.org/ns/ldp/",
-                "@id": "",
-                "@type": "ldp:BasicContainer",
-                # Here we actually mean the name
-                #"label": str(model.name),
-                "ldp:contains": ["%s%s" % (base_url, resourceid) for resourceid in list(Resource.objects.values_list('pk', flat=True).order_by('pk')[start:end])]
-            }
-
-        return JSONResponse(out, indent=indent)
+            return JSONResponse(status=403)
 
     def put(self, request, resourceid):
         if user_can_edit_resources(user=request.user):
@@ -173,7 +183,7 @@ class Resources(APIBase):
             reader = JsonLdReader()
             reader.read_resource(data)
         else:
-            return JSONResponse(status=500)
+            return JSONResponse(status=403)
 
         return JSONResponse(self.get(request, resourceid))
 

@@ -113,6 +113,14 @@ class Resource(models.ResourceInstance):
 
         return root_ontology_class
 
+    def load_tiles(self):
+        """
+        Loads the resource's tiles array with all the tiles from the database as a flat list
+
+        """
+
+        self.tiles = list(models.TileModel.objects.filter(resourceinstance=self))
+
     # # flatten out the nested tiles into a single array
     def get_flattened_tiles(self):
         tiles = []
