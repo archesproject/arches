@@ -359,9 +359,9 @@ Assigned to: Adam
 
 | Test Subject                                                            | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ----------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Confirm that report templates with map header gets rendered correctly   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Confirm that report templates with image header gets rendered correctly |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Confirm that report templates with no header gets rendered correctly    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Confirm that report templates with map header gets rendered correctly   |   :white_check_mark:  |    ?   |    ?    |   ?  | ?   | -     |
+| Confirm that report templates with image header gets rendered correctly |    :x:   |    ?   |    ?    |   ?  | ?   | #3896     |
+| Confirm that report templates with no header gets rendered correctly    |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 
 #### Data Rendering
 
