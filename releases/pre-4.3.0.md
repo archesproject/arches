@@ -75,7 +75,7 @@ Assigned to: Cyrus (0.1)
 
 | Test Subject                                                                              | Chrome | Safari | Firefox | IE11 |  UI | Notes |
 | ----------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | :-: | ----- |
-| Test that users can't access the Mobile Survey Manager page                               |    ?   |    ?   |    ?    |   ?  |  ?  |  -    |
+| Test that users can't access the Mobile Survey Manager page                               |:white_check_mark:|    ?   |    ?    |   ?  |  ?  |  -    |
 
 * * *
 
@@ -103,8 +103,8 @@ Assigned to: Cyrus (0.25)
 
 | Test Subject                                                                                                                 | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Project Name - Updating name updates and the page tab                                                                        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Web Analytics - String value inserts in base.htm at the location of this template variable:{{GOOGLE_ANALYTICS_TRACKING_ID}}  |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Project Name - Updating name updates and the page tab                                                                        |:construction:|    ?   |    ?    |   ?  | ?   | #3897|
+| Web Analytics - String value inserts in base.htm at the location of this template variable:{{GOOGLE_ANALYTICS_TRACKING_ID}}  |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 #### Map Settings
 
@@ -112,13 +112,13 @@ Assigned to: Cyrus (1.0)
 
 | Test Subject                                                                                                                                                                                    | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| API Key - Key saves and API calls are successful                                                                                                                                                |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| API Key - Key saves and API calls are successful                                                                                                                                                |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 | Hex Grid Precision - Saves properly, but errors if precision is too high (\`Exception detail: TransportError(400, u'parsing_exception', u'[geohash_grid] failed to parse field [precision]')``) |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Hex Cell Size - Changes reflected in Search results                                                                                                                                             |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Default Zoom  Changes reflected in Card Config Manager                                                                                                                                          |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Min Zoom  Changes reflected in Card Config Manager                                                                                                                                              |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Max Zoom  Changes reflected in Card Config Manager                                                                                                                                              |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Project Extent - Changes reflected in Card Config Manager                                                                                                                                       |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Default Zoom  Changes reflected in Card Config Manager                                                                                                                                          |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Min Zoom  Changes reflected in Card Config Manager                                                                                                                                              |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Max Zoom  Changes reflected in Card Config Manager                                                                                                                                              |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Project Extent - Changes reflected in Card Config Manager                                                                                                                                       |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 #### Search Settings
 
@@ -148,10 +148,10 @@ Test in the Card Configuration Manager.
 
 | Test Subject                                                                                                                                            | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Point line and poly geoms can be created, edited, and deleted                                                                                           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| XY widget is working properly                                                                                                                           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Valid geojson entered in the geojson input adds features to the map and pans to those features. If geojson is invalid user has a chance to update data. |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Widget configs (maxzoom, tilt, etc) update when the map changes and the map changes when the properties change                                          |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Point line and poly geoms can be created, edited, and deleted                                                                                           |:construction:|    ?   |    ?    |   ?  | ?   | #3898 |
+| XY widget is working properly                                                                                                                           |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Valid geojson entered in the geojson input adds features to the map and pans to those features. If geojson is invalid user has a chance to update data. |:white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Widget configs (maxzoom, tilt, etc) update when the map changes and the map changes when the properties change                                          |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -262,9 +262,9 @@ Assigned to: Cyrus (0.5)
 
 | Test Subject                                                                                        | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | --------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Provisional users see indication in a widget that their tile edits were submitted                   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Resource reviewers are able to identify provisional tiles and can approve/discard provisional edits |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Provisional edit history properly shows the status of a tile: pending, approved, or declined        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Provisional users see indication in a widget that their tile edits were submitted                   | :white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Resource reviewers are able to identify provisional tiles and can approve/discard provisional edits | :white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Provisional edit history properly shows the status of a tile: pending, approved, or declined        | :white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
