@@ -211,11 +211,11 @@ Assigned to: Ryan (0.5)
 
 | Test Subject               | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Create_mapping_file        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Import business data (cli) |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Export business data (cli) |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Load package (cli)         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Create package (cli)       |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Create_mapping_file        |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Import business data (cli) |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Export business data (cli) |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Load package (cli)         |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Create package (cli)       |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
