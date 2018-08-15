@@ -1,3 +1,4 @@
+Django==1.11.14
 fabric
 livereload
 webtest

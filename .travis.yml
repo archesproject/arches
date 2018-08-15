@@ -40,7 +40,7 @@ before_script: ./arches/install/ci_install/setup_couch.sh
 
 install:
   - python setup.py install
-  - pip install -r arches/install/requirements.txt
+  - pip install -r arches/install/requirements_dev.txt
   - pip install coveralls
   # - npm install -g yarn
   # - yarn install
