@@ -36,7 +36,7 @@ before_install:
   - psql -d postgres -c "CREATE EXTENSION postgis;"
 
 
-before_script: ./arches/install/ci_install/setup_couch.sh
+# before_script: ./arches/install/ci_install/setup_couch.sh
 
 install:
   - python setup.py install
