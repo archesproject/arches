@@ -6963,7 +6963,7 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 div.row.widget-wrapper {
     margin: 0;
     margin-right: 10px;
-    padding: 0px 5px 25px 5px;
+    padding: 10px 5px 25px 5px;
     position: relative;
 }
 
@@ -6998,11 +6998,18 @@ div.row.widget-wrapper {
 .widget-preview.active {
     background: #fcfcfc;
     border: 1px solid #ddd;
-    margin-right: 11px;
+    margin-left: -10px;
+    padding-left: 10px;
+    margin-right: -10px;
+    padding-right: 10px;
 }
 
 .widget-preview.hover {
     background: #fafafa;
+    margin-left: -10px;
+    padding-left: 10px;
+    margin-right: -10px;
+    padding-right: 10px;
 }
 
 .panel-heading.note-toolbar {
@@ -11563,7 +11570,9 @@ ul.select2-choices:after {
 }
 
 .card-component-panel h5 {
-    color: #989898;
+    color: #999;
+    margin-top: -8px;
+    margin-bottom: 10px;
 }
 
 .card-header {
@@ -11806,7 +11815,7 @@ a.jstree-anchor.permissions-card {
     .rp-no-data {
         color: #888;
         position: relative;
-        top: -30px;
+        top: -20px;
     }
 
 }
