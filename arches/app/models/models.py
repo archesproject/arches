@@ -38,6 +38,7 @@ class CardModel(models.Model):
     name = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     instructions = models.TextField(blank=True, null=True)
+    cssclass = models.TextField(blank=True, null=True)
     helpenabled = models.BooleanField(default=False)
     helptitle = models.TextField(blank=True, null=True)
     helptext = models.TextField(blank=True, null=True)

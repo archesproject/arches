@@ -71,6 +71,7 @@ class Card(models.CardModel):
         # self.active
         # self.visible
         # self.sortorder
+        # self.cssclass
         # end from models.CardModel
         self.disabled = False
         self.cardinality = ''
