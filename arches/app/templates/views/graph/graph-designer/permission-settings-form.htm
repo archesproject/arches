@@ -6,29 +6,19 @@
             <div class="">
                 <h3 id="cc-title" class="panel-title card-main-title">{% trans "Permissions" %}</h3>
             </div>
-            <div class="selected-group-user-permissions">
-                <ul class="permissions-selected" data-bind="visible: permissionsDesigner.permissionSettingsForm.selectedIdentities().length === 0">
-                    <li class="permissions-default">
-                        <i class="confirmation permissions-title"></i> <span class="permissions-account-warning">{% trans "No Groups/Accounts selected" %}</span>
-                    </li>
-                </ul>
-                <ul class="permissions-selected" style="display:none;" data-bind="foreach: permissionsDesigner.permissionSettingsForm.selectedIdentities, visible: permissionsDesigner.permissionSettingsForm.selectedIdentities().length !== 0">
-                    <li>
-                        <div class="library-icon-permissions" style="">
-                            <span class="icon-wrap icon-wrap-sm icon-circle" data-bind="css: $data.type === 'group' ? 'bg-purple' : 'bg-mint'">
-                                <i data-bind="attr: {class: 'fa fa-' + $data.type}" class="fa fa-group"></i>
-                            </span>
-                            <div class="permissions-title-panel">
-                                <span class="permissions-title" data-bind="text: $data.name"></span>
-                                <!-- ko if $data.permsLiteral: -->
-                                    <!-- <div class="confirmation-permissions">{% trans "Default Permissions" %}
-                                        <span data-bind="text: $data.permsLiteral"></span>
-                                    </div> -->
-                                <!-- /ko -->
-                            </div>
-                        </div>
-                    </li>
-                </ul>
+            <!-- Menu Item -->
+            <div class="graph-selector" data-bind="" style="margin-left: 32px;">
+                <!-- ko if: permissionsDesigner.permissionSettingsForm.groupedIdentities -->
+                <select data-bind="template: { name: 'selectAccountTemplate', data: permissionsDesigner.permissionSettingsForm.groupedIdentities }, chosen: {width: '100%'}, value: permissionsDesigner.permissionSettingsForm.identityid"></select>
+                <!-- /ko -->
+                <script type="text/html" id="selectAccountTemplate">
+                    <option disabled selected value>{% trans "Select a Group/Account..." %}</option>
+                    <!-- ko foreach: groups -->
+                        <optgroup data-bind="attr: { 'label': (name==='Groups')?'{% trans "Groups" %}':'{% trans "Accounts" %}' }, foreach: items">
+                            <option data-bind="value: combinedId, text: name"></option>
+                        </optgroup>
+                    <!-- /ko -->
+                </script>
             </div>
         </div>
 
@@ -102,7 +92,7 @@
                                         <ul class="permissions-selected" style="display:none;" data-bind="foreach: permissionsDesigner.permissionSettingsForm.selectedCards, visible: permissionsDesigner.permissionSettingsForm.selectedCards().length !== 0">
                                             <!-- ko if $data.permsLiteral: -->
                                             <li class="permissions-node-row">
-                                                <span class="permissions-node" data-bind="text: $data.name"></span>
+                                                <span class="permissions-node" data-bind="text: $data.model.name()"></span>
                                                 <span class="permissions-readout" data-bind="text: $data.permsLiteral"></span>
                                             </li>
                                             <!--/ko -->

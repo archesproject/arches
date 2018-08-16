@@ -21,13 +21,6 @@
             </div>
         </div>
 
-        <!-- ko if: node.datatypeConfigComponent -->
-        <div data-bind='component: {
-            name: node.datatypeConfigComponent,
-            params: node
-        }'></div>
-        <!-- /ko -->
-
         <div class="node-config-item" style="">
             <div class="control-label">
                 {% trans "Template" %}
@@ -49,7 +42,7 @@
             }
         }'></div>
 
-        
+
 
         <!-- ko if: ko.isObservable(card) -->
         <div class="node-config-item switch-panel" data-bind="css: {'disabled': checkIfImmutable() }">

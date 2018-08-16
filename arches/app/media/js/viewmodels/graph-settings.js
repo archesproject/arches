@@ -46,10 +46,9 @@ define([
             if (self.graph.ontology_id() === undefined) {
                 self.graph.ontology_id(null);
             }
-            var rootNodeDatatype = self.node() === undefined ?  ko.unwrap(self.graph.root.datatype) : ko.unwrap(self.node().datatype);
+
             return JSON.stringify({
                 graph: koMapping.toJS(self.graph),
-                root_node_datatype: rootNodeDatatype,
                 relatable_resource_ids: relatableResourceIds,
                 ontology_class: ontologyClass(),
             });
@@ -103,11 +102,7 @@ define([
         self.reset = function() {
             var graph = self.graph;
             var src = JSON.parse(self.jsonCache());
-            _.each(src.graph, function(value, key) {
-                if (ko.isObservable(graph[key])) {
-                    graph[key](value);
-                }
-            });
+            ko.mapping.fromJS(src.graph, graph);
             self.ontologyClass(src.graph.root.ontologyclass);
             self.relatable_resources().forEach(function(resource) {
                 if (_.contains(src.relatable_resource_ids, resource.id)){
@@ -118,6 +113,9 @@ define([
             });
             self.jsonCache(self.jsonData());
             self.node()._node(JSON.stringify(self.node()));
+            if (params.onReset && typeof params.onReset === 'function') {
+                params.onReset();
+            }
         };
 
     };

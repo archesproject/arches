@@ -317,6 +317,12 @@ class GraphModel(models.Model):
     ontology = models.ForeignKey('Ontology', db_column='ontologyid', related_name='graphs', null=True, blank=True)
     functions = models.ManyToManyField(to='Function', through='FunctionXGraph')
     jsonldcontext = models.TextField(blank=True, null=True)
+    template = models.ForeignKey(
+        'ReportTemplate',
+        db_column='templateid',
+        default='50000000-0000-0000-0000-000000000001'
+    )
+    config = JSONField(db_column='config', default={})
 
     @property
     def disable_instance_creation(self):
@@ -518,19 +524,6 @@ class ReportTemplate(models.Model):
     class Meta:
         managed = True
         db_table = 'report_templates'
-
-
-class Report(models.Model):
-    reportid = models.UUIDField(primary_key=True, default=uuid.uuid1)
-    name = models.TextField(blank=True, null=True)
-    template = models.ForeignKey(ReportTemplate, db_column='templateid')
-    graph = models.ForeignKey(GraphModel, db_column='graphid')
-    config = JSONField(blank=True, null=True, db_column='config')
-    active = models.BooleanField(default=False)
-
-    class Meta:
-        managed = True
-        db_table = 'reports'
 
 
 class Resource2ResourceConstraint(models.Model):

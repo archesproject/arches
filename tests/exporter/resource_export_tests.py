@@ -32,7 +32,8 @@ from arches.app.utils.data_management.resources.importer import  BusinessDataImp
 from arches.app.utils.data_management.resources.exporter import  ResourceExporter as BusinessDataExporter
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
 
-
+# these tests can be run from the command line via
+# python manage.py test tests/exporter/resource_export_tests.py --pattern="*.py" --settings="tests.test_settings"
 
 class BusinessDataExportTests(ArchesTestCase):
     @classmethod

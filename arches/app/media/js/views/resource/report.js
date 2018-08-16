@@ -16,7 +16,6 @@ require([
     var ResourceReportView = BaseManagerView.extend({
         initialize: function(options){
             var self = this;
-            var report = null;
 
             var graphModel = new GraphModel({
                 data: data.graph,
@@ -41,12 +40,8 @@ require([
                 });
             });
 
-            if (data.report) {
-                report =  new ReportModel(_.extend(data, {graphModel: graphModel, cards: cards}));
-            }
-
             this.viewModel.reportLookup = reportLookup;
-            this.viewModel.report = report;
+            this.viewModel.report = new ReportModel(_.extend(data, {graphModel: graphModel, cards: cards}));
             this.viewModel.graph = data.graph;
 
             var createLookup = function(list, idKey) {
@@ -59,6 +54,18 @@ require([
             this.viewModel.cardComponentLookup = createLookup(data.cardComponents, 'componentid');
             this.viewModel.nodeLookup = createLookup(graphModel.get('nodes')(), 'nodeid');
             BaseManagerView.prototype.initialize.call(this, options);
+
+            if (location.search.indexOf('print') > 0) {
+                this.viewModel.loading(true);
+                setTimeout(
+                    function() {
+                        self.viewModel.loading(false);
+                        window.print();
+                    },
+                    7000 // a generous timeout here to allow maps/images to load
+                );
+
+            }
         }
     });
     return new ResourceReportView();

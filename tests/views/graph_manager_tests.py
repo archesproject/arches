@@ -224,7 +224,7 @@ class GraphManagerViewTests(ArchesTestCase):
         graph = json.loads(response.content)
 
         graph['name'] = 'new graph name'
-        post_data = {'graph': graph, 'relatable_resource_ids': [str(self.ROOT_ID)], 'root_node_datatype': 'semantic'}
+        post_data = {'graph': graph, 'relatable_resource_ids': [str(self.ROOT_ID)]}
         post_data = JSONSerializer().serialize(post_data)
         content_type = 'application/x-www-form-urlencoded'
         response = self.client.post(url, post_data, content_type)

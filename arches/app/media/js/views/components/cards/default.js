@@ -5,6 +5,12 @@ define(['knockout', 'bindings/scrollTo'], function(ko) {
         this.loading = params.loading || ko.observable(false);
         this.card = params.card;
         this.tile = params.tile;
+        if (this.preview) {
+            if (!this.card.newTile) {
+                this.card.newTile = this.card.getNewTile();
+            }
+            this.tile = this.card.newTile;
+        }
         this.form = params.form;
         this.provisionalTileViewModel = params.provisionalTileViewModel;
         this.reviewer = params.reviewer;
@@ -15,6 +21,8 @@ define(['knockout', 'bindings/scrollTo'], function(ko) {
     };
     return ko.components.register('default-card', {
         viewModel: viewModel,
-        template: { require: 'text!templates/views/components/cards/default.htm' }
+        template: {
+            require: 'text!templates/views/components/cards/default.htm'
+        }
     });
 });

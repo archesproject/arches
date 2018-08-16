@@ -40,27 +40,23 @@
                 </li>
 
                 <!-- Menu Item -->
-                {% if active_report_count > 0 %}
                 <li id="report-manager" class="edit-menu-item" data-bind="css: {'disabled': !resourceId()}">
-                    <a href="#" data-bind="click: viewReport">
+                    <a href="#" data-bind="click: function() { viewReport(false) }">
                         <div class="media-body">
                             <div class="menu-item-title"><i class="fa fa-book"></i> {% trans "Jump to Report" %}</div>
                             <span class="text-muted menu-item-subtitle">{% trans "View the full resource report" %}</span>
                         </div>
                     </a>
                 </li>
-                {% else %}
-                <li id="report-manager" class="edit-menu-item disabled">
-                    <a href="#">
+
+                <li id="report-manager" class="edit-menu-item" data-bind="css: {'disabled': !resourceId()}">
+                    <a href="#" data-bind="click: function() { viewReport(true) }">
                         <div class="media-body">
-                            <div class="menu-item-title"><i class="fa fa-book"></i> {% trans "Report Not Available" %}</div>
-                            <span class="text-muted menu-item-subtitle">{% trans "Report template not activated" %}</span>
+                            <div class="menu-item-title"><i class="fa fa-print"></i> {% trans "Print Report" %}</div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Print the full resource report" %}</span>
                         </div>
                     </a>
                 </li>
-                {% endif %}
-
-
 
             </ul>
         </div>

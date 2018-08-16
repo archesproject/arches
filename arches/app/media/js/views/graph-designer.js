@@ -6,6 +6,7 @@ define([
     'views/base-manager',
     'viewmodels/alert',
     'models/graph',
+    'models/report',
     'views/graph/graph-manager/graph',
     'views/graph/graph-designer/graph-tree',
     'views/graph/graph-designer/node-form',
@@ -17,10 +18,11 @@ define([
     'viewmodels/graph-settings',
     'viewmodels/card',
     'view-data',
+    'report-templates',
     'bindings/resizable-sidepanel',
     'datatype-config-components',
     'views/components/simple-switch'
-], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, GraphModel, GraphView, GraphTree, NodeFormView, BranchListView, CardTreeViewModel, PermissionDesigner, data, arches, GraphSettingsViewModel, CardViewModel, viewData) {
+], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, GraphModel, ReportModel, GraphView, GraphTree, NodeFormView, BranchListView, CardTreeViewModel, PermissionDesigner, data, arches, GraphSettingsViewModel, CardViewModel, viewData, reportLookup) {
     var GraphDesignerView = BaseManagerView.extend({
 
         initialize: function(options) {
@@ -99,6 +101,10 @@ define([
                         if (data.responseJSON.success === false || data.status === 500) {
                             viewModel.alert(new AlertViewModel('ep-alert-red', data.responseJSON.title, data.responseJSON.message));
                         }
+                        else {
+                            viewModel.cardTree.updateCards('update', data.responseJSON);
+                            viewModel.permissionTree.updateCards('update', data.responseJSON);
+                        }
                         viewModel.loading(false);
                     });
                 }
@@ -113,6 +119,24 @@ define([
             viewModel.cardTree = new CardTreeViewModel({
                 graph: viewModel.graph,
                 graphModel: viewModel.graphModel
+            });
+
+            viewModel.permissionTree = new CardTreeViewModel({
+                graph: viewModel.graph,
+                graphModel: viewModel.graphModel,
+                multiselect: true
+            });
+
+            viewModel.selectedCards = ko.computed(function() {
+                var selection = viewModel.permissionTree.selection();
+                if (selection) {
+                    if (selection.widgets) {
+                        return selection;
+                    }
+                    return selection.parent;
+                } else {
+                    return null;
+                }
             });
 
             viewModel.selectedCard = ko.computed(function() {
@@ -145,7 +169,7 @@ define([
             });
 
             viewModel.permissionsDesigner = new PermissionDesigner({
-                cardTree: viewModel.cardTree
+                cardTree: viewModel.permissionTree
             });
 
             viewModel.graphSettingsViewModel = new GraphSettingsViewModel({
@@ -158,12 +182,41 @@ define([
                 iconFilter: ko.observable(''),
                 node: viewModel.selectedNode,
                 rootNodeColor: ko.observable(''),
-                ontology_namespaces: data.ontology_namespaces
+                "ontology_namespaces": data.ontology_namespaces,
+                onReset: function() {
+                    var graph = ko.mapping.toJS(viewModel.graphSettingsViewModel.graph);
+                    viewModel.report.configJSON(graph.config);
+                    viewModel.report.get('template_id')(graph["template_id"]);
+                }
+            });
+
+            viewModel.report = new ReportModel(_.extend(data, {
+                graphModel: viewModel.graphModel,
+                cards: viewModel.cardTree.topCards,
+                preview: true
+            }));
+
+            viewModel.report.configJSON.subscribe(function(config) {
+                var graph = ko.mapping.toJS(viewModel.graphSettingsViewModel.graph);
+                graph.config = config;
+                ko.mapping.fromJS(graph, viewModel.graphSettingsViewModel.graph);
+            });
+
+            viewModel.report.get('template_id').subscribe(function(val) {
+                viewModel.graphSettingsViewModel.graph["template_id"](val);
+            });
+
+            viewModel.reportLookup = reportLookup;
+            viewModel.reportTemplates = _.map(reportLookup, function(report, id) {
+                report.id = id;
+                return report;
             });
 
             viewModel.graphTree = new GraphTree({
                 graphModel: viewModel.graphModel,
-                graphSettings: viewModel.graphSettingsViewModel
+                graphSettings: viewModel.graphSettingsViewModel,
+                cardTree: viewModel.cardTree,
+                permissionTree: viewModel.permissionTree
             });
 
             viewModel.graphTree.branchListVisible.subscribe(function(visible) {
@@ -191,6 +244,107 @@ define([
                         throw 'error loading graph settings';
                     });
             };
+
+            var correspondingCard = function(item, cardTree){
+                var cardList = cardTree.cachedFlatTree;
+                if (cardList === undefined) {
+                    var cardList = cardTree.flattenTree(cardTree.topCards(), []);
+                    cardTree.cachedFlatTree = cardList;
+                }
+                var res;
+                var matchingWidget;
+                if (item && typeof item !== 'string') {
+                    if (item.nodeGroupId) { //if the item is a node in graph tree
+                        var matchingCards = _.filter(cardList, function(card){
+                            return card.nodegroupid === item.nodeGroupId();
+                        });
+                        _.each(matchingCards, function(card){
+                            var match;
+                            match = _.find(card.widgets(), function(widget){
+                                return widget.node_id() === item.nodeid;
+                            });
+                            if (match) {
+                                matchingWidget = match;
+                            }
+                        });
+                        if (matchingWidget) {
+                            res = matchingWidget;
+                        } else {
+                            res = matchingCards[0];
+                        }
+                    } else { //if the item is a card or widget in the card tree
+                        res = _.find(cardList, function(card){
+                            if (item.nodegroupid) {
+                                return card.nodegroupid === item.nodegroupid;
+                            } else {
+                                return card.nodegroupid === item.node.nodeGroupId();
+                            }
+                        });
+                    }
+                }
+                return res;
+
+            };
+
+            var correspondingNode = function(card, graphTree){
+                var nodeMatch = _.find(graphTree.items(), function(node){
+                    if (card.node) {
+                        return node.nodeid === card.node_id();
+                    } else {
+                        return node.nodeGroupId() === card.nodegroupid && node.nodeid === node.nodeGroupId();
+                    }
+                });
+                return nodeMatch;
+            };
+
+            var updateGraphSelection = function() {
+                if (viewModel.activeTab() === 'card') {
+                    viewModel.graphTree.collapseAll();
+                    var matchingNode = correspondingNode(viewModel.cardTree.selection(), viewModel.graphTree);
+                    if (matchingNode) {
+                        viewModel.graphTree.selectItem(matchingNode);
+                    }
+                }
+            };
+
+            var updateCardSelection = function() {
+                if (viewModel.activeTab() === 'graph') {
+                    var graphTreeSelection = viewModel.graphTree.selectedItems().length > 0 ? viewModel.graphTree.selectedItems()[0] : null;
+                    var matchingCard;
+                    if (graphTreeSelection) {
+                        if (graphTreeSelection.istopnode === true) {
+                            viewModel.cardTree.selection(viewModel.cardTree.topCards()[0]);
+                        } else {
+                            matchingCard = correspondingCard(graphTreeSelection, viewModel.cardTree);
+                            if (matchingCard) {
+                                viewModel.cardTree.selection(matchingCard);
+                                viewModel.cardTree.collapseAll();
+                                viewModel.cardTree.expandToRoot(viewModel.cardTree.selection());
+                            }
+                        }
+                    }
+                }
+            };
+
+            var updatePermissionCardSelection = function() {
+                var matchingCard = correspondingCard(viewModel.cardTree.selection(), viewModel.permissionTree);
+                if (matchingCard) {
+                    viewModel.permissionTree.collapseAll();
+                    viewModel.permissionTree.expandToRoot(matchingCard);
+                    viewModel.permissionTree.selection.removeAll();
+                    matchingCard.selected(true);
+                }
+            };
+
+            viewModel.cardTree.selection.subscribe(function(){
+                updateGraphSelection();
+                updatePermissionCardSelection();
+            });
+
+            viewModel.graphTree.selectedItems.subscribe(function(){
+                updateCardSelection();
+                updatePermissionCardSelection();
+            });
 
             if (viewModel.activeTab() === 'graph') {
                 viewModel.loadGraphSettings();

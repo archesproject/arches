@@ -145,10 +145,6 @@ class NewResourceEditorView(MapBaseManagerView):
         map_sources = models.MapSource.objects.all()
         geocoding_providers = models.Geocoder.objects.all()
         templates = models.ReportTemplate.objects.all()
-        try:
-            report = models.Report.objects.get(graph=graph, active=True)
-        except models.Report.DoesNotExist:
-            report = None
 
         context = self.get_context_data(
             main_script=main_script,
@@ -174,11 +170,10 @@ class NewResourceEditorView(MapBaseManagerView):
             map_markers=map_markers,
             map_sources=map_sources,
             geocoding_providers=geocoding_providers,
-            active_report_count=models.Report.objects.filter(graph=graph, active=True).count(),
             user_is_reviewer=json.dumps(user_is_reviewer),
             report_templates=templates,
             templates_json=JSONSerializer().serialize(templates, sort_keys=False, exclude=['name', 'description']),
-            report=JSONSerializer().serialize(report),
+            graph_json=JSONSerializer().serialize(graph),
         )
 
         context['nav']['title'] = ''
@@ -279,8 +274,6 @@ class ResourceEditorView(MapBaseManagerView):
                 saved_searches=JSONSerializer().serialize(settings.SAVED_SEARCHES),
                 resource_instance_exists=resource_instance_exists,
                 user_is_reviewer=json.dumps(request.user.groups.filter(name='Resource Reviewer').exists()),
-                active_report_count=models.Report.objects.filter(
-                    graph_id=resource_instance.graph_id, active=True).count(),
                 userid=request.user.id
             )
 
@@ -469,20 +462,6 @@ class ResourceCards(View):
         return JSONResponse({'success': True, 'cards': cards})
 
 
-class ResourceReportData(View):
-
-    def get(self, request, resourceid=None):
-        resource_instance_id = request.GET.get('resourceid', None)
-        resource_instance = models.ResourceInstance.objects.get(pk=resource_instance_id)
-        active_report_count = models.Report.objects.filter(graph_id=resource_instance.graph_id, active=True).count()
-        if active_report_count > 0:
-            res = JSONResponse({'success': True})
-        else:
-            res = JSONResponse({'status': 'false', 'message': _(
-                'A report template has not been activated for this resource type'), 'title': _('No Report Available')}, status=500)
-        return res
-
-
 class ResourceDescriptors(View):
 
     def get(self, request, resourceid=None):
@@ -529,14 +508,10 @@ class ResourceReportView(MapBaseManagerView):
                     summary['resources'].append({'instance_id': rr['resourceinstanceid'], 'displayname': rr[
                                                 'displayname'], 'relationships': relationship_summary})
 
-        tiles = Tile.objects.filter(resourceinstance=resource)
-        try:
-            report = models.Report.objects.get(graph=resource.graph, active=True)
-        except models.Report.DoesNotExist:
-            report = None
+        tiles = Tile.objects.filter(resourceinstance=resource).order_by('sortorder')
 
         graph = Graph.objects.get(graphid=resource.graph_id)
-        cards = Card.objects.filter(graph=graph)
+        cards = Card.objects.filter(graph=graph).order_by('sortorder')
         permitted_cards = []
         permitted_tiles = []
 
@@ -571,7 +546,6 @@ class ResourceReportView(MapBaseManagerView):
 
         context = self.get_context_data(
             main_script='views/resource/report',
-            report=JSONSerializer().serialize(report),
             report_templates=templates,
             templates_json=JSONSerializer().serialize(templates, sort_keys=False, exclude=['name', 'description']),
             card_components=card_components,

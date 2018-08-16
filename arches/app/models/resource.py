@@ -91,7 +91,7 @@ class Resource(models.ResourceInstance):
         super(Resource, self).save(*args, **kwargs)
         for tile in self.tiles:
             tile.resourceinstance_id = self.resourceinstanceid
-            saved_tile = tile.save(index=False)
+            saved_tile = tile.save(request=request, index=False)
         if request == '':
             if user == '':
                 user = {}
@@ -113,6 +113,13 @@ class Resource(models.ResourceInstance):
 
         return root_ontology_class
 
+    # # flatten out the nested tiles into a single array
+    def get_flattened_tiles(self):
+        tiles = []
+        for tile in self.tiles:
+            tiles.extend(tile.get_flattened_tiles())
+        return tiles
+
     @staticmethod
     def bulk_save(resources):
         """
@@ -130,14 +137,8 @@ class Resource(models.ResourceInstance):
         documents = []
         term_list = []
 
-        # flatten out the nested tiles into a single array
         for resource in resources:
-            for parent_tile in resource.tiles:
-                for child_tile in parent_tile.tiles.itervalues():
-                    if len(child_tile) > 0:
-                        resource.tiles.extend(child_tile)
-                parent_tile.tiles = {}
-
+            resource.tiles = resource.get_flattened_tiles()
             tiles.extend(resource.tiles)
 
         # need to save the models first before getting the documents for index

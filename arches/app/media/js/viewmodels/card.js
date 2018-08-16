@@ -51,7 +51,6 @@ define([
     var CardViewModel = function(params) {
         var TileViewModel = require('viewmodels/tile');
         var self = this;
-        var selection = params.selection || ko.observable();
         var hover = params.hover || ko.observable();
         var scrollTo = params.scrollTo || ko.observable();
         var filter = params.filter || ko.observable();
@@ -59,7 +58,13 @@ define([
         var perms = ko.observableArray();
         var permsLiteral = ko.observableArray();
         var nodegroups = params.graphModel.get('nodegroups');
-
+        var multiselect = params.multiselect || false;
+        var selection;
+        if (params.multiselect) {
+            selection = params.selection || ko.observableArray([]);
+        } else {
+            selection = params.selection || ko.observable();
+        }
         var nodegroup = _.find(ko.unwrap(nodegroups), function(group) {
             return ko.unwrap(group.nodegroupid) === ko.unwrap(params.card.nodegroup_id);
         });
@@ -111,6 +116,7 @@ define([
 
         _.extend(this, nodegroup, {
             model: cardModel,
+            multiselect: params.multiselect,
             widgets: cardModel.widgets,
             parent: params.tile,
             expanded: ko.observable(false),
@@ -170,6 +176,7 @@ define([
                     cards: params.cards,
                     tiles: params.tiles,
                     selection: selection,
+                    multiselect: multiselect,
                     scrollTo: scrollTo,
                     loading: loading,
                     filter: filter,
@@ -188,10 +195,19 @@ define([
             }),
             selected: ko.pureComputed({
                 read: function() {
-                    return selection() === this;
+                    if (self.multiselect) {
+                        return _.contains(selection(), this);
+                    } else {
+                        return selection() === this;
+                    }
                 },
                 write: function(value) {
-                    if (value) {
+                    if (self.multiselect && value && _.contains(selection(), this) === false) {
+                        selection.push(this);
+                    } else if (self.multiselect && value && _.contains(selection(), this) === true) {
+                        selection.remove(this);
+                    }
+                    else if (value) {
                         selection(this);
                     }
                 },
@@ -270,6 +286,7 @@ define([
                 });
             }
         });
+
         this.isChildSelected = ko.computed(function() {
             return isChildSelected(this);
         }, this);

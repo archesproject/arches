@@ -385,6 +385,8 @@ DATE_IMPORT_EXPORT_FORMAT = '%Y-%m-%d'
 
 API_MAX_PAGE_SIZE = 500
 
+UUID_REGEX = '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
+
 #######################################
 ###       END STATIC SETTINGS       ###
 #######################################

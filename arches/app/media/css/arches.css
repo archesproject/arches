@@ -1408,16 +1408,18 @@ a.select2-search-choice-close {
 }
 
 .permissions-node {
-    font-size: 13px;
+    font-size: 11px;
     color: #777;
 }
 
 .permissions-node-row {
+    display: inline-flex;
     background: #fff;
     padding-top: 6px;
     padding-bottom: 6px;
     padding-left: 10px;
     margin-right: 10px;
+    justify-content: space-between;
 }
 
 .account-card-main {
@@ -1502,6 +1504,8 @@ a.select2-search-choice-close {
 }
 
 .permissions-selected {
+    display: flex;
+    flex-direction: column;
     list-style: none;
     color: #666;
     line-height: 1.2;
@@ -10700,6 +10704,16 @@ a.search-facet-item.disabled {
     display: block;
 }
 
+.editor-report {
+    background: white;
+    width: 100%;
+    overflow-y: auto;
+}
+
+.editor-report .rp-report-section {
+    border-bottom: none;
+    padding-bottom: 0;
+}
 
 .editor-report .report-related-resources, .editor-report .report-title-bar {
     display: none;

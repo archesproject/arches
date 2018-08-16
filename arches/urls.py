@@ -22,8 +22,8 @@ from django.conf.urls import include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from arches.app.views import concept, main, map, search, graph, tileserver, api
 from arches.app.views.admin import ReIndexResources
-from arches.app.views.graph import GraphDesignerView, GraphSettingsView, GraphDataView, GraphManagerView, DatatypeTemplateView, CardView, ReportManagerView, ReportEditorView, FunctionManagerView, PermissionDataView
-from arches.app.views.resource import ResourceEditorView, ResourceListView, ResourceData, ResourceCards, ResourceReportView, ResourceReportData, RelatedResourcesView, ResourceDescriptors, ResourceEditLogView, ResourceTiles
+from arches.app.views.graph import GraphDesignerView, GraphSettingsView, GraphDataView, GraphManagerView, DatatypeTemplateView, CardView, FunctionManagerView, PermissionDataView
+from arches.app.views.resource import ResourceEditorView, ResourceListView, ResourceData, ResourceCards, ResourceReportView, RelatedResourcesView, ResourceDescriptors, ResourceEditLogView, ResourceTiles
 from arches.app.views.resource import NewResourceEditorView
 from arches.app.views.concept import RDMView
 from arches.app.views.user import UserManagerView
@@ -38,7 +38,7 @@ from arches.app.utils.forms import ArchesSetPasswordForm
 from django.contrib import admin
 admin.autodiscover()
 
-uuid_regex = '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
+uuid_regex = settings.UUID_REGEX
 
 urlpatterns = [
     url(r'^$', main.index, name='root'),
@@ -91,8 +91,6 @@ urlpatterns = [
     url(r'^graph/(?P<graphid>%s)/get_related_nodes/(?P<nodeid>%s)$' % (uuid_regex, uuid_regex), GraphDataView.as_view(action='get_related_nodes'), name='get_related_nodes'),
     url(r'^graph/(?P<graphid>%s)/get_valid_domain_nodes/(?P<nodeid>%s|())$' % (uuid_regex, uuid_regex), GraphDataView.as_view(action='get_valid_domain_nodes'), name='get_valid_domain_nodes'),
     url(r'^graph/(?P<graphid>%s)/get_domain_connections$' % uuid_regex, GraphDataView.as_view(action='get_domain_connections'), name='get_domain_connections'),
-    url(r'^graph/(?P<graphid>%s)/report_manager$' % uuid_regex, ReportManagerView.as_view(), name='report_manager'),
-    url(r'^graph/(?P<graphid>%s)/add_report$' % uuid_regex, ReportManagerView.as_view(), name='add_report'),
     url(r'^graph/(?P<graphid>%s)/function_manager$' % uuid_regex, FunctionManagerView.as_view(), name='function_manager'),
     url(r'^graph/(?P<graphid>%s)/apply_functions$' % uuid_regex, FunctionManagerView.as_view(), name='apply_functions'),
     url(r'^graph/(?P<graphid>%s)/remove_functions$' % uuid_regex, FunctionManagerView.as_view(), name='remove_functions'),
@@ -118,8 +116,6 @@ urlpatterns = [
     url(r'^report/(?P<resourceid>%s)$' % uuid_regex, ResourceReportView.as_view(), name='resource_report'),
     url(r'^card/(?P<cardid>%s|())$' % uuid_regex, CardView.as_view(action='update_card'), name='card'),
     url(r'^reorder_cards/', CardView.as_view(action='reorder_cards'), name='reorder_cards'),
-    url(r'^report_editor/(?P<reportid>%s|())$' % uuid_regex, ReportEditorView.as_view(), name='report_editor'),
-    url(r'^report/data$', ResourceReportData.as_view(), name='report_data'),
     url(r'^node/(?P<graphid>%s)$' % uuid_regex, GraphDataView.as_view(action='update_node'), name='node'),
     url(r'^node_layer/(?P<graphid>%s)$' % uuid_regex, GraphDataView.as_view(action='update_node_layer'), name='node_layer'),
     url(r'^widgets/(?P<template>[a-zA-Z_-]*)', main.widget, name="widgets"),

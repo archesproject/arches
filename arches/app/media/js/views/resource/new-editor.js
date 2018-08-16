@@ -26,7 +26,7 @@ define([
     var tiles = data.tiles;
     var filter = ko.observable('');
     var loading = ko.observable(false);
-    var selection = ko.observable();
+    var selection = ko.observable('root');
     var scrollTo = ko.observable();
     var displayname = ko.observable(data.displayname);
     var resourceId = ko.observable(data.resourceid);
@@ -153,6 +153,12 @@ define([
                 return item;
             }
         }),
+        addableCards: ko.computed(function() {
+            var tile = selectedTile();
+            return _.filter(tile ? tile.cards : [], function(card) {
+                return card.canAdd();
+            });
+        }),
         provisionalTileViewModel: provisionalTileViewModel,
         filter: filter,
         on: function(eventName, handler) {
@@ -217,22 +223,20 @@ define([
                 vm.navigate(arches.urls.get_resource_edit_log(resourceId()));
             }
         },
-        viewReport: function() {
+        viewReport: function(print) {
             if (resourceId()) {
+                var url = arches.urls.resource_report + resourceId();
+                if (print) {
+                    url = url + '?print';
+                }
                 vm.menuActive(false);
-                vm.navigate(arches.urls.resource_report + resourceId());
+                window.open(url, "_blank");
             }
         }
     };
-    var topCard = vm.topCards[0];
-    if (topCard) {
-        selection(topCard.tiles().length > 0 ? topCard.tiles()[0] : topCard);
-    }
 
     vm.report = null;
-    if (data.report) {
-        vm.report = new ReportModel(_.extend(data, {graphModel: graphModel, cards: vm.topCards}));
-    }
+    vm.report = new ReportModel(_.extend(data, {graphModel: graphModel, cards: vm.topCards}));
 
     vm.resourceId.subscribe(function(){
         //switches the url from 'create-resource' once the resource id is available
