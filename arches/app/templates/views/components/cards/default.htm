@@ -332,7 +332,7 @@
 <!-- ko if: state === 'report' -->
 <div class="rp-card-section">
     <span class="rp-tile-title" data-bind="text: card.model.get('name')"></span>
-    <!-- ko foreach: { data: card.tiles, as: 'tile' } -->
+    <!-- ko foreach: { data: self.preview ? [card.newTile] : card.tiles, as: 'tile' } -->
         <div class="rp-card-section">
             <!-- ko if: card.model.get('widgets')().length > 0 -->
                 <div class="rp-report-tile" data-bind="attr: { id: tile.tileid }">
@@ -354,11 +354,12 @@
             <!-- /ko -->
 
             <div class="rp-report-container-tile" data-bind="visible: card.cards().length > 0">
-                <!-- ko foreach: { data: tile.cards, as: 'card' } -->
+                <!-- ko foreach: { data: self.preview ? card.cards : tile.cards, as: 'card' } -->
                         <!-- ko component: {
                             name: card.model.cardComponentLookup[card.model.component_id()].componentname,
                             params: {
                                 state: 'report',
+                                preview: self.preview,
                                 card: card
                             }
                         } --> <!-- /ko -->
@@ -367,7 +368,7 @@
         </div>
     <!-- /ko -->
 
-    <!-- ko if: card.tiles().length === 0 -->
+    <!-- ko if: card.tiles().length === 0 && !self.preview -->
     <div class="row rp-report-tile rp-no-data">
         <!-- ko ifnot: card.model.get('cardid') -->
         {% trans "Sorry, you don't have access to this information" %}

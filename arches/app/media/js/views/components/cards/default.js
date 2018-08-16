@@ -4,6 +4,9 @@ define(['knockout', 'bindings/scrollTo'], function(ko) {
         this.preview = params.preview;
         this.loading = params.loading || ko.observable(false);
         this.card = params.card;
+        if (this.preview && !this.card.newTile) {
+            this.card.newTile = this.card.getNewTile();
+        }
         this.tile = params.tile;
         this.form = params.form;
         this.provisionalTileViewModel = params.provisionalTileViewModel;
