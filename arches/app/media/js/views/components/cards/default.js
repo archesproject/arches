@@ -21,6 +21,8 @@ define(['knockout', 'bindings/scrollTo'], function(ko) {
     };
     return ko.components.register('default-card', {
         viewModel: viewModel,
-        template: { require: 'text!templates/views/components/cards/default.htm' }
+        template: {
+            require: 'text!templates/views/components/cards/default.htm'
+        }
     });
 });
