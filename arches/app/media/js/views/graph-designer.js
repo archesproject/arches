@@ -102,8 +102,8 @@ define([
                             viewModel.alert(new AlertViewModel('ep-alert-red', data.responseJSON.title, data.responseJSON.message));
                         }
                         else {
-                            viewModel.cardTree.updateCards('update', data.responseJSON);
-                            viewModel.permissionTree.updateCards('update', data.responseJSON);
+                            viewModel.cardTree.updateCards('update', viewModel.selectedNode().nodeGroupId(), data.responseJSON);
+                            viewModel.permissionTree.updateCards('update', viewModel.selectedNode().nodeGroupId(), data.responseJSON);
                         }
                         viewModel.loading(false);
                     });
