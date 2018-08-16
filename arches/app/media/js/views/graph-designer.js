@@ -101,6 +101,10 @@ define([
                         if (data.responseJSON.success === false || data.status === 500) {
                             viewModel.alert(new AlertViewModel('ep-alert-red', data.responseJSON.title, data.responseJSON.message));
                         }
+                        else {
+                            viewModel.cardTree.updateCards('update', data.responseJSON);
+                            viewModel.permissionTree.updateCards('update', data.responseJSON);
+                        }
                         viewModel.loading(false);
                     });
                 }
@@ -210,7 +214,9 @@ define([
 
             viewModel.graphTree = new GraphTree({
                 graphModel: viewModel.graphModel,
-                graphSettings: viewModel.graphSettingsViewModel
+                graphSettings: viewModel.graphSettingsViewModel,
+                cardTree: viewModel.cardTree,
+                permissionTree: viewModel.permissionTree
             });
 
             viewModel.graphTree.branchListVisible.subscribe(function(visible) {
@@ -240,7 +246,11 @@ define([
             };
 
             var correspondingCard = function(item, cardTree){
-                var cardList = cardTree.flattenTree(cardTree.topCards(), []);
+                var cardList = cardTree.cachedFlatTree;
+                if (cardList === undefined) {
+                    var cardList = cardTree.flattenTree(cardTree.topCards(), []);
+                    cardTree.cachedFlatTree = cardList;
+                }
                 var res;
                 var matchingWidget;
                 if (item && typeof item !== 'string') {
