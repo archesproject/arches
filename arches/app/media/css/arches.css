@@ -10706,6 +10706,8 @@ a.search-facet-item.disabled {
 
 .editor-report {
     background: white;
+    width: 100%;
+    overflow-y: auto;
 }
 
 .editor-report .rp-report-section {

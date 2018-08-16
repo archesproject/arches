@@ -114,12 +114,25 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <!--/ko -->
 
             <!--ko if: selection() === 'root' -->
+                <!--ko if: resourceId() -->
                 <div class='resource-report editor-report' data-bind='component: {
                     name: reportLookup[report.get("template_id")()].componentname,
                     params: {
                         report: report
                     }
                 }'></div>
+                <!--/ko -->
+                <!--ko if: !resourceId() -->
+                <div id="rr-splash" class="rr-splash">
+
+                    <div class="rr-splash-title">{% trans "New Resource" %}</div>
+
+                    <div class="rr-splash-description">
+                        {% trans "This resource doesn't have any data yet! Select a card from the tree to start describing this resource." %}
+                    </div>
+
+                </div>
+                <!--/ko -->
             <!--/ko -->
 
             <!-- ko if: !selection() && topCards.length == 0 -->
