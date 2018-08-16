@@ -203,7 +203,7 @@
 
 
 
-    <div class="new-provisional-edit-card-container">
+    <div class="new-provisional-edit-card-container" data-bind="css: card.model.cssclass">
         <!--ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 -->
         <!--ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
         <div class='new-provisional-edits-list'>
@@ -230,7 +230,7 @@
         <!--/ko-->
 
 
-        <div class="card" data-bind="css: card.model.cssclass">
+        <div class="card">
 
             <h4 data-bind="text: card.model.name"></h4>
             <h5 data-bind="text: card.model.instructions"></h5>
