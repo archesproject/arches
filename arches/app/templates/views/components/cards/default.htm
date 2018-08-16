@@ -180,7 +180,7 @@
 
 
 <!-- ko if: state === 'form' -->
-<div class="card-component">
+<div class="card-component" data-bind="css: card.model.cssclass">
 
     <!--ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
     <div class="edit-message-container">
@@ -203,7 +203,7 @@
 
 
 
-    <div class="new-provisional-edit-card-container" data-bind="css: card.model.cssclass">
+    <div class="new-provisional-edit-card-container">
         <!--ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 -->
         <!--ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
         <div class='new-provisional-edits-list'>
@@ -330,7 +330,7 @@
 <!-- /ko -->
 
 <!-- ko if: state === 'report' -->
-<div class="rp-card-section">
+<div class="rp-card-section" data-bind="css: card.model.cssclass">
     <span class="rp-tile-title" data-bind="text: card.model.get('name')"></span>
     <!-- ko foreach: { data: self.preview ? [card.newTile] : card.tiles, as: 'tile' } -->
         <div class="rp-card-section">
