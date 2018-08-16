@@ -192,7 +192,8 @@ define([
 
             viewModel.report = new ReportModel(_.extend(data, {
                 graphModel: viewModel.graphModel,
-                cards: viewModel.cardTree.topCards
+                cards: viewModel.cardTree.topCards,
+                preview: true
             }));
 
             viewModel.report.configJSON.subscribe(function(config) {

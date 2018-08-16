@@ -286,6 +286,7 @@ define([
                 });
             }
         });
+
         this.isChildSelected = ko.computed(function() {
             return isChildSelected(this);
         }, this);
