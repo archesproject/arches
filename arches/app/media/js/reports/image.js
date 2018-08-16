@@ -49,7 +49,7 @@ define([
                     getCardWidgets(card);
                 });
             };
-            self.report.cards().forEach(getCardWidgets);
+            ko.unwrap(self.report.cards).forEach(getCardWidgets);
             this.nodeOptions = ko.observableArray(
                 widgets.map(function(widget) {
                     return widget.node;
