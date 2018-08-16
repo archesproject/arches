@@ -203,7 +203,7 @@
 
 
 
-    <div class="new-provisional-edit-card-container">
+    <div class="new-provisional-edit-card-container" data-bind="css: card.model.cssclass">
         <!--ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 -->
         <!--ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
         <div class='new-provisional-edits-list'>

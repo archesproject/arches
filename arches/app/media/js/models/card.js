@@ -29,6 +29,7 @@ define([
             this.nodegroup_id = ko.observable();
             this.name = ko.observable();
             this.instructions = ko.observable();
+            this.cssclass = ko.observable();
             this.helptext = ko.observable();
             this.helpenabled = ko.observable();
             this.helptitle = ko.observable();
@@ -50,6 +51,7 @@ define([
             this.set('nodegroup_id', this.nodegroup_id);
             this.set('name', this.name);
             this.set('instructions', this.instructions);
+            this.set('cssclass', this.cssclass);
             this.set('helptext', this.helptext);
             this.set('helpenabled', this.helpenabled);
             this.set('helptitle', this.helptitle);
@@ -129,6 +131,7 @@ define([
                 case 'name':
                 case 'nodegroup_id':
                 case 'instructions':
+                case 'cssclass':
                 case 'helptext':
                 case 'helpenabled':
                 case 'helptitle':
