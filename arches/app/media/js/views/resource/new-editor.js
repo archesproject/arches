@@ -223,10 +223,14 @@ define([
                 vm.navigate(arches.urls.get_resource_edit_log(resourceId()));
             }
         },
-        viewReport: function() {
+        viewReport: function(print) {
             if (resourceId()) {
+                var url = arches.urls.resource_report + resourceId();
+                if (print) {
+                    url = url + '?print';
+                }
                 vm.menuActive(false);
-                window.open(arches.urls.resource_report + resourceId(), "_blank");
+                window.open(url, "_blank");
             }
         }
     };

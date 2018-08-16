@@ -41,10 +41,19 @@
 
                 <!-- Menu Item -->
                 <li id="report-manager" class="edit-menu-item" data-bind="css: {'disabled': !resourceId()}">
-                    <a href="#" data-bind="click: viewReport">
+                    <a href="#" data-bind="click: function() { viewReport(false) }">
                         <div class="media-body">
                             <div class="menu-item-title"><i class="fa fa-book"></i> {% trans "Jump to Report" %}</div>
                             <span class="text-muted menu-item-subtitle">{% trans "View the full resource report" %}</span>
+                        </div>
+                    </a>
+                </li>
+
+                <li id="report-manager" class="edit-menu-item" data-bind="css: {'disabled': !resourceId()}">
+                    <a href="#" data-bind="click: function() { viewReport(true) }">
+                        <div class="media-body">
+                            <div class="menu-item-title"><i class="fa fa-book"></i> {% trans "Print Report" %}</div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Print the full resource report" %}</span>
                         </div>
                     </a>
                 </li>
