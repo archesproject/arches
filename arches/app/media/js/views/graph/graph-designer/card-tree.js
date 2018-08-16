@@ -38,13 +38,12 @@ define([
 
         this.getNodeList = function() {
             var nodes = self.cachedFlatTree;
-            console.log(nodes)
             if (nodes === undefined) {
                 nodes = self.flattenTree(self.topCards(), []);
                 self.cachedFlatTree = nodes;
             }
             return nodes;
-        }
+        };
 
         var toggleAll = function(state) {
             var nodes = self.getNodeList();
@@ -183,8 +182,6 @@ define([
                         });
                         if (nodegroup) {
                             return !nodegroup || !ko.unwrap(nodegroup.parentnodegroup_id);
-                        } else {
-                            console.log('no nodgroup')
                         }
                     }).map(function(card) {
                         return new CardViewModel({
