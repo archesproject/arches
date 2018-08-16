@@ -23,6 +23,7 @@ define([
         }
         var hover = ko.observable();
         var scrollTo = ko.observable();
+        var cachedFlatTree;
 
         this.flattenTree = function(parents, flatList) {
             _.each(ko.unwrap(parents), function(parent) {
@@ -35,8 +36,18 @@ define([
             return flatList;
         };
 
+        this.getNodeList = function() {
+            var nodes = self.cachedFlatTree;
+            console.log(nodes)
+            if (nodes === undefined) {
+                nodes = self.flattenTree(self.topCards(), []);
+                self.cachedFlatTree = nodes;
+            }
+            return nodes;
+        }
+
         var toggleAll = function(state) {
-            var nodes = self.flattenTree(self.topCards(), []);
+            var nodes = self.getNodeList();
             _.each(nodes, function(node) {
                 node.expanded(state);
             });
@@ -46,7 +57,7 @@ define([
         };
 
         var selectAll = function(state) {
-            var nodes = self.flattenTree(self.topCards(), []);
+            var nodes = self.getNodeList();
             _.each(nodes, function(node) {
                 if (node.selected() !== state) {
                     node.selected(true);
@@ -56,7 +67,7 @@ define([
 
         var expandToRoot = function(node) {
             //expands all nodes up to the root, but does not expand the root.
-            var nodes = self.flattenTree(self.topCards(), []);
+            var nodes = self.getNodeList();
             if (node.parent) {
                 node.parent.expanded(true);
                 expandToRoot(node.parent);
@@ -98,6 +109,7 @@ define([
                 return true;
             },
             loading: loading,
+            cachedFlatTree: cachedFlatTree,
             widgetLookup: createLookup(data.widgets, 'widgetid'),
             cardComponentLookup: createLookup(data.cardComponents, 'componentid'),
             nodeLookup: createLookup(params.graphModel.get('nodes')(), 'nodeid'),
@@ -171,6 +183,8 @@ define([
                         });
                         if (nodegroup) {
                             return !nodegroup || !ko.unwrap(nodegroup.parentnodegroup_id);
+                        } else {
+                            console.log('no nodgroup')
                         }
                     }).map(function(card) {
                         return new CardViewModel({
@@ -203,11 +217,11 @@ define([
                         .value();
                     _.each(self.topCards(), function(topCard){
                         if (topCard.nodegroupid === ng) {
-                            console.log('removed', topCard);
                             self.topCards.remove(topCard);
                         }
                     }, self);
                 }
+                self.cachedFlatTree = self.flattenTree(self.topCards(), []);
             },
             reorderCards: function() {
                 loading(true);
