@@ -36,18 +36,15 @@ define([
             return flatList;
         };
 
-        this.getNodeList = function() {
-            var nodes = self.cachedFlatTree;
-            if (nodes === undefined) {
-                nodes = self.flattenTree(self.topCards(), []);
-                self.cachedFlatTree = nodes;
+        this.updateNodeList = function() {
+            if (self.cachedFlatTree === undefined) {
+                self.cachedFlatTree = self.flattenTree(self.topCards(), []);
             }
-            return nodes;
         };
 
         var toggleAll = function(state) {
-            var nodes = self.getNodeList();
-            _.each(nodes, function(node) {
+            self.updateNodeList();
+            _.each(self.cachedFlatTree, function(node) {
                 node.expanded(state);
             });
             if (state) {
@@ -56,8 +53,8 @@ define([
         };
 
         var selectAll = function(state) {
-            var nodes = self.getNodeList();
-            _.each(nodes, function(node) {
+            self.updateNodeList();
+            _.each(self.cachedFlatTree, function(node) {
                 if (node.selected() !== state) {
                     node.selected(true);
                 }
@@ -66,13 +63,13 @@ define([
 
         var expandToRoot = function(node) {
             //expands all nodes up to the root, but does not expand the root.
-            var nodes = self.getNodeList();
+            self.updateNodeList();
             if (node.parent) {
                 node.parent.expanded(true);
                 expandToRoot(node.parent);
             } else {
                 node.expanded(true);
-                _.each(nodes, function(n) {
+                _.each(self.cachedFlatTree, function(n) {
                     if (node.parentnodegroup_id !== null && node.parentnodegroup_id === n.nodegroupid) {
                         expandToRoot(n);
                     }
