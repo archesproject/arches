@@ -1298,7 +1298,14 @@ a.select2-search-choice-close {
 }
 
 .permission-manager {
-    background-color: white;
+    width: 100%;
+}
+
+.permissions-instructions-panel {
+    border: 1px solid #ddd;
+    padding: 30px;
+    margin-bottom: 30px;
+    background: #fbfbfb;
 }
 
 .permission-manager.panel-body {
@@ -1345,10 +1352,6 @@ a.select2-search-choice-close {
     padding: 15px;
 }
 
-.permission-manager {
-    background-color: #f4f4f4;
-}
-
 .permission-manager-item-list {
     padding-left: 10px;
 }
@@ -1364,7 +1367,7 @@ a.select2-search-choice-close {
 
 .permission-manager .control-panel {
     display: flex;
-    margin-left: 15px;
+    margin-left: 0px;
 }
 
 .permission-level-icon {
@@ -1390,8 +1393,7 @@ a.select2-search-choice-close {
 }
 
 .permission-selector {
-    padding-top: 0px;
-    margin: 0px 0px 10px 0px;
+    margin: 20px 0px 30px 0px;
 }
 
 .permissions-summary {
@@ -1408,8 +1410,13 @@ a.select2-search-choice-close {
 }
 
 .permissions-node {
-    font-size: 11px;
+    font-size: 13px;
     color: #777;
+}
+
+.no-cards-selected {
+    padding: 5px;
+    font-size: 13px;
 }
 
 .permissions-node-row {
@@ -1418,7 +1425,7 @@ a.select2-search-choice-close {
     padding-top: 6px;
     padding-bottom: 6px;
     padding-left: 10px;
-    margin-right: 10px;
+    margin-right: 0px;
     justify-content: space-between;
 }
 
@@ -1509,8 +1516,9 @@ a.select2-search-choice-close {
     list-style: none;
     color: #666;
     line-height: 1.2;
-    padding-left: 15px;
+    padding-left: 0px;
     font-size: 15px;
+    border: 1px solid #ddd;
 }
 
 .library-search {
@@ -10531,6 +10539,10 @@ a.search-facet-item.disabled {
     padding: 15px 10px 15px 10px;
 }
 
+.graph-selector-panel {
+    height: 60px;
+}
+
 .graph-selector {
     width: 350px;
     margin-right: 10px;
@@ -11109,11 +11121,10 @@ a.search-facet-item.disabled {
 
 
 .mpm-instructions {
-    position: absolute;
-    top: 15px;
+    display: table-cell;
+    vertical-align: middle;
     color: #555;
     font-size: 13px;
-    padding: 15px 20px 5px 5px;
 }
 
 .mpm-user-name .mpm-user-status.invited {
