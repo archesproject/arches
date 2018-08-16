@@ -126,13 +126,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </a>
                     </li>
                     <li data-bind="css: { active: activeTab() === 'card' }, click: function(){activeTab('card');}">
-                        <a class="graph-designer-tab ion-android-folder" aria-expanded="false">
+                        <a class="graph-designer-tab ion-clipboard" aria-expanded="false">
                             {% trans 'Cards' %}
                         </a>
                     </li>
                     <!--ko if: graph.isresource() -->
                     <li data-bind="css: { active: activeTab() === 'permissions' }, click: function(){activeTab('permissions');}">
-                        <a class="graph-designer-tab ion-android-folder" aria-expanded="false">
+                        <a class="graph-designer-tab ion-lock-combination" aria-expanded="false">
                             {% trans 'Permissions' %}
                         </a>
                     </li>
