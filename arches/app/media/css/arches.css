@@ -11748,10 +11748,15 @@ a.jstree-anchor.permissions-card {
         padding: 15px 15px 25px;
     }
     .rp-report-container-preview {
-        padding: 0px 150px 35px 150px;
+        padding: 0px 0px 35px 0px;
+    }
+
+    .rp-report-tile {
+        padding-left: 0px;
     }
     .dl-horizontal dd {
         padding-right: 20px;
+        margin-left: 220px;
     }
     .dl-horizontal dt {
         float: left;
@@ -11760,19 +11765,50 @@ a.jstree-anchor.permissions-card {
         text-align: right;
         text-overflow: ellipsis;
         white-space: nowrap;
+        width: 200px;
     }
     .dl-horizontal dt a {
         font-weight: 600;
     }
     .rp-no-data {
-        margin-left: 280px;
+        margin-left: 0px;
+        margin-top: 0px;
+        margin-bottom: 10px;
     }
 }
 
 @media (min-width: 1366px) {
     .rp-report-container-preview {
-        padding: 0px 180px 35px 180px;
+        padding: 0px 0px 35px 0px;
     }
+
+    .dl-horizontal dt {
+        width: 300px;
+    }
+
+    .dl-horizontal dd {
+        padding-right: 20px;
+        margin-left: 320px;
+    }
+
+    .rp-report-section-title {
+        padding-left: 60px;
+    }
+
+    .rp-card-section.rp-card-section {
+        padding-left: 20px;
+    }
+
+    .rp-no-data {
+        margin-left: 200px;
+    }
+
+    .rp-no-data {
+        color: #888;
+        position: relative;
+        top: -30px;
+    }
+
 }
 
 @media (min-width: 400px) {
@@ -11805,6 +11841,12 @@ a.jstree-anchor.permissions-card {
     .morphsearch.open .morphsearch-submit {
         -webkit-transform: translate3d(0, -50%, 0) scale3d(0.5, 0.5, 1);
         transform: translate3d(0, -50%, 0) scale3d(0.5, 0.5, 1);
+    }
+
+    .rp-no-data {
+        color: #888;
+        position: relative;
+        top: -30px;
     }
 }
 
