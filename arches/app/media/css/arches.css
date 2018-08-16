@@ -5779,7 +5779,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     border-bottom: 1px solid #DF2E6A;
     height: 50px;
     margin-top: -15px;
-    margin-bottom: 0px;
+    margin-bottom: 15px;
     margin-left: -25px;
     margin-right: -25px;
     padding: 15px 25px;
@@ -5807,7 +5807,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 .new-provisional-edits-list {
     display: flex;
     flex-direction: column;
-    top: 0px;
+    top: -15px;
     position: relative;
     margin-right: 15px;
     width: 250px;
@@ -5819,7 +5819,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 .new-provisional-edit-card-container {
     display: flex;
     flex-direction: row-reverse;
-    align-items: baseline;
+/*    align-items: baseline;*/
 }
 
 .new-provisional-edit-card-container .card {
