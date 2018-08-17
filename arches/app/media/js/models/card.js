@@ -88,6 +88,19 @@ define([
                 owner: this
             });
 
+            this.get('component_id').subscribe(function(value) {
+                var key;
+                var defaultConfig = JSON.parse(self.cardComponentLookup[value].defaultconfig);
+                for (key in defaultConfig) {
+                    defaultConfig[key] = ko.observable(defaultConfig[key]);
+                }
+                var currentConfig = self.get('config');
+                self.set('config', _.defaults(currentConfig, defaultConfig));
+                for (key in defaultConfig) {
+                    self.configKeys.push(key);
+                }
+            });
+
             this._card = ko.observable('{}');
 
             this.dirty = ko.computed(function() {
