@@ -233,6 +233,11 @@
         <div class="card">
 
             <h4 data-bind="text: card.model.name"></h4>
+            <!-- ko if: card.model.helpenabled -->
+            <span>
+                <a class="pull-right card-help help editable-help" data-bind="click: function () {card.model.get('helpactive')(true) }" style="cursor:pointer;"> {% trans "Help" %} <i class="fa fa-question-circle"></i></a>
+            </span>
+            <!-- /ko -->
             <h5 data-bind="text: card.model.instructions"></h5>
 
             <!-- ko if: card.widgets().length > 0 -->
@@ -324,6 +329,22 @@
                 <!-- /ko -->
             </div>
 
+            <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: card.model.get('helpactive')">
+                <div class="relative">
+                    <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" style="" data-bind="click: function () { card.model.get('helpactive')(false) }"></a>
+                </div>
+                <div id="add-basemap-wizard-help-content">
+                    <div>
+                        <div class="panel-heading">
+                            <h3 class="panel-title help-panel-title" style="">
+                                <span class="help-text-small">{% trans "Help" %}</span><span data-bind="html: card.model.get('helptitle')"></span>
+                            </h3>
+                        </div>
+                        <div class="panel-body" style="padding: 10px 10px 15px 10px;" data-bind="html: card.model.get('helptext')">
+                        </div>
+                    </div>
+                </div>
+            </aside>
         </div>
     </div>
 </div>
