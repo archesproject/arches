@@ -167,6 +167,8 @@ class GraphDesignerView(GraphBaseView):
         cardwidgets = [widget for widgets in [card.cardxnodexwidget_set.order_by(
             'sortorder').all() for card in cards] for widget in widgets]
         widgets = models.Widget.objects.all()
+        nodegroups = cards.values_list('nodegroup_id', flat=True)
+        restricted_nodegroups = models.TileModel.objects.filter(nodegroup__in=nodegroups).values_list('nodegroup_id', flat=True).distinct()
         card_components = models.CardComponent.objects.all()
         map_layers = models.MapLayer.objects.all()
         map_markers = models.MapMarker.objects.all()
@@ -198,6 +200,7 @@ class GraphDesignerView(GraphBaseView):
             map_sources=map_sources,
             geocoding_providers=geocoding_providers,
             report_templates=templates,
+            restricted_nodegroups=[str(nodegroup) for nodegroup in restricted_nodegroups],
         )
         context['ontologies'] = JSONSerializer().serialize(ontologies, exclude=['version', 'path'])
         context['ontology_classes'] = JSONSerializer().serialize(ontology_classes)
