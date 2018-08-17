@@ -51,12 +51,23 @@
 
         </div>
 
+        <div>
+            <!-- ko component: {
+                name: model.cardComponentLookup[model.component_id()].componentname,
+                params: {
+                    state: 'config',
+                    preview: self.preview,
+                    card: $data
+                }
+            } --> <!-- /ko -->
+        </div>
+
         <!-- Settings -->
         <div>
             <div class="panel-section-title dark-colored-text pad-top">
                 {% trans "Settings" %}
             </div>
-            
+
             <div class="form-divider">
                 <!-- Card Visibility -->
                 <div class="pad-top" data-bind="component: { name: 'views/components/simple-switch', params: {value: model.visible, config:{label: '{% trans "Make Card Visible" %}', subtitle: '{% trans "Show this card by default" %}'}}}"></div>
@@ -97,7 +108,7 @@
                                 <textarea rows="10" cols="80" data-bind="ckeditor: model.helptext, ckeditorOptions: {}, valueUpdate: 'afterkeydown'"></textarea>
                             </div>
 
-                            
+
                         </div>
                     </div>
                 </div>

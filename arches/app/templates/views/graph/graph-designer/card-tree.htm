@@ -22,6 +22,7 @@
                         <i data-bind="css: (graphiconclass() != (null || '') ? graphiconclass() : 'fa fa-question')" role="presentation"></i>
                         <span data-bind="text: graphname"></span>
                     </strong>
+                     {% trans "(edit report)" %}
                 </a>
                 <!-- ko foreach: { data: [$data], as: 'self' } -->
                 <ul class="jstree-children card-designer-tree" aria-expanded="true" data-bind="sortable: {
