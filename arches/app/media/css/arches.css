@@ -5918,6 +5918,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 .new-provisional-edit-history .entry {
     flex-direction: row;
     display: flex;
+    color: #6494cc;
     align-items: baseline;
     justify-content: left;
     width: 400px;
@@ -5933,7 +5934,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     padding-right: 5px;
     font-weight: 600;
     font-size:15px;
-    color: #6494cc;
+    color: #454545;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
