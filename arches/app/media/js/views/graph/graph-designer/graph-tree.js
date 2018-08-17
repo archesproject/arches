@@ -65,6 +65,7 @@ define([
             this.items = this.graphModel.get('nodes');
             this.branchListVisible = ko.observable(false);
             this.scrollTo = ko.observable();
+            this.restrictedNodegroups = options.restrictedNodegroups;
             TreeView.prototype.initialize.apply(this, arguments);
         },
 
@@ -73,6 +74,7 @@ define([
         * @memberof GraphTree.prototype
         * @param {object} node - a node in the tree
         */
+
         getDisplayName: function(node) {
             return ko.computed(function(){
                 var name = node.name();

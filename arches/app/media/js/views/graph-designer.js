@@ -155,7 +155,8 @@ define([
                 graph: viewModel.graph,
                 graphModel: viewModel.graphModel,
                 loading: viewModel.loading,
-                node: viewModel.selectedNode
+                node: viewModel.selectedNode,
+                restrictedNodegroups: data.restrictedNodegroups
             });
 
             viewModel.branchListView = new BranchListView({
@@ -216,7 +217,8 @@ define([
                 graphModel: viewModel.graphModel,
                 graphSettings: viewModel.graphSettingsViewModel,
                 cardTree: viewModel.cardTree,
-                permissionTree: viewModel.permissionTree
+                permissionTree: viewModel.permissionTree,
+                restrictedNodegroups: data.restrictedNodegroups
             });
 
             viewModel.graphTree.branchListVisible.subscribe(function(visible) {
