@@ -147,6 +147,8 @@ define([
             this.graphModel.appendNode(node ,function(response, status){
                 if(status === 'success') {
                     node.expanded(true);
+                    this.cardTree.updateCards('update', null, response.responseJSON);
+                    this.permissionTree.updateCards('update', null, response.responseJSON);
                 }
             }, this);
         },

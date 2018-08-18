@@ -169,7 +169,6 @@ class Graph(models.GraphModel):
         node -- a dictionary representing a Node instance or an actual models.Node instance
 
         """
-
         if not isinstance(node, models.Node):
             nodeobj = node.copy()
             node = models.Node()
@@ -205,6 +204,7 @@ class Graph(models.GraphModel):
         if node.istopnode:
             self.root = node
         self.nodes[node.pk] = node
+
         return node
 
     def add_edge(self, edge):
@@ -241,7 +241,7 @@ class Graph(models.GraphModel):
         Adds a card to this graph
 
         Arguments:
-        node -- a dictionary representing a Card instance or an actual models.CardModel instance
+        card -- a dictionary representing a Card instance or an actual models.CardModel instance
 
         """
         if not isinstance(card, models.CardModel):
@@ -432,6 +432,9 @@ class Graph(models.GraphModel):
         tree = self.get_tree()
 
         def traverse_tree(tree, current_nodegroup=None):
+            print tree['node'].name
+            print tree['node'].is_collector
+            print tree['node'].nodegroup_id
             if tree['node']:
                 if tree['node'].is_collector:
                     nodegroup = self.get_or_create_nodegroup(nodegroupid=tree['node'].nodegroup_id)
@@ -443,8 +446,9 @@ class Graph(models.GraphModel):
             for child in tree['children']:
                 traverse_tree(child, current_nodegroup)
             return tree
-
+        print '----------------treeversal'
         traverse_tree(tree)
+        print '----------------end treeversal'
 
         return tree
 
@@ -516,20 +520,39 @@ class Graph(models.GraphModel):
                 temp_node_name = 'New Node_%s' % i
 
         nodeToAppendTo = self.nodes[uuid.UUID(str(nodeid))] if nodeid else self.root
-
+        card = None
         tile_count = models.TileModel.objects.filter(nodegroup_id=nodeToAppendTo.nodegroup_id).count()
         if tile_count > 0:
             raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot modify a Resource Model with instances.".format(self.name)), 1006)
 
-
-        newNode = models.Node(
-            nodeid=uuid.uuid1(),
-            name=temp_node_name,
-            istopnode=False,
-            ontologyclass=None,
-            datatype='semantic',
-            graph=self
-        )
+        if nodeToAppendTo.nodeid == self.root.nodeid:
+            newid = uuid.uuid1()
+            nodegroup = models.NodeGroup.objects.create(
+                pk=newid
+            )
+            card = models.CardModel.objects.create(
+                nodegroup=nodegroup,
+                name=temp_node_name,
+                graph=self
+            )
+            newNode = models.Node(
+                nodeid=newid,
+                name=temp_node_name,
+                istopnode=False,
+                ontologyclass=None,
+                datatype='semantic',
+                nodegroup=nodegroup,
+                graph=self
+            )
+        else:
+            newNode = models.Node(
+                nodeid=uuid.uuid1(),
+                name=temp_node_name,
+                istopnode=False,
+                ontologyclass=None,
+                datatype='semantic',
+                graph=self
+            )
 
         newEdge = models.Edge(
             domainnode=nodeToAppendTo,
@@ -537,9 +560,9 @@ class Graph(models.GraphModel):
             ontologyproperty=None,
             graph=self
         )
-
         self.add_node(newNode)
         self.add_edge(newEdge)
+
         self.populate_null_nodegroups()
 
         # assign the first class and property found
@@ -550,8 +573,7 @@ class Graph(models.GraphModel):
                 newNode.ontologyclass = ontology_classes[0]['ontology_classes'][0]
             else:
                 raise GraphValidationError(_('Ontology rules don\'t allow this node to be appended'))
-
-        return {'node': newNode, 'edge': newEdge}
+        return {'node': newNode, 'edge': newEdge, 'card': card}
 
     def clear_ontology_references(self):
         """
