@@ -11723,15 +11723,44 @@ a.jstree-anchor.permissions-card {
     margin: 5%;
     border: 1px solid #e8e8e8;
     padding: 5%;
-    background: #f4f4f4
+    background: #f8f8f8;
 }
 
 .rr-splash-title {
-    font-size: 24px;
+    color: #666;
+    font-size: 28px;
+    margin-bottom: 30px;
+    margin-top: 25px;
 }
 
+
+.rr-splash-img-container {
+    padding: 20px;
+    background: #fff;
+    border: 1px solid steelblue;
+    display: inline-block;
+}
+
+.rr-splash-img {
+    margin-top: -3px;
+    margin-left: -2px;
+    height: 110%;
+}
+
+.rr-splash-icon {
+    font-size: 48px;
+}
+
+.rr-splash-description {
+    font-size: 16px;
+    color: #999;
+}
 .rr-splash-subtitle {
-    font-size: 15px;
+    color: #999;
+}
+
+.rr-splash-description:last-child {
+    margin-bottom: 80px;
 }
 
 .rr-splash-help-link {
