@@ -7,6 +7,7 @@
     *   [Troubleshoot](#troubleshoot)
 *   [Developing](#developing)
     *   [Setting up your own Arches project](#setting-up-your-own-arches-project)
+    *   [Running in DEV mode](#running-in-dev-mode)
     *   [Arches Core Development](#arches-core-development)
     *   [Arches Core Development Troubleshoot](#arches-core-development-troubleshoot)
 *   [Additional Information](#additional-information)
@@ -135,13 +136,15 @@ If you would like search engines such as Google to index your Arches website, se
 
 
 ### Troubleshoot
-Potentially ports `80` and/or `443` on your machine are already taken by another application. In this case, change the port number of your Nginx service in `docker-compose.yml`. Be sure to keep the second number of the `port:port` pairs unchanged:
-```
-      ports:
-        - '81:80'
-        - '444:443'
-```
+- Potentially ports `80` and/or `443` on your machine are already taken by another application. In this case, change the port number of your Nginx service in `docker-compose.yml`. Be sure to keep the second number of the `port:port` pairs unchanged:
+    ```
+        ports:
+            - '81:80'
+            - '444:443'
+    ```
 
+
+- When you try to load Arches in your browser and all you see is a white page with black text (and many 404 errors in your browser console), check out [Running in DEV mode](#running-in-dev-mode)
 
 
 
@@ -225,6 +228,28 @@ This will be used throughout your development process and does not need to be ch
 *Note 1: Point 4 will mount your Arches project from your host machine into your container. This is a way for connecting your development machine to the Docker container. It is very useful during the development process, as it allows you to edit code without having to build your Docker image after each edit. Remove this line for production environments.*
 
 *Note 2: with the tool `docker-compose` you can easilly orchestrate all required apps (in this case Arches, Postgres and Elasticsearch) on one server. This is mostly useful for development environments, as well as production setups with only one host server. The `docker-compose` program must be run from the root of your project folder.* 
+
+
+
+### Running in DEV mode
+The `docker-compose.yml` file provided for you in the Arches git repository is configured to run in production.  
+Specific settings of interest are:
+
+- Environment variables in the `Arches` service: 
+    - `DJANGO_MODE=PROD`: When set to PROD, prepares your static files (css, js, etc) to be served through the Nginx web server
+    - `DJANGO_DEBUG=False`: Among other things, `True` will display exception pages in the browser (more info [here](https://docs.djangoproject.com/en/1.11/ref/settings/#debug))
+- The `Nginx` service, which is a web server that sits between the user (you) and the Arches service
+
+When developing, use `DJANGO_MODE=DEV` and `DJANGO_DEBUG=True`. This will effectively bypass your Nginx service, so contact your Arches service directly on port 8000:
+http://localhost:8000
+
+For convenience you can map port 80 from your host machine to port 8000 in your Arches container. In your `docker-compose(-local).yml` under your Arches  service:
+```
+      ports:
+        - '8000:8000'
+        - '80:8000'  # <-- Add this line
+```
+Now you can access your Arches service through http://localhost
 
 
 
