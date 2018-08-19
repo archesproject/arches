@@ -5,17 +5,20 @@
     *   [Commands](#commands)
     *   [Running Docker in Production](#running-docker-in-production)
     *   [Troubleshoot](#troubleshoot)
+*   [Developing](#developing)
+    *   [Setting up your own Arches project](#setting-up-your-own-arches-project)
+    *   [Arches Core Development](#arches-core-development)
+    *   [Arches Core Development Troubleshoot](#arches-core-development-troubleshoot)
 *   [Additional Information](#additional-information)
     *   [Initialize](#initialize)
     *   [Settings](#settings)
-    *   [Connect to your container](#connect-to-your-container)
     *   [Custom scripts on startup](#custom-scripts-on-startup)
+    *   [Connect to your container](#connect-to-your-container)
     *   [Remote Debugging](#remote-debugging)
-    *   [Housekeeping](#housekeeping)
-    *   [Setting up your own Arches project](#setting-up-your-own-arches-project)
-    *   [Useful environment variables](#useful-environment-variables)
-    *   [Arches Core Development](#arches-core-development)
-    *   [Arches Core Development Troubleshoot](#arches-core-development-troubleshoot)
+    *   [Housekeeping](#housekeeping) 
+
+
+
 
 ## Quick start
 1.  Install [Docker](https://www.docker.com/get-docker) on your Machine.  
@@ -36,6 +39,8 @@ Your Arches app can now be reached by going to `http://localhost` in your browse
 
 To gracefully shut down, hit `ctrl + c` in the same terminal window and wait for the containers to stop.  
 Alternatively, type this command in another terminal window: `docker-compose down`
+
+
 
 ### Parameter overview
 Your docker-compose.yml file expects the following Environment Variables:
@@ -73,6 +78,8 @@ Optional Environment Variables:
 -   `TZ` = *Time Zone*  
 	-> **Useful for logging the correct time. US Pacific = PST**
 
+
+
 ### Commands
 Any command you would normally run on the command line can be used with this Docker image of Arches.  
 The basic format is: `docker-compose run arches <command>`  
@@ -91,6 +98,8 @@ These commands can be chained, e.g.:
 
 Or in your `docker-compose.yml` file:  
 `command: run_tests run_server`
+
+
 
 ### Running Docker in Production
 When running Arches in production, be sure to set your domain name in the DOMAIN_NAMES variable in all appropriate services (Arches, Nginx and LetsEcrypt) in the `docker-compose.yml` file. Separate your domain names by spaces if you have multiple. You should also ensure your docker-compose.yml sets PRODUCTION_MODE=True as the default False setting will not issue verifyable certificates and cause your https: connections to be marked as insecure. Documentation for the letsencrypt setup can be found at https://hub.docker.com/r/cvast/cvast-letsencrypt/ an example production config appears below:
@@ -123,6 +132,8 @@ into
   
 If you would like search engines such as Google to index your Arches website, set the `Nginx` variable `PUBLIC_MODE` to `true`.
 
+
+
 ### Troubleshoot
 Potentially ports `80` and/or `443` on your machine are already taken by another application. In this case, change the port number of your Nginx service in `docker-compose.yml`. Be sure to keep the second number of the `port:port` pairs unchanged:
 ```
@@ -131,51 +142,14 @@ Potentially ports `80` and/or `443` on your machine are already taken by another
         - '444:443'
 ```
 
-## Additional Information
 
-### Initialize
-**On first run** Arches needs to initialize the PostgreSQL database and ElasticSearch.
 
-For your convenience, this initialization is done when you first run Arches.
-(See [docker/entrypoint.sh](/docker/entrypoint.sh) in the official Arches source code)
 
-The initialization can be forced using the `setup_arches` command.  
-**Be aware that this command deletes any existing database with the name set in the PGDBNAME environment variable.**
 
-### Settings
-In order to make this Docker image portable, it is using environment variables.  
-This is done through a settings_local.py file, which is copied into your new custom Arches project.  
 
-This settings_local.py complements the default settings.py and overrides settings with the same name.  
+## Developing 
 
-### Connect to your container
-The general command to enter your running container from the command line is:  
-`docker exec -it <container id> bash`  
-To get the container id:  
-`docker ps`  
 
-For more information, see the [```docker exec``` command documentation](https://docs.docker.com/engine/reference/commandline/exec/)
-
-### Custom scripts on startup
-On startup, you can run custom scripts before Arches is started up (called an entrypoint).
-Any script placed in /docker/entrypoint in the Docker container is ran after the default actions, such as database initialization and the creation of a new custom Arches app.
-
-You can mount your custom scripts into the container, e.g.:
-```
-      volumes:
-        - ./docker/entrypoint/script.sh:/docker/entrypoint/script.sh
-```
-
-### Remote Debugging
-In order to enable remote debugging, see [this tutorial](https://gist.github.com/veuncent/1e7fcfe891883dfc52516443a008cfcb) for Visual Studio (Code).  
-Point 4 is handled for you, all you need to do is set this environment variable:
--   DJANGO_REMOTE_DEBUG=True
-
-For remote debugging Pycharm, see [this tutorial](https://gist.github.com/veuncent/1e7fcfe891883dfc52516443a008cfcb.)
-
-### Housekeeping
-A cleanup script is provided in the official Arches repository: [docker/cleanup.ps1](docker/cleanup.ps1).
-This can be run on any OS and removes old Docker containers, unused images, etc.
 
 ### Setting up your own Arches project
 1.  Set the name of your Docker image. Edit your `docker-compose.yml`:  
@@ -252,6 +226,8 @@ This will be used throughout your development process and does not need to be ch
 
 *Note 2: with the tool `docker-compose` you can easilly orchestrate all required apps (in this case Arches, Postgres and Elasticsearch) on one server. This is mostly useful for development environments, as well as production setups with only one host server. The `docker-compose` program must be run from the root of your project folder.* 
 
+
+
 ### Arches Core Development
 To develop on Arches Core, ensure you are not already running PostgreSQL and it is advisable to mount your source code into the container for instant code editing without rebuilding your Docker image.  
 
@@ -285,6 +261,9 @@ The volume commands at *point 2* also mounts a settings_local.py into the contai
 
 Here is a link to a working [docker-compose-local.yml](https://gist.github.com/jmunowitch/c63fa39be4651b9bf2f0b1abc69f7479) file
 
+
+
+
 ### Arches Core Development Troubleshoot
 Errors during setting up the Arches container for Development that you may encounter:
 -   `The 'arches==4.0.2b0' distribution was not found and is required by the application`  
@@ -296,3 +275,68 @@ Potentially ports `80` and/or `443` on your machine are already taken by another
         - '81:80'
         - '444:443'
 ```
+
+
+
+
+
+## Additional Information
+
+
+
+
+### Initialize
+**On first run** Arches needs to initialize the PostgreSQL database and ElasticSearch.
+
+For your convenience, this initialization is done when you first run Arches.
+(See [docker/entrypoint.sh](/docker/entrypoint.sh) in the official Arches source code)
+
+The initialization can be forced using the `setup_arches` command.  
+**Be aware that this command deletes any existing database with the name set in the PGDBNAME environment variable.**
+
+
+
+### Settings
+In order to make this Docker image portable, it is using environment variables.  
+This is done through a settings_local.py file, which is copied into your new custom Arches project.  
+
+This settings_local.py complements the default settings.py and overrides settings with the same name.  
+
+
+
+### Custom scripts on startup
+On startup, you can run custom scripts before Arches is started up (called an entrypoint).
+Any script placed in /docker/entrypoint in the Docker container is ran after the default actions, such as database initialization and the creation of a new custom Arches app.
+
+You can mount your custom scripts into the container, e.g.:
+```
+      volumes:
+        - ./docker/entrypoint/script.sh:/docker/entrypoint/script.sh
+```
+
+
+
+### Connect to your container
+The general command to enter your running container from the command line is:  
+`docker exec -it <container id> bash`  
+To get the container id:  
+`docker ps`  
+
+For more information, see the [```docker exec``` command documentation](https://docs.docker.com/engine/reference/commandline/exec/)
+
+
+
+### Remote Debugging
+In order to enable remote debugging, see [this tutorial](https://gist.github.com/veuncent/1e7fcfe891883dfc52516443a008cfcb) for Visual Studio (Code).  
+Point 4 is handled for you, all you need to do is set this environment variable:
+-   DJANGO_REMOTE_DEBUG=True
+
+For remote debugging Pycharm, see [this tutorial](https://gist.github.com/veuncent/1e7fcfe891883dfc52516443a008cfcb.)
+
+
+
+### Housekeeping
+A cleanup script is provided in the official Arches repository: [docker/cleanup.ps1](docker/cleanup.ps1).
+This can be run on any OS and removes old Docker containers, unused images, etc.
+
+
