@@ -60,9 +60,12 @@ define([
         initialize: function(options) {
             this.graphModel = options.graphModel;
             this.graphSettings = options.graphSettings;
+            this.cardTree = options.cardTree;
+            this.permissionTree = options.permissionTree;
             this.items = this.graphModel.get('nodes');
             this.branchListVisible = ko.observable(false);
             this.scrollTo = ko.observable();
+            this.restrictedNodegroups = options.restrictedNodegroups;
             TreeView.prototype.initialize.apply(this, arguments);
         },
 
@@ -71,6 +74,7 @@ define([
         * @memberof GraphTree.prototype
         * @param {object} node - a node in the tree
         */
+
         getDisplayName: function(node) {
             return ko.computed(function(){
                 var name = node.name();
@@ -150,6 +154,10 @@ define([
         deleteNode: function(node, e) {
             e.stopImmediatePropagation();
             this.graphModel.deleteNode(node);
+            if (node.isCollector()) {
+                this.cardTree.updateCards('delete', node.nodeGroupId());
+                this.permissionTree.updateCards('delete', node.nodeGroupId());
+            }
         },
 
         exportBranch: function(node, e) {

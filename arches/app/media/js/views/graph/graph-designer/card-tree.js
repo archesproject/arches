@@ -23,6 +23,7 @@ define([
         }
         var hover = ko.observable();
         var scrollTo = ko.observable();
+        var cachedFlatTree;
 
         this.flattenTree = function(parents, flatList) {
             _.each(ko.unwrap(parents), function(parent) {
@@ -35,9 +36,15 @@ define([
             return flatList;
         };
 
+        this.updateNodeList = function() {
+            if (self.cachedFlatTree === undefined) {
+                self.cachedFlatTree = self.flattenTree(self.topCards(), []);
+            }
+        };
+
         var toggleAll = function(state) {
-            var nodes = self.flattenTree(self.topCards(), []);
-            _.each(nodes, function(node) {
+            self.updateNodeList();
+            _.each(self.cachedFlatTree, function(node) {
                 node.expanded(state);
             });
             if (state) {
@@ -46,8 +53,8 @@ define([
         };
 
         var selectAll = function(state) {
-            var nodes = self.flattenTree(self.topCards(), []);
-            _.each(nodes, function(node) {
+            self.updateNodeList();
+            _.each(self.cachedFlatTree, function(node) {
                 if (node.selected() !== state) {
                     node.selected(true);
                 }
@@ -56,18 +63,31 @@ define([
 
         var expandToRoot = function(node) {
             //expands all nodes up to the root, but does not expand the root.
-            var nodes = self.flattenTree(self.topCards(), []);
+            self.updateNodeList();
             if (node.parent) {
                 node.parent.expanded(true);
                 expandToRoot(node.parent);
             } else {
                 node.expanded(true);
-                _.each(nodes, function(n) {
+                _.each(self.cachedFlatTree, function(n) {
                     if (node.parentnodegroup_id !== null && node.parentnodegroup_id === n.nodegroupid) {
                         expandToRoot(n);
                     }
                 });
             }
+        };
+
+        var removeCard = function(cards, nodegroupid) {
+            var removed;
+            _.each(cards(), function(card){
+                if (card.nodegroupid === nodegroupid) {
+                    cards.remove(card);
+                    removed = card;
+                } else {
+                    removeCard(card.cards, nodegroupid);
+                }
+            });
+            return removed;
         };
 
         var createLookup = function(list, idKey) {
@@ -98,6 +118,7 @@ define([
                 return true;
             },
             loading: loading,
+            cachedFlatTree: cachedFlatTree,
             widgetLookup: createLookup(data.widgets, 'widgetid'),
             cardComponentLookup: createLookup(data.cardComponents, 'componentid'),
             nodeLookup: createLookup(params.graphModel.get('nodes')(), 'nodeid'),
@@ -105,6 +126,7 @@ define([
             graphname: params.graph.name,
             graphiconclass: params.graph.iconclass,
             graph: params.graph,
+            graphModel: params.graphModel,
             expandAll: function() {
                 toggleAll(true);
             },
@@ -123,7 +145,7 @@ define([
                 return;
             },
             topCards: ko.observableArray(_.filter(data.cards, function(card) {
-                var nodegroup = _.find(ko.unwrap(params.graph.nodegroups), function(group) {
+                var nodegroup = _.find(ko.unwrap(params.graphModel.get('nodegroups')), function(group) {
                     return ko.unwrap(group.nodegroupid) === card.nodegroup_id;
                 });
                 return !nodegroup || !ko.unwrap(nodegroup.parentnodegroup_id);
@@ -152,6 +174,62 @@ define([
             })),
             beforeMove: function(e) {
                 e.cancelDrop = (e.sourceParent!==e.targetParent);
+            },
+            updateCards: function(action, selectedNodegroupId, data) {
+                var cards;
+                var existingNodegroupIds;
+                var newNodegroups;
+                if (action === 'update') {
+                    self.topCards.removeAll();
+                    existingNodegroupIds = _.pluck(self.graphModel.get('nodegroups'), 'nodegroupid');
+                    newNodegroups = _.filter(data.nodegroups, function(ng) {return _.contains(existingNodegroupIds, ng.nodegroupid) === false;});
+                    if (newNodegroups.length > 0) {
+                        self.graphModel.set('nodegroups', self.graphModel.get('nodegroups').concat(newNodegroups));
+                    }
+                    cards = data.cards;
+                    self.topCards(_.filter(cards, function(card) {
+                        var nodegroup = _.find(ko.unwrap(self.graphModel.get('nodegroups')), function(group) {
+                            return ko.unwrap(group.nodegroupid) === card.nodegroup_id;
+                        });
+                        if (nodegroup) {
+                            return !nodegroup || !ko.unwrap(nodegroup.parentnodegroup_id);
+                        }
+                    }, self).map(function(card) {
+                        var newCard = new CardViewModel({
+                            card: card,
+                            graphModel: self.graphModel,
+                            tile: null,
+                            resourceId: ko.observable(),
+                            displayname: ko.observable(),
+                            handlers: {},
+                            cards: cards,
+                            tiles: [],
+                            selection: selection,
+                            hover: hover,
+                            scrollTo: scrollTo,
+                            multiselect: self.multiselect,
+                            loading: loading,
+                            filter: filter,
+                            provisionalTileViewModel: null,
+                            cardwidgets: data.cardwidgets,
+                            userisreviewer: true,
+                            perms: ko.observableArray(),
+                            permsLiteral: ko.observableArray()
+                        });
+                        return newCard;
+                    }, self));
+                    self.cachedFlatTree = self.flattenTree(self.topCards(), []);
+                    _.each(self.cachedFlatTree, function(node) {
+                        if (node.nodegroupid === selectedNodegroupId) {
+                            self.collapseAll();
+                            self.multiselect ? self.selection([node]) : self.selection(node);
+                            self.expandToRoot(node);
+                        }
+                    });
+                } else if (action === 'delete') {
+                    removeCard(self.topCards, selectedNodegroupId);
+                    if (self.topCards().length){ self.topCards()[0].selected(true); }
+                }
             },
             reorderCards: function() {
                 loading(true);

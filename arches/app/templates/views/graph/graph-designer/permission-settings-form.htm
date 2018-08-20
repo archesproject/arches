@@ -1,13 +1,28 @@
 {% load i18n %}
-<div id="card-preview" class="pad-all" style="">
+<div id="" class="graph-designer-graph-content permission-manager">
 <!--ko if: permissionsDesigner.showPermissionsForm() === true -->
-    <div class="permission-manager" class="project-panel">
-        <div class="permissions-form permission-manager header">
-            <div class="">
-                <h3 id="cc-title" class="panel-title card-main-title">{% trans "Permissions" %}</h3>
+    <div class="settings-panel">
+        <div class="settings-panel-heading">
+            <div class="graph-designer-title">
+                <div class="name">
+                    <i class="ion-lock-combination"></i> {% trans "Permissions" %}
+                </div>
             </div>
-            <!-- Menu Item -->
-            <div class="graph-selector" data-bind="" style="margin-left: 32px;">
+        </div>
+
+        <!-- Help/Instructions -->
+        <div class="permissions-instructions-panel">
+            <p class="mpm-instruction">
+                To set permissions: <strong> Click on the card(s) </strong>you want from the list on the left, then select a Group or User Account from the dropdown below.
+            </p>
+        </div>
+
+        <!-- Group/Account Selector -->
+        <div class="graph-selector-panel">
+            <div class="control-label">
+                {% trans "Set permissions for:" %}
+            </div>
+            <div class="graph-selector" data-bind="">
                 <!-- ko if: permissionsDesigner.permissionSettingsForm.groupedIdentities -->
                 <select data-bind="template: { name: 'selectAccountTemplate', data: permissionsDesigner.permissionSettingsForm.groupedIdentities }, chosen: {width: '100%'}, value: permissionsDesigner.permissionSettingsForm.identityid"></select>
                 <!-- /ko -->
@@ -22,100 +37,60 @@
             </div>
         </div>
 
-        <!-- Alert Panel -->
-        <div id="basemap-delete-alert" class="panel wizard-data-card-alert" style=""></div>
 
+        <!-- Permissions Selector -->   
+        <div class="form-group">
+            <div class="permission-selector">
+                <div>{% trans 'Permissions' %}</div>
+                <ul class="permissions-options" style="list-style: none; margin-left: -5px;" data-bind="foreach: permissionsDesigner.permissionSettingsForm.nodegroupPermissions">
+                    <li>
+                    <label class="form-checkbox form-normal form-primary form-text permission-option"
+                        data-bind="css: {
+                            'active': $data.selected
+                        },
+                        click: $data.selected.bind($data, !$data.selected())">
+                        <input type="checkbox" data-bind="checked: $data.selected">
+                        <i data-bind="css: $data.icon"></i> <span data-bind="text: $data.name"></span>
+                    </label>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
 
-        <!-- Data Entry -->
-        <div class="fade in">
-            <div class="tab-base card-content-container pad-top">
-                <div>
-                    <p class="mpm-instruction">
-                        To set permissions: <strong> Click on the card(s) </strong>you want from the list on the left, then select the permission levels from the form on the right.
-                    </p>
-                </div>
-                <div class="" style="margin-left: 0px;">
-                    <!-- Card -->
-                    <div class="row">
+        <!-- Buttons -->
+        <!-- ko with: permissionsDesigner.permissionSettingsForm -->
+        <div class="permission-buttons mar-btm">
+            <button id="cc-delete-btn" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt disabled" data-bind="click: revert, css: {'disabled': selectedCards().length === 0 || selectedIdentities().length === 0}">{% trans "Revert Permissions" %}
+            </button>
+            <button id="cc-save-btn" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-check disabled" data-bind="click: save, css: {'disabled': selectedCards().length === 0 || selectedIdentities().length === 0}">{% trans "Apply Permissions" %}</button>
+        </div>
+        <!--/ko-->
 
-                        <!-- Available Cards -->
-                        <div>
-                            <div class="mpm-selector-header">
-                                <div class="mpm-selector-header-txt">
-                                    <strong>Set Permissions</strong>
-
-                                    <!-- remove all switch -->
-                                    <!-- <span class="mpm-select-switch-label">
-                                        <a class="pad-lft" href="" data-bind="click: function(){permissionsDesigner.permissionSettingsForm.selectedCards([])}">{% trans 'Clear' %}</a>
-                                    </span> -->
-                                </div>
-                            </div>
-
-                            <!-- Permissions Selector -->
-                            <div id="" class="permission-selector" style="">
-                                <div class="row widget-container" style="">
-                                    <div class="col-xs-12">
-                                        <div class="form-group">
-                                            <div class="col-xs-12">
-                                                <div>
-                                                <div>{% trans 'Permissions' %}</div>
-                                                <ul class="permissions-options" style="list-style: none; margin-left: -5px;" data-bind="foreach: permissionsDesigner.permissionSettingsForm.nodegroupPermissions">
-                                                    <li>
-                                                    <label class="form-checkbox form-normal form-primary form-text permission-option"
-                                                        data-bind="css: {
-                                                            'active': $data.selected
-                                                        },
-                                                        click: $data.selected.bind($data, !$data.selected())">
-                                                        <input type="checkbox" data-bind="checked: $data.selected">
-                                                        <i data-bind="css: $data.icon"></i> <span data-bind="text: $data.name"></span>
-                                                    </label>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Selection Summary -->
-                            <div>
-                            <div class="control-panel">
-                                <div class="permissions-list">
-                                    <div class="node-list-panel">
-                                        <span class="permissions-title">{% trans "Selected Cards" %}</span>
-                                        <ul class="permissions-selected" data-bind="visible: permissionsDesigner.permissionSettingsForm.selectedCards().length === 0">
-                                            <li>
-                                                <i class="confirmation ion-information-circled"></i> <span>{% trans "No cards selected" %}</span>
-                                            </li>
-                                        </ul>
-                                        <ul class="permissions-selected" style="display:none;" data-bind="foreach: permissionsDesigner.permissionSettingsForm.selectedCards, visible: permissionsDesigner.permissionSettingsForm.selectedCards().length !== 0">
-                                            <!-- ko if $data.permsLiteral: -->
-                                            <li class="permissions-node-row">
-                                                <span class="permissions-node" data-bind="text: $data.model.name()"></span>
-                                                <span class="permissions-readout" data-bind="text: $data.permsLiteral"></span>
-                                            </li>
-                                            <!--/ko -->
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                            </div>
-
-                            <!-- Buttons -->
-                            <!-- ko with: permissionsDesigner.permissionSettingsForm -->
-                            <div class="permission-buttons mar-btm">
-                                <button id="cc-delete-btn" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt disabled" data-bind="click: revert, css: {'disabled': selectedCards().length === 0 || selectedIdentities().length === 0}">{% trans "Revert Permissions" %}
-                                </button>
-                                <button id="cc-save-btn" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-check disabled" data-bind="click: save, css: {'disabled': selectedCards().length === 0 || selectedIdentities().length === 0}">{% trans "Apply Permissions" %}</button>
-                            </div>
-                            <!--/ko-->
-
-                        </div>
+        <!-- Selection Summary -->
+        <div>
+            <div class="control-panel">
+                <div class="permissions-list">
+                    <div class="node-list-panel">
+                        <span class="permissions-title">{% trans "Selected Cards" %}</span>
+                        <ul class="permissions-selected" data-bind="visible: permissionsDesigner.permissionSettingsForm.selectedCards().length === 0">
+                            <li class="no-cards-selected">
+                                <i class="confirmation ion-information-circled"></i> <span>{% trans "No cards selected" %}</span>
+                            </li>
+                        </ul>
+                        <ul class="permissions-selected" style="display:none;" data-bind="foreach: permissionsDesigner.permissionSettingsForm.selectedCards, visible: permissionsDesigner.permissionSettingsForm.selectedCards().length !== 0">
+                            <!-- ko if $data.permsLiteral: -->
+                            <li class="permissions-node-row">
+                                <span class="permissions-node" data-bind="text: $data.model.name()"></span>
+                                <span class="permissions-readout" data-bind="text: $data.permsLiteral"></span>
+                            </li>
+                            <!--/ko -->
+                        </ul>
                     </div>
                 </div>
             </div>
         </div>
+    
     </div>
     <!--/ko-->
 </div>

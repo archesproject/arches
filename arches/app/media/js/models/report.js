@@ -18,6 +18,7 @@ define(['arches',
         initialize: function(options) {
             var self = this;
             this.cards = options.cards || [];
+            this.preview = options.preview;
 
             this.set('graphid', ko.observable());
             this.set('config', {});
@@ -141,7 +142,7 @@ define(['arches',
         toJSON: function() {
             var ret = {};
             var self = this;
-            for (var key in this.attributes) {
+            for (var key in ['template_id', 'config']) {
                 if (ko.isObservable(this.attributes[key])) {
                     ret[key] = this.attributes[key]();
                 } else if (key === 'config') {

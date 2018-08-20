@@ -18,6 +18,8 @@ module.exports = {
         "window": false,
         "console": false,
         "history": false,
-        "Promise": false
+        "location": false,
+        "Promise": false,
+        "setTimeout": false
     }
 };
