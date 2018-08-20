@@ -61,6 +61,17 @@ define([
                 return self.isResourceTopNode() || isImmutable;
             });
 
+            this.displayMakeCard = ko.computed(function() {
+                var res = true;
+                if (self.node() && self.graphModel.get('isresource')) {
+                    var parentNode = self.graphModel.getParentNode(self.node());
+                    if (parentNode.istopnode === true) {
+                        res = false;
+                    }
+                }
+                return res;
+            });
+
             this.disableIsCollector = ko.computed(function() {
                 var node = self.node();
                 var isCollector = false;
