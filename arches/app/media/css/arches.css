@@ -338,8 +338,8 @@ dl.inline-flex dd {
 
 .card-help {
     padding-right: 20px;
-    font-size: 13px;
-    margin-top: -3px;
+    font-size: 14px;
+    margin-top: -34px;
 }
 
 .card-form-container {
@@ -1035,7 +1035,7 @@ a.select2-search-choice-close {
 
 .list-filter {
     position: relative;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
     margin-right: 0px;
 }
 
@@ -7224,7 +7224,7 @@ a.mega-dropdown-toggle.disabled {
 .rr-drag-panel-target {
     border-bottom-width: 0px;
     height: 100vh;
-    background: #f4f4f4;
+    background: #fbfbfb;
     border: 1px solid #ddd;
     border-radius: 2px;
     padding: 0px 25px;
@@ -11505,7 +11505,7 @@ ul.select2-choices:after {
 }
 
 .left-panel {
-    width: 270px;
+    width: 300px;
     overflow-x: auto;
     overflow-y: hidden;
     z-index: 3;
@@ -11715,15 +11715,20 @@ a.jstree-anchor.permissions-card {
     background: #9490EE;
     color: #fff;
     border: 1px solid rgba(0,0,0,0.09);
-    margin: 30px;
+    margin: -10px 0px 30px 0px;
+}
+
+.btn-rr:hover {
+    color: #fff;
 }
 
 .rr-splash {
     text-align: center;
     margin: 5%;
-    border: 1px solid #e8e8e8;
+    border: 1px solid #ddd;
     padding: 5%;
-    background: #f8f8f8;
+    background: #f6f6f6;
+    border-radius: 4px;
 }
 
 .rr-splash-title {
@@ -11764,9 +11769,15 @@ a.jstree-anchor.permissions-card {
 }
 
 .rr-splash-help-link {
-    margin: 10px;
-    font-size: 16px;
+    margin: 20px 0px 50px 0px;
+    font-size: 28px;
+    color: steelblue;
 }
+
+.rr-splash-help-link:hover {
+    cursor: pointer;
+}
+
 
 @keyframes loader {
     0% {
@@ -11846,6 +11857,7 @@ a.jstree-anchor.permissions-card {
         color: #888;
         position: relative;
         top: -20px;
+        left: 90px;
     }
 
 }
