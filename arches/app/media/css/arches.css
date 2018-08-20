@@ -338,8 +338,8 @@ dl.inline-flex dd {
 
 .card-help {
     padding-right: 20px;
-    font-size: 13px;
-    margin-top: -3px;
+    font-size: 14px;
+    margin-top: -34px;
 }
 
 .card-form-container {
@@ -1035,7 +1035,7 @@ a.select2-search-choice-close {
 
 .list-filter {
     position: relative;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
     margin-right: 0px;
 }
 
@@ -1298,7 +1298,14 @@ a.select2-search-choice-close {
 }
 
 .permission-manager {
-    background-color: white;
+    width: 100%;
+}
+
+.permissions-instructions-panel {
+    border: 1px solid #ddd;
+    padding: 30px;
+    margin-bottom: 30px;
+    background: #fbfbfb;
 }
 
 .permission-manager.panel-body {
@@ -1345,10 +1352,6 @@ a.select2-search-choice-close {
     padding: 15px;
 }
 
-.permission-manager {
-    background-color: #f4f4f4;
-}
-
 .permission-manager-item-list {
     padding-left: 10px;
 }
@@ -1364,7 +1367,7 @@ a.select2-search-choice-close {
 
 .permission-manager .control-panel {
     display: flex;
-    margin-left: 15px;
+    margin-left: 0px;
 }
 
 .permission-level-icon {
@@ -1390,8 +1393,7 @@ a.select2-search-choice-close {
 }
 
 .permission-selector {
-    padding-top: 0px;
-    margin: 0px 0px 10px 0px;
+    margin: 20px 0px 30px 0px;
 }
 
 .permissions-summary {
@@ -1408,8 +1410,13 @@ a.select2-search-choice-close {
 }
 
 .permissions-node {
-    font-size: 11px;
+    font-size: 13px;
     color: #777;
+}
+
+.no-cards-selected {
+    padding: 5px;
+    font-size: 13px;
 }
 
 .permissions-node-row {
@@ -1418,7 +1425,7 @@ a.select2-search-choice-close {
     padding-top: 6px;
     padding-bottom: 6px;
     padding-left: 10px;
-    margin-right: 10px;
+    margin-right: 0px;
     justify-content: space-between;
 }
 
@@ -1509,8 +1516,9 @@ a.select2-search-choice-close {
     list-style: none;
     color: #666;
     line-height: 1.2;
-    padding-left: 15px;
+    padding-left: 0px;
     font-size: 15px;
+    border: 1px solid #ddd;
 }
 
 .library-search {
@@ -5771,7 +5779,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     border-bottom: 1px solid #DF2E6A;
     height: 50px;
     margin-top: -15px;
-    margin-bottom: 0px;
+    margin-bottom: 15px;
     margin-left: -25px;
     margin-right: -25px;
     padding: 15px 25px;
@@ -5799,7 +5807,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 .new-provisional-edits-list {
     display: flex;
     flex-direction: column;
-    top: 0px;
+    top: -15px;
     position: relative;
     margin-right: 15px;
     width: 250px;
@@ -5811,7 +5819,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 .new-provisional-edit-card-container {
     display: flex;
     flex-direction: row-reverse;
-    align-items: baseline;
+/*    align-items: baseline;*/
 }
 
 .new-provisional-edit-card-container .card {
@@ -5910,6 +5918,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 .new-provisional-edit-history .entry {
     flex-direction: row;
     display: flex;
+    color: #6494cc;
     align-items: baseline;
     justify-content: left;
     width: 400px;
@@ -5925,7 +5934,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     padding-right: 5px;
     font-weight: 600;
     font-size:15px;
-    color: #6494cc;
+    color: #454545;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
@@ -6955,7 +6964,7 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 div.row.widget-wrapper {
     margin: 0;
     margin-right: 10px;
-    padding: 0px 5px 25px 5px;
+    padding: 10px 5px 25px 5px;
     position: relative;
 }
 
@@ -6990,11 +6999,18 @@ div.row.widget-wrapper {
 .widget-preview.active {
     background: #fcfcfc;
     border: 1px solid #ddd;
-    margin-right: 11px;
+    margin-left: -10px;
+    padding-left: 10px;
+    margin-right: -10px;
+    padding-right: 10px;
 }
 
 .widget-preview.hover {
     background: #fafafa;
+    margin-left: -10px;
+    padding-left: 10px;
+    margin-right: -10px;
+    padding-right: 10px;
 }
 
 .panel-heading.note-toolbar {
@@ -7208,7 +7224,7 @@ a.mega-dropdown-toggle.disabled {
 .rr-drag-panel-target {
     border-bottom-width: 0px;
     height: 100vh;
-    background: #f4f4f4;
+    background: #fbfbfb;
     border: 1px solid #ddd;
     border-radius: 2px;
     padding: 0px 25px;
@@ -10531,6 +10547,10 @@ a.search-facet-item.disabled {
     padding: 15px 10px 15px 10px;
 }
 
+.graph-selector-panel {
+    height: 60px;
+}
+
 .graph-selector {
     width: 350px;
     margin-right: 10px;
@@ -10706,6 +10726,8 @@ a.search-facet-item.disabled {
 
 .editor-report {
     background: white;
+    width: 100%;
+    overflow-y: auto;
 }
 
 .editor-report .rp-report-section {
@@ -11109,11 +11131,10 @@ a.search-facet-item.disabled {
 
 
 .mpm-instructions {
-    position: absolute;
-    top: 15px;
+    display: table-cell;
+    vertical-align: middle;
     color: #555;
     font-size: 13px;
-    padding: 15px 20px 5px 5px;
 }
 
 .mpm-user-name .mpm-user-status.invited {
@@ -11484,7 +11505,7 @@ ul.select2-choices:after {
 }
 
 .left-panel {
-    width: 270px;
+    width: 300px;
     overflow-x: auto;
     overflow-y: hidden;
     z-index: 3;
@@ -11550,7 +11571,9 @@ ul.select2-choices:after {
 }
 
 .card-component-panel h5 {
-    color: #989898;
+    color: #999;
+    margin-top: -8px;
+    margin-bottom: 10px;
 }
 
 .card-header {
@@ -11692,29 +11715,69 @@ a.jstree-anchor.permissions-card {
     background: #9490EE;
     color: #fff;
     border: 1px solid rgba(0,0,0,0.09);
-    margin: 30px;
+    margin: -10px 0px 30px 0px;
+}
+
+.btn-rr:hover {
+    color: #fff;
 }
 
 .rr-splash {
     text-align: center;
     margin: 5%;
-    border: 1px solid #e8e8e8;
+    border: 1px solid #ddd;
     padding: 5%;
-    background: #f4f4f4
+    background: #f6f6f6;
+    border-radius: 4px;
 }
 
 .rr-splash-title {
-    font-size: 24px;
+    color: #666;
+    font-size: 28px;
+    margin-bottom: 30px;
+    margin-top: 25px;
 }
 
+
+.rr-splash-img-container {
+    padding: 20px;
+    background: #fff;
+    border: 1px solid steelblue;
+    display: inline-block;
+}
+
+.rr-splash-img {
+    margin-top: -3px;
+    margin-left: -2px;
+    height: 110%;
+}
+
+.rr-splash-icon {
+    font-size: 48px;
+}
+
+.rr-splash-description {
+    font-size: 16px;
+    color: #999;
+}
 .rr-splash-subtitle {
-    font-size: 15px;
+    color: #999;
+}
+
+.rr-splash-description:last-child {
+    margin-bottom: 80px;
 }
 
 .rr-splash-help-link {
-    margin: 10px;
-    font-size: 16px;
+    margin: 20px 0px 50px 0px;
+    font-size: 28px;
+    color: steelblue;
 }
+
+.rr-splash-help-link:hover {
+    cursor: pointer;
+}
+
 
 @keyframes loader {
     0% {
@@ -11735,10 +11798,15 @@ a.jstree-anchor.permissions-card {
         padding: 15px 15px 25px;
     }
     .rp-report-container-preview {
-        padding: 0px 150px 35px 150px;
+        padding: 0px 0px 35px 0px;
+    }
+
+    .rp-report-tile {
+        padding-left: 0px;
     }
     .dl-horizontal dd {
         padding-right: 20px;
+        margin-left: 220px;
     }
     .dl-horizontal dt {
         float: left;
@@ -11747,19 +11815,51 @@ a.jstree-anchor.permissions-card {
         text-align: right;
         text-overflow: ellipsis;
         white-space: nowrap;
+        width: 200px;
     }
     .dl-horizontal dt a {
         font-weight: 600;
     }
     .rp-no-data {
-        margin-left: 280px;
+        margin-left: 0px;
+        margin-top: 0px;
+        margin-bottom: 10px;
     }
 }
 
 @media (min-width: 1366px) {
     .rp-report-container-preview {
-        padding: 0px 180px 35px 180px;
+        padding: 0px 0px 35px 0px;
     }
+
+    .dl-horizontal dt {
+        width: 300px;
+    }
+
+    .dl-horizontal dd {
+        padding-right: 20px;
+        margin-left: 320px;
+    }
+
+    .rp-report-section-title {
+        padding-left: 60px;
+    }
+
+    .rp-card-section.rp-card-section {
+        padding-left: 20px;
+    }
+
+    .rp-no-data {
+        margin-left: 200px;
+    }
+
+    .rp-no-data {
+        color: #888;
+        position: relative;
+        top: -20px;
+        left: 90px;
+    }
+
 }
 
 @media (min-width: 400px) {
@@ -11792,6 +11892,12 @@ a.jstree-anchor.permissions-card {
     .morphsearch.open .morphsearch-submit {
         -webkit-transform: translate3d(0, -50%, 0) scale3d(0.5, 0.5, 1);
         transform: translate3d(0, -50%, 0) scale3d(0.5, 0.5, 1);
+    }
+
+    .rp-no-data {
+        color: #888;
+        position: relative;
+        top: -30px;
     }
 }
 

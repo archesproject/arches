@@ -116,8 +116,8 @@ class Resources(APIBase):
                         out = output[0]['outputfile'].getvalue()
                     except models.ResourceInstance.DoesNotExist:
                         return JSONResponse(status=404)
-                    except:
-                        return JSONResponse(status=500)
+                    except Exception as e:
+                        return JSONResponse(status=500, reason=e)
                 elif format == 'json':
                     out = Resource.objects.get(pk=resourceid)
                     out.load_tiles()

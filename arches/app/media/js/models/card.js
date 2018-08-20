@@ -29,6 +29,7 @@ define([
             this.nodegroup_id = ko.observable();
             this.name = ko.observable();
             this.instructions = ko.observable();
+            this.cssclass = ko.observable();
             this.helptext = ko.observable();
             this.helpenabled = ko.observable();
             this.helptitle = ko.observable();
@@ -50,6 +51,7 @@ define([
             this.set('nodegroup_id', this.nodegroup_id);
             this.set('name', this.name);
             this.set('instructions', this.instructions);
+            this.set('cssclass', this.cssclass);
             this.set('helptext', this.helptext);
             this.set('helpenabled', this.helpenabled);
             this.set('helptitle', this.helptitle);
@@ -61,6 +63,43 @@ define([
             this.set('sortorder', this.sortorder);
             this.set('disabled', this.disabled);
             this.set('component_id', this.component_id);
+            this.set('config', {});
+
+            this.cardComponentLookup = cardComponentLookup;
+            this.configKeys = ko.observableArray();
+
+            this.configJSON = ko.computed({
+                read: function() {
+                    var configJSON = {};
+                    var config = this.get('config');
+                    _.each(this.configKeys(), function(key) {
+                        configJSON[key] = ko.unwrap(config[key]);
+                    });
+                    return configJSON;
+                },
+                write: function(value) {
+                    var config = this.get('config');
+                    for (var key in value) {
+                        if (config[key] && config[key]() !== value[key]) {
+                            config[key](value[key]);
+                        }
+                    }
+                },
+                owner: this
+            });
+
+            this.get('component_id').subscribe(function(value) {
+                var key;
+                var defaultConfig = JSON.parse(self.cardComponentLookup[value].defaultconfig);
+                for (key in defaultConfig) {
+                    defaultConfig[key] = ko.observable(defaultConfig[key]);
+                }
+                var currentConfig = self.get('config');
+                self.set('config', _.defaults(currentConfig, defaultConfig));
+                for (key in defaultConfig) {
+                    self.configKeys.push(key);
+                }
+            });
 
             this._card = ko.observable('{}');
 
@@ -91,8 +130,6 @@ define([
                 this.parseNodes(attributes);
                 this._card(JSON.stringify(this.toJSON()));
             }, this);
-
-            this.cardComponentLookup = cardComponentLookup;
         },
 
         /**
@@ -101,10 +138,25 @@ define([
          * @param  {object} attributes - the properties to seed a {@link CardModel} with
          */
         parse: function(attributes) {
+            var self = this;
             this._attributes = attributes;
 
             _.each(attributes.data, function(value, key) {
                 switch (key) {
+                case 'config':
+                    var config = {};
+                    var configKeys = [];
+                    self.configKeys.removeAll();
+                    _.each(value, function(configVal, configKey) {
+                        if (!ko.isObservable(configVal)) {
+                            configVal = ko.observable(configVal);
+                        }
+                        config[configKey] = configVal;
+                        configKeys.push(configKey);
+                    });
+                    this.set(key, config);
+                    self.configKeys(configKeys);
+                    break;
                 case 'cards':
                     var cards = [];
                     var cardData = _.sortBy(value, 'sortorder');
@@ -129,6 +181,7 @@ define([
                 case 'name':
                 case 'nodegroup_id':
                 case 'instructions':
+                case 'cssclass':
                 case 'helptext':
                 case 'helpenabled':
                 case 'helptitle':
@@ -204,10 +257,12 @@ define([
         },
 
         toJSON: function() {
+            var self = this;
             var ret = {};
             for (var key in this.attributes) {
                 if (key !== 'datatypelookup' && key !== 'ontology_properties' && key !== 'nodes' &&
-                 key !== 'widgets' && key !== 'datatypes' && key !== 'data') {
+                 key !== 'widgets' && key !== 'datatypes' && key !== 'data' && key !== 'helpactive' &&
+                 key !== 'config') {
                     if (ko.isObservable(this.attributes[key])) {
                         if (key === 'cards') {
                             ret[key] = [];
@@ -225,6 +280,16 @@ define([
                     ret[key] = _.map(widgets, function(widget) {
                         return widget.toJSON();
                     });
+                } else if (key === 'config') {
+                    var configKeys = this.configKeys();
+                    var config = null;
+                    if (configKeys.length > 0) {
+                        config = {};
+                        _.each(configKeys, function(configKey) {
+                            config[configKey] = ko.unwrap(self.get('config')[configKey]);
+                        });
+                    }
+                    ret[key] = config;
                 }
             }
             return ret;

@@ -101,6 +101,10 @@ define([
                         if (data.responseJSON.success === false || data.status === 500) {
                             viewModel.alert(new AlertViewModel('ep-alert-red', data.responseJSON.title, data.responseJSON.message));
                         }
+                        else {
+                            viewModel.cardTree.updateCards('update', viewModel.selectedNode().nodeGroupId(), data.responseJSON);
+                            viewModel.permissionTree.updateCards('update', viewModel.selectedNode().nodeGroupId(), data.responseJSON);
+                        }
                         viewModel.loading(false);
                     });
                 }
@@ -151,7 +155,8 @@ define([
                 graph: viewModel.graph,
                 graphModel: viewModel.graphModel,
                 loading: viewModel.loading,
-                node: viewModel.selectedNode
+                node: viewModel.selectedNode,
+                restrictedNodegroups: data.restrictedNodegroups
             });
 
             viewModel.branchListView = new BranchListView({
@@ -188,7 +193,8 @@ define([
 
             viewModel.report = new ReportModel(_.extend(data, {
                 graphModel: viewModel.graphModel,
-                cards: viewModel.cardTree.topCards
+                cards: viewModel.cardTree.topCards,
+                preview: true
             }));
 
             viewModel.report.configJSON.subscribe(function(config) {
@@ -209,7 +215,10 @@ define([
 
             viewModel.graphTree = new GraphTree({
                 graphModel: viewModel.graphModel,
-                graphSettings: viewModel.graphSettingsViewModel
+                graphSettings: viewModel.graphSettingsViewModel,
+                cardTree: viewModel.cardTree,
+                permissionTree: viewModel.permissionTree,
+                restrictedNodegroups: data.restrictedNodegroups
             });
 
             viewModel.graphTree.branchListVisible.subscribe(function(visible) {
@@ -239,7 +248,11 @@ define([
             };
 
             var correspondingCard = function(item, cardTree){
-                var cardList = cardTree.flattenTree(cardTree.topCards(), []);
+                var cardList = cardTree.cachedFlatTree;
+                if (cardList === undefined) {
+                    var cardList = cardTree.flattenTree(cardTree.topCards(), []);
+                    cardTree.cachedFlatTree = cardList;
+                }
                 var res;
                 var matchingWidget;
                 if (item && typeof item !== 'string') {

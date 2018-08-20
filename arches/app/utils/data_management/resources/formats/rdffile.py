@@ -3,6 +3,7 @@ import re
 import json
 import uuid
 import datetime
+from django.core.urlresolvers import reverse
 from format import Writer, Reader
 from arches.app.models import models
 from arches.app.models.resource import Resource
@@ -40,7 +41,7 @@ class RdfWriter(Writer):
 
     def get_rdf_graph(self):
         archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
-        graph_uri = URIRef(archesproject["graph/%s" % self.graph_id])
+        graph_uri = URIRef(archesproject[reverse('graph', args=[self.graph_id]).lstrip('/')])
 
         g = Graph()
         g.bind('archesproject', archesproject, False)
@@ -129,7 +130,7 @@ class RdfWriter(Writer):
                 if graph_info['subgraphs'][tile.nodegroup]['parentnode_nodegroup'] == None:
                     edge = graph_info['subgraphs'][tile.nodegroup]['inedge']
                     if edge.domainnode.istopnode:
-                        domainnode = archesproject['resource/%s' % resourceinstanceid]
+                        domainnode = archesproject[reverse('resources', args=[resourceinstanceid]).lstrip('/')]
                     else:
                         domainnode = archesproject[str(edge.domainnode.pk)]
                     rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]

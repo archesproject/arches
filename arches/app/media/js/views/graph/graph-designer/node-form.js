@@ -27,11 +27,12 @@ define([
             this.loading = options.loading || ko.observable(false);
             this.hasOntology = ko.computed(function(){
                 return self.graph.ontology_id() === null ? false : true;
-            })
+            });
             this.isResourceTopNode = ko.computed(function() {
                 var node = self.node();
                 return self.graphModel.get('isresource') && node && node.istopnode;
             });
+            this.restrictedNodegroups = options.restrictedNodegroups;
 
             /**
             * Checks if a node's card is editable and returns a boolean useful
@@ -40,16 +41,9 @@ define([
             * @return {boolean}
             */
             this.checkIfImmutable = function() {
-                var isImmutable = false;
-                var node = self.node();
-                if (node) {
-                    var cards = _.filter(node.graph.get('cards')(), function(card){return card.nodegroup_id === node.nodeGroupId()})
-                    if (cards.length) {
-                        isImmutable = !cards[0].is_editable
-                    }
-                }
+                var isImmutable = _.contains(this.restrictedNodegroups, self.node().nodeGroupId());
                 return isImmutable;
-            }
+            };
 
             this.toggleRequired = function() {
                 var isImmutable = self.checkIfImmutable();
@@ -58,18 +52,16 @@ define([
                 }
             };
 
-            this.disableDatatype = ko.computed(function () {
+            this.disableDatatype = ko.computed(function() {
                 var isImmutable = false;
                 var node = self.node();
-                var isInParentGroup = false;
                 if (node) {
-                    isInParentGroup = self.graphModel.isNodeInParentGroup(node);
                     isImmutable = self.checkIfImmutable();
                 }
-                return self.isResourceTopNode() || isInParentGroup || isImmutable;
+                return self.isResourceTopNode() || isImmutable;
             });
 
-            this.disableIsCollector = ko.computed(function () {
+            this.disableIsCollector = ko.computed(function() {
                 var node = self.node();
                 var isCollector = false;
                 var isNodeInChildGroup = false;
@@ -84,14 +76,13 @@ define([
                     var childNodes = self.graphModel.getChildNodesAndEdges(node).nodes;
                     childNodes.push(node);
                     var parentGroupNodes = _.difference(groupNodes, childNodes);
-                    hasNonSemanticParentNodes = !!_.find(parentGroupNodes, function (node) {
+                    hasNonSemanticParentNodes = !!_.find(parentGroupNodes, function(node) {
                         return node.datatype() !== 'semantic';
                     });
-                    groupHasNonSemanticNodes = !!_.find(groupNodes, function (node) {
+                    groupHasNonSemanticNodes = !!_.find(groupNodes, function(node) {
                         return node.datatype() !== 'semantic';
                     });
-                    var nodeGroupId = node.nodeGroupId();
-                    hasDownstreamCollector = !!_.find(childNodes, function (node) {
+                    hasDownstreamCollector = !!_.find(childNodes, function(node) {
                         return node.isCollector();
                     });
                     isInParentGroup = self.graphModel.isNodeInParentGroup(node);
@@ -108,7 +99,7 @@ define([
          * Resets the edited model
          * @memberof NodeFormView.prototype
          */
-        cancel: function () {
+        cancel: function() {
             this.node().reset();
         },
 
@@ -121,10 +112,10 @@ define([
          *
          * @param  {string} methodName - method to call on the graph model
          */
-        callAsync: function (methodName) {
-            var self = this
+        callAsync: function(methodName) {
+            var self = this;
             this.loading(true);
-            this.graphModel[methodName](this.node(), function(response, status){
+            this.graphModel[methodName](this.node(), function(){
                 self.loading(false);
             });
         },
@@ -133,7 +124,7 @@ define([
          * Calls the updateNode method on the graph model for the edited node
          * @memberof NodeFormView.prototype
          */
-        save: function () {
+        save: function() {
             this.callAsync('updateNode');
         },
 
@@ -141,7 +132,7 @@ define([
          * Calls the deleteNode method on the graph model for the edited node
          * @memberof NodeFormView.prototype
          */
-        deleteNode: function () {
+        deleteNode: function() {
             this.callAsync('deleteNode');
         },
 
@@ -149,8 +140,10 @@ define([
          * Calls the toggleIsCollector method on the node model
          * @memberof NodeFormView.prototype
          */
-        toggleIsCollector: function () {
-            this.node().toggleIsCollector();
+        toggleIsCollector: function() {
+            if (this.checkIfImmutable() === false) {
+                this.node().toggleIsCollector();
+            }
         }
     });
     return NodeFormView;

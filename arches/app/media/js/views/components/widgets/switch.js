@@ -1,4 +1,4 @@
-define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetViewModel) {
+define(['knockout', 'underscore', 'viewmodels/widget'], function(ko, _, WidgetViewModel) {
     /**
     * knockout components namespace used in arches
     * @external "ko.components"
@@ -33,26 +33,26 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
                         self.value(self.on);
                     }
                 }
-            }
+            };
             this.getvalue = this.config().getvalue || ko.computed(function(){
                 var result = null;
                 if (this.value() === this.on) {
                     result = true;
                 } else if (this.value() === false) {
                     result = false;
-                };
+                }
                 return result;
             }, this);
 
             this.setdefault = this.config().setdefault || function(self, evt){
                 if(self.defaultValue() === self.on){
-                    self.defaultValue(self.null)
+                    self.defaultValue(self.null);
                 }else if(self.defaultValue() === self.null){
-                    self.defaultValue(self.off)
+                    self.defaultValue(self.off);
                 }else if(self.defaultValue() === self.off){
-                    self.defaultValue(self.on)
+                    self.defaultValue(self.on);
                 }
-            }
+            };
 
             this.getdefault = this.config().getdefault || ko.computed(function(){
                 var result = null;
@@ -60,15 +60,15 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
                     result = true;
                 } else if (this.defaultValue() === false) {
                     result = false;
-                };
+                }
                 return result;
             }, this);
 
-            var defaultValue = ko.unwrap(this.defaultValue)
+            var defaultValue = ko.unwrap(this.defaultValue);
             if (this.value() === null && this.defaultValue() !== null) {
                 this.value(this.defaultValue());
             }
-            if (this.tile && this.tile.tileid() == "" && defaultValue != null && defaultValue != "") {
+            if (this.tile && this.tile.tileid == "" && defaultValue != null && defaultValue != "") {
                 this.value(defaultValue);
             }
 
