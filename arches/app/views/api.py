@@ -110,8 +110,8 @@ class Resources(APIBase):
                 out = output[0]['outputfile'].getvalue()
             except models.ResourceInstance.DoesNotExist:
                 return JSONResponse(status=404)
-            except:
-                return JSONResponse(status=500)
+            except Exception as e:
+                return JSONResponse(status=500, reason=e)
         else:
             #
             # The following commented code would be what you would use if you wanted to use the rdflib module,
