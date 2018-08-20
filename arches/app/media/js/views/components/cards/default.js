@@ -30,9 +30,14 @@ define(['knockout', 'bindings/scrollTo'], function(ko) {
                     currentCard.selected(false);
                 }
             }
-            currentCard.cards().forEach(function(childCard){
-                this.selectChildCards(childCard, value);
-            }, this);
+            if (currentCard.cards().length > 0) {
+                currentCard.expanded(true);
+
+                currentCard.cards().forEach(function(childCard){
+                    this.selectChildCards(childCard, value);
+                }, this);
+            }
+
         };
     };
     return ko.components.register('default-card', {
