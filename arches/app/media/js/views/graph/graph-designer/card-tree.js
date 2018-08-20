@@ -178,15 +178,17 @@ define([
             updateCards: function(action, selectedNodegroupId, data) {
                 var cards;
                 var existingNodegroupIds;
+                var nodegroups;
                 var newNodegroups;
                 if (action === 'update') {
+                    cards = data.cards || [data.card];
+                    nodegroups = data.nodegroups || [data.nodegroup];
                     self.topCards.removeAll();
                     existingNodegroupIds = _.pluck(self.graphModel.get('nodegroups'), 'nodegroupid');
-                    newNodegroups = _.filter(data.nodegroups, function(ng) {return _.contains(existingNodegroupIds, ng.nodegroupid) === false;});
+                    newNodegroups = _.filter(nodegroups, function(ng) {return _.contains(existingNodegroupIds, ng.nodegroupid) === false;});
                     if (newNodegroups.length > 0) {
                         self.graphModel.set('nodegroups', self.graphModel.get('nodegroups').concat(newNodegroups));
                     }
-                    cards = data.cards;
                     self.topCards(_.filter(cards, function(card) {
                         var nodegroup = _.find(ko.unwrap(self.graphModel.get('nodegroups')), function(group) {
                             return ko.unwrap(group.nodegroupid) === card.nodegroup_id;

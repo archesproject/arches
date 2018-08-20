@@ -432,9 +432,6 @@ class Graph(models.GraphModel):
         tree = self.get_tree()
 
         def traverse_tree(tree, current_nodegroup=None):
-            print tree['node'].name
-            print tree['node'].is_collector
-            print tree['node'].nodegroup_id
             if tree['node']:
                 if tree['node'].is_collector:
                     nodegroup = self.get_or_create_nodegroup(nodegroupid=tree['node'].nodegroup_id)
@@ -446,9 +443,7 @@ class Graph(models.GraphModel):
             for child in tree['children']:
                 traverse_tree(child, current_nodegroup)
             return tree
-        print '----------------treeversal'
         traverse_tree(tree)
-        print '----------------end treeversal'
 
         return tree
 
@@ -511,19 +506,21 @@ class Graph(models.GraphModel):
         """
 
         node_names = [node.name for node in self.nodes.itervalues()]
-        temp_node_name = 'New Node'
+        temp_node_name = _('New Node')
         if temp_node_name in node_names:
             i = 1
-            temp_node_name = 'New Node_%s' % i
+            temp_node_name = "{0}_{1}".format(_('New Node'), i)
             while temp_node_name in node_names:
                 i += 1
-                temp_node_name = 'New Node_%s' % i
+                temp_node_name = "{0}_{1}".format(_('New Node'), i)
 
         nodeToAppendTo = self.nodes[uuid.UUID(str(nodeid))] if nodeid else self.root
         card = None
         tile_count = models.TileModel.objects.filter(nodegroup_id=nodeToAppendTo.nodegroup_id).count()
         if tile_count > 0:
             raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot modify a Resource Model with instances.".format(self.name)), 1006)
+
+        nodegroup = None
 
         if nodeToAppendTo.nodeid == self.root.nodeid:
             newid = uuid.uuid1()
@@ -573,7 +570,7 @@ class Graph(models.GraphModel):
                 newNode.ontologyclass = ontology_classes[0]['ontology_classes'][0]
             else:
                 raise GraphValidationError(_('Ontology rules don\'t allow this node to be appended'))
-        return {'node': newNode, 'edge': newEdge, 'card': card}
+        return {'node': newNode, 'edge': newEdge, 'card': card, 'nodegroup': nodegroup}
 
     def clear_ontology_references(self):
         """
