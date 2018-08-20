@@ -63,7 +63,7 @@ define([
 
             this.displayMakeCard = ko.computed(function() {
                 var res = true;
-                if (self.node()) {
+                if (self.node() && self.graphModel.get('isresource')) {
                     var parentNode = self.graphModel.getParentNode(self.node());
                     if (parentNode.istopnode === true) {
                         res = false;

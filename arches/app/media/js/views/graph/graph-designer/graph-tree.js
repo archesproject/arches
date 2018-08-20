@@ -147,7 +147,7 @@ define([
             this.graphModel.appendNode(node ,function(response, status){
                 if(status === 'success') {
                     node.expanded(true);
-                    if (node.istopnode) {
+                    if (node.istopnode && this.graphModel.get('isresource')) {
                         this.cardTree.addCard(response.responseJSON);
                         this.permissionTree.addCard(response.responseJSON);
                     }

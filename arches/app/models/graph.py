@@ -521,8 +521,7 @@ class Graph(models.GraphModel):
             raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot modify a Resource Model with instances.".format(self.name)), 1006)
 
         nodegroup = None
-
-        if nodeToAppendTo.nodeid == self.root.nodeid:
+        if nodeToAppendTo.nodeid == self.root.nodeid and self.isresource == True:
             newid = uuid.uuid1()
             nodegroup = models.NodeGroup.objects.create(
                 pk=newid
