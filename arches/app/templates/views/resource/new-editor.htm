@@ -39,14 +39,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <div class="left-panel graph-designer resource-editor" data-bind="resizableSidepanel:true">
             <div class="jstree jstree-default" data-bind="visible: true" style="display: none;">
                 <div class="header">
-                    <div class="list-filter" data-bind="" style="margin-right: 10px;">
+                    <div class="list-filter" data-bind="">
                         <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a card...' %}" data-bind="textInput: filter, event: {keypress: filterEnterKeyHandler}">
 
                         <!-- Clear Search -->
                         <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
                     </div>
-                    <a data-bind="click: expandAll">{% trans 'Expand' %}</a>
-                    <a data-bind="click: collapseAll" style="padding-left: 10px;">{% trans 'Collapse' %}</a>
+                    <div class="tree-display-tools-panel">
+                        <a class="tree-display-tool" data-bind="click: expandAll"><i class="ion-plus"></i>{% trans ' Expand' %}</a>
+            <a class="tree-display-tool" data-bind="click: collapseAll"><i class="ion-minus"></i>{% trans ' Collapse' %}</a>
+                    </div>
                 </div>
                 <div class="resource-editor-tree">
                     <ul class="jstree-container-ul jstree-children" aria-expanded="true">
@@ -124,13 +126,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!--/ko -->
                 <!--ko if: !resourceId() -->
                 <div id="rr-splash" class="rr-splash">
-
-                    <div class="rr-splash-title">{% trans "New Resource" %}</div>
-
-                    <div class="rr-splash-description">
-                        {% trans "This resource doesn't have any data yet! Select a card from the tree to start describing this resource." %}
+                    
+                    <!-- Image -->
+                    <div class="img-lg img-circle rr-splash-img-container">
+                        <img class="rr-splash-img" src="../media/img/inspection.png" alt="Resource Editor">
                     </div>
-
+                    
+                    <!-- Splash Title -->
+                    <div class="rr-splash-title">{% trans "Welcome to Arches' Resource Editor" %}</div>
+                    
+                    <!-- Splash Instructions -->
+                    <div class="rr-splash-description">{% trans "You are about to create a new resource record.  Select any data card from the list on the left and start entering information." %}</div>
+                    <div class="rr-splash-description">{% trans "Don't worry if you decide not to enter any data just yet." %}</div>
+                    <div class="rr-splash-description">{% trans "Arches will create your new resource record once you've saved a data entry card." %}</div>
                 </div>
                 <!--/ko -->
             <!--/ko -->

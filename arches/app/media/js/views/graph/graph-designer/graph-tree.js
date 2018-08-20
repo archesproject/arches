@@ -147,6 +147,10 @@ define([
             this.graphModel.appendNode(node ,function(response, status){
                 if(status === 'success') {
                     node.expanded(true);
+                    if (node.istopnode && this.graphModel.get('isresource')) {
+                        this.cardTree.addCard(response.responseJSON);
+                        this.permissionTree.addCard(response.responseJSON);
+                    }
                 }
             }, this);
         },
@@ -155,8 +159,8 @@ define([
             e.stopImmediatePropagation();
             this.graphModel.deleteNode(node);
             if (node.isCollector()) {
-                this.cardTree.updateCards('delete', node.nodeGroupId());
-                this.permissionTree.updateCards('delete', node.nodeGroupId());
+                this.cardTree.deleteCard(node.nodeGroupId());
+                this.permissionTree.deleteCard(node.nodeGroupId());
             }
         },
 
