@@ -868,6 +868,7 @@ define([
                     } else { //if values are for a form widget...
                         if (_.isObject(self.value())) { //confirm value is not "", null, or undefined
                             data = koMapping.toJS(self.value);
+                            self.loadGeometriesIntoDrawLayer();
                         }
                     }
 
