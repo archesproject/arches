@@ -252,6 +252,7 @@ define([
                     perms: ko.observableArray(),
                     permsLiteral: ko.observableArray()
                 }));
+                self.cachedFlatTree = self.flattenTree(self.topCards(), []);
             },
             reorderCards: function() {
                 loading(true);
