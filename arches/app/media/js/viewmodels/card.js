@@ -202,12 +202,17 @@ define([
                     }
                 },
                 write: function(value) {
-                    if (self.multiselect && value && _.contains(selection(), this) === false) {
-                        selection.push(this);
-                    } else if (self.multiselect && value && _.contains(selection(), this) === true) {
-                        selection.remove(this);
-                    }
-                    else if (value) {
+                    if (self.multiselect){
+                        if (value === true){
+                            if (_.contains(selection(), this) === false){
+                                selection.push(this);
+                            }
+                        } else if (value === false) {
+                            if (_.contains(selection(), this) === true) {
+                                selection.remove(this);
+                            }
+                        }
+                    } else if (value) {
                         selection(this);
                     }
                 },
