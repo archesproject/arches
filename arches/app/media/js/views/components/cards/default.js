@@ -18,27 +18,6 @@ define(['knockout', 'bindings/scrollTo'], function(ko) {
         this.beforeMove = function(e) {
             e.cancelDrop = (e.sourceParent!==e.targetParent);
         };
-        this.selectChildCards = function(currentCard, value) {
-            if (value !== undefined){
-                currentCard.selected(value);
-            } else {
-                if (currentCard.selected() === false) {
-                    value = true;
-                    currentCard.selected(true);
-                } else {
-                    value = false;
-                    currentCard.selected(false);
-                }
-            }
-            if (currentCard.cards().length > 0) {
-                currentCard.expanded(true);
-
-                currentCard.cards().forEach(function(childCard){
-                    this.selectChildCards(childCard, value);
-                }, this);
-            }
-
-        };
     };
     return ko.components.register('default-card', {
         viewModel: viewModel,
