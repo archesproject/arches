@@ -358,8 +358,7 @@ dl.inline-flex dd {
     position: absolute;
     bottom: 0px;
     right: 0px;
-    background: #fff;
-    opacity: .9;
+    background: #e7e7e7;
     z-index: 500;
     overflow-y: scroll;
     color: #123;
@@ -430,7 +429,7 @@ input[type="checkbox"] {
 }
 
 .help-close {
-    color: #ddd;
+    color: #868686;
     position: absolute;
     right: 10px;
     top: 20px;
@@ -1147,6 +1146,9 @@ a.select2-search-choice-close {
     padding: 10px 15px;
 }
 
+.middle-column-container.card-configuration.expanded {
+    flex-basis: 450px;
+}
 
 .library-icon {
     width: 30px;
@@ -6476,21 +6478,9 @@ ul .card-tree-list a .node-subname {
     margin-left: 60px;
 }
 
-.tertiary-panel {
-    position: absolute;
-    top: 55px;
-    left: 534px;
-    bottom: 0;
-    z-index: 50;
-}
-
 .tertiary-panel-content {
     background: #f5f5f5;
-    border-right: 1px solid #ddd;
-    border-left: 1px solid #ddd;
     height: 100%;
-    width: 450px;
-    padding: 10px;
     overflow-y: scroll;
 }
 
@@ -10360,10 +10350,6 @@ a.search-facet-item.disabled {
     color: #fff;
 }
 
-.help-text-crud {
-    z-index: 1000;
-}
-
 .related-resources-header .resource-instance-wrapper {
     padding: 0;
 }
@@ -10733,6 +10719,22 @@ a.search-facet-item.disabled {
 .editor-report .rp-report-section {
     border-bottom: none;
     padding-bottom: 0;
+}
+
+.report-related-resources {
+    padding: 0px 30px;
+}
+
+.report-related-resources .rp-card-section {
+    margin-left: -15px;
+}
+
+
+
+.report-related-resources .rp-card-section .rp-report-container-tile {
+    padding-top: 0px;
+    padding-bottom: 10px;
+    margin-top: -5px;
 }
 
 .editor-report .report-related-resources, .editor-report .report-title-bar {
@@ -11667,6 +11669,10 @@ a.jstree-anchor.permissions-card {
     list-style: none;
 }
 
+.card-summary-section h4 {
+    font-size: 1.1em;
+}
+
 .card-summary-section .card-summary {
     padding-bottom:5px;
 }
@@ -11707,8 +11713,7 @@ a.jstree-anchor.permissions-card {
 }
 
 .card-summary-section {
-    padding-left: 0px;
-    padding-bottom: 10px;
+    padding: 20px 0 10px 0;
 }
 
 .btn-rr {
@@ -11858,6 +11863,19 @@ a.jstree-anchor.permissions-card {
         position: relative;
         top: -20px;
         left: 90px;
+    }
+
+    .report-related-resources .rp-card-section {
+        margin-left: 50px;
+    }
+
+    .report-related-resources .rp-card-section div div .dl-horizontal dt {
+        width: 500px;
+    }
+
+    .report-related-resources .rp-card-section div div .dl-horizontal dd {
+        padding-right: 20px;
+        margin-left: 520px;
     }
 
 }
