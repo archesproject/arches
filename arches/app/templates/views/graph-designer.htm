@@ -200,7 +200,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             <div class="flex" data-bind="visible: activeTab() === 'card'">
                 <!--Middle Panel -->
-                <!-- ko if: cardTree.selection() -->
+                <!-- ko if: cardTree.selection -->
                 <div class="middle-column-container graph-designer branch-library card-configuration" data-bind="css: {'expanded': selectedCard() && selectedCard().model.helpenabled() && cardTree.selection().constructor.name === 'CardViewModel' }" style="">
                     <!-- ko if: typeof cardTree.selection()!=='string' -->
                         <!-- ko if: cardTree.selection().constructor.name === 'CardViewModel' -->
