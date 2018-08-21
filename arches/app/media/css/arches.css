@@ -10737,6 +10737,22 @@ a.search-facet-item.disabled {
     padding-bottom: 0;
 }
 
+.report-related-resources {
+    padding: 0px 30px;
+}
+
+.report-related-resources .rp-card-section {
+    margin-left: -15px;
+}
+
+
+
+.report-related-resources .rp-card-section .rp-report-container-tile {
+    padding-top: 0px;
+    padding-bottom: 10px;
+    margin-top: -5px;
+}
+
 .editor-report .report-related-resources, .editor-report .report-title-bar {
     display: none;
 }
@@ -11860,6 +11876,19 @@ a.jstree-anchor.permissions-card {
         position: relative;
         top: -20px;
         left: 90px;
+    }
+
+    .report-related-resources .rp-card-section {
+        margin-left: 50px;
+    }
+
+    .report-related-resources .rp-card-section div div .dl-horizontal dt {
+        width: 500px;
+    }
+
+    .report-related-resources .rp-card-section div div .dl-horizontal dd {
+        padding-right: 20px;
+        margin-left: 520px;
     }
 
 }
