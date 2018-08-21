@@ -83,11 +83,8 @@
                 <div data-bind="component: { name: 'views/components/simple-switch', params: {value: model.helpenabled, config:{label: '{% trans "Enable Card-level help" %}', subtitle: '{% trans "Provide specific user guidance for this card" %}'}}}"></div>
 
                 <!-- Tertiary Panel For Card Help Text-->
-                <div class="tertiary-panel help-text-crud" style="display: none;" data-bind="visible: model.helpenabled">
+                <div class="" style="display: none;" data-bind="visible: model.helpenabled">
                     <div class="tertiary-panel-content">
-                        <div class="">
-                            <h4 class="title-block-title"> {% trans "Card-Level Help" %} </h4>
-                        </div>
 
                         <!-- Help CRUD -->
                         <div class="pad-all">
@@ -96,14 +93,14 @@
                                     {% trans "Help Panel Title" %}
                                 </div>
                                 <div class="col-sm-12 pad-no crud-widget-container">
-                                    <input type="" placeholder="{% trans "Help title" %}" class="form-control input-md widget-input" data-bind='value: model.helptitle'>
+                                    <input type="" placeholder="{% trans "Help title" %}" class="form-control input-md widget-input" data-bind='textInput: model.helptitle'>
                                 </div>
                             </div>
 
                             <!--Rich text editor-->
                             <div class="node-widget-label">
                                 <div class="control-label">
-                                    {% trans "Help Content" %}
+                                    {% trans "Content" %}
                                 </div>
                                 <textarea rows="10" cols="80" data-bind="ckeditor: model.helptext, ckeditorOptions: {}, valueUpdate: 'afterkeydown'"></textarea>
                             </div>
