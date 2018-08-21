@@ -72,7 +72,8 @@ define([
         var cardModel = new CardModel({
             data: _.extend(params.card, {
                 widgets: params.cardwidgets,
-                nodes: params.graphModel.get('nodes')
+                nodes: params.graphModel.get('nodes'),
+                nodegroup: nodegroup
             }),
             datatypelookup: params.graphModel.get('datatypelookup'),
         });
