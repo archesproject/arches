@@ -332,7 +332,7 @@ define([
                     viewModel.permissionTree.collapseAll();
                     viewModel.permissionTree.expandToRoot(matchingCard);
                     viewModel.permissionTree.selection.removeAll();
-                    matchingCard.selected(true);
+                    matchingCard.selectChildCards();
                 }
             };
 

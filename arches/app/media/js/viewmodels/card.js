@@ -305,6 +305,28 @@ define([
                 expandParents(item.parent);
             }
         };
+
+        this.selectChildCards = function(value) {
+            if (value !== undefined){
+                this.selected(value);
+            } else {
+                if (this.selected() === false) {
+                    value = true;
+                    this.selected(true);
+                } else {
+                    value = false;
+                    this.selected(false);
+                }
+            }
+            if (this.cards().length > 0) {
+                this.expanded(true);
+
+                this.cards().forEach(function(childCard){
+                    childCard.selectChildCards(value);
+                }, this);
+            }
+        };
+
         this.highlight.subscribe(function(highlight) {
             if (highlight) {
                 this.expanded(true);
