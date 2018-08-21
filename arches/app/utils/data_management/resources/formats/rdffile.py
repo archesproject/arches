@@ -207,7 +207,7 @@ class JsonLdReader(Reader):
         if not isinstance(strs_to_test, list):
             strs_to_test = [strs_to_test]
         for str_to_test in strs_to_test:
-            match = re.match(r'.*?%sresource/(?P<resourceid>%s)' %
+            match = re.match(r'.*?%sresources/(?P<resourceid>%s)' %
                              (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, settings.UUID_REGEX), str_to_test)
             if match:
                 return match.group('resourceid')
