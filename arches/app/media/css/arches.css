@@ -11685,6 +11685,10 @@ a.jstree-anchor.permissions-card {
     list-style: none;
 }
 
+.card-summary-section h4 {
+    font-size: 1.1em;
+}
+
 .card-summary-section .card-summary {
     padding-bottom:5px;
 }
@@ -11725,8 +11729,7 @@ a.jstree-anchor.permissions-card {
 }
 
 .card-summary-section {
-    padding-left: 0px;
-    padding-bottom: 10px;
+    padding: 20px 0 10px 0;
 }
 
 .btn-rr {
