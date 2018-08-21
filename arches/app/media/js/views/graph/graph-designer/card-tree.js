@@ -56,7 +56,7 @@ define([
             self.updateNodeList();
             _.each(self.cachedFlatTree, function(node) {
                 if (node.selected() !== state) {
-                    node.selected(true);
+                    node.selected(state);
                 }
             });
         };
