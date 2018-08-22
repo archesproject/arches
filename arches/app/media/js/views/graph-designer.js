@@ -85,6 +85,9 @@ define([
                     });
                 }));
             };
+            viewModel.cloneGraph = function() {
+                newGraph(arches.urls.clone_graph(viewModel.graph.graphid()));
+            };
             viewModel.graph.ontology = ko.computed(function() {
                 return viewModel.ontologies().find(function(obj) {
                     return obj.ontologyid === viewModel.graph.ontology_id();
