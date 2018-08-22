@@ -8,7 +8,7 @@
             <ul class="list-group ep-menu-list">
                 <!-- Menu Item -->
                 <li class="edit-menu-item">
-                    <a href="{% url 'graph' '' %}">
+                    <a href="{% url 'graph' '' %}" data-bind="click: newResource">
                         <div class="media-body">
                             <div class="menu-item-title"><i class="fa fa-sitemap"></i> {% trans "New Model" %}</div>
                             <span class="text-muted menu-item-subtitle">{% trans "Create new Resource Model" %} </span>
@@ -17,7 +17,7 @@
                 </li>
                 <!-- Menu Item -->
                 <li class="edit-menu-item">
-                    <a href="{% url 'graph' '' %}">
+                    <a href="{% url 'graph' '' %}" data-bind="click: newBranch">
                         <div class="media-body">
                             <div class="menu-item-title"><i class="fa ion-merge"></i> {% trans "New Branch" %}</div>
                             <span class="text-muted menu-item-subtitle">{% trans "Create new Branch" %} </span>

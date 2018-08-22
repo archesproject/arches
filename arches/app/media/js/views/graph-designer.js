@@ -44,6 +44,27 @@ define([
                 return !graph.isresource;
             });
 
+            var newGraph = function(url, data) {
+                data = data || {};
+                viewModel.loading(true);
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: JSON.stringify(data),
+                    success: function(response) {
+                        window.location = arches.urls.graph_designer(response.graphid);
+                    },
+                    error: function() {
+                        viewModel.loading(false);
+                    }
+                });
+            };
+            viewModel.newResource = function() {
+                newGraph('/graph/new', {isresource: true});
+            };
+            viewModel.newBranch = function() {
+                newGraph('/graph/new', {isresource: false});
+            };
             viewModel.graph.ontology = ko.computed(function() {
                 return viewModel.ontologies().find(function(obj) {
                     return obj.ontologyid === viewModel.graph.ontology_id();
