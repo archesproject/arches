@@ -37,7 +37,7 @@
 
                 <!-- Menu Item -->
                 <li class="edit-menu-item">
-                    <a href="{% url 'function_manager' graphid %}" data-bind="click:function () { navigate('{% url 'function_manager' graphid %}'); }">
+                    <a href="{% url 'graph' '' %}" data-bind="click: deleteGraph">
                         <div class="media-body">
                             <div class="menu-item-title"><i class="fa fa-trash"></i><span data-bind="text: graph.isresource() ? ' {% trans "Delete Model" %}' : ' {% trans "Delete Branch" %}' "></span></div>
                             <span class="text-muted menu-item-subtitle" data-bind="text: graph.isresource() ? ' {% trans "Delete the existing Resource Model" %}' : ' {% trans "Delete the existing Branch" %}' "></span>

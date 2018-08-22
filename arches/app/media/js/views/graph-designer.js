@@ -65,6 +65,26 @@ define([
             viewModel.newBranch = function() {
                 newGraph('/graph/new', {isresource: false});
             };
+
+            viewModel.deleteGraph = function() {
+                viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmGraphDelete.title, arches.confirmGraphDelete.text, function() {
+                    return;
+                }, function(){
+                    viewModel.loading(true);
+                    $.ajax({
+                        type: "DELETE",
+                        url: arches.urls.delete_graph(viewModel.graph.graphid()),
+                        complete: function(response, status) {
+                            viewModel.loading(false);
+                            if (status === 'success') {
+                                window.location = arches.urls.graph;
+                            } else {
+                                viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.title, response.responseJSON.message));
+                            }
+                        }
+                    });
+                }));
+            };
             viewModel.graph.ontology = ko.computed(function() {
                 return viewModel.ontologies().find(function(obj) {
                     return obj.ontologyid === viewModel.graph.ontology_id();
