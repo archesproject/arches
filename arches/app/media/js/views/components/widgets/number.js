@@ -8,32 +8,47 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
     * @param {string} params.config().label - label to use alongside the text input
     * @param {string} params.config().placeholder - default text to show in the text input
     */
-    return ko.components.register('number-widget', {
-        viewModel: function(params) {
-            params.configKeys = ['placeholder', 'width', 'min', 'max', 'step', 'precision', 'prefix', 'suffix', 'defaultValue'];
 
-            WidgetViewModel.apply(this, [params]);
 
-            var self = this;
+    var viewModel = function(params) {
+        params.configKeys = ['placeholder', 'width', 'min', 'max', 'step', 'precision', 'prefix', 'suffix', 'defaultValue'];
 
-            updateVal = ko.computed(function(){
-                if (self.value()){
-                    var val = self.value();
-                    if (self.precision()) {
-                        val = Number(val).toFixed(self.precision())
-                    }
-                    self.value(Number(val));
+        WidgetViewModel.apply(this, [params]);
+
+        var self = this;
+
+        var updateVal = ko.computed(function(){
+            if (self.value()){
+                var val = self.value();
+                if (self.precision()) {
+                    val = Number(val).toFixed(self.precision());
                 }
-            }, self).extend({ throttle: 600 });
+                self.value(Number(val));
+            }
+        }, self).extend({ throttle: 600 });
 
-            if (ko.isObservable(this.precision)) {
-                this.precision.subscribe(function(val){
-                    if (self.value() && val){
-                        self.value(Number(self.value()).toFixed(val))
-                    }
-                }, self);
-            };
-        },
+        if (ko.isObservable(this.precision)) {
+            var precisionSubscription = this.precision.subscribe(function(val){
+                if (self.value() && val){
+                    self.value(Number(self.value()).toFixed(val));
+                }
+            }, self);
+            self.disposables.push(precisionSubscription);
+        }
+        self.disposables.push(updateVal);
+    };
+
+    viewModel.prototype.dispose = function() {
+        _.each(this.disposables, function(disposable){
+            if (disposable) {
+                disposable.dispose();
+                console.log('number disposing', disposable);
+            }
+        }, this);
+    };
+
+    return ko.components.register('number-widget', {
+        viewModel: viewModel,
         template: { require: 'text!widget-templates/number' }
     });
 });
