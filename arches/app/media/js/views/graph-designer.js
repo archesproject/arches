@@ -88,6 +88,9 @@ define([
             viewModel.cloneGraph = function() {
                 newGraph(arches.urls.clone_graph(viewModel.graph.graphid()));
             };
+            viewModel.exportGraph = function() {
+                window.open(arches.urls.export_graph(viewModel.graph.graphid()), '_blank');
+            };
             viewModel.graph.ontology = ko.computed(function() {
                 return viewModel.ontologies().find(function(obj) {
                     return obj.ontologyid === viewModel.graph.ontology_id();

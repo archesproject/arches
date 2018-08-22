@@ -33,6 +33,15 @@
                     </a>
                 </li>
                 <!-- Menu Item -->
+                <li class="edit-menu-item">
+                    <a href="{% url 'graph' '' %}" data-bind="click: exportGraph">
+                        <div class="media-body">
+                            <div class="menu-item-title"><i class="fa fa-download"></i><span data-bind="text: graph.isresource() ? ' {% trans "Export Model" %}' : ' {% trans "Export Branch" %}' "></span></div>
+                            <span class="text-muted menu-item-subtitle" data-bind="text: graph.isresource() ? ' {% trans "Export the existing Resource Model" %}' : ' {% trans "Export the existing Branch" %}' "></span>
+                        </div>
+                    </a>
+                </li>
+                <!-- Menu Item -->
                 <li class="edit-menu-item" data-bind="visible: graph.isresource">
                     <a href="{% url 'function_manager' graphid %}" data-bind="click:function () { navigate('{% url 'function_manager' graphid %}'); }">
                         <div class="media-body">
