@@ -38,7 +38,9 @@ class BaseManagerView(TemplateView):
         context['nav'] = {
             'icon':'fa fa-chevron-circle-right',
             'title':'',
-            'help':('',''),
+            'help':{
+                ## title:'',template:'' (leave this commented out)
+            },
             'menu':False,
             'search':True,
             'res_edit':False,

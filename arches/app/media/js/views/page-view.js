@@ -74,7 +74,7 @@ define([
                     window.location = url;
                 },
                 getHelp: function() {
-                    if (self.viewModel.helploaded()) {
+                    if (!self.viewModel.helploaded()) {
                         self.viewModel.helploading(true);
                         var el = $('.ep-help-content');
                         $.ajax({

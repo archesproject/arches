@@ -148,8 +148,10 @@ class GraphManagerView(GraphBaseView):
             context['graphs'] = JSONSerializer().serialize(context['graph_models'], exclude=['functions'])
             context['nav']['title'] = 'Arches Designer'
             context['nav']['icon'] = 'fa-bookmark'
-            context['nav']['help'] = (_('About the Arches Designer'), 'help/base-help.htm')
-            context['help'] = 'arches-designer-help'
+            context['nav']['help'] = {
+                'title':_('Using the Graph Designer'),
+                'template':'graph-designer-help',
+            }
             return render(request, 'views/graph.htm', context)
 
 
@@ -204,16 +206,20 @@ class GraphDesignerView(GraphBaseView):
         )
         context['ontologies'] = JSONSerializer().serialize(ontologies, exclude=['version', 'path'])
         context['ontology_classes'] = JSONSerializer().serialize(ontology_classes)
-        context['nav']['title'] = self.graph.name
-        context['nav']['help'] = (_('Using the Graph Designer'), 'help/graph-designer-help.htm')
-        context['help'] = 'graph-designer-help'
-        #context['nav']['menu'] = True
         context['graph'] = JSONSerializer().serialize(self.graph, exclude=['functions', 'cards', 'deploymentfile',
                                                                            'deploymentdate', '_nodegroups_to_delete',
                                                                            '_functions'])
         context['graph_models'] = models.GraphModel.objects.all().exclude(
             graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         context['graphs'] = JSONSerializer().serialize(context['graph_models'], exclude=['functions'])
+        
+        context['nav']['title'] = self.graph.name
+        context['nav']['menu'] = True
+        context['nav']['help'] = {
+            'title':_('Using the Graph Designer'),
+            'template':'graph-designer-help',
+        }
+        
         return render(request, 'views/graph-designer.htm', context)
 
 
@@ -440,8 +446,10 @@ class CardView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = (_('Configuring Cards and Widgets'), 'help/base-help.htm')
-        context['help'] = 'card-designer-help'
+        context['nav']['help'] = {
+            'title':_('Configuring Cards and Widgets'),
+            'template':'card-designer-help',
+        }
 
         return render(request, 'views/graph/card-configuration-manager.htm', context)
 
@@ -489,8 +497,10 @@ class FunctionManagerView(GraphBaseView):
 
             context['nav']['title'] = self.graph.name
             context['nav']['menu'] = True
-            context['nav']['help'] = (_('Managing Functions'), 'help/base-help.htm')
-            context['help'] = 'function-help'
+            context['nav']['help'] = {
+                'title':_('Managing Functions'),
+                'template':'function-help',
+            }
 
             return render(request, 'views/graph/function-manager.htm', context)
         else:

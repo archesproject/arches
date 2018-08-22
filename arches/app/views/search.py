@@ -100,8 +100,11 @@ class SearchView(MapBaseManagerView):
         context['nav']['title'] = _('Search')
         context['nav']['icon'] = 'fa-search'
         context['nav']['search'] = False
-        context['nav']['help'] = (_('Searching the Arches Database'),'help/base-help.htm')
-        context['help'] = 'search-help'
+        context['nav']['help'] = {
+            'title':_('Searching the Database'),
+            'template':'search-help',
+        }
+        
 
         return render(request, 'views/search.htm', context)
 
