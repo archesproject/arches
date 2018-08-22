@@ -52,7 +52,8 @@ define([
                     url: url,
                     data: JSON.stringify(data),
                     success: function(response) {
-                        window.location = arches.urls.graph_designer(response.graphid);
+                        window.open(arches.urls.graph_designer(response.graphid), '_blank');
+                        viewModel.loading(false);
                     },
                     error: function() {
                         viewModel.loading(false);

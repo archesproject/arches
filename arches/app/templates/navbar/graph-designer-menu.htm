@@ -24,10 +24,11 @@
                         </div>
                     </a>
                 </li>
+                <!-- Menu Item -->
                 <li class="edit-menu-item">
                     <a href="{% url 'graph' '' %}" data-bind="click: cloneGraph">
                         <div class="media-body">
-                            <div class="menu-item-title"><i class="fa fa-trash"></i><span data-bind="text: graph.isresource() ? ' {% trans "Clone Model" %}' : ' {% trans "Clone Branch" %}' "></span></div>
+                            <div class="menu-item-title"><i class="fa fa-clone"></i><span data-bind="text: graph.isresource() ? ' {% trans "Clone Model" %}' : ' {% trans "Clone Branch" %}' "></span></div>
                             <span class="text-muted menu-item-subtitle" data-bind="text: graph.isresource() ? ' {% trans "Clone the existing Resource Model" %}' : ' {% trans "Clone the existing Branch" %}' "></span>
                         </div>
                     </a>
