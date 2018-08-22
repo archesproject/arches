@@ -42,7 +42,6 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
         _.each(this.disposables, function(disposable){
             if (disposable) {
                 disposable.dispose();
-                console.log('number disposing', disposable);
             }
         }, this);
     };

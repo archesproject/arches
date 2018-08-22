@@ -108,7 +108,6 @@ define(['knockout', 'underscore', 'uuid'], function (ko, _, uuid) {
         _.each(this.disposables, function(disposable){
             if (disposable) {
                 disposable.dispose();
-                console.log('disposing', disposable);
             }
         }, this);
     };
