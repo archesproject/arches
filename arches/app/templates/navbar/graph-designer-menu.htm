@@ -5,42 +5,42 @@
 
         <!-- Menu List -->
         <div class="panel-body">
-           <ul class="list-group ep-menu-list">
+            <ul class="list-group ep-menu-list">
                 <!-- Menu Item -->
-                <li class="resource-selector" data-bind="click: function() { menuActive(true); }, clickBubble: false">
-                    <select data-placeholder="{% trans "Select a graph..." %}" class="design" style="width:100px;" data-bind="value: graphid, options: allGraphs, optionsText: 'name', optionsValue: 'graphid', chosen: {'width': '100%'}"></select>
-                </li>
-
-                <!-- Menu Item -->
-                <li id="settings-manager" class="edit-menu-item {% if main_script == "views/graph/graph-settings" %} selected{% endif %}">
-
-                    <a href="{% url 'graph_settings' graphid %}" data-bind="click:function () { navigate('{% url 'graph_settings' graphid %}') }">
+                <li class="edit-menu-item">
+                    <a href="{% url 'graph' '' %}">
                         <div class="media-body">
-                            <div class="menu-item-title"><i class="fa fa-wrench"></i> {% trans "Settings" %}</div>
-                            <span class="text-muted menu-item-subtitle">{% trans "Asset Name, Settings, Relations" %}</span>
+                            <div class="menu-item-title"><i class="fa fa-sitemap"></i> {% trans "New Model" %}</div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Create new Resource Model" %} </span>
+                        </div>
+                    </a>
+                </li>
+                <!-- Menu Item -->
+                <li class="edit-menu-item">
+                    <a href="{% url 'graph' '' %}">
+                        <div class="media-body">
+                            <div class="menu-item-title"><i class="fa ion-merge"></i> {% trans "New Branch" %}</div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Create new Branch" %} </span>
                         </div>
                     </a>
                 </li>
 
-                {% if graph.isresource %}
+                <!-- Menu Item -->
+                <li class="edit-menu-item" data-bind="visible: graph.isresource">
+                    <a href="{% url 'function_manager' graphid %}" data-bind="click:function () { navigate('{% url 'function_manager' graphid %}'); }">
+                        <div class="media-body">
+                            <div class="menu-item-title"><i class="fa fa-code"></i> {% trans "Functions" %}</div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Configure functions attached to this Resource Model" %} </span>
+                        </div>
+                    </a>
+                </li>
+
                 <!-- Menu Item -->
                 <li class="edit-menu-item">
                     <a href="{% url 'function_manager' graphid %}" data-bind="click:function () { navigate('{% url 'function_manager' graphid %}'); }">
                         <div class="media-body">
-                            <div class="menu-item-title"><i class="fa fa-code"></i> {% trans "Functions" %}</div>
-                            <span class="text-muted menu-item-subtitle">{% trans "Configure functions" %} </span>
-                        </div>
-                    </a>
-                </li>
-                {% endif %}
-
-                <!-- Menu Item -->
-
-                <li id="graph-manager" class="edit-menu-item {% if main_script == "views/graph/graph-manager" %} selected{% endif %}">
-                    <a href="{% url 'graph' graphid %}" data-bind="click:function () { navigate('{% url 'graph' graphid %}') }">
-                        <div class="media-body">
-                            <div class="menu-item-title"><i class="fa fa-sitemap"></i> {% trans "Graphs/Semantics" %}</div>
-                            <span class="text-muted menu-item-subtitle">{% trans "Define graph" %}</span>
+                            <div class="menu-item-title"><i class="fa fa-trash"></i><span data-bind="text: graph.isresource() ? ' {% trans "Delete Model" %}' : ' {% trans "Delete Branch" %}' "></span></div>
+                            <span class="text-muted menu-item-subtitle" data-bind="text: graph.isresource() ? ' {% trans "Delete the existing Resource Model" %}' : ' {% trans "Delete the existing Branch" %}' "></span>
                         </div>
                     </a>
                 </li>
