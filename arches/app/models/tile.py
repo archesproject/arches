@@ -195,10 +195,13 @@ class Tile(models.TileModel):
             if request is not None:
                 datatype.handle_request(self, request, node)
                 if self.data[nodeid] == None and node.isrequired == True:
-                    missing_nodes.append(node.name)
-                    if missing_nodes != []:
-                        message = _('This card requires values for the following:')
-                        raise ValidationError(message, (', ').join(missing_nodes))
+                    if len(node.cardxnodexwidget_set.all()) > 0:
+                        missing_nodes.append(node.cardxnodexwidget_set.all()[0].label)
+                    else:
+                        missing_nodes.append(node.name)
+        if missing_nodes != []:
+            message = _('This card requires values for the following:')
+            raise ValidationError(message, (', ').join(missing_nodes))
 
     def validate(self, errors=None):
         for nodeid, value in self.data.iteritems():
@@ -351,7 +354,7 @@ class Tile(models.TileModel):
         if self.data != {}:
             if len([item for item in self.data.values() if item != None]) > 0:
                 return False
-        
+
         child_tiles_are_blank = True
         for tile in self.tiles:
             if tile.is_blank() == False:

@@ -1,4 +1,5 @@
 define([
+    'jquery',
     'arches',
     'knockout',
     'underscore',
@@ -6,11 +7,11 @@ define([
     'bindings/mapbox-gl',
     'bindings/codemirror',
     'codemirror/mode/javascript/javascript'
-], function (arches, ko, _) {
+], function($, arches, ko, _) {
     var name = 'geojson-feature-collection-datatype-config';
     ko.components.register(name, {
         viewModel: function(params) {
-            var self = this
+            var self = this;
             this.node = params;
             this.config = params.config;
             this.graph = params.graph;
@@ -18,15 +19,15 @@ define([
             if (this.layer) {
                 this.permissions = params.permissions;
                 this.iconFilter = ko.observable('');
-                this.icons = ko.computed(function () {
-                    return _.filter(params.icons, function (icon) {
+                this.icons = ko.computed(function() {
+                    return _.filter(params.icons, function(icon) {
                         return icon.name.indexOf(self.iconFilter()) >= 0;
                     });
                 });
                 this.count = params.mapSource.count;
                 this.loading = params.loading || ko.observable(false);
                 var overlays = JSON.parse(this.layer.layer_definitions);
-                var getDisplayLayers = function () {
+                var getDisplayLayers = function() {
                     var displayLayers = overlays;
                     if (self.config.advancedStyling()) {
                         var advancedStyle = self.config.advancedStyle();
@@ -42,24 +43,24 @@ define([
                             layer["source-layer"] = params.nodeid;
                         });
                     }
-                    return displayLayers
-                }
+                    return displayLayers;
+                };
                 if (params.mapSource.count === 0) {
                     _.each(overlays, function(overlay){
                         delete overlay["source-layer"];
-                    })
+                    });
                 }
                 this.selectedBasemapName = ko.observable('');
                 var mapLayers = $.extend(true, {}, arches.mapLayers);
                 this.basemaps = _.filter(mapLayers, function(layer) {
                     return !layer.isoverlay;
                 });
-                this.basemaps.forEach(function (basemap) {
-                    basemap.select = function () {
+                this.basemaps.forEach(function(basemap) {
+                    basemap.select = function(){
                         self.selectedBasemapName(basemap.name);
-                    }
+                    };
                 });
-                var defaultBasemap = _.find(this.basemaps, function (basemap) {
+                var defaultBasemap = _.find(this.basemaps, function(basemap) {
                     return basemap.addtomap;
                 });
                 if (!defaultBasemap) {
@@ -68,13 +69,13 @@ define([
                 if (defaultBasemap) {
                     this.selectedBasemapName(defaultBasemap.name);
                 }
-                var getBasemapLayers = function () {
+                var getBasemapLayers = function() {
                     return _.filter(self.basemaps, function(layer) {
                         return layer.name === self.selectedBasemapName();
                     }).reduce(function(layers, layer) {
                         return layers.concat(layer.layer_definitions);
                     }, []);
-                }
+                };
                 var sources = $.extend(true, {}, arches.mapSources);
                 sources[params.mapSource.name] = JSON.parse(params.mapSource.source);
                 _.each(sources, function(sourceConfig, name) {
@@ -128,43 +129,43 @@ define([
                                 this.node.layer.bounds.top_left.lat
                             ]
                         ];
-                        _.defer(function () {
+                        _.defer(function() {
                             map.fitBounds(bounds, {
                                 padding: 20
                             });
                         }, 1);
                     }
-                }
+                };
 
-                var updateMapStyle = function () {
+                var updateMapStyle = function() {
                     _.each(overlays, function(layer) {
                         switch (layer.id) {
-                            case "resources-fill-" + params.nodeid:
-                                layer.paint["fill-color"] = self.config.fillColor()
-                                break;
-                            case "resources-line-halo-" + params.nodeid:
-                                layer.paint["line-width"] = parseInt(self.config.haloWeight());
-                                layer.paint["line-color"] = self.config.lineHaloColor();
-                                break;
-                            case "resources-line-" + params.nodeid:
-                                layer.paint["line-width"] = parseInt(self.config.weight());
-                                layer.paint["line-color"] = self.config.lineColor();
-                                break;
-                            case "resources-poly-outline-" + params.nodeid:
-                                layer.paint["line-width"] = parseInt(self.config.outlineWeight());
-                                layer.paint["line-color"] = self.config.outlineColor();
-                                break;
-                            case "resources-point-halo-" + params.nodeid:
-                                layer.paint["circle-radius"] = parseInt(self.config.haloRadius());
-                            case "resources-cluster-point-halo-" + params.nodeid:
-                                layer.paint["circle-color"] = self.config.pointHaloColor();
-                                break;
-                            case "resources-point-" + params.nodeid:
-                                layer.paint["circle-radius"] = parseInt(self.config.radius());
-                            case "resources-cluster-point-" + params.nodeid:
-                                layer.paint["circle-color"] = self.config.pointColor();
-                                break;
-                            default:
+                        case "resources-fill-" + params.nodeid:
+                            layer.paint["fill-color"] = self.config.fillColor();
+                            break;
+                        case "resources-line-halo-" + params.nodeid:
+                            layer.paint["line-width"] = parseInt(self.config.haloWeight());
+                            layer.paint["line-color"] = self.config.lineHaloColor();
+                            break;
+                        case "resources-line-" + params.nodeid:
+                            layer.paint["line-width"] = parseInt(self.config.weight());
+                            layer.paint["line-color"] = self.config.lineColor();
+                            break;
+                        case "resources-poly-outline-" + params.nodeid:
+                            layer.paint["line-width"] = parseInt(self.config.outlineWeight());
+                            layer.paint["line-color"] = self.config.outlineColor();
+                            break;
+                        case "resources-point-halo-" + params.nodeid:
+                            layer.paint["circle-radius"] = parseInt(self.config.haloRadius());
+                        case "resources-cluster-point-halo-" + params.nodeid:
+                            layer.paint["circle-color"] = self.config.pointHaloColor();
+                            break;
+                        case "resources-point-" + params.nodeid:
+                            layer.paint["circle-radius"] = parseInt(self.config.radius());
+                        case "resources-cluster-point-" + params.nodeid:
+                            layer.paint["circle-color"] = self.config.pointColor();
+                            break;
+                        default:
 
                         }
                     });
@@ -179,7 +180,7 @@ define([
 
                 this.config.advancedStyling.subscribe(function(value) {
                     if (value && !self.config.advancedStyle()) {
-                        self.config.advancedStyle(JSON.stringify(overlays, null, '\t'))
+                        self.config.advancedStyle(JSON.stringify(overlays, null, '\t'));
                     }
                 });
 
@@ -188,7 +189,7 @@ define([
                     self.node.save(function() {
                         self.loading(false);
                     });
-                }
+                };
             }
         },
         template: { require: 'text!datatype-config-templates/geojson-feature-collection' }

@@ -1,4 +1,9 @@
-define(['knockout', 'underscore', 'uuid'], function (ko, _, uuid) {
+define([
+    'knockout',
+    'underscore',
+    'uuid',
+    'utils/dispose'
+], function(ko, _, uuid, dispose) {
     /**
     * A viewmodel used for generic widgets
     *
@@ -8,6 +13,7 @@ define(['knockout', 'underscore', 'uuid'], function (ko, _, uuid) {
     * @param  {string} params - a configuration object
     */
     var WidgetViewModel = function(params) {
+        this.externalObservables = ['value', 'config', 'expanded', 'defaultValueSubscription', 'valueSubscription'];
         var self = this;
         this.state = params.state || 'form';
         var expanded = params.expanded || ko.observable(false);
@@ -25,7 +31,7 @@ define(['knockout', 'underscore', 'uuid'], function (ko, _, uuid) {
             }
         });
         this.value = params.value || ko.observable(null);
-        this.formData = params.formData || new FormData();
+        this.formData = params.formData || null;
         this.form = params.form || null;
         this.tile = params.tile || null;
         this.results = params.results || null;
@@ -47,20 +53,24 @@ define(['knockout', 'underscore', 'uuid'], function (ko, _, uuid) {
             this.config = ko.observable(this.config);
         }
 
-        var subscribeConfigObservable = function (obs, key) {
+        this.disposables = [];
+
+        var subscribeConfigObservable = function(obs, key) {
             self[key] = obs;
 
-            self[key].subscribe(function(val) {
+            var forwardSubscription = self[key].subscribe(function(val) {
                 var configObj = self.config();
                 configObj[key] = val;
                 self.config(configObj);
             });
 
-            self.config.subscribe(function(val) {
+            var reverseSubscription = self.config.subscribe(function(val) {
                 if (val[key] !== self[key]()) {
                     self[key](val[key]);
                 }
             });
+            self.disposables.push(forwardSubscription);
+            self.disposables.push(reverseSubscription);
         };
         _.each(this.configObservables, subscribeConfigObservable);
         _.each(this.configKeys, function(key) {
@@ -76,24 +86,33 @@ define(['knockout', 'underscore', 'uuid'], function (ko, _, uuid) {
 
             if (!self.form) {
                 if (ko.isObservable(self.value)) {
-                    self.value.subscribe(function(val){
+                    self.valueSubscription = self.value.subscribe(function(val){
                         if (self.defaultValue() != val) {
-                            self.defaultValue(val)
-                        };
+                            self.defaultValue(val);
+                        }
                     });
-                    self.defaultValue.subscribe(function(val){
+                    self.defaultValueSubscription = self.defaultValue.subscribe(function(val){
                         if (self.value() != val) {
-                            self.value(val)
-                        };
+                            self.value(val);
+                        }
                     });
                 }
-            };
-        };
+            }
+        }
+
+        this.disposables.push(this.defaultValueSubscription);
+        this.disposables.push(this.valueSubscription);
 
         this.onInit = params.onInit;
         if (typeof this.onInit === 'function') {
             this.onInit();
         }
+
+        this.dispose = function(){
+            //console.log('disposing ' + self.constructor.name);
+            dispose(self);
+        };
     };
+
     return WidgetViewModel;
 });

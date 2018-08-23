@@ -106,6 +106,10 @@ ONTOLOGY_NAMESPACES = {
 # Make sure to use a trailing slash
 ARCHES_NAMESPACE_FOR_DATA_EXPORT = 'http://localhost:8000/'
 
+RDM_JSONLD_CONTEXT = {
+    'arches': ARCHES_NAMESPACE_FOR_DATA_EXPORT
+}
+
 PREFERRED_COORDINATE_SYSTEMS = (
     {"name": "Geographic", "srid": "4326", "proj4": "+proj=longlat +datum=WGS84 +no_defs", "default": True}, #Required
 )

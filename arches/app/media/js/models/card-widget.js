@@ -1,4 +1,10 @@
-define(['underscore', 'knockout', 'models/abstract', 'widgets'], function(_, ko, AbstractModel, widgets) {
+define([
+    'underscore',
+    'knockout',
+    'models/abstract',
+    'widgets',
+    'utils/dispose'
+], function(_, ko, AbstractModel, widgets, dispose) {
     return AbstractModel.extend({
         /**
         * A backbone model to manage cards_x_nodes_x_widgets records
@@ -18,6 +24,7 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function(_, ko,
                 'disabled': false
             };
             var self = this;
+            this.disposables = [];
             this.widgetLookup = widgets;
             this.widgetList = function() {
                 var widgets = _.map(self.widgetLookup, function(widget, id) {
@@ -80,6 +87,13 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function(_, ko,
             });
             this.configJSON.extend({ rateLimit: { timeout: 100, method: "notifyWhenChangesStop" } });
 
+            this.disposables.push(this.configJSON);
+
+            this.dispose = function() {
+                //console.log('disposing CardWidgetModel');
+                dispose(self);
+            };
+
             return this;
         },
 
@@ -128,6 +142,7 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function(_, ko,
                         },
                         owner: this
                     }));
+                    this.disposables.push(this.get(key));
                 } else {
                     this.set(key, ko.observable(value));
                 }

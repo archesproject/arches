@@ -212,14 +212,14 @@ class GraphDesignerView(GraphBaseView):
         context['graph_models'] = models.GraphModel.objects.all().exclude(
             graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         context['graphs'] = JSONSerializer().serialize(context['graph_models'], exclude=['functions'])
-        
+
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
         context['nav']['help'] = {
             'title':_('Using the Graph Designer'),
             'template':'graph-designer-help',
         }
-        
+
         return render(request, 'views/graph-designer.htm', context)
 
 
@@ -371,6 +371,16 @@ class GraphDataView(View):
                 return JSONResponse({})
             except GraphValidationError as e:
                 return JSONResponse({'status': 'false', 'message': e.message, 'title': e.title}, status=500)
+        elif self.action == 'delete_instances':
+            try:
+                graph = Graph.objects.get(graphid=graphid)
+                graph.delete_instances()
+                return JSONResponse({
+                    'success': True,
+                    'message': "All the resources associated with the Model '{0}' have been successfully deleted.".format(graph.name),
+                    'title': "Resources Successfully Deleted."})
+            except GraphValidationError as e:
+                return JSONResponse({'status': 'false', 'message': e.message, 'title': e.title}, status=500)
         elif self.action == 'delete_graph':
             try:
                 graph = Graph.objects.get(graphid=graphid)
@@ -495,6 +505,9 @@ class FunctionManagerView(GraphBaseView):
                 function_templates=models.Function.objects.exclude(component__isnull=True),
             )
 
+            context['graphs'] = JSONSerializer().serialize(
+                models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID),
+                exclude=['functions'])
             context['nav']['title'] = self.graph.name
             context['nav']['menu'] = True
             context['nav']['help'] = {
@@ -504,7 +517,7 @@ class FunctionManagerView(GraphBaseView):
 
             return render(request, 'views/graph/function-manager.htm', context)
         else:
-            return redirect('graph_settings', graphid=graphid)
+            return redirect('graph_designer', graphid=graphid)
 
     def post(self, request, graphid):
         data = JSONDeserializer().deserialize(request.body)

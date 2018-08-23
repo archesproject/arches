@@ -7,8 +7,9 @@ define([
     'models/card-widget',
     'arches',
     'require',
+    'utils/dispose',
     'viewmodels/tile'
-], function($, _, ko, koMapping, CardModel, CardWidgetModel, arches, require) {
+], function($, _, ko, koMapping, CardModel, CardWidgetModel, arches, require, dispose) {
     /**
     * A viewmodel used for generic cards
     *
@@ -111,7 +112,7 @@ define([
 
         applySelectedComputed(cardModel.widgets());
 
-        cardModel.widgets.subscribe(function(widgets){
+        var widgetsSubscription = cardModel.widgets.subscribe(function(widgets){
             applySelectedComputed(widgets);
         });
 
@@ -328,12 +329,29 @@ define([
             }
         };
 
-        this.highlight.subscribe(function(highlight) {
+        var higlightSubscription = this.highlight.subscribe(function(highlight) {
             if (highlight) {
                 this.expanded(true);
                 expandParents(this);
             }
         }, this);
+
+        this.disposables = [];
+        this.disposables.push(higlightSubscription);
+        this.disposables.push(widgetsSubscription);
+        this.disposables.push(this.scrollTo);
+        this.disposables.push(this.highlight);
+        this.disposables.push(this.hasprovisionaledits);
+        this.disposables.push(this.selected);
+        this.disposables.push(this.canAdd);
+        this.disposables.push(this.isChildSelected);
+        this.disposables.push(this.doesChildHaveProvisionalEdits);
+        this.disposables.push(this.model);
+
+        this.dispose = function() {
+            dispose(self);
+        };
+
     };
     return CardViewModel;
 });

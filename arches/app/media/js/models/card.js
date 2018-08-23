@@ -6,8 +6,9 @@ define([
     'models/card-widget',
     'knockout',
     'knockout-mapping',
-    'card-components'
-], function(_, arches, AbstractModel, NodeModel, CardWidgetModel, ko, koMapping, cardComponentLookup) {
+    'card-components',
+    'utils/dispose'
+], function(_, arches, AbstractModel, NodeModel, CardWidgetModel, ko, koMapping, cardComponentLookup, dispose) {
     var CardModel = AbstractModel.extend({
         /**
         * A backbone model to manage card data
@@ -34,7 +35,10 @@ define([
             this.helpenabled = ko.observable();
             this.helptitle = ko.observable();
             this.helpactive = ko.observable(false);
-            this.cardinality = ko.observable(attributes.data.nodegroup.cardinality);
+            this.cardinality = ko.observable();
+            if (attributes.data.nodegroup) {
+                this.cardinality(attributes.data.nodegroup.cardinality);
+            }
             this.visible = ko.observable();
             this.active = ko.observable();
             this.ontologyproperty = ko.observable();
@@ -68,6 +72,7 @@ define([
 
             this.cardComponentLookup = cardComponentLookup;
             this.configKeys = ko.observableArray();
+            this.disposables = [];
 
             this.configJSON = ko.computed({
                 read: function() {
@@ -89,7 +94,7 @@ define([
                 owner: this
             });
 
-            this.get('component_id').subscribe(function(value) {
+            var componentIdSubscription = this.get('component_id').subscribe(function(value) {
                 var key;
                 var defaultConfig = JSON.parse(self.cardComponentLookup[value].defaultconfig);
                 for (key in defaultConfig) {
@@ -115,22 +120,36 @@ define([
             this.parse(attributes);
             this.parseNodes.call(this, attributes);
 
-            this.get('cards').subscribe(function(cards) {
+            var cardSubscription = this.get('cards').subscribe(function(cards) {
                 _.each(cards, function(card, i) {
                     card.get('sortorder')(i);
                 });
             });
 
-            this.get('widgets').subscribe(function(widgets) {
+            var widgetSubscription = this.get('widgets').subscribe(function(widgets) {
                 _.each(widgets, function(widget, i) {
                     widget.get('sortorder')(i);
                 });
             });
 
-            attributes.data.nodes.subscribe(function(){
+            var nodesSubscription = attributes.data.nodes.subscribe(function(){
                 this.parseNodes(attributes);
                 this._card(JSON.stringify(this.toJSON()));
             }, this);
+
+
+            this.disposables.push(componentIdSubscription);
+            this.disposables.push(cardSubscription);
+            this.disposables.push(widgetSubscription);
+            this.disposables.push(nodesSubscription);
+            this.disposables.push(this.configJSON);
+            this.disposables.push(this.dirty);
+            this.disposables.push(this.isContainer);
+
+            this.dispose = function() {
+                //console.log('disposing CardModel');
+                dispose(self);
+            };
         },
 
         /**
@@ -213,10 +232,10 @@ define([
                 if((ko.unwrap(node.nodeGroupId) || ko.unwrap(node.nodegroup_id)) === ko.unwrap(attributes.data.nodegroup_id)){
 
                     var datatype = attributes.datatypelookup[ko.unwrap(node.datatype)];
-                    node.datatype.subscribe(function(){
-                        this.parseNodes(attributes);
+                    var nodeDatatypeSubscription = node.datatype.subscribe(function(){
                         this._card(JSON.stringify(this.toJSON()));
                     }, this);
+                    this.disposables.push(nodeDatatypeSubscription);
                     node.config = koMapping.fromJS(node.config);
 
                     if (datatype.defaultwidget_id) {
@@ -235,6 +254,9 @@ define([
             }, this);
             widgets.sort(function(w, ww) {
                 return w.get('sortorder')() > ww.get('sortorder')();
+            });
+            this.get('widgets')().forEach(function(widget){
+                widget.dispose();
             });
             this.get('widgets')(widgets);
             this._card(JSON.stringify(this.toJSON()));
@@ -306,6 +328,7 @@ define([
                 }
             }, this);
         }
+
     });
     return CardModel;
 });
