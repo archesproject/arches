@@ -357,6 +357,9 @@
         <div class="rp-card-section">
             <!--ko if: tile.isfullyprovisional() === false -->
             <!-- ko if: card.model.get('widgets')().length > 0 -->
+            <!-- ko if: tile.provisionaledits() !== null && tile.userisreviewer === false -->
+                <div>{% trans 'These data are provisional' %}</div>
+            <!--/ko-->
                 <div class="rp-report-tile" data-bind="attr: { id: tile.tileid }">
                     <dl class="dl-horizontal">
                         <!-- ko foreach: { data: card.model.get('widgets'), as: 'widget' } -->
