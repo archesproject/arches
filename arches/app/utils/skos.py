@@ -329,7 +329,7 @@ class SKOSWriter(object):
                         if value.category == 'label' or value.category == 'note':
                             if node.nodetype == 'ConceptScheme':
                                 if value.type == 'prefLabel':
-                                    # TODO: remove lowercasing of value.language once the pyld module 
+                                    # TODO: remove lowercasing of value.language once the pyld module
                                     # can accept mixedcase language tags
                                     rdf_graph.add((ARCHES[node.id], DCTERMS.title, Literal(
                                         jsonLiteralValue, lang=value.language.lower())))
