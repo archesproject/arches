@@ -80,11 +80,13 @@ define([
         var removeCard = function(cards, nodegroupid) {
             var removed;
             _.each(cards(), function(card){
-                if (card.nodegroupid === nodegroupid) {
-                    cards.remove(card);
-                    removed = card;
-                } else {
-                    removeCard(card.cards, nodegroupid);
+                if (card) {
+                    if (card.nodegroupid === nodegroupid) {
+                        cards.remove(card);
+                        removed = card;
+                    } else {
+                        removeCard(card.cards, nodegroupid);
+                    }
                 }
             });
             return removed;
