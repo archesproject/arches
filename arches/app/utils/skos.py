@@ -329,20 +329,22 @@ class SKOSWriter(object):
                         if value.category == 'label' or value.category == 'note':
                             if node.nodetype == 'ConceptScheme':
                                 if value.type == 'prefLabel':
+                                    # TODO: remove lowercasing of value.language once the pyld module 
+                                    # can accept mixedcase language tags
                                     rdf_graph.add((ARCHES[node.id], DCTERMS.title, Literal(
-                                        jsonLiteralValue, lang=value.language)))
+                                        jsonLiteralValue, lang=value.language.lower())))
                                 elif value.type == 'scopeNote':
                                     rdf_graph.add((ARCHES[node.id], DCTERMS.description,
-                                                   Literal(jsonLiteralValue, lang=value.language)))
+                                                   Literal(jsonLiteralValue, lang=value.language.lower())))
                             else:
                                 rdf_graph.add((ARCHES[node.id], SKOS[value.type],
-                                               Literal(jsonLiteralValue, lang=value.language)))
+                                               Literal(jsonLiteralValue, lang=value.language.lower())))
                         elif value.type == 'identifier':
                             rdf_graph.add((ARCHES[node.id], DCTERMS.identifier,
-                                           Literal(jsonLiteralValue, lang=value.language)))
+                                           Literal(jsonLiteralValue, lang=value.language.lower())))
                         else:
                             rdf_graph.add((ARCHES[node.id], ARCHES[value.type.replace(' ', '_')],
-                                           Literal(jsonLiteralValue, lang=value.language)))
+                                           Literal(jsonLiteralValue, lang=value.language.lower())))
 
                     rdf_graph.add((ARCHES[node.id], RDF.type, SKOS[node.nodetype]))
 
@@ -361,7 +363,7 @@ class SKOSWriter(object):
                             if value.category == 'label' or value.category == 'note':
                                 jsonLiteralValue = serializer.serialize({'value': value.value, 'id': value.id})
                                 rdf_graph.add((ARCHES[node.id], SKOS[value.type],
-                                               Literal(jsonLiteralValue, lang=value.language)))
+                                               Literal(jsonLiteralValue, lang=value.language.lower())))
 
                 concept_graph.traverse(build_skos)
             else:
