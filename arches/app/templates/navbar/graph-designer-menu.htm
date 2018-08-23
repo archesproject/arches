@@ -65,6 +65,16 @@
                 </li>
 
                 <!-- Menu Item -->
+                <li class="edit-menu-item" data-bind="visible: graph.isresource">
+                    <a href="{% url 'graph' '' %}" data-bind="click: deleteInstances">
+                        <div class="media-body">
+                            <div class="menu-item-title"><i class="fa fa-trash"></i> {% trans "Delete Associated Instances" %}</div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Delete All Associated Instances with this Model" %}</span>
+                        </div>
+                    </a>
+                </li>
+
+                <!-- Menu Item -->
                 <li class="edit-menu-item">
                     <a href="{% url 'graph' '' %}" data-bind="click: deleteGraph">
                         <div class="media-body">
