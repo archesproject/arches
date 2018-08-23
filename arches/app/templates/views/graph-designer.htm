@@ -60,7 +60,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
         <div class="btn-group btn-group-toggle" data-bind="visible: activeTab() === 'graph'">
             <button class="btn btn-md viewstate-btn" data-bind="css: { active: viewState() === 'design' }, click: function(){viewState('design');}">{% trans "Design" %}</button>
-            <button class="btn btn-md viewstate-btn" data-bind="css: { active: viewState() === 'preview' }, click: function(){viewState('preview');}">{% trans "Preview" %}</button>
+            <button class="btn btn-md viewstate-btn" data-bind="css: { active: viewState() === 'preview' }, click: showPreview">{% trans "Preview" %}</button>
         </div>
 
         <div class="graph-settings-crud">
