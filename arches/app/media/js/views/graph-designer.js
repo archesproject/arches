@@ -123,6 +123,25 @@ define([
             viewModel.importButtonClick = function() {
                 $("#fileupload").trigger('click');
             };
+            viewModel.deleteInstances = function() {
+                viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmAllResourceDelete.title, arches.confirmAllResourceDelete.text, function() {
+                    return;
+                }, function(){
+                    viewModel.loading(true);
+                    $.ajax({
+                        type: "DELETE",
+                        url: arches.urls.delete_instances(viewModel.graph.graphid()),
+                        complete: function(response, status) {
+                            viewModel.loading(false);
+                            if (status === 'success') {
+                                viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.title, response.responseJSON.message));
+                            } else {
+                                viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.title, response.responseJSON.message));
+                            }
+                        }
+                    });
+                }));
+            };
             viewModel.graph.ontology = ko.computed(function() {
                 return viewModel.ontologies().find(function(obj) {
                     return obj.ontologyid === viewModel.graph.ontology_id();
