@@ -37,8 +37,6 @@ define(['underscore', 'knockout', 'knockout-mapping', 'viewmodels/report', 'view
                 }, this);
                 return count;
             });
-
-            this.forReportManager = false;
         },
         template: { require: 'text!report-templates/map' }
     });
