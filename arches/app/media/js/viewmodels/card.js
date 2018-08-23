@@ -348,9 +348,7 @@ define([
         this.disposables.push(this.doesChildHaveProvisionalEdits);
         this.disposables.push(this.model);
 
-
         this.dispose = function() {
-            console.log('disposing CardViewModel');
             dispose(self);
         };
 
