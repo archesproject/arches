@@ -33,6 +33,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 # define the ARCHES namespace
 ARCHES = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 
+
 class SKOSReader(object):
 
     def __init__(self):
