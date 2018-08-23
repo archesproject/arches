@@ -6,7 +6,7 @@ define(['knockout'], function (ko) {
     * @param  {string} the request method name
     * @return {boolean} true if the method is CSRF safe
     */
-    disposeOne = function(propOrValue, value) {
+    var disposeOne = function(propOrValue, value) {
         var disposable = value || propOrValue;
         //console.log('disposing ' + disposable);
 
@@ -15,7 +15,7 @@ define(['knockout'], function (ko) {
         }
     };
 
-    dispose = function(obj) {
+    var dispose = function(obj) {
         if(!!obj.disposables){
             ko.utils.arrayForEach(obj.disposables, disposeOne);
         }
