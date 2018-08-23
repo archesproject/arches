@@ -365,6 +365,16 @@ class GraphDataView(View):
                 return JSONResponse({})
             except GraphValidationError as e:
                 return JSONResponse({'status': 'false', 'message': e.message, 'title': e.title}, status=500)
+        elif self.action == 'delete_instances':
+            try:
+                graph = Graph.objects.get(graphid=graphid)
+                graph.delete_instances()
+                return JSONResponse({
+                    'success': True,
+                    'message': "All the resources associated with the Model '{0}' have been successfully deleted.".format(graph.name),
+                    'title': "Resources Successfully Deleted."})
+            except GraphValidationError as e:
+                return JSONResponse({'status': 'false', 'message': e.message, 'title': e.title}, status=500)
         elif self.action == 'delete_graph':
             try:
                 graph = Graph.objects.get(graphid=graphid)
