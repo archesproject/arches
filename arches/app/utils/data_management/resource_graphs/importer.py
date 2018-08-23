@@ -32,6 +32,7 @@ class GraphImportReporter:
         self.resource_model = False
         self.graphs = len(graphs)
         self.graphs_saved = 0
+        self.graph_id = ''
 
     def update_graphs_saved(self, count=1):
         self.graphs_saved += count
@@ -76,6 +77,7 @@ def import_graph(graphs, overwrite_graphs=True):
 
                 reporter.name = resource['name']
                 reporter.resource_model = resource['isresource']
+                reporter.graph_id = resource['graphid']
                 graph = Graph(resource)
                 ontology_classes = [str(f['source']) for f in OntologyClass.objects.all().values('source')]
 

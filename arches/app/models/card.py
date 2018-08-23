@@ -82,7 +82,7 @@ class Card(models.CardModel):
         if args:
             if isinstance(args[0], dict):
                 for key, value in args[0].iteritems():
-                    if key not in ('cards', 'widgets', 'nodes', 'is_editable'):
+                    if key not in ('cards', 'widgets', 'nodes', 'is_editable', 'nodegroup'):
                         setattr(self, key, value)
 
                 if 'cards' in args[0]:

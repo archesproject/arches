@@ -35,6 +35,9 @@ define([
             this.helptitle = ko.observable();
             this.helpactive = ko.observable(false);
             this.cardinality = ko.observable();
+            if (attributes.data.nodegroup) {
+                this.cardinality(attributes.data.nodegroup.cardinality);
+            }
             this.visible = ko.observable();
             this.active = ko.observable();
             this.ontologyproperty = ko.observable();
@@ -49,6 +52,7 @@ define([
 
             this.set('cardid', this.cardid);
             this.set('nodegroup_id', this.nodegroup_id);
+            this.set('cardinality', this.cardinality);
             this.set('name', this.name);
             this.set('instructions', this.instructions);
             this.set('cssclass', this.cssclass);

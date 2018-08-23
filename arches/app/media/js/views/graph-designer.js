@@ -44,6 +44,104 @@ define([
                 return !graph.isresource;
             });
 
+            var newGraph = function(url, data) {
+                data = data || {};
+                viewModel.loading(true);
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: JSON.stringify(data),
+                    success: function(response) {
+                        window.open(arches.urls.graph_designer(response.graphid), '_blank');
+                        viewModel.loading(false);
+                    },
+                    error: function() {
+                        viewModel.loading(false);
+                    }
+                });
+            };
+            viewModel.newResource = function() {
+                newGraph('/graph/new', {isresource: true});
+            };
+            viewModel.newBranch = function() {
+                newGraph('/graph/new', {isresource: false});
+            };
+
+            viewModel.deleteGraph = function() {
+                viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmGraphDelete.title, arches.confirmGraphDelete.text, function() {
+                    return;
+                }, function(){
+                    viewModel.loading(true);
+                    $.ajax({
+                        type: "DELETE",
+                        url: arches.urls.delete_graph(viewModel.graph.graphid()),
+                        complete: function(response, status) {
+                            viewModel.loading(false);
+                            if (status === 'success') {
+                                window.location = arches.urls.graph;
+                            } else {
+                                viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.title, response.responseJSON.message));
+                            }
+                        }
+                    });
+                }));
+            };
+            viewModel.cloneGraph = function() {
+                newGraph(arches.urls.clone_graph(viewModel.graph.graphid()));
+            };
+            viewModel.exportGraph = function() {
+                window.open(arches.urls.export_graph(viewModel.graph.graphid()), '_blank');
+            };
+            viewModel.importGraph = function(data, e) {
+                var formData = new FormData();
+                formData.append("importedGraph", e.target.files[0]);
+
+                $.ajax({
+                    type: "POST",
+                    url: '/graph/import/',
+                    processData: false,
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    success: function(response) {
+                        if (response[0].length != 0) {
+                            if (typeof(response[0])) {
+                                response = response[0].join('<br />');
+                            }
+                            viewModel.alert(new AlertViewModel('ep-alert-red', arches.graphImportFailed.title, response));
+                        } else {
+                            viewModel.loading(false);
+                            window.open(arches.urls.graph_designer(response[1].graph_id), '_blank');
+                        }
+                    },
+                    error: function(response) {
+                        viewModel.alert(new AlertViewModel('ep-alert-red', arches.graphImportFailed.title, 'Please contact your system administrator for more details.'));
+                        viewModel.loading(false);
+                    },
+                });
+            };
+            viewModel.importButtonClick = function() {
+                $("#fileupload").trigger('click');
+            };
+            viewModel.deleteInstances = function() {
+                viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmAllResourceDelete.title, arches.confirmAllResourceDelete.text, function() {
+                    return;
+                }, function(){
+                    viewModel.loading(true);
+                    $.ajax({
+                        type: "DELETE",
+                        url: arches.urls.delete_instances(viewModel.graph.graphid()),
+                        complete: function(response, status) {
+                            viewModel.loading(false);
+                            if (status === 'success') {
+                                viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.title, response.responseJSON.message));
+                            } else {
+                                viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.title, response.responseJSON.message));
+                            }
+                        }
+                    });
+                }));
+            };
             viewModel.graph.ontology = ko.computed(function() {
                 return viewModel.ontologies().find(function(obj) {
                     return obj.ontologyid === viewModel.graph.ontology_id();
@@ -334,7 +432,7 @@ define([
                     viewModel.permissionTree.collapseAll();
                     viewModel.permissionTree.expandToRoot(matchingCard);
                     viewModel.permissionTree.selection.removeAll();
-                    matchingCard.selected(true);
+                    matchingCard.selectChildCards();
                 }
             };
 
