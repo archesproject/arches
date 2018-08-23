@@ -1,4 +1,4 @@
-define(['knockout'], function(ko) {
+define(['underscore', 'knockout'], function(_, ko) {
     /**
      * A viewmodel used for a generic geocoder
      *
@@ -31,7 +31,7 @@ define(['knockout'], function(ko) {
                 panelName === panel ? panelValue(false) : panelValue(true);
                 panel === 'overlays' || self.overlaySelectorClosed(true);
             });
-        }
+        };
 
         /**
          * toggles the open or closed state of the of the map controls
@@ -39,34 +39,34 @@ define(['knockout'], function(ko) {
          */
         this.toggleMapTools = function() {
             self.mapControlsExpanded(!self.mapControlsExpanded());
-        }
+        };
 
         /**
          * toggles the visibility of the of the map controls and the availability of map controls in a report-template
          * @return {null}
          */
-         this.toggleMapControlsVisibility = function() {
-             if (self.mapControlsHidden() === true) {
-                 self.mapControlsHidden(false)
-             } else {
-                 self.mapControlsHidden(true)
-             }
-         }
+        this.toggleMapControlsVisibility = function() {
+            if (self.mapControlsHidden() === true) {
+                self.mapControlsHidden(false);
+            } else {
+                self.mapControlsHidden(true);
+            }
+        };
 
-         this.moveOverlay = function(overlay, direction) {
-             var overlays = ko.utils.unwrapObservable(self.overlays);
-             var source = ko.utils.arrayIndexOf(overlays, overlay);
-             var target = (direction === 'up') ? source - 1 : source + 1;
+        this.moveOverlay = function(overlay, direction) {
+            var overlays = ko.utils.unwrapObservable(self.overlays);
+            var source = ko.utils.arrayIndexOf(overlays, overlay);
+            var target = (direction === 'up') ? source - 1 : source + 1;
 
-             if (target >= 0 && target < overlays.length) {
-                 self.overlays.valueWillMutate();
+            if (target >= 0 && target < overlays.length) {
+                self.overlays.valueWillMutate();
 
-                 overlays.splice(source, 1);
-                 overlays.splice(target, 0, overlay);
+                overlays.splice(source, 1);
+                overlays.splice(target, 0, overlay);
 
-                 self.overlays.valueHasMutated();
-             }
-         };
+                self.overlays.valueHasMutated();
+            }
+        };
     };
     return MapControlsViewModel;
 });
