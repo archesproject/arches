@@ -91,8 +91,11 @@ define([
                 });
             }),
             expanded: ko.observable(false),
-            hasprovisionaledits: ko.computed(function() {
+            hasprovisionaledits: ko.pureComputed(function() {
                 return !!self.provisionaledits();
+            }, this),
+            isfullyprovisional: ko.pureComputed(function() {
+                return !!self.provisionaledits() && _.keys(koMapping.toJS(this.data)).length === 0;
             }, this),
             selected: ko.pureComputed({
                 read: function() {
@@ -106,7 +109,7 @@ define([
                 owner: this
             }),
             formData: new FormData(),
-            dirty: ko.computed(function() {
+            dirty: ko.pureComputed(function() {
                 return this._tileData() !== koMapping.toJSON(this.data);
             }, this),
             reset: function() {
@@ -223,10 +226,10 @@ define([
                 });
             }
         });
-        this.isChildSelected = ko.computed(function() {
+        this.isChildSelected = ko.pureComputed(function() {
             return isChildSelected(this);
         }, this);
-        this.doesChildHaveProvisionalEdits = ko.computed(function() {
+        this.doesChildHaveProvisionalEdits = ko.pureComputed(function() {
             return doesChildHaveProvisionalEdits(this);
         }, this);
     };

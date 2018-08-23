@@ -111,10 +111,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </li>
                             <!-- ko if: $parent.showResources() -->
                              <li>
-                                 <a href="#" data-bind="click:function () { $parent.navigate($parent.arches.urls.function_manager(graphid)) }, attr: { href: $parent.arches.urls.function_manager(graphid)}"><i class="fa fa-code"></i> {% trans "Manage Functions" %}</a>
+                                <a href="#" data-bind="click:function () { $parent.navigate($parent.arches.urls.function_manager(graphid)) }, attr: { href: $parent.arches.urls.function_manager(graphid)}"><i class="fa fa-code"></i> {% trans "Manage Functions" %}</a>
                             </li>
                             <li>
-                               <a href="#" data-bind="click:exportMappingFile"><i class="fa fa-file"></i> {% trans "Create Mapping File" %}</a>
+                                <a href="#" data-bind="click:exportMappingFile"><i class="fa fa-file"></i> {% trans "Create Mapping File" %}</a>
+                            </li>
+                            <li>
+                                <a href="#" data-bind="click:deleteInstances"><i class="fa fa-trash"></i> {% trans "Delete Instances" %}</a>
                             </li>
                             <!-- /ko -->
                             <li class="divider"></li>

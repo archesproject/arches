@@ -337,7 +337,7 @@
                     <div>
                         <div class="panel-heading">
                             <h3 class="panel-title help-panel-title" style="">
-                                <span class="help-text-small">{% trans "Help" %}</span><span data-bind="html: card.model.get('helptitle')"></span>
+                                <span data-bind="html: card.model.get('helptitle')"></span>
                             </h3>
                         </div>
                         <div class="panel-body" style="padding: 10px 10px 15px 10px;" data-bind="html: card.model.get('helptext')">
@@ -355,6 +355,7 @@
     <span class="rp-tile-title" data-bind="text: card.model.get('name')"></span>
     <!-- ko foreach: { data: self.preview ? [card.newTile] : card.tiles, as: 'tile' } -->
         <div class="rp-card-section">
+            <!--ko if: tile.isfullyprovisional() === false -->
             <!-- ko if: card.model.get('widgets')().length > 0 -->
                 <div class="rp-report-tile" data-bind="attr: { id: tile.tileid }">
                     <dl class="dl-horizontal">
@@ -372,7 +373,7 @@
                         <!-- /ko -->
                     </dl>
                 </div>
-            <!-- /ko -->
+                <!-- /ko -->
 
             <div class="rp-report-container-tile" data-bind="visible: card.cards().length > 0">
                 <!-- ko foreach: { data: self.preview ? card.cards : tile.cards, as: 'card' } -->
@@ -386,6 +387,7 @@
                         } --> <!-- /ko -->
                 <!-- /ko -->
             </div>
+            <!-- /ko -->
         </div>
     <!-- /ko -->
 
