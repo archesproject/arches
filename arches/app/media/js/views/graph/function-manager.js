@@ -18,11 +18,12 @@ require([
     * set up the page view model with the graph model and related sub views
     */
     var functionModels = [];
+    var savedFunctions = ko.observableArray(_.map(data.applied_functions, function(fn){return fn.function_id;}));
+
     var viewModel = {
         loading: ko.observable(false),
         selectedFunction: ko.observable()
     };
-
 
     data.functions.forEach(function(func){
         functionModels.push(new FunctionModel(func));
@@ -47,6 +48,7 @@ require([
     viewModel.appliedFunctionList = new AppliedFunctionList({
         functions: ko.observableArray()
     });
+
     data.applied_functions.forEach(function(func){
         func.function = _.find(functionModels, function(fn){
             return fn.functionid === func.function_id;
@@ -74,9 +76,13 @@ require([
     };
 
     viewModel.dirty = ko.computed(function(){
-        return !!(_.find(viewModel.appliedFunctionList.items(), function(fn){
-            return fn.dirty();
-        }));
+        if (viewModel.selectedFunction() && _.contains(savedFunctions(), viewModel.selectedFunction().function_id) === false) {
+            return true;
+        } else {
+            return !!(_.find(viewModel.appliedFunctionList.items(), function(fn){
+                return fn.dirty();
+            }));
+        }
     });
 
     var alertFailure = function(responseJSON) {
@@ -99,6 +105,7 @@ require([
             success: function(response) {
                 var functionToUpdate;
                 response.forEach(function(fn){
+                    savedFunctions.push(fn.function_id);
                     functionToUpdate = _.find(viewModel.appliedFunctionList.items(), function(func){
                         return fn._id === func.toJSON()._id;
                     });
@@ -123,6 +130,7 @@ require([
                 url: arches.urls.remove_functions.replace('//', '/' + baseData.graphid + '/'),
                 data: JSON.stringify([functionToDelete]),
                 success: function() {
+                    savedFunctions.remove(functionToDelete.function_id);
                     viewModel.appliedFunctionList.items.remove(functionToDelete);
                     viewModel.toggleFunctionLibrary();
                     viewModel.loading(false);
