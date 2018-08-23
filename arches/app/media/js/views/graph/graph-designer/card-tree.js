@@ -182,6 +182,9 @@ define([
                 var nodegroups = data.nodegroups;
                 var existingNodegroupIds = _.pluck(self.graphModel.get('nodegroups'), 'nodegroupid');
                 var newNodegroups = _.filter(nodegroups, function(ng) {return _.contains(existingNodegroupIds, ng.nodegroupid) === false;});
+                _.each(self.cachedFlatTree, function(cardViewModel) {
+                    cardViewModel.dispose();
+                });
                 self.topCards.removeAll();
                 if (newNodegroups.length > 0) {
                     self.graphModel.set('nodegroups', self.graphModel.get('nodegroups').concat(newNodegroups));
