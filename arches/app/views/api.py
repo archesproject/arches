@@ -295,61 +295,31 @@ class Concepts(APIBase):
                     ret.append(concept_graph)
                 except models.Concept.DoesNotExist:
                     return JSONResponse(status=404)
-                except:
-                    return JSONResponse(status=500)
+                except Exception as e:
+                    return JSONResponse(status=500, reason=e)
             else:
                 return JSONResponse(status=500)
         else:
             return JSONResponse(status=500)
 
-        if format == 'json':
-            return JSONResponse(ret, indent=indent)
+        if format == 'json-ld':
+            try:
+                skos = SKOSWriter()
+                value = skos.write(ret, format="nt")
+                js = from_rdf(str(value), options={format: 'application/nquads'})
 
-        elif format == 'json-ld':
+                context = [{
+                    "@context": {
+                        "skos": SKOS,
+                        "dcterms": DCTERMS,
+                        "rdf": str(RDF)
+                    }
+                },{
+                    "@context": settings.RDM_JSONLD_CONTEXT
+                }]
 
-            skos = SKOSWriter()
-            #return HttpResponse(skos.write(ret, format="nt"), content_type="application/xml")
-            value = skos.write(ret, format="nt")
-            js = from_rdf(str(value), options={format: 'application/nquads'})
-
-            # print js
-            # framing = {
-            #     "@omitDefault": True,
-            #     "@type": "%sgraph/%s" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, "self.graph_id")
-            # }
-
-            # js = frame(js, framing)
-
-            # print js
-            # try:
-            #     context = self.graph_model.jsonldcontext
-            #     context = JSONDeserializer().deserialize(context)
-            # except ValueError:
-            #     if context == '':
-            #         context = {}
-            #     context = {
-            #         "@context": context
-            #     }
-            # except AttributeError:
-            context = [{
-                "@context": {
-                    "skos": SKOS,
-                    "dcterms": DCTERMS,
-                    "rdf": str(RDF)
-                }
-            },{
-                "@context": settings.RDM_JSONLD_CONTEXT
-            }]
-
-            js = compact(js, context)
-            # out = json.dumps(out, indent=indent, sort_keys=True)
-            # print out
-            # dest = StringIO(out)
-
-            # full_file_name = os.path.join('{0}.{1}'.format("self.file_name", 'jsonld'))
-            # # return [{'name': full_file_name, 'outputfile': dest}]
-            # # output = exporter.writer.write_resources(
-            # #                 resourceinstanceids=[resourceid], indent=indent, user=request.user)
-            # out = dest.getvalue()
-            return JSONResponse(js, indent=indent)
-
+                ret = compact(js, context)
+            except Exception as e:
+                return JSONResponse(status=500, reason=e)
+        
+        return JSONResponse(ret, indent=indent)
