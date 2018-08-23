@@ -507,7 +507,7 @@ class FunctionManagerView(GraphBaseView):
 
             return render(request, 'views/graph/function-manager.htm', context)
         else:
-            return redirect('graph_settings', graphid=graphid)
+            return redirect('graph_designer', graphid=graphid)
 
     def post(self, request, graphid):
         data = JSONDeserializer().deserialize(request.body)
