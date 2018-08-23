@@ -4,7 +4,7 @@ define([
     'knockout',
     'knockout-mapping',
     'underscore'
-], function (arches, AbstractModel, ko, koMapping, _) {
+], function(arches, AbstractModel, ko, koMapping, _) {
 
     var FunctionModel = AbstractModel.extend({
         /**
@@ -24,7 +24,7 @@ define([
         * @param {object} options.description - the description of the function
         * @param {object} options.functiontype - the function type
         * @param {object} options.component - a reference to the knockout component
-        * @param {object} options.defaultconfig - the default properties requiring user configuration 
+        * @param {object} options.defaultconfig - the default properties requiring user configuration
         */
         initialize: function(options) {
             var self = this;
@@ -62,7 +62,7 @@ define([
         * @param {object} data.description - the description of the function
         * @param {object} data.functiontype - the function type
         * @param {object} data.component - a reference to the knockout component
-        * @param {object} data.defaultconfig - the default properties requiring user configuration 
+        * @param {object} data.defaultconfig - the default properties requiring user configuration
         */
         parse: function(data) {
             this._json(JSON.stringify(data));
@@ -73,14 +73,14 @@ define([
             this.functiontype(data.functiontype);
             this.component(data.component);
 
-            this.set('id', data.functionid)
+            this.set('id', data.functionid);
         },
 
         /**
         * discard unsaved model changes and resets the model data
         * @memberof FunctionModel.prototype
         */
-        reset: function () {
+        reset: function() {
             this.parse(JSON.parse(this._json()));
         },
 
@@ -89,7 +89,7 @@ define([
         * @memberof FunctionModel.prototype
         * @return {object} a JSON object containing model data
         */
-        toJSON: function () {
+        toJSON: function() {
             return JSON.parse(this.json());
         },
     });
