@@ -207,7 +207,7 @@ class GraphDesignerView(GraphBaseView):
         context['nav']['title'] = self.graph.name
         context['nav']['help'] = (_('Using the Graph Designer'), 'help/graph-designer-help.htm')
         context['help'] = 'graph-designer-help'
-        #context['nav']['menu'] = True
+        context['nav']['menu'] = True
         context['graph'] = JSONSerializer().serialize(self.graph, exclude=['functions', 'cards', 'deploymentfile',
                                                                            'deploymentdate', '_nodegroups_to_delete',
                                                                            '_functions'])
@@ -365,6 +365,16 @@ class GraphDataView(View):
                 return JSONResponse({})
             except GraphValidationError as e:
                 return JSONResponse({'status': 'false', 'message': e.message, 'title': e.title}, status=500)
+        elif self.action == 'delete_instances':
+            try:
+                graph = Graph.objects.get(graphid=graphid)
+                graph.delete_instances()
+                return JSONResponse({
+                    'success': True,
+                    'message': "All the resources associated with the Model '{0}' have been successfully deleted.".format(graph.name),
+                    'title': "Resources Successfully Deleted."})
+            except GraphValidationError as e:
+                return JSONResponse({'status': 'false', 'message': e.message, 'title': e.title}, status=500)
         elif self.action == 'delete_graph':
             try:
                 graph = Graph.objects.get(graphid=graphid)
@@ -487,6 +497,9 @@ class FunctionManagerView(GraphBaseView):
                 function_templates=models.Function.objects.exclude(component__isnull=True),
             )
 
+            context['graphs'] = JSONSerializer().serialize(
+                models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID),
+                exclude=['functions'])
             context['nav']['title'] = self.graph.name
             context['nav']['menu'] = True
             context['nav']['help'] = (_('Managing Functions'), 'help/base-help.htm')

@@ -31,7 +31,7 @@ define([
             }
         });
         this.value = params.value || ko.observable(null);
-        // this.formData = params.formData || new FormData();
+        this.formData = params.formData || null;
         this.form = params.form || null;
         this.tile = params.tile || null;
         this.results = params.results || null;
