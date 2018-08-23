@@ -63,7 +63,7 @@ class SKOSReader(object):
         """
         given an RDF graph, tries to save the concpets to the system
 
-        Keyword arguments: 
+        Keyword arguments:
         overwrite_options -- 'overwrite', 'ignore'
         staging_options -- 'stage', 'keep'
 
@@ -189,8 +189,13 @@ class SKOSReader(object):
                         if relation_or_value_type in skos_value_types_list:
                             value_type = skos_value_types[relation_or_value_type]
                             val = self.unwrapJsonLiteral(object)
-                            concept.addvalue({'id': val['value_id'], 'value': val[
-                                             'value'], 'language': object.language or default_lang, 'type': value_type.valuetype, 'category': value_type.category})
+                            concept.addvalue({
+                                'id': val['value_id'],
+                                'value': val['value'],
+                                'language': object.language or default_lang,
+                                'type': value_type.valuetype,
+                                'category': value_type.category
+                            })
 
                 self.nodes.append(concept)
 

@@ -161,10 +161,10 @@ class Concept(object):
                         downlevel = downlevel + 1
                     for relation in conceptrealations:
                         subconcept = _cache[str(relation.conceptto_id)] if str(relation.conceptto_id) in _cache else self.__class__().get(id=relation.conceptto_id,
-                                                                                                                                          include_subconcepts=include_subconcepts, include_parentconcepts=include_parentconcepts,
-                                                                                                                                          include_relatedconcepts=include_relatedconcepts, exclude=exclude, include=include,
-                                                                                                                                          depth_limit=depth_limit, up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel,
-                                                                                                                                          nodetype=nodetype, semantic=semantic, pathway_filter=pathway_filter, _cache=_cache.copy(), lang=lang)
+                            include_subconcepts=include_subconcepts, include_parentconcepts=include_parentconcepts,
+                            include_relatedconcepts=include_relatedconcepts, exclude=exclude, include=include,
+                            depth_limit=depth_limit, up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel,
+                            nodetype=nodetype, semantic=semantic, pathway_filter=pathway_filter, _cache=_cache.copy(), lang=lang)
                         subconcept.relationshiptype = relation.relationtype_id
                         self.subconcepts.append(subconcept)
 
@@ -179,10 +179,10 @@ class Concept(object):
                         uplevel = uplevel + 1
                     for relation in conceptrealations:
                         parentconcept = _cache[str(relation.conceptfrom_id)] if str(relation.conceptfrom_id) in _cache else self.__class__().get(id=relation.conceptfrom_id,
-                                                                                                                                                 include_subconcepts=False, include_parentconcepts=include_parentconcepts,
-                                                                                                                                                 include_relatedconcepts=include_relatedconcepts, exclude=exclude, include=include,
-                                                                                                                                                 depth_limit=depth_limit, up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel,
-                                                                                                                                                 nodetype=nodetype, semantic=semantic, pathway_filter=pathway_filter, _cache=_cache.copy(), lang=lang)
+                            include_subconcepts=False, include_parentconcepts=include_parentconcepts,
+                            include_relatedconcepts=include_relatedconcepts, exclude=exclude, include=include,
+                            depth_limit=depth_limit, up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel,
+                            nodetype=nodetype, semantic=semantic, pathway_filter=pathway_filter, _cache=_cache.copy(), lang=lang)
                         parentconcept.relationshiptype = relation.relationtype_id
 
                         self.parentconcepts.append(parentconcept)

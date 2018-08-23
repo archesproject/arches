@@ -37,6 +37,7 @@ try:
 except ImportError:
     from StringIO import StringIO
 
+
 class CouchdbProxy(ProxyView):
     # check user credentials here
     upstream = settings.COUCHDB_URL
@@ -206,7 +207,8 @@ class Resources(APIBase):
                     response = []
                     for resource in reader.resources:
                         if resourceid != str(resource.pk):
-                            raise Exception('Resource id in the URI does not match the resource @id supplied in the document')
+                            raise Exception(
+                                'Resource id in the URI does not match the resource @id supplied in the document')
                         old_resource = Resource.objects.get(pk=resource.pk)
                         old_resource.load_tiles()
                         old_tile_ids = set([str(tile.pk) for tile in old_resource.tiles])
@@ -216,7 +218,8 @@ class Resources(APIBase):
                         with transaction.atomic():
                             tiles_to_delete.delete()
                             resource.save(request=request)
-                        response.append(JSONDeserializer().deserialize(self.get(request, resource.resourceinstanceid).content))
+                        response.append(JSONDeserializer().deserialize(
+                            self.get(request, resource.resourceinstanceid).content))
                     return JSONResponse(response, indent=indent)
             else:
                 return JSONResponse(status=403)
@@ -244,7 +247,8 @@ class Resources(APIBase):
                     for resource in reader.resources:
                         with transaction.atomic():
                             resource.save(request=request)
-                        response.append(JSONDeserializer().deserialize(self.get(request, resource.resourceinstanceid).content))
+                        response.append(JSONDeserializer().deserialize(
+                            self.get(request, resource.resourceinstanceid).content))
                     return JSONResponse(response, indent=indent)
             else:
                 return JSONResponse(status=403)
@@ -314,12 +318,12 @@ class Concepts(APIBase):
                         "dcterms": DCTERMS,
                         "rdf": str(RDF)
                     }
-                },{
+                }, {
                     "@context": settings.RDM_JSONLD_CONTEXT
                 }]
 
                 ret = compact(js, context)
             except Exception as e:
                 return JSONResponse(status=500, reason=e)
-        
+
         return JSONResponse(ret, indent=indent)
