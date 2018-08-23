@@ -207,7 +207,7 @@ class GraphDesignerView(GraphBaseView):
         context['nav']['title'] = self.graph.name
         context['nav']['help'] = (_('Using the Graph Designer'), 'help/graph-designer-help.htm')
         context['help'] = 'graph-designer-help'
-        #context['nav']['menu'] = True
+        context['nav']['menu'] = True
         context['graph'] = JSONSerializer().serialize(self.graph, exclude=['functions', 'cards', 'deploymentfile',
                                                                            'deploymentdate', '_nodegroups_to_delete',
                                                                            '_functions'])
