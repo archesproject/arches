@@ -848,9 +848,11 @@ define([
 
 
                     if (self.context === 'report-header') {
-                        source.setData(self.value());
+                        data = self.value();
+                        source.setData(data);
                         self.value.subscribe(function(value) {
                             source.setData(value);
+                            zoomToGeoJSON(value);
                         });
                         _.each(['resource-poly' + self.graphId, 'resource-line' + self.graphId, 'resource-point' + self.graphId], function(layerId) { //clear and add resource layers so that they are on top of map
                             var cacheLayer = self.map.getLayer(layerId);
