@@ -2686,11 +2686,8 @@ div.dropdown-menu.open {
     height: 36px;
 }
 
-.search-choice-close:before {
-    font-size: 14px;
-     color: grey;
-     content: "\f00d";
-     font-family: FontAwesome;
+.chosen-container-multi .chosen-choices li.search-choice .search-choice-close {
+    background-image: none !important;
 }
 
 .list-group-item.active:hover, .list-group-item.active:active, .list-group-item.active:focus {
