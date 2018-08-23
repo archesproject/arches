@@ -497,6 +497,9 @@ class FunctionManagerView(GraphBaseView):
                 function_templates=models.Function.objects.exclude(component__isnull=True),
             )
 
+            context['graphs'] = JSONSerializer().serialize(
+                models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID),
+                exclude=['functions'])
             context['nav']['title'] = self.graph.name
             context['nav']['menu'] = True
             context['nav']['help'] = (_('Managing Functions'), 'help/base-help.htm')
