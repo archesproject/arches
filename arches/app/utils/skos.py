@@ -31,8 +31,7 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 # define the ARCHES namespace
-ARCHES = Namespace('http://www.archesproject.org/')
-
+ARCHES = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 
 class SKOSReader(object):
 

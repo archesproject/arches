@@ -1,3 +1,4 @@
+import os
 import json
 import uuid
 import re
@@ -17,6 +18,7 @@ from arches.app.models.graph import Graph
 from arches.app.models.mobile_survey import MobileSurvey
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
+from arches.app.utils.skos import SKOSWriter
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.decorators import can_read_resource_instance, can_edit_resource_instance, can_read_concept
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -26,7 +28,14 @@ from arches.app.utils.permission_backend import user_can_read_resources
 from arches.app.utils.permission_backend import user_can_edit_resources
 from arches.app.utils.permission_backend import user_can_read_concepts
 from arches.app.utils.decorators import group_required
+from pyld.jsonld import compact, frame, from_rdf
+from rdflib import RDF
+from rdflib.namespace import SKOS, DCTERMS
 
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
 
 class CouchdbProxy(ProxyView):
     # check user credentials here
@@ -260,6 +269,11 @@ class Concepts(APIBase):
 
     def get(self, request, conceptid=None):
         if user_can_read_concepts(user=request.user):
+            allowed_formats = ['json', 'json-ld']
+            format = request.GET.get('format', 'json-ld')
+            if format not in allowed_formats:
+                return JSONResponse(status=406, reason='incorrect format specified, only %s formats allowed' % allowed_formats)
+
             include_subconcepts = request.GET.get('includesubconcepts', 'true') == 'true'
             include_parentconcepts = request.GET.get('includeparentconcepts', 'true') == 'true'
             include_relatedconcepts = request.GET.get('includerelatedconcepts', 'true') == 'true'
@@ -288,4 +302,54 @@ class Concepts(APIBase):
         else:
             return JSONResponse(status=500)
 
-        return JSONResponse(ret, indent=indent)
+        if format == 'json':
+            return JSONResponse(ret, indent=indent)
+
+        elif format == 'json-ld':
+
+            skos = SKOSWriter()
+            #return HttpResponse(skos.write(ret, format="nt"), content_type="application/xml")
+            value = skos.write(ret, format="nt")
+            js = from_rdf(str(value), options={format: 'application/nquads'})
+
+            # print js
+            # framing = {
+            #     "@omitDefault": True,
+            #     "@type": "%sgraph/%s" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, "self.graph_id")
+            # }
+
+            # js = frame(js, framing)
+
+            # print js
+            # try:
+            #     context = self.graph_model.jsonldcontext
+            #     context = JSONDeserializer().deserialize(context)
+            # except ValueError:
+            #     if context == '':
+            #         context = {}
+            #     context = {
+            #         "@context": context
+            #     }
+            # except AttributeError:
+            context = [{
+                "@context": {
+                    "skos": SKOS,
+                    "dcterms": DCTERMS,
+                    "rdf": str(RDF)
+                }
+            },{
+                "@context": settings.RDM_JSONLD_CONTEXT
+            }]
+
+            js = compact(js, context)
+            # out = json.dumps(out, indent=indent, sort_keys=True)
+            # print out
+            # dest = StringIO(out)
+
+            # full_file_name = os.path.join('{0}.{1}'.format("self.file_name", 'jsonld'))
+            # # return [{'name': full_file_name, 'outputfile': dest}]
+            # # output = exporter.writer.write_resources(
+            # #                 resourceinstanceids=[resourceid], indent=indent, user=request.user)
+            # out = dest.getvalue()
+            return JSONResponse(js, indent=indent)
+
