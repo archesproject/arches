@@ -92,6 +92,37 @@ define([
             viewModel.exportGraph = function() {
                 window.open(arches.urls.export_graph(viewModel.graph.graphid()), '_blank');
             };
+            viewModel.importGraph = function(data, e) {
+                var formData = new FormData();
+                formData.append("importedGraph", e.target.files[0]);
+
+                $.ajax({
+                    type: "POST",
+                    url: '/graph/import/',
+                    processData: false,
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    success: function(response) {
+                        if (response[0].length != 0) {
+                            if (typeof(response[0])) {
+                                response = response[0].join('<br />');
+                            }
+                            viewModel.alert(new AlertViewModel('ep-alert-red', arches.graphImportFailed.title, response));
+                        } else {
+                            viewModel.loading(false);
+                            window.open(arches.urls.graph_designer(response[1].graph_id), '_blank');
+                        }
+                    },
+                    error: function(response) {
+                        viewModel.alert(new AlertViewModel('ep-alert-red', arches.graphImportFailed.title, 'Please contact your system administrator for more details.'));
+                        viewModel.loading(false);
+                    },
+                });
+            };
+            viewModel.importButtonClick = function() {
+                $("#fileupload").trigger('click');
+            };
             viewModel.graph.ontology = ko.computed(function() {
                 return viewModel.ontologies().find(function(obj) {
                     return obj.ontologyid === viewModel.graph.ontology_id();

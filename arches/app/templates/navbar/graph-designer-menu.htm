@@ -25,6 +25,18 @@
                     </a>
                 </li>
                 <!-- Menu Item -->
+                <li class="edit-menu-item file-upload upload">
+                    <form id="data">
+                        <input type="file" class="upload" id="fileupload" data-bind="event: {change: importGraph}" accept=".json"/>
+                    </form>
+                    <a href="{% url 'graph' '' %}" data-bind="click: importButtonClick">
+                        <div class="media-body">
+                            <div class="menu-item-title"><i class="fa ion-merge"></i> {% trans "Import Graph" %}</div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Import Graph by uploading a json file" %} </span>
+                        </div>
+                    </a>
+                </li>
+                <!-- Menu Item -->
                 <li class="edit-menu-item">
                     <a href="{% url 'graph' '' %}" data-bind="click: cloneGraph">
                         <div class="media-body">
