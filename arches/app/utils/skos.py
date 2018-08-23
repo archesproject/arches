@@ -301,8 +301,11 @@ class SKOSWriter(object):
             concept_graphs = [concept_graphs]
 
         for concept_graph in concept_graphs:
-            if concept_graph.nodetype == 'ConceptScheme':
+            if concept_graph.nodetype == 'ConceptScheme' or concept_graph.nodetype == 'Concept':
                 scheme_id = concept_graph.id
+                if concept_graph.nodetype == 'Concept':
+                    scheme = concept_graph.get_scheme()
+                    scheme_id = scheme.id if scheme is not None else None
 
                 def build_skos(node):
                     if node.nodetype == 'Concept':

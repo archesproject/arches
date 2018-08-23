@@ -920,6 +920,11 @@ class Concept(object):
         return {'nodes': nodes, 'links': links}
 
     def get_context(self):
+        """ 
+        get the Top Concept that the Concept particpates in
+
+        """
+
         if self.nodetype == 'Concept' or self.nodetype == 'Collection':
             concept = Concept().get(id = self.id, include_parentconcepts = True, include = None)
             def get_scheme_id(concept):
@@ -934,6 +939,19 @@ class Concept(object):
 
         else: # like ConceptScheme or EntityType
             return self
+
+    def get_scheme(self):
+        """ 
+        get the ConceptScheme that the Concept particpates in
+
+        """
+
+        topConcept = self.get_context()
+        if len(topConcept.parentconcepts) == 1:
+            if topConcept.parentconcepts[0].nodetype == 'ConceptScheme':
+                return topConcept.parentconcepts[0]
+
+        return None
 
     def check_if_concept_in_use(self):
         """Checks  if a concept or any of its subconcepts is in use by a resource instance"""
