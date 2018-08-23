@@ -1,26 +1,44 @@
-define(['knockout', 'viewmodels/report', 'views/components/widgets/map'], function (ko, ReportViewModel) {
+define(['underscore', 'knockout', 'knockout-mapping', 'viewmodels/report', 'views/components/widgets/map'], function(_, ko, koMapping, ReportViewModel) {
     return ko.components.register('map-report', {
         viewModel: function(params) {
+            var self = this;
             params.configKeys = ['zoom', 'centerX', 'centerY', 'geocoder', 'basemap', 'geometryTypes', 'pitch', 'bearing', 'geocodePlaceholder'];
 
             ReportViewModel.apply(this, [params]);
 
-            var tiles = this.report.get('tiles')
-            this.feature_count = 0
-            this.forReportManager = false
+            this.featureCollection = ko.computed({
+                read: function() {
+                    var features = [];
+                    ko.unwrap(self.tiles).forEach(function(tile) {
+                        _.each(tile.data, function(val) {
+                            if ('features' in val) {
+                                features = features.concat(koMapping.toJS(val.features));
+                            }
+                        }, this);
+                    }, this);
+                    return {
+                        type: 'FeatureCollection',
+                        features: features
+                    };
+                },
+                write: function() {
+                    return;
+                }
+            });
 
-            if (tiles) {
-                tiles.forEach(function(tile) {
-                    _.each(tile.data, function(val, key) {
-                        if (_.contains(val, 'FeatureCollection')) {
-                            this.feature_count += 1
+            this.featureCount = ko.computed(function() {
+                var count = 0;
+                ko.unwrap(self.tiles).forEach(function(tile) {
+                    _.each(tile.data, function(val) {
+                        if ('features' in val) {
+                            count += 1;
                         }
                     }, this);
-                }, this)
-            } else {
-                this.forReportManager = true;
-            }
-            // this.configObservable = ko.observable()
+                }, this);
+                return count;
+            });
+
+            this.forReportManager = false;
         },
         template: { require: 'text!report-templates/map' }
     });
