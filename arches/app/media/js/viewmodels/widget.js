@@ -3,7 +3,7 @@ define([
     'underscore',
     'uuid',
     'utils/dispose'
-], function (ko, _, uuid, dispose) {
+], function(ko, _, uuid, dispose) {
     /**
     * A viewmodel used for generic widgets
     *
