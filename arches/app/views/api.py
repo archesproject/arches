@@ -1,3 +1,4 @@
+import os
 import json
 import uuid
 import re
@@ -17,6 +18,7 @@ from arches.app.models.graph import Graph
 from arches.app.models.mobile_survey import MobileSurvey
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
+from arches.app.utils.skos import SKOSWriter
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.decorators import can_read_resource_instance, can_edit_resource_instance, can_read_concept
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -26,6 +28,14 @@ from arches.app.utils.permission_backend import user_can_read_resources
 from arches.app.utils.permission_backend import user_can_edit_resources
 from arches.app.utils.permission_backend import user_can_read_concepts
 from arches.app.utils.decorators import group_required
+from pyld.jsonld import compact, frame, from_rdf
+from rdflib import RDF
+from rdflib.namespace import SKOS, DCTERMS
+
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
 
 
 class CouchdbProxy(ProxyView):
@@ -197,7 +207,8 @@ class Resources(APIBase):
                     response = []
                     for resource in reader.resources:
                         if resourceid != str(resource.pk):
-                            raise Exception('Resource id in the URI does not match the resource @id supplied in the document')
+                            raise Exception(
+                                'Resource id in the URI does not match the resource @id supplied in the document')
                         old_resource = Resource.objects.get(pk=resource.pk)
                         old_resource.load_tiles()
                         old_tile_ids = set([str(tile.pk) for tile in old_resource.tiles])
@@ -207,7 +218,8 @@ class Resources(APIBase):
                         with transaction.atomic():
                             tiles_to_delete.delete()
                             resource.save(request=request)
-                        response.append(JSONDeserializer().deserialize(self.get(request, resource.resourceinstanceid).content))
+                        response.append(JSONDeserializer().deserialize(
+                            self.get(request, resource.resourceinstanceid).content))
                     return JSONResponse(response, indent=indent)
             else:
                 return JSONResponse(status=403)
@@ -235,7 +247,8 @@ class Resources(APIBase):
                     for resource in reader.resources:
                         with transaction.atomic():
                             resource.save(request=request)
-                        response.append(JSONDeserializer().deserialize(self.get(request, resource.resourceinstanceid).content))
+                        response.append(JSONDeserializer().deserialize(
+                            self.get(request, resource.resourceinstanceid).content))
                     return JSONResponse(response, indent=indent)
             else:
                 return JSONResponse(status=403)
@@ -260,6 +273,11 @@ class Concepts(APIBase):
 
     def get(self, request, conceptid=None):
         if user_can_read_concepts(user=request.user):
+            allowed_formats = ['json', 'json-ld']
+            format = request.GET.get('format', 'json-ld')
+            if format not in allowed_formats:
+                return JSONResponse(status=406, reason='incorrect format specified, only %s formats allowed' % allowed_formats)
+
             include_subconcepts = request.GET.get('includesubconcepts', 'true') == 'true'
             include_parentconcepts = request.GET.get('includeparentconcepts', 'true') == 'true'
             include_relatedconcepts = request.GET.get('includerelatedconcepts', 'true') == 'true'
@@ -281,11 +299,31 @@ class Concepts(APIBase):
                     ret.append(concept_graph)
                 except models.Concept.DoesNotExist:
                     return JSONResponse(status=404)
-                except:
-                    return JSONResponse(status=500)
+                except Exception as e:
+                    return JSONResponse(status=500, reason=e)
             else:
                 return JSONResponse(status=500)
         else:
             return JSONResponse(status=500)
+
+        if format == 'json-ld':
+            try:
+                skos = SKOSWriter()
+                value = skos.write(ret, format="nt")
+                js = from_rdf(str(value), options={format: 'application/nquads'})
+
+                context = [{
+                    "@context": {
+                        "skos": SKOS,
+                        "dcterms": DCTERMS,
+                        "rdf": str(RDF)
+                    }
+                }, {
+                    "@context": settings.RDM_JSONLD_CONTEXT
+                }]
+
+                ret = compact(js, context)
+            except Exception as e:
+                return JSONResponse(status=500, reason=e)
 
         return JSONResponse(ret, indent=indent)
