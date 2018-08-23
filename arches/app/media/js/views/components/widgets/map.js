@@ -847,16 +847,13 @@ define([
                     }
 
 
-                    if (self.context === 'report-header' && !ko.isObservable(self.value)) {
-                        self.value.forEach(function(tile) {
-                            _.each(tile.data, function(val, key) {
-                                if (_.contains(val, 'FeatureCollection')) {
-                                    result.features = _.union(result.features, val.features);
-                                }
-                            }, self);
-                        }, self);
-                        data = result;
+                    if (self.context === 'report-header') {
+                        data = self.value();
                         source.setData(data);
+                        self.value.subscribe(function(value) {
+                            source.setData(value);
+                            zoomToGeoJSON(value);
+                        });
                         _.each(['resource-poly' + self.graphId, 'resource-line' + self.graphId, 'resource-point' + self.graphId], function(layerId) { //clear and add resource layers so that they are on top of map
                             var cacheLayer = self.map.getLayer(layerId);
                             self.map.moveLayer(layerId, self.anchorLayerId);

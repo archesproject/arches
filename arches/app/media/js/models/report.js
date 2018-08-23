@@ -50,6 +50,7 @@ define(['arches',
                 owner: this
             });
 
+            this.graph = options.graph;
             this.parse(options.graph);
         },
 
