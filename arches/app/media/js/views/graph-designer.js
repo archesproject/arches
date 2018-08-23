@@ -484,12 +484,10 @@ define([
                 viewModel.graphTree.expandParentNode(node);
             });
 
-            viewModel.viewState.subscribe(function(state) {
-                if (state === 'preview') {
-                    viewModel.graphView.resize();
-                }
-            });
-
+            viewModel.showPreview = function() {
+                viewModel.viewState('preview');
+                viewModel.graphView.resize();
+            };
 
             /**
             * update the sizing of elements on window resize
