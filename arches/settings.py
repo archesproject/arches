@@ -121,6 +121,11 @@ ADMINS = (
 )
 MANAGERS = ADMINS
 
+RESOURCE_EDITOR_GROUPS = (
+    'Resource Editor',
+    'Crowdsource Editor'
+)
+
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  #<-- Only need to uncomment this for testing without an actual email server
 # EMAIL_USE_TLS = True
 # EMAIL_HOST = 'smtp.gmail.com'
