@@ -17,7 +17,7 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function(ko, _, WidgetVi
     * @param {string|false} [params.config.off=false] - the value to use for the "off" state of the switch
     */
 
-    var viewModel = function(params) {
+    var SwitchWidget = function(params) {
         params.configKeys = ['subtitle', 'defaultValue'];
         WidgetViewModel.apply(this, [params]);
         this.on = this.config().on || true;
@@ -76,16 +76,8 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function(ko, _, WidgetVi
         this.disposables.push(this.getdefault);
     };
 
-    viewModel.prototype.dispose = function() {
-        _.each(this.disposables, function(disposable){
-            if (disposable && disposable.dispose) {
-                disposable.dispose();
-            }
-        }, this);
-    };
-
     return ko.components.register('switch-widget', {
-        viewModel: viewModel,
+        viewModel: SwitchWidget,
         template: { require: 'text!widget-templates/switch' }
     });
 });

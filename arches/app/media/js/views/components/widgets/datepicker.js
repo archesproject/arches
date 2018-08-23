@@ -21,7 +21,7 @@ define([
      * @param {string} params.config.dateFormat - Format of the date to display. (See moment.js' options for format: http://momentjs.com/docs/#/displaying/format/)
      */
 
-    var viewModel = function(params) {
+    var DatePickerWidget = function(params) {
         var self = this;
         params.configKeys = ['minDate', 'maxDate', 'viewMode', 'dateFormat', 'defaultValue'];
         WidgetViewModel.apply(this, [params]);
@@ -105,16 +105,8 @@ define([
         this.disposables.push(this.getdefault);
     };
 
-    viewModel.prototype.dispose = function() {
-        _.each(this.disposables, function(disposable){
-            if (disposable) {
-                disposable.dispose();
-            }
-        }, this);
-    };
-
     return ko.components.register('datepicker-widget', {
-        viewModel: viewModel,
+        viewModel: DatePickerWidget,
         template: {
             require: 'text!widget-templates/datepicker'
         }
