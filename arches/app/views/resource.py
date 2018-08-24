@@ -189,7 +189,7 @@ class NewResourceEditorView(MapBaseManagerView):
             context['nav']['help'] = {
                 'title': _('Using the Resource Editor'),
                 'template': 'resource-editor-help',
-            } 
+            }
 
         return render(request, view_template, context)
 
