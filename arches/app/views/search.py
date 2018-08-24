@@ -101,8 +101,8 @@ class SearchView(MapBaseManagerView):
         context['nav']['icon'] = 'fa-search'
         context['nav']['search'] = False
         context['nav']['help'] = {
-            'title':_('Searching the Database'),
-            'template':'search-help',
+            'title': _('Searching the Database'),
+            'template': 'search-help',
         }
         
 

@@ -462,15 +462,15 @@ define([
             var helpContentLookup = {
                 permissions: {
                     'title': 'Using the Permissions Manager',
-                    'template':'permissions-manager-help',
+                    'template': 'permissions-manager-help',
                 },
                 graph: {
                     'title':'Using the Graph Designer',
-                    'template':'graph-designer-help',
+                    'template': 'graph-designer-help',
                 },
                 card: {
                     'title':'Using the Card Designer',
-                    'template':'card-manager-help',
+                    'template': 'card-manager-help',
                 }
             };
 

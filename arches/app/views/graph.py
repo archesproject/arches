@@ -149,8 +149,8 @@ class GraphManagerView(GraphBaseView):
             context['nav']['title'] = 'Arches Designer'
             context['nav']['icon'] = 'fa-bookmark'
             context['nav']['help'] = {
-                'title':_('Using the Graph Designer'),
-                'template':'graph-designer-help',
+                'title': _('Using the Graph Designer'),
+                'template': 'graph-designer-help',
             }
             return render(request, 'views/graph.htm', context)
 
@@ -216,8 +216,8 @@ class GraphDesignerView(GraphBaseView):
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
         context['nav']['help'] = {
-            'title':_('Using the Graph Designer'),
-            'template':'graph-designer-help',
+            'title': _('Using the Graph Designer'),
+            'template': 'graph-designer-help',
         }
 
         return render(request, 'views/graph-designer.htm', context)
@@ -457,8 +457,8 @@ class CardView(GraphBaseView):
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
         context['nav']['help'] = {
-            'title':_('Configuring Cards and Widgets'),
-            'template':'card-designer-help',
+            'title': _('Configuring Cards and Widgets'),
+            'template': 'card-designer-help',
         }
 
         return render(request, 'views/graph/card-configuration-manager.htm', context)
@@ -511,8 +511,8 @@ class FunctionManagerView(GraphBaseView):
             context['nav']['title'] = self.graph.name
             context['nav']['menu'] = True
             context['nav']['help'] = {
-                'title':_('Managing Functions'),
-                'template':'function-help',
+                'title': _('Managing Functions'),
+                'template': 'function-help',
             }
 
             return render(request, 'views/graph/function-manager.htm', context)

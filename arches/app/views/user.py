@@ -88,8 +88,8 @@ class UserManagerView(BaseManagerView):
             context['nav']['title'] = _("Profile Manager")
             context['nav']['login'] = True
             context['nav']['help'] = {
-                'title':_('Profile Editing'),
-                'template':'profile-manager-help',
+                'title': _('Profile Editing'),
+                'template': 'profile-manager-help',
             }
             context['validation_help'] = validation.password_validators_help_texts()
 
@@ -120,8 +120,8 @@ class UserManagerView(BaseManagerView):
             context['nav']['title'] = _('Profile Manager')
             context['nav']['login'] = True
             context['nav']['help'] = {
-                'title':_('Profile Editing'),
-                'template':'profile-manager-help',
+                'title': _('Profile Editing'),
+                'template': 'profile-manager-help',
             }
             context['validation_help'] = validation.password_validators_help_texts()
             context['user_surveys'] = JSONSerializer().serialize(user_details['user_surveys'])
