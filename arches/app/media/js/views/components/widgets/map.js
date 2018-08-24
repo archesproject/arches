@@ -232,7 +232,8 @@ define([
         };
 
         this.zoomToDrawLayer = function(){
-            var allFeatures = self.draw.getAll();
+            var allFeatures = this.context === 'report-header' ?
+                this.value() : self.draw.getAll();
             if (allFeatures.features.length > 0) {
                 this.map.fitBounds(geojsonExtent(allFeatures), {padding:20});
             }
