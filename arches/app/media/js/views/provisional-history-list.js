@@ -37,7 +37,6 @@ define([
                     url: arches.urls.tile_history,
                     data: {start: this.start(), end: this.end()}
                 }).done(function(data) {
-                    self.helploaded(true);
                     self.helploading(false);
                     self.items(_.map(data, function(edit) {
                         edit.displaytime = moment(edit.lasttimestamp).format('DD-MM-YYYY hh:mm a');
@@ -96,7 +95,6 @@ define([
 
             this.items = options.items;
             this.helploading = options.helploading;
-            this.helploaded = options.helploaded;
             this.start = ko.observable(dateRange.start);
             this.end = ko.observable(dateRange.end);
             this.dateRangeType = ko.observable('custom');

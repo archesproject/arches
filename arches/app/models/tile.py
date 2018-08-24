@@ -196,12 +196,8 @@ class Tile(models.TileModel):
                 datatype.handle_request(self, request, node)
                 if self.data[nodeid] == None and node.isrequired == True:
                     if len(node.cardxnodexwidget_set.all()) > 0:
-                        import ipdb
-                        ipdb.sset_trace()
                         missing_nodes.append(node.cardxnodexwidget_set.all()[0].label)
                     else:
-                        import ipdb
-                        ipdb.sset_trace()
                         missing_nodes.append(node.name)
         if missing_nodes != []:
             message = _('This card requires values for the following:')

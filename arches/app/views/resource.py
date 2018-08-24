@@ -58,8 +58,10 @@ class ResourceListView(BaseManagerView):
         context['nav']['icon'] = "fa fa-bookmark"
         context['nav']['title'] = _("Resource Manager")
         context['nav']['login'] = True
-        context['nav']['help'] = (_('Creating Resources'), 'help/base-help.htm')
-        context['help'] = 'resource-editor-landing-help'
+        context['nav']['help'] = {
+            'title': _('Creating Resources'),
+            'template': 'resource-editor-landing-help',
+        }
 
         return render(request, 'views/resource.htm', context)
 
@@ -178,8 +180,16 @@ class NewResourceEditorView(MapBaseManagerView):
 
         context['nav']['title'] = ''
         context['nav']['menu'] = nav_menu
-        context['nav']['help'] = (_('Using the Resource Editor'), 'help/base-help.htm')
-        context['help'] = 'resource-editor-help'
+        if resourceid == settings.RESOURCE_INSTANCE_ID:
+            context['nav']['help'] = {
+                'title': _('Managing System Settings'),
+                'template': 'system-settings-help',
+            }
+        else:
+            context['nav']['help'] = {
+                'title': _('Using the Resource Editor'),
+                'template': 'resource-editor-help',
+            }
 
         return render(request, view_template, context)
 
