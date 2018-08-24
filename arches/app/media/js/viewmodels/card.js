@@ -60,6 +60,7 @@ define([
         var permsLiteral = ko.observableArray();
         var nodegroups = params.graphModel.get('nodegroups');
         var multiselect = params.multiselect || false;
+        var is_writable = params.card.is_writable || false;
         var selection;
         if (params.multiselect) {
             selection = params.selection || ko.observableArray([]);
@@ -117,6 +118,7 @@ define([
         });
 
         _.extend(this, nodegroup, {
+            is_writable: is_writable,
             model: cardModel,
             multiselect: params.multiselect,
             widgets: cardModel.widgets,
