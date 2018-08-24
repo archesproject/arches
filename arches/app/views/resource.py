@@ -97,8 +97,19 @@ class NewResourceEditorView(MapBaseManagerView):
             pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
         ontologyclass = [node for node in nodes if node.istopnode is True][0].ontologyclass
         relationship_type_values = get_resource_relationship_types()
-        nodegroups = [node.nodegroup for node in nodes if node.is_collector and request.user.has_perm(
-            'write_nodegroup', node.nodegroup)]
+
+        nodegroups = []
+        editable_nodegroups = []
+        for node in nodes:
+            if node.is_collector:
+                added = False
+                if request.user.has_perm('write_nodegroup', node.nodegroup):
+                    editable_nodegroups.append(node.nodegroup)
+                    nodegroups.append(node.nodegroup)
+                    added = True
+                if not added and request.user.has_perm('read_nodegroup', node.nodegroup):
+                    nodegroups.append(node.nodegroup)
+
         nodes = nodes.filter(nodegroup__in=nodegroups)
         cards = graph.cardmodel_set.order_by('sortorder').filter(
             nodegroup__in=nodegroups).prefetch_related('cardxnodexwidget_set')
@@ -147,6 +158,13 @@ class NewResourceEditorView(MapBaseManagerView):
         map_sources = models.MapSource.objects.all()
         geocoding_providers = models.Geocoder.objects.all()
         templates = models.ReportTemplate.objects.all()
+
+        cards = JSONSerializer().serializeToPython(cards)
+        editable_nodegroup_ids = [str(nodegroup.pk) for nodegroup in editable_nodegroups]
+        for card in cards:
+            card['is_writable'] = False
+            if str(card['nodegroup_id']) in editable_nodegroup_ids:
+                card['is_writable'] = True
 
         context = self.get_context_data(
             main_script=main_script,
