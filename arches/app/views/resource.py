@@ -97,7 +97,7 @@ class NewResourceEditorView(MapBaseManagerView):
             pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
         ontologyclass = [node for node in nodes if node.istopnode is True][0].ontologyclass
         relationship_type_values = get_resource_relationship_types()
-        
+
         nodegroups = []
         editable_nodegroups = []
         for node in nodes:
