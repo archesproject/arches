@@ -125,9 +125,9 @@
 <!-- ko if: state === 'permissions-tree' -->
 <li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards().length > 0 || card.widgets().length > 0) && card.expanded()), 'jstree-closed' : ((card.cards().length > 0 || card.widgets().length > 0) && !card.expanded()), 'jstree-leaf': card.cards().length === 0 && card.widgets().length === 0}">
     <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
-    <a class="jstree-anchor permissions-card" href="#" tabindex="-1" data-bind="css:{'jstree-clicked': card.selected, 'child-selected': card.isChildSelected()}, click: function () { card.selectChildCards() },">
+    <a class="jstree-anchor permissions-card" href="#" tabindex="-1" data-bind="css:{'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'filtered': card.highlight()}, click: function () { card.selectChildCards() },">
         <i class="fa fa-file-o" role="presentation"></i>
-        <span style="padding-right: 5px;" data-bind="text: card.model.name, css:{'filtered': card.highlight()}">
+        <span style="padding-right: 5px;" data-bind="text: card.model.name">
         </span>
         <span class="node-permissions">
             <!--ko if: card.perms -->

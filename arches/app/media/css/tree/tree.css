@@ -39,6 +39,9 @@ a.tree-display-tool:hover {
     background: #3acaa1;
 }
 
+.filtered i {
+    color: #fff;
+}
 
 .filtered-leaf {
     font-weight: 600;
