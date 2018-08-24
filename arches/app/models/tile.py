@@ -133,7 +133,7 @@ class Tile(models.TileModel):
         Creates or updates the json stored in a tile's provisionaledits db_column
 
         """
-        if self.tile_collects_data() == True:
+        if self.tile_collects_data() is True and data != {}:
 
             provisionaledit =  {
                 "value": data,
@@ -143,7 +143,8 @@ class Tile(models.TileModel):
                 "timestamp": unicode(timezone.now()),
                 "reviewtimestamp": None
             }
-            if existing_model and existing_model.provisionaledits is not None:
+
+            if existing_model is not None and existing_model.provisionaledits is not None:
                 provisionaledits = existing_model.provisionaledits
                 provisionaledits[str(user.id)] = provisionaledit
             else:
