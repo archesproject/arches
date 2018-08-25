@@ -120,7 +120,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class='resource-report editor-report' data-bind='component: {
                     name: reportLookup[report.get("template_id")()].componentname,
                     params: {
-                        report: report
+                        report: report,
+                        editorContext: true
                     }
                 }'></div>
                 <!--/ko -->

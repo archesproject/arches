@@ -19,6 +19,7 @@ define(['arches',
             var self = this;
             this.cards = options.cards || [];
             this.preview = options.preview;
+            this.userisreviewer = options.userisreviewer;
 
             this.set('graphid', ko.observable());
             this.set('config', {});
