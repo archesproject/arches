@@ -1646,8 +1646,8 @@ a.select2-search-choice-close {
 }
 
 .node .node-filtered {
-    fill: #f0f0f0;
-    stroke: #bbb;
+/*    fill: #f0f0f0;
+    stroke: #bbb;*/
 }
 
 .graph-node-text {
@@ -2686,11 +2686,8 @@ div.dropdown-menu.open {
     height: 36px;
 }
 
-.search-choice-close:before {
-    font-size: 14px;
-     color: grey;
-     content: "\f00d";
-     font-family: FontAwesome;
+.chosen-container-multi .chosen-choices li.search-choice .search-choice-close {
+    background-image: none !important;
 }
 
 .list-group-item.active:hover, .list-group-item.active:active, .list-group-item.active:focus {
@@ -6573,6 +6570,10 @@ li.search-field {
 
 .library-wide, .card-search-widget {
     width: 400px;
+}
+
+#graph {
+    background: #fdfdfd;
 }
 
 .library-medium, #graph-grid .library-card {

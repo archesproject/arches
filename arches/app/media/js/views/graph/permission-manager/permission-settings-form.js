@@ -89,10 +89,23 @@ define([
         save: function() {
             var self = this;
             var postData = {
-                'selectedIdentities': this.selectedIdentities(),
-                'selectedCards': this.selectedCards(),
+                'selectedIdentities': this.selectedIdentities().map(function(identity) {
+                    return {
+                        type: identity.type,
+                        id: identity.id
+                    };
+                }),
+                'selectedCards': this.selectedCards().map(function(card) {
+                    return {
+                        nodegroupid: card.nodegroupid
+                    };
+                }),
                 'selectedPermissions': _.filter(this.nodegroupPermissions(), function(perm) {
                     return perm.selected();
+                }).map(function(perm) {
+                    return {
+                        codename: perm.codename
+                    };
                 })
             };
 

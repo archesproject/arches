@@ -460,13 +460,22 @@ define([
             });
 
             var helpContentLookup = {
-                permissions: 'permissions-manager-help',
-                graph: 'graph-designer-help',
-                card: 'card-manager-help'
+                permissions: {
+                    'title': 'Using the Permissions Manager',
+                    'template': 'permissions-manager-help',
+                },
+                graph: {
+                    'title':'Using the Graph Designer',
+                    'template': 'graph-designer-help',
+                },
+                card: {
+                    'title':'Using the Card Designer',
+                    'template': 'card-manager-help',
+                }
             };
 
             viewModel.activeTab.subscribe(function(tab) {
-                viewModel.helpTemplate(helpContentLookup[tab]);
+                viewModel.helpTemplate(helpContentLookup[tab]['template']);
                 viewModel.getHelp();
             });
 
@@ -484,12 +493,10 @@ define([
                 viewModel.graphTree.expandParentNode(node);
             });
 
-            viewModel.viewState.subscribe(function(state) {
-                if (state === 'preview') {
-                    viewModel.graphView.resize();
-                }
-            });
-
+            viewModel.showPreview = function() {
+                viewModel.viewState('preview');
+                viewModel.graphView.resize();
+            };
 
             /**
             * update the sizing of elements on window resize

@@ -91,24 +91,38 @@ class SearchView(MapBaseManagerView):
             resource_graphs=resource_graphs,
             datatypes=datatypes,
             datatypes_json=JSONSerializer().serialize(datatypes),
-            user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
+            user_is_reviewer=request.user.groups.filter(name='Resource Reviewer').exists()
         )
 
-        graphs = JSONSerializer().serialize(context['resource_graphs'], exclude=['functions','author','deploymentdate', 'deploymentfile','version', 'subtitle','description','disable_instance_creation','ontology_id'])
+        graphs = JSONSerializer().serialize(
+            context['resource_graphs'],
+            exclude=['functions',
+                     'author',
+                     'deploymentdate',
+                     'deploymentfile',
+                     'version',
+                     'subtitle',
+                     'description',
+                     'disable_instance_creation',
+                     'ontology_id'])
         context['graphs'] = graphs
         context['graph_models'] = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         context['nav']['title'] = _('Search')
         context['nav']['icon'] = 'fa-search'
         context['nav']['search'] = False
-        context['nav']['help'] = (_('Searching the Arches Database'),'help/base-help.htm')
-        context['help'] = 'search-help'
+        context['nav']['help'] = {
+            'title': _('Searching the Database'),
+            'template': 'search-help',
+        }
 
         return render(request, 'views/search.htm', context)
+
 
 def home_page(request):
     return render(request, 'views/search.htm', {
         'main_script': 'views/search',
     })
+
 
 def search_terms(request):
     lang = request.GET.get('lang', settings.LANGUAGE_CODE)

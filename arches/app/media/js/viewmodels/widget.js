@@ -1,4 +1,9 @@
-define(['knockout', 'underscore', 'uuid'], function (ko, _, uuid) {
+define([
+    'knockout',
+    'underscore',
+    'uuid',
+    'utils/dispose'
+], function(ko, _, uuid, dispose) {
     /**
     * A viewmodel used for generic widgets
     *
@@ -26,7 +31,7 @@ define(['knockout', 'underscore', 'uuid'], function (ko, _, uuid) {
             }
         });
         this.value = params.value || ko.observable(null);
-        // this.formData = params.formData || new FormData();
+        this.formData = params.formData || null;
         this.form = params.form || null;
         this.tile = params.tile || null;
         this.results = params.results || null;
@@ -102,14 +107,11 @@ define(['knockout', 'underscore', 'uuid'], function (ko, _, uuid) {
         if (typeof this.onInit === 'function') {
             this.onInit();
         }
-    };
 
-    WidgetViewModel.prototype.dispose = function() {
-        _.each(this.disposables, function(disposable){
-            if (disposable) {
-                disposable.dispose();
-            }
-        }, this);
+        this.dispose = function(){
+            //console.log('disposing ' + self.constructor.name);
+            dispose(self);
+        };
     };
 
     return WidgetViewModel;

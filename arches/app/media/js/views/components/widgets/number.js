@@ -10,7 +10,7 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
     */
 
 
-    var viewModel = function(params) {
+    var NumberWidget = function(params) {
         params.configKeys = ['placeholder', 'width', 'min', 'max', 'step', 'precision', 'prefix', 'suffix', 'defaultValue'];
 
         WidgetViewModel.apply(this, [params]);
@@ -38,16 +38,8 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
         self.disposables.push(updateVal);
     };
 
-    viewModel.prototype.dispose = function() {
-        _.each(this.disposables, function(disposable){
-            if (disposable) {
-                disposable.dispose();
-            }
-        }, this);
-    };
-
     return ko.components.register('number-widget', {
-        viewModel: viewModel,
+        viewModel: NumberWidget,
         template: { require: 'text!widget-templates/number' }
     });
 });

@@ -313,21 +313,36 @@ Assigned to: Jeff
 
 * * *
 
+## Graph Design
+
 Assigned to: Alexei
 
-## Graph/Resource Designer
+### Arches Designer
 
 | Test Subject     | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Export graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Import graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Export graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Clone graph      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Delete graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Create branch    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Create resource  |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Create graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Delete Instances |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+
+### Graph Designer
+
+| Test Subject     | Chrome | Safari | Firefox | IE11 | UI  | Notes |
+| ---------------- | :----: | :----: | :-----: | :--: | --- | ----- |
+| Import graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Export graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Clone graph      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Delete graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Create branch    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Create graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Delete Instances |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Add/Edit cards   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Add/Edit menus   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Add/Edit reports |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| delete graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| clone graph      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 

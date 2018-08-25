@@ -173,7 +173,7 @@ require([
 
             this.viewModel.graphId.subscribe(function(graphid) {
                 if(graphid && graphid !== ""){
-                    self.viewModel.navigate(arches.urls.graph_settings(graphid));
+                    self.viewModel.navigate(arches.urls.graph_designer(graphid));
                 }
             });
 
