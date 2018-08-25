@@ -48,6 +48,7 @@ define([
         );
     };
 
+
     var CardViewModel = function(params) {
         var TileViewModel = require('viewmodels/tile');
         var self = this;
@@ -125,6 +126,30 @@ define([
             permsLiteral: permsLiteral,
             scrollTo: ko.pureComputed(function() {
                 return scrollTo() === this;
+            }, this),
+            fullyProvisional: ko.pureComputed(function(){
+                var res;
+                var provisionalindex;
+                var summary = _.map(this.tiles(), function(tile){
+                    var dataEmpty = _.keys(koMapping.toJS(tile.data)).length === 0;
+                    if (tile.provisionaledits() !== null && dataEmpty) {
+                        return 2;
+                    } else if (tile.provisionaledits() !== null && !dataEmpty) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                });
+                provisionalindex = _.reduce(summary, function(a, b){return a + b;});
+                if (provisionalindex > 0) {
+                    if (provisionalindex % 2 === 0) {
+                        res = 'fullyprovisional';
+                    }
+                    else if (provisionalindex % 2 === 1) {
+                        res = 'provisional';
+                    }
+                }
+                return res;
             }, this),
             highlight: ko.computed(function() {
                 var filterText = filter();

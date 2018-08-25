@@ -5,6 +5,7 @@ define(['knockout', 'underscore', 'moment', 'bindings/let'], function (ko, _, mo
         this.reportDate = moment().format('MMMM D, YYYY');
         this.configForm = params.configForm || false;
         this.configType = params.configType || 'header';
+        this.editorContext = params.editorContext || false;
 
         this.config = params.report.configJSON || ko.observable({});
         this.configObservables = params.configObservables || {};
@@ -13,7 +14,13 @@ define(['knockout', 'underscore', 'moment', 'bindings/let'], function (ko, _, mo
             this.config = ko.observable(this.config);
         }
 
-        var subscribeConfigObservable = function (obs, key) {
+        this.hasProvisionalData = ko.pureComputed(function() {
+            return _.some(params.report.get('tiles'), function(tile){
+                return tile.provisionaledits !== null;
+            });
+        }, this);
+
+        var subscribeConfigObservable = function(obs, key) {
             self[key] = obs;
 
             self[key].subscribe(function(val) {

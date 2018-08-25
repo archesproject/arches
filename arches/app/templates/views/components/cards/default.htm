@@ -351,17 +351,16 @@
 <!-- /ko -->
 
 <!-- ko if: state === 'report' -->
-<div class="rp-card-section" data-bind="css: card.model.cssclass">
+<div class="rp-card-section" data-bind="css: card.model.cssclass, visible: card.fullyProvisional() !== 'fullyprovisional'">
     <span class="rp-tile-title" data-bind="text: card.model.get('name')"></span>
     <!-- ko foreach: { data: self.preview ? [card.newTile] : card.tiles, as: 'tile' } -->
         <div class="rp-card-section">
-            <!--ko if: tile.isfullyprovisional() === false -->
             <!-- ko if: card.model.get('widgets')().length > 0 -->
-            <!-- ko if: tile.provisionaledits() !== null && tile.userisreviewer === false -->
-                <div>{% trans 'These data are provisional' %}</div>
-            <!--/ko-->
                 <div class="rp-report-tile" data-bind="attr: { id: tile.tileid }">
-                    <dl class="dl-horizontal">
+                    <!-- ko if: tile.provisionaledits() !== null && tile.userisreviewer === false -->
+                    <div class="report-card-provisional-flag">{% trans 'These data are provisional and pending review' %}</div>
+                    <!--/ko-->
+                    <dl class="dl-horizontal" data-bind="css: {'provisional': tile.provisionaledits() !== null && tile.userisreviewer === false}">
                         <!-- ko foreach: { data: card.model.get('widgets'), as: 'widget' } -->
                             <!-- ko component: {
                                 name: widget.widgetLookup[widget.get("widget_id")()].name,
@@ -390,7 +389,6 @@
                         } --> <!-- /ko -->
                 <!-- /ko -->
             </div>
-            <!-- /ko -->
         </div>
     <!-- /ko -->
 
