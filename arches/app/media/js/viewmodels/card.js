@@ -145,10 +145,10 @@ define([
                 });
                 provisionalindex = _.reduce(summary, function(a, b){return a + b;});
                 if (provisionalindex > 0) {
-                    if (provisionalindex % 2 === 0) {
+                    if (_.every(summary, function(val){return val === 2;})) {
                         res = 'fullyprovisional';
                     }
-                    else if (provisionalindex % 2 === 1) {
+                    else {
                         res = 'provisional';
                     }
                 }

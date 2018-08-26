@@ -3116,6 +3116,10 @@ ul .collapse li:last-of-type {
     background-color: #f5f5f5;
 }
 
+.resource-report .fullyprovisional {
+    display: none;
+}
+
 .dl-horizontal.provisional {
     border-style: solid;
     margin-right: 25px;
