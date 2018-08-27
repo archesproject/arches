@@ -432,22 +432,6 @@ define([
                 }
             };
 
-            viewModel.activeTab.subscribe(function(value) {
-                switch (value) {
-                case 'card':
-                    updateCardSelection();
-                    break;
-                case 'graph':
-                    updateGraphSelection();
-                    break;
-                case 'permissions':
-                    updatePermissionCardSelection();
-                    break;
-                default:
-                    return;
-                }
-            });
-
             if (viewModel.activeTab() === 'graph') {
                 viewModel.loadGraphSettings();
                 // here we might load data/views asyncronously
@@ -479,6 +463,19 @@ define([
             viewModel.activeTab.subscribe(function(tab) {
                 viewModel.helpTemplate(helpContentLookup[tab]['template']);
                 viewModel.getHelp();
+                switch (tab) {
+                case 'card':
+                    updateCardSelection();
+                    break;
+                case 'graph':
+                    updateGraphSelection();
+                    break;
+                case 'permissions':
+                    updatePermissionCardSelection();
+                    break;
+                default:
+                    return;
+                }
             });
 
             viewModel.graphView = new GraphView({
