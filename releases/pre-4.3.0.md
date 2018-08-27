@@ -4,7 +4,19 @@ The Arches team has been busy improving Arches and fixing several bugs as well.
 Below you'll find a listing of all the changes that are included in the latest release.
 
 Some of the highlights:
--
+- Branch depth is no longer restricted
+- Adds ability to append a branch to any node in a resource model
+- Individual nodes can be added to Resource Models
+- The Resource Editor has also been redesigned to support the new graph capabilities
+- Branches can be exported from Resource Models
+- Cards have adapted as knockout components, allowing developers to create their own custom cards
+- The Graph Manager has been redesigned to support the lifting of the graph depth constraint
+- The Card Manager, Permission Manager, and Report Manager pages have been integrated into the new graph designer
+- Lifting the graph depth constraint allows cards to serve the role of 'Menus'. Menus are therefore deprecated
+- Package settings now allow packages to have tailored settings
+- The main navigation panel now expands revealing more navigation details
+- Provisional users can now view the status of their edits
+- API endpoints have been added for concepts, resource instances with JSON-LD context support
 
 
 #### Upgrading Arches
@@ -39,6 +51,79 @@ As always the documentation can be found at http://arches.readthedocs.io
 
 #### Changes
 
+    - add new management command that finds a uuid in your db and tells you about it
+    - Fix issue with importing dates from shapefile with new date_import_export_format setting,re # 3230
+    - Loads a package settings file #3377
+    - Exports package settings when updating or creating a package re # 3377
+    - applies permissions in new editor, re: #3210
+    - supports new instances in new editor, re: #3210
+    - fix issue with setting the user to anonymous and oauth authentication,re # 3311
+    - adds support for expanded nav, re: #3222 ...via click on main icon
+    - better defaults for fit buffer and max zoom
+    - Applies hover and click filters to overlay features. re # 3375
+    - Shows provisional flag in search to reviewers only. re # 3473
+    - Add ability to append a branch to any node in a resource model. re # 3397
+    - Prevents provisional users from seeing the provisional edits of other users. re # 3385
+    - add oauth tests,re # 3311
+    - push headers prefixed with X_ARCHES_ to the request.GET dict,re # 3309
+    - add unit test for api, re # 3309
+    - Remove references to protected graphs,re # 3443
+    - validate that a proper json-ld context is used,re # 3313
+    - allow users to supply a URI that points to JSON-LD context object, or the actual context object itself,re # 3313
+    - working version of a paging api to get a list of resource instance ids, #3313
+    - enable permissions on all output formats so that the api can filter tiles based on the request.user,re # 3313
+    - Add API endpoint for single concept retrieval RE: #3399
+    - Adjust get inputs to allow for passing of Headers RE: #3399
+    - Adjust variables to match similar classes in the api RE: #3399
+    - Add Method Decorator for API retreival of concepts RE: #3399
+    - integrate permissions into PUT endpoint, re #3313
+    - Update Docker entrypoint.sh to utilize the set PGUSERNAME [ci skip]
+    - Adds alert when saving graph settings fails. re #3199
+    - Make 'Create a New Account' link open in a new tab, re #2739
+    - Fixes issue with provisional edits getting overwritten by other users. re #3385
+    - Changes provisionaledits in postgres from json string to true json. re #3385
+    - improve map source deletion and error handling
+    - Graph Manager: Add Graph Switcher RE: #3553
+    - Style improvements of provisional edit list.re #3385
+    - Allow filter box and expand/collapse button to remain in header while scrolling graph tree, re #3436
+    - Migrates editor tree to card components, re: #3205
+    - Add dictionary equality to json export test, fix error with null concept-list values in json import, re #3455
+    - Implement verbose errors for Graph Validation issues #3554
+    - Summarizes a provisional user's edit history, re #3385
+    - Moves provisional edit panel into card component. re #3385
+    - Moves color input above icon selector and pins color picker to the bottom of the color input when scrolling. re #3199
+    - Add progress bar to deleting all the instances of a resource model #3574
+    - Allow progress bar in deleting all instances of a Resource model #3574
+    - Add CLI option to remove all instances related to a Resource model #3574
+    - Remove restrictions on appending graphs to non-resource nodes,re #3397
+    - Set Splash to only show when no Related Resources are set #3605
+    - Allows users to enter a search url into the resource-instance search widget. re #3607
+    - Makes the provisional edit history filterable and sortable by date. Adds the instance display name to each edit and adds the reviewer status if a reviewer approves an edit by directly saving the card.re #3385
+    - Allow deletion of an invalid graph,re #3725
+    - Add Delete ability for Resource API Endpoint #3709
+    - Records provisional edit data when a reviewer deletes a fully provisional tile.re #3385
+    - Removes edit link in provisional edit history if the resource has been deleted (prevents error when user navigates to the edit page of a deleted resource)re #3385
+    - Records reviewer when saving a deletion to the edit log.re #3385
+    - Gracefully notifies a user if they try to edit or delete a tile that has already been deleted that it does not exist in the system.re #3385
+    - Adds card components to reports, re: #3757
+    - Removes deprecated graph manager, updates test to work with the designer view.re #3601
+    - Removes Form/Menu views and models on front end, server and import commands.re #3601
+    - Removes "forms" mode from management command. re #3601
+    - Removes references to forms in report and graph modelsre #3601
+    - Add UUID_REGEX setting to settings.py, re #3706
+    - Add error handling into JSONldReader, re #3706
+    - Make sure we serialize and deserialize tile data properly for JSONld support, re #3706
+    - Adds new report manager interface, re: #3724
+
+- Several dependencies were updated including (but not limited to):
+    - upgrades TileStache and mapboxgl
+    - Bump django from 1.11.10 to 1.11.14 in /arches/install
+    - Bump sparqlwrapper from 1.8.0 to 1.8.2 in /arches/install
+    - Updates django-revproxy to 0.9.15
+    - Bump underscore from 1.8.3 to 1.9.1
+    - Updates django-revproxy to 0.9.15
+    - Bump underscore from 1.8.3 to 1.9.1
+    - Remove pycrypto #3704
 
 # Testing Script
 
