@@ -160,7 +160,7 @@ Assigned to: Cyrus (0.1)
 
 | Test Subject                                                                              | Chrome | Safari | Firefox | IE11 |  UI | Notes |
 | ----------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | :-: | ----- |
-| Test that users can't access the Mobile Survey Manager page                               |:white_check_mark:|    ?   |    ?    |   ?  |  ?  |  -    |
+| Test that users can't access the Mobile Survey Manager page                               |   ?    |    ?   |    ?    |   ?  |  ?  |  -    |
 
 * * *
 
@@ -172,11 +172,11 @@ Ensure that all browsers are compatible with Authentication process.
 
 | Test Subject                                                             | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| User can sign themselves up for a new Arches account                     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
-| User is added to default group (Crowdsource Editor)                      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
-| User can log in with their email address                                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
-| User can reset their password                                            |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
-| User can edit their profile (First and Last name, email address, etc...) |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| User can sign themselves up for a new Arches account                     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| User is added to default group (Crowdsource Editor)                      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| User can log in with their email address                                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| User can reset their password                                            |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| User can edit their profile (First and Last name, email address, etc...) |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -188,8 +188,8 @@ Assigned to: Cyrus (0.25)
 
 | Test Subject                                                                                                                 | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Project Name - Updating name updates and the page tab                                                                        |:construction:|    ?   |    ?    |   ?  | ?   | #3897|
-| Web Analytics - String value inserts in base.htm at the location of this template variable:{{GOOGLE_ANALYTICS_TRACKING_ID}}  |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Project Name - Updating name updates and the page tab                                                                        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Web Analytics - String value inserts in base.htm at the location of this template variable:{{GOOGLE_ANALYTICS_TRACKING_ID}}  |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 #### Map Settings
 
@@ -197,13 +197,13 @@ Assigned to: Cyrus (1.0)
 
 | Test Subject                                                                                                                                                                                    | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| API Key - Key saves and API calls are successful                                                                                                                                                |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
-| Hex Grid Precision - Saves properly, but errors if precision is too high (\`Exception detail: TransportError(400, u'parsing_exception', u'[geohash_grid] failed to parse field [precision]')``) |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
-| Hex Cell Size - Changes reflected in Search results                                                                                                                                             |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
-| Default Zoom  Changes reflected in Card Config Manager                                                                                                                                          |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
-| Min Zoom  Changes reflected in Card Config Manager                                                                                                                                              |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
-| Max Zoom  Changes reflected in Card Config Manager                                                                                                                                              |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
-| Project Extent - Changes reflected in Card Config Manager                                                                                                                                       |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| API Key - Key saves and API calls are successful                                                                                                                                                |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Hex Grid Precision - Saves properly, but errors if precision is too high (\`Exception detail: TransportError(400, u'parsing_exception', u'[geohash_grid] failed to parse field [precision]')``) |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Hex Cell Size - Changes reflected in Search results                                                                                                                                             |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Default Zoom  Changes reflected in Card Config Manager                                                                                                                                          |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Min Zoom  Changes reflected in Card Config Manager                                                                                                                                              |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Max Zoom  Changes reflected in Card Config Manager                                                                                                                                              |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Project Extent - Changes reflected in Card Config Manager                                                                                                                                       |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 #### Search Settings
 
@@ -213,15 +213,15 @@ Basic Search Settings
 
 | Test Subject                                                   | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Searches per page updates properly in Search                   |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
-| Number of search suggestions is reflected in search term input |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Searches per page updates properly in Search                   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Number of search suggestions is reflected in search term input |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 Saved Searches
 
 | Test Subject                                                                                                       | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| A new search saves with a name, search url, description, and image and displays properly in the saved search page. |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
-| Users can delete a saved search                                                                                    |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| A new search saves with a name, search url, description, and image and displays properly in the saved search page. |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Users can delete a saved search                                                                                    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -233,10 +233,10 @@ Test in the Card Configuration Manager.
 
 | Test Subject                                                                                                                                            | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Point line and poly geoms can be created, edited, and deleted                                                                                           |:construction:|    ?   |    ?    |   ?  | ?   | #3898 |
-| XY widget is working properly                                                                                                                           |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
-| Valid geojson entered in the geojson input adds features to the map and pans to those features. If geojson is invalid user has a chance to update data. |:white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Widget configs (maxzoom, tilt, etc) update when the map changes and the map changes when the properties change                                          |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Point line and poly geoms can be created, edited, and deleted                                                                                           |    ?   |    ?   |    ?    |   ?  | ?   | #3898 |
+| XY widget is working properly                                                                                                                           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Valid geojson entered in the geojson input adds features to the map and pans to those features. If geojson is invalid user has a chance to update data. |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Widget configs (maxzoom, tilt, etc) update when the map changes and the map changes when the properties change                                          |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -250,13 +250,13 @@ Assigned to: Rob
 
 | Test Subject                                                                                                                         | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| Settings - changes to the name and icon of a layer are reflected in the map widget overlay list and overlay library                  |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Deactivating/Activating a resource layer hides/shows the layer in the map widget overlay list and overlay library                    |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Style Settings - changes to the layer style are displayed in the layer                                                               |   :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Style Settings Advanced - changes to the layer style are displayed in the layer                                                      |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Activating caching adds a cache folder for a resource in your projects tileserver directory                                          |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Activating clean cache on edit updates the cache when a geometry is edited                                                           |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Setting permissions for a user or group as No Access removes the user and group from the permissions list under the permissions tab. |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Settings - changes to the name and icon of a layer are reflected in the map widget overlay list and overlay library                  |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Deactivating/Activating a resource layer hides/shows the layer in the map widget overlay list and overlay library                    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Style Settings - changes to the layer style are displayed in the layer                                                               |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Style Settings Advanced - changes to the layer style are displayed in the layer                                                      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Activating caching adds a cache folder for a resource in your projects tileserver directory                                          |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Activating clean cache on edit updates the cache when a geometry is edited                                                           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Setting permissions for a user or group as No Access removes the user and group from the permissions list under the permissions tab. |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 #### Clustering (Resource Layers)
 
@@ -264,10 +264,10 @@ Assigned to: Rob
 
 | Test Subject                                                                               | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| Increasing cluster distance causes features to cluster at increased distances between them |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Increasing cluster max zoom causes clusters to be formed at higher zoom levels             |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Decreasing min points to 2 points causes clusters to form with only 2 points               |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Increasing vector simplification to 0.0 prevents simplification a low zoom levels          |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Increasing cluster distance causes features to cluster at increased distances between them |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Increasing cluster max zoom causes clusters to be formed at higher zoom levels             |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Decreasing min points to 2 points causes clusters to form with only 2 points               |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Increasing vector simplification to 0.0 prevents simplification a low zoom levels          |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 #### Basemaps
 
@@ -275,9 +275,9 @@ Assigned to: Rob
 
 | Test Subject                                                                                    | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ----------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Changing the default search basemap in the basemap settings is reflected on the search page     |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Settings - changes to the name and icon of a layer are reflected in the map widget basemap list |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| User can delete a basemap and it no longer appears in the map widget's list of basemaps         |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Changing the default search basemap in the basemap settings is reflected on the search page     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Settings - changes to the name and icon of a layer are reflected in the map widget basemap list |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| User can delete a basemap and it no longer appears in the map widget's list of basemaps         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 #### Overlays
 
@@ -285,9 +285,9 @@ Assigned to: Rob
 
 | Test Subject                                                                                                        | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Settings - changes to the name and icon of a layer are reflected in the map widget overlay list and overlay library |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| User can delete an overlay and it no longer appears in the map widget overlay library                               |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Overlays support custom popups                                                                                      |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Settings - changes to the name and icon of a layer are reflected in the map widget overlay list and overlay library |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| User can delete an overlay and it no longer appears in the map widget overlay library                               |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Overlays support custom popups                                                                                      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 * * *
 
 ## Import/Export
@@ -296,11 +296,11 @@ Assigned to: Ryan (0.5)
 
 | Test Subject               | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Create_mapping_file        |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Import business data (cli) |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Export business data (cli) |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Load package (cli)         |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Create package (cli)       |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Create_mapping_file        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Import business data (cli) |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Export business data (cli) |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Load package (cli)         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Create package (cli)       |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -315,15 +315,15 @@ Note (GeoJson is covered by map widget testing in a different section)
 
 | Test Subject           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| String                 |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Concepts               |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Domains                |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Images                 |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Dates                  |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Number                 |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Boolean                |    :x:   |    ?   |    ?    |   ?  | ?   | #3816     |
-| Resource instance type |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Node data type         |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| String                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Concepts               |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Domains                |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Images                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Dates                  |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Number                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Boolean                |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Resource instance type |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Node data type         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 #### Resource Descriptors
 
@@ -333,10 +333,10 @@ Updating a resource descriptor should be reflected in the following subjects.
 
 | Test Subject                                                                                        | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | --------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Search results                                                                                      |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Form headings                                                                                       |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Search results                                                                                      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Form headings                                                                                       |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Report headings                                                                                     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Map popups                                                                                          |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Map popups                                                                                          |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Related resource d3 graph and listings                                                              |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
@@ -347,9 +347,9 @@ Assigned to: Cyrus (0.5)
 
 | Test Subject                                                                                        | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | --------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Provisional users see indication in a widget that their tile edits were submitted                   | :white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
-| Resource reviewers are able to identify provisional tiles and can approve/discard provisional edits | :white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
-| Provisional edit history properly shows the status of a tile: pending, approved, or declined        | :white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Provisional users see indication in a widget that their tile edits were submitted                   |     ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Resource reviewers are able to identify provisional tiles and can approve/discard provisional edits |     ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Provisional edit history properly shows the status of a tile: pending, approved, or declined        |     ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -386,15 +386,15 @@ Assigned to: Jeff (.5)
 
 | Test Subject                                                                                                                                                                         | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| Free text search                                                                                                                                                                     |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Concept search                                                                                                                                                                       |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Map search                                                                                                                                                                           |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Time range based search                                                                                                                                                              |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Time wheel search                                                                                                                                                                    |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Advanced search                                                                                                                                                                      |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Related resource table search                                                                                                                                                        |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Related resource graph list filter graph                                                                                                                                             |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Resource type search                                                                                                                                                                 |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Free text search                                                                                                                                                                     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Concept search                                                                                                                                                                       |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Map search                                                                                                                                                                           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Time range based search                                                                                                                                                              |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Time wheel search                                                                                                                                                                    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Advanced search                                                                                                                                                                      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Related resource table search                                                                                                                                                        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Related resource graph list filter graph                                                                                                                                             |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Resource type search                                                                                                                                                                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Edit status search (provisional, authoritative, or both). Confirm that only resource reviewers are able to see provisional tile data                                                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Map should not zoom to points that a user is not permitted to read, nor should the search aggregation layer (e.g. hexbin or heatmap) indicate that a restricted resource is present. |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
@@ -406,15 +406,15 @@ Assigned to: Alexei (1.5)
 
 | Test Subject     | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Export graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
-| Import graph     |:construction:|    ?   |    ?    |   ?  | ?   | #3866     |
-| Create branch    |:x:|    ?   |    ?    |   ?  | ?   | #3887    |
-| Create resource  |:x:|    ?   |    ?    |   ?  | ?   | #3887    |
-| Add/Edit cards   |:x:|    ?   |    ?    |   ?  | ?   | #3892    |
-| Add/Edit reports |:construction:|    ?   |    ?    |   ?  | ?   | #3893     |
-| Edit functions   | :x:|    ?   |    ?    |   ?  | ?   | #3888     |
-| delete graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
-| clone graph      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Export graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Import graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Create branch    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Create resource  |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Add/Edit cards   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Add/Edit reports |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Edit functions   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| delete graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| clone graph      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -424,15 +424,15 @@ Assigned to: Ryan (1)
 
 | Test Subject                                                                                                                                            | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Confirm removing `read` permissions removes that section from the report                                                                                |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Confirm removing `read` permissions removes that section from the form                                                                                  |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Confirm removing `read` permissions removes that section from the adv. search                                                                           |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Confirm removing `read` permissions for a spatial nodegroup removes that resource type from map based search results                                    |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Confirm removing `read` permissions for a spatial nodegroup removes that resource type from the overlays section of the map settings                    |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Confirm removing `read` permissions for a spatial nodegroup removes the map from the Map Report                                                         |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Confirm removing `read` permissions removes that section from the report                                                                                |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Confirm removing `read` permissions removes that section from the form                                                                                  |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Confirm removing `read` permissions removes that section from the adv. search                                                                           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Confirm removing `read` permissions for a spatial nodegroup removes that resource type from map based search results                                    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Confirm removing `read` permissions for a spatial nodegroup removes that resource type from the overlays section of the map settings                    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Confirm removing `read` permissions for a spatial nodegroup removes the map from the Map Report                                                         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Confirm removing `read` permissions for a date based nodegroup removes the related entries from the type dropdown in the time filter of the search page |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Confirm removing `read` permissions for a date based nodegroup reduces the wheel count appropriately                                                    |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Confirm removing `write` permissions but still having read permissions disallows saving that section of the form                                        |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Confirm removing `read` permissions for a date based nodegroup reduces the wheel count appropriately                                                    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Confirm removing `write` permissions but still having read permissions disallows saving that section of the form                                        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -444,9 +444,9 @@ Assigned to: Adam
 
 | Test Subject                                                            | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ----------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Confirm that report templates with map header gets rendered correctly   |   :white_check_mark:  |    ?   |    ?    |   ?  | ?   | -     |
-| Confirm that report templates with image header gets rendered correctly |    :x:   |    ?   |    ?    |   ?  | ?   | #3896     |
-| Confirm that report templates with no header gets rendered correctly    |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Confirm that report templates with map header gets rendered correctly   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Confirm that report templates with image header gets rendered correctly |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Confirm that report templates with no header gets rendered correctly    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 #### Data Rendering
 
@@ -472,26 +472,26 @@ Assigned to: Ryan (1)
 
 | Test Subject       | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| Add scheme         |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Delete scheme      |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Import scheme      |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Export scheme      |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Add top concept    |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Import from SPARQL |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Manage parents     |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Make collection    |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Add label          |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Add Note           |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Add image          |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Add scheme         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Delete scheme      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Import scheme      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Export scheme      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Add top concept    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Import from SPARQL |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Manage parents     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Make collection    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Add label          |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Add Note           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Add image          |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 #### Collections
 
 | Test Subject                           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Add collection                         |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Delete collection                      |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Export all collections                 |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Add dropdown entry                     |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Add sort order and confirm in dropdown |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Add collection                         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Delete collection                      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Export all collections                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Add dropdown entry                     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Add sort order and confirm in dropdown |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
