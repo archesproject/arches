@@ -3109,7 +3109,7 @@ ul .collapse li:last-of-type {
 
 .report-provisional-flag {
     padding: 15px;
-    margin-top: 10px;
+    margin-top: 0px;
     padding-left: 25px;
     border-bottom-style: solid;
     border-bottom-color: #DF2E6A;
@@ -4308,7 +4308,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
 .node-current-over, .node-ancestor-over {
     /* The currently moused-over node */
     stroke: #115fa5;
-    stroke-width: 2px;
+    stroke-width: 5px;
     fill: #dcecfa;
     opacity: 1.0;
     cursor: pointer;
@@ -5596,6 +5596,33 @@ ul.jqtree_common li.jqtree-folder {
     padding-left: 3px;
 }
 
+.ep-help-table {
+    width: 100%;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+.ep-help-table tr th {
+    border-bottom: solid grey 1px;
+}
+.ep-help-table tr {
+    border-bottom: dashed grey 1px;
+}
+.ep-help-table tr td {
+    vertical-align: top;
+    color: grey;
+    padding: 5px 3px 5px 3px;
+}
+.ep-help-table tr td:first-of-type {
+    color: red;
+}
+.ep-help-table-header {
+    font-weight: 700;
+}
+
+.ep-help-topic-toggle > h4 {
+    display: inline-block;
+}
+
 .reloadable-img {
     border: 2px solid #eee;
 }
@@ -6474,7 +6501,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .node-permissions {
-    float: right;
     padding-right: 10px;
     margin-top: 2px;
 }
@@ -7764,6 +7790,7 @@ a .csv-chart-menubar-item {
 div.row.widget-wrapper.report-header {
     margin-right: 5px;
     padding: 0px;
+    padding-bottom: 10px;
     width: 100%;
 }
 
@@ -11687,10 +11714,6 @@ a.jstree-anchor.permissions-widget {
     color: #ccc;
     cursor: default;
     pointer-events: none;
-}
-
-a.jstree-anchor.permissions-card {
-    overflow-x: auto;
 }
 
 .jstree-default .card-designer-tree li {

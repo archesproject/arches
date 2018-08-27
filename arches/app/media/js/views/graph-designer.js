@@ -473,16 +473,16 @@ define([
 
             var helpContentLookup = {
                 permissions: {
-                    'title': 'Using the Permissions Manager',
-                    'template': 'permissions-manager-help',
+                    'title': 'xxxx', // dynamic title loading not implemented
+                    'template': 'permissions-tab-help',
                 },
                 graph: {
-                    'title':'Using the Graph Designer',
-                    'template': 'graph-designer-help',
+                    'title': 'xxxx', // dynamic title loading not implemented
+                    'template': 'graph-tab-help',
                 },
                 card: {
-                    'title':'Using the Card Designer',
-                    'template': 'card-manager-help',
+                    'title': 'xxxx', // dynamic title loading not implemented
+                    'template': 'cards-tab-help',
                 }
             };
 

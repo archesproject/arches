@@ -84,6 +84,14 @@ define([
                         self.viewModel.helploading(false);
                         $('.ep-help-topic-toggle').click(function() {
                             var sectionEl = $(this).closest('div');
+                            var iconEl = $(this).find('i');
+                            if (iconEl.hasClass("fa-chevron-right")) {
+                                iconEl.removeClass("fa-chevron-right");
+                                iconEl.addClass("fa-chevron-down");
+                            } else {
+                                iconEl.removeClass("fa-chevron-down");
+                                iconEl.addClass("fa-chevron-right");
+                            }
                             var contentEl = $(sectionEl).find('.ep-help-topic-content').first();
                             contentEl.slideToggle();
                         });
