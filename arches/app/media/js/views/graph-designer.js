@@ -398,29 +398,25 @@ define([
             };
 
             var updateGraphSelection = function() {
-                if (viewModel.activeTab() === 'card') {
-                    viewModel.graphTree.collapseAll();
-                    var matchingNode = correspondingNode(viewModel.cardTree.selection(), viewModel.graphTree);
-                    if (matchingNode) {
-                        viewModel.graphTree.selectItem(matchingNode);
-                    }
+                viewModel.graphTree.collapseAll();
+                var matchingNode = correspondingNode(viewModel.cardTree.selection(), viewModel.graphTree);
+                if (matchingNode) {
+                    viewModel.graphTree.selectItem(matchingNode);
                 }
             };
 
             var updateCardSelection = function() {
-                if (viewModel.activeTab() === 'graph') {
-                    var graphTreeSelection = viewModel.graphTree.selectedItems().length > 0 ? viewModel.graphTree.selectedItems()[0] : null;
-                    var matchingCard;
-                    if (graphTreeSelection) {
-                        if (graphTreeSelection.istopnode === true) {
-                            viewModel.cardTree.selection(viewModel.cardTree.topCards()[0]);
-                        } else {
-                            matchingCard = correspondingCard(graphTreeSelection, viewModel.cardTree);
-                            if (matchingCard) {
-                                viewModel.cardTree.selection(matchingCard);
-                                viewModel.cardTree.collapseAll();
-                                viewModel.cardTree.expandToRoot(viewModel.cardTree.selection());
-                            }
+                var graphTreeSelection = viewModel.graphTree.selectedItems().length > 0 ? viewModel.graphTree.selectedItems()[0] : null;
+                var matchingCard;
+                if (graphTreeSelection) {
+                    if (graphTreeSelection.istopnode === true) {
+                        viewModel.cardTree.selection(viewModel.cardTree.topCards()[0]);
+                    } else {
+                        matchingCard = correspondingCard(graphTreeSelection, viewModel.cardTree);
+                        if (matchingCard) {
+                            viewModel.cardTree.selection(matchingCard);
+                            viewModel.cardTree.collapseAll();
+                            viewModel.cardTree.expandToRoot(viewModel.cardTree.selection());
                         }
                     }
                 }
@@ -435,6 +431,22 @@ define([
                     matchingCard.selectChildCards();
                 }
             };
+
+            viewModel.activeTab.subscribe(function(value) {
+                switch (value) {
+                case 'card':
+                    updateCardSelection();
+                    break;
+                case 'graph':
+                    updateGraphSelection();
+                    break;
+                case 'permissions':
+                    updatePermissionCardSelection();
+                    break;
+                default:
+                    return;
+                }
+            });
 
             viewModel.cardTree.selection.subscribe(function(){
                 updateGraphSelection();
