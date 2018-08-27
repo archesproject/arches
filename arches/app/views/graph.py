@@ -148,10 +148,12 @@ class GraphManagerView(GraphBaseView):
             context['graphs'] = JSONSerializer().serialize(context['graph_models'], exclude=['functions'])
             context['nav']['title'] = 'Arches Designer'
             context['nav']['icon'] = 'fa-bookmark'
-            context['nav']['help'] = {
-                'title': _('Using the Graph Designer'),
-                'template': 'graph-designer-help',
-            }
+            
+            ## commenting out b/c this view doesn't seem to be in use
+            # context['nav']['help'] = {
+                # 'title': _('Using the Graph Designer'),
+                # 'template': 'graph-designer-help',
+            # }
             return render(request, 'views/graph.htm', context)
 
 
@@ -212,16 +214,19 @@ class GraphDesignerView(GraphBaseView):
         context['graph_models'] = models.GraphModel.objects.all().exclude(
             graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         context['graphs'] = JSONSerializer().serialize(context['graph_models'], exclude=['functions'])
-
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
+        
+        help_title = _('Designing a Resource Model')
+        if not self.graph.isresource:
+            help_title = _('Designing a Branch')
+            
         context['nav']['help'] = {
-            'title': _('Using the Graph Designer'),
-            'template': 'graph-designer-help',
+            'title': help_title,
+            'template': 'graph-tab-help',
         }
 
         return render(request, 'views/graph-designer.htm', context)
-
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
 class GraphDataView(View):
