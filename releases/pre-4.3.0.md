@@ -315,15 +315,15 @@ Note (GeoJson is covered by map widget testing in a different section)
 
 | Test Subject           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| String                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Concepts               |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Domains                |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Images                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Dates                  |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Number                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Boolean                |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Resource instance type |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Node data type         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| String                 |   :white_check_mark:  |    ?   |    ?    |   ?  | ?   | -     |
+| Concepts               |   :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Domains                |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Images                 |    :white_check_mark:  |    ?   |    ?    |   ?  | ?   | -     |
+| Dates                  |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Number                 |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Boolean                |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Resource instance type |    :white_check_mark:  |    ?   |    ?    |   ?  | ?   | -     |
+| Node data type         |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 
 #### Resource Descriptors
 
@@ -410,7 +410,7 @@ Assigned to: Alexei (1.5)
 | Import graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Create branch    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Create resource  |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add/Edit cards   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Add/Edit cards   |    ?   |    ?   |    ?    |   ?  | ?   | #4034 |
 | Add/Edit reports |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Edit functions   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Delete graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
