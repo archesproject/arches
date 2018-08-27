@@ -149,11 +149,10 @@ class GraphManagerView(GraphBaseView):
             context['nav']['title'] = 'Arches Designer'
             context['nav']['icon'] = 'fa-bookmark'
             
-            ## commenting out b/c this view doesn't seem to be in use
-            # context['nav']['help'] = {
-                # 'title': _('Using the Graph Designer'),
-                # 'template': 'graph-designer-help',
-            # }
+            context['nav']['help'] = {
+                'title': _('Using the Arches Designer'),
+                'template': 'arches-designer-help',
+            }
             return render(request, 'views/graph.htm', context)
 
 
@@ -216,11 +215,11 @@ class GraphDesignerView(GraphBaseView):
         context['graphs'] = JSONSerializer().serialize(context['graph_models'], exclude=['functions'])
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        
+
         help_title = _('Designing a Resource Model')
         if not self.graph.isresource:
             help_title = _('Designing a Branch')
-            
+
         context['nav']['help'] = {
             'title': help_title,
             'template': 'graph-tab-help',
