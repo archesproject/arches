@@ -15,10 +15,10 @@ define(['knockout', 'underscore', 'moment', 'bindings/let'], function(ko, _, mom
         }
 
         this.hasProvisionalData = ko.pureComputed(function() {
-            return _.some(params.report.get('tiles'), function(tile){
-                return tile.provisionaledits !== null;
+            return _.some(self.tiles(), function(tile){
+                return ko.unwrap(tile.provisionaledits) !== null;
             });
-        }, this);
+        });
 
         var subscribeConfigObservable = function(obs, key) {
             self[key] = obs;
