@@ -5559,6 +5559,33 @@ ul.jqtree_common li.jqtree-folder {
     padding-left: 3px;
 }
 
+.ep-help-table {
+    width: 100%;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+.ep-help-table tr th {
+    border-bottom: solid grey 1px;
+}
+.ep-help-table tr {
+    border-bottom: dashed grey 1px;
+}
+.ep-help-table tr td {
+    vertical-align: top;
+    color: grey;
+    padding: 5px 3px 5px 3px;
+}
+.ep-help-table tr td:first-of-type {
+    color: red;
+}
+.ep-help-table-header {
+    font-weight: 700;
+}
+
+.ep-help-topic-toggle > h4 {
+    display: inline-block;
+}
+
 .reloadable-img {
     border: 2px solid #eee;
 }
