@@ -3109,7 +3109,7 @@ ul .collapse li:last-of-type {
 
 .report-provisional-flag {
     padding: 15px;
-    margin-top: 10px;
+    margin-top: 0px;
     padding-left: 25px;
     border-bottom-style: solid;
     border-bottom-color: #DF2E6A;
@@ -4308,7 +4308,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
 .node-current-over, .node-ancestor-over {
     /* The currently moused-over node */
     stroke: #115fa5;
-    stroke-width: 2px;
+    stroke-width: 5px;
     fill: #dcecfa;
     opacity: 1.0;
     cursor: pointer;
@@ -7764,6 +7764,7 @@ a .csv-chart-menubar-item {
 div.row.widget-wrapper.report-header {
     margin-right: 5px;
     padding: 0px;
+    padding-bottom: 10px;
     width: 100%;
 }
 
