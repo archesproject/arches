@@ -1,6 +1,6 @@
 /* jsTree default theme */
 .jstree>.header {
-    height: 70px;
+    height: 75px;
     padding-left: 13px;
     padding-right: 13px;
     background-color: #f4f4f4;
@@ -17,12 +17,31 @@
     background: #fbfbfb;
 }
 
+.tree-display-tools-panel {
+    min-width: 400px;
+}
+
+a.tree-display-tool {
+    margin-left: 0px;
+    padding: 3px 6px;
+    color: #888;
+}
+
+a.tree-display-tool:hover {
+    cursor: pointer;
+    background: #ddd;
+    color: #454545;
+}
+
 .filtered {
     font-weight: 600;
     color: #fff;
     background: #3acaa1;
 }
 
+.filtered i {
+    color: #fff;
+}
 
 .filtered-leaf {
     font-weight: 600;

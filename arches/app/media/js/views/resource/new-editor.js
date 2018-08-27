@@ -26,7 +26,7 @@ define([
     var tiles = data.tiles;
     var filter = ko.observable('');
     var loading = ko.observable(false);
-    var selection = ko.observable();
+    var selection = ko.observable('root');
     var scrollTo = ko.observable();
     var displayname = ko.observable(data.displayname);
     var resourceId = ko.observable(data.resourceid);
@@ -234,17 +234,17 @@ define([
                 vm.navigate(arches.urls.get_resource_edit_log(resourceId()));
             }
         },
-        viewReport: function() {
+        viewReport: function(print) {
             if (resourceId()) {
+                var url = arches.urls.resource_report + resourceId();
+                if (print) {
+                    url = url + '?print';
+                }
                 vm.menuActive(false);
-                window.open(arches.urls.resource_report + resourceId(), "_blank");
+                window.open(url, "_blank");
             }
         }
     };
-    var topCard = vm.topCards[0];
-    if (topCard) {
-        selection(topCard.tiles().length > 0 ? topCard.tiles()[0] : topCard);
-    }
 
     vm.report = null;
     vm.report = new ReportModel(_.extend(data, {graphModel: graphModel, cards: vm.topCards}));

@@ -1,10 +1,11 @@
-define(['knockout', 'underscore', 'moment', 'bindings/let'], function (ko, _, moment) {
+define(['knockout', 'underscore', 'moment', 'bindings/let'], function(ko, _, moment) {
     var ReportViewModel = function(params) {
         var self = this;
-        this.report = params.report || ko.observable(null);
+        this.report = params.report || null;
         this.reportDate = moment().format('MMMM D, YYYY');
         this.configForm = params.configForm || false;
         this.configType = params.configType || 'header';
+        this.editorContext = params.editorContext || false;
 
         this.config = params.report.configJSON || ko.observable({});
         this.configObservables = params.configObservables || {};
@@ -13,7 +14,13 @@ define(['knockout', 'underscore', 'moment', 'bindings/let'], function (ko, _, mo
             this.config = ko.observable(this.config);
         }
 
-        var subscribeConfigObservable = function (obs, key) {
+        this.hasProvisionalData = ko.pureComputed(function() {
+            return _.some(self.tiles(), function(tile){
+                return ko.unwrap(tile.provisionaledits) !== null;
+            });
+        });
+
+        var subscribeConfigObservable = function(obs, key) {
             self[key] = obs;
 
             self[key].subscribe(function(val) {
@@ -37,6 +44,26 @@ define(['knockout', 'underscore', 'moment', 'bindings/let'], function (ko, _, mo
                 obs = ko.observable(self.config()[key]);
             }
             subscribeConfigObservable(obs, key);
+        });
+
+        var getCardTiles = function(card, tiles) {
+            var cardTiles = ko.unwrap(card.tiles);
+            cardTiles.forEach(function(tile) {
+                tiles.push(tile);
+                tile.cards.forEach(function(card) {
+                    getCardTiles(card, tiles);
+                });
+            });
+        };
+
+        this.tiles = ko.computed(function() {
+            var tiles = [];
+            if (self.report) {
+                ko.unwrap(self.report.cards).forEach(function(card) {
+                    getCardTiles(card, tiles);
+                });
+            }
+            return tiles;
         });
     };
     return ReportViewModel;

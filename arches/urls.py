@@ -83,6 +83,7 @@ urlpatterns = [
     url(r'^graph/(?P<graphid>%s)/move_node$' % uuid_regex, GraphDataView.as_view(action='move_node'), name='move_node'),
     url(r'^graph/(?P<graphid>%s)/update_node$' % uuid_regex, GraphDataView.as_view(action='update_node'), name='update_node'),
     url(r'^graph/(?P<graphid>%s)/delete_node$' % uuid_regex, GraphDataView.as_view(action='delete_node'), name='delete_node'),
+    url(r'^graph/(?P<graphid>%s)/delete_instances$' % uuid_regex, GraphDataView.as_view(action='delete_instances'), name='delete_instances'),
     url(r'^graph/(?P<graphid>%s)/clone$' % uuid_regex, GraphDataView.as_view(action='clone_graph'), name='clone_graph'),
     url(r'^graph/(?P<graphid>%s)/export$' % uuid_regex, GraphDataView.as_view(action='export_graph'), name='export_graph'),
     url(r'^graph/(?P<graphid>%s)/delete$' % uuid_regex, GraphDataView.as_view(action='delete_graph'), name='delete_graph'),

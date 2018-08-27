@@ -2,6 +2,7 @@
 <!-- ko foreach: { data: [$data], as: 'self' } -->
 
 <!-- ko if: state === 'editor-tree' -->
+<!-- ko if: card.isWritable -->
 <li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.tiles().length > 0 && card.expanded()), 'jstree-closed' : (card.tiles().length > 0 && !card.expanded()), 'jstree-leaf': card.tiles().length === 0}, scrollTo: card.scrollTo, container: '.resource-editor-tree'">
     <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
     <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected()}, click: function () { card.canAdd() ? card.selected(true) : card.tiles()[0].selected(true) },">
@@ -65,6 +66,7 @@
     </ul>
 </li>
 <!-- /ko -->
+<!-- /ko -->
 
 <!-- ko if: state === 'designer-tree' -->
 <li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards().length > 0 || card.widgets().length > 0) && card.expanded()), 'jstree-closed' : ((card.cards().length > 0 || card.widgets().length > 0) && !card.expanded()), 'jstree-leaf': card.cards().length === 0 && card.widgets().length === 0}, scrollTo: card.scrollTo, container: '.designer-card-tree'">
@@ -125,9 +127,9 @@
 <!-- ko if: state === 'permissions-tree' -->
 <li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards().length > 0 || card.widgets().length > 0) && card.expanded()), 'jstree-closed' : ((card.cards().length > 0 || card.widgets().length > 0) && !card.expanded()), 'jstree-leaf': card.cards().length === 0 && card.widgets().length === 0}">
     <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
-    <a class="jstree-anchor permissions-card" href="#" tabindex="-1" data-bind="css:{'jstree-clicked': card.selected, 'child-selected': card.isChildSelected()}, click: function () { card.selected(true) },">
+    <a class="jstree-anchor permissions-card" href="#" tabindex="-1" data-bind="css:{'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'filtered': card.highlight()}, click: function () { card.selectChildCards() },">
         <i class="fa fa-file-o" role="presentation"></i>
-        <span style="padding-right: 5px;" data-bind="text: card.model.name, css:{'filtered': card.highlight()}">
+        <span style="padding-right: 5px;" data-bind="text: card.model.name">
         </span>
         <span class="node-permissions">
             <!--ko if: card.perms -->
@@ -180,7 +182,7 @@
 
 
 <!-- ko if: state === 'form' -->
-<div class="card-component">
+<div class="card-component" data-bind="css: card.model.cssclass">
 
     <!--ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
     <div class="edit-message-container">
@@ -233,6 +235,11 @@
         <div class="card">
 
             <h4 data-bind="text: card.model.name"></h4>
+            <!-- ko if: card.model.helpenabled -->
+            <span>
+                <a class="pull-right card-help help editable-help" data-bind="click: function () {card.model.get('helpactive')(true) }" style="cursor:pointer;"> {% trans "Help" %} <i class="fa fa-question-circle"></i></a>
+            </span>
+            <!-- /ko -->
             <h5 data-bind="text: card.model.instructions"></h5>
 
             <!-- ko if: card.widgets().length > 0 -->
@@ -324,19 +331,38 @@
                 <!-- /ko -->
             </div>
 
+            <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: card.model.get('helpactive')">
+                <div class="relative">
+                    <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" style="" data-bind="click: function () { card.model.get('helpactive')(false) }"></a>
+                </div>
+                <div id="add-basemap-wizard-help-content">
+                    <div>
+                        <div class="panel-heading">
+                            <h3 class="panel-title help-panel-title" style="">
+                                <span data-bind="html: card.model.get('helptitle')"></span>
+                            </h3>
+                        </div>
+                        <div class="panel-body" style="padding: 10px 10px 15px 10px;" data-bind="html: card.model.get('helptext')">
+                        </div>
+                    </div>
+                </div>
+            </aside>
         </div>
     </div>
 </div>
 <!-- /ko -->
 
 <!-- ko if: state === 'report' -->
-<div class="rp-card-section">
+<div class="rp-card-section" data-bind="css: card.model.cssclass, visible: card.fullyProvisional() !== 'fullyprovisional'">
     <span class="rp-tile-title" data-bind="text: card.model.get('name')"></span>
-    <!-- ko foreach: { data: card.tiles, as: 'tile' } -->
-        <div class="rp-card-section">
+    <!-- ko foreach: { data: self.preview ? [card.newTile] : card.tiles, as: 'tile' } -->
+        <div class="rp-card-section" data-bind="css: {'provisional': tile.provisionaledits() !== null && tile.userisreviewer === false, 'fullyprovisional': tile.isfullyprovisional()}">
             <!-- ko if: card.model.get('widgets')().length > 0 -->
                 <div class="rp-report-tile" data-bind="attr: { id: tile.tileid }">
-                    <dl class="dl-horizontal">
+                    <!-- ko if: tile.provisionaledits() !== null && tile.userisreviewer === false -->
+                    <div class="report-card-provisional-flag">{% trans 'These data are provisional and pending review' %}</div>
+                    <!--/ko-->
+                    <dl class="dl-horizontal" data-bind="css: {'provisional': tile.provisionaledits() !== null && tile.userisreviewer === false}">
                         <!-- ko foreach: { data: card.model.get('widgets'), as: 'widget' } -->
                             <!-- ko component: {
                                 name: widget.widgetLookup[widget.get("widget_id")()].name,
@@ -351,14 +377,15 @@
                         <!-- /ko -->
                     </dl>
                 </div>
-            <!-- /ko -->
+                <!-- /ko -->
 
             <div class="rp-report-container-tile" data-bind="visible: card.cards().length > 0">
-                <!-- ko foreach: { data: tile.cards, as: 'card' } -->
+                <!-- ko foreach: { data: self.preview ? card.cards : tile.cards, as: 'card' } -->
                         <!-- ko component: {
                             name: card.model.cardComponentLookup[card.model.component_id()].componentname,
                             params: {
                                 state: 'report',
+                                preview: self.preview,
                                 card: card
                             }
                         } --> <!-- /ko -->
@@ -367,17 +394,20 @@
         </div>
     <!-- /ko -->
 
-    <!-- ko if: card.tiles().length === 0 -->
+    <!-- ko if: card.tiles().length === 0 && !self.preview -->
     <div class="row rp-report-tile rp-no-data">
         <!-- ko ifnot: card.model.get('cardid') -->
         {% trans "Sorry, you don't have access to this information" %}
         <!-- /ko -->
         <!-- ko if: card.model.get('cardid') -->
-        {% trans "No data added yet for" %} "<span data-bind="text: card.model.get('name')"></span>"
+        <span>{% trans "No data added yet for " %}</span><span data-bind="text: card.model.get('name')"></span>"
         <!-- /ko -->
     </div>
     <!-- /ko -->
 </div>
+<!-- /ko -->
+
+<!-- ko if: state === 'config' -->
 <!-- /ko -->
 
 <!-- /ko -->

@@ -2,8 +2,9 @@ define(['arches',
     'models/abstract',
     'knockout',
     'knockout-mapping',
-    'underscore'
-], function(arches, AbstractModel, ko, koMapping, _) {
+    'underscore',
+    'report-templates'
+], function(arches, AbstractModel, ko, koMapping, _, reportLookup) {
     var ReportModel = AbstractModel.extend({
         /**
          * A backbone model to manage report data
@@ -17,9 +18,10 @@ define(['arches',
         initialize: function(options) {
             var self = this;
             this.cards = options.cards || [];
+            this.preview = options.preview;
+            this.userisreviewer = options.userisreviewer;
 
             this.set('graphid', ko.observable());
-            this.set('template_id', ko.observable());
             this.set('config', {});
             self.configKeys = ko.observableArray();
 
@@ -49,6 +51,7 @@ define(['arches',
                 owner: this
             });
 
+            this.graph = options.graph;
             this.parse(options.graph);
         },
 
@@ -68,7 +71,26 @@ define(['arches',
                     this.get('graphid')(value);
                     break;
                 case 'template_id':
-                    this.get(key)(value);
+                    var templateId = ko.observable(value);
+                    this.set(key, ko.computed({
+                        read: function() {
+                            return templateId();
+                        },
+                        write: function(value) {
+                            var key;
+                            var defaultConfig = JSON.parse(reportLookup[value].defaultconfig);
+                            for (key in defaultConfig) {
+                                defaultConfig[key] = ko.observable(defaultConfig[key]);
+                            }
+                            var currentConfig = this.get('config');
+                            this.set('config', _.defaults(currentConfig, defaultConfig));
+                            for (key in defaultConfig) {
+                                self.configKeys.push(key);
+                            }
+                            templateId(value);
+                        },
+                        owner: this
+                    }));
                     break;
                 case 'config':
                     var config = {};
@@ -122,7 +144,7 @@ define(['arches',
         toJSON: function() {
             var ret = {};
             var self = this;
-            for (var key in this.attributes) {
+            for (var key in ['template_id', 'config']) {
                 if (ko.isObservable(this.attributes[key])) {
                     ret[key] = this.attributes[key]();
                 } else if (key === 'config') {

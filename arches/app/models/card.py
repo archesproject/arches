@@ -71,6 +71,7 @@ class Card(models.CardModel):
         # self.active
         # self.visible
         # self.sortorder
+        # self.cssclass
         # end from models.CardModel
         self.disabled = False
         self.cardinality = ''
@@ -81,7 +82,7 @@ class Card(models.CardModel):
         if args:
             if isinstance(args[0], dict):
                 for key, value in args[0].iteritems():
-                    if key not in ('cards', 'widgets', 'nodes', 'is_editable'):
+                    if key not in ('cards', 'widgets', 'nodes', 'is_editable', 'nodegroup'):
                         setattr(self, key, value)
 
                 if 'cards' in args[0]:
@@ -122,7 +123,7 @@ class Card(models.CardModel):
 
     def save(self):
         """
-        Saves an a card and it's parent ontology property back to the db
+        Saves a card and its parent ontology property back to the db
 
         """
         with transaction.atomic():
@@ -180,7 +181,7 @@ class Card(models.CardModel):
 
     def serialize(self, fields=None, exclude=None):
         """
-        serialize to a different form then used by the internal class structure
+        serialize to a different form than used by the internal class structure
 
         """
 

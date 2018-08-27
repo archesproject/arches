@@ -413,8 +413,8 @@ Assigned to: Alexei (1.5)
 | Add/Edit cards   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Add/Edit reports |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Edit functions   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| delete graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| clone graph      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Delete graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Clone graph      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 

@@ -6,11 +6,11 @@
             <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a card...' %}" data-bind="textInput: filter, event: {keypress: filterEnterKeyHandler}">
 
             <!-- Clear Search -->
-            <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }" style="top: 8px;"><i class="fa fa-times-circle"></i></span>
+            <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
         </div>
-        <div style="">
-            <a data-bind="click: expandAll" style="cursor:pointer;">{% trans 'Expand' %}</a>
-            <a data-bind="click: collapseAll" style="padding-left: 10px; cursor:pointer;">{% trans 'Collapse' %}</a>
+        <div class="tree-display-tools-panel">
+            <a class="tree-display-tool" data-bind="click: expandAll"><i class="ion-plus"></i>{% trans ' Expand' %}</a>
+            <a class="tree-display-tool" data-bind="click: collapseAll"><i class="ion-minus"></i>{% trans ' Collapse' %}</a>
         </div>
     </div>
     <div class="left-panel-overflow designer-card-tree">
@@ -22,6 +22,7 @@
                         <i data-bind="css: (graphiconclass() != (null || '') ? graphiconclass() : 'fa fa-question')" role="presentation"></i>
                         <span data-bind="text: graphname"></span>
                     </strong>
+                     {% trans "(edit report)" %}
                 </a>
                 <!-- ko foreach: { data: [$data], as: 'self' } -->
                 <ul class="jstree-children card-designer-tree" aria-expanded="true" data-bind="sortable: {

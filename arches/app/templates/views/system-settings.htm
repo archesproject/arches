@@ -39,14 +39,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <div class="left-panel graph-designer resource-editor" data-bind="resizableSidepanel:true">
             <div class="jstree jstree-default" data-bind="visible: true" style="display: none;">
                 <div class="header">
-                    <div class="list-filter" data-bind="" style="margin-right: 10px;">
-                        <input type="text" class="form-control" style="width: 250px;" placeholder="{% trans 'Find a card...' %}" data-bind="textInput: filter">
+                    <div class="list-filter" data-bind="">
+                        <input type="text" class="form-control" placeholder="{% trans 'Find a card...' %}" data-bind="textInput: filter">
 
                         <!-- Clear Search -->
                         <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
                     </div>
-                    <a data-bind="click: expandAll">{% trans 'Expand' %}</a>
-                    <a data-bind="click: collapseAll" style="padding-left:5px;">{% trans 'Collapse' %}</a>
+                    <div class="tree-display-tools-panel">
+                        <a class="tree-display-tool" data-bind="click: expandAll"><i class="ion-plus"></i>{% trans ' Expand' %}</a>
+                        <a class="tree-display-tool" data-bind="click: collapseAll"><i class="ion-minus"></i>{% trans ' Collapse' %}</a>
+                    </div>
                 </div>
                 <div class="resource-editor-tree">
                     <ul class="jstree-container-ul jstree-children" aria-expanded="true">

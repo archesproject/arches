@@ -148,8 +148,11 @@ class GraphManagerView(GraphBaseView):
             context['graphs'] = JSONSerializer().serialize(context['graph_models'], exclude=['functions'])
             context['nav']['title'] = 'Arches Designer'
             context['nav']['icon'] = 'fa-bookmark'
-            context['nav']['help'] = (_('About the Arches Designer'), 'help/base-help.htm')
-            context['help'] = 'arches-designer-help'
+            
+            context['nav']['help'] = {
+                'title': _('Using the Arches Designer'),
+                'template': 'arches-designer-help',
+            }
             return render(request, 'views/graph.htm', context)
 
 
@@ -167,6 +170,8 @@ class GraphDesignerView(GraphBaseView):
         cardwidgets = [widget for widgets in [card.cardxnodexwidget_set.order_by(
             'sortorder').all() for card in cards] for widget in widgets]
         widgets = models.Widget.objects.all()
+        nodegroups = cards.values_list('nodegroup_id', flat=True)
+        restricted_nodegroups = models.TileModel.objects.filter(nodegroup__in=nodegroups).values_list('nodegroup_id', flat=True).distinct()
         card_components = models.CardComponent.objects.all()
         map_layers = models.MapLayer.objects.all()
         map_markers = models.MapMarker.objects.all()
@@ -198,21 +203,29 @@ class GraphDesignerView(GraphBaseView):
             map_sources=map_sources,
             geocoding_providers=geocoding_providers,
             report_templates=templates,
+            restricted_nodegroups=[str(nodegroup) for nodegroup in restricted_nodegroups],
         )
         context['ontologies'] = JSONSerializer().serialize(ontologies, exclude=['version', 'path'])
         context['ontology_classes'] = JSONSerializer().serialize(ontology_classes)
-        context['nav']['title'] = self.graph.name
-        context['nav']['help'] = (_('Using the Graph Designer'), 'help/graph-designer-help.htm')
-        context['help'] = 'graph-designer-help'
-        #context['nav']['menu'] = True
         context['graph'] = JSONSerializer().serialize(self.graph, exclude=['functions', 'cards', 'deploymentfile',
                                                                            'deploymentdate', '_nodegroups_to_delete',
                                                                            '_functions'])
         context['graph_models'] = models.GraphModel.objects.all().exclude(
             graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         context['graphs'] = JSONSerializer().serialize(context['graph_models'], exclude=['functions'])
-        return render(request, 'views/graph-designer.htm', context)
+        context['nav']['title'] = self.graph.name
+        context['nav']['menu'] = True
 
+        help_title = _('Designing a Resource Model')
+        if not self.graph.isresource:
+            help_title = _('Designing a Branch')
+
+        context['nav']['help'] = {
+            'title': help_title,
+            'template': 'graph-tab-help',
+        }
+
+        return render(request, 'views/graph-designer.htm', context)
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
 class GraphDataView(View):
@@ -362,6 +375,16 @@ class GraphDataView(View):
                 return JSONResponse({})
             except GraphValidationError as e:
                 return JSONResponse({'status': 'false', 'message': e.message, 'title': e.title}, status=500)
+        elif self.action == 'delete_instances':
+            try:
+                graph = Graph.objects.get(graphid=graphid)
+                graph.delete_instances()
+                return JSONResponse({
+                    'success': True,
+                    'message': "All the resources associated with the Model '{0}' have been successfully deleted.".format(graph.name),
+                    'title': "Resources Successfully Deleted."})
+            except GraphValidationError as e:
+                return JSONResponse({'status': 'false', 'message': e.message, 'title': e.title}, status=500)
         elif self.action == 'delete_graph':
             try:
                 graph = Graph.objects.get(graphid=graphid)
@@ -437,8 +460,10 @@ class CardView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = (_('Configuring Cards and Widgets'), 'help/base-help.htm')
-        context['help'] = 'card-designer-help'
+        context['nav']['help'] = {
+            'title': _('Configuring Cards and Widgets'),
+            'template': 'card-designer-help',
+        }
 
         return render(request, 'views/graph/card-configuration-manager.htm', context)
 
@@ -484,14 +509,19 @@ class FunctionManagerView(GraphBaseView):
                 function_templates=models.Function.objects.exclude(component__isnull=True),
             )
 
+            context['graphs'] = JSONSerializer().serialize(
+                models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID),
+                exclude=['functions'])
             context['nav']['title'] = self.graph.name
             context['nav']['menu'] = True
-            context['nav']['help'] = (_('Managing Functions'), 'help/base-help.htm')
-            context['help'] = 'function-help'
+            context['nav']['help'] = {
+                'title': _('Managing Functions'),
+                'template': 'function-help',
+            }
 
             return render(request, 'views/graph/function-manager.htm', context)
         else:
-            return redirect('graph_settings', graphid=graphid)
+            return redirect('graph_designer', graphid=graphid)
 
     def post(self, request, graphid):
         data = JSONDeserializer().deserialize(request.body)
