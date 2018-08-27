@@ -448,16 +448,6 @@ define([
                 }
             });
 
-            viewModel.cardTree.selection.subscribe(function(){
-                updateGraphSelection();
-                updatePermissionCardSelection();
-            });
-
-            viewModel.graphTree.selectedItems.subscribe(function(){
-                updateCardSelection();
-                updatePermissionCardSelection();
-            });
-
             if (viewModel.activeTab() === 'graph') {
                 viewModel.loadGraphSettings();
                 // here we might load data/views asyncronously
