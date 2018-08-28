@@ -233,10 +233,10 @@ Test in the Card Configuration Manager.
 
 | Test Subject                                                                                                                                            | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Point line and poly geoms can be created, edited, and deleted                                                                                           |    ?   |    ?   |    ?    |   ?  | ?   | #3898 |
-| XY widget is working properly                                                                                                                           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Valid geojson entered in the geojson input adds features to the map and pans to those features. If geojson is invalid user has a chance to update data. |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Widget configs (maxzoom, tilt, etc) update when the map changes and the map changes when the properties change                                          |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Point line and poly geoms can be created, edited, and deleted                                                                                           |:white_check_mark:|    ?   |    ?    |   ?  | ?   | #3898 |
+| XY widget is working properly                                                                                                                           |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Valid geojson entered in the geojson input adds features to the map and pans to those features. If geojson is invalid user has a chance to update data. |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Widget configs (maxzoom, tilt, etc) update when the map changes and the map changes when the properties change                                          |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
