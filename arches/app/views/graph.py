@@ -151,7 +151,7 @@ class GraphManagerView(GraphBaseView):
 
             context['nav']['help'] = {
                 'title': _('Using the Arches Designer'),
-                'template': 'arches-designer-help',
+                'template': 'arches-designer-new-help',
             }
             return render(request, 'views/graph.htm', context)
 
