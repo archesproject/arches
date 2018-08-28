@@ -296,10 +296,10 @@ Assigned to: Ryan (0.5)
 
 | Test Subject               | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Create_mapping_file        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Import business data (cli) |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Create_mapping_file        |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Import business data (cli) |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 | Export business data (cli) |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Load package (cli)         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Load package (cli)         |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 | Create package (cli)       |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
