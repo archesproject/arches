@@ -475,26 +475,26 @@ Assigned to: Ryan (1)
 
 | Test Subject       | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| Add scheme         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Delete scheme      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Import scheme      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Export scheme      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add top concept    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Add scheme         |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Delete scheme      |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Import scheme      |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Export scheme      |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Add top concept    |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 | Import from SPARQL |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Manage parents     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Make collection    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add label          |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add Note           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add image          |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Manage parents     |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Make collection    |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Add label          |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Add Note           |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Add image          |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 
 #### Collections
 
 | Test Subject                           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Add collection                         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Delete collection                      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Export all collections                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add dropdown entry                     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add sort order and confirm in dropdown |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Add collection                         |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Delete collection                      |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Export all collections                 |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Add dropdown entry                     |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Add sort order and confirm in dropdown |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
