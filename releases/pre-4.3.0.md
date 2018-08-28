@@ -188,8 +188,8 @@ Assigned to: Cyrus (0.25)
 
 | Test Subject                                                                                                                 | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Project Name - Updating name updates and the page tab                                                                        |    ?   |    ?   |    ?    |   ?  |  ?  | -     |
-| Web Analytics - String value inserts in base.htm at the location of this template variable:{{GOOGLE_ANALYTICS_TRACKING_ID}}  |    ?   |    ?   |    ?    |   ?  |  ?  | -     |
+| Project Name - Updating name updates and the page tab                                                                        |:white_check_mark:|    ?   |    ?    |   ?  |  ?  | -     |
+| Web Analytics - String value inserts in base.htm at the location of this template variable:{{GOOGLE_ANALYTICS_TRACKING_ID}}  |:white_check_mark:|    ?   |    ?    |   ?  |  ?  | -     |
 
 #### Map Settings
 
@@ -315,15 +315,15 @@ Note (GeoJson is covered by map widget testing in a different section)
 
 | Test Subject           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| String                 |   :white_check_mark:  |    ?   |    ?    |   ?  | ?   | -     |
-| Concepts               |   :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Domains                |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Images                 |    :white_check_mark:  |    ?   |    ?    |   ?  | ?   | -     |
-| Dates                  |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Number                 |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Boolean                |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Resource instance type |    :white_check_mark:  |    ?   |    ?    |   ?  | ?   | -     |
-| Node data type         |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| String                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Concepts               |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Domains                |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Images                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Dates                  |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Number                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Boolean                |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Resource instance type |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Node data type         |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 #### Resource Descriptors
 
