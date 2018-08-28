@@ -409,15 +409,15 @@ Assigned to: Alexei (1.5)
 
 | Test Subject     | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Export graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Import graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Create branch    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Create resource  |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add/Edit cards   |    ?   |    ?   |    ?    |   ?  | ?   | #4034 |
-| Add/Edit reports |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Edit functions   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Delete graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Clone graph      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Export graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Import graph     |:construction:|    ?   |    ?    |   ?  | ?   | #4043    |
+| Create branch    |:x:|    ?   |    ?    |   ?  | ?   | #4050     |
+| Create resource  |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Add/Edit cards   |:white_check_mark:|    ?   |    ?    |   ?  | ?   | #4034 |
+| Add/Edit reports |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Edit functions   |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Delete graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Clone graph      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
