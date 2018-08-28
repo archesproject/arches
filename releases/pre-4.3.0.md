@@ -333,11 +333,11 @@ Updating a resource descriptor should be reflected in the following subjects.
 
 | Test Subject                                                                                        | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | --------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Search results                                                                                      |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Form headings                                                                                       |    :white_check_mark:  |    ?   |    ?    |   ?  | ?   | -     |
-| Report headings                                                                                     |    :white_check_mark:  |    ?   |    ?    |   ?  | ?   | -     |
-| Map popups                                                                                          |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Related resource d3 graph and listings                                                              |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Search results                                                                                      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Form headings                                                                                       |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Report headings                                                                                     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Map popups                                                                                          |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Related resource d3 graph and listings                                                              |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -347,9 +347,12 @@ Assigned to: Cyrus (0.5)
 
 | Test Subject                                                                                        | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | --------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Provisional users see indication in a widget that their tile edits were submitted                   |     ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Resource reviewers are able to identify provisional tiles and can approve/discard provisional edits |     ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Provisional edit history properly shows the status of a tile: pending, approved, or declined        |     ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Provisional users see indication in a widget that their tile edits were submitted                   |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Resource reviewers are able to identify provisional tiles and can approve/discard provisional edits |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Provisional edit history properly shows the status of a tile: pending, approved, or declined        |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Reviewer can switch between edits of 2 or more provisional users in a partially provisional tile    |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Provisional edits display in editor report for provisional users.                                   |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| No provisional data appears in reviewer or report page report.                                      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
