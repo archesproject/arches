@@ -315,15 +315,15 @@ Note (GeoJson is covered by map widget testing in a different section)
 
 | Test Subject           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| String                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Concepts               |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Domains                |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Images                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Dates                  |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Number                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Boolean                |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Resource instance type |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Node data type         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| String                 |   :white_check_mark:  |    ?   |    ?    |   ?  | ?   | -     |
+| Concepts               |   :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Domains                |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Images                 |    :white_check_mark:  |    ?   |    ?    |   ?  | ?   | -     |
+| Dates                  |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Number                 |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Boolean                |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Resource instance type |    :white_check_mark:  |    ?   |    ?    |   ?  | ?   | -     |
+| Node data type         |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 
 #### Resource Descriptors
 
@@ -333,11 +333,11 @@ Updating a resource descriptor should be reflected in the following subjects.
 
 | Test Subject                                                                                        | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | --------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Search results                                                                                      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Form headings                                                                                       |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Report headings                                                                                     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Map popups                                                                                          |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Related resource d3 graph and listings                                                              |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Search results                                                                                      |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Form headings                                                                                       |    :white_check_mark:  |    ?   |    ?    |   ?  | ?   | -     |
+| Report headings                                                                                     |    :white_check_mark:  |    ?   |    ?    |   ?  | ?   | -     |
+| Map popups                                                                                          |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Related resource d3 graph and listings                                                              |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -410,7 +410,7 @@ Assigned to: Alexei (1.5)
 | Import graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Create branch    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Create resource  |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add/Edit cards   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Add/Edit cards   |    ?   |    ?   |    ?    |   ?  | ?   | #4034 |
 | Add/Edit reports |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Edit functions   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Delete graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
@@ -444,23 +444,23 @@ Assigned to: Adam
 
 | Test Subject                                                            | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ----------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Confirm that report templates with map header gets rendered correctly   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Confirm that report templates with image header gets rendered correctly |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Confirm that report templates with no header gets rendered correctly    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Confirm that report templates with map header gets rendered correctly   |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Confirm that report templates with image header gets rendered correctly |    :x:   |    ?   |    ?    |   ?  | ?   | #4035     |
+| Confirm that report templates with no header gets rendered correctly    |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 
 #### Data Rendering
 
 | Test Subject           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| String                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Concepts               |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Domains                |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Images                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Dates                  |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Number                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Boolean                |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Resource instance type |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Node data type         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| String                 |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Concepts               |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Domains                |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Images                 |   :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Dates                  |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Number                 |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Boolean                |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Resource instance type |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Node data type         |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
