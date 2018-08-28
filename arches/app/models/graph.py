@@ -252,7 +252,7 @@ class Graph(models.GraphModel):
             card.description = cardobj.get('description', '')
             card.instructions = cardobj.get('instructions', '')
             card.helpenabled = cardobj.get('helpenabled', '')
-            card.helptitle = cardobj.get('helptext', '')
+            card.helptitle = cardobj.get('helptitle', '')
             card.helptext = cardobj.get('helptext', '')
             card.active = cardobj.get('active', '')
             card.visible = cardobj.get('visible', '')
