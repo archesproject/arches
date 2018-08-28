@@ -198,8 +198,8 @@ Assigned to: Cyrus (1.0)
 | Test Subject                                                                                                                                                                                    | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
 | API Key - Key saves and API calls are successful                                                                                                                                                |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
-| Hex Grid Precision - Saves properly, but errors if precision is too high (\`Exception detail: TransportError(400, u'parsing_exception', u'[geohash_grid] failed to parse field [precision]')``) |    ?    |    ?   |    ?    |   ?  | ?   | -     |
-| Hex Cell Size - Changes reflected in Search results                                                                                                                                             |    ?    |    ?   |    ?    |   ?  | ?   | -     |
+| Hex Grid Precision - Saves properly, but errors if precision is too high (\`Exception detail: TransportError(400, u'parsing_exception', u'[geohash_grid] failed to parse field [precision]')``) |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Hex Cell Size - Changes reflected in Search results                                                                                                                                             |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 | Default Zoom  Changes reflected in Card Config Manager                                                                                                                                          |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 | Min Zoom  Changes reflected in Card Config Manager                                                                                                                                              |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 | Max Zoom  Changes reflected in Card Config Manager                                                                                                                                              |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
@@ -213,15 +213,15 @@ Basic Search Settings
 
 | Test Subject                                                   | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Searches per page updates properly in Search                   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Number of search suggestions is reflected in search term input |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Searches per page updates properly in Search                   |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Number of search suggestions is reflected in search term input |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 Saved Searches
 
 | Test Subject                                                                                                       | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| A new search saves with a name, search url, description, and image and displays properly in the saved search page. |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Users can delete a saved search                                                                                    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| A new search saves with a name, search url, description, and image and displays properly in the saved search page. |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Users can delete a saved search                                                                                    |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
