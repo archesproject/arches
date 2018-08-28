@@ -432,7 +432,7 @@ Assigned to: Ryan (1)
 | Confirm removing `read` permissions for a spatial nodegroup removes that resource type from map based search results                                    |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 | Confirm removing `read` permissions for a spatial nodegroup removes that resource type from the overlays section of the map settings                    |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 | Confirm removing `read` permissions for a spatial nodegroup removes the map from the Map Report                                                         |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Confirm removing `read` permissions for a date based nodegroup removes the related entries from the type dropdown in the time filter of the search page |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Confirm removing `read` permissions for a date based nodegroup removes the related entries from the type dropdown in the time filter of the search page |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 | Confirm removing `read` permissions for a date based nodegroup reduces the wheel count appropriately                                                    |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 | Confirm removing `write` permissions but still having read permissions disallows saving that section of the form                                        |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 
