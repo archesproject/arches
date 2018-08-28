@@ -297,10 +297,10 @@ Assigned to: Ryan (0.5)
 | Test Subject               | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
 | Create_mapping_file        |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Import business data (cli) |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Export business data (cli) |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Import business data (cli) |    ?   |    ?   |    ?    |   ?  | ?   | #4044     |
+| Export business data (cli) |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 | Load package (cli)         |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Create package (cli)       |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Create package (cli)       |    ?   |    ?   |    ?    |   ?  | ?   | #4042     |
 
 * * *
 
