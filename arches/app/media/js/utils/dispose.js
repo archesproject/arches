@@ -18,8 +18,9 @@ define(['knockout'], function(ko) {
     var dispose = function(obj) {
         if(!!obj.disposables){
             ko.utils.arrayForEach(obj.disposables, disposeOne);
+        } else {
+            ko.utils.objectForEach(obj, disposeOne);
         }
-        ko.utils.objectForEach(obj, disposeOne);
     };
 
     return dispose;
