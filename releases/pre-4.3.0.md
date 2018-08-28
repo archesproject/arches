@@ -296,11 +296,11 @@ Assigned to: Ryan (0.5)
 
 | Test Subject               | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Create_mapping_file        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Import business data (cli) |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Export business data (cli) |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Load package (cli)         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Create package (cli)       |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Create_mapping_file        |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Import business data (cli) |    ?   |    ?   |    ?    |   ?  | ?   | #4044     |
+| Export business data (cli) |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Load package (cli)         |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Create package (cli)       |    ?   |    ?   |    ?    |   ?  | ?   | #4042     |
 
 * * *
 
@@ -364,21 +364,21 @@ Assigned to: Jeff
 
 | Test Subject                                           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| User can add a related resource                        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can delete a related resource                     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can change the properties of related resources    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can switch between table and force directed graph |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can page through related resources in table       |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| User can add a related resource                        |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| User can delete a related resource                     |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| User can change the properties of related resources    |    :x:   |    ?   |    ?    |   ?  | ?   | [#4040](https://github.com/archesproject/arches/issues/4040)     |
+| User can switch between table and force directed graph |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| User can page through related resources in table       |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 
 #### Resource Search (.5)
 
 | Test Subject                                                                                                                           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Hovering over a link in the force directed graph opens a panel with source and target node info and list each unique relationship type |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Hovering over a node highlights the adjacent links and the corresponding entry in the node list                                        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Hovering over a node list entry highlights the corresponding node and its adjacent links                                               |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can switch between table and force directed graph                                                                                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Entering text in the search field filters the list of list entries                                                                     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Hovering over a link in the force directed graph opens a panel with source and target node info and list each unique relationship type |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Hovering over a node highlights the adjacent links and the corresponding entry in the node list                                        |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Hovering over a node list entry highlights the corresponding node and its adjacent links                                               |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| User can switch between table and force directed graph                                                                                 |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Entering text in the search field filters the list of list entries                                                                     |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 
 
 * * *
@@ -389,15 +389,14 @@ Assigned to: Jeff (.5)
 
 | Test Subject                                                                                                                                                                         | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| Free text search                                                                                                                                                                     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Concept search                                                                                                                                                                       |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Map search                                                                                                                                                                           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Time range based search                                                                                                                                                              |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Time wheel search                                                                                                                                                                    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Advanced search                                                                                                                                                                      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Related resource table search                                                                                                                                                        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Related resource graph list filter graph                                                                                                                                             |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Resource type search                                                                                                                                                                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Free text search                                                                                                                                                                     |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Concept search                                                                                                                                                                       |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Map search                                                                                                                                                                           |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Time range based search                                                                                                                                                              |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Time wheel search                                                                                                                                                                    |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Advanced search                                                                                                                                                                      |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Related resource graph list filter graph                                                                                                                                             |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | the d3 graph seems to not center very well     |
+| Resource type search                                                                                                                                                                 |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 | Edit status search (provisional, authoritative, or both). Confirm that only resource reviewers are able to see provisional tile data                                                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Map should not zoom to points that a user is not permitted to read, nor should the search aggregation layer (e.g. hexbin or heatmap) indicate that a restricted resource is present. |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
@@ -475,26 +474,26 @@ Assigned to: Ryan (1)
 
 | Test Subject       | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| Add scheme         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Delete scheme      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Import scheme      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Export scheme      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add top concept    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Add scheme         |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Delete scheme      |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Import scheme      |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Export scheme      |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Add top concept    |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 | Import from SPARQL |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Manage parents     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Make collection    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add label          |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add Note           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add image          |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Manage parents     |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Make collection    |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Add label          |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Add Note           |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Add image          |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 
 #### Collections
 
 | Test Subject                           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Add collection                         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Delete collection                      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Export all collections                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add dropdown entry                     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add sort order and confirm in dropdown |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Add collection                         |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Delete collection                      |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Export all collections                 |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Add dropdown entry                     |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Add sort order and confirm in dropdown |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
