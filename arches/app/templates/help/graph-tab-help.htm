@@ -77,7 +77,7 @@
                 {% if graph.isresource %}
                 <tr>
                     <td>{% trans "JSON-LD Context" %}</td>
-                    <td>{% blocktrans %}Add a JSON-LD Context for this Resource Model.{% endblocktrans %}</td>
+                    <td>{% blocktrans %}Add a <a href="https://www.w3.org/TR/json-ld/">JSON-LD Context</a> for this Resource Model. This allows you to namespace common URI endpoints that are used within a JSON-LD output of the resource. You can enter a plain URL (<code>"http://www.cidoc-crm.org/cidoc-crm/"</code>), or JSON that defines multiple keys (<code>{"crm":"http://www.cidoc-crm.org/cidoc-crm/","rdf":"http://www.w3.org/1999/02/22-rdf-syntax-ns#"}</code>).{% endblocktrans %}</td>
                 </tr>
                 {% endif %}
             </table>
@@ -86,7 +86,7 @@
                 {% if graph.isresource %}
                 <tr>
                     <td>{% trans "Color" %}</td>
-                    <td>{% blocktrans %}Choose a color for this Resource Model.{% endblocktrans %}</td>
+                    <td>{% blocktrans %}Choose a color for this Resource Model to be used in the related resources force directed graph.{% endblocktrans %}</td>
                 </tr>
                 {% endif %}
                 <tr>
@@ -151,7 +151,7 @@
                 </tr>
                 <tr>
                     <td>{% trans "Expose to Advanced Search" %}</td>
-                    <td><em>{% blocktrans%}If true users will be able to add this node to an Advanced Search query.{% endblocktrans %}</td>
+                    <td>{% blocktrans%}If true users will be able to add this node to an Advanced Search query.{% endblocktrans %}</td>
                 </tr>
                 <tr>
                     <td>{% trans "Required" %}</td>
