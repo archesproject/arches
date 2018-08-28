@@ -397,8 +397,8 @@ Assigned to: Jeff (.5)
 | Advanced search                                                                                                                                                                      |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 | Related resource graph list filter graph                                                                                                                                             |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | the d3 graph seems to not center very well     |
 | Resource type search                                                                                                                                                                 |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
-| Edit status search (provisional, authoritative, or both). Confirm that only resource reviewers are able to see provisional tile data                                                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Map should not zoom to points that a user is not permitted to read, nor should the search aggregation layer (e.g. hexbin or heatmap) indicate that a restricted resource is present. |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Edit status search (provisional, authoritative, or both). Confirm that only resource reviewers are able to see provisional tile data                                                 |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Map should not zoom to points that a user is not permitted to read, nor should the search aggregation layer (e.g. hexbin or heatmap) indicate that a restricted resource is present. |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
