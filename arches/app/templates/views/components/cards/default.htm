@@ -23,7 +23,7 @@
                 <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { self.form.selection($data) }, css:{'jstree-clicked': selected, 'child-selected': isChildSelected(), 'filtered-leaf': card.highlight()}">
                     <i class="fa fa-file" role="presentation" data-bind="css:{'has-provisional-edits': doesChildHaveProvisionalEdits() || $data.hasprovisionaledits()}"></i>
                     <strong style="margin-right: 10px;">
-                        <!-- ko if: card.widgets().length > 0 -->
+                        <!-- ko if: card.widgets().length > 0 && card.widgets()[0].visible -->
                         <span data-bind="text: card.widgets()[0].label || card.model.name"></span>:
                         <div style="display: inline;" data-bind="component: {
                             name: self.form.widgetLookup[card.widgets()[0].widget_id()].name,
@@ -38,7 +38,7 @@
                             }
                         }"></div>
                         <!-- /ko -->
-                        <!-- ko if: card.widgets().length === 0 -->
+                        <!-- ko if: card.widgets().length === 0 || !card.widgets()[0].visible -->
                         <span data-bind="text: card.model.name"></span>
                         <!-- /ko -->
                     </strong>
@@ -247,7 +247,6 @@
                 <div data-bind="foreach: {
                         data:card.widgets, as: 'widget'
                     }">
-                    <!-- ko if: widget.visible -->
                     <div data-bind='component: {
                         name: self.form.widgetLookup[widget.widget_id()].name,
                         params: {
@@ -264,8 +263,7 @@
                         }
                     }, css:{ "active": widget.selected, "hover": widget.hovered, "widget-preview": self.preview
                 }, click: function(data, e) { if (!widget.selected() && self.preview) {widget.selected(true);}
-            }, event: { mouseover: function(){ if (self.preview){widget.hovered(true) } }, mouseout: function(){ if (self.preview){widget.hovered(null)} } }'></div>
-            <!-- /ko -->
+            }, event: { mouseover: function(){ if (self.preview){widget.hovered(true) } }, mouseout: function(){ if (self.preview){widget.hovered(null)} } }, visible: widget.visible'></div>
                 </div>
             </form>
             <!-- /ko -->
