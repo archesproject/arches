@@ -2,7 +2,7 @@
 <!-- ko foreach: { data: [$data], as: 'self' } -->
 
 <!-- ko if: state === 'editor-tree' -->
-<!-- ko if: card.isWritable -->
+<!-- ko if: card.isWritable && card.model.visible() -->
 <li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.tiles().length > 0 && card.expanded()), 'jstree-closed' : (card.tiles().length > 0 && !card.expanded()), 'jstree-leaf': card.tiles().length === 0}, scrollTo: card.scrollTo, container: '.resource-editor-tree'">
     <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
     <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected()}, click: function () { card.canAdd() ? card.selected(true) : card.tiles()[0].selected(true) },">
@@ -354,6 +354,7 @@
 
 <!-- ko if: state === 'report' -->
 <div class="rp-card-section" data-bind="css: card.model.cssclass, visible: card.fullyProvisional() !== 'fullyprovisional'">
+    <!--ko if: card.model.visible()-->
     <span class="rp-tile-title" data-bind="text: card.model.get('name')"></span>
     <!-- ko foreach: { data: self.preview ? [card.newTile] : card.tiles, as: 'tile' } -->
         <div class="rp-card-section" data-bind="css: {'provisional': tile.provisionaledits() !== null && tile.userisreviewer === false, 'fullyprovisional': tile.isfullyprovisional()}">
@@ -404,6 +405,7 @@
         <!-- /ko -->
     </div>
     <!-- /ko -->
+<!-- /ko -->
 </div>
 <!-- /ko -->
 
