@@ -279,7 +279,6 @@ define([
                 ontologies: viewModel.ontologies,
                 ontologyClass: ko.observable(''),
                 iconFilter: ko.observable(''),
-                node: viewModel.selectedNode,
                 rootNodeColor: ko.observable(''),
                 "ontology_namespaces": data.ontology_namespaces,
                 onReset: function() {

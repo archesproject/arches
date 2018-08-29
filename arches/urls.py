@@ -71,7 +71,7 @@ urlpatterns = [
     url(r'^search/export$', search.export_results, name="search_results_export"),
     url(r'^search/time_wheel_config$', search.time_wheel_config, name="time_wheel_config"),
     url(r'^buffer/$', search.buffer, name="buffer"),
-    url(r'^settings/', NewResourceEditorView.as_view(), { 'resourceid': settings.RESOURCE_INSTANCE_ID, 'view_template':'views/system-settings.htm', 'main_script':'views/resource/new-editor', 'nav_menu':False}, name='config'),
+    url(r'^settings/', NewResourceEditorView.as_view(), {'resourceid': settings.RESOURCE_INSTANCE_ID, 'view_template': 'views/resource/new-editor.htm', 'main_script': 'views/resource/new-editor', 'nav_menu': False}, name='config'),
     url(r'^graph/new$', GraphDataView.as_view(action='new_graph'), name='new_graph'),
     url(r'^graph/import/', GraphDataView.as_view(action='import_graph'), name='import_graph'),
     url(r'^graph/reorder_nodes$', GraphDataView.as_view(action='reorder_nodes'), name='reorder_nodes'),

@@ -86,6 +86,7 @@ class CardXNodeXWidget(models.Model):
     widget = models.ForeignKey('Widget', db_column='widgetid')
     config = JSONField(blank=True, null=True, db_column='config')
     label = models.TextField(blank=True, null=True)
+    visible = models.BooleanField(default=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
 
     class Meta:

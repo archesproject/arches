@@ -112,6 +112,7 @@ define([
         nodeLookup: createLookup(graphModel.get('nodes')(), 'nodeid'),
         graphid: data.graphid,
         graphname: data.graphname,
+        issystemsettings: data.issystemsettings,
         reviewer: data.userisreviewer,
         graphiconclass: data.graphiconclass,
         relationship_types: data.relationship_types,

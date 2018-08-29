@@ -20,6 +20,7 @@ define([
                 'widget_id': '',
                 'config': {},
                 'label': '',
+                'visible': true,
                 'sortorder': null,
                 'disabled': false
             };

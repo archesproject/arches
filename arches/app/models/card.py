@@ -98,6 +98,7 @@ class Card(models.CardModel):
                         widget_model.widget_id = widget.get('widget_id', None)
                         widget_model.config = widget.get('config', {})
                         widget_model.label = widget.get('label', '')
+                        widget_model.visible = widget.get('visible', None)
                         widget_model.sortorder = widget.get('sortorder', None)
                         if widget_model.pk is None:
                             widget_model.save()
