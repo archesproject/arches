@@ -43,13 +43,6 @@ python manage.py migrate
 python manage.py es delete_indexes
 python manage.py es setup_indexes
 python manage.py es index_database
-
-cd into your project's root directory (where yarn.lock is located) and run the following:
-yarn add core-js@2.5.7
-yarn add dom4@2.0.1
-yarn install
-yarn upgrade mapbox-gl@0.46.0
-yarn upgrade underscore@1.9.1
 ```
 
 If you have Arches running on a web server such as Apache, be sure to update your static files directory and restart your web server.
@@ -57,6 +50,27 @@ If you have Arches running on a web server such as Apache, be sure to update you
 As always the documentation can be found at http://arches.readthedocs.io
 
 #### Upgrading an Arches project
+
+If you are upgrading your project from 4.1.1, you should review the project [upgrade steps from 4.1.1 to 4.2](https://github.com/archesproject/arches/blob/master/releases/4.2.0.md#upgrading-arches) before proceeding.
+
+If you have made no changes to the package.json file in your project you can run :
+
+1. In a terminal cd to your project directory and run the following command::
+
+        python manage.py updateproject
+
+    This command adds the `package.json` and `.yarnrc` files to your project and then runs `yarn install`.
+
+2. If you have made changes to `package.json`, then you should update your javascript dependencies manually:
+
+    ```
+    cd into your project's root directory (where yarn.lock is located) and run the following:
+    yarn add core-js@2.5.7
+    yarn add dom4@2.0.1
+    yarn install
+    yarn upgrade mapbox-gl@0.48.0
+    yarn upgrade underscore@1.9.1
+    ```
 
 #### Changes
 
