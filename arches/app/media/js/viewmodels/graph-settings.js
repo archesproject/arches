@@ -21,21 +21,24 @@ define([
 
         self.designerViewModel = params.designerViewModel;
         self.graph = params.graph;
-        self.node = params.node;
         self.graph.name.subscribe(function(val){
-            self.node().name(val);
             self.graph.root.name(val);
+            self.rootnode.name(val);
+        });
+        self.graph.root.datatype.subscribe(function(val){
+            self.rootnode.datatype(val);
         });
 
         self.graphModel = params.graphModel;
+        self.rootnode = self.graphModel.get('root');
         self.nodes = self.graphModel.get('nodes');
 
         self.nodeCount = ko.computed(function(){
             return self.nodes().length;
         });
 
-        var ontologyClass = self.graphModel.get('root').ontologyclass;
-        var ontologyClassFriendlyName = self.graphModel.get('root').ontologyclass_friendlyname;
+        var ontologyClass = self.rootnode.ontologyclass;
+        var ontologyClassFriendlyName = self.rootnode.ontologyclass_friendlyname;
 
         self.jsonData = ko.computed(function() {
             var relatableResourceIds = _.filter(self.resource_data(), function(resource){
@@ -89,7 +92,7 @@ define([
                 data: self.jsonData()})
                 .done(function(response) {
                     self.jsonCache(self.jsonData());
-                    self.node()._node(JSON.stringify(self.node()));
+                    self.rootnode._node(JSON.stringify(self.rootnode));
                 })
                 .fail(function(response) {
                     self.designerViewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.title, response.responseJSON.message));
@@ -112,7 +115,7 @@ define([
                 }
             });
             self.jsonCache(self.jsonData());
-            self.node()._node(JSON.stringify(self.node()));
+            self.rootnode._node(JSON.stringify(self.rootnode));
             if (params.onReset && typeof params.onReset === 'function') {
                 params.onReset();
             }
