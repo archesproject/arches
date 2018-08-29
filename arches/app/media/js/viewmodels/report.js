@@ -16,7 +16,7 @@ define(['knockout', 'underscore', 'moment', 'bindings/let'], function(ko, _, mom
 
         this.hasProvisionalData = ko.pureComputed(function() {
             return _.some(self.tiles(), function(tile){
-                return ko.unwrap(tile.provisionaledits) !== null;
+                return _.keys(ko.unwrap(tile.provisionaledits)).length > 0;
             });
         });
 
