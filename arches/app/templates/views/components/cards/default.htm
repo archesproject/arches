@@ -23,8 +23,7 @@
                 <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { self.form.selection($data) }, css:{'jstree-clicked': selected, 'child-selected': isChildSelected(), 'filtered-leaf': card.highlight()}">
                     <i class="fa fa-file" role="presentation" data-bind="css:{'has-provisional-edits': doesChildHaveProvisionalEdits() || $data.hasprovisionaledits()}"></i>
                     <strong style="margin-right: 10px;">
-                        <!-- ko if: card.widgets().length > 0 -->
-                        <!-- ko if: card.widgets()[0].visible -->
+                        <!-- ko if: card.widgets().length > 0 && card.widgets()[0].visible -->
                         <span data-bind="text: card.widgets()[0].label || card.model.name"></span>:
                         <div style="display: inline;" data-bind="component: {
                             name: self.form.widgetLookup[card.widgets()[0].widget_id()].name,
@@ -39,9 +38,8 @@
                             }
                         }"></div>
                         <!-- /ko -->
-                        <!-- ko if: card.widgets().length === 0 -->
+                        <!-- ko if: card.widgets().length === 0 || !card.widgets()[0].visible -->
                         <span data-bind="text: card.model.name"></span>
-                        <!-- /ko -->
                         <!-- /ko -->
                     </strong>
                 </a>
