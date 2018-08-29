@@ -119,6 +119,7 @@ class NewResourceEditorView(MapBaseManagerView):
         card_components = models.CardComponent.objects.all()
         datatypes = models.DDataType.objects.all()
         user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
+        is_system_settings = False
 
         if resource_instance is None:
             tiles = []
@@ -127,6 +128,10 @@ class NewResourceEditorView(MapBaseManagerView):
             displayname = resource_instance.displayname
             if displayname == 'undefined':
                 displayname = _('Unnamed Resource')
+            if str(resource_instance.graph_id) == settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
+                is_system_settings = True
+                displayname = _("System Settings")
+
             tiles = resource_instance.tilemodel_set.order_by('sortorder').filter(nodegroup__in=nodegroups)
 
             provisionaltiles = []
@@ -194,6 +199,7 @@ class NewResourceEditorView(MapBaseManagerView):
             report_templates=templates,
             templates_json=JSONSerializer().serialize(templates, sort_keys=False, exclude=['name', 'description']),
             graph_json=JSONSerializer().serialize(graph),
+            is_system_settings=is_system_settings
         )
 
         context['nav']['title'] = ''
