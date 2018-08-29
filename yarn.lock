@@ -1457,9 +1457,9 @@ latlon-geohash@1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/latlon-geohash/-/latlon-geohash-1.1.0.tgz#7abe15224c4800e3eaecac71c753a20bfb6cbf65"
 
-leaflet-draw@^0.4.9:
-  version "0.4.14"
-  resolved "https://registry.yarnpkg.com/leaflet-draw/-/leaflet-draw-0.4.14.tgz#1b5b06d570873a015aa96b80d664dab496c45a4a"
+leaflet-draw@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/leaflet-draw/-/leaflet-draw-1.0.2.tgz#212d1d958a53b849bec19a2135d39c13ed012559"
 
 leaflet-iiif@^1.1.1:
   version "1.2.2"
