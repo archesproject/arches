@@ -4,21 +4,30 @@ The Arches team has been busy improving Arches and fixing several bugs as well.
 Below you'll find a listing of all the changes that are included in the latest release.
 
 Some of the highlights:
+- The Graph Manager has been redesigned to support the lifting of the graph depth constraint
+- The Card Manager, Permission Manager, and Report Manager pages have been integrated into the new graph designer
 - Branch depth is no longer restricted
 - Adds ability to append a branch to any node in a resource model
 - Individual nodes can be added to Resource Models
 - The Resource Editor has also been redesigned to support the new graph capabilities
 - Branches can be exported from Resource Models
 - Cards have adapted as knockout components, allowing developers to create their own custom cards
-- The Graph Manager has been redesigned to support the lifting of the graph depth constraint
-- The Card Manager, Permission Manager, and Report Manager pages have been integrated into the new graph designer
 - Lifting the graph depth constraint allows cards to serve the role of 'Menus'. Menus are therefore deprecated
 - Package settings now allow packages to have tailored settings
 - The main navigation panel now expands revealing more navigation details
 - Provisional users can now view the status of their edits
 - API endpoints have been added for concepts, resource instances with JSON-LD context support
 
+#### Known Issues
 
+- [#3993](https://github.com/archesproject/arches/issues/3993) - During graph creation (adding several nodes in a single session) the browser may crash or hang.  This is because the Knockout.js Mapping package that Arches uses consumes an unnecessarily large amount of memory.  
+
+  **Workaround:** During heavy graph development users can periodically refresh the browser to reclaim memory and reduce the occurrence of browser issues.
+
+- [#4044](https://github.com/archesproject/arches/issues/4044) - Exporting data that uses the File-list datatype in csv format can't be successfully re-imported.  
+  
+  **Workaround:** If users need to export data that uses the File-list datatype, then they should export in JSON format instead, so that data can be successfully re-imported.
+  
 #### Upgrading Arches
 
 Users are encouraged to update at their earliest convenience.  Completely re-installing Arches is the easiest way to accomplish this.
