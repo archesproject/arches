@@ -1,3 +1,4 @@
+import arches
 import json
 import os
 import subprocess
@@ -34,7 +35,7 @@ class Command(BaseCommand):
             write_file = True
         return write_file
 
-    def update_yard_depenencies(self, version):
+    def update_yarn_depenencies(self, version):
         packages_path = os.path.join(settings.APP_ROOT, 'package.json')
         yarn_config_path = os.path.join(settings.APP_ROOT, '.yarnrc')
 
@@ -58,7 +59,7 @@ class Command(BaseCommand):
                 print e
 
     def upgrade_to_v4_2_0(self):
-        update_yarn_depenencies('4.2.x')
+        self.update_yarn_depenencies('4.2.x')
 
     def upgrade_to_v4_3_0(self):
-        update_yarn_depenencies('4.3.x')
+        self.update_yarn_depenencies('4.3.x')
