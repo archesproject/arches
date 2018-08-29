@@ -303,6 +303,7 @@ class Command(BaseCommand):
                 'extensions/datatypes',
                 'extensions/functions',
                 'extensions/widgets',
+                'extensions/card_components',
                 'graphs/branches',
                 'graphs/resource_models',
                 'map_layers/mapbox_spec_json/overlays',
