@@ -20,6 +20,7 @@ define([
                 'widget_id': '',
                 'config': {},
                 'label': '',
+                'visible': true,
                 'sortorder': null,
                 'disabled': false
             };
@@ -70,6 +71,7 @@ define([
                         configJSON[key] = config[key]();
                     });
                     configJSON.label = this.get('label')();
+                    configJSON.visible = this.get('visible')();
                     return configJSON;
                 },
                 write: function(value) {
@@ -77,6 +79,9 @@ define([
                     for (var key in value) {
                         if (key === 'label') {
                             this.get('label')(value[key]);
+                        }
+                        if (key === 'visible') {
+                            this.get('visible')(value[key]);
                         }
                         if (config[key] && config[key]() !== value[key]) {
                             config[key](value[key]);
