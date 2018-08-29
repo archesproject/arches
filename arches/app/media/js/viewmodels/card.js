@@ -20,8 +20,16 @@ define([
     */
     var isChildSelected = function(parent) {
         var childSelected = false;
-        var childrenKey = 'tileid' in parent ? 'cards': 'tiles';
-        ko.unwrap(parent[childrenKey]).forEach(function(child) {
+        var children = [];
+        if ('tileid' in parent) {
+            children = ko.unwrap(parent.cards);
+        } else if ('model' in parent) {
+            children = ko.unwrap(parent.cards).concat(
+                ko.unwrap(parent.tiles),
+                ko.unwrap(parent.widgets)
+            );
+        }
+        children.forEach(function(child) {
             if (child.selected && child.selected() || isChildSelected(child)) {
                 childSelected = true;
             }
