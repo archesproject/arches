@@ -136,7 +136,7 @@
                     "name": "Settings Time Search",
                     "nodegroup_id": "32f2d663-fae4-11e6-83ad-6c4008b05c4c",
                     "sortorder": null,
-                    "visible": true
+                    "visible": false
                 },
                 {
                     "active": true,
@@ -1674,7 +1674,7 @@
             "root": {
                 "config": null,
                 "datatype": "semantic",
-                "description": "", 
+                "description": "",
                 "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                 "is_collector": false,
                 "isrequired": false,

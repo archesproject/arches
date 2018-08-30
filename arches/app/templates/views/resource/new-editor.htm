@@ -78,6 +78,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </ul>
                         <!-- /ko -->
                     </li>
+                    <!--ko ifnot: issystemsettings -->
                     <li role="treeitem" class="jstree-node jstree-open" data-bind="css: {'disabled': resourceId()}">
                         <i class="jstree-icon jstree-ocl" role="presentation"></i>
                         <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function(){if (resourceId()){showRelatedResourcesManager()}}, css: {'jstree-clicked': selection() === 'related-resources', 'disabled': resourceId() === ''}">
@@ -101,6 +102,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </li>
                         </ul>
                     </li>
+                    <!--/ko-->
                 </ul>
                 </div>
             </div>
@@ -127,15 +129,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!--/ko -->
                 <!--ko if: !resourceId() -->
                 <div id="rr-splash" class="rr-splash">
-                    
+
                     <!-- Image -->
                     <div class="img-lg img-circle rr-splash-img-container">
                         <img class="rr-splash-img" src="../media/img/inspection.png" alt="Resource Editor">
                     </div>
-                    
+
                     <!-- Splash Title -->
                     <div class="rr-splash-title">{% trans "Welcome to Arches' Resource Editor" %}</div>
-                    
+
                     <!-- Splash Instructions -->
                     <div class="rr-splash-description">{% trans "You are about to create a new resource record.  Select any data card from the list on the left and start entering information." %}</div>
                     <div class="rr-splash-description">{% trans "Don't worry if you decide not to enter any data just yet." %}</div>
@@ -269,7 +271,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 nodegroups: {{nodegroups}},
                 userisreviewer:  JSON.parse('{{ user_is_reviewer }}'.toLowerCase()),
                 templates: {{templates_json}},
-                graph: {{graph_json}}
+                graph: {{graph_json}},
+                issystemsettings: {{is_system_settings|yesno:"true,false"}}
             };
         });{% endautoescape %}
     </script>

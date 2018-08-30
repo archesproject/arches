@@ -224,7 +224,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!-- System Settings list item -->
                                         {% if request.user|has_group:"System Administrator" %}
-                                        <li{% if "system-settings" in main_script %} class="active-sub"{% endif %}>
+                                        <li{% if "views/resource" in main_script and is_system_settings is True %} class="active-sub"{% endif %}>
                                             <a href="{% url 'config' %}" data-bind="click: navigate.bind(this, '{% url 'config' %}') ">
                                                 <i class="ti-alarm-clock"></i>
                                                 <span class="menu-title">
@@ -245,7 +245,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!--Menu list item-->
                                         {% if request.user|can_edit_resource_instance %}
-                                        <li{% if "views/resource" in main_script %} class="active-sub"{% endif %}>
+                                        <li{% if "views/resource" in main_script and is_system_settings is False %} class="active-sub"{% endif %}>
                                             <a href="{% url 'resource' %}" data-bind="click: navigate.bind(this, '{% url 'resource' %}') ">
                                                 <i class="fa fa-building-o"></i>
                                                 <span class="menu-title">

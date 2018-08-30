@@ -148,10 +148,10 @@ class GraphManagerView(GraphBaseView):
             context['graphs'] = JSONSerializer().serialize(context['graph_models'], exclude=['functions'])
             context['nav']['title'] = 'Arches Designer'
             context['nav']['icon'] = 'fa-bookmark'
-            
+
             context['nav']['help'] = {
                 'title': _('Using the Arches Designer'),
-                'template': 'arches-designer-help',
+                'template': 'arches-designer-new-help',
             }
             return render(request, 'views/graph.htm', context)
 
@@ -272,7 +272,7 @@ class GraphDataView(View):
             ret = graph.get_valid_domain_ontology_classes()
             for r in ret:
                 res.append({'ontology_property': r['ontology_property'], 'ontology_classes': [
-                           c for c in r['ontology_classes'] if c == ontology_class]})
+                           c for c in r['ontology_classes']]})
             return JSONResponse(res)
 
         else:

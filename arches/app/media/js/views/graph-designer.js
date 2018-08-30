@@ -279,7 +279,6 @@ define([
                 ontologies: viewModel.ontologies,
                 ontologyClass: ko.observable(''),
                 iconFilter: ko.observable(''),
-                node: viewModel.selectedNode,
                 rootNodeColor: ko.observable(''),
                 "ontology_namespaces": data.ontology_namespaces,
                 onReset: function() {
@@ -398,7 +397,6 @@ define([
             };
 
             var updateGraphSelection = function() {
-                viewModel.graphTree.collapseAll();
                 var matchingNode = correspondingNode(viewModel.cardTree.selection(), viewModel.graphTree);
                 if (matchingNode) {
                     viewModel.graphTree.selectItem(matchingNode);
@@ -415,7 +413,6 @@ define([
                         matchingCard = correspondingCard(graphTreeSelection, viewModel.cardTree);
                         if (matchingCard) {
                             viewModel.cardTree.selection(matchingCard);
-                            viewModel.cardTree.collapseAll();
                             viewModel.cardTree.expandToRoot(viewModel.cardTree.selection());
                         }
                     }
@@ -425,7 +422,6 @@ define([
             var updatePermissionCardSelection = function() {
                 var matchingCard = correspondingCard(viewModel.cardTree.selection(), viewModel.permissionTree);
                 if (matchingCard) {
-                    viewModel.permissionTree.collapseAll();
                     viewModel.permissionTree.expandToRoot(matchingCard);
                     viewModel.permissionTree.selection.removeAll();
                     matchingCard.selectChildCards();
