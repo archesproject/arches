@@ -33,16 +33,11 @@ $( document ).ready(function() {
     
     var filepath = '';
     var archesFilepath = '';
+    var formdata = new FormData();
 
     'use strict';
     var csrftoken = $("[name=csrfmiddlewaretoken]").val();
-    $(".fileinputs").click(function () {                            
-            $('#files-msg').css("color","red");
-            $('#files-msg').text("No file yet...");
-            $('#progress .progress-bar').width("0");
-        }
-    );
-    $('#fileupload').fileupload({
+    $('#excelfileupload').fileupload({
         beforeSend: function(request) {
             request.setRequestHeader("X-CSRFToken",csrftoken);
         },
@@ -98,7 +93,8 @@ $( document ).ready(function() {
                     'validate_rows_and_values',
                     'validate_dates',
                     'validate_geometries',
-                    'validate_concepts'
+                    'validate_concepts',
+                    'validate_files'
                 );
                 
                 $.each(testList, function (index, test) {
@@ -115,6 +111,12 @@ $( document ).ready(function() {
                     $('#import-msg').css("color","green");
                     $('#import-msg').text("Ready to load.");
                     archesFilepath = result.filepath;
+                    formdata.append('archesfile', archesFilepath)
+                    if ($('#resource-type-select').val() === "INFORMATION_RESOURCE.E73"){
+                        if (result.hasfiles) {
+                            $('#folder-upload-div').removeAttr('hidden');
+                        }
+                    }
                 } else {
                     $('#validation-msg').css("color","red");
                     $('#validation-msg').text("Validation complete. Some tests failed. Fix the errors locally and re-upload the file.");
@@ -141,10 +143,44 @@ $( document ).ready(function() {
                     console.log("python errors:");
                     console.log(result.errors);
                 }
-                window.location.href = $("#bulk-url").attr("data-url");
+                formdata.append('resdict', result.load_id)
+                if ($('#folder-upload-div').is(":visible")) {
+                    $('#full-load-mask').hide();
+                    $('#import-msg').css("color", "green");
+                    $('#import-msg').text("Resources imported");
+                }else {
+                    window.location.href = $("#bulk-url").attr("data-url");
+                }
             }
         });
     });
+
+    $('#folderupload').fileupload({
+            beforeSend: function(request) {
+                request.setRequestHeader("X-CSRFToken",csrftoken);
+            },
+            dataType: 'json',
+            formData: formdata,
+            done: function (e, data) {
+                if (!data.result.foldervalid) {
+                    // note that resources will have been uploaded with missing images
+                    $('#folder-msg').css("color","red");
+                    $('#folder-msg').text("Failed to identify matching resource.");
+                } else {
+                    $('#folder-msg').css("color","green");
+                    $('#folder-msg').text("Upload successful - click finished!");
+                    $('#folder-upload-btn').removeAttr('disabled');
+                }
+            },
+        }).prop('disabled', !$.support.fileInput)
+            .parent().addClass($.support.fileInput ? undefined : 'disabled');
+
+
+    $('#folder-upload-btn').click(function () {
+        window.location.href = $("#bulk-url").attr("data-url");
+    });
+
+
     updateRestype();
 });
 

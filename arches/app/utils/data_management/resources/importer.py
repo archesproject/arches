@@ -74,6 +74,8 @@ class ResourceLoader(object):
         else:
             print 'No relationship file'
 
+        return results['legacyid_to_entityid']
+
         #self.se.bulk_index(self.resources)
 
 

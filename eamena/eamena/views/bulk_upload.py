@@ -25,6 +25,8 @@ from django.core.management import call_command
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
+from arches.app.models.resource import Resource
+from arches.app.utils.imageutils import generate_thumbnail
 
 def handle_uploaded_file(f):
     '''the actual file upload happens here, and returns a path to the file
@@ -77,12 +79,14 @@ def validate(request):
 
     fullpath = os.path.join(settings.BULK_UPLOAD_DIR,str(fpath))
     destpath = get_archesfile_path(fullpath)
+    out = StringIO()
     call_command('Excelreader',
         operation='site_dataset',
         source=fullpath,
         dest_dir=destpath,
         resource_type=restype,
         append_data=append,
+        stdout=out,
     )
     errorlog = os.path.join(settings.BULK_UPLOAD_DIR,'_validation_errors.json')
 
@@ -94,6 +98,9 @@ def validate(request):
 
     else:
         result['filepath'] = os.path.basename(destpath)
+
+    if "Has attachments" in out.getvalue():
+        result['hasfiles'] = True
 
     return HttpResponse(json.dumps(result), content_type="application/json")
     
@@ -128,11 +135,53 @@ def import_archesfile(request):
     fullpath = os.path.join(settings.BULK_UPLOAD_DIR,fpath)
     append = request.POST.get('append', 'false')
 
+    output = StringIO()
+
     call_command('packages',
         operation='load_resources',
         source=fullpath,
         appending=append,
+        run_internal=True,
+        stdout = output,
     )
-    
-    return HttpResponse(json.dumps({}), content_type="application/json")
-    
+
+    val = output.getvalue().strip()
+    return HttpResponse(json.dumps({'load_id': val}), content_type="application/json")
+
+def upload_attachments(request):
+    """
+    We'll enter this view for each file within the uploaded folder. So for each one we need to find which resource it
+    belongs to (if any) and add that entry. We're pulling a dictionary of old and new resource ids out from the load_resources
+    process and using that to update and edit the file entities.
+    """
+
+    response_data = {
+        'foldervalid': True,
+    }
+
+    if request.method == 'POST':
+        resdict = json.loads(request.POST['resdict'])
+
+        f = request._files['attachments[]']
+        filename, ext = os.path.splitext(os.path.basename(str(f)))
+        if ext == '.xlsx':
+            return HttpResponse(json.dumps({}), content_type="application/json")
+
+        archesfile = request.POST['archesfile']
+        archesfilepath = os.path.join(settings.BULK_UPLOAD_DIR, archesfile)
+        with open(archesfilepath, 'r') as ins:
+            for l in ins:
+                if 'FILE_PATH' in l:
+                    data = l.split('|')
+                    if data[3] == str(f):
+                        if data[0] not in resdict:
+                            response_data['foldervalid'] = False
+                        resid = resdict[data[0]]
+                        res = Resource(resid)
+                        res.set_entity_value('FILE_PATH.E62', f)
+                        thumb = generate_thumbnail(f)
+                        if thumb != None:
+                            res.set_entity_value('THUMBNAIL.E62', thumb)
+                        res.save()
+
+    return HttpResponse(json.dumps(response_data), content_type="application/json")

@@ -29,7 +29,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <h5>1. Upload a Spreadsheet</h5>
                     <button class="fileinputs bulk-upload-btn">
                         <p id="upload-btn-title" class="bulk-upload-btn">Choose File...</p>
-                        <input id="fileupload" type="file" class="file" name="files[]" data-url='/bulk-upload/excel-upload'/>
+                        <input id="excelfileupload" type="file" class="file" name="files[]" data-url='/bulk-upload/excel-upload'/>
                     </button>
                     <div id="progress" class="progress">
                         <div class="progress-bar progress-bar-success"></div>
@@ -59,6 +59,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <h5>4. Load Resources into EAMENA</h5>
                     <button id="load-data-button" class="bulk-upload-btn" type="button" disabled>Load Resources</button>
                     <div id="import-msg" class="upload-msg-box" style="color:red;">Not ready to load...</div>
+                </div>
+                <div id="folder-upload-div" class="bulk-upload-step-box" hidden>
+                    <h5>5. Select file attachment folder</h5>
+                    <input id="folderupload" type="file" name="attachments[]" data-url="/bulk-upload/attachments" multiple directory webkitdirectory mozdirectory>
+                    <div id="folder-msg" class="upload-msg-box" style="color:red;">No file yet...</div>
+                    &nbsp;
+                    <button id="folder-upload-btn" class="fileinputs bulk-upload-btn" disabled>Finished</button>
                 </div>
             </div>
             <div class="col-xs-8">
