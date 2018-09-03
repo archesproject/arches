@@ -87,8 +87,10 @@ class UserManagerView(BaseManagerView):
             context['nav']['icon'] = "fa fa-user"
             context['nav']['title'] = _("Profile Manager")
             context['nav']['login'] = True
-            context['nav']['help'] = (_('Profile Editing'),'help/base-help.htm')
-            context['help'] = 'profile-manager-help'
+            context['nav']['help'] = {
+                'title': _('Profile Editing'),
+                'template': 'profile-manager-help',
+            }
             context['validation_help'] = validation.password_validators_help_texts()
 
             context['user_surveys'] = JSONSerializer().serialize(user_details['user_surveys'], sort_keys=False)
@@ -117,8 +119,10 @@ class UserManagerView(BaseManagerView):
             context['nav']['icon'] = 'fa fa-user'
             context['nav']['title'] = _('Profile Manager')
             context['nav']['login'] = True
-            context['nav']['help'] = (_('Profile Editing'),'help/base-help.htm')
-            context['help'] = 'profile-manager-help'
+            context['nav']['help'] = {
+                'title': _('Profile Editing'),
+                'template': 'profile-manager-help',
+            }
             context['validation_help'] = validation.password_validators_help_texts()
             context['user_surveys'] = JSONSerializer().serialize(user_details['user_surveys'])
             context['identities'] = JSONSerializer().serialize(user_details['identities'])

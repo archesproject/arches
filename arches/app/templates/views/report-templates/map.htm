@@ -3,13 +3,13 @@
 
 {% block header %}
 <div>
-  <!-- ko if: feature_count > 0 || forReportManager === true -->
+  <!-- ko if: featureCount() > 0 || report.preview -->
   <!-- ko component: {
       name: 'map-widget',
       params: {
           config: report.configJSON,
           node: null,
-          value: report.get('tiles'),
+          value: featureCollection,
           type: 'report-header',
           graph: report.graph
       }

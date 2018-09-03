@@ -47,7 +47,7 @@ class CardModel(models.Model):
     active = models.BooleanField(default=True)
     visible = models.BooleanField(default=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
-    component = models.ForeignKey('CardComponent', db_column='componentid', default=uuid.UUID('f05e4d3a-53c1-11e8-b0ea-784f435179ea'))
+    component = models.ForeignKey('CardComponent', db_column='componentid', default=uuid.UUID('f05e4d3a-53c1-11e8-b0ea-784f435179ea'), on_delete=models.SET_DEFAULT)
     config = JSONField(blank=True, null=True, db_column='config')
 
     def is_editable(self):
@@ -86,6 +86,7 @@ class CardXNodeXWidget(models.Model):
     widget = models.ForeignKey('Widget', db_column='widgetid')
     config = JSONField(blank=True, null=True, db_column='config')
     label = models.TextField(blank=True, null=True)
+    visible = models.BooleanField(default=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
 
     class Meta:

@@ -188,7 +188,7 @@ install_yarn_components() {
 init_arches_project() {
 	if [[ ! -z ${ARCHES_PROJECT} ]]; then
 		echo "Checking if Arches project "${ARCHES_PROJECT}" exists..."
-		if [[ ! -d ${APP_FOLDER} ]] || [[ ! "$(ls -A ${APP_FOLDER})" ]]; then
+		if [[ ! -d ${APP_FOLDER} ]] || [[ ! "$(ls ${APP_FOLDER})" ]]; then
 			echo ""
 			echo "----- Custom Arches project '${ARCHES_PROJECT}' does not exist. -----"
 			echo "----- Creating '${ARCHES_PROJECT}'... -----"

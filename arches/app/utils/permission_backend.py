@@ -7,7 +7,9 @@ from guardian.shortcuts import get_perms, get_objects_for_user
 from guardian.exceptions import WrongAppError
 from django.contrib.auth.models import User, Group, Permission
 
+
 class PermissionBackend(ObjectPermissionBackend):
+
     def has_perm(self, user_obj, perm, obj=None):
         # check if user_obj and object are supported (pulled directly from guardian)
         support, user_obj = check_support(user_obj, obj)
@@ -65,6 +67,7 @@ def get_groups_for_object(perm, obj):
             ret.append(group)
     return ret
 
+
 def get_users_for_object(perm, obj):
     """
     returns a list of user objects that have the given permission on the given object
@@ -80,6 +83,7 @@ def get_users_for_object(perm, obj):
         if user.has_perm(perm, obj):
             ret.append(user)
     return ret
+
 
 def get_nodegroups_by_perm(user, perms, any_perm=True):
     """
@@ -97,10 +101,11 @@ def get_nodegroups_by_perm(user, perms, any_perm=True):
         'models.write_nodegroup',
         'models.delete_nodegroup',
         'models.no_access_to_nodegroup'
-        ], accept_global_perms=False, any_perm=True))
+    ], accept_global_perms=False, any_perm=True))
     B = set(get_objects_for_user(user, perms, accept_global_perms=False, any_perm=any_perm))
     C = set(get_objects_for_user(user, perms, accept_global_perms=True, any_perm=any_perm))
-    return list(C-A|B)
+    return list(C - A | B)
+
 
 def get_editable_resource_types(user):
     """
@@ -112,6 +117,7 @@ def get_editable_resource_types(user):
     """
 
     return get_resource_types_by_perm(user, ['models.write_nodegroup', 'models.delete_nodegroup'])
+
 
 def get_createable_resource_types(user):
     """
@@ -161,9 +167,11 @@ def user_can_edit_resources(user):
     """
 
     if user.is_authenticated():
-        return user.is_superuser or (len(get_editable_resource_types(user)) > 0 and
-                user.groups.filter(name='Resource Editor').exists())
+        return user.is_superuser or \
+            len(get_editable_resource_types(user)) > 0 or \
+            user.groups.filter(name__in=settings.RESOURCE_EDITOR_GROUPS).exists()
     return False
+
 
 def user_can_read_concepts(user):
     """

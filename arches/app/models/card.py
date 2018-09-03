@@ -82,7 +82,7 @@ class Card(models.CardModel):
         if args:
             if isinstance(args[0], dict):
                 for key, value in args[0].iteritems():
-                    if key not in ('cards', 'widgets', 'nodes', 'is_editable'):
+                    if key not in ('cards', 'widgets', 'nodes', 'is_editable', 'nodegroup'):
                         setattr(self, key, value)
 
                 if 'cards' in args[0]:
@@ -98,6 +98,7 @@ class Card(models.CardModel):
                         widget_model.widget_id = widget.get('widget_id', None)
                         widget_model.config = widget.get('config', {})
                         widget_model.label = widget.get('label', '')
+                        widget_model.visible = widget.get('visible', None)
                         widget_model.sortorder = widget.get('sortorder', None)
                         if widget_model.pk is None:
                             widget_model.save()

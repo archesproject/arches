@@ -58,8 +58,10 @@ class ResourceListView(BaseManagerView):
         context['nav']['icon'] = "fa fa-bookmark"
         context['nav']['title'] = _("Resource Manager")
         context['nav']['login'] = True
-        context['nav']['help'] = (_('Creating Resources'), 'help/base-help.htm')
-        context['help'] = 'resource-editor-landing-help'
+        context['nav']['help'] = {
+            'title': _('Creating Resources'),
+            'template': 'resource-editor-landing-help',
+        }
 
         return render(request, 'views/resource.htm', context)
 
@@ -95,8 +97,19 @@ class NewResourceEditorView(MapBaseManagerView):
             pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
         ontologyclass = [node for node in nodes if node.istopnode is True][0].ontologyclass
         relationship_type_values = get_resource_relationship_types()
-        nodegroups = [node.nodegroup for node in nodes if node.is_collector and request.user.has_perm(
-            'write_nodegroup', node.nodegroup)]
+
+        nodegroups = []
+        editable_nodegroups = []
+        for node in nodes:
+            if node.is_collector:
+                added = False
+                if request.user.has_perm('write_nodegroup', node.nodegroup):
+                    editable_nodegroups.append(node.nodegroup)
+                    nodegroups.append(node.nodegroup)
+                    added = True
+                if not added and request.user.has_perm('read_nodegroup', node.nodegroup):
+                    nodegroups.append(node.nodegroup)
+
         nodes = nodes.filter(nodegroup__in=nodegroups)
         cards = graph.cardmodel_set.order_by('sortorder').filter(
             nodegroup__in=nodegroups).prefetch_related('cardxnodexwidget_set')
@@ -106,6 +119,7 @@ class NewResourceEditorView(MapBaseManagerView):
         card_components = models.CardComponent.objects.all()
         datatypes = models.DDataType.objects.all()
         user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
+        is_system_settings = False
 
         if resource_instance is None:
             tiles = []
@@ -114,6 +128,10 @@ class NewResourceEditorView(MapBaseManagerView):
             displayname = resource_instance.displayname
             if displayname == 'undefined':
                 displayname = _('Unnamed Resource')
+            if str(resource_instance.graph_id) == settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
+                is_system_settings = True
+                displayname = _("System Settings")
+
             tiles = resource_instance.tilemodel_set.order_by('sortorder').filter(nodegroup__in=nodegroups)
 
             provisionaltiles = []
@@ -146,6 +164,13 @@ class NewResourceEditorView(MapBaseManagerView):
         geocoding_providers = models.Geocoder.objects.all()
         templates = models.ReportTemplate.objects.all()
 
+        cards = JSONSerializer().serializeToPython(cards)
+        editable_nodegroup_ids = [str(nodegroup.pk) for nodegroup in editable_nodegroups]
+        for card in cards:
+            card['is_writable'] = False
+            if str(card['nodegroup_id']) in editable_nodegroup_ids:
+                card['is_writable'] = True
+
         context = self.get_context_data(
             main_script=main_script,
             resourceid=resourceid,
@@ -174,12 +199,21 @@ class NewResourceEditorView(MapBaseManagerView):
             report_templates=templates,
             templates_json=JSONSerializer().serialize(templates, sort_keys=False, exclude=['name', 'description']),
             graph_json=JSONSerializer().serialize(graph),
+            is_system_settings=is_system_settings
         )
 
         context['nav']['title'] = ''
         context['nav']['menu'] = nav_menu
-        context['nav']['help'] = (_('Using the Resource Editor'), 'help/base-help.htm')
-        context['help'] = 'resource-editor-help'
+        if resourceid == settings.RESOURCE_INSTANCE_ID:
+            context['nav']['help'] = {
+                'title': _('Managing System Settings'),
+                'template': 'system-settings-help',
+            }
+        else:
+            context['nav']['help'] = {
+                'title': _('Using the Resource Editor'),
+                'template': 'resource-editor-help',
+            }
 
         return render(request, view_template, context)
 

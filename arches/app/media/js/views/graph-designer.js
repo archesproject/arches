@@ -44,6 +44,104 @@ define([
                 return !graph.isresource;
             });
 
+            var newGraph = function(url, data) {
+                data = data || {};
+                viewModel.loading(true);
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: JSON.stringify(data),
+                    success: function(response) {
+                        window.open(arches.urls.graph_designer(response.graphid), '_blank');
+                        viewModel.loading(false);
+                    },
+                    error: function() {
+                        viewModel.loading(false);
+                    }
+                });
+            };
+            viewModel.newResource = function() {
+                newGraph('/graph/new', {isresource: true});
+            };
+            viewModel.newBranch = function() {
+                newGraph('/graph/new', {isresource: false});
+            };
+
+            viewModel.deleteGraph = function() {
+                viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmGraphDelete.title, arches.confirmGraphDelete.text, function() {
+                    return;
+                }, function(){
+                    viewModel.loading(true);
+                    $.ajax({
+                        type: "DELETE",
+                        url: arches.urls.delete_graph(viewModel.graph.graphid()),
+                        complete: function(response, status) {
+                            viewModel.loading(false);
+                            if (status === 'success') {
+                                window.location = arches.urls.graph;
+                            } else {
+                                viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.title, response.responseJSON.message));
+                            }
+                        }
+                    });
+                }));
+            };
+            viewModel.cloneGraph = function() {
+                newGraph(arches.urls.clone_graph(viewModel.graph.graphid()));
+            };
+            viewModel.exportGraph = function() {
+                window.open(arches.urls.export_graph(viewModel.graph.graphid()), '_blank');
+            };
+            viewModel.importGraph = function(data, e) {
+                var formData = new FormData();
+                formData.append("importedGraph", e.target.files[0]);
+
+                $.ajax({
+                    type: "POST",
+                    url: '/graph/import/',
+                    processData: false,
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    success: function(response) {
+                        if (response[0].length != 0) {
+                            if (typeof(response[0])) {
+                                response = response[0].join('<br />');
+                            }
+                            viewModel.alert(new AlertViewModel('ep-alert-red', arches.graphImportFailed.title, response));
+                        } else {
+                            viewModel.loading(false);
+                            window.open(arches.urls.graph_designer(response[1].graph_id), '_blank');
+                        }
+                    },
+                    error: function(response) {
+                        viewModel.alert(new AlertViewModel('ep-alert-red', arches.graphImportFailed.title, 'Please contact your system administrator for more details.'));
+                        viewModel.loading(false);
+                    },
+                });
+            };
+            viewModel.importButtonClick = function() {
+                $("#fileupload").trigger('click');
+            };
+            viewModel.deleteInstances = function() {
+                viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmAllResourceDelete.title, arches.confirmAllResourceDelete.text, function() {
+                    return;
+                }, function(){
+                    viewModel.loading(true);
+                    $.ajax({
+                        type: "DELETE",
+                        url: arches.urls.delete_instances(viewModel.graph.graphid()),
+                        complete: function(response, status) {
+                            viewModel.loading(false);
+                            if (status === 'success') {
+                                viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.title, response.responseJSON.message));
+                            } else {
+                                viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.title, response.responseJSON.message));
+                            }
+                        }
+                    });
+                }));
+            };
             viewModel.graph.ontology = ko.computed(function() {
                 return viewModel.ontologies().find(function(obj) {
                     return obj.ontologyid === viewModel.graph.ontology_id();
@@ -102,8 +200,8 @@ define([
                             viewModel.alert(new AlertViewModel('ep-alert-red', data.responseJSON.title, data.responseJSON.message));
                         }
                         else {
-                            viewModel.cardTree.updateCards('update', viewModel.selectedNode().nodeGroupId(), data.responseJSON);
-                            viewModel.permissionTree.updateCards('update', viewModel.selectedNode().nodeGroupId(), data.responseJSON);
+                            viewModel.cardTree.updateCards(viewModel.selectedNode().nodeGroupId(), data.responseJSON);
+                            viewModel.permissionTree.updateCards(viewModel.selectedNode().nodeGroupId(), data.responseJSON);
                         }
                         viewModel.loading(false);
                     });
@@ -181,7 +279,6 @@ define([
                 ontologies: viewModel.ontologies,
                 ontologyClass: ko.observable(''),
                 iconFilter: ko.observable(''),
-                node: viewModel.selectedNode,
                 rootNodeColor: ko.observable(''),
                 "ontology_namespaces": data.ontology_namespaces,
                 onReset: function() {
@@ -300,29 +397,23 @@ define([
             };
 
             var updateGraphSelection = function() {
-                if (viewModel.activeTab() === 'card') {
-                    viewModel.graphTree.collapseAll();
-                    var matchingNode = correspondingNode(viewModel.cardTree.selection(), viewModel.graphTree);
-                    if (matchingNode) {
-                        viewModel.graphTree.selectItem(matchingNode);
-                    }
+                var matchingNode = correspondingNode(viewModel.cardTree.selection(), viewModel.graphTree);
+                if (matchingNode) {
+                    viewModel.graphTree.selectItem(matchingNode);
                 }
             };
 
             var updateCardSelection = function() {
-                if (viewModel.activeTab() === 'graph') {
-                    var graphTreeSelection = viewModel.graphTree.selectedItems().length > 0 ? viewModel.graphTree.selectedItems()[0] : null;
-                    var matchingCard;
-                    if (graphTreeSelection) {
-                        if (graphTreeSelection.istopnode === true) {
-                            viewModel.cardTree.selection(viewModel.cardTree.topCards()[0]);
-                        } else {
-                            matchingCard = correspondingCard(graphTreeSelection, viewModel.cardTree);
-                            if (matchingCard) {
-                                viewModel.cardTree.selection(matchingCard);
-                                viewModel.cardTree.collapseAll();
-                                viewModel.cardTree.expandToRoot(viewModel.cardTree.selection());
-                            }
+                var graphTreeSelection = viewModel.graphTree.selectedItems().length > 0 ? viewModel.graphTree.selectedItems()[0] : null;
+                var matchingCard;
+                if (graphTreeSelection) {
+                    if (graphTreeSelection.istopnode === true) {
+                        viewModel.cardTree.selection(viewModel.cardTree.topCards()[0]);
+                    } else {
+                        matchingCard = correspondingCard(graphTreeSelection, viewModel.cardTree);
+                        if (matchingCard) {
+                            viewModel.cardTree.selection(matchingCard);
+                            viewModel.cardTree.expandToRoot(viewModel.cardTree.selection());
                         }
                     }
                 }
@@ -331,22 +422,11 @@ define([
             var updatePermissionCardSelection = function() {
                 var matchingCard = correspondingCard(viewModel.cardTree.selection(), viewModel.permissionTree);
                 if (matchingCard) {
-                    viewModel.permissionTree.collapseAll();
                     viewModel.permissionTree.expandToRoot(matchingCard);
                     viewModel.permissionTree.selection.removeAll();
-                    matchingCard.selected(true);
+                    matchingCard.selectChildCards();
                 }
             };
-
-            viewModel.cardTree.selection.subscribe(function(){
-                updateGraphSelection();
-                updatePermissionCardSelection();
-            });
-
-            viewModel.graphTree.selectedItems.subscribe(function(){
-                updateCardSelection();
-                updatePermissionCardSelection();
-            });
 
             if (viewModel.activeTab() === 'graph') {
                 viewModel.loadGraphSettings();
@@ -362,14 +442,36 @@ define([
             });
 
             var helpContentLookup = {
-                permissions: 'permissions-manager-help',
-                graph: 'graph-designer-help',
-                card: 'card-manager-help'
+                permissions: {
+                    'title': 'xxxx', // dynamic title loading not implemented
+                    'template': 'permissions-tab-help',
+                },
+                graph: {
+                    'title': 'xxxx', // dynamic title loading not implemented
+                    'template': 'graph-tab-help',
+                },
+                card: {
+                    'title': 'xxxx', // dynamic title loading not implemented
+                    'template': 'cards-tab-help',
+                }
             };
 
             viewModel.activeTab.subscribe(function(tab) {
-                viewModel.helpTemplate(helpContentLookup[tab]);
+                viewModel.helpTemplate(helpContentLookup[tab]['template']);
                 viewModel.getHelp();
+                switch (tab) {
+                case 'card':
+                    updateCardSelection();
+                    break;
+                case 'graph':
+                    updateGraphSelection();
+                    break;
+                case 'permissions':
+                    updatePermissionCardSelection();
+                    break;
+                default:
+                    return;
+                }
             });
 
             viewModel.graphView = new GraphView({
@@ -386,12 +488,10 @@ define([
                 viewModel.graphTree.expandParentNode(node);
             });
 
-            viewModel.viewState.subscribe(function(state) {
-                if (state === 'preview') {
-                    viewModel.graphView.resize();
-                }
-            });
-
+            viewModel.showPreview = function() {
+                viewModel.viewState('preview');
+                viewModel.graphView.resize();
+            };
 
             /**
             * update the sizing of elements on window resize

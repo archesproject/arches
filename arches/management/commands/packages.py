@@ -195,7 +195,7 @@ class Command(BaseCommand):
 
         if options['operation'] == 'delete_tileserver_layer':
             self.delete_tileserver_layer(options['layer_name'])
-            
+
         if options['operation'] == 'delete_mapbox_layer':
             self.delete_mapbox_layer(options['layer_name'])
 
@@ -303,6 +303,7 @@ class Command(BaseCommand):
                 'extensions/datatypes',
                 'extensions/functions',
                 'extensions/widgets',
+                'extensions/card_components',
                 'graphs/branches',
                 'graphs/resource_models',
                 'map_layers/mapbox_spec_json/overlays',
@@ -529,6 +530,9 @@ class Command(BaseCommand):
         def load_widgets(package_dir):
             load_extensions(package_dir, 'widgets', 'widget')
 
+        def load_card_components(package_dir):
+            load_extensions(package_dir, 'card_components', 'card_component')
+
         def load_reports(package_dir):
             load_extensions(package_dir, 'reports', 'report')
 
@@ -580,6 +584,8 @@ class Command(BaseCommand):
         load_system_settings(package_location)
         print 'loading widgets'
         load_widgets(package_location)
+        print 'loading card components'
+        load_card_components(package_location)
         print 'loading reports'
         load_reports(package_location)
         print 'loading functions'
@@ -1092,7 +1098,7 @@ class Command(BaseCommand):
                 tileserver_layer.map_layer.delete()
                 tileserver_layer.map_source.delete()
                 tileserver_layer.delete()
-    
+
     def delete_mapbox_layer(self, layer_name=False):
         if layer_name != False:
             try:

@@ -43,7 +43,6 @@ define([
             this.viewModel.helpOpen = ko.observable(false);
             this.viewModel.provisionalHistoryList = new ProvisionalHistoryList({
                 items: ko.observableArray(),
-                helploaded: this.viewModel.helploaded,
                 helploading: this.viewModel.helploading
             });
 
@@ -74,27 +73,32 @@ define([
                     window.location = url;
                 },
                 getHelp: function() {
-                    if (self.viewModel.helploaded()) {
-                        self.viewModel.helploading(true);
-                        var el = $('.ep-help-content');
-                        $.ajax({
-                            type: "GET",
-                            url: arches.urls.help_template,
-                            data: {'template': self.viewModel.helpTemplate()}
-                        }).done(function(data) {
-                            el.html(data);
-                            self.viewModel.helploaded(true);
-                            self.viewModel.helploading(false);
-                            $('.ep-help-topic-toggle').click(function() {
-                                var sectionEl = $(this).closest('div');
-                                var contentEl = $(sectionEl).find('.ep-help-topic-content').first();
-                                contentEl.slideToggle();
-                            });
-                            $('.reloadable-img').click(function(){
-                                $(this).attr('src', $(this).attr('src'));
-                            });
+                    self.viewModel.helploading(true);
+                    var el = $('.ep-help-content');
+                    $.ajax({
+                        type: "GET",
+                        url: arches.urls.help_template,
+                        data: {'template': self.viewModel.helpTemplate()}
+                    }).done(function(data) {
+                        el.html(data);
+                        self.viewModel.helploading(false);
+                        $('.ep-help-topic-toggle').click(function() {
+                            var sectionEl = $(this).closest('div');
+                            var iconEl = $(this).find('i');
+                            if (iconEl.hasClass("fa-chevron-right")) {
+                                iconEl.removeClass("fa-chevron-right");
+                                iconEl.addClass("fa-chevron-down");
+                            } else {
+                                iconEl.removeClass("fa-chevron-down");
+                                iconEl.addClass("fa-chevron-right");
+                            }
+                            var contentEl = $(sectionEl).find('.ep-help-topic-content').first();
+                            contentEl.slideToggle();
                         });
-                    }
+                        $('.reloadable-img').click(function(){
+                            $(this).attr('src', $(this).attr('src'));
+                        });
+                    });
                 },
                 getProvisionalHistory: function() {
                     self.viewModel.provisionalHistoryList.updateList();

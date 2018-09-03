@@ -28,11 +28,6 @@
     text-decoration: underline;
 }
 
-#container {
-    /*min-width: 768px;*/
-    overflow-x: scroll;
-}
-
 /*.navbar-top-links:last-child>li {
     border-right: 1px solid rgba(0,0,0,0.07);
 }*/
@@ -338,8 +333,8 @@ dl.inline-flex dd {
 
 .card-help {
     padding-right: 20px;
-    font-size: 13px;
-    margin-top: -3px;
+    font-size: 14px;
+    margin-top: -34px;
 }
 
 .card-form-container {
@@ -358,8 +353,7 @@ dl.inline-flex dd {
     position: absolute;
     bottom: 0px;
     right: 0px;
-    background: #fff;
-    opacity: .9;
+    background: #fbfbfb;
     z-index: 500;
     overflow-y: scroll;
     color: #123;
@@ -430,7 +424,7 @@ input[type="checkbox"] {
 }
 
 .help-close {
-    color: #ddd;
+    color: #868686;
     position: absolute;
     right: 10px;
     top: 20px;
@@ -1035,7 +1029,7 @@ a.select2-search-choice-close {
 
 .list-filter {
     position: relative;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
     margin-right: 0px;
 }
 
@@ -1147,6 +1141,9 @@ a.select2-search-choice-close {
     padding: 10px 15px;
 }
 
+.middle-column-container.card-configuration.expanded {
+    flex-basis: 450px;
+}
 
 .library-icon {
     width: 30px;
@@ -1644,8 +1641,8 @@ a.select2-search-choice-close {
 }
 
 .node .node-filtered {
-    fill: #f0f0f0;
-    stroke: #bbb;
+/*    fill: #f0f0f0;
+    stroke: #bbb;*/
 }
 
 .graph-node-text {
@@ -2684,11 +2681,8 @@ div.dropdown-menu.open {
     height: 36px;
 }
 
-.search-choice-close:before {
-    font-size: 14px;
-     color: grey;
-     content: "\f00d";
-     font-family: FontAwesome;
+.chosen-container-multi .chosen-choices li.search-choice .search-choice-close {
+    background-image: none !important;
 }
 
 .list-group-item.active:hover, .list-group-item.active:active, .list-group-item.active:focus {
@@ -3106,6 +3100,43 @@ ul .collapse li:last-of-type {
 
 .report-image-grid .resource-grid-item:last-of-type .resource-grid-tools-container .btn-group ul {
     margin-top: -331px;
+}
+
+.report-provisional-flag {
+    padding: 15px;
+    margin-top: 0px;
+    padding-left: 25px;
+    border-bottom-style: solid;
+    border-bottom-color: #DF2E6A;
+    border-bottom-width: 1px;
+    background-color: #F799B9;
+    color: #fff;
+}
+
+.resource-report .fullyprovisional {
+    display: none;
+}
+
+.dl-horizontal.provisional {
+    border-style: solid;
+    margin-right: 25px;
+    margin-left: -20px;
+    background: #fdfdfd;
+    padding: 10px;
+    border-color: #ddd;
+    border-width: 1px;
+}
+
+
+
+.report-card-provisional-flag {
+    background-color: #f8f8f8;
+    padding: 5px 10px;
+    margin-left: -20px;
+    margin-right: 25px;
+    border-top: solid 1px #ddd;
+    border-left: solid 1px #ddd;
+    border-right: solid 1px #ddd;
 }
 
 .resource-grid-main {
@@ -4272,7 +4303,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
 .node-current-over, .node-ancestor-over {
     /* The currently moused-over node */
     stroke: #115fa5;
-    stroke-width: 2px;
+    stroke-width: 5px;
     fill: #dcecfa;
     opacity: 1.0;
     cursor: pointer;
@@ -5560,6 +5591,33 @@ ul.jqtree_common li.jqtree-folder {
     padding-left: 3px;
 }
 
+.ep-help-table {
+    width: 100%;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+.ep-help-table tr th {
+    border-bottom: solid grey 1px;
+}
+.ep-help-table tr {
+    border-bottom: dashed grey 1px;
+}
+.ep-help-table tr td {
+    vertical-align: top;
+    color: grey;
+    padding: 5px 3px 5px 3px;
+}
+.ep-help-table tr td:first-of-type {
+    color: red;
+}
+.ep-help-table-header {
+    font-weight: 700;
+}
+
+.ep-help-topic-toggle > h4 {
+    display: inline-block;
+}
+
 .reloadable-img {
     border: 2px solid #eee;
 }
@@ -6438,7 +6496,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .node-permissions {
-    float: right;
     padding-right: 10px;
     margin-top: 2px;
 }
@@ -6476,21 +6533,9 @@ ul .card-tree-list a .node-subname {
     margin-left: 60px;
 }
 
-.tertiary-panel {
-    position: absolute;
-    top: 55px;
-    left: 534px;
-    bottom: 0;
-    z-index: 50;
-}
-
 .tertiary-panel-content {
     background: #f5f5f5;
-    border-right: 1px solid #ddd;
-    border-left: 1px solid #ddd;
     height: 100%;
-    width: 450px;
-    padding: 10px;
     overflow-y: scroll;
 }
 
@@ -6559,6 +6604,10 @@ li.search-field {
     width: 400px;
 }
 
+#graph {
+    background: #fdfdfd;
+}
+
 .library-medium, #graph-grid .library-card {
     width: 300px;
 }
@@ -6603,7 +6652,7 @@ li.aside-li.active:hover, .library-dark .tab-content {
 
 .library-card.relative.hovered {
     background: #ffffff;
-    border-left: 5px solid #ccc;
+    border-left: 5px solid #20CE05;
 }
 
 .library-card.relative {
@@ -7224,7 +7273,7 @@ a.mega-dropdown-toggle.disabled {
 .rr-drag-panel-target {
     border-bottom-width: 0px;
     height: 100vh;
-    background: #f4f4f4;
+    background: #fbfbfb;
     border: 1px solid #ddd;
     border-radius: 2px;
     padding: 0px 25px;
@@ -7736,6 +7785,7 @@ a .csv-chart-menubar-item {
 div.row.widget-wrapper.report-header {
     margin-right: 5px;
     padding: 0px;
+    padding-bottom: 10px;
     width: 100%;
 }
 
@@ -10360,10 +10410,6 @@ a.search-facet-item.disabled {
     color: #fff;
 }
 
-.help-text-crud {
-    z-index: 1000;
-}
-
 .related-resources-header .resource-instance-wrapper {
     padding: 0;
 }
@@ -10733,6 +10779,22 @@ a.search-facet-item.disabled {
 .editor-report .rp-report-section {
     border-bottom: none;
     padding-bottom: 0;
+}
+
+.report-related-resources {
+    padding: 0px 30px;
+}
+
+.report-related-resources .rp-card-section {
+    margin-left: -15px;
+}
+
+
+
+.report-related-resources .rp-card-section .rp-report-container-tile {
+    padding-top: 0px;
+    padding-bottom: 10px;
+    margin-top: -5px;
 }
 
 .editor-report .report-related-resources, .editor-report .report-title-bar {
@@ -11505,7 +11567,7 @@ ul.select2-choices:after {
 }
 
 .left-panel {
-    width: 270px;
+    width: 300px;
     overflow-x: auto;
     overflow-y: hidden;
     z-index: 3;
@@ -11649,10 +11711,6 @@ a.jstree-anchor.permissions-widget {
     pointer-events: none;
 }
 
-a.jstree-anchor.permissions-card {
-    overflow-x: auto;
-}
-
 .jstree-default .card-designer-tree li {
     background-image: url("tree/32px.png");
     background-position: -292px -4px;
@@ -11665,6 +11723,10 @@ a.jstree-anchor.permissions-card {
 
 .card-summary-section li {
     list-style: none;
+}
+
+.card-summary-section h4 {
+    font-size: 1.1em;
 }
 
 .card-summary-section .card-summary {
@@ -11707,37 +11769,76 @@ a.jstree-anchor.permissions-card {
 }
 
 .card-summary-section {
-    padding-left: 0px;
-    padding-bottom: 10px;
+    padding: 20px 0 10px 0;
 }
 
 .btn-rr {
     background: #9490EE;
     color: #fff;
     border: 1px solid rgba(0,0,0,0.09);
-    margin: 30px;
+    margin: -10px 0px 30px 0px;
+}
+
+.btn-rr:hover {
+    color: #fff;
 }
 
 .rr-splash {
     text-align: center;
     margin: 5%;
-    border: 1px solid #e8e8e8;
+    border: 1px solid #ddd;
     padding: 5%;
-    background: #f4f4f4
+    background: #f6f6f6;
+    border-radius: 4px;
 }
 
 .rr-splash-title {
-    font-size: 24px;
+    color: #666;
+    font-size: 28px;
+    margin-bottom: 30px;
+    margin-top: 25px;
 }
 
+
+.rr-splash-img-container {
+    padding: 20px;
+    background: #fff;
+    border: 1px solid steelblue;
+    display: inline-block;
+}
+
+.rr-splash-img {
+    margin-top: -3px;
+    margin-left: -2px;
+    height: 110%;
+}
+
+.rr-splash-icon {
+    font-size: 48px;
+}
+
+.rr-splash-description {
+    font-size: 16px;
+    color: #999;
+}
 .rr-splash-subtitle {
-    font-size: 15px;
+    color: #999;
+}
+
+.rr-splash-description:last-child {
+    margin-bottom: 80px;
 }
 
 .rr-splash-help-link {
-    margin: 10px;
-    font-size: 16px;
+    margin: 20px 0px 50px 0px;
+    font-size: 28px;
+    color: steelblue;
 }
+
+.rr-splash-help-link:hover {
+    cursor: pointer;
+}
+
 
 @keyframes loader {
     0% {
@@ -11817,6 +11918,20 @@ a.jstree-anchor.permissions-card {
         color: #888;
         position: relative;
         top: -20px;
+        left: 90px;
+    }
+
+    .report-related-resources .rp-card-section {
+        margin-left: 50px;
+    }
+
+    .report-related-resources .rp-card-section div div .dl-horizontal dt {
+        width: 500px;
+    }
+
+    .report-related-resources .rp-card-section div div .dl-horizontal dd {
+        padding-right: 20px;
+        margin-left: 520px;
     }
 
 }

@@ -337,14 +337,25 @@
             <!--ko if: resourceRelationships().length === 0 && resourceEditorContext && displaySplash() -->
             <div id="rr-splash" class="rr-splash" data-bind="visible: displaySplash()" style="display: none;">
 
-                <div class="rr-splash-title">{% trans "Related Resources" %}</div>
-                <div class="rr-splash-subtitle">{% trans "Arches allows you to create relationships between your resources" %}</div>
+                <!-- Image -->
+                <div class="img-lg img-circle rr-splash-img-container">
+                    <img class="rr-splash-img" src="../media/img/Workflow.png" alt="Resource Editor">
+                </div>
+
+                <!-- Splash Title -->
+                <div class="rr-splash-title">{% trans "Related Resources Editor" %}</div>
+
 
                 <button class="btn btn-shim btn-rr btn-labeled btn-lg fa fa-link" data-bind="click: function(){displaySplash(false)}">{% trans 'Add Related resources' %}</button>
 
-                <div class="rr-splash-description">{% trans "Arches allows you to define relationships between resources so you can better understand the context and interplay between physical objects, events, activities, people and documents. Relating resources lets you build a network of relatinships for your data objects." %}</div>
+                <!-- Splash Instructions -->
+                <div class="rr-splash-description">{% trans "Arches allows you to define relationships between resources so you can better understand the context and interplay" %}</div>
+                <div class="rr-splash-description">{% trans "between physical objects, events, activities, people and documents." %}</div>
+                <div class="rr-splash-description">{% trans "Relating resources lets you build a network of relatinships for your data objects." %}</div>
 
-                <div class="rr-splash-help-link" data-bind="click: function(){$parent.helpTemplate('report-manager-help'); $parent.getHelp(); $parent.helpOpen(true);}">{% trans "Show Me How" %}</div>
+               
+                <!-- Help Hyperlink -->
+                <div class="rr-splash-help-link" data-bind="click: function(){$parent.helpTemplate('report-manager-help'); $parent.helpOpen(true);}">{% trans "Show Me How" %}</div>
             </div>
             <!--/ko-->
         </div>

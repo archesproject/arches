@@ -232,7 +232,8 @@ define([
         };
 
         this.zoomToDrawLayer = function(){
-            var allFeatures = self.draw.getAll();
+            var allFeatures = this.context === 'report-header' ?
+                this.value() : self.draw.getAll();
             if (allFeatures.features.length > 0) {
                 this.map.fitBounds(geojsonExtent(allFeatures), {padding:20});
             }
@@ -847,16 +848,15 @@ define([
                     }
 
 
-                    if (self.context === 'report-header' && !ko.isObservable(self.value)) {
-                        self.value.forEach(function(tile) {
-                            _.each(tile.data, function(val, key) {
-                                if (_.contains(val, 'FeatureCollection')) {
-                                    result.features = _.union(result.features, val.features);
-                                }
-                            }, self);
-                        }, self);
-                        data = result;
+                    if (self.context === 'report-header') {
+                        data = self.value();
                         source.setData(data);
+                        self.value.subscribe(function(value) {
+                            source.setData(value);
+                            if (value.features.length > 0){
+                                zoomToGeoJSON(value);
+                            }
+                        });
                         _.each(['resource-poly' + self.graphId, 'resource-line' + self.graphId, 'resource-point' + self.graphId], function(layerId) { //clear and add resource layers so that they are on top of map
                             var cacheLayer = self.map.getLayer(layerId);
                             self.map.moveLayer(layerId, self.anchorLayerId);
@@ -868,6 +868,7 @@ define([
                     } else { //if values are for a form widget...
                         if (_.isObject(self.value())) { //confirm value is not "", null, or undefined
                             data = koMapping.toJS(self.value);
+                            self.loadGeometriesIntoDrawLayer();
                         }
                     }
 

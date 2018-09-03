@@ -60,7 +60,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
         <div class="btn-group btn-group-toggle" data-bind="visible: activeTab() === 'graph'">
             <button class="btn btn-md viewstate-btn" data-bind="css: { active: viewState() === 'design' }, click: function(){viewState('design');}">{% trans "Design" %}</button>
-            <button class="btn btn-md viewstate-btn" data-bind="css: { active: viewState() === 'preview' }, click: function(){viewState('preview');}">{% trans "Preview" %}</button>
+            <button class="btn btn-md viewstate-btn" data-bind="css: { active: viewState() === 'preview' }, click: showPreview">{% trans "Preview" %}</button>
         </div>
 
         <div class="graph-settings-crud">
@@ -198,10 +198,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
             </div>
 
+            <!--ko if: activeTab() === 'card' -->
             <div class="flex" data-bind="visible: activeTab() === 'card'">
                 <!--Middle Panel -->
                 <!-- ko if: cardTree.selection -->
-                <div class="middle-column-container graph-designer branch-library card-configuration" style="">
+                <div class="middle-column-container graph-designer branch-library card-configuration" data-bind="css: {'expanded': selectedCard() && selectedCard().model.helpenabled() && cardTree.selection().constructor.name === 'CardViewModel' }" style="">
                     <!-- ko if: typeof cardTree.selection()!=='string' -->
                         <!-- ko if: cardTree.selection().constructor.name === 'CardViewModel' -->
                         <div data-bind="with: cardTree.selection()">
@@ -268,13 +269,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
                 <!-- /ko -->
             </div>
+            <!-- /ko -->
 
-            <div class="flex" data-bind="visible: activeTab() === 'permissions'">
+            <!--ko if: activeTab() === 'permissions' -->
+            <div class="flex">
                 <!-- Card Manager -->
                 <div class="flex tab-pane fade in" data-bind="css: { active: activeTab() === 'permissions' }">
                     {% include 'views/graph/graph-designer/permission-settings-form.htm' %}
                 </div>
             </div>
+            <!--/ko-->
 
         </div>
 
