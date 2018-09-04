@@ -14,6 +14,10 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunSQL(
             """
+                update reports
+                set config = '{}'::json
+                where config is NULL;
+
                 update graphs
                 set templateid = r.templateid, config = r.config
                 from reports r where r.graphid = graphs.graphid and r.active = true;
