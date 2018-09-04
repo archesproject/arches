@@ -227,7 +227,8 @@ class GraphDesignerView(GraphBaseView):
 
         return render(request, 'views/graph-designer.htm', context)
 
-@method_decorator(group_required('Graph Editor'), name='dispatch')
+
+
 class GraphDataView(View):
 
     action = 'update_node'
@@ -290,6 +291,7 @@ class GraphDataView(View):
 
         return HttpResponseNotFound()
 
+    @method_decorator(group_required('Graph Editor'), name='dispatch')
     def post(self, request, graphid=None):
         ret = {}
 
@@ -366,6 +368,7 @@ class GraphDataView(View):
         except GraphValidationError as e:
             return JSONResponse({'status': 'false', 'success': False, 'message': e.message, 'title': e.title}, status=500)
 
+    @method_decorator(group_required('Graph Editor'), name='dispatch')
     def delete(self, request, graphid):
         if self.action == 'delete_node':
             data = JSONDeserializer().deserialize(request.body)
