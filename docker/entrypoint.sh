@@ -126,7 +126,7 @@ wait_for_db() {
 	echo "Testing if database server is up..."
 	while [[ ! ${return_code} == 0 ]]
 	do
-		psql -h ${PGHOST} -p ${PGPORT} -U ${PGUSERNAME} -c "select 1" >&/dev/null
+		psql --host=${PGHOST} --port=${PGPORT} --user=${PGUSERNAME} --dbname=postgres -c "select 1"
 		return_code=$?
 		sleep 1
 	done
@@ -144,14 +144,14 @@ wait_for_db() {
 
 db_exists() {
 	echo "Checking if database "${PGDBNAME}" exists..."
-	count=`psql -h ${PGHOST} -p ${PGPORT} -U ${PGUSERNAME} -Atc "SELECT COUNT(*) FROM pg_catalog.pg_database WHERE datname='${PGDBNAME}'"`
+	count=`psql --host=${PGHOST} --port=${PGPORT} --user=${PGUSERNAME} --dbname=postgres -Atc "SELECT COUNT(*) FROM pg_catalog.pg_database WHERE datname='${PGDBNAME}'"`
 
 	# Check if returned value is a number and not some error message
 	re='^[0-9]+$'
 	if ! [[ ${count} =~ $re ]] ; then
 	   echo "Error: Something went wrong when checking if database "${PGDBNAME}" exists..." >&2;
-		 echo "Exiting..."
-		 exit 1
+	   echo "Exiting..."
+	   exit 1
 	fi
 
 	# Return 0 (= true) if database exists
