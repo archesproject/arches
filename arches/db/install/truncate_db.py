@@ -27,4 +27,4 @@ def create_sqlfile(database_settings, path_to_file):
         "       CONNECTION LIMIT=-1;\n"
     )
 
-    utils.write_to_file(path_to_file, t.render(context));
+    utils.write_to_file(path_to_file, t.render(context))
