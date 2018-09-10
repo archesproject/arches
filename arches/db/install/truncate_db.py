@@ -25,7 +25,6 @@ def create_sqlfile(database_settings, path_to_file):
         "CREATE DATABASE {{ NAME }}\n"
         "  WITH ENCODING='UTF8'\n"
         "       CONNECTION LIMIT=-1;\n"
-        "\n"
     )
 
     utils.write_to_file(path_to_file, t.render(context));
