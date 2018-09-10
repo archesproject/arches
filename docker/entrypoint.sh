@@ -126,7 +126,7 @@ wait_for_db() {
 	echo "Testing if database server is up..."
 	while [[ ! ${return_code} == 0 ]]
 	do
-		psql --host=${PGHOST} --port=${PGPORT} --user=${PGUSERNAME} --dbname=postgres -c "select 1"
+        psql --host=${PGHOST} --port=${PGPORT} --user=${PGUSERNAME} --dbname=postgres -c "select 1" >&/dev/null
 		return_code=$?
 		sleep 1
 	done
