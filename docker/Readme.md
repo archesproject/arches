@@ -7,6 +7,7 @@
     *   [Troubleshoot](#troubleshoot)
 *   [Developing](#developing)
     *   [Setting up your own Arches project](#setting-up-your-own-arches-project)
+    *   [Running in DEV mode](#running-in-dev-mode)
     *   [Arches Core Development](#arches-core-development)
     *   [Arches Core Development Troubleshoot](#arches-core-development-troubleshoot)
 *   [Additional Information](#additional-information)
@@ -135,13 +136,15 @@ If you would like search engines such as Google to index your Arches website, se
 
 
 ### Troubleshoot
-Potentially ports `80` and/or `443` on your machine are already taken by another application. In this case, change the port number of your Nginx service in `docker-compose.yml`. Be sure to keep the second number of the `port:port` pairs unchanged:
-```
-      ports:
-        - '81:80'
-        - '444:443'
-```
+- Potentially ports `80` and/or `443` on your machine are already taken by another application. In this case, change the port number of your Nginx service in `docker-compose.yml`. Be sure to keep the second number of the `port:port` pairs unchanged:
+    ```
+        ports:
+            - '81:80'
+            - '444:443'
+    ```
 
+
+- When you try to load Arches in your browser and all you see is a white page with black text (and many 404 errors in your browser console), check out [Running in DEV mode](#running-in-dev-mode)
 
 
 
@@ -228,23 +231,45 @@ This will be used throughout your development process and does not need to be ch
 
 
 
+### Running in DEV mode
+The `docker-compose.yml` file provided for you in the Arches git repository is configured to run in production.  
+Specific settings of interest are:
+
+- Environment variables in the `Arches` service: 
+    - `DJANGO_MODE=PROD`: When set to PROD, prepares your static files (css, js, etc) to be served through the Nginx web server
+    - `DJANGO_DEBUG=False`: Among other things, `True` will display exception pages in the browser (more info [here](https://docs.djangoproject.com/en/1.11/ref/settings/#debug))
+- The `Nginx` service, which is a web server that sits between the user (you) and the Arches service
+
+When developing, use `DJANGO_MODE=DEV` and `DJANGO_DEBUG=True`. This will effectively bypass your Nginx service, so contact your Arches service directly on port 8000:
+http://localhost:8000
+
+For convenience you can map port 80 from your host machine to port 8000 in your Arches container. In your `docker-compose(-local).yml` under your Arches  service:
+```
+      ports:
+        - '8000:8000'
+        - '80:8000'  # <-- Add this line
+```
+Now you can access your Arches service through http://localhost
+
+
+
 ### Arches Core Development
 To develop on Arches Core, ensure you are not already running PostgreSQL and it is advisable to mount your source code into the container for instant code editing without rebuilding your Docker image.  
 
-1.  In your Arches Root Directory, create a copy of [docker-compose.yml](../docker-compose.yml) called `docker-compose-local.yml`.  
+1. Checkout your fork of the Arches repository. See [here](https://github.com/archesproject/arches/wiki#-contributing-code) for more information. 
 
-2.  Set your Project Variables of `ARCHES_PROJECT`, `PGDBNAME`, and `ELASTICSEARCH_PREFIX` to be the same Project Name.
+2. In your Arches Root Directory, create a copy of [docker-compose.yml](../docker-compose.yml) called `docker-compose-local.yml`.  
 
 3.  Adjust the `image` for the `arches` container to be:  
     `image: archesproject/arches:master`
 
-
 4.  Add these lines to `docker-compose-local.yml` under the `arches` container under `volumes`:  
 ```
-	- ./:/web_root/arches/  
-	- ./docker/settings_local.py:/web_root/arches/arches/settings_local.py  
-	- ../<insert_project_name>:/web_root/<insert_project_name>	
+    - ./:/web_root/arches/  
+    - ./docker/settings_local.py:/web_root/arches/arches/settings_local.py  
 ```
+    This will mount the root Arches folder into your container, which allows you to edit code on your development machine, which is directly linked to the code in your Docker container.
+
 5.  Build your Docker containers using:  
 	`docker-compose -f .\docker-compose-local.yml build`  
     
@@ -253,11 +278,12 @@ To develop on Arches Core, ensure you are not already running PostgreSQL and it 
 7.  Run your Docker containers using:  
 	`docker-compose -f .\docker-compose-local.yml up`  
 
-This will mount the root Arches folder into your container. This allows you to edit code on your development machine, which is directly linked to the code in your Docker container.  
+8. See [Running in DEV mode](#running-in-dev-mode) to get exception messages in the browser and to bypass Nginx.  
+
 
 Any time you change Arches Dependancies, you will need to re-build your Docker Container. The `docker-compose -f .\docker-compose-local.yml build` command will re-build the container for you based upon the `Dockerfile`. If your new or updated dependency does not install correctly, you may need to build without cache: `docker-compose -f .\docker-compose-local.yml build --no-cache`
 
-The volume commands at *point 2* also mounts a settings_local.py into the container. This ensures some important settings, e.g. database and Elasticsearch endpoints, can still be set through environment variables. **This settings file may be overwritten by your own settings file, presuming you are including these settings as well.**
+(Note: *The volume section at **point 4** also mounts a settings_local.py into the container. This ensures some important settings, e.g. database and Elasticsearch endpoints, can still be set through environment variables.* **This settings file may be overwritten by your own settings file, presuming you are including these settings as well.**)
 
 Here is a link to a working [docker-compose-local.yml](https://gist.github.com/jmunowitch/c63fa39be4651b9bf2f0b1abc69f7479) file
 
