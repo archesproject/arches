@@ -180,7 +180,8 @@ class Resources(APIBase):
                     "@type": "ldp:BasicContainer",
                     # Here we actually mean the name
                     #"label": str(model.name),
-                    "ldp:contains": ["%s%s" % (base_url, resourceid) for resourceid in list(Resource.objects.values_list('pk', flat=True).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_ID).order_by('pk')[start:end])]
+                    "ldp:contains": ["%s%s" % (base_url, resourceid) for resourceid in list(Resource.objects.values_list('pk', flat=True).
+                        exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_ID).order_by('pk')[start:end])]
                 }
 
             return JSONResponse(out, indent=indent)
