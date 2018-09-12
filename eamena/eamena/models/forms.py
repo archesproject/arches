@@ -125,7 +125,7 @@ class FeatureSummaryForm(ResourceForm):
         return {
             'id': 'summary-feature',
             'icon': 'fa-align-center',
-            'name': _('Resource Summary'),
+            'name': _('Feature Summary'),
             'class': FeatureSummaryForm
         }
 
