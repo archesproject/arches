@@ -132,6 +132,7 @@ class FeatureSummaryForm(ResourceForm):
     def update(self, data, files):
         self.update_nodes('NAME.E41', data)
         self.update_nodes('HERITAGE_CLASSIFICATION_TYPE.E55', data)
+        self.update_nodes('HERITAGE_FEATURE_USE_TYPE.E55', data)
         self.update_nodes('RIGHT.E30', data)
         self.update_nodes('DESCRIPTION_ASSIGNMENT.E13', data)
         return
@@ -145,7 +146,11 @@ class FeatureSummaryForm(ResourceForm):
             self.data['HERITAGE_CLASSIFICATION_TYPE.E55'] = {
                 'branch_lists': self.get_nodes('HERITAGE_CLASSIFICATION_TYPE.E55'),
                 'domains': {'HERITAGE_CLASSIFICATION_TYPE.E55' : Concept().get_e55_domain('HERITAGE_CLASSIFICATION_TYPE.E55')}
-            }            
+            }        
+            self.data['HERITAGE_FEATURE_USE_TYPE.E55'] = {
+                'branch_lists': self.get_nodes('HERITAGE_FEATURE_USE_TYPE.E55'),
+                'domains': {'HERITAGE_FEATURE_USE_TYPE.E55' : Concept().get_e55_domain('HERITAGE_FEATURE_USE_TYPE.E55')}
+            }               
             
             self.data['RIGHT.E30'] = {
                 'branch_lists': datetime_nodes_to_dates(self.get_nodes('RIGHT.E30')),

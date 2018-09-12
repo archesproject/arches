@@ -67,11 +67,77 @@
 </div>
 <!-- End Name Records -->
 
+<hr class="devider arches-RDM-divider">
+
+<div id="current-use-section">
+    <!-- Current Use  CRUD Form -->
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="padding-left-10">
+                
+                <dl>
+                    <!-- Title -->
+                    <dt>
+                        <h5 id="arches-subjects-form" class="section-headline">{% trans "Current Use" %}</h5>
+                    </dt>
+                    
+                    <!-- Form -->
+                    <dd>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <input style="width:33%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" placeholder="{% trans 'Current Use' %}" data-bind="select2: {value: getEditedNode('HERITAGE_FEATURE_USE_TYPE.E55', 'value'), dataKey: 'HERITAGE_FEATURE_USE_TYPE.E55'}"></input>
+                                
+                                
+                                <!-- Spacer (for xs screens) -->
+                                <div class="margin-top-5 hidden-sm hidden-md hidden-lg"></div>
+                                
+                                {% include 'views/components/add-item-button.htm' %}
+                            </div>
+                        </div>
+                    </dd>
+                    <!-- End Form -->
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "This value must be populated." %}</div>
+                </dl>
+                
+            </div>
+        </div>
+    </div>
+    <!-- End Current Use CRUD -->
+    
+    <!-- Current Use Records -->
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="arches-crud-child-section">
+                <dl>
+                    <dd class="arches-CRUD-child-title">
+                        
+                        {% trans "This resource is classified as:" %}
+                    </dd>
+                    <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
+                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Current Use Defined" %}</div>
+                        
+                        <div data-bind='foreach: getBranchLists()'>
+                            <div class="arches-crud-record">
+                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans 'Delete this value' %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans 'Edit this value' %}"><span data-bind='{text: nodes.get("HERITAGE_FEATURE_USE_TYPE.E55", "label")}' style="padding-right:2px;"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </dd>
+                    
+                </dl>
+                
+            </div>
+        </div>
+    </div>
+    <!-- End Current Use Records -->
+</div>
+
 
 
 <hr class="devider arches-RDM-divider">
 
-
+<!-- Begin Designation Section -->
 <div id="designation-section">
     <div class="row">
         <div class="col-xs-12">
@@ -277,9 +343,8 @@
                         <dd>
                             <div class="row">
                                 <div class="col-xs-12">
-                                    <input style="width:33%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type hidden-xs" placeholder="{% trans 'Classification' %}" data-bind="select2: {value: getEditedNode('HERITAGE_CLASSIFICATION_TYPE.E55', 'value'), dataKey: 'HERITAGE_CLASSIFICATION_TYPE.E55'}"></input>
-                                    
-                                    <input style="width:33%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type  hidden-sm hidden-md hidden-lg"  placeholder= "{% trans 'Classification' %}" data-bind="select2: {value: getEditedNode('HERITAGE_CLASSIFICATION_TYPE.E55', 'value'), dataKey: 'HERITAGE_CLASSIFICATION_TYPE.E55'}"></input>
+                                    <input style="width:33%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" placeholder="{% trans 'Classification' %}" data-bind="select2: {value: getEditedNode('HERITAGE_CLASSIFICATION_TYPE.E55', 'value'), dataKey: 'HERITAGE_CLASSIFICATION_TYPE.E55'}"></input>
+
                                     
                                     <!-- Spacer (for xs screens) -->
                                     <div class="margin-top-5 hidden-sm hidden-md hidden-lg"></div>
@@ -307,7 +372,7 @@
                             {% trans "This resource is classified as:" %}
                         </dd>
                         <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
-                            <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Heritage Classification Defined" %}</div>
+                            <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Feature Classification Defined" %}</div>
                             
                             <div data-bind='foreach: getBranchLists()'>
                                 <div class="arches-crud-record">
@@ -323,7 +388,7 @@
                 </div>
             </div>
         </div>
-        <!-- End Classificaiton Records -->
+        <!-- End Classification Records -->
     </div>
 </div>
 
