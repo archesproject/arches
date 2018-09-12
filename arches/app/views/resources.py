@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import re
+import math
 from django.template import RequestContext
 from django.shortcuts import render_to_response, redirect
 from django.views.decorators.csrf import csrf_exempt
@@ -65,6 +66,35 @@ def resource_manager(request, resourcetypeid='', form_id='default', resourceid='
 
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.POST.get('formdata', {}))
+
+        # Will check that this resource doesn't already exist!
+        if form_id in ['location', 'location-component', 'coverage']:
+            existing = check_existing(data, resourcetypeid, resource.entityid)
+            if existing:
+                # existing contains the JSON response
+                lang = request.GET.get('lang', request.LANGUAGE_CODE)
+                form.load(lang)
+                return render_to_response('resource-manager.htm', {
+                    'alert': existing,  # JSON response containing info on nearby resources
+                    'submitted_data': JSONSerializer().serialize(data),  # original submitted data
+                    'form': form,
+                    'formdata': JSONSerializer().serialize(form.data),
+                    'form_template': 'views/forms/' + form_id + '.htm',
+                    'form_id': form_id,
+                    'resourcetypeid': resourcetypeid,
+                    'resourceid': resourceid,
+                    'main_script': 'resource-manager',
+                    'active_page': 'ResourceManger',
+                    'resource': resource,
+                    'resource_name': resource.get_primary_name(),
+                    'resource_type_name': resource.get_type_name(),
+                    'form_groups': resource.form_groups,
+                    'timefilterdata': JSONSerializer().serialize(Concept.get_time_filter_data()),
+                    'resource_icon': settings.RESOURCE_TYPE_CONFIGS()[resourcetypeid]['icon_class'],
+                    'child_resource': 'HERITAGE_FEATURE.E24' if resourcetypeid == 'HERITAGE_RESOURCE_GROUP.E27' else 'HERITAGE_COMPONENT.B2'
+                },
+                context_instance=RequestContext(request))
+
         form.set_user(request.user)
         form.update(data, request.FILES)
 
@@ -258,4 +288,57 @@ def debug_view(request, resourceid=''):
     resource_dict = resource.dictify()
     
     return JSONResponse(resource_dict, indent=4)
-    
+
+
+def check_existing(resource):
+    nearbyres = {}
+    geomentities = ["SPATIAL_COORDINATES.E47", "GEOMETRIC_PLACE_EXPRESSION.SP5", "SPATIAL_COORDINATES_GEOMETRY.E47"]
+    geoms = [ent for ent in resource.flatten() if ent.entitytypeid in geomentities]
+    for geom in geoms:
+        target = GEOSGeometry(geom.value, srid=4326)
+        mindistance = settings.METER_RADIUS
+        if not mindistance:
+            mindistance = 1000  # if settings.METER_RADIUS isn't set, default to 1Km
+        nearbygeos = models.Geometries.objects.filter(val__dwithin=(target, getDegrees(mindistance, target)))
+        for g in nearbygeos:
+            parent = get_root_id(g.entityid)
+            # check that it's a new resource with the same resource type.
+            if str(parent.entityid) != resource.entityid and str(parent.entitytypeid) == resource.entitytypeid:
+                if parent.entityid not in nearbyres:
+                    # create a class instance to get the primary_name
+                    # this can be slow so if the primary_name isn't needed it could be worth skipping
+                    res = Resource().get(parent.entityid)
+                    nearbyres[parent.entityid] = res.get_primary_name()
+
+    if nearbyres:
+        return nearbyres
+    return False
+
+
+def get_root_id(entityid):
+    parent = get_parent_id(entityid)
+    while True:
+        if get_parent_id(parent.entityid):
+            parent = get_parent_id(parent.entityid)
+        else:
+            break
+    return parent
+
+
+def get_parent_id(entityid):
+    if models.Relations.objects.filter(entityidrange=entityid):
+        return models.Relations.objects.get(entityidrange=entityid).entityiddomain
+    else:
+        return False
+
+
+def getDegrees(meters, target):
+    diffy = target.extent[3] - target.extent[1]
+    midpoint = target.extent[1] + diffy
+    return metersToDegrees(meters, midpoint)
+
+
+def metersToDegrees(meters, latitude):
+    """Based on the C# function described in
+    https://stackoverflow.com/questions/25237356/convert-meters-to-decimal-degrees"""
+    return meters / (111319.9 * math.cos(latitude * (math.pi / 180)))
