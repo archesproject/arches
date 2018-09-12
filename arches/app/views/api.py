@@ -169,7 +169,7 @@ class Resources(APIBase):
                 except:
                     page = 1
 
-                start = ((page - 1) * page_size) + 1
+                start = ((page - 1) * page_size)
                 end = start + page_size
 
                 base_url = "%s%s" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT,
@@ -180,7 +180,7 @@ class Resources(APIBase):
                     "@type": "ldp:BasicContainer",
                     # Here we actually mean the name
                     #"label": str(model.name),
-                    "ldp:contains": ["%s%s" % (base_url, resourceid) for resourceid in list(Resource.objects.values_list('pk', flat=True).order_by('pk')[start:end])]
+                    "ldp:contains": ["%s%s" % (base_url, resourceid) for resourceid in list(Resource.objects.values_list('pk', flat=True).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_ID).order_by('pk')[start:end])]
                 }
 
             return JSONResponse(out, indent=indent)
