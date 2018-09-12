@@ -530,52 +530,47 @@ def rename_entity_type(old_entitytype_id, new_entitytype_id):
     #First find if Rules with the new entitytypeid already exist, if so, delete them and replace their ruleid into mapping_steps with that of the old entitytypeid rule, then rename the rules
     pre_existing_rulesout = models.Rules.objects.filter(entitytypedomain=new_entitytype_id)
     pre_existing_rulesin = models.Rules.objects.filter(entitytyperange=new_entitytype_id)
-    if pre_existing_rulesout:
-        print "<<<<<Beginning of rulesout>>>>>>"       
-        for pre_existing_ruleout in pre_existing_rulesout:
-            ruleid_to_replace_with = None
-            try:
-                ruleid_to_replace_with = models.Rules.objects.get(entitytypedomain=old_entitytype_id, entitytyperange = pre_existing_ruleout.entitytyperange, propertyid = pre_existing_ruleout.propertyid)
-                steps = models.MappingSteps.objects.filter(ruleid= pre_existing_ruleout.ruleid)
-                print "RULEID TO REPLACE WITH", ruleid_to_replace_with.ruleid, pre_existing_ruleout.ruleid, len(steps)
-                prexistingrule = pre_existing_ruleout.ruleid
-                pre_existing_ruleout.delete()    
-                steps2 = models.MappingSteps.objects.filter(ruleid= prexistingrule)
-                print "Steps after deleting pre-existing rule: %s" % len(steps2)
-            except:
-                continue
-            if steps and ruleid_to_replace_with:                
-                for step in steps:
-                    print "STEP being analysed has mapping %s and rule %s, and the rule will be replaced with %s" % (step.mappingid_id, step.ruleid_id,ruleid_to_replace_with.pk) 
-                    step.ruleid = ruleid_to_replace_with
-                    try:
-                        step.save()
-                        print "STEP saved: %s %s" % (step.mappingid, step.ruleid_id)
-                    except IntegrityError as e:
-                        print "Error saving step %s" % e
-                        continue
+#     if pre_existing_rulesout:
+#         print "<<<<<Beginning of rulesout>>>>>>"       
+#         for pre_existing_ruleout in pre_existing_rulesout:
+#             ruleid_to_replace_with = None
+#             ruleid_to_replace_with = models.Rules.objects.filter(entitytypedomain=old_entitytype_id, entitytyperange = pre_existing_ruleout.entitytyperange, propertyid = pre_existing_ruleout.propertyid).values_list('ruleid', flat=True)
+#             if ruleid_to_replace_with:
+#                 steps = models.MappingSteps.objects.filter(ruleid= pre_existing_ruleout.ruleid)
+#                 models.MappingSteps.objects.filter(ruleid= pre_existing_ruleout.ruleid).delete()
+#                 print "RULEID TO REPLACE WITH", ruleid_to_replace_with[0], pre_existing_ruleout.ruleid, len(steps)
+#                 pre_existing_ruleout.delete()    
+#                 if steps:                
+#                     for step in steps:
+#                         print "STEP being analysed has mapping %s and rule %s, and the rule will be replaced with %s" % (step.mappingid_id, step.ruleid_id,ruleid_to_replace_with[0]) 
+#                         step.ruleid_id = ruleid_to_replace_with[0]
+#                         try:
+#                             steps2 = models.MappingSteps.objects.filter(ruleid= step.ruleid_id, mappingid = step.mappingid_id)
+#                             step.save()
+#                             steps3 = models.MappingSteps.objects.filter(ruleid= step.ruleid_id, mappingid = step.mappingid_id)
+#                             print "STEP saved: %s %s. No. of steps before save: %s, and after %s" % (step.mappingid_id, step.ruleid_id, len(steps2), len(steps3))
+#                         except IntegrityError as e:
+#                             print "Error saving step %s" % e
+#                             continue
                 
 
  
     if pre_existing_rulesin:
         print "<<<<<Beginning of rulesin>>>>>>"        
-        for pre_extisting_rulein in pre_existing_rulesin:
+        for pre_existing_rulein in pre_existing_rulesin:
             ruleid_to_replace_with = None
             try:
-                ruleid_to_replace_with = models.Rules.objects.get(entitytyperange=old_entitytype_id, entitytypedomain = pre_extisting_rulein.entitytypedomain, propertyid = pre_extisting_rulein.propertyid)
+                ruleid_to_replace_with = models.Rules.objects.filter(entitytyperange=old_entitytype_id, entitytypedomain = pre_existing_rulein.entitytypedomain, propertyid = pre_existing_rulein.propertyid).values_list('ruleid', flat=True)
                 steps = models.MappingSteps.objects.filter(ruleid= pre_existing_rulein.ruleid)
                 print "RULEID TO REPLACE WITH", ruleid_to_replace_with.ruleid, pre_existing_rulein.ruleid, len(steps)
                 pre_existing_rulein.delete()
-                prexistingrule = pre_existing_rulein.ruleid    
-                steps2 = models.MappingSteps.objects.filter(ruleid= prexistingrule)
-                print "Steps after deleting pre-existing rule: %s" % len(steps2)
             except:
                 continue
             if steps and ruleid_to_replace_with:
                 
                 for step in steps:
                     print "STEP being analysed has mapping %s and rule %s, and the rule will be replaced with %s" % (step.mappingid_id, step.ruleid_id,ruleid_to_replace_with.pk) 
-                    step.ruleid_id = ruleid_to_replace_with.ruleid_id
+                    step.ruleid_id = ruleid_to_replace_with[0]
                     try:
                         step.save()
                         print "STEP saved: %s %s" % (step.mappingid, step.ruleid_id)
