@@ -73,6 +73,7 @@ def validate(request):
 
     fpath = request.POST.get('filepath', '')
     restype = request.POST.get('restype','')
+    valtype = request.POST.get('validationtype','')
 
     convert = {'false':False,'true':True}
     append = convert[request.POST.get('append', 'false')]
@@ -81,19 +82,23 @@ def validate(request):
     destpath = get_archesfile_path(fullpath)
     out = StringIO()
     call_command('Excelreader',
-        operation='site_dataset',
+        operation='validate',
         source=fullpath,
         dest_dir=destpath,
-        resource_type=restype,
+        res_type=restype,
         append_data=append,
+        validation_type=valtype,
         stdout=out,
     )
-    errorlog = os.path.join(settings.BULK_UPLOAD_DIR,'_validation_errors.json')
 
+    errorlog = os.path.join(settings.BULK_UPLOAD_DIR,
+        "{}_validation_errors-{}.json".format(os.path.basename(os.path.splitext(destpath)[0]),valtype)
+    )
     with open(errorlog,'r') as readjson:
         data = readjson.read()
         result = json.loads(data)
-    if 'success' not in result:
+
+    if not result['success']:
         os.remove(fullpath)
 
     else:
