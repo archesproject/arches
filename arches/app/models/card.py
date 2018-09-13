@@ -91,11 +91,21 @@ class Card(models.CardModel):
 
                 if 'widgets' in args[0]:
                     for widget in args[0]["widgets"]:
+                        cardxnodexwidgetid = widget.get('id', None)
+                        node_id = widget.get('node_id', None)
+                        card_id = widget.get('card_id', None)
+                        widget_id = widget.get('widget_id', None)
+                        if cardxnodexwidgetid is None and (node_id is not None and card_id is not None and widget_id is not None):
+                            try:
+                                wm = models.CardXNodeXWidget.objects.get(node_id=node_id, card_id=card_id, widget_id=widget_id)
+                                cardxnodexwidgetid = wm.pk
+                            except:
+                                pass
                         widget_model = models.CardXNodeXWidget()
-                        widget_model.pk = widget.get('id', None)
-                        widget_model.node_id = widget.get('node_id', None)
-                        widget_model.card_id = widget.get('card_id', None)
-                        widget_model.widget_id = widget.get('widget_id', None)
+                        widget_model.pk = cardxnodexwidgetid
+                        widget_model.node_id = node_id
+                        widget_model.card_id = card_id
+                        widget_model.widget_id = widget_id
                         widget_model.config = widget.get('config', {})
                         widget_model.label = widget.get('label', '')
                         widget_model.visible = widget.get('visible', None)
