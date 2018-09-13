@@ -381,6 +381,7 @@ input.file {
 
 #upload-log-output {
     height:500px;
+    width: 650px;
     overflow-y:scroll;
     border: 1px solid #e3e3e3;
     background-color: #eeeeee;
