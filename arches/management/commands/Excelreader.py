@@ -1,24 +1,21 @@
 from __future__ import division
 import os
-import re
 import csv
+import json
 import datetime
 from django.conf import settings
 from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError 
 from openpyxl import load_workbook
-from openpyxl import Workbook
 import arches.app.models.models as archesmodels
 from arches.management.commands import utils
 from django.contrib.gis.geos import GEOSGeometry
-import json
 
 class Command(BaseCommand):
     
     option_list = BaseCommand.option_list + (
-        make_option('-o', '--operation', action='store', dest='operation', default='site_dataset',type='choice', choices=['bibliography','site_dataset','validate','write_arches_files'],help='Operation Type; ' + '\'bibliography\'=Reads a bibliographic XLSX and converts it to arches import file' + '\'site_dataset\'=Reads a site gazetteer XLSX and converts it to arches import file'),
+        make_option('-o', '--operation', action='store', dest='operation', default='site_dataset',type='choice', choices=['validate'],help="'validate' must be chosen as the operation, and a 'validation_type' must be added as well"),
         make_option('-s', '--source', action='store', dest='source', default='',help='Directory containing the XLSX file you need to convert to .arches'),
-        make_option('-m', '--mapping', action='store', dest='mapping_file', default='',help='Directory containing a .csv mapping file'),        
         make_option('-d', '--dest_dir', action='store', dest='dest_dir',help='Directory, comprinsing of file name, where you want to save the .arches file'),
         make_option('-r', '--res_type', action='store', dest='resource_type', default='HERITAGE_RESOURCE_GROUP.E27', help='What kind of resource the source file contains e.g. HERITAGE_RESOURCE_GROUP.E27'),
         make_option('-a', '--append', action='store_true', dest='append_data', default=False, help='This flag indicates that the XLSX file contains data to append'),
@@ -81,10 +78,6 @@ class Command(BaseCommand):
                 print repr(e)
             with open(error_path,'w') as out:
                 json.dump(result,out)
-
-        ## DEPRECATED sept 13 2018
-        if options['operation'] == 'site_dataset':
-            result, filelist = self.SiteDataset(options['source'], options['resource_type'], options['dest_dir'],options['append_data'])
 
         if filelist:
             self.stdout.write("Has attachments")
@@ -449,115 +442,3 @@ class Command(BaseCommand):
             writer.writerow(['RESOURCEID_FROM','RESOURCEID_TO','START_DATE','END_DATE','RELATION_TYPE','NOTES'])
 
         return
-
-    ## DEPRECATED sept 13 2018
-    def SiteDataset(self, source, resourcetype, destination, append = False):
-        wb2 = load_workbook(source)
-#             self.validaterows(wb2)
-                
-        ResourceList = []
-        FaultyConceptsList = []
-        Log = {
-            'validate_headers' : {'errors': [], 'passed': True},
-            'validate_rows_and_values' : {'errors': [], 'passed': True},
-            'validate_geometries' :  {'errors': [], 'passed': True},
-            'validate_dates' : {'errors': [], 'passed': True},
-            'validate_concepts' :  {'errors': [], 'passed': True},
-            'validate_files' : {'errors': [], 'passed': True},
-        }
-        if append:
-            resourceids_list = self.create_resourceid_list(wb2)
-        
-        headers_errors = self.validate_headers(wb2,skip_resourceid_col = append)
-        rows_values_errors =  self.validate_rows_and_values(wb2)
-        if headers_errors:
-            Log['validate_headers']['errors'].extend(headers_errors)
-            Log['validate_headers']['passed'] = False
-        if rows_values_errors:
-            Log['validate_rows_and_values']['errors'].extend(rows_values_errors)
-            Log['validate_rows_and_values']['passed'] = False            
-#             if rows_values_errors['different_rows'] == True:
-#                 Log['validate_rows_and_values']['passed'] = False
-#             else:
-#                 rows_values_errors.pop('different_rows', None)
-#                 Log['validate_rows_and_values']['errors'].append(rows_values_errors['errors'])
-#                 Log['validate_rows_and_values']['passed'] = False
-
-        filelist = []
-        
-        if headers_errors or rows_values_errors:
-            return Log, filelist
-
-        for sheet_index,sheet in enumerate(wb2.worksheets):
-            sheet_name = wb2.sheetnames[sheet_index]
-            for col_index,header in enumerate(sheet.iter_cols(max_row = 1)):
-                GroupNo = 0
-                if header[0].value is not None and header[0].value != 'RESOURCEID':
-                    print "Now analysing values for %s" % header[0].value
-                    modelinstance = archesmodels.EntityTypes.objects.get(pk = header[0].value)
-                    for row_index, row in enumerate(sheet.iter_rows(row_offset = 1)):
-    #                     print "Row %s column %s with value %s" %(row_index, col_index, row[col_index].value)
-                        if row[col_index].value is not None:
-                            resourceid = row_index if append == False else resourceids_list[row_index]
-                            value_encoded = (unicode(row[col_index].value)).encode('utf-8') #Values could be in Arabic or containing unicode chars, so it is essential to encode them properly.
-                            for concept_index,concept in enumerate(re.sub(ur'|\s+', '|', value_encoded).split('|')): #replacing a semicolon (u003b) and space (u0020) with a semicolon in case that that space in front of the semicolon exists
-                                concept = concept.rstrip() #removes potential trailing spaces
-                                GroupNo = GroupNo +1 if sheet_name is not 'NOT' else ''
-                                GroupName = " ".join((sheet_name, str(GroupNo))) if sheet_name != 'NOT' else sheet_name
-                                if concept != 'x':
-                                    if modelinstance.businesstablename == 'domains':                                
-                                        concepts_in_node = self.collect_concepts(modelinstance.conceptid_id, full_concept_list =[])
-                                        valueinstance =  self.validate_concept(concept, concepts_in_node)
-                                        if valueinstance is not None:
-                                            conceptinstance = archesmodels.Concepts.objects.get(pk=valueinstance[0][0].conceptid)
-                                            concept_list = [str(resourceid),resourcetype,modelinstance.entitytypeid,conceptinstance.legacyoid,GroupName]
-                                            ResourceList.append(concept_list)
-#                                             print "ConceptId %s, ResourceId %s, AttributeName %s, AttributeValue %s, GroupId %s" %(valueinstance[0][0].conceptid, row_index,modelinstance.entitytypeid,conceptinstance.legacyoid,GroupName)
-                                        else:
-                                            Log['validate_concepts']['errors'].append("{0} in {1}, at row no. {2}".format(concept,header[0].value,(row_index+2)))
-                                            Log['validate_concepts']['passed'] = False
-                                            # logger.info("{0} in {1}, at row no. {2}".format(concept,header[0].value,(row_index+2)))
-                                    if modelinstance.businesstablename == 'strings':
-                                            concept_list = [str(resourceid),resourcetype,modelinstance.entitytypeid,concept, GroupName]
-                                            ResourceList.append(concept_list)
-        #                                     print "ResourceId %s, AttributeName %s, AttributeValue %s, GroupId %s" %(row_index,modelinstance.entitytypeid,concept, GroupName)
-                                    if modelinstance.businesstablename == 'dates':
-                                            if isinstance(self.validatedate(concept), basestring):
-                                                Log['validate_dates']['errors'].append(self.validatedate(concept,header =header[0].value, row_no = row_index+2))
-                                                Log['validate_dates']['passed'] = False                                       
-                                            else:
-                                                concept_list = [str(resourceid),resourcetype,modelinstance.entitytypeid,self.validatedate(concept), GroupName]
-                                                ResourceList.append(concept_list)                                                         
-                                    if modelinstance.businesstablename == 'geometries':
-                                            if self.validate_geometry(concept,header[0].value,row_index):
-                                                Log['validate_geometries']['errors'].append(self.validate_geometry(concept,header[0].value,row_index))
-                                                Log['validate_geometries']['passed'] = False
-                                            else:
-                                                concept_list = [str(resourceid),resourcetype,modelinstance.entitytypeid,concept, GroupName]
-                                                ResourceList.append(concept_list)
-                                    if modelinstance.businesstablename == 'files':
-                                            if self.validate_files(concept, header[0].value, row_index):
-                                                Log['validate_files']['errors'].append(self.validate_files(concept, header[0].value, row_index))
-                                                Log['validate_files']['passed'] = False
-                                            else:
-                                                concept_list = [str(resourceid), resourcetype, modelinstance.entitytypeid, concept, GroupName]
-                                                ResourceList.append(concept_list)
-                                                filelist.append(concept)
-
-        else:
-            Log['success'] = True
-            with open(destination, 'wb') as archesfile:
-                writer = csv.writer(archesfile, delimiter ="|")
-                writer.writerow(['RESOURCEID', 'RESOURCETYPE', 'ATTRIBUTENAME', 'ATTRIBUTEVALUE', 'GROUPID'])
-                ResourceList = sorted(ResourceList, key = lambda row:(row[0],row[4],row[2]), reverse = False)
-                for row in ResourceList:
-                    writer.writerow(row)
-
-            ## make blank relations file
-            relationsfile = destination.replace(".arches",".relations")
-            with open(relationsfile, 'wb') as rel:
-                writer = csv.writer(rel, delimiter ="|")
-                writer.writerow(['RESOURCEID_FROM','RESOURCEID_TO','START_DATE','END_DATE','RELATION_TYPE','NOTES'])
-
-            return Log, filelist
-                                                                        
