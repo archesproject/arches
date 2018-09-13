@@ -5,17 +5,21 @@ function updateRestype() {
     });
 };
 
-function displayResults(result,testName,logEl) {
+// sleep function just for testing
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function displayResults(result,testName) {
+    var logEl = document.getElementById('upload-log-output');
     var passColor = 'green';
     var failColor = 'red';
-    var pass = true;
-    if (result.passed) {
+    if (result.success) {
         t = testName+": PASS";
         logEl.insertAdjacentHTML('beforeend',
             '<p class="log-line" style="color:'+passColor+'">'+t+'</p>'
         );
     } else {
-        pass = false;
         t = testName+": FAIL";
         logEl.insertAdjacentHTML('beforeend',
             '<p class="log-line" style="color:'+failColor+'">'+t+'</p>'
@@ -26,7 +30,40 @@ function displayResults(result,testName,logEl) {
             );
         });
     }
-    return pass;
+    return
+}
+
+function setValPostData(valType,filePath) {
+    data = {
+        'validationtype':valType,
+        'filepath':filePath,
+        'restype':$('#resource-type-select').val(),
+        'append':$('#append-select').val(),
+    }
+    return data
+}
+
+function postValidation(passed,valType,filePath) {
+    if (!passed) {return passed}
+    
+    xhr = $.ajax({
+        beforeSend: function(request) {
+            request.setRequestHeader("X-CSRFToken",csrftoken);
+        },
+        url: '/bulk-upload/validate',
+        type: 'post',
+        data: setValPostData(valType,filePath),
+        done: function (result) {
+        },
+        success: function(result) {
+            
+            
+            var logEl = document.getElementById('upload-log-output');
+            displayResults(result,valType,logEl)
+            if (!result.success) {passed = false};
+            return passed
+        }
+    });
 }
 
 $( document ).ready(function() {
@@ -34,6 +71,7 @@ $( document ).ready(function() {
     var filepath = '';
     var archesFilepath = '';
     var formdata = new FormData();
+    var xhr = null;
 
     'use strict';
     var csrftoken = $("[name=csrfmiddlewaretoken]").val();
@@ -48,7 +86,7 @@ $( document ).ready(function() {
                 $('#files-msg').css("color","red");
                 $('#files-msg').text("Invalid file format rejected for upload.");
             } else {
-                filepath = data.result.filepath;
+                filePath = data.result.filepath;
                 $('#files-msg').css("color","green");
                 $('#files-msg').text(data.result.filename);
                 $('#resource-type-select').removeAttr('disabled');
@@ -65,64 +103,176 @@ $( document ).ready(function() {
         }
     }).prop('disabled', !$.support.fileInput)
         .parent().addClass($.support.fileInput ? undefined : 'disabled');
-        
+
     $('#validate-button').click( function () {
         $('#validation-msg').css("color","orange");
         $('#validation-msg').text("Validating... this may take a while.");
         $('#validate-load-mask').show();
+        $('#cancel-button').removeAttr('disabled');
         $('.log-line').remove();
-        $.ajax({
-            beforeSend: function(request) {
-                request.setRequestHeader("X-CSRFToken",csrftoken);
-            },
-            url: '/bulk-upload/validate',
-            type: 'post',
-            data: {
-                'filepath':filepath,
-                'restype':$('#resource-type-select').val(),
-                'append':$('#append-select').val(),
-            },
-            done: function (result) {
-            },
-            success: function(result) {
-                $('#validate-load-mask').hide();
-                var logEl = document.getElementById('upload-log-output');
-                var allPassed = true;
-                var testList = new Array(
-                    'validate_headers',
-                    'validate_rows_and_values',
-                    'validate_dates',
-                    'validate_geometries',
-                    'validate_concepts',
-                    'validate_files'
-                );
-                
-                $.each(testList, function (index, test) {
-                    var pass = displayResults(result[test],test,logEl);
-                    if (!pass) {
-                        allPassed = false;
-                        return false; // this line breaks the reporting early
-                    };
-                });
-                if (allPassed) {
-                    $('#load-data-button').removeAttr('disabled');
-                    $('#validation-msg').css("color","green");
-                    $('#validation-msg').text("Validation complete. All tests passed.");
-                    $('#import-msg').css("color","green");
-                    $('#import-msg').text("Ready to load.");
-                    archesFilepath = result.filepath;
-                    formdata.append('archesfile', archesFilepath)
+        
+        var testList = new Array(
+            'headers',
+            'rows_and_values',
+            'dates',
+            // 'geometries',
+            // 'concepts',
+            // 'files'
+        );
+        var testCt = testList.length
+        var passed = true;
+        function headers () {
+            test = 'headers';
+            return $.ajax({
+                beforeSend: function(request) {
+                    request.setRequestHeader("X-CSRFToken",csrftoken);
+                },
+                url: '/bulk-upload/validate',
+                type: 'post',
+                data: setValPostData(test,filePath),
+                success: function(result) {
+                    
+                    displayResults(result,test)
+                    if (!result.success) {passed = false};
+                }
+            });
+        }
+        function rows_and_values(data, textStatus, jqXHR) {
+            if (!data.success) {return false}
+            test = 'rows_and_values';
+            return $.ajax({
+                beforeSend: function(request) {
+                    request.setRequestHeader("X-CSRFToken",csrftoken);
+                },
+                url: '/bulk-upload/validate',
+                type: 'post',
+                data: setValPostData(test,filePath),
+                success: function(result) {
+                    displayResults(result,test)
+                    if (!result.success) {passed = false};
+                }
+            });
+        }
+        
+        function dates(data, textStatus, jqXHR) {
+            if (!data.success) {return false}
+            test = 'dates';
+            return $.ajax({
+                beforeSend: function(request) {
+                    request.setRequestHeader("X-CSRFToken",csrftoken);
+                },
+                url: '/bulk-upload/validate',
+                type: 'post',
+                data: setValPostData(test,filePath),
+                success: function(result) {
+                    displayResults(result,test)
+                    if (!result.success) {passed = false} else {archesFilepath = result.filepath;};
+                }
+            });
+        }
+        
+        function geometries(data, textStatus, jqXHR) {
+            if (!data.success) {return false}
+            test = 'geometries';
+            return $.ajax({
+                beforeSend: function(request) {
+                    request.setRequestHeader("X-CSRFToken",csrftoken);
+                },
+                url: '/bulk-upload/validate',
+                type: 'post',
+                data: setValPostData(test,filePath),
+                success: function(result) {
+                    displayResults(result,test)
+                    if (!result.success) {passed = false} else {archesFilepath = result.filepath;};
+                }
+            });
+        }
+        
+        function concepts(data, textStatus, jqXHR) {
+            if (!data.success) {return false}
+            test = 'concepts';
+            return $.ajax({
+                beforeSend: function(request) {
+                    request.setRequestHeader("X-CSRFToken",csrftoken);
+                },
+                url: '/bulk-upload/validate',
+                type: 'post',
+                data: setValPostData(test,filePath),
+                success: function(result) {
+                    displayResults(result,test)
+                    if (!result.success) {passed = false} else {archesFilepath = result.filepath;};
+                }
+            });
+        }
+        
+        function files(data, textStatus, jqXHR) {
+            if (!data.success) {return false}
+            test = 'files';
+            return $.ajax({
+                beforeSend: function(request) {
+                    request.setRequestHeader("X-CSRFToken",csrftoken);
+                },
+                url: '/bulk-upload/validate',
+                type: 'post',
+                data: setValPostData(test,filePath),
+                success: function(result) {
+                    displayResults(result,test)
+                    if (!result.success) {passed = false} else {archesFilepath = result.filepath;};
                     if ($('#resource-type-select').val() === "INFORMATION_RESOURCE.E73"){
                         if (result.hasfiles) {
                             $('#folder-upload-div').removeAttr('hidden');
                         }
                     }
-                } else {
-                    $('#validation-msg').css("color","red");
-                    $('#validation-msg').text("Validation complete. Some tests failed. Fix the errors locally and re-upload the file.");
                 }
+            });
+        }
+        
+        function writefile(data, textStatus, jqXHR) {
+            if (!data.success) {return false}
+            test = 'write_arches_file';
+            return $.ajax({
+                beforeSend: function(request) {
+                    request.setRequestHeader("X-CSRFToken",csrftoken);
+                },
+                url: '/bulk-upload/validate',
+                type: 'post',
+                data: setValPostData(test,filePath),
+                success: function(result) {
+                    displayResults(result,test)
+                    if (!result.success) {passed = false} else {archesFilepath = result.filepath;};
+                }
+            });
+        }
+        
+        function validateMsgs (){
+            if (passed) {
+                $('#validate-load-mask').hide();
+                $('#load-data-button').removeAttr('disabled');
+                $('#validation-msg').css("color","green");
+                $('#validation-msg').text("Validation complete. All tests passed.");
+                $('#import-msg').css("color","green");
+                $('#import-msg').text("Ready to load.");
+                formdata.append('archesfile', archesFilepath)
+                
+            } else {
+                $('#validate-load-mask').hide();
+                $('#validation-msg').css("color","red");
+                $('#validation-msg').text("Validation failed. Fix the errors locally and re-upload the file.");
             }
-        });
+        }
+        
+        // chain all individual validation ajax requests together to simulate asynchronous behavior
+        headers().then(rows_and_values).then(dates).then(geometries).then(concepts).then(files).then(writefile).then(validateMsgs);
+
+    });
+
+    $('#cancel-button').click( function () {
+        xhr.abort();
+        $('#cancel-button').disabled = true;
+        $('#validate-load-mask').hide();
+        $('#validation-msg').css("color","red");
+        $('#validation-msg').text("Validation canceled.");
+        $('.log-line').remove();
     });
     $('#load-data-button').click( function () {
         $('#import-msg').css("color","orange");
