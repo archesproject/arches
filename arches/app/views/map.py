@@ -19,7 +19,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.conf import settings
+from django.contrib.auth.decorators import permission_required
 
+
+@permission_required('edit')
 def get_page(request):
     resource_id = request.GET.get('resourceid', '')
     return render_to_response('map.htm', {
