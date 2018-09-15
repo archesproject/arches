@@ -11,6 +11,7 @@ from arches.app.models.graph import Graph as GraphProxy
 from arches.app.models.tile import Tile
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.DatatypeToRDF import add_tile_information_to_graph
 from rdflib import Namespace
 from rdflib import URIRef, Literal
 from rdflib import Graph
@@ -64,11 +65,18 @@ class RdfWriter(Writer):
             if graphid not in graph_cache:
                 graph_cache[graphid] = {
                     'rootedges': [],
-                    'subgraphs': {}
+                    'subgraphs': {},
+                    'nodedatatypes': {},
                 }
                 graph = models.GraphModel.objects.get(pk=graphid)
                 nodegroups = set()
                 for node in graph.node_set.all():
+                    # casting nodeid to str to make a copy
+                    if str(node.nodeid) not in graph_cache[graphid]['nodedatatypes']:
+                        graph_cache[graphid]['nodedatatypes'][str(node.nodeid)] = node.datatype
+                    else:
+                        assert node.datatype == graph_cache[graphid]['nodedatatypes'][node.nodeid], 
+                                 "Node has more than one datatype?!"
                     if node.nodegroup:
                         nodegroups.add(node.nodegroup)
                     if node.istopnode:
@@ -87,43 +95,45 @@ class RdfWriter(Writer):
                         graphid]['subgraphs'][nodegroup]['inedge'].domainnode.nodegroup
                     graph_cache[graphid]['subgraphs'][nodegroup][
                         'edges'] = get_nodegroup_edges_by_collector_node(models.Node.objects.get(pk=nodegroup.pk))
-
             return graph_cache[graphid]
 
-        def add_edge_to_graph(graph, domainnode, rangenode, edge, tile):
-            graph.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
-            graph.add((domainnode, URIRef(edge.ontologyproperty), rangenode))
+        def node2uri(node_key):
+            return archesproject[str(node_key)]
 
-            if edge.domainnode.istopnode:
-                graph.add((domainnode, RDF.type, graph_uri))
-                graph.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
-            else:
-                graph.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
+        def tile_node2uri(tile_key, node_key):
+            return archesproject["tile/%s/node/%s" % (str(tile_key), str(node_key))]
 
-            try:
-                g.add((domainnode, RDF.value, Literal(JSONSerializer().serialize(tile.data[str(edge.domainnode_id)]))))
-            except:
-                pass
-            try:
-                g.add((rangenode, RDF.value, Literal(JSONSerializer().serialize(tile.data[str(edge.rangenode_id)]))))
-            except:
-                pass
-
+        # Build the graph:
         for resourceinstanceid, tiles in self.resourceinstances.iteritems():
             graph_info = get_graph_parts(self.graph_id)
 
-            # add the edges for the group of nodes that include the root (this group of nodes has no nodegroup)
-            for edge in graph_cache[self.graph_id]['rootedges']:
-                domainnode = archesproject[str(edge.domainnode.pk)]
-                rangenode = archesproject[str(edge.rangenode.pk)]
-                add_edge_to_graph(g, domainnode, rangenode, edge, None)
+            # Deal with root edges:
+            for edge in graph_info['rootedges']:
+                # FIXME: make sure that we are not readding the same serialized data to
+                # the graph if a node is mentioned multiple times
+                d_uri, r_uri = node2uri(edge.domainnode.pk), node2uri(edge.rangenode.pk)
+                # FIXME: How likely is this to be true more than once?!
+                if edge.domainnode.istopnode:
+                    g.add((d_uri, RDF.type, graph_uri))
+
+                g.add((d_uri, RDF.type, URIRef(edge.domainnode.ontologyclass)))
+                # root_edges are edges where the range node is not part of a nodegroup.
+                # FIXME: what circumstances does this actually occur? Is it just top of branch information?
+                # like label?
+                g.add((d_uri, URIRef(edge.ontologyproperty), r_uri))
+                # FIXME: Is it actually necessary to add in the type for the range node here?
+                # I'm guessing yes, as a tile must(?) be attached to a nodegroup. Maybe?
+                # eg: 
+                g.add((r_uri, RDF.type, URIRef(edge.rangenode.ontologyclass)))
 
             for tile in tiles:
                 # add all the edges for a given tile/nodegroup
                 for edge in graph_info['subgraphs'][tile.nodegroup]['edges']:
-                    domainnode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.domainnode.pk))]
-                    rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
-                    add_edge_to_graph(g, domainnode, rangenode, edge, tile)
+                    d_uri = res_node2uri(resourceinstanceid, edge.domainnode.pk)
+                    r_uri = res_node2uri(resourceinstanceid, edge.rangenode.pk)
+                    datatype = graph_info['nodedatatypes'].get(str(edge.rangenode.pk))
+
+                    add_tile_information_to_graph(g, d_uri, r_uri, edge, tile, datatype)
 
                 # add the edge from the parent node to this tile's root node
                 # where the tile has no parent tile, which means the domain node has no tile_id
@@ -143,7 +153,6 @@ class RdfWriter(Writer):
                     domainnode = archesproject["tile/%s/node/%s" % (str(tile.parenttile.pk), str(edge.domainnode.pk))]
                     rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
                     add_edge_to_graph(g, domainnode, rangenode, edge, tile)
-
         return g
 
 
