@@ -123,15 +123,6 @@ define([
                 }
             }));
 
-            this.addBranchList(new BranchList({
-                el: this.$el.find('#country')[0],
-                data: this.data,
-                dataKey: 'COUNTRY_TYPE.E55',
-
-                validateBranch: function (nodes) {
-                    return this.validateHasValues(nodes);
-                }
-            }));
 
             this.addBranchList(new BranchList({
                 el: this.$el.find('#administrative-area')[0],

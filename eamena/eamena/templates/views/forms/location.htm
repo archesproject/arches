@@ -499,50 +499,7 @@
 
 
 
-<div id="country">
-    <div class="row">
-        <div class="col-xs-12">
-            <div class="padding-left-10">
-                <dl>
-                    <dt>
-                        <h5 id="arches-subjects-form" class="section-headline">{% trans "Country" %}</h5>
-                    </dt>
-                    <dd>
-                        <div class="row">
-                            <div class="col-xs-12">
-                                <input style="width:33%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form resource-type" placeholder="{% trans 'Country' %}" data-bind="select2: {value: getEditedNode('COUNTRY_TYPE.E55', 'value'), dataKey: 'COUNTRY_TYPE.E55'}"></input>
-                                {% include 'views/components/add-item-button.htm' %}
-                            </div>
-                        </div>
-                    </dd>
-                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "Country required." %}</div>
-                </dl>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-xs-12">
-            <div class="arches-crud-child-section">
-                <dl>
-                    <dd class="arches-CRUD-child-title">
-                        {% trans "This resource is located in the following Country(s):" %}
-                    </dd>
-                    <dd class="margin-left-5" style="display: none;" data-bind="visible: true">
-                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Country Defined" %}</div>
-                        <div data-bind='foreach: getBranchLists()'>
-                            <div class="arches-crud-record">
-                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans "Delete this Country" %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
-                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans "Edit this Country" %}">
-                                    <span data-bind='{text: nodes.get("COUNTRY_TYPE.E55", "label")}' style="padding-right:2px;"></span>
-                                </a>
-                            </div>
-                        </div>
-                    </dd>
-                </dl>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 
 {% if resourcetypeid != 'ACTOR.E39' %}
