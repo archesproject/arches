@@ -10,16 +10,29 @@
                 {% for CONDITION_ASSESSMENT_E14 in report_info.source.graph.CONDITION_ASSESSMENT_E14|dictsort:"orderby" %}
                     {% if 'CONDITION_STATE_E3' in CONDITION_ASSESSMENT_E14 %}
                         {% for CONDITION_STATE_E3 in CONDITION_ASSESSMENT_E14.CONDITION_STATE_E3 %}
-                            {% if 'THREAT_STATE_E3' in CONDITION_STATE_E3 %}   
-                                {% for THREAT_STATE_E3 in CONDITION_STATE_E3.THREAT_STATE_E3 %}
-                                    {% if 'THREAT_TYPE_STATE_E3' in THREAT_STATE_E3 %}
-                                        {% for THREAT_TYPE_STATE_E3 in THREAT_STATE_E3.THREAT_TYPE_STATE_E3 %}
-                                            {% for THREAT_TYPE_E55 in THREAT_TYPE_STATE_E3.THREAT_TYPE_E55 %}
-                                                <dd class="arches-report-subsection-item">
-                                                    {{ THREAT_TYPE_E55.THREAT_TYPE_E55__value }} 
+                            {% if 'THREAT_INFERENCE_MAKING_I5' in CONDITION_STATE_E3 %}   
+                                {% for THREAT_INFERENCE_MAKING_I5 in CONDITION_STATE_E3.THREAT_INFERENCE_MAKING_I5 %}
+                                    {% if 'THREAT_BELIEF_I2' in THREAT_INFERENCE_MAKING_I5 %}
+                                        {% for THREAT_BELIEF_I2 in THREAT_INFERENCE_MAKING_I5.THREAT_BELIEF_I2 %}
+                                            {% for THREAT_CATEGORY_I4 in THREAT_BELIEF_I2.THREAT_CATEGORY_I4 %}
+                                                <dd class="arches-report-subsection-item"><span class="arches-report-subsection-item-type"> - {% trans "Threat category: " %} </span> 
+                                                    {{ THREAT_CATEGORY_I4.THREAT_CATEGORY_I4__value }} 
                                             {% endfor %}
+                                            {% for THREAT_TYPE_I4 in THREAT_BELIEF_I2.THREAT_TYPE_I4 %}
+                                                <dd class="arches-report-subsection-item"><span class="arches-report-subsection-item-type"> - {% trans "Potential cause: " %} </span> 
+                                                    {{ THREAT_TYPE_I4.THREAT_TYPE_I4__value }} 
+                                            {% endfor %}
+                                            
+                                            {% for THREAT_PROBABILITY_I6 in THREAT_BELIEF_I2.THREAT_PROBABILITY_I6 %}
+                                                <dd class="arches-report-subsection-item"><span class="arches-report-subsection-item-type"> - {% trans "Cause probability: " %} </span> 
+                                                    {{ THREAT_PROBABILITY_I6.THREAT_PROBABILITY_I6__value }} 
+                                            {% endfor %}                                                                                        
                                         {% endfor %} 
                                     {% endif %}
+                                    
+                                    
+                                    
+                                    
                                     {% if 'THREAT_CAUSE_STATE_E3' in THREAT_STATE_E3 %}   
                                         {% for THREAT_CAUSE_STATE_E3 in THREAT_STATE_E3.THREAT_CAUSE_STATE_E3 %}            
                                             {% for THREAT_CAUSE_TYPE_E55 in THREAT_CAUSE_STATE_E3.THREAT_CAUSE_TYPE_E55 %}
@@ -30,11 +43,13 @@
                                             </dd>            
                                         {% endfor %}    
                                     {% endif %}            
-            {% endfor %}    
-            {% endif %}
-            {% endfor %}    
-            {% endif %}
-            {% endfor %}    
+                                {% endfor %}    
+                            {% else %}
+                                 <dd class="arches-report-subsection-item">{% trans "No threat assessment recorded" %}</dt>
+                            {% endif %}
+                        {% endfor %}    
+                    {% endif %}
+                {% endfor %}    
             {% endif %}
 
         </dl>

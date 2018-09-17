@@ -175,6 +175,8 @@ def report(request, resourceid):
     related_resource_dict = {
         'HERITAGE_RESOURCE': [],
         'HERITAGE_RESOURCE_GROUP': [],
+        'HERITAGE_FEATURE': [],
+        'HERITAGE_COMPONENT': [],
         'ACTIVITY': [],
         'ACTOR': [],
         'HISTORICAL_EVENT': [],
@@ -205,7 +207,15 @@ def report(request, resourceid):
                     related_resource['relationship'].append(get_preflabel_from_valueid(entity['value'], lang)['value'])
         elif related_resource['entitytypeid'] == 'HERITAGE_RESOURCE_GROUP.E27':
             for entity in related_resource['domains']:
-                if entity['entitytypeid'] == 'SITE_FUNCTION_TYPE.E55':
+                if entity['entitytypeid'] == 'NAME.E41':
+                    related_resource['relationship'].append(get_preflabel_from_valueid(entity['value'], lang)['value'])
+        elif related_resource['entitytypeid'] == 'HERITAGE_FEATURE.E24':
+            for entity in related_resource['domains']:
+                if entity['entitytypeid'] == 'INTERPRETATION_TYPE.I4':
+                    related_resource['relationship'].append(get_preflabel_from_valueid(entity['value'], lang)['value'])
+        elif related_resource['entitytypeid'] == 'HERITAGE_COMPONENT.B2':
+            for entity in related_resource['domains']:
+                if entity['entitytypeid'] == 'COMPONENT_TYPE.E55':
                     related_resource['relationship'].append(get_preflabel_from_valueid(entity['value'], lang)['value'])
         elif related_resource['entitytypeid'] == 'ACTIVITY.E7':
             for entity in related_resource['domains']:

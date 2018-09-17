@@ -3,20 +3,21 @@
      <div class="col-xs-12">
         <dl>
             <dt>
-                <h5 id="" class="arches-report-subsection-title">{% trans "Overall Site Certainty" %}</h5>
+                <h5 id="" class="arches-report-subsection-title">{% trans "Overall Archaeological Certainty" %}</h5>
             </dt>
-
-            {% if 'SITE_OVERALL_ARCHAEOLOGICAL_CERTAINTY_TYPE_E55' not in report_info.source.graph %}
-                <dd class="arches-report-subsection-item">
-                    {% trans "No site certainty recorded" %}
-                </dd>
-            {% else %}
-                {% for SITE_OVERALL_ARCHAEOLOGICAL_CERTAINTY_TYPE_E55 in report_info.source.graph.SITE_OVERALL_ARCHAEOLOGICAL_CERTAINTY_TYPE_E55 %}
+            {% for FEATURE_COLLECTION_E24 in report_info.source.graph.FEATURE_COLLECTION_E24 %}
+                {% if 'ARCHAEOLOGICAL_CERTAINTY_OBSERVATION_S4' not in FEATURE_COLLECTION_E24 %}
                     <dd class="arches-report-subsection-item">
-                        {{ SITE_OVERALL_ARCHAEOLOGICAL_CERTAINTY_TYPE_E55.SITE_OVERALL_ARCHAEOLOGICAL_CERTAINTY_TYPE_E55__value }} 
+                        {% trans "No archaeological certainty recorded" %}
                     </dd>
-                {% endfor %}            
-            {% endif %}
+                {% else %}
+                    {% for OVERALL_ARCHAEOLOGICAL_CERTAINTY_VALUE_I6 in FEATURE_COLLECTION_E24.ARCHAEOLOGICAL_CERTAINTY_OBSERVATION_S4 %}
+                        <dd class="arches-report-subsection-item">
+                            {{ SITE_OVERALL_ARCHAEOLOGICAL_CERTAINTY_VALUE_I6.SITE_OVERALL_ARCHAEOLOGICAL_CERTAINTY_VALUE_I6__value }} 
+                        </dd>
+                    {% endfor %}            
+                {% endif %}
+            {% endfor %}
 
         </dl>
     </div>
