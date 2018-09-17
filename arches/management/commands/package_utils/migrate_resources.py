@@ -543,11 +543,13 @@ def rename_entity_type(old_entitytype_id, new_entitytype_id):
                         mapping = models.Mappings.objects.get(pk = step.mappingid_id)
                         order = step.order
                         try:
-                            steps_with_mapping_before_delete = models.MappingSteps.objects.filter(mappingid = mapping)
-                            print "Steps length with mapping %s before deletion %s" % (mapping.mappingid, len(steps_with_mapping_before_delete))
+                            other_steps = models.MappingSteps.objects.filter(mappingid = mapping).exclude(ruleid=step.ruleid_id) 
                             step.delete()
                             new_step = models.MappingSteps(mappingid = mapping, ruleid = ruleid_to_replace_with[0], order = order)
-                            new_step.save()
+                            new_step.save(force_insert = True)
+                            for other_step in other_steps:
+                                print other_step.mappingid_id
+                                other_step.save(force_insert=True)
                             steps_with_mapping_after_new = models.MappingSteps.objects.filter(mappingid = mapping)
                             print "Steps length with mapping %s after deletion %s" % (mapping.mappingid, len(steps_with_mapping_after_new))
                             
