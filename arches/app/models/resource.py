@@ -40,19 +40,14 @@ class Resource(models.ResourceInstance):
 
     def __init__(self, *args, **kwargs):
         super(Resource, self).__init__(*args, **kwargs)
-        # from models.ResourceInstance
-        # self.resourceinstanceid
-        # self.graph
-        # self.resourceinstancesecurity
-        # end from models.ResourceInstance
         self.tiles = []
 
     def get_descriptor(self, descriptor):
         module = importlib.import_module('arches.app.functions.primary_descriptors')
-        PrimaryDescriptorsFunction = getattr(module, 'PrimaryDescriptorsFunction')()
-        functionConfig = models.FunctionXGraph.objects.filter(graph_id=self.graph_id, function__functiontype='primarydescriptors')
-        if len(functionConfig) == 1:
-            return PrimaryDescriptorsFunction.get_primary_descriptor_from_nodes(self, functionConfig[0].config[descriptor])
+        primary_descriptors_function = getattr(module, 'PrimaryDescriptorsFunction')()
+        function_config = models.FunctionXGraph.objects.filter(graph_id=self.graph_id, function__functiontype='primarydescriptors')
+        if len(function_config) == 1:
+            return primary_descriptors_function.get_primary_descriptor_from_nodes(self, function_config[0].config[descriptor])
         else:
             return 'undefined'
 
@@ -91,7 +86,7 @@ class Resource(models.ResourceInstance):
         super(Resource, self).save(*args, **kwargs)
         for tile in self.tiles:
             tile.resourceinstance_id = self.resourceinstanceid
-            saved_tile = tile.save(index=False)
+            tile.save(index=False)
         if request == '':
             user = {}
         else:
