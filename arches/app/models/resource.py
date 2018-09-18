@@ -34,7 +34,6 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 
 class Resource(models.ResourceInstance):
-
     class Meta:
         proxy = True
 
@@ -45,9 +44,11 @@ class Resource(models.ResourceInstance):
     def get_descriptor(self, descriptor):
         module = importlib.import_module('arches.app.functions.primary_descriptors')
         primary_descriptors_function = getattr(module, 'PrimaryDescriptorsFunction')()
-        function_config = models.FunctionXGraph.objects.filter(graph_id=self.graph_id, function__functiontype='primarydescriptors')
+        function_config = models.FunctionXGraph.objects.filter(graph_id=self.graph_id,
+                                                               function__functiontype='primarydescriptors')
         if len(function_config) == 1:
-            return primary_descriptors_function.get_primary_descriptor_from_nodes(self, function_config[0].config[descriptor])
+            return primary_descriptors_function.get_primary_descriptor_from_nodes(self,
+                                                                                  function_config[0].config[descriptor])
         else:
             return 'undefined'
 
@@ -136,7 +137,8 @@ class Resource(models.ResourceInstance):
 
         se = SearchEngineFactory().create()
         datatype_factory = DataTypeFactory()
-        node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list('nodeid', 'datatype')}
+        node_datatypes = {str(nodeid): datatype for nodeid, datatype in
+                          models.Node.objects.values_list('nodeid', 'datatype')}
         tiles = []
         documents = []
         term_list = []
@@ -151,11 +153,18 @@ class Resource(models.ResourceInstance):
 
         for resource in resources:
             resource.save_edit(edit_type='create')
-            document, terms = resource.get_documents_to_index(fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes)
+            document, terms = resource.get_documents_to_index(fetchTiles=False,
+                                                              datatype_factory=datatype_factory,
+                                                              node_datatypes=node_datatypes)
             document['root_ontology_class'] = resource.get_root_ontology()
-            documents.append(se.create_bulk_item(index='resource', doc_type=document['graph_id'], id=document['resourceinstanceid'], data=document))
+            documents.append(
+                se.create_bulk_item(index='resource',
+                                    doc_type=document['graph_id'],
+                                    id=document['resourceinstanceid'],
+                                    data=document))
             for term in terms:
-                term_list.append(se.create_bulk_item(index='strings', doc_type='term', id=term['_id'], data=term['_source']))
+                term_list.append(
+                    se.create_bulk_item(index='strings', doc_type='term', id=term['_id'], data=term['_source']))
 
         for tile in tiles:
             tile.save_edit(edit_type='tile create', new_value=tile.data)
@@ -171,8 +180,10 @@ class Resource(models.ResourceInstance):
         if unicode(self.graph_id) != unicode(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
             se = SearchEngineFactory().create()
             datatype_factory = DataTypeFactory()
-            node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list('nodeid', 'datatype')}
-            document, terms = self.get_documents_to_index(datatype_factory=datatype_factory, node_datatypes=node_datatypes)
+            node_datatypes = {str(nodeid): datatype for nodeid, datatype in
+                              models.Node.objects.values_list('nodeid', 'datatype')}
+            document, terms = self.get_documents_to_index(datatype_factory=datatype_factory,
+                                                          node_datatypes=node_datatypes)
             document['root_ontology_class'] = self.get_root_ontology()
             se.index_data('resource', self.graph_id, JSONSerializer().serializeToPython(document), id=self.pk)
             for term in terms:
@@ -212,7 +223,10 @@ class Resource(models.ResourceInstance):
                     datatype_instance.append_to_document(document, nodevalue, nodeid, tile)
                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
                     for index, term in enumerate(node_terms):
-                        terms.append({'_id':unicode(nodeid)+unicode(tile.tileid)+unicode(index), '_source': {'value': term, 'nodeid': nodeid, 'nodegroupid': tile.nodegroup_id, 'tileid': tile.tileid, 'resourceinstanceid':tile.resourceinstance_id, 'provisional': False}})
+                        terms.append({'_id': unicode(nodeid) + unicode(tile.tileid) + unicode(index),
+                                      '_source': {'value': term, 'nodeid': nodeid, 'nodegroupid': tile.nodegroup_id,
+                                                  'tileid': tile.tileid, 'resourceinstanceid': tile.resourceinstance_id,
+                                                  'provisional': False}})
 
             if tile.provisionaledits is not None:
                 provisionaledits = tile.provisionaledits
@@ -228,8 +242,12 @@ class Resource(models.ResourceInstance):
                                     datatype_instance.append_to_document(document, nodevalue, nodeid, tile, True)
                                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
                                     for index, term in enumerate(node_terms):
-                                        terms.append({'_id':unicode(nodeid)+unicode(tile.tileid)+unicode(index), '_source': {'value': term, 'nodeid': nodeid, 'nodegroupid': tile.nodegroup_id, 'tileid': tile.tileid, 'resourceinstanceid':tile.resourceinstance_id, 'provisional': True}})
-
+                                        terms.append({'_id': unicode(nodeid) + unicode(tile.tileid) + unicode(index),
+                                                      '_source': {'value': term, 'nodeid': nodeid,
+                                                                  'nodegroupid': tile.nodegroup_id,
+                                                                  'tileid': tile.tileid,
+                                                                  'resourceinstanceid': tile.resourceinstance_id,
+                                                                  'provisional': True}})
 
         return document, terms
 
@@ -257,11 +275,17 @@ class Resource(models.ResourceInstance):
 
     def get_related_resources(self, lang='en-US', limit=settings.RELATED_RESOURCES_EXPORT_LIMIT, start=0, page=0):
         """
-        Returns an object that lists the related resources, the relationship types, and a reference to the current resource
+        Returns an object that lists the related resources, the relationship types, and a reference to the current
+        resource
 
         """
-        graphs = models.GraphModel.objects.all().exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False)
-        graph_lookup = {str(graph.graphid): {'name':graph.name, 'iconclass': graph.iconclass, 'fillColor': graph.color} for graph in graphs}
+        graphs = models.GraphModel.objects.all() \
+            .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID) \
+            .exclude(isresource=False)
+
+        graph_lookup = {str(graph.graphid): {'name': graph.name, 'iconclass': graph.iconclass, 'fillColor': graph.color}
+                        for graph in graphs}
+
         ret = {
             'resource_instance': self,
             'resource_relationships': [],
@@ -272,7 +296,7 @@ class Resource(models.ResourceInstance):
 
         if page > 0:
             limit = settings.RELATED_RESOURCES_PER_PAGE
-            start = limit*int(page-1)
+            start = limit * int(page - 1)
 
         def get_relations(resourceinstanceid, start, limit):
             query = Query(se, start=start, limit=limit)
@@ -384,7 +408,7 @@ class Resource(models.ResourceInstance):
                     else:
                         values.append(value)
 
-        try:        
+        try:
             return [
                 models.Value.objects.get(
                     pk=value).value for value in values]
