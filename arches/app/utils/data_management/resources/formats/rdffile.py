@@ -75,7 +75,7 @@ class RdfWriter(Writer):
                     if str(node.nodeid) not in graph_cache[graphid]['nodedatatypes']:
                         graph_cache[graphid]['nodedatatypes'][str(node.nodeid)] = node.datatype
                     else:
-                        assert node.datatype == graph_cache[graphid]['nodedatatypes'][node.nodeid], 
+                        assert node.datatype == graph_cache[graphid]['nodedatatypes'][node.nodeid], \
                                  "Node has more than one datatype?!"
                     if node.nodegroup:
                         nodegroups.add(node.nodegroup)
@@ -129,11 +129,14 @@ class RdfWriter(Writer):
             for tile in tiles:
                 # add all the edges for a given tile/nodegroup
                 for edge in graph_info['subgraphs'][tile.nodegroup]['edges']:
-                    d_uri = res_node2uri(resourceinstanceid, edge.domainnode.pk)
-                    r_uri = res_node2uri(resourceinstanceid, edge.rangenode.pk)
-                    datatype = graph_info['nodedatatypes'].get(str(edge.rangenode.pk))
+                    d_datatype = graph_info['nodedatatypes'].get(str(edge.domainnode.pk))
+                    r_datatype = graph_info['nodedatatypes'].get(str(edge.rangenode.pk))
 
-                    add_tile_information_to_graph(g, d_uri, r_uri, edge, tile, datatype)
+                    d_uri = tile_node2uri(tile.pk, edge.domainnode.pk)
+                    r_uri = tile_node2uri(tile.pk, edge.rangenode.pk)
+
+                    add_tile_information_to_graph(g, (d_uri, d_datatype), (r_uri, r_datatype), \
+                                                  edge, tile, graph_uri)
 
                 # add the edge from the parent node to this tile's root node
                 # where the tile has no parent tile, which means the domain node has no tile_id
@@ -144,7 +147,11 @@ class RdfWriter(Writer):
                     else:
                         domainnode = archesproject[str(edge.domainnode.pk)]
                     rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
-                    add_edge_to_graph(g, domainnode, rangenode, edge, tile)
+
+                    d_datatype = graph_info['nodedatatypes'].get(str(edge.domainnode.pk))
+                    r_datatype = graph_info['nodedatatypes'].get(str(edge.rangenode.pk))
+                    add_tile_information_to_graph(g, (domainnode, d_datatype), (rangenode, r_datatype), \
+                                                  edge, tile, graph_uri)
 
                 # add the edge from the parent node to this tile's root node
                 # where the tile has a parent tile
@@ -152,7 +159,11 @@ class RdfWriter(Writer):
                     edge = graph_info['subgraphs'][tile.nodegroup]['inedge']
                     domainnode = archesproject["tile/%s/node/%s" % (str(tile.parenttile.pk), str(edge.domainnode.pk))]
                     rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
-                    add_edge_to_graph(g, domainnode, rangenode, edge, tile)
+
+                    d_datatype = graph_info['nodedatatypes'].get(str(edge.domainnode.pk))
+                    r_datatype = graph_info['nodedatatypes'].get(str(edge.rangenode.pk))
+                    add_tile_information_to_graph(g, (domainnode, d_datatype), (rangenode, r_datatype), \
+                                                  edge, tile, graph_uri)
         return g
 
 
