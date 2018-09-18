@@ -182,6 +182,11 @@ define([
                         self.tileid = tileData.tileid;
                         self.parent.tiles.push(self);
                         self.parent.expanded(true);
+                        self.data = koMapping.fromJS(tileData.data);
+                        self.provisionaledits = koMapping.fromJS(tileData.provisionaledits);
+                        self.dirty = ko.pureComputed(function() {
+                            return self._tileData() !== koMapping.toJSON(self.data);
+                        }, self);
                         selection(self);
                     }
                     if (params.userisreviewer === false && !self.provisionaledits()) {
