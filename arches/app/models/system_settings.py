@@ -17,19 +17,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from django.conf import LazySettings
+from django.db import ProgrammingError, OperationalError
 from django.utils.functional import empty
 from arches.app.models import models
 
 
 class SystemSettings(LazySettings):
     """
-    This class can be used just like you would use settings.py 
+    This class can be used just like you would use settings.py
 
     To use, import like you would the django settings module:
-        
+
         from system_settings import settings
         ....
-        settings.SEARCH_ITEMS_PER_PAGE 
+        settings.SEARCH_ITEMS_PER_PAGE
 
         # will list all settings
         print settings
@@ -57,16 +58,16 @@ class SystemSettings(LazySettings):
         If a setting is requested that isn't found, assume it's saved in the database and try and retrieve it from there
         by calling update_from_db first which populates this class with any settings from the database
 
-        What this means is that update_from_db will only be called once a setting is requested that isn't initially in the settings.py file 
+        What this means is that update_from_db will only be called once a setting is requested that isn't initially in the settings.py file
         Only then will settings from the database be applied (and potentially overwrite settings found in settings.py)
-        
+
         """
 
         try:
             return super(SystemSettings, self).__getattr__(name)
         except:
             self.update_from_db()
-            return getattr(self, name)
+            return super(SystemSettings, self).__getattr__(name) #getattr(self, name, True)
 
     def update_from_db(self, **kwargs):
         """
@@ -95,7 +96,7 @@ class SystemSettings(LazySettings):
 
             setup_node(node)
 
-        # set any values saved in the instance of the Arches System Settings Graph 
+        # set any values saved in the instance of the Arches System Settings Graph
         for tile in models.TileModel.objects.filter(resourceinstance__graph_id=self.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
             if tile.nodegroup.cardinality == '1':
                 for node in tile.nodegroup.node_set.all():
@@ -133,3 +134,7 @@ class SystemSettings(LazySettings):
 
 
 settings = SystemSettings()
+# try:
+#     settings.update_from_db()
+# except OperationalError, ProgrammingError:
+#     print "Skipping system settings update"

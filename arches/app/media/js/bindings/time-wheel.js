@@ -62,8 +62,8 @@ define([
             });
 
             var partition = d3.layout.partition()
-                .sort(function(d) {
-                    return d3.descending(d.start);
+                .sort(function(d, e) {
+                    return d.start - e.start;
                 })
                 .value(function(d) {
                     return d.size;
@@ -74,7 +74,7 @@ define([
                 total = _.find(data, function(d) {
                     return d.name === 'root';
                 }).value;
-                breadCrumb(total + ' resources');
+                breadCrumb(total + ' date values');
             }
 
             var arc = d3.svg.arc()
@@ -256,7 +256,7 @@ define([
                         d3.select(this).on("mouseover", highlightPeriod);
                     });
 
-                breadCrumb(total + ' resources')
+                breadCrumb(total + ' date values')
             }
 
             selectedPeriod.subscribe(function(d) {

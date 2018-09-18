@@ -23,13 +23,13 @@ define([
         * @type {boolean}
         * @memberof ListView.prototype
         */
-        single_select: true,
+        singleSelect: true,
 
         /**
         * Callback function called every time a user types into the filter input box
         * @memberof ListView.prototype
         */
-        filter_function: function(newValue){
+        filterFunction: function(){
             var filter = this.filter().toLowerCase();
             this.items().forEach(function(item){
                 var name = typeof item.name === 'string' ? item.name : item.name();
@@ -49,43 +49,56 @@ define([
         * @param {object} options - optional parameters to pass in during initialization
         */
         initialize: function(options) {
-            var self = this;
             if (options.items) {
                 this.items = options.items;
             }
             if (options.items) {
                 this.groups = options.groups;
             }
-            var initializeItem = function(item){
-                if (!item.filtered) {
-                    item.filtered = ko.observable(false);
-                }
-                if (!('selectable' in item)){
-                    item.selectable = true;
-                }
-                if (!item.selected) {
-                    item.selected = ko.observable(false);
-                }
-            }
-            this.items.subscribe(function (items) {
-                items.forEach(initializeItem, this);
+            this.items.subscribe(function(items) {
+                items.forEach(this._initializeItem, this);
             }, this);
-            if(this.filter_function){
+            if(this.filterFunction){
                 this.filter = ko.observable('');
-                this.filter.subscribe(this.filter_function, this, 'change');
-                this.filter_function();
+                ko.computed(function() {
+                    return this.filter();
+                }, this).extend({
+                    throttle: 100
+                }).subscribe(
+                    this.filterFunction,
+                    this,
+                    'change'
+                );
+                this.filterFunction();
             }
 
             this.selectedItems = ko.computed(function(){
                 return this.items().filter(function(item){
-                    initializeItem(item);
+                    this._initializeItem(item);
                     return item.selected();
                 }, this);
             }, this);
         },
 
         /**
-        * Toggles the selected status of a single list item, if {@link ListView#single_select} is
+        * Used internally to add observable parameters to list items
+        * @memberof ListView.prototype
+        * @param {object} item - a list item
+        */
+        _initializeItem: function(item){
+            if (!item.filtered) {
+                item.filtered = ko.observable(false);
+            }
+            if (!('selectable' in item)){
+                item.selectable = true;
+            }
+            if (!item.selected) {
+                item.selected = ko.observable(false);
+            }
+        },
+
+        /**
+        * Toggles the selected status of a single list item, if {@link ListView#singleSelect} is
         *   true clear the selected status of all other list items
         * @memberof ListView.prototype
         * @param {object} item - the item to be selected or unselected
@@ -94,7 +107,7 @@ define([
         selectItem: function(item, evt){
             if(!!item.selectable){
                 var selectedStatus = item.selected();
-                if(this.single_select){
+                if(this.singleSelect){
                     this.clearSelection();
                 }
                 item.selected(!selectedStatus);

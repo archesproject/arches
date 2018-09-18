@@ -22,6 +22,7 @@ from tests import test_settings
 from tests.base_test import ArchesTestCase
 from arches.app.models import models
 from arches.app.models.graph import Graph, GraphValidationError
+from arches.app.models.card import Card
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 # these tests can be run from the command line via
@@ -35,6 +36,127 @@ class GraphTests(ArchesTestCase):
 
         cls.NODE_NODETYPE_GRAPHID = '22000000-0000-0000-0000-000000000001'
         cls.SINGLE_NODE_GRAPHID = '22000000-0000-0000-0000-000000000000'
+
+        # Node Branch
+        graph_dict = {
+            "author": "Arches",
+            "color": None,
+            "deploymentdate": None,
+            "deploymentfile": None,
+            "description": "Represents a single node in a graph",
+            "graphid": cls.SINGLE_NODE_GRAPHID,
+            "iconclass": "fa fa-circle",
+            "isactive": True,
+            "isresource": False,
+            "name": "Node",
+            "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
+            "subtitle": "Represents a single node in a graph.",
+            "version": "v1"
+        }
+        models.GraphModel.objects.create(**graph_dict).save()
+
+        node_dict = {
+            "config": None,
+            "datatype": "semantic",
+            "description": "Represents a single node in a graph",
+            "graph_id": cls.SINGLE_NODE_GRAPHID,
+            "isrequired": False,
+            "issearchable": True,
+            "istopnode": True,
+            "name": "Node",
+            "nodegroup_id": None,
+            "nodeid": "20000000-0000-0000-0000-100000000000",
+            "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity",
+        }
+        models.Node.objects.create(**node_dict).save()
+
+        # Node/Node Type Branch
+        graph_dict = {
+            "author": "Arches",
+            "color": None,
+            "deploymentdate": None,
+            "deploymentfile": None,
+            "description": "Represents a node and node type pairing",
+            "graphid": cls.NODE_NODETYPE_GRAPHID,
+            "iconclass": "fa fa-angle-double-down",
+            "isactive": True,
+            "isresource": False,
+            "name": "Node/Node Type",
+            "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
+            "subtitle": "Represents a node and node type pairing",
+            "version": "v1"
+        }
+        models.GraphModel.objects.create(**graph_dict).save()
+
+        nodegroup_dict = {
+            "cardinality": "n",
+            "legacygroupid": "",
+            "nodegroupid": "20000000-0000-0000-0000-100000000001",
+            "parentnodegroup_id": None
+        }
+        models.NodeGroup.objects.create(**nodegroup_dict).save()
+
+        card_dict = {
+            "active": True,
+            "cardid": "bf9ea150-3eaa-11e8-8b2b-c3a348661f61",
+            "description": "Represents a node and node type pairing",
+            "graph_id": cls.NODE_NODETYPE_GRAPHID,
+            "helpenabled": False,
+            "helptext": None,
+            "helptitle": None,
+            "instructions": "",
+            "name": "Node/Node Type",
+            "nodegroup_id": "20000000-0000-0000-0000-100000000001",
+            "sortorder": None,
+            "visible": True
+        }
+        models.CardModel.objects.create(**card_dict).save()
+
+        nodes = [
+            {
+                "config": None,
+                "datatype": "string",
+                "description": "",
+                "graph_id": cls.NODE_NODETYPE_GRAPHID,
+                "isrequired": False,
+                "issearchable": True,
+                "istopnode": True,
+                "name": "Node",
+                "nodegroup_id": "20000000-0000-0000-0000-100000000001",
+                "nodeid": "20000000-0000-0000-0000-100000000001",
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"
+            },
+            {
+                "config": {
+                    "rdmCollection": None
+                },
+                "datatype": "concept",
+                "description": "",
+                "graph_id": cls.NODE_NODETYPE_GRAPHID,
+                "isrequired": False,
+                "issearchable": True,
+                "istopnode": False,
+                "name": "Node Type",
+                "nodegroup_id": "20000000-0000-0000-0000-100000000001",
+                "nodeid": "20000000-0000-0000-0000-100000000002",
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E55_Type"
+            }
+        ]
+
+        for node in nodes:
+            models.Node.objects.create(**node).save()
+
+        edges_dict = {
+            "description": None,
+            "domainnode_id": "20000000-0000-0000-0000-100000000001",
+            "edgeid": "22200000-0000-0000-0000-000000000001",
+            "graph_id": cls.NODE_NODETYPE_GRAPHID,
+            "name": None,
+            "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type",
+            "rangenode_id": "20000000-0000-0000-0000-100000000002"
+        }
+        models.Edge.objects.create(**edges_dict).save()
+
 
     @classmethod
     def tearDownClass(cls):
@@ -85,7 +207,7 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(len(graph.cards), 1)
         self.assertEqual(len(graph.get_nodegroups()), 1)
 
-    def test_graph_doesnt_polute_db(self):
+    def test_graph_doesnt_pollute_db(self):
         """
         test that the mere act of creating a Graph instance doesn't save anything to the database
 
@@ -346,59 +468,14 @@ class GraphTests(ArchesTestCase):
         graph.isresource = True
         self.assertIsNotNone(graph.append_branch('http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID))
 
-        # try to append to any other node that is not the root
-        for node in graph.nodes.itervalues():
-            if node is not graph.root:
-                with self.assertRaises(GraphValidationError):
-                    graph.append_branch('http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID, nodeid=node.nodeid)
-
-        # try to append a non-grouped graph
-        with self.assertRaises(GraphValidationError):
-            graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
-
-
-        graph = Graph.objects.get(graphid=self.SINGLE_NODE_GRAPHID)
-        # test that we can't append a single non-grouped node to a graph that is a single non grouped node
-        with self.assertRaises(GraphValidationError):
-            graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
-
         graph = Graph.new()
         graph.root.datatype = 'string'
         graph.update_node(JSONSerializer().serializeToPython(graph.root))
-
-        # test that we can't append a card to a graph that is a card that at it's root is not semantic
-        with self.assertRaises(GraphValidationError):
-            graph.append_branch('http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID)
-
-        # test that we can't append a card as a child to another card
-        graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
-        for node in graph.nodes.itervalues():
-            if node != graph.root:
-                with self.assertRaises(GraphValidationError):
-                    graph.append_branch('http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID, nodeid=node.nodeid)
-
 
         # create card collector graph to use for appending on to other graphs
         collector_graph = Graph.new()
         collector_graph.append_branch('http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID)
         collector_graph.save()
-
-        # test that we can't append a card collector on to a graph that is a card
-        graph = Graph.new()
-        with self.assertRaises(GraphValidationError):
-            graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=collector_graph.graphid)
-
-        # test that we can't append a card collector to another card collector
-
-        collector_copy = collector_graph.copy()['copy']
-        with self.assertRaises(GraphValidationError):
-            collector_copy.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=collector_graph.graphid)
-
-        # test that we can't append a card to a node in a child card within a card collector
-        for node in collector_graph.nodes.itervalues():
-            if node != collector_graph.root:
-                with self.assertRaises(GraphValidationError):
-                    collector_graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=graph.graphid, nodeid=node.nodeid)
 
     def test_node_update(self):
         """
@@ -512,8 +589,6 @@ class GraphTests(ArchesTestCase):
         # test moving a branch to another branch
         # this branch should NOT be grouped with it's new parent nodegroup
         branch_two_rootnodeid = branch_two.root.nodeid
-        with self.assertRaises(GraphValidationError):
-            graph.move_node(branch_one_rootnodeid, 'http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', branch_two_rootnodeid)
         graph.move_node(branch_one_rootnodeid, 'http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', branch_two_rootnodeid, skip_validation=True)
         self.assertEqual(len(graph.edges), 5)
         self.assertEqual(len(graph.nodes), 6)
@@ -540,9 +615,7 @@ class GraphTests(ArchesTestCase):
 
         # save and retrieve the graph from the database and confirm that
         # the graph shape has been saved properly
-        # have to set the parentnodegroup nodes to semantic datatype to pass validation
-        with self.assertRaises(GraphValidationError):
-            graph.save()
+        graph.save()
         for node in branch_two.nodes.itervalues():
             node.datatype = 'semantic'
         graph.save()
@@ -772,15 +845,16 @@ class GraphTests(ArchesTestCase):
 
         self.assertEqual(len(graph.cards), 1)
         for card in graph.get_cards():
-            self.assertEqual(card.name, graph.name)
-            self.assertEqual(card.description, graph.description)
+            self.assertEqual(card['name'], graph.name)
+            self.assertEqual(card['description'], graph.description)
+            card = Card.objects.get(pk=card['cardid'])
             card.name = 'TEST card name'
             card.description = 'TEST card description'
             card.save()
 
         for card in graph.get_cards():
-            self.assertEqual(card.name, 'TEST')
-            self.assertEqual(card.description, 'A test description')
+            self.assertEqual(card['name'], 'TEST')
+            self.assertEqual(card['description'], 'A test description')
 
         graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
         graph.save()
@@ -795,14 +869,14 @@ class GraphTests(ArchesTestCase):
 
         self.assertEqual(len(graph.get_cards()), 2)
         for card in graph.get_cards():
-            if str(card.nodegroup_id) == str(graph.root.nodegroup_id):
-                self.assertEqual(card.name, graph.name)
-                self.assertEqual(card.description, graph.description)
+            if str(card['nodegroup_id']) == str(graph.root.nodegroup_id):
+                self.assertEqual(card['name'], graph.name)
+                self.assertEqual(card['description'], graph.description)
             else:
-                self.assertTrue(len(graph.nodes[card.nodegroup.pk].name) > 0)
-                self.assertTrue(len(graph.nodes[card.nodegroup.pk].description) > 0)
-                self.assertEqual(card.name, graph.nodes[card.nodegroup.pk].name)
-                self.assertEqual(card.description, graph.nodes[card.nodegroup.pk].description)
+                self.assertTrue(len(graph.nodes[card['nodegroup_id']].name) > 0)
+                self.assertTrue(len(graph.nodes[card['nodegroup_id']].description) > 0)
+                self.assertEqual(card['name'], graph.nodes[card['nodegroup_id']].name)
+                self.assertEqual(card['description'], graph.nodes[card['nodegroup_id']].description)
 
 
         # TESTING A RESOURCE
@@ -812,31 +886,19 @@ class GraphTests(ArchesTestCase):
         resource_graph.save()
 
         self.assertEqual(len(resource_graph.get_cards()), 2)
-        for card in resource_graph.get_cards():
-            if card.nodegroup.parentnodegroup is None:
-                self.assertEqual(card.name, graph.name)
-                self.assertEqual(card.description, graph.description)
-                card.name = 'altered root card name'
-                card.description = 'altered root card description'
-            else:
-                self.assertTrue(len(resource_graph.nodes[card.nodegroup.pk].name) > 0)
-                self.assertTrue(len(resource_graph.nodes[card.nodegroup.pk].description) > 0)
-                self.assertEqual(card.name, resource_graph.nodes[card.nodegroup.pk].name)
-                self.assertEqual(card.description, resource_graph.nodes[card.nodegroup.pk].description)
-                card.name = 'altered child card name'
-                card.description = 'altered child card description'
 
-        # loop through the cards again now looking for the updated desctiptions
         for card in resource_graph.get_cards():
-            if card.nodegroup.parentnodegroup is None:
-                self.assertEqual(card.name, 'altered root card name')
-                self.assertEqual(card.description, 'altered root card description')
+            cardobj = Card.objects.get(pk=card['cardid'])
+            if cardobj.nodegroup.parentnodegroup is None:
+                self.assertEqual(card['name'], graph.name)
+                self.assertEqual(card['description'], graph.description)
             else:
-                self.assertEqual(card.name, 'altered child card name')
-                self.assertEqual(card.description, 'altered child card description')
+                self.assertEqual(card['name'], resource_graph.nodes[card['nodegroup_id']].name)
+                self.assertEqual(card['description'], resource_graph.nodes[card['nodegroup_id']].description)
+                self.assertTrue(len(resource_graph.nodes[card['nodegroup_id']].name) > 0)
+                self.assertTrue(len(resource_graph.nodes[card['nodegroup_id']].description) > 0)
 
         resource_graph.delete()
-
 
         # TESTING A RESOURCE
         resource_graph = Graph.new(name='TEST',is_resource=True,author='TEST')
@@ -847,15 +909,15 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(len(resource_graph.cards), 1)
         the_card = resource_graph.cards.itervalues().next()
         for card in resource_graph.get_cards():
-            self.assertEqual(card.name, the_card.name)
-            self.assertEqual(card.description, the_card.description)
+            self.assertEqual(card['name'], the_card.name)
+            self.assertEqual(card['description'], the_card.description)
 
         # after removing the card name and description, the cards should take on the node name and description
         the_card.name = ''
         the_card.description = ''
         for card in resource_graph.get_cards():
-            self.assertEqual(card.name, resource_graph.nodes[card.nodegroup.pk].name)
-            self.assertEqual(card.description, resource_graph.nodes[card.nodegroup.pk].description)
+            self.assertEqual(card['name'], resource_graph.nodes[card['nodegroup_id']].name)
+            self.assertEqual(card['description'], resource_graph.nodes[card['nodegroup_id']].description)
 
     def test_get_root_nodegroup(self):
         """
@@ -884,6 +946,21 @@ class GraphTests(ArchesTestCase):
             if card.nodegroup.parentnodegroup is None:
                 self.assertEqual(graph.get_root_card(), card)
 
+    def test_graph_validation_of_null_ontology_class(self):
+        """
+        test to make sure null ontology classes aren't allowed
+
+        """
+
+        graph = Graph.objects.get(graphid=self.rootNode.graph_id)
+        new_node = graph.add_node({'nodeid':uuid.uuid1(), 'datatype': 'semantic'}) # A blank node with no ontology class is specified
+        graph.add_edge({'domainnode_id':self.rootNode.pk, 'rangenode_id':new_node.pk, 'ontologyproperty':None})
+
+        with self.assertRaises(GraphValidationError) as cm:
+            graph.save()
+        the_exception = cm.exception
+        self.assertEqual(the_exception.code, 1000)
+
     def test_graph_validation_of_invalid_ontology_class(self):
         """
         test to make sure invalid ontology classes aren't allowed
@@ -891,7 +968,7 @@ class GraphTests(ArchesTestCase):
         """
 
         graph = Graph.objects.get(graphid=self.rootNode.graph_id)
-        new_node = graph.add_node({'nodeid':uuid.uuid1()}) # A blank node with no ontology class is specified
+        new_node = graph.add_node({'nodeid':uuid.uuid1(), 'datatype': 'semantic', 'ontologyclass': 'InvalidOntologyClass'}) # A blank node with an invalid ontology class specified
         graph.add_edge({'domainnode_id':self.rootNode.pk, 'rangenode_id':new_node.pk, 'ontologyproperty':None})
 
         with self.assertRaises(GraphValidationError) as cm:
@@ -962,3 +1039,34 @@ class GraphTests(ArchesTestCase):
             graph.save()
         the_exception = cm.exception
         self.assertEqual(the_exception.code, 1005)
+
+    def test_appending_a_branch_with_an_invalid_ontology_property(self):
+        graph = Graph.objects.get(graphid=self.NODE_NODETYPE_GRAPHID)
+        graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P43_has_dimension', graphid=self.NODE_NODETYPE_GRAPHID)
+
+        with self.assertRaises(GraphValidationError) as cm:
+            graph.save()
+
+    def test_appending_a_branch_with_an_invalid_ontology_class(self):
+        graph = Graph.new()
+        graph.name = "TEST GRAPH"
+        graph.subtitle = "ARCHES TEST GRAPH"
+        graph.author = "Arches"
+        graph.description = "ARCHES TEST GRAPH"
+        graph.ontology = models.Ontology.objects.get(pk="e6e8db47-2ccf-11e6-927e-b8f6b115d7dd")
+        graph.version = "v1.0.0"
+        graph.isactive = False
+        graph.iconclass = "fa fa-building"
+        graph.nodegroups = []
+
+        graph.root.name = 'ROOT NODE'
+        graph.root.description = 'Test Root Node'
+        graph.root.ontologyclass = 'http://www.cidoc-crm.org/cidoc-crm/E21_Person'
+        graph.root.datatype = 'semantic'
+
+        graph.save()
+
+        graph.append_branch('http://www.cidoc-crm.org/cidoc-crm/P43_has_dimension', graphid=self.NODE_NODETYPE_GRAPHID)
+
+        with self.assertRaises(GraphValidationError) as cm:
+            graph.save()

@@ -1,0 +1,45 @@
+{% extends "views/list.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block title %}{% trans "Groups/Accounts" %}{% endblock %}
+
+{% block filter %}
+<!-- ko if:  permissionsDesigner.identityList.filterFunction -->
+<div class="list-filter" style="display:none" data-bind="visible:  permissionsDesigner.identityList.filterFunction">
+    <input type="text" class="form-control" style="" placeholder="{% block search_placeholder %}{% endblock %}" data-bind="value: permissionsDesigner.identityList.filter, valueUpdate: 'afterkeydown'">
+
+    <!-- Clear Search -->
+    <span class="clear-node-search" data-bind="click: permissionsDesigner.identityList.clearSearch()"><i class="fa fa-times-circle"></i></span>
+
+
+</div>
+<!-- /ko -->
+{% endblock %}
+
+{% block list_wrapper %}
+<div class="list-wrapper">
+<div class="grid" class="grid-list">
+
+    <!-- Card -->
+    <!-- ko foreach: permissionsDesigner.identityList.items -->
+            <div class="library-card" data-bind="visible: $data.filtered() == false, click: function(){$parent.permissionsDesigner.identityList.selectItem($data)}, css:{ 'selected selected-card': $data.selected }">
+            <div data-bind="attr:{'title': $data.groups}">
+                <div class="library-icon" style="">
+                    <span class="icon-wrap icon-wrap-sm icon-circle" data-bind="css: $data.type === 'group' ? 'bg-purple' : 'bg-mint'">
+                        <i data-bind="attr: {class: 'fa fa-' + $data.type}"></i>
+                    </span>
+                </div>
+                <div class="library-card-main" style="">
+                    <a class="name">
+                        <div data-bind="text: $data.name"></div>
+                        <div class="user-groups" data-bind="text: $data.groups"></div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    <!-- /ko -->
+
+</div>
+</div>
+{% endblock list_wrapper %}

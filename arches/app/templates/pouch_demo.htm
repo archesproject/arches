@@ -1,0 +1,180 @@
+{% load i18n %}
+{% load staticfiles %}
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="media/css/arches.css">
+        <title>Couchdb/Pouchdb Demo</title>
+    </head>
+    <body>
+        <div class="pad-all">
+            <div class="resource-grid-title">{% trans "Recently Added Resources" %}</div>
+            <div class="recent-additions-container">
+                <table data-bind="datatable: resourceTableConfig" class="table table-striped table-bordered" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th>{% trans "Project Id" %}</th>
+                            <th>{% trans "Name" %}</th>
+                            <th>{% trans "Start Date" %}</th>
+                            <th>{% trans "Active" %}</th>
+                            <th class="min-desktop"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for project in projects %}
+                        <tr>
+                            <td><a href="" class="regular-link" target="_blank">{{project.pk}}</a></td>
+                            <td>{{project.name}}</td>
+                            <td>{{project.startdate}}</td>
+                            <td>{{project.active}}</td>
+                            <td>
+                                <a href="javascript: sync('{{project.pk}}')" target="_blank" class="btn btn-primary">{% trans "Sync" %}</a>
+                                <!-- <a href="javascript: listDocs('{{project.pk}}')" target="_blank" class="btn btn-primary">{% trans "List local DB contents" %}</a> -->
+                                <!-- ko if: listening() == false -->
+                                <a href="javascript: listen('{{project.pk}}')" target="_blank" class="btn btn-primary">{% trans "Listen Live" %}</a>
+                                <!-- /ko -->
+                                <!-- ko if: listening -->
+                                <a href="javascript: quitListen('{{project.pk}}')" target="_blank" class="btn btn-success">{% trans "Quit Listening" %}</a>
+                                <!-- /ko -->
+                                <!-- ko if: remote_data_updated -->
+                                <a href="javascript: sync('{{project.pk}}')" target="_blank" class="btn btn-warning">{% trans "Pull Remote Data" %}</a>
+                                <!-- /ko -->
+
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <section id="todoapp">
+                <section id="main">
+                    <ul data-bind="foreach: {data: tiles, as: '_tile'}">
+                        <!-- ko if: _tile.doc.tileid -->
+                        <li><span>tileid: </span><span data-bind="text: _tile.doc.tileid"></span></li>
+                        <!-- ko if: _tile.doc.data -->
+                        <table>
+                        <thead>
+                            <tr>
+                                <th>nodeid</th>
+                                <th>value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- ko foreach: {data: Object.keys(_tile.doc.data), as: 'nodeid'} -->
+                            <tr>
+                                <td data-bind="text: nodeid"></td>    
+                                <td><input type="text" data-bind="value: _tile.doc.data[nodeid], event: { blur: updateDbValues.bind(_tile)}"/></td>
+                            </tr>
+                            <!-- /ko -->
+                        </tbody>
+                        </table>
+                        <!-- /ko -->
+                        <!-- /ko -->
+                    </ul>
+                </section>
+            </section>
+            
+        </div>
+    </body>
+        {% block javascript %}
+        <script src="https://cdn.jsdelivr.net/npm/pouchdb@6.3.4/dist/pouchdb.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-debug.js"></script>
+        <script
+            src="https://code.jquery.com/jquery-3.2.1.min.js"
+            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+            crossorigin="anonymous">
+        </script>
+        <script>
+
+            viewModel = {
+                "tiles": ko.observableArray(),
+                "remote_data_updated": ko.observable(false),
+                "listening": ko.observable(false)
+            }
+
+            function setupDBs(project_id){
+                localDB = new PouchDB('project_'+project_id);
+                remoteDB = new PouchDB('http://localhost:8000/couchdb/project_'+project_id)
+            }
+
+            // Show the current list of todos by reading them from the database
+            function listDocs(project_id) {
+                setupDBs(project_id);
+                localDB.allDocs({include_docs: true, descending: true}, function(err, doc) {
+                    console.log(doc)
+                    viewModel.tiles(doc.rows);
+                });
+            }
+
+            // Initialise a sync with the remote server
+            function sync(project_id) {
+                console.log(project_id)
+                setupDBs(project_id);
+
+                var opts = {live: true};
+                localDB.sync(remoteDB).on('complete', function () {
+                    // yay, we're in sync!
+                    console.log('yay, we\'re in sync!')
+                    viewModel.remote_data_updated(false);
+                    listDocs(project_id);
+                    $.get( "push_edits_to_db?project_id=" + project_id, function(data) {
+                        console.log( "Load was performed." );
+                    });
+                }).on('error', function (err) {
+                    // boo, we hit an error!
+                    console.log('boo, we hit an error!')
+                    console.log(err)
+                });
+            }
+
+            function updateDbValues(nodeid, event) {
+                var self = this;
+                //if (event.keyCode === ENTER_KEY) {
+                localDB.get(this.id).then(function (doc) {
+                  // update their age
+                  doc.data = self.doc.data;
+                  // put them back
+                  return localDB.put(doc);
+                }).then(function () {
+                  // fetch mittens again
+                  return localDB.get(self.id);
+                }).then(function (doc) {
+                  console.log(doc);
+                });
+                //}
+                return true;
+            }
+
+            function listen(project_id){
+                viewModel.listening(true);
+                setupDBs(project_id);
+                changes = remoteDB.changes({
+                    since: 'now',
+                    live: true,
+                    include_docs: true
+                }).on('change', function(change) {
+                    // handle change
+                    viewModel.remote_data_updated(true);
+                    console.log(change);
+                }).on('complete', function(info) {
+                    // changes() was canceled
+                }).on('error', function (err) {
+                    console.log(err);
+                });
+
+                //changes.cancel();
+            }
+
+            function quitListen(project_id){
+                changes.cancel();
+                viewModel.listening(false);
+            }
+
+            ko.applyBindings(viewModel);
+
+
+        </script>
+        {% endblock javascript %}
+</html>

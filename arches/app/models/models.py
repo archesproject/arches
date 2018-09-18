@@ -18,10 +18,13 @@ import datetime
 from django.forms.models import model_to_dict
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
-from django.db.models import Q, Max
 from django.core.files.storage import FileSystemStorage
+from django.core.validators import RegexValidator
+from django.db.models import Q, Max
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
+from django.contrib.auth.models import User
+from django.contrib.auth.models import Group
 
 # can't use "arches.app.models.system_settings.SystemSettings" because of circular refernce issue
 # so make sure the only settings we use in this file are ones that are static (fixed at run time)
@@ -35,6 +38,7 @@ class CardModel(models.Model):
     name = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     instructions = models.TextField(blank=True, null=True)
+    cssclass = models.TextField(blank=True, null=True)
     helpenabled = models.BooleanField(default=False)
     helptitle = models.TextField(blank=True, null=True)
     helptext = models.TextField(blank=True, null=True)
@@ -43,8 +47,9 @@ class CardModel(models.Model):
     active = models.BooleanField(default=True)
     visible = models.BooleanField(default=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
+    component = models.ForeignKey('CardComponent', db_column='componentid', default=uuid.UUID('f05e4d3a-53c1-11e8-b0ea-784f435179ea'), on_delete=models.SET_DEFAULT)
+    config = JSONField(blank=True, null=True, db_column='config')
 
-    @property
     def is_editable(self):
         result = True
         tiles = TileModel.objects.filter(nodegroup=self.nodegroup).count()
@@ -57,6 +62,22 @@ class CardModel(models.Model):
         managed = True
         db_table = 'cards'
 
+class CardComponent(models.Model):
+    componentid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    name = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    component = models.TextField()
+    componentname = models.TextField()
+    defaultconfig = JSONField(blank=True, null=True, db_column='defaultconfig')
+
+    @property
+    def defaultconfig_json(self):
+        json_string = json.dumps(self.defaultconfig)
+        return json_string
+
+    class Meta:
+        managed = True
+        db_table = 'card_components'
 
 class CardXNodeXWidget(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid1)
@@ -65,6 +86,7 @@ class CardXNodeXWidget(models.Model):
     widget = models.ForeignKey('Widget', db_column='widgetid')
     config = JSONField(blank=True, null=True, db_column='config')
     label = models.TextField(blank=True, null=True)
+    visible = models.BooleanField(default=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
 
     class Meta:
@@ -156,6 +178,7 @@ class Edge(models.Model):
 
 class EditLog(models.Model):
     editlogid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    resourcedisplayname = models.TextField(blank=True, null=True)
     resourceclassid = models.TextField(blank=True, null=True)
     resourceinstanceid = models.TextField(blank=True, null=True)
     nodegroupid = models.TextField(blank=True, null=True)
@@ -163,11 +186,17 @@ class EditLog(models.Model):
     edittype = models.TextField(blank=True, null=True)
     newvalue = JSONField(blank=True, null=True, db_column='newvalue')
     oldvalue = JSONField(blank=True, null=True, db_column='oldvalue')
+    newprovisionalvalue = JSONField(blank=True, null=True, db_column='newprovisionalvalue')
+    oldprovisionalvalue = JSONField(blank=True, null=True, db_column='oldprovisionalvalue')
     timestamp = models.DateTimeField(blank=True, null=True)
     userid = models.TextField(blank=True, null=True)
     user_firstname = models.TextField(blank=True, null=True)
     user_lastname = models.TextField(blank=True, null=True)
     user_email = models.TextField(blank=True, null=True)
+    user_username = models.TextField(blank=True, null=True)
+    provisional_userid = models.TextField(blank=True, null=True)
+    provisional_user_username = models.TextField(blank=True, null=True)
+    provisional_edittype = models.TextField(blank=True, null=True)
     note = models.TextField(blank=True, null=True)
 
     class Meta:
@@ -224,32 +253,6 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
         except Exception:
             return False
 
-
-class Form(models.Model):
-    formid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    title = models.TextField(blank=True, null=True)
-    subtitle = models.TextField(blank=True, null=True)
-    iconclass = models.TextField(blank=True, null=True)
-    visible = models.BooleanField(default=True)
-    sortorder = models.IntegerField(blank=True, null=True, default=None)
-    graph = models.ForeignKey('GraphModel', db_column='graphid', blank=False, null=False)
-
-    class Meta:
-        managed = True
-        db_table = 'forms'
-
-
-class FormXCard(models.Model):
-    id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
-    card = models.ForeignKey('CardModel', db_column='cardid')
-    form = models.ForeignKey('Form', db_column='formid')
-    sortorder = models.IntegerField(blank=True, null=True, default=None)
-
-    class Meta:
-        managed = True
-        db_table = 'forms_x_cards'
-
-
 class Function(models.Model):
     functionid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField(blank=True, null=True)
@@ -300,7 +303,6 @@ class FunctionXGraph(models.Model):
         db_table = 'functions_x_graphs'
         unique_together = ('function', 'graph',)
 
-
 class GraphModel(models.Model):
     graphid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField(blank=True, null=True)
@@ -312,30 +314,26 @@ class GraphModel(models.Model):
     isresource = models.BooleanField()
     isactive = models.BooleanField()
     iconclass = models.TextField(blank=True, null=True)
+    color = models.TextField(blank=True, null=True)
     subtitle = models.TextField(blank=True, null=True)
     ontology = models.ForeignKey('Ontology', db_column='ontologyid', related_name='graphs', null=True, blank=True)
     functions = models.ManyToManyField(to='Function', through='FunctionXGraph')
+    jsonldcontext = models.TextField(blank=True, null=True)
+    template = models.ForeignKey(
+        'ReportTemplate',
+        db_column='templateid',
+        default='50000000-0000-0000-0000-000000000001'
+    )
+    config = JSONField(db_column='config', default={})
 
     @property
     def disable_instance_creation(self):
         if not self.isresource:
             return _('Only resource models may be edited - branches are not editable')
-        msg = []
-        forms = Form.objects.filter(graph_id=self.pk)
         if not self.isactive:
-            msg.append(_('change resource model status in graph manager'))
-        if forms.count() == 0:
-            msg.append(_('add menu(s)'))
-        else:
-            if FormXCard.objects.filter(form__in=forms).count() == 0:
-                msg.append(_('add card(s) to menu(s)'))
-            if forms.filter(visible=True).count() == 0:
-                msg.append(_('make menu(s) visible'))
-        if len(msg) == 0:
-            return False
-        return _('To make this resource editable: ') + ', '.join(msg)
+            return _('Set resource model status to Active in Graph Designer')
+        return False
 
-    @property
     def is_editable(self):
         result = True
         if self.isresource:
@@ -396,6 +394,7 @@ class Node(models.Model):
     config = JSONField(blank=True, null=True, db_column='config')
     issearchable = models.BooleanField(default=True)
     isrequired = models.BooleanField(default=False)
+    sortorder = models.IntegerField(blank=True, null=True, default=0)
 
     def get_child_nodes_and_edges(self):
         """
@@ -529,20 +528,6 @@ class ReportTemplate(models.Model):
         db_table = 'report_templates'
 
 
-class Report(models.Model):
-    reportid = models.UUIDField(primary_key=True, default=uuid.uuid1)
-    name = models.TextField(blank=True, null=True)
-    template = models.ForeignKey(ReportTemplate, db_column='templateid')
-    graph = models.ForeignKey(GraphModel, db_column='graphid')
-    config = JSONField(blank=True, null=True, db_column='config')
-    formsconfig = JSONField(blank=True, null=True, db_column='formsconfig')
-    active = models.BooleanField(default=False)
-
-    class Meta:
-        managed = True
-        db_table = 'reports'
-
-
 class Resource2ResourceConstraint(models.Model):
     resource2resourceid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     resourceclassfrom = models.ForeignKey(Node, db_column='resourceclassfrom', blank=True, null=True, related_name='resxres_contstraint_classes_from')
@@ -616,6 +601,47 @@ class TileModel(models.Model): #Tile
             "20000000-0000-0000-0000-000000000004": "Primary"
         }
 
+    the provisionaledits JSONField has this schema:
+
+    values are dictionaries with n number of keys that represent nodeid's and values the value of that node instance
+
+    .. code-block:: python
+
+        {
+            userid: {
+                value: node value,
+                status: "review", "approved", or "rejected"
+                action: "create", "update", or "delete"
+                reviewer: reviewer's user id,
+                timestamp: time of last provisional change,
+                reviewtimestamp: time of review
+                }
+            ...
+        }
+
+        {
+            1: {
+                "value": {
+                        "20000000-0000-0000-0000-000000000002": "Jack",
+                        "20000000-0000-0000-0000-000000000003": "Smith",
+                        "20000000-0000-0000-0000-000000000004": "Primary"
+                      },
+                "status": "rejected",
+                "action": "update",
+                "reviewer": 8,
+                "timestamp": "20180101T1500",
+                "reviewtimestamp": "20180102T0800",
+                },
+            15: {
+                "value": {
+                        "20000000-0000-0000-0000-000000000002": "John",
+                        "20000000-0000-0000-0000-000000000003": "Smith",
+                        "20000000-0000-0000-0000-000000000004": "Secondary"
+                      },
+                "status": "review",
+                "action": "update",
+        }
+
     """
 
     tileid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
@@ -624,13 +650,14 @@ class TileModel(models.Model): #Tile
     data = JSONField(blank=True, null=True, db_column='tiledata')  # This field type is a guess.
     nodegroup = models.ForeignKey(NodeGroup, db_column='nodegroupid')
     sortorder = models.IntegerField(blank=True, null=True, default=0)
+    provisionaledits = JSONField(blank=True, null=True, db_column='provisionaledits')  # This field type is a guess.
 
     class Meta:
         managed = True
         db_table = 'tiles'
 
     def save(self, *args, **kwargs):
-        if(self.sortorder is None):
+        if(self.sortorder is None or (self.provisionaledits is not None and self.data == {})):
             sortorder_max = TileModel.objects.filter(nodegroup_id=self.nodegroup_id, resourceinstance_id=self.resourceinstance_id).aggregate(Max('sortorder'))['sortorder__max']
             self.sortorder = sortorder_max + 1 if sortorder_max is not None else 0
         super(TileModel, self).save(*args, **kwargs) # Call the "real" save() method.
@@ -796,6 +823,7 @@ class TileserverLayer(models.Model):
         managed = True
         db_table = 'tileserver_layers'
 
+
 class GraphXMapping(models.Model):
     id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     graph = models.ForeignKey('GraphModel', db_column='graphid')
@@ -816,3 +844,80 @@ class IIIFManifest(models.Model):
     class Meta:
         managed = True
         db_table = 'iiif_manifests'
+
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    phone = models.CharField(max_length=16, blank=True)
+    class Meta:
+        managed = True
+        db_table = 'user_profile'
+
+
+class MobileSurveyModel(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    name = models.TextField(null=True)
+    active = models.BooleanField(default=False)
+    createdby = models.ForeignKey(User, related_name='createdby')
+    lasteditedby = models.ForeignKey(User, related_name='lasteditedby')
+    users = models.ManyToManyField(to=User, through='MobileSurveyXUser')
+    groups = models.ManyToManyField(to=Group, through='MobileSurveyXGroup')
+    cards = models.ManyToManyField(to=CardModel, through='MobileSurveyXCard')
+    startdate = models.DateField(blank=True, null=True)
+    enddate = models.DateField(blank=True, null=True)
+    description = models.TextField(null=True)
+    bounds = models.MultiPolygonField(null=True)
+    tilecache = models.TextField(null=True)
+    datadownloadconfig = JSONField(blank=True, null=True, default='{"download":false, "count":1000, "resources":[], "custom":null}')
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        managed = True
+        db_table = 'mobile_surveys'
+
+
+class MobileSurveyXUser(models.Model):
+    mobile_survey_x_user_id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    mobile_survey = models.ForeignKey(MobileSurveyModel, on_delete=models.CASCADE, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'mobile_surveys_x_users'
+        unique_together = ('mobile_survey', 'user',)
+
+
+class MobileSurveyXGroup(models.Model):
+    mobile_survey_x_group_id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    mobile_survey = models.ForeignKey(MobileSurveyModel, on_delete=models.CASCADE, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'mobile_surveys_x_groups'
+        unique_together = ('mobile_survey', 'group',)
+
+class MobileSurveyXCard(models.Model):
+    mobile_survey_x_card_id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
+    card = models.ForeignKey(CardModel, on_delete=models.CASCADE)
+    mobile_survey = models.ForeignKey(MobileSurveyModel, on_delete=models.CASCADE, null=True)
+    sortorder = models.IntegerField(default=0)
+
+    class Meta:
+        managed = True
+        db_table = 'mobile_surveys_x_cards'
+        unique_together = ('mobile_survey', 'card',)
+
+
+class MapMarker(models.Model):
+    name = models.TextField(unique=True)
+    url = models.TextField()
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        managed = True
+        db_table = 'map_markers'

@@ -1,0 +1,311 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "base-manager.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+
+{% block title %}
+{{ block.super }}
+{% trans "Graph Designer" %}
+{% endblock title %}
+
+
+{% block graph_title %}
+<div class="ep-tools-title">
+    <h1 class="page-header text-overflow ep-graph-title">
+        <i class="text-center icon-wrap bg-gray ep-graph-title-icon" data-bind="css: (graph.iconclass() || 'fa fa-question')" ></i>
+        <span data-bind="text: graph.name()"></span><span class="graph-type" data-bind="text: graph.isresource() ? '({% trans "Resource Model" %})' : '({% trans "Branch" %})'"></span>
+    </h1>
+</div>
+{% endblock graph_title %}
+
+{% block main_content %}
+<div class="content-panel">
+    <!-- Title Block -->
+    <div class="ep-form-toolbar">
+
+        <h4 class="ep-form-toolbar-title">
+            <!-- Menu Item -->
+            <div class="graph-selector" data-bind="">
+                <!-- ko if: groupedGraphs -->
+                <select data-bind="template: { name: 'selectGraphTemplate', data: groupedGraphs }, chosen: {width: '100%'}, value: graphid"></select>
+                <!-- /ko -->
+                <script type="text/html" id="selectGraphTemplate">
+                    <option disabled selected value>{% trans "Find a Resource Model/Branch..." %}</option>
+                    <!-- ko foreach: groups -->
+                        <optgroup data-bind="attr: { 'label': (name==='Resource Models')?'{% trans "Resource Models" %}':'{% trans "Branches" %}' }, foreach: items">
+                            <option data-bind="value: graphid, text: name"></option>
+                        </optgroup>
+                    <!-- /ko -->
+                </script>
+            </div>
+        </h4>
+
+
+        <div class="btn-group btn-group-toggle" data-bind="visible: activeTab() === 'graph'">
+            <button class="btn btn-md viewstate-btn" data-bind="css: { active: viewState() === 'design' }, click: function(){viewState('design');}">{% trans "Design" %}</button>
+            <button class="btn btn-md viewstate-btn" data-bind="css: { active: viewState() === 'preview' }, click: showPreview">{% trans "Preview" %}</button>
+        </div>
+
+        <div class="graph-settings-crud">
+
+            <span data-bind="visible: graphSettingsVisible()" style="display: none;">
+                <!-- ko if: graphSettingsViewModel.dirty() -->
+                <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: graphSettingsViewModel.reset">{% trans "Discard Edits" %}</button>
+                <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: graphSettingsViewModel.save">{% trans "Save Edits" %}</button>
+                <!-- /ko -->
+            </span>
+
+            <span data-bind="visible: selectedNode() && activeTab() === 'graph'" style="display: none;">
+                <!-- ko if: selectedNode() && selectedNode().dirty() && selectedNode().istopnode == false -->
+                <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: function(){graphModel.get('selectedNode')().reset()}">{% trans "Discard Edits" %}</button>
+                <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: saveSelectedNode">{% trans "Save Edits" %}</button>
+                <!-- /ko -->
+            </span>
+
+            <!-- ko if: cardTree.selection && cardTree.selection() && cardTree.selection()!=='root' -->
+            <span data-bind="visible: cardTree.selection() && activeTab() === 'card'" style="display: none;">
+                <!-- ko with: cardTree.selection().model ? cardTree.selection().model : cardTree.selection().card -->
+                <!-- ko if: $data.dirty() -->
+                <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: function(){$data.reset()}">{% trans "Discard Card Edits" %}</button>
+                <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: function(){$data.save()}">{% trans "Save Card Edits" %}</button>
+                <!-- /ko -->
+                <!-- /ko -->
+            </span>
+            <!-- /ko -->
+
+            <!-- ko if: cardTree.selection && cardTree.selection()==='root' -->
+            <span>
+                <!-- ko if: $data.dirty() -->
+                <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: function(){$data.reset()}">{% trans "Discard Card Edits" %}</button>
+                <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: function(){$data.save()}">{% trans "Save Card Edits" %}</button>
+                <!-- /ko -->
+            </span>
+            <!-- /ko -->
+
+            <a class="btn btn-sm btn-mint btn-labeled fa fa-mail-reply back-to-designer" data-bind="
+                attr: {
+                    href: '{% url 'graph' '' %}' + (graph.isresource() ? '' : '#branches')
+                },
+                click: function () {
+                    navigate('{% url 'graph' '' %}' + (graph.isresource() ? '' : '#branches'))
+                }">
+                {% trans "Done" %}
+            </a>
+        </div>
+
+    </div>
+
+    <div class="flex">
+
+        <!-- Left Panel -->
+        <div class="left-panel graph-designer" data-bind="resizableSidepanel:true">
+
+            <!--Nav Tabs-->
+            <div class="graph-designer-tab-container">
+                <ul class="nav nav-tabs">
+                    <li data-bind="css: { active: activeTab() === 'graph' }, click: function(){activeTab('graph');}">
+                        <a class="graph-designer-tab ion-android-share-alt" aria-expanded="true">
+                            {% trans 'Graph' %}
+                        </a>
+                    </li>
+                    <li data-bind="css: { active: activeTab() === 'card' }, click: function(){activeTab('card');}">
+                        <a class="graph-designer-tab ion-clipboard" aria-expanded="false">
+                            {% trans 'Cards' %}
+                        </a>
+                    </li>
+                    <!--ko if: graph.isresource() -->
+                    <li data-bind="css: { active: activeTab() === 'permissions' }, click: function(){activeTab('permissions');}">
+                        <a class="graph-designer-tab ion-lock-combination" aria-expanded="false">
+                            {% trans 'Permissions' %}
+                        </a>
+                    </li>
+                    <!--/ko-->
+                </ul>
+            </div>
+
+            <div class="tab-content" >
+                <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'graph' }">
+                    <div class="" data-bind="with: graphTree">
+                        {% include 'views/graph/graph-designer/graph-tree.htm' %}
+                    </div>
+                </div>
+
+                <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }">
+                    <div class="jstree jstree-default" data-bind="visible: true, with: cardTree" style="display: none;">
+                        {% include 'views/graph/graph-designer/card-tree.htm' %}
+                    </div>
+                </div>
+
+                <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'permissions' }">
+                    <div class="jstree jstree-default" data-bind="visible: true, with: permissionTree" style="display: none;">
+                        {% include 'views/graph/graph-designer/card-tree-permissions.htm' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Panel -->
+        <div class="flex node-configuration">
+            <div class="flex" data-bind="visible: activeTab() === 'graph'">
+                <!--Branch Library -->
+                <div id="branch-library" class="middle-column-container graph-designer branch-library" data-bind="visible: graphTree.branchListVisible" style="display: none;">
+                    <div>
+                        <div class="title-block-title" style="margin-bottom: 0px; padding-bottom: 0px;">
+                            <span class="">{{branch_list.title}}</span>
+                        </div>
+                        <div class="relative">
+                            <a id="node-crud-close" href="javascript:void(0)" class="library-close-btn" data-bind="click: graphTree.toggleBranchList.bind(graphTree)"><i class="ion-close"></i></a>
+                        </div>
+                        <div style="padding: 4px 0px 12px 6px">{% trans "Add a branch to your model from the library" %}</div>
+                    </div>
+                    <div data-bind="with: branchListView">
+                        {% include 'views/graph/graph-designer/branch-list.htm' %}
+                    </div>
+                </div>
+
+                <!-- Settings, Node Form, and Branch List -->
+                <div class="tab-pane fade in flex" style="position: relative;" data-bind="visible: viewState() === 'design'">
+                    <!--ko if: selectedNode() -->
+                    <div class="graph-designer-graph-content" data-bind="visible: selectedNode().nodeid == graph.root.nodeid()">
+                        {% include 'views/graph/graph-designer/graph-settings.htm' %}
+                    </div>
+
+                    <div class="graph-designer-graph-content" data-bind="visible: selectedNode().nodeid != graph.root.nodeid(), with: nodeForm">
+                        {% include 'views/graph/graph-designer/node-form.htm' %}
+                    </div>
+                    <!--/ko-->
+                </div>
+
+                <div class="tab-pane fade in flex" style="position: relative;" data-bind="visible: viewState() === 'preview'">
+                    <div id="graph" class="flex"></div>
+                </div>
+            </div>
+
+            <!--ko if: activeTab() === 'card' -->
+            <div class="flex" data-bind="visible: activeTab() === 'card'">
+                <!--Middle Panel -->
+                <!-- ko if: cardTree.selection -->
+                <div class="middle-column-container graph-designer branch-library card-configuration" data-bind="css: {'expanded': selectedCard() && selectedCard().model.helpenabled() && cardTree.selection().constructor.name === 'CardViewModel' }" style="">
+                    <!-- ko if: typeof cardTree.selection()!=='string' -->
+                        <!-- ko if: cardTree.selection().constructor.name === 'CardViewModel' -->
+                        <div data-bind="with: cardTree.selection()">
+                            {% include 'views/graph/graph-designer/card-configuration.htm' %}
+                        </div>
+                        <!-- /ko -->
+                        <!-- ko if: cardTree.selection().constructor.name !== 'CardViewModel' -->
+                        <div data-bind="with: cardTree.selection()">
+                            {% include 'views/graph/graph-designer/widget-configuration.htm' %}
+                        </div>
+                        <!-- /ko -->
+                    <!-- /ko -->
+                    <!-- ko if: cardTree.selection()==='root' -->
+                    <div class="panel-section-title dark-colored-text">
+                        {% trans "Report Configuration" %}
+                    </div>
+                    <div class="tab-content listing-container form-divider">
+                        <div class="node-config-item" style="">
+                            <div class="control-label">
+                                {% trans "Template" %}
+                            </div>
+                            <div class="pad-no">
+                                <select class="design" data-bind="value: report.get('template_id'), options: reportTemplates, optionsText: 'name', optionsValue: 'id', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                            </div>
+                        </div>
+
+                        <div class='report-preview' data-bind='component: {
+                            name: reportLookup[report.get("template_id")()].componentname,
+                            params: {
+                                report: report,
+                                configForm: true,
+                                configType: "header"
+                            }
+                        }'></div>
+                    </div>
+                    <!-- /ko -->
+                </div>
+                <!-- Card Manager -->
+                <div class="flex tab-pane fade in graph-designer" data-bind="css: { active: activeTab() === 'card' }">
+                    <!-- ko if: selectedCard() -->
+                    <div class="card-component-panel">
+                        <!-- ko component: {
+                        name: cardTree.cardComponentLookup[selectedCard().model.component_id()].componentname,
+                        params: {
+                                card: selectedCard(),
+                                tile: null,
+                                provisionalTileViewModel: null,
+                                reviewer: null,
+                                loading: loading,
+                                form: cardTree,
+                                preview: true
+                            }
+                        } --><!-- /ko -->
+                    </div>
+                    <!-- /ko -->
+                    <!-- ko if: cardTree.selection()==='root' -->
+                        <div class='resource-report editor-report' data-bind='component: {
+                            name: reportLookup[report.get("template_id")()].componentname,
+                            params: {
+                                report: report
+                            }
+                        }'></div>
+                    <!-- /ko -->
+                </div>
+                <!-- /ko -->
+            </div>
+            <!-- /ko -->
+
+            <!--ko if: activeTab() === 'permissions' -->
+            <div class="flex">
+                <!-- Card Manager -->
+                <div class="flex tab-pane fade in" data-bind="css: { active: activeTab() === 'permissions' }">
+                    {% include 'views/graph/graph-designer/permission-settings-form.htm' %}
+                </div>
+            </div>
+            <!--/ko-->
+
+        </div>
+
+    </div>
+</div>
+{% endblock main_content %}
+
+{% block tabs %}{% endblock tabs %}
+
+{% block pre_require_js %}
+{{block.super}}
+    <script>
+        {% autoescape off %}define('graph-designer-data', [], function() {
+            return {
+                graphid: '{{graphid}}',
+                ontologyClasses: {{ontology_classes}},
+                ontologies: {{ontologies}},
+                datatypes: {{datatypes_json}},
+                graph: {{graph}},
+                ontology_namespaces: {{ontology_namespaces}},
+                branches: {{branches}},
+                cards: {{cards}},
+                cardwidgets: {{cardwidgets}},
+                widgets: {{widgets_json}},
+                cardComponents: {{card_components_json}},
+                restrictedNodegroups: {{restricted_nodegroups}}
+            };
+        });{% endautoescape %}
+    </script>
+{% endblock pre_require_js %}

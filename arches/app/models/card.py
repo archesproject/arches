@@ -15,11 +15,12 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
-import uuid
+
 from django.db import transaction
 from arches.app.models import models
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.betterJSONSerializer import JSONSerializer
 from django.forms import ModelForm
+
 
 class Card(models.CardModel):
     """
@@ -70,7 +71,9 @@ class Card(models.CardModel):
         # self.active
         # self.visible
         # self.sortorder
+        # self.cssclass
         # end from models.CardModel
+        self.disabled = False
         self.cardinality = ''
         self.cards = []
         self.widgets = []
@@ -79,32 +82,46 @@ class Card(models.CardModel):
         if args:
             if isinstance(args[0], dict):
                 for key, value in args[0].iteritems():
-                    if key not in ('cards', 'widgets', 'nodes', 'is_editable'):
+                    if key not in ('cards', 'widgets', 'nodes', 'is_editable', 'nodegroup'):
                         setattr(self, key, value)
 
-                for card in args[0]["cards"]:
-                    self.cards.append(Card(card))
+                if 'cards' in args[0]:
+                    for card in args[0]["cards"]:
+                        self.cards.append(Card(card))
 
-                for widget in args[0]["widgets"]:
-                    widget_model = models.CardXNodeXWidget()
-                    widget_model.pk = widget.get('id', None)
-                    widget_model.node_id = widget.get('node_id', None)
-                    widget_model.card_id = widget.get('card_id', None)
-                    widget_model.widget_id = widget.get('widget_id', None)
-                    widget_model.config = widget.get('config', {})
-                    widget_model.label = widget.get('label', '')
-                    widget_model.sortorder = widget.get('sortorder', None)
-                    if widget_model.pk == None:
-                        widget_model.save()
-                    self.widgets.append(widget_model)
+                if 'widgets' in args[0]:
+                    for widget in args[0]["widgets"]:
+                        cardxnodexwidgetid = widget.get('id', None)
+                        node_id = widget.get('node_id', None)
+                        card_id = widget.get('card_id', None)
+                        widget_id = widget.get('widget_id', None)
+                        if cardxnodexwidgetid is None and (node_id is not None and card_id is not None and widget_id is not None):
+                            try:
+                                wm = models.CardXNodeXWidget.objects.get(node_id=node_id, card_id=card_id, widget_id=widget_id)
+                                cardxnodexwidgetid = wm.pk
+                            except:
+                                pass
+                        widget_model = models.CardXNodeXWidget()
+                        widget_model.pk = cardxnodexwidgetid
+                        widget_model.node_id = node_id
+                        widget_model.card_id = card_id
+                        widget_model.widget_id = widget_id
+                        widget_model.config = widget.get('config', {})
+                        widget_model.label = widget.get('label', '')
+                        widget_model.visible = widget.get('visible', None)
+                        widget_model.sortorder = widget.get('sortorder', None)
+                        if widget_model.pk is None:
+                            widget_model.save()
+                        self.widgets.append(widget_model)
 
-                for node in args[0]["nodes"]:
-                    nodeid = node.get('nodeid', None)
-                    if nodeid is not None:
-                        node_model = models.Node.objects.get(nodeid=nodeid)
-                        node_model.config = node.get('config', None)
-                        node_model.isrequired = node.get('isrequired', node_model.isrequired)
-                        self.nodes.append(node_model)
+                if 'nodes' in args[0]:
+                    for node in args[0]["nodes"]:
+                        nodeid = node.get('nodeid', None)
+                        if nodeid is not None:
+                            node_model = models.Node.objects.get(nodeid=nodeid)
+                            node_model.config = node.get('config', None)
+                            node_model.isrequired = node.get('isrequired', node_model.isrequired)
+                            self.nodes.append(node_model)
 
             else:
                 self.widgets = list(self.cardxnodexwidget_set.all())
@@ -117,13 +134,14 @@ class Card(models.CardModel):
 
     def save(self):
         """
-        Saves an a card and it's parent ontology property back to the db
+        Saves a card and its parent ontology property back to the db
 
         """
         with transaction.atomic():
             if self.graph.ontology and self.graph.isresource:
                 edge = self.get_edge_to_parent()
-                edge.ontologyproperty = self.ontologyproperty
+                if self.ontologyproperty is not None:
+                    edge.ontologyproperty = self.ontologyproperty
                 edge.save()
 
             self.nodegroup.cardinality = self.cardinality
@@ -138,6 +156,10 @@ class Card(models.CardModel):
                 card.save()
 
         return self
+
+    def confirm_enabled_state(self, user, nodegroup):
+        if user.has_perms(['write_nodegroup'], self.nodegroup) is False:
+            self.disabled = True
 
     def get_edge_to_parent(self):
         """
@@ -155,33 +177,37 @@ class Card(models.CardModel):
         perm -- the permission string to check (eg: 'read_nodegroup')
 
         """
-
         if user:
             if user.has_perm(perm, self.nodegroup):
+                self.confirm_enabled_state(user, self.nodegroup)
                 cards = []
                 for card in self.cards:
                     if user.has_perm(perm, card.nodegroup):
+                        card.confirm_enabled_state(user, card.nodegroup)
                         cards.append(card)
                 self.cards = cards
             else:
                 return None
         return self
 
-    def serialize(self):
+    def serialize(self, fields=None, exclude=None):
         """
-        serialize to a different form then used by the internal class structure
+        serialize to a different form than used by the internal class structure
 
         """
 
-        ret = JSONSerializer().handle_model(self)
-        ret['cardinality'] = self.cardinality
-        ret['cards'] = self.cards
-        ret['nodes'] = list(self.nodegroup.node_set.all())
-        ret['visible'] = self.visible
-        ret['active'] = self.active
-        ret['widgets'] = self.widgets
-        ret['is_editable'] = self.is_editable
-        ret['ontologyproperty'] = self.ontologyproperty
+        exclude = [] if exclude is None else exclude
+        ret = JSONSerializer().handle_model(self, fields, exclude)
+
+        ret['cardinality'] = self.cardinality if 'cardinality' not in exclude else ret.pop('cardinality', None)
+        ret['cards'] = self.cards if 'cards' not in exclude else ret.pop('cards', None)
+        ret['nodes'] = list(self.nodegroup.node_set.all()) if 'nodes' not in exclude else ret.pop('nodes', None)
+        ret['visible'] = self.visible if 'visible' not in exclude else ret.pop('visible', None)
+        ret['active'] = self.active if 'active' not in exclude else ret.pop('active', None)
+        ret['is_editable'] = self.is_editable() if 'is_editable' not in exclude else ret.pop('is_editable', None)
+        ret['ontologyproperty'] = self.ontologyproperty if 'ontologyproperty' not in exclude else ret.pop(
+            'ontologyproperty', None)
+        ret['disabled'] = self.disabled if 'disabled' not in exclude else ret.pop('disabled', None)
 
         if self.graph and self.graph.ontology and self.graph.isresource:
             edge = self.get_edge_to_parent()
@@ -189,26 +215,31 @@ class Card(models.CardModel):
 
         # provide a models.CardXNodeXWidget model for every node
         # even if a widget hasn't been configured
-        for node in ret['nodes']:
-            found = False
-            for widget in ret['widgets']:
-                if node.nodeid == widget.node_id:
-                    found = True
-            if not found:
-                widget = models.DDataType.objects.get(pk=node.datatype).defaultwidget
-                if widget:
-                    widget_model = models.CardXNodeXWidget()
-                    widget_model.node_id = node.nodeid
-                    widget_model.card_id = self.cardid
-                    widget_model.widget_id = widget.pk
-                    widget_model.config = JSONSerializer().serialize(widget.defaultconfig)
-                    widget_model.label = node.name
-                    ret['widgets'].append(widget_model)
+        ret['widgets'] = self.widgets
+        if 'widgets' not in exclude:
+            for node in ret['nodes']:
+                found = False
+                for widget in ret['widgets']:
+                    if node.nodeid == widget.node_id:
+                        found = True
+                if not found:
+                    widget = models.DDataType.objects.get(pk=node.datatype).defaultwidget
+                    if widget:
+                        widget_model = models.CardXNodeXWidget()
+                        widget_model.node_id = node.nodeid
+                        widget_model.card_id = self.cardid
+                        widget_model.widget_id = widget.pk
+                        widget_model.config = JSONSerializer().serialize(widget.defaultconfig)
+                        widget_model.label = node.name
+                        ret['widgets'].append(widget_model)
+        else:
+            ret.pop('widgets', None)
 
         return ret
 
 
 class CardXNodeXWidgetForm(ModelForm):
+
     class Meta:
         model = models.CardXNodeXWidget
         fields = '__all__'

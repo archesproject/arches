@@ -1,10 +1,12 @@
 import uuid
+import csv
 from arches.app.models import models
 from arches.app.models import concept
 from arches.app.datatypes.base import BaseDataType
+from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.concept import get_preflabel_from_valueid
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Nested, Exists
-from arches.app.utils.date_utils import SortableDate
+from arches.app.utils.date_utils import ExtendedDateFormat
 from django.core.exceptions import ObjectDoesNotExist
 
 
@@ -41,7 +43,7 @@ class BaseConceptDataType(BaseDataType):
             result = date_range
         return result
 
-    def append_to_document(self, document, nodevalue, nodeid, tile):
+    def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         try:
             assert isinstance(nodevalue, (list, tuple)) #assert nodevalue is an array
         except AssertionError:
@@ -50,28 +52,39 @@ class BaseConceptDataType(BaseDataType):
             value = self.get_value(valueid)
             date_range = self.get_concept_dates(value.concept)
             if date_range is not None:
-                min_date = SortableDate(date_range['min_year']).as_float()
-                max_date = SortableDate(date_range['max_year']).as_float()
+                min_date = ExtendedDateFormat(date_range['min_year']).lower
+                max_date = ExtendedDateFormat(date_range['max_year']).upper
                 if {'gte': min_date, 'lte': max_date} not in document['date_ranges']:
-                    document['date_ranges'].append({'date_range': {'gte': min_date, 'lte': max_date}, 'nodegroup_id': tile.nodegroup_id})
-            document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': valueid, 'nodegroup_id': tile.nodegroup_id})
-            document['strings'].append({'string': value.value, 'nodegroup_id': tile.nodegroup_id})
+                    document['date_ranges'].append({'date_range': {'gte': min_date, 'lte': max_date}, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
+            document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': valueid, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
+            document['strings'].append({'string': value.value, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
 
 
 class ConceptDataType(BaseConceptDataType):
 
-    def validate(self, value, source=''):
+    def validate(self, value, row_number=None, source=''):
         errors = []
-        try:
-            models.Value.objects.get(pk=value)
-        except ObjectDoesNotExist:
-            message = "Not a valid domain value"
-            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, message, 'This data was not imported.')})
+
+        ## first check to see if the validator has been passed a valid UUID,
+        ## which should be the case at this point. return error if not.
+        if value != None:
+            try:
+                uuid.UUID(str(value))
+            except ValueError:
+                message = "This is an invalid concept prefLabel, or an incomplete UUID"
+                errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} {3} - {4}. {5}'.format(self.datatype_model.datatype, value, source, row_number, message, 'This data was not imported.')})
+                return errors
+
+            ## if good UUID, test whether it corresponds to an actual Value object
+            try:
+                models.Value.objects.get(pk=value)
+            except ObjectDoesNotExist:
+                message = "This UUID does not correspond to a valid domain value"
+                errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} {3} - {4}. {5}'.format(self.datatype_model.datatype, value, source, row_number, message, 'This data was not imported.')})
         return errors
 
     def transform_import_values(self, value, nodeid):
-        ret = value.strip()
-        return ret
+        return value.strip()
 
     def transform_export_values(self, value, *args, **kwargs):
         if 'concept_export_value_type' in kwargs:
@@ -102,22 +115,22 @@ class ConceptDataType(BaseConceptDataType):
 
 
 class ConceptListDataType(BaseConceptDataType):
-    def validate(self, value, source=''):
+    def validate(self, value, row_number=None, source=''):
         errors = []
-        for v in value:
-            val = v.strip()
-            try:
-                models.Value.objects.get(pk=val)
-            except ObjectDoesNotExist:
-                message = "Not a valid domain value"
-                errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, val, source, message, 'This data was not imported.')})
+
+        ## iterate list of values and use the concept validation on each one
+        if value != None:
+            validate_concept = DataTypeFactory().get_instance('concept')
+            for v in value:
+                val = v.strip()
+                errors += validate_concept.validate(val, row_number)
         return errors
 
     def transform_import_values(self, value, nodeid):
-        ret = []
-        concept = ConceptDataType()
-        for val in [v.strip() for v in value.split(',')]:
-            ret.append(concept.transform_import_values(val, nodeid))
+        ret =[]
+        for val in csv.reader([value], delimiter=',', quotechar='"'):
+            for v in val:
+                ret.append(v.strip())
         return ret
 
     def transform_export_values(self, value, *args, **kwargs):
@@ -129,9 +142,10 @@ class ConceptListDataType(BaseConceptDataType):
 
     def get_display_value(self, tile, node):
         new_values = []
-        for val in tile.data[str(node.nodeid)]:
-            new_val = self.get_value(uuid.UUID(val))
-            new_values.append(new_val.value)
+        if tile.data[str(node.nodeid)]:
+            for val in tile.data[str(node.nodeid)]:
+                new_val = self.get_value(uuid.UUID(val))
+                new_values.append(new_val.value)
         return ','.join(new_values)
 
     def append_search_filters(self, value, node, query, request):

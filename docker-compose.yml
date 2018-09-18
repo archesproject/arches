@@ -11,27 +11,33 @@ services:
       volumes:
         - arches-log:/arches/arches/logs
         - arches-static:/static_root
-        - arches-bowercomponents:/web_root/arches/arches/app/media/bower_components
       environment:
+        # - ARCHES_PROJECT=insert_project_name
         - INSTALL_DEFAULT_GRAPHS=True
         - INSTALL_DEFAULT_CONCEPTS=True
+        - PGUSERNAME=postgres
         - PGPASSWORD=postgres
         - PGDBNAME=arches
         - PGHOST=db
         - PGPORT=5432
+        - COUCHDB_HOST=couchdb
+        - COUCHDB_PORT=5984
+        - COUCHDB_USER=admin
+        - COUCHDB_PASS=password
         - ESHOST=elasticsearch
         - ESPORT=9200
+        # - ELASTICSEARCH_PREFIX=insert_project_name
         - DJANGO_MODE=PROD
         - DJANGO_DEBUG=False
-        - DJANGO_NORELOAD=False
+        # - DJANGO_REMOTE_DEBUG=False
         - DOMAIN_NAMES=localhost
-        - TZ=EST
+        - TZ=PST
       ports:
         - '8000:8000'
       depends_on:
         - db
         - elasticsearch
-
+        - couchdb
 
     nginx:
       container_name: nginx
@@ -42,7 +48,7 @@ services:
         - '443:443'
       volumes:
         - arches-static:/www/static
-        - letsencrypt_acme_challenge:/var/www
+        - letsencrypt-acme-challenge:/var/www
         - letsencrypt:/etc/letsencrypt
       environment:
         - NGINX_PROXY_MODE=local
@@ -51,14 +57,13 @@ services:
         - LOCAL_PROXY_PORT=8000
         - DOMAIN_NAMES=localhost
         - PUBLIC_MODE=False
-        - TZ=EST
+        - TZ=PST
       depends_on:
         - arches
 
-
     db:
       container_name: db
-      image: mdillon/postgis:9.6
+      image: mdillon/postgis:9.6-alpine
       volumes:
           - postgres-data:/var/lib/postgresql/data
           - postgres-log:/var/log/postgresql
@@ -66,8 +71,19 @@ services:
         - '5432:5432'
       environment:
         - POSTGRES_PASSWORD=postgres
-        - TZ=EST
+        - TZ=PST
 
+    couchdb:
+      container_name: couchdb
+      image: couchdb:2.1.1
+      ports:
+        - "5984:5984"
+      environment:
+        COUCHDB_USER: admin
+        COUCHDB_PASSWORD: password
+      volumes:
+        - couchdb-data:/usr/local/var/lib/couchdb
+        - couchdb-log:/usr/local/var/log/couchdb
 
     elasticsearch:
       container_name: elasticsearch
@@ -78,14 +94,13 @@ services:
         - "9200:9200"
         - "9300:9300"
       environment:
-        - TZ=EST
-
+        - TZ=PST
 
     letsencrypt:
       container_name: letsencrypt
       image: cvast/cvast-letsencrypt:1.1
       volumes:
-        - letsencrypt_acme_challenge:/var/www
+        - letsencrypt-acme-challenge:/var/www
         - letsencrypt:/etc/letsencrypt
         - letsencrypt-log:/var/log/letsencrypt
       command: get_certificate
@@ -95,17 +110,16 @@ services:
         - DOMAIN_NAMES=localhost
         - PRODUCTION_MODE=False
         - PERSISTENT_MODE=True
-        - TZ=EST
-
+        - TZ=PST
 
 volumes:
     arches-log:
     arches-static:
-    arches-bowercomponents:
+    couchdb-data:
+    couchdb-log:
     postgres-data:
     postgres-log:
     elasticsearch-data:
-    elasticsearch-config:
     letsencrypt:
     letsencrypt-log:
-    letsencrypt_acme_challenge:
+    letsencrypt-acme-challenge:

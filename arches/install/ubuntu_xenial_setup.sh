@@ -5,7 +5,6 @@
 # yes | sudo ./ubuntu_xenial_setup.sh
 
 function install_postgres {
-
     sudo add-apt-repository "deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main"
     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
     sudo apt-get update
@@ -35,11 +34,17 @@ function install_postgres {
     sudo -u postgres createdb training -T template_postgis_20
 }
 
-function install_bower {
+function install_couchdb {
+    sudo add-apt-repository "deb https://apache.bintray.com/couchdb-deb xenial main"
+    sudo apt-get update
+    sudo apt-get install couchdb
+}
+
+function install_yarn {
     sudo apt-get update -y
     sudo apt-get install nodejs-legacy -y
     sudo apt-get install npm -y
-    sudo npm install -g bower
+    sudo npm install -g yarn
 }
 
 function install_java {
@@ -82,13 +87,22 @@ function main {
       echo Skipping postgres/postgis installation
   fi
 
-  echo -n "Would you like to install and nodejs/npm/and bower (y/n)? "
+  echo -n "Would you like to install and configure couchdb? (y/n)? "
   read answer
   if echo "$answer" | grep -iq "^y" ;then
-      echo Yes, installing Node/Bower
-      install_bower
+      echo Yes, Installing couchdb
+      install_couchdb
   else
-      echo Skipping node/npm/bower installation
+      echo Skipping couch installation
+  fi
+
+  echo -n "Would you like to install and nodejs/npm/and yarn (y/n)? "
+  read answer
+  if echo "$answer" | grep -iq "^y" ;then
+      echo Yes, installing Node/Yarn
+      install_yarn
+  else
+      echo Skipping node/npm/yarn installation
   fi
 }
 

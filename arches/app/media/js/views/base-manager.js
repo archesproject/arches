@@ -5,7 +5,10 @@ define([
     'backbone',
     'views/page-view',
     'view-data',
-    'bindings/datatable'
+    'bindings/datatable',
+    'uuid',
+    'core-js',
+    'dom-4'
 ], function($, _, ko, Backbone, PageView, data) {
 
     var BaseManager = PageView.extend({
@@ -49,6 +52,11 @@ define([
                 ko.applyBindingsToNode(option, {disable: item.disable_instance_creation}, item);
               }
             };
+
+            options.viewModel.navExpanded = ko.observable(false);
+            options.viewModel.navExpanded.subscribe(function () {
+                window.nifty.window.trigger('resize');
+            });
 
             PageView.prototype.constructor.call(this, options);
             return this;

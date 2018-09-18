@@ -17,7 +17,6 @@ from django.forms.models import model_to_dict
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.files import File
 
-
 class UnableToSerializeError(Exception):
     """ Error for not implemented classes """
     def __init__(self, value):
@@ -42,25 +41,25 @@ class JSONSerializer(object):
 
         self.stream = options.pop("stream", StringIO())
         self.selected_fields = options.pop("fields", None)
+        self.exclude = options.pop("exclude", None)
         self.use_natural_keys = options.pop("use_natural_keys", False)
         self.geom_format = options.pop("geom_format", "wkt")
-
-        return self.handle_object(obj)
+        return self.handle_object(obj, self.selected_fields, self.exclude)
 
     def serialize(self, obj, **options):
         obj = self.serializeToPython(obj, **options)
-
         # prevent raw strings from begin re-encoded
         # this is especially important when doing bulk operations in elasticsearch
         if (isinstance(obj, basestring)):
             return obj
 
-        ret = self.handle_object(obj)
+        sort_keys = options.pop("sort_keys", True)
+        options.pop("fields", None)
+        options.pop("exclude", None)
+        return json.dumps(obj, cls=DjangoJSONEncoder, sort_keys=sort_keys, **options.copy())
 
-        return json.dumps(ret, cls=DjangoJSONEncoder, sort_keys=True, **options.copy())
 
-
-    def handle_object(self, object):
+    def handle_object(self, object, fields=None, exclude=None):
         """ Called to handle everything, looks for the correct handling """
         # print type(object)
         # print object
@@ -83,15 +82,16 @@ class JSONSerializer(object):
             return self.handle_list(object)
         elif isinstance(object, Model):
             if hasattr(object, 'serialize'):
-                return self.handle_object(getattr(object, 'serialize')())
+                exclude = self.exclude
+                return self.handle_object(getattr(object, 'serialize')(fields, exclude), fields, exclude)
             else:
-                return self.handle_model(object)
+                return self.handle_model(object, fields, self.exclude)
             #return PythonSerializer().serialize([object],**self.options.copy())[0]['fields']
         elif isinstance(object, QuerySet):
             #return super(JSONSerializer,self).serialize(object, **self.options.copy())[0]
             ret = []
             for item in object:
-                ret.append(self.handle_object(item))
+                ret.append(self.handle_object(item, fields, exclude))
             return ret
         elif (isinstance(object, int) or
               isinstance(object, float) or
@@ -218,7 +218,7 @@ class JSONDeserializer(object):
         return ret
 
 
-    def handle_object(self, object):
+    def handle_object(self, object, fields=None, exclude=None):
         """ Called to handle everything, looks for the correct handling """
         if isinstance(object, dict):
             if ('pk' in object and 'model' in object and 'fields' in object):

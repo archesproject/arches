@@ -68,7 +68,7 @@
                                                     config: configJSON,
                                                     value: ko.observable(null),
                                                     node: node,
-                                                    disabled: true,
+                                                    disabled: card.get("disabled"),
                                                     graph: self.graph
                                                 }
                                             }, css:{
@@ -77,9 +77,12 @@
                                         </form>
 
                                         <!-- Save/Add Button -->
+
+                                        <!-- ko if: !card.get('disabled') -->
                                         <div id="card-save-tile-btn" class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
                                             <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" disabled>{% trans "Add" %}</button>
                                         </div>
+                                        <!-- /ko -->
                                     </div>
                                 </div>
                             </div>

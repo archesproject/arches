@@ -6,9 +6,6 @@ import uuid
 import importlib
 import datetime
 import unicodecsv
-import shapefile
-from zipfile import ZipFile
-from shapely.geometry import shape
 from time import time
 from copy import deepcopy
 from optparse import make_option
@@ -36,7 +33,7 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.management.commands import utils
-from formats.archesjson import JsonReader
+from arches.setup import unzip_file
 from formats.csvfile import CsvReader
 from formats.archesfile import ArchesFileReader
 
@@ -114,19 +111,34 @@ class BusinessDataImporter(object):
                         data = unicodecsv.DictReader(open(file[0], 'rU'), encoding='utf-8-sig', restkey='ADDITIONAL', restval='MISSING')
                         self.business_data = list(data)
                     elif self.file_format == 'zip':
-                        zipfile = ZipFile(StringIO(open(file[0], 'r').read()))
-                        filenames = [y for y in sorted(zipfile.namelist()) for ending in ['dbf', 'prj', 'shp', 'shx'] if y.endswith(ending)]
-                        dbf, prj, shp, shx = [StringIO(zipfile.read(filename)) for filename in filenames]
-                        shape_file = shapefile.Reader(shp=shp, shx=shx, dbf=dbf)
-                        self.business_data = self.shape_to_csv(shape_file)
+                        shp_zipfile = os.path.basename(path)
+                        shp_zipfile_name = os.path.splitext(shp_zipfile)[0]
+                        unzip_dir = os.path.join(os.path.dirname(path),shp_zipfile_name)
+                        unzip_file(path,unzip_dir)
+                        shp = [i for i in os.listdir(unzip_dir) if i.endswith(".shp")]
+                        if len(shp) == 0:
+                            print '*'*80
+                            print "ERROR: There is no shapefile in this zipfile."
+                            print '*'*80
+                            exit()
+                        elif len(shp) > 1:
+                            print '*'*80
+                            print "ERROR: There are multiple shapefiles in this zipfile. Please load each individually:"
+                            for s in shp:
+                                print "\npython manage.py packages -o import_business_data -s {0} -c {1} -ow [append or overwrite]".format(
+                                    os.path.join(unzip_dir,s),mapping_file[0])
+                            print '*'*80
+                            exit()
+                        shp_path = os.path.join(unzip_dir,shp[0])
+                        self.business_data = self.shape_to_csv(shp_path)
                     elif self.file_format == 'shp':
-                        self.business_data = self.shape_to_csv(shapefile.Reader(file[0]))
+                        self.business_data = self.shape_to_csv(path)
                 else:
                     print str(file) + ' is not a valid file'
             else:
                 print path + ' is not a valid path'
 
-    def import_business_data(self, file_format=None, business_data=None, mapping=None, overwrite='append', bulk=False):
+    def import_business_data(self, file_format=None, business_data=None, mapping=None, overwrite='append', bulk=False, create_concepts=False, create_collections=False):
         reader = None
         start = time()
         cursor = connection.cursor()
@@ -144,7 +156,7 @@ class BusinessDataImporter(object):
             elif file_format == 'csv' or file_format == 'shp' or file_format == 'zip':
                 if mapping != None:
                     reader = CsvReader()
-                    reader.import_business_data(business_data=business_data, mapping=mapping, overwrite=overwrite, bulk=bulk)
+                    reader.import_business_data(business_data=business_data, mapping=mapping, overwrite=overwrite, bulk=bulk, create_concepts=create_concepts, create_collections=create_collections)
                 else:
                     print '*'*80
                     print 'ERROR: No mapping file detected. Please indicate one with the \'-c\' paramater or place one in the same directory as your business data.'
@@ -163,88 +175,13 @@ class BusinessDataImporter(object):
                 datatype_instance = datatype_factory.get_instance(datatype.datatype)
                 datatype_instance.after_update_all()
 
-    def shape_to_csv(self, shapefile):
+    def shape_to_csv(self, shp_path):
         csv_records = []
-        field_names = [field[0] for field in shapefile.fields[1:]]
-        for feature in shapefile.shapeRecords():
-            csv_record = (dict(zip(field_names, feature.record)))
-            csv_record['geom'] = shape(feature.shape.__geo_interface__).wkt
+        ds = DataSource(shp_path)
+        layer = ds[0]
+        field_names = layer.fields
+        for feat in layer:
+            csv_record = dict((f, feat.get(f)) for f in field_names)
+            csv_record['geom'] = feat.geom.wkt
             csv_records.append(csv_record)
-
         return csv_records
-
-class ResourceLoader(object):
-
-    def __init__(self):
-        self.user = User()
-        self.user.first_name = settings.ETL_USERNAME
-        self.resources = []
-        self.se = SearchEngineFactory().create()
-
-    option_list = BaseCommand.option_list + (
-        make_option('--source',
-            action='store',
-            dest='source',
-            default='',
-            help='.arches file containing resource records'),
-         make_option('--format',
-            action='store_true',
-            default='arches',
-            help='format extension that you would like to load: arches or shp'),
-        )
-
-    def load(self, source):
-        file_name, file_format = os.path.splitext(source)
-        archesjson = False
-        if file_format == '.arches':
-            reader = ArchesReader()
-            print '\nVALIDATING ARCHES FILE ({0})'.format(source)
-            reader.validate_file(source)
-        elif file_format == '.json':
-            archesjson = True
-            reader = JsonReader()
-
-        start = time()
-        resources = reader.load_file(source)
-
-        print '\nLOADING RESOURCES ({0})'.format(source)
-        relationships = None
-        related_resource_records = []
-        relationships_file = file_name + '.relations'
-        elapsed = (time() - start)
-        print 'time to parse {0} resources = {1}'.format(file_name, elapsed)
-        results = self.resource_list_to_entities(resources, archesjson)
-        if os.path.exists(relationships_file):
-            relationships = csv.DictReader(open(relationships_file, 'r'), delimiter='|')
-            for relationship in relationships:
-                related_resource_records.append(self.relate_resources(relationship, results['legacyid_to_entityid'], archesjson))
-        else:
-            print 'No relationship file'
-
-
-    # def relate_resources(self, relationship, legacyid_to_entityid, archesjson):
-    #     start_date = None if relationship['START_DATE'] in ('', 'None') else relationship['START_DATE']
-    #     end_date = None if relationship['END_DATE'] in ('', 'None') else relationship['END_DATE']
-    #
-    #     if archesjson == False:
-    #         relationshiptype_concept = Concept.objects.get(legacyoid = relationship['RELATION_TYPE'])
-    #         concept_value = Value.objects.filter(concept = relationshiptype_concept.conceptid).filter(valuetype = 'prefLabel')
-    #         entityid1 = legacyid_to_entityid[relationship['RESOURCEID_FROM']]
-    #         entityid2 = legacyid_to_entityid[relationship['RESOURCEID_TO']]
-    #
-    #     else:
-    #         concept_value = Value.objects.filter(valueid = relationship['RELATION_TYPE'])
-    #         entityid1 = relationship['RESOURCEID_FROM']
-    #         entityid2 = relationship['RESOURCEID_TO']
-    #
-    #     related_resource_record = ResourceXResource(
-    #         entityid1 = entityid1,
-    #         entityid2 = entityid2,
-    #         notes = relationship['NOTES'],
-    #         relationshiptype = concept_value[0].valueid,
-    #         datestarted = start_date,
-    #         dateended = end_date,
-    #         )
-    #
-    #     related_resource_record.save()
-    #     self.se.index_data(index='resource_relations', doc_type='all', body=model_to_dict(related_resource_record), idfield='resourcexid')

@@ -10,17 +10,19 @@ from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.betterJSONSerializer import JSONSerializer
-from arches.app.utils.date_utils import SortableDate
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Exists
+from arches.app.utils.date_utils import ExtendedDateFormat
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Exists, RangeDSLException
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from django.core.cache import cache
+from django.utils.translation import ugettext as _
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import fromstr
 from django.contrib.gis.geos import Polygon
 from django.core.exceptions import ValidationError
 from django.db import connection, transaction
-from shapely.geometry import asShape
 from elasticsearch import Elasticsearch
+from edtf import parse_edtf
 
 EARTHCIRCUM = 40075016.6856
 PIXELSPERTILE = 256
@@ -57,20 +59,21 @@ class DataTypeFactory(object):
 
 class StringDataType(BaseDataType):
 
-    def validate(self, value, source=None):
+    def validate(self, value, row_number=None, source=None):
         errors = []
         try:
             value.upper()
         except:
-            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, 'this is not a string', 'This data was not imported.')})
+            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} {3} - {4}. {5}'.format(self.datatype_model.datatype, value, source, row_number, 'this is not a string', 'This data was not imported.')})
         return errors
 
-    def convert_value(self, tile, nodeid):
+    def clean(self, tile, nodeid):
         if tile.data[nodeid] in ['', "''"]:
             tile.data[nodeid] = None
 
-    def append_to_document(self, document, nodevalue, nodeid, tile):
-        document['strings'].append({'string': nodevalue, 'nodegroup_id': tile.nodegroup_id})
+    def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
+        val = {'string': nodevalue, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional}
+        document['strings'].append(val)
 
     def transform_export_values(self, value, *args, **kwargs):
         if value != None:
@@ -99,20 +102,27 @@ class StringDataType(BaseDataType):
 
 class NumberDataType(BaseDataType):
 
-    def validate(self, value, source=''):
+    def validate(self, value, row_number=None, source=''):
         errors = []
 
         try:
             decimal.Decimal(value)
         except:
-            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, 'not a properly formatted number', 'This data was not imported.')})
+            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} {3}- {4}. {5}'.format(self.datatype_model.datatype, value, source, row_number, 'not a properly formatted number', 'This data was not imported.')})
         return errors
 
     def transform_import_values(self, value, nodeid):
         return float(value)
 
-    def append_to_document(self, document, nodevalue, nodeid, tile):
-        document['numbers'].append({'number': nodevalue, 'nodegroup_id': tile.nodegroup_id})
+    def clean(self, tile, nodeid):
+        try:
+            tile.data[nodeid].upper()
+            tile.data[nodeid] = float(tile.data[nodeid])
+        except:
+            pass
+
+    def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
+        document['numbers'].append({'number': nodevalue, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
 
     def append_search_filters(self, value, node, query, request):
         try:
@@ -130,7 +140,7 @@ class NumberDataType(BaseDataType):
 
 class BooleanDataType(BaseDataType):
 
-    def validate(self, value, source=''):
+    def validate(self, value, row_number=None, source=''):
         errors = []
 
         try:
@@ -154,7 +164,7 @@ class BooleanDataType(BaseDataType):
 
 class DateDataType(BaseDataType):
 
-    def validate(self, value, source=''):
+    def validate(self, value, row_number=None, source=''):
         errors = []
 
         date_formats = ['-%Y','%Y','%Y-%m-%d','%B-%m-%d','%Y-%m-%d %H:%M:%S']
@@ -167,20 +177,39 @@ class DateDataType(BaseDataType):
                 except:
                     valid = False
         if valid == False:
-            errors.append({'type': 'ERROR', 'message': '{0} is not in the correct format, should be formatted YYYY-MM-DD, YYYY-MM-DD HH:MM:SS or MM-DD. This data was not imported.'.format(value)})
+            if hasattr(settings, 'DATE_IMPORT_EXPORT_FORMAT'):
+                date_format = settings.DATE_IMPORT_EXPORT_FORMAT
+            else:
+                date_format = date_formats
+
+            errors.append({'type': 'ERROR', 'message': '{0} {1} is not in the correct format, make sure it is in this format: {2} or set the date format in settings.DATE_IMPORT_EXPORT_FORMAT. This data was not imported.'.format(value, row_number, date_format)})
+
 
         return errors
 
     def transform_import_values(self, value, nodeid):
         if type(value) == list:
-            try:
-                value = str(datetime(*value).date())
-            except:
-                pass
+            value = value[0]
+
+        try:
+            if hasattr(settings, 'DATE_IMPORT_EXPORT_FORMAT'):
+                v = datetime.strptime(str(value), settings.DATE_IMPORT_EXPORT_FORMAT)
+                value = str(datetime.strftime(v, '%Y-%m-%d'))
+            else:
+                value = str(datetime(value).date())
+        except:
+            pass
+
         return value
 
-    def append_to_document(self, document, nodevalue, nodeid, tile):
-        document['dates'].append({'date': SortableDate(nodevalue).as_float(), 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid})
+    def transform_export_values(self, value, *args, **kwargs):
+        if hasattr(settings, 'DATE_IMPORT_EXPORT_FORMAT'):
+            v = datetime.strptime(value, '%Y-%m-%d')
+            value = datetime.strftime(v, settings.DATE_IMPORT_EXPORT_FORMAT)
+        return value
+
+    def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
+        document['dates'].append({'date': ExtendedDateFormat(nodevalue).lower, 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid, 'provisional': provisional})
 
     def append_search_filters(self, value, node, query, request):
         try:
@@ -196,10 +225,87 @@ class DateDataType(BaseDataType):
         except KeyError, e:
             pass
 
+    def after_update_all(self):
+        config = cache.get('time_wheel_config_anonymous')
+        if config is not None:
+            cache.delete('time_wheel_config_anonymous')
+
+class EDTFDataType(BaseDataType):
+
+    def validate(self, value, row_number=None, source=''):
+        errors = []
+        if not ExtendedDateFormat(value).is_valid():
+            errors.append({'type': 'ERROR', 'message': '{0} {1} is not in the correct Extended Date Time Format, see http://www.loc.gov/standards/datetime/ for supported formats. This data was not imported.'.format(value, row_number)})
+
+        return errors
+
+    def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
+        def add_date_to_doc(document, edtf):
+            if edtf.lower == edtf.upper:
+                if edtf.lower is not None:
+                    document['dates'].append({'date': edtf.lower, 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid, 'provisional': provisional})
+            else:
+                dr = {}
+                if edtf.lower_fuzzy is not None:
+                    dr['gte'] = edtf.lower_fuzzy
+                    document['dates'].append({'date': edtf.lower_fuzzy, 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid, 'provisional': provisional})
+                if edtf.upper_fuzzy is not None:
+                    dr['lte'] = edtf.upper_fuzzy
+                    document['dates'].append({'date': edtf.upper_fuzzy, 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid, 'provisional': provisional})
+                document['date_ranges'].append({'date_range': dr, 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid, 'provisional': provisional})
+
+        # update the indexed tile value to support adv. search
+        tile.data[nodeid] = {
+            'value': nodevalue,
+            'dates': [],
+            'date_ranges': []
+        }
+
+        node = models.Node.objects.get(nodeid=nodeid)
+        edtf = ExtendedDateFormat(nodevalue, **node.config)
+        if edtf.result_set:
+            for result in edtf.result_set:
+                add_date_to_doc(document, result)
+                add_date_to_doc(tile.data[nodeid], result)
+        else:
+            add_date_to_doc(document, edtf)
+            add_date_to_doc(tile.data[nodeid], edtf)
+
+    def append_search_filters(self, value, node, query, request):
+        def add_date_to_doc(query, edtf):
+            if value['op'] == 'eq':
+                if edtf.lower != edtf.upper:
+                    raise Exception(_('Only dates that specify an exact year, month, and day can be used with the "=" operator'))
+                query.should(Match(field='tiles.data.%s.dates.date' % (str(node.pk)), query=edtf.lower, type='phrase_prefix', fuzziness=0))
+            else:
+                if value['op'] == 'overlaps':
+                    operators = {'gte': edtf.lower, 'lte': edtf.upper}
+                else:
+                    if edtf.lower != edtf.upper:
+                        raise Exception(_('Only dates that specify an exact year, month, and day can be used with the ">", "<", ">=", and "<=" operators'))
+
+                    operators = {
+                        value['op']: edtf.lower or edtf.upper
+                    }
+
+                try:
+                    query.should(Range(field='tiles.data.%s.dates.date' % (str(node.pk)), **operators))
+                    query.should(Range(field='tiles.data.%s.date_ranges.date_range' % (str(node.pk)), relation='intersects', **operators))
+                except RangeDSLException:
+                    if edtf.lower == None and edtf.upper == None:
+                        raise Exception(_('Invalid date specified.'))
+
+        edtf = ExtendedDateFormat(value['val'])
+        if edtf.result_set:
+            for result in edtf.result_set:
+                add_date_to_doc(query, result)
+        else:
+            add_date_to_doc(query, edtf)
+
 
 class GeojsonFeatureCollectionDataType(BaseDataType):
 
-    def validate(self, value, source=None):
+    def validate(self, value, row_number=None, source=None):
         errors = []
         coord_limit = 1500
         coordinate_count = 0
@@ -229,8 +335,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
         return errors
 
-    def convert_value(self, tile, nodeid):
-        if 'features' in tile.data[nodeid]:
+    def clean(self, tile, nodeid):
+        if tile.data[nodeid] is not None and 'features' in tile.data[nodeid]:
             if len(tile.data[nodeid]['features']) == 0:
                 tile.data[nodeid] = None
 
@@ -263,8 +369,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             wkt_geoms.append(GEOSGeometry(json.dumps(feature['geometry'])))
         return GeometryCollection(wkt_geoms)
 
-    def append_to_document(self, document, nodevalue, nodeid, tile):
-        document['geometries'].append({'geom':nodevalue, 'nodegroup_id': tile.nodegroup_id})
+    def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
+        document['geometries'].append({'geom':nodevalue, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
         bounds = self.get_bounds_from_value(nodevalue)
         if bounds is not None:
             minx, miny, maxx, maxy = bounds
@@ -275,7 +381,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "lon": centerx,
                     "lat": centery
                 },
-                'nodegroup_id': tile.nodegroup_id
+                'nodegroup_id': tile.nodegroup_id,
+                'provisional': provisional
             })
 
     def get_bounds(self, tile, node):
@@ -318,7 +425,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 )
 
                 SELECT resourceinstanceid::text,
-                        false AS poly_outline,
                 		row_number() over () as __id__,
                 		1 as total,
                 		ST_Centroid(geom) AS __geometry__,
@@ -329,7 +435,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 UNION
 
                 SELECT NULL as resourceinstanceid,
-                		false AS poly_outline,
                 		row_number() over () as __id__,
                 		count(*) as total,
                 		ST_Centroid(
@@ -355,24 +460,13 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
             sql_list.append("""
                 SELECT resourceinstanceid::text,
-                        false AS poly_outline,
                         (row_number() over ())::text as __id__,
                         1 as total,
                         geom AS __geometry__,
                         '' AS extent
                     FROM mv_geojson_geoms
                     WHERE nodeid = '%s'
-                UNION
-                SELECT resourceinstanceid::text,
-                        true AS poly_outline,
-                        (row_number() over ())::text||'-outline' as __id__,
-                        1 as total,
-                        ST_ExteriorRing(geom) AS __geometry__,
-                        '' AS extent
-                    FROM mv_geojson_geoms
-                    WHERE ST_GeometryType(geom) = 'ST_Polygon'
-                    AND nodeid = '%s'
-            """ % (node.pk, node.pk))
+            """ % node.pk)
 
         else:
             config = {"cacheTiles": False}
@@ -396,6 +490,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                         "port": database["PORT"]
                     },
                     "simplify": simplification,
+                    "clip": False,
                     "queries": sql_list
                 },
             },
@@ -424,7 +519,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         elif node.config is None:
             return None
         count = models.TileModel.objects.filter(data__has_key=str(node.nodeid)).count()
-        if not preview and count < 1 or not node.config["layerActivated"]:
+        if not preview and (count < 1 or not node.config["layerActivated"]):
             return None
 
         source_name = "resources-%s" % node.nodeid
@@ -492,7 +587,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "layout": {
                         "visibility": "visible"
                     },
-                    "filter": ["all", ["!=", "poly_outline", false],["==", "total", 1]],
+                    "filter": ["all",["==", "$type", "Polygon"],["==", "total", 1]],
                     "paint": {
                         "line-width": %(outlineWeight)s,
                         "line-color": "%(outlineColor)s"
@@ -506,7 +601,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "layout": {
                         "visibility": "visible"
                     },
-                    "filter": ["all", ["!=", "poly_outline", false],["==", "total", 1],["==", "resourceinstanceid", ""]],
+                    "filter": ["all",["==", "$type", "Polygon"],["==", "total", 1],["==", "resourceinstanceid", ""]],
                     "paint": {
                         "line-width": %(expanded_outlineWeight)s,
                         "line-color": "%(outlineColor)s"
@@ -520,7 +615,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "layout": {
                         "visibility": "visible"
                     },
-                    "filter": ["all", ["!=", "poly_outline", false],["==", "total", 1],["==", "resourceinstanceid", ""]],
+                    "filter": ["all",["==", "$type", "Polygon"],["==", "total", 1],["==", "resourceinstanceid", ""]],
                     "paint": {
                         "line-width": %(expanded_outlineWeight)s,
                         "line-color": "%(outlineColor)s"
@@ -534,7 +629,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "layout": {
                         "visibility": "visible"
                     },
-                    "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "total", 1]],
+                    "filter": ["all", ["==", "$type", "LineString"],["==", "total", 1]],
                     "paint": {
                         "line-width": %(haloWeight)s,
                         "line-color": "%(lineHaloColor)s"
@@ -548,7 +643,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "layout": {
                         "visibility": "visible"
                     },
-                    "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "total", 1]],
+                    "filter": ["all",["==", "$type", "LineString"],["==", "total", 1]],
                     "paint": {
                         "line-width": %(weight)s,
                         "line-color": "%(lineColor)s"
@@ -562,7 +657,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "layout": {
                         "visibility": "visible"
                     },
-                    "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "total", 1],["==", "resourceinstanceid", ""]],
+                    "filter": ["all",["==", "$type", "LineString"],["==", "total", 1],["==", "resourceinstanceid", ""]],
                     "paint": {
                         "line-width": %(expanded_haloWeight)s,
                         "line-color": "%(lineHaloColor)s"
@@ -576,7 +671,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "layout": {
                         "visibility": "visible"
                     },
-                    "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "total", 1],["==", "resourceinstanceid", ""]],
+                    "filter": ["all",["==", "$type", "LineString"],["==", "total", 1],["==", "resourceinstanceid", ""]],
                     "paint": {
                         "line-width": %(expanded_weight)s,
                         "line-color": "%(lineColor)s"
@@ -590,7 +685,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "layout": {
                         "visibility": "visible"
                     },
-                    "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "total", 1],["==", "resourceinstanceid", ""]],
+                    "filter": ["all", ["==", "$type", "LineString"],["==", "total", 1],["==", "resourceinstanceid", ""]],
                     "paint": {
                         "line-width": %(expanded_haloWeight)s,
                         "line-color": "%(lineHaloColor)s"
@@ -604,7 +699,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "layout": {
                         "visibility": "visible"
                     },
-                    "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "total", 1],["==", "resourceinstanceid", ""]],
+                    "filter": ["all", ["==", "$type", "LineString"],["==", "total", 1],["==", "resourceinstanceid", ""]],
                     "paint": {
                         "line-width": %(expanded_weight)s,
                         "line-color": "%(lineColor)s"
@@ -767,10 +862,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                      "source-layer": "%(nodeid)s",
                      "layout": {
                          "text-field": "{total}",
-                         "text-font": [
-                             "DIN Offc Pro Medium",
-                             "Arial Unicode MS Bold"
-                         ],
                          "text-size": 10
                      },
                      "paint": {
@@ -815,7 +906,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
 
 class FileListDataType(BaseDataType):
-    def manage_files(self, previously_saved_tile, current_tile, request, node):
+    def handle_request(self, current_tile, request, node):
+        previously_saved_tile = models.TileModel.objects.filter(pk=current_tile.tileid)
         if previously_saved_tile.count() == 1:
             if previously_saved_tile[0].data[str(node.pk)] != None:
                 for previously_saved_file in previously_saved_tile[0].data[str(node.pk)]:
@@ -900,8 +992,9 @@ class CSVChartJsonDataType(FileListDataType):
     def __init__(self, model=None):
         super(CSVChartJsonDataType, self).__init__(model=model)
 
-    def manage_files(self, previously_saved_tile, current_tile, request, node):
+    def handle_request(self, current_tile, request, node):
         try:
+            previously_saved_tile = models.TileModel.objects.filter(pk=current_tile.tileid)
             if previously_saved_tile.count() == 1:
                 for previously_saved_file in previously_saved_tile[0].data[str(node.pk)]['files']:
                     previously_saved_file_has_been_removed = True
@@ -934,7 +1027,7 @@ class IIIFDrawingDataType(BaseDataType):
                 string_list.append(feature['properties']['name'])
         return string_list
 
-    def append_to_document(self, document, nodevalue, nodeid, tile):
+    def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         string_list = self.get_strings(nodevalue)
         for string_item in string_list:
             document['strings'].append({'string': string_item, 'nodegroup_id': tile.nodegroup_id})
@@ -942,7 +1035,7 @@ class IIIFDrawingDataType(BaseDataType):
             if feature['properties']['type'] is not None:
                 valueid = feature['properties']['type']
                 value = models.Value.objects.get(pk=valueid)
-                document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': valueid, 'nodegroup_id': tile.nodegroup_id})
+                document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': valueid, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
 
     def get_search_terms(self, nodevalue, nodeid=None):
         terms = []
@@ -963,13 +1056,10 @@ class BaseDomainDataType(BaseDataType):
 
 class DomainDataType(BaseDomainDataType):
 
-    def validate(self, value, source=''):
+    def validate(self, value, row_number=None, source=''):
         errors = []
-
-        try:
-            models.Node.objects.filter(config__options__contains=[{"id": value}])
-        except:
-            errors.append({'type': 'ERROR', 'message': '{0} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(value)})
+        if len(models.Node.objects.filter(config__options__contains=[{"id": value}])) < 1:
+            errors.append({'type': 'ERROR', 'message': '{0} {1} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(value, row_number)})
         return errors
 
     def get_search_terms(self, nodevalue, nodeid=None):
@@ -981,7 +1071,7 @@ class DomainDataType(BaseDomainDataType):
                 terms.append(domain_text)
         return terms
 
-    def append_to_document(self, document, nodevalue, nodeid, tile):
+    def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         domain_text = None
         for tile in document['tiles']:
             for k, v in tile.data.iteritems():
@@ -990,7 +1080,7 @@ class DomainDataType(BaseDomainDataType):
                     domain_text = self.get_option_text(node, v)
 
         if domain_text not in document['strings'] and domain_text != None:
-            document['strings'].append({'string': domain_text, 'nodegroup_id': tile.nodegroup_id})
+            document['strings'].append({'string': domain_text, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
 
     def get_display_value(self, tile, node):
         return self.get_option_text(node, tile.data[str(node.nodeid)])
@@ -1021,14 +1111,12 @@ class DomainDataType(BaseDomainDataType):
 
 
 class DomainListDataType(BaseDomainDataType):
-    def validate(self, value, source=''):
+    def validate(self, value, row_number=None, source=''):
         errors = []
 
         for v in value:
-            try:
-                models.Node.objects.filter(config__options__contains=[{"id": v}])
-            except:
-                errors.append({'type': 'ERROR', 'message': '{0} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(v)})
+            if len(models.Node.objects.filter(config__options__contains=[{"id": v}])) < 1:
+                errors.append({'type': 'ERROR', 'message': '{0} {1} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(v, row_number)})
         return errors
 
     def transform_import_values(self, value, nodeid):
@@ -1045,7 +1133,7 @@ class DomainListDataType(BaseDomainDataType):
 
         return terms
 
-    def append_to_document(self, document, nodevalue, nodeid, tile):
+    def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         domain_text_values = set([])
         for tile in document['tiles']:
             for k, v in tile.data.iteritems():
@@ -1057,7 +1145,7 @@ class DomainListDataType(BaseDomainDataType):
 
         for value in domain_text_values:
             if value not in document['strings']:
-                document['strings'].append({'string': value, 'nodegroup_id': tile.nodegroup_id})
+                document['strings'].append({'string': value, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
 
     def get_display_value(self, tile, node):
         new_values = []
@@ -1111,35 +1199,53 @@ class ResourceInstanceDataType(BaseDataType):
 
     def get_resource_names(self, nodevalue):
         resource_names = set([])
-        es = Elasticsearch()
-        se = SearchEngineFactory().create()
-        id_list = self.get_id_list(nodevalue)
-        for resourceid in id_list:
-            print resourceid
-            resource_document = se.search(index='resource', doc_type='_all', id=resourceid)
-            resource_names.add(resource_document['_source']['displayname'])
+        if nodevalue is not None:
+            se = SearchEngineFactory().create()
+            id_list = self.get_id_list(nodevalue)
+            for resourceid in id_list:
+                try:
+                    resource_document = se.search(index='resource', doc_type='_all', id=resourceid)
+                    resource_names.add(resource_document['_source']['displayname'])
+                except:
+                    print 'resource not available'
+        else:
+            print 'resource not avalable'
         return resource_names
 
-    def validate(self, value, source=''):
+    def validate(self, value, row_number=None, source=''):
         errors = []
-        id_list = self.get_id_list(nodevalue)
+        id_list = self.get_id_list(value)
 
         for resourceid in id_list:
             try:
-                models.Resource.objects.get(pk=resourceid)
+                models.ResourceInstance.objects.get(pk=resourceid)
             except:
-                errors.append({'type': 'ERROR', 'message': '{0} is not a valid resource id. This data was not imported.'.format(v)})
+                errors.append({'type': 'WARNING', 'message': 'The resource id: {0} does not exist in the system. The data for this card will be available in the system once resource {0} is loaded.'.format(resourceid)})
         return errors
 
     def get_display_value(self, tile, node):
+        nodevalue = tile.data[str(node.nodeid)]
         resource_names = self.get_resource_names(nodevalue)
         return ', '.join(resource_names)
 
-    def append_to_document(self, document, nodevalue, nodeid, tile):
+    def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         resource_names = self.get_resource_names(nodevalue)
         for value in resource_names:
             if value not in document['strings']:
-                document['strings'].append({'string': value, 'nodegroup_id': tile.nodegroup_id})
+                document['strings'].append({'string': value, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
+
+    def transform_import_values(self, value, nodeid):
+        return [v.strip() for v in value.split(',')]
+
+    def transform_export_values(self, value, *args, **kwargs):
+        result = value
+        try:
+            if not isinstance(value, basestring): #change basestring to str in python3
+                result = ",".join(value)
+        except:
+            pass
+
+        return result
 
     def append_search_filters(self, value, node, query, request):
         try:
@@ -1153,3 +1259,30 @@ class ResourceInstanceDataType(BaseDataType):
                     query.must(search_query)
         except KeyError, e:
             pass
+
+
+class NodeValueDataType(BaseDataType):
+    def validate(self, value, row_number=None, source=''):
+        errors = []
+        if value:
+            try:
+                models.TileModel.objects.get(tileid=value)
+            except:
+                errors.append({'type': 'ERROR', 'message': '{0} {1} is not a valid tile id. This data was not imported.'.format(v, row_number)})
+        return errors
+
+    def get_display_value(self, tile, node):
+        datatype_factory = DataTypeFactory()
+        value_node = models.Node.objects.get(nodeid=node.config['nodeid'])
+        tileid = tile.data[str(node.pk)]
+        if tileid:
+            value_tile = models.TileModel.objects.get(tileid=tileid)
+            datatype = datatype_factory.get_instance(value_node.datatype)
+            return datatype.get_display_value(value_tile, value_node)
+        return ''
+
+    def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
+        pass
+
+    def append_search_filters(self, value, node, query, request):
+        pass

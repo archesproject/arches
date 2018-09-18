@@ -12,7 +12,7 @@
         <img data-bind="attr: {src: mapImage() }">
     </div>
     <!-- /ko -->
-
+    <div data-bind="css:{'map-disabled': disabled}"></div>
     <div class="relative" data-bind="mapboxgl: {
         mapOptions: {
             style: mapStyle,
@@ -30,7 +30,7 @@
     }, css: getContextCss()">
 
         <!--ko if: drawFeaturesOnMap() || geojsonInput() === true || xyInput.active() === true ||  drawMode() === 'draw_point' || drawMode() === 'draw_polygon' || drawMode() === 'draw_line_string' -->
-        <!--ko if: context !== 'search-filter' -->
+        <!--ko ifnot: _.contains(['search-filter', 'report-header'], context) -->
         <div class="geometry-editing-notifications" data-bind= "css: {'notifications-minimized': minimizeNotifications}">
             <div class="alert-wrap in animated jellyIn">
                 <div class="alert alert-warning relative" role="alert">
@@ -72,8 +72,8 @@
         <!-- /ko -->
         <!-- /ko -->
 
-        <div class="overlay-selection-container scroll-y" data-bind="css : {'selector-closed': overlaySelectorClosed}">
-          <div data-bind="with: overlayLibraryList">
+        <div class="overlay-selection-container" data-bind="css : {'selector-closed': overlaySelectorClosed}">
+          <div class="relative" data-bind="with: overlayLibraryList">
            <!-- Title -->
            <div class="overlay-title">
                {% trans "Map Overlay Library" %}
@@ -130,10 +130,10 @@
 
 
                         <!--ko ifnot: featureEditingDisabled -->
-
+                        <!--ko ifnot: disabled -->
                         <div class="leaflet-draw-section">
                             <div class="leaflet-draw-toolbar leaflet-bar">
-
+                                <!--ko ifnot: _.contains(['survey-bounds'], context) -->
                                 <a class="" style="background-position: -342px -2px;" href="#" title='{% trans "Add Easting/Northing" %}' data-bind="click: function(){xyInput.active(!xyInput.active())}, css: {'active': xyInput.active}"><i class="fa fa-thumb-tack"></i></a>
                                 <div class="map-tool-container map-tool-item xy" data-bind="fadeVisible: xyInput.active, delay:100, fade: 200, css: {'buffer': context === 'search-filter'}">
                                     <div class="form-control">
@@ -149,7 +149,7 @@
                                         <button class="btn btn-primary btn-sm btn-block mar-top" disabled data-bind="click: function(){xyInput.addLocation()}, enable: xyInput.validCoords">{% trans "Add Location" %}</button>
                                     </div>
                                 </div>
-
+                                <!--/ko-->
                                 <!-- ko foreach: geometryTypes -->
                                 <a class="" href="#" data-bind="click: function(){self.selectEditingTool(self, self.geometryTypeDetails[$data.id].name)}, attr: {'class': self.geometryTypeDetails[$data.id].class, 'title': self.geometryTypeDetails[$data.id].title}, css: {'active': self.geometryTypeDetails[$data.id].active}">
                                         <span class="sr-only" data-bind="text: self.geometryTypeDetails[$data.id].title"></span>
@@ -187,6 +187,7 @@
                             </div>
                             <ul class="leaflet-draw-actions"></ul>
                         </div>
+                        <!--/ko-->
                         <!--/ko-->
                         <!--/ko-->
                     </div>
@@ -275,7 +276,20 @@
             </div>
             <!--/ko-->
 
-            <!-- ko if: popupData().geojson -->
+            <!--ko if: popupData().feature_info_content-->
+            <div class="hover-feature-metadata">
+                <i class="ion-ios-close pull-right add-tooltip hover-panel-dismiss"
+                style="cursor: pointer;"
+                data-placement="left"
+                data-toggle="tooltip"
+                data-original-title="add overlay"
+                data-bind="visible: popupData() === clickData(), click: function () { clickData(null); }"
+                ></i>
+                <div class="hover-feature-body" data-bind="html: popupData().feature_info_content"></div>
+            </div>
+            <!--/ko-->
+
+            <!-- ko if: popupData().geojson && context != 'search-filter' -->
             <div class="hover-panel-small">
                 <div class="hover-feature-title-bar">
                     <div class="hover-feature-title">{% trans "Add drawing?" %}</div>
@@ -383,11 +397,16 @@
                             <i class="ion-information-circled pull-right overlay-tool-icon add-tooltip" data-placement="left" data-toggle="tooltip" data-original-title="visible: 7-20"></i>
                             -->
                             <a href="#" data-bind="click: function () { self.mapControls.moveOverlay($data, 'up') }">
-                                <i class="ion-ios-arrow-up pull-right overlay-tool-icon add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="move overlay up"></i>
+                                <i class="fa fa-arrow-circle-o-up overlay-tool-icon add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="move overlay up"></i>
                             </a>
                             <a href="#" data-bind="click: function () { self.mapControls.moveOverlay($data, 'down') }">
-                                <i class="ion-ios-arrow-down pull-right overlay-tool-icon add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="move overlay down"></i>
+                                <i class="fa fa-arrow-circle-o-down overlay-tool-icon add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="move overlay down"></i>
                             </a>
+                            <!-- ko if: self.resourceLayer && self.resourceLayer !== $data -->
+                            <a href="#" data-bind="click: self.exchangeOverlay">
+                                <i class="fa fa-close overlay-tool-icon add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="move overlay down"></i>
+                            </a>
+                            <!-- /ko -->
                         </div>
                     </div>
                 </div>
@@ -458,10 +477,13 @@
     <!-- /ko -->
 
     <div class="panel">
-        <div class="panel-heading">
+        <div class="panel-heading map-widget-config-accoridan-item">
             <h4 class="panel-title">
-                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-position" class="collapsed" aria-expanded="false">{% trans "Position" %}</a>
+                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-position" class="collapsed" aria-expanded="false" data-bind="click: function(){positionConfigOpen(!positionConfigOpen())}">{% trans "Position" %}
+                    <i class="fa" data-bind="css: {'fa-caret-down': positionConfigOpen(), 'fa-caret-right': !positionConfigOpen()}"></i>
+                </a>
             </h4>
+
         </div>
         <div class="panel-collapse collapse" id="map-config-position" aria-expanded="false" style="height: 0px;">
             <div class="panel-body accordion-body">
@@ -494,9 +516,11 @@
     </div>
     <div class="panel">
 
-        <div class="panel-heading">
+        <div class="panel-heading map-widget-config-accoridan-item">
             <h4 class="panel-title">
-                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-zoom" class="collapsed" aria-expanded="false">{% trans "Zoom" %}</a>
+                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-zoom" class="collapsed" aria-expanded="false" data-bind="click: function(){zoomConfigOpen(!zoomConfigOpen())}">{% trans "Zoom" %}
+                    <i class="fa" data-bind="css: {'fa-caret-down': zoomConfigOpen(), 'fa-caret-right': !zoomConfigOpen()}"></i>
+                </a>
             </h4>
         </div>
 
@@ -525,9 +549,11 @@
     </div>
     <div class="panel">
 
-        <div class="panel-heading">
+        <div class="panel-heading map-widget-config-accoridan-item">
             <h4 class="panel-title">
-                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-geocoder" aria-expanded="false" class="collapsed">{% trans "Geocoder" %}</a>
+                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-geocoder" aria-expanded="false" class="collapsed" data-bind="click: function(){geocoderConfigOpen(!geocoderConfigOpen())}">{% trans "Geocoder" %}
+                    <i class="fa" data-bind="css: {'fa-caret-down': geocoderConfigOpen(), 'fa-caret-right': !geocoderConfigOpen()}"></i>
+                </a>
             </h4>
         </div>
 
@@ -559,9 +585,11 @@
     </div>
 
     <div class="panel">
-        <div class="panel-heading">
+        <div class="panel-heading map-widget-config-accoridan-item">
             <h4 class="panel-title">
-                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-resource-style" aria-expanded="false" class="collapsed">{% trans "Resource Properties" %}</a>
+                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-resource-style" aria-expanded="false" class="collapsed" data-bind="click: function(){resourcePropertiesConfigOpen(!resourcePropertiesConfigOpen())}">{% trans "Resource Properties" %}
+                <i class="fa" data-bind="css: {'fa-caret-down': resourcePropertiesConfigOpen(), 'fa-caret-right': !resourcePropertiesConfigOpen()}"></i>
+                </a>
             </h4>
         </div>
 
@@ -597,5 +625,31 @@
         </div>
 
     </div>
+
+    <div class="panel">
+
+        <div class="panel-heading map-widget-config-accoridan-item">
+            <h4 class="panel-title">
+                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-default-value" aria-expanded="false" class="collapsed" data-bind="click: function(){defaultValueConfigOpen(!defaultValueConfigOpen())}">{% trans "Default Value" %}
+                    <i class="fa" data-bind="css: {'fa-caret-down': defaultValueConfigOpen(), 'fa-caret-right': !defaultValueConfigOpen()}"></i>
+                </a>
+            </h4>
+        </div>
+
+        <div class="panel-collapse collapse" id="map-config-default-value" aria-expanded="false" style="height: 0px;">
+            <div class="panel-body accordion-body">
+                <div class="control-label">
+                    {% trans "Select Location" %}
+                </div>
+                <div class="col-xs-12 pad-no crud-widget-container" style="height: 200px;">
+                    <select type="" id="" placeholder="{% trans " Default Value " %}" data-bind="options: defaultValueOptions, optionsText:'name', optionsValue:'defaultOptionid', value: defaultValueType, chosen: {width: '100%', allow_single_deselect: true, disable_search: true}"></select>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock config_form %}
+
+{% block display_value %}
+<span data-bind="text: displayValue()"></span> {% trans "feature(s)" %}
+{% endblock display_value %}

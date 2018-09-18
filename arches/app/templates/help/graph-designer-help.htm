@@ -43,21 +43,20 @@
 
                   {% if graph.isresource %}
                     {% blocktrans %}
-                      <strong>CRM Class</strong> - (only present if this Resource Model uses an ontology) This setting defines what ontological class of data will be collected by this node. To learn more, read <a href="https://arches4.readthedocs.io/en/latest/managing-resources/#ontologies-in-arches" target="_blank">Ontologies in Arches</a>.<br>
+                      <strong>CRM Class</strong> - (only present if this Resource Model uses an ontology) This setting defines what ontological class of data will be collected by this node. To learn more, read <a href="https://arches.readthedocs.io/en/stable/managing-resources/#ontologies-in-arches" target="_blank">Ontologies in Arches</a>.<br>
                       <strong>Relationship from ...</strong> - (only present if this Resource Model uses an ontology) Define what relationship this node has with its parent node (the one directly above it in the graph branch). A verbalization of your choice is shown below this setting.<br>
                     {% endblocktrans %}
                   {% else %}
                     {% blocktrans %}
-                      <strong>CRM Class</strong> - (only present if this Branch uses an ontology) This setting defines what ontological class of data will be collected by this node. To learn more, read <a href="https://arches4.readthedocs.io/en/latest/managing-resources/#ontologies-in-arches">Ontologies in Arches</a>.<br>
+                      <strong>CRM Class</strong> - (only present if this Branch uses an ontology) This setting defines what ontological class of data will be collected by this node. To learn more, read <a href="https://arches.readthedocs.io/en/stable/managing-resources/#ontologies-in-arches">Ontologies in Arches</a>.<br>
                       <strong>Relationship from ...</strong> - (only present if this Branch uses an ontology) Define what relationship this node has with its parent node (the one directly above it in the graph branch). A verbalization of your choice is shown below this setting.<br>
                     {% endblocktrans %}
                   {% endif %}
-
                     {% blocktrans %}
-                      <strong>Searchable</strong> - If true users will be able to search on this node's value.<br>
+                      <strong>Expose to Advanced Search</strong> - If true users will be able to add this node to an Advanced Search query.<br>
                       <strong>Required</strong> - If true a value must be entered for this node in order to save its tile. <em>Important:</em> Once data is collected for this node, this setting cannot be changed<br>
                       <strong>Data type</strong> - Choose what type of data will be collected in this node. See below for more information.<br>
-                      <strong>Make Sub-Card</strong> - NEEDS TO BE UPDATED - when the card collection/card terminology is fully implemented. -----OLD This setting defines data collection grouping for this node. Read more about what this means in the Cards documentation.
+                      <strong>Make Card/Place node(s) in a separate card</strong> - Depending on the location of the node within the Graph, you may be given the option to "make a card" from the node and its descendants, or "place it into a separate card". Doing the latter will turn the upstream Card into a Card Container, and will make this nodegroup display as a tab within that Card Container.
                     {% endblocktrans %}
                 </p>
             </div>

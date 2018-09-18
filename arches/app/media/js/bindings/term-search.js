@@ -62,6 +62,9 @@ define([
                         };
                     }
                 },
+                id: function(item) {
+                    return item.type + item.value + item.context_label;
+                },
                 formatResult: function(result, container, query, escapeMarkup) {
                     var markup = [];
                     window.Select2.util.markMatch(result.text, query.term, markup, escapeMarkup);
@@ -98,7 +101,7 @@ define([
             }).on('choice-selected', function(e, el) {
                 var selectedTerm = $(el).data('select2-data');
                 var terms = searchbox.select2('data');
-                
+
                 if(!selectedTerm.inverted()){
                     $(el).find('.fa-minus').show();
                 }else{
@@ -106,11 +109,11 @@ define([
                 }
 
                 selectedTerm.inverted(!selectedTerm.inverted());
-                
+
                 //terms(terms);
 
             });
-            searchbox.select2('data', ko.unwrap(terms).concat(ko.unwrap(tags))).trigger('change');            
+            searchbox.select2('data', ko.unwrap(terms).concat(ko.unwrap(tags))).trigger('change');
         }
     };
 

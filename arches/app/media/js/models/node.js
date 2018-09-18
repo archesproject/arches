@@ -35,6 +35,10 @@ define([
                 self.url = options.url;
             }
 
+            if (options.source.config && _.keys(options.source.config).length === 0) {
+                options.source.config = null
+            }
+
             self._node = ko.observable('');
             self.selected = ko.observable(false);
             self.filtered = ko.observable(false);
@@ -151,7 +155,7 @@ define([
                     _.each(keys, function(key) {
                         config[key] = self.config[key]();
                     });
-                }
+                };
                 var jsObj = ko.toJS({
                     name: self.name,
                     datatype: self.datatype,
@@ -226,7 +230,7 @@ define([
         parse: function(source) {
             var self = this;
             self._node(JSON.stringify(source));
-            self.name(source.name);
+            self.name(ko.unwrap(source.name));
             self.nodeGroupId(source.nodegroup_id);
             self.datatype(source.datatype);
             self.ontologyclass(source.ontologyclass);

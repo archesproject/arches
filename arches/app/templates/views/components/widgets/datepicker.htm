@@ -11,7 +11,7 @@
         <div class="col-xs-12">
             <div style="pad-hor">
                 <div class="input-group date">
-                    <input type="text" data-bind="value: value, placeholder: placeholder, datepicker: {format: dateFormat, viewMode: viewMode, maxDate: maxDate, minDate: minDate}" class="form-control input-lg"><span class="input-group-addon"><i class="fa fa-calendar fa-lg"></i></span>
+                    <input type="text" data-bind="value: value, placeholder: placeholder, disable: disabled, datepicker: {format: dateFormat, viewMode: viewMode, maxDate: maxDate, minDate: minDate}" class="form-control input-lg"><span class="input-group-addon"><i class="fa fa-calendar fa-lg"></i></span>
                 </div>
             </div>
             <!-- <input type="text" data-bind="datepicker: value, placeholder: placeholder" class="form-control input-lg widget-input"> -->
@@ -50,5 +50,24 @@
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <select type="" id="" placeholder="{% trans " Date Format " %}" data-bind="options:dateFormatOptions, optionsText:'name', optionsValue:'id', event: {change: onDateFormatSelection}, value: dateFormat, chosen: {width: '100%', disable_search: true}"></select>
+</div>
+<div class="control-label">
+    {% trans "Default Value" %}
+</div>
+<div>
+    <div class="form-group col-xs-12 pad-no crud-widget-container">
+        <div style="pad-hor">
+            <div class="input-group date">
+                <input type="text" data-bind="value: defaultValue, placeholder: placeholder, datepicker: {format: dateFormat, viewMode: viewMode, maxDate: maxDate, minDate: minDate}" class="form-control input-md" style="height: 32px;"><span class="input-group-addon"><i class="fa fa-calendar fa-lg"></i></span>
+            </div>
+        </div>
+    </div>
+    <div class="toggle-container">
+        <span class="switch switch-small" data-bind="css: {'on': getdefault}, click: setdefault"><small></small></span>
+                <div style="display:flex; flex-direction:row;">
+                <div class="arches-toggle-sm" data-bind="text:'Use date of data entry'"></div>
+                </div>
+        <span class="arches-toggle-subtitle" data-bind="text: 'Check this to use the date of data entry as the default value.'"></span>
+    </div>
 </div>
 {% endblock config_form %}

@@ -42,7 +42,7 @@ def make_permissions(apps, schema_editor, with_create_permissions=True):
     User = apps.get_model("auth", "User")
     Permission = apps.get_model("auth", "Permission")
     try:
-        read_nodegroup = Permission.objects.get(codename='read_nodegroup', content_type__app_label='models', content_type__model='nodegroup')
+        read_nodegroup = Permission.objects.using(db_alias).get(codename='read_nodegroup', content_type__app_label='models', content_type__model='nodegroup')
         write_nodegroup = Permission.objects.using(db_alias).get(codename='write_nodegroup', content_type__app_label='models', content_type__model='nodegroup')
         delete_nodegroup = Permission.objects.using(db_alias).get(codename='delete_nodegroup', content_type__app_label='models', content_type__model='nodegroup')
     except Permission.DoesNotExist:
@@ -50,9 +50,10 @@ def make_permissions(apps, schema_editor, with_create_permissions=True):
             # Manually run create_permissions
             from django.contrib.auth.management import create_permissions
             assert not getattr(apps, 'models_module', None)
-            apps.models_module = True
-            create_permissions(apps, verbosity=0)
-            apps.models_module = None
+            model_app = apps.get_app_config('models')
+            model_app.models_module = True
+            create_permissions(model_app, verbosity=0)
+            model_app.models_module = None
             return make_permissions(
                 apps, schema_editor, with_create_permissions=False)
         else:
@@ -274,7 +275,6 @@ class Migration(migrations.Migration):
                 ('classname', models.TextField(blank=True, null=True)),
                 ('configcomponent', models.TextField(blank=True, null=True)),
                 ('defaultconfig', JSONField(blank=True, db_column='defaultconfig', null=True)),
-                ('configcomponent', models.TextField(blank=True, null=True)),
                 ('configname', models.TextField(blank=True, null=True)),
                 ('isgeometric', models.BooleanField(default=False)),
             ],

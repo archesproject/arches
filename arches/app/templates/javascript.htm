@@ -1,11 +1,12 @@
-
 {% load staticfiles %}
+{% load l10n %}
 {% load i18n %}
 
 <script>
-    var CKEDITOR_BASEPATH = '{{ STATIC_URL }}bower_components/ckeditor/';
+    var CKEDITOR_BASEPATH = '{{ STATIC_URL }}packages/ckeditor/';
     require.config({
         baseUrl: '{{ STATIC_URL }}js',
+        urlArgs: '_dc={{ app_settings.VERSION }}',
         paths: {
             'plugins': '{{ STATIC_URL }}plugins',
             'widget-templates': '{% url "widgets" ""%}'.replace(/\/$/, ""),
@@ -14,58 +15,68 @@
             'templates': '{% url "templates" ""%}'.replace(/\/$/, ""),
             'datatype-config-templates': '{% url "datatype_template" ""%}'.replace(/\/$/, ""),
             'nifty': '{{ STATIC_URL }}plugins/nifty',
-            'async': '{{ STATIC_URL }}bower_components/requirejs-plugins/src/async',
-            'text': '{{ STATIC_URL }}bower_components/requirejs-text/text',
-            'jquery': '{{ STATIC_URL }}bower_components/jquery/dist/jquery.min',
-            'js-cookie': '{{ STATIC_URL }}bower_components/js-cookie/src/js.cookie',
-            'select2': '{{ STATIC_URL }}bower_components/select2v3/index',
-            'bootstrap': '{{ STATIC_URL }}bower_components/bootstrap/dist/js/bootstrap.min',
-            'jquery-ui': '{{ STATIC_URL }}bower_components/jqueryui/ui/jquery-ui',
-            'flexslider': '{{ STATIC_URL }}bower_components/flexslider/2.2.2/jquery.flexslider-min',
-            'easing': '{{ STATIC_URL }}bower_components/jquery-easing/jquery.easing.min',
-            'backbone': '{{ STATIC_URL }}bower_components/backbone/backbone',
-            'underscore': '{{ STATIC_URL }}bower_components/underscore/underscore-min',
-            'jquery-validate': '{{ STATIC_URL }}bower_components/jquery-validate/jquery.validate',
-            'd3': '{{ STATIC_URL }}bower_components/d3/d3.min',
-            'dropzone': '{{ STATIC_URL }}bower_components/dropzone/downloads/dropzone-amd-module.min',
-            'ckeditor': '{{ STATIC_URL }}bower_components/ckeditor/ckeditor',
-            'ckeditor-jquery': '{{ STATIC_URL }}bower_components/ckeditor/adapters/jquery',
-            'knockout': '{{ STATIC_URL }}bower_components/knockout/dist/knockout',
-            'knockout-mapping': '{{ STATIC_URL }}bower_components/bower-knockout-mapping/dist/knockout.mapping.min',
-            'moment': '{{ STATIC_URL }}bower_components/moment/min/moment.min',
-            'bootstrap-datetimepicker': '{{ STATIC_URL }}bower_components/bootstrap3-datetimepicker/build/js/bootstrap-datetimepicker.min',
-            'shp': '{{ STATIC_URL }}bower_components/shp/index',
-            'blueimp-gallery': '{{ STATIC_URL }}bower_components/blueimp-gallery/js/blueimp-gallery.min',
-            'blueimp-jquery': '{{ STATIC_URL }}bower_components/blueimp-gallery/js/jquery.blueimp-gallery.min',
-            'blueimp-helper': '{{ STATIC_URL }}bower_components/blueimp-gallery/js/blueimp-helper.min',
-            'datatables.net': '{{ STATIC_URL }}bower_components/datatables.net/js/jquery.dataTables.min',
-            'datatables.net-bs': '{{ STATIC_URL }}bower_components/datatables.net-bs/js/dataTables.bootstrap.min',
-            'datatables.net-responsive': '{{ STATIC_URL }}bower_components/datatables.net-responsive/js/dataTables.responsive.min',
-            'datatables.net-responsive-bs': '{{ STATIC_URL }}bower_components/datatables.net-responsive-bs/js/responsive.bootstrap',
-            'chosen': '{{ STATIC_URL }}bower_components/chosen/chosen.jquery.min',
-            'mapbox-gl': '{{ STATIC_URL }}bower_components/mapbox-gl/mapbox-gl',
-            'mapbox-gl-draw': '{{ STATIC_URL }}bower_components/mapbox-gl-draw/index',
-            'proj4': '{{ STATIC_URL }}bower_components/proj4/dist/proj4',
-            'noUiSlider': '{{ STATIC_URL }}bower_components/nouislider/distribute/nouislider.min',
-            'geojson-extent': '{{ STATIC_URL }}bower_components/geojson-extent/geojson-extent',
-            'bootstrap-colorpicker': '{{ STATIC_URL }}bower_components/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min',
-            'uuid': '{{ STATIC_URL }}bower_components/uuid.js/dist/uuid.core',
-            'turf': '{{ STATIC_URL }}bower_components/turf/index',
-            'geohash': '{{ STATIC_URL }}bower_components/geohash/latlon-geohash',
-            'nvd3': '{{ STATIC_URL }}bower_components/nvd3/build/nv.d3.min',
-            'leaflet': '{{ STATIC_URL }}bower_components/leaflet/dist/leaflet',
-            'leaflet-iiif': '{{ STATIC_URL }}bower_components/leaflet-iiif/leaflet-iiif',
-            'leaflet-draw': '{{ STATIC_URL }}bower_components/leaflet-draw/dist/leaflet.draw',
-            'mathjs': '{{ STATIC_URL }}bower_components/mathjs/dist/math.min'
+            'async': '{{ STATIC_URL }}packages/requirejs-plugins/src/async',
+            'text': '{{ STATIC_URL }}packages/requirejs-text/text',
+            'jquery-lib': '{{ STATIC_URL }}packages/jquery/dist/jquery.min',
+            'jquery': '{{ STATIC_URL }}packages/jquery-migrate/dist/jquery-migrate.min',
+            'js-cookie': '{{ STATIC_URL }}packages/js-cookie/src/js.cookie',
+            'select2': '{{ STATIC_URL }}packages/select2/select2',
+            'bootstrap': '{{ STATIC_URL }}packages/bootstrap/dist/js/bootstrap.min',
+            'jquery-ui': '{{ STATIC_URL }}packages/jqueryui/jquery-ui.min',
+            'flexslider': '{{ STATIC_URL }}packages/flexslider/jquery.flexslider-min',
+            'easing': '{{ STATIC_URL }}packages/jquery.easing/jquery.easing.min',
+            'backbone': '{{ STATIC_URL }}packages/backbone/backbone-min',
+            'underscore': '{{ STATIC_URL }}packages/underscore/underscore-min',
+            'jquery-validate': '{{ STATIC_URL }}packages/jquery-validation/dist/jquery.validate.min',
+            'd3': '{{ STATIC_URL }}packages/d3/d3.min',
+            'dropzone': '{{ STATIC_URL }}packages/dropzone/downloads/dropzone-amd-module.min',
+            'ckeditor': '{{ STATIC_URL }}packages/ckeditor/ckeditor',
+            'ckeditor-jquery': '{{ STATIC_URL }}packages/ckeditor/adapters/jquery',
+            'knockout': '{{ STATIC_URL }}packages/knockout/build/output/knockout-latest',
+            'knockout-mapping': '{{ STATIC_URL }}packages/knockout-mapping/dist/knockout.mapping.min',
+            'moment': '{{ STATIC_URL }}packages/moment/min/moment.min',
+            'bootstrap-datetimepicker': '{{ STATIC_URL }}packages/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min',
+            'shp': '{{ STATIC_URL }}packages/js-shapefile-to-geojson/shapefile',
+            'blueimp-gallery': '{{ STATIC_URL }}packages/blueimp-gallery/js/blueimp-gallery.min',
+            'blueimp-jquery': '{{ STATIC_URL }}packages/blueimp-gallery/js/jquery.blueimp-gallery.min',
+            'blueimp-helper': '{{ STATIC_URL }}packages/blueimp-gallery/js/blueimp-helper.min',
+            'datatables.net': '{{ STATIC_URL }}packages/datatables.net/js/jquery.dataTables',
+            'datatables.net-bs': '{{ STATIC_URL }}packages/datatables.net-bs/js/dataTables.bootstrap',
+            'datatables.net-responsive': '{{ STATIC_URL }}packages/datatables.net-responsive/js/dataTables.responsive',
+            'datatables.net-responsive-bs': '{{ STATIC_URL }}packages/datatables.net-responsive-bs/js/responsive.bootstrap',
+            'chosen': '{{ STATIC_URL }}packages/chosen-js/chosen.jquery',
+            'mapbox-gl': '{{ STATIC_URL }}packages/mapbox-gl/dist/mapbox-gl',
+            'mapbox-gl-draw': '{{ STATIC_URL }}packages/@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw',
+            'proj4': '{{ STATIC_URL }}packages/proj4/dist/proj4',
+            'noUiSlider': '{{ STATIC_URL }}packages/nouislider/distribute/nouislider.min',
+            'geojson-extent': '{{ STATIC_URL }}packages/@mapbox/geojson-extent/geojson-extent',
+            'bootstrap-colorpicker': '{{ STATIC_URL }}packages/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min',
+            'uuid': '{{ STATIC_URL }}packages/uuidjs/dist/uuid.core',
+            'turf': '{{ STATIC_URL }}packages/@turf/turf/turf.min',
+            'geohash': '{{ STATIC_URL }}packages/latlon-geohash/latlon-geohash',
+            'nvd3': '{{ STATIC_URL }}packages/nvd3/build/nv.d3.min',
+            'leaflet': '{{ STATIC_URL }}packages/leaflet/dist/leaflet',
+            'leaflet-iiif': '{{ STATIC_URL }}packages/leaflet-iiif/leaflet-iiif',
+            'leaflet-draw': '{{ STATIC_URL }}packages/leaflet-draw/dist/leaflet.draw',
+            'mathjs': '{{ STATIC_URL }}packages/mathjs/dist/math.min',
+            'metismenu': '{{ STATIC_URL }}packages/metismenu/dist/metisMenu.min',
+            'knockstrap': '{{ STATIC_URL }}packages/knockstrap/build/knockstrap.min',
+            'jqtree': '{{ STATIC_URL }}packages/jqtree/tree.jquery',
+            'core-js':'{{ STATIC_URL }}packages/core-js/client/shim.min',
+            'dom-4': '{{ STATIC_URL }}packages/dom4/build/dom4'
         },
         packages: [{
             name: "codemirror",
-            location: '{{ STATIC_URL }}bower_components/codemirror',
+            location: '{{ STATIC_URL }}packages/codemirror',
             main: "lib/codemirror"
         }],
         shim: {
             'nifty': {
-                deps: ['bootstrap', 'jquery', 'jquery-ui']
+                exports: 'nifty',
+                deps: ['bootstrap', 'jquery', 'jquery-ui', 'metismenu']
+            },
+            'metismenu': {
+                deps: ['jquery', 'jquery-ui']
             },
             'chosen': {
                 deps: ['jquery']
@@ -82,6 +93,9 @@
             'jquery-ui': {
                 deps: ['jquery']
             },
+            'jqtree': {
+                deps: ['jquery']
+            },
             'datatables': {
                 deps: ['jquery']
             },
@@ -90,6 +104,10 @@
             },
             'noUiSlider': {
                 deps: ['jquery'],
+                exports : '$'
+            },
+            'jquery': {
+                deps: ['jquery-lib'],
                 exports : '$'
             },
             'mapbox-gl-draw': {
@@ -117,6 +135,9 @@
             'leaflet-draw': {
                 deps: ['leaflet']
             },
+            'ckeditor': {
+                deps: ['jquery']
+            },
             'ckeditor-jquery': {
                 deps: ['ckeditor']
             }
@@ -140,8 +161,10 @@
                 concept_value: "{% url 'concept_value' %}",
                 concept_manage_parents: "{% url 'concept_manage_parents' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 concept_make_collection: "{% url 'make_collection' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
+                change_password: "{% url 'change_password' %}",
                 export_concept: "{% url 'export_concept' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 export_concept_collections: "{% url 'export_concept_collections' %}",
+                get_concept_collections: "{% url 'get_concept_collections' %}",
                 dropdown: "{% url 'dropdown' %}",
                 paged_dropdown: "{% url 'paged_dropdown' %}",
                 get_pref_label: "{% url 'get_pref_label' %}",
@@ -156,35 +179,48 @@
                 node: "{% url 'node' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 node_layer: "{% url 'node_layer' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 graph: "{% url 'graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
+                graph_designer: function(graphid){return "{% url 'graph_designer' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
+                graph_settings: function(graphid){return "{% url 'graph_settings' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 card: "{% url 'card' '' %}",
-                form: "{% url 'form' '' %}",
+                reorder_cards: "{% url 'reorder_cards'%}",
                 resource: "{% url 'resource' %}",
                 resource_editor: "{% url 'resource_editor' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 resource_copy: "{% url 'resource_copy' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 resource_report: "{% url 'resource_report' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 resource_edit_log: "{% url 'resource_edit_log' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
+                get_resource_edit_log: function(graphid){return "{% url 'resource_edit_log' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 resource_data: "{% url 'resource_data' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace(/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/g, ''),
+                resource_cards: "{% url 'resource_cards' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 related_resources: "{% url 'related_resources' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 resource_descriptors: "{% url 'resource_descriptors' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
+                resource_tiles: "{% url 'resource_tiles' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 tile: "{% url 'tile' %}",
-                report_editor: "{% url 'report_editor' '' %}",
                 reorder_tiles: "{% url 'reorder_tiles' %}",
+                reorder_nodes: "{% url 'reorder_nodes' %}",
+                delete_provisional_tile: "{% url 'delete_provisional_tile' %}",
+                tile_history: "{% url 'tile_history' %}",
                 apply_functions: "{% url 'apply_functions' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 remove_functions: "{% url 'remove_functions' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 tileserver: "{% url 'tileserver' %}",
                 time_wheel_config: "{% url 'time_wheel_config' %}",
                 reindex: "{% url 'reindex' %}",
                 permission_data: "{% url 'permission_data' %}",
+                permission_manager_data: "{% url 'permission_manager_data' %}",
+                get_user_names: "{% url 'get_user_names' %}",
+                feature_popup_content: "{% url 'feature_popup_content' %}",
+                related_resource_candidates: "{% url 'related_resource_candidates' %}",
+                relatable_resources: "{% url 'relatable_resources' %}",
+                get_domain_connections: function(graphid){return "{% url 'get_domain_connections' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 clone_graph: function(graphid){return "{% url 'clone_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 export_graph: function(graphid){return "{% url 'export_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
+                delete_graph: function(graphid){return "{% url 'delete_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
+                delete_instances: function(graphid){return "{% url 'delete_instances' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 export_mapping_file: function(graphid){return "{% url 'export_mapping_file' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 add_resource: function(graphid){return "{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
-                graph_settings: function(graphid){return "{% url 'graph_settings' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
-                card_manager: function(graphid){return "{% url 'card_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
-                report_manager: function(graphid){return "{% url 'report_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 function_manager: function(graphid){return "{% url 'function_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
-                form_manager: function(graphid){return "{% url 'form_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
-                permission_manager: function(graphid){return "{% url 'permission_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)}
+                mobile_survey_resources: function(surveyid){return "{% url 'mobile_survey_resources' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', surveyid)},
+                mobile_survey: "{% url 'mobile_survey_manager' %}",
+                help_template: "{% url 'help_templates' %}"
             },
             confirmNav: {
                 title: "{% trans 'Edits pending...' %}",
@@ -194,6 +230,10 @@
                 title: "{% trans 'Delete Branch/Resource Model?' %}",
                 text: "{% trans 'Deleting this branch/resource model will remove it (and all associated data) entirely.  Are you sure you would like to proceed?' %}"
             },
+            confirmAllResourceDelete: {
+                title: "{% trans 'Delete All Resources Associated with this Graph?' %}",
+                text: "{% trans 'Deleting All Resources removes all associated data with this graph entirely.  Are you sure you would like to proceed?' %}"
+            },
             confirmResourceDelete: {
                 title: "{% trans 'Delete Resource?' %}",
                 text: "{% trans 'Deleting this resource will remove it (and all associated data) entirely.  Are you sure you would like to proceed?' %}"
@@ -201,6 +241,10 @@
             confirmMaplayerDelete: {
                 title: "{% trans 'Delete map layer?' %}",
                 text: "{% trans 'Deleting this map layer will remove it entirely.  You cannot undo this action.  Are you sure you would like to proceed?' %}"
+            },
+            confirmSurveyDelete: {
+                title: "{% trans 'Delete survey?' %}",
+                text: "{% trans 'Deleting this survey will remove it entirely.  You cannot undo this action.  Are you sure you would like to proceed?' %}"
             },
             graphImportFailed: {
                 title: "{% trans 'Graph import failed.'%}"
@@ -217,19 +261,22 @@
                 text: "{% trans 'Sorry! The copy request failed. Please try again.  Contact your system administrator if the problem persists.' %}"
             },
             mapboxApiKey: '{{ map_info.mapbox_api_key }}',
-            mapzenApiKey: '{{ map_info.mapzen_api_key }}',
             hexBinSize: {{ map_info.hex_bin_size }},
             mapboxSprites: '{{ map_info.mapbox_sprites }}',
             mapboxGlyphs: '{{ map_info.mapbox_glyphs }}',
             hexBinBounds: {{ map_info.hex_bin_bounds }},
-            mapDefaultX: {{ map_info.x }},
-            mapDefaultY: {{ map_info.y }},
+            mapDefaultX: {{ map_info.x|unlocalize }},
+            mapDefaultY: {{ map_info.y|unlocalize }},
             mapDefaultZoom: {{ map_info.zoom }},
             mapDefaultMinZoom: {{ map_info.map_min_zoom }},
             mapDefaultMaxZoom: {{ map_info.map_max_zoom }},
             preferredCoordinateSystems: {% autoescape off %}{{ map_info.preferred_coordinate_systems }}{% endautoescape %},
-            useSemanticRelationships: {{ use_semantic_relationships|lower }},
+            useSemanticRelationships: {{ app_settings.USE_SEMANTIC_RESOURCE_RELATIONSHIPS|lower }},
             geocoderDefault: '{{ map_info.geocoder_default }}',
+            mapMarkers: [{% autoescape off %}{% for map_marker in map_markers %}{
+                'name': '{{ map_marker.name }}',
+                'url': '{{ map_marker.url }}',
+            },{% endfor %}{% endautoescape %}],
             mapSources: {{% autoescape off %}{% for map_source in map_sources %}
                 '{{ map_source.name }}': {{ map_source.source_json }},
             {% endfor %}{% for resource_map_source in resource_map_sources %}
@@ -244,8 +291,8 @@
                 'activated': {{ map_layer.activated|lower }},
                 'addtomap': {{ map_layer.addtomap|lower }},
                 'is_resource_layer': false,
-                'centerx': {{ map_layer.centerx|default_if_none:"null" }},
-                'centery': {{ map_layer.centery|default_if_none:"null" }},
+                'centerx': {{ map_layer.centerx|default_if_none:"null"|unlocalize }},
+                'centery': {{ map_layer.centery|default_if_none:"null"|unlocalize }},
                 'zoom': {{ map_layer.zoom|default_if_none:"null" }}
             },{% endfor %}{% for resource_map_layer in resource_map_layers %}{
                 'maplayerid': '{{ resource_map_layer.nodeid }}',
@@ -263,7 +310,7 @@
                 'icon': '{{ manifest.icon }}'
             },{% endfor %}{% endautoescape %}],
             conceptCollections: [{% autoescape off %}{% for concept_collection in concept_collections %}{
-                'label': '{{ concept_collection.label }}',
+                'label': '{{ concept_collection.label | escapejs }}',
                 'id': '{{ concept_collection.id }}',
             },{% endfor %}{% endautoescape %}],
             geocodingProviders: [{% autoescape off %}{% for provider in geocoding_providers %}{
@@ -278,7 +325,7 @@
               'name': '{{ resource.name }}',
               'icon': '{{ resource.iconclass }}',
             },{% endfor %}{% endautoescape %}],
-            graphs: {% autoescape off %}{{graphs|default_if_none:"[]"}}{% endautoescape %}
+            graphs: {% autoescape off %}{{graphs|default:"[]"}}{% endautoescape %}
         };
     });
 
@@ -322,7 +369,18 @@
             '{{ template.pk }}': {
                 'componentname': '{{ template.componentname }}',
                 'component': '{{ template.component }}',
-                'defaultconfig': '{{ template.defaultconfig_json }}'
+                'defaultconfig': '{{ template.defaultconfig_json }}',
+                'name': '{{ template.name }}'
+            },
+        {% endfor %}{% endautoescape %}};
+    });
+
+    define('card-components', [{% for component in card_components %}'{{ component.component }}',{% endfor %}], function () {
+        return {{% autoescape off %}{% for component in card_components %}
+            '{{ component.pk }}': {
+                'componentname': '{{ component.componentname }}',
+                'component': '{{ component.component }}',
+                'defaultconfig': '{{ component.defaultconfig_json }}'
             },
         {% endfor %}{% endautoescape %}};
     });
@@ -331,7 +389,7 @@
          return;
     });
 
-    define('component-templates', ['views/components/nodegroup-selector'], function () {
+    define('component-templates', ['views/components/nodegroup-selector','views/components/simple-switch'], function () {
          return;
     });
 
@@ -340,7 +398,12 @@
     });
 
     define('datatype-config-components',
-        [{% for datatype in datatypes %}{% if datatype.configcomponent != None %}'{{ datatype.configcomponent }}',{% endif %}{% endfor %}],
+        [{% for datatype in datatypes %}
+            {% if datatype.configcomponent != None %}
+            "{{ datatype.configcomponent }}",
+            {% endif %}
+        {% endfor %}
+        ],
         function () { return });
 
     define('geoms', function () {

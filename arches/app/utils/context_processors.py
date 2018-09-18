@@ -25,14 +25,19 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 
 def livereload(request):
     return {
-        'livereload_port': settings.LIVERELOAD_PORT
+        'livereload_port': settings.LIVERELOAD_PORT,
+        'use_livereload': settings.USE_LIVERELOAD
     }
 
 
 def map_info(request):
     geo_utils = GeoUtils()
-    hex_bin_bounds = geo_utils.get_bounds_from_geojson(settings.DEFAULT_BOUNDS)
-    default_center = geo_utils.get_centroid(settings.DEFAULT_BOUNDS)
+    if settings.DEFAULT_BOUNDS is not None:
+        hex_bin_bounds = geo_utils.get_bounds_from_geojson(settings.DEFAULT_BOUNDS)
+        default_center = geo_utils.get_centroid(settings.DEFAULT_BOUNDS)
+    else:
+        hex_bin_bounds = None
+        default_center = None
     return {
         'map_info': {
             'x': default_center['coordinates'][0],
@@ -41,7 +46,6 @@ def map_info(request):
             'map_min_zoom': settings.MAP_MIN_ZOOM,
             'map_max_zoom': settings.MAP_MAX_ZOOM,
             'mapbox_api_key': settings.MAPBOX_API_KEY,
-            'mapzen_api_key': settings.MAPZEN_API_KEY,
             'hex_bin_size': settings.HEX_BIN_SIZE if settings.HEX_BIN_SIZE != None else 100,
             'mapbox_sprites': settings.MAPBOX_SPRITES,
             'mapbox_glyphs': settings.MAPBOX_GLYPHS,
@@ -53,7 +57,10 @@ def map_info(request):
 
 def app_settings(request):
     return {
-        'VERSION': __version__,
-        'APP_NAME': settings.APP_NAME,
-        'GOOGLE_ANALYTICS_TRACKING_ID': settings.GOOGLE_ANALYTICS_TRACKING_ID
+        'app_settings':{
+            'VERSION': __version__,
+            'APP_NAME': settings.APP_NAME,
+            'GOOGLE_ANALYTICS_TRACKING_ID': settings.GOOGLE_ANALYTICS_TRACKING_ID,
+            'USE_SEMANTIC_RESOURCE_RELATIONSHIPS': settings.USE_SEMANTIC_RESOURCE_RELATIONSHIPS
+        }
     }

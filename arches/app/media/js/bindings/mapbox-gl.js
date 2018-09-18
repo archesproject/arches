@@ -27,6 +27,14 @@ define([
             var map = new mapboxgl.Map(
                 _.defaults(mapInitOptions, defaults)
             );
+            map.on('load', function() {
+                _.each(arches.mapMarkers, function(marker) {
+                    map.loadImage(marker.url, function(error, image) {
+                        if (error) throw error;
+                        map.addImage(marker.name, image);
+                    });
+                })
+            });
 
             // prevents drag events from bubbling
             $(element).mousedown(function(event) {

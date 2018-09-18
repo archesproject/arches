@@ -8,7 +8,7 @@ hooks:
       runas: ubuntu
   BeforeInstall:
     - location: arches/install/ci_install/ci_ubuntu_xenial_setup.sh
-      timeout: 300
+      timeout: 600
       mode: 755
       runas: ubuntu
     - location: arches/install/ci_install/install_arches.sh

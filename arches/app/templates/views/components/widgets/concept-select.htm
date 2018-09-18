@@ -13,6 +13,7 @@
             <input style="width:30%; display:inline-block;"
                 data-bind="
                     value: value,
+                    disable: disabled,
                     select2Query: {
                         select2Config: select2Config
                     }
@@ -31,6 +32,22 @@
         <input placeholder="{% trans "Placeholder" %}"
             class="form-control input-md widget-input"
             data-bind="value: placeholder, valueUpdate: 'keyup'">
+    </div>
+</div>
+<div class="control-label">
+    {% trans "Default Value" %}
+</div>
+<div class="row widget-wrapper">
+    <div class="form-group">
+        <div class="col-xs-12 resource-instance-wrapper">
+            <input style="width:30%; display:inline-block;"
+                data-bind="
+                    value: defaultValue,
+                    select2Query: {
+                        select2Config: select2Config
+                    }
+                ">
+        </div>
     </div>
 </div>
 {% endblock config_form %}

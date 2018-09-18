@@ -10,7 +10,7 @@
             <ul class="list-group ep-menu-list editor-tools">
 
                 <!-- Menu Item -->
-                <li id="settings-manager" class="edit-menu-item">
+                <li id="settings-manager" class="edit-menu-item" data-bind="css: {'disabled': !resourceInstanceExists()}">
                     <a href="" target="" class="" data-bind="click: copyResource">
                         <div class="media-body">
                             <div class="menu-item-title"><i class="fa fa-copy"></i> {% trans "Copy Resource" %} </div>
@@ -20,8 +20,8 @@
                 </li>
 
                 <!-- Menu Item -->
-                <li id="card-manager" class="edit-menu-item">
-                    <a href="" target="" class="" data-bind="click: deleteResource">
+                <li id="card-manager" class="edit-menu-item" data-bind="css: {'disabled': !resourceInstanceExists()}">
+                    <a href="" target="" class="" data-bind="disable: !resourceInstanceExists(), click: deleteResource">
                         <div class="media-body">
                             <div class="menu-item-title"><i class="fa fa-trash"></i> {% trans "Delete Resource" %} </div>
                             <span class="text-muted menu-item-subtitle">{% trans "Permanently delete this resource" %}</span>
@@ -30,7 +30,7 @@
                 </li>
 
                 <!-- Menu Item -->
-                <li id="history-manager" class="edit-menu-item">
+                <li id="history-manager" class="edit-menu-item" data-bind="css: {'disabled': !resourceInstanceExists()}">
                     <a id="edit-history-btn" href="#" data-bind="click: function () {window.open('{% url 'resource_edit_log' resourceid %}')}">
                         <div class="media-body">
                             <div class="menu-item-title"><i class="fa fa-step-backward"></i> {% trans "Review Edit History" %}</div>
@@ -40,7 +40,7 @@
                 </li>
 
                 <!-- Menu Item -->
-                <li id="report-manager" class="edit-menu-item">
+                <li id="report-manager" class="edit-menu-item" data-bind="css: {'disabled': !resourceInstanceExists()}">
                     <a href="#" data-bind="click: function () {window.open('{% url 'resource_report' resourceid %}')}">
                         <div class="media-body">
                             <div class="menu-item-title"><i class="fa fa-book"></i> {% trans "Jump to Report" %}</div>

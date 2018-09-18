@@ -17,4 +17,4 @@ arches/settings_local.pyc
 
 elasticsearch-5.2.1
 virtualenv
-arches/app/media/bower_components
+arches/app/media/packages

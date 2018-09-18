@@ -12,7 +12,7 @@ define(['arches', 'models/abstract'], function(arches, AbstractModel) {
 
         save: function(callback, scope, fd) {
             fd || (fd = new FormData());
-            fd.delete('data');
+            delete fd.data;
             fd.append('data', JSON.stringify(this.toJSON()));
             var method = "POST";
             this._doRequest({

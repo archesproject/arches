@@ -9,11 +9,28 @@
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
         <div class="col-xs-12">
-            <input type="number" data-bind="value: value, attr: {placeholder: placeholder, max: max, min: min}, style: {width: width}" class="form-control input-lg widget-input">
+            <div class="input-group" data-bind="style: {width: width}">
+            <!-- ko if: prefix -->
+            <span class="input-group-addon" data-bind="text: prefix"></span>
+            <!-- /ko -->
+            <input type="number" data-bind="value: value, attr: {placeholder: placeholder, max: max, min: min, step: step, disabled: disabled}, style: {width: width}, valueUpdate: 'keyup'" class="form-control input-lg widget-input">
+            <!-- ko if: suffix -->
+            <span class="input-group-addon" data-bind="text: suffix"></span>
+            <!-- /ko -->
+            </div>
         </div>
     </div>
 </div>
 {% endblock form %}
+
+{% block report %}
+<dt data-bind="text: label"></dt>
+<dd class='number-widget-report'>
+    <div data-bind="text: prefix(), css: {'number-prefix': prefix()}"></div>
+    <div data-bind="text: value()"></div>
+    <div data-bind="text: suffix(), css: {'number-suffix': suffix()}"></div>
+</dd>
+{% endblock report %}
 
 {% block config_form %}
 <div class="control-label">
@@ -33,5 +50,35 @@
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input type="number" placeholder="{% trans "Max" %}" id="" class="form-control input-md widget-input" data-bind="value: max, valueUpdate: 'keyup'">
+</div>
+<div class="control-label">
+    {% trans "Increment" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="number" placeholder="{% trans "Increment size" %}" id="" class="form-control input-md widget-input" data-bind="value: step, valueUpdate: 'keyup'">
+</div>
+<div class="control-label">
+    {% trans "Decimal Places" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="number" placeholder="{% trans "Number of decimal places" %}" id="" class="form-control input-md widget-input" data-bind="value: precision, valueUpdate: 'keyup'">
+</div>
+<div class="control-label">
+    {% trans "Prefix" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="" placeholder="{% trans "Field prefix" %}" id="" class="form-control input-md widget-input" data-bind="value: prefix, valueUpdate: 'keyup'">
+</div>
+<div class="control-label">
+    {% trans "Suffix" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="" placeholder="{% trans "Field suffix" %}" id="" class="form-control input-md widget-input" data-bind="value: suffix, valueUpdate: 'keyup'">
+</div>
+<div class="control-label">
+    {% trans "Default Value" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="number" placeholder="{% trans "Default Value" %}" id="" class="form-control input-md widget-input" data-bind="value: defaultValue, valueUpdate: 'keyup'">
 </div>
 {% endblock config_form %}

@@ -35,7 +35,7 @@ RUN apt-get update -y &&\
         pkg-config &&\
 	curl -sL https://deb.nodesource.com/setup_6.x | bash - &&\
 	apt-get install nodejs &&\
-	npm install -g bower &&\
+	npm install -g yarn &&\
 	wget https://bootstrap.pypa.io/get-pip.py &&\
 	python get-pip.py
 
@@ -65,16 +65,20 @@ RUN rm -rf /tmp/*
 # From here, run commands from ARCHES_ROOT
 WORKDIR ${ARCHES_ROOT}
 
-# Install Bower components
-ADD ./bower.json ${ARCHES_ROOT}/bower.json
-RUN bower --allow-root install
+# Install Yarn components
+COPY ./package.json ${ARCHES_ROOT}/package.json
+RUN yarn install
 
 # Install pip requirements
-ADD ./arches/install/requirements.txt ${ARCHES_ROOT}/arches/install/requirements.txt
-ADD ./arches/install/requirements_dev.txt ${ARCHES_ROOT}/arches/install/requirements_dev.txt
+COPY ./arches/install/requirements.txt ${ARCHES_ROOT}/arches/install/requirements.txt
+COPY ./arches/install/requirements_dev.txt ${ARCHES_ROOT}/arches/install/requirements_dev.txt
 RUN	. ${WEB_ROOT}/ENV/bin/activate &&\
 	pip install -r ${ARCHES_ROOT}/arches/install/requirements.txt &&\
-	pip install -r ${ARCHES_ROOT}/arches/install/requirements_dev.txt
+	pip install -r ${ARCHES_ROOT}/arches/install/requirements_dev.txt &&\
+	pip install 'gunicorn==19.7.1'
+
+# Ensure that a new version of Arches invalidates the cache so it rebuilds
+COPY ./arches/__init__.py /tmp/
 
 # Install the Arches application
 COPY . ${ARCHES_ROOT}

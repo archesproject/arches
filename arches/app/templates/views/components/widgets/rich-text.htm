@@ -9,7 +9,7 @@
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
         <div class="col-xs-12">
-            <textarea rows="10" cols="80" data-bind="ckeditor: value, ckeditorOptions: {},  valueUpdate: 'afterkeydown'"></textarea>
+            <textarea rows="10" cols="80" data-bind="ckeditor: value, ckeditorOptions: {},  valueUpdate: 'afterkeydown', attr: {disabled: disabled}"></textarea>
         </div>
     </div>
 </div>
@@ -21,5 +21,10 @@
 {% endblock report %}
 
 {% block display_value %}
-<div data-bind="html: value()" style="padding:20px;"></div>
+<!-- ko if: value() -->
+<em>[{% trans "rich text" %}]</em>
+<!-- /ko -->
+<!-- ko if: !value() -->
+{% trans "None" %}
+<!-- /ko -->
 {% endblock display_value %}

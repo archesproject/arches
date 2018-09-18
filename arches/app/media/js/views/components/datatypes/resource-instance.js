@@ -1,9 +1,9 @@
 define([
     'knockout',
     'underscore',
-    'arches',
+    'view-data',
     'views/components/widgets/resource-instance-select'
-], function (ko, _, arches) {
+], function (ko, _, data) {
     var name = 'resource-instance-datatype-config';
     ko.components.register(name, {
         viewModel: function(params) {
@@ -11,8 +11,8 @@ define([
             this.resourceModels = [{
                 graphid: null,
                 name: ''
-            }].concat(_.filter(arches.graphs, function (graph) {
-                return graph.isresource && graph.isactive;
+            }].concat(_.filter(data.createableResources, function (graph) {
+                return graph;
             }));
             this.config = params.config;
             this.search = params.search;

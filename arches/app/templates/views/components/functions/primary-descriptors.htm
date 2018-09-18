@@ -18,7 +18,7 @@
                 </div>
 
                 <div class="col-xs-12">
-                    <select data-placeholder="{% trans "Select a card from which to choose nodes to power your primary name identifier." %}" data-bind="chosen: {width: '100%', disable_search_threshold: 15}, value: name.nodegroup_id, options: cards, optionsText: 'name', optionsValue: 'nodegroup_id', valueAllowUnset: true"></select>
+                    <select data-placeholder="{% trans "Select a card from which to choose nodes to power your primary name identifier." %}" data-bind="value: name.nodegroup_id, options: cards, optionsText: 'name', optionsValue: 'nodegroup_id', chosen: {width: '100%', allow_single_deselect: true, disable_search_threshold: 15}"></select>
                 </div>
             </div>
         </div>
@@ -43,7 +43,7 @@
                 </div>
 
                 <div class="col-xs-12">
-                    <select data-placeholder="{% trans "Select a card from which to choose nodes to power your primary description identifier." %}" data-bind="chosen: {width: '100%', disable_search_threshold: 15}, value: description.nodegroup_id, options: cards, optionsText: 'name', optionsValue: 'nodegroup_id', valueAllowUnset: true"></select>
+                    <select data-placeholder="{% trans "Select a card from which to choose nodes to power your primary description identifier." %}" data-bind="value: description.nodegroup_id, options: cards, optionsText: 'name', optionsValue: 'nodegroup_id', valueAllowUnset: true, chosen: {width: '100%', allow_single_deselect: true, disable_search_threshold: 15}"></select>
                 </div>
             </div>
         </div>
@@ -68,7 +68,7 @@
                 </div>
 
                 <div class="col-xs-12">
-                    <select data-placeholder="{% trans "Select a card from which to choose nodes to power your primary description identifier." %}" data-bind="chosen: {width: '100%', disable_search_threshold: 15}, value: map_popup.nodegroup_id, options: cards, optionsText: 'name', optionsValue: 'nodegroup_id', valueAllowUnset: true"></select>
+                    <select data-placeholder="{% trans "Select a card from which to choose nodes to power your primary description identifier." %}" data-bind="value: map_popup.nodegroup_id, options: cards, optionsText: 'name', optionsValue: 'nodegroup_id', valueAllowUnset: true, chosen: {width: '100%', allow_single_deselect: true, disable_search_threshold: 15}"></select>
                 </div>
             </div>
         </div>

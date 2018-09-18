@@ -14,7 +14,11 @@ define([
      * @param {string} params.config.options -
      */
     return ko.components.register('concept-radio-widget', {
-        viewModel: ConceptWidgetViewModel,
+        viewModel: function(params) {
+            params.configKeys = ['defaultValue'];
+
+            ConceptWidgetViewModel.apply(this, [params]);
+        },
         template: {
             require: 'text!widget-templates/radio'
         }

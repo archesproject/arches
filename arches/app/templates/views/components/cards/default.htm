@@ -1,0 +1,417 @@
+{% load i18n %}
+<!-- ko foreach: { data: [$data], as: 'self' } -->
+
+<!-- ko if: state === 'editor-tree' -->
+<!-- ko if: card.isWritable && card.model.visible() -->
+<li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.tiles().length > 0 && card.expanded()), 'jstree-closed' : (card.tiles().length > 0 && !card.expanded()), 'jstree-leaf': card.tiles().length === 0}, scrollTo: card.scrollTo, container: '.resource-editor-tree'">
+    <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
+    <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected()}, click: function () { card.canAdd() ? card.selected(true) : card.tiles()[0].selected(true) },">
+        <i class="fa fa-file-o" role="presentation" data-bind="css:{'filtered': card.highlight(), 'has-provisional-edits fa-file': card.doesChildHaveProvisionalEdits()}"></i>
+        <span style="padding-right: 5px;" data-bind="text: card.model.name"></span>
+        <!-- ko if: card.canAdd() -->
+        <i class="fa fa-plus-circle add-new-tile" role="presentation" data-bind="css:{'jstree-clicked': card.selected}" data-toggle="tooltip" data-original-title="{% trans "Add New" %}"></i>
+        <!-- /ko -->
+    </a>
+    <ul class="jstree-children" aria-expanded="true">
+        <div data-bind="sortable: {
+            data: card.tiles,
+            beforeMove: self.beforeMove,
+            afterMove: card.reorderTiles
+        }">
+            <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (cards.length > 0 && expanded), 'jstree-closed' : (cards.length > 0 && !expanded()), 'jstree-leaf': cards.length === 0}">
+                <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){expanded(!expanded())}"></i>
+                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { self.form.selection($data) }, css:{'jstree-clicked': selected, 'child-selected': isChildSelected(), 'filtered-leaf': card.highlight()}">
+                    <i class="fa fa-file" role="presentation" data-bind="css:{'has-provisional-edits': doesChildHaveProvisionalEdits() || $data.hasprovisionaledits()}"></i>
+                    <strong style="margin-right: 10px;">
+                        <!-- ko if: card.widgets().length > 0 && card.widgets()[0].visible -->
+                        <span data-bind="text: card.widgets()[0].label || card.model.name"></span>:
+                        <div style="display: inline;" data-bind="component: {
+                            name: self.form.widgetLookup[card.widgets()[0].widget_id()].name,
+                            params: {
+                                tile: $data,
+                                node: self.form.nodeLookup[card.widgets()[0].node_id()],
+                                config: self.form.widgetLookup[card.widgets()[0].widget_id()].config,
+                                label: self.form.widgetLookup[card.widgets()[0].widget_id()].label,
+                                value: $data.data[card.widgets()[0].node_id()],
+                                type: 'resource-editor',
+                                state: 'display_value'
+                            }
+                        }"></div>
+                        <!-- /ko -->
+                        <!-- ko if: card.widgets().length === 0 || !card.widgets()[0].visible -->
+                        <span data-bind="text: card.model.name"></span>
+                        <!-- /ko -->
+                    </strong>
+                </a>
+                <!-- ko if: cards.length > 0 -->
+                <ul class="jstree-children" aria-expanded="true" data-bind="foreach: {
+                        data: cards,
+                        as: 'card'
+                    }">
+                    <!-- ko component: {
+                        name: self.form.cardComponentLookup[card.model.component_id()].componentname,
+                        params: {
+                            state: 'editor-tree',
+                            card: card,
+                            tile: null,
+                            loading: self.loading,
+                            form: self.form
+                        }
+                    } --> <!-- /ko -->
+                </ul>
+                <!-- /ko -->
+            </li>
+        </div>
+        <!-- /ko -->
+    </ul>
+</li>
+<!-- /ko -->
+<!-- /ko -->
+
+<!-- ko if: state === 'designer-tree' -->
+<li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards().length > 0 || card.widgets().length > 0) && card.expanded()), 'jstree-closed' : ((card.cards().length > 0 || card.widgets().length > 0) && !card.expanded()), 'jstree-leaf': card.cards().length === 0 && card.widgets().length === 0}, scrollTo: card.scrollTo, container: '.designer-card-tree'">
+    <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
+    <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected()}, click: function () { card.selected(true) },">
+        <i class="fa fa-file-o" role="presentation"></i>
+        <span style="padding-right: 5px;" data-bind="text: card.model.name"></span>
+    </a>
+    <!-- ko if: card.cards().length > 0 || card.widgets().length > 0 -->
+    <ul class="jstree-children card-designer-tree" aria-expanded="true">
+        <div data-bind="sortable: {
+                data: card.widgets,
+                as: 'widget',
+                beforeMove: self.beforeMove,
+                afterMove: function() { card.model.save() }
+            }">
+            <li role="treeitem" class="jstree-node jstree-leaf" data-bind="css: {
+                    'jstree-last': $index() === (card.widgets().length - 1) && card.cards().length === 0
+                }">
+                <i class="jstree-icon jstree-ocl" role="presentation"></i>
+                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function() { widget.selected(true) }, css:{'jstree-clicked': widget.selected, 'hover': widget.hovered}, event: { mouseover: function(){ widget.hovered(true) }, mouseout: function(){ widget.hovered(null) } }">
+                    <i data-bind="css: widget.datatype.iconclass" role="presentation"></i>
+                    <strong style="margin-right: 10px;" >
+                        <span data-bind="text: !!(widget.label()) ? widget.label() : widget.node.name"></span>
+                    </strong>
+                </a>
+            </li>
+        </div>
+        <div data-bind="sortable: {
+                data: card.cards,
+                as: 'childCard',
+                beforeMove: self.beforeMove,
+                afterMove: function() {
+                    card.reorderCards();
+                }
+            }">
+            <div data-bind="css: {
+                    'jstree-last': ($index() === (card.cards().length - 1))
+                }">
+                <!-- ko component: {
+                        name: self.form.cardComponentLookup[childCard.model.component_id()].componentname,
+                        params: {
+                        state: 'designer-tree',
+                        card: childCard,
+                        tile: null,
+                        loading: self.loading,
+                        form: self.form
+                    }
+                } --> <!-- /ko -->
+            </div>
+        </div>
+    </ul>
+    <!-- /ko -->
+</li>
+<!-- /ko -->
+
+
+<!-- ko if: state === 'permissions-tree' -->
+<li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards().length > 0 || card.widgets().length > 0) && card.expanded()), 'jstree-closed' : ((card.cards().length > 0 || card.widgets().length > 0) && !card.expanded()), 'jstree-leaf': card.cards().length === 0 && card.widgets().length === 0}">
+    <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
+    <a class="jstree-anchor permissions-card" href="#" tabindex="-1" data-bind="css:{'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'filtered': card.highlight()}, click: function () { card.selectChildCards() },">
+        <i class="fa fa-file-o" role="presentation"></i>
+        <span style="padding-right: 5px;" data-bind="text: card.model.name">
+        </span>
+        <span class="node-permissions">
+            <!--ko if: card.perms -->
+            <!-- ko foreach: card.perms() -->
+            <i class="node-permission-icon" data-bind="css: $data.icon"></i>
+            <!-- /ko -->
+            <!-- /ko -->
+        </span>
+    </a>
+    <!-- ko if: card.cards().length > 0 || card.widgets().length > 0 -->
+    <ul class="jstree-children" aria-expanded="true">
+        <div data-bind="sortable: {
+                data: card.widgets,
+                as: 'widget',
+                beforeMove: self.beforeMove,
+                afterMove: function() { card.model.save() }
+            }">
+            <li role="treeitem" class="jstree-node jstree-leaf" data-bind="css: {
+                    'jstree-last': $index() === (card.widgets().length - 1) && card.cards().length === 0
+                }">
+                <i class="jstree-icon jstree-ocl" role="presentation"></i>
+                <a class="jstree-anchor permissions-widget" href="#" tabindex="-1">
+                    <i class="fa fa-file" role="presentation" ></i>
+                    <strong style="margin-right: 10px;" >
+                        <span data-bind="text: !!(widget.label()) ? widget.label() : widget.node.name"></span>
+                    </strong>
+                </a>
+            </li>
+        </div>
+        <div data-bind="foreach: {
+                data: card.cards,
+                as: 'card'
+            }">
+            <!-- ko component: {
+                name: self.form.cardComponentLookup[card.model.component_id()].componentname,
+                params: {
+                    state: 'permissions-tree',
+                    card: card,
+                    tile: null,
+                    loading: self.loading,
+                    form: self.form,
+                    multiselect: true
+                }
+            } --> <!-- /ko -->
+        </div>
+    </ul>
+    <!-- /ko -->
+</li>
+<!-- /ko -->
+
+
+<!-- ko if: state === 'form' -->
+<div class="card-component" data-bind="css: card.model.cssclass">
+
+    <!--ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
+    <div class="edit-message-container">
+        <span>{% trans 'Currently showing edits by' %}</span>
+        <span class="edit-message-container-user" data-bind="text: provisionalTileViewModel.selectedProvisionalEdit().username() + '.'"></span>
+        <!--ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
+        <a class="reset-authoritative" href='' data-bind="click: function(){provisionalTileViewModel.resetAuthoritative();}">{% trans 'Return to approved edits' %}</a>
+        <!--/ko-->
+        <!--ko if: provisionalTileViewModel.selectedProvisionalEdit().isfullyprovisional -->
+        <span>{% trans ' This is a new contribution by a provisional editor.' %}</span>
+        <!--/ko-->
+    </div>
+    <!--/ko-->
+
+    <!--ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 && !provisionalTileViewModel.selectedProvisionalEdit()-->
+    <div class="edit-message-container approved">
+        <div>{% trans 'Currently showing the most recent approved edits' %}</div>
+    </div>
+    <!--/ko-->
+
+
+
+    <div class="new-provisional-edit-card-container">
+        <!--ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 -->
+        <!--ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
+        <div class='new-provisional-edits-list'>
+            <div class='new-provisional-edits-header'>
+                <div class='new-provisional-edits-title'>{% trans 'Provisional Edits' %}</div>
+                <div class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" style="padding: 3px;" data-bind="click: function(){provisionalTileViewModel.deleteAllProvisionalEdits()}">{% trans 'Delete all edits' %}</div>
+            </div>
+            <!--ko foreach: { data: provisionalTileViewModel.provisionaledits(), as: 'pe' } -->
+            <div class='new-provisional-edit-entry' data-bind="css: {'selected': pe === $parent.provisionalTileViewModel.selectedProvisionalEdit()}, click: function(){$parent.provisionalTileViewModel.selectProvisionalEdit(pe)}">
+                <div class='title'>
+                    <div class='field'>
+                        <span data-bind="text : pe.username"></span>
+                    </div>
+                    <a href='' class='field fa fa-times-circle new-delete-provisional-edit' data-bind="click : function(){$parent.provisionalTileViewModel.rejectProvisionalEdit(pe)}"></a>
+                </div>
+                <div class="field timestamp">
+                    <span data-bind="text : pe.displaydate">@</span>
+                    <span data-bind="text : pe.displaytimestamp"></span>
+                </div>
+            </div>
+            <!-- /ko -->
+        </div>
+        <!--/ko-->
+        <!--/ko-->
+
+
+        <div class="card">
+
+            <h4 data-bind="text: card.model.name"></h4>
+            <!-- ko if: card.model.helpenabled -->
+            <span>
+                <a class="pull-right card-help help editable-help" data-bind="click: function () {card.model.get('helpactive')(true) }" style="cursor:pointer;"> {% trans "Help" %} <i class="fa fa-question-circle"></i></a>
+            </span>
+            <!-- /ko -->
+            <h5 data-bind="text: card.model.instructions"></h5>
+
+            <!-- ko if: card.widgets().length > 0 -->
+            <form class="widgets" style="margin-bottom: 20px;">
+                <div data-bind="foreach: {
+                        data:card.widgets, as: 'widget'
+                    }">
+                    <div data-bind='component: {
+                        name: self.form.widgetLookup[widget.widget_id()].name,
+                        params: {
+                            formData: self.tile.formData,
+                            tile: self.tile,
+                            form: self.form,
+                            config: widget.configJSON,
+                            label: widget.label(),
+                            value: self.tile.data[widget.node_id()],
+                            node: self.form.nodeLookup[widget.node_id()],
+                            expanded: self.expanded,
+                            graph: self.form.graph,
+                            type: "resource-editor"
+                        }
+                    }, css:{ "active": widget.selected, "hover": widget.hovered, "widget-preview": self.preview
+                }, click: function(data, e) { if (!widget.selected() && self.preview) {widget.selected(true);}
+            }, event: { mouseover: function(){ if (self.preview){widget.hovered(true) } }, mouseout: function(){ if (self.preview){widget.hovered(null)} } }, visible: widget.visible'></div>
+                </div>
+            </form>
+            <!-- /ko -->
+            <!-- ko if: card.widgets().length === 0 -->
+            <ul class="card-summary-section" data-bind="css: {disabled: !tile.tileid}">
+                <!-- ko foreach: { data: tile.cards, as: 'card' } -->
+                <li class="card-summary">
+                    <a href="javascript:void(0)" data-bind="click: function () {
+                        if (card.parent.tileid) {
+                            card.canAdd() ? card.selected(true) : card.tiles()[0].selected(true);
+                        }
+                    }">
+                        <h4 class="card-summary-name">
+                            <span data-bind="text: card.model.name"></span>
+                            <!-- ko if: card.canAdd() && card.parent.tileid -->
+                            <i class="fa fa-plus-circle card-summary-add"></i>
+                            <!-- /ko -->
+                        </h4>
+                    </a>
+                    <ul class="tile-summary-item" data-bind="foreach: {
+                            data: card.tiles,
+                            as: 'tile'
+                        }">
+                        <li class="tile-summary">
+                            <a href="#" data-bind="click: function () { tile.selected(true) }">
+                                <!-- ko if: card.widgets().length > 0 -->
+                                <span data-bind="text: card.widgets()[0].label || card.model.name" class="tile-summary-label"></span>:
+                                <div style="display: inline;" data-bind="component: {
+                                    name: self.form.widgetLookup[card.widgets()[0].widget_id()].name,
+                                    params: {
+                                        tile: tile,
+                                        node: self.form.nodeLookup[card.widgets()[0].node_id()],
+                                        config: self.form.widgetLookup[card.widgets()[0].widget_id()].config,
+                                        label: self.form.widgetLookup[card.widgets()[0].widget_id()].label,
+                                        value: tile.data[card.widgets()[0].node_id()],
+                                        type: 'resource-editor',
+                                        state: 'display_value'
+                                    }
+                                }"></div>
+                                <!-- /ko -->
+                                <!-- ko if: card.widgets().length === 0 -->
+                                <span data-bind="text: card.model.name"></span>
+                                <!-- /ko -->
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <!-- /ko -->
+            </ul>
+            <!-- /ko -->
+            <div class="install-buttons">
+                <!-- ko if: tile.tileid -->
+                <button class="btn btn-shim btn-warning btn-labeled btn-lg fa fa-trash" data-bind="click: function () { self.form.deleteTile(tile); }">{% trans 'Delete this record' %}</button>
+                <!-- /ko -->
+                <!-- ko if: tile.dirty() -->
+                <!-- ko if: provisionalTileViewModel && !provisionalTileViewModel.tileIsFullyProvisional() -->
+                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset">{% trans 'Cancel edit' %}</button>
+                <!-- /ko -->
+                    <!-- ko if: tile.tileid -->
+                    <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: function () { self.form.saveTile(tile); }">{% trans 'Save edit' %}</button>
+                    <!-- /ko -->
+                <!-- /ko -->
+                <!-- ko if: !tile.tileid -->
+                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: function () { self.form.saveTile(tile); }">{% trans 'Add'  %}</button>
+                <!-- /ko -->
+            </div>
+
+            <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: card.model.get('helpactive')">
+                <div class="relative">
+                    <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" style="" data-bind="click: function () { card.model.get('helpactive')(false) }"></a>
+                </div>
+                <div id="add-basemap-wizard-help-content">
+                    <div>
+                        <div class="panel-heading">
+                            <h3 class="panel-title help-panel-title" style="">
+                                <span data-bind="html: card.model.get('helptitle')"></span>
+                            </h3>
+                        </div>
+                        <div class="panel-body" style="padding: 10px 10px 15px 10px;" data-bind="html: card.model.get('helptext')">
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+</div>
+<!-- /ko -->
+
+<!-- ko if: state === 'report' -->
+<div class="rp-card-section" data-bind="css: card.model.cssclass, visible: card.fullyProvisional() !== 'fullyprovisional'">
+    <!--ko if: card.model.visible()-->
+    <span class="rp-tile-title" data-bind="text: card.model.get('name')"></span>
+    <!-- ko foreach: { data: self.preview ? [card.newTile] : card.tiles, as: 'tile' } -->
+        <div class="rp-card-section" data-bind="css: {'provisional': tile.provisionaledits() !== null && tile.userisreviewer === false, 'fullyprovisional': tile.isfullyprovisional()}">
+            <!-- ko if: card.model.get('widgets')().length > 0 -->
+                <div class="rp-report-tile" data-bind="attr: { id: tile.tileid }">
+                    <!-- ko if: tile.provisionaledits() !== null && tile.userisreviewer === false -->
+                    <div class="report-card-provisional-flag">{% trans 'These data are provisional and pending review' %}</div>
+                    <!--/ko-->
+                    <dl class="dl-horizontal" data-bind="css: {'provisional': tile.provisionaledits() !== null && tile.userisreviewer === false}">
+                        <!-- ko foreach: { data: card.model.get('widgets'), as: 'widget' } -->
+                            <!-- ko if: widget.visible -->
+                            <!-- ko component: {
+                                name: widget.widgetLookup[widget.get("widget_id")()].name,
+                                params: {
+                                    config: configJSON,
+                                    label: widget.get("label")(),
+                                    node: widget.node,
+                                    value: tile.data[widget.node.nodeid],
+                                    state: "report"
+                                }
+                            } --><!-- /ko -->
+                            <!-- /ko -->
+                        <!-- /ko -->
+                    </dl>
+                </div>
+                <!-- /ko -->
+
+            <div class="rp-report-container-tile" data-bind="visible: card.cards().length > 0">
+                <!-- ko foreach: { data: self.preview ? card.cards : tile.cards, as: 'card' } -->
+                        <!-- ko component: {
+                            name: card.model.cardComponentLookup[card.model.component_id()].componentname,
+                            params: {
+                                state: 'report',
+                                preview: self.preview,
+                                card: card
+                            }
+                        } --> <!-- /ko -->
+                <!-- /ko -->
+            </div>
+        </div>
+    <!-- /ko -->
+
+    <!-- ko if: card.tiles().length === 0 && !self.preview -->
+    <div class="row rp-report-tile rp-no-data">
+        <!-- ko ifnot: card.model.get('cardid') -->
+        {% trans "Sorry, you don't have access to this information" %}
+        <!-- /ko -->
+        <!-- ko if: card.model.get('cardid') -->
+        <span>{% trans "No data added yet for " %}</span><span data-bind="text: card.model.get('name')"></span>"
+        <!-- /ko -->
+    </div>
+    <!-- /ko -->
+<!-- /ko -->
+</div>
+<!-- /ko -->
+
+<!-- ko if: state === 'config' -->
+<!-- /ko -->
+
+<!-- /ko -->

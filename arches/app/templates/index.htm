@@ -103,7 +103,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                             </a>
                             {% else %}
                             <a id="auth-link" data-bind="click: function(){showAuthMenu(!showAuthMenu())}">
-                                {% trans "Welcome" %} {{ user.username }}
+                                {% trans "Welcome" %} {{ user.first_name|default:user.username }}
                             </a>
                             <span class="fa fa-chevron-circle-down auth-options" data-bind="click: function(){showAuthMenu(!showAuthMenu())}"></span>
 
@@ -112,7 +112,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         <!-- ko if: showAuthMenu -->
                         <ul class="auth-options">
                             <li><a href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% trans 'Logout' %}</a></li>
-                            <li><a href="{% url 'change_password' %}">{% trans 'Change Password' %}</a></li>
+                            <li><a href="{% url 'user_profile_manager' %}">{% trans 'User Profile' %}</a></li>
                         </ul>
                         <!-- /ko -->
                     </ul>
@@ -400,7 +400,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
     <script src="{% static 'plugins/style-switcher.js' %}"></script>
     <script src="{% static 'plugins/revolution-slider.js' %}"></script>
     <script src="{% static 'plugins/cube-portfolio-lightbox.js' %}"></script>
-    <script src="{% static 'bower_components/knockout/dist/knockout.js' %}"></script>
+    <script src="{% static 'packages/knockout/build/output/knockout-latest.js' %}"></script>
 
 
     <script>

@@ -30,20 +30,7 @@ require([
         ontology_namespaces: data.ontology_namespaces
     })
 
-    var rootNodeConfig = ko.observable(rootNode.config)
     var ontologyClass = ko.observable(data.node.ontologyclass);
-    var topNode = _.filter(graph.nodes(), function(node) {
-                    if (node.istopnode() === true) {
-                        return node
-                    }
-                    })[0];
-
-    var rootNodeColor = ko.observable('rgba(233,112,111,0.8)')
-    if (_.has(ko.unwrap(topNode.config),'fillColor')) {
-        rootNodeColor = ko.unwrap(topNode.config).fillColor
-    } else {
-        topNode.config = ko.observable({fillColor:rootNodeColor});
-    }
     var jsonData = ko.computed(function() {
         var relatableResourceIds = _.filter(data.resources, function(resource){
             return resource.isRelatable();
@@ -64,7 +51,6 @@ require([
         return jsonData() !== jsonCache();
     });
     var viewModel = {
-        rootNodeColor: rootNodeColor,
         dirty: dirty,
         iconFilter: iconFilter,
         icons: ko.computed(function () {
@@ -99,7 +85,9 @@ require([
         },
         reset: function () {
             _.each(JSON.parse(srcJSON), function(value, key) {
-                graph[key](value);
+                if (ko.isObservable(graph[key])) {
+                    graph[key](value);
+                };
             });
             JSON.parse(resourceJSON).forEach(function(jsonResource) {
                 var resource = _.find(data.resources, function (resource) {
@@ -118,13 +106,4 @@ require([
         viewModel: viewModel
     });
     var self = this;
-
-    var updatePageViewGraph = function(pageView, prop){
-      return function(e){
-        var graph = _.findWhere(pageView.viewModel.allGraphs(), {graphid: pageView.viewModel.graphid()})
-        graph[prop](e);
-      }
-    }
-    viewModel.graph.name.subscribe(updatePageViewGraph(pageView, 'name'))
-    viewModel.graph.iconclass.subscribe(updatePageViewGraph(pageView, 'iconclass'))
 });

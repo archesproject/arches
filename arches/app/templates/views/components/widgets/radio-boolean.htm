@@ -11,11 +11,11 @@
       </div></div>
       <div class="col-xs-12">
         <div style="pad-hor">
-        <label data-bind="css: { 'active': value() }, click: function () { value(true) }" class="form-radio form-normal form-text">
-            <input type="radio" name="stat-w-label" data-bind="checked: value" value="true"><span data-bind="text:trueLabel"></span>
+        <label data-bind="css: { 'active': value() === true, 'disabled': disabled }, click: function(e){setValue(true)}" class="form-radio form-normal form-text">
+            <input type="radio" name="stat-w-label" data-bind="checked: value() === true"><span data-bind="text:node.config.trueLabel"></span>
         </label>
-        <label data-bind="css: { 'active': !value() }, click: function () { value(false) }" class="form-radio form-normal form-text">
-            <input type="radio" name="stat-w-label" data-bind="checked: value" value="false"><span data-bind="text:config().falseLabel"></span>
+        <label data-bind="css: { 'active': value() === false, 'disabled': disabled }, click: function(e){setValue(false)}" class="form-radio form-normal form-text">
+            <input type="radio" name="stat-w-label" data-bind="checked: value() === false"><span data-bind="text:node.config.falseLabel"></span>
         </label>
      </div>
    </div>
@@ -25,15 +25,16 @@
 
 {% block config_form %}
 <div class="control-label">
-    {% trans "Label 'True'" %}
+    {% trans "Default Value" %}
 </div>
-<div class="col-xs-12 pad-no crud-widget-container">
-    <input type="" id="" class="form-control input-md widget-input" data-bind="value:trueLabel, valueUpdate: 'keyup'">
-</div>
-<div class="control-label">
-    {% trans "Label 'False'" %}
-</div>
-<div class="col-xs-12 pad-no crud-widget-container">
-    <input type="" id="" class="form-control input-md widget-input" data-bind="value: falseLabel, valueUpdate: 'keyup'">
+<div class="col-xs-12" style="display:flex; flex-direction: column; height: 50px">
+  <div style="pad-hor">
+      <label data-bind="css: { 'active': defaultValue() === true }, click: function(e){setDefaultValue(true)}" class="form-radio form-normal form-text">
+          <input type="radio" name="stat-w-label" data-bind="checked: defaultValue() === true"><span data-bind="text: node.config.trueLabel"></span>
+      </label>
+      <label data-bind="css: { 'active': defaultValue() === false }, click: function(e){setDefaultValue(false)}" class="form-radio form-normal form-text">
+          <input type="radio" name="stat-w-label" data-bind="checked: defaultValue() === false"><span data-bind="text: node.config.falseLabel"></span>
+      </label>
+  </div>
 </div>
 {% endblock config_form %}

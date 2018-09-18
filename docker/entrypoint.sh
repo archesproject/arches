@@ -2,11 +2,11 @@
 
 HELP_TEXT="
 
-Arguments:  
-	run_arches: Default. Run the Arches server  
-	run_tests: Run unit tests  
-	setup_arches: Delete any existing Arches database and set up a fresh one  
-	-h or help: Display help text  
+Arguments:
+	run_arches: Default. Run the Arches server
+	run_tests: Run unit tests
+	setup_arches: Delete any existing Arches database and set up a fresh one
+	-h or help: Display help text
 "
 
 display_help() {
@@ -16,9 +16,21 @@ display_help() {
 
 
 CUSTOM_SCRIPT_FOLDER=${CUSTOM_SCRIPT_FOLDER:-/docker/entrypoint}
-APP_FOLDER=${ARCHES_ROOT}/${ARCHES_PROJECT}
-BOWER_JSON_FOLDER=${APP_FOLDER}/${ARCHES_PROJECT}
+if [[ -z ${ARCHES_PROJECT} ]]; then
+	APP_FOLDER=${ARCHES_ROOT}
+	PACKAGE_JSON_FOLDER=${ARCHES_ROOT}
+else
+	APP_FOLDER=${WEB_ROOT}/${ARCHES_PROJECT}
+	PACKAGE_JSON_FOLDER=${APP_FOLDER}/${ARCHES_PROJECT}
+fi
+
 DJANGO_PORT=${DJANGO_PORT:-8000}
+COUCHDB_URL="http://$COUCHDB_USER:$COUCHDB_PASS@$COUCHDB_HOST:$COUCHDB_PORT"
+
+cd_web_root() {
+	cd ${WEB_ROOT}
+	echo "Current work directory: ${WEB_ROOT}"
+}
 
 cd_arches_root() {
 	cd ${ARCHES_ROOT}
@@ -30,9 +42,9 @@ cd_app_folder() {
 	echo "Current work directory: ${APP_FOLDER}"
 }
 
-cd_bower_folder() {
-	cd ${BOWER_JSON_FOLDER}
-	echo "Current work directory: ${BOWER_JSON_FOLDER}"
+cd_yarn_folder() {
+	cd ${PACKAGE_JSON_FOLDER}
+	echo "Current work directory: ${PACKAGE_JSON_FOLDER}"
 }
 
 activate_virtualenv() {
@@ -42,7 +54,7 @@ activate_virtualenv() {
 
 
 
-#### Install 
+#### Install
 
 init_arches() {
 	if db_exists; then
@@ -53,12 +65,13 @@ init_arches() {
 		setup_arches
 	fi
 
-	init_arches_projects
+	init_arches_project
 }
 
 
+# Setup Postgresql and Elasticsearch
 setup_arches() {
-	# Setup Postgresql and Elasticsearch (this deletes your existing database)
+	cd_arches_root
 
 	echo "" && echo ""
 	echo "*** Initializing database ***"
@@ -71,6 +84,10 @@ setup_arches() {
 	echo "Running: python manage.py packages -o setup_db"
 	python manage.py packages -o setup_db
 
+    echo "Running: Creating couchdb system databaess"
+    curl -X PUT ${COUCHDB_URL}/_users
+    curl -X PUT ${COUCHDB_URL}/_global_changes
+    curl -X PUT ${COUCHDB_URL}/_replicator
 
 	if [[ "${INSTALL_DEFAULT_GRAPHS}" == "True" ]]; then
 		# Import graphs
@@ -102,23 +119,32 @@ setup_arches() {
 		fi
 	fi
 
+	run_migrations
 }
-
 
 wait_for_db() {
 	echo "Testing if database server is up..."
 	while [[ ! ${return_code} == 0 ]]
 	do
-		psql -h ${PGHOST} -p ${PGPORT} -U postgres -c "select 1" >&/dev/null
+		psql -h ${PGHOST} -p ${PGPORT} -U ${PGUSERNAME} -c "select 1" >&/dev/null
 		return_code=$?
 		sleep 1
 	done
 	echo "Database server is up"
+
+    echo "Testing if Elasticsearch is up..."
+    while [[ ! ${return_code} == 0 ]]
+    do
+        curl -s "http://${ESHOST}:${ESPORT}" >&/dev/null
+        return_code=$?
+        sleep 1
+    done
+    echo "Elasticsearch is up"
 }
 
 db_exists() {
 	echo "Checking if database "${PGDBNAME}" exists..."
-	count=`psql -h ${PGHOST} -p ${PGPORT} -U postgres -Atc "SELECT COUNT(*) FROM pg_catalog.pg_database WHERE datname='${PGDBNAME}'"`
+	count=`psql -h ${PGHOST} -p ${PGPORT} -U ${PGUSERNAME} -Atc "SELECT COUNT(*) FROM pg_catalog.pg_database WHERE datname='${PGDBNAME}'"`
 
 	# Check if returned value is a number and not some error message
 	re='^[0-9]+$'
@@ -141,36 +167,35 @@ set_dev_mode() {
 	echo ""
 	echo "----- SETTING DEV MODE -----"
 	echo ""
+	cd_arches_root
 	python ${ARCHES_ROOT}/setup.py develop
 }
 
-# This is also done in Dockerfile, but that does not include user's custom Arches app bower.json
-# Also, the bower_components folder may have been overlaid by a Docker volume.
-install_bower_components() {
+# This is also done in Dockerfile, but that does not include user's custom Arches app package.json
+# Also, the packages folder may have been overlaid by a Docker volume.
+install_yarn_components() {
 	echo ""
 	echo ""
-	echo "----- INSTALLING BOWER COMPONENTS -----"
+	echo "----- INSTALLING YARN COMPONENTS -----"
 	echo ""
-	cd_bower_folder
-	bower --allow-root install
+	cd_yarn_folder
+	yarn install
 }
-
-
 
 
 #### Misc
 
-init_arches_projects() {
-	cd_arches_root
+init_arches_project() {
 	if [[ ! -z ${ARCHES_PROJECT} ]]; then
 		echo "Checking if Arches project "${ARCHES_PROJECT}" exists..."
-		if [[ ! -d ${APP_FOLDER} ]] || [[ ! "$(ls -A ${APP_FOLDER})" ]]; then
+		if [[ ! -d ${APP_FOLDER} ]] || [[ ! "$(ls ${APP_FOLDER})" ]]; then
 			echo ""
 			echo "----- Custom Arches project '${ARCHES_PROJECT}' does not exist. -----"
 			echo "----- Creating '${ARCHES_PROJECT}'... -----"
 			echo ""
 
-			mkdir ${ARCHES_PROJECT}
+			cd_web_root
+			[[ -d ${APP_FOLDER} ]] || mkdir ${APP_FOLDER}
 
 			arches-project create ${ARCHES_PROJECT} --directory ${ARCHES_PROJECT}
 
@@ -269,40 +294,52 @@ collect_static(){
 run_django_server() {
 	echo ""
 	echo ""
-	echo "----- *** RUNNING DJANGO SERVER *** -----"
+	echo "----- *** RUNNING DJANGO DEVELOPMENT SERVER *** -----"
 	echo ""
 	cd_app_folder
-	if [[ ${DJANGO_NORELOAD} == "True" ]]; then
-	    echo "Running Django with options --noreload --nothreading."
-		exec python manage.py runserver --noreload --nothreading 0.0.0.0:${DJANGO_PORT}
-	else
+	if [[ ${DJANGO_REMOTE_DEBUG} != "True" ]]; then
+	    echo "Running Django with livereload."
 		exec python manage.py runserver 0.0.0.0:${DJANGO_PORT}
+	else
+        echo "Running Django with options --noreload --nothreading for remote debugging."
+		exec python manage.py runserver --noreload --nothreading 0.0.0.0:${DJANGO_PORT}
 	fi
 }
 
 
+run_gunicorn_server() {
+	echo ""
+	echo ""
+	echo "----- *** RUNNING GUNICORN PRODUCTION SERVER *** -----"
+	echo ""
+	cd_app_folder
+    if [[ ! -z ${ARCHES_PROJECT} ]]; then
+        gunicorn arches.wsgi:application -w 2 -b :${DJANGO_PORT} --pythonpath ${ARCHES_PROJECT}
+	else
+        gunicorn arches.wsgi:application -w 2 -b :${DJANGO_PORT}
+    fi
+}
 
 
-#### Main commands 
+
+#### Main commands
 run_arches() {
 
 	init_arches
+	install_yarn_components
 
 	if [[ "${DJANGO_MODE}" == "DEV" ]]; then
 		set_dev_mode
 	fi
 
-	install_bower_components
-
-	if [[ "${DJANGO_MODE}" == "DEV" ]]; then
-		run_migrations
-	elif [[ "${DJANGO_MODE}" == "PROD" ]]; then
-		collect_static
-	fi
-
 	run_custom_scripts
 
-	run_django_server
+	if [[ "${DJANGO_MODE}" == "DEV" ]]; then
+		run_django_server
+	elif [[ "${DJANGO_MODE}" == "PROD" ]]; then
+		collect_static
+		run_gunicorn_server
+	fi
 }
 
 
@@ -366,9 +403,10 @@ do
 			display_help
 		;;
 		*)
-			exec "$@"
+            cd_app_folder
+			"$@"
+			exit 0
 		;;
 	esac
 	shift # next argument or value
 done
-

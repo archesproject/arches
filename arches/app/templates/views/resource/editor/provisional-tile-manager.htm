@@ -1,0 +1,46 @@
+{% load staticfiles %}
+{% load i18n %}
+
+<div>
+    <div class="">
+        <!-- ko if: provisionalTileViewModel.edits().length > 0 -->
+        <h4 class='provisional-edits-list-header ep-form-toolbar-title'><div data-bind="text: provisionalTileViewModel.card.get('name')()"></div><span>{% trans 'Provisional Edits' %}</span></h4>
+        <div class='provisional-edit-qa-tool ep-form-toolbar-title'>
+             <div data-bind="component: { name: 'views/components/simple-switch', params: {value: provisionalTileViewModel.declineUnacceptedEdits, config:{label: '{% trans "Decline all unaccepted edits" %}', subtitle: ''}}}"></div>
+            </div>
+            <!--ko foreach: {data: provisionalTileViewModel.edits, as: 'edit'} -->
+            <div class="provisional-edit">
+            <div>
+                <span class="content-title">{% trans 'User: ' %}</span><span data-bind='text: edit.username'></span>
+            </div>
+            <div>
+                <span class="content-title">{% trans 'Created: ' %}</span><span data-bind='text: edit.timestamp'></span>
+            </div>
+            <div class="rp-report-tile provisional-edit-cards">
+                <dl class="">
+            <!-- ko foreach: { data: $parent.provisionalTileViewModel.card.get('widgets'), as: 'widget' } -->
+                <!-- ko component: {
+                    name: widget.widgetLookup[widget.get("widget_id")()].name,
+                    params: {
+                        config: configJSON,
+                        label: widget.get("label")(),
+                        node: widget.node,
+                        value: edit.value[widget.node.nodeid],
+                        state: "report"
+                    }
+                } --><!-- /ko -->
+            <!-- /ko -->
+                </dl>
+            </div>
+            <a type="button" class="btn btn-default btn-sm btn-mint" data-bind="click: function(){$parent.provisionalTileViewModel.acceptProvisionalEdit(edit)}">
+              <span class="glyphicon glyphicon-" aria-hidden="true"></span> {%  trans 'Accept' %}
+            </a>
+            <a type="button" class="btn btn-default btn-sm btn-danger" data-bind="click: function(){$parent.provisionalTileViewModel.rejectProvisionalEdit(edit)}">
+              <span class="glyphicon glyphicon-" aria-hidden="true"></span> {% trans 'Decline' %}
+            </a>
+            </div>
+
+            <!--/ko-->
+        <!-- /ko -->
+    </div>
+</div>

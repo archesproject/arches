@@ -1,5 +1,6 @@
 dist: trusty
 language: python
+filter_secrets: false
 
 python:
   - 2.7
@@ -26,6 +27,7 @@ addons:
 services:
   - postgresql
   - elasticsearch
+  - couchdb
 
 before_install:
   - psql -d postgres -c "ALTER USER postgres with encrypted password 'postgis';"
@@ -33,12 +35,15 @@ before_install:
   - psql -d postgres -c "SET standard_conforming_strings = off;"
   - psql -d postgres -c "CREATE EXTENSION postgis;"
 
+
+before_script: ./arches/install/ci_install/setup_couch.sh
+
 install:
   - python setup.py install
   - pip install -r arches/install/requirements_dev.txt
   - pip install coveralls
-  # - npm install -g bower
-  # - bower install
+  # - npm install -g yarn
+  # - yarn install
 
 script:
   - python manage.py test tests --pattern="*.py" --settings="tests.test_settings"

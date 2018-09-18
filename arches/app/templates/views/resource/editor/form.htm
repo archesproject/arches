@@ -65,8 +65,7 @@
 
                             <div class="list-group" style="margin-top: 5px;" data-bind="sortable: {data: parentTile.tiles[card.get('nodegroup_id')], afterMove: form.reorderTiles.bind(form, parentTile.tiles[card.get('nodegroup_id')]), as: 'innerTile', connectClass: 'list-group', options: {'placeholder': 'ui-sortable-placeholder sortable-placeholder', forcePlaceholderSize: true}}">
 
-                                <div class="list-group-item crud-record-item" style="">
-
+                                <div class="list-group-item crud-record-item" style="" data-bind="css: {'selected-provisional-tile': innerTile === form.selectedProvisionalTile()}">
                                     <h5 style="cursor: pointer; padding: 6px 6px 6px 10px;" class="list-group-item-heading text-thin" data-bind="click: form.toggleTile">
                                         <i class="ion-ios-loop-strong add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Show/Hide" %}'></i>
                                         <span style="position: relative; top: -2px;">
@@ -90,6 +89,20 @@
                                                     }
                                                 } --><!-- /ko -->
 
+                                                <!-- ko if: form.user.reviewer == true -->
+                                                    <!-- ko if: innerTile.provisionaledits() && innerTile.modified() == false -->
+                                                    <i class="fa fa-exclamation-triangle add-tooltip provisional-tile icon" data-placement="bottom" data-toggle="tooltip" data-bind="css: {'authoritative': innerTile.hasAuthoritativeData()}"></i>
+                                                    <span data-bind="text: innerTile.hasAuthoritativeData() ? '{% trans "has provisional edits" %}' : '{% trans "is provisional" %}'"></span>
+                                                        <span class="provisional-tile qa-btn" data-bind="text: innerTile === form.selectedProvisionalTile() ? '{% trans "End QA" %}' : '{% trans "Start QA" %}', click: function(){form.loadSelectedProvisionalTile(innerTile, parentTile, cardinality)}, clickBubble: false"></span>
+                                                    <!-- /ko -->
+                                                <!-- /ko -->
+
+                                                <!-- ko if: form.user.reviewer == false -->
+                                                    <!-- ko if: innerTile.modified() || innerTile.userHasProvisionalEdits -->
+                                                    <i class="fa fa-check-circle add-tooltip provisional-tile icon submitted" data-placement="bottom" data-toggle="tooltip"></i>
+                                                    <span data-bind="text: '{% trans "Your changes have been submitted for review" %}'"></span>
+                                                    <!-- /ko -->
+                                                <!-- /ko -->
                                             <!-- /ko -->
                                         </span>
                                     </h5>
@@ -129,7 +142,7 @@
                                                         value: innerTile.data[widget.get("node_id")()],
                                                         node: widget.node,
                                                         expanded: innerTile.expanded,
-                                                        disabled: false,
+                                                        disabled: widget.disabled,
                                                         graph: form.graph,
                                                         type: "resource-editor"
                                                     }
@@ -142,10 +155,17 @@
 
                                         <!-- Save/Add Button -->
                                         <!-- ko if: innerTile.dirty() && !forceBlank -->
+                                        <!--ko if: !card.get('disabled') -->
                                         <div class="install-buttons" data-bind="css: { 'expanded-buttons': innerTile.expanded() }">
+                                            <!-- ko if: innerTile.hasAuthoritativeData() && form.user.reviewer == true -->
                                             <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, parentTile, innerTile)">{% trans "Cancel" %}</button>
+                                            <!-- /ko -->
+                                            <!-- ko if: innerTile.hasAuthoritativeData() == false && form.user.reviewer == false -->
+                                            <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, parentTile, innerTile)">{% trans "Cancel" %}</button>
+                                            <!-- /ko -->
                                             <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: form.saveTile.bind(form, parentTile, cardinality)">{% trans "Save" %}</button>
                                         </div>
+                                        <!-- /ko -->
                                         <!-- /ko -->
 
                                     </div>
@@ -174,12 +194,28 @@
                                 </div>
 
                                 <!-- Form -->
-                                <div data-bind="with: form.getFormEditingContext(outerCard, card, parentTile)" >
+                                <div data-bind="with: form.getFormEditingContext(outerCard, card, parentTile)">
                                     <div class="card-form-container" data-bind="let: {'tile': $data}">
+                                    <div class="tacos" data-bind="css:{'selected-provisional-tile': tile === form.selectedProvisionalTile()}">
+                                        <!-- ko if: form.user.reviewer == true -->
+                                        <!-- ko if: tile.provisionaledits() -->
+                                        <i class="fa fa-exclamation-triangle add-tooltip provisional-tile icon" data-placement="bottom" data-toggle="tooltip" data-bind="css: {'authoritative': tile.hasAuthoritativeData()}"></i>
+                                        <span data-bind="text: tile.hasAuthoritativeData() ? '{% trans "has provisional edits" %}' : '{% trans "is provisional" %}'"></span>
+                                            <span class="provisional-tile qa-btn" data-bind="text: tile === form.selectedProvisionalTile() ? '{% trans "End QA" %}' : '{% trans "Start QA" %}', click: function(){form.loadSelectedProvisionalTile(tile, parentTile, cardinality)}, clickBubble: false"></span>
+                                        <!-- /ko -->
+                                        <!-- /ko -->
+
+                                        <!-- ko if: form.user.reviewer == false -->
+                                        <!-- ko if: tile.modified() || tile.userHasProvisionalEdits -->
+                                        <i class="fa fa-check-circle add-tooltip provisional-tile icon submitted" data-placement="bottom" data-toggle="tooltip"></i>
+                                        <span data-bind="text: '{% trans "Your changes have been submitted for review" %}'"></span>
+                                        <!-- /ko -->
+                                        <!-- /ko -->
 
                                         <form class="widgets" style="margin-bottom: 20px;" data-bind="foreach: {
                                                 data:card.get('widgets'), as: 'widget'
                                             }">
+
                                             <div class='' data-bind='component: {
                                                 name: form.widgetLookup[widget.get("widget_id")()].name,
                                                 params: {
@@ -192,26 +228,27 @@
                                                     value: tile.data[widget.get("node_id")()],
                                                     node: widget.node,
                                                     expanded: tile.expanded,
-                                                    disabled: false,
+                                                    disabled: widget.disabled,
                                                     graph: form.graph,
                                                     type: "resource-editor"
                                                 }
                                             }, css: {
                                                 "hidden": !tile.expanded() && form.expanded()
-                                            }'></div>
+                                            }'>
+                                        </div>
                                         </form>
 
 
 
                                         <!-- Save/Add Buttons -->
                                         <!-- ko if: tile.dirty -->
+                                        <!--ko if: !card.get('disabled') -->
                                             <!-- ko if: forceBlank -->
                                             <div class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n', css: { 'expanded-buttons': tile.expanded() }" style="display: none;">
                                                 <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, parentTile)">{% trans "Cancel" %}</button>
                                                 <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, parentTile, cardinality)">{% trans 'Add' %}</button>
                                             </div>
-                                            <!-- ko if: card.get('cardinality')() === '1' ? parentTile.dirty(true): null -->
-                                            <!-- /ko -->
+                                            <!-- ko if: card.get('cardinality')() === '1' ? parentTile.dirty(true): null --><!-- /ko -->
                                             <!-- /ko -->
 
                                             <!-- ko if: !forceBlank -->
@@ -221,6 +258,7 @@
                                             </div>
                                             <!-- /ko -->
                                         <!-- /ko -->
+                                        <!-- /ko -->
 
                                         <!-- ko if: !tile.dirty() -->
                                         <!-- ko if: forceBlank -->
@@ -229,6 +267,7 @@
                                         <!-- /ko -->
                                         <!-- /ko -->
 
+                                    </div>
                                     </div>
                                 </div>
                             </div>

@@ -18,7 +18,7 @@ define([
          * @memberof Form.prototype
          * @param  {object} options [description]
          * @param  {string} [options.modelName='tile'] name of the model use as the basis for the form
-         * @return {null} 
+         * @return {null}
          */
         initialize: function(options) {
             var self = this;
@@ -48,10 +48,9 @@ define([
          * @param  {boolean} [justadd=false] if true, then just adds a tile without saving it to the database
          * @param  {object} tile the tile to add/save
          * @param  {object} e event object
-         * @return {null} 
+         * @return {null}
          */
         saveTile: function(tilegroup, justadd, tile, e){
-            console.log(koMapping.toJS(tile));
             var nodegroup_id = tile.nodegroup_id();
             if(justadd === "true"){
                 tilegroup.unshift(koMapping.fromJS(ko.toJS(tile)));
@@ -78,7 +77,7 @@ define([
          * @memberof Form.prototype
          * @param  {object} tile the tile to save
          * @param  {object} e event object
-         * @return {null} 
+         * @return {null}
          */
         updateTile: function(tile, e){
             console.log(ko.toJS(tile));
@@ -98,7 +97,7 @@ define([
          * @param  {object} tilegroup a reference to the group of tiles being managed by this form
          * @param  {object} tile the tile to add/save
          * @param  {object} e event object
-         * @return {null} 
+         * @return {null}
          */
         deleteTile: function(tilegroup, tile, e){
             console.log(ko.toJS(tile));
@@ -118,7 +117,7 @@ define([
          * @memberof Form.prototype
          * @param  {object} data a knockout reference to the tile object
          * @param  {object} e event object
-         * @return {null} 
+         * @return {null}
          */
         cancelEdit: function(data, e){
             console.log(ko.toJSON(data));
@@ -129,7 +128,7 @@ define([
          * @memberof Form.prototype
          * @param  {object} data a knockout reference to the tile object
          * @param  {object} e event object
-         * @return {null} 
+         * @return {null}
          */
         toggleTile: function(data, e){
             $('#abc'+data.tileid()).toggle('fast');
@@ -139,7 +138,7 @@ define([
          * removes any existing values set on the tile
          * @memberof Form.prototype
          * @param  {object} tile the tile to remove values from
-         * @return {null} 
+         * @return {null}
          */
         clearTile: function(tile){
             _.each(tile.data, function(value, key, list){

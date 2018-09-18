@@ -9,7 +9,7 @@ define([
         * @name NodeList
         */
 
-        filter_function: function(newValue){
+        filterFunction: function(){
             var filter = this.filter().toLowerCase();
             this.items().forEach(function(item){
                 item.filtered(true);
@@ -39,7 +39,7 @@ define([
         * @param {object} item - the node to be selected via {@link GraphModel#selectNode}
         * @param {object} evt - click event object
         */
-        selectItem: function(item, evt){
+        selectItem: function(item){
             this.graphModel.selectNode(item);
             this.trigger('node-selected', item);
         },

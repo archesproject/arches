@@ -8,6 +8,7 @@ from arches.app.models.models import ResourceXResource
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer
+from arches.app.utils.permission_backend import get_nodegroups_by_perm
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import MultiPoint
@@ -147,14 +148,14 @@ class Reader(object):
             log_nums = [0]
             if os.path.isfile(settings.RESOURCE_IMPORT_LOG):
                 if os.path.getsize(settings.RESOURCE_IMPORT_LOG)/1000000 > 5:
-                    for file in os.listdir('arches/logs',):
+                    for file in os.listdir(os.path.dirname(settings.RESOURCE_IMPORT_LOG)):
                         try:
                             log_nums.append(int(file.split('.')[-1]))
                         except:
                             pass
 
                     archive_log_num = str(max(log_nums) + 1)
-                    shutil.copy2(settings.RESOURCE_IMPORT_LOG, settings.RESOURCE_IMPORT_LOG + '.' + archive_log_num)
+                    shutil.copy2(settings.RESOURCE_IMPORT_LOG , settings.RESOURCE_IMPORT_LOG.split('.')[0] + '_' + archive_log_num + '.' + settings.RESOURCE_IMPORT_LOG.split('.')[-1])
                     f = open(settings.RESOURCE_IMPORT_LOG, 'w')
                 else:
                     f = open(settings.RESOURCE_IMPORT_LOG, 'a')
@@ -184,10 +185,12 @@ class Writer(object):
         }
         self.resourceinstances = {}
         self.file_prefix = ''
+        self.file_name = ''
         self.tiles = []
         self.graph_id = None
+        self.graph_model = None
 
-    def write_resources(self, graph_id=None, resourceinstanceids=None):
+    def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
         """
         Returns a list of dictionaries with the following format:
 
@@ -195,7 +198,7 @@ class Writer(object):
 
         """
 
-        self.get_tiles(graph_id=graph_id, resourceinstanceids=resourceinstanceids)
+        self.get_tiles(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
 
     def write_resource_relations(self):
         """
@@ -207,7 +210,7 @@ class Writer(object):
 
         pass
 
-    def get_tiles(self, graph_id=None, resourceinstanceids=None):
+    def get_tiles(self, graph_id=None, resourceinstanceids=None, **kwargs):
         """
         Returns a dictionary of tiles keyed by their resourceinstanceid
 
@@ -218,15 +221,36 @@ class Writer(object):
 
         """
 
+        user = kwargs.get('user', None)
+        permitted_nodegroups = []
+        if user:
+            permitted_nodegroups = [str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(user, 'models.read_nodegroup')]
+
         if (graph_id is None or graph_id is False) and resourceinstanceids is None:
             raise MissingGraphException(_("Must supply either a graph id or a list of resource instance ids to export"))
-        self.graph_id = graph_id
+        
         if graph_id:
-            self.file_prefix = models.GraphModel.objects.get(graphid=graph_id).name.replace(' ', '_')
-            self.tiles = models.TileModel.objects.filter(resourceinstance__graph_id=graph_id)
+            filters = {'resourceinstance__graph_id':graph_id}
+            if user:
+                filters['nodegroup_id__in'] = permitted_nodegroups
+            self.tiles = models.TileModel.objects.filter(**filters)
+            self.graph_id = graph_id
         else:
-            self.tiles = models.TileModel.objects.filter(resourceinstance_id__in=resourceinstanceids)
+            filters = {'resourceinstance_id__in':resourceinstanceids}
+            if user:
+                filters['nodegroup_id__in'] = permitted_nodegroups
+            self.tiles = models.TileModel.objects.filter(**filters)
+            try:
+                self.graph_id = self.tiles[0].resourceinstance.graph_id
+            except:
+                self.graph_id = models.ResourceInstance.objects.get(resourceinstanceid=resourceinstanceids[0]).graph_id
 
+
+        iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        self.graph_model = models.GraphModel.objects.get(graphid=self.graph_id)
+        self.file_prefix = self.graph_model.name.replace(' ', '_')
+        self.file_name = '{0}_{1}'.format(self.file_prefix, iso_date)
+        
         for tile in self.tiles:
             try:
                 self.resourceinstances[tile.resourceinstance_id].append(tile)

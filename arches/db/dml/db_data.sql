@@ -98,10 +98,10 @@ INSERT INTO d_node_types VALUES ('Concept', 'skos');
 INSERT INTO d_node_types VALUES ('Collection', 'skos');
 
 --Data types
-INSERT INTO d_data_types VALUES ('string', 'fa fa-file-code-o', 'datatypes.py', 'StringDataType',  null, null, null, FALSE, '10000000-0000-0000-0000-000000000001');
-INSERT INTO d_data_types VALUES ('number', 'fa fa-hashtag', 'datatypes.py', 'NumberDataType', null, null, null, FALSE, '10000000-0000-0000-0000-000000000008');
-INSERT INTO d_data_types VALUES ('date', 'fa fa-calendar', 'datatypes.py', 'DateDataType', null, null, null, FALSE, '10000000-0000-0000-0000-000000000004');
-INSERT INTO d_data_types VALUES ('geojson-feature-collection', 'fa fa-globe', 'datatypes.py', 'GeojsonFeatureCollectionDataType', '{
+INSERT INTO d_data_types(datatype, iconclass, modulename, classname, defaultconfig, configcomponent, configname, isgeometric, defaultwidget) VALUES ('string', 'fa fa-file-code-o', 'datatypes.py', 'StringDataType',  null, null, null, FALSE, '10000000-0000-0000-0000-000000000001');
+INSERT INTO d_data_types(datatype, iconclass, modulename, classname, defaultconfig, configcomponent, configname, isgeometric, defaultwidget) VALUES ('number', 'fa fa-hashtag', 'datatypes.py', 'NumberDataType', null, null, null, FALSE, '10000000-0000-0000-0000-000000000008');
+INSERT INTO d_data_types(datatype, iconclass, modulename, classname, defaultconfig, configcomponent, configname, isgeometric, defaultwidget) VALUES ('date', 'fa fa-calendar', 'datatypes.py', 'DateDataType', null, null, null, FALSE, '10000000-0000-0000-0000-000000000004');
+INSERT INTO d_data_types(datatype, iconclass, modulename, classname, defaultconfig, configcomponent, configname, isgeometric, defaultwidget) VALUES ('geojson-feature-collection', 'fa fa-globe', 'datatypes.py', 'GeojsonFeatureCollectionDataType', '{
     "pointColor": "rgba(130, 130, 130, 0.7)",
     "pointHaloColor": "rgba(200, 200, 200, 0.5)",
     "radius": 2,
@@ -124,13 +124,13 @@ INSERT INTO d_data_types VALUES ('geojson-feature-collection', 'fa fa-globe', 'd
     "advancedStyling": false,
     "advancedStyle": ""
 }', 'views/graph/datatypes/geojson-feature-collection', 'geojson-feature-collection-datatype-config', TRUE, '10000000-0000-0000-0000-000000000007');
-INSERT INTO d_data_types VALUES ('concept', 'fa fa-list-ul', 'concept_types.py', 'ConceptDataType', '{"rdmCollection": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', FALSE, '10000000-0000-0000-0000-000000000002');
-INSERT INTO d_data_types VALUES ('concept-list', 'fa fa-list-ul', 'concept_types.py', 'ConceptListDataType', '{"rdmCollection": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', FALSE, '10000000-0000-0000-0000-000000000012');
-INSERT INTO d_data_types VALUES ('domain-value', 'fa fa-list-ul', 'concept_types.py', 'ConceptDataType', '{"options": []}', 'views/graph/datatypes/domain-value', 'domain-value-datatype-config', FALSE, '10000000-0000-0000-0000-000000000015');
-INSERT INTO d_data_types VALUES ('domain-value-list', 'fa fa-list-ul', 'concept_types.py', 'ConceptListDataType', '{"options": []}', 'views/graph/datatypes/domain-value', 'domain-value-datatype-config', FALSE, '10000000-0000-0000-0000-000000000016');
-INSERT INTO d_data_types VALUES ('boolean', 'fa fa-toggle-on', 'datatypes.py', 'BooleanDataType', null, null, null, FALSE, '10000000-0000-0000-0000-000000000006');
-INSERT INTO d_data_types VALUES ('file-list', 'fa fa-file-image-o', 'datatypes.py', 'FileListDataType', null, null, null, FALSE, '10000000-0000-0000-0000-000000000019');
-INSERT INTO d_data_types VALUES ('semantic', 'fa fa-link', 'datatypes.py', 'BaseDataType', null, null, null, FALSE);
+INSERT INTO d_data_types(datatype, iconclass, modulename, classname, defaultconfig, configcomponent, configname, isgeometric, defaultwidget) VALUES ('concept', 'fa fa-list-ul', 'concept_types.py', 'ConceptDataType', '{"rdmCollection": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', FALSE, '10000000-0000-0000-0000-000000000002');
+INSERT INTO d_data_types(datatype, iconclass, modulename, classname, defaultconfig, configcomponent, configname, isgeometric, defaultwidget) VALUES ('concept-list', 'fa fa-list-ul', 'concept_types.py', 'ConceptListDataType', '{"rdmCollection": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', FALSE, '10000000-0000-0000-0000-000000000012');
+INSERT INTO d_data_types(datatype, iconclass, modulename, classname, defaultconfig, configcomponent, configname, isgeometric, defaultwidget) VALUES ('domain-value', 'fa fa-list-ul', 'concept_types.py', 'ConceptDataType', '{"options": []}', 'views/graph/datatypes/domain-value', 'domain-value-datatype-config', FALSE, '10000000-0000-0000-0000-000000000015');
+INSERT INTO d_data_types(datatype, iconclass, modulename, classname, defaultconfig, configcomponent, configname, isgeometric, defaultwidget) VALUES ('domain-value-list', 'fa fa-list-ul', 'concept_types.py', 'ConceptListDataType', '{"options": []}', 'views/graph/datatypes/domain-value', 'domain-value-datatype-config', FALSE, '10000000-0000-0000-0000-000000000016');
+INSERT INTO d_data_types(datatype, iconclass, modulename, classname, defaultconfig, configcomponent, configname, isgeometric, defaultwidget) VALUES ('boolean', 'fa fa-toggle-on', 'datatypes.py', 'BooleanDataType', null, null, null, FALSE, '10000000-0000-0000-0000-000000000006');
+INSERT INTO d_data_types(datatype, iconclass, modulename, classname, defaultconfig, configcomponent, configname, isgeometric, defaultwidget) VALUES ('file-list', 'fa fa-file-image-o', 'datatypes.py', 'FileListDataType', null, null, null, FALSE, '10000000-0000-0000-0000-000000000019');
+INSERT INTO d_data_types(datatype, iconclass, modulename, classname, defaultconfig, configcomponent, configname, isgeometric) VALUES ('semantic', 'fa fa-link', 'datatypes.py', 'BaseDataType', null, null, null, FALSE);
 
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000001', 'ConceptScheme', 'ARCHES');
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000004', 'Concept', 'ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES CONCEPT');
@@ -3306,150 +3306,3 @@ CREATE MATERIALIZED VIEW mv_geojson_geoms AS
     				 WHERE n_1.datatype = 'geojson-feature-collection'::text)))) > 0 AND n.datatype = 'geojson-feature-collection'::text;
 
 CREATE INDEX mv_geojson_geoms_gix ON mv_geojson_geoms USING GIST (geom);
-
-INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
-   VALUES (public.uuid_generate_v1mc(), 'Search Results', '[
-        {
-            "layout": {},
-            "source": "search-results-hex",
-            "filter": [
-                "all",
-                [
-                    ">",
-                    "doc_count",
-                    0
-                ]
-            ],
-            "paint": {
-                "line-color": "#54278f",
-                "line-opacity": 0.5
-            },
-            "type": "line",
-            "id": "search-results-hex-outline"
-        },
-        {
-            "layout": {},
-            "source": "search-results-hex",
-            "filter": [
-                "==",
-                "id",
-                ""
-            ],
-            "paint": {
-                "line-color": "#54278f",
-                "line-opacity": 1
-            },
-            "type": "line",
-            "id": "search-results-hex-outline-highlighted"
-        },
-        {
-           "layout": {},
-           "source": "search-results-hex",
-           "filter": [
-               "all",
-               [
-                   ">",
-                   "doc_count",
-                   0
-               ]
-           ],
-           "paint": {
-               "fill-extrusion-color": {
-                   "property": "doc_count",
-                   "stops": [
-                       [
-                            0,
-                            "#f2f0f7"
-                        ],
-                        [
-                            10,
-                            "#cbc9e2"
-                        ],
-                        [
-                            50,
-                            "#9e9ac8"
-                        ],
-                        [
-                            200,
-                            "#756bb1"
-                        ],
-                        [
-                            500,
-                            "#54278f"
-                        ]
-                   ]
-               },
-               "fill-extrusion-height": {
-                   "type": "exponential",
-                   "property": "doc_count",
-                   "stops": [
-                       [
-                           0,
-                           0
-                       ],
-                       [
-                           1000,
-                           1
-                       ]
-                   ]
-               },
-               "fill-extrusion-opacity": 0.5
-           },
-           "type": "fill-extrusion",
-           "id": "search-results-hex"
-       }
-   ]', TRUE, 'ion-search', TRUE, TRUE);
-
-INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
-   VALUES (public.uuid_generate_v1mc(), 'Search Markers', '[
-       {
-           "id": "search-results-points-markers",
-           "type": "symbol",
-           "source": "search-results-points",
-           "filter": [
-               "all",
-               [
-                   "==",
-                   "$type",
-                   "Point"
-               ],
-               [
-                   "!=",
-                   "highlight",
-                   true
-               ]
-           ],
-           "layout": {
-               "icon-image": "marker-15",
-               "icon-size": 2,
-               "icon-offset": [0,-6],
-               "icon-allow-overlap": true
-           },
-           "paint": {}
-       },
-       {
-           "id": "search-results-points-markers-highlighted",
-           "type": "symbol",
-           "source": "search-results-points",
-           "filter": [
-               "all",
-               [
-                   "==",
-                   "$type",
-                   "Point"
-               ],
-               [
-                   "==",
-                   "highlight",
-                   true
-               ]
-           ],
-           "layout": {
-               "icon-image": "marker-15",
-               "icon-size": 3,
-               "icon-offset": [0,-6],
-               "icon-allow-overlap": true
-           },
-           "paint": {}
-       }
-   ]', TRUE, 'ion-ios-location', TRUE, TRUE);

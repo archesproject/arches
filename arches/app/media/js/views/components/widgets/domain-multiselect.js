@@ -15,7 +15,7 @@ define([
      */
     return ko.components.register('domain-multiselect-widget', {
         viewModel: function(params) {
-            params.configKeys = ['placeholder'];
+            params.configKeys = ['placeholder', 'defaultValue'];
             DomainWidgetViewModel.apply(this, [params]);
 
             this.multiple = true;

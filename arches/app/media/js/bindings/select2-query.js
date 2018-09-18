@@ -27,6 +27,10 @@ define([
 
             $(el).select2("val", value());
 
+            if (ko.unwrap(select2Config.disabled)) {
+                $(el).select2("disable");
+            };
+
             $(el).on("change", function(val) {
                 if (val.val === "") {
                   val.val = null

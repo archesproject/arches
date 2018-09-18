@@ -5,6 +5,7 @@ import requests
 import sys
 from settings import *
 
+
 def get_env_variable(var_name):
     msg = "Set the %s environment variable"
     try:
@@ -13,20 +14,28 @@ def get_env_variable(var_name):
         error_msg = msg % var_name
         raise ImproperlyConfigured(error_msg)
 
+
 def get_optional_env_variable(var_name):
     try:
         return os.environ[var_name]
     except KeyError:
         return None
 
-MODE = get_env_variable('DJANGO_MODE') #options are either "PROD" or "DEV" (installing with Dev mode set, get's you extra dependencies)
+
+# options are either "PROD" or "DEV" (installing with Dev mode set gets you extra dependencies)
+MODE = get_env_variable('DJANGO_MODE')
+
 DEBUG = ast.literal_eval(get_env_variable('DJANGO_DEBUG'))
+
+COUCHDB_URL = 'http://{}:{}@{}:{}'.format(get_env_variable('COUCHDB_USER'), get_env_variable('COUCHDB_PASS'),
+                                          get_env_variable('COUCHDB_HOST'),
+                                          get_env_variable('COUCHDB_PORT'))  # defaults to localhost:5984
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': get_env_variable('PGDBNAME'),
-        'USER': 'postgres',
+        'USER': get_env_variable('PGUSERNAME'),
         'PASSWORD': get_env_variable('PGPASSWORD'),
         'HOST': get_env_variable('PGHOST'),
         'PORT': get_env_variable('PGPORT'),
@@ -36,8 +45,12 @@ DATABASES = {
 
 ELASTICSEARCH_HTTP_PORT = get_env_variable('ESPORT')
 ELASTICSEARCH_HOSTS = [
-    { 'host': get_env_variable('ESHOST'), 'port': ELASTICSEARCH_HTTP_PORT }
+    {'host': get_env_variable('ESHOST'), 'port': ELASTICSEARCH_HTTP_PORT}
 ]
+
+USER_ELASTICSEARCH_PREFIX = get_optional_env_variable('ELASTICSEARCH_PREFIX')
+if USER_ELASTICSEARCH_PREFIX:
+    ELASTICSEARCH_PREFIX = USER_ELASTICSEARCH_PREFIX
 
 ALLOWED_HOSTS = get_env_variable('DOMAIN_NAMES').split()
 

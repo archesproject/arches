@@ -1,0 +1,13 @@
+linters:
+  pep8:
+    python: 2
+    max-line-length: 119
+    fixer: false
+  eslint:
+    config: './.eslintrc.js'
+files:
+  ignore:
+    - 'arches/app/media/packages/*'
+    - 'node_modules/*'
+fixers:
+  enable: false

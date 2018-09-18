@@ -1,15 +1,18 @@
 require([
+    'underscore',
     'knockout',
     'views/graph/graph-page-view',
     'views/graph/report-editor/report-editor-tree',
     'views/graph/report-editor/report-editor-form',
     'views/graph/report-editor/report-editor-preview',
     'models/report',
+    'models/graph',
     'models/card',
     'report-editor-data',
     'arches',
-    'bindings/sortable'
-], function(ko, PageView, ReportEditorTree, ReportEditorForm, ReportEditorPreview, ReportModel, CardModel, data, arches) {
+    'bindings/sortable',
+    'card-components'
+], function(_, ko, PageView, ReportEditorTree, ReportEditorForm, ReportEditorPreview, ReportModel, GraphModel, CardModel, data, arches) {
     var viewModel = {
         selectedReportId: ko.observable(data.report.reportid),
         reports: ko.observableArray(data.reports)
@@ -17,11 +20,11 @@ require([
 
     var setupTiles = function(card) {
         var tileData = {};
-        card.nodes.forEach(function (node) {
+        card.nodes.forEach(function(node) {
             tileData[node.nodeid] = ko.observable(null);
         });
-        var children = []
-        card.cards.forEach(function (childCard) {
+        var children = [];
+        card.cards.forEach(function(childCard) {
             children = children.concat(setupTiles(childCard));
         });
         card.tiles = [{
@@ -34,9 +37,15 @@ require([
     };
     data.cards.forEach(setupTiles);
 
-    viewModel.report = new ReportModel(data);
+    var graphModel = new GraphModel({
+        data: data.graph,
+        datatypes: data.datatypes,
+        ontology_namespaces: data.ontology_namespaces
+    });
 
-    viewModel.reset = function () {
+    viewModel.report = new ReportModel(_.extend({graphModel: graphModel}, data));
+
+    viewModel.reset = function() {
         viewModel.report.reset();
         viewModel.selection('header');
     };
@@ -45,7 +54,7 @@ require([
 
     viewModel.selection = ko.observable('header');
 
-    viewModel.openReport = function (reportId) {
+    viewModel.openReport = function(reportId) {
         pageView.viewModel.navigate(arches.urls.report_editor + reportId);
     };
 
@@ -55,12 +64,12 @@ require([
         }
     });
 
-    viewModel.reportOptions = ko.computed(function () {
+    viewModel.reportOptions = ko.computed(function() {
         var options = [{
             name: null,
             reportid: null,
             disabled: true
-        }]
+        }];
         return options.concat(viewModel.reports());
     });
 

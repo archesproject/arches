@@ -21,16 +21,16 @@ function(_, ko, moment, BaseFilter, arches) {
             }
             this.filter.fromDate.subscribe(function (fromDate) {
                 var toDate = self.filter.toDate();
-                if (fromDate && toDate && toDate < fromDate) {
+                if (fromDate && toDate && !this.isFromLessThanTo(fromDate, toDate)) {
                     self.filter.toDate(fromDate);
                 }
-            });
+            }, this);
             this.filter.toDate.subscribe(function (toDate) {
                 var fromDate = self.filter.fromDate();
-                if (fromDate && toDate && fromDate > toDate) {
+                if (fromDate && toDate && !this.isFromLessThanTo(fromDate, toDate)) {
                     self.filter.fromDate(toDate);
                 }
-            })
+            }, this);
             this.dateRangeType = ko.observable('custom');
             this.format = 'YYYY-MM-DD';
             this.showWheel = ko.observable(false);
@@ -132,6 +132,23 @@ function(_, ko, moment, BaseFilter, arches) {
                 doQuery = true;
             }
             return doQuery;
+        },
+
+        isFromLessThanTo: function(fromDate, toDate) {
+            if(!this.isBCE(fromDate) && !this.isBCE(toDate)) {
+                return fromDate < toDate;
+            }else if(this.isBCE(fromDate) && !this.isBCE(toDate)) {
+                return true;
+            }else if(!this.isBCE(fromDate) && this.isBCE(toDate)) {
+                return false;
+            }else if(this.isBCE(fromDate) && this.isBCE(toDate)) {
+                return fromDate > toDate;
+            }
+            return true;
+        },
+
+        isBCE: function(date) {
+            return (date.charAt(0) === '-');
         },
 
         clear: function() {

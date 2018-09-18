@@ -5,6 +5,7 @@ import sys
 import math
 import json
 from django.http import HttpResponse
+from django.core.urlresolvers import reverse
 from ModestMaps.Core import Coordinate
 from ModestMaps.Geo import Location
 from arches.app.datatypes import datatypes
@@ -40,7 +41,7 @@ def get_tileserver_config(layer_id, request=None):
 
 
 def handle_request(request):
-    path_info = request.path.replace('/tileserver/', '')
+    path_info = request.path.replace(reverse('tileserver') + '/', '')
     layer_id = path_info.split('/')[0]
     config_dict = get_tileserver_config(layer_id, request=request)
     config = TileStache.Config.buildConfiguration(config_dict)
@@ -121,16 +122,18 @@ def clean_resource_cache(tile):
 
                 for (offset, count, coord) in coordinates:
                     config.cache.remove(layer, coord, format)
-    for key, tile_list in tile.tiles.iteritems():
-        for child_tile in tile_list:
-            clean_resource_cache(child_tile)
+    for tile in tile.tiles:
+        clean_resource_cache(tile)
 
 def seed_resource_cache():
     datatype_factory = DataTypeFactory()
     zooms = range(settings.CACHE_SEED_MAX_ZOOM + 1)
     extension = 'pbf'
+    try:
+        lat1, lon1, lat2, lon2 = settings.CACHE_SEED_BOUNDS
+    except:
+        lat1, lon1, lat2, lon2 = GeoUtils().get_bounds_from_geojson(settings.CACHE_SEED_BOUNDS)
 
-    lat1, lon1, lat2, lon2 = GeoUtils().get_bounds_from_geojson(settings.CACHE_SEED_BOUNDS)
     south, west = min(lat1, lat2), min(lon1, lon2)
     north, east = max(lat1, lat2), max(lon1, lon2)
 

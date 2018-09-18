@@ -2,8 +2,9 @@ define([
     'views/list',
     'views/graph/graph-manager/graph-base',
     'models/graph',
-    'knockout'
-], function(ListView, GraphBase, GraphModel , ko) {
+    'knockout',
+    'arches'
+], function(ListView, GraphBase, GraphModel, ko, arches) {
     var BranchList = ListView.extend({
         /**
         * A backbone view to manage a list of branch graphs
@@ -24,7 +25,6 @@ define([
             ListView.prototype.initialize.apply(this, arguments);
 
             this.loading = options.loading || ko.observable(false);
-            this.failed = options.failed || ko.observable(false);
             this.disableAppendButton = options.disableAppendButton || ko.observable(false);
             this.graphModel = options.graphModel;
             this.selectedNode = this.graphModel.get('selectedNode');
@@ -32,13 +32,24 @@ define([
                 branch.selected = ko.observable(false);
                 branch.filtered = ko.observable(false);
                 branch.graphModel = new GraphModel({
-                    data: branch
+                    data: branch,
+                    selectRoot: false
                 })
                 this.items.push(branch);
             }, this);
             this.selectedBranch = ko.observable(null);
             this.viewMetadata = ko.observable(false);
+            this.loadingBranchDomains = ko.observable(false);
 
+            this.filtered_items = ko.pureComputed(function() {
+                var filtered_items = _.filter(this.items(), function(item){ 
+                    return !item.filtered(); 
+                }, this);
+                return filtered_items;
+            }, this)
+
+            // update the list of items in the branch list 
+            // when any of these properties change
             var valueListener = ko.computed(function() {
                 var node = self.selectedNode;
                 if(!!node()){
@@ -48,24 +59,40 @@ define([
                     return oc + datatype + collector;
                 }
                 return false;
-            });
-
+            }, this).extend({ deferred: true });
 
             valueListener.subscribe(function(){
-                if (!!this.selectedNode()){
-                    this.filter_function();
-                }
+                this.loadDomainConnections();
             }, this);
 
-            // need to call this on init so that branches that can't be appended get filtered out initially
-            this.filter_function();
+        },
+
+        /**
+        * Downloads domain connection data for each branch (usually an expensive operation)
+        * @memberof BranchList.prototype
+        */
+        loadDomainConnections: function(){
+            var self = this;
+            var domainConnections = [];
+
+            this.loadingBranchDomains(true);
+            this.items().forEach(function(branch, i){
+                domainConnections.push(branch.graphModel.loadDomainConnections());
+            }, this)
+
+            $.when(...domainConnections)
+            .then(function(){
+                self.loadingBranchDomains(false);
+                self.filterFunction();
+            });
+
         },
 
         /**
         * Callback function called every time a user types into the filter input box
         * @memberof ListView.prototype
         */
-        filter_function: function(){
+        filterFunction: function(){
             var filter = this.filter().toLowerCase();
             this.items().forEach(function(item){
                 var name = typeof item.name === 'string' ? item.name : item.name();
@@ -87,17 +114,19 @@ define([
         */
         selectItem: function(item, evt){
             ListView.prototype.selectItem.apply(this, arguments);
+            if (item.isactive) {
 
-            if(item.selected()){
-                this.selectedBranch(item);
-                this.graph = new GraphBase({
-                    el: $('#branch-preview'),
-                    graphModel: item.graphModel
-                });
-                this.viewMetadata(true);
-            }else{
-                this.selectedBranch(null);
-                this.viewMetadata(false);
+                if(item.selected()){
+                    this.selectedBranch(item);
+                    this.graph = new GraphBase({
+                        el: $('#branch-preview'),
+                        graphModel: item.graphModel
+                    });
+                    this.viewMetadata(true);
+                }else{
+                    this.selectedBranch(null);
+                    this.viewMetadata(false);
+                }
             }
         },
 
@@ -111,12 +140,10 @@ define([
             var self = this;
             if(this.selectedNode()){
                 this.loading(true);
-                this.failed(false);
-                this.graphModel.appendBranch(this.selectedNode().nodeid, null, item.graphModel, function(response, status){
+                this.graphModel.appendBranch(this.selectedNode(), null, item.graphModel, function(response, status){
                     this.loading(false);
                     _.delay(_.bind(function(){
-                        this.failed(status !== 'success');
-                        if(!(this.failed())){
+                        if(status === 'success'){
                             this.closeForm();
                         }
                     }, this), 300, true);
@@ -132,7 +159,6 @@ define([
             this.clearSelection();
             this.selectedBranch(null);
             this.viewMetadata(false);
-
             this.trigger('close');
         },
 

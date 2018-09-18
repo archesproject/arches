@@ -3,12 +3,12 @@
 
 
     <div class="btn-group time-wheel-display-toggle">
-        <button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="{% trans "time filter" %}" data-bind="click: function () { showWheel(false) };"><i class="ion-calendar"></i></button>
-        <button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="{% trans "time wheel" %}" data-bind="click: function () { showWheel(true) };"><i class="ion-help-buoy"></i></button>
+        <button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="{% trans "time filter" %}" data-bind="click: function () { showWheel(false) };"><i class="ion-calendar"></i>{% trans " Time Filter" %}</button>
+        <button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="{% trans "time wheel" %}" data-bind="click: function () { showWheel(true) };"><i class="ion-help-buoy"></i>{% trans " Time Wheel" %}</button>
     </div>
 
     <h3 class="search-title" data-bind="visible: !showWheel()">{% trans "Time Filter" %}</h3>
-    <h3 class="search-title" data-bind="visible: showWheel()">{% trans "Time Wheel" %} <span class="text-xs text-muted text-thin">{% trans "(Click on a block to set a filter, double-click to zoom in, double-click center to zoom out)" %}</span></h3>
+    <h3 class="search-title" data-bind="visible: showWheel()">{% trans "Time Wheel" %} <div class="text-xs text-muted text-thin">{% trans "(Click on a block to set a filter, double-click to zoom in, double-click center to zoom out)" %}</div></h3>
 
     <!-- Calendar Search -->
     <div id="calendar" class="time-search-subcontainer" data-bind="visible: !showWheel()">
@@ -51,7 +51,7 @@
         <div class="calendar">
             <h3 class="search-label">{% trans "From" %}</h3>
             <div id="search-from-c">
-                <input class="form-control input-lg" data-bind="value: filter.fromDate, datepicker: {format: format}, disable: dateRangeType() !== 'custom'">
+                <input placeholder="" class="form-control input-lg" data-bind="value: filter.fromDate, datepicker: {format: format, keepInvalid: true}, attr:{'placeholder': format}, disable: dateRangeType() !== 'custom'">
             </div>
         </div>
 
@@ -59,12 +59,12 @@
         <div class="calendar">
             <h3 class="search-label">{% trans "To" %}</h3>
             <div id="search-from-b">
-                <input class="form-control input-lg" data-bind="value: filter.toDate, datepicker: {format: format}, disable: dateRangeType() !== 'custom'">
+                <input placeholder="" class="form-control input-lg" data-bind="value: filter.toDate, datepicker: {format: format, keepInvalid: true}, attr:{'placeholder': format}, disable: dateRangeType() !== 'custom'">
             </div>
         </div>
 
-        <div class="pull-right" style="margin:-32px 20px 0 0; cursor:pointer;" data-bind="if: filter.fromDate() || filter.toDate() || filter.dateNodeId() !== 'all'">
-            <a href="#" data-bind="click: function () { clear(); }"><i class="fa fa-close"></i></a>
+        <div class="time-filter-clear" data-bind="if: filter.fromDate() || filter.toDate() || filter.dateNodeId() !== 'all'">
+            <a class="time-filter-clear-link" href="#" data-bind="click: function () { clear(); }"><i class="fa fa-close"></i> {% trans "Clear" %}</a>
         </div>
     </div>
 

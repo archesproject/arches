@@ -5,10 +5,10 @@
         {% trans "Resource Model" %}
     </div>
     <div>
-        <select data-bind="
-            disable: isEditable === false,
+        <select multiple data-bind="
+            disabled: isEditable === false || disabled,
             placeholder: '{% trans "Select a resource model" %}',
-            value: config.graphid,
+            selectedOptions: config.graphid,
             options: resourceModels ,
             optionsText: 'name',
             optionsValue: 'graphid',

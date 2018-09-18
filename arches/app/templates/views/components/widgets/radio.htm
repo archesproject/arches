@@ -13,7 +13,8 @@
             <div class="pad-hor columns" data-bind="foreach: flatOptions">
                 <label class="form-radio form-normal form-text"
                     data-bind="css: {
-                        'active': $parent.isOptionSelected($data)
+                        'active': $parent.isOptionSelected($data),
+                        'disabled': $parent.disabled
                     },
                     click: function () {
                         $parent.setOptionSelection($data, true);
@@ -23,10 +24,37 @@
                             value: id,
                             name: $parent.node.nodeid
                         }">
-                    <span data-bind="text: text"></span>
+                    <span data-bind="text: $data.text"></span>
                 </label>
             </div>
         </div>
     </div>
 </div>
 {% endblock form %}
+
+{% block config_form %}
+<div>
+    <div class="control-label">
+        {% trans "Default Value" %}
+    </div>
+    <div class="col-xs-12">
+        <div class="pad-hor columns" data-bind="foreach: flatOptions">
+            <label class="form-radio form-normal form-text"
+                data-bind="css: {
+                    'active': $parent.isOptionSelected($data)
+                },
+                click: function () {
+                    $parent.setOptionSelection($data, true);
+                }">
+                <input type="radio" data-bind="checked: $parent.defaultValue,
+                    attr: {
+                        value: id,
+                        name: $parent.node.nodeid
+                    }">
+                <span data-bind="text: $data.text"></span>
+            </label>
+        </div>
+    </div>
+</div>
+
+{% endblock config_form %}

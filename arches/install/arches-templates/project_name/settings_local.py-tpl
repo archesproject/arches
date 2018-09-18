@@ -6,6 +6,8 @@ import os
 
 #ADMIN_MEDIA_PREFIX = '/media/admin/'
 
+#ANALYSIS_COORDINATE_SYSTEM_SRID = 3857
+
 #ANONYMOUS_USER_NAME = None
 
 #APP_NAME = 'Arches'
@@ -14,10 +16,63 @@ import os
 
 
 #AUTHENTICATION_BACKENDS = (
+#    oauth2_provider.backends.OAuth2Backend,
 #    django.contrib.auth.backends.ModelBackend,
 #    guardian.backends.ObjectPermissionBackend,
 #    arches.app.utils.permission_backend.PermissionBackend,
 #)
+
+
+
+#AUTH_PASSWORD_VALIDATORS = [
+#    {
+#        "NAME": "arches.app.utils.password_validation.NumericPasswordValidator"
+#    }, 
+#    {
+#        "NAME": "arches.app.utils.password_validation.SpecialCharacterValidator", 
+#        "OPTIONS": {
+#            "special_characters": [
+#                "!", 
+#                "@", 
+#                "#", 
+#                ")", 
+#                "(", 
+#                "*", 
+#                "&", 
+#                "^", 
+#                "%", 
+#                "$"
+#            ]
+#        }
+#    }, 
+#    {
+#        "NAME": "arches.app.utils.password_validation.HasNumericCharacterValidator"
+#    }, 
+#    {
+#        "NAME": "arches.app.utils.password_validation.HasUpperAndLowerCaseValidator"
+#    }, 
+#    {
+#        "NAME": "arches.app.utils.password_validation.MinLengthValidator", 
+#        "OPTIONS": {
+#            "min_length": 9
+#        }
+#    }
+#]
+
+
+
+#CACHES = {
+#    "default": {
+#        "BACKEND": "django.core.cache.backends.memcached.MemcachedCache", 
+#        "LOCATION": "127.0.0.1:11211"
+#    }
+#}
+
+
+
+#CACHE_BY_USER = {
+#    "anonymous": 86400
+#}
 
 
 #COPYRIGHT_TEXT = 'All Rights Reserved.'
@@ -55,6 +110,8 @@ import os
 #]
 
 
+#DATE_IMPORT_EXPORT_FORMAT = '%Y-%m-%d'
+
 #DEBUG = True
 
 
@@ -74,6 +131,18 @@ import os
 
 #ELASTICSEARCH_HTTP_PORT = 9200
 
+#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+#EMAIL_HOST = 'localhost'
+
+#EMAIL_HOST_PASSWORD = ''
+
+#EMAIL_HOST_USER = ''
+
+#EMAIL_PORT = 25
+
+#EMAIL_USE_TLS = False
+
 
 #INSTALLED_APPS = (
 #    django.contrib.admin,
@@ -87,6 +156,10 @@ import os
 #    arches.app.models,
 #    arches.management,
 #    guardian,
+#    captcha,
+#    revproxy,
+#    corsheaders,
+#    oauth2_provider,
 #)
 
 
@@ -139,16 +212,10 @@ import os
 #MEDIA_URL = '/files/'
 
 
-#MIDDLEWARE_CLASSES = (
-#    django.contrib.sessions.middleware.SessionMiddleware,
-#    django.middleware.common.CommonMiddleware,
-#    django.middleware.csrf.CsrfViewMiddleware,
-#    django.contrib.auth.middleware.AuthenticationMiddleware,
-#    django.contrib.auth.middleware.SessionAuthenticationMiddleware,
-#    django.contrib.messages.middleware.MessageMiddleware,
-#    django.middleware.clickjacking.XFrameOptionsMiddleware,
-#    arches.app.utils.set_anonymous_user.SetAnonymousUser,
-#)
+#MIDDLEWARE_CLASSES = [
+#    "django.middleware.common.CommonMiddleware", 
+#    "django.middleware.csrf.CsrfViewMiddleware"
+#]
 
 
 #MODE = 'PROD'
