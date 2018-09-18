@@ -2,6 +2,9 @@ import json
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from rdflib import Namespace, URIRef, Literal, Graph
 from rdflib.namespace import RDF, RDFS, XSD
+from arches.app.models.system_settings import settings
+
+archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 
 def _handle_semantic(graph, domainnode, rangenode, edge, tile, 
                      domain_tile_data, range_tile_data, graph_uri):
@@ -41,7 +44,15 @@ def _handle_date(graph, domainnode, rangenode, edge, tile,
 
 def _handle_resource_instance(graph, domainnode, rangenode, edge, tile,
                               domain_tile_data, range_tile_data, graph_uri):
-    pass
+    # manipulate rangenode's id from range_tile_data
+    # resource-instance (rather than -list) will always be single value
+    if edge.domainnode.istopnode:
+        graph.add((domainnode, RDF.type, graph_uri))
+    rangenode = URIRef(archesproject['resources/%s' % range_tile_data] )
+    graph.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
+    graph.add((domainnode, URIRef(edge.ontologyproperty), rangenode))
+    # XXX Insert label here if exists on instance
+    
 
 def _handle_domain_value(graph, domainnode, rangenode, edge, tile,
                          domain_tile_data, range_tile_data, graph_uri):
@@ -53,7 +64,11 @@ def _handle_geojson_feature_collection(graph, domainnode, rangenode, edge, tile,
 
 def _handle_concept(graph, domainnode, rangenode, edge, tile,
                     domain_tile_data, range_tile_data, graph_uri):
-    pass
+    if edge.domainnode.istopnode:
+        graph.add((domainnode, RDF.type, graph_uri))
+    rangenode = URIRef(archesproject['concepts/%s' % range_tile_data] )
+    graph.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
+    graph.add((domainnode, URIRef(edge.ontologyproperty), rangenode))
 
 def _handle_csv_chart_json(graph, domainnode, rangenode, edge, tile,
                     domain_tile_data, range_tile_data, graph_uri):
@@ -73,7 +88,12 @@ def _handle_node_value(graph, domainnode, rangenode, edge, tile,
 
 def _handle_concept_list(graph, domainnode, rangenode, edge, tile, 
                          domain_tile_data, range_tile_data, graph_uri):
-    pass
+    if edge.domainnode.istopnode:
+        graph.add((domainnode, RDF.type, graph_uri))
+    for r in range_tile_data:
+        rangenode = URIRef(archesproject['concepts/%s' % r] )
+        graph.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
+        graph.add((domainnode, URIRef(edge.ontologyproperty), rangenode))
 
 def _handle_file_list(graph, domainnode, rangenode, edge, tile, 
                       domain_tile_data, range_tile_data, graph_uri):
@@ -81,7 +101,12 @@ def _handle_file_list(graph, domainnode, rangenode, edge, tile,
 
 def _handle_resource_instance_list(graph, domainnode, rangenode, edge, tile, 
                                    domain_tile_data, range_tile_data, graph_uri):
-    pass
+    if edge.domainnode.istopnode:
+        graph.add((domainnode, RDF.type, graph_uri))
+    for r in range_tile_data:
+        rangenode = URIRef(archesproject['resources/%s' % r] )
+        graph.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
+        graph.add((domainnode, URIRef(edge.ontologyproperty), rangenode))
 
 def _handle_domain_value_list(graph, domainnode, rangenode, edge, tile,
                          domain_tile_data, range_tile_data, graph_uri):
@@ -115,14 +140,14 @@ _output_mapping = {#"semantic": _handle_semantic,
                    #"iiif-drawing": _handle_iiif_drawing,
                    #"edtf": _handle_edtf,
                    #"node-value": _handle_node_value,
-                   #"resource-instance": _handle_resource_instance,
+                   "resource-instance": _handle_resource_instance,
                    #"domain-value": _handle_domain_value,
                    #"domain-value-list": _handle_domain_value_list,
                    #"geojson-feature-collection": _handle_geojson_feature_collection,
-                   #"concept": _handle_concept,
-                   #"concept-list": _handle_concept_list,
+                   "concept": _handle_concept,
+                   "concept-list": _handle_concept_list,
                    #"file-list": _handle_file_list,
-                   #"resource-instance-list": _handle_resource_instance_list,
+                   "resource-instance-list": _handle_resource_instance_list,
                    "_default": _handle__default,
                    }
 
@@ -132,7 +157,7 @@ def add_tile_information_to_graph(graph, domainnode_data, rangenode_data, edge, 
     range_tile_data = None
     domain_tile_data = None
 
-    if d_datatype not in ['number', 'boolean','string', 'date']:
+    if d_datatype not in ['number', 'boolean','string', 'date', 'resource-instance', 'concept', 'resource-instance-list']:
         if str(edge.rangenode_id) in tile.data:
             range_tile_data = tile.data[str(edge.rangenode_id)]
         if str(edge.domainnode_id) in tile.data:
