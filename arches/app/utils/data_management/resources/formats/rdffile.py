@@ -81,7 +81,7 @@ class RdfWriter(Writer):
                     if node.nodegroup:
                         nodegroups.add(node.nodegroup)
                     if node.istopnode:
-                        top_nodes.add(node.pk)
+                        top_nodes.add(node.nodeid)
                         for edge in get_nodegroup_edges_by_collector_node(node):
                             if edge.rangenode.nodegroup is None:
                                 graph_cache[graphid]['rootedges'].append(edge)
