@@ -128,7 +128,7 @@ class ResourceTests(ArchesTestCase):
         valueid = response_json['subconcepts'][0]['values'][0]['id']
         cls.conceptid = response_json['subconcepts'][0]['id']
 
-        # Add resource with Name, Cultural Period, Creation and Destruction Dates and Geometry
+        # Add resource with Name, Cultural Period, Creation Date and Geometry
         cls.test_resource = Resource(graph_id=cls.search_model_graphid)
 
         # Add Name
@@ -145,13 +145,8 @@ class ResourceTests(ArchesTestCase):
                     nodegroup_id=cls.search_model_creation_date_nodeid)
         cls.test_resource.tiles.append(tile)
 
-        # Add Destruction Date
-        tile = Tile(data={cls.search_model_destruction_date_nodeid: '1948-01-01'},
-                    nodegroup_id=cls.search_model_destruction_date_nodeid)
-        cls.test_resource.tiles.append(tile)
-
         # Add Gometry
-        geom = {
+        cls.geom = {
             "type": "FeatureCollection",
             "features": [{
                 "geometry": {
@@ -162,7 +157,7 @@ class ResourceTests(ArchesTestCase):
                 "properties": {}
             }]
         }
-        tile = Tile(data={cls.search_model_geom_nodeid: geom}, nodegroup_id=cls.search_model_geom_nodeid)
+        tile = Tile(data={cls.search_model_geom_nodeid: cls.geom}, nodegroup_id=cls.search_model_geom_nodeid)
         cls.test_resource.tiles.append(tile)
 
         cls.test_resource.save()
@@ -188,4 +183,20 @@ class ResourceTests(ArchesTestCase):
         """
         node_name = "Creation Date"
         result = self.test_resource.get_node_values(node_name)
-        self.assertEqual('1942-01-01', result[0])
+        self.assertEqual('1941-01-01', result[0])
+
+    def test_get_node_value_concept(self):
+        """
+        Query a concept value
+        """
+        node_name = "Cultural Period Concept"
+        result = self.test_resource.get_node_values(node_name)
+        self.assertEqual('Mock concept', result[0])
+
+    def test_get_node_value_geometry(self):
+        """
+        Query a geometry value
+        """
+        node_name = "Geometry"
+        result = self.test_resource.get_node_values(node_name)
+        self.assertEqual(self.geom, result[0])
