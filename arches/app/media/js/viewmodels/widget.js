@@ -100,6 +100,26 @@ define([
             }
         }
 
+        if (Array.isArray(this.valueProperties)) {
+            this.valueProperties.forEach(function(property) {
+                if (ko.isObservable(self.value)){
+                    self[property] = ko.observable();
+                    self[property].subscribe(function() {
+                        self.value(
+                            self.valueProperties.reduce(
+                                function(data, property){
+                                    data[property] = self[property]();
+                                    return data;
+                                }, {}
+                            )
+                        );
+                    }, this);
+                } else {
+                    self[property] = self.value[property];
+                }
+            });
+        }
+
         this.disposables.push(this.defaultValueSubscription);
         this.disposables.push(this.valueSubscription);
 
