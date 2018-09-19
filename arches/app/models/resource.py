@@ -408,11 +408,4 @@ class Resource(models.ResourceInstance):
                     else:
                         values.append(value)
 
-        try:
-            return [
-                models.Value.objects.get(
-                    pk=value).value for value in values]
-        except ValueError:
-            return values
-        except ObjectDoesNotExist:
-            return []
+        return values
