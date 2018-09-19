@@ -180,6 +180,11 @@ define([
                     self._tileData(koMapping.toJSON(self.data));
                     if (!self.tileid) {
                         self.tileid = tileData.tileid;
+                        self.data = koMapping.fromJS(tileData.data);
+                        self.provisionaledits = koMapping.fromJS(tileData.provisionaledits);
+                        self.dirty = ko.pureComputed(function() {
+                            return self._tileData() !== koMapping.toJSON(self.data);
+                        }, self);
                         self.parent.tiles.push(self);
                         self.parent.expanded(true);
                         selection(self);
