@@ -34,7 +34,7 @@ class RdfWriter(Writer):
         super(RdfWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
 
         dest = StringIO()
-        g = self.get_rdf_graph()
+        g, top_nodes = self.get_rdf_graph()
         g.serialize(destination=dest, format=self.format)
 
         full_file_name = os.path.join('{0}.{1}'.format(self.file_name, 'rdf'))
@@ -47,6 +47,7 @@ class RdfWriter(Writer):
         g = Graph()
         g.bind('archesproject', archesproject, False)
         graph_cache = {}
+        top_nodes = set()
 
         def get_nodegroup_edges_by_collector_node(node):
             edges = []
@@ -80,6 +81,7 @@ class RdfWriter(Writer):
                     if node.nodegroup:
                         nodegroups.add(node.nodegroup)
                     if node.istopnode:
+                        top_nodes.add(node.pk)
                         for edge in get_nodegroup_edges_by_collector_node(node):
                             if edge.rangenode.nodegroup is None:
                                 graph_cache[graphid]['rootedges'].append(edge)
@@ -164,14 +166,14 @@ class RdfWriter(Writer):
                     r_datatype = graph_info['nodedatatypes'].get(str(edge.rangenode.pk))
                     add_tile_information_to_graph(g, (domainnode, d_datatype), (rangenode, r_datatype), \
                                                   edge, tile, graph_uri)
-        return g
+        return g, top_nodes
 
 
 class JsonLdWriter(RdfWriter):
 
     def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
         super(RdfWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
-        g = self.get_rdf_graph()
+        g, top_nodes = self.get_rdf_graph()
         value = g.serialize(format='nt')
         js = from_rdf(str(value), options={format: 'application/nquads'})
 
