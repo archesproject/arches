@@ -8,21 +8,28 @@ define([
     'bindings/sortable'
 ], function($, _, ko, mapboxgl, arches) {
     ko.bindingHandlers.mapboxgl = {
-        init: function(element, valueAccessor, allBindings, viewModel) {
+        init: function(element, valueAccessor) {
             var defaults = {
                 container: element
             };
-            var options = ko.unwrap(valueAccessor()).mapOptions;
-            var mapInitOptions = {style: options.style};
+            var options = ko.unwrap(valueAccessor()).mapOptions || {};
+            var mapInitOptions = {};
             mapboxgl.accessToken = arches.mapboxApiKey;
 
             _.each(options, function(option, key){
-              if (ko.isObservable(option)){
-                mapInitOptions[key] = option();
-              }
-            })
+                if (ko.isObservable(option)){
+                    mapInitOptions[key] = option();
+                } else {
+                    mapInitOptions[key] = option;
+                }
+            });
 
-            mapInitOptions['center'] = new mapboxgl.LngLat(mapInitOptions.centerX, mapInitOptions.centerY);
+            if (mapInitOptions.centerX && mapInitOptions.centerY) {
+                mapInitOptions['center'] = [
+                    mapInitOptions.centerX,
+                    mapInitOptions.centerY
+                ];
+            }
 
             var map = new mapboxgl.Map(
                 _.defaults(mapInitOptions, defaults)
@@ -33,7 +40,7 @@ define([
                         if (error) throw error;
                         map.addImage(marker.name, image);
                     });
-                })
+                });
             });
 
             // prevents drag events from bubbling
@@ -42,30 +49,40 @@ define([
             });
 
             if (typeof ko.unwrap(valueAccessor()).afterRender === 'function') {
-                ko.unwrap(valueAccessor()).afterRender(map)
+                ko.unwrap(valueAccessor()).afterRender(map);
             }
 
-            options.zoom.subscribe(function(val) {
-                map.setZoom(options.zoom())
-            }, this);
+            if (ko.isObservable(options.zoom)) {
+                options.zoom.subscribe(function(val) {
+                    map.setZoom(val);
+                }, this);
+            }
 
-            options.centerX.subscribe(function(val) {
-                map.setCenter(new mapboxgl.LngLat(options.centerX(), options.centerY()))
-            }, this);
+            if (ko.isObservable(options.centerX)) {
+                options.centerX.subscribe(function(val) {
+                    map.setCenter(new mapboxgl.LngLat(val, options.centerY()));
+                }, this);
+            }
 
-            options.centerY.subscribe(function(val) {
-                map.setCenter(new mapboxgl.LngLat(options.centerX(), options.centerY()))
-            }, this);
+            if (ko.isObservable(options.centerY)) {
+                options.centerY.subscribe(function(val) {
+                    map.setCenter(new mapboxgl.LngLat(options.centerX(), val));
+                }, this);
+            }
 
-            options.pitch.subscribe(function(val) {
-                map.setPitch(options.pitch())
-            }, this);
+            if (ko.isObservable(options.pitch)) {
+                options.pitch.subscribe(function(val) {
+                    map.setPitch(val);
+                }, this);
+            }
 
-            options.bearing.subscribe(function(val) {
-                map.setBearing(options.bearing())
-            }, this);
+            if (ko.isObservable(options.setBearing)) {
+                options.bearing.subscribe(function(val) {
+                    map.setBearing(val);
+                }, this);
+            }
         }
-    }
+    };
 
     return ko.bindingHandlers.mapboxgl;
 });
