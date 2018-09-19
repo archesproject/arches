@@ -391,9 +391,11 @@ class Resource(models.ResourceInstance):
         nodes = models.Node.objects.filter(
             name=node_name, graph_id=self.graph_id)
 
-        if len(nodes) != 1:
-            print("invalid node name or multiple nodes with the same name")
-            return False
+        if len(nodes) > 1:
+            raise Resource.MultipleNodesFoundException(node_name, nodes)
+
+        if len(nodes) == 0:
+            raise Resource.InvalidNodeNameException(node_name, nodes)
 
         tiles = self.tilemodel_set.filter(
             nodegroup_id=nodes[0].nodegroup_id)
@@ -409,3 +411,12 @@ class Resource(models.ResourceInstance):
                         values.append(value)
 
         return values
+
+    class MultipleNodesFoundException(Exception):
+        def __init__(self, name, nodes):
+            self.nodes = nodes
+            self.message = "Multiple nodes with the name '%s' were found" % name
+
+    class InvalidNodeNameException(Exception):
+        def __init__(self, name):
+            self.message = "Node with the name '%s' does not exist" % name
