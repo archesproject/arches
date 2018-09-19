@@ -49,6 +49,12 @@ define([
                 }
             });
 
+            if (typeof select2Config.onSelect === 'function') {
+                $(el).on("select2-selecting", function(e) {
+                    select2Config.onSelect(e.choice);
+                });
+            }
+
             value.subscribe(function(newVal) {
                 select2Config.value = newVal;
                 $(el).select2("val", newVal);
