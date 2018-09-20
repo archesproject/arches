@@ -34,7 +34,7 @@ class RdfWriter(Writer):
         super(RdfWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
 
         dest = StringIO()
-        g, top_nodes = self.get_rdf_graph()
+        g = self.get_rdf_graph()
         g.serialize(destination=dest, format=self.format)
 
         full_file_name = os.path.join('{0}.{1}'.format(self.file_name, 'rdf'))
@@ -47,7 +47,6 @@ class RdfWriter(Writer):
         g = Graph()
         g.bind('archesproject', archesproject, False)
         graph_cache = {}
-        top_nodes = set()
 
         def get_nodegroup_edges_by_collector_node(node):
             edges = []
@@ -81,7 +80,6 @@ class RdfWriter(Writer):
                     if node.nodegroup:
                         nodegroups.add(node.nodegroup)
                     if node.istopnode:
-                        top_nodes.add(node.nodeid)
                         for edge in get_nodegroup_edges_by_collector_node(node):
                             if edge.rangenode.nodegroup is None:
                                 graph_cache[graphid]['rootedges'].append(edge)
@@ -99,11 +97,26 @@ class RdfWriter(Writer):
                         'edges'] = get_nodegroup_edges_by_collector_node(models.Node.objects.get(pk=nodegroup.pk))
             return graph_cache[graphid]
 
+        # vestigial method? No need for this URI form I think?
         def node2uri(node_key):
             return archesproject[str(node_key)]
 
         def tile_node2uri(tile_key, node_key):
             return archesproject["tile/%s/node/%s" % (str(tile_key), str(node_key))]
+
+        def analyse_edge(graph_info, edge, tile):
+            d_datatype = graph_info['nodedatatypes'].get(str(edge.domainnode.pk))
+            r_datatype = graph_info['nodedatatypes'].get(str(edge.rangenode.pk))
+
+            # determine what the URIs for the domain and range nodes are:
+            d_uri = tile_node2uri(tile.pk, edge.domainnode.pk)
+            if edge.domainnode.istopnode:
+                # if it is a top node in a given resource instance, make its
+                # URI the host/resources/{resourceinstanceid} URI instead
+                d_uri = archesproject[reverse('resources', args=[resourceinstanceid]).lstrip('/')]
+            r_uri = tile_node2uri(tile.pk, edge.rangenode.pk)
+
+            return (d_uri, d_datatype), (r_uri, r_datatype)
 
         # Build the graph:
         for resourceinstanceid, tiles in self.resourceinstances.iteritems():
@@ -111,6 +124,7 @@ class RdfWriter(Writer):
 
             # Deal with root edges:
             for edge in graph_info['rootedges']:
+                raise Exception("No idea why this code would be used, given how the node URIs are formed...")
                 # FIXME: make sure that we are not readding the same serialized data to
                 # the graph if a node is mentioned multiple times
                 d_uri, r_uri = node2uri(edge.domainnode.pk), node2uri(edge.rangenode.pk)
@@ -129,57 +143,43 @@ class RdfWriter(Writer):
                 g.add((r_uri, RDF.type, URIRef(edge.rangenode.ontologyclass)))
 
             for tile in tiles:
+                # add all the type and extra node information for the nodes
                 # add all the edges for a given tile/nodegroup
                 for edge in graph_info['subgraphs'][tile.nodegroup]['edges']:
-                    d_datatype = graph_info['nodedatatypes'].get(str(edge.domainnode.pk))
-                    r_datatype = graph_info['nodedatatypes'].get(str(edge.rangenode.pk))
-
-                    d_uri = tile_node2uri(tile.pk, edge.domainnode.pk)
-                    r_uri = tile_node2uri(tile.pk, edge.rangenode.pk)
-
-                    add_tile_information_to_graph(g, (d_uri, d_datatype), (r_uri, r_datatype), \
+                    domain_info, range_info = analyse_edge(graph_info, edge, tile)
+                    add_tile_information_to_graph(g, domain_info, range_info, \
                                                   edge, tile, graph_uri)
 
                 # add the edge from the parent node to this tile's root node
                 # where the tile has no parent tile, which means the domain node has no tile_id
-                if graph_info['subgraphs'][tile.nodegroup]['parentnode_nodegroup'] == None:
-                    edge = graph_info['subgraphs'][tile.nodegroup]['inedge']
-                    if edge.domainnode.istopnode:
-                        domainnode = archesproject[reverse('resources', args=[resourceinstanceid]).lstrip('/')]
-                    else:
-                        domainnode = archesproject[str(edge.domainnode.pk)]
-                    rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
 
-                    d_datatype = graph_info['nodedatatypes'].get(str(edge.domainnode.pk))
-                    r_datatype = graph_info['nodedatatypes'].get(str(edge.rangenode.pk))
-                    add_tile_information_to_graph(g, (domainnode, d_datatype), (rangenode, r_datatype), \
-                                                  edge, tile, graph_uri)
+                in_edge = graph_info['subgraphs'][tile.nodegroup]['inedge']
+                domain_info, range_info = analyse_edge(graph_info, in_edge, tile)
 
-                # add the edge from the parent node to this tile's root node
-                # where the tile has a parent tile
-                if graph_info['subgraphs'][tile.nodegroup]['parentnode_nodegroup'] != None:
-                    edge = graph_info['subgraphs'][tile.nodegroup]['inedge']
-                    domainnode = archesproject["tile/%s/node/%s" % (str(tile.parenttile.pk), str(edge.domainnode.pk))]
-                    rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
+                if graph_info['subgraphs'][tile.nodegroup]['parentnode_nodegroup'] == None \
+                                                        and not in_edge.domainnode.istopnode:
 
-                    d_datatype = graph_info['nodedatatypes'].get(str(edge.domainnode.pk))
-                    r_datatype = graph_info['nodedatatypes'].get(str(edge.rangenode.pk))
-                    add_tile_information_to_graph(g, (domainnode, d_datatype), (rangenode, r_datatype), \
-                                                  edge, tile, graph_uri)
-        return g, top_nodes
+                    raise Exception("No idea why root no parent whatevs code would be used")
+                    domainnode = archesproject[str(in_edge.domainnode.pk)]
+                    add_tile_information_to_graph(g, (domainnode, domain_info[1]), range_info, \
+                                                  in_edge, tile, graph_uri)
+                else:
+                    add_tile_information_to_graph(g, domain_info, range_info, \
+                                                  in_edge, tile, graph_uri)
+        return g
 
 
 class JsonLdWriter(RdfWriter):
 
     def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
         super(RdfWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
-        g, top_nodes = self.get_rdf_graph()
+        g = self.get_rdf_graph()
         value = g.serialize(format='nt')
         js = from_rdf(str(value), options={format: 'application/nquads'})
 
         framing = {
             "@omitDefault": True,
-            "@type": "%sgraph/%s" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, self.graph_id)
+            #"@type": "%sgraph/%s" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, self.graph_id)
         }
 
         js = frame(js, framing)
