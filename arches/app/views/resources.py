@@ -25,6 +25,7 @@ from django.contrib.auth.decorators import permission_required
 from django.conf import settings
 from django.db import transaction
 from arches.app.models import models
+from arches.app.models.entity import Entity
 from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
@@ -74,9 +75,9 @@ def resource_manager(request, resourcetypeid='', form_id='default', resourceid='
                 # existing contains the JSON response
                 lang = request.GET.get('lang', request.LANGUAGE_CODE)
                 form.load(lang)
+                process_form_data(form.data, data)
                 return render_to_response('resource-manager.htm', {
                     'alert': existing,  # JSON response containing info on nearby resources
-                    'submitted_data': JSONSerializer().serialize(data),  # original submitted data
                     'form': form,
                     'formdata': JSONSerializer().serialize(form.data),
                     'form_template': 'views/forms/' + form_id + '.htm',
@@ -343,3 +344,26 @@ def metersToDegrees(meters, latitude):
     """Based on the C# function described in
     https://stackoverflow.com/questions/25237356/convert-meters-to-decimal-degrees"""
     return meters / (111319.9 * math.cos(latitude * (math.pi / 180)))
+
+
+def process_form_data(formdata, data):
+    """Function will add new non-saved entities into the formdata branch_lists field"""
+
+    newdatatoadd = {}
+    for entid, val in data.items():
+        if len(val) == 0:
+            continue
+        for obj in val:
+            nodelist = []
+            for node in obj['nodes']:
+                entity = Entity().load(node)
+                nodelist.append(entity)
+            if entid not in newdatatoadd:
+                newdatatoadd[entid] = []
+            newdatatoadd[entid].append({'nodes': nodelist})
+
+    for fieldid in formdata.keys():
+        if fieldid in newdatatoadd:
+            formdata[fieldid]['branch_lists'] = newdatatoadd[fieldid]
+
+    return
