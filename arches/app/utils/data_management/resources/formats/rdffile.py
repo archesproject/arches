@@ -129,8 +129,8 @@ class RdfWriter(Writer):
                 # the graph if a node is mentioned multiple times
                 d_uri, r_uri = node2uri(edge.domainnode.pk), node2uri(edge.rangenode.pk)
                 # FIXME: How likely is this to be true more than once?!
-                if edge.domainnode.istopnode:
-                    g.add((d_uri, RDF.type, graph_uri))
+                #if edge.domainnode.istopnode:
+                #    g.add((d_uri, RDF.type, graph_uri))
 
                 g.add((d_uri, RDF.type, URIRef(edge.domainnode.ontologyclass)))
                 # root_edges are edges where the range node is not part of a nodegroup.
@@ -179,7 +179,7 @@ class JsonLdWriter(RdfWriter):
 
         framing = {
             "@omitDefault": True,
-            #"@type": "%sgraph/%s" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, self.graph_id)
+            "@type": "%sgraph/%s" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, self.graph_id)
         }
 
         js = frame(js, framing)

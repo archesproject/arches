@@ -77,7 +77,8 @@ def _append_concept_node(graph, domainnode, edge, concept_value_id):
     graph.add((domainnode, URIRef(edge.ontologyproperty), rangenode))
 
     # add in some convenience information for the concept:
-    graph.add((rangenode, URIRef(RDFS.label), Literal(info['label'], lang=info['lang'])))
+    #graph.add((rangenode, URIRef(RDFS.label), Literal(info['label'], lang=info['lang'])))
+    graph.add((rangenode, URIRef(RDFS.label), Literal(info['label'])))
 
     # add in additional identifiers?
     # the DB/ORM way
@@ -137,8 +138,10 @@ def _handle__default(graph, domainnode, rangenode, edge, tile,
     graph.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
     graph.add((domainnode, URIRef(edge.ontologyproperty), rangenode))
 
-    if edge.domainnode.istopnode:
-        graph.add((domainnode, RDF.type, graph_uri))
+    # This is in the original default method, but graph_uri just shouldn't be a type
+    #if edge.domainnode.istopnode:
+    #    graph.add((domainnode, RDF.type, graph_uri))
+    
     graph.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
 
     if domain_tile_data != None:
