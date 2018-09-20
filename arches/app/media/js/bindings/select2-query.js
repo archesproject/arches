@@ -54,6 +54,11 @@ define([
                     select2Config.onSelect(e.choice);
                 });
             }
+            if (typeof select2Config.onClear === 'function') {
+                $(el).on("select2-clearing", function(e) {
+                    select2Config.onClear(e.choice);
+                });
+            }
 
             value.subscribe(function(newVal) {
                 select2Config.value = newVal;
