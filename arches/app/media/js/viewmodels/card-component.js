@@ -25,7 +25,7 @@ define([
         };
         this.getValuesByDatatype = function(type) {
             var values = {};
-            if (self.tile) {
+            if (self.tile && self.form) {
                 var data = self.tile.getAttributes().data;
                 _.each(data, function(value, key) {
                     var node = self.form.nodeLookup[key];
