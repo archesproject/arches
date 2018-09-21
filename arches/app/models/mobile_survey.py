@@ -60,7 +60,10 @@ class MobileSurvey(models.MobileSurveyModel):
         super(MobileSurvey, self).save()
         db = self.couch.create_db('project_' + str(self.id))
 
-        survey = self.serialize()
+        # need to serialize to JSON and then back again because UUID's
+        # cause the couch update_doc method to throw an error
+        survey = JSONSerializer().serialize(self)
+        survey = JSONDeserializer().deserialize(survey)
         survey['type'] = 'metadata'
         self.couch.update_doc(db, survey, 'metadata')
         self.load_data_into_couch()
