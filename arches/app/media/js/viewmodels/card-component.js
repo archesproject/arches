@@ -23,13 +23,14 @@ define([
         this.beforeMove = function(e) {
             e.cancelDrop = (e.sourceParent!==e.targetParent);
         };
+        this.config = this.card.model ? this.card.model.get('config') : {};
         this.getValuesByDatatype = function(type) {
             var values = {};
             if (self.tile && self.form) {
                 var data = self.tile.getAttributes().data;
                 _.each(data, function(value, key) {
                     var node = self.form.nodeLookup[key];
-                    if (ko.unwrap(node.datatype) === type){
+                    if (node && ko.unwrap(node.datatype) === type){
                         values[ko.unwrap(node.id)] = {
                             name: ko.unwrap(node.name),
                             value: value
