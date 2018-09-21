@@ -69,7 +69,7 @@ class Surveys(APIBase):
 
     def get(self, request):
         group_ids = list(request.user.groups.values_list('id', flat=True))
-        projects = MobileSurvey.objects.filter(Q(users__in=[request.user]) | Q(groups__in=group_ids), active=True)
+        projects = MobileSurvey.objects.filter(Q(users__in=[request.user]) | Q(groups__in=group_ids), active=True).distinct()
         response = JSONResponse(projects, indent=4)
         return response
 
