@@ -63,7 +63,7 @@ define([
                 self.viewModel.branch_lists.push(branch);
                 self.trigger('change', 'geometrychange', branch);
                 self.trigger('geometrychange', feature, wkt.writeGeometry(geom));
-                
+                self.trigger('geometryadded', feature, wkt.writeGeometry(geom));
             };
             var resourcetypeid = $('#resourcetypeid').val();
             var formid = $('#form-id').val();
