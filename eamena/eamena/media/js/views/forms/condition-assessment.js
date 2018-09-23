@@ -65,7 +65,8 @@ define(['jquery',
                     dataKey: 'THREAT_INFERENCE_MAKING.I5',
                     rules: true,
                     validateBranch: function (nodes) {
-                        var canBeEmpty = ['THREAT_INFERENCE_MAKING_ASSESSOR_NAME.E41'];
+                        var canBeEmpty = ['THREAT_INFERENCE_MAKING_ASSESSOR_NAME.E41',
+                        'THREAT_CATEGORY.I4'];
                         return this.validateHasValues(nodes, canBeEmpty);
 
                     }

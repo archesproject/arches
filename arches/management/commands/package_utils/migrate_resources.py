@@ -13,8 +13,8 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from django.forms.models import model_to_dict
 from .. import utils
 import datetime
-
-
+import csv
+from django.db import IntegrityError
 
 from itertools import groupby
 
@@ -241,9 +241,42 @@ def insert_actors(settings=None):
                 
                 root_resource = Resource()
                 root_resource.get(root_resource_model.entityid)
-                
 
-def prune_ontology(settings=None, remove_graph=None):
+def remove_entitytypes_and_concepts(all_entitytypeids_to_remove, only_entitytypes = False):
+    # if the entity_types are no longer associated to any resource graph, then delete the entity_types themselves and then proceed with pruning concepts
+    if not isinstance(all_entitytypeids_to_remove, list):
+        all_entitytypeids_to_remove = [all_entitytypeids_to_remove]
+    for entity_to_remove in all_entitytypeids_to_remove:
+        still_linked = False if not models.Mappings.objects.filter(entitytypeidto = entity_to_remove) else True
+        if not still_linked: 
+            entity_types = models.EntityTypes.objects.filter(entitytypeid=entity_to_remove)
+            #### Prune the concepts
+            concepts_to_delete = []
+            for entity_type in entity_types:
+                # Find the root concept
+                concept = entity_type.conceptid
+                
+                # only add this for deletion if the concept isn't used by any other entitytypes
+                relations = models.EntityTypes.objects.filter(conceptid=concept.pk)
+                if len(relations) <= 1:
+                    concepts_to_delete.append(entity_type.conceptid)
+                else:
+                    logging.warning("Concept type for entity in use (perhaps because this node was mapped to a new one). Not deleting. %s", entity_type)
+
+            # delete the entity types, and then their concepts
+            entity_types.delete()
+            
+            for concept_model in concepts_to_delete:
+                # remove it and all of its relations and their values
+                logging.warning("Removing concept and children/values/relationships for %s", concept_model.legacyoid)
+                concept = Concept()
+                concept.get(concept_model.pk, semantic=False, include_subconcepts=False)
+                concept.delete(delete_self=True)
+#                 concept_model.delete()
+            
+#             logging.warning("Removed all entities and ontology data related to the following entity types: %s", entity_to_remove)                    
+
+def prune_ontology(settings=None, only_concepts=False):
     
     logging.warning("pruning ontology")
     
@@ -263,7 +296,9 @@ def prune_ontology(settings=None, remove_graph=None):
                     nodes_to_remove = get_list_dict(basepath + '_removed_nodes.csv', ['NodeId'])
                     
                     all_entitytypeids_to_remove = [x['NodeId'] for x in nodes_to_remove]
-                    
+                    if only_concepts == True:
+                        remove_entitytypes_and_concepts(all_entitytypeids_to_remove,only_concepts)
+                        return
                     '''Given an resource type and a list of entity types, it returns a list of rules'''
                     def collect_leaf_rules(entitytypes,resource_type,rule_ids_to_delete):
                         for entitytype in entitytypes:
@@ -314,16 +349,23 @@ def prune_ontology(settings=None, remove_graph=None):
                             except:
                                 print "No mapping found for %s, moving on" % entitytypeid_to_remove
                                 continue
-                            rule_id = models.Rules.objects.get(ruleid__in=models.MappingSteps.objects.filter(mappingid=mappingid.pk).values_list('ruleid', flat=True), entitytyperange=entitytypeid_to_remove)
-                            entities_to_delete,mappings_to_delete,rule_ids_to_delete = collect_leaf_entities_and_rules(models.Relations.objects.filter(ruleid=rule_id).values_list('entityidrange', flat=True), entities_to_delete,rule_ids_to_delete,mappings_to_delete,resource_type)                        
+                            try:
+                                rule_id = models.Rules.objects.get(ruleid__in=models.MappingSteps.objects.filter(mappingid=mappingid.pk).values_list('ruleid', flat=True), entitytyperange=entitytypeid_to_remove)
+                            except:
+                                print "No rule found with mapping %s for entitytype %s, moving on" % (mappingid.pk,entitytypeid_to_remove)
+                                continue
+                            relations = models.Relations.objects.filter(ruleid=rule_id).values_list('entityidrange', flat=True)
+                            entities_to_delete,mappings_to_delete,rule_ids_to_delete = collect_leaf_entities_and_rules(relations, entities_to_delete,rule_ids_to_delete,mappings_to_delete,resource_type)                        
                             entities_or_ontology['entities_to_delete'].extend(list(set(entities_to_delete)))
-                            entities_or_ontology['mappings'].extend(list(set(mappings_to_delete)))
-                            entities_or_ontology['rule_ids'].extend(list(set(rule_ids_to_delete)))
+                            entities_or_ontology['mappings'].extend(list(set(mappings_to_delete))) if relations else entities_or_ontology['mappings'].append(mappingid.pk)
+                            entities_or_ontology['rule_ids'].extend(list(set(rule_ids_to_delete))) if relations else entities_or_ontology['rule_ids'].append(rule_id.ruleid)
                         
                         return entities_or_ontology
                         
                     ### Remove entities and their associated values/relationships
                     entities_to_delete = retrieve_entities_to_delete(name, all_entitytypeids_to_remove)
+                    
+                    
                     if any(entities_to_delete.values()):                
                         print "Deleting %s data entities and associated values and relations" % len(entities_to_delete['entities_to_delete'])
                         # delete any value records for this entity id
@@ -364,39 +406,33 @@ def prune_ontology(settings=None, remove_graph=None):
                         # remove the rules
                         models.Rules.objects.filter(ruleid__in=entities_to_delete['rule_ids']).delete()
                         
-                        # if the entity_types are no longer associated to any resource graph, then delete the entity_types themselves and then proceed with pruning concepts
-                        still_linked = False if not models.Mappings.objects.filter(entitytypeidto__in = all_entitytypeids_to_remove) else True
-                        if still_linked: 
-                            entity_types = models.EntityTypes.objects.filter(entitytypeid__in=all_entitytypeids_to_remove)
-                            
-                            
-                            #### Prune the concepts
-                            concepts_to_delete = []
-                            
-                            for entity_type in entity_types:
-                                # Find the root concept
-                                concept = entity_type.conceptid
-                                
-                                # only add this for deletion if the concept isn't used by any other entitytypes
-                                relations = models.EntityTypes.objects.filter(conceptid=concept.pk)
-                                if len(relations) <= 1:
-                                    concepts_to_delete.append(entity_type.conceptid)
-                                else:
-                                    logging.warning("Concept type for entity in use (perhaps because this node was mapped to a new one). Not deleting. %s", entity_type)
-                                
-                            # delete the entity types, and then their concepts
-                            entity_types.delete()
-                            
-                            for concept_model in concepts_to_delete:
-                                # remove it and all of its relations and their values
-                                logging.warning("Removing concept and children/values/relationships for %s", concept_model.legacyoid)
-                                concept = Concept()
-                                concept.get(concept_model.pk, semantic=False, include_subconcepts=True)
-                                
-                                concept.delete(delete_self=True)
-                                concept_model.delete()
-                            
-                            logging.warning("Removed all entities and ontology data related to the following entity types: %s", all_entitytypeids_to_remove)
+                        remove_entitytypes_and_concepts(all_entitytypeids_to_remove)
+
+def prune_resource_graph(resource_type):
+    print "Deleting resource graph %s" % resource_type
+    mappings_for_resource = models.Mappings.objects.filter(entitytypeidfrom=resource_type).values_list("mappingid", flat= True)
+    entity_types = models.Mappings.objects.filter(entitytypeidfrom=resource_type).values_list("entitytypeidto", flat= True)
+    mappings_with_other_res = models.Mappings.objects.filter(entitytypeidto__in=entity_types).exclude(entitytypeidfrom=resource_type).values_list("entitytypeidto", flat= True)   
+    steps = models.MappingSteps.objects.filter(mappingid__in= mappings_for_resource).values_list('ruleid', flat=True)
+    if mappings_with_other_res.count()>0:
+        cleaned_entity_list = [x for x in entity_types if x not in mappings_with_other_res]
+        rule_ids =  models.Rules.objects.filter(ruleid__in=steps, entitytyperange__in=cleaned_entity_list).values_list('ruleid', flat=True)
+        entity_types = cleaned_entity_list
+    else:
+        rule_ids =  models.Rules.objects.filter(ruleid__in=steps, entitytyperange__in=entity_types).values_list('ruleid', flat=True)
+    
+    relations = models.Relations.objects.filter(ruleid__in=rule_ids).values_list('ruleid', flat=True)
+    if relations.count() >0:
+        print "There are still %s entities connected to this graph!" % relations.count()
+        return
+    else:
+        # remove mappings to these entitytype if there is one
+        models.Mappings.objects.filter(mappingid__in=mappings_for_resource).delete()
+        # remove mapping steps associated to the relevant rules
+        models.MappingSteps.objects.filter(mappingid__in =mappings_for_resource).delete()
+        # remove the rules
+        models.Rules.objects.filter(ruleid__in=rule_ids).delete()        
+        remove_entitytypes_and_concepts(entity_types)
 
 def log_entity(entity):
     def do_log(subentity):
@@ -482,11 +518,70 @@ def convert_resource(resourceid, target_entitytypeid):
 
 def rename_entity_type(old_entitytype_id, new_entitytype_id):
     logging.warning("renaming entitytype from %s to %s", old_entitytype_id, new_entitytype_id)
+    
+
+        
     # update the entity_type model and save
     newentitytype = models.EntityTypes.objects.get(entitytypeid=old_entitytype_id)
     newentitytype.entitytypeid=new_entitytype_id
     newentitytype.save()
     
+    # update the Rules
+    #First find if Rules with the new entitytypeid already exist, if so, delete them and replace their ruleid into mapping_steps with that of the old entitytypeid rule, then rename the rules
+    pre_existing_rulesout = models.Rules.objects.filter(entitytypedomain=new_entitytype_id)
+    pre_existing_rulesin = models.Rules.objects.filter(entitytyperange=new_entitytype_id)
+    if pre_existing_rulesout:
+        print "<<<<<Beginning of rulesout>>>>>>"       
+        for pre_existing_ruleout in pre_existing_rulesout:
+            ruleid_to_replace_with = models.Rules.objects.filter(entitytypedomain=old_entitytype_id, entitytyperange = pre_existing_ruleout.entitytyperange, propertyid = pre_existing_ruleout.propertyid)
+            if ruleid_to_replace_with:
+                steps = models.MappingSteps.objects.filter(ruleid= pre_existing_ruleout.ruleid)
+                print "RULEID TO REPLACE WITH", ruleid_to_replace_with[0].pk, pre_existing_ruleout.ruleid, len(steps) 
+                if steps:                
+                    for step in steps:
+                        print "STEP being analysed has mapping %s and rule %s, and the rule will be replaced with %s" % (step.mappingid_id, step.ruleid_id,ruleid_to_replace_with[0].pk) 
+                        mapping = models.Mappings.objects.get(pk = step.mappingid_id)
+                        order = step.order
+                        try:
+                            other_steps = models.MappingSteps.objects.filter(mappingid = mapping).exclude(ruleid=step.ruleid_id) 
+                            step.delete()
+                            new_step = models.MappingSteps(mappingid = mapping, ruleid = ruleid_to_replace_with[0], order = order)
+                            new_step.save(force_insert = True)
+                            for other_step in other_steps:
+                                print other_step.mappingid_id
+                                other_step.save(force_insert=True)
+                            steps_with_mapping_after_new = models.MappingSteps.objects.filter(mappingid = mapping)
+                            print "Steps length with mapping %s after deletion %s" % (mapping.mappingid, len(steps_with_mapping_after_new))
+                            
+                        except IntegrityError as e:
+                            print "Error saving step %s" % e
+                            continue
+                pre_existing_ruleout.delete()                   
+
+ 
+    if pre_existing_rulesin:
+        print "<<<<<Beginning of rulesin>>>>>>"        
+        for pre_existing_rulein in pre_existing_rulesin:
+
+            ruleid_to_replace_with = models.Rules.objects.filter(entitytyperange=old_entitytype_id, entitytypedomain = pre_existing_rulein.entitytypedomain, propertyid = pre_existing_rulein.propertyid)
+            if ruleid_to_replace_with:
+                steps = models.MappingSteps.objects.filter(ruleid= pre_existing_rulein.ruleid)
+                print "RULEID TO REPLACE WITH", ruleid_to_replace_with[0].pk, pre_existing_rulein.ruleid, len(steps) 
+                if steps:                
+                    for step in steps:
+                        print "STEP being analysed has mapping %s and rule %s, and the rule will be replaced with %s" % (step.mappingid_id, step.ruleid_id,ruleid_to_replace_with[0].pk) 
+                        mapping = models.Mappings.objects.get(pk = step.mappingid_id)
+                        order = step.order
+                        try:
+                            step.delete()
+                            new_step = models.MappingSteps(mappingid = mapping, ruleid = ruleid_to_replace_with[0], order = order)
+                            new_step.save()
+                            
+                        except IntegrityError as e:
+                            print "Error saving step %s" % e
+                            continue
+                pre_existing_rulein.delete()
+
     # update the Rules
     rulesout = models.Rules.objects.filter(entitytypedomain=old_entitytype_id)
     for r in rulesout:
@@ -515,15 +610,15 @@ def rename_entity_type(old_entitytype_id, new_entitytype_id):
         m.mergenodeid=newentitytype
         m.save()    
     
-    # update the entities
-    entities = models.Entities.objects.filter(entitytypeid=old_entitytype_id)
-    for e in entities:
-        logging.warning("Changing type of entity %s from %s to %s", e, old_entitytype_id, newentitytype)
-        e.entitytypeid=newentitytype
-        e.save()
+    # update the entities --- COMMENTED OFF UNTIL BUG WITH RULES IS RESOLVED
+#     entities = models.Entities.objects.filter(entitytypeid=old_entitytype_id)
+#     for e in entities:
+#         logging.warning("Changing type of entity %s from %s to %s", e, old_entitytype_id, newentitytype)
+#         e.entitytypeid=newentitytype
+#         e.save()
 
-    # delete the original entity type (saving the old one with a new pk actually duplicates it)
-    models.EntityTypes.objects.get(entitytypeid=old_entitytype_id).delete()
+    # delete the original entity type (saving the old one with a new pk actually duplicates it) -- COMMENTED OFF UNTIL BUG WITH RULES IS RESOLVED
+#     remove_entitytypes_and_concepts([old_entitytype_id,new_entitytype_id])
 
 def add_resource_relation(entityid1, entityid2, relationship_type_string):
     # find the relationship type
@@ -555,3 +650,34 @@ def get_list_dict(pathtofile, fieldnames):
         for row in rows:  
             ret.append(row)
     return ret
+
+def remove_concept_list(concepts):
+    with open(concepts, 'rb') as csvfile:
+        try:
+            dialect = csv.Sniffer().sniff(csvfile.read(1024))
+            csvfile.seek(0)
+        except csv.Error:
+            print "The source data is not a CSV file"
+    
+        concept_list = csv.reader(csvfile, delimiter = ',')
+        print "There are",sum(1 for line in open(concepts))," concepts that will be deleted"
+        concepts_to_delete = []
+        for c in concept_list:
+
+            relations = models.EntityTypes.objects.filter(conceptid=c[0])
+            if len(relations) <= 1:
+                concepts_to_delete.append(c[0])
+            else:
+                logging.warning("Concept type for entity in use (perhaps because this node was mapped to a new one). Not deleting. %s", c[0])
+            
+            for concept_model in concepts_to_delete:
+                # remove it and all of its relations and their values
+                logging.warning("Removing concept and children/values/relationships for %s", concept_model)
+                concept = Concept()
+                try:
+                    concept.get(concept_model, semantic=False, include_subconcepts=True)
+                    concept.delete(delete_self=True)
+                    concept_model.delete()
+                except:
+                    print "Conceptid %s does not exist" % concept_model
+        

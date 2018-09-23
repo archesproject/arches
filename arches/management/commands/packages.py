@@ -51,7 +51,7 @@ class Command(BaseCommand):
     
     option_list = BaseCommand.option_list + (
         make_option('-o', '--operation', action='store', dest='operation', default='setup',
-            type='choice', choices=['setup', 'install', 'setup_db', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resource_graphs','export_resources','create_backlog', 'remove_resources_from_csv', 'legacy_fixer', 'load_relations', 'unload_relations', 'delete_indices', 'extend_ontology', 'migrate_resources', 'insert_actors', 'prune_ontology', 'load_graphs', 'convert_resources', 'validate_values', 'find_unused_entity_types', 'rename_entity_type', 'insert_actors', 'node_to_csv'],
+            type='choice', choices=['setup', 'install', 'setup_db', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resource_graphs','export_resources','create_backlog', 'remove_resources_from_csv', 'legacy_fixer', 'load_relations', 'unload_relations', 'delete_indices', 'extend_ontology', 'migrate_resources', 'insert_actors', 'prune_ontology', 'prune_resource_graph', 'load_graphs', 'convert_resources', 'validate_values', 'find_unused_entity_types', 'rename_entity_type', 'insert_actors', 'node_to_csv', 'remove_concepts_from_csv'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' + 
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' + 
@@ -73,8 +73,10 @@ class Command(BaseCommand):
             help='Select old node name'),
         make_option('-z', '--newtype', action='store', dest='newtype',
             help='select new node name'),
-        make_option('-n', '--node', action='store', dest='node',
-            help='select resource type to remove'),
+        make_option('-c', '--concepts', action='store_true', dest='only_concepts',
+            help='Select this option to remove only concepts when pruning'),
+         make_option('-r', '--resource', action='store', dest='resource_type',
+            help='Select this option to remove a whole resource graph from the ontology'),       
     )
 
     def handle(self, *args, **options):
@@ -111,7 +113,10 @@ class Command(BaseCommand):
         
         if options['operation'] == 'remove_resources_from_csv':     
             self.remove_resources_from_csv(options['source'])
-
+            
+        if options['operation'] == 'remove_concepts_from_csv':     
+            self.remove_concepts_from_csv(options['source'])
+            
         if options['operation'] == 'load_concept_scheme':
             self.load_concept_scheme(package_name, options['source'])
 
@@ -141,7 +146,9 @@ class Command(BaseCommand):
         if options['operation'] == 'insert_actors':
             self.insert_actors()
         if options['operation'] == 'prune_ontology':
-            self.prune_ontology(node = options['node'])
+            self.prune_ontology(only_concepts = options['only_concepts'])
+        if options['operation'] == 'prune_resource_graph':
+            self.prune_resource_graph(options['resource_type'])
         if options['operation'] == 'load_graphs':
             self.load_graphs()
         if options['operation'] == 'convert_resources':
@@ -449,9 +456,12 @@ class Command(BaseCommand):
     def insert_actors(self):
         migrate_resources.insert_actors()
         
-    def prune_ontology(self, node = None):
-        migrate_resources.prune_ontology(remove_graph = node)
-        
+    def prune_ontology(self, only_concepts = False):
+        migrate_resources.prune_ontology(only_concepts = only_concepts)
+    
+    def prune_resource_graph(self, resource_type):
+        migrate_resources.prune_resource_graph(resource_type)
+    
     def load_graphs(self):
         load_graphs()
                
@@ -469,3 +479,6 @@ class Command(BaseCommand):
         migrate_resources.insert_actors()
     def node_to_csv(self, nodename, data_dest):
         return_one_node(nodename, data_dest)
+        
+    def remove_concepts_from_csv(self, concepts_list):
+        migrate_resources.remove_concept_list(concepts_list)

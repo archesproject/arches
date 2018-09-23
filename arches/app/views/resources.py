@@ -17,7 +17,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import re
-import math
 from django.template import RequestContext
 from django.shortcuts import render_to_response, redirect
 from django.views.decorators.csrf import csrf_exempt
@@ -67,7 +66,6 @@ def resource_manager(request, resourcetypeid='', form_id='default', resourceid='
 
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.POST.get('formdata', {}))
-
         form.set_user(request.user)
         form.update(data, request.FILES)
 
@@ -261,5 +259,4 @@ def debug_view(request, resourceid=''):
     resource_dict = resource.dictify()
     
     return JSONResponse(resource_dict, indent=4)
-
 
