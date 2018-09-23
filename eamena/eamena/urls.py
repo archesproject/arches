@@ -31,6 +31,7 @@ urlpatterns = patterns('',
     url(r'^admin/auth/group/(?P<groupid>[0-9]*)/group_activity/$' , 'eamena.views.group_activity.group_activity', name='group_activity'),
     url(r'^admin/auth/user/(?P<userid>[0-9]*)/user_activity_data/$' , 'eamena.views.user_activity.user_activity_data', name='user_activity_data'),
     url(r'^admin/auth/group/(?P<groupid>[0-9]*)/group_activity_data/$' , 'eamena.views.group_activity.group_activity_data', name='group_activity_data'),
+    url(r'^search/overlaps', 'eamena.views.search.find_overlapping', name="find_overlapping_data"),
     url(r'', include(arches_urls)),
 )
 
