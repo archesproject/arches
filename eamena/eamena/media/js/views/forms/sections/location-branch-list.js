@@ -50,7 +50,6 @@ define([
                     }else{ //Points
                         FlatCoordinates = geom.getCoordinates();
                         FlatCoordinates.pop();
-                        console.log(FlatCoordinates);
                        
                     }
                     geom.setCoordinates(FlatCoordinates, 'XY');
@@ -69,6 +68,8 @@ define([
             var formid = $('#form-id').val();
             if (resourcetypeid == 'HERITAGE_COMPONENT.B2' || formid == 'man-made-component') {
                 var geom_node = 'SPATIAL_COORDINATES.E47';
+            } else if (resourcetypeid == 'INFORMATION_RESOURCE.E73' || formid == 'coverage') {
+                var geom_node = 'SPATIAL_COORDINATES_GEOMETRY.E47';
             } else {
                 var geom_node = 'GEOMETRIC_PLACE_EXPRESSION.SP5';
             }

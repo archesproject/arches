@@ -124,7 +124,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="">
                     <i class="center-icon rounded-x fa fa-folder-open"></i>
                     <div class="">
-                        <h2 class="arches-report-section-header">{% trans "Heritage Resource E27" %}</h2>
+                        <h2 class="arches-report-section-header">{% trans "Heritage Place" %}</h2>
                     </div> 
                 </div>
 
@@ -187,7 +187,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                 <!-- Section sub-header -->
                                 <div class="col-sm-4">
-                                    <h3 class="arches-report-subsection">{% trans "Classification" %}</h3>
+                                    <h3 class="arches-report-subsection">{% trans "Archaeological Assessment" %}</h3>
                                 </div>
                                 <!-- End Section sub-header -->
 
@@ -277,9 +277,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
 
-    {% if 'EVALUATION_CRITERIA_ASSIGNMENT_E13' in report_info.source.graph %}
-        {% include 'views/reports/sections/evaluation_section.htm' %}
-    {% endif %}
+
 
     {% if 'RIGHT_E30' in report_info.source.graph %}
         {% include 'views/reports/sections/designation_section.htm' %}
