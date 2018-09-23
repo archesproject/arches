@@ -25,7 +25,6 @@ from django.contrib.auth.decorators import permission_required
 from django.conf import settings
 from django.db import transaction
 from arches.app.models import models
-from arches.app.models.entity import Entity
 from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
@@ -37,6 +36,7 @@ from django.http import HttpResponseNotFound
 from django.contrib.gis.geos import GEOSGeometry
 from django.db.models import Max, Min
 from django.contrib.auth.decorators import user_passes_test
+
 
 def report(request, resourceid):
     raise NotImplementedError('Reports are not yet implemented.')
@@ -67,34 +67,6 @@ def resource_manager(request, resourcetypeid='', form_id='default', resourceid='
 
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.POST.get('formdata', {}))
-
-        # Will check that this resource doesn't already exist!
-        if form_id in ['location', 'location-component', 'coverage']:
-            existing = check_existing(data, resourcetypeid, resource.entityid)
-            if existing:
-                # existing contains the JSON response
-                lang = request.GET.get('lang', request.LANGUAGE_CODE)
-                form.load(lang)
-                process_form_data(form.data, data)
-                return render_to_response('resource-manager.htm', {
-                    'alert': existing,  # JSON response containing info on nearby resources
-                    'form': form,
-                    'formdata': JSONSerializer().serialize(form.data),
-                    'form_template': 'views/forms/' + form_id + '.htm',
-                    'form_id': form_id,
-                    'resourcetypeid': resourcetypeid,
-                    'resourceid': resourceid,
-                    'main_script': 'resource-manager',
-                    'active_page': 'ResourceManger',
-                    'resource': resource,
-                    'resource_name': resource.get_primary_name(),
-                    'resource_type_name': resource.get_type_name(),
-                    'form_groups': resource.form_groups,
-                    'timefilterdata': JSONSerializer().serialize(Concept.get_time_filter_data()),
-                    'resource_icon': settings.RESOURCE_TYPE_CONFIGS()[resourcetypeid]['icon_class'],
-                    'child_resource': 'HERITAGE_FEATURE.E24' if resourcetypeid == 'HERITAGE_RESOURCE_GROUP.E27' else 'HERITAGE_COMPONENT.B2'
-                },
-                context_instance=RequestContext(request))
 
         form.set_user(request.user)
         form.update(data, request.FILES)
@@ -291,79 +263,3 @@ def debug_view(request, resourceid=''):
     return JSONResponse(resource_dict, indent=4)
 
 
-def check_existing(data, restype, entid):
-    nearbyres = {}
-    geomentities = ["SPATIAL_COORDINATES.E47", "GEOMETRIC_PLACE_EXPRESSION.SP5", "SPATIAL_COORDINATES_GEOMETRY.E47"]
-    geoms = [data[val] for val in data if val in geomentities]
-    for geomtype in geoms:
-        for geom in geomtype:
-            target = GEOSGeometry(geom['nodes'][0]['value'], srid=4326)
-            mindistance = settings.METER_RADIUS
-            if not mindistance:
-                mindistance = 1000  # if settings.METER_RADIUS isn't set, default to 1Km
-            nearbygeos = models.Geometries.objects.filter(val__dwithin=(target, getDegrees(mindistance, target)))
-            for g in nearbygeos:
-                parent = get_root_id(g.entityid)
-                # check that it's a new resource with the same resource type.
-                if str(parent.entityid) != entid and str(parent.entitytypeid) == restype:
-                    if parent.entityid not in nearbyres:
-                        # create a class instance to get the primary_name
-                        # this can be slow so if the primary_name isn't needed it could be worth skipping
-                        res = Resource().get(parent.entityid)
-                        nearbyres[parent.entityid] = res.get_primary_name()
-
-    if nearbyres:
-        return nearbyres
-    return False
-
-
-def get_root_id(entityid):
-    parent = get_parent_id(entityid)
-    while True:
-        if get_parent_id(parent.entityid):
-            parent = get_parent_id(parent.entityid)
-        else:
-            break
-    return parent
-
-
-def get_parent_id(entityid):
-    if models.Relations.objects.filter(entityidrange=entityid):
-        return models.Relations.objects.get(entityidrange=entityid).entityiddomain
-    else:
-        return False
-
-
-def getDegrees(meters, target):
-    diffy = target.extent[3] - target.extent[1]
-    midpoint = target.extent[1] + diffy
-    return metersToDegrees(meters, midpoint)
-
-
-def metersToDegrees(meters, latitude):
-    """Based on the C# function described in
-    https://stackoverflow.com/questions/25237356/convert-meters-to-decimal-degrees"""
-    return meters / (111319.9 * math.cos(latitude * (math.pi / 180)))
-
-
-def process_form_data(formdata, data):
-    """Function will add new non-saved entities into the formdata branch_lists field"""
-
-    newdatatoadd = {}
-    for entid, val in data.items():
-        if len(val) == 0:
-            continue
-        for obj in val:
-            nodelist = []
-            for node in obj['nodes']:
-                entity = Entity().load(node)
-                nodelist.append(entity)
-            if entid not in newdatatoadd:
-                newdatatoadd[entid] = []
-            newdatatoadd[entid].append({'nodes': nodelist})
-
-    for fieldid in formdata.keys():
-        if fieldid in newdatatoadd:
-            formdata[fieldid]['branch_lists'] = newdatatoadd[fieldid]
-
-    return
