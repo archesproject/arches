@@ -37,7 +37,7 @@ define(['jquery',
                 this.addBranchList(new BranchList({
                     el: this.$el.find('#designation-section')[0],
                     data: this.data,
-                    dataKey: 'RIGHT_NEW.E30', 
+                    dataKey: 'RIGHT.E30', 
                     validateBranch: function (nodes) {
                         var ck0 = this.validateHasValues(nodes);
                         var ck1 = vt.isValidDate(nodes, 'DESIGNATION_FROM_DATE.E61');

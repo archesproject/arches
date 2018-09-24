@@ -10,6 +10,7 @@ eamena/eamena/logs
 eamena/eamena/uploadedfiles
 eamena/eamena/bulk_upload
 eamena/eamena/additional_resource_graphs
+eamena/eamena/resource_graphs
 virtualenv/ENV
 tests/elasticsearch
 tests/logs

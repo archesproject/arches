@@ -7,20 +7,23 @@
             </dt>
 
             {% if 'CONDITION_ASSESSMENT_E14'  in report_info.source.graph %}
-            {% for CONDITION_ASSESSMENT_E14 in report_info.source.graph.CONDITION_ASSESSMENT_E14 %}
-            {% if 'CONDITION_STATE_E3' in CONDITION_ASSESSMENT_E14 %}
-            {% for CONDITION_STATE_E3 in CONDITION_ASSESSMENT_E14.CONDITION_STATE_E3 %}
-                {% for DISTURBANCE_EXTENT_TYPE_E55 in CONDITION_STATE_E3.DISTURBANCE_EXTENT_TYPE_E55 %}
-                    <dd class="arches-report-subsection-item">
-                        {{ DISTURBANCE_EXTENT_TYPE_E55.DISTURBANCE_EXTENT_TYPE_E55__value }} 
-                    </dd>
-
-    
-                {% endfor %}            
-
-            {% endfor %}    
-            {% endif %}
-            {% endfor %}    
+                {% for CONDITION_ASSESSMENT_E14 in report_info.source.graph.CONDITION_ASSESSMENT_E14 %}
+                    {% if 'CONDITION_STATE_E3' in CONDITION_ASSESSMENT_E14 %}
+                        {% for CONDITION_STATE_E3 in CONDITION_ASSESSMENT_E14.CONDITION_STATE_E3 %}
+                            {% if 'DAMAGE_EXTENT_ESTIMATED_E16' in CONDITION_STATE_E3 %}
+                                {% for DISTURBANCE_EXTENT_TYPE_E55 in CONDITION_STATE_E3.DISTURBANCE_EXTENT_TYPE_E55 %}
+                                    <dd class="arches-report-subsection-item">
+                                        {{ DISTURBANCE_EXTENT_TYPE_E55.DISTURBANCE_EXTENT_TYPE_E55__value }} 
+                                    </dd>
+                
+                    
+                                {% endfor %}
+                            {% else %}
+                                 <dd class="arches-report-subsection-item">{% trans "No overall disturbance extent recorded" %}</dd>
+                            {% endif %} 
+                        {% endfor %}    
+                    {% endif %}
+                {% endfor %}    
             {% endif %}
 
         </dl>

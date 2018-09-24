@@ -24,7 +24,7 @@ define(['jquery',
             this.addBranchList(new BranchList({
                 el: this.$el.find('#disturbances-section')[0],
                 data: this.data,
-                dataKey: 'DISTURBANCE_EVENT.E5',
+                dataKey: 'DAMAGE_STATE.E3',
                 validateBranch: function (nodes) {
                     var ck0 = vt.isValidDate(nodes,"DISTURBANCE_DATE_TO.E61");
                     var ck1 = vt.isValidDate(nodes,"DISTURBANCE_DATE_FROM.E61");

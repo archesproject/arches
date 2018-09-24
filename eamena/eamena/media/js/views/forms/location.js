@@ -91,18 +91,11 @@ define([
                 }
             }));
             
-            if (resourcetypeid == 'HERITAGE_FEATURE.E24') {
-                var siteshape_node = 'SITE_OVERALL_SHAPE_TYPE.E55';
-                var grid_node = 'GRID_ID.E42';
-            } else { 
-                var siteshape_node = 'SITE_OVERALL_SHAPE_TYPE_NEW.E55';
-                var grid_node = 'GRID_ID_NEW.E42';
-            }
-            
+
             this.addBranchList(new BranchList({
                 el: this.$el.find('#grid_ID-section')[0],
                 data: this.data,
-                dataKey: grid_node,
+                dataKey: 'GRID_ID.E42',
 
                 validateBranch: function (nodes) {
                     return this.validateHasValues(nodes);
@@ -113,7 +106,7 @@ define([
             this.addBranchList(new BranchList({
                 el: this.$el.find('#siteshape-section')[0],
                 data: this.data,
-                dataKey: siteshape_node,
+                dataKey: 'SITE_OVERALL_SHAPE_TYPE.E55',
 
                 validateBranch: function (nodes) {
                     return this.validateHasValues(nodes);

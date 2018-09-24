@@ -65,9 +65,19 @@ define(['jquery',
                     el: this.$el.find('#feature-morphology')[0],
                     data: this.data,
                     dataKey: 'FEATURE_ASSIGNMENT.E13',
-                    rules: true,
+                    rules: false,
                     validateBranch: function (nodes) {
-                        var canBeEmpty = ['FEATURE_ASSIGNMENT_INVESTIGATOR_NAME.E41'];
+                        var canBeEmpty = [
+                        
+                            'FEATURE_FORM_TYPE.I4',
+                            'FEATURE_FORM_TYPE_CERTAINTY.I6',
+                            'FEATURE_SHAPE_TYPE.E55',
+                            'FEATURE_ARRANGEMENT_TYPE.E55',
+                            'FEATURE_NUMBER_TYPE.E55',
+                            'FEATURE_ASSIGNMENT_INVESTIGATOR_NAME.E41'
+                        
+                        
+                        ];
                         return this.validateHasValues(nodes,canBeEmpty);
                     }
                 }));
