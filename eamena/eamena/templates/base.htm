@@ -152,6 +152,8 @@
                         get_admin_areas: "{% url 'get_admin_areas'%}",
                         user_activity_data: "{% url 'user_activity_data' userid %}",
                         group_activity_data: "{% url 'group_activity_data' groupid %}",
+                        find_overlapping_data: "{% url 'find_overlapping_data' %}",
+                        resource_manager:  "{% url 'resource_manager' resourcetypeid 'default' resourceid %}"
                     },
                     mapDefaults: {
                         x: {{ map_info.x }},

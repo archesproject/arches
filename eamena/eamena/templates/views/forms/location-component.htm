@@ -3,6 +3,30 @@
 
 {% block form_content %}
 
+<!-- The Modal -->
+<div id="Disclaimer" class="modal" data-backdrop="static" data-keyboard="false" >
+    <!-- Modal content -->
+    <div class="modal-content">
+        <h5>{% trans 'The geometry you have drawn is likely to overlap with the following features:' %}</h5>
+         <div id = "list_overlaps" class="arches-crud-child-section">
+            <dl>
+                <dd  class="margin-left-5" data-bind='foreach: over'>
+                    <a data-bind="attr: {href:id}" target="_blank">
+                    <div class="arches-crud-record">           
+                            <span data-bind="text: primaryname"></span><span class="text-muted">{% trans '(ID)' %}</span>                     
+                            <span data-bind="text: type"></span><span class="text-muted">{% trans '(Type)' %}</span>
+                    </div>
+                    </a>
+                </dd>
+             </dl>
+        </div>
+         <div class = "disclaimer-button">
+            <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Dismiss' %}</button>
+        </div>
+    </div>
+</div>   
+
+
 <div id="geom-list-section">
 
     <!-- Map -->

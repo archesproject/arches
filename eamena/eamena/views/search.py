@@ -30,10 +30,9 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range
 from django.utils.translation import ugettext as _
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
-
+from django.contrib.gis.geos import GEOSGeometry
 from arches.app.views.resources import get_related_resources
-
-from django.contrib.auth.decorators import permission_required
+from arches.app.utils.JSONResponse import JSONResponse
 
 import csv
 import logging
@@ -42,8 +41,7 @@ try:
     from cStringIO import StringIO
 except ImportError:
     from StringIO import StringIO
-
-@permission_required('edit')
+    
 def home_page(request):
     lang = request.GET.get('lang', settings.LANGUAGE_CODE)
     min_max_dates = models.Dates.objects.aggregate(Min('val'), Max('val'))
@@ -163,3 +161,31 @@ def export_results(request):
     results.append({'name':csv_name, 'outputfile': dest})
     zipped_results = exporter.zip_response(results, '{0}_{1}_export.zip'.format(settings.PACKAGE_NAME, format))
     return zipped_results
+
+def find_overlapping(request):
+    '''This function queries ES when called via Ajax when a new geometry is created in the Location tab. If pre-existing resources are found within the perimeter of the polygon (or the buffered zone around a point/line/polygon), an alert is raised.'''
+    geomString = request.GET.get('geom', '')
+    geom = GEOSGeometry(geomString,srid=4326)
+    mindistance = settings.METER_RADIUS
+    if not mindistance:
+        mindistance = 1000  # if settings.METER_RADIUS isn't set, default to 1Km
+    geom.transform(3857)
+    buffered_geom = geom.buffer(mindistance)
+    buffered_geom.transform(4326)
+    print geom,buffered_geom
+    se = SearchEngineFactory().create()
+    query = Query(se)
+    boolfilter= Bool()
+    geoshape = GeoShape(field='geometries.value', type=buffered_geom.geom_type, coordinates=buffered_geom.coords)
+    nested = Nested(path='geometries', query=geoshape)
+    boolfilter.must(nested)
+    query.add_filter(boolfilter)
+    results = query.search(index='entity', doc_type='')
+    overlaps = []
+    for hit in results['hits']['hits']:
+        overlaps.append({
+            'id': hit['_id'],
+            'type': hit['_type'],
+            'primaryname': hit['_source']['primaryname']
+        })
+    return JSONResponse(overlaps)
