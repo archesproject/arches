@@ -70,7 +70,7 @@ class Command(BaseCommand):
                 elif vtype == 'write_arches_file':
                     result = {'success':True,'errors':[]}
                     try:
-                        self.write_arches_file(workbook,options['resource_type'], options['dest_dir'],options['append_data'])
+                        self.write_arches_file(workbook,options['res_type'], options['dest_dir'],options['append_data'])
                     except Exception as e:
                         result['success'] = False
                         result['errors'].append('error writing .arches file: '+repr(e))
@@ -447,7 +447,6 @@ class Command(BaseCommand):
 
                         else:
                             outval = concept
-
                         row = [str(resourceid),resourcetype,entitytype,outval, GroupName]
                         ResourceList.append(row)
 
