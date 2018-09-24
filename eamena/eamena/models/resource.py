@@ -79,9 +79,9 @@ class Resource(ArchesResource):
                 forms.LocationForm.get_info(),
                 forms.MeasurementvaluesForm.get_info(),
                 forms.FeatureArchaeologicalAssessmentForm.get_info(),
+                forms.ModificationForm.get_info(),
                 forms.FeatureConditionAssessmentForm.get_info(),
                 forms.RelatedResourcesForm.get_info(),
-                forms.ModificationForm.get_info(),
                 forms.RelatedFilesForm.get_info(),
                 forms.ManMadeComponentForm.get_info(),
             ]

@@ -50,7 +50,6 @@ define([
                     }else{ //Points
                         FlatCoordinates = geom.getCoordinates();
                         FlatCoordinates.pop();
-                        console.log(FlatCoordinates);
                        
                     }
                     geom.setCoordinates(FlatCoordinates, 'XY');
@@ -63,33 +62,38 @@ define([
                 self.viewModel.branch_lists.push(branch);
                 self.trigger('change', 'geometrychange', branch);
                 self.trigger('geometrychange', feature, wkt.writeGeometry(geom));
-                
+                self.trigger('geometryadded', feature, wkt.writeGeometry(geom));
             };
             var resourcetypeid = $('#resourcetypeid').val();
             var formid = $('#form-id').val();
             if (resourcetypeid == 'HERITAGE_COMPONENT.B2' || formid == 'man-made-component') {
                 var geom_node = 'SPATIAL_COORDINATES.E47';
+            } else if (resourcetypeid == 'INFORMATION_RESOURCE.E73' || formid == 'coverage') {
+                var geom_node = 'SPATIAL_COORDINATES_GEOMETRY.E47';
             } else {
                 var geom_node = 'GEOMETRIC_PLACE_EXPRESSION.SP5';
             }
             var object = JSON.parse($('#formdata').val());
             var datesall =[];
-            datesall.push(object[geom_node]['BingDates']['start']);
-            datesall.push(object[geom_node]['BingDates']['end']);
-            var nonull = _.reject(datesall, function(date) {
-                return date ==null;
-            });
-            var dates = _.uniq(nonull);
-            if (dates.length>1) {
-                var datestring = dates[0].slice(0,-4) && "/" && dates[0].slice(0,-4);
-            }else if (dates.length == 1) {
-                    var datestring = dates[0].slice(0,-4);
-            }else{
-                var datestring = "None"
-                
+            if (object[geom_node]['BingDates']) {
+                datesall.push(object[geom_node]['BingDates']['start']);
+                datesall.push(object[geom_node]['BingDates']['end']);
+                var nonull = _.reject(datesall, function(date) {
+                    return date ==null;
+                });
+                var dates = _.uniq(nonull);
+                if (dates.length>1) {
+                    var datestring = dates[0].slice(0,-4) && "/" && dates[0].slice(0,-4);
+                }else if (dates.length == 1) {
+                        var datestring = dates[0].slice(0,-4);
+                }else{
+                    var datestring = "None"
+                    
+                };
+                $("#imagery-date").text(datestring);
+                $("#datescontainer").show();
             };
-            $("#imagery-date").text(datestring);
-            $("#datescontainer").show();
+
 
                 
             var bulkAddFeatures = function (features) {

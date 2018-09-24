@@ -35,12 +35,14 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.models import models
 import csv
 import arches.app.utils.backlogids as create_backlog
+from arches.app.utils.eamena_utils import return_one_node
 from arches.app.utils.FixingMethods import LegacyIdsFixer,IndexConceptFixer
 from arches.app.utils.load_relations import LoadRelations,UnloadRelations
 import arches.management.commands.package_utils.update_schema as update_schema
 import arches.management.commands.package_utils.migrate_resources as migrate_resources
 from arches.management.commands.package_utils.resource_graphs import load_graphs
 from arches.management.commands.package_utils.validate_values import validate_values, find_unused_entity_types
+import json
 
 class Command(BaseCommand):
     """
@@ -50,7 +52,7 @@ class Command(BaseCommand):
     
     option_list = BaseCommand.option_list + (
         make_option('-o', '--operation', action='store', dest='operation', default='setup',
-            type='choice', choices=['setup', 'install', 'setup_db', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resource_graphs','export_resources','create_backlog', 'remove_resources_from_csv', 'legacy_fixer', 'load_relations', 'unload_relations', 'delete_indices', 'extend_ontology', 'migrate_resources', 'insert_actors', 'prune_ontology', 'load_graphs', 'convert_resources', 'validate_values', 'find_unused_entity_types', 'rename_entity_type', 'insert_actors'],
+            type='choice', choices=['setup', 'install', 'setup_db', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resource_graphs','export_resources','create_backlog', 'remove_resources_from_csv', 'legacy_fixer', 'load_relations', 'unload_relations', 'delete_indices', 'extend_ontology', 'migrate_resources', 'insert_actors', 'prune_ontology', 'prune_resource_graph', 'load_graphs', 'convert_resources', 'validate_values', 'find_unused_entity_types', 'rename_entity_type', 'insert_actors', 'node_to_csv', 'remove_concepts_from_csv'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' + 
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' + 
@@ -72,6 +74,12 @@ class Command(BaseCommand):
             help='Select old node name'),
         make_option('-z', '--newtype', action='store', dest='newtype',
             help='select new node name'),
+        make_option('-i', '--internal', action='store_true', default=False, dest='run_internal',
+                    help='print stdout required for internal processes'),
+        make_option('-c', '--concepts', action='store_true', dest='only_concepts',
+            help='Select this option to remove only concepts when pruning'),
+         make_option('-r', '--resource', action='store', dest='resource_type',
+            help='Select this option to remove a whole resource graph from the ontology'),       
     )
 
     def handle(self, *args, **options):
@@ -101,14 +109,17 @@ class Command(BaseCommand):
             self.build_permissions()
 
         if options['operation'] == 'load_resources':
-            self.load_resources(package_name, options['source'], options['appending'])
+            self.load_resources(package_name, options['source'], options['appending'], options['run_internal'])
             
         if options['operation'] == 'remove_resources':     
             self.remove_resources(options['load_id'])
         
         if options['operation'] == 'remove_resources_from_csv':     
             self.remove_resources_from_csv(options['source'])
-
+            
+        if options['operation'] == 'remove_concepts_from_csv':     
+            self.remove_concepts_from_csv(options['source'])
+            
         if options['operation'] == 'load_concept_scheme':
             self.load_concept_scheme(package_name, options['source'])
 
@@ -138,7 +149,9 @@ class Command(BaseCommand):
         if options['operation'] == 'insert_actors':
             self.insert_actors()
         if options['operation'] == 'prune_ontology':
-            self.prune_ontology()
+            self.prune_ontology(only_concepts = options['only_concepts'])
+        if options['operation'] == 'prune_resource_graph':
+            self.prune_resource_graph(options['resource_type'])
         if options['operation'] == 'load_graphs':
             self.load_graphs()
         if options['operation'] == 'convert_resources':
@@ -150,7 +163,9 @@ class Command(BaseCommand):
         if options['operation'] == 'rename_entity_type':
             self.rename_entity_type(options['oldtype'],options['newtype'])            
         if options['operation'] == 'insert_actors':
-            self.insert_actors()            
+            self.insert_actors()           
+        if options['operation'] == 'node_to_csv':
+            self.node_to_csv(options['node'],options['dest_dir'])             
     def setup(self, package_name):
         """
         Installs Elasticsearch into the package directory and 
@@ -342,7 +357,7 @@ class Command(BaseCommand):
                 Permission.objects.get_or_create(codename='read_%s' % entitytype, name='%s - read' % entitytype , content_type=content_type[0])
                 Permission.objects.get_or_create(codename='delete_%s' % entitytype, name='%s - delete' % entitytype , content_type=content_type[0])
 
-    def load_resources(self, package_name, data_source=None, appending = False):
+    def load_resources(self, package_name, data_source=None, appending = False, run_internal=False):
         """
         Runs the setup.py file found in the package root
 
@@ -350,7 +365,9 @@ class Command(BaseCommand):
         data_source = None if data_source == '' else data_source
         module = import_module('%s.setup' % package_name)
         load = getattr(module, 'load_resources')
-        ResourceLoader().load(data_source, appending) 
+        results = ResourceLoader().load(data_source, appending)
+        if run_internal:
+            self.stdout.write(json.dumps(results))
 
     def remove_resources(self, load_id = None):
         """
@@ -444,9 +461,12 @@ class Command(BaseCommand):
     def insert_actors(self):
         migrate_resources.insert_actors()
         
-    def prune_ontology(self):
-        migrate_resources.prune_ontology()
-        
+    def prune_ontology(self, only_concepts = False):
+        migrate_resources.prune_ontology(only_concepts = only_concepts)
+    
+    def prune_resource_graph(self, resource_type):
+        migrate_resources.prune_resource_graph(resource_type)
+    
     def load_graphs(self):
         load_graphs()
                
@@ -462,3 +482,8 @@ class Command(BaseCommand):
         migrate_resources.rename_entity_type(oldtype,newtype)
     def insert_actors(self):
         migrate_resources.insert_actors()
+    def node_to_csv(self, nodename, data_dest):
+        return_one_node(nodename, data_dest)
+        
+    def remove_concepts_from_csv(self, concepts_list):
+        migrate_resources.remove_concept_list(concepts_list)

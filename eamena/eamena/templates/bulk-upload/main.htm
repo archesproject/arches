@@ -1,0 +1,56 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "bulk-upload/bulk-upload.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block content %}
+<div class="block-description arches-secondary-header" style="padding-top:20px;">
+    <div class="container content padding-top-0">
+        <div class="row">
+            <div class="col-xs-6">
+                <div class="bulk-upload-step-box" style="margin-top:0px;">
+                    <h5>Latest Upload</h5>
+                    <!-- each load entry is 4 lines in the log, so get the last 4 lines -->
+                    {% for load in load_log|slice:"-4:" %}
+                        <p class="log-line" style="color:green">{{load}}</p>
+                    {% endfor %}
+                </div>
+                <div class="" style="text-align:center;">
+                    <button id="" class="bulk-upload-btn" type="button" onclick='location.href="{% url "new_upload" %}"'>New Upload</button>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="bulk-upload-step-box" style="margin-top:0px;">
+                    <h5>All Uploads</h5>
+                    <div id="upload-log-output">
+                        <!-- loading mask -->
+                        <div class="form-load-mask" style="position:relative;margin:0px;" hidden>
+                            <i class="fa fa-spinner fa-spin" style="margin-top:200px;"></i>
+                        </div>
+                        <!-- all of the log lines are inserted here as separate <p> elements -->
+                        {% for load in load_log %}
+                            <p class="log-line" style="">{{load}}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+         </div>
+    </div>
+</div>
+{% endblock %}

@@ -8,7 +8,7 @@ arches==3.1.2
 arches-hip==1.0.4
 boto==2.46.1
 decorator==4.0.10
-django-storages-redux==1.3.2
+django-storages==1.4
 elasticsearch==1.9.0
 et-xmlfile==1.0.1
 html5lib==0.9999999

@@ -16,6 +16,9 @@ LOCALE_PATHS = (os.path.join(PACKAGE_ROOT, '../locale'),)
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # MEDIA_ROOT =  os.path.join(PACKAGE_ROOT, 'uploadedfiles')
 
+# Absolute filesystem path to the directory holds bulk upload data
+BULK_UPLOAD_DIR =  os.path.join(PACKAGE_ROOT, 'bulk_upload')
+
 ugettext = lambda s: s
 LANGUAGES = (
     ('en-US', ugettext('English')),
@@ -40,7 +43,7 @@ def RESOURCE_TYPE_CONFIGS():
             'resourcetypeid': 'HERITAGE_RESOURCE_GROUP.E27',
             'name': _('Heritage Place'),
             'icon_class': 'fa fa-stop',
-            'default_page': 'summary',
+            'default_page': 'assessment-summary',
             'default_description': _('No name available'),
             'description_node': _('NAME.E41'),
             'categories': [_('Resource')],
@@ -59,7 +62,7 @@ def RESOURCE_TYPE_CONFIGS():
             'resourcetypeid': 'HERITAGE_FEATURE.E24',
             'name': _('Heritage Feature'),
             'icon_class': 'fa fa-th-large',
-            'default_page': 'summary-feature',
+            'default_page': 'assessment-summary',
             'default_description': _('No name available'),
             'description_node': _('NAME.E41'),
             'categories': [_('Resource')],
@@ -78,7 +81,7 @@ def RESOURCE_TYPE_CONFIGS():
             'resourcetypeid': 'HERITAGE_COMPONENT.B2',
             'name': _('Heritage Component'),
             'icon_class': 'fa fa-th',
-            'default_page': 'component-classification',
+            'default_page': 'component-assessment',
             'default_description': _('No name available'),
             'description_node': _('NAME.E41'),
             'categories': [_('Resource')],
@@ -237,7 +240,39 @@ SEARCH_GROUP_ROOTS= [
 
 EXPORT_CONFIG = os.path.normpath(os.path.join(PACKAGE_ROOT, 'source_data', 'business_data', 'resource_export_mappings.json'))
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format':'%(levelname)s|%(message)s',
+        },
+        'simple': {
+            'format':'%(message)s',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(ROOT_DIR, 'arches.log'),
+            'formatter':'simple'
+        },
+    },
+    'loggers': {
+        'arches': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
+
 try:
     from settings_local import *
 except ImportError:
     pass
+
+
+#Radius in metres to be used to calculate the existence of pre-existing resources in the database. If, upon resource creation, other pre-existing resources fall within this radius, an alert is returned before save.
+METER_RADIUS = 1000

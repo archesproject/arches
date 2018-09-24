@@ -52,7 +52,14 @@ define(['jquery',
                     el: this.$el.find('#classification-section')[0],
                     data: this.data,
                     dataKey: 'HERITAGE_CLASSIFICATION_TYPE.E55', 
-                    rules: true,
+                    validateBranch: function (nodes) {
+                        return this.validateHasValues(nodes);
+                    }
+                }));
+                this.addBranchList(new BranchList({
+                    el: this.$el.find('#current-use-section')[0],
+                    data: this.data,
+                    dataKey: 'HERITAGE_FEATURE_USE_TYPE.E55', 
                     validateBranch: function (nodes) {
                         return this.validateHasValues(nodes);
                     }
@@ -81,3 +88,22 @@ define(['jquery',
         });
     }
 );
+
+
+$(function($) {
+    PlusMinus = true;	
+    $('#plusminus').click(function() {
+
+        var wasPlay = $(this).hasClass('fa-plus-square');
+        $(this).removeClass('fa-plus-square fa-minus-square');
+        var klass = wasPlay ? 'fa-minus-square' : 'fa-plus-square';
+        $(this).addClass(klass)
+        if (PlusMinus == true) {
+            $('#tobehidden').show();
+        } else {
+            $('#tobehidden').hide();
+        }
+        PlusMinus = !PlusMinus;
+    }); 
+    
+});

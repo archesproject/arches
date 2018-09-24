@@ -16,7 +16,10 @@ define([
             var includeMap = (resourcetypeid !== 'ACTOR.E39');
             var adminAreaTypeLookup = {};
             BaseForm.prototype.initialize.apply(this);
-            
+            var OverlapModel = {
+                over: ko.observableArray([])
+            }
+            ko.applyBindings(OverlapModel,document.getElementById('list_overlaps'));            
             _.each(this.data["ADMINISTRATIVE_DIVISION.E53"].domains["ADMINISTRATIVE_DIVISION_TYPE.E55"], function (typeRecord) {
                 adminAreaTypeLookup[typeRecord.text] = typeRecord.id;
             });
@@ -27,61 +30,26 @@ define([
                     data: this.data,
                     dataKey: 'GEOMETRIC_PLACE_EXPRESSION.SP5'
                 });
-                locationBranchList.on('geometrychange', function(feature, wkt) {
+                locationBranchList.on('geometryadded', function(feature, wkt) {
                     $.ajax({
-                        url: arches.urls.get_admin_areas + '?geom=' + wkt,
+                        url: arches.urls.find_overlapping_data + '?geom=' + wkt,
                         success: function (response) {
-                            _.each(response.results, function(item) {
-                                var duplicate = false;
-                                _.each(adminAreaBranchList.viewModel.branch_lists(), function(branch) {
-                                    var sameName = false;
-                                    var sameType = false;
-                                    _.each(branch.nodes(), function (node) {
-                                        if (node.entitytypeid() === "ADMINISTRATIVE_DIVISION_TYPE.E55" &&
-                                            node.label() === item.overlayty) {
-                                            sameType = true;
-                                        }
-                                        if (node.entitytypeid() === "ADMINISTRATIVE_DIVISION.E53" &&
-                                            node.value() === item.overlayval) {
-                                            sameName = true;
-                                        }
-                                    });
-                                    if (sameName && sameType) {
-                                        duplicate = true;
-                                    }
-                                });
-                                if (adminAreaTypeLookup[item.overlayty] && !duplicate) {
-                                    adminAreaBranchList.viewModel.branch_lists.push(koMapping.fromJS({
-                                        'editing':ko.observable(false),
-                                        'nodes': ko.observableArray([
-                                            koMapping.fromJS({
-                                              "property": "",
-                                              "entitytypeid": "ADMINISTRATIVE_DIVISION_TYPE.E55",
-                                              "entityid": "",
-                                              "value": adminAreaTypeLookup[item.overlayty],
-                                              "label": item.overlayty,
-                                              "businesstablename": "",
-                                              "child_entities": []
-                                            }),
-                                            koMapping.fromJS({
-                                              "property": "",
-                                              "entitytypeid": "ADMINISTRATIVE_DIVISION.E53",
-                                              "entityid": "",
-                                              "value": item.overlayval,
-                                              "label": "",
-                                              "businesstablename": "",
-                                              "child_entities": []
-                                            })
-                                        ])
-                                    }));
+                                if (response.length > 0) {
+                                    showOverlapsWarning(response);
                                 }
-                            });
                         }
                     })
                 });
                 this.addBranchList(locationBranchList);
             }
-            
+            var showOverlapsWarning = function(overlaps) {
+                _.each(overlaps,function(item) {
+                    item['id'] = arches.urls.resource_manager+item['id'];
+                    OverlapModel.over.push(item);
+                });            
+                $('#Disclaimer').modal('show');
+                
+             }
             this.addBranchList(new BranchList({
                 el: this.$el.find('#certainty-of-geometry')[0],
                 data: this.data,
@@ -91,18 +59,11 @@ define([
                 }
             }));
             
-            if (resourcetypeid == 'HERITAGE_FEATURE.E24') {
-                var siteshape_node = 'SITE_OVERALL_SHAPE_TYPE.E55';
-                var grid_node = 'GRID_ID.E42';
-            } else { 
-                var siteshape_node = 'SITE_OVERALL_SHAPE_TYPE_NEW.E55';
-                var grid_node = 'GRID_ID_NEW.E42';
-            }
-            
+
             this.addBranchList(new BranchList({
                 el: this.$el.find('#grid_ID-section')[0],
                 data: this.data,
-                dataKey: grid_node,
+                dataKey: 'GRID_ID.E42',
 
                 validateBranch: function (nodes) {
                     return this.validateHasValues(nodes);
@@ -113,7 +74,7 @@ define([
             this.addBranchList(new BranchList({
                 el: this.$el.find('#siteshape-section')[0],
                 data: this.data,
-                dataKey: siteshape_node,
+                dataKey: 'SITE_OVERALL_SHAPE_TYPE.E55',
 
                 validateBranch: function (nodes) {
                     return this.validateHasValues(nodes);
@@ -163,7 +124,7 @@ define([
                     return this.validateHasValues(nodes);
                 }
             }));
-        }
+        },    
     });
 });
 
@@ -171,7 +132,6 @@ define([
 $(function($) {
     PlusMinus = true;	
     $('#plusminus').click(function() {
-
         var wasPlay = $(this).hasClass('fa-plus-square');
         $(this).removeClass('fa-plus-square fa-minus-square');
         var klass = wasPlay ? 'fa-minus-square' : 'fa-plus-square';
