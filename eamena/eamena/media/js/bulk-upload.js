@@ -304,7 +304,10 @@ $( document ).ready(function() {
             }
         });
     });
-
+    $('#folderupload').change( function () {
+        $('#folder-msg').css("color","orange");
+        $('#folder-msg').text("Uploading files... this may take a while.");
+    });   
     $('#folderupload').fileupload({
             beforeSend: function(request) {
                 request.setRequestHeader("X-CSRFToken",csrftoken);
