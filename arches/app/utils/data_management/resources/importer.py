@@ -64,7 +64,9 @@ class ResourceLoader(object):
         relationships_file = file_name + '.relations'
         elapsed = (time() - start)
         print 'time to parse {0} resources = {1}'.format(file_name, elapsed)
-        results = self.resource_list_to_entities(resources, archesjson, appending)     
+        results = self.resource_list_to_entities(resources, archesjson, appending,
+            filename=os.path.basename(source)
+        )     
         if os.path.exists(relationships_file):
             relationships = csv.DictReader(open(relationships_file, 'r'), delimiter='|')
             for relationship in relationships:
@@ -72,10 +74,12 @@ class ResourceLoader(object):
         else:
             print 'No relationship file'
 
+        return results['legacyid_to_entityid']
+
         #self.se.bulk_index(self.resources)
 
 
-    def resource_list_to_entities(self, resource_list, archesjson=False, append=False):
+    def resource_list_to_entities(self, resource_list, archesjson=False, append=False, filename=''):
         '''Takes a collection of imported resource records and saves them as arches entities'''
         start = time()
         d = datetime.datetime.now()
@@ -143,6 +147,11 @@ class ResourceLoader(object):
             print 'Load Identifier =', load_id
             print '***You can reverse this load with the following command:'
             print 'python manage.py packages -o remove_resources --load_id', load_id
+            log_msg = "\n~~~~~\n{}\nfile: {}\nresources: {}\nloadid: {}".format(
+                d.strftime("%d/%m/%Y - %H:%M"),filename,len(resource_list),load_id
+            )
+            with open(os.path.join(settings.BULK_UPLOAD_DIR,'_loadlog.txt'), "a") as loadlog:
+                loadlog.write(log_msg)
         return ret
 
     def build_master_graph(self, resource, schema):

@@ -16,6 +16,9 @@ LOCALE_PATHS = (os.path.join(PACKAGE_ROOT, '../locale'),)
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # MEDIA_ROOT =  os.path.join(PACKAGE_ROOT, 'uploadedfiles')
 
+# Absolute filesystem path to the directory holds bulk upload data
+BULK_UPLOAD_DIR =  os.path.join(PACKAGE_ROOT, 'bulk_upload')
+
 ugettext = lambda s: s
 LANGUAGES = (
     ('en-US', ugettext('English')),
@@ -236,6 +239,34 @@ SEARCH_GROUP_ROOTS= [
 ]
 
 EXPORT_CONFIG = os.path.normpath(os.path.join(PACKAGE_ROOT, 'source_data', 'business_data', 'resource_export_mappings.json'))
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format':'%(levelname)s|%(message)s',
+        },
+        'simple': {
+            'format':'%(message)s',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(ROOT_DIR, 'arches.log'),
+            'formatter':'simple'
+        },
+    },
+    'loggers': {
+        'arches': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
 
 try:
     from settings_local import *

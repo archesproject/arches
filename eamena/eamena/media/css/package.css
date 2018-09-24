@@ -355,3 +355,73 @@ button.btn-default.advanced-search {
 	border-left: #5cb85c solid 4px;
 }
 /* Advanced Search end*/
+
+/* Style for bulk upload page */
+.log-line {
+    margin:0px;
+    font-family:Courier;
+}
+
+button.fileinputs {
+    position: relative;
+    width:125px;
+    padding:0px;
+}
+
+input.file {
+	position: relative;
+	text-align: right;
+	-moz-opacity:0 ;
+	filter:alpha(opacity: 0);
+	opacity: 0;
+	z-index: 2;
+    width:100%;
+    cursor:pointer;
+}
+
+#upload-log-output {
+    height:500px;
+    width: 650px;
+    overflow-y:scroll;
+    border: 1px solid #e3e3e3;
+    background-color: #eeeeee;
+}    
+
+#upload-btn-title {
+    position: absolute;
+    cursor: pointer;
+    z-index: 1;
+    padding-left: 6px;
+    margin-bottom: 0px;
+}
+
+.progress {
+    width: 125px;
+    height: 10px;
+    margin-bottom: 10px;
+}
+
+.upload-page-select {
+    font-size: 17px;
+    font-weight: 300;
+}
+.upload-page-select[disabled] { color: grey; }
+
+.bulk-upload-btn {
+    font-size: 17px;
+    font-weight: 300;
+    font-family: 'PT Sans', sans-serif;
+}
+.bulk-upload-btn[disabled] { color: grey; }
+
+.bulk-upload-step-box {
+    margin: 10px;
+    background-color: #eeeeee;
+    padding: 12px;
+    border: 1px solid #e3e3e3;
+}
+
+.upload-msg-box {
+    margin-top: 10px;
+}
+/* end bulk upload style */

@@ -39,6 +39,9 @@
 <body class="scroll-y" style="direction: {% if LANGUAGE_BIDI %} rtl; {% else %} ltr; {% endif %}" > 
 
     <div class="wrapper">
+        <div id="full-load-mask" class="form-load-mask" style="margin:0px;background-color: rgba(0, 0, 0, 0.25);z-index:1000;" hidden>
+            <i class="fa fa-spinner fa-spin" style="margin-top:400px;"></i>
+        </div>
     	{% block header %}
             {% include 'header.htm' %}
         {% endblock header %} 

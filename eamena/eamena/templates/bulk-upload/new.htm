@@ -1,0 +1,88 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "bulk-upload/bulk-upload.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'plugins/jQueryFileUpload/jquery.fileupload-ui.css' %}">
+<div class="block-description arches-secondary-header" style="padding-top:20px;">
+    <div class="container content padding-top-0">
+        <div class="row">
+            <div class="col-xs-4">
+                <div class="bulk-upload-step-box" style="margin-top:0px;">
+                    <h5>1. Upload a Spreadsheet</h5>
+                    <button class="fileinputs bulk-upload-btn">
+                        <p id="upload-btn-title" class="bulk-upload-btn">Choose File...</p>
+                        <input id="excelfileupload" type="file" class="file" name="files[]" data-url='/bulk-upload/excel-upload'/>
+                    </button>
+                    <div id="progress" class="progress">
+                        <div class="progress-bar progress-bar-success"></div>
+                    </div>
+                    <div id="files-msg" class="upload-msg-box" style="color:red;">No file yet...</div>
+                </div>
+                <div class="bulk-upload-step-box">
+                    <h5>2. Choose the Configuration</h5>
+                    <select id="append-select" class="upload-page-select" disabled>
+                        <option value="false">New Data</option>
+                        <option value="true">Append to Existing</option>
+                    </select>
+                    <select id="resource-type-select" class="upload-page-select" disabled>
+                    {% for type, type_data in resource_types %}
+                        <option value="{{type}}">{{type_data.name}}</option>
+                    {% endfor %}
+                    </select>
+                    <div id="restype-msg" class="upload-msg-box" style="color:grey;"></div>
+                </div>
+                <div class="bulk-upload-step-box">
+                    <h5>3. Run the Validation</h5>
+                    <button id="validate-button" class="bulk-upload-btn" type="button" disabled>Validate File</button>
+                    <div id="validation-msg" class="upload-msg-box" style="color:red;">Not ready to validate...</div>
+                </div>
+                <div class="bulk-upload-step-box">
+                    <input type="hidden" id="bulk-url" data-url="{% url 'bulk_upload' %}" />
+                    <h5>4. Load Resources into EAMENA</h5>
+                    <button id="load-data-button" class="bulk-upload-btn" type="button" disabled>Load Resources</button>
+                    <div id="import-msg" class="upload-msg-box" style="color:red;">Not ready to load...</div>
+                </div>
+                <div id="folder-upload-div" class="bulk-upload-step-box" hidden>
+                    <h5>5. Select file attachment folder</h5>
+                    <input id="folderupload" type="file" name="attachments[]" data-url="/bulk-upload/attachments" multiple directory webkitdirectory mozdirectory>
+                    <div id="folder-msg" class="upload-msg-box" style="color:red;">No file yet...</div>
+                    &nbsp;
+                    <button id="folder-upload-btn" class="fileinputs bulk-upload-btn" disabled>Finished</button>
+                </div>
+            </div>
+            <div class="col-xs-8">
+                <div id="upload-log-output">
+                    <!-- loading mask -->
+                    <div id="validate-load-mask" class="form-load-mask" style="margin:0px;width:650px;" hidden>
+                        <i class="fa fa-spinner fa-spin" style="margin-top:200px;"></i>
+                    </div>
+                    <!-- all of the log lines are inserted here as separate <p> elements -->
+                </div>
+            </div>
+         </div>
+    </div>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="{% static 'plugins/jQueryFileUpload/vendor/jquery.ui.widget.js' %}"></script>
+    <script src="{% static 'plugins/jQueryFileUpload/jquery.iframe-transport.js' %}"></script>
+    <script src="{% static 'plugins/jQueryFileUpload/jquery.fileupload.js' %}"></script>
+    <script src="{% static 'js/bulk-upload.js' %}"></script>
+</div>
+{% endblock %}
