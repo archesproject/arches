@@ -91,7 +91,7 @@ class MobileSurvey(models.MobileSurveyModel):
                 graphids.append(card.graph_id)
                 #we may want the full proxy model at some point, but for now just the root node color
                 graph = Graph.objects.get(pk=card.graph_id)
-                graph_obj = graph.serialize(exclude=['domain_connections', 'functions', 'edges', 'relatable_resource_model_ids'])
+                graph_obj = graph.serialize(exclude=['domain_connections', 'edges', 'relatable_resource_model_ids'])
                 graph_obj['widgets'] = models.CardXNodeXWidget.objects.filter(card__graph=graph).distinct()
                 graphs.append(graph_obj)
 
