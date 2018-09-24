@@ -142,44 +142,67 @@ class Command(BaseCommand):
         offset_max = False
 
         for sheet_index,sheet in enumerate(workbook.worksheets):
-            last_row = list(sheet.rows)[sheet.max_row-1]
-            if last_row[0].value is None: #this if cluase is to exclude rows with None values from the row count across worksheets
-                max_row = sheet.max_row - 1
-            else:
-                max_row = sheet.max_row
-            rows_count = rows_count + max_row
+            sheet_name = workbook.sheetnames[sheet_index]
 
-            ret = self.validate_value_number(sheet, workbook.sheetnames[sheet_index])
-            if ret:
-                ret = sorted(ret)
-                result['errors'].append("Error: cells in sheet %s do not contain an equal number of \"|\" separated values or are empty. Errors are at the following lines: %s" % (workbook.sheetnames[sheet_index], sorted(ret)))
+            ## iterate from the last row to the first, to properly ignore
+            ## empty rows that are on the end of the sheet.
+            backward_rows = list(sheet.rows)
+            backward_rows.reverse()
+            for n,row in enumerate(backward_rows):
+                if any([cell.value for cell in row]):
+                    num_rows = len(backward_rows)-n
+                    break
+            rows_count = rows_count + num_rows
+
+            #In the NOT tab, cells in a row are not part of the same merge
+            # group, so the number of pipe-separated values need not be equal
+            if not sheet_name == "NOT":
+                ret = self.validate_value_number(sheet,sheet_name)
+                for msg in ret:
+                   result['errors'].append(msg)
+
         if (rows_count/sheet_count).is_integer() is not True:
-            result['errors'].append("Error: some sheets in your XLSX file have a different number of rows")
+            result['errors'].append("Inconsistent number of rows across "\
+            "workbook sheets.")
 
         if result['errors']:
             result['success'] = False
         return result
             
     def validate_value_number(self, sheet, sheet_name):
-        FaultyRows=[]
-        for row_index, row in enumerate(sheet.iter_rows(row_offset = 1)):
+
+        msgs=[]
+        num_cols = 0
+        headers = []
+        for row_index, row in enumerate(sheet.iter_rows()):
+            if row_index == 0:
+                headers = [cell.value for cell in row if cell.value]
+                num_cols = len(headers)
+                continue
+
             values_no = []
-            if any(cell.value for cell in row):
-                for cell in row:
-                    if cell.value is not None:
-                        if sheet_name !='NOT': #In the NOT tab, cells in a row are not part of the same merge group, so the number of semicolon separated values need not be equal
-                            value_encoded = (unicode(cell.value)).encode('utf-8')
-                            cell_no = len(value_encoded.split("|"))
-                            values_no.append(cell_no)
-                    else:
-                        values_no.append(0)
-            try: 
-                if values_no.count(values_no[0]) != len(values_no) or 0 in values_no:
-                    FaultyRows.append(row_index+2) 
-            except:
-                pass
-                        
-        return list(set(FaultyRows))       
+
+            # skip completely empty rows
+            if not any(cell.value for cell in row):
+                continue
+
+            for col,cell in enumerate(row):
+                # don't analyze values that are in columns without headers
+                # (this is to control for situations where excel adds extra
+                # empty columns somehow)
+                if col+1 > num_cols:
+                    continue
+                if cell.value is not None:
+                    value_encoded = (unicode(cell.value)).encode('utf-8')
+                    cell_no = len(value_encoded.split("|"))
+                    values_no.append(cell_no)
+                else:
+                    values_no.append(0)
+            if values_no.count(values_no[0]) != len(values_no) or 0 in values_no:
+                msgs.append("Inconsistent number of pipe-separated values:"\
+                " {} row {}".format(sheet_name,row_index+1))
+
+        return msgs
 
     def validate_headers(self, workbook, skip_resourceid_col = False):
         result = {'success':True,'errors':[]}
