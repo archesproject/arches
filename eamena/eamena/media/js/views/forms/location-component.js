@@ -16,7 +16,10 @@ define([
 
             var adminAreaTypeLookup = {};
             BaseForm.prototype.initialize.apply(this);
-            
+            var OverlapModel = {
+                over: ko.observableArray([])
+            }
+            ko.applyBindings(OverlapModel,document.getElementById('list_overlaps'));            
 
             var locationBranchList = new LocationBranchList({
                 el: this.$el.find('#geom-list-section')[0],
@@ -24,60 +27,26 @@ define([
                 dataKey: 'SPATIAL_COORDINATES.E47'
             });
             
-            locationBranchList.on('geometrychange', function(feature, wkt) {
+            locationBranchList.on('geometryadded', function(feature, wkt) {
                 $.ajax({
-                    url: arches.urls.get_admin_areas + '?geom=' + wkt,
+                    url: arches.urls.find_overlapping_data + '?geom=' + wkt,
                     success: function (response) {
-                        _.each(response.results, function(item) {
-                            var duplicate = false;
-                            _.each(adminAreaBranchList.viewModel.branch_lists(), function(branch) {
-                                var sameName = false;
-                                var sameType = false;
-                                _.each(branch.nodes(), function (node) {
-                                    if (node.entitytypeid() === "ADMINISTRATIVE_DIVISION_TYPE.E55" &&
-                                        node.label() === item.overlayty) {
-                                        sameType = true;
-                                    }
-                                    if (node.entitytypeid() === "ADMINISTRATIVE_DIVISION.E53" &&
-                                        node.value() === item.overlayval) {
-                                        sameName = true;
-                                    }
-                                });
-                                if (sameName && sameType) {
-                                    duplicate = true;
-                                }
-                            });
-                            if (adminAreaTypeLookup[item.overlayty] && !duplicate) {
-                                adminAreaBranchList.viewModel.branch_lists.push(koMapping.fromJS({
-                                    'editing':ko.observable(false),
-                                    'nodes': ko.observableArray([
-                                        koMapping.fromJS({
-                                          "property": "",
-                                          "entitytypeid": "ADMINISTRATIVE_DIVISION_TYPE.E55",
-                                          "entityid": "",
-                                          "value": adminAreaTypeLookup[item.overlayty],
-                                          "label": item.overlayty,
-                                          "businesstablename": "",
-                                          "child_entities": []
-                                        }),
-                                        koMapping.fromJS({
-                                          "property": "",
-                                          "entitytypeid": "ADMINISTRATIVE_DIVISION.E53",
-                                          "entityid": "",
-                                          "value": item.overlayval,
-                                          "label": "",
-                                          "businesstablename": "",
-                                          "child_entities": []
-                                        })
-                                    ])
-                                }));
-                            }
-                        });
+                        if (response.length > 0) {
+                            showOverlapsWarning(response);
+                        }
                     }
                 })
             });
             this.addBranchList(locationBranchList);
             
         }
+        var showOverlapsWarning = function(overlaps) {
+            _.each(overlaps,function(item) {
+                item['id'] = arches.urls.resource_manager+item['id'];
+                OverlapModel.over.push(item);
+            });            
+            $('#Disclaimer').modal('show');
+            
+         }
     });
 });

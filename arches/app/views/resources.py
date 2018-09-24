@@ -36,6 +36,7 @@ from django.contrib.gis.geos import GEOSGeometry
 from django.db.models import Max, Min
 from django.contrib.auth.decorators import user_passes_test
 
+
 def report(request, resourceid):
     raise NotImplementedError('Reports are not yet implemented.')
 
@@ -258,4 +259,4 @@ def debug_view(request, resourceid=''):
     resource_dict = resource.dictify()
     
     return JSONResponse(resource_dict, indent=4)
-    
+

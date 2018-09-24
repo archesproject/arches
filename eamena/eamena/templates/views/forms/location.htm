@@ -4,7 +4,31 @@
 {% block form_content %}
 
 {% if resourcetypeid != 'ACTOR.E39' %}
+    <!-- The Modal -->
+    <div id="Disclaimer" class="modal" data-backdrop="static" data-keyboard="false" >
+        <!-- Modal content -->
+        <div class="modal-content">
+            <h5>{% trans 'The geometry you have drawn is likely to overlap with the following features:' %}</h5>
 
+            <div id = "list_overlaps" class="arches-crud-child-section">
+                <dl>
+                    <dd  class="margin-left-5" data-bind='foreach: over'>
+                        <a data-bind="attr: {href:id}" target="_blank">
+                        <div class="arches-crud-record">           
+                                <span data-bind="text: primaryname"></span><span class="text-muted">{% trans '(ID)' %}</span>                     
+                                <span data-bind="text: type"></span><span class="text-muted">{% trans '(Type)' %}</span>
+                        </div>
+                        </a>
+                    </dd>
+
+                </dl>
+            </div>
+
+            <div class = "disclaimer-button">
+                <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Dismiss' %}</button>
+            </div>
+        </div>
+    </div>    
 
     <div id="geom-list-section">
 
@@ -34,7 +58,7 @@
                 <div id="geometry-type" class="row">
                     <div class="col-xs-6 col-xs-offset-1" data-bind="attr: { 'style': getEditedNode('GEOMETRIC_PLACE_EXPRESSION.SP5', 'value')() === '' ? 'opacity:0;' : '' }">
                         <div class="form-group" style="width:80%; float: left;margin-top:-510px; padding-right: 10px; ">       
-                            <input class="geometry-selection" id="geometry-selection" name="" style="width:40%" data-bind="select2: {value: getEditedNode('LOCATION_CERTAINTY.I6', 'value'), placeholder: 'Location Certainty', dataKey: 'LOCATION_CERTAINTY.I6'}"> 
+                            <input class="geometry-selection" id="geometry-selection" name="" style="width:40%" data-bind="select2: {value: getEditedNode('LOCATION_CERTAINTY.I6', 'value'), placeholder: 'Location Certainty', dataKey: 'LOCATION_CERTAINTY.I6'}">
                         </div>
                     </div>
                 </div>
@@ -289,6 +313,7 @@
                     <!-- End Form -->
                     
                     <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "This value must be populated." %}</div>
+                    
                 </dl>
                 
             </div>

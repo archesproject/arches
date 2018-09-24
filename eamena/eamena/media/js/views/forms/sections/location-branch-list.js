@@ -62,7 +62,7 @@ define([
                 self.viewModel.branch_lists.push(branch);
                 self.trigger('change', 'geometrychange', branch);
                 self.trigger('geometrychange', feature, wkt.writeGeometry(geom));
-                
+                self.trigger('geometryadded', feature, wkt.writeGeometry(geom));
             };
             var resourcetypeid = $('#resourcetypeid').val();
             var formid = $('#form-id').val();
@@ -75,22 +75,25 @@ define([
             }
             var object = JSON.parse($('#formdata').val());
             var datesall =[];
-            datesall.push(object[geom_node]['BingDates']['start']);
-            datesall.push(object[geom_node]['BingDates']['end']);
-            var nonull = _.reject(datesall, function(date) {
-                return date ==null;
-            });
-            var dates = _.uniq(nonull);
-            if (dates.length>1) {
-                var datestring = dates[0].slice(0,-4) && "/" && dates[0].slice(0,-4);
-            }else if (dates.length == 1) {
-                    var datestring = dates[0].slice(0,-4);
-            }else{
-                var datestring = "None"
-                
+            if (object[geom_node]['BingDates']) {
+                datesall.push(object[geom_node]['BingDates']['start']);
+                datesall.push(object[geom_node]['BingDates']['end']);
+                var nonull = _.reject(datesall, function(date) {
+                    return date ==null;
+                });
+                var dates = _.uniq(nonull);
+                if (dates.length>1) {
+                    var datestring = dates[0].slice(0,-4) && "/" && dates[0].slice(0,-4);
+                }else if (dates.length == 1) {
+                        var datestring = dates[0].slice(0,-4);
+                }else{
+                    var datestring = "None"
+                    
+                };
+                $("#imagery-date").text(datestring);
+                $("#datescontainer").show();
             };
-            $("#imagery-date").text(datestring);
-            $("#datescontainer").show();
+
 
                 
             var bulkAddFeatures = function (features) {
