@@ -23,6 +23,12 @@ uuid_regex = '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-
 
 urlpatterns = patterns('',
     url(r'^search$', 'eamena.views.search.home_page', name="search_home"),
+    url(r'^bulk-upload/$', 'eamena.views.bulk_upload.main', name="bulk_upload"),
+    url(r'^bulk-upload/new$', 'eamena.views.bulk_upload.new_upload', name="new_upload"),
+    url(r'^bulk-upload/excel-upload$', 'eamena.views.bulk_upload.upload_spreadsheet', name="excel_upload"),
+    url(r'^bulk-upload/validate$', 'eamena.views.bulk_upload.validate', name="excel_validate"),
+    url(r'^bulk-upload/import$', 'eamena.views.bulk_upload.import_archesfile', name="excel_import"),
+    url(r'^bulk-upload/attachments$', 'eamena.views.bulk_upload.upload_attachments', name='upload_attachments'),
     url(r'^search/resources$', 'eamena.views.search.search_results', name="search_results"),
     url(r'^search/export$', 'eamena.views.search.export_results', name="search_results_export"),
     url(r'^reports/(?P<resourceid>%s)$' % uuid_regex , 'eamena.views.resources.report', name='report'),

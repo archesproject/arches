@@ -16,6 +16,9 @@ LOCALE_PATHS = (os.path.join(PACKAGE_ROOT, '../locale'),)
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # MEDIA_ROOT =  os.path.join(PACKAGE_ROOT, 'uploadedfiles')
 
+# Absolute filesystem path to the directory holds bulk upload data
+BULK_UPLOAD_DIR =  os.path.join(PACKAGE_ROOT, 'bulk_upload')
+
 ugettext = lambda s: s
 LANGUAGES = (
     ('en-US', ugettext('English')),
@@ -252,3 +255,32 @@ except ImportError:
     
 #Radius in metres to be used to calculate the existence of pre-existing resources in the database. If, upon resource creation, other pre-existing resources fall within this radius, an alert is returned before save.
 METER_RADIUS = 1000 
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format':'%(levelname)s|%(message)s',
+        },
+        'simple': {
+            'format':'%(message)s',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(ROOT_DIR, 'arches.log'),
+            'formatter':'simple'
+        },
+    },
+    'loggers': {
+        'arches': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
