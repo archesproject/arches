@@ -502,6 +502,8 @@ class RelatedFilesForm(ResourceForm):
                 filedict[f.name] = f
 
         for newfile in data.get('new-files', []):
+            if newfile['id'] not in filedict:
+                continue
             resource = Resource()
             resource.entitytypeid = 'INFORMATION_RESOURCE.E73'
             resource.set_entity_value('INFORMATION_RESOURCE_TYPE.E55', newfile['title_type']['value'])
