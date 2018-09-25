@@ -91,6 +91,8 @@ class Command(BaseCommand):
         
         result = {'success':True,'errors':[]}
         for dt in date_tuples:
+            if dt[0] == "x":
+                continue
             validated = self.validatedate(dt[0])
             if not self.validatedate(dt[0]):
                 msg = "{}: {} ({} > row {}, col {})".format(
@@ -102,6 +104,9 @@ class Command(BaseCommand):
         return result
 
     def validatedate(self, date, header = None, row_no = None):
+        """validates a date string that has been passed from the spreadsheet.
+        note that 'x' values should never be sent though this method. returns
+        date objects."""
         
         valid_formats = [
             '%Y-%m-%d', #Checks for format  YYYY-MM-DD
@@ -276,6 +281,8 @@ class Command(BaseCommand):
         
         result = {'success':True,'errors':[]}
         for gt in geom_tuples:
+            if gt[0] == "x":
+                continue
             validated = self.validate_geometry(gt[0])
             if not validated:
                 msg = "{}: {} ({} > row {}, col {})".format(
@@ -288,6 +295,9 @@ class Command(BaseCommand):
         return result
         
     def validate_geometry(self, geometry,header,row):
+        """validates a geom string that has been passed from the spreadsheet.
+        note that 'x' values should never be sent though this method. returns
+        True or False."""
         try:
             GEOSGeometry(geometry)
             return True
@@ -432,14 +442,19 @@ class Command(BaseCommand):
                     value_encoded = (unicode(value)).encode('utf-8')
 
                     for concept in value_encoded.split('|'):
-                        concept = concept.rstrip().lstrip() #removes potential trailing spaces, r and l
+
+                        ## remove leading and trailing spaces
+                        concept = concept.rstrip().lstrip()
+
+                        ## skip x in every case. this is a reserved placeholder to signify a non-value
+                        if concept == "x":
+                            continue
+
                         GroupNo = GroupNo + 1 if sheet_name is not 'NOT' else ''
                         GroupName = " ".join((sheet_name, str(GroupNo))) if sheet_name != 'NOT' else sheet_name
 
                         ## data transformations must happen with domains and dates
                         if datatype == 'domains':
-                            if concept == "x":
-                                continue
                             outval = label_lookup[concept.lower()]
 
                         elif datatype == 'dates':
