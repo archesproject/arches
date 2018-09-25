@@ -10,7 +10,7 @@ today! Here are the guidelines we'd like you to follow:
 If you find a bug in the source code or a mistake in the documentation, you can help us by
 submitting an issue to this [GitHub Repository][github]. Even better you can submit a Pull Request
 with a fix.
-First, be sure that a ticket exists that addresses the code you are going to commit (see [Submitting and Issue](#Submitting and Issue) above). It is important to start with a ticket so that the community has a chance to become aware of the problem you intend to solve or the feature you'd like to add.
+
 
 #### Submitting an Issue
 Before you submit your issue search the archive, maybe your question was already answered. Please take a minute to search through the open issues in the repo, and if you find one that matches your own, feel free to comment and your thoughts.
@@ -21,7 +21,7 @@ We use ZenHub in our repo to enhance our issue tracking, and generate statistics
 We strongly encourage code contributions. To begin, you should begin by **forking the Arches repo**. Then, follow our guide for [creating a development environment](https://arches.readthedocs.io/en/latest/creating-a-development-environment/) and clone your own fork, not the official archesproject repo. Once you have Arches fully installed using your own fork of the repo, you are ready to begin.
 #### Submitting Code
 
-First, be sure that a ticket exists that addresses the code you are going to commit (see [Submitting and Issue](#Submitting and Issue) above)
+First, be sure that a ticket exists that addresses the code you are going to commit (see [Submitting and Issue](#Submitting and Issue) above). It is important to start with a ticket so that the community has a chance to become aware of the problem you intend to solve or the feature you'd like to add.
 
 Before code will be accepted into the Arches, contributors will need to sign the [Contributor License Agreement](https://gist.github.com/archesprojectbot/a3fac614c9fcb9129cd0b5339d9981a4) (CLA). This process is handled by [CLA-Assistant](https://cla-assistant.io). You can sign it [here](https://cla-assistant.io/archesproject/arches), or CLA-Assistant will ask you to sign it once a Pull Request is submitted.
 Typically, work on arches is done in branches outside of master, and then merged into master when all work on that bug/feature is completed. Branches are usually created to resolve a particular ticket. As such, branches are typically named for the ticket number they address followed by a short description of the issue addressed in the ticket, all in snake (lower) case.
