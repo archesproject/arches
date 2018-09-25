@@ -177,9 +177,15 @@ class JsonLdWriter(RdfWriter):
         value = g.serialize(format='nt')
         js = from_rdf(str(value), options={format: 'application/nquads'})
 
+        assert len(resourceinstanceids) == 1 # currently, this should be limited to a single top resource
+        
+        archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
+        resource_inst_uri = archesproject[reverse('resources', args=[resourceinstanceids[0]]).lstrip('/')]
+        print(resource_inst_uri)
+
         framing = {
             "@omitDefault": True,
-            "@type": "%sgraph/%s" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, self.graph_id)
+            "@id": str(resource_inst_uri),
         }
 
         js = frame(js, framing)

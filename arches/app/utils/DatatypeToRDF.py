@@ -77,6 +77,8 @@ def _append_concept_node(graph, domainnode, edge, concept_value_id):
     graph.add((domainnode, URIRef(edge.ontologyproperty), rangenode))
 
     # add in some convenience information for the concept:
+    # FIXME: Add the language back in, once pyld fixes its problem with uppercase lang
+    # tokens -> https://github.com/digitalbazaar/pyld/issues/86
     #graph.add((rangenode, URIRef(RDFS.label), Literal(info['label'], lang=info['lang'])))
     graph.add((rangenode, URIRef(RDFS.label), Literal(info['label'])))
 
@@ -141,7 +143,7 @@ def _handle__default(graph, domainnode, rangenode, edge, tile,
     # This is in the original default method, but graph_uri just shouldn't be a type
     #if edge.domainnode.istopnode:
     #    graph.add((domainnode, RDF.type, graph_uri))
-    
+
     graph.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
 
     if domain_tile_data != None:
