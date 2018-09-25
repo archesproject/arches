@@ -10,8 +10,6 @@ today! Here are the guidelines we'd like you to follow:
 If you find a bug in the source code or a mistake in the documentation, you can help us by
 submitting an issue to this [GitHub Repository][github]. Even better you can submit a Pull Request
 with a fix.
-
-
 #### Submitting an Issue
 Before you submit your issue search the archive, maybe your question was already answered. Please take a minute to search through the open issues in the repo, and if you find one that matches your own, feel free to comment and your thoughts.
 If your issue appears to be a bug, and hasn't been reported, open a new issue. Be sure to create your issue in the Arches repo and not a fork of Arches so that it is visible to the community. Please add the appropriate labels to the issue (multiple labels are ok) to help us keep track of them.  Most labels are used across all Arches Project repositories, but some are specific to `archesproject/arches`.
