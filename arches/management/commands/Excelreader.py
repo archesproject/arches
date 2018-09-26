@@ -49,21 +49,21 @@ class Command(BaseCommand):
                     result = self.validate_rows_and_values(workbook)
                     
                 elif vtype == 'dates':
-                    data = self.get_values(workbook,datatype="dates")
+                    data = self.get_values_for_validation(workbook,datatype="dates")
                     values = self.flatten_values(data)
                     result = self.validatedates(values)
 
                 elif vtype == 'geometries':
-                    data = self.get_values(workbook,datatype="geomtries")
+                    data = self.get_values_for_validation(workbook,datatype="geomtries")
                     values = self.flatten_values(data)
                     result = self.validate_geometries(values)
                     
                 elif vtype == 'concepts':
-                    data = self.get_values(workbook,datatype="domains")
+                    data = self.get_values_for_validation(workbook,datatype="domains")
                     result = self.validate_concepts(data)
                     
                 elif vtype == 'files':
-                    data = self.get_values(workbook,datatype="files")
+                    data = self.get_values_for_validation(workbook,datatype="files")
                     values = self.flatten_values(data)
                     result, filelist = self.validate_files(values)
                     
@@ -371,7 +371,7 @@ class Command(BaseCommand):
                     output.append(line)
         return output
 
-    def get_values(self,wb,datatype=''):
+    def get_values_for_validation(self,wb,datatype=''):
         '''collects all data values from the workbook, only of certain type
         if specified.
         '''
@@ -393,13 +393,15 @@ class Command(BaseCommand):
 
                 result[sheet_name][node_name] = []
                 for row_index, row in enumerate(sheet.iter_rows(row_offset = 1)):
-                    value = row[col_index].value
-                    if not value:
+                    values = row[col_index].value
+                    if not values:
                         continue
-                    result[sheet_name][node_name].append((value,row_index,col_index))
+                    for value in str(values).split("|"):
+                        tuple = (value,row_index,col_index)
+                        result[sheet_name][node_name].append(tuple)
 
         return result
-        
+
     def write_arches_file(self,workbook,resourcetype,destination,append=False):
         '''trimmed down version of SiteDataset, removing all validation operations.
         only produces a .arches file now.'''
