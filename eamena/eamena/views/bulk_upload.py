@@ -58,8 +58,12 @@ def new_upload(request):
 def main(request):
     ''' nothing special here, everything is handled with ajax'''
 
-    with open(os.path.join(settings.BULK_UPLOAD_DIR,"_loadlog.txt"),'rb') as loadlog:
-        loads = loadlog.readlines()
+    loadlog = os.path.join(settings.BULK_UPLOAD_DIR,"_loadlog.txt")
+    if os.path.isfile(loadlog):
+        with open(loadlog,'rb') as loadlog:
+            loads = loadlog.readlines()
+    else:
+        loads = []
     return render_to_response('bulk-upload/main.htm',
         {'active_page': 'Bulk Upload',
         'load_log':loads}, # not sure if this is necessary
