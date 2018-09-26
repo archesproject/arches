@@ -127,6 +127,8 @@ class RdfWriter(Writer):
                 raise Exception("No idea why this code would be used, given how the node URIs are formed...")
                 # FIXME: make sure that we are not readding the same serialized data to
                 # the graph if a node is mentioned multiple times
+                # FIXME: Determine the scenario when this code will ever run, given the exception 
+                # it should throw has never been triggered by the fixture models. 
                 d_uri, r_uri = node2uri(edge.domainnode.pk), node2uri(edge.rangenode.pk)
                 # FIXME: How likely is this to be true more than once?!
                 #if edge.domainnode.istopnode:
