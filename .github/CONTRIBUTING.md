@@ -115,3 +115,96 @@ If you are so inclined, we greatly appreciate any help in adding to the Arches d
 [wmf]: http://www.wmf.org/
 [maindocs]: https://arches.readthedocs.io/
 [Contributing]: https://github.com/archesproject/arches/blob/master/.github/CONTRIBUTING.md
+
+## <a name="notes"></a> Additional Notes
+
+### Issue and Pull Request Labels
+
+This section describes how labels are used to help track and manage issues and pull requests. Most labels are used across all Arches Project repositories, but some are specific to `archesproject/arches`.
+
+
+[GitHub search](https://help.github.com/articles/searching-issues/) makes it easy to use labels for finding groups of issues or pull requests you're interested in. For example, you might be interested in [open issues across `archesproject/arches` and all Arches Project owned packages which are labeled as bugs](https://github.com/issues?utf8=✓&q=is%3Aopen+is%3Aissue+user%3Aarchesproject+label%3A%22Type%3A+Bug%22) or perhaps [open pull requests in `archesproject/arches` which are dependency upgrades](https://github.com/issues?utf8=✓&q=is%3Aopen+is%3Apr+repo%3Aarchesproject%2Farches+label%3A%22Type%3A+Dependencies%22+). To help you find issues and pull requests, each label is listed with search links for finding open items with that label in `archesproject/arches` only and also across all Atom repositories. We encourage you to read about [other search filters](https://help.github.com/articles/searching-issues/) which will help you write more focused queries.
+
+The labels are grouped by their purpose, but it's not required that every issue have a label from every group or that an issue can't have more than one label from the same group.
+
+#### Type of Issue
+Labels in this category are proceeded by the `Type: ` tag.
+
+| Label name   | `arches` :mag_right: | `archesproject`‑org :mag_right: | Description |
+| --- | --- | --- | --- |
+| `Bug` | [search][search-arches-repo-label-bug] | [search][search-arches-org-label-bug] | Issues that are confirmed bugs or reports that are very likely to be bugs. |
+| `Dependencies` | [search][search-arches-repo-label-dependencies] | [search][search-arches-org-label-dependencies] | Issues relating to Dependency upgrades. |
+| `Enhancement` | [search][search-arches-repo-label-enhancement] | [search][search-arches-org-label-enhancement] | Issues relating to an enhancement to the functionality of the Arches software. |
+| `Proposal` | [search][search-arches-repo-label-proposal] | [search][search-arches-org-label-proposal] | Issues that are a proposal that is looking for input from the Arches team or community. |
+
+#### Priority of Issue
+Labels in this category are proceeded by the `Priority: ` tag.
+
+| Label name   | `arches` :mag_right: | `archesproject`‑org :mag_right: | Description |
+| --- | --- | --- | --- |
+| `High` | [search][search-arches-repo-label-high] | [search][search-arches-org-label-high] | Issues that are deemed a high priority to be handled quickly. |
+| `Low` | [search][search-arches-repo-label-low] | [search][search-arches-org-label-low] | Issues that are deemed a low priority to be handled when time permits. |
+
+#### Status of Issue
+Labels in this category are proceeded by the `Status: ` tag.
+
+| Label name   | `arches` :mag_right: | `archesproject`‑org :mag_right: | Description |
+| --- | --- | --- | --- |
+| `Blocked` | [search][search-arches-repo-label-blocked] | [search][search-arches-org-label-blocked] | Issues blocked by other issues. |
+| `Duplicate` | [search][search-arches-repo-label-duplicate] | [search][search-arches-org-label-duplicate] | Issues which are duplicates of other issues, i.e. they have been reported before. |
+| `On Hold` | [search][search-arches-repo-label-onhold] | [search][search-arches-org-label-onhold] | Issues that have been put on hold for the foreseeable future. |
+| `Won't Fix` | [search][search-arches-repo-label-wontfix] | [search][search-arches-org-label-wontfix] | Issues that the Arches core team has decided not to fix for now, either because they're working as intended or for some other reason. |
+
+
+#### Subject of Issue
+Labels in this category are proceeded by the `Subject: ` tag. Since there are many different subjects that change over time, not all are listed here. A few examples are listed below. To view all the Subject Labels, follow this [link](https://github.com/archesproject/arches/labels?utf8=%E2%9C%93&q=Subject). 
+
+| Label name   | `arches` :mag_right: | `archesproject`‑org :mag_right: | Description |
+| --- | --- | --- | --- |
+| `Documentation` | [search][search-arches-repo-label-documentation] | [search][search-arches-org-label-documentation] | Issues relating to Documentation, either In App or on [Read The Docs][readthedocs]. |
+| `Import/Export` | [search][search-arches-repo-label-importexport] | [search][search-arches-org-label-importexport] | Issues relating to Import/Export of data in and out of Arches |
+| `RDM` | [search][search-arches-repo-label-rdm] | [search][search-arches-org-label-rdm] | Issues relating to the Reference Data Manager |
+| `Search` | [search][search-arches-repo-label-search] | [search][search-arches-org-label-search] | Issues relating to search. |
+| `Testing` | [search][search-arches-repo-label-testing] | [search][search-arches-org-label-testing] | Issues relating to testing the Arches codebase. |
+
+#### Roadmap Issues
+Labels in this category are proceeded by the `Roadmap: ` tag. Since there are many different subjects that change over time, not all are listed here. These labels pertain to specific work that is planned in the near future. To view all the Roadmap Labels, follow this [link](https://github.com/archesproject/arches/labels?utf8=%E2%9C%93&q=Roadmap). 
+
+[search-arches-repo-label-bug]: https://github.com/issues?q=is%3Aopen+is%3Aissue+repo%3Aarchesproject%2Farches+label%3A%22Type%3A+Bug%22
+[search-arches-org-label-bug]: https://github.com/issues?q=is%3Aopen+is%3Aissue+user%3Aarchesproject+label%3A%22Type%3A+Bug%22
+[search-arches-repo-label-dependencies]: https://github.com/issues?q=is%3Aopen+is%3Aissue+repo%3Aarchesproject%2Farches+label%3A%22Type%3A+Dependencies%22
+[search-arches-org-label-dependencies]: https://github.com/issues?q=is%3Aopen+is%3Aissue+user%3Aarchesproject+label%3A%22Type%3A+Dependencies%22
+[search-arches-repo-label-enhancement]: https://github.com/issues?q=is%3Aopen+is%3Aissue+repo%3Aarchesproject%2Farches+label%3A%22Type%3A+Enhancement%22
+[search-arches-org-label-enhancement]: https://github.com/issues?q=is%3Aopen+is%3Aissue+user%3Aarchesproject+label%3A%22Type%3A+Enhancement%22
+[search-arches-repo-label-proposal]: https://github.com/issues?q=is%3Aopen+is%3Aissue+repo%3Aarchesproject%2Farches+label%3A%22Type%3A+Proposal%22
+[search-arches-org-label-proposal]: https://github.com/issues?q=is%3Aopen+is%3Aissue+user%3Aarchesproject+label%3A%22Type%3A+Proposal%22
+
+[search-arches-repo-label-high]: https://github.com/issues?q=is%3Aopen+is%3Aissue+repo%3Aarchesproject%2Farches+label%3A%22Priority%3A+High%22+
+[search-arches-org-label-high]: https://github.com/issues?q=is%3Aopen+is%3Aissue+user%3Aarchesproject+label%3A%22Priority%3A+High%22+
+[search-arches-repo-label-low]: https://github.com/issues?q=is%3Aopen+is%3Aissue+repo%3Aarchesproject%2Farches+label%3A%22Priority%3A+Low%22+
+[search-arches-org-label-low]: https://github.com/issues?q=is%3Aopen+is%3Aissue+user%3Aarchesproject+label%3A%22Priority%3A+Low%22+
+
+[search-arches-repo-label-blocked]: https://github.com/issues?q=is%3Aopen+is%3Aissue+repo%3Aarchesproject%2Farches+label%3A%22Status%3A+Blocked%22+
+[search-arches-org-label-blocked]: https://github.com/issues?q=is%3Aopen+is%3Aissue+user%3Aarchesproject+label%3A%22Status%3A+Blocked%22+
+[search-arches-repo-label-duplicate]: https://github.com/issues?q=is%3Aopen+is%3Aissue+repo%3Aarchesproject%2Farches+label%3A%22Status%3A+Duplicate%22+
+[search-arches-org-label-duplicate]: https://github.com/issues?q=is%3Aopen+is%3Aissue+user%3Aarchesproject+label%3A%22Status%3A+Duplicate%22+
+[search-arches-repo-label-onhold]: https://github.com/issues?q=is%3Aopen+is%3Aissue+repo%3Aarchesproject%2Farches+label%3A%22Status%3A+On+Hold%22+
+[search-arches-org-label-onhold]: https://github.com/issues?q=is%3Aopen+is%3Aissue+user%3Aarchesproject+label%3A%22Status%3A+On+Hold%22+
+[search-arches-repo-label-wontfix]: https://github.com/issues?q=is%3Aopen+is%3Aissue+repo%3Aarchesproject%2Farches+label%3A%22Status%3A+Won%27t+Fix%22+
+[search-arches-org-label-wontfix]: https://github.com/issues?q=is%3Aopen+is%3Aissue+user%3Aarchesproject+label%3A%22Status%3A+Won%27t+Fix%22+
+
+[search-arches-repo-label-documentation]: https://github.com/issues?q=is%3Aopen+is%3Aissue+repo%3Aarchesproject%2Farches+label%3A%22Subject%3A+Documentation%22+
+[search-arches-org-label-documentation]: https://github.com/issues?q=is%3Aopen+is%3Aissue+user%3Aarchesproject+label%3A%22Subject%3A+Documentation%22+
+[search-arches-repo-label-importexport]: https://github.com/issues?q=is%3Aopen+is%3Aissue+repo%3Aarchesproject%2Farches+label%3A%22Subject%3A+Import%2FExport%22+
+[search-arches-org-label-importexport]: https://github.com/issues?q=is%3Aopen+is%3Aissue+user%3Aarchesproject+label%3A%22Subject%3A+Import%2FExport%22+
+[search-arches-repo-label-rdm]: https://github.com/issues?q=is%3Aopen+is%3Aissue+repo%3Aarchesproject%2Farches+label%3A%22Subject%3A+RDM%22+
+[search-arches-org-label-rdm]: https://github.com/issues?q=is%3Aopen+is%3Aissue+user%3Aarchesproject+label%3A%22Subject%3A+RDM%22+
+[search-arches-repo-label-search]: https://github.com/issues?q=is%3Aopen+is%3Aissue+repo%3Aarchesproject%2Farches+label%3A%22Subject%3A+Search%22+
+[search-arches-org-label-search]: https://github.com/issues?q=is%3Aopen+is%3Aissue+user%3Aarchesproject+label%3A%22Subject%3A+Search%22+
+[search-arches-repo-label-testing]: https://github.com/issues?q=is%3Aopen+is%3Aissue+repo%3Aarchesproject%2Farches+label%3A%22Subject%3A+Testing%22+
+[search-arches-org-label-testing]: https://github.com/issues?q=is%3Aopen+is%3Aissue+user%3Aarchesproject+label%3A%22Subject%3A+Testing%22+
+
+
+[github]: https://github.com/archesproject/arches/
+[groups]: https://groups.google.com/forum/#!forum/archesproject
+[readthedocs]: http://arches.readthedocs.io/en/stable/
