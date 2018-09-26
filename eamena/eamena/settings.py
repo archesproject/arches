@@ -201,6 +201,10 @@ ACTOR_NODES = [
 
 APP_NAME = 'eamena'
 
+
+DATE_PARSING_FORMAT = ['%B %d, %Y', '%Y-%m-%d', '%Y-%m-%d %H:%M:%S']
+
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
