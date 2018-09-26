@@ -32,7 +32,8 @@ RUN apt-get update -y &&\
 		zlib1g-dev \
         clang \
         make \
-        pkg-config &&\
+        pkg-config \
+		zopfli &&\
 	curl -sL https://deb.nodesource.com/setup_6.x | bash - &&\
 	apt-get install nodejs &&\
 	npm install -g yarn &&\
