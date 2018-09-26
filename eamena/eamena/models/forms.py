@@ -1230,7 +1230,6 @@ class LocationForm(ResourceForm):
         self.update_nodes('SITE_OVERALL_SHAPE_TYPE.E55', data)
         
         self.update_nodes('TOPOGRAPHY_TYPE.E55', data)
-        self.update_nodes('COUNTRY_TYPE.E55', data)
         self.update_nodes('ADMINISTRATIVE_DIVISION.E53', data)
         self.update_nodes('ADDRESS.E45', data)
         self.update_nodes('CADASTRAL_REFERENCE.E44', data)        
@@ -1276,12 +1275,7 @@ class LocationForm(ResourceForm):
             }
         }
 
-        self.data['COUNTRY_TYPE.E55'] = {
-            'branch_lists': self.get_nodes('COUNTRY_TYPE.E55'),
-            'domains': {
-                'COUNTRY_TYPE.E55': Concept().get_e55_domain('COUNTRY_TYPE.E55')
-            }
-        }
+
 
         self.data['ADMINISTRATIVE_DIVISION.E53'] = {
             'branch_lists': self.get_nodes('ADMINISTRATIVE_DIVISION.E53'),
