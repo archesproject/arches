@@ -573,80 +573,135 @@ def show_entity_structure(entity_type_id, verbose=False):
                 print " ",k,v
 
 def rename_entity_type(old_entitytype_id, new_entitytype_id):
-    logging.warning("renaming entitytype from %s to %s", old_entitytype_id, new_entitytype_id)
-    
 
-        
+    ## cancel operation if the entity doesn't exist in the first place
+    try:
+        newentitytype = models.EntityTypes.objects.get(entitytypeid=old_entitytype_id)
+    except models.EntityTypes.DoesNotExist:
+        logging.warning("%s does not exist, cancelling operation" % old_entitytype_id)
+        return False
+
+    logging.warning("renaming entitytype from %s to %s", old_entitytype_id, new_entitytype_id)
+
+    ## this is just a print operation to help with debugging
+    show_entity_structure(old_entitytype_id)
+
+    ## create duplicate of the EntityType object with the new id
+    entity = models.EntityTypes.objects.get(entitytypeid=old_entitytype_id)
+    entity.entitytypeid=new_entitytype_id
+    entity.save()
+
     # update the entity_type model and save
-    newentitytype = models.EntityTypes.objects.get(entitytypeid=old_entitytype_id)
     newentitytype.entitytypeid=new_entitytype_id
     newentitytype.save()
-    
-    # update the Rules
-    #First find if Rules with the new entitytypeid already exist, if so, delete them and replace their ruleid into mapping_steps with that of the old entitytypeid rule, then rename the rules
-    pre_existing_rulesout = models.Rules.objects.filter(entitytypedomain=new_entitytype_id)
-    pre_existing_rulesin = models.Rules.objects.filter(entitytyperange=new_entitytype_id)
-    if pre_existing_rulesout:
-        print "<<<<<Beginning of rulesout>>>>>>"       
+
+    ## I have a hunch that none of this is necessary. I think MappingSteps are
+    ## autocreated objects that are the result of foreign key relationships.
+    ## They seem to be properly removed and created during the removal and
+    ## creation events of the Rules and Mapping objects. -AC
+
+    if 2 == 1:
+        # update the Rules
+        # First find if Rules with the new entitytypeid already exist, if so, delete them and
+        # replace their ruleid into mapping_steps with that of the old entitytypeid rule, then rename the rules
+        pre_existing_rulesout = models.Rules.objects.filter(entitytypedomain=new_entitytype_id)
+        print "pre_existing_rulesout:",len(pre_existing_rulesout)
+        
+        print "<<<<<Beginning of rulesout>>>>>>"
+        if len(pre_existing_rulesout) == 0:
+            print "no rulesout"
         for pre_existing_ruleout in pre_existing_rulesout:
-            ruleid_to_replace_with = models.Rules.objects.filter(entitytypedomain=old_entitytype_id, entitytyperange = pre_existing_ruleout.entitytyperange, propertyid = pre_existing_ruleout.propertyid)
+            ruleid_to_replace_with = models.Rules.objects.filter(
+                entitytypedomain = old_entitytype_id,
+                entitytyperange = pre_existing_ruleout.entitytyperange,
+                propertyid = pre_existing_ruleout.propertyid
+            )
+            print pre_existing_ruleout
+            print ruleid_to_replace_with
             if ruleid_to_replace_with:
                 steps = models.MappingSteps.objects.filter(ruleid= pre_existing_ruleout.ruleid)
-                print "RULEID TO REPLACE WITH", ruleid_to_replace_with[0].pk, pre_existing_ruleout.ruleid, len(steps) 
-                if steps:                
-                    for step in steps:
-                        print "STEP being analysed has mapping %s and rule %s, and the rule will be replaced with %s" % (step.mappingid_id, step.ruleid_id,ruleid_to_replace_with[0].pk) 
-                        mapping = models.Mappings.objects.get(pk = step.mappingid_id)
-                        order = step.order
-                        try:
-                            steps_with_mapping_before_delete = models.MappingSteps.objects.filter(mappingid = mapping)
-                            print "Steps length with mapping %s before deletion %s" % (mapping.mappingid, len(steps_with_mapping_before_delete))
-                            step.delete()
-                            new_step = models.MappingSteps(mappingid = mapping, ruleid = ruleid_to_replace_with[0], order = order)
-                            new_step.save()
-                            steps_with_mapping_after_new = models.MappingSteps.objects.filter(mappingid = mapping)
-                            print "Steps length with mapping %s after deletion %s" % (mapping.mappingid, len(steps_with_mapping_after_new))
-                            
-                        except IntegrityError as e:
-                            print "Error saving step %s" % e
-                            continue
+                #print "RULEID TO REPLACE WITH", ruleid_to_replace_with[0].pk, pre_existing_ruleout.ruleid, len(steps)
+                print "steps:", len(steps)
+                print steps
+                for step in steps:
+                    for k,v in vars(step).iteritems():
+                        print "  ",k,v
+                    print "  --"
+                if not steps:
+                    continue
+                for step in steps:
+                    #print "STEP being analysed has mapping %s and rule %s, and the rule will be replaced with %s" % (step.mappingid_id, step.ruleid_id,ruleid_to_replace_with[0].pk) 
+                    mapping = models.Mappings.objects.get(pk = step.mappingid_id)
+                    order = step.order
+                    try:
+                        steps_with_mapping_before_delete = models.MappingSteps.objects.filter(mappingid = mapping)
+                        #print "Steps length with mapping %s before deletion %s" % (mapping.mappingid, len(steps_with_mapping_before_delete))
+                        step.delete()
+                        new_step = models.MappingSteps(mappingid = mapping, ruleid = ruleid_to_replace_with[0], order = order)
+                        new_step.save()
+                        steps_with_mapping_after_new = models.MappingSteps.objects.filter(mappingid = mapping)
+                        #print "Steps length with mapping %s after deletion %s" % (mapping.mappingid, len(steps_with_mapping_after_new))
+                        
+                    except IntegrityError as e:
+                        print "Error saving step %s" % e
+                        continue
                 pre_existing_ruleout.delete()                   
 
- 
-    if pre_existing_rulesin:
-        print "<<<<<Beginning of rulesin>>>>>>"        
-        for pre_existing_rulein in pre_existing_rulesin:
+        pre_existing_rulesin = models.Rules.objects.filter(entitytyperange=new_entitytype_id)
+        print "pre_existing_rulesin:",len(pre_existing_rulesin)
+        if pre_existing_rulesin:
+            print "<<<<<Beginning of rulesin>>>>>>"        
+            for pre_existing_rulein in pre_existing_rulesin:
 
-            ruleid_to_replace_with = models.Rules.objects.filter(entitytyperange=old_entitytype_id, entitytypedomain = pre_existing_rulein.entitytypedomain, propertyid = pre_existing_rulein.propertyid)
-            if ruleid_to_replace_with:
-                steps = models.MappingSteps.objects.filter(ruleid= pre_existing_rulein.ruleid)
-                print "RULEID TO REPLACE WITH", ruleid_to_replace_with[0].pk, pre_existing_rulein.ruleid, len(steps) 
-                if steps:                
-                    for step in steps:
-                        print "STEP being analysed has mapping %s and rule %s, and the rule will be replaced with %s" % (step.mappingid_id, step.ruleid_id,ruleid_to_replace_with[0].pk) 
-                        mapping = models.Mappings.objects.get(pk = step.mappingid_id)
-                        order = step.order
-                        try:
-                            step.delete()
-                            new_step = models.MappingSteps(mappingid = mapping, ruleid = ruleid_to_replace_with[0], order = order)
-                            new_step.save()
-                            
-                        except IntegrityError as e:
-                            print "Error saving step %s" % e
-                            continue
-                pre_existing_rulein.delete()
+                ruleid_to_replace_with = models.Rules.objects.filter(entitytyperange=old_entitytype_id, entitytypedomain = pre_existing_rulein.entitytypedomain, propertyid = pre_existing_rulein.propertyid)
+                print ruleid_to_replace_with
+                if ruleid_to_replace_with:
+                    steps = models.MappingSteps.objects.filter(ruleid= pre_existing_rulein.ruleid)
+                    #print "RULEID TO REPLACE WITH", ruleid_to_replace_with[0].pk, pre_existing_rulein.ruleid, len(steps) 
+                    print "steps:", len(steps)
+                    break
+                    if steps:                
+                        for step in steps:
+                            #print "STEP being analysed has mapping %s and rule %s, and the rule will be replaced with %s" % (step.mappingid_id, step.ruleid_id,ruleid_to_replace_with[0].pk) 
+                            mapping = models.Mappings.objects.get(pk = step.mappingid_id)
+                            order = step.order
+                            try:
+                                step.delete()
+                                new_step = models.MappingSteps(mappingid = mapping, ruleid = ruleid_to_replace_with[0], order = order)
+                                new_step.save()
+                                
+                            except IntegrityError as e:
+                                print "Error saving step %s" % e
+                                continue
+                    pre_existing_rulein.delete()
+
+    ## I'm pretty sure that IntegrityErrors are ok in the Rules operations below,
+    ## because I think thatrules are meant to be unique throughout the db. In 
+    ## other words, if there is already one that matches the one you are trying to
+    ## make, then you don't need to create it again. This could be handled better
+    ## with an if statement, instead of using try/except, which isn't optimal. -AC
 
     # update the Rules
     rulesout = models.Rules.objects.filter(entitytypedomain=old_entitytype_id)
+    print "updating {} rulesout".format(len(rulesout))
     for r in rulesout:
-        r.entitytypedomain=newentitytype
-        r.save()
-    
+        try:
+            r.entitytypedomain=newentitytype
+            r.save()
+            print "success"
+        except IntegrityError:
+            print "failed"
+
     rulesin = models.Rules.objects.filter(entitytyperange=old_entitytype_id)
+    print "updating {} rulesin".format(len(rulesin))
     for r in rulesin:
-        r.entitytyperange=newentitytype
-        r.save()
-    
+        try:
+            r.entitytyperange=newentitytype
+            r.save()
+            print "success"
+        except IntegrityError:
+            print "failed"
+
     # update the Mappings
     mappingsout = models.Mappings.objects.filter(entitytypeidfrom=old_entitytype_id)
     for m in mappingsout:
@@ -657,22 +712,27 @@ def rename_entity_type(old_entitytype_id, new_entitytype_id):
     for m in mappingsin:
         m.entitytypeidto=newentitytype
         m.save()
-    
+        print "  --"
+
     #update the mergenodeids in the Mappings
     mappingsmergenodes = models.Mappings.objects.filter(mergenodeid=old_entitytype_id)
     for m in mappingsmergenodes:
         m.mergenodeid=newentitytype
         m.save()    
-    
-    # update the entities --- COMMENTED OFF UNTIL BUG WITH RULES IS RESOLVED
-#     entities = models.Entities.objects.filter(entitytypeid=old_entitytype_id)
-#     for e in entities:
-#         logging.warning("Changing type of entity %s from %s to %s", e, old_entitytype_id, newentitytype)
-#         e.entitytypeid=newentitytype
-#         e.save()
 
-    # delete the original entity type (saving the old one with a new pk actually duplicates it) -- COMMENTED OFF UNTIL BUG WITH RULES IS RESOLVED
-#     remove_entitytypes_and_concepts([old_entitytype_id,new_entitytype_id])
+    ## NOT SURE THIS SECTION IS NEEDED??? -AC
+    #update the entities --- COMMENTED OFF UNTIL BUG WITH RULES IS RESOLVED
+    # entities = models.Entities.objects.filter(entitytypeid=old_entitytype_id)
+    # print "entities:", len(entities)
+    # for e in entities:
+        # logging.warning("Changing type of entity %s from %s to %s", e, old_entitytype_id, newentitytype)
+        # e.entitytypeid=newentitytype
+        # e.save()
+
+    ## print statement shows what the new EntityType object looks like
+    show_entity_structure(new_entitytype_id)
+
+    remove_entitytypes_and_concepts([old_entitytype_id,new_entitytype_id])
 
 def add_resource_relation(entityid1, entityid2, relationship_type_string):
     # find the relationship type
