@@ -576,7 +576,7 @@ def rename_entity_type(old_entitytype_id, new_entitytype_id):
 
     ## cancel operation if the entity doesn't exist in the first place
     try:
-        newentitytype = models.EntityTypes.objects.get(entitytypeid=old_entitytype_id)
+        newentitytype = models.EntityTypes.objects.get(entitytypeid=new_entitytype_id)
     except models.EntityTypes.DoesNotExist:
         logging.warning("%s does not exist, cancelling operation" % old_entitytype_id)
         return False
