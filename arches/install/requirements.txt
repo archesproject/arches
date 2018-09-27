@@ -5,7 +5,7 @@ rdflib==4.2.2
 unicodecsv==0.14.1
 PyYAML==3.12
 django-guardian==1.4.9
-TileStache==1.51.8
+TileStache==1.51.11
 python-memcached==1.59
 mapbox-vector-tile==1.2.0
 mapnik==0.1
