@@ -9,7 +9,7 @@ today! Here are the guidelines we'd like you to follow:
 
 ### <a name="issue"></a> Found an Issue?
 If you find a bug in the source code or a mistake in the documentation, you can help us by
-submitting an issue to this [GitHub Repository][github]. Even better you can submit a Pull Request
+[submitting an issue](https://github.com/archesproject/arches/issues). Bugs are much easier to fix if you [include a screenshot or gif](https://github.com/archesproject/arches/wiki/Screen-capture) in the issue. Even better you can submit a Pull Request
 with a fix.
 
 #### Submitting an Issue
@@ -73,7 +73,7 @@ If I am working on ticket "Cool New Feature (ticket #1231)" my branch may be nam
    git push origin my-fix-branch -f
    ```
 
-*WARNING. Squashing or reverting commits and forced push thereafter may remove GitHub comments
+    *WARNING. Squashing or reverting commits and forced push thereafter may remove GitHub comments
 on code that were previously made by you and others in your commits.*
 
 That's it! Thank you for your contribution!
@@ -107,7 +107,7 @@ readable messages** that are easy to follow when looking through the **project h
 * Use the imperative mood ("Move cursor to..." not "Moves cursor to...")
 * Limit the first line to 72 characters or less
 * Make sure every commit references an issue, for example "improve contributing guidelines docs #1926"
-* When only changing documentation, include [ci skip] in the commit description
+* When only changing in-app help panels, include [ci skip] in the commit description
 
 ### <a name="documentation"></a> Contributing Documentation
 We greatly appreciate any help in adding to the Arches documentation. This could include creating example videos/workflows, to-do tasks, etc. We have two categories of documentation:
