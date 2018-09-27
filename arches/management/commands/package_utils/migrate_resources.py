@@ -515,6 +515,62 @@ def convert_resource(resourceid, target_entitytypeid):
 
     # reindex
     resource.index()
+    
+def show_entity_structure(entity_type_id, verbose=False):
+    """just a series of print statements created to help with debugging.
+    if verbose == True, properties for the entities are printed,
+    otherwise only counts are reported."""
+
+    print entity_type_id
+    try:
+        entity = models.EntityTypes.objects.get(entitytypeid=entity_type_id)
+        if verbose:
+            for k,v in vars(entity).iteritems():
+                print k,v
+    except models.EntityTypes.DoesNotExist:
+        print "  doesn't exist"
+
+    rules_to_entity = models.Rules.objects.filter(entitytyperange=entity_type_id)
+    print "-"*30
+    print "rules to entity:", len(rules_to_entity)
+
+    for i,rule_to in enumerate(rules_to_entity):
+        if verbose:
+            print "  ----"
+            for k,v in vars(rule_to).iteritems():
+                print " ",k,v
+
+        steps = models.MappingSteps.objects.filter(ruleid=rule_to.ruleid)
+        print "  steps for rule {}".format(i+1,len(steps))
+
+    rules_from_entity = models.Rules.objects.filter(entitytypedomain=entity_type_id)
+    print "-"*30
+    print "rules from entity:", len(rules_from_entity)
+    for i,rule_from in enumerate(rules_from_entity):
+        if verbose:
+            print "  ----"
+            for k,v in vars(rule_from).iteritems():
+                print " ",k,v
+        steps = models.MappingSteps.objects.filter(ruleid=rule_from.ruleid)
+        print "  steps for rule {}".format(i+1,len(steps))
+
+    mappings_to_entity = models.Mappings.objects.filter(entitytypeidto=entity_type_id)
+    print "-"*30
+    print "mappings to entity:", len(mappings_to_entity)
+    if verbose:
+        for mapping_to in mappings_to_entity:
+            print "  ----"
+            for k,v in vars(mapping_to).iteritems():
+                print " ",k,v
+
+    mappings_from_entity = models.Mappings.objects.filter(entitytypeidfrom=entity_type_id)
+    print "-"*30
+    print "mappings from entity:", len(mappings_from_entity)
+    if verbose:
+        for mapping_from in mappings_from_entity:
+            print "  ----"
+            for k,v in vars(mapping_to).iteritems():
+                print " ",k,v
 
 def rename_entity_type(old_entitytype_id, new_entitytype_id):
     logging.warning("renaming entitytype from %s to %s", old_entitytype_id, new_entitytype_id)
