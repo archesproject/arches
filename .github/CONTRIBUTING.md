@@ -112,8 +112,8 @@ readable messages** that are easy to follow when looking through the **project h
 ### <a name="documentation"></a> Contributing Documentation
 We greatly appreciate any help in adding to the Arches documentation. This could include creating example videos/workflows, to-do tasks, etc. We have two categories of documentation:
 - Official [Arches documentation][readthedocs] - full and publically accessible documentation
-   - Stored the [archesproject/arches-docs](https://github.com/archesproject/arches-docs) repository. Please see that repo's [wiki](https://github.com/archesproject/arches-docs/wiki) for more information.
-   - To contribute to this documentation, fork the Arches repo as described above. Or, you can create an [issue](https://github.com/archesproject/arches-docs/issues) on the docs repo.
+   - Managed in the [archesproject/arches-docs](https://github.com/archesproject/arches-docs) repository. Please see that repo's [wiki](https://github.com/archesproject/arches-docs/wiki) for more information on contributing content.
+   - Also, feel free to just create an [issue](https://github.com/archesproject/arches-docs/issues) on the docs repo.
 - In-app help panels - accessible only from within the Arches interface, meant for quick user reference
    - This content is stored as HTML templates in [`/arches/arches/app/templates/help`](https://github.com/archesproject/arches/tree/master/arches/app/templates/help).
    - To contribute to this documentation, use the normal contributing procedures described above.
