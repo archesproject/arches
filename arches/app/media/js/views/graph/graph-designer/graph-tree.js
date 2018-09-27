@@ -60,9 +60,12 @@ define([
         initialize: function(options) {
             this.graphModel = options.graphModel;
             this.graphSettings = options.graphSettings;
+            this.cardTree = options.cardTree;
+            this.permissionTree = options.permissionTree;
             this.items = this.graphModel.get('nodes');
             this.branchListVisible = ko.observable(false);
             this.scrollTo = ko.observable();
+            this.restrictedNodegroups = options.restrictedNodegroups;
             TreeView.prototype.initialize.apply(this, arguments);
         },
 
@@ -71,9 +74,14 @@ define([
         * @memberof GraphTree.prototype
         * @param {object} node - a node in the tree
         */
+
         getDisplayName: function(node) {
             return ko.computed(function(){
-                return node.name() + ' (' + node.ontologyclass_friendlyname().split('_')[0] + ')';
+                var name = node.name();
+                if (node.ontologyclass_friendlyname() != "") {
+                    name = name + ' (' + node.ontologyclass_friendlyname().split('_')[0] + ')';
+                }
+                return name;
             }, this);
         },
 
@@ -139,6 +147,10 @@ define([
             this.graphModel.appendNode(node ,function(response, status){
                 if(status === 'success') {
                     node.expanded(true);
+                    if (node.istopnode && this.graphModel.get('isresource')) {
+                        this.cardTree.addCard(response.responseJSON);
+                        this.permissionTree.addCard(response.responseJSON);
+                    }
                 }
             }, this);
         },
@@ -146,6 +158,10 @@ define([
         deleteNode: function(node, e) {
             e.stopImmediatePropagation();
             this.graphModel.deleteNode(node);
+            if (node.isCollector()) {
+                this.cardTree.deleteCard(node.nodeGroupId());
+                this.permissionTree.deleteCard(node.nodeGroupId());
+            }
         },
 
         exportBranch: function(node, e) {
@@ -176,6 +192,20 @@ define([
             });
         },
 
+        _initializeItem: function(item){
+            if (!item.expanded) {
+                item.expanded = ko.observable(item.istopnode);
+            }
+            TreeView.prototype._initializeItem.apply(this, arguments);
+        },
+
+        collapseAll: function(){
+            this.items().forEach(function(item){
+                if (!item.istopnode) {
+                    item.expanded(false);
+                }
+            }, this);
+        }
     });
     return GraphTree;
 });

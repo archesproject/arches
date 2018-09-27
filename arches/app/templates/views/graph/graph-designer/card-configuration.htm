@@ -5,9 +5,6 @@
     <div class="panel-section-title dark-colored-text">
         {% trans "Card Configuration" %}
     </div>
-    <div class="panel-section-subtitle">
-        {% trans "Define how this card will be presented to the user" %}
-    </div>
 </div>
 
 <!-- Tabs Content -->
@@ -15,10 +12,7 @@
 
     <!-- Card Container Base Settings Form -->
     <div id="card-crud-settings" class="tab-pane fade in active">
-        <div class="panel-section-heading dark-colored-text">
-            {% trans "Card Component" %}
-        </div>
-        <div class="node-widget-label">
+        <div class="node-config-item">
             <div class="control-label">
                 {% trans "Card Type" %}
             </div>
@@ -27,21 +21,17 @@
             </div>
         </div>
 
-        <div class="form-divider">
-            <div class="panel-section-heading dark-colored-text">
-                {% trans "Appearance" %}
-            </div>
-
-            <div class="node-widget-label">
+        <div class="">
+            <div class="node-config-item">
                 <div class="control-label">
-                    {% trans "Card Tab Title" %}
+                    {% trans "Card Title" %}
                 </div>
                 <div>
                     <input type="" placeholder="{% trans "Card name" %}" class="form-control input-md widget-input" data-bind="textInput: model.name">
                 </div>
             </div>
 
-            <div class="node-widget-label">
+            <div class="node-config-item">
                 <div class="control-label">
                     {% trans "Subtitle" %}
                 </div>
@@ -50,61 +40,73 @@
                 </div>
             </div>
 
-            <div class="node-widget-label">
+            <div class="node-config-item">
                 <div class="control-label">
                     {% trans "CSS Classes (Optional)" %}
                 </div>
                 <div>
-                    <input type="" placeholder="{% trans " " %}" class="form-control input-md widget-input">
+                    <input type="" placeholder="{% trans " " %}" class="form-control input-md widget-input" data-bind="textInput: model.cssclass">
                 </div>
             </div>
 
         </div>
 
+        <div>
+            <!-- ko component: {
+                name: model.cardComponentLookup[model.component_id()].componentname,
+                params: {
+                    state: 'config',
+                    preview: self.preview,
+                    card: $data
+                }
+            } --> <!-- /ko -->
+        </div>
 
-        <div class="form-divider">
-            <div class="panel-section-heading dark-colored-text"> {% trans "Settings" %} </div>
-            
-            <!-- Card Visibility -->
-            <div data-bind="component: { name: 'views/components/simple-switch', params: {value: model.visible, config:{label: '{% trans "Make Card Visible" %}', subtitle: '{% trans "Show this card by default" %}'}}}"></div>
-
-            <!-- Set Cardinaltiy -->
-            <div data-bind="component: { name: 'views/components/simple-switch', params: {value: model.cardinality, config:{on: 'n', off: '1', label: '{% trans "Allow multiple values" %}', subtitle: '{% trans "Let users enter multiple values for this data entry card" %}'}}}"></div>
-
-            <!-- Multiple values tools -->
-            <div class="cardinality-form" data-bind="visible: model.cardinality() === 'n'" style="display: none;">
+        <!-- Settings -->
+        <div>
+            <div class="panel-section-title dark-colored-text pad-top">
+                {% trans "Settings" %}
             </div>
 
-            <!-- Enable help -->
-            <div data-bind="component: { name: 'views/components/simple-switch', params: {value: model.helpenabled, config:{label: '{% trans "Enable Card-level help" %}', subtitle: '{% trans "Provide specific user guidance for this card" %}'}}}"></div>
+            <div class="form-divider">
+                <!-- Card Visibility -->
+                <div class="pad-top" data-bind="component: { name: 'views/components/simple-switch', params: {value: model.visible, config:{label: '{% trans "Make Card Visible" %}', subtitle: '{% trans "Show this card by default" %}'}}}"></div>
 
-            <!-- Tertiary Panel For Card Help Text-->
-            <div class="tertiary-panel help-text-crud" style="display: none;" data-bind="visible: model.helpenabled">
-                <div class="tertiary-panel-content">
-                    <div class="">
-                        <h4 class="title-block-title"> {% trans "Card-Level Help" %} </h4>
-                    </div>
+                <!-- Set Cardinaltiy -->
+                <div class="pad-top" data-bind="component: { name: 'views/components/simple-switch', params: {value: model.cardinality, config:{on: 'n', off: '1', label: '{% trans "Allow multiple values" %}', subtitle: '{% trans "Let users enter multiple values for this data entry card" %}'}}}"></div>
 
-                    <!-- Help CRUD -->
-                    <div class="pad-all">
-                        <div class="node-widget-label">
-                            <div class="control-label">
-                                {% trans "Help Panel Title" %}
+                <!-- Multiple values tools -->
+                <div class="cardinality-form" data-bind="visible: model.cardinality() === 'n'" style="display: none;">
+                </div>
+
+                <!-- Enable help -->
+                <div data-bind="component: { name: 'views/components/simple-switch', params: {value: model.helpenabled, config:{label: '{% trans "Enable Card-level help" %}', subtitle: '{% trans "Provide specific user guidance for this card" %}'}}}"></div>
+
+                <!-- Tertiary Panel For Card Help Text-->
+                <div class="" style="display: none;" data-bind="visible: model.helpenabled">
+                    <div class="tertiary-panel-content">
+
+                        <!-- Help CRUD -->
+                        <div class="pad-all">
+                            <div class="node-widget-label">
+                                <div class="control-label">
+                                    {% trans "Help Panel Title" %}
+                                </div>
+                                <div class="col-sm-12 pad-no crud-widget-container">
+                                    <input type="" placeholder="{% trans "Help title" %}" class="form-control input-md widget-input" data-bind='textInput: model.helptitle'>
+                                </div>
                             </div>
-                            <div class="col-sm-12 pad-no crud-widget-container">
-                                <input type="" placeholder="{% trans "Help title" %}" class="form-control input-md widget-input" data-bind='value: model.helptitle'>
+
+                            <!--Rich text editor-->
+                            <div class="node-widget-label">
+                                <div class="control-label">
+                                    {% trans "Content" %}
+                                </div>
+                                <textarea rows="10" cols="80" data-bind="ckeditor: model.helptext, ckeditorOptions: {}, valueUpdate: 'afterkeydown'"></textarea>
                             </div>
+
+
                         </div>
-
-                        <!--Rich text editor-->
-                        <div class="node-widget-label">
-                            <div class="control-label">
-                                {% trans "Help Content" %}
-                            </div>
-                            <textarea rows="10" cols="80" data-bind="ckeditor: model.helptext, ckeditorOptions: {}, valueUpdate: 'afterkeydown'"></textarea>
-                        </div>
-
-                        
                     </div>
                 </div>
             </div>

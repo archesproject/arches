@@ -7,8 +7,9 @@ define([
     'models/card-widget',
     'arches',
     'require',
+    'utils/dispose',
     'viewmodels/tile'
-], function($, _, ko, koMapping, CardModel, CardWidgetModel, arches, require) {
+], function($, _, ko, koMapping, CardModel, CardWidgetModel, arches, require, dispose) {
     /**
     * A viewmodel used for generic cards
     *
@@ -19,9 +20,17 @@ define([
     */
     var isChildSelected = function(parent) {
         var childSelected = false;
-        var childrenKey = parent.tiles ? 'tiles' : 'cards';
-        ko.unwrap(parent[childrenKey]).forEach(function(child) {
-            if (child.selected() || isChildSelected(child)) {
+        var children = [];
+        if ('tileid' in parent) {
+            children = ko.unwrap(parent.cards);
+        } else if ('model' in parent) {
+            children = ko.unwrap(parent.cards).concat(
+                ko.unwrap(parent.tiles),
+                ko.unwrap(parent.widgets)
+            );
+        }
+        children.forEach(function(child) {
+            if (child.selected && child.selected() || isChildSelected(child)) {
                 childSelected = true;
             }
         });
@@ -30,9 +39,9 @@ define([
 
     var doesChildHaveProvisionalEdits = function(parent) {
         var hasEdits = false;
-        var childrenKey = parent.tiles ? 'tiles' : 'cards';
+        var childrenKey = 'tileid' in parent ? 'cards': 'tiles';
         ko.unwrap(parent[childrenKey]).forEach(function(child) {
-            if (child.hasprovisionaledits() || doesChildHaveProvisionalEdits(child)) {
+            if (child.hasprovisionaledits && child.hasprovisionaledits() || doesChildHaveProvisionalEdits(child)) {
                 hasEdits = true;
             }
         });
@@ -48,26 +57,35 @@ define([
         );
     };
 
+
     var CardViewModel = function(params) {
         var TileViewModel = require('viewmodels/tile');
         var self = this;
-        var selection = params.selection || ko.observable();
+        var hover = params.hover || ko.observable();
         var scrollTo = params.scrollTo || ko.observable();
         var filter = params.filter || ko.observable();
         var loading = params.loading || ko.observable();
         var perms = ko.observableArray();
         var permsLiteral = ko.observableArray();
         var nodegroups = params.graphModel.get('nodegroups');
-
+        var multiselect = params.multiselect || false;
+        var isWritable = params.card.is_writable || false;
+        var selection;
+        if (params.multiselect) {
+            selection = params.selection || ko.observableArray([]);
+        } else {
+            selection = params.selection || ko.observable();
+        }
         var nodegroup = _.find(ko.unwrap(nodegroups), function(group) {
             return ko.unwrap(group.nodegroupid) === ko.unwrap(params.card.nodegroup_id);
         });
 
         var cardModel = new CardModel({
-            data: _.extend({
+            data: _.extend(params.card, {
                 widgets: params.cardwidgets,
-                nodes: params.graphModel.get('nodes')
-            }, params.card),
+                nodes: params.graphModel.get('nodes'),
+                nodegroup: nodegroup
+            }),
             datatypelookup: params.graphModel.get('datatypelookup'),
         });
 
@@ -85,24 +103,64 @@ define([
                     },
                     owner: widget
                 });
+                widget.hovered = ko.pureComputed({
+                    read: function() {
+                        return hover() === this;
+                    },
+                    write: function(value) {
+                        if (value === true) {
+                            hover(this);
+                        }
+                        if (value === null) {
+                            hover(null);
+                        }
+                    },
+                    owner: widget
+                });
             });
         };
 
         applySelectedComputed(cardModel.widgets());
 
-        cardModel.widgets.subscribe(function(widgets){
+        var widgetsSubscription = cardModel.widgets.subscribe(function(widgets){
             applySelectedComputed(widgets);
         });
 
         _.extend(this, nodegroup, {
+            isWritable: isWritable,
             model: cardModel,
+            multiselect: params.multiselect,
             widgets: cardModel.widgets,
             parent: params.tile,
-            expanded: ko.observable(true),
+            expanded: ko.observable(false),
             perms: perms,
             permsLiteral: permsLiteral,
             scrollTo: ko.pureComputed(function() {
                 return scrollTo() === this;
+            }, this),
+            fullyProvisional: ko.pureComputed(function(){
+                var res;
+                var provisionalindex;
+                var summary = _.map(this.tiles(), function(tile){
+                    var dataEmpty = _.keys(koMapping.toJS(tile.data)).length === 0;
+                    if (tile.provisionaledits() !== null && dataEmpty) {
+                        return 2;
+                    } else if (tile.provisionaledits() !== null && !dataEmpty) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                });
+                provisionalindex = _.reduce(summary, function(a, b){return a + b;});
+                if (provisionalindex > 0) {
+                    if (_.every(summary, function(val){return val === 2;})) {
+                        res = 'fullyprovisional';
+                    }
+                    else {
+                        res = 'provisional';
+                    }
+                }
+                return res;
             }, this),
             highlight: ko.computed(function() {
                 var filterText = filter();
@@ -139,7 +197,7 @@ define([
                     });
                 })
             ),
-            cards: _.filter(params.cards, function(card) {
+            cards: ko.observableArray(_.filter(params.cards, function(card) {
                 var nodegroup = _.find(ko.unwrap(nodegroups), function(group) {
                     return ko.unwrap(group.nodegroupid) === ko.unwrap(card.nodegroup_id);
                 });
@@ -155,6 +213,7 @@ define([
                     cards: params.cards,
                     tiles: params.tiles,
                     selection: selection,
+                    multiselect: multiselect,
                     scrollTo: scrollTo,
                     loading: loading,
                     filter: filter,
@@ -163,7 +222,7 @@ define([
                     perms: perms,
                     permsLiteral: permsLiteral
                 });
-            }),
+            })),
             hasprovisionaledits: ko.computed(function() {
                 return _.filter(params.tiles, function(tile) {
                     return (
@@ -173,10 +232,24 @@ define([
             }),
             selected: ko.pureComputed({
                 read: function() {
-                    return selection() === this;
+                    if (self.multiselect) {
+                        return _.contains(selection(), this);
+                    } else {
+                        return selection() === this;
+                    }
                 },
                 write: function(value) {
-                    if (value) {
+                    if (self.multiselect){
+                        if (value === true){
+                            if (_.contains(selection(), this) === false){
+                                selection.push(this);
+                            }
+                        } else if (value === false) {
+                            if (_.contains(selection(), this) === true) {
+                                selection.remove(this);
+                            }
+                        }
+                    } else if (value) {
                         selection(this);
                     }
                 },
@@ -202,6 +275,27 @@ define([
                     complete: function() {
                         loading(false);
                         updateDisplayName(params.resourceId, params.displayname);
+                    }
+                });
+            },
+            reorderCards: function() {
+                loading(true);
+                var cards = _.map(self.cards(), function(card, i) {
+                    card.model.get('sortorder')(i);
+                    return {
+                        id: card.model.id,
+                        name: card.model.get('name')(),
+                        sortorder: i
+                    };
+                });
+                $.ajax({
+                    type: 'POST',
+                    data: JSON.stringify({
+                        cards: cards
+                    }),
+                    url: arches.urls.reorder_cards,
+                    complete: function() {
+                        loading(false);
                     }
                 });
             },
@@ -234,6 +328,7 @@ define([
                 });
             }
         });
+
         this.isChildSelected = ko.computed(function() {
             return isChildSelected(this);
         }, this);
@@ -247,12 +342,51 @@ define([
                 expandParents(item.parent);
             }
         };
-        this.highlight.subscribe(function(highlight) {
+
+        this.selectChildCards = function(value) {
+            if (value !== undefined){
+                this.selected(value);
+            } else {
+                if (this.selected() === false) {
+                    value = true;
+                    this.selected(true);
+                } else {
+                    value = false;
+                    this.selected(false);
+                }
+            }
+            if (this.cards().length > 0) {
+                this.expanded(true);
+
+                this.cards().forEach(function(childCard){
+                    childCard.selectChildCards(value);
+                }, this);
+            }
+        };
+
+        var higlightSubscription = this.highlight.subscribe(function(highlight) {
             if (highlight) {
                 this.expanded(true);
                 expandParents(this);
             }
         }, this);
+
+        this.disposables = [];
+        this.disposables.push(higlightSubscription);
+        this.disposables.push(widgetsSubscription);
+        this.disposables.push(this.scrollTo);
+        this.disposables.push(this.highlight);
+        this.disposables.push(this.hasprovisionaledits);
+        this.disposables.push(this.selected);
+        this.disposables.push(this.canAdd);
+        this.disposables.push(this.isChildSelected);
+        this.disposables.push(this.doesChildHaveProvisionalEdits);
+        this.disposables.push(this.model);
+
+        this.dispose = function() {
+            dispose(self);
+        };
+
     };
     return CardViewModel;
 });

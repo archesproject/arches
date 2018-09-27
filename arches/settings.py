@@ -106,6 +106,10 @@ ONTOLOGY_NAMESPACES = {
 # Make sure to use a trailing slash
 ARCHES_NAMESPACE_FOR_DATA_EXPORT = 'http://localhost:8000/'
 
+RDM_JSONLD_CONTEXT = {
+    'arches': ARCHES_NAMESPACE_FOR_DATA_EXPORT
+}
+
 PREFERRED_COORDINATE_SYSTEMS = (
     {"name": "Geographic", "srid": "4326", "proj4": "+proj=longlat +datum=WGS84 +no_defs", "default": True}, #Required
 )
@@ -116,6 +120,11 @@ ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
 MANAGERS = ADMINS
+
+RESOURCE_EDITOR_GROUPS = (
+    'Resource Editor',
+    'Crowdsource Editor'
+)
 
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  #<-- Only need to uncomment this for testing without an actual email server
 # EMAIL_USE_TLS = True
@@ -315,6 +324,7 @@ PROFILE_LOG_BASE = os.path.join(ROOT_DIR, 'logs')
 BULK_IMPORT_BATCH_SIZE = 2000
 
 SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Local.json')
+SYSTEM_SETTINGS_RESOURCE_ID = 'a106c400-260c-11e7-a604-14109fd34195'
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -384,6 +394,8 @@ CACHE_BY_USER = {'anonymous': 3600 * 24}
 DATE_IMPORT_EXPORT_FORMAT = '%Y-%m-%d'
 
 API_MAX_PAGE_SIZE = 500
+
+UUID_REGEX = '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
 
 #######################################
 ###       END STATIC SETTINGS       ###

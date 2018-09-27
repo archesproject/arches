@@ -2,8 +2,8 @@
 
 <!-- Title Block -->
 <div>
-    <div class="">
-        <h4 class="title-block-title" style=""> {% trans "Widget Manager" %} </h4>
+    <div class="panel-section-title dark-colored-text">
+        {% trans "Widget Manager" %}
     </div>
 </div>
 
@@ -12,7 +12,7 @@
 
     <div id="widget-crud-settings" class="tab-pane fade in active">
 
-        <div class="node-widget-label" style="">
+        <div class="node-config-item" style="">
             <div class="control-label">
                 {% trans "Widget Label" %}
             </div>
@@ -21,8 +21,25 @@
             </div>
         </div>
 
+        <div class="node-config-item" style="">
+            <div class="control-label">
+                {% trans "Template" %}
+            </div>
+            <div class="pad-no">
+                <select class="design" data-bind="value: widget_id, options: widgetList(), optionsText: 'name', optionsValue: 'id', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+            </div>
+        </div>
 
-        <div data-bind='component: {
+        <div class="node-config-item" style="">
+            <div class="control-label">
+                {% trans "Visible" %}
+            </div>
+            <div class="pad-no">
+                <div data-bind="component: { name: 'views/components/simple-switch', params: {value: visible, config:{label: '{% trans "Make Widget Visible" %}', subtitle: '{% trans "Show this widget by default" %}'}}}"></div>
+            </div>
+        </div>
+
+        <div style="margin-top: 5px;" data-bind='component: {
             name: widgetLookup[widget_id()].name,
             params: {
                 config: configJSON,
@@ -33,25 +50,10 @@
             }
         }'></div>
 
-        <!-- ko if: node.datatypeConfigComponent -->
-        <div data-bind='component: {
-            name: node.datatypeConfigComponent,
-            params: node
-        }'></div>
-        <!-- /ko -->
 
-
-        <div class="node-widget-label" style="">
-            <div class="control-label">
-                {% trans "Template" %}
-            </div>
-            <div class="pad-no">
-                <select class="design" data-bind="value: widget_id, options: widgetList(), optionsText: 'name', optionsValue: 'id', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
-            </div>
-        </div>
 
         <!-- ko if: ko.isObservable(card) -->
-        <div class="node-widget-label switch-panel" data-bind="css: {'disabled': checkIfImmutable() }">
+        <div class="node-config-item switch-panel" data-bind="css: {'disabled': checkIfImmutable() }">
 
             <span class="switch switch-small arches-switch" data-bind="css: {'on': node.isrequired(), 'disabled': checkIfImmutable() }, click: toggleRequired"><small></small></span>
 

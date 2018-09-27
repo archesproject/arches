@@ -169,7 +169,6 @@ class Graph(models.GraphModel):
         node -- a dictionary representing a Node instance or an actual models.Node instance
 
         """
-
         if not isinstance(node, models.Node):
             nodeobj = node.copy()
             node = models.Node()
@@ -205,6 +204,7 @@ class Graph(models.GraphModel):
         if node.istopnode:
             self.root = node
         self.nodes[node.pk] = node
+
         return node
 
     def add_edge(self, edge):
@@ -241,7 +241,7 @@ class Graph(models.GraphModel):
         Adds a card to this graph
 
         Arguments:
-        node -- a dictionary representing a Card instance or an actual models.CardModel instance
+        card -- a dictionary representing a Card instance or an actual models.CardModel instance
 
         """
         if not isinstance(card, models.CardModel):
@@ -252,7 +252,7 @@ class Graph(models.GraphModel):
             card.description = cardobj.get('description', '')
             card.instructions = cardobj.get('instructions', '')
             card.helpenabled = cardobj.get('helpenabled', '')
-            card.helptitle = cardobj.get('helptext', '')
+            card.helptitle = cardobj.get('helptitle', '')
             card.helptext = cardobj.get('helptext', '')
             card.active = cardobj.get('active', '')
             card.visible = cardobj.get('visible', '')
@@ -310,7 +310,6 @@ class Graph(models.GraphModel):
                     new.update({k: d2[k]})
             except KeyError:
                 old.update({k: v})
-
         return old, new
 
     def save(self, validate=True):
@@ -444,7 +443,6 @@ class Graph(models.GraphModel):
             for child in tree['children']:
                 traverse_tree(child, current_nodegroup)
             return tree
-
         traverse_tree(tree)
 
         return tree
@@ -508,24 +506,49 @@ class Graph(models.GraphModel):
         """
 
         node_names = [node.name for node in self.nodes.itervalues()]
-        temp_node_name = 'New Node'
+        temp_node_name = _('New Node')
         if temp_node_name in node_names:
             i = 1
-            temp_node_name = 'New Node_%s' % i
+            temp_node_name = "{0}_{1}".format(_('New Node'), i)
             while temp_node_name in node_names:
                 i += 1
-                temp_node_name = 'New Node_%s' % i
+                temp_node_name = "{0}_{1}".format(_('New Node'), i)
 
         nodeToAppendTo = self.nodes[uuid.UUID(str(nodeid))] if nodeid else self.root
+        card = None
+        tile_count = models.TileModel.objects.filter(nodegroup_id=nodeToAppendTo.nodegroup_id).count()
+        if tile_count > 0:
+            raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot modify a Resource Model with instances.".format(self.name)), 1006)
 
-        newNode = models.Node(
-            nodeid=uuid.uuid1(),
-            name=temp_node_name,
-            istopnode=False,
-            ontologyclass=None,
-            datatype='semantic',
-            graph=self
-        )
+        nodegroup = None
+        if nodeToAppendTo.nodeid == self.root.nodeid and self.isresource is True:
+            newid = uuid.uuid1()
+            nodegroup = models.NodeGroup.objects.create(
+                pk=newid
+            )
+            card = models.CardModel.objects.create(
+                nodegroup=nodegroup,
+                name=temp_node_name,
+                graph=self
+            )
+            newNode = models.Node(
+                nodeid=newid,
+                name=temp_node_name,
+                istopnode=False,
+                ontologyclass=None,
+                datatype='semantic',
+                nodegroup=nodegroup,
+                graph=self
+            )
+        else:
+            newNode = models.Node(
+                nodeid=uuid.uuid1(),
+                name=temp_node_name,
+                istopnode=False,
+                ontologyclass=None,
+                datatype='semantic',
+                graph=self
+            )
 
         newEdge = models.Edge(
             domainnode=nodeToAppendTo,
@@ -533,9 +556,9 @@ class Graph(models.GraphModel):
             ontologyproperty=None,
             graph=self
         )
-
         self.add_node(newNode)
         self.add_edge(newEdge)
+
         self.populate_null_nodegroups()
 
         # assign the first class and property found
@@ -546,8 +569,7 @@ class Graph(models.GraphModel):
                 newNode.ontologyclass = ontology_classes[0]['ontology_classes'][0]
             else:
                 raise GraphValidationError(_('Ontology rules don\'t allow this node to be appended'))
-
-        return {'node': newNode, 'edge': newEdge}
+        return {'node': newNode, 'edge': newEdge, 'card': card, 'nodegroup': nodegroup}
 
     def clear_ontology_references(self):
         """
@@ -588,46 +610,6 @@ class Graph(models.GraphModel):
                 graph=self
                 )
             function_copy.save()
-
-    def copy_forms(self, other_graph, card_map):
-        """
-        Copies the forms and card relationships from a different graph and relates them to this graph.
-
-        """
-        form_map = {}
-        for form in other_graph.form_set.all():
-            form_copy = models.Form(
-                title=form.title,
-                subtitle=form.subtitle,
-                iconclass=form.iconclass,
-                visible=form.visible,
-                sortorder=form.sortorder,
-                graph=self
-                )
-            form_copy.save()
-            form_map[form.formid] = form_copy.formid
-            for form_x_card in form.formxcard_set.all():
-                card = models.CardModel.objects.get(pk=card_map[form_x_card.card_id])
-                form_x_card_copy = models.FormXCard(
-                    form=form_copy,
-                    card=card,
-                    sortorder=form_x_card.sortorder
-                )
-                form_x_card_copy.save()
-        return form_map
-
-    def copy_reports(self, other_graph, id_maps=[]):
-        for report in other_graph.report_set.all():
-            forms_config_copy = self.replace_config_ids(report.formsconfig, id_maps)
-            config_copy = self.replace_config_ids(report.config, id_maps)
-            models.Report(
-                name=report.name,
-                template=report.template,
-                graph=self,
-                config=report.config,
-                formsconfig=forms_config_copy,
-                active=report.active
-            ).save()
 
     def copy(self, root=None):
         """
@@ -844,7 +826,6 @@ class Graph(models.GraphModel):
 
             tree = self.get_tree(root=node)
             tile_count = models.TileModel.objects.filter(nodegroup=node.nodegroup).count()
-
             if self.is_editable() is False and tile_count > 0:
                 raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot delete nodes from a Resource Model with instances.".format(self.name)), 1006)
 
@@ -1234,21 +1215,15 @@ class Graph(models.GraphModel):
 
     def check_if_resource_is_editable(self):
 
-        def find_unpermitted_edits(obj_a, obj_b, ignore_list):
+        def find_unpermitted_edits(obj_a, obj_b, ignore_list, obj_type):
+            # if node_tile_count > 0:
             res = None
             pre_diff = self._compare(obj_a, obj_b, ignore_list)
             diff = filter(lambda x: len(x.keys()) > 0, pre_diff)
             if len(diff) > 0:
-                res = diff
-                if len(diff) == 2:
-                    #Allowing edit if user is adding cards:
-                    if 'cards' in diff[0] and 'cards' in diff[1]:
-                        if len(diff[0]['cards']) > len(diff[1]['cards']):
-                            res = None
-                    if 'datatype' in diff[0] and 'datatype' in diff[1]:
-                        res = None
-                    if 'config' in diff[0] and 'config' in diff[1]:
-                        res = None
+                if obj_type == 'node':
+                    tile_count = models.TileModel.objects.filter(nodegroup_id=db_node.nodegroup_id).count()
+                    res = diff if tile_count > 0 else None #If your node has no data, you can change any property
             return res
 
         if self.isresource is True:
@@ -1256,14 +1231,13 @@ class Graph(models.GraphModel):
                 unpermitted_edits = []
                 db_nodes = models.Node.objects.filter(graph=self)
                 for db_node in db_nodes:
-                    unpermitted_node_edits = find_unpermitted_edits(db_node, self.nodes[db_node.nodeid], ['name', 'issearchable', 'ontologyclass', 'description', 'isrequired'])
+                    unpermitted_node_edits = find_unpermitted_edits(db_node, self.nodes[db_node.nodeid], ['name', 'issearchable', 'ontologyclass', 'description', 'isrequired'], 'node')
                     if unpermitted_node_edits is not None:
                         unpermitted_edits.append(unpermitted_node_edits)
                 db_graph = Graph.objects.get(pk=self.graphid)
-                unpermitted_graph_edits = find_unpermitted_edits(self, db_graph, ['name', 'ontology_id', 'subtitle', 'iconclass', 'author', 'description', 'isactive', 'color'])
+                unpermitted_graph_edits = find_unpermitted_edits(db_graph, self, ['name', 'ontology_id', 'subtitle', 'iconclass', 'author', 'description', 'isactive', 'color', 'nodes', 'edges', 'cards', 'nodegroup_id'], 'graph')
                 if unpermitted_graph_edits is not None:
                     unpermitted_edits.append(unpermitted_graph_edits)
-
                 if len(unpermitted_edits) > 0:
                     raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot modify a Resource Model with instances.".format(self.name)), 1006)
 

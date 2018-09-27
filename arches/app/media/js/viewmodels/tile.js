@@ -11,15 +11,15 @@ define([
     * A viewmodel used for generic cards
     *
     * @constructor
-    * @name CardViewModel
+    * @name TileViewModel
     *
     * @param  {string} params - a configuration object
     */
     var isChildSelected = function(parent) {
         var childSelected = false;
-        var childrenKey = parent.tiles ? 'tiles' : 'cards';
+        var childrenKey = 'tileid' in parent ? 'cards': 'tiles';
         ko.unwrap(parent[childrenKey]).forEach(function(child) {
-            if (child.selected() || isChildSelected(child)){
+            if (child.selected && child.selected() || isChildSelected(child)){
                 childSelected = true;
             }
         });
@@ -28,9 +28,9 @@ define([
 
     var doesChildHaveProvisionalEdits = function(parent) {
         var hasEdits = false;
-        var childrenKey = parent.tiles ? 'tiles' : 'cards';
+        var childrenKey = 'tileid' in parent ? 'cards': 'tiles';
         ko.unwrap(parent[childrenKey]).forEach(function(child) {
-            if (child.hasprovisionaledits() || doesChildHaveProvisionalEdits(child)){
+            if (child.hasprovisionaledits && child.hasprovisionaledits() || doesChildHaveProvisionalEdits(child)){
                 hasEdits = true;
             }
         });
@@ -66,6 +66,7 @@ define([
         _.extend(this, {
             filter: filter,
             parent: params.card,
+            userisreviewer: params.userisreviewer,
             cards: _.filter(params.cards, function(card) {
                 var nodegroup = _.find(ko.unwrap(params.graphModel.get('nodegroups')), function(group) {
                     return ko.unwrap(group.nodegroupid) === ko.unwrap(card.nodegroup_id);
@@ -90,9 +91,12 @@ define([
                     cardwidgets: params.cardwidgets
                 });
             }),
-            expanded: ko.observable(true),
-            hasprovisionaledits: ko.computed(function() {
+            expanded: ko.observable(false),
+            hasprovisionaledits: ko.pureComputed(function() {
                 return !!self.provisionaledits();
+            }, this),
+            isfullyprovisional: ko.pureComputed(function() {
+                return !!self.provisionaledits() && _.keys(koMapping.toJS(this.data)).length === 0;
             }, this),
             selected: ko.pureComputed({
                 read: function() {
@@ -106,7 +110,7 @@ define([
                 owner: this
             }),
             formData: new FormData(),
-            dirty: ko.computed(function() {
+            dirty: ko.pureComputed(function() {
                 return this._tileData() !== koMapping.toJSON(this.data);
             }, this),
             reset: function() {
@@ -172,12 +176,15 @@ define([
                     if (self.tileid) {
                         koMapping.fromJS(tileData.data, self.data);
                         koMapping.fromJS(tileData.provisionaledits, self.provisionaledits);
-                    } else {
-                        self.data = koMapping.fromJS(tileData.data);
                     }
                     self._tileData(koMapping.toJSON(self.data));
                     if (!self.tileid) {
                         self.tileid = tileData.tileid;
+                        self.data = koMapping.fromJS(tileData.data);
+                        self.provisionaledits = koMapping.fromJS(tileData.provisionaledits);
+                        self.dirty = ko.pureComputed(function() {
+                            return self._tileData() !== koMapping.toJSON(self.data);
+                        }, self);
                         self.parent.tiles.push(self);
                         self.parent.expanded(true);
                         selection(self);
@@ -225,10 +232,10 @@ define([
                 });
             }
         });
-        this.isChildSelected = ko.computed(function() {
+        this.isChildSelected = ko.pureComputed(function() {
             return isChildSelected(this);
         }, this);
-        this.doesChildHaveProvisionalEdits = ko.computed(function() {
+        this.doesChildHaveProvisionalEdits = ko.pureComputed(function() {
             return doesChildHaveProvisionalEdits(this);
         }, this);
     };

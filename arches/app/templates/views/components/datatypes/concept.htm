@@ -1,10 +1,10 @@
 {% load i18n %}
 <!-- ko ifnot: $data.search -->
-<div class="node-widget-label concept-label">
+<div class="node-config-item">
     <div class="control-label">
         {% trans "Concept Collection" %}
     </div>
-    <div>
+    <div data-bind="if: conceptCollections().length > 0">
         <select data-bind="disable: isEditable === false, placeholder: '{% trans "Select a concept collection" %}', value: topConcept, options: conceptCollections , optionsText: 'label', optionsValue: 'id', chosen: {width: '100%', allow_single_deselect: true}"></select>
     </div>
 </div>

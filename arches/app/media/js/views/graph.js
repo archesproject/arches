@@ -21,7 +21,7 @@ require([
         * @param {object} options - additional options to pass to the view
         * @return {object} an instance of GraphView
         */
-        initialize: function (options) {
+        initialize: function(options) {
             var self = this;
             /**
             * creates a request to add a new graph; redirects to the graph settings
@@ -40,14 +40,14 @@ require([
                     success: function(response) {
                         window.location = arches.urls.graph_designer(response.graphid);
                     },
-                    error: function(response) {
+                    error: function() {
                         self.viewModel.loading(false);
                     }
                 });
             };
 
-            this.viewModel.leaveDropdown = function(e){
-              $('.dropdown').dropdown('toggle')
+            this.viewModel.leaveDropdown = function(){
+                $('.dropdown').dropdown('toggle');
             };
 
             this.viewModel.allGraphs().forEach(function(graph) {
@@ -55,7 +55,7 @@ require([
                 graph.isCard = false;
                 if (graphManagerData && typeof graphManagerData.root_nodes === 'object') {
                     graph.root = _.find(graphManagerData.root_nodes, function(node) {
-                        return node.graph_id === graph.graphid
+                        return node.graph_id === graph.graphid;
                     });
                     if (graph.root) {
                         graph.isCard = (graph.root.nodegroup_id === graph.root.nodeid);
@@ -72,22 +72,41 @@ require([
                 graph.exportMappingFile = function(model) {
                     window.open(arches.urls.export_mapping_file(graph.graphid), '_blank');
                 };
-                graph.deleteGraph = function () {
+                graph.deleteGraph = function() {
                     self.viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmGraphDelete.title, arches.confirmGraphDelete.text, function() {
                         return;
                     }, function(){
                         self.viewModel.loading(true);
                         $.ajax({
-                            complete: function (response, status) {
+                            type: "DELETE",
+                            url: arches.urls.delete_graph(graph.graphid),
+                            complete: function(response, status) {
                                 self.viewModel.loading(false);
                                 if (status === 'success') {
-                                  self.viewModel.allGraphs.remove(graph);
+                                    self.viewModel.allGraphs.remove(graph);
                                 } else {
-                                  self.viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.title, response.responseJSON.message));
+                                    self.viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.title, response.responseJSON.message));
                                 }
-                            },
+                            }
+                        });
+                    }));
+                };
+                graph.deleteInstances = function() {
+                    self.viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmAllResourceDelete.title, arches.confirmAllResourceDelete.text, function() {
+                        return;
+                    }, function(){
+                        self.viewModel.loading(true);
+                        $.ajax({
                             type: "DELETE",
-                            url: graph.graphid
+                            url: arches.urls.delete_instances(graph.graphid),
+                            complete: function(response, status) {
+                                self.viewModel.loading(false);
+                                if (status === 'success') {
+                                    self.viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.title, response.responseJSON.message));
+                                } else {
+                                    self.viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.title, response.responseJSON.message));
+                                }
+                            }
                         });
                     }));
                 };
@@ -112,13 +131,13 @@ require([
                         return self.viewModel.graphs() ;
                     }
                 }),
-                newResource: function () {
+                newResource: function() {
                     newGraph('new', {isresource: true});
                 },
-                newGraph: function () {
+                newGraph: function() {
                     newGraph('new', {isresource: false});
                 },
-                importGraph: function (data, e) {
+                importGraph: function(data, e) {
                     var formData = new FormData();
                     formData.append("importedGraph", e.target.files[0]);
 
@@ -130,14 +149,14 @@ require([
                         cache: false,
                         contentType: false,
                         success: function(response) {
-                          if (response[0].length != 0) {
-                            if (typeof(response[0])) {
-                              response = response[0].join('<br />')
-                            }
-                              self.viewModel.alert(new AlertViewModel('ep-alert-red', arches.graphImportFailed.title, response));
+                            if (response[0].length != 0) {
+                                if (typeof(response[0])) {
+                                    response = response[0].join('<br />');
+                                }
+                                self.viewModel.alert(new AlertViewModel('ep-alert-red', arches.graphImportFailed.title, response));
                             }
                             else {
-                              window.location.reload(true);
+                                window.location.reload(true);
                             }
                         },
                         error: function(response) {
@@ -146,15 +165,15 @@ require([
                         },
                     });
                 },
-                importButtonClick: function () {
+                importButtonClick: function() {
                     $("#fileupload").trigger('click');
                 }
             });
 
 
-            this.viewModel.graphId.subscribe(function (graphid) {
+            this.viewModel.graphId.subscribe(function(graphid) {
                 if(graphid && graphid !== ""){
-                    self.viewModel.navigate(arches.urls.graph_settings(graphid));
+                    self.viewModel.navigate(arches.urls.graph_designer(graphid));
                 }
             });
 

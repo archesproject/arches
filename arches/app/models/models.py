@@ -38,6 +38,7 @@ class CardModel(models.Model):
     name = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     instructions = models.TextField(blank=True, null=True)
+    cssclass = models.TextField(blank=True, null=True)
     helpenabled = models.BooleanField(default=False)
     helptitle = models.TextField(blank=True, null=True)
     helptext = models.TextField(blank=True, null=True)
@@ -46,7 +47,7 @@ class CardModel(models.Model):
     active = models.BooleanField(default=True)
     visible = models.BooleanField(default=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
-    component = models.ForeignKey('CardComponent', db_column='componentid', default=uuid.UUID('f05e4d3a-53c1-11e8-b0ea-784f435179ea'))
+    component = models.ForeignKey('CardComponent', db_column='componentid', default=uuid.UUID('f05e4d3a-53c1-11e8-b0ea-784f435179ea'), on_delete=models.SET_DEFAULT)
     config = JSONField(blank=True, null=True, db_column='config')
 
     def is_editable(self):
@@ -85,6 +86,7 @@ class CardXNodeXWidget(models.Model):
     widget = models.ForeignKey('Widget', db_column='widgetid')
     config = JSONField(blank=True, null=True, db_column='config')
     label = models.TextField(blank=True, null=True)
+    visible = models.BooleanField(default=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
 
     class Meta:
@@ -251,32 +253,6 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
         except Exception:
             return False
 
-
-class Form(models.Model):
-    formid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    title = models.TextField(blank=True, null=True)
-    subtitle = models.TextField(blank=True, null=True)
-    iconclass = models.TextField(blank=True, null=True)
-    visible = models.BooleanField(default=True)
-    sortorder = models.IntegerField(blank=True, null=True, default=None)
-    graph = models.ForeignKey('GraphModel', db_column='graphid', blank=False, null=False)
-
-    class Meta:
-        managed = True
-        db_table = 'forms'
-
-
-class FormXCard(models.Model):
-    id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
-    card = models.ForeignKey('CardModel', db_column='cardid')
-    form = models.ForeignKey('Form', db_column='formid')
-    sortorder = models.IntegerField(blank=True, null=True, default=None)
-
-    class Meta:
-        managed = True
-        db_table = 'forms_x_cards'
-
-
 class Function(models.Model):
     functionid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField(blank=True, null=True)
@@ -343,6 +319,12 @@ class GraphModel(models.Model):
     ontology = models.ForeignKey('Ontology', db_column='ontologyid', related_name='graphs', null=True, blank=True)
     functions = models.ManyToManyField(to='Function', through='FunctionXGraph')
     jsonldcontext = models.TextField(blank=True, null=True)
+    template = models.ForeignKey(
+        'ReportTemplate',
+        db_column='templateid',
+        default='50000000-0000-0000-0000-000000000001'
+    )
+    config = JSONField(db_column='config', default={})
 
     @property
     def disable_instance_creation(self):
@@ -544,20 +526,6 @@ class ReportTemplate(models.Model):
     class Meta:
         managed = True
         db_table = 'report_templates'
-
-
-class Report(models.Model):
-    reportid = models.UUIDField(primary_key=True, default=uuid.uuid1)
-    name = models.TextField(blank=True, null=True)
-    template = models.ForeignKey(ReportTemplate, db_column='templateid')
-    graph = models.ForeignKey(GraphModel, db_column='graphid')
-    config = JSONField(blank=True, null=True, db_column='config')
-    formsconfig = JSONField(blank=True, null=True, db_column='formsconfig')
-    active = models.BooleanField(default=False)
-
-    class Meta:
-        managed = True
-        db_table = 'reports'
 
 
 class Resource2ResourceConstraint(models.Model):

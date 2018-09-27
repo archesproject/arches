@@ -6,17 +6,19 @@ define([
     'views/base-manager',
     'viewmodels/alert',
     'models/graph',
+    'models/report',
     'viewmodels/card',
-    'viewmodels/new-provisional-tile',
+    'viewmodels/provisional-tile',
     'arches',
     'resource-editor-data',
     'views/search/search-results',
     'views/resource/related-resources-manager',
+    'report-templates',
     'bindings/resizable-sidepanel',
     'bindings/sortable',
     'widgets',
     'card-components'
-], function($, _, ko, moment, BaseManagerView, AlertViewModel, GraphModel, CardViewModel, ProvisionalTileViewModel, arches, data, searchResults, RelatedResourcesManager) {
+], function($, _, ko, moment, BaseManagerView, AlertViewModel, GraphModel, ReportModel, CardViewModel, ProvisionalTileViewModel, arches, data, searchResults, RelatedResourcesManager, reportLookup) {
     var handlers = {
         'after-update': [],
         'tile-reset': []
@@ -24,14 +26,13 @@ define([
     var tiles = data.tiles;
     var filter = ko.observable('');
     var loading = ko.observable(false);
-    var selection = ko.observable();
+    var selection = ko.observable('root');
     var scrollTo = ko.observable();
     var displayname = ko.observable(data.displayname);
     var resourceId = ko.observable(data.resourceid);
-    var manageRelatedResources = ko.observable(false);
     var selectedTile = ko.computed(function() {
         var item = selection();
-        if (item) {
+        if (item && typeof item !== 'string') {
             if (item.tileid) {
                 return item;
             }
@@ -53,12 +54,13 @@ define([
     };
 
     var toggleAll = function(state) {
-        var nodes = flattenTree(vm.topCards, []).concat([{
-            expanded: vm.rootExpanded
-        }]);
+        var nodes = flattenTree(vm.topCards, []);
         _.each(nodes, function(node) {
             node.expanded(state);
         });
+        if (state) {
+            vm.rootExpanded(true);
+        }
     };
     var createLookup = function(list, idKey) {
         return _.reduce(list, function(lookup, item) {
@@ -71,8 +73,6 @@ define([
         data: {nodes: data.nodes, nodegroups: data.nodegroups, edges: []},
         datatypes: data.datatypes
     });
-
-
 
     var vm = {
         loading: loading,
@@ -101,10 +101,10 @@ define([
         nodeLookup: createLookup(graphModel.get('nodes')(), 'nodeid'),
         graphid: data.graphid,
         graphname: data.graphname,
+        issystemsettings: data.issystemsettings,
         reviewer: data.userisreviewer,
         graphiconclass: data.graphiconclass,
         relationship_types: data.relationship_types,
-        manageRelatedResources: manageRelatedResources,
         graph: {
             graphid: data.graphid,
             name: data.graphname,
@@ -147,13 +147,18 @@ define([
         selectedTile: selectedTile,
         selectedCard: ko.computed(function() {
             var item = selection();
-            if (item) {
-                manageRelatedResources(false);
+            if (item && typeof item !== 'string') {
                 if (item.tileid) {
                     return item.parent;
                 }
                 return item;
             }
+        }),
+        addableCards: ko.computed(function() {
+            var tile = selectedTile();
+            return _.filter(tile ? tile.cards : [], function(card) {
+                return card.canAdd();
+            });
         }),
         provisionalTileViewModel: provisionalTileViewModel,
         filter: filter,
@@ -163,6 +168,7 @@ define([
             }
         },
         resourceId: resourceId,
+        reportLookup: reportLookup,
         copyResource: function() {
             if (resourceId()) {
                 vm.menuActive(false);
@@ -218,15 +224,20 @@ define([
                 vm.navigate(arches.urls.get_resource_edit_log(resourceId()));
             }
         },
-        viewReport: function() {
+        viewReport: function(print) {
             if (resourceId()) {
+                var url = arches.urls.resource_report + resourceId();
+                if (print) {
+                    url = url + '?print';
+                }
                 vm.menuActive(false);
-                vm.navigate(arches.urls.resource_report + resourceId());
+                window.open(url, "_blank");
             }
         }
     };
-    var topCard = vm.topCards[0];
-    selection(topCard.tiles().length > 0 ? topCard.tiles()[0] : topCard);
+
+    vm.report = null;
+    vm.report = new ReportModel(_.extend(data, {graphModel: graphModel, cards: vm.topCards}));
 
     vm.resourceId.subscribe(function(){
         //switches the url from 'create-resource' once the resource id is available
@@ -252,14 +263,12 @@ define([
                         relationship_types: vm.relationship_types,
                         graph: vm.graph
                     });
-                    vm.manageRelatedResources(true);
-                    vm.selection(undefined);
+                    vm.selection('related-resources');
                 });
             });
 
         } else {
-            vm.manageRelatedResources(true);
-            vm.selection(undefined);
+            vm.selection('related-resources');
         }
     };
 

@@ -1,10 +1,8 @@
-import os
-import inspect
+import re
 import subprocess
 from django.template import Template
 from django.template import Context
 from arches.management.commands import utils
-import re
 
 postgres_version = subprocess.check_output(["psql", "--version"])
 pattern = re.compile(r'\s\d+.\d*.\d*')
@@ -27,16 +25,14 @@ def create_sqlfile(database_settings, path_to_file):
         context['PID'] = "procpid"
 
     t = Template(
-	"SELECT pg_terminate_backend({{ PID }}) from pg_stat_activity where datname='{{ NAME }}';\n"
-	"\n"
+        "SELECT pg_terminate_backend({{ PID }}) from pg_stat_activity where datname='{{ NAME }}';\n"
+        "\n"
 
-	"DROP DATABASE IF EXISTS {{ NAME }};\n"
-	"\n"
+        "DROP DATABASE IF EXISTS {{ NAME }};\n"
+        "\n"
 
-	"CREATE DATABASE {{ NAME }}\n"
-	"  WITH ENCODING='UTF8'\n"
-	"       OWNER={{ USER }}\n"
-	"       CONNECTION LIMIT=-1;\n"
-	"\n"
-	)
+        "CREATE DATABASE {{ NAME }}\n"
+        "  WITH ENCODING='UTF8'\n"
+        "       CONNECTION LIMIT=-1;\n"
+    )
     utils.write_to_file(path_to_file, t.render(context))

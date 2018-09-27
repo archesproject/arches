@@ -1,6 +1,6 @@
 /* jsTree default theme */
 .jstree>.header {
-    height: 70px;
+    height: 75px;
     padding-left: 13px;
     padding-right: 13px;
     background-color: #f4f4f4;
@@ -17,10 +17,30 @@
     background: #fbfbfb;
 }
 
+.tree-display-tools-panel {
+    min-width: 400px;
+}
+
+a.tree-display-tool {
+    margin-left: 0px;
+    padding: 3px 6px;
+    color: #888;
+}
+
+a.tree-display-tool:hover {
+    cursor: pointer;
+    background: #ddd;
+    color: #454545;
+}
+
 .filtered {
     font-weight: 600;
     color: #fff;
     background: #3acaa1;
+}
+
+.filtered i {
+    color: #fff;
 }
 
 .filtered-leaf {
@@ -90,7 +110,8 @@ a.filtered > span:hover {
     color: #7a878e;
 }
 
-.jstree-anchor:hover {
+.jstree-anchor:hover,
+.jstree-anchor.hover {
     background-color: rgba(105,132,160,0.15);
     color: #425965;
 }
@@ -292,6 +313,14 @@ a.filtered > span:hover {
     line-height: 28px;
     margin-left: 28px;
     min-width: 28px;
+}
+
+ul.jstree-container-ul > li.jstree-node.jstree-open {
+    margin-left: 4px;
+}
+
+ul.jstree-container-ul > li.jstree-node.jstree-closed {
+    margin-left: 4px;
 }
 
 .jstree-default .jstree-anchor {
