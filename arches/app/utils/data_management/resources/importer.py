@@ -177,8 +177,8 @@ class ResourceLoader(object):
             if master_graph == None:
                 master_graph = mapping_graph
             else:
-                node_type_to_merge_at = schema[row.attributename]['mergenodeid']
-                master_graph.merge_at(mapping_graph, node_type_to_merge_at)
+#                 node_type_to_merge_at = schema[row.attributename]['mergenodeid']
+                master_graph.merge_at(mapping_graph, master_graph.entitytypeid)
         return master_graph
 
     def pre_save(self, master_graph):
