@@ -17,6 +17,7 @@ import csv
 from django.db import IntegrityError
 
 from itertools import groupby
+from django.db import connection
 
 import logging
 
@@ -584,7 +585,7 @@ def rename_entity_type(old_entitytype_id, new_entitytype_id):
     logging.warning("renaming entitytype from %s to %s", old_entitytype_id, new_entitytype_id)
 
     ## this is just a print operation to help with debugging
-    show_entity_structure(old_entitytype_id)
+    show_entity_structure(old_entitytype_id, verbose = True)
 
     ## create duplicate of the EntityType object with the new id
     entity = models.EntityTypes.objects.get(entitytypeid=old_entitytype_id)
@@ -680,28 +681,43 @@ def rename_entity_type(old_entitytype_id, new_entitytype_id):
     ## other words, if there is already one that matches the one you are trying to
     ## make, then you don't need to create it again. This could be handled better
     ## with an if statement, instead of using try/except, which isn't optimal. -AC
-
+    steps_to_be_created = []
     # update the Rules
     rulesout = models.Rules.objects.filter(entitytypedomain=old_entitytype_id)
     print "updating {} rulesout".format(len(rulesout))
     for r in rulesout:
+        deleted_steps = models.MappingSteps.objects.filter(ruleid = r)
         try:
             r.entitytypedomain=newentitytype
             r.save()
-            print "success"
+            print "success",r.entitytypedomain,r.entitytyperange
         except IntegrityError:
-            print "failed"
+            print "failed", r.entitytypedomain,r.entitytyperange
+            step_to_delete = models.MappingSteps.objects.get(mappingid = models.Mappings.objects.get(entitytypeidfrom ='HERITAGE_RESOURCE_GROUP.E27', entitytypeidto =r.entitytyperange), ruleid = r)
+            for step in deleted_steps:
+                steps_to_be_created.append({
+                    'ruleid': models.Rules.objects.get(entitytypedomain=newentitytype, entitytyperange = r.entitytyperange),
+                    'mappingid': step.mappingid,
+                    'order': step.order
+                })
+            
 
     rulesin = models.Rules.objects.filter(entitytyperange=old_entitytype_id)
     print "updating {} rulesin".format(len(rulesin))
     for r in rulesin:
+        deleted_steps = models.MappingSteps.objects.filter(ruleid = r)
         try:
             r.entitytyperange=newentitytype
             r.save()
             print "success"
         except IntegrityError:
             print "failed"
-
+            for step in deleted_steps:
+                steps_to_be_created.append({
+                    'ruleid': models.Rules.objects.get(entitytypedomain=r.entitytypedomain, entitytyperange = newentitytype),
+                    'mappingid': step.mappingid,
+                    'order': step.order
+                })
     # update the Mappings
     mappingsout = models.Mappings.objects.filter(entitytypeidfrom=old_entitytype_id)
     for m in mappingsout:
@@ -720,19 +736,20 @@ def rename_entity_type(old_entitytype_id, new_entitytype_id):
         m.mergenodeid=newentitytype
         m.save()    
 
-    ## NOT SURE THIS SECTION IS NEEDED??? -AC
-    #update the entities --- COMMENTED OFF UNTIL BUG WITH RULES IS RESOLVED
-    # entities = models.Entities.objects.filter(entitytypeid=old_entitytype_id)
-    # print "entities:", len(entities)
-    # for e in entities:
-        # logging.warning("Changing type of entity %s from %s to %s", e, old_entitytype_id, newentitytype)
-        # e.entitytypeid=newentitytype
-        # e.save()
+    #update the entities
+    entities = models.Entities.objects.filter(entitytypeid=old_entitytype_id)
+    for e in entities:
+        logging.warning("Changing type of entity %s from %s to %s", e, old_entitytype_id, newentitytype)
+        e.entitytypeid=newentitytype
+        e.save()
 
     ## print statement shows what the new EntityType object looks like
-    show_entity_structure(new_entitytype_id)
+    show_entity_structure(new_entitytype_id, verbose = True)
 
     remove_entitytypes_and_concepts([old_entitytype_id,new_entitytype_id])
+    cursor = connection.cursor()
+    for step in steps_to_be_created:
+        cursor.execute("INSERT INTO ontology.mapping_steps VALUES (%s,%s,%s)", [step['mappingid'].mappingid, step['ruleid'].ruleid, step['order']])
 
 def add_resource_relation(entityid1, entityid2, relationship_type_string):
     # find the relationship type
