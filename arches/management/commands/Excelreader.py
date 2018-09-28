@@ -237,15 +237,8 @@ class Command(BaseCommand):
         for sheet_name,contents in concept_data.iteritems():
 
             for node_name, concept_tuples in contents.iteritems():
-                node_obj = archesmodels.EntityTypes.objects.get(pk=node_name)
-                all_concepts = self.collect_concepts(node_obj.conceptid_id,full_concept_list=[])
-                all_labels = []
-                for c in all_concepts:
-                    labels = archesmodels.Values.objects.filter(conceptid_id=c)
-                    for label in labels:
-                        ## label.lower() allows for case-agnostic matching
-                        all_labels.append(label.value.lower())
 
+                label_lookup = self.get_label_lookup(node_name)
                 for ct in concept_tuples:
                     if ct[0] == "x":
                         continue
@@ -253,10 +246,11 @@ class Command(BaseCommand):
                     value_encoded = (unicode(ct[0])).encode('utf-8')
                     for concept in value_encoded.split('|'):
                         concept = concept.rstrip().lstrip()
-                        ## concept.lower() allows for case-agnostic matching
-                        if not concept.lower() in all_labels:
-                            msg = "{}: {} ({} > row {}, col {})".format(
-                                node_name,concept,sheet_name,ct[1],ct[2]
+                        try:
+                            label_lookup[concept.lower()]
+                        except KeyError:
+                            msg = "{} - {}: {} (row {}, col {})".format(
+                                sheet_name,node_name,concept,ct[1],ct[2]
                             )
                             result['errors'].append(msg)
 
@@ -406,6 +400,21 @@ class Command(BaseCommand):
                         result[sheet_name][node_name].append(tuple)
 
         return result
+        
+    def get_label_lookup(self,node_name):
+        
+        node_obj = archesmodels.EntityTypes.objects.get(pk=node_name)
+        all_concepts = self.collect_concepts(node_obj.conceptid_id,full_concept_list=[])
+
+        ## dictionary will hold {label:concept.legacyoid}
+        label_lookup = {}
+        for c in all_concepts:
+            cobj = archesmodels.Concepts.objects.get(pk=c)
+            labels = archesmodels.Values.objects.filter(conceptid_id=c)
+            for label in labels:
+                label_lookup[label.value.lower()] = cobj.legacyoid
+                
+        return label_lookup
 
     def write_arches_file(self,workbook,resourcetype,destination,append=False):
         '''trimmed down version of SiteDataset, removing all validation operations.
@@ -429,16 +438,7 @@ class Command(BaseCommand):
                 entitytype = node_obj.entitytypeid
                 datatype = node_obj.businesstablename
 
-                start = datetime.datetime.now()
-                all_concepts = self.collect_concepts(node_obj.conceptid_id,full_concept_list=[])
-
-                ## dictionary will hold {label:concept.legacyoid}
-                label_lookup = {}
-                for c in all_concepts:
-                    cobj = archesmodels.Concepts.objects.get(pk=c)
-                    labels = archesmodels.Values.objects.filter(conceptid_id=c)
-                    for label in labels:
-                            label_lookup[label.value.lower()] = cobj.legacyoid
+                label_lookup = self.get_label_lookup(node_name)
 
                 for row_index, row in enumerate(sheet.iter_rows(row_offset = 1)):
                     
