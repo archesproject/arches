@@ -442,7 +442,7 @@ class Command(BaseCommand):
                 label_lookup = self.get_label_lookup(node_name)
 
                 for row_index, row in enumerate(sheet.iter_rows(row_offset = 1)):
-                    
+
                     value = row[col_index].value
                     if not value:
                         continue
@@ -451,31 +451,39 @@ class Command(BaseCommand):
 
                     encoded = unicode(value).encode('utf-8')
                     for concept in encoded.split('|'):
+                        
+                        try:
+                            ## remove leading and trailing spaces
+                            concept = concept.rstrip().lstrip()
+                            GroupNo += 1
 
-                        ## remove leading and trailing spaces
-                        concept = concept.rstrip().lstrip()
-                        GroupNo += 1
+                            ## skip x in every case. this is a reserved placeholder to signify a non-value
+                            if concept == "x":
+                                continue
 
-                        ## skip x in every case. this is a reserved placeholder to signify a non-value
-                        if concept == "x":
-                            continue
+                            if sheet_name == "NOT":
+                                GroupName = col_index
+                            else:
+                                GroupName = " ".join((sheet_name, str(GroupNo)))
 
-                        if sheet_name == "NOT":
-                            GroupName = col_index
-                        else:
-                            GroupName = " ".join((sheet_name, str(GroupNo)))
+                            ## data transformations must happen with domains and dates
+                            if datatype == 'domains':
+                                outval = label_lookup[concept.lower()]
 
-                        ## data transformations must happen with domains and dates
-                        if datatype == 'domains':
-                            outval = label_lookup[concept.lower()]
+                            elif datatype == 'dates':
+                                outval = self.validatedate(concept)
 
-                        elif datatype == 'dates':
-                            outval = self.validatedate(concept)
-
-                        else:
-                            outval = concept
-                        row = [str(resourceid),resourcetype,entitytype,outval, GroupName]
-                        ResourceList.append(row)
+                            else:
+                                outval = concept
+                            row = [str(resourceid),resourcetype,entitytype,outval, GroupName]
+                            ResourceList.append(row)
+                        
+                        except Exception as e:
+                            result['success'] = False
+                            result['errors'].append(
+                            "error writing value: {} - {}".format(
+                                concept,entitytype)
+                            )
 
         with open(destination, 'wb') as archesfile:
             writer = csv.writer(archesfile, delimiter ="|")
