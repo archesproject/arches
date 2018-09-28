@@ -389,8 +389,10 @@ class Command(BaseCommand):
 
                 if datatype and businesstable[node_name] != datatype:
                     continue
+                
+                if not node_name in result[sheet_name]:
+                    result[sheet_name][node_name] = []
 
-                result[sheet_name][node_name] = []
                 for row_index, row in enumerate(sheet.iter_rows(row_offset = 1)):
                     values = row[col_index].value
                     if not values:
