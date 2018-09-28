@@ -278,10 +278,10 @@ class Command(BaseCommand):
         for gt in geom_tuples:
             if gt[0] == "x":
                 continue
-            validated = self.validate_geometry(gt[0])
-            if not validated:
-                msg = "{}: {} ({} > row {}, col {})".format(
-                    gt[2],gt[0],gt[1],gt[3],gt[4]
+            msg = self.validate_geometry(gt[0])
+            if not validation == "valid":
+                msg = "{}: {} ({} > row {}, col {})\n{}".format(
+                    gt[2],gt[0],gt[1],gt[3],gt[4],msg
                 )
                 result['errors'].append(msg)
 
@@ -295,9 +295,9 @@ class Command(BaseCommand):
         True or False."""
         try:
             GEOSGeometry(geometry)
-            return True
-        except:
-            return False
+            return "valid"
+        except Exception as e:
+            return str(e)
 
     def validate_files(self, file_tuples):
         """
