@@ -37,16 +37,14 @@ define([
                     }
                 })
             });
-            this.addBranchList(locationBranchList);
-            
+            this.addBranchList(locationBranchList);    
+             var showOverlapsWarning = function(overlaps) {
+                _.each(overlaps,function(item) {
+                    item['id'] = arches.urls.resource_manager+item['id'];
+                    OverlapModel.over.push(item);
+                });            
+                $('#Disclaimer').modal('show');
+             }        
         }
-        var showOverlapsWarning = function(overlaps) {
-            _.each(overlaps,function(item) {
-                item['id'] = arches.urls.resource_manager+item['id'];
-                OverlapModel.over.push(item);
-            });            
-            $('#Disclaimer').modal('show');
-            
-         }
     });
 });
