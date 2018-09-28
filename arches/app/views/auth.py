@@ -239,9 +239,12 @@ class GetClientIdView(View):
         username = request.POST.get('username', None)
         password = request.POST.get('password', None)
         user = authenticate(username=username, password=password)
-        if user:
-            response = HttpResponse(settings.MOBILE_OAUTH_CLIENT_ID, content_type='text/plain')
+        if settings.MOBILE_OAUTH_CLIENT_ID == '':
+            response = HttpResponse('Make sure to set your MOBILE_OAUTH_CLIENT_ID in settings.py', status=500)
         else:
-            response = Http401Response()
+            if user:
+                response = HttpResponse(settings.MOBILE_OAUTH_CLIENT_ID, content_type='text/plain')
+            else:
+                response = Http401Response()
 
         return response
