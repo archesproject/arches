@@ -216,16 +216,12 @@ class Command(BaseCommand):
             for header in sheet.iter_cols(max_row = 1):
                 if header[0].value is not None:
                     if skip_resourceid_col == True and header[0].value =='RESOURCEID':
-                        pass
-                    else:
-                        try:
-                            modelinstance = archesmodels.EntityTypes.objects.get(pk = header[0].value)
-                            # print modelinstance
-                        except archesmodels.EntityTypes.DoesNotExist:
-                            print "exception!"
-                            result['errors'].append("The header %s is not a valid EAMENA node name" % header[0].value)
-#                             logger.error("The header %s is not a valid EAMENA node name" % header[0].value)
-                            # raise ObjectDoesNotExist("The header %s is not a valid EAMENA node name" % header[0].value)
+                        continue
+                    try:
+                        modelinstance = archesmodels.EntityTypes.objects.get(pk = header[0].value)
+                        
+                    except archesmodels.EntityTypes.DoesNotExist:
+                        result['errors'].append("The header %s is not a valid EAMENA node name" % header[0].value)
         if result['errors']:
             result['success'] = False
         return result
@@ -242,7 +238,9 @@ class Command(BaseCommand):
                 for ct in concept_tuples:
                     if ct[0] == "x":
                         continue
-                    #Values could be in Arabic or contain unicode chars, so it is essential to encode them properly.
+
+                    #Values could be in Arabic or contain unicode chars, so it
+                    #is essential to encode them properly.
                     value_encoded = (unicode(ct[0])).encode('utf-8')
                     for concept in value_encoded.split('|'):
                         concept = concept.rstrip().lstrip()
@@ -397,7 +395,8 @@ class Command(BaseCommand):
                     values = row[col_index].value
                     if not values:
                         continue
-                    for value in str(values).split("|"):
+                    encoded_values = unicode(values).encode('utf-8')
+                    for value in encoded_values.split("|"):
                         tuple = (value,row_index+2,col_letters[col_index])
                         result[sheet_name][node_name].append(tuple)
 
@@ -449,9 +448,9 @@ class Command(BaseCommand):
                         continue
 
                     resourceid = row_index if append == False else resourceids_list[row_index]
-                    value_encoded = (unicode(value)).encode('utf-8')
 
-                    for concept in value_encoded.split('|'):
+                    encoded = unicode(value).encode('utf-8')
+                    for concept in encoded.split('|'):
 
                         ## remove leading and trailing spaces
                         concept = concept.rstrip().lstrip()
