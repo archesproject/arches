@@ -3,6 +3,7 @@ import os
 import csv
 import json
 import datetime
+import string
 from django.conf import settings
 from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError 
@@ -68,12 +69,12 @@ class Command(BaseCommand):
                     result, filelist = self.validate_files(values)
                     
                 elif vtype == 'write_arches_file':
-                    result = {'success':True,'errors':[]}
-                    try:
-                        self.write_arches_file(workbook,options['res_type'], options['dest_dir'],options['append_data'])
-                    except Exception as e:
-                        result['success'] = False
-                        result['errors'].append('error writing .arches file: '+repr(e))
+                    result = self.write_arches_file(
+                        workbook,options['res_type'],
+                        options['dest_dir'],
+                        options['append_data']
+                    )
+
             except Exception as e:
                 print repr(e)
             with open(error_path,'w') as out:
@@ -215,16 +216,12 @@ class Command(BaseCommand):
             for header in sheet.iter_cols(max_row = 1):
                 if header[0].value is not None:
                     if skip_resourceid_col == True and header[0].value =='RESOURCEID':
-                        pass
-                    else:
-                        try:
-                            modelinstance = archesmodels.EntityTypes.objects.get(pk = header[0].value)
-                            # print modelinstance
-                        except archesmodels.EntityTypes.DoesNotExist:
-                            print "exception!"
-                            result['errors'].append("The header %s is not a valid EAMENA node name" % header[0].value)
-#                             logger.error("The header %s is not a valid EAMENA node name" % header[0].value)
-                            # raise ObjectDoesNotExist("The header %s is not a valid EAMENA node name" % header[0].value)
+                        continue
+                    try:
+                        modelinstance = archesmodels.EntityTypes.objects.get(pk = header[0].value)
+                        
+                    except archesmodels.EntityTypes.DoesNotExist:
+                        result['errors'].append("The header %s is not a valid EAMENA node name" % header[0].value)
         if result['errors']:
             result['success'] = False
         return result
@@ -236,26 +233,22 @@ class Command(BaseCommand):
         for sheet_name,contents in concept_data.iteritems():
 
             for node_name, concept_tuples in contents.iteritems():
-                node_obj = archesmodels.EntityTypes.objects.get(pk=node_name)
-                all_concepts = self.collect_concepts(node_obj.conceptid_id,full_concept_list=[])
-                all_labels = []
-                for c in all_concepts:
-                    labels = archesmodels.Values.objects.filter(conceptid_id=c)
-                    for label in labels:
-                        ## label.lower() allows for case-agnostic matching
-                        all_labels.append(label.value.lower())
 
+                label_lookup = self.get_label_lookup(node_name)
                 for ct in concept_tuples:
                     if ct[0] == "x":
                         continue
-                    #Values could be in Arabic or contain unicode chars, so it is essential to encode them properly.
+
+                    #Values could be in Arabic or contain unicode chars, so it
+                    #is essential to encode them properly.
                     value_encoded = (unicode(ct[0])).encode('utf-8')
                     for concept in value_encoded.split('|'):
                         concept = concept.rstrip().lstrip()
-                        ## concept.lower() allows for case-agnostic matching
-                        if not concept.lower() in all_labels:
-                            msg = "{}: {} ({} > row {}, col {})".format(
-                                node_name,concept,sheet_name,ct[1],ct[2]
+                        try:
+                            label_lookup[concept.lower()]
+                        except KeyError:
+                            msg = "{} - {}: {} (row {}, col {})".format(
+                                sheet_name,node_name,concept,ct[1],ct[2]
                             )
                             result['errors'].append(msg)
 
@@ -283,10 +276,10 @@ class Command(BaseCommand):
         for gt in geom_tuples:
             if gt[0] == "x":
                 continue
-            validated = self.validate_geometry(gt[0])
-            if not validated:
-                msg = "{}: {} ({} > row {}, col {})".format(
-                    gt[2],gt[0],gt[1],gt[3],gt[4]
+            msg = self.validate_geometry(gt[0])
+            if not validation == "valid":
+                msg = "{}: {} ({} > row {}, col {})\n{}".format(
+                    gt[2],gt[0],gt[1],gt[3],gt[4],msg
                 )
                 result['errors'].append(msg)
 
@@ -300,9 +293,9 @@ class Command(BaseCommand):
         True or False."""
         try:
             GEOSGeometry(geometry)
-            return True
-        except:
-            return False
+            return "valid"
+        except Exception as e:
+            return str(e)
 
     def validate_files(self, file_tuples):
         """
@@ -375,6 +368,10 @@ class Command(BaseCommand):
         '''collects all data values from the workbook, only of certain type
         if specified.
         '''
+        
+        col_letters1 = [i for i in string.ascii_uppercase]
+        col_letters2 = [i*2 for i in string.ascii_uppercase]
+        col_letters = col_letters1+col_letters2
 
         result = {}
         businesstable = self.get_node_x_business_table_dict(wb)
@@ -382,7 +379,7 @@ class Command(BaseCommand):
         for sheet_index,sheet in enumerate(wb.worksheets):
             sheet_name = wb.sheetnames[sheet_index]
             result[sheet_name] = {}
-            for col_index,header in enumerate(sheet.iter_cols(max_row = 1)):
+            for col_index,header in enumerate(sheet.iter_cols()):
                 node_name = header[0].value
 
                 if not node_name or node_name == 'RESOURCEID':
@@ -390,22 +387,41 @@ class Command(BaseCommand):
 
                 if datatype and businesstable[node_name] != datatype:
                     continue
+                
+                if not node_name in result[sheet_name]:
+                    result[sheet_name][node_name] = []
 
-                result[sheet_name][node_name] = []
                 for row_index, row in enumerate(sheet.iter_rows(row_offset = 1)):
                     values = row[col_index].value
                     if not values:
                         continue
-                    for value in str(values).split("|"):
-                        tuple = (value,row_index,col_index)
+                    encoded_values = unicode(values).encode('utf-8')
+                    for value in encoded_values.split("|"):
+                        tuple = (value,row_index+2,col_letters[col_index])
                         result[sheet_name][node_name].append(tuple)
 
         return result
+        
+    def get_label_lookup(self,node_name):
+        
+        node_obj = archesmodels.EntityTypes.objects.get(pk=node_name)
+        all_concepts = self.collect_concepts(node_obj.conceptid_id,full_concept_list=[])
+
+        ## dictionary will hold {label:concept.legacyoid}
+        label_lookup = {}
+        for c in all_concepts:
+            cobj = archesmodels.Concepts.objects.get(pk=c)
+            labels = archesmodels.Values.objects.filter(conceptid_id=c)
+            for label in labels:
+                label_lookup[label.value.lower()] = cobj.legacyoid
+                
+        return label_lookup
 
     def write_arches_file(self,workbook,resourcetype,destination,append=False):
         '''trimmed down version of SiteDataset, removing all validation operations.
         only produces a .arches file now.'''
-
+        
+        result = {'success':True,'errors':[]}
         ResourceList = []
 
         if append:
@@ -423,49 +439,51 @@ class Command(BaseCommand):
                 entitytype = node_obj.entitytypeid
                 datatype = node_obj.businesstablename
 
-                start = datetime.datetime.now()
-                all_concepts = self.collect_concepts(node_obj.conceptid_id,full_concept_list=[])
-
-                ## dictionary will hold {label:concept.legacyoid}
-                label_lookup = {}
-                for c in all_concepts:
-                    cobj = archesmodels.Concepts.objects.get(pk=c)
-                    labels = archesmodels.Values.objects.filter(conceptid_id=c)
-                    for label in labels:
-                            label_lookup[label.value.lower()] = cobj.legacyoid
+                label_lookup = self.get_label_lookup(node_name)
 
                 for row_index, row in enumerate(sheet.iter_rows(row_offset = 1)):
-                    
+
                     value = row[col_index].value
                     if not value:
                         continue
 
                     resourceid = row_index if append == False else resourceids_list[row_index]
-                    value_encoded = (unicode(value)).encode('utf-8')
 
-                    for concept in value_encoded.split('|'):
+                    encoded = unicode(value).encode('utf-8')
+                    for concept in encoded.split('|'):
+                        
+                        try:
+                            ## remove leading and trailing spaces
+                            concept = concept.rstrip().lstrip()
+                            GroupNo += 1
 
-                        ## remove leading and trailing spaces
-                        concept = concept.rstrip().lstrip()
+                            ## skip x in every case. this is a reserved placeholder to signify a non-value
+                            if concept == "x":
+                                continue
 
-                        ## skip x in every case. this is a reserved placeholder to signify a non-value
-                        if concept == "x":
-                            continue
+                            if sheet_name == "NOT":
+                                GroupName = col_index
+                            else:
+                                GroupName = " ".join((sheet_name, str(GroupNo)))
 
-                        GroupNo = GroupNo + 1 if sheet_name is not 'NOT' else ''
-                        GroupName = " ".join((sheet_name, str(GroupNo))) if sheet_name != 'NOT' else sheet_name
+                            ## data transformations must happen with domains and dates
+                            if datatype == 'domains':
+                                outval = label_lookup[concept.lower()]
 
-                        ## data transformations must happen with domains and dates
-                        if datatype == 'domains':
-                            outval = label_lookup[concept.lower()]
+                            elif datatype == 'dates':
+                                outval = self.validatedate(concept)
 
-                        elif datatype == 'dates':
-                            outval = self.validatedate(concept)
-
-                        else:
-                            outval = concept
-                        row = [str(resourceid),resourcetype,entitytype,outval, GroupName]
-                        ResourceList.append(row)
+                            else:
+                                outval = concept
+                            row = [str(resourceid),resourcetype,entitytype,outval, GroupName]
+                            ResourceList.append(row)
+                        
+                        except Exception as e:
+                            result['success'] = False
+                            result['errors'].append(
+                            "error writing value: {} - {}".format(
+                                concept,entitytype)
+                            )
 
         with open(destination, 'wb') as archesfile:
             writer = csv.writer(archesfile, delimiter ="|")
@@ -480,4 +498,4 @@ class Command(BaseCommand):
             writer = csv.writer(rel, delimiter ="|")
             writer.writerow(['RESOURCEID_FROM','RESOURCEID_TO','START_DATE','END_DATE','RELATION_TYPE','NOTES'])
 
-        return
+        return result
