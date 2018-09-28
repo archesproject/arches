@@ -3,6 +3,7 @@ import os
 import csv
 import json
 import datetime
+import string
 from django.conf import settings
 from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError 
@@ -375,6 +376,10 @@ class Command(BaseCommand):
         '''collects all data values from the workbook, only of certain type
         if specified.
         '''
+        
+        col_letters1 = [i for i in string.ascii_uppercase]
+        col_letters2 = [i*2 for i in string.ascii_uppercase]
+        col_letters = col_letters1+col_letters2
 
         result = {}
         businesstable = self.get_node_x_business_table_dict(wb)
@@ -382,7 +387,7 @@ class Command(BaseCommand):
         for sheet_index,sheet in enumerate(wb.worksheets):
             sheet_name = wb.sheetnames[sheet_index]
             result[sheet_name] = {}
-            for col_index,header in enumerate(sheet.iter_cols(max_row = 1)):
+            for col_index,header in enumerate(sheet.iter_cols()):
                 node_name = header[0].value
 
                 if not node_name or node_name == 'RESOURCEID':
@@ -397,7 +402,7 @@ class Command(BaseCommand):
                     if not values:
                         continue
                     for value in str(values).split("|"):
-                        tuple = (value,row_index,col_index)
+                        tuple = (value,row_index+2,col_letters[col_index])
                         result[sheet_name][node_name].append(tuple)
 
         return result
