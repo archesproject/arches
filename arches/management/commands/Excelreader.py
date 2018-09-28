@@ -54,7 +54,7 @@ class Command(BaseCommand):
                     result = self.validatedates(values)
 
                 elif vtype == 'geometries':
-                    data = self.get_values_for_validation(workbook,datatype="geomtries")
+                    data = self.get_values_for_validation(workbook,datatype="geometries")
                     values = self.flatten_values(data)
                     result = self.validate_geometries(values)
                     
@@ -294,7 +294,7 @@ class Command(BaseCommand):
             result['success'] = False
         return result
         
-    def validate_geometry(self, geometry,header,row):
+    def validate_geometry(self, geometry):
         """validates a geom string that has been passed from the spreadsheet.
         note that 'x' values should never be sent though this method. returns
         True or False."""
