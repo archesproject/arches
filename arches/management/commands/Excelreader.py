@@ -455,13 +455,16 @@ class Command(BaseCommand):
 
                         ## remove leading and trailing spaces
                         concept = concept.rstrip().lstrip()
+                        GroupNo += 1
 
                         ## skip x in every case. this is a reserved placeholder to signify a non-value
                         if concept == "x":
                             continue
 
-                        GroupNo = GroupNo + 1 if sheet_name is not 'NOT' else ''
-                        GroupName = " ".join((sheet_name, str(GroupNo))) if sheet_name != 'NOT' else sheet_name
+                        if sheet_name == "NOT":
+                            GroupName = col_index
+                        else:
+                            GroupName = " ".join((sheet_name, str(GroupNo)))
 
                         ## data transformations must happen with domains and dates
                         if datatype == 'domains':
