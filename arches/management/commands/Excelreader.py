@@ -69,12 +69,12 @@ class Command(BaseCommand):
                     result, filelist = self.validate_files(values)
                     
                 elif vtype == 'write_arches_file':
-                    result = {'success':True,'errors':[]}
-                    try:
-                        self.write_arches_file(workbook,options['res_type'], options['dest_dir'],options['append_data'])
-                    except Exception as e:
-                        result['success'] = False
-                        result['errors'].append('error writing .arches file: '+repr(e))
+                    result = self.write_arches_file(
+                        workbook,options['res_type'],
+                        options['dest_dir'],
+                        options['append_data']
+                    )
+
             except Exception as e:
                 print repr(e)
             with open(error_path,'w') as out:
@@ -410,7 +410,8 @@ class Command(BaseCommand):
     def write_arches_file(self,workbook,resourcetype,destination,append=False):
         '''trimmed down version of SiteDataset, removing all validation operations.
         only produces a .arches file now.'''
-
+        
+        result = {'success':True,'errors':[]}
         ResourceList = []
 
         if append:
@@ -485,4 +486,4 @@ class Command(BaseCommand):
             writer = csv.writer(rel, delimiter ="|")
             writer.writerow(['RESOURCEID_FROM','RESOURCEID_TO','START_DATE','END_DATE','RELATION_TYPE','NOTES'])
 
-        return
+        return result
