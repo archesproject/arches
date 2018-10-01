@@ -17,64 +17,62 @@ define([
             this.graphModel = options.graphModel;
             this.selectedNode = options.graphModel.get('selectedNode');
             GraphBase.prototype.initialize.apply(this, arguments);
-            
+
             options = _.defaults(options, {nodeSizeOver: this.nodeSize});
             this.nodeSizeOver = options.nodeSizeOver;
 
             this.addNodeListeners();
-            this.nodes.subscribe(function() {
+
+            var graphShape = ko.computed(function() {
+                this.nodes();
+                this.edges();
+                this.selectedNode();
+            }, this).extend({ throttle: 100 });
+
+            graphShape.subscribe(function() {
                 this.render();
                 this.addNodeListeners();
-            }, this);
-            this.edges.subscribe(function() {
-                this.render();
-            }, this);
-
-            ko.computed(function() {
-                this.selectedNode();
-                this.render();
-            }, this);
-
+            });
         },
 
         /**
-        * Renders only the nodes in the graph and adds Drag and Drop functionality 
-        * as well as dynamically updating the styling based on hover events and allowing 
-        * users to select a node by directly clicking it.  Nodes tagged as selected or filtered 
+        * Renders only the nodes in the graph and adds Drag and Drop functionality
+        * as well as dynamically updating the styling based on hover events and allowing
+        * users to select a node by directly clicking it.  Nodes tagged as selected or filtered
         * are rendered differently
         * @memberof GraphView.prototype
         */
         renderNodes: function(){
             GraphBase.prototype.renderNodes.apply(this, arguments);
             var self = this;
-            var getNodeClass = function (d, className) {
+            var getNodeClass = function(d, className) {
                 className += d.selected() ? ' node-selected' : '';
                 className += d.filtered() ? ' node-filtered' : '';
                 className += (self.selectedNode() && self.selectedNode().nodeGroupId() === d.nodeGroupId()) ? ' node-collected' : '';
                 return className;
-            }
+            };
             this.initDragDrop();
             this.allNodes.selectAll('circle')
                 .call(this.dragListener)
-                .attr("class", function (d) {
+                .attr("class", function(d) {
                     return getNodeClass(d, '');
                 })
                 .on("mouseover", function(d) {
                     self.overNode = d3.select(this.parentElement);
                     d3.select(this)
                         .attr("r", self.nodeSizeOver)
-                        .attr("class", function (d) {
+                        .attr("class", function(d) {
                             return getNodeClass(d, 'node-over');
-                        })
+                        });
                 })
-                .on("click", function (node) {
+                .on("click", function(node) {
                     self.graphModel.selectNode(node);
                 })
                 .on("mouseout", function(d) {
                     self.overNode = null;
                     d3.select(this)
                         .attr("r", self.nodeSize)
-                        .attr("class", function (d) {
+                        .attr("class", function(d) {
                             return getNodeClass(d, '');
                         });
                 });
@@ -84,24 +82,24 @@ define([
         },
 
         /**
-        * Renders the text associated with each node in the graph.  
+        * Renders the text associated with each node in the graph.
         * Nodes tagged as filtered are rendered differently
         * @memberof GraphView.prototype
         */
         renderNodeText: function(){
             GraphBase.prototype.renderNodeText.apply(this, arguments);
-            var getNodeClass = function (d, className) {
+            var getNodeClass = function(d, className) {
                 className += d.filtered() ? ' node-filtered' : '';
                 return className;
-            }
+            };
             this.allNodes.selectAll('text')
-                .attr("class", function (d) {
+                .attr("class", function(d) {
                     return getNodeClass(d, '');
-                })
+                });
         },
 
         /**
-        * Renders only the edges in the graph.  Nodes with a common group id have 
+        * Renders only the edges in the graph.  Nodes with a common group id have
         * a different link styling
         * @memberof GraphView.prototype
         */
@@ -109,7 +107,7 @@ define([
             var self = this;
             GraphBase.prototype.renderLinks.apply(this, arguments);
             this.svg.selectAll(".link")
-                .attr("class", function (d) {
+                .attr("class", function(d) {
                     var className = 'link';
                     if (self.selectedNode()) {
                         var selectedGroup = self.selectedNode().nodeGroupId();
@@ -122,25 +120,25 @@ define([
         },
 
         /**
-        * Listens to changes in node name or groupid and forces a {@link GraphView#render} 
+        * Listens to changes in node name or groupid and forces a {@link GraphView#render}
         * @memberof GraphView.prototype
         */
-        addNodeListeners: function () {
+        addNodeListeners: function() {
             var self = this;
             var nodes = this.nodes();
 
-            nodes.forEach(function (node) {
-                node.name.subscribe(function () {
+            nodes.forEach(function(node) {
+                node.name.subscribe(function() {
                     self.render();
                 });
-                node.nodeGroupId.subscribe(function () {
+                node.nodeGroupId.subscribe(function() {
                     self.render();
                 });
             });
         },
 
         /**
-        * Allows users to drag a part of the graph and append it to another part.  Styling 
+        * Allows users to drag a part of the graph and append it to another part.  Styling
         * of the graph is updated to reflect only valid drop targets.
         * @memberof GraphView.prototype
         */
@@ -170,28 +168,28 @@ define([
                 data.ontology_id = self.graphModel.get('ontology_id');
                 data.domain_connections = [{
                     ontology_classes: allowed_target_ontologies
-                }]
+                }];
 
                 var draggedGraph = new GraphModel({
                     data: data
                 });
-   
+
                 if(self.graphModel.canAppend(draggedGraph, node)){
                     return true;
                 }
 
                 return false;
-            }
+            };
 
             var initiateDrag = function(d, draggedNodeElement) {
                 var nodes = self.tree.nodes(d);
                 draggingNode = d;
 
                 getTargetNodes(d, function(response){
-                    var allowed_target_ontologies = []
+                    var allowed_target_ontologies = [];
                     _.each(response, function(item){
-                        allowed_target_ontologies = allowed_target_ontologies.concat(item.ontology_classes)
-                    }, this)
+                        allowed_target_ontologies = allowed_target_ontologies.concat(item.ontology_classes);
+                    }, this);
                     allowed_target_ontologies = _.uniq(allowed_target_ontologies);
                     self.allNodes.property('canDrop', false);
                     nodes = self.allNodes.filter(function(node){
@@ -201,17 +199,17 @@ define([
                         var d3node = d3.select(node);
                         if (d3node.data()[0].id != draggingNode.id){
                             d3node.attr('class', 'target-node')
-                            .property('canDrop', true);
+                                .property('canDrop', true);
                         }
                     }, this);
                 });
 
-                
+
 
                 // remove the text of the dragged node
                 draggedNodeElement.nextSibling.remove();
 
-                //if nodes has children, remove the links and nodes 
+                //if nodes has children, remove the links and nodes
                 if (nodes.length > 1) {
 
                     // remove link paths
@@ -242,7 +240,7 @@ define([
                 }).remove();
 
                 dragStarted = null;
-            }
+            };
 
             var endDrag = function() {
                 self.redraw(true);
@@ -261,9 +259,9 @@ define([
                     //console.log('drag start');
                     //dragStarted = true;
                     d3.event.sourceEvent.stopPropagation();
-                    // it's important that we suppress the mouseover event on the node being dragged. 
-                    // Otherwise it will absorb the mouseover event and the underlying node will not 
-                    // detect it 
+                    // it's important that we suppress the mouseover event on the node being dragged.
+                    // Otherwise it will absorb the mouseover event and the underlying node will not
+                    // detect it
                     d3.select(this).attr('pointer-events', 'none');
                     initiateDrag(d, this);
                 })
@@ -321,16 +319,16 @@ define([
                 }, self);
                 var data = [];
                 //if (draggingNode !== null && closestNode !== null) {
-                     data = [{
-                        target: {
-                            x: closestNode.x,
-                            y: closestNode.y
-                        },
-                        source: {
-                            x: draggingNode.x,
-                            y: draggingNode.y
-                        }
-                    }];
+                data = [{
+                    target: {
+                        x: closestNode.x,
+                        y: closestNode.y
+                    },
+                    source: {
+                        x: draggingNode.x,
+                        y: draggingNode.y
+                    }
+                }];
                 //}
 
                 //return [d.y, d.x / 180 * Math.PI]

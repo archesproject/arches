@@ -132,15 +132,19 @@ define([
                 });
             });
 
-            var nodesSubscription = attributes.data.nodes.subscribe(function(){
+            var nodes = ko.computed(function() {
+                attributes.data.nodes();
+            }, this).extend({ throttle: 100 });
+
+            var nodesSubscription = nodes.subscribe(function(){
                 this.parseNodes(attributes);
                 this._card(JSON.stringify(this.toJSON()));
             }, this);
 
-
             this.disposables.push(componentIdSubscription);
             this.disposables.push(cardSubscription);
             this.disposables.push(widgetSubscription);
+            this.disposables.push(nodes);
             this.disposables.push(nodesSubscription);
             this.disposables.push(this.configJSON);
             this.disposables.push(this.dirty);
