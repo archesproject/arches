@@ -64,7 +64,17 @@ class StringDataType(BaseDataType):
         try:
             value.upper()
         except:
-            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} {3} - {4}. {5}'.format(self.datatype_model.datatype, value, source, row_number, 'this is not a string', 'This data was not imported.')})
+            errors.append({
+                'type': 'ERROR',
+                'message': 'datatype: {0} value: {1} {2} {3} - {4}. {5}'.format(
+                    self.datatype_model.datatype,
+                    value,
+                    source,
+                    row_number,
+                    'this is not a string',
+                    'This data was not imported.'
+                )
+            })
         return errors
 
     def clean(self, tile, nodeid):
@@ -144,9 +154,12 @@ class BooleanDataType(BaseDataType):
         errors = []
 
         try:
-            type(bool(distutils.util.strtobool(str(value)))) == True
+            type(bool(distutils.util.strtobool(str(value)))) is True
         except:
-            errors.append({'type': 'ERROR', 'message': '{0} is not of type boolean. This data was not imported.'.format(value)})
+            errors.append({
+                'type': 'ERROR',
+                'message': '{0} is not of type boolean. This data was not imported.'.format(value)
+            })
 
         return errors
 
