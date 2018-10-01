@@ -5,6 +5,7 @@ define([
 ], function(ko, _) {
     return function(params) {
         var self = this;
+        this.configKeys = params.configKeys || [];
         this.state = params.state || 'form';
         this.preview = params.preview;
         this.loading = params.loading || ko.observable(false);
@@ -24,6 +25,9 @@ define([
             e.cancelDrop = (e.sourceParent!==e.targetParent);
         };
         this.config = this.card.model ? this.card.model.get('config') : {};
+        _.each(this.configKeys, function(key) {
+            self[key] = self.config[key];
+        });
         this.getValuesByDatatype = function(type) {
             var values = {};
             if (self.tile && self.form) {
