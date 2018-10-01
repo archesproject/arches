@@ -1,10 +1,11 @@
 define([
+    'underscore',
     'backbone',
     'views/graph/graph-manager/graph-base',
     'models/graph',
     'knockout',
     'd3'
-], function(Backbone, GraphBase, GraphModel, ko, d3) {
+], function(_, Backbone, GraphBase, GraphModel, ko, d3) {
     var GraphView = GraphBase.extend({
         /**
         * A backbone view to manage a list of branch graphs
@@ -165,9 +166,9 @@ define([
                 data.nodes = _.map(data.nodes, function(node){
                     return node.toJSON();
                 });
-                data.ontology_id = self.graphModel.get('ontology_id');
-                data.domain_connections = [{
-                    ontology_classes: allowedTargetOntologies
+                data['ontology_id'] = self.graphModel.get('ontology_id');
+                data['domain_connections'] = [{
+                    'ontology_classes': allowedTargetOntologies
                 }];
 
                 var draggedGraph = new GraphModel({
@@ -188,7 +189,7 @@ define([
                 getTargetNodes(d, function(response){
                     var allowedTargetOntologies = [];
                     _.each(response, function(item){
-                        allowedTargetOntologies = allowedTargetOntologies.concat(item.ontology_classes);
+                        allowedTargetOntologies = allowedTargetOntologies.concat(item['ontology_classes']);
                     }, this);
                     allowedTargetOntologies = _.uniq(allowedTargetOntologies);
                     self.allNodes.property('canDrop', false);
@@ -276,14 +277,13 @@ define([
                         d.x = 0;
                     }
 
-                    var mouse_location = d3.mouse(self.svg[0][0]);
+                    var mouseLocation = d3.mouse(self.svg[0][0]);
                     var node = d3.select(this);
-                    d.x = mouse_location[1];
-                    d.y = mouse_location[0] / 180 * Math.PI;
+                    d.x = mouseLocation[1];
+                    d.y = mouseLocation[0] / 180 * Math.PI;
                     node.attr("transform", "translate(" + d3.event.x + "," + d3.event.y + ")");
-                    //updateTempConnector();
 
-                }).on("dragend", function(d) {
+                }).on("dragend", function() {
                     //console.log('drag end');
                     if (dragging){
                         self.loading(true);
@@ -296,55 +296,6 @@ define([
                         }
                     }
                 });
-
-
-            // Function to update the temporary connector indicating dragging affiliation
-            var updateTempConnector = function() {
-                var dist = null;
-                var closestNode = null;
-                self.allNodes[0].forEach(function(node){
-                    var thisnode = d3.select(node).data()[0];
-                    if(thisnode !== draggingNode){
-                        var nodedist = Math.sqrt(Math.pow(thisnode.x-draggingNode.x,2) + Math.pow(thisnode.y-draggingNode.y,2));
-                        if (dist === null){
-                            dist = nodedist;
-                            closestNode = thisnode;
-                        }else{
-                            if(nodedist < dist){
-                                dist = nodedist;
-                                closestNode = thisnode;
-                            }
-                        }
-                    }
-                }, self);
-                var data = [];
-                //if (draggingNode !== null && closestNode !== null) {
-                data = [{
-                    target: {
-                        x: closestNode.x,
-                        y: closestNode.y
-                    },
-                    source: {
-                        x: draggingNode.x,
-                        y: draggingNode.y
-                    }
-                }];
-                //}
-
-                //return [d.y, d.x / 180 * Math.PI]
-                //console.log(data[0].source)
-
-                var link = self.svg.selectAll(".templink").data(data);
-
-                link.enter().append("path")
-                    .attr("class", "templink")
-                    .attr("d", self.diagonal)
-                    .attr('pointer-events', 'none');
-
-                link.attr("d", self.diagonal);
-
-                link.exit().remove();
-            };
         }
     });
     return GraphView;
