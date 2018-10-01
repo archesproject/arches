@@ -159,7 +159,7 @@ define([
                 }
             };
 
-            var testCanAppend = function(d, node, allowed_target_ontologies){
+            var testCanAppend = function(d, node, allowedTargetOntologies){
                 var data = self.graphModel.getChildNodesAndEdges(d);
                 data.nodes.push(d);
                 data.nodes = _.map(data.nodes, function(node){
@@ -167,7 +167,7 @@ define([
                 });
                 data.ontology_id = self.graphModel.get('ontology_id');
                 data.domain_connections = [{
-                    ontology_classes: allowed_target_ontologies
+                    ontology_classes: allowedTargetOntologies
                 }];
 
                 var draggedGraph = new GraphModel({
@@ -186,14 +186,14 @@ define([
                 draggingNode = d;
 
                 getTargetNodes(d, function(response){
-                    var allowed_target_ontologies = [];
+                    var allowedTargetOntologies = [];
                     _.each(response, function(item){
-                        allowed_target_ontologies = allowed_target_ontologies.concat(item.ontology_classes);
+                        allowedTargetOntologies = allowedTargetOntologies.concat(item.ontology_classes);
                     }, this);
-                    allowed_target_ontologies = _.uniq(allowed_target_ontologies);
+                    allowedTargetOntologies = _.uniq(allowedTargetOntologies);
                     self.allNodes.property('canDrop', false);
                     nodes = self.allNodes.filter(function(node){
-                        return testCanAppend(d, node, allowed_target_ontologies);
+                        return testCanAppend(d, node, allowedTargetOntologies);
                     }, self);
                     nodes[0].forEach(function(node){
                         var d3node = d3.select(node);
