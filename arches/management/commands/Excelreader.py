@@ -277,7 +277,7 @@ class Command(BaseCommand):
             if gt[0] == "x":
                 continue
             msg = self.validate_geometry(gt[0])
-            if not validation == "valid":
+            if not msg == "valid":
                 msg = "{}: {} ({} > row {}, col {})\n{}".format(
                     gt[2],gt[0],gt[1],gt[3],gt[4],msg
                 )
