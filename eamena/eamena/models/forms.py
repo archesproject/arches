@@ -389,8 +389,10 @@ class FeatureArchaeologicalAssessmentForm(ResourceForm):
 
     def update(self, data, files):
         data = add_actor('DATE_INTERPRETATION_INFERENCE_MAKING.I5', 'DATE_INTERPRETATION_INFERENCE_MAKING_ACTOR_NAME.E41', data, self.user)
-        
         self.update_nodes('DATE_INTERPRETATION_INFERENCE_MAKING.I5', data)
+        
+        data = add_actor('FORM_ASSIGNMENT.E13', 'FORM_ASSIGNMENT_INVESTIGATOR_NAME.E41', data, self.user)
+        self.update_nodes('FORM_ASSIGNMENT.E13', data)
 
         return
     
@@ -407,6 +409,17 @@ class FeatureArchaeologicalAssessmentForm(ResourceForm):
                     'CULTURAL_PERIOD_TYPE.I4' : Concept().get_e55_domain('CULTURAL_PERIOD_TYPE.I4'),
                     'CULTURAL_PERIOD_CERTAINTY.I6' : Concept().get_e55_domain('CULTURAL_PERIOD_CERTAINTY.I6'),
                     'CULTURAL_PERIOD_DETAIL_TYPE.E55' : Concept().get_e55_domain('CULTURAL_PERIOD_DETAIL_TYPE.E55')
+                }
+            }
+            
+            self.data['FORM_ASSIGNMENT.E13'] = {
+                'branch_lists': self.get_nodes('FORM_ASSIGNMENT.E13'),
+                'domains': {
+                    'FORM_NUMBER.E55' : Concept().get_e55_domain('FORM_NUMBER.E55'),
+                    'FORM_ARRANGEMENT.E55' : Concept().get_e55_domain('FORM_ARRANGEMENT.E55'),
+                    'FORM_SHAPE_TYPE.E55' : Concept().get_e55_domain('FORM_SHAPE_TYPE.E55'),
+                    'FORM_CERTAINTY_BELIEF_VALUE.I6' : Concept().get_e55_domain('FORM_CERTAINTY_BELIEF_VALUE.I6'),
+                    'FORM_TYPE_PROPOSITION_SET.I4' : Concept().get_e55_domain('FORM_TYPE_PROPOSITION_SET.I4'),
                 }
             }
 
