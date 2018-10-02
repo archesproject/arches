@@ -6,10 +6,13 @@ define([
     'underscore',
     'openlayers',
     'views/forms/sections/branch-list',
+    'views/forms/sections/coordinate-utils',
     'views/map',
     'resource-types'
-], function ($, Backbone, ko, koMapping, _, ol, BranchList, MapView, Resources) {
+], function ($, Backbone, ko, koMapping, _, ol, BranchList, CoordUtils, MapView, Resources) {
     var wkt = new ol.format.WKT();
+    var cu = new CoordUtils;
+    console.log(cu)
     return BranchList.extend({
         initialize: function(options) {
             var self = this;
@@ -326,6 +329,28 @@ define([
                 bulkAddFeatures([feature]);
                 $("#inventory-home").click();
                 $('.coord-input').val("");
+            });
+            
+            // take the input UTM coords and add to map by making a feature from wkt.
+            //Credits: Chuck Taylor @ http://home.hiwaay.net/~taylorc/toolbox/geography/geoutm.html
+            // all conversion code in media/js/views/forms/sections/coordinate-utils.js
+            this.$el.find('#add-utm').on('click', function() {
+                var utmx = $('#utmx').val();
+                var utmy = $('#utmy').val();
+                var utmzone = $('#utmzone').val();
+                var utmhemisphere = $('#utmhemisphere').val();
+                if (utmhemisphere == "north"){ southhemi = false } else {southhemi = true};
+                coords = cu.convertUTM(utmx, utmy, utmzone, southhemi);
+                var wkt = 'POINT('+coords.lat+' '+coords.lon+')';
+                var format = new ol.format.WKT();
+                var feature = format.readFeature(wkt, {
+                    dataProjection: 'EPSG:4326',
+                    featureProjection: 'EPSG:3857'
+                });
+                bulkAddFeatures([feature]);
+                $("#inventory-home").click();
+                $('.coord-input').val("");
+
             });
 
 
