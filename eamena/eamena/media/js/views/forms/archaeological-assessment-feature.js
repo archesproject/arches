@@ -16,6 +16,17 @@ define(['jquery',
                 date_picker.on('dp.change', function(evt){
                     $(this).find('input').trigger('change'); 
                 });
+                
+                this.addBranchList(new BranchList({
+                    el: this.$el.find('#morphology-section')[0],
+                    data: this.data,
+                    dataKey: 'FORM_ASSIGNMENT.E13',
+                    rules: true,
+                    validateBranch: function (nodes) {
+                        var ck0 = this.validateHasValues(nodes);
+                        return ck0;
+                    }
+                }));
 
                 this.addBranchList(new BranchList({
                     el: this.$el.find('#assessment-section')[0],
