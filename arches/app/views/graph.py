@@ -294,7 +294,6 @@ class GraphDataView(View):
     @method_decorator(group_required('Graph Editor'), name='dispatch')
     def post(self, request, graphid=None):
         ret = {}
-
         try:
             if self.action == 'import_graph':
                 graph_file = request.FILES.get('importedGraph').read()
@@ -312,9 +311,11 @@ class GraphDataView(View):
                     ret = Graph.new(name=name, is_resource=isresource, author=author)
 
                 elif self.action == 'update_node':
-                    graph.update_node(data)
+                    updated_values = graph.update_node(data)
                     ret = graph
                     graph.save()
+                    ret = JSONSerializer().serializeToPython(graph)
+                    ret['updated_values'] = updated_values
 
                 elif self.action == 'update_node_layer':
                     nodeid = uuid.UUID(str(data.get('nodeid')))
