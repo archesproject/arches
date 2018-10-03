@@ -132,15 +132,22 @@ define([
                 });
             });
 
-            var nodesSubscription = attributes.data.nodes.subscribe(function(){
-                this.parseNodes(attributes);
+            var nodes = ko.computed(function() {
+                return attributes.data.nodes();
+            }, this).extend({ throttle: 100 });
+
+            var nodesSubscription = nodes.subscribe(function(){
+                var widgets = this.get('widgets');
+                widgets.sort(function(w, ww) {
+                    return w.get('sortorder')() > ww.get('sortorder')();
+                });
                 this._card(JSON.stringify(this.toJSON()));
             }, this);
-
 
             this.disposables.push(componentIdSubscription);
             this.disposables.push(cardSubscription);
             this.disposables.push(widgetSubscription);
+            this.disposables.push(nodes);
             this.disposables.push(nodesSubscription);
             this.disposables.push(this.configJSON);
             this.disposables.push(this.dirty);
