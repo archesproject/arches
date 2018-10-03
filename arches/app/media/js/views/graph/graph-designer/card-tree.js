@@ -177,49 +177,43 @@ define([
             beforeMove: function(e) {
                 e.cancelDrop = (e.sourceParent!==e.targetParent);
             },
+            updateCard: function(parents, card, data) {
+                var updatedCards = [];
+                _.each(ko.unwrap(parents), function(parent) {
+                    if (parent.nodegroupid === card.parentnodegroupId) {
+                        var newcard = {
+                            card: card,
+                            nodegroup: _.filter(data.nodegroups, function(ng){return data.updated_values.card.nodegroup_id === ng.nodegroupid;})[0]
+                        };
+                        self.addCard(newcard, parent.cards);
+                    } else {
+                        self.updateCard(ko.unwrap(parent.cards), card, data);
+                    }
+                }, this);
+                return updatedCards;
+            },
+            updateNode: function(parents, node) {
+                var updatedCards = [];
+                _.each(ko.unwrap(parents), function(parent) {
+                    if (parent.nodegroupid === node.nodegroup_id) {
+                        parent.model.parseNodes(parent.model.attributes);
+                    } else {
+                        self.updateNode(ko.unwrap(parent.cards), node);
+                    }
+                }, this);
+                return updatedCards;
+            },
             updateCards: function(selectedNodegroupId, data) {
-                var cards = data.cards;
-                var nodegroups = data.nodegroups;
-                var existingNodegroupIds = _.pluck(self.graphModel.get('nodegroups'), 'nodegroupid');
-                var newNodegroups = _.filter(nodegroups, function(ng) {return _.contains(existingNodegroupIds, ng.nodegroupid) === false;});
+                if (data.updated_values.card) {
+                    var card = data.updated_values.card;
+                    card.parentnodegroupId = _.filter(data.nodegroups, function(ng){return data.updated_values.card.nodegroup_id === ng.nodegroupid;})[0].parentnodegroup_id;
+                    self.updateCard(self.topCards(), card, data);
+                } else {
+                    self.updateNode(self.topCards(), data.updated_values.node);
+                }
                 _.each(self.cachedFlatTree, function(cardViewModel) {
                     cardViewModel.dispose();
                 });
-                self.topCards.removeAll();
-                if (newNodegroups.length > 0) {
-                    self.graphModel.set('nodegroups', self.graphModel.get('nodegroups').concat(newNodegroups));
-                }
-                self.topCards(_.filter(cards, function(card) {
-                    var nodegroup = _.find(ko.unwrap(self.graphModel.get('nodegroups')), function(group) {
-                        return ko.unwrap(group.nodegroupid) === card.nodegroup_id;
-                    });
-                    if (nodegroup) {
-                        return !nodegroup || !ko.unwrap(nodegroup.parentnodegroup_id);
-                    }
-                }, self).map(function(card) {
-                    var newCard = new CardViewModel({
-                        card: card,
-                        graphModel: self.graphModel,
-                        tile: null,
-                        resourceId: ko.observable(),
-                        displayname: ko.observable(),
-                        handlers: {},
-                        cards: cards,
-                        tiles: [],
-                        selection: selection,
-                        hover: hover,
-                        scrollTo: scrollTo,
-                        multiselect: self.multiselect,
-                        loading: loading,
-                        filter: filter,
-                        provisionalTileViewModel: null,
-                        cardwidgets: data.cardwidgets,
-                        userisreviewer: true,
-                        perms: ko.observableArray(),
-                        permsLiteral: ko.observableArray()
-                    });
-                    return newCard;
-                }, self));
                 self.cachedFlatTree = self.flattenTree(self.topCards(), []);
                 _.each(self.cachedFlatTree, function(node) {
                     if (node.nodegroupid === selectedNodegroupId) {
@@ -233,10 +227,13 @@ define([
                 removeCard(self.topCards, selectedNodegroupId);
                 if (self.topCards().length){ self.topCards()[0].selected(true); }
             },
-            addCard: function(data) {
+            addCard: function(data, parentcards) {
+                if (!parentcards) {
+                    parentcards = self.topCards;
+                }
                 var cards;
                 self.graphModel.set('nodegroups', self.graphModel.get('nodegroups').concat([data.nodegroup]));
-                self.topCards.push(new CardViewModel({
+                var newCardViewModel = new CardViewModel({
                     card: data.card,
                     graphModel: self.graphModel,
                     tile: null,
@@ -256,8 +253,10 @@ define([
                     userisreviewer: true,
                     perms: ko.observableArray(),
                     permsLiteral: ko.observableArray()
-                }));
+                });
+                parentcards.push(newCardViewModel);
                 self.cachedFlatTree = self.flattenTree(self.topCards(), []);
+                return newCardViewModel;
             },
             reorderCards: function() {
                 loading(true);
