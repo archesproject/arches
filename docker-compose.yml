@@ -32,6 +32,7 @@ services:
         # - DJANGO_REMOTE_DEBUG=False
         - COMPRESS_STATIC_FILES=False
         - DOMAIN_NAMES=localhost
+        - PYTHONUNBUFFERED=0
         - TZ=PST
       ports:
         - '8000:8000'
