@@ -192,13 +192,13 @@ define([
                 }, this);
                 return updatedCards;
             },
-            updateNode: function(parents, node, data) {
+            updateNode: function(parents, node) {
                 var updatedCards = [];
                 _.each(ko.unwrap(parents), function(parent) {
                     if (parent.nodegroupid === node.nodegroup_id) {
                         parent.model.parseNodes(parent.model.attributes);
                     } else {
-                        self.updateNode(ko.unwrap(parent.cards), node, data);
+                        self.updateNode(ko.unwrap(parent.cards), node);
                     }
                 }, this);
                 return updatedCards;
@@ -209,7 +209,7 @@ define([
                     card.parentnodegroupId = _.filter(data.nodegroups, function(ng){return data.updated_values.card.nodegroup_id === ng.nodegroupid;})[0].parentnodegroup_id;
                     self.updateCard(self.topCards(), card, data);
                 } else {
-                    self.updateNode(self.topCards(), data.updated_values.node, data);
+                    self.updateNode(self.topCards(), data.updated_values.node);
                 }
                 _.each(self.cachedFlatTree, function(cardViewModel) {
                     cardViewModel.dispose();
