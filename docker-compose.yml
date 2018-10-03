@@ -30,6 +30,7 @@ services:
         - DJANGO_MODE=PROD
         - DJANGO_DEBUG=False
         # - DJANGO_REMOTE_DEBUG=False
+        - COMPRESS_STATIC_FILES=False
         - DOMAIN_NAMES=localhost
         - TZ=PST
       ports:
