@@ -234,7 +234,6 @@ define([
 
         parseNodes: function(attributes) {
             var widgets = [];
-            console.log('parsing nodes')
             ko.unwrap(this.nodes).forEach(function(node) {
                 // TODO: it would be nice to normalize the nodegroup_id names (right now we have several different versions)
                 if((ko.unwrap(node.nodeGroupId) || ko.unwrap(node.nodegroup_id)) === ko.unwrap(attributes.data.nodegroup_id)){

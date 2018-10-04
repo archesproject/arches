@@ -216,14 +216,14 @@ define([
                                         datatype: datatype,
                                         disabled: attributes.data.disabled
                                     });
-                                    var replacewidget;
+                                    var widgetIndex;
                                     _.each(parent.widgets(), function(pw, i){
                                         if (pw.node_id() === widget.node_id()) {
-                                            replacewidget = i;
+                                            widgetIndex = i;
                                         }
                                     }, self);
-                                    if (replacewidget !== undefined) {
-                                        parent.widgets.splice(replacewidget, 1, widget);
+                                    if (widgetIndex !== undefined) {
+                                        parent.widgets.splice(widgetIndex, 1, widget);
                                     } else {
                                         parent.widgets.push(widget);
                                     }
