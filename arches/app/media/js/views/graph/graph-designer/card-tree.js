@@ -25,6 +25,7 @@ define([
         var hover = ko.observable();
         var scrollTo = ko.observable();
         var cachedFlatTree;
+        var cardList = data.cards;
 
         this.flattenTree = function(parents, flatList) {
             _.each(ko.unwrap(parents), function(parent) {
@@ -265,7 +266,6 @@ define([
                 if (!parentcards) {
                     parentcards = self.topCards;
                 }
-                var cards;
                 self.graphModel.set('nodegroups', self.graphModel.get('nodegroups').concat([data.nodegroup]));
                 var newCardViewModel = new CardViewModel({
                     card: data.card,
@@ -274,7 +274,7 @@ define([
                     resourceId: ko.observable(),
                     displayname: ko.observable(),
                     handlers: {},
-                    cards: cards,
+                    cards: cardList,
                     tiles: [],
                     selection: selection,
                     hover: hover,
@@ -324,6 +324,33 @@ define([
                 selection(topCard.tiles().length > 0 ? topCard.tiles()[0] : topCard);
             }
         }
+
+        self.graphModel.get('cards').subscribe(function(graphCards) {
+            var currentCards = self.flattenTree(self.topCards(), []);
+            var cardIds = currentCards.map(function(card) {
+                return card.model.cardid();
+            });
+            var newCards = graphCards.filter(function(card) {
+                return !_.contains(cardIds, card.cardid);
+            });
+            cardList = cardList.concat(newCards);
+
+            newCards.forEach(function(card) {
+                var nodegroup = _.find(ko.unwrap(params.graphModel.get('nodegroups')), function(group) {
+                    return ko.unwrap(group.nodegroupid) === card.nodegroup_id;
+                });
+                var parent = _.find(currentCards, function(currentCard) {
+                    return currentCard.nodegroupid === nodegroup.parentnodegroup_id;
+                });
+                if (parent || !nodegroup.parentnodegroup_id) {
+                    self.addCard({
+                        nodegroup: nodegroup,
+                        card: card,
+                        cardwidgets: self.graphModel.get('cardwidgets')
+                    }, parent ? parent.cards : self.topCards);
+                }
+            });
+        });
     };
     return CardTreeViewModel;
 });
