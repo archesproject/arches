@@ -221,11 +221,11 @@ define([
                                         if (pw.node_id() === widget.node_id()) {
                                             replacewidget = i;
                                         }
-                                    }, self)
+                                    }, self);
                                     if (replacewidget !== undefined) {
                                         parent.widgets.splice(replacewidget, 1, widget);
                                     } else {
-                                        parent.widgets.push(widget)
+                                        parent.widgets.push(widget);
                                     }
                                 }
                             }
