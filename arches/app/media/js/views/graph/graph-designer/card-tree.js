@@ -308,7 +308,7 @@ define([
                     return ko.unwrap(group.nodegroupid) === card.nodegroup_id;
                 });
                 var parent = _.find(currentCards, function(currentCard) {
-                    return ko.unwrap(nodegroup.parentnodegroup_id) === card.nodegroup_id;
+                    return currentCard.nodegroupid === nodegroup.parentnodegroup_id;
                 });
                 if (parent || !nodegroup.parentnodegroup_id) {
                     self.addCard({
