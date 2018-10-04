@@ -3,13 +3,14 @@ define([
     'underscore',
     'knockout',
     'viewmodels/card',
+    'models/card-widget',
     'arches',
     'graph-designer-data',
     'bindings/sortable',
     'bindings/scrollTo',
     'widgets',
     'card-components'
-], function($, _, ko, CardViewModel, arches, data) {
+], function($, _, ko, CardViewModel, CardWidgetModel, arches, data) {
     var CardTreeViewModel = function(params) {
         var self = this;
         var filter = ko.observable('');
@@ -196,7 +197,40 @@ define([
                 var updatedCards = [];
                 _.each(ko.unwrap(parents), function(parent) {
                     if (parent.nodegroupid === node.nodegroup_id) {
-                        parent.model.parseNodes(parent.model.attributes);
+                        var attributes = parent.model.attributes;
+                        _.each(parent.model.nodes(), function(modelnode){
+                            if (modelnode.nodeid === node.nodeid) {
+                                var datatype = attributes.datatypelookup[ko.unwrap(modelnode.datatype)];
+                                if (!modelnode.nodeDatatypeSubscription) {
+                                    modelnode.nodeDatatypeSubscription = modelnode.datatype.subscribe(function(){
+                                        parent.model._card(JSON.stringify(parent.model.toJSON()));
+                                    }, this);
+                                }
+                                if (datatype.defaultwidget_id) {
+                                    var cardWidgetData = _.find(attributes.data.widgets, function(widget) {
+                                        return widget.node_id === node.nodeid;
+                                    });
+                                    var widget = new CardWidgetModel(cardWidgetData, {
+                                        node: modelnode,
+                                        card: parent.model,
+                                        datatype: datatype,
+                                        disabled: attributes.data.disabled
+                                    });
+                                    var widgetIndex;
+                                    _.each(parent.widgets(), function(pw, i){
+                                        if (pw.node_id() === widget.node_id()) {
+                                            widgetIndex = i;
+                                        }
+                                    }, self);
+                                    if (widgetIndex !== undefined) {
+                                        parent.widgets.splice(widgetIndex, 1, widget);
+                                    } else {
+                                        parent.widgets.push(widget);
+                                    }
+                                }
+                            }
+                        });
+                        parent.model._card(JSON.stringify(parent.model.toJSON()));
                     } else {
                         self.updateNode(ko.unwrap(parent.cards), node);
                     }

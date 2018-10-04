@@ -312,7 +312,6 @@ class GraphDataView(View):
 
                 elif self.action == 'update_node':
                     updated_values = graph.update_node(data)
-                    ret = graph
                     graph.save()
                     ret = JSONSerializer().serializeToPython(graph)
                     ret['updated_values'] = updated_values
