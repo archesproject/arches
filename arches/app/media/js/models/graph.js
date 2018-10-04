@@ -179,9 +179,7 @@ define(['arches',
                     response.responseJSON.edges.forEach(function(edge){
                         this.get('edges').push(edge);
                     }, this);
-                    response.responseJSON.nodegroups.forEach(function(nodegroup){
-                        this.get('nodegroups').push(nodegroup);
-                    }, this);
+                    this.set('nodegroups', response.responseJSON.nodegroups);
                     response.responseJSON.widgets.forEach(function(widget){
                         this.get('cardwidgets').push(widget);
                     }, this);
