@@ -44,17 +44,33 @@ def _handle_date(graph, domainnode, rangenode, edge, tile,
 
     graph.add((domainnode, URIRef(edge.ontologyproperty), Literal(str(range_tile_data), datatype=XSD.dateTime)))
 
+def _append_resource_node(graph, domainnode, edge, resource_inst):
+    rangenode = URIRef(archesproject['resources/%s' % resource_inst])
+    graph.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
+    graph.add((domainnode, URIRef(edge.ontologyproperty), rangenode))
+    # XXX Insert label here if exists on instance
+
 def _handle_resource_instance(graph, domainnode, rangenode, edge, tile,
                               domain_tile_data, range_tile_data, graph_uri):
     # manipulate rangenode's id from range_tile_data
     # resource-instance (rather than -list) will always be single value
     if edge.domainnode.istopnode:
         graph.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
-    rangenode = URIRef(archesproject['resources/%s' % range_tile_data] )
-    graph.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
-    graph.add((domainnode, URIRef(edge.ontologyproperty), rangenode))
-    # XXX Insert label here if exists on instance
-    
+
+    # should really assert that the range_tile_data is a string and a valid resource
+    # instance UUID
+    _append_resource_node(graph, domainnode, edge, range_tile_data)
+
+
+def _handle_resource_instance_list(graph, domainnode, rangenode, edge, tile, 
+                                   domain_tile_data, range_tile_data, graph_uri):
+
+    if edge.domainnode.istopnode:
+        graph.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
+
+    for r in range_tile_data:
+        _append_resource_node(graph, domainnode, edge, r)
+
 
 def _handle_domain_value(graph, domainnode, rangenode, edge, tile,
                          domain_tile_data, range_tile_data, graph_uri):
@@ -67,6 +83,8 @@ def _handle_geojson_feature_collection(graph, domainnode, rangenode, edge, tile,
 def _append_concept_node(graph, domainnode, edge, concept_value_id):
     info = {}
     c = ConceptValue(concept_value_id)
+    # FIXME: switch this to a DB call that gets all this in one or forces the
+    # ORM to do that and cache.
     info['label'] = c.value
     info['concept_id'] = c.conceptid
     info['lang'] = c.language
@@ -80,6 +98,7 @@ def _append_concept_node(graph, domainnode, edge, concept_value_id):
     # FIXME: Add the language back in, once pyld fixes its problem with uppercase lang
     # tokens -> https://github.com/digitalbazaar/pyld/issues/86
     #graph.add((rangenode, URIRef(RDFS.label), Literal(info['label'], lang=info['lang'])))
+
     graph.add((rangenode, URIRef(RDFS.label), Literal(info['label'])))
 
     # add in additional identifiers?
@@ -92,6 +111,13 @@ def _handle_concept(graph, domainnode, rangenode, edge, tile,
         graph.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
 
     _append_concept_node(graph, domainnode, edge, str(range_tile_data))
+
+def _handle_concept_list(graph, domainnode, rangenode, edge, tile, 
+                         domain_tile_data, range_tile_data, graph_uri):
+    if edge.domainnode.istopnode:
+        graph.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
+    for r in range_tile_data:
+        _append_concept_node(graph, domainnode, edge, str(r))
 
 def _handle_csv_chart_json(graph, domainnode, rangenode, edge, tile,
                     domain_tile_data, range_tile_data, graph_uri):
@@ -109,27 +135,9 @@ def _handle_node_value(graph, domainnode, rangenode, edge, tile,
                     domain_tile_data, range_tile_data, graph_uri):
     pass
 
-def _handle_concept_list(graph, domainnode, rangenode, edge, tile, 
-                         domain_tile_data, range_tile_data, graph_uri):
-    if edge.domainnode.istopnode:
-        graph.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
-    for r in range_tile_data:
-        _append_concept_node(graph, domainnode, edge, str(r))
-
 def _handle_file_list(graph, domainnode, rangenode, edge, tile, 
                       domain_tile_data, range_tile_data, graph_uri):
     pass
-
-def _handle_resource_instance_list(graph, domainnode, rangenode, edge, tile, 
-                                   domain_tile_data, range_tile_data, graph_uri):
-
-    if edge.domainnode.istopnode:
-        graph.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
-
-    for r in range_tile_data:
-        rangenode = URIRef(archesproject['resources/%s' % r] )
-        graph.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
-        graph.add((domainnode, URIRef(edge.ontologyproperty), rangenode))
 
 def _handle_domain_value_list(graph, domainnode, rangenode, edge, tile,
                          domain_tile_data, range_tile_data, graph_uri):
