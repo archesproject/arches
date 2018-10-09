@@ -272,7 +272,7 @@ run_custom_scripts() {
 compress_static_files() {
 	echo ""
 	echo "Compressing static files..."
-	find ${STATIC_ROOT} -type f -regextype posix-extended -iregex '.*\.(css|js|txt|svg|xml)' -exec zopfli '{}' \;
+	find ${STATIC_ROOT} -type f -regextype posix-extended -iregex '.*\.(css|js|html|txt|svg|xml)' -exec sh -c 'for i do if [ ! -f "${i%}.gz" ]; then echo Archiving "${i%}"; zopfli "${i%}"; fi;done' sh {} +
 	echo "Done compressing static files"
 	echo ""
 }
