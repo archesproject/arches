@@ -293,7 +293,10 @@ class Command(BaseCommand):
         True or False."""
         try:
             GEOSGeometry(geometry)
-            return "valid"
+            if GEOSGeometry(geometry).valid:
+                return "valid"
+            else:
+                return "Intersecting polygon"
         except Exception as e:
             return str(e)
 
