@@ -1167,6 +1167,18 @@ class Graph(models.GraphModel):
 
         return cards
 
+    def get_widgets(self):
+        """
+        get the widget data (if any) associated with this graph
+
+        """
+        widgets = []
+        for widget in self.widgets.itervalues():
+            widget_dict = JSONSerializer().serializeToPython(widget)
+            widgets.append(widget_dict)
+
+        return widgets
+
     def serialize(self, fields=None, exclude=None):
         """
         serialize to a different form then used by the internal class structure
@@ -1186,6 +1198,8 @@ class Graph(models.GraphModel):
             ret.pop('relatable_resource_model_ids', None)
 
         ret['cards'] = self.get_cards() if 'cards' not in exclude else ret.pop('cards', None)
+        if 'widgets' not in exclude:
+            ret['widgets'] = self.get_widgets()
         ret['nodegroups'] = self.get_nodegroups() if 'nodegroups' not in exclude else ret.pop('nodegroups', None)
         ret['domain_connections'] = self.get_valid_domain_ontology_classes() if 'domain_connections' not in exclude else ret.pop('domain_connections', None)
         ret['is_editable'] = self.is_editable() if 'is_editable' not in exclude else ret.pop('is_editable', None)

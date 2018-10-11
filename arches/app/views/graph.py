@@ -325,6 +325,10 @@ class GraphDataView(View):
 
                 elif self.action == 'append_branch':
                     ret = graph.append_branch(data['property'], nodeid=data['nodeid'], graphid=data['graphid'])
+                    ret = ret.serialize()
+                    ret['nodegroups'] = graph.get_nodegroups()
+                    ret['cards'] = graph.get_cards()
+                    ret['widgets'] = graph.get_widgets()
                     graph.save()
 
                 elif self.action == 'append_node':
