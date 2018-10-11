@@ -75,14 +75,14 @@ def get_graphs_for_export(graphids=None):
     graphs = {}
     graphs['graph'] = []
     if graphids == None or graphids[0] == 'all' or graphids == ['']:
-        resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.all().exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID))
+        resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.all().exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID), exclude=["widgets"])
     elif graphids[0] == 'resource_models':
-        resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(isresource=True).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID))
+        resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(isresource=True).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID), exclude=["widgets"])
     elif graphids[0] == 'branches':
-        resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(isresource=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID))
+        resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(isresource=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID), exclude=["widgets"])
     else:
         try:
-            resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(graphid__in=graphids))
+            resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(graphid__in=graphids), exclude=["widgets"])
         except:
             # this warning should never get thrown while doing an export from the UI, but maybe it should be moved somewhere else.
             print '*'*80
