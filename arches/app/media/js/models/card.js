@@ -134,12 +134,11 @@ define([
             });
 
             var nodes = ko.computed(function() {
-                attributes.data.nodes();
+                return attributes.data.nodes();
             }, this).extend({ throttle: 100 });
 
             var nodesSubscription = nodes.subscribe(function(){
                 this.parseNodes(attributes);
-                this._card(JSON.stringify(this.toJSON()));
             }, this);
 
             this.disposables.push(componentIdSubscription);

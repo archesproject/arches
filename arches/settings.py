@@ -220,6 +220,17 @@ JWT_KEY = SECRET_KEY
 JWT_TOKEN_EXPIRATION = 50 #days before the token becomes stale
 JWT_ALGORITHM = 'HS256'
 
+# OAuth settings
+# https://django-oauth-toolkit.readthedocs.io/en/latest/settings.html
+OAUTH2_PROVIDER = {
+    'ACCESS_TOKEN_EXPIRE_SECONDS': 36000
+}
+
+# This is the client id you get when you register a new application
+# see https://arches.readthedocs.io/en/stable/api/#authentication
+MOBILE_OAUTH_CLIENT_ID = ''  #'9JCibwrWQ4hwuGn5fu2u1oRZSs9V6gK8Vu8hpRC4'
+
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -250,6 +261,7 @@ TEMPLATES = [
 ]
 
 AUTHENTICATION_BACKENDS = (
+    'arches.app.utils.email_auth_backend.EmailAuthenticationBackend',
     'oauth2_provider.backends.OAuth2Backend',
     'django.contrib.auth.backends.ModelBackend', # this is default
     'guardian.backends.ObjectPermissionBackend',
@@ -324,6 +336,7 @@ PROFILE_LOG_BASE = os.path.join(ROOT_DIR, 'logs')
 BULK_IMPORT_BATCH_SIZE = 2000
 
 SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Local.json')
+SYSTEM_SETTINGS_RESOURCE_ID = 'a106c400-260c-11e7-a604-14109fd34195'
 
 AUTH_PASSWORD_VALIDATORS = [
     {

@@ -116,6 +116,9 @@ class DDataType(models.Model):
     issearchable = models.NullBooleanField(default=False)
     isgeometric = models.BooleanField()
 
+    def __unicode__(self):
+        return self.datatype
+
     class Meta:
         managed = True
         db_table = 'd_data_types'
@@ -747,6 +750,9 @@ class Widget(models.Model):
     def defaultconfig_json(self):
         json_string = json.dumps(self.defaultconfig)
         return json_string
+
+    def __unicode__(self):
+        return self.name
 
     class Meta:
         managed = True
