@@ -327,10 +327,14 @@ run_gunicorn_server() {
 	echo "----- *** RUNNING GUNICORN PRODUCTION SERVER *** -----"
 	echo ""
 	cd_app_folder
-    if [[ ! -z ${ARCHES_PROJECT} ]]; then
-        gunicorn arches.wsgi:application -w 2 -b :${DJANGO_PORT} --pythonpath ${ARCHES_PROJECT}
+	
+	if [[ ! -z ${ARCHES_PROJECT} ]]; then
+        gunicorn arches.wsgi:application \
+            --CONFIG gunicorn_config.py \
+            --pythonpath ${ARCHES_PROJECT}
 	else
-        gunicorn arches.wsgi:application -w 2 -b :${DJANGO_PORT}
+        gunicorn arches.wsgi:application \
+            --CONFIG gunicorn_config.py
     fi
 }
 
