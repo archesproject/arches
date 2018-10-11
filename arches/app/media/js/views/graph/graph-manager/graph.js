@@ -15,6 +15,7 @@ define([
         */
 
         initialize: function(options) {
+            var self = this;
             this.graphModel = options.graphModel;
             this.selectedNode = options.graphModel.get('selectedNode');
             GraphBase.prototype.initialize.apply(this, arguments);
@@ -25,14 +26,16 @@ define([
             this.addNodeListeners();
 
             var graphShape = ko.computed(function() {
-                this.nodes();
-                this.edges();
-                this.selectedNode();
-            }, this).extend({ throttle: 100 });
+                return {
+                    nodes: this.nodes(),
+                    edges: this.edges(),
+                    selection: this.selectedNode()
+                };
+            }, this).extend({ throttle: 200 });
 
             graphShape.subscribe(function() {
-                this.render();
-                this.addNodeListeners();
+                self.render();
+                self.addNodeListeners();
             });
         },
 

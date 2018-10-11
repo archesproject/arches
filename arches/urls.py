@@ -30,7 +30,7 @@ from arches.app.views.user import UserManagerView
 from arches.app.views.tile import TileData
 from arches.app.views.map import MapLayerManagerView
 from arches.app.views.mobile_survey import MobileSurveyManagerView, MobileSurveyResources
-from arches.app.views.auth import LoginView, SignupView, ConfirmSignupView, ChangePasswordView, GetTokenView
+from arches.app.views.auth import LoginView, SignupView, ConfirmSignupView, ChangePasswordView, GetTokenView, GetClientIdView
 from arches.app.models.system_settings import settings
 from arches.app.utils.forms import ArchesPasswordResetForm
 from arches.app.utils.forms import ArchesSetPasswordForm
@@ -47,6 +47,7 @@ urlpatterns = [
     url(r'^auth/signup$', SignupView.as_view(), name='signup'),
     url(r'^auth/confirm_signup$', ConfirmSignupView.as_view(), name='confirm_signup'),
     url(r'^auth/get_token$', GetTokenView.as_view(), name='get_token'),
+    url(r'^auth/get_client_id$', GetClientIdView.as_view(), name='get_client_id'),
     url(r'^auth/', LoginView.as_view(), name='auth'),
     url(r'^rdm/(?P<conceptid>%s|())$' % uuid_regex , RDMView.as_view(), name='rdm'),
     url(r'^admin/reindex/resources$', ReIndexResources.as_view(), name="reindex"),

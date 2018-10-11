@@ -69,7 +69,7 @@ class Surveys(APIBase):
 
     def get(self, request):
         group_ids = list(request.user.groups.values_list('id', flat=True))
-        projects = MobileSurvey.objects.filter(Q(users__in=[request.user]) | Q(groups__in=group_ids), active=True)
+        projects = MobileSurvey.objects.filter(Q(users__in=[request.user]) | Q(groups__in=group_ids), active=True).distinct()
         response = JSONResponse(projects, indent=4)
         return response
 
@@ -169,7 +169,7 @@ class Resources(APIBase):
                 except:
                     page = 1
 
-                start = ((page - 1) * page_size) + 1
+                start = ((page - 1) * page_size)
                 end = start + page_size
 
                 base_url = "%s%s" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT,
@@ -180,7 +180,8 @@ class Resources(APIBase):
                     "@type": "ldp:BasicContainer",
                     # Here we actually mean the name
                     #"label": str(model.name),
-                    "ldp:contains": ["%s%s" % (base_url, resourceid) for resourceid in list(Resource.objects.values_list('pk', flat=True).order_by('pk')[start:end])]
+                    "ldp:contains": ["%s%s" % (base_url, resourceid) for resourceid in list(Resource.objects.values_list('pk', flat=True).
+                        exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_ID).order_by('pk')[start:end])]
                 }
 
             return JSONResponse(out, indent=indent)
