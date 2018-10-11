@@ -88,6 +88,7 @@ RUN . ${WEB_ROOT}/ENV/bin/activate &&\
 
 # Add Docker-related files
 COPY docker/entrypoint.sh ${DOCKER_DIR}/entrypoint.sh
+COPY docker/gunicorn_config.py ${DOCKER_DIR}/gunicorn_config.py
 COPY docker/settings_local.py ${ARCHES_ROOT}/arches/settings_local.py
 RUN	chmod -R 700 ${DOCKER_DIR} &&\
 	dos2unix ${DOCKER_DIR}/*
