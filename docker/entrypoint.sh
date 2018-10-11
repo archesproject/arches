@@ -330,11 +330,11 @@ run_gunicorn_server() {
 	
 	if [[ ! -z ${ARCHES_PROJECT} ]]; then
         gunicorn arches.wsgi:application \
-            --config gunicorn_config.py \
+            --config ${ARCHES_ROOT}/gunicorn_config.py \
             --pythonpath ${ARCHES_PROJECT}
 	else
         gunicorn arches.wsgi:application \
-            --config gunicorn_config.py
+            --config ${ARCHES_ROOT}/gunicorn_config.py
     fi
 }
 
