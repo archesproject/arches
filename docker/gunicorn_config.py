@@ -27,8 +27,11 @@ def get_optional_env_variable(var_name):
 #       range.
 #
 
-
-bind = ':' + get_optional_env_variable('DJANGO_PORT') or ':8000'
+django_port = get_optional_env_variable('DJANGO_PORT')
+if django_port:
+    bind = ':' + django_port
+else:
+    ':8000'
 backlog = get_optional_env_variable('GUNICORN_BACKLOG') or 2048
 
 #
