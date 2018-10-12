@@ -139,6 +139,16 @@ into
   
 If you would like search engines such as Google to index your Arches website, set the `Nginx` variable `PUBLIC_MODE` to `true`.
 
+#### Gunicorn
+When running in production mode, traffic to and from the user is handled by Gunicorn.  
+This is all set up for you in the Arches docker image and no further action is required.
+
+Optionally, most settings can be overriden with environment variables.  
+Settings of interest may be `GUNICORN_WORKERS` and `GUNICORN_WORKER_TIMEOUT`.  
+
+- `GUNICORN_WORKERS` sets the amount of Gunicorn workers that are created to handle user requests. Rule of thumb is: 2 * amount of CPUs + 1 [(more info)](http://docs.gunicorn.org/en/stable/design.html#how-many-workers).  
+- `GUNICORN_WORKER_TIMEOUT` sets the timeout in seconds for requests handled by Gunicorn. Default is 30; set this to a higher value if you expect to upload large files.
+
 
 
 ### Troubleshoot
