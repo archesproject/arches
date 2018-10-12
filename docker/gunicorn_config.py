@@ -1,14 +1,6 @@
 import os
 from django.core.exceptions import ImproperlyConfigured
 
-def get_env_variable(var_name):
-    msg = "Set the %s environment variable"
-    try:
-        return os.environ[var_name]
-    except KeyError:
-        error_msg = msg % var_name
-        raise ImproperlyConfigured(error_msg)
-
 
 def get_optional_env_variable(var_name):
     try:
@@ -36,8 +28,8 @@ def get_optional_env_variable(var_name):
 #
 
 
-bind = '127.0.0.1:8000'
-backlog = 2048
+bind = ':' + get_optional_env_variable('DJANGO_PORT') or ':8000'
+backlog = get_optional_env_variable('GUNICORN_BACKLOG') or 2048
 
 #
 # Worker processes
@@ -83,11 +75,11 @@ backlog = 2048
 #       A positive integer. Generally set in the 1-5 seconds range.
 #
 
-workers = 1
-worker_class = 'sync'
-worker_connections = 1000
-timeout = 30
-keepalive = 2
+workers = get_optional_env_variable('GUNICORN_WORKERS') or 2
+worker_class = get_optional_env_variable('GUNICORN_WORKER_CLASS') or 'sync'
+worker_connections = get_optional_env_variable('GUNICORN_WORKER_CONNECTIONS') or 1000
+timeout = get_optional_env_variable('GUNICORN_WORKER_TIMEOUT') or 30
+keepalive = get_optional_env_variable('GUNICORN_KEEPALIVE') or 2
 
 #
 #   spew - Install a trace function that spews every line of Python
@@ -97,7 +89,7 @@ keepalive = 2
 #       True or False
 #
 
-spew = False
+spew = get_optional_env_variable('GUNICORN_SPEW') or False
 
 #
 # Server mechanics
@@ -140,16 +132,13 @@ spew = False
 #       None to signal that Python should choose one on its own.
 #
 
-daemon = False
-raw_env = [
-    'DJANGO_SECRET_KEY=something',
-    'SPAM=eggs',
-]
-pidfile = None
-umask = 0
-user = None
-group = None
-tmp_upload_dir = None
+daemon = get_optional_env_variable('GUNICORN_DAEMON') or False
+raw_env = get_optional_env_variable('GUNICORN_RAW_ENV') or []
+pidfile = get_optional_env_variable('GUNICORN_PIDFILE') or None
+umask = get_optional_env_variable('GUNICORN_UMASK') or 0
+user = get_optional_env_variable('GUNICORN_USER') or None
+group = get_optional_env_variable('GUNICORN_GROUP') or None
+tmp_upload_dir = get_optional_env_variable('GUNICORN_TMP_UPLOAD_DIR') or None
 
 #
 #   Logging
@@ -163,10 +152,10 @@ tmp_upload_dir = None
 #       A string of "debug", "info", "warning", "error", "critical"
 #
 
-errorlog = '-'
-loglevel = 'info'
-accesslog = '-'
-access_log_format = '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"'
+errorlog = get_optional_env_variable('GUNICORN_ERRORLOG') or '-'
+loglevel = get_optional_env_variable('GUNICORN_LOGLEVEL') or 'info'
+accesslog = get_optional_env_variable('GUNICORN_ACCESSLOG') or '-'
+access_log_format = get_optional_env_variable('GUNICORN_ACCESS_LOG_FORMAT') or '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"'
 
 #
 # Process naming
@@ -181,7 +170,7 @@ access_log_format = '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"
 #       A string or None to choose a default of something like 'gunicorn'.
 #
 
-proc_name = None
+proc_name = get_optional_env_variable('GUNICORN_PROC_NAME') or None
 
 #
 # Server hooks
