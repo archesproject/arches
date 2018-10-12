@@ -97,7 +97,7 @@ class Card(models.CardModel):
                         widget_id = widget.get('widget_id', None)
                         if cardxnodexwidgetid is None and (node_id is not None and card_id is not None and widget_id is not None):
                             try:
-                                wm = models.CardXNodeXWidget.objects.get(node_id=node_id, card_id=card_id, widget_id=widget_id)
+                                wm = models.CardXNodeXWidget.objects.get(node_id=node_id, card_id=card_id)
                                 cardxnodexwidgetid = wm.pk
                             except:
                                 pass
