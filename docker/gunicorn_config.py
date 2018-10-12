@@ -28,10 +28,12 @@ def get_optional_env_variable(var_name):
 #
 
 django_port = get_optional_env_variable('DJANGO_PORT')
+listen_port = django_port or '8000'
 if django_port:
-    bind = ':' + django_port
+    print 'django port form env var:' + django_port
 else:
-    ':8000'
+    print 'using default django port'
+bind = '0.0.0.0:' + listen_port
 backlog = get_optional_env_variable('GUNICORN_BACKLOG') or 2048
 
 #
