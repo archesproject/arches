@@ -216,6 +216,7 @@ class MobileSurveyManagerView(MapBaseManagerView):
 
         mobile_survey.bounds = MultiPolygon(polygons)
         mobile_survey.lasteditedby = self.request.user
+
         try:
             connection_error = False
             with transaction.atomic():
@@ -223,7 +224,7 @@ class MobileSurveyManagerView(MapBaseManagerView):
         except Exception as e:
             if connection_error == False:
                 error_title = _('Unable to save survey')
-                if e.strerror == 'Connection refused':
+                if 'strerror' in e and e.strerror == 'Connection refused':
                     error_message = "Unable to connect to CouchDB"
                 else:
                     error_message = e.message

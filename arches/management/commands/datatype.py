@@ -43,6 +43,9 @@ class Command(BaseCommand):
         if options['operation'] == 'register':
             self.register(source=options['dt_source'])
 
+        if options['operation'] == 'update':
+            self.update(source=options['dt_source'])
+
         if options['operation'] == 'unregister':
             self.unregister(datatype=options['datatype'])
 
@@ -56,19 +59,19 @@ class Command(BaseCommand):
         """
 
         import imp
-        fn_config = imp.load_source('', source)
-        details = fn_config.details
+        dt_source = imp.load_source('', source)
+        details = dt_source.details
 
         dt = models.DDataType(
-            datatype = details['datatype'],
-            iconclass = details['iconclass'],
-            modulename = os.path.basename(source),
-            classname = details['classname'],
-            defaultwidget = details['defaultwidget'],
-            defaultconfig = details['defaultconfig'],
-            configcomponent = details['configcomponent'],
-            configname = details['configname'],
-            isgeometric = details['isgeometric']
+            datatype=details['datatype'],
+            iconclass=details['iconclass'],
+            modulename=os.path.basename(source),
+            classname=details['classname'],
+            defaultwidget=details['defaultwidget'],
+            defaultconfig=details['defaultconfig'],
+            configcomponent=details['configcomponent'],
+            configname=details['configname'],
+            isgeometric=details['isgeometric']
             )
 
 
@@ -83,10 +86,34 @@ class Command(BaseCommand):
 
         """
         try:
-            fn = models.DDataType.objects.filter(datatype=datatype)
-            fn[0].delete()
+            dt = models.DDataType.objects.filter(datatype=datatype)
+            print dt
+            dt[0].delete()
         except Exception as e:
             print e
+
+    def update(self, source):
+        """
+        Updates an existing datatype in the arches db
+
+        """
+
+        import imp
+        dt_source = imp.load_source('', source)
+        details = dt_source.details
+
+        instance = models.DDataType.objects.get(datatype=details["datatype"])
+        instance.iconclass = details['iconclass']
+        instance.modulename = details['modulename']
+        instance.classname = details['classname']
+        instance.defaultwidget = details["defaultwidget"]
+        instance.defaultconfig = details['defaultconfig']
+        instance.configcomponent = details['configcomponent']
+        instance.configname = details['configname']
+        instance.isgeometric = details['isgeometric']
+        instance.issearchable = details['issearchable']
+
+        instance.save()
 
     def list(self):
         """

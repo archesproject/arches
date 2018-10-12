@@ -22,6 +22,7 @@ define([
         initialize: function(attributes) {
             var self = this;
             this.cards = ko.observableArray();
+            this._nodeIDs = [];
             this.nodes = attributes.data.nodes;
             this.widgets = ko.observableArray();
             this.tiles = ko.observableArray();
@@ -132,15 +133,18 @@ define([
                 });
             });
 
-            var nodesSubscription = attributes.data.nodes.subscribe(function(){
-                this.parseNodes(attributes);
-                this._card(JSON.stringify(this.toJSON()));
-            }, this);
+            var nodes = ko.computed(function() {
+                return attributes.data.nodes();
+            }, this).extend({ throttle: 100 });
 
+            var nodesSubscription = nodes.subscribe(function(){
+                this.parseNodes(attributes);
+            }, this);
 
             this.disposables.push(componentIdSubscription);
             this.disposables.push(cardSubscription);
             this.disposables.push(widgetSubscription);
+            this.disposables.push(nodes);
             this.disposables.push(nodesSubscription);
             this.disposables.push(this.configJSON);
             this.disposables.push(this.dirty);
@@ -226,11 +230,11 @@ define([
         },
 
         parseNodes: function(attributes) {
+            var self = this;
             var widgets = [];
             ko.unwrap(this.nodes).forEach(function(node) {
                 // TODO: it would be nice to normalize the nodegroup_id names (right now we have several different versions)
-                if((ko.unwrap(node.nodeGroupId) || ko.unwrap(node.nodegroup_id)) === ko.unwrap(attributes.data.nodegroup_id)){
-
+                if((ko.unwrap(node.nodeGroupId) || ko.unwrap(node.nodegroup_id)) === ko.unwrap(attributes.data.nodegroup_id) && self._nodeIDs.indexOf(node.nodeid) < 0){
                     var datatype = attributes.datatypelookup[ko.unwrap(node.datatype)];
                     var nodeDatatypeSubscription = node.datatype.subscribe(function(){
                         this._card(JSON.stringify(this.toJSON()));
@@ -248,17 +252,14 @@ define([
                             datatype: datatype,
                             disabled: attributes.data.disabled
                         });
-                        widgets.push(widget);
+                        this.get('widgets').push(widget);
                     }
+                    self._nodeIDs.push(node.nodeid);
                 }
             }, this);
             widgets.sort(function(w, ww) {
                 return w.get('sortorder')() > ww.get('sortorder')();
             });
-            this.get('widgets')().forEach(function(widget){
-                widget.dispose();
-            });
-            this.get('widgets')(widgets);
             this._card(JSON.stringify(this.toJSON()));
         },
 

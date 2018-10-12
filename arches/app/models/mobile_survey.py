@@ -60,7 +60,10 @@ class MobileSurvey(models.MobileSurveyModel):
         super(MobileSurvey, self).save()
         db = self.couch.create_db('project_' + str(self.id))
 
-        survey = self.serialize()
+        # need to serialize to JSON and then back again because UUID's
+        # cause the couch update_doc method to throw an error
+        survey = JSONSerializer().serialize(self)
+        survey = JSONDeserializer().deserialize(survey)
         survey['type'] = 'metadata'
         self.couch.update_doc(db, survey, 'metadata')
         self.load_data_into_couch()
@@ -87,12 +90,11 @@ class MobileSurvey(models.MobileSurveyModel):
             if card.graph_id not in graphids:
                 graphids.append(card.graph_id)
                 #we may want the full proxy model at some point, but for now just the root node color
-                # graphs.append(Graph.objects.get(pk=card.graph_id))
-                graph = JSONSerializer().serializeToPython(card.graph, exclude=['functions','disable_instance_creation','deploymentdate','deploymentfile'])
-                graph['color'] = card.graph.color
-                graph['ontology_id'] = str(graph['ontology_id'])
-                graph['template_id'] = str(graph['template_id'])
-                graphs.append(graph)
+                graph = Graph.objects.get(pk=card.graph_id)
+                graph_obj = graph.serialize(exclude=['domain_connections', 'edges', 'relatable_resource_model_ids'])
+                graph_obj['widgets'] = models.CardXNodeXWidget.objects.filter(card__graph=graph).distinct()
+                graphs.append(graph_obj)
+
         ret['graphs'] = graphs
         ret['cards'] = ordered_cards
         try:

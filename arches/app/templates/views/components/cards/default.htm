@@ -1,8 +1,8 @@
 {% load i18n %}
 <!-- ko foreach: { data: [$data], as: 'self' } -->
 
-<!-- ko if: state === 'editor-tree' -->
-<!-- ko if: card.isWritable && card.model.visible() -->
+<!-- ko if: state === 'editor-tree' && card.isWritable && card.model.visible() -->
+{% block editor_tree %}
 <li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.tiles().length > 0 && card.expanded()), 'jstree-closed' : (card.tiles().length > 0 && !card.expanded()), 'jstree-leaf': card.tiles().length === 0}, scrollTo: card.scrollTo, container: '.resource-editor-tree'">
     <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
     <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected()}, click: function () { card.canAdd() ? card.selected(true) : card.tiles()[0].selected(true) },">
@@ -65,10 +65,11 @@
         <!-- /ko -->
     </ul>
 </li>
-<!-- /ko -->
+{% endblock editor_tree %}
 <!-- /ko -->
 
 <!-- ko if: state === 'designer-tree' -->
+{% block designer_tree %}
 <li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards().length > 0 || card.widgets().length > 0) && card.expanded()), 'jstree-closed' : ((card.cards().length > 0 || card.widgets().length > 0) && !card.expanded()), 'jstree-leaf': card.cards().length === 0 && card.widgets().length === 0}, scrollTo: card.scrollTo, container: '.designer-card-tree'">
     <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
     <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected()}, click: function () { card.selected(true) },">
@@ -84,7 +85,7 @@
                 afterMove: function() { card.model.save() }
             }">
             <li role="treeitem" class="jstree-node jstree-leaf" data-bind="css: {
-                    'jstree-last': $index() === (card.widgets().length - 1) && card.cards().length === 0
+                    'jstree-last': $index() === (card.widgets().length - 1) && $parent.card.cards().length === 0
                 }">
                 <i class="jstree-icon jstree-ocl" role="presentation"></i>
                 <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function() { widget.selected(true) }, css:{'jstree-clicked': widget.selected, 'hover': widget.hovered}, event: { mouseover: function(){ widget.hovered(true) }, mouseout: function(){ widget.hovered(null) } }">
@@ -104,7 +105,7 @@
                 }
             }">
             <div data-bind="css: {
-                    'jstree-last': ($index() === (card.cards().length - 1))
+                    'jstree-last': ($index() === ($parent.card.cards().length - 1))
                 }">
                 <!-- ko component: {
                         name: self.form.cardComponentLookup[childCard.model.component_id()].componentname,
@@ -121,10 +122,12 @@
     </ul>
     <!-- /ko -->
 </li>
+{% endblock designer_tree %}
 <!-- /ko -->
 
 
 <!-- ko if: state === 'permissions-tree' -->
+{% block permissions_tree %}
 <li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards().length > 0 || card.widgets().length > 0) && card.expanded()), 'jstree-closed' : ((card.cards().length > 0 || card.widgets().length > 0) && !card.expanded()), 'jstree-leaf': card.cards().length === 0 && card.widgets().length === 0}">
     <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
     <a class="jstree-anchor permissions-card" href="#" tabindex="-1" data-bind="css:{'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'filtered': card.highlight()}, click: function () { card.selectChildCards() },">
@@ -140,7 +143,7 @@
         </span>
     </a>
     <!-- ko if: card.cards().length > 0 || card.widgets().length > 0 -->
-    <ul class="jstree-children" aria-expanded="true">
+    <ul class="jstree-children card-designer-tree" aria-expanded="true">
         <div data-bind="sortable: {
                 data: card.widgets,
                 as: 'widget',
@@ -148,7 +151,7 @@
                 afterMove: function() { card.model.save() }
             }">
             <li role="treeitem" class="jstree-node jstree-leaf" data-bind="css: {
-                    'jstree-last': $index() === (card.widgets().length - 1) && card.cards().length === 0
+                    'jstree-last': $index() === (card.widgets().length - 1) && $parent.card.cards().length === 0
                 }">
                 <i class="jstree-icon jstree-ocl" role="presentation"></i>
                 <a class="jstree-anchor permissions-widget" href="#" tabindex="-1">
@@ -163,9 +166,12 @@
                 data: card.cards,
                 as: 'card'
             }">
-            <!-- ko component: {
-                name: self.form.cardComponentLookup[card.model.component_id()].componentname,
-                params: {
+            <div data-bind="css: {
+                    'jstree-last': ($index() === ($parent.card.cards().length - 1))
+                }">
+                <!-- ko component: {
+                    name: self.form.cardComponentLookup[card.model.component_id()].componentname,
+                    params: {
                     state: 'permissions-tree',
                     card: card,
                     tile: null,
@@ -174,14 +180,17 @@
                     multiselect: true
                 }
             } --> <!-- /ko -->
+            </div>
         </div>
     </ul>
     <!-- /ko -->
 </li>
+{% endblock permissions_tree %}
 <!-- /ko -->
 
 
 <!-- ko if: state === 'form' -->
+{% block form %}
 <div class="card-component" data-bind="css: card.model.cssclass">
 
     <!--ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
@@ -233,7 +242,7 @@
 
 
         <div class="card">
-
+            {% block form_header %}
             <h4 data-bind="text: card.model.name"></h4>
             <!-- ko if: card.model.helpenabled -->
             <span>
@@ -241,7 +250,7 @@
             </span>
             <!-- /ko -->
             <h5 data-bind="text: card.model.instructions"></h5>
-
+            {% endblock form_header %}
             <!-- ko if: card.widgets().length > 0 -->
             <form class="widgets" style="margin-bottom: 20px;">
                 <div data-bind="foreach: {
@@ -314,6 +323,7 @@
                 <!-- /ko -->
             </ul>
             <!-- /ko -->
+            {% block form_buttons %}
             <div class="install-buttons">
                 <!-- ko if: tile.tileid -->
                 <button class="btn btn-shim btn-warning btn-labeled btn-lg fa fa-trash" data-bind="click: function () { self.form.deleteTile(tile); }">{% trans 'Delete this record' %}</button>
@@ -330,6 +340,7 @@
                 <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: function () { self.form.saveTile(tile); }">{% trans 'Add'  %}</button>
                 <!-- /ko -->
             </div>
+            {% endblock form_buttons %}
 
             <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: card.model.get('helpactive')">
                 <div class="relative">
@@ -350,11 +361,12 @@
         </div>
     </div>
 </div>
+{% endblock form %}
 <!-- /ko -->
 
-<!-- ko if: state === 'report' -->
+<!-- ko if: state === 'report' && card.model.visible() -->
+{% block report %}
 <div class="rp-card-section" data-bind="css: card.model.cssclass, visible: card.fullyProvisional() !== 'fullyprovisional'">
-    <!--ko if: card.model.visible()-->
     <span class="rp-tile-title" data-bind="text: card.model.get('name')"></span>
     <!-- ko foreach: { data: self.preview ? [card.newTile] : card.tiles, as: 'tile' } -->
         <div class="rp-card-section" data-bind="css: {'provisional': tile.provisionaledits() !== null && tile.userisreviewer === false, 'fullyprovisional': tile.isfullyprovisional()}">
@@ -407,11 +419,13 @@
         <!-- /ko -->
     </div>
     <!-- /ko -->
-<!-- /ko -->
 </div>
+{% endblock report %}
 <!-- /ko -->
 
 <!-- ko if: state === 'config' -->
+{% block config %}
+{% endblock config %}
 <!-- /ko -->
 
 <!-- /ko -->

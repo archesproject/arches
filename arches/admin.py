@@ -16,7 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from app.models.models import DLanguage, MapLayer, MapSource, TileserverLayer, IIIFManifest, Geocoder, MapMarker
+from app.models.models import DLanguage, MapLayer, MapSource, TileserverLayer, IIIFManifest, Geocoder, MapMarker, DDataType, Widget
 from django.contrib import admin
 
-admin.site.register([DLanguage, MapLayer, MapSource, TileserverLayer, IIIFManifest, Geocoder, MapMarker])
+admin.site.register([DLanguage, MapLayer, MapSource, TileserverLayer, IIIFManifest, Geocoder, MapMarker, DDataType, Widget])
