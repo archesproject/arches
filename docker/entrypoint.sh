@@ -28,6 +28,8 @@ DJANGO_PORT=${DJANGO_PORT:-8000}
 COUCHDB_URL="http://$COUCHDB_USER:$COUCHDB_PASS@$COUCHDB_HOST:$COUCHDB_PORT"
 COMPRESS_STATIC_FILES=${COMPRESS_STATIC_FILES:-False}
 STATIC_ROOT=${STATIC_ROOT:-/static_root}
+INSTALL_YARN_COMPONENTS=${INSTALL_YARN_COMPONENTS:-True}
+
 
 cd_web_root() {
 	cd ${WEB_ROOT}
@@ -340,7 +342,10 @@ run_gunicorn_server() {
 run_arches() {
 
 	init_arches
-	install_yarn_components
+
+	if [[ "${INSTALL_YARN_COMPONENTS}" == "True" ]]; then
+		install_yarn_components
+	fi
 
 	if [[ "${DJANGO_MODE}" == "DEV" ]]; then
 		set_dev_mode

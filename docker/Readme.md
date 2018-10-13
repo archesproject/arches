@@ -286,11 +286,21 @@ To develop on Arches Core, ensure you are not already running PostgreSQL and it 
 
 8. See [Running in DEV mode](#running-in-dev-mode) to get exception messages in the browser and to bypass Nginx.  
 
+##### Dependencies
+Any time you change Arches Dependancies, you will need to re-build your Docker Container.  
+The `docker-compose -f .\docker-compose-local.yml build` command will re-build the container for you based upon the `Dockerfile`.  
+*Tip: If your new or updated dependency does not install correctly, you may need to build without cache: `docker-compose -f .\docker-compose-local.yml build --no-cache`*
 
-Any time you change Arches Dependancies, you will need to re-build your Docker Container. The `docker-compose -f .\docker-compose-local.yml build` command will re-build the container for you based upon the `Dockerfile`. If your new or updated dependency does not install correctly, you may need to build without cache: `docker-compose -f .\docker-compose-local.yml build --no-cache`
+##### settings_local.py
+The volume section at **point 4** also mounts a `settings_local.py` into the container.  
+This ensures some important settings, e.g. database and Elasticsearch endpoints, can still be set through environment variables.  
+**This settings file may be overwritten by your own settings file, presuming you are including these settings as well.**
 
-(Note: *The volume section at **point 4** also mounts a settings_local.py into the container. This ensures some important settings, e.g. database and Elasticsearch endpoints, can still be set through environment variables.* **This settings file may be overwritten by your own settings file, presuming you are including these settings as well.**)
+##### Yarn components
+The INSTALL_YARN_COMPONENTS environment variable causes yarn components (static files) to be installed when the container is started.  
+This is necessary, because your volume from `step 4` is laid over the files in your container, thus hiding them. To turn this off and speed up container startup, set this variable to `False`.
 
+##### docker-compose-local.yml
 Here is a link to a working [docker-compose-local.yml](https://gist.github.com/jmunowitch/c63fa39be4651b9bf2f0b1abc69f7479) file
 
 
