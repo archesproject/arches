@@ -411,7 +411,7 @@ class Command(BaseCommand):
         label_lookup = {}
         for c in all_concepts:
             cobj = archesmodels.Concepts.objects.get(pk=c)
-            labels = archesmodels.Values.objects.filter(conceptid_id=c)
+            labels = archesmodels.Values.objects.filter(conceptid_id=c,valuetype_id="prefLabel")
             for label in labels:
                 label_lookup[label.value.lower()] = cobj.legacyoid
                 
