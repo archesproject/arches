@@ -1198,7 +1198,8 @@ class Graph(models.GraphModel):
             ret.pop('relatable_resource_model_ids', None)
 
         ret['cards'] = self.get_cards() if 'cards' not in exclude else ret.pop('cards', None)
-        ret['widgets'] = self.get_widgets() if 'widgets' not in exclude else ret.pop('widgets', None)
+        if 'widgets' not in exclude:
+            ret['widgets'] = self.get_widgets()
         ret['nodegroups'] = self.get_nodegroups() if 'nodegroups' not in exclude else ret.pop('nodegroups', None)
         ret['domain_connections'] = self.get_valid_domain_ontology_classes() if 'domain_connections' not in exclude else ret.pop('domain_connections', None)
         ret['is_editable'] = self.is_editable() if 'is_editable' not in exclude else ret.pop('is_editable', None)
