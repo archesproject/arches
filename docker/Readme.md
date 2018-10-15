@@ -76,12 +76,6 @@ Optional Environment Variables:
 	-> **Runs Django with options --noreload --nothreading. Useful for remote debugging.**
 -   `DJANGO_SECRET_KEY` = *50 character string*  
 	-> **Used by Django for security. Use this environment variable only if you run Arches without custom project (i.e. the `ARCHES_PROJECT` environment variable is not set)**
--    `COMPRESS_STATIC_FILES` = True | False  
-    -> **Compresses static files when `DJANGO_MODE=PROD`.  
-        Use this if your web server supports serving gzipped files.  
-        Saves time during runtime, but initially takes long to compress.  
-        Only use this if your static files are stored and served from a local file system.  
-        Set the `STATIC_ROOT` env variable if you set it to anything other than '/static_root' in your `settings.py`.**
 -   `TZ` = *Time Zone*  
 	-> **Useful for logging the correct time. US Pacific = PST**
 
