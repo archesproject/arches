@@ -26,7 +26,6 @@ fi
 
 DJANGO_PORT=${DJANGO_PORT:-8000}
 COUCHDB_URL="http://$COUCHDB_USER:$COUCHDB_PASS@$COUCHDB_HOST:$COUCHDB_PORT"
-COMPRESS_STATIC_FILES=${COMPRESS_STATIC_FILES:-False}
 STATIC_ROOT=${STATIC_ROOT:-/static_root}
 
 cd_web_root() {
@@ -269,14 +268,6 @@ run_custom_scripts() {
 	done
 }
 
-compress_static_files() {
-	echo ""
-	echo "Compressing static files..."
-	find ${STATIC_ROOT} -type f -regextype posix-extended -iregex '.*\.(css|js|txt|svg|xml)' -exec zopfli '{}' \;
-	echo "Done compressing static files"
-	echo ""
-}
-
 
 
 
@@ -298,10 +289,6 @@ collect_static(){
 	echo ""
 	cd_app_folder
 	python manage.py collectstatic --noinput
-
-	if [[ ${COMPRESS_STATIC_FILES} == "True" ]]; then
-		compress_static_files
-	fi
 }
 
 
