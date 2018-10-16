@@ -60,6 +60,19 @@ def add_actor( observed_field, actor_field, data, user):
         
     return data
 
+def handle_relationship_object(object):
+    """helper method to properly serialize relationship objects to prepare them
+    for elasticsearch indexing."""
+
+    mdict = model_to_dict(object)
+    ret = {}
+    for k, v in mdict.iteritems():
+        if isinstance(v, uuid.UUID):
+            v = str(v)
+        ret[k] = v
+
+    return ret
+
 def datetime_nodes_to_dates(branch_list):
     for branch in branch_list:
         for node in branch['nodes']:
@@ -657,7 +670,8 @@ class ManMadeForm(ResourceForm):
             except:
                 continue
         relationship = self.resource.create_resource_relationship(resource.entityid, relationship_type_id=relation_id)
-        se.index_data(index='resource_relations', doc_type='all', body=model_to_dict(relationship), idfield='resourcexid')
+        relationship_doc = handle_relationship_object(relationship)
+        se.index_data(index='resource_relations', doc_type='all', body=relationship_doc, idfield='resourcexid')
 
         return
 
@@ -775,7 +789,8 @@ class ManMadeComponentForm(ResourceForm):
             except:
                 continue
         relationship = self.resource.create_resource_relationship(resource.entityid, relationship_type_id=relation_id)
-        se.index_data(index='resource_relations', doc_type='all', body=model_to_dict(relationship), idfield='resourcexid')
+        relationship_doc = handle_relationship_object(relationship)
+        se.index_data(index='resource_relations', doc_type='all', body=relationship_doc, idfield='resourcexid')
 
         return
 
