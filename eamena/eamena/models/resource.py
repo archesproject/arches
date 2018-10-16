@@ -201,18 +201,6 @@ class Resource(ArchesResource):
             return entity_data
 
         document_data = {}
-        
-#         if self.entitytypeid == 'HERITAGE_RESOURCE.E18':
-#             document_data['certainty_type'] = get_entity_data('ARCHAEOLOGY_CERTAINTY_VALUE.I6', get_label=True)
-
-#             document_data['address'] = _('None specified')
-#             address_nodes = self.find_entities_by_type_id('PLACE_ADDRESS.E45')
-#             for node in address_nodes:
-#                 if node.find_entities_by_type_id('ADDRESS_TYPE.E55')[0].label == 'Primary':
-#                     document_data['address'] = node.value
-
-#         if self.entitytypeid == 'HERITAGE_RESOURCE_GROUP.E27':
-#             document_data['certainty_type'] = get_entity_data('ARCHAEOLOGY_CERTAINTY_VALUE.I6', get_label=True)
                     
         if self.entitytypeid == 'ACTIVITY.E7':
             document_data['resource_type'] = get_entity_data('ACTIVITY_TYPE.E55', get_label=True)
@@ -234,10 +222,15 @@ class Resource(ArchesResource):
             document_data['start_date'] = get_entity_data('BEGINNING_OF_EXISTENCE.E63')
             document_data['end_date'] = get_entity_data('END_OF_EXISTENCE.E64')
 
-        if self.entitytypeid == 'HERITAGE_RESOURCE.E18' or self.entitytypeid == 'HERITAGE_RESOURCE_GROUP.E27':
+        if self.entitytypeid == 'HERITAGE_RESOURCE_GROUP.E27':
             document_data['certainty_type'] = get_entity_data('ARCHAEOLOGY_CERTAINTY_VALUE.I6', get_label=True)
-            document_data['site_function'] = get_entity_data('SITE_FUNCTION_TYPE.E55', get_label=True)
-            document_data['disturbance_type'] = get_entity_data('DISTURBANCE_TYPE.E55', get_label=True)
+            document_data['site_function'] = get_entity_data('FUNCTION_TYPE.I4', get_label=True)
+            document_data['disturbance_type'] = get_entity_data('DISTURBANCE_CAUSE_CATEGORY_TYPE.E55', get_label=True)
+            
+        if self.entitytypeid == 'HERITAGE_FEATURE.E24':
+            document_data['feature_interpretation'] = get_entity_data('INTERPRETATION_TYPE.I4', get_label=True)
+            document_data['overall_condition'] = get_entity_data('OVERALL_DAMAGE_SEVERITY_TYPE.I6', get_label=True)
+
 
         for document in documents:
             for key in document_data:
