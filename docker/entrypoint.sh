@@ -24,7 +24,7 @@ else
 	PACKAGE_JSON_FOLDER=${APP_FOLDER}/${ARCHES_PROJECT}
 fi
 
-DJANGO_PORT=${DJANGO_PORT:-8000}
+export DJANGO_PORT=${DJANGO_PORT:-8000}
 COUCHDB_URL="http://$COUCHDB_USER:$COUCHDB_PASS@$COUCHDB_HOST:$COUCHDB_PORT"
 STATIC_ROOT=${STATIC_ROOT:-/static_root}
 
@@ -314,10 +314,14 @@ run_gunicorn_server() {
 	echo "----- *** RUNNING GUNICORN PRODUCTION SERVER *** -----"
 	echo ""
 	cd_app_folder
-    if [[ ! -z ${ARCHES_PROJECT} ]]; then
-        gunicorn arches.wsgi:application -w 2 -b :${DJANGO_PORT} --pythonpath ${ARCHES_PROJECT}
+	
+	if [[ ! -z ${ARCHES_PROJECT} ]]; then
+        gunicorn arches.wsgi:application \
+            --config ${ARCHES_ROOT}/gunicorn_config.py \
+            --pythonpath ${ARCHES_PROJECT}
 	else
-        gunicorn arches.wsgi:application -w 2 -b :${DJANGO_PORT}
+        gunicorn arches.wsgi:application \
+            --config ${ARCHES_ROOT}/gunicorn_config.py
     fi
 }
 

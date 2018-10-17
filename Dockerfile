@@ -87,10 +87,11 @@ RUN . ${WEB_ROOT}/ENV/bin/activate &&\
 
 # Add Docker-related files
 COPY docker/entrypoint.sh ${DOCKER_DIR}/entrypoint.sh
-COPY docker/settings_local.py ${ARCHES_ROOT}/arches/settings_local.py
 RUN	chmod -R 700 ${DOCKER_DIR} &&\
 	dos2unix ${DOCKER_DIR}/*
-
+	
+COPY docker/gunicorn_config.py ${ARCHES_ROOT}/gunicorn_config.py
+COPY docker/settings_local.py ${ARCHES_ROOT}/arches/settings_local.py
 
 # Set entrypoint
 ENTRYPOINT ["/docker/entrypoint.sh"]
@@ -98,7 +99,6 @@ CMD ["run_arches"]
 
 # Expose port 8000
 EXPOSE 8000
-
 
 # Set default workdir
 WORKDIR ${ARCHES_ROOT}
