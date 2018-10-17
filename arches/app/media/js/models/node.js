@@ -208,7 +208,7 @@ define([
                     .value();
 
                 if(!!uri){
-                    namespace = this.ontology_namespaces[uri];
+                    var namespace = this.ontology_namespaces[uri];
                     if(!!namespace){
                         return ontologyname.replace(uri, namespace + ":");
                     }else{
