@@ -262,7 +262,6 @@ define([
                     widget = ko.unwrap(this.get('widgets')).find(function(widget) {
                         return ko.unwrap(widget.node_id) === node.nodeid;
                     });
-                    console.log(widget);
                     this.get('widgets').remove(widget);
                 }
             }, this);
