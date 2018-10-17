@@ -355,12 +355,12 @@
                                 <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind='click: $parent.editItem.bind($parent)' title="Edit this Feature Interpretation">
                                     <span data-bind="{text: nodes.get('INTERPRETATION_TYPE.I4', 'label')}" style="padding-right:2px"></span><span class="text-muted">{% trans '( Interpretation Type )' %}</span>
                                     <span data-bind="{text: nodes.get('INTERPRETATION_CERTAINTY.I6', 'label')}" style="padding-right:2px"></span><span class="text-muted">{% trans '( Interpretation Certainty )' %}</span>
-                                    <span data-bind="{text: nodes.get('INTERPRETATION_NUMBER_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted">{% trans '( Number )' %}</span>
-                                    <span data-bind="foreach: $data.nodes">
-                                            <span data-bind="visible: $data.entitytypeid() ==='FUNCTION_TYPE.I4' "><span data-bind="{text: $data.label}"></span><span class="text-muted">{% trans '( Function Type )' %}</span></span>
-                                            <span data-bind="visible: $data.entitytypeid() ==='FUNCTION_CERTAINTY.I6' "><span data-bind="{text: $data.label}"></span><span class="text-muted">{% trans '( Function Certainty )' %}</span></span>
+                                    <span data-bind="{text: nodes.get('INTERPRETATION_NUMBER_TYPE.E55', 'label')}" style="padding-right:2px"></span><span class="text-muted">{% trans '( Number )' %}</span><span data-bind="foreach: $data.nodes">
+                                        <span data-bind="visible: $data.entitytypeid() ==='FUNCTION_TYPE.I4' "><span data-bind="{text: $data.label}"></span><span class="text-muted">{% trans '( Function Type )' %}</span></span>
                                     </span>
-                                    <span class="text-muted" data-bind="{visible: nodes.get('FUNCTION_INTERPRETATION_INFERENCE_MAKING_ACTOR_NAME.E41', 'value').length > 0}"> by: </span>
+                                    <span data-bind="foreach: $data.nodes">
+                                        <span data-bind="visible: $data.entitytypeid() ==='FUNCTION_CERTAINTY.I6' "><span data-bind="{text: $data.label}"></span><span class="text-muted">{% trans '( Function Certainty )' %}</span></span>
+                                    </span><br><span class="text-muted" data-bind="{visible: nodes.get('FUNCTION_INTERPRETATION_INFERENCE_MAKING_ACTOR_NAME.E41', 'value').length > 0}"> by: </span>
                                     <span data-bind='text: nodes.get("FUNCTION_INTERPRETATION_INFERENCE_MAKING_ACTOR_NAME.E41", "value")' style="padding-right:2px;"></span><span class="text-muted arches-crud-type-identifier"></span>
                                 </a>
                             </div>
