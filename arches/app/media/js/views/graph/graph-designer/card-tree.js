@@ -187,7 +187,7 @@ define([
                             card: card,
                             nodegroup: _.filter(data.nodegroups, function(ng){return data.updated_values.card.nodegroup_id === ng.nodegroupid;})[0]
                         };
-                        self.addCard(newcard, parent.cards);
+                        self.addCard(newcard, parent.cards, parent);
                     } else {
                         self.updateCard(ko.unwrap(parent.cards), card, data);
                     }
@@ -245,6 +245,20 @@ define([
                     self.updateCard(self.topCards(), card, data);
                 } else {
                     self.updateNode(self.topCards(), data.updated_values.node);
+                    if (data.updated_values.node.nodegroup_id !== data.updated_values.node.nodeid) {
+                        var oldCard = _.find(self.flattenTree(self.topCards(), []), function(card) {
+                            return card.nodegroupid === data['updated_values'].node.nodeid;
+                        });
+                        if (oldCard) {
+                            var parentCards = oldCard.parentCard ? oldCard.parentCard.cards : self.topCards;
+                            parentCards.remove(oldCard);
+                            parentCards(
+                                parentCards().concat(
+                                    oldCard.cards()
+                                )
+                            );
+                        }
+                    }
                 }
                 _.each(self.cachedFlatTree, function(cardViewModel) {
                     cardViewModel.dispose();
@@ -262,7 +276,7 @@ define([
                 removeCard(self.topCards, selectedNodegroupId);
                 if (self.topCards().length){ self.topCards()[0].selected(true); }
             },
-            addCard: function(data, parentcards) {
+            addCard: function(data, parentcards, parent) {
                 if (!parentcards) {
                     parentcards = self.topCards;
                 }
@@ -286,9 +300,29 @@ define([
                     cardwidgets: data.cardwidgets,
                     userisreviewer: true,
                     perms: ko.observableArray(),
-                    permsLiteral: ko.observableArray()
+                    permsLiteral: ko.observableArray(),
+                    parentCard: parent
                 });
                 parentcards.push(newCardViewModel);
+
+                var node = _.find(self.graphModel.get('nodes')(), function(node) {
+                    return node.nodeid === data.card.nodegroup_id;
+                });
+                self.graphModel.getChildNodesAndEdges(node).nodes.forEach(function(node) {
+                    var card = _.find(ko.unwrap(parentcards), function(card) {
+                        return card.nodegroupid === (ko.unwrap(node.nodeGroupId) || ko.unwrap(node.nodegroup_id));
+                    });
+                    if (card) {
+                        parentcards.remove(card);
+                        var cardIDs = newCardViewModel.cards().map(function(card) {
+                            return card.cardid;
+                        });
+                        if (!_.contains(cardIDs, card.cardid)) {
+                            newCardViewModel.cards.push(card);
+                        }
+                    }
+                });
+
                 self.cachedFlatTree = self.flattenTree(self.topCards(), []);
                 return newCardViewModel;
             },
@@ -347,7 +381,7 @@ define([
                         nodegroup: nodegroup,
                         card: card,
                         cardwidgets: self.graphModel.get('cardwidgets')
-                    }, parent ? parent.cards : self.topCards);
+                    }, parent ? parent.cards : self.topCards, parent);
                 }
             });
         });
