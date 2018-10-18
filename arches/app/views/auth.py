@@ -245,7 +245,7 @@ class GetClientIdView(View):
             if user:
                 user = JSONSerializer().serializeToPython(user)
                 user['password'] = None
-                response = JSONResponse({'user': user,'clientid': settings.MOBILE_OAUTH_CLIENT_ID})
+                response = JSONResponse({'user': user, 'clientid': settings.MOBILE_OAUTH_CLIENT_ID})
             else:
                 response = Http401Response()
 
