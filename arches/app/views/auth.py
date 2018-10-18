@@ -243,7 +243,9 @@ class GetClientIdView(View):
             response = HttpResponse('Make sure to set your MOBILE_OAUTH_CLIENT_ID in settings.py', status=500)
         else:
             if user:
-                response = HttpResponse(settings.MOBILE_OAUTH_CLIENT_ID, content_type='text/plain')
+                user = JSONSerializer().serializeToPython(user)
+                user['password'] = None
+                response = JSONResponse({'user': user,'clientid': settings.MOBILE_OAUTH_CLIENT_ID})
             else:
                 response = Http401Response()
 
