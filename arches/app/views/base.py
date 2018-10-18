@@ -35,6 +35,7 @@ class BaseManagerView(TemplateView):
         context['system_settings_graphid'] = settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
         context['graph_models'] = []
         context['graphs'] = '[]'
+        context['plugins'] = models.Plugin.objects.all()
         context['createable_resources'] = JSONSerializer().serialize(
             get_createable_resource_types(self.request.user),
             exclude=['functions',

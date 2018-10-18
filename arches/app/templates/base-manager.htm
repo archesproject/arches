@@ -342,12 +342,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </li>
                                         {% endif %}
 
-                                        {% if request.user|has_group:"RDM Administrator" %}
                                         <li class="list-divider-dark"></li>
 
                                         <!-- Tools -->
                                         <li class="list-header">{% trans "Modules" %}</li>
 
+                                        {% if request.user|has_group:"RDM Administrator" %}
                                         <!--Menu list item-->
                                         <li{% if main_script == "rdm" %} class="active-sub"{% endif %}>
                                             <a href="{% url 'rdm' '' %}" data-bind="click: navigate.bind(this, '{% url 'rdm' '' %}') ">
@@ -359,6 +359,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </li>
                                         {% endif %}
 
+                                        {% for p in plugins %}
+                                        <li{% if main_script == "views/plugin" and plugin.pluginid == p.pluginid  %} class="active-sub"{% endif %}>
+                                            <a href="{% url 'plugins' p.pluginid %}" data-bind="click: navigate.bind(this, '{% url 'plugins' p.pluginid %}') ">
+                                                <i class="{{p.icon}}"></i>
+                                                <span class="menu-title">
+                                                    {{p.name}}
+                                                </span>
+                                            </a>
+                                        </li>
+                                        {% endfor %}
                                     </ul>
                                 </div>
                             </div>
