@@ -27,7 +27,7 @@ from arches.app.views.base import MapBaseManagerView
 class PluginView(MapBaseManagerView):
     action = None
 
-    def get(self, request, pluginid=None, view_template='views/plugin.htm', main_script='views/plugin', nav_menu=False):
+    def get(self, request, pluginid=None):
         resource_graphs = models.GraphModel.objects.exclude(
             pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
         widgets = models.Widget.objects.all()
@@ -43,24 +43,31 @@ class PluginView(MapBaseManagerView):
         context = self.get_context_data(
             plugin=plugin,
             plugin_json=JSONSerializer().serialize(plugin),
-            main_script=main_script,
+            main_script='views/plugin',
             resource_graphs=resource_graphs,
             widgets=widgets,
             widgets_json=JSONSerializer().serialize(widgets),
             card_components=card_components,
             card_components_json=JSONSerializer().serialize(card_components),
-            datatypes_json=JSONSerializer().serialize(datatypes, exclude=['iconclass', 'modulename', 'classname']),
+            datatypes_json=JSONSerializer().serialize(
+                datatypes,
+                exclude=['iconclass', 'modulename', 'classname']
+            ),
             map_layers=map_layers,
             map_markers=map_markers,
             map_sources=map_sources,
             geocoding_providers=geocoding_providers,
             report_templates=templates,
-            templates_json=JSONSerializer().serialize(templates, sort_keys=False, exclude=['name', 'description']),
+            templates_json=JSONSerializer().serialize(
+                templates,
+                sort_keys=False,
+                exclude=['name', 'description']
+            ),
         )
 
         context['nav']['title'] = ''
-        context['nav']['menu'] = nav_menu
+        context['nav']['menu'] = False
         context['nav']['icon'] = plugin.icon
         context['nav']['title'] = plugin.name
 
-        return render(request, view_template, context)
+        return render(request, 'views/plugin.htm', context)

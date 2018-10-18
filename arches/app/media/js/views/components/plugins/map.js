@@ -1,8 +1,7 @@
 define([
     'knockout',
-    'knockout-mapping',
     'views/components/widgets/map'
-], function(ko, koMapping) {
+], function(ko) {
     return ko.components.register('map-plugin', {
         viewModel: function() {
             this.configJSON = {
