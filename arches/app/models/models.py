@@ -927,3 +927,19 @@ class MapMarker(models.Model):
     class Meta:
         managed = True
         db_table = 'map_markers'
+
+
+class PlugIn(models.Model):
+    pluginid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
+    name = models.TextField()
+    icon = models.TextField(default=None)
+    component = models.TextField()
+    componentname = models.TextField()
+    config = JSONField(blank=True, null=True, db_column='config')
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        managed = True
+        db_table = 'plugins'
