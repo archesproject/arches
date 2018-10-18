@@ -929,7 +929,7 @@ class MapMarker(models.Model):
         db_table = 'map_markers'
 
 
-class PlugIn(models.Model):
+class Plugin(models.Model):
     pluginid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField()
     icon = models.TextField(default=None)

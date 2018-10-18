@@ -8218,6 +8218,15 @@ div.row.widget-wrapper.report-header:hover {
     background: #fbfbfb;
 }
 
+.plugin-main .map-report-header-container {
+    height: 100%;
+}
+
+.plugin-main .row.widget-wrapper.report-header {
+    padding: 0;
+    margin: 0;
+}
+
 .expanded-map {
     position: absolute;
     top: 50px;

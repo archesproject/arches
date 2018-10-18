@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='PlugIn',
+            name='Plugin',
             fields=[
                 ('pluginid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('name', models.TextField()),
