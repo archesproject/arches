@@ -76,12 +76,6 @@ Optional Environment Variables:
 	-> **Runs Django with options --noreload --nothreading. Useful for remote debugging.**
 -   `DJANGO_SECRET_KEY` = *50 character string*  
 	-> **Used by Django for security. Use this environment variable only if you run Arches without custom project (i.e. the `ARCHES_PROJECT` environment variable is not set)**
--    `COMPRESS_STATIC_FILES` = True | False  
-    -> **Compresses static files when `DJANGO_MODE=PROD`.  
-        Use this if your web server supports serving gzipped files.  
-        Saves time during runtime, but initially takes long to compress.  
-        Only use this if your static files are stored and served from a local file system.  
-        Set the `STATIC_ROOT` env variable if you set it to anything other than '/static_root' in your `settings.py`.**
 -   `TZ` = *Time Zone*  
 	-> **Useful for logging the correct time. US Pacific = PST**
 
@@ -138,6 +132,16 @@ into
 `NGINX_PROTOCOL=strict-https`  
   
 If you would like search engines such as Google to index your Arches website, set the `Nginx` variable `PUBLIC_MODE` to `true`.
+
+#### Gunicorn
+When running in production mode, traffic to and from the user is handled by Gunicorn.  
+This is all set up for you in the Arches docker image and no further action is required.
+
+Optionally, most settings can be overriden with environment variables.  
+Settings of interest may be `GUNICORN_WORKERS` and `GUNICORN_WORKER_TIMEOUT`.  
+
+- `GUNICORN_WORKERS` sets the amount of Gunicorn workers that are created to handle user requests. Rule of thumb is: 2 * amount of CPUs + 1 [(more info)](http://docs.gunicorn.org/en/stable/design.html#how-many-workers).  
+- `GUNICORN_WORKER_TIMEOUT` sets the timeout in seconds for requests handled by Gunicorn. Default is 30; set this to a higher value if you expect to upload large files.
 
 
 

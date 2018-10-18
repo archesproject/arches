@@ -227,7 +227,7 @@ Note (GeoJson is covered by map widget testing in a different section)
 | Test Subject           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
 | String                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Concepts               |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Concepts               |    ?   |    ?   |    ?    |   ?  | ?   | Make sure collector nodes are not clickable     |
 | Domains                |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Images                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Dates                  |    ?   |    ?   |    ?    |   ?  | ?   | -     |

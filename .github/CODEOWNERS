@@ -1,0 +1,4 @@
+# This file will help with figuring out who should review specific sections of code.
+# See this github help doc: https://help.github.com/articles/about-codeowners/
+
+docker/ @archesproject/docker-users
