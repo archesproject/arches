@@ -25,8 +25,10 @@ else
 fi
 
 # Read modules folder from yarn config file
-# Get string after '--install.modules-folder' -> get first word of the result -> remove line endlings -> trim quotes -> trim leading ./
-YARN_MODULES_FOLDER=${PACKAGE_JSON_FOLDER}/$(awk -F '--install.modules-folder' '{print $2}' ${PACKAGE_JSON_FOLDER}/.yarnrc \
+# Get string after '--install.modules-folder' -> get first word of the result 
+# -> remove line endlings -> trim quotes -> trim leading ./
+YARN_MODULES_FOLDER=${PACKAGE_JSON_FOLDER}/$(awk \
+	-F '--install.modules-folder' '{print $2}' ${PACKAGE_JSON_FOLDER}/.yarnrc \
 	| awk '{print $1}' \
 	| tr -d $'\r' \
 	| tr -d '"' \
