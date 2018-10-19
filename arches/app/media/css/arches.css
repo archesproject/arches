@@ -141,6 +141,10 @@ dl.inline-flex dd {
     background-color: #2d3c4b;
 }
 
+#mainnav-menu .arches {
+    margin-left: -25px;
+}
+
 .list-group.bg-trans .list-group-item:not(.active):not(.disabled) {
     border-bottom: 1px solid #eee;
     background-color: rgba(0, 0, 0, 0.05);
@@ -10623,7 +10627,7 @@ a.search-facet-item.disabled {
 }
 
 .graph-designer-tab-container .nav-tabs>li:not(.active)>a {
-    color: #999;
+    color: #777;
 }
 
 .graph-designer-tab-container .nav-tabs>li:not(.active)>a:hover {
@@ -11561,6 +11565,7 @@ ul.select2-choices:after {
     border-right: solid 1px gainsboro;
     height:100%;
     z-index: 3;
+    font-size: 11px;
 }
 
 .sidepanel-draggable div {
@@ -11585,6 +11590,7 @@ ul.select2-choices:after {
 .left-panel-overflow {
     height: calc(100vh - 225px);
     overflow-y: auto;
+    background: #f4f4f4;
 }
 
 .main-panel{
@@ -11693,7 +11699,7 @@ ul.select2-choices:after {
 }
 
 a.jstree-anchor strong {
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .expanded-nav {
@@ -11715,7 +11721,7 @@ a.jstree-anchor.disabled {
 }
 
 a.jstree-anchor.permissions-widget {
-    color: #ccc;
+    color: #bbb;
     cursor: default;
     pointer-events: none;
 }
