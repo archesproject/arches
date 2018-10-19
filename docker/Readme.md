@@ -104,7 +104,7 @@ Or in your `docker-compose.yml` file:
 
 ### Running Docker in Production
 When running Arches in production, be sure to set your domain name in the DOMAIN_NAMES variable in all appropriate services (Arches, Nginx and LetsEcrypt) in the `docker-compose.yml` file. Separate your domain names by spaces if you have multiple. You should also ensure your docker-compose.yml sets PRODUCTION_MODE=True as the default False setting will not issue verifyable certificates and cause your https: connections to be marked as insecure. Documentation for the letsencrypt setup can be found at https://hub.docker.com/r/cvast/cvast-letsencrypt/ an example production config appears below:
-
+```
     letsencrypt:
       container_name: letsencrypt
       image: cvast/cvast-letsencrypt:1.1
@@ -123,7 +123,7 @@ When running Arches in production, be sure to set your domain name in the DOMAIN
         - TZ=GMT
         - FORCE_NON_ELB=True
         - AWS_DEFAULT_REGION=YOUR_REGION - eg eu_west
-
+```
 
 
 In order to enable https (`port 443`), scroll down to the `nginx` service in your `docker-compose.yml` and change this environment variable:  
@@ -174,8 +174,10 @@ Settings of interest may be `GUNICORN_WORKERS` and `GUNICORN_WORKER_TIMEOUT`.
 
 2.  Set the name of your Arches project. Edit your `docker-compose.yml`:  
 	Add `ARCHES_PROJECT` to the '`environment:`' node under the `arches` service:  
+    ```
         environment:
-            ARCHES_PROJECT=<your project name>
+            - ARCHES_PROJECT=<your project name>                    # <-- Add this line
+    ```
     
     *Note: `<your project name>` cannot contain dashes (-) or spaces.*
 
@@ -184,8 +186,10 @@ This will be used throughout your development process and does not need to be ch
 
 4.  For quick development, mount your source code from your development machine into the container. Edit your `docker-compose-local.yml`:  
 	Add this line under the `volumes` node:
-		volumes:
-			- ./<your project name>:/web_root/<your project name>
+	```
+        volumes:
+            - ./<your project name>:/web_root/<your project name>   # <-- Add this line
+    ```
 
     *Note: <your project name> must be the same as the value set in `ARCHES_PROJECT` in step 2.*  
 	
@@ -193,21 +197,28 @@ This will be used throughout your development process and does not need to be ch
 
 5.  Set a couple of important Arches variables. Edit your `docker-compose-local.yml`:  
   Fill out the `PGPASSWORD` environment variables under the `arches` service:  
-		environment:
-			- PGPASSWORD=<your chosen Postgres password>
+	```
+        environment:
+            - PGPASSWORD=<your chosen Postgres password>            # <-- Add this line
+    ```
 
 6.  Set the PostgreSQL password. Edit your `docker-compose-local.yml`:  
 
     Fill out the `POSTGRES_PASSWORD` environment variable under the `db` service:  
-	`- POSTGRES_PASSWORD=<your chosen Postgres password>`  
-	*Note: Password must be the same as PGPASSWORD in step 5.*
+    ```
+        environment:
+	        - POSTGRES_PASSWORD=<your chosen Postgres password>     # <-- Add this line
+    ```
+	*Note: Password must be the same as `PGPASSWORD` in step 5.*
 
 
 7.  Set up your own Docker image build. Create a new file in the root of your project called '`Dockerfile`' (no file extension) and add these lines:  
-		FROM archesproject/arches:latest  
-		COPY . ${WEB_ROOT}  
-		WORKDIR ${WEB_ROOT}/${ARCHES_PROJECT}/${ARCHES_PROJECT}  
-		RUN yarn install  
+    ```
+        FROM archesproject/arches:latest  
+        COPY . ${WEB_ROOT}  
+        WORKDIR ${WEB_ROOT}/${ARCHES_PROJECT}/${ARCHES_PROJECT}  
+        RUN yarn install  
+    ```
 
 8.  Build your Docker image using your favorite command line tool (Powershell, CMD, Linux CLI, etc.).  
 	Navigate to the root of your Arches project folder and type:  
@@ -225,8 +236,9 @@ This will be used throughout your development process and does not need to be ch
     This is your very own Arches app. This is where you will change or edit code to adapt Arches to your needs.*
 
 10. Optimize your Docker build. Open your Dockerfile and edit the `COPY` command, so that only your Arches project gets copied to the image, instead of the complete root folder:  
-	`COPY ./<your project name> ${WEB_ROOT}`  
-
+    ```
+	COPY ./<your project name> ${WEB_ROOT}
+    ```
     *Note: `your project name` must be the same as the value set in `ARCHES_PROJECT` in step 2.*  
 	
 11. Build the latest version of your Docker image using:  
@@ -257,9 +269,9 @@ http://localhost:8000
 
 For convenience you can map port 80 from your host machine to port 8000 in your Arches container. In your `docker-compose(-local).yml` under your Arches  service:
 ```
-      ports:
+    ports:
         - '8000:8000'
-        - '80:8000'  # <-- Add this line
+        - '80:8000'             # <-- Add this line
 ```
 Now you can access your Arches service through http://localhost
 
@@ -276,10 +288,11 @@ To develop on Arches Core, ensure you are not already running PostgreSQL and it 
     `image: archesproject/arches:master`
 
 4.  Add these lines to `docker-compose-local.yml` under the `arches` container under `volumes`:  
-```
-    - ./:/web_root/arches/  
-    - ./docker/settings_local.py:/web_root/arches/arches/settings_local.py  
-```
+    ```
+    volumes:
+        - ./:/web_root/arches/                                                  # <-- Add this line
+        - ./docker/settings_local.py:/web_root/arches/arches/settings_local.py  # <-- Add this line
+    ```
     This will mount the root Arches folder into your container, which allows you to edit code on your development machine, which is directly linked to the code in your Docker container.
 
 5.  Build your Docker containers using:  
@@ -322,7 +335,7 @@ Errors during setting up the Arches container for Development that you may encou
 
 Potentially ports `80` and/or `443` on your machine are already taken by another application. In this case, change the port number of your Nginx service in `docker-compose.yml`. Be sure to keep the second number of the `port:port` pairs unchanged:
 ```
-      ports:
+    ports:
         - '81:80'
         - '444:443'
 ```
@@ -361,8 +374,8 @@ Any script placed in /docker/entrypoint in the Docker container is ran after the
 
 You can mount your custom scripts into the container, e.g.:
 ```
-      volumes:
-        - ./docker/entrypoint/script.sh:/docker/entrypoint/script.sh
+    volumes:
+        - ./docker/entrypoint/script.sh:/docker/entrypoint/script.sh    # <-- Add this line
 ```
 
 
@@ -380,7 +393,10 @@ For more information, see the [```docker exec``` command documentation](https://
 ### Remote Debugging
 In order to enable remote debugging, see [this tutorial](https://gist.github.com/veuncent/1e7fcfe891883dfc52516443a008cfcb) for Visual Studio (Code).  
 Point 4 is handled for you, all you need to do is set this environment variable:
--   DJANGO_REMOTE_DEBUG=True
+```
+    environment:
+        - DJANGO_REMOTE_DEBUG=True
+```
 
 For remote debugging Pycharm, see [this tutorial](https://gist.github.com/veuncent/1e7fcfe891883dfc52516443a008cfcb.)
 
