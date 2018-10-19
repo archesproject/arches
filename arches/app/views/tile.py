@@ -17,6 +17,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import uuid, importlib, json as jsonparser
+import logging
+import traceback
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from arches.app.models.resource import Resource
@@ -34,6 +36,8 @@ from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.views.generic import View
 from django.db import transaction
 from arches.app.models.resource import EditLog
+
+logger = logging.getLogger(__name__)
 
 @method_decorator(can_edit_resource_instance(), name='dispatch')
 class TileData(View):
@@ -109,6 +113,10 @@ class TileData(View):
 
                         except ValidationError as e:
                             return JSONResponse({'status':'false','message':e.args}, status=500)
+                        except Exception as e:
+                            message = 'Saving tile failed'
+                            logger.error(message + ' [Tile id: {tile_id}] [Exception message: {message}] [Exception trace: {trace}]'.format(tile_id=tile_id, message=e.message, trace=traceback.format_exc()))
+                            return JSONResponse({'status': 'false', 'message': [_(message), _(e.message)] }, status=500)
                         tile.after_update_all()
                         clean_resource_cache(tile)
                         update_system_settings_cache(tile)
