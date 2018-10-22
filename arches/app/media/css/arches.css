@@ -62,6 +62,7 @@ dl.inline-flex dd {
 
 .navbar-header {
     height: 50px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.4);
 }
 
 .arches-navbar {
@@ -11696,6 +11697,7 @@ ul.select2-choices:after {
 .resource-editor-tree {
     overflow-y: auto;
     height: 100%;
+    background: #f4f4f4;
 }
 
 a.jstree-anchor strong {
