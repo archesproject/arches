@@ -25,6 +25,7 @@ from django.dispatch import receiver
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
+from django.core.validators import validate_slug
 
 # can't use "arches.app.models.system_settings.SystemSettings" because of circular refernce issue
 # so make sure the only settings we use in this file are ones that are static (fixed at run time)
@@ -936,6 +937,7 @@ class Plugin(models.Model):
     component = models.TextField()
     componentname = models.TextField()
     config = JSONField(blank=True, null=True, db_column='config')
+    slug = models.TextField(validators=[validate_slug], unique=True, null=True)
 
     def __unicode__(self):
         return self.name
