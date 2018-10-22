@@ -18,5 +18,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from app.models.models import DLanguage, MapLayer, MapSource, TileserverLayer, IIIFManifest, Geocoder, MapMarker, DDataType, Widget, Plugin
 from django.contrib import admin
+from guardian.admin import GuardedModelAdmin
 
-admin.site.register([DLanguage, MapLayer, MapSource, TileserverLayer, IIIFManifest, Geocoder, MapMarker, DDataType, Widget, Plugin])
+class PluginAdmin(GuardedModelAdmin):
+    pass
+
+admin.site.register([DLanguage, MapLayer, MapSource, TileserverLayer, IIIFManifest, Geocoder, MapMarker, DDataType, Widget])
+admin.site.register(Plugin, PluginAdmin)
