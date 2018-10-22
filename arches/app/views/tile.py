@@ -115,7 +115,9 @@ class TileData(View):
                             return JSONResponse({'status':'false','message':e.args}, status=500)
                         except Exception as e:
                             exception_title = 'Saving tile failed'
-                            exception_message = e
+                            exception_message = str(e)
+                            if hasattr(e, 'message') and e.message:
+                                exception_message += "({0})".format(e.message)
                             
                             logger.error(exception_title + ' [Tile id: {tile_id}] [Exception message: {message}] [Exception trace: {trace}]'
                                          .format(tile_id=tile_id, message=exception_message, trace=traceback.format_exc()))
