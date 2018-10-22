@@ -16,7 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.utils.translation import ugettext as _
 from arches.app.models import models
 from arches.app.models.system_settings import settings
@@ -28,6 +28,9 @@ class PluginView(MapBaseManagerView):
     action = None
 
     def get(self, request, pluginid=None):
+        plugin = models.Plugin.objects.get(pk=pluginid)
+        if not request.user.has_perm('add_plugin', plugin):
+            return redirect('home')
         resource_graphs = models.GraphModel.objects.exclude(
             pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
         widgets = models.Widget.objects.all()
@@ -38,7 +41,6 @@ class PluginView(MapBaseManagerView):
         map_sources = models.MapSource.objects.all()
         geocoding_providers = models.Geocoder.objects.all()
         templates = models.ReportTemplate.objects.all()
-        plugin = models.Plugin.objects.get(pk=pluginid)
 
         context = self.get_context_data(
             plugin=plugin,
