@@ -338,6 +338,7 @@ Assigned to: Alexei
 | Create graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Delete Instances |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Add/Edit cards   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Reorder widgets  in card |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Add/Edit menus   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Add/Edit reports |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
