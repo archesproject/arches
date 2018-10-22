@@ -92,7 +92,26 @@ class MobileSurvey(models.MobileSurveyModel):
                 #we may want the full proxy model at some point, but for now just the root node color
                 graph = Graph.objects.get(pk=card.graph_id)
                 graph_obj = graph.serialize(exclude=['domain_connections', 'edges', 'relatable_resource_model_ids'])
-                graph_obj['widgets'] = models.CardXNodeXWidget.objects.filter(card__graph=graph).distinct()
+                graph_obj['widgets'] = list(models.CardXNodeXWidget.objects.filter(card__graph=graph).distinct())
+                for node in graph_obj['nodes']:
+                    found = False
+                    for widget in graph_obj['widgets']:
+                        if node['nodeid'] == str(widget.node_id):
+                            found = True
+                            break
+                    if not found:
+                        for card in graph_obj['cards']:
+                            if card['nodegroup_id'] == node['nodegroup_id']:
+                                widget = models.DDataType.objects.get(pk=node['datatype']).defaultwidget
+                                if widget:
+                                    widget_model = models.CardXNodeXWidget()
+                                    widget_model.node_id = node['nodeid']
+                                    widget_model.card_id = card['cardid']
+                                    widget_model.widget_id = widget.pk
+                                    widget_model.config = widget.defaultconfig
+                                    widget_model.label = node['name']
+                                    graph_obj['widgets'].append(widget_model)
+                                break
                 graphs.append(graph_obj)
 
         ret['graphs'] = graphs
