@@ -115,15 +115,13 @@ class TileData(View):
                             return JSONResponse({'status':'false','message':e.args}, status=500)
                         except Exception as e:
                             exception_title = 'Saving tile failed'
-                            exception_message = str(e)
-                            if e.object:
-                                exception_message += ". Potential cause: {0}".format(e.object)
+                            exception_message = e
                             
                             logger.error(exception_title + ' [Tile id: {tile_id}] [Exception message: {message}] [Exception trace: {trace}]'
                                          .format(tile_id=tile_id, message=exception_message, trace=traceback.format_exc()))
                             
                             return JSONResponse({'status': 'false', 'message':
-                                                 [_(exception_title), _(exception_message)]}, status=500)
+                                                 [_(exception_title), _(str(exception_message))]}, status=500)
                         tile.after_update_all()
                         clean_resource_cache(tile)
                         update_system_settings_cache(tile)
