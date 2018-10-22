@@ -27,8 +27,11 @@ from arches.app.views.base import MapBaseManagerView
 class PluginView(MapBaseManagerView):
     action = None
 
-    def get(self, request, pluginid=None):
-        plugin = models.Plugin.objects.get(pk=pluginid)
+    def get(self, request, pluginid=None, slug=None):
+        if slug is not None:
+            plugin = models.Plugin.objects.get(slug=slug)
+        else:
+            plugin = models.Plugin.objects.get(pk=pluginid)
         if not request.user.has_perm('add_plugin', plugin):
             return redirect('home')
         resource_graphs = models.GraphModel.objects.exclude(

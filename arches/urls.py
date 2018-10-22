@@ -143,6 +143,7 @@ urlpatterns = [
     url(r'^resources/(?P<resourceid>%s|())$' % uuid_regex, api.Resources.as_view(), name='resources'),
     url(r'^rdm/concepts/(?P<conceptid>%s|())$' % uuid_regex, api.Concepts.as_view(), name='concepts'),
     url(r'^plugins/(?P<pluginid>%s)$' % uuid_regex, PluginView.as_view(), name='plugins'),
+    url(r'^plugins/(?P<slug>[-\w]+)$', PluginView.as_view(), name='plugins'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
