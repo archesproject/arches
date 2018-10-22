@@ -47,7 +47,7 @@ define([
             if (tile && tile.data) {
                 var users = [];
                 var data = koMapping.toJS(tile.data);
-                var provisionaleditlist = _.map(tile.provisionaledits(), function(edit, key){
+                var provisionaleditlist = _.map(ko.unwrap(tile.provisionaledits), function(edit, key){
                     users.push(key);
                     edit['username'] = ko.observable('');
                     edit['displaytimestamp'] = moment(edit.timestamp).format("hh:mm");
