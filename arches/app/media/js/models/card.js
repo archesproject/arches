@@ -258,7 +258,7 @@ define([
                 }
             }, this);
             this.get('widgets').sort(function(w, ww) {
-                return w.get('sortorder')() > ww.get('sortorder')();
+                return w.get('sortorder')() - ww.get('sortorder')();
             });
             this._card(JSON.stringify(this.toJSON()));
         },
