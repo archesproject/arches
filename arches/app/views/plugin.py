@@ -32,7 +32,7 @@ class PluginView(MapBaseManagerView):
             plugin = models.Plugin.objects.get(slug=slug)
         else:
             plugin = models.Plugin.objects.get(pk=pluginid)
-        if not request.user.has_perm('add_plugin', plugin):
+        if not request.user.has_perm('view_plugin', plugin):
             return redirect('home')
         resource_graphs = models.GraphModel.objects.exclude(
             pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
