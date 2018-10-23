@@ -119,9 +119,13 @@ class TileData(View):
                             if hasattr(e, 'message') and e.message:
                                 exception_message += "({0})".format(e.message)
 
-                            logger.error(exception_title + 
-                                ' [Tile id: {tile_id}] [Exception message: {message}] [Exception trace: {trace}]'
-                                .format(tile_id=tile_id, message=exception_message, trace=traceback.format_exc()))
+                            logger.error(exception_title +
+                                         ''' [Tile id: {tile_id}] \
+                                         [Exception message: {message}] \
+                                         [Exception trace: {trace}]'''
+                                         .format(tile_id=tile_id,
+                                                 message=exception_message,
+                                                 trace=traceback.format_exc()))
 
                             return JSONResponse({'status': 'false', 'message':
                                                  [_(exception_title), _(str(exception_message))]}, status=500)
