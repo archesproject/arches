@@ -242,6 +242,7 @@ SEARCH_GROUP_ROOTS= [
 
 EXPORT_CONFIG = os.path.normpath(os.path.join(PACKAGE_ROOT, 'source_data', 'business_data', 'resource_export_mappings.json'))
 
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -277,4 +278,4 @@ except ImportError:
 
 
 #Radius in metres to be used to calculate the existence of pre-existing resources in the database. If, upon resource creation, other pre-existing resources fall within this radius, an alert is returned before save.
-METER_RADIUS = 1000
+METER_RADIUS = 50
