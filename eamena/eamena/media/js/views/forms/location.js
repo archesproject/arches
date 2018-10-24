@@ -28,7 +28,11 @@ define([
                 var locationBranchList = new LocationBranchList({
                     el: this.$el.find('#geom-list-section')[0],
                     data: this.data,
-                    dataKey: 'GEOMETRIC_PLACE_EXPRESSION.SP5'
+                    dataKey: 'GEOMETRIC_PLACE_EXPRESSION.SP5',
+                    rules: true,
+                    validateBranch: function (nodes) {
+                        return this.validateHasValues(nodes);
+                    }
                 });
                 locationBranchList.on('geometryadded', function(feature, wkt) {
                     $.ajax({
@@ -54,6 +58,7 @@ define([
                 el: this.$el.find('#certainty-of-geometry')[0],
                 data: this.data,
                 dataKey: 'GEOMETRY_EXTENT_CERTAINTY.I6',
+                rules: true,
                 validateBranch: function (nodes) {
                     return this.validateHasValues(nodes);
                 }
@@ -75,7 +80,7 @@ define([
                 el: this.$el.find('#siteshape-section')[0],
                 data: this.data,
                 dataKey: 'SITE_OVERALL_SHAPE_TYPE.E55',
-
+                rules: true,
                 validateBranch: function (nodes) {
                     return this.validateHasValues(nodes);
                 }
@@ -85,7 +90,7 @@ define([
                 el: this.$el.find('#topography')[0],
                 data: this.data,
                 dataKey: 'TOPOGRAPHY_TYPE.E55',
-
+                rules: true,
                 validateBranch: function (nodes) {
                     return this.validateHasValues(nodes);
                 }

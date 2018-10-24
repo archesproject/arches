@@ -154,6 +154,7 @@
 
                 <!-- Geometries -->
                 <div class="arches-crud-child-section">
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "A Geometry is required, and you must specify a Location Certainty." %}</div>
                     <dl>
                         <dd class="arches-CRUD-child-title">
                             {% trans 'This resource is represented by the following geometries:' %}
@@ -299,7 +300,7 @@
                         </div>
                     </dd>
                     <!-- End Form -->
-                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "This value must be populated." %}</div>
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "Overall Site Shape required." %}</div>
                 </dl>
                 
             </div>
@@ -359,7 +360,7 @@
                             </div>
                         </div>
                     </dd>
-                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "Geometry required." %}</div>
+                    <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "Certainty of Geometric Extent required." %}</div>
                 </dl>
             </div>
         </div>

@@ -79,6 +79,35 @@ define(['jquery',
                 }
             }, this);
             return valid;
-        }
+        },
+        
+        // pass in a list of nodes where at least one must be populated
+        mustHaveAtLeastOneOf: function(nodes, node_names) {
+            var valid = false;
+            _.each(nodes, function(node) {
+                if (node.value !== '' && node_names.indexOf(node.entitytypeid) != -1) {
+                    valid = true
+                }
+            });
+            return valid
+        },
+        
+        // pass in a list of nodes where if one is populated, then all of them
+        // must be. if all are empty, that is fine.
+        ifOneThenAll: function(nodes, node_names) {
+            var values = [];
+            _.each(nodes, function(node) { 
+                if (node.value !== '' && node_names.indexOf(node.entitytypeid) != -1) {
+                    values.push(node.value);
+                }
+            });
+            var valid = false;
+            if (values.length > 0 && values.length == node_names.length){
+                valid = true
+            } else if (values.length == 0) {
+                valid = true;
+            }
+            return valid
+        },
     });
 });
