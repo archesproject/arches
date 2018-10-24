@@ -175,6 +175,19 @@ class Resource(ArchesResource):
                 names.append(name)
 
         return names
+        
+    def get_descriptive_name(self):
+        """
+        Gets the human readable name to display for entity instances
+        """
+
+        name_nodes = self.find_entities_by_type_id(settings.RESOURCE_TYPE_CONFIGS()[self.entitytypeid]['description_node'])
+        if len(name_nodes) > 0:
+            name = name_nodes[0].value
+        else:
+            name = "(unnamed)"
+        
+        return name
 
 
     def prepare_documents_for_map_index(self, geom_entities=[]):

@@ -696,9 +696,11 @@ class ManMadeForm(ResourceForm):
     def load(self, lang):        
         data = []
         for relatedentity in self.resource.get_related_resources(entitytypeid='HERITAGE_FEATURE.E24'):
+            descriptivename = relatedentity['related_entity'].get_descriptive_name()
             nodes = relatedentity['related_entity'].flatten()
             data.append({
-                'nodes': nodes, 
+                'descriptivename':descriptivename,
+                'nodes': nodes,
                 'relationship': relatedentity['relationship'], 
                 'relatedresourcename':relatedentity['related_entity'].get_primary_name(),
                 'relatedresourceidlink': '/resources/HERITAGE_FEATURE.E24/default/' + relatedentity['related_entity'].entityid,
