@@ -129,7 +129,34 @@ define([
                     return this.validateHasValues(nodes);
                 }
             }));
-        },    
+        },
+        checkForRequiredBranchlists: function() {
+            var isValid = true
+            var canBeEmpty = ['SPATIAL_COORDINATES_REF_SYSTEM.SP4'] //can be removed once this node is pruned
+            _.each(this.branchLists, function(branchList){
+                if (branchList.rules === true && branchList.getData().length === 0 && branchList.singleEdit === false) {
+                    isValid = false;
+                    this.showAlert(branchList);
+                } else if (branchList.rules === true && branchList.singleEdit === false) {
+                    if (branchList.getData().length === 0) {
+                        isValid = false;
+                    } else {
+                        _.each(branchList.getData(), function(nodes) {
+                            _.each(nodes, function(node) {
+                                _.each(node, function(n) {
+                                    if (n.value === '' && n.entityid === '' && canBeEmpty.indexOf(n.entitytypeid) == -1) {
+                                        isValid = false;
+                                        this.showAlert(branchList);
+                                    }
+                                }, this)
+                            }, this)
+                        }, this)
+                    }
+                }
+            }, this); 
+            return isValid;
+        }, 
+    
     });
 });
 
