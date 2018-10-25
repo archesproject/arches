@@ -133,13 +133,15 @@ class MobileSurvey(models.MobileSurveyModel):
         # save back to postgres db
         db = self.couch.create_db('project_' + str(self.id))
         ret = []
-        for row in db.view('_all_docs', include_docs=True):
+        for row in db.all_docs:
             ret.append(row)
             if 'tileid' in row.doc:
-                tile = Tile(row.doc)
+                if row.doc['provisionaledits'] is not None:
+                    print row.doc['provisionaledits']
+                # tile = Tile(row.doc)
                 #if tile.filter_by_perm(request.user, 'write_nodegroup'):
-                with transaction.atomic():
-                    tile.save()
+                # with transaction.atomic():
+                #     tile.save()
                 #tile = models.TileModel.objects.get(pk=row.doc.tileid).update(**row.doc)
         return ret
 
