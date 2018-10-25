@@ -209,6 +209,9 @@ define([
                     $.ajax({
                         type: "DELETE",
                         url: arches.urls.resource_editor + resourceId(),
+                        error: function(err) {
+                            vm.alert(new AlertViewModel('ep-alert-red', err.responseJSON.title, err.responseJSON.message, null, function(){}));
+                        },
                         complete: function(request, status) {
                             loading(false);
                             if (status === 'success') {
