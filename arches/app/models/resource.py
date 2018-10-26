@@ -243,21 +243,34 @@ class Resource(models.ResourceInstance):
 
         """
 
-        se = SearchEngineFactory().create()
-        related_resources = self.get_related_resources(lang="en-US", start=0, limit=1000, page=0)
-        for rr in related_resources['resource_relationships']:
-            models.ResourceXResource.objects.get(pk=rr['resourcexid']).delete()
-        query = Query(se)
-        bool_query = Bool()
-        bool_query.filter(Terms(field='resourceinstanceid', terms=[self.resourceinstanceid]))
-        query.add_query(bool_query)
-        results = query.search(index='strings', doc_type='term')['hits']['hits']
-        for result in results:
-            se.delete(index='strings', doc_type='term', id=result['_id'])
-        se.delete(index='resource', doc_type=str(self.graph_id), id=self.resourceinstanceid)
+        permit_deletion = False
+        user_is_reviewer = user.groups.filter(name='Resource Reviewer').exists()
+        if user_is_reviewer is False:
+            tiles = list(models.TileModel.objects.filter(resourceinstance=self))
+            resource_is_provisional = True if sum([len(t.data) for t in tiles]) == 0 else False
+            if resource_is_provisional is True:
+                permit_deletion = True
+        else:
+            permit_deletion = True
 
-        self.save_edit(edit_type='delete', user=user, note=self.displayname)
-        super(Resource, self).delete()
+        if permit_deletion is True:
+            se = SearchEngineFactory().create()
+            related_resources = self.get_related_resources(lang="en-US", start=0, limit=1000, page=0)
+            for rr in related_resources['resource_relationships']:
+                models.ResourceXResource.objects.get(pk=rr['resourcexid']).delete()
+            query = Query(se)
+            bool_query = Bool()
+            bool_query.filter(Terms(field='resourceinstanceid', terms=[self.resourceinstanceid]))
+            query.add_query(bool_query)
+            results = query.search(index='strings', doc_type='term')['hits']['hits']
+            for result in results:
+                se.delete(index='strings', doc_type='term', id=result['_id'])
+            se.delete(index='resource', doc_type=str(self.graph_id), id=self.resourceinstanceid)
+
+            self.save_edit(edit_type='delete', user=user, note=self.displayname)
+            super(Resource, self).delete()
+
+        return permit_deletion
 
     def get_related_resources(self, lang='en-US', limit=settings.RELATED_RESOURCES_EXPORT_LIMIT, start=0, page=0):
         """
