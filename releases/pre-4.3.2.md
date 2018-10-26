@@ -1,11 +1,20 @@
-### Arches 4.4.0 release notes
+### Arches 4.3.2 release notes
 
 The Arches team has been busy improving Arches and fixing several bugs as well.
 Below you'll find a listing of all the changes that are included in the latest release.
 
 Some of the highlights:
--   
+- Significantly improves performance in the Graph Designer
+- Adds template blocks in card components to support overriding the default card component
+- Fixes card ordering in the Graph Designer
+- Adds package css for package relevant styling
+- Many other small improvements
 
+#### Known Issues
+
+- [#4044](https://github.com/archesproject/arches/issues/4044) - Exporting data that uses the File-list datatype in csv format can't be successfully re-imported.  
+
+  **Workaround:** If users need to export data that uses the File-list datatype, then they should export in JSON format instead, so that data can be successfully re-imported.
 
 #### Upgrading Arches
 
@@ -15,10 +24,6 @@ If you can't completely re-install Arches (because you have data in the system t
 
 ```
 pip install arches --upgrade --no-binary :all:
-python manage.py migrate
-python manage.py es delete_indexes
-python manage.py es setup_indexes
-python manage.py es index_database
 ```
 
 If you have Arches running on a web server such as Apache, be sure to update your static files directory and restart your web server.
@@ -28,7 +33,36 @@ As always the documentation can be found at <http://arches.readthedocs.io>
 #### Upgrading an Arches project
 
 #### Changes
--   Upgrade of django from 1.11.14 to 1.11.15 [#4085](https://github.com/archesproject/arches/pull/4085)
+59e2eae Prevents provisional users from deleting resources with authoritative data re #4231
+fb4dcff Resolves knockout errors, re 4214
+6056e8b Fixes sort order bug, re #4169
+9a7ead2 Fixes urllib3 at v1.21.1
+6aa393c makes collectors unselectable, re: #4124
+943bae3 Sorts widgets after they are added to the card model. re #4169
+47e599f Adds update method to datatype management command.
+cce616d fixes graph export, re: #4172
+61972b9 fixes card tree sync, re: #4164
+c6bae4a refactors, prevents excessive JS calls, re: #4149
+780b47c adds onClear to select2-query binding
+bc8cd3c enhances card component viewmodel for extension
+d722d98 enhances mapboxgl binding handler
+df8640c copies package css during load, re: #4101
+beb92cb adds css files to be overridden, re: #4101
+8bb32ea enhances card components to support extension
+3a8e530 enhancements for widget development
+f387c75 enhances widget viewmodel and select2-query binding
+f7654c3 fixes tile viewmodel dirty state for new tiles
+65f1378 fix error where card_x_node_x_widget id was being used as a lookup, but was always null, re #3892
+26c0835 fix for issue with report migration
+40d2727 Allows loading of the related resources page for users unassigned to the Graph Editor group. re #4010
+e62ff9b removes arches_splash images
+041efd4 re #4074 reduce size of nested card edit gif
+b1a2ccb remove unused gif files re: #4047
+058abab Fixes widget visibility logic in the editor card tree #3965
+9efcff8 Uses css to hide the widget rather than remove it from the resource editor. This allows a default value to be saved with the tile. re #4042
+72bfcd8 Fix issue where resource editor breadcrumb dropdown was empty when clicking on certain cards, re #3800
+c055c56 Make 'Jump to Report' link open in new window, re #3799
+0c340c5 Remove "all" from "Expand all" and "Collapse all" labels, re #3776
 
 # Testing Script
 
