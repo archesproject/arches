@@ -310,7 +310,9 @@ define([
                 });
                 self.graphModel.getChildNodesAndEdges(node).nodes.forEach(function(node) {
                     var card = _.find(ko.unwrap(parentcards), function(card) {
-                        return card.nodegroupid === (ko.unwrap(node.nodeGroupId) || ko.unwrap(node.nodegroup_id));
+                        return card.nodegroupid === (ko.unwrap(node.nodeGroupId) ||
+                            ko.unwrap(node.nodegroup_id)) &&
+                            card.model.cardid() !== newCardViewModel.model.cardid();
                     });
                     if (card) {
                         parentcards.remove(card);
