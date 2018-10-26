@@ -30,8 +30,10 @@ define([
             );
         }
         children.forEach(function(child) {
-            if (child.selected && child.selected() || isChildSelected(child)) {
-                childSelected = true;
+            if (parent.nodegroupid && parent.nodegroupid !== child.nodegroupid) {
+                if (child.selected && child.selected() || isChildSelected(child)) {
+                    childSelected = true;
+                }
             }
         });
         return childSelected;
