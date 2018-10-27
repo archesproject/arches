@@ -89,7 +89,7 @@ Assigned to: Cyrus
 
 | Test Subject                                                   | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Confirm that upgrading from the previous release is issue free |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Confirm that upgrading from the previous release is issue free |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -97,9 +97,9 @@ Assigned to: Cyrus
 
 Assigned to: Cyrus
 
-| Test Subject                                                                              | Chrome | Safari | Firefox | IE11 | UI | Notes |
-| ----------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | :-: | ----- |
-| Test that users can't access the Mobile Survey Manager page |    ?   |    ?   |    ?    |   ?  | ?  | -     |
+| Test Subject                                                | Chrome | Safari | Firefox | IE11 | UI | Notes |
+| ----------------------------------------------------------- | :----: | :----: | :-----: | :--: | :-: | ----- |
+| Test that users can't access the Mobile Survey Manager page |:white_check_mark:|    ?   |    ?    |   ?  | ?  | -     |
 
 * * *
 
@@ -111,11 +111,11 @@ Ensure that all browsers are compatible with Authentication process.
 
 | Test Subject                                                             | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| User can sign themselves up for a new Arches account                     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User is added to default group (Crowdsource Editor)                      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can log in with their email address                                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can reset their password                                            |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can edit their profile (First and Last name, email address, etc...) |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| User can sign themselves up for a new Arches account                     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| User is added to default group (Crowdsource Editor)                      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| User can log in with their email address                                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| User can reset their password                                            |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| User can edit their profile (First and Last name, email address, etc...) |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -127,8 +127,8 @@ Assigned to: Cyrus
 
 | Test Subject                                                                                                                 | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Project Name - Updating name updates in index.htm and the page tab                                                           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Web Analytics - String value inserts in base.htm at the location of this template variable:{{GOOGLE_ANALYTICS_TRACKING_ID}} |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Project Name - Updating name updates in index.htm and the page tab                                                           |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Web Analytics - String value inserts in base.htm at the location of this template variable:{{GOOGLE_ANALYTICS_TRACKING_ID}}  |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 #### Map Settings
 
@@ -136,13 +136,13 @@ Assigned to: Cyrus
 
 | Test Subject                                                                                                                                                                                    | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| API Key - Key saves and API calls are successful                                                                                                                                                |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Hex Grid Precision - Saves properly, but errors if precision is too high (\`Exception detail: TransportError(400, u'parsing_exception', u'[geohash_grid] failed to parse field [precision]')``) |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Hex Cell Size - Changes reflected in Search results                                                                                                                                             |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Default Zoom - Changes reflected in Card Config Manager                                                                                                                                         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Min Zoom - Changes reflected in Card Config Manager                                                                                                                                             |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Max Zoom - Changes reflected in Card Config Manager                                                                                                                                             |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Project Extent - Changes reflected in Card Config Manager                                                                                                                                       |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| API Key - Key saves and API calls are successful                                                                                                                                                |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Hex Grid Precision - Saves properly, but errors if precision is too high (\`Exception detail: TransportError(400, u'parsing_exception', u'[geohash_grid] failed to parse field [precision]')``) |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Hex Cell Size - Changes reflected in Search results                                                                                                                                             |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Default Zoom - Changes reflected in Card Config Manager                                                                                                                                         |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Min Zoom - Changes reflected in Card Config Manager                                                                                                                                             |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Max Zoom - Changes reflected in Card Config Manager                                                                                                                                             |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Project Extent - Changes reflected in Card Config Manager                                                                                                                                       |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 #### Search Settings
 
@@ -152,8 +152,8 @@ Basic Search Settings
 
 | Test Subject                                                   | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Searches per page updates properly in Search                   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Number of search suggestions is reflected in search term input |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Searches per page updates properly in Search                   |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Number of search suggestions is reflected in search term input |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 Temporal Search Settings (not in use)
 
@@ -166,8 +166,8 @@ Saved Searches
 
 | Test Subject                                                                                                       | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| A new search saves with a name, search url, description, and image and displays properly in the saved search page. |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Users can delete a saved search                                                                                    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| A new search saves with a name, search url, description, and image and displays properly in the saved search page. |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Users can delete a saved search                                                                                    |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -179,9 +179,9 @@ Test in the Card Configuration Manager.
 
 | Test Subject                                                                                                                                            | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Point line and poly geoms can be created, edited, and deleted                                                                                           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| XY widget is working properly                                                                                                                           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Valid geojson entered in the geojson input adds features to the map and pans to those features. If geojson is invalid user has a chance to update data. |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Point line and poly geoms can be created, edited, and deleted                                                                                           |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| XY widget is working properly                                                                                                                           |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Valid geojson entered in the geojson input adds features to the map and pans to those features. If geojson is invalid user has a chance to update data. |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -195,13 +195,13 @@ Assigned to: Rob
 
 | Test Subject                                                                                                                         | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| Settings - changes to the name and icon of a layer are reflected in the map widget overlay list and overlay library                  |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Deactivating/Activating a resource layer hides/shows the layer in the map widget overlay list and overlay library                    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Style Settings - changes to the layer style are displayed in the layer                                                               |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Style Settings Advanced - changes to the layer style are displayed in the layer                                                      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Activating caching adds a cache folder for a resource in your projects tileserver directory                                          |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Activating clean cache on edit updates the cache when a geometry is edited                                                           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Setting permissions for a user or group as No Access removes the user and group from the permissions list under the permissions tab. |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Settings - changes to the name and icon of a layer are reflected in the map widget overlay list and overlay library                  |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Deactivating/Activating a resource layer hides/shows the layer in the map widget overlay list and overlay library                    |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Style Settings - changes to the layer style are displayed in the layer                                                               |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Style Settings Advanced - changes to the layer style are displayed in the layer                                                      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Activating caching adds a cache folder for a resource in your project's tileserver directory                                         |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Activating clean cache on edit updates the cache when a geometry is edited                                                           |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Setting permissions for a user or group as No Access removes the user and group from the permissions list under the permissions tab. |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 #### Clustering (Resource Layers)
 
@@ -209,10 +209,10 @@ Assigned to: Rob
 
 | Test Subject                                                                               | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| Increasing cluster distance causes features to cluster at increased distances between them |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Increasing cluster max zoom causes clusters to be formed at higher zoom levels             |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Decreasing min points to 2 points causes clusters to form with only 2 points               |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Increasing vector simplification to 0.0 prevents simplification a low zoom levels          |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Increasing cluster distance causes features to cluster at increased distances between them |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Increasing cluster max zoom causes clusters to be formed at higher zoom levels             |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Decreasing min points to 2 points causes clusters to form with only 2 points               |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Increasing vector simplification to 0.0 prevents simplification a low zoom levels          |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 #### Basemaps
 
@@ -220,9 +220,9 @@ Assigned to: Rob
 
 | Test Subject                                                                                    | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ----------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Changing the default search basemap in the basemap settings is reflected on the search page     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Settings - changes to the name and icon of a layer are reflected in the map widget basemap list |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can delete a basemap and it no longer appears in the map widget's list of basemaps         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Changing the default search basemap in the basemap settings is reflected on the search page     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Settings - changes to the name a layer are reflected in the map widget basemap list             |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| User can delete a basemap and it no longer appears in the map widget's list of basemaps         |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 #### Overlays
 
@@ -230,8 +230,8 @@ Assigned to: Rob
 
 | Test Subject                                                                                                        | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Settings - changes to the name and icon of a layer are reflected in the map widget overlay list and overlay library |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can delete an overlay and it no longer appears in the map widget overlay library                               |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Settings - changes to the name and icon of a layer are reflected in the map widget overlay list and overlay library |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| User can delete an overlay and it no longer appears in the map widget overlay library                               |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -244,7 +244,7 @@ Assigned to: Ryan
 | Create_mapping_file        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Import business data (cli) |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Export business data (cli) |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Load package (cli)         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Load package (cli)         |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 | Create package (cli)       |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
