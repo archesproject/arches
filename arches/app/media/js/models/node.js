@@ -171,7 +171,7 @@ define([
 
             self.dirty = ko.computed(function() {
                 return self.json() !== self._node();
-            });
+            }).extend({ rateLimit: 100 });
 
             self.isCollector = ko.computed(function() {
                 return self.nodeid === self.nodeGroupId();
