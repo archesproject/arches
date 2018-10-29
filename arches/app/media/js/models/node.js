@@ -315,9 +315,17 @@ define([
          */
         toggleIsCollector: function() {
             var nodeGroupId = this.nodeid;
+            var self = this;
             if (this.isCollector()) {
                 nodeGroupId = this.graph.getParentNode(this).nodeGroupId();
             }
+            var children  = this.graph.getChildNodesAndEdges(this).nodes;
+            children.forEach(function(child) {
+                if (child.nodeGroupId() === self.nodeGroupId()) {
+                    child.nodeGroupId(nodeGroupId);
+                    child._node(child.json());
+                }
+            });
             this.nodeGroupId(nodeGroupId);
         },
 
