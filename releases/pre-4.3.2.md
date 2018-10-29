@@ -241,11 +241,11 @@ Assigned to: Ryan
 
 | Test Subject               | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Create_mapping_file        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Import business data (cli) |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Export business data (cli) |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Create_mapping_file        |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Import business data (cli) |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Export business data (cli) |:white_check_mark:|    ?   |    ?    |   ?  | ?   |  ?  |
 | Load package (cli)         |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
-| Create package (cli)       |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Create package (cli)       |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -292,8 +292,8 @@ Assigned to: Cyrus
 
 | Test Subject                                           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| Provisional users see indication in a widget that their tile edits were submitted                   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Resource reviewers are able to identify provisional tiles and can approve/discard provisional edits |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Provisional users see indication in a widget that their tile edits were submitted                   |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Resource reviewers are able to identify provisional tiles and can approve/discard provisional edits |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -305,22 +305,21 @@ Assigned to: Jeff
 
 | Test Subject                                           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| User can add a related resource                        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can delete a related resource                     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can change the properties of related resources    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can switch between table and force directed graph |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can page through related resources in table       |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| User can add a related resource                        |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| User can delete a related resource                     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| User can change the properties of related resources    |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| User can switch between table and force directed graph |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| User can page through related resources in table       |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 #### Resource Search
 
 | Test Subject                                                                                                                           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Hovering over a link in the force directed graph opens a panel with source and target node info and list each unique relationship type |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Hovering over a node highlights the adjacent links and the corresponding entry in the node list                                        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Hovering over a node list entry highlights the corresponding node and its adjacent links                                               |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can switch between table and force directed graph                                                                                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Entering text in the search field filters the list of list entries                                                                     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Overlays support custom popups                                                                                                         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Hovering over a link in the force directed graph opens a panel with source and target node info and list each unique relationship type |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Hovering over a node highlights the adjacent links and the corresponding entry in the node list                                        |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Hovering over a node list entry highlights the corresponding node and its adjacent links                                               |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| User can switch between table and force directed graph                                                                                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Entering text in the search field filters the list of list entries                                                                     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -330,17 +329,19 @@ Assigned to: Jeff
 
 | Test Subject                                                                                                                                                                         | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| Free text search                                                                                                                                                                     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Concept search                                                                                                                                                                       |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Map search                                                                                                                                                                           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Time range based search                                                                                                                                                              |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Time wheel search                                                                                                                                                                    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Advanced search                                                                                                                                                                      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Free text search                                                                                                                                                                     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Concept search                                                                                                                                                                       |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Map search                                                                                                                                                                           |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Time range based search                                                                                                                                                              |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Time wheel search                                                                                                                                                                    |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Advanced search                                                                                                                                                                      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 | Related resource table search                                                                                                                                                        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Related resource graph search                                                                                                                                                        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Resource type search                                                                                                                                                                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Edit status search (provisional, authoritative, or both). Confirm that only resource reviewers are able to see provisional tile data                                                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Resource type search                                                                                                                                                                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Edit status search (provisional, authoritative, or both). Confirm that only resource reviewers are able to see provisional tile data                                                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 | Map should not zoom to points that a user is not permitted to read, nor should the search aggregation layer (e.g. hexbin or heatmap) indicate that a restricted resource is present. |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Overlays support custom popups                                                                                                         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+
 
 * * *
 
@@ -348,31 +349,20 @@ Assigned to: Jeff
 
 Assigned to: Alexei
 
-### Arches Designer
-
-| Test Subject     | Chrome | Safari | Firefox | IE11 | UI  | Notes |
-| ---------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Import graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Export graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Clone graph      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Delete graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Create branch    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Create graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Delete Instances |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-
 ### Graph Designer
 
 | Test Subject     | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------- | :----: | :----: | :-----: | :--: | --- | ----- |
 | Import graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Export graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Clone graph      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Export branch    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Clone graph      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 | Delete graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Create branch    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Create graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Create branch    |   |    ?   |    ?    |   ?  | ?   | -     |
+| Create graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 | Delete Instances |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Add/Edit cards   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add/Edit menus   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Sort cards       |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Add/Edit reports |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
