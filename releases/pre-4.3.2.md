@@ -260,15 +260,15 @@ Note (GeoJson is covered by map widget testing in a different section)
 
 | Test Subject           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| String                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Concepts               |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Domains                |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Images                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Dates                  |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Number                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Boolean                |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Resource instance type |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Node data type         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| String                 |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Concepts               |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Domains                |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Images                 |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Dates                  |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Number                 |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Boolean                |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Resource instance type |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
+| Node data type         |    :white_check_mark:   |    ?   |    ?    |   ?  | ?   | -     |
 
 #### Resource Descriptors
 
@@ -278,11 +278,11 @@ Updating a resource descriptor should be reflected in the following subjects.
 
 | Test Subject                                                                                        | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | --------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Search results                                                                                      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Form headings                                                                                       |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Report headings                                                                                     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Map popups                                                                                          |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Related resource d3 graph and listings                                                              |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Search results                                                                                      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Form headings                                                                                       |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Report headings                                                                                     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Map popups                                                                                          |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Related resource d3 graph and listings                                                              |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -335,11 +335,11 @@ Assigned to: Jeff
 | Time range based search                                                                                                                                                              |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 | Time wheel search                                                                                                                                                                    |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 | Advanced search                                                                                                                                                                      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
-| Related resource table search                                                                                                                                                        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Related resource graph search                                                                                                                                                        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Related resource table search                                                                                                                                                        |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Related resource graph search                                                                                                                                                        |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 | Resource type search                                                                                                                                                                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 | Edit status search (provisional, authoritative, or both). Confirm that only resource reviewers are able to see provisional tile data                                                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
-| Map should not zoom to points that a user is not permitted to read, nor should the search aggregation layer (e.g. hexbin or heatmap) indicate that a restricted resource is present. |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Map should not zoom to points that a user is not permitted to read, nor should the search aggregation layer (e.g. hexbin or heatmap) indicate that a restricted resource is present. |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 | Overlays support custom popups                                                                                                         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 
@@ -353,17 +353,17 @@ Assigned to: Alexei
 
 | Test Subject     | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Import graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Export graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Export branch    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Import graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Export graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Export branch    |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 | Clone graph      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
-| Delete graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Create branch    |   |    ?   |    ?    |   ?  | ?   | -     |
+| Delete graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Create branch    |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 | Create graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
-| Delete Instances |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add/Edit cards   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Sort cards       |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add/Edit reports |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Delete Instances |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Add/Edit cards   |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Sort cards       |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Edit reports     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -373,15 +373,15 @@ Assigned to: Ryan
 
 | Test Subject                                                                                                                                            | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Confirm removing `read` permissions removes that section from the report                                                                                |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Confirm removing `read` permissions removes that section from the form                                                                                  |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Confirm removing `read` permissions removes that section from the adv. search                                                                           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Confirm removing `read` permissions for a spatial nodegroup removes that resource type from map based search results                                    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Confirm removing `read` permissions for a spatial nodegroup removes that resource type from the overlays section of the map settings                    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Confirm removing `read` permissions for a spatial nodegroup removes the map from the Map Report                                                         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Confirm removing `read` permissions for a date based nodegroup removes the related entries from the type dropdown in the time filter of the search page |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Confirm removing `read` permissions for a date based nodegroup reduces the wheel count appropriately                                                    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Confirm removing `write` permissions but still having read permissions disallows saving that section of the form                                        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Confirm removing `read` permissions removes that section from the report                                                                                |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Confirm removing `read` permissions removes that section from the form                                                                                  |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Confirm removing `read` permissions removes that section from the adv. search                                                                           |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Confirm removing `read` permissions for a spatial nodegroup removes that resource type from map based search results                                    |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Confirm removing `read` permissions for a spatial nodegroup removes that resource type from the overlays section of the map settings                    |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Confirm removing `read` permissions for a spatial nodegroup removes the map from the Map Report                                                         |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Confirm removing `read` permissions for a date based nodegroup removes the related entries from the type dropdown in the time filter of the search page |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Confirm removing `read` permissions for a date based nodegroup reduces the wheel count appropriately                                                    |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Confirm removing `write` permissions but still having read permissions disallows saving that section of the form                                        |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -393,9 +393,9 @@ Assigned to: Adam
 
 | Test Subject                                                            | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ----------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Confirm that report templates with map header gets rendered correctly   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Confirm that report templates with image header gets rendered correctly |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Confirm that report templates with no header gets rendered correctly    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Confirm that report templates with map header gets rendered correctly   |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Confirm that report templates with image header gets rendered correctly |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Confirm that report templates with no header gets rendered correctly    |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 #### Data Rendering
 
