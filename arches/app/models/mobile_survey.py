@@ -131,18 +131,23 @@ class MobileSurvey(models.MobileSurveyModel):
     def push_edits_to_db(self):
         # read all docs that have changes
         # save back to postgres db
+        #for row in couch.all_docs(db):
+            #if (row.doc['type'] == 'tile' and row.doc['provisionaledits']):
+                #print row.doc['provisionaledits']
+                #tile = Tile(row.doc)
+                #tile.save()
         db = self.couch.create_db('project_' + str(self.id))
         ret = []
-        for row in db.all_docs:
+        for row in self.couch.all_docs(db):
             ret.append(row)
-            if 'tileid' in row.doc:
+            if row.doc['type'] == 'tile':
                 if row.doc['provisionaledits'] is not None:
                     print row.doc['provisionaledits']
                     tile = Tile(row.doc)
                     # if tile.filter_by_perm(request.user, 'write_nodegroup'):
                     with transaction.atomic():
                         tile.save()
-                    tile = models.TileModel.objects.get(pk=row.doc.tileid).update(**row.doc)
+                    # tile = models.TileModel.objects.get(pk=row.doc.tileid).update(**row.doc)
         return ret
 
     def collect_resource_instances_for_couch(self):
