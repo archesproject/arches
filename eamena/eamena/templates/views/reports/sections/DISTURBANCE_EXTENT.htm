@@ -5,21 +5,20 @@
             <dt>
                 <h5 id="" class="arches-report-subsection-title">{% trans "Overall disturbance extent" %}</h5>
             </dt>
-
+                 <dd class="arches-report-subsection-item hidden">{% trans "No overall disturbance extent recorded" %}</dd>
             {% if 'CONDITION_ASSESSMENT_E14'  in report_info.source.graph %}
                 {% for CONDITION_ASSESSMENT_E14 in report_info.source.graph.CONDITION_ASSESSMENT_E14 %}
                     {% if 'CONDITION_STATE_E3' in CONDITION_ASSESSMENT_E14 %}
                         {% for CONDITION_STATE_E3 in CONDITION_ASSESSMENT_E14.CONDITION_STATE_E3 %}
-                            {% if 'DAMAGE_EXTENT_ESTIMATED_E16' in CONDITION_STATE_E3 %}
-                                {% for DISTURBANCE_EXTENT_TYPE_E55 in CONDITION_STATE_E3.DISTURBANCE_EXTENT_TYPE_E55 %}
-                                    <dd class="arches-report-subsection-item">
-                                        {{ DISTURBANCE_EXTENT_TYPE_E55.DISTURBANCE_EXTENT_TYPE_E55__value }} 
-                                    </dd>
-                
+                            {% if 'DAMAGE_EXTENT_EXTIMATED_E16' in CONDITION_STATE_E3 %}
+                                {% for DAMAGE_EXTENT_EXTIMATED_E16 in CONDITION_STATE_E3.DAMAGE_EXTENT_EXTIMATED_E16 %}
+                                    {% for DAMAGE_EXTENT_TYPE_E55 in DAMAGE_EXTENT_EXTIMATED_E16.DAMAGE_EXTENT_TYPE_E55 %}
+                                        <dd class="arches-report-subsection-item">
+                                            {{ DAMAGE_EXTENT_TYPE_E55.DAMAGE_EXTENT_TYPE_E55__value }} 
+                                        </dd>
+                                    {% endfor %}
                     
                                 {% endfor %}
-                            {% else %}
-                                 <dd class="arches-report-subsection-item">{% trans "No overall disturbance extent recorded" %}</dd>
                             {% endif %} 
                         {% endfor %}    
                     {% endif %}

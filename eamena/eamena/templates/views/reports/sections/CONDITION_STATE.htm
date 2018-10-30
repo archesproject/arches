@@ -5,7 +5,7 @@
             <dt>
                 <h5 id="" class="arches-report-subsection-title">{% trans "Overall condition of resource" %}</h5>
             </dt>
-
+            <dd class="arches-report-subsection-item hidden">{% trans "No overall condition recorded" %}</dd>
             {% if 'CONDITION_ASSESSMENT_E14'  in report_info.source.graph %}
                 {% for CONDITION_ASSESSMENT_E14 in report_info.source.graph.CONDITION_ASSESSMENT_E14 %}
                     {% if 'CONDITION_STATE_E3' in CONDITION_ASSESSMENT_E14 %}
@@ -15,9 +15,7 @@
                                     <dd class="arches-report-subsection-item">
                                         {{ OVERALL_CONDITION_STATE_TYPE_E55.OVERALL_CONDITION_STATE_TYPE_E55__value }} 
                                     </dd>
-                                {% endfor %}            
-                            {% else %}
-                                 <dd class="arches-report-subsection-item">{% trans "No overall condition recorded" %}</dd>
+                                {% endfor %}             
                             {% endif %}
                         {% endfor %}    
                     {% endif %}

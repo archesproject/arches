@@ -5,16 +5,18 @@
             <dt>
                 <h5 id="" class="arches-report-subsection-title">{% trans "Overall Archaeological Certainty" %}</h5>
             </dt>
-            {% for FEATURE_COLLECTION_E24 in report_info.source.graph.FEATURE_COLLECTION_E24 %}
-                {% if 'ARCHAEOLOGICAL_CERTAINTY_OBSERVATION_S4' not in FEATURE_COLLECTION_E24 %}
-                    <dd class="arches-report-subsection-item">
+                <dd class="arches-report-subsection-item hidden">
                         {% trans "No archaeological certainty recorded" %}
-                    </dd>
-                {% else %}
+                </dd>
+            {% for FEATURE_COLLECTION_E24 in report_info.source.graph.FEATURE_COLLECTION_E24 %}
+                {% if 'ARCHAEOLOGICAL_CERTAINTY_OBSERVATION_S4' in FEATURE_COLLECTION_E24 %}
+
                     {% for OVERALL_ARCHAEOLOGICAL_CERTAINTY_VALUE_I6 in FEATURE_COLLECTION_E24.ARCHAEOLOGICAL_CERTAINTY_OBSERVATION_S4 %}
-                        <dd class="arches-report-subsection-item">
-                            {{ SITE_OVERALL_ARCHAEOLOGICAL_CERTAINTY_VALUE_I6.SITE_OVERALL_ARCHAEOLOGICAL_CERTAINTY_VALUE_I6__value }} 
-                        </dd>
+                        {% for data in OVERALL_ARCHAEOLOGICAL_CERTAINTY_VALUE_I6.OVERALL_ARCHAEOLOGICAL_CERTAINTY_VALUE_I6 %}
+                            <dd class="arches-report-subsection-item">
+                                {{ data.OVERALL_ARCHAEOLOGICAL_CERTAINTY_VALUE_I6__value }}
+                            </dd>
+                        {% endfor %}
                     {% endfor %}            
                 {% endif %}
             {% endfor %}
