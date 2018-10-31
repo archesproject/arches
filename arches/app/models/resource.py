@@ -89,14 +89,14 @@ class Resource(models.ResourceInstance):
         Saves and indexes a single resource
 
         """
-        request = kwargs.pop('request', '')
-        user = kwargs.pop('user', '')
+        request = kwargs.pop('request', None)
+        user = kwargs.pop('user', None)
         super(Resource, self).save(*args, **kwargs)
         for tile in self.tiles:
             tile.resourceinstance_id = self.resourceinstanceid
             saved_tile = tile.save(request=request, index=False)
-        if request == '':
-            if user == '':
+        if request is None:
+            if user is None:
                 user = {}
         else:
             user = request.user
