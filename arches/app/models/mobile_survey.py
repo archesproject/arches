@@ -131,29 +131,21 @@ class MobileSurvey(models.MobileSurveyModel):
     def push_edits_to_db(self):
         # read all docs that have changes
         # save back to postgres db
-        #for row in couch.all_docs(db):
-            #if (row.doc['type'] == 'tile' and row.doc['provisionaledits']):
-                #print row.doc['provisionaledits']
-                #tile = Tile(row.doc)
-                #tile.save()
         db = self.couch.create_db('project_' + str(self.id))
         ret = []
         for row in self.couch.all_docs(db):
             ret.append(row)
             if row.doc['type'] == 'tile':
                 if row.doc['provisionaledits'] is not None:
-                    # Lookup Tile from Arches with that tileid
                     tile = Tile.objects.get(tileid=row.doc['tileid'])
-                    # Apply Loop through provisional edits on couch tile and apply to Arches tile
                     for u in row.doc['provisionaledits'].items():
-                        # If user is provisional user, apply as provisional edit
-                        # If user is reviewer, apply as authoritative edit
-                        tile.provisionaledits[u[0]]= u[1]
-                    # if tile.filter_by_perm(request.user, 'write_nodegroup'):
+                        tile.provisionaledits[u[0]] = u[1]
+                        # TODO: Only import provisionaledits if provisional value is different than authoritative value
+                        # TODO: If user is provisional user, apply as provisional edit
+                        # TODO: If user is reviewer, apply as authoritative edit
                     print('Tile {0} Saved'.format(row.doc['tileid']))
                     with transaction.atomic():
                         tile.save()
-                    # tile = models.TileModel.objects.get(pk=row.doc.tileid).update(**row.doc)
         return ret
 
     def collect_resource_instances_for_couch(self):
