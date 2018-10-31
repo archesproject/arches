@@ -134,14 +134,19 @@ class MobileSurvey(models.MobileSurveyModel):
         # save back to postgres db
         db = self.couch.create_db('project_' + str(self.id))
         ret = []
-        for row in db.view('_all_docs', include_docs=True):
+        for row in self.couch.all_docs(db):
             ret.append(row)
-            if 'tileid' in row.doc:
-                tile = Tile(row.doc)
-                #if tile.filter_by_perm(request.user, 'write_nodegroup'):
-                with transaction.atomic():
-                    tile.save()
-                #tile = models.TileModel.objects.get(pk=row.doc.tileid).update(**row.doc)
+            if row.doc['type'] == 'tile':
+                if row.doc['provisionaledits'] is not None:
+                    tile = Tile.objects.get(tileid=row.doc['tileid'])
+                    for u in row.doc['provisionaledits'].items():
+                        tile.provisionaledits[u[0]] = u[1]
+                        # TODO: Only import provisionaledits if provisional value is different than authoritative value
+                        # TODO: If user is provisional user, apply as provisional edit
+                        # TODO: If user is reviewer, apply as authoritative edit
+                    print('Tile {0} Saved'.format(row.doc['tileid']))
+                    with transaction.atomic():
+                        tile.save()
         return ret
 
     def collect_resource_instances_for_couch(self):
