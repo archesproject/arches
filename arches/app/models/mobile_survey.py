@@ -142,11 +142,17 @@ class MobileSurvey(models.MobileSurveyModel):
             ret.append(row)
             if row.doc['type'] == 'tile':
                 if row.doc['provisionaledits'] is not None:
-                    print row.doc['provisionaledits']
-                    tile = Tile(row.doc)
+                    # Lookup Tile from Arches with that tileid
+                    tile = Tile.objects.get(tileid=row.doc['tileid'])
+                    # Apply Loop through provisional edits on couch tile and apply to Arches tile
+                    for u in row.doc['provisionaledits'].items():
+                        # If user is provisional user, apply as provisional edit
+                        # If user is reviewer, apply as authoritative edit
+                        tile.provisionaledits[u[0]]= u[1]['value']
                     # if tile.filter_by_perm(request.user, 'write_nodegroup'):
+                    print('Tile {0} Saved'.format(row.doc['tileid']))
                     with transaction.atomic():
-                        tile.save()
+                        tile.save(index=False)
                     # tile = models.TileModel.objects.get(pk=row.doc.tileid).update(**row.doc)
         return ret
 
