@@ -90,6 +90,16 @@
 
 /* Report page CSS */
 
+.dataalert {
+	display: none;
+	
+}
+
+.content {
+	padding-top: 0px;
+    	padding-bottom: 0px;
+}
+
 .arches-report-section-header {
 	text-align: center;
 	margin-bottom: 10px;

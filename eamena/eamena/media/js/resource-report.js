@@ -108,7 +108,7 @@ require([
                     $(list).find('.empty-message').show();
                 }
             })
-
+            this.CheckForMissingData();
         },
 
         zoomToResource: function(resourceid){
@@ -174,6 +174,14 @@ require([
             };
 
             this.selectedFeatureLayer.getSource().addFeature(f.readFeature(feature, {featureProjection: 'EPSG:3857'}));
+        },
+        CheckForMissingData: function() {
+            var alerts = $('.dataalert');
+            $('.content').each(function(i, obj) {
+                if(!$.trim($(this).html())) {
+                    $(alerts[i]).show();
+                }
+            });
         }
     });
     new ReportView();
