@@ -5,9 +5,10 @@
             <dt>
                 <h5 id="" class="arches-report-subsection-title">{% trans "Overall Archaeological Certainty" %}</h5>
             </dt>
-                <dd class="arches-report-subsection-item hidden">
+                <dd class="arches-report-subsection-item dataalert">
                         {% trans "No archaeological certainty recorded" %}
                 </dd>
+            <div class = "content">
             {% for FEATURE_COLLECTION_E24 in report_info.source.graph.FEATURE_COLLECTION_E24 %}
                 {% if 'ARCHAEOLOGICAL_CERTAINTY_OBSERVATION_S4' in FEATURE_COLLECTION_E24 %}
 
@@ -20,7 +21,7 @@
                     {% endfor %}            
                 {% endif %}
             {% endfor %}
-
+            </div>
         </dl>
     </div>
 </div>

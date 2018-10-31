@@ -5,7 +5,8 @@
             <dt>
                 <h5 id="" class="arches-report-subsection-title">{% trans "Types of disturbances affecting the resource" %}</h5>
             </dt>
-                <dd class="arches-report-subsection-item hidden">{% trans "No disturbance assessment recorded" %}</dd>
+            <dd class="arches-report-subsection-item dataalert">{% trans "No disturbance assessment recorded" %}</dd>
+            <div class ="content">
             {% if 'CONDITION_ASSESSMENT_E14'  in report_info.source.graph %}
                 {% for CONDITION_ASSESSMENT_E14 in report_info.source.graph.CONDITION_ASSESSMENT_E14|dictsort:"orderby" %}
                     {% if 'CONDITION_STATE_E3' in CONDITION_ASSESSMENT_E14 %}
@@ -91,7 +92,7 @@
                     {% endif %}
                 {% endfor %}    
             {% endif %}
-
+            </div>
         </dl>
     </div>
 </div>
