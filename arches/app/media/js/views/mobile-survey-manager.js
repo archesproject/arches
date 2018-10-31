@@ -52,7 +52,8 @@ define([
                     groups: [],
                     bounds: null,
                     datadownloadconfig: {download:false, count:1000, resources:[], custom: null},
-                    tilecache: ''
+                    tilecache: '',
+                    onlinebasemap: ''
                 },
                 identities: data.identities
             }));

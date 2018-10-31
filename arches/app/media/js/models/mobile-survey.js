@@ -25,6 +25,7 @@ define([
             self.cards = ko.observableArray([]);
             self.datadownloadconfig = koMapping.fromJS(options.source.datadownloadconfig) || ko.observable();
             self.tilecache = ko.observable('');
+            self.onlinebasemap = ko.observable('');
             self.bounds = ko.observable(self.getDefaultBounds(null));
             self.collectedResources = ko.observable(false);
             self.showCustomDataDownload = ko.observable(false);
@@ -37,15 +38,15 @@ define([
             };
 
             self.setIdentityApproval = function() {
-                var groups = ko.unwrap(this.groups)
-                var users = ko.unwrap(this.users)
+                var groups = ko.unwrap(this.groups);
+                var users = ko.unwrap(this.users);
                 _.each(this.identities, function(item) {
                     item.approved(false);
                     if ((item.type === 'group' && _.contains(groups, item.id)) ||
                         (item.type === 'user' && _.contains(users, item.id))) {
                         item.approved(true);
                     }
-                })
+                });
             };
 
             _.each(this.identities, function(item) {
@@ -54,9 +55,9 @@ define([
                         if (!user.expanded) {
                             user.expanded = ko.observable(false);
                         }
-                    })
+                    });
                 }
-            })
+            });
 
             self.createdbyName = ko.computed(function() {
                 return getUserName(self.createdby());
@@ -64,6 +65,11 @@ define([
 
             self.lasteditedbyName = ko.computed(function() {
                 return getUserName(self.lasteditedby());
+            });
+
+            self.onlinebasemaps = ko.computed(function(){
+                var basemaps = {default: ko.unwrap(self.onlinebasemap)};
+                return basemaps;
             });
 
             self.userFilter = ko.observable('');
@@ -74,7 +80,7 @@ define([
                 this.selected = _.filter(self.identities, function(identity) {
                     return ko.unwrap(identity.selected);
                 });
-                var list = []
+                var list = [];
 
                 if (this.selected.length === 1) {
                     list = this.selected[0].users;
@@ -85,7 +91,7 @@ define([
 
                 return _.filter(list, function(user) {
                     if (user.username.startsWith(filter)) {
-                        return user
+                        return user;
                     }
                 });
 
@@ -102,33 +108,35 @@ define([
             });
 
 
+
+
             self.approvedUserNames = ko.computed(function() {
-                names = [];
+                var names = [];
                 _.each(self.identities, function(identity) {
                     if (identity.type === 'user' && identity.approved()) {
                         names.push(identity.name);
                     }
                 }, this);
                 return names;
-            })
+            });
 
             self.approvedGroupNames = ko.computed(function() {
-                names = [];
+                var names = [];
                 _.each(self.identities, function(identity) {
                     if (identity.type === 'group' && identity.approved()) {
                         names.push(identity.name);
                     }
                 }, this);
                 return names;
-            })
+            });
 
             self.hasIdentity = function() {
                 var approved = false;
                 var identity = self.selectedIdentity();
                 if (identity) {
-                    approved = identity.approved()
+                    approved = identity.approved();
                 }
-                return approved
+                return approved;
             };
 
             self.toggleIdentity = function() {
@@ -142,14 +150,14 @@ define([
                         } else {
                             identity.approved(false);
                             _.chain(self.identities).filter(function(id) {
-                                return id.type === 'user' && _.contains(_.pluck(this.selectedIdentity().users, 'id'), id.id)
+                                return id.type === 'user' && _.contains(_.pluck(this.selectedIdentity().users, 'id'), id.id);
                             }, this).each(function(user) {
                                 if (_.intersection(user.group_ids, self.groups()).length === 0) { // user does not belong to any accepted groups
                                     user.approved(false);
                                     self.users.remove(user.id);
                                 }
-                            })
-                        };
+                            });
+                        }
                     } else {
                         if (!_.contains(currentIdentities(), identity.id)) {
                             currentIdentities.push(identity.id);
@@ -160,7 +168,7 @@ define([
                         } else {
                             _.chain(self.identities).filter(function(id) {
                                 var identity = identity;
-                                return id.type === 'user'
+                                return id.type === 'user';
                             }).each(function(user) {
                                 if (_.intersection(user.group_ids, self.groups()).length > 0) {
                                     user.approved(true);
@@ -168,62 +176,62 @@ define([
                                         self.users.push(user.id);
                                     }
                                 }
-                            })
+                            });
                         }
-                    };
-                };
+                    }
+                }
             };
 
             self.updateResourceDownloadList = function(val){
                 if (_.contains(self.datadownloadconfig.resources(), val.id)) {
-                    self.datadownloadconfig.resources.remove(val.id)
+                    self.datadownloadconfig.resources.remove(val.id);
                 } else {
-                    self.datadownloadconfig.resources.push(val.id)
+                    self.datadownloadconfig.resources.push(val.id);
                 }
-            }
+            };
 
             self.updateCards = function(cards) {
                 var approvedCards = _.chain(cards)
-                .filter(function(card){
-                    if (card.approved()) {
-                        return card.cardid
-                    }
-                })
-                .pluck('cardid').value()
-                var diff = _.difference(self.cards(), approvedCards)
-                self.cards(_.union(diff, approvedCards))
-            }
+                    .filter(function(card){
+                        if (card.approved()) {
+                            return card.cardid;
+                        }
+                    })
+                    .pluck('cardid').value();
+                var diff = _.difference(self.cards(), approvedCards);
+                self.cards(_.union(diff, approvedCards));
+            };
 
             self.updateApproved = function(val){
                 val.item.approved(true);
-                self.updateCards(val.targetParent())
+                self.updateCards(val.targetParent());
             };
 
             self.updateUnapproved = function(val){
                 val.item.approved(false);
-                self.cards.remove(val.item.cardid)
+                self.cards.remove(val.item.cardid);
             };
 
             self.addAllCardsByResource = function(val) {
-                var resource = val.resourceList.selected()
+                var resource = val.resourceList.selected();
                 _.each(resource.cards(), function(card){
-                    card.approved(true)
-                })
-                self.updateCards(resource.cards())
-            }
+                    card.approved(true);
+                });
+                self.updateCards(resource.cards());
+            };
 
             self.removeAllCardsByResource = function(val) {
-                var resource = val.resourceList.selected()
+                var resource = val.resourceList.selected();
                 _.each(resource.cards(), function(card){
                     card.approved(false);
-                    self.cards.remove(card.cardid)
-                })
-            }
+                    self.cards.remove(card.cardid);
+                });
+            };
 
             self.toggleShowDetails = function() {
                 self.setIdentityApproval();
-                self.showDetails(!self.showDetails())
-            }
+                self.showDetails(!self.showDetails());
+            };
 
             self.parse(options.source);
             self.setIdentityApproval();
@@ -241,9 +249,10 @@ define([
                     cards: self.cards,
                     bounds: self.bounds,
                     tilecache: self.tilecache,
+                    onlinebasemaps: ko.unwrap(self.onlinebasemaps),
                     datadownloadconfig: koMapping.toJS(self.datadownloadconfig)
                 });
-                return JSON.stringify(_.extend(JSON.parse(self._mobilesurvey()), jsObj))
+                return JSON.stringify(_.extend(JSON.parse(self._mobilesurvey()), jsObj));
             });
 
             self.dirty = ko.computed(function() {
@@ -252,28 +261,28 @@ define([
         },
 
         getDefaultBounds: function(geojson) {
-            result = geojson;
+            var result = geojson;
             if (!geojson) {
-                var fc = {"type": "FeatureCollection", "features": []}
+                var fc = {"type": "FeatureCollection", "features": []};
                 var geomFactory = function(coords){
                     return { "type": "Feature",
-                                "geometry": {
-                                    "type": "Polygon",
-                                    "coordinates": coords
-                                },
-                                "properties": {}
-                            };
-                        }
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": coords
+                        },
+                        "properties": {}
+                    };
+                };
                 //TODO: make the true project boundry available in the arches object rather than just the hexBinBounds
                 //and use the true bounds here instead of the hexBinBounds.
-                var extent = arches.hexBinBounds
+                var extent = arches.hexBinBounds;
                 var coords = [[
                     [extent[0], extent[1]],
                     [extent[2], extent[1]],
                     [extent[2], extent[3]],
                     [extent[0], extent[3]],
                     [extent[0], extent[1]]
-                ]]
+                ]];
                 fc.features.push(geomFactory(coords));
                 result = fc;
             }
@@ -294,6 +303,7 @@ define([
             self.users(source.users);
             self.cards(source.cards);
             self.tilecache(source.tilecache);
+            self.onlinebasemap(source.onlinebasemaps ? source.onlinebasemaps['default'] : source.onlinebasemaps);
             self.bounds(self.getDefaultBounds(source.bounds));
             self.set('id', source.id);
         },

@@ -16,6 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import uuid
 import json
 import couchdb
+import urlparse
 from copy import copy, deepcopy
 from django.db import transaction
 from arches.app.models import models
@@ -51,6 +52,7 @@ class MobileSurvey(models.MobileSurveyModel):
         # self.description = models.TextField(null=True)
         # self.bounds = models.MultiPolygonField(null=True)
         # self.tilecache = models.TextField(null=True)
+        # self.onlinebasemaps = JSONField(blank=True, null=True, db_column='onlinebasemaps')
         # self.datadownloadconfig = JSONField(blank=True, null=True, default='{"download":false, "count":1000, "resources":[]}')
         # end from models.MobileSurvey
 
@@ -59,7 +61,6 @@ class MobileSurvey(models.MobileSurveyModel):
     def save(self):
         super(MobileSurvey, self).save()
         db = self.couch.create_db('project_' + str(self.id))
-
         # need to serialize to JSON and then back again because UUID's
         # cause the couch update_doc method to throw an error
         survey = JSONSerializer().serialize(self)
@@ -75,7 +76,7 @@ class MobileSurvey(models.MobileSurveyModel):
 
     def serialize(self, fields=None, exclude=None):
         """
-        serialize to a different form then used by the internal class structure
+        serialize to a different form than used by the internal class structure
         used to append additional values (like parent ontology properties) that
         internal objects (like models.Nodes) don't support
         """
