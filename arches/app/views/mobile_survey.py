@@ -86,6 +86,7 @@ class MobileSurveyManagerView(MapBaseManagerView):
         for mobile_survey in mobile_surveys:
             try:
                 mobile_survey['datadownloadconfig'] = json.loads(mobile_survey['datadownloadconfig'])
+                mobile_survey['onlinebasemaps'] = json.loads(mobile_survey['onlinebasemaps'])
             except TypeError:
                 pass
             multipart = mobile_survey['bounds']
@@ -194,6 +195,7 @@ class MobileSurveyManagerView(MapBaseManagerView):
                 self.notify_mobile_survey_end(request, mobile_survey)
         mobile_survey.name = data['name']
         mobile_survey.description = data['description']
+        mobile_survey.onlinebasemaps = data['onlinebasemaps']
         if data['startdate'] != '':
             mobile_survey.startdate = data['startdate']
         if data['enddate'] != '':

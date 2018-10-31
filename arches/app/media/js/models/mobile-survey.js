@@ -25,6 +25,7 @@ define([
             self.cards = ko.observableArray([]);
             self.datadownloadconfig = koMapping.fromJS(options.source.datadownloadconfig) || ko.observable();
             self.tilecache = ko.observable('');
+            self.onlinebasemap = ko.observable('');
             self.bounds = ko.observable(self.getDefaultBounds(null));
             self.collectedResources = ko.observable(false);
             self.showCustomDataDownload = ko.observable(false);
@@ -64,6 +65,11 @@ define([
 
             self.lasteditedbyName = ko.computed(function() {
                 return getUserName(self.lasteditedby());
+            });
+
+            self.onlinebasemaps = ko.computed(function(){
+                var basemaps = {default: ko.unwrap(self.onlinebasemap)};
+                return basemaps;
             });
 
             self.userFilter = ko.observable('');
@@ -243,6 +249,7 @@ define([
                     cards: self.cards,
                     bounds: self.bounds,
                     tilecache: self.tilecache,
+                    onlinebasemaps: ko.unwrap(self.onlinebasemaps),
                     datadownloadconfig: koMapping.toJS(self.datadownloadconfig)
                 });
                 return JSON.stringify(_.extend(JSON.parse(self._mobilesurvey()), jsObj));
@@ -296,6 +303,7 @@ define([
             self.users(source.users);
             self.cards(source.cards);
             self.tilecache(source.tilecache);
+            self.onlinebasemap(source.onlinebasemaps ? source.onlinebasemaps['default'] : source.onlinebasemaps);
             self.bounds(self.getDefaultBounds(source.bounds));
             self.set('id', source.id);
         },
