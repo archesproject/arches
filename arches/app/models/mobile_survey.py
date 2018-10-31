@@ -148,11 +148,11 @@ class MobileSurvey(models.MobileSurveyModel):
                     for u in row.doc['provisionaledits'].items():
                         # If user is provisional user, apply as provisional edit
                         # If user is reviewer, apply as authoritative edit
-                        tile.provisionaledits[u[0]]= u[1]['value']
+                        tile.provisionaledits[u[0]]= u[1]
                     # if tile.filter_by_perm(request.user, 'write_nodegroup'):
                     print('Tile {0} Saved'.format(row.doc['tileid']))
                     with transaction.atomic():
-                        tile.save(index=False)
+                        tile.save()
                     # tile = models.TileModel.objects.get(pk=row.doc.tileid).update(**row.doc)
         return ret
 
