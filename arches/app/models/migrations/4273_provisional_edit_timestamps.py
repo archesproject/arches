@@ -15,16 +15,23 @@ class Migration(migrations.Migration):
         ('models', '4264_online_msm_basemap'),
     ]
 
+    local = pytz.timezone(settings.TIME_ZONE)
+    utc = pytz.utc
+    old_date_format = '%Y-%m-%d %H:%M:%S.%f'
+    new_date_format = '%Y-%m-%dT%H:%M:%S.%fZ'
+    TileModel = apps.get_model("models", "TileModel")
+
 
     def forwards_func():
-        tz = pytz.timezone(settings.TIME_ZONE)
-        utc = pytz.utc
-        TileModel = apps.get_model("models", "TileModel")
+
         tiles_w_provisional_edits = TileModel.objects.filter(provisionaledits__isnull = False)
         for tile in tiles_w_provisional_edits:
             for k, v in iter(tile.provisionaledits.items()):
-                print v['timestamp']
-                # datetime.now(tz).astimezone(utc)
+                naive_timestamp = datetime.strptime(v['timestamp'], format)
+                local_datetime = local.localize(naive_timestamp)
+                utc_datetime = local_datetime.astimezone(utc)
+                v['timestamp'] = utc_datetime.strftime(new_date_format)
+            tile.save()
 
     def reverse_func():
         pass
