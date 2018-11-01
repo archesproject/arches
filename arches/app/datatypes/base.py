@@ -266,3 +266,35 @@ class BaseDataType(object):
         Updates files
         """
         pass
+
+    def to_rdf(self, domainnode, rangenode, edge, tile, 
+               domain_tile_data, range_tile_data):
+        """
+        Outputs an inmemory graph, converting the range tile data JSON into
+        an appropriate RDF representation using rdflib
+        """
+
+        # default implementation that encodes the JSON serialisation
+        # as a literal string, linked by 'RDF.value' to the source node
+        # for this tile data
+        from rdflib import Namespace, URIRef, Literal, Graph, BNode
+        from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS
+
+        g = Graph()
+
+        g.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
+        g.add((domainnode, URIRef(edge.ontologyproperty), rangenode))
+
+        g.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
+
+        if domain_tile_data != None:
+            g.add((domainnode, 
+                   RDF.value, 
+                   Literal(JSONSerializer().serialize(domain_tile_data))))
+
+        if range_tile_data != None:
+            g.add((rangenode, 
+                   RDF.value, 
+                   Literal(JSONSerializer().serialize(range_tile_data))))
+
+        return g
