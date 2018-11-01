@@ -244,11 +244,15 @@ class Resource(models.ResourceInstance):
         """
 
         permit_deletion = False
-        user_is_reviewer = user.groups.filter(name='Resource Reviewer').exists()
-        if user_is_reviewer is False:
-            tiles = list(models.TileModel.objects.filter(resourceinstance=self))
-            resource_is_provisional = True if sum([len(t.data) for t in tiles]) == 0 else False
-            if resource_is_provisional is True:
+
+        if user != {}:
+            user_is_reviewer = user.groups.filter(name='Resource Reviewer').exists()
+            if user_is_reviewer is False:
+                tiles = list(models.TileModel.objects.filter(resourceinstance=self))
+                resource_is_provisional = True if sum([len(t.data) for t in tiles]) == 0 else False
+                if resource_is_provisional is True:
+                    permit_deletion = True
+            else:
                 permit_deletion = True
         else:
             permit_deletion = True
