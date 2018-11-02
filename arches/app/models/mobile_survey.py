@@ -168,7 +168,7 @@ class MobileSurvey(models.MobileSurveyModel):
                                         if user_edits[1]['timestamp'] > tile.provisionaledits[user_edits[0]]['timestamp']:
                                             # If the mobile user edits are newer by UTC timestamp, overwrite the tile data
                                             tile.provisionaledits[user_edits[0]] = user_edits[1]
-                                #remove conflicted revision from couch
+                                # Remove conflicted revision from couch
                                 db.delete(conflict_data)
 
                             # TODO: If user is provisional user, apply as provisional edit
