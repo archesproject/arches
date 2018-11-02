@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
         local_date_format = '%Y-%m-%d %H:%M:%S.%f'
         utc_date_format = '%Y-%m-%dT%H:%M:%S.%fZ'
         TileModel = apps.get_model("models", "TileModel")
-        tiles_w_provisional_edits = TileModel.objects.filter(provisionaledits__isnull = False)
+        tiles_w_provisional_edits = TileModel.objects.filter(provisionaledits__isnull=False)
         for tile in tiles_w_provisional_edits:
             for k, v in iter(tile.provisionaledits.items()):
                 naive_timestamp = datetime.strptime(v['timestamp'], local_date_format)
@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
         local_date_format = '%Y-%m-%d %H:%M:%S.%f'
         utc_date_format = '%Y-%m-%dT%H:%M:%S.%fZ'
         TileModel = apps.get_model("models", "TileModel")
-        tiles_w_provisional_edits = TileModel.objects.filter(provisionaledits__isnull = False)
+        tiles_w_provisional_edits = TileModel.objects.filter(provisionaledits__isnull=False)
         for tile in tiles_w_provisional_edits:
             for k, v in iter(tile.provisionaledits.items()):
                 naive_timestamp = datetime.strptime(v['timestamp'], utc_date_format)
