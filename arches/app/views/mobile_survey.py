@@ -216,6 +216,15 @@ class MobileSurveyManagerView(MapBaseManagerView):
                 for coord in feature['geometry']['coordinates']:
                     polygons.append(Polygon(coord))
 
+        elif len(polygons) == 0:
+            try:
+                if data['bounds']['type'] == 'MultiPolygon':
+                    for poly in data['bounds']['coordinates']:
+                        for coords in poly:
+                            polygons.append(Polygon(coords))
+            except AttributeError:
+                print('bounds is not a geojson geometry object')
+
         mobile_survey.bounds = MultiPolygon(polygons)
         mobile_survey.lasteditedby = self.request.user
 
