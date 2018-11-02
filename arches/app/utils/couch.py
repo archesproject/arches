@@ -48,12 +48,15 @@ class Couch(object):
         except:
             db[doc_id] = doc
 
-    def read_doc(self, db, doc_id):
-        doc = db.get(doc_id)
+    def read_doc(self, db, doc_id, rev=None):
+        if rev is None:
+            doc = db.get(doc_id)
+        else:
+            doc = db.get(doc_id, rev)
         if doc is not None:
             return doc
         else:
             return False
 
     def all_docs(self, db):
-        return db.view('_all_docs', include_docs=True)
+        return db.view('_all_docs', include_docs=True, conflicts=True)
