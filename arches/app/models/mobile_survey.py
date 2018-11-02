@@ -175,6 +175,9 @@ class MobileSurvey(models.MobileSurveyModel):
                     print('Tile {0} Saved'.format(row.doc['tileid']))
                     with transaction.atomic():
                         tile.save()
+                        tile_serialized = json.loads(JSONSerializer().serialize(tile))
+                        tile_serialized['type'] = 'tile'
+                        self.couch.update_doc(db, tile_serialized, tile_serialized['tileid'])
                         db.compact()
         return ret
 
