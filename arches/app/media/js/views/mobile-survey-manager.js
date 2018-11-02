@@ -25,17 +25,17 @@ define([
                 pageView.viewModel.alert(new AlertViewModel('ep-alert-red', data.responseJSON.title, data.responseJSON.message));
             }
             self.loading(false);
-        })
+        });
     };
 
     viewModel.discardEdits = function() {
         if (!this.selectedMobileSurvey().get('id')) {
-            this.selectedMobileSurvey(null)
+            this.selectedMobileSurvey(null);
         } else {
-            this.resourceList.resetCards(this.selectedMobileSurvey().get('source').cards)
+            this.resourceList.resetCards(this.selectedMobileSurvey().get('source').cards);
             this.selectedMobileSurvey().reset();
         }
-    }
+    };
 
     viewModel.newMobileSurvey = function() {
         if (!this.selectedMobileSurvey() || !this.selectedMobileSurvey().dirty()) {
@@ -58,15 +58,15 @@ define([
                 identities: data.identities
             }));
         }
-    }
+    };
 
     viewModel.deleteMobileSurvey = function(mobilesurvey){
         if (!mobilesurvey.active()) {
             var self = this;
             pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmSurveyDelete.title, arches.confirmSurveyDelete.text, function() {
                 return;
-            }, function(a){
-                self.loading(true)
+            }, function(){
+                self.loading(true);
                 if (mobilesurvey) {
                     mobilesurvey.delete(function(data){
                         if (data.responseJSON.success){
@@ -79,21 +79,21 @@ define([
                         }
                         self.loading(false);
                     });
-                };
+                }
             }));
         }
-    }
+    };
 
     viewModel.deleteSelectedMobileSurvey = function(){
         if (this.selectedMobileSurvey()) {
-            this.deleteMobileSurvey(this.selectedMobileSurvey())
-        };
-    }
+            this.deleteMobileSurvey(this.selectedMobileSurvey());
+        }
+    };
 
     if (viewModel.mobilesurveys().length === 0) {
-        viewModel.newMobileSurvey()
+        viewModel.newMobileSurvey();
     } else {
-        viewModel.selectedMobileSurvey(viewModel.mobilesurveys()[0])
+        viewModel.selectedMobileSurvey(viewModel.mobilesurveys()[0]);
     }
 
     var pageView = new BaseManagerView({
