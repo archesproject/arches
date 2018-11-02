@@ -29,6 +29,8 @@ TEST_ROOT = os.path.normpath(os.path.join(ROOT_DIR, '..', 'tests'))
 SEARCH_BACKEND = 'tests.base_test.TestSearchEngine'
 
 RESOURCE_GRAPH_LOCATIONS = (os.path.join(TEST_ROOT, 'fixtures', 'resource_graphs'),)
+TEST_PACKAGE = os.path.join(TEST_ROOT, 'fixtures', 'arches-test-pkg')
+APP_ROOT = TEST_ROOT
 
 ONTOLOGY_FIXTURES = os.path.join(TEST_ROOT, 'fixtures', 'ontologies')
 
