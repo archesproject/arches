@@ -24,6 +24,7 @@ Replace this with more appropriate tests for your application.
 """
 
 import os
+import json
 from django.core import management
 from tests import test_settings as settings
 from tests.base_test import ArchesTestCase
@@ -34,6 +35,7 @@ from django.test import RequestFactory
 from django.test.client import RequestFactory, Client
 from arches.app.views.auth import LoginView, GetTokenView
 from arches.app.views.concept import RDMView
+from arches.app.views.mobile_survey import MobileSurveyManagerView
 from arches.app.utils.middleware import SetAnonymousUser
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.management.commands.packages import Command as PackageCommand
@@ -45,7 +47,6 @@ from arches.app.models.models import GraphModel
 
 class MobileSurveyManagerTests(ArchesTestCase):
     def setUp(self):
-
         management.call_command('packages', operation='load_package', source=settings.TEST_PACKAGE, yes='y', setup_db=False)
         self.factory = RequestFactory()
         self.client = Client()
@@ -67,3 +68,13 @@ class MobileSurveyManagerTests(ArchesTestCase):
 
         """
         self.assertTrue(0 < GraphModel.objects.all())
+
+    def test_save_mobile_survey(self):
+        self.factory = RequestFactory()
+        self.client.login(username='admin', password='admin')
+        json_path = os.path.join(settings.TEST_ROOT, 'fixtures', 'mobile_surveys', 'test-package-msm.json')
+        with open(json_path) as f:
+            mobile_survey = json.load(f)
+        url = reverse('mobile_survey_manager')
+        response = self.client.post(url, json.dumps(mobile_survey), 'application/json')
+        self.assertTrue(response.status_code == 200)
