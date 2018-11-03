@@ -52,9 +52,9 @@ def _handle_resource_instance(graph, domainnode, rangenode, edge, tile,
     if edge.domainnode.istopnode:
         graph.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
 
-    # should really assert that the range_tile_data is a string and a valid resource
-    # instance UUID
-    _append_resource_node(graph, domainnode, edge, range_tile_data)
+    if range_tile_data is not None:
+        # instance UUID
+        _append_resource_node(graph, domainnode, edge, range_tile_data)
 
 
 def _handle_resource_instance_list(graph, domainnode, rangenode, edge, tile, 
