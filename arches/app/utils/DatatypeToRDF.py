@@ -14,7 +14,9 @@ def _handle_number(graph, domainnode, rangenode, edge, tile,
                    domain_tile_data, range_tile_data, graph_uri):
 
     graph.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
-    graph.add((domainnode, URIRef(edge.ontologyproperty), Literal(range_tile_data)))
+    # Check if actually an int in disguise
+    rtd = int(range_tile_data) if range_tile_data.is_integer() else range_tile_data
+    graph.add((domainnode, URIRef(edge.ontologyproperty), Literal(rtd)))
 
 def _handle_boolean(graph, domainnode, rangenode, edge, tile, 
                     domain_tile_data, range_tile_data, graph_uri):
@@ -61,8 +63,9 @@ def _handle_resource_instance_list(graph, domainnode, rangenode, edge, tile,
     if edge.domainnode.istopnode:
         graph.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
 
-    for r in range_tile_data:
-        _append_resource_node(graph, domainnode, edge, r)
+    if range_tile_data:
+        for r in range_tile_data:
+            _append_resource_node(graph, domainnode, edge, r)
 
 def _append_concept_node(graph, domainnode, edge, concept_value_id):
     info = {}
@@ -98,8 +101,9 @@ def _handle_concept_list(graph, domainnode, rangenode, edge, tile,
                          domain_tile_data, range_tile_data, graph_uri):
     if edge.domainnode.istopnode:
         graph.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
-    for r in range_tile_data:
-        _append_concept_node(graph, domainnode, edge, str(r))
+    if range_tile_data:
+        for r in range_tile_data:
+            _append_concept_node(graph, domainnode, edge, str(r))
 
 def _get_aat_refs(graph):
        unit_nt = """
@@ -185,7 +189,8 @@ def _handle_geojson_feature_collection(graph, domainnode, rangenode, edge, tile,
 
 def _handle_semantic(graph, domainnode, rangenode, edge, tile, 
                      domain_tile_data, range_tile_data, graph_uri):
-    pass
+    return _handle__default(graph, domainnode, rangenode, edge, tile,
+      domain_tile_data, range_tile_data, graph_uri)
 
 def _handle_csv_chart_json(graph, domainnode, rangenode, edge, tile,
                     domain_tile_data, range_tile_data, graph_uri):
@@ -228,7 +233,7 @@ def _handle__default(graph, domainnode, rangenode, edge, tile,
                RDF.value, 
                Literal(JSONSerializer().serialize(range_tile_data))))
 
-_output_mapping = {#"semantic": _handle_semantic,
+_output_mapping = {"semantic": _handle_semantic,
                    "number": _handle_number,
                    "boolean": _handle_boolean,
                    "string": _handle_string,
