@@ -121,24 +121,37 @@ class ConceptDataType(BaseConceptDataType):
     def to_rdf(self, domainnode, rangenode, edge, tile, 
                domain_tile_data, range_tile_data):
         g = Graph()
+        # logic: No data -> empty graph
+        #        concept_id, but no value -> node linked to class of Concept, no label
+        #        value but no concept_id -> node linked to BNode, labelled
+        #        concept_id + value -> normal expected functionality
+        if range_tile_data is not None:
+            c = ConceptValue(str(range_tile_data))
 
-        info = {}
-        c = ConceptValue(concept_value_id)
-        info['concept_id'] = c.conceptid
-        info['lang'] = c.language
-        info['label'] = c.value
+            # Use the conceptid URI rather than the pk for the ConceptValue
+            try:
+                assert c.concept_id is not None, "Null concept_id"
+                rangenode = URIRef(archesproject['concepts/%s' % c.concept_id])
+                g.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
+                g.add((domainnode, URIRef(edge.ontologyproperty), rangenode))
+            except:
+                # FIXME find out the correct Error that Django throws if this fails
+                rangenode = BNode()
+                if c.value:
+                    g.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
+                    g.add((domainnode, URIRef(edge.ontologyproperty), rangenode))
+                    #g.add((rangenode, URIRef(RDFS.label), Literal(c.value)))
 
-        # Use the conceptid URI rather than the pk for the ConceptValue
-        rangenode = URIRef(archesproject['concepts/%s' % info['concept_id']] )
+            try:
+                assert c.value is not None, "Null or blank concept value"
+                g.add((rangenode, URIRef(RDFS.label), Literal(c.value)))
+            except:
+                pass
 
-        g.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
-        g.add((domainnode, URIRef(edge.ontologyproperty), rangenode))
+            # FIXME: Add the language back in, once pyld fixes its problem with uppercase lang
+            # tokens -> https://github.com/digitalbazaar/pyld/issues/86
+            #graph.add((rangenode, URIRef(RDFS.label), Literal(info['label'], lang=info['lang'])))
 
-        # FIXME: Add the language back in, once pyld fixes its problem with uppercase lang
-        # tokens -> https://github.com/digitalbazaar/pyld/issues/86
-        #graph.add((rangenode, URIRef(RDFS.label), Literal(info['label'], lang=info['lang'])))
-
-        g.add((rangenode, URIRef(RDFS.label), Literal(info['label'])))
         return g
 
 class ConceptListDataType(BaseConceptDataType):
