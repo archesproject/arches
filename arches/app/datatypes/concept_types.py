@@ -9,6 +9,11 @@ from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term
 from arches.app.utils.date_utils import ExtendedDateFormat
 from django.core.exceptions import ObjectDoesNotExist
 
+# for the RDF graph export helper functions
+from rdflib import Namespace, URIRef, Literal, Graph, BNode
+from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS
+archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
+cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
 
 class BaseConceptDataType(BaseDataType):
     def __init__(self, model=None):
@@ -113,6 +118,28 @@ class ConceptDataType(BaseConceptDataType):
         except KeyError, e:
             pass
 
+    def to_rdf(self, domainnode, rangenode, edge, tile, 
+               domain_tile_data, range_tile_data):
+        g = Graph()
+
+        info = {}
+        c = ConceptValue(concept_value_id)
+        info['concept_id'] = c.conceptid
+        info['lang'] = c.language
+        info['label'] = c.value
+
+        # Use the conceptid URI rather than the pk for the ConceptValue
+        rangenode = URIRef(archesproject['concepts/%s' % info['concept_id']] )
+
+        g.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
+        g.add((domainnode, URIRef(edge.ontologyproperty), rangenode))
+
+        # FIXME: Add the language back in, once pyld fixes its problem with uppercase lang
+        # tokens -> https://github.com/digitalbazaar/pyld/issues/86
+        #graph.add((rangenode, URIRef(RDFS.label), Literal(info['label'], lang=info['lang'])))
+
+        g.add((rangenode, URIRef(RDFS.label), Literal(info['label'])))
+        return g
 
 class ConceptListDataType(BaseConceptDataType):
     def validate(self, value, row_number=None, source=''):
@@ -160,3 +187,12 @@ class ConceptListDataType(BaseConceptDataType):
 
         except KeyError, e:
             pass
+
+    def to_rdf(self, domainnode, rangenode, edge, tile, 
+               domain_tile_data, range_tile_data):
+        g = Graph()
+        c = ConceptDataType()
+        for r in range_tile_data:
+            g += c.to_rdf(domainnode, rangenode, edge, tile,
+                domain_tile_data, r)
+        return g
