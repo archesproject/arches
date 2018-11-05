@@ -270,7 +270,7 @@ class BaseDataType(object):
     def to_rdf(self, domainnode, rangenode, edge, tile, 
                domain_tile_data, range_tile_data):
         """
-        Outputs an inmemory graph, converting the range tile data JSON into
+        Outputs an in-memory graph, converting the range tile data JSON into
         an appropriate RDF representation using rdflib
         """
 
