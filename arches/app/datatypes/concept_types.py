@@ -119,8 +119,7 @@ class ConceptDataType(BaseConceptDataType):
         except KeyError, e:
             pass
 
-    def to_rdf(self, domainnode, rangenode, edge, tile, 
-               domain_tile_data, range_tile_data):
+    def to_rdf(self, domainnode, rangenode, edge, tile, domain_tile_data, range_tile_data):
         g = Graph()
         # logic: No data -> empty graph
         #        concept_id, but no value -> node linked to class of Concept, no label
@@ -141,8 +140,6 @@ class ConceptDataType(BaseConceptDataType):
                 if c.value:
                     g.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
                     g.add((domainnode, URIRef(edge.ontologyproperty), rangenode))
-                    #g.add((rangenode, URIRef(RDFS.label), Literal(c.value)))
-
             try:
                 assert c.value is not None, "Null or blank concept value"
                 g.add((rangenode, URIRef(RDFS.label), Literal(c.value)))
@@ -151,7 +148,7 @@ class ConceptDataType(BaseConceptDataType):
 
             # FIXME: Add the language back in, once pyld fixes its problem with uppercase lang
             # tokens -> https://github.com/digitalbazaar/pyld/issues/86
-            #graph.add((rangenode, URIRef(RDFS.label), Literal(info['label'], lang=info['lang'])))
+            # graph.add((rangenode, URIRef(RDFS.label), Literal(info['label'], lang=info['lang'])))
 
         return g
 
@@ -202,11 +199,9 @@ class ConceptListDataType(BaseConceptDataType):
         except KeyError, e:
             pass
 
-    def to_rdf(self, domainnode, rangenode, edge, tile, 
-               domain_tile_data, range_tile_data):
+    def to_rdf(self, domainnode, rangenode, edge, tile, domain_tile_data, range_tile_data):
         g = Graph()
         c = ConceptDataType()
         for r in range_tile_data:
-            g += c.to_rdf(domainnode, rangenode, edge, tile,
-                domain_tile_data, r)
+            g += c.to_rdf(domainnode, rangenode, edge, tile, domain_tile_data, r)
         return g
