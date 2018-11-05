@@ -169,8 +169,9 @@ class NumberDataType(BaseDataType):
         # returns an in-memory graph object, containing the domain resource, its
         # type and the number as a numeric literal (as this is how it is in the JSON)
         g = Graph()
+        rtd = int(range_tile_data) if range_tile_data.is_integer() else range_tile_data
         g.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
-        g.add((domainnode, URIRef(edge.ontologyproperty), Literal(range_tile_data)))
+        g.add((domainnode, URIRef(edge.ontologyproperty), Literal(rtd)))
         return g
 
 class BooleanDataType(BaseDataType):
@@ -1391,9 +1392,10 @@ class ResourceInstanceDataType(BaseDataType):
     def to_rdf(self, domainnode, rangenode, edge, tile, 
                domain_tile_data, range_tile_data):
         g = Graph()
-        rangenode = URIRef(archesproject['resources/%s' % resource_inst])
-        g.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
-        g.add((domainnode, URIRef(edge.ontologyproperty), rangenode))
+        if range_tile_data is not None:
+            rangenode = URIRef(archesproject['resources/%s' % resource_inst])
+            g.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
+            g.add((domainnode, URIRef(edge.ontologyproperty), rangenode))
         return g
 
 class NodeValueDataType(BaseDataType):
