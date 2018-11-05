@@ -24,7 +24,7 @@ from django.db import connection, transaction
 from elasticsearch import Elasticsearch
 from edtf import parse_edtf
 
-# One benefit of shifting to python3.x would be to use 
+# One benefit of shifting to python3.x would be to use
 # importlib.util.LazyLoader to load rdflib (and other lesser
 # used but memory soaking libs)
 from rdflib import Namespace, URIRef, Literal, Graph, BNode
@@ -117,8 +117,7 @@ class StringDataType(BaseDataType):
         except KeyError, e:
             pass
 
-    def to_rdf(self, domainnode, rangenode, edge, tile, 
-               domain_tile_data, range_tile_data):
+    def to_rdf(self, domainnode, rangenode, edge, tile, domain_tile_data, range_tile_data):
         # returns an in-memory graph object, containing the domain resource, its
         # type and the string as a string literal
         g = Graph()
@@ -164,8 +163,7 @@ class NumberDataType(BaseDataType):
         except KeyError, e:
             pass
 
-    def to_rdf(self, domainnode, rangenode, edge, tile, 
-               domain_tile_data, range_tile_data):
+    def to_rdf(self, domainnode, rangenode, edge, tile, domain_tile_data, range_tile_data):
         # returns an in-memory graph object, containing the domain resource, its
         # type and the number as a numeric literal (as this is how it is in the JSON)
         g = Graph()
@@ -200,8 +198,7 @@ class BooleanDataType(BaseDataType):
         except KeyError, e:
             pass
 
-    def to_rdf(self, domainnode, rangenode, edge, tile, 
-               domain_tile_data, range_tile_data):
+    def to_rdf(self, domainnode, rangenode, edge, tile, domain_tile_data, range_tile_data):
         # returns an in-memory graph object, containing the domain resource, its
         # type and the number as a numeric literal (as this is how it is in the JSON)
         g = Graph()
@@ -278,8 +275,7 @@ class DateDataType(BaseDataType):
         if config is not None:
             cache.delete('time_wheel_config_anonymous')
 
-    def to_rdf(self, domainnode, rangenode, edge, tile, 
-               domain_tile_data, range_tile_data):
+    def to_rdf(self, domainnode, rangenode, edge, tile, domain_tile_data, range_tile_data):
         # returns an in-memory graph object, containing the domain resource, its
         # type and the number as a numeric literal (as this is how it is in the JSON)
         g = Graph()
@@ -1063,14 +1059,14 @@ class FileListDataType(BaseDataType):
         <http://vocab.getty.edu/aat/300266190> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.cidoc-crm.org/cidoc-crm/E58_Measurement_Unit> .
         <http://vocab.getty.edu/aat/300266190> <http://www.w3.org/2000/01/rdf-schema#label> "pixels" .
         """
-        
+
         g.parse(data=unit_nt, format="nt")
 
         aatrefs = {'pixels': URIRef("http://vocab.getty.edu/aat/300266190"),
-               'bytes': URIRef("http://vocab.getty.edu/aat/300265869"),
-               'height': URIRef("http://vocab.getty.edu/aat/300055644"),
-               'width': URIRef("http://vocab.getty.edu/aat/300055647"),
-               'file size': URIRef("http://vocab.getty.edu/aat/300265863"),}
+                   'bytes': URIRef("http://vocab.getty.edu/aat/300265869"),
+                   'height': URIRef("http://vocab.getty.edu/aat/300055644"),
+                   'width': URIRef("http://vocab.getty.edu/aat/300055647"),
+                   'file size': URIRef("http://vocab.getty.edu/aat/300265863"), }
 
         def add_dimension(graphobj, domain_uri, unittype, unit, value):
             dim_node = BNode()
@@ -1105,7 +1101,7 @@ class FileListDataType(BaseDataType):
                 lm = f_data['lastModified']
                 if lm > 9999999999:   # not a straight timestamp, but includes milliseconds
                     lm = f_data['lastModified'] / 1000
-                graph.add((f_uri, DCTERMS.modified, Literal(datetime.utcfromtimestamp(lm).isoformat()) ))
+                graph.add((f_uri, DCTERMS.modified, Literal(datetime.utcfromtimestamp(lm).isoformat())))
 
             if 'size' in f_data:
                 add_dimension(graph, f_uri, "file size", "bytes", f_data['size'])
@@ -1389,8 +1385,7 @@ class ResourceInstanceDataType(BaseDataType):
         except KeyError, e:
             pass
 
-    def to_rdf(self, domainnode, rangenode, edge, tile, 
-               domain_tile_data, range_tile_data):
+    def to_rdf(self, domainnode, rangenode, edge, tile, domain_tile_data, range_tile_data):
         g = Graph()
         if range_tile_data is not None:
             rangenode = URIRef(archesproject['resources/%s' % resource_inst])
