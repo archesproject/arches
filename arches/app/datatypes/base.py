@@ -267,8 +267,7 @@ class BaseDataType(object):
         """
         pass
 
-    def to_rdf(self, domainnode, rangenode, edge, tile, 
-               domain_tile_data, range_tile_data):
+    def to_rdf(self, domainnode, rangenode, edge, tile, domain_tile_data, range_tile_data):
         """
         Outputs an in-memory graph, converting the range tile data JSON into
         an appropriate RDF representation using rdflib
@@ -287,14 +286,10 @@ class BaseDataType(object):
 
         g.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
 
-        if domain_tile_data != None:
-            g.add((domainnode, 
-                   RDF.value, 
-                   Literal(JSONSerializer().serialize(domain_tile_data))))
+        if domain_tile_data is not None:
+            g.add((domainnode, RDF.value, Literal(JSONSerializer().serialize(domain_tile_data))))
 
-        if range_tile_data != None:
-            g.add((rangenode, 
-                   RDF.value, 
-                   Literal(JSONSerializer().serialize(range_tile_data))))
+        if range_tile_data is not None:
+            g.add((rangenode, RDF.value, Literal(JSONSerializer().serialize(range_tile_data))))
 
         return g
