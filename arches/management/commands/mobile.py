@@ -37,14 +37,20 @@ class Command(BaseCommand):
         parser.add_argument(
             'operation',
             nargs='?',
-            choices=['delete_surveys', 'delete_unassociated_surveys', 'sync_surveys', 'rebuild_surveys', ],
+            choices=['list_surveys','delete_surveys', 'delete_unassociated_surveys', 'sync_survey', 'rebuild_surveys', ],
             help='Operation Type; ' +
             '\'delete_surveys\' deletes all surveys that belong to the current arches install' +
             '\'delete_unassociated_surveys\' deletes all surveys that do not belong to the current arches install' +
-            '\'sync_surveys\' sync all survey databases (couch) with arches' +
+            '\'sync_survey\' sync all survey databases (couch) with arches' +
             '\'rebuild_surveys\' rebuilds all surveys that belong to the current arches install')
+        parser.add_argument('-id', '--id', dest='id', default=None,
+            help='UUID of Survey')
 
     def handle(self, *args, **options):
+        if options['operation'] == 'list_surveys':
+            for mobile_survey in MobileSurvey.objects.all():
+                print("{0}: {1} ({2})".format(mobile_survey.name, mobile_survey.id, 'Active' if mobile_survey.active else 'Inactive'))
+
         if options['operation'] == 'delete_surveys':
             self.delete_associated_surveys()
 
@@ -54,10 +60,17 @@ class Command(BaseCommand):
         if options['operation'] == 'delete_unassociated_surveys':
             self.delete_unassociated_surveys()
 
-        if options['operation'] == 'sync_surveys':
-            for mobile_survey in MobileSurvey.objects.all():
-                print("Syncing {0} from CouchDB to PostgreSQL").format(mobile_survey)
-                mobile_survey.push_edits_to_db()
+        if options['operation'] == 'sync_survey':
+            if options['id'] is not None:
+                self.sync_survey(options['id'])
+            else:
+                for mobile_survey in MobileSurvey.objects.all():
+                    self.sync_survey(mobile_survey.id)
+
+    def sync_survey(self,uuid):
+        mobile_survey = MobileSurvey.objects.get(id=uuid)
+        print("Syncing {0} from CouchDB to PostgreSQL").format(mobile_survey)
+        mobile_survey.push_edits_to_db()
 
     def delete_associated_surveys(self):
         couch = Couch()
