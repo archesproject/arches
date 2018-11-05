@@ -177,22 +177,26 @@ class JsonLdWriter(RdfWriter):
         super(RdfWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
         g = self.get_rdf_graph()
         value = g.serialize(format='nt')
-        js = from_rdf(str(value), options={format: 'application/nquads'})
+        js = from_rdf(value, {'format': 'application/nquads', 'useNativeTypes': True})
 
         assert len(resourceinstanceids) == 1 # currently, this should be limited to a single top resource
         
         archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
         resource_inst_uri = archesproject[reverse('resources', args=[resourceinstanceids[0]]).lstrip('/')]
-        print(resource_inst_uri)
 
+        context = self.graph_model.jsonldcontext
         framing = {
+            "@context": context,
             "@omitDefault": True,
+            "@omitGraph": False,
             "@id": str(resource_inst_uri),
+            "classified_as": {
+                "@embed": "@always"
+            }
         }
 
         js = frame(js, framing)
 
-        context = self.graph_model.jsonldcontext
         try:
             context = JSONDeserializer().deserialize(context)
         except ValueError:
@@ -206,8 +210,15 @@ class JsonLdWriter(RdfWriter):
                 "@context": {}
             }
 
-        out = compact(js, context)
-        out = json.dumps(out, indent=kwargs.get('indent', None), sort_keys=True)
+        # Currently omitGraph is not processed by pyLd, but data is compacted
+        # simulate omitGraph:
+        if '@graph' in js and len(js['@graph']) == 1:
+            # merge up
+            for (k,v) in js['@graph'][0].items():
+                js[k] = v
+            del js['@graph']
+
+        out = json.dumps(js, indent=kwargs.get('indent', None), sort_keys=True)
         dest = StringIO(out)
 
         full_file_name = os.path.join('{0}.{1}'.format(self.file_name, 'jsonld'))
