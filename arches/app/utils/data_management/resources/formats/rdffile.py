@@ -15,7 +15,7 @@ from rdflib import Namespace
 from rdflib import URIRef, Literal
 from rdflib import Graph
 from rdflib.namespace import RDF, RDFS
-from pyld.jsonld import compact, frame, from_rdf, to_rdf
+from pyld.jsonld import compact, frame, from_rdf, to_rdf, expand
 
 try:
     from cStringIO import StringIO
@@ -220,6 +220,7 @@ class JsonLdReader(Reader):
 
         for jsonld in data:
             self.errors = {}
+            jsonld = expand(jsonld)
             graphid = self.get_graph_id(jsonld["@type"])
             if graphid:
                 graph = GraphProxy.objects.get(graphid=graphid)
