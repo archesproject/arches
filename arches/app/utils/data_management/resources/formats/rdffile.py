@@ -329,6 +329,7 @@ class JsonLdReader(Reader):
                 # print "node['node'].ontologyclass == jsonld_graph['@type']"
                 # print node['node'].ontologyclass == jsonld_graph['@type']
                 # print node['node'].ontologyclass
+                # print jsonld_graph
                 if '@type' in jsonld_graph:
                     if node['parent_edge'].ontologyproperty == ontology_property and node['node'].ontologyclass == jsonld_graph['@type'][0]:
                         print "found %s" % node['node'].name
@@ -337,6 +338,16 @@ class JsonLdReader(Reader):
                     else:
                         invalid_nodes.add((node['node'].name, node['node'].pk))
                         pass
+                if '@value' in jsonld_graph:
+                    if node['parent_edge'].ontologyproperty == ontology_property and node['node'].ontologyclass == str(RDFS.Literal):
+                        # print node['parent_edge'].ontologyproperty == ontology_property and node['node'].ontologyclass == str(RDFS.Literal)
+                        # print node['node'].name
+                        # print node['node'].ontologyclass
+                        # print node['parent_edge'].ontologyproperty
+                        # print ontology_property
+                        print "found %s" % node['node'].name
+                        nodes_copy.add((node['node'].name, node['node'].pk))
+                        found.append(node)
 
             # print 'found %s branches' % len(found)
             if len(found) == 0:
@@ -430,8 +441,12 @@ class JsonLdReader(Reader):
                         else:
                             self.tiles[parent_tileid].tiles.append(self.tiles[tileid])
 
-                    if str(RDF.value) in jsonld_node:
-                        value = jsonld_node[str(RDF.value)]
+                    print 'finding value'
+                    print jsonld_node
+                    if '@value' in jsonld_node:
+                        value = jsonld_node['@value']
+                        print 'value'
+                        print value
                         try:
                             value = JSONDeserializer().deserialize(value)
                         except:
