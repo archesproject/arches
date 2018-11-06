@@ -267,7 +267,7 @@ class BaseDataType(object):
         """
         pass
 
-    def to_rdf(self, domainnode, rangenode, edge, tile, domain_tile_data, range_tile_data):
+    def to_rdf(self, edge_info, edge, tile):
         """
         Outputs an in-memory graph, converting the range tile data JSON into
         an appropriate RDF representation using rdflib
@@ -281,15 +281,15 @@ class BaseDataType(object):
 
         g = Graph()
 
-        g.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
-        g.add((domainnode, URIRef(edge.ontologyproperty), rangenode))
+        g.add((edge_info['r_uri'], RDF.type, URIRef(edge.rangenode.ontologyclass)))
 
-        g.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
+        g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), edge_info['rangenode']))
+        g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
 
-        if domain_tile_data is not None:
-            g.add((domainnode, RDF.value, Literal(JSONSerializer().serialize(domain_tile_data))))
+        if edge_info['domain_tile_data'] is not None:
+            g.add((edge_info['d_uri'], RDF.value, Literal(JSONSerializer().serialize(edge_info['domain_tile_data']))))
 
-        if range_tile_data is not None:
-            g.add((rangenode, RDF.value, Literal(JSONSerializer().serialize(range_tile_data))))
+        if edge_info['range_tile_data'] is not None:
+            g.add((edge_info['r_uri'], RDF.value, Literal(JSONSerializer().serialize(edge_info['range_tile_data']))))
 
         return g

@@ -117,12 +117,12 @@ class StringDataType(BaseDataType):
         except KeyError, e:
             pass
 
-    def to_rdf(self, domainnode, rangenode, edge, tile, domain_tile_data, range_tile_data):
+    def to_rdf(self, edge_info, edge, tile):
         # returns an in-memory graph object, containing the domain resource, its
         # type and the string as a string literal
         g = Graph()
-        g.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
-        g.add((domainnode, URIRef(edge.ontologyproperty), Literal(str(range_tile_data))))
+        g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
+        g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), Literal(str(edge_info['range_tile_data']))))
         return g
 
 
@@ -163,13 +163,13 @@ class NumberDataType(BaseDataType):
         except KeyError, e:
             pass
 
-    def to_rdf(self, domainnode, rangenode, edge, tile, domain_tile_data, range_tile_data):
+    def to_rdf(self, edge_info, edge, tile):
         # returns an in-memory graph object, containing the domain resource, its
         # type and the number as a numeric literal (as this is how it is in the JSON)
         g = Graph()
-        rtd = int(range_tile_data) if range_tile_data.is_integer() else range_tile_data
-        g.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
-        g.add((domainnode, URIRef(edge.ontologyproperty), Literal(rtd)))
+        rtd = int(edge_info['range_tile_data']) if edge_info['range_tile_data'].is_integer() else edge_info['range_tile_data']
+        g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
+        g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), Literal(rtd)))
         return g
 
 class BooleanDataType(BaseDataType):
@@ -198,12 +198,12 @@ class BooleanDataType(BaseDataType):
         except KeyError, e:
             pass
 
-    def to_rdf(self, domainnode, rangenode, edge, tile, domain_tile_data, range_tile_data):
+    def to_rdf(self, edge_info, edge, tile):
         # returns an in-memory graph object, containing the domain resource, its
         # type and the number as a numeric literal (as this is how it is in the JSON)
         g = Graph()
-        g.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
-        g.add((domainnode, URIRef(edge.ontologyproperty), Literal(Boolean(range_tile_data))))
+        g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
+        g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), Literal(Boolean(edge_info['range_tile_data']))))
         return g
 
 
@@ -275,12 +275,13 @@ class DateDataType(BaseDataType):
         if config is not None:
             cache.delete('time_wheel_config_anonymous')
 
-    def to_rdf(self, domainnode, rangenode, edge, tile, domain_tile_data, range_tile_data):
+    def to_rdf(self, edge_info, edge, tile):
         # returns an in-memory graph object, containing the domain resource, its
         # type and the number as a numeric literal (as this is how it is in the JSON)
         g = Graph()
-        g.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
-        g.add((domainnode, URIRef(edge.ontologyproperty), Literal(str(range_tile_data), datatype=XSD.dateTime)))
+        g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
+        g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty),
+               Literal(str(edge_info['range_tile_data']), datatype=XSD.dateTime)))
         return g
 
 class EDTFDataType(BaseDataType):
@@ -1041,8 +1042,7 @@ class FileListDataType(BaseDataType):
         result = json.loads(json.dumps(tile_data))
         return result
 
-    def to_rdf(self, domainnode, rangenode, edge, tile, 
-               domain_tile_data, range_tile_data):
+    def to_rdf(self, edge_info, edge, tile):
         # outputs a graph holding an RDF representation of the file stored in the Arches instance
         
         g = Graph()
@@ -1076,7 +1076,7 @@ class FileListDataType(BaseDataType):
             graphobj.add((dim_node, cidoc["P91_has_unit"], aatrefs[unit]))
             graphobj.add((dim_node, RDF.value, Literal(value)))
 
-        for f_data in range_tile_data:
+        for f_data in edge_info['range_tile_data']:
             # f_data will be something like:
             # "{\"accepted\": true, \"content\": \"blob:http://localhost/cccadfd0-64fc-104a-8157-3c96aca0b9bd\", 
             # \"file_id\": \"f4cd6596-cd75-11e8-85e0-0242ac1b0003\", \"height\": 307, \"index\": 0,
@@ -1090,7 +1090,7 @@ class FileListDataType(BaseDataType):
                 f_uri = URIRef(archesproject[f_data['url'][1:]])
             else:
                 f_uri = URIRef(archesproject[f_data['url']])
-            g.add((domainnode, URIRef(edge.ontologyproperty), f_uri))
+            g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), f_uri))
             g.add((f_uri, RDF.type, URIRef(edge.rangenode.ontologyclass)))
             g.add((f_uri, DC['format'], Literal(f_data['type'])))
             g.add((f_uri, RDFS.label, Literal(f_data['name'])))
@@ -1385,10 +1385,10 @@ class ResourceInstanceDataType(BaseDataType):
         except KeyError, e:
             pass
 
-    def to_rdf(self, domainnode, rangenode, edge, tile, domain_tile_data, range_tile_data):
+    def to_rdf(self, edge_info, edge, tile):
         g = Graph()
-        if range_tile_data is not None:
-            rangenode = URIRef(archesproject['resources/%s' % resource_inst])
+        if edge_info['range_tile_data'] is not None:
+            rangenode = URIRef(archesproject['resources/%s' % edge_info['range_tile_data']])
             g.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
             g.add((domainnode, URIRef(edge.ontologyproperty), rangenode))
         return g

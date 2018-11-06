@@ -119,27 +119,27 @@ class ConceptDataType(BaseConceptDataType):
         except KeyError, e:
             pass
 
-    def to_rdf(self, domainnode, rangenode, edge, tile, domain_tile_data, range_tile_data):
+    def to_rdf(self, edge_info, edge, tile):
         g = Graph()
         # logic: No data -> empty graph
         #        concept_id, but no value -> node linked to class of Concept, no label
         #        value but no concept_id -> node linked to BNode, labelled
         #        concept_id + value -> normal expected functionality
-        if range_tile_data is not None:
-            c = ConceptValue(str(range_tile_data))
+        if edge_info['range_tile_data'] is not None:
+            c = ConceptValue(str(edge_info['range_tile_data']))
 
             # Use the conceptid URI rather than the pk for the ConceptValue
             try:
                 assert c.concept_id is not None, "Null concept_id"
                 rangenode = URIRef(archesproject['concepts/%s' % c.concept_id])
                 g.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
-                g.add((domainnode, URIRef(edge.ontologyproperty), rangenode))
+                g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), rangenode))
             except:
                 # FIXME find out the correct Error that Django throws if this fails
                 rangenode = BNode()
                 if c.value:
                     g.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
-                    g.add((domainnode, URIRef(edge.ontologyproperty), rangenode))
+                    g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), rangenode))
             try:
                 assert c.value is not None, "Null or blank concept value"
                 g.add((rangenode, URIRef(RDFS.label), Literal(c.value)))
@@ -199,9 +199,11 @@ class ConceptListDataType(BaseConceptDataType):
         except KeyError, e:
             pass
 
-    def to_rdf(self, domainnode, rangenode, edge, tile, domain_tile_data, range_tile_data):
+    def to_rdf(self, edge_info, edge, tile):
         g = Graph()
         c = ConceptDataType()
-        for r in range_tile_data:
-            g += c.to_rdf(domainnode, rangenode, edge, tile, domain_tile_data, r)
+        for r in edge_info['range_tile_data']:
+            concept_info = edge_info.copy()
+            concept_info['range_tile_data'] = r
+            g += c.to_rdf(concept_info, edge, tile)
         return g
