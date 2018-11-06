@@ -283,7 +283,7 @@ class BaseDataType(object):
 
         g.add((edge_info['r_uri'], RDF.type, URIRef(edge.rangenode.ontologyclass)))
 
-        g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), edge_info['rangenode']))
+        g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), edge_info['r_uri']))
         g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
 
         if edge_info['domain_tile_data'] is not None:

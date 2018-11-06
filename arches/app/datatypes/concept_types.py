@@ -13,6 +13,7 @@ from django.core.exceptions import ObjectDoesNotExist
 # for the RDF graph export helper functions
 from rdflib import Namespace, URIRef, Literal, Graph, BNode
 from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS
+from arches.app.models.concept import ConceptValue
 archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
 
