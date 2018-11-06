@@ -326,13 +326,17 @@ class JsonLdReader(Reader):
             # try to find a node in the graph among a bunch of sibling nodes that has the same incoming edge (propertyclass) as
             # the edge/node combination we're searching for from the json-ld graph
             for node in nodes:
-                if node['parent_edge'].ontologyproperty == ontology_property and node['node'].ontologyclass == jsonld_graph['@type']:
-                    # print "found %s" % node['node'].name
-                    nodes_copy.add((node['node'].name, node['node'].pk))
-                    found.append(node)
-                else:
-                    invalid_nodes.add((node['node'].name, node['node'].pk))
-                    pass
+                # print "node['node'].ontologyclass == jsonld_graph['@type']"
+                # print node['node'].ontologyclass == jsonld_graph['@type']
+                # print node['node'].ontologyclass
+                if '@type' in jsonld_graph:
+                    if node['parent_edge'].ontologyproperty == ontology_property and node['node'].ontologyclass == jsonld_graph['@type'][0]:
+                        print "found %s" % node['node'].name
+                        nodes_copy.add((node['node'].name, node['node'].pk))
+                        found.append(node)
+                    else:
+                        invalid_nodes.add((node['node'].name, node['node'].pk))
+                        pass
 
             # print 'found %s branches' % len(found)
             if len(found) == 0:
@@ -358,8 +362,8 @@ class JsonLdReader(Reader):
             valid_nodes = nodes_copy.difference(invalid_nodes)
 
             if len(valid_nodes) == 1:
-                # print 'branch found'
-                # print valid_nodes
+                print 'branch found'
+                print valid_nodes
                 valid_node = valid_nodes.pop()
                 for node in nodes:
                     if node['node'].pk == valid_node[1]:
