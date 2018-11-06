@@ -220,7 +220,9 @@ class JsonLdReader(Reader):
 
         for jsonld in data:
             self.errors = {}
-            jsonld = expand(jsonld)
+            # import ipdb
+            # ipdb.set_trace()
+            jsonld = expand(jsonld)[0]
             graphid = self.get_graph_id(jsonld["@type"])
             if graphid:
                 graph = GraphProxy.objects.get(graphid=graphid)
