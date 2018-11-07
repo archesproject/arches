@@ -10,6 +10,7 @@ from arches.app.models.resource import Resource
 from arches.app.models.graph import Graph as GraphProxy
 from arches.app.models.tile import Tile
 from arches.app.models.system_settings import settings
+from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from rdflib import Namespace
 from rdflib import URIRef, Literal
@@ -43,6 +44,7 @@ class RdfWriter(Writer):
         archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
         graph_uri = URIRef(archesproject[reverse('graph', args=[self.graph_id]).lstrip('/')])
 
+        dt_factory = DataTypeFactory()
         g = Graph()
         g.bind('archesproject', archesproject, False)
         graph_cache = {}
@@ -64,11 +66,18 @@ class RdfWriter(Writer):
             if graphid not in graph_cache:
                 graph_cache[graphid] = {
                     'rootedges': [],
-                    'subgraphs': {}
+                    'subgraphs': {},
+                    'nodedatatypes': {},
                 }
                 graph = models.GraphModel.objects.get(pk=graphid)
                 nodegroups = set()
                 for node in graph.node_set.all():
+                    # casting nodeid to str to make a copy
+                    if str(node.nodeid) not in graph_cache[graphid]['nodedatatypes']:
+                        graph_cache[graphid]['nodedatatypes'][str(node.nodeid)] = node.datatype
+                    else:
+                        assert node.datatype == graph_cache[graphid]['nodedatatypes'][node.nodeid], \
+                                 "Node has more than one datatype?!"
                     if node.nodegroup:
                         nodegroups.add(node.nodegroup)
                     if node.istopnode:
@@ -87,63 +96,102 @@ class RdfWriter(Writer):
                         graphid]['subgraphs'][nodegroup]['inedge'].domainnode.nodegroup
                     graph_cache[graphid]['subgraphs'][nodegroup][
                         'edges'] = get_nodegroup_edges_by_collector_node(models.Node.objects.get(pk=nodegroup.pk))
-
             return graph_cache[graphid]
 
-        def add_edge_to_graph(graph, domainnode, rangenode, edge, tile):
-            graph.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
-            graph.add((domainnode, URIRef(edge.ontologyproperty), rangenode))
+        # vestigial method? No need for this URI form I think given that the code that refers to it
+        # is never called, nor should create this URI form?
+        def node2uri(node_key):
+            return archesproject[str(node_key)]
 
+        def tile_node2uri(tile_key, node_key):
+            return archesproject["tile/%s/node/%s" % (str(tile_key), str(node_key))]
+
+        def is_domain_node_not_a_leaf(d_datatype):
+            return d_datatype not in ['number', 'boolean','string', 'date',
+                                      'resource-instance', 'concept', 'resource-instance-list']
+
+        def analyse_edge(graph_info, edge, tile):
+            # this functionality was in the prior version of the RDF export
+            # Not entirely sure about what would cause this to be called so
+            # left it in as it was.
+            pkg = {}
+            pkg['d_datatype'] = graph_info['nodedatatypes'].get(str(edge.domainnode.pk))
+            pkg['r_datatype'] = graph_info['nodedatatypes'].get(str(edge.rangenode.pk))
+
+            # determine what the URIs for the domain and range nodes are:
+            pkg['d_uri'] = tile_node2uri(tile.pk, edge.domainnode.pk)
             if edge.domainnode.istopnode:
-                graph.add((domainnode, RDF.type, graph_uri))
-                graph.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
-            else:
-                graph.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
+                # if it is a top node in a given resource instance, make its
+                # URI the host/resources/{resourceinstanceid} URI instead
+                pkg['d_uri'] = archesproject[reverse('resources', args=[resourceinstanceid]).lstrip('/')]
+            pkg['r_uri'] = tile_node2uri(tile.pk, edge.rangenode.pk)
 
-            try:
-                g.add((domainnode, RDF.value, Literal(JSONSerializer().serialize(tile.data[str(edge.domainnode_id)]))))
-            except:
-                pass
-            try:
-                g.add((rangenode, RDF.value, Literal(JSONSerializer().serialize(tile.data[str(edge.rangenode_id)]))))
-            except:
-                pass
+            pkg['range_tile_data'] = None
+            pkg['domain_tile_data'] = None
+            if str(edge.rangenode_id) in tile.data:
+                pkg['range_tile_data'] = tile.data[str(edge.rangenode_id)]
+            if str(edge.domainnode_id) in tile.data:
+                pkg['domain_tile_data'] = tile.data[str(edge.domainnode_id)]
 
+            return pkg
+
+        # Build the graph:
         for resourceinstanceid, tiles in self.resourceinstances.iteritems():
             graph_info = get_graph_parts(self.graph_id)
 
-            # add the edges for the group of nodes that include the root (this group of nodes has no nodegroup)
-            for edge in graph_cache[self.graph_id]['rootedges']:
-                domainnode = archesproject[str(edge.domainnode.pk)]
-                rangenode = archesproject[str(edge.rangenode.pk)]
-                add_edge_to_graph(g, domainnode, rangenode, edge, None)
+            # Deal with root edges:
+            for edge in graph_info['rootedges']:
+                raise Exception("No idea why this code would be used, given how the node URIs are formed...")
+                # FIXME: make sure that we are not readding the same serialized data to
+                # the graph if a node is mentioned multiple times
+                # FIXME: Determine the scenario when this code will ever run, given the exception
+                # it should throw has never been triggered by the fixture models.
+                d_uri, r_uri = node2uri(edge.domainnode.pk), node2uri(edge.rangenode.pk)
+                # FIXME: How likely is this to be true more than once?!
+                # if edge.domainnode.istopnode:
+                #     g.add((d_uri, RDF.type, graph_uri))
+
+                g.add((d_uri, RDF.type, URIRef(edge.domainnode.ontologyclass)))
+                # root_edges are edges where the range node is not part of a nodegroup.
+                # FIXME: what circumstances does this actually occur? Is it just top of branch information?
+                # like label?
+                g.add((d_uri, URIRef(edge.ontologyproperty), r_uri))
+                # FIXME: Is it actually necessary to add in the type for the range node here?
+                # I'm guessing yes, as a tile must(?) be attached to a nodegroup. Maybe?
+                # eg:
+                g.add((r_uri, RDF.type, URIRef(edge.rangenode.ontologyclass)))
 
             for tile in tiles:
+                # add all the type and extra node information for the nodes
                 # add all the edges for a given tile/nodegroup
                 for edge in graph_info['subgraphs'][tile.nodegroup]['edges']:
-                    domainnode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.domainnode.pk))]
-                    rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
-                    add_edge_to_graph(g, domainnode, rangenode, edge, tile)
+                    edge_info = analyse_edge(graph_info, edge, tile)
+                    if is_domain_node_not_a_leaf(edge_info['d_datatype']):
+                        dt = dt_factory.get_instance(edge_info['r_datatype'])
+
+                        # append graph returned from datatype to_rdf function to main graph
+                        g += dt.to_rdf(edge_info, edge, tile)
 
                 # add the edge from the parent node to this tile's root node
                 # where the tile has no parent tile, which means the domain node has no tile_id
-                if graph_info['subgraphs'][tile.nodegroup]['parentnode_nodegroup'] == None:
-                    edge = graph_info['subgraphs'][tile.nodegroup]['inedge']
-                    if edge.domainnode.istopnode:
-                        domainnode = archesproject[reverse('resources', args=[resourceinstanceid]).lstrip('/')]
-                    else:
-                        domainnode = archesproject[str(edge.domainnode.pk)]
-                    rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
-                    add_edge_to_graph(g, domainnode, rangenode, edge, tile)
 
-                # add the edge from the parent node to this tile's root node
-                # where the tile has a parent tile
-                if graph_info['subgraphs'][tile.nodegroup]['parentnode_nodegroup'] != None:
-                    edge = graph_info['subgraphs'][tile.nodegroup]['inedge']
-                    domainnode = archesproject["tile/%s/node/%s" % (str(tile.parenttile.pk), str(edge.domainnode.pk))]
-                    rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
-                    add_edge_to_graph(g, domainnode, rangenode, edge, tile)
+                in_edge = graph_info['subgraphs'][tile.nodegroup]['inedge']
+                edge_info = analyse_edge(graph_info, in_edge, tile)
 
+                # get the relevant dataype helper instance for the range datatype
+                dt = dt_factory.get_instance(edge_info['r_datatype'])
+
+                if graph_info['subgraphs'][tile.nodegroup]['parentnode_nodegroup'] == None \
+                                                        and not in_edge.domainnode.istopnode:
+
+                    raise Exception("No idea why root no parent whatevs code would be used")
+                    edge_info['d_uri'] = archesproject[str(in_edge.domainnode.pk)]
+                    edge_info['domain_tile_data'] = edge_info['domain_tile_data'][1]
+                    g += dt.to_rdf(edge_info, edge, tile)
+                    # add_tile_information_to_graph(g, (domainnode, 
+                    # domain_info[1]), range_info,in_edge, tile, graph_uri)
+                else:
+                    g += dt.to_rdf(edge_info, edge, tile)
         return g
 
 
@@ -153,16 +201,26 @@ class JsonLdWriter(RdfWriter):
         super(RdfWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
         g = self.get_rdf_graph()
         value = g.serialize(format='nt')
-        js = from_rdf(str(value), options={format: 'application/nquads'})
+        js = from_rdf(value, {'format': 'application/nquads', 'useNativeTypes': True})
 
+        assert len(resourceinstanceids) == 1 # currently, this should be limited to a single top resource
+        
+        archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
+        resource_inst_uri = archesproject[reverse('resources', args=[resourceinstanceids[0]]).lstrip('/')]
+
+        context = self.graph_model.jsonldcontext
         framing = {
+            "@context": context,
             "@omitDefault": True,
-            "@type": "%sgraph/%s" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, self.graph_id)
+            "@omitGraph": False,
+            "@id": str(resource_inst_uri),
+            "classified_as": {
+                "@embed": "@always"
+            }
         }
 
         js = frame(js, framing)
 
-        context = self.graph_model.jsonldcontext
         try:
             context = JSONDeserializer().deserialize(context)
         except ValueError:
@@ -176,8 +234,15 @@ class JsonLdWriter(RdfWriter):
                 "@context": {}
             }
 
-        out = compact(js, context)
-        out = json.dumps(out, indent=kwargs.get('indent', None), sort_keys=True)
+        # Currently omitGraph is not processed by pyLd, but data is compacted
+        # simulate omitGraph:
+        if '@graph' in js and len(js['@graph']) == 1:
+            # merge up
+            for (k,v) in js['@graph'][0].items():
+                js[k] = v
+            del js['@graph']
+
+        out = json.dumps(js, indent=kwargs.get('indent', None), sort_keys=True)
         dest = StringIO(out)
 
         full_file_name = os.path.join('{0}.{1}'.format(self.file_name, 'jsonld'))

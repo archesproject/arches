@@ -2,6 +2,7 @@ import uuid
 import csv
 from arches.app.models import models
 from arches.app.models import concept
+from arches.app.models.system_settings import settings
 from arches.app.datatypes.base import BaseDataType
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.concept import get_preflabel_from_valueid
@@ -9,6 +10,12 @@ from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term
 from arches.app.utils.date_utils import ExtendedDateFormat
 from django.core.exceptions import ObjectDoesNotExist
 
+# for the RDF graph export helper functions
+from rdflib import Namespace, URIRef, Literal, Graph, BNode
+from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS
+from arches.app.models.concept import ConceptValue
+archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
+cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
 
 class BaseConceptDataType(BaseDataType):
     def __init__(self, model=None):
@@ -113,6 +120,38 @@ class ConceptDataType(BaseConceptDataType):
         except KeyError, e:
             pass
 
+    def to_rdf(self, edge_info, edge, tile):
+        g = Graph()
+        # logic: No data -> empty graph
+        #        concept_id, but no value -> node linked to class of Concept, no label
+        #        value but no concept_id -> node linked to BNode, labelled
+        #        concept_id + value -> normal expected functionality
+        if edge_info['range_tile_data'] is not None:
+            c = ConceptValue(str(edge_info['range_tile_data']))
+
+            # Use the conceptid URI rather than the pk for the ConceptValue
+            try:
+                assert c.concept_id is not None, "Null concept_id"
+                rangenode = URIRef(archesproject['concepts/%s' % c.concept_id])
+                g.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
+                g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), rangenode))
+            except:
+                # FIXME find out the correct Error that Django throws if this fails
+                rangenode = BNode()
+                if c.value:
+                    g.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
+                    g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), rangenode))
+            try:
+                assert c.value is not None, "Null or blank concept value"
+                g.add((rangenode, URIRef(RDFS.label), Literal(c.value)))
+            except:
+                pass
+
+            # FIXME: Add the language back in, once pyld fixes its problem with uppercase lang
+            # tokens -> https://github.com/digitalbazaar/pyld/issues/86
+            # graph.add((rangenode, URIRef(RDFS.label), Literal(info['label'], lang=info['lang'])))
+
+        return g
 
 class ConceptListDataType(BaseConceptDataType):
     def validate(self, value, row_number=None, source=''):
@@ -160,3 +199,12 @@ class ConceptListDataType(BaseConceptDataType):
 
         except KeyError, e:
             pass
+
+    def to_rdf(self, edge_info, edge, tile):
+        g = Graph()
+        c = ConceptDataType()
+        for r in edge_info['range_tile_data']:
+            concept_info = edge_info.copy()
+            concept_info['range_tile_data'] = r
+            g += c.to_rdf(concept_info, edge, tile)
+        return g
