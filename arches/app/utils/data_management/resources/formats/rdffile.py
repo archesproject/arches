@@ -10,6 +10,7 @@ from arches.app.models.resource import Resource
 from arches.app.models.graph import Graph as GraphProxy
 from arches.app.models.tile import Tile
 from arches.app.models.system_settings import settings
+from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from rdflib import Namespace
 from rdflib import URIRef, Literal
@@ -191,6 +192,17 @@ class JsonLdReader(Reader):
         self.errors = {}
         self.resources = []
         self.use_ids = False
+        self.datatype_factory = DataTypeFactory()
+        self.resource_model_root_classes = set()
+        self.non_unique_classes = set()
+        for graph in models.GraphModel.filter(isresource=True):
+            node = models.Node.objects.get(graph_id=graph.pk, istopnode=True)
+            if node.ontologyclass in self.resource_model_root_classes:
+                #make a note of non-unique root classes
+                self.non_unique_classes.add(node.ontologyclass)
+            else:
+                self.resource_model_root_classes.add(node.ontologyclass)
+        self.resource_model_root_classes = self.resource_model_root_classes - self.non_unique_classes
         self.ontologyproperties = models.Edge.objects.values_list('ontologyproperty', flat=True).distinct()
 
     def get_graph_id(self, strs_to_test):
@@ -355,20 +367,62 @@ class JsonLdReader(Reader):
                 raise self.DataDoesNotMatchGraphException()
 
             # if len(self.findOntologyProperties(jsonld_graph)) == 0:
-                # print 'at a leaf -- unwinding'
+            # print 'at a leaf -- unwinding'
+            
+            def json_data_is_valid(node, json_ld_node):
+                datatype = self.datatype_factory.get_instance(node.datatype)
+                value = datatype.from_rdf(json_ld_node)
+                return len(datatype.validate(value)) == 0
 
-            for ontology_prop in self.findOntologyProperties(jsonld_graph):
+            if len(found) > 1:
                 for found_node in found:
-                    try:
-                        # print 'now searching children of %s node' % found_node['node'].name
-                        branch = self.findBranch(found_node['children'], ontology_prop, jsonld_graph[ontology_prop])
-                    except self.DataDoesNotMatchGraphException as e:
-                        found_node['remove'] = True
-                        invalid_nodes.add((found_node['node'].name, found_node['node'].pk))
-                    except self.AmbiguousGraphException as e:
-                        # print 'threw AmbiguousGraphException'
-                        # print nodes_copy
-                        pass
+                    # here we follow the algorithm supplied by the Getty
+                    # If the range in the model is a domain-value, and the incoming data is of the right format and part of the domain-value's enumeration, then accept that node.
+                    # If the range in the model is a number, string, or date, and the incoming data is of the right format, then accept that node.
+                    # If the range in the model is a file-list, and the referenced file already exists, then accept that node.
+                    # If the range in the model is a concept, then consider if the incoming data is a concept that is part of the collection for the node. If it is, then accept that node. If it is a concept, and not part of the collection, then fail. If it is not a concept, then continue.
+                    for datatype in ['domain-value', 'number', 'string', 'date', 'file-list', 'concept']:
+                        if found_node['node'].datatype == datatype and json_data_is_valid(found_node['node'], jsonld_graph):
+                            return found_node['node']
+
+                    # If the range is semantic, then check the class of the incoming node is the same 
+                    # class as the model's node. If it does, then recursively test the edges of the 
+                    # semantic node to determine if it is a candidate (peek-ahead). Remove from the 
+                    # candidate list if it is not.
+                    if found_node['node'].datatype == 'semantic':
+                        for ontology_prop in self.findOntologyProperties(jsonld_graph):
+                            try:
+                                # print 'now searching children of %s node' % found_node['node'].name
+                                branch = self.findBranch(found_node['children'], ontology_prop, jsonld_graph[ontology_prop])
+                            except self.DataDoesNotMatchGraphException as e:
+                                found_node['remove'] = True
+                                invalid_nodes.add((found_node['node'].name, found_node['node'].pk))
+                            except self.AmbiguousGraphException as e:
+                                # print 'threw AmbiguousGraphException'
+                                # print nodes_copy
+                                pass
+
+                    # If the range in the model is a resource-instance, then check that the incoming 
+                    # node has the same class as the top node of any of the referenced models. If more 
+                    # than one model has the same top level class, then fail as the model is ambiguous. 
+                    # If there is exactly one possible model, then accept that node.
+                    if found_node['node'].datatype == 'resource-instance':
+                        if found_node['node'].ontologyclass in self.resource_model_root_classes:
+                            return found_node['node']
+
+            # ORIGINAL CODE
+            # for ontology_prop in self.findOntologyProperties(jsonld_graph):
+            #     for found_node in found:
+            #         try:
+            #             # print 'now searching children of %s node' % found_node['node'].name
+            #             branch = self.findBranch(found_node['children'], ontology_prop, jsonld_graph[ontology_prop])
+            #         except self.DataDoesNotMatchGraphException as e:
+            #             found_node['remove'] = True
+            #             invalid_nodes.add((found_node['node'].name, found_node['node'].pk))
+            #         except self.AmbiguousGraphException as e:
+            #             # print 'threw AmbiguousGraphException'
+            #             # print nodes_copy
+            #             pass
 
             valid_nodes = nodes_copy.difference(invalid_nodes)
 
