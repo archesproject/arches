@@ -142,8 +142,6 @@ class MobileSurvey(models.MobileSurveyModel):
                         try:
                             tile = Tile.objects.get(tileid=row.doc['tileid'])
                             for user_edits in row.doc['provisionaledits'].items():
-                                import ipdb
-                                ipdb.sset_trace()
                                 # user_edits is a dict with the user number as the key and data as the value
                                 # {u'5': {
                                 #     u'action': u'update',
