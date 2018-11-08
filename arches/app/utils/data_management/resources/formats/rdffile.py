@@ -195,7 +195,7 @@ class JsonLdReader(Reader):
         self.datatype_factory = DataTypeFactory()
         self.resource_model_root_classes = set()
         self.non_unique_classes = set()
-        for graph in models.GraphModel.filter(isresource=True):
+        for graph in models.GraphModel.objects.filter(isresource=True):
             node = models.Node.objects.get(graph_id=graph.pk, istopnode=True)
             if node.ontologyclass in self.resource_model_root_classes:
                 #make a note of non-unique root classes
@@ -344,7 +344,7 @@ class JsonLdReader(Reader):
                 # print jsonld_graph
                 if '@type' in jsonld_graph:
                     if node['parent_edge'].ontologyproperty == ontology_property and node['node'].ontologyclass == jsonld_graph['@type'][0]:
-                        print "found %s" % node['node'].name
+                        # print "found %s" % node['node'].name
                         nodes_copy.add((node['node'].name, node['node'].pk))
                         found.append(node)
                     else:
@@ -357,7 +357,7 @@ class JsonLdReader(Reader):
                         # print node['node'].ontologyclass
                         # print node['parent_edge'].ontologyproperty
                         # print ontology_property
-                        print "found %s" % node['node'].name
+                        # print "found %s" % node['node'].name
                         nodes_copy.add((node['node'].name, node['node'].pk))
                         found.append(node)
 
@@ -372,6 +372,8 @@ class JsonLdReader(Reader):
             def json_data_is_valid(node, json_ld_node):
                 datatype = self.datatype_factory.get_instance(node.datatype)
                 value = datatype.from_rdf(json_ld_node)
+                print 'in json_data_is_valid'
+                print datatype.validate(value)
                 return len(datatype.validate(value)) == 0
 
             if len(found) > 1:
@@ -383,7 +385,7 @@ class JsonLdReader(Reader):
                     # If the range in the model is a concept, then consider if the incoming data is a concept that is part of the collection for the node. If it is, then accept that node. If it is a concept, and not part of the collection, then fail. If it is not a concept, then continue.
                     for datatype in ['domain-value', 'number', 'string', 'date', 'file-list', 'concept']:
                         if found_node['node'].datatype == datatype and json_data_is_valid(found_node['node'], jsonld_graph):
-                            return found_node['node']
+                            return found_node
 
                     # If the range is semantic, then check the class of the incoming node is the same 
                     # class as the model's node. If it does, then recursively test the edges of the 
@@ -408,9 +410,9 @@ class JsonLdReader(Reader):
                     # If there is exactly one possible model, then accept that node.
                     if found_node['node'].datatype == 'resource-instance':
                         if found_node['node'].ontologyclass in self.resource_model_root_classes:
-                            return found_node['node']
+                            return found_node
 
-            # ORIGINAL CODE
+            # ORIGINAL CODE - this is probably more flexable to have this here as this allows for non-semantic nodes to have child nodes
             # for ontology_prop in self.findOntologyProperties(jsonld_graph):
             #     for found_node in found:
             #         try:
@@ -427,8 +429,8 @@ class JsonLdReader(Reader):
             valid_nodes = nodes_copy.difference(invalid_nodes)
 
             if len(valid_nodes) == 1:
-                print 'branch found'
-                print valid_nodes
+                # print 'branch found'
+                # print valid_nodes
                 valid_node = valid_nodes.pop()
                 for node in nodes:
                     if node['node'].pk == valid_node[1]:
@@ -497,15 +499,19 @@ class JsonLdReader(Reader):
 
                     print 'finding value'
                     print jsonld_node
-                    if '@value' in jsonld_node:
-                        value = jsonld_node['@value']
-                        print 'value'
-                        print value
-                        try:
-                            value = JSONDeserializer().deserialize(value)
-                        except:
-                            pass
-                        self.tiles[tileid].data[str(branch['node'].nodeid)] = value
+                    datatype = self.datatype_factory.get_instance(branch['node'].datatype)
+                    value = datatype.from_rdf(jsonld_node)
+                    self.tiles[tileid].data[str(branch['node'].nodeid)] = value
+
+                    # if '@value' in jsonld_node:
+                    #     value = jsonld_node['@value']
+                    #     print 'value'
+                    #     print value
+                    #     try:
+                    #         value = JSONDeserializer().deserialize(value)
+                    #     except:
+                    #         pass
+                    #     self.tiles[tileid].data[str(branch['node'].nodeid)] = value
 
                 if len(ontology_properties) > 0:
                     for ontology_property in ontology_properties:
