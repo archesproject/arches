@@ -20,6 +20,7 @@ import urlparse
 from copy import copy, deepcopy
 from django.db import transaction
 from arches.app.models import models
+from arches.app.models.concept import Concept
 from arches.app.models.tile import Tile
 from arches.app.models.graph import Graph
 from arches.app.models.system_settings import settings
@@ -110,6 +111,13 @@ class MobileSurvey(models.MobileSurveyModel):
                                     widget_model.card_id = card['cardid']
                                     widget_model.widget_id = widget.pk
                                     widget_model.config = widget.defaultconfig
+                                    if widget.datatype == 'concept':
+                                        collectionId = node['config']['rdmCollection']
+                                        try:
+                                            concept_collection = Concept().get(id=collectionId, include_subconcepts=True, semantic=False, include=['label'])
+                                            widget_model.config['options'] = concept_collection
+                                        except:
+                                            pass
                                     widget_model.label = node['name']
                                     graph_obj['widgets'].append(widget_model)
                                 break
