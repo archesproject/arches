@@ -37,7 +37,7 @@ class Command(BaseCommand):
         parser.add_argument(
             'operation',
             nargs='?',
-            choices=['list_surveys','delete_surveys', 'delete_unassociated_surveys', 'sync_survey', 'rebuild_surveys', ],
+            choices=['list_surveys', 'delete_surveys', 'delete_unassociated_surveys', 'sync_survey', 'rebuild_surveys', ],
             help='Operation Type; ' +
             '\'delete_surveys\' deletes all surveys that belong to the current arches install' +
             '\'delete_unassociated_surveys\' deletes all surveys that do not belong to the current arches install' +
@@ -67,7 +67,7 @@ class Command(BaseCommand):
                 for mobile_survey in MobileSurvey.objects.all():
                     self.sync_survey(mobile_survey.id)
 
-    def sync_survey(self,uuid):
+    def sync_survey(self, uuid):
         mobile_survey = MobileSurvey.objects.get(id=uuid)
         print("Syncing {0} from CouchDB to PostgreSQL").format(mobile_survey)
         mobile_survey.push_edits_to_db()

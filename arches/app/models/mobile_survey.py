@@ -155,7 +155,7 @@ class MobileSurvey(models.MobileSurveyModel):
                                 #         }
                                 #     }
                                 # }
-                                if tile.provisionaledits == None:
+                                if tile.provisionaledits is None:
                                     tile.provisionaledits = {}
                                     tile.provisionaledits[user_edits[0]] = user_edits[1]
                                 else:
