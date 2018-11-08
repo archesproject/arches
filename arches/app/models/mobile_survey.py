@@ -147,46 +147,53 @@ class MobileSurvey(models.MobileSurveyModel):
                 ret.append(row)
                 if row.doc['type'] == 'tile':
                     if row.doc['provisionaledits'] is not None:
-                        tile = Tile.objects.get(tileid=row.doc['tileid'])
-                        for user_edits in row.doc['provisionaledits'].items():
-                            # user_edits is a dict with the user number as the key and data as the value
-                            # {u'5': {
-                            #     u'action': u'update',
-                            #     u'reviewer': None,
-                            #     u'reviewtimestamp': None,
-                            #     u'status': u'review',
-                            #     u'timestamp': u'2018-11-02T18:38:00.684250Z',
-                            #     u'value': {
-                            #         u'bb97b857-d646-11e8-9f94-acbc32b81a1b': u'Provisional String Value',
-                            #         u'bb98aab8-d646-11e8-922d-acbc32b81a1b': None
-                            #         }
-                            #     }
-                            # }
-                            if user_edits[0] in tile.provisionaledits:
-                                if user_edits[1]['timestamp'] > tile.provisionaledits[user_edits[0]]['timestamp']:
-                                    # If the mobile user edits are newer by UTC timestamp, overwrite the tile data
+                        try:
+                            tile = Tile.objects.get(tileid=row.doc['tileid'])
+                            for user_edits in row.doc['provisionaledits'].items():
+                                # user_edits is a dict with the user number as the key and data as the value
+                                # {u'5': {
+                                #     u'action': u'update',
+                                #     u'reviewer': None,
+                                #     u'reviewtimestamp': None,
+                                #     u'status': u'review',
+                                #     u'timestamp': u'2018-11-02T18:38:00.684250Z',
+                                #     u'value': {
+                                #         u'bb97b857-d646-11e8-9f94-acbc32b81a1b': u'Provisional String Value',
+                                #         u'bb98aab8-d646-11e8-922d-acbc32b81a1b': None
+                                #         }
+                                #     }
+                                # }
+                                if tile.provisionaledits is None:
+                                    tile.provisionaledits = {}
                                     tile.provisionaledits[user_edits[0]] = user_edits[1]
-
-                        # If there are conflicting documents, lets clear those out
-                        if '_conflicts' in row.doc:
-                            for conflict_rev in row.doc['_conflicts']:
-                                conflict_data = db.get(row.id, rev=conflict_rev)
-                                for user_edits in conflict_data['provisionaledits'].items():
+                                else:
                                     if user_edits[0] in tile.provisionaledits:
                                         if user_edits[1]['timestamp'] > tile.provisionaledits[user_edits[0]]['timestamp']:
                                             # If the mobile user edits are newer by UTC timestamp, overwrite the tile data
                                             tile.provisionaledits[user_edits[0]] = user_edits[1]
-                                # Remove conflicted revision from couch
-                                db.delete(conflict_data)
 
-                            # TODO: If user is provisional user, apply as provisional edit
-                            # TODO: If user is reviewer, apply as authoritative edit
-                        print('Tile {0} Saved'.format(row.doc['tileid']))
+                            # If there are conflicting documents, lets clear those out
+                            if '_conflicts' in row.doc:
+                                for conflict_rev in row.doc['_conflicts']:
+                                    conflict_data = db.get(row.id, rev=conflict_rev)
+                                    for user_edits in conflict_data['provisionaledits'].items():
+                                        if user_edits[0] in tile.provisionaledits:
+                                            if user_edits[1]['timestamp'] > tile.provisionaledits[user_edits[0]]['timestamp']:
+                                                # If the mobile user edits are newer by UTC timestamp, overwrite the tile data
+                                                tile.provisionaledits[user_edits[0]] = user_edits[1]
+                                    # Remove conflicted revision from couch
+                                    db.delete(conflict_data)
+
+                                # TODO: If user is provisional user, apply as provisional edit
+                                # TODO: If user is reviewer, apply as authoritative edit
+                        except Tile.DoesNotExist:
+                            tile = Tile(row.doc)
 
                         tile.save()
                         tile_serialized = json.loads(JSONSerializer().serialize(tile))
                         tile_serialized['type'] = 'tile'
                         self.couch.update_doc(db, tile_serialized, tile_serialized['tileid'])
+                        print('Tile {0} Saved'.format(row.doc['tileid']))
                         db.compact()
         return ret
 
