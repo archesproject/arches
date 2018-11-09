@@ -125,6 +125,11 @@ class StringDataType(BaseDataType):
         g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), Literal(str(edge_info['range_tile_data']))))
         return g
 
+    def from_rdf(self, json_ld_node):
+        # returns an in-memory graph object, containing the domain resource, its
+        # type and the number as a numeric literal (as this is how it is in the JSON)
+        return json_ld_node.get("@value")
+
 
 class NumberDataType(BaseDataType):
 
@@ -173,6 +178,11 @@ class NumberDataType(BaseDataType):
         g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), Literal(rtd)))
         return g
 
+    def from_rdf(self, json_ld_node):
+        # expects a node taken from an expanded json-ld graph
+        # returns the value, or None if no "@value" key is found
+        return json_ld_node.get("@value")
+
 
 class BooleanDataType(BaseDataType):
 
@@ -208,6 +218,10 @@ class BooleanDataType(BaseDataType):
         g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), Literal(Boolean(edge_info['range_tile_data']))))
         return g
 
+    def from_rdf(self, json_ld_node):
+        # expects a node taken from an expanded json-ld graph
+        # returns the value, or None if no "@value" key is found
+        return json_ld_node.get("@value")
 
 class DateDataType(BaseDataType):
 
@@ -285,6 +299,12 @@ class DateDataType(BaseDataType):
         g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty),
                Literal(str(edge_info['range_tile_data']), datatype=XSD.dateTime)))
         return g
+
+    def from_rdf(self, json_ld_node):
+        # expects a node taken from an expanded json-ld graph
+        # returns the value, or None if no "@value" key is found
+        return json_ld_node.get("@value")
+
 
 class EDTFDataType(BaseDataType):
 
@@ -1391,7 +1411,7 @@ class ResourceInstanceDataType(BaseDataType):
         g = Graph()
         if edge_info['range_tile_data'] is not None:
             rangenode = URIRef(archesproject['resources/%s' % edge_info['range_tile_data']])
-            # should be the class of the Resource Instance, rather than the expected class
+            # FIXME: should be the class of the Resource Instance, rather than the expected class
             # from the edge.
             g.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
             g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), rangenode))
