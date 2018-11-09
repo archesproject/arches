@@ -2,6 +2,7 @@ import json
 from django.core.urlresolvers import reverse
 from arches.app.models import models
 
+
 class BaseDataType(object):
 
     def __init__(self, model=None):

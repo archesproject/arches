@@ -167,10 +167,12 @@ class NumberDataType(BaseDataType):
         # returns an in-memory graph object, containing the domain resource, its
         # type and the number as a numeric literal (as this is how it is in the JSON)
         g = Graph()
-        rtd = int(edge_info['range_tile_data']) if edge_info['range_tile_data'].is_integer() else edge_info['range_tile_data']
+        rtd = int(edge_info['range_tile_data']) if edge_info['range_tile_data'].is_integer(
+        ) else edge_info['range_tile_data']
         g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
         g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), Literal(rtd)))
         return g
+
 
 class BooleanDataType(BaseDataType):
 
@@ -1044,7 +1046,7 @@ class FileListDataType(BaseDataType):
 
     def to_rdf(self, edge_info, edge, tile):
         # outputs a graph holding an RDF representation of the file stored in the Arches instance
-        
+
         g = Graph()
 
         unit_nt = """
@@ -1078,12 +1080,12 @@ class FileListDataType(BaseDataType):
 
         for f_data in edge_info['range_tile_data']:
             # f_data will be something like:
-            # "{\"accepted\": true, \"content\": \"blob:http://localhost/cccadfd0-64fc-104a-8157-3c96aca0b9bd\", 
+            # "{\"accepted\": true, \"content\": \"blob:http://localhost/cccadfd0-64fc-104a-8157-3c96aca0b9bd\",
             # \"file_id\": \"f4cd6596-cd75-11e8-85e0-0242ac1b0003\", \"height\": 307, \"index\": 0,
-            # \"lastModified\": 1535067185606, \"name\": \"FUjJqP6.jpg\", \"size\": 19350, 
+            # \"lastModified\": 1535067185606, \"name\": \"FUjJqP6.jpg\", \"size\": 19350,
             # \"status\": \"uploaded\", \"type\": \"image/jpeg\", \"url\": \"/files/uploadedfiles/FUjJqP6.jpg\",
             # \"width\": 503}"
-            
+
             # range URI should be the file URL/URI, and the rest of the details should hang off that
             # FIXME - (Poor) assumption that file is on same host as Arches instance host config.
             if f_data['url'].startswith("/"):

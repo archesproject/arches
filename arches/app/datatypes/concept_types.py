@@ -17,6 +17,7 @@ from arches.app.models.concept import ConceptValue
 archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
 
+
 class BaseConceptDataType(BaseDataType):
     def __init__(self, model=None):
         super(BaseConceptDataType, self).__init__(model=model)
@@ -152,6 +153,7 @@ class ConceptDataType(BaseConceptDataType):
             # graph.add((rangenode, URIRef(RDFS.label), Literal(info['label'], lang=info['lang'])))
 
         return g
+
 
 class ConceptListDataType(BaseConceptDataType):
     def validate(self, value, row_number=None, source=''):

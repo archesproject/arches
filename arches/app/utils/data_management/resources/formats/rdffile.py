@@ -77,7 +77,7 @@ class RdfWriter(Writer):
                         graph_cache[graphid]['nodedatatypes'][str(node.nodeid)] = node.datatype
                     else:
                         assert node.datatype == graph_cache[graphid]['nodedatatypes'][node.nodeid], \
-                                 "Node has more than one datatype?!"
+                            "Node has more than one datatype?!"
                     if node.nodegroup:
                         nodegroups.add(node.nodegroup)
                     if node.istopnode:
@@ -107,7 +107,7 @@ class RdfWriter(Writer):
             return archesproject["tile/%s/node/%s" % (str(tile_key), str(node_key))]
 
         def is_domain_node_not_a_leaf(d_datatype):
-            return d_datatype not in ['number', 'boolean','string', 'date',
+            return d_datatype not in ['number', 'boolean', 'string', 'date',
                                       'resource-instance', 'concept', 'resource-instance-list']
 
         def analyse_edge(graph_info, edge, tile):
@@ -181,14 +181,14 @@ class RdfWriter(Writer):
                 # get the relevant dataype helper instance for the range datatype
                 dt = dt_factory.get_instance(edge_info['r_datatype'])
 
-                if graph_info['subgraphs'][tile.nodegroup]['parentnode_nodegroup'] == None \
-                                                        and not in_edge.domainnode.istopnode:
+                if graph_info['subgraphs'][tile.nodegroup]['parentnode_nodegroup'] is None \
+                        and not in_edge.domainnode.istopnode:
 
                     raise Exception("No idea why root no parent whatevs code would be used")
                     edge_info['d_uri'] = archesproject[str(in_edge.domainnode.pk)]
                     edge_info['domain_tile_data'] = edge_info['domain_tile_data'][1]
                     g += dt.to_rdf(edge_info, in_edge, tile)
-                    # add_tile_information_to_graph(g, (domainnode, 
+                    # add_tile_information_to_graph(g, (domainnode,
                     # domain_info[1]), range_info,in_edge, tile, graph_uri)
                 else:
                     g += dt.to_rdf(edge_info, in_edge, tile)
@@ -203,8 +203,8 @@ class JsonLdWriter(RdfWriter):
         value = g.serialize(format='nt')
         js = from_rdf(value, {'format': 'application/nquads', 'useNativeTypes': True})
 
-        assert len(resourceinstanceids) == 1 # currently, this should be limited to a single top resource
-        
+        assert len(resourceinstanceids) == 1  # currently, this should be limited to a single top resource
+
         archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
         resource_inst_uri = archesproject[reverse('resources', args=[resourceinstanceids[0]]).lstrip('/')]
 
@@ -238,7 +238,7 @@ class JsonLdWriter(RdfWriter):
         # simulate omitGraph:
         if '@graph' in js and len(js['@graph']) == 1:
             # merge up
-            for (k,v) in js['@graph'][0].items():
+            for (k, v) in js['@graph'][0].items():
                 js[k] = v
             del js['@graph']
 
