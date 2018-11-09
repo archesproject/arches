@@ -23,6 +23,7 @@ from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.models.tile import Tile
 from arches.app.models.graph import Graph
+from arches.app.models.models import ResourceInstance
 from arches.app.models.system_settings import settings
 from django.http import HttpRequest
 from arches.app.utils.couch import Couch
@@ -143,6 +144,18 @@ class MobileSurvey(models.MobileSurveyModel):
         db = self.couch.create_db('project_' + str(self.id))
         ret = []
         with transaction.atomic():
+            for row in self.couch.all_docs(db):
+                ret.append(row)
+                if row.doc['type'] == 'resource':
+                    if row.doc['provisional_resource'] == 'true':
+                        resourceinstance, created = ResourceInstance.objects.update_or_create(
+                            resourceinstanceid = uuid.UUID(str(row.doc['resourceinstanceid'])),
+                            defaults = {
+                            'graph_id': uuid.UUID(str(row.doc['graph_id']))
+                            }
+                        )
+                        print('Resource {0} Saved'.format(row.doc['resourceinstanceid']))
+
             for row in self.couch.all_docs(db):
                 ret.append(row)
                 if row.doc['type'] == 'tile':
