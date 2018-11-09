@@ -100,6 +100,12 @@ class MobileSurvey(models.MobileSurveyModel):
                     for widget in graph_obj['widgets']:
                         if node['nodeid'] == str(widget.node_id):
                             found = True
+                            try:
+                                collection_id = node['config']['rdmCollection']
+                                concept_collection = Concept().get_child_collections_hierarchically(collection_id)
+                                widget.config['options'] = concept_collection
+                            except:
+                                pass
                             break
                     if not found:
                         for card in graph_obj['cards']:
@@ -111,13 +117,12 @@ class MobileSurvey(models.MobileSurveyModel):
                                     widget_model.card_id = card['cardid']
                                     widget_model.widget_id = widget.pk
                                     widget_model.config = widget.defaultconfig
-                                    if widget.datatype == 'concept':
-                                        collectionId = node['config']['rdmCollection']
-                                        try:
-                                            concept_collection = Concept().get(id=collectionId, include_subconcepts=True, semantic=False, include=['label'])
-                                            widget_model.config['options'] = concept_collection
-                                        except:
-                                            pass
+                                    try:
+                                        collection_id = node['config']['rdmCollection']
+                                        concept_collection = Concept().get_child_collections_hierarchically(collection_id)
+                                        widget_model.config['options'] = concept_collection
+                                    except:
+                                        pass
                                     widget_model.label = node['name']
                                     graph_obj['widgets'].append(widget_model)
                                 break
