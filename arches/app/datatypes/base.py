@@ -278,6 +278,7 @@ class BaseDataType(object):
         # for this tile data
         from rdflib import Namespace, URIRef, Literal, Graph, BNode
         from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS
+        from arches.app.utils.betterJSONSerializer import JSONSerializer
 
         g = Graph()
 

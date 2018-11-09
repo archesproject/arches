@@ -187,11 +187,11 @@ class RdfWriter(Writer):
                     raise Exception("No idea why root no parent whatevs code would be used")
                     edge_info['d_uri'] = archesproject[str(in_edge.domainnode.pk)]
                     edge_info['domain_tile_data'] = edge_info['domain_tile_data'][1]
-                    g += dt.to_rdf(edge_info, edge, tile)
+                    g += dt.to_rdf(edge_info, in_edge, tile)
                     # add_tile_information_to_graph(g, (domainnode, 
                     # domain_info[1]), range_info,in_edge, tile, graph_uri)
                 else:
-                    g += dt.to_rdf(edge_info, edge, tile)
+                    g += dt.to_rdf(edge_info, in_edge, tile)
         return g
 
 

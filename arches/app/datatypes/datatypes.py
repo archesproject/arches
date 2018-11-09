@@ -1389,8 +1389,10 @@ class ResourceInstanceDataType(BaseDataType):
         g = Graph()
         if edge_info['range_tile_data'] is not None:
             rangenode = URIRef(archesproject['resources/%s' % edge_info['range_tile_data']])
+            # should be the class of the Resource Instance, rather than the expected class
+            # from the edge.
             g.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
-            g.add((domainnode, URIRef(edge.ontologyproperty), rangenode))
+            g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), rangenode))
         return g
 
 class NodeValueDataType(BaseDataType):
