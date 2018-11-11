@@ -1,0 +1,56 @@
+{% load i18n %}
+<div class="row">
+    <div class="col-xs-12">
+        <dl>
+            <dt>
+                <h5 id="" class="arches-report-subsection-title">{% trans "Feature forms within the Heritage Feature" %}</h5>
+            </dt>
+            <dd class="arches-report-subsection-item dataalert">{% trans "No feature forms recorded" %}</dd>
+            <div class = "content"> 
+             {% for FORM_ASSIGNMENT_E13 in report_info.source.graph.FORM_ASSIGNMENT_E13|dictsort:"orderby" %}
+                 <dd class="arches-report-subsection-item">
+                {% if 'FORM_BELIEF_I2' in FORM_ASSIGNMENT_E13 %}
+                    {% for FORM_BELIEF_I2 in FORM_ASSIGNMENT_E13.FORM_BELIEF_I2 %}
+                        {% for FORM_TYPE_PROPOSITION_SET_I4 in FORM_BELIEF_I2.FORM_TYPE_PROPOSITION_SET_I4 %} 
+                            {{ FORM_TYPE_PROPOSITION_SET_I4.FORM_TYPE_PROPOSITION_SET_I4__value }}  <span class="arches-report-subsection-item-type"> ( {% trans "Form Type" %} )</span>
+                        {% endfor %}
+                        {% for FORM_CERTAINTY_BELIEF_VALUE_I6 in FORM_BELIEF_I2.FORM_CERTAINTY_BELIEF_VALUE_I6  %}
+                                
+                               {{ FORM_CERTAINTY_BELIEF_VALUE_I6.FORM_CERTAINTY_BELIEF_VALUE_I6__value }}<span class="arches-report-subsection-item-type"> ( {% trans "Certainty" %} )</span> 
+                        {% empty %}
+                        {% endfor %} 
+                    {% endfor %}
+                {% endif %}             
+                {% if 'FORM_NUMBER_E55' in FORM_ASSIGNMENT_E13 %}
+                    {% for FORM_NUMBER_E55 in FORM_ASSIGNMENT_E13.FORM_NUMBER_E55  %}
+                           {{ FORM_NUMBER_E55.FORM_NUMBER_E55__value }}  <span class="arches-report-subsection-item-type">( {% trans "Number" %} )</span>
+
+                    {% empty %}
+                    {% endfor %} 
+                {% endif %}    
+
+
+                {% if 'FORM_SHAPE_TYPE_E55' in FORM_ASSIGNMENT_E13 %}
+                    {% for FORM_SHAPE_TYPE_E55 in FORM_ASSIGNMENT_E13.FORM_SHAPE_TYPE_E55  %}
+                           {{ FORM_SHAPE_TYPE_E55.FORM_SHAPE_TYPE_E55__value }}  <span class="arches-report-subsection-item-type">( {% trans "Shape" %} )</span>
+
+                    {% empty %}
+                    {% endfor %} 
+                {% endif %}    
+
+
+                {% if 'FORM_ARRANGEMENT_E55' in FORM_ASSIGNMENT_E13 %}
+                    {% for FORM_ARRANGEMENT_E55 in FORM_ASSIGNMENT_E13.FORM_ARRANGEMENT_E55  %}
+                           {{ FORM_ARRANGEMENT_E55.FORM_ARRANGEMENT_E55__value }}  <span class="arches-report-subsection-item-type">( {% trans "Arrangement" %} )</span>
+
+                    {% empty %}
+                    {% endfor %} 
+                {% endif %}    
+                <hr class="devider margin-top-10" style="margin-bottom: 5px;"></hr>
+                </dd>      
+            {% endfor %}  
+            </div>
+        </dl>
+
+    </div>
+</div>
