@@ -1409,13 +1409,24 @@ class ResourceInstanceDataType(BaseDataType):
 
     def to_rdf(self, edge_info, edge, tile):
         g = Graph()
+
+        def _add_resource(d, p, r, r_type):
+            g.add((r, RDF.type, URIRef(r_type)))
+            g.add((d, URIRef(p), r))
+
         if edge_info['range_tile_data'] is not None:
-            rangenode = URIRef(archesproject['resources/%s' % edge_info['range_tile_data']])
-            # FIXME: should be the class of the Resource Instance, rather than the expected class
-            # from the edge.
-            g.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
-            g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), rangenode))
+            res_insts = edge_info['range_tile_data']
+            if not isinstance(list, res_insts):
+                res_insts = [res_insts]
+
+            for res_inst in res_insts:
+                rangenode = URIRef(archesproject['resources/%s' % res_inst])
+                # FIXME: should be the class of the Resource Instance, rather than the expected class
+                # from the edge.
+                _add_resource(edge_info['d_uri'], edge.ontologyproperty,
+                              rangenode, edge.rangenode.ontologyclass)
         return g
+
 
 class NodeValueDataType(BaseDataType):
     def validate(self, value, row_number=None, source=''):
