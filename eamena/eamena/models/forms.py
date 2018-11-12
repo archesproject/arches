@@ -886,6 +886,8 @@ class FeatureConditionAssessmentForm(ResourceForm):
         
         ## step 3
         self.update_nodes('OVERALL_CONDITION_TYPE.E55',data)
+        self.update_nodes('NEXT_ASSESSMENT_DATE_TYPE.E55',data)
+        self.update_nodes('CONDITION_REMARKS_ASSIGNMENT.E13',data)
 
     def load(self, lang):
         if self.resource:
