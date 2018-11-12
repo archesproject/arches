@@ -5,7 +5,7 @@ from arches.app.models import concept
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.base import BaseDataType
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.concept import get_preflabel_from_valueid
+from arches.app.models.concept import get_preflabel_from_valueid, get_preflabel_from_conceptid
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Nested, Exists
 from arches.app.utils.date_utils import ExtendedDateFormat
 from django.core.exceptions import ObjectDoesNotExist
@@ -153,6 +153,16 @@ class ConceptDataType(BaseConceptDataType):
             # graph.add((rangenode, URIRef(RDFS.label), Literal(info['label'], lang=info['lang'])))
 
         return g
+
+    def from_rdf(self, json_ld_node):
+        # Expects a label and a concept URI within the json_ld_node
+        # FIXME: SHOULD be able to handle cases when the label is not supplied,
+        # or if the label does not match any label from the ConceptValue
+        concept_uri = json_ld_node.get('id')
+        label = json_ld_node.get(str(RDFS.label))
+        if concept_uri and label:
+            # find a matching Concept Value to the label
+
 
 
 class ConceptListDataType(BaseConceptDataType):

@@ -1255,6 +1255,11 @@ def get_preflabel_from_conceptid(conceptid, lang):
     return default if ret == None else ret
 
 
+def get_valueid_from_concept_label(label):
+    se = SearchEngineFactory().create()
+    concept_label = se.search(index='strings', doc_type='concept', q="value:{0}".format(label))
+
+
 def get_concept_label_from_valueid(valueid):
     se = SearchEngineFactory().create()
     concept_label = se.search(index='strings', doc_type='concept', id=valueid)
