@@ -1259,6 +1259,9 @@ def get_valueids_from_concept_label(label, lang=None):
     se = SearchEngineFactory().create()
 
     def exact_val_match(val):
+        # exact term match, don't care about relevance ordering.
+        # due to language formating issues, and with (hopefully) small result sets
+        # easier to have filter logic in python than to craft it in dsl
         dsl = {
             "query": {
                 "constant_score": {
@@ -1275,14 +1278,7 @@ def get_valueids_from_concept_label(label, lang=None):
     concept_label_results = se.search(index='strings', doc_type='concept',
                                       body=exact_val_match(label))
     if concept_label_results is None:
-        return {
-            "category": "",
-            "conceptid": "",
-            "language": "",
-            "value": "",
-            "type": "",
-            "id": ""
-            }
+        return
     return [res['_source'] for res in concept_label_results['hits']['hits']
             if lang is None or res['_source']['language'] == lang]
 

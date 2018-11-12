@@ -5,7 +5,8 @@ from arches.app.models import concept
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.base import BaseDataType
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.concept import get_preflabel_from_valueid, get_preflabel_from_conceptid
+from arches.app.models.concept import get_preflabel_from_valueid, get_preflabel_from_conceptid, \
+                                      get_valueids_from_concept_label
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Nested, Exists
 from arches.app.utils.date_utils import ExtendedDateFormat
 from django.core.exceptions import ObjectDoesNotExist
@@ -160,9 +161,23 @@ class ConceptDataType(BaseConceptDataType):
         # or if the label does not match any label from the ConceptValue
         concept_uri = json_ld_node.get('id')
         label = json_ld_node.get(str(RDFS.label))
+        # FIXME when pyld supports uppercase lang in strings, include
+        # language handling here.
         if concept_uri and label:
             # find a matching Concept Value to the label
+            values = get_valueids_from_concept_label(label)
+            if values:
+                return values[0]["id"]
+            else:
+                print("FAILED TO FIND MATCHING LABEL '{0}' FOR CONCEPT '{1}'").format(
+                    label, concept_uri)
+                label = None
 
+        if concept_uri and label is None:
+            # got a concept URI but the label is nonexistant
+            # or cannot be resolved in Arches
+            value = get_preflabel_from_conceptid(concept_uri, lang=None)
+            return value['id']
 
 
 class ConceptListDataType(BaseConceptDataType):
