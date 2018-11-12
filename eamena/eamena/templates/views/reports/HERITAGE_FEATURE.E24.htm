@@ -206,13 +206,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                             <hr class="devider margin-top-10" style="margin-bottom: 5px;"></hr>
 
-
-                            <!-- Conditions Section -->
+                            <!--  Condition Section -->
                             <div class="row">
 
                                 <!-- Section sub-header -->
                                 <div class="col-sm-3">
-                                    <h3 class="arches-report-subsection">{% trans "Condition" %}</h3>
+                                    <h3 class="arches-report-subsection">{% trans "Overall Condition" %}</h3>
                                 </div>
                                 <!-- End Section sub-header -->
 
@@ -225,37 +224,106 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <div class="arches-report-subsection-content">
 
                                         <!-- Condition State -->
-                                        {% include 'views/reports/sections/CONDITION_STATE.htm' %}
+                                        {% include 'views/reports/sections/E24_CONDITION_STATE.htm' %}
+
+                                    </div>
+                                    <div class="arches-report-subsection-content">
+
+                                        <!-- Priority -->
+                                        {% include 'views/reports/sections/PRIORITY.htm' %}
+
+                                    </div>     
+                                    <div class="arches-report-subsection-content">
+
+                                        <!-- Remarks -->
+                                        {% include 'views/reports/sections/REMARKS.htm' %}
+
+                                    </div>                                                                             
+                                </div>
+                                <!-- End Section Content-->
+
+                            </div>
+                            <!-- End Condition Section --> 
+                            <!-- Damage Section -->
+                            <div class="row">
+
+                                <!-- Section sub-header -->
+                                <div class="col-sm-3">
+                                    <h3 class="arches-report-subsection">{% trans "Damage" %}</h3>
+                                </div>
+                                <!-- End Section sub-header -->
+
+                                 <!-- Section Content -->
+                                <div class="col-sm-9">
+
+                                    <!-- Spacer -->
+                                    <div class="arches-report-spacer hidden-xs"></div>
+
+                                    <div class="arches-report-subsection-content">
+
+                                        <!-- Damage Severity -->
+                                        {% include 'views/reports/sections/DAMAGE_SEVERITY.htm' %}
 
                                     </div>
                                      <div class="arches-report-subsection-content">
 
-                                        <!-- Disturbance extent -->
-                                        {% include 'views/reports/sections/DISTURBANCE_EXTENT.htm' %}
+                                        <!-- Damage extent -->
+                                        {% include 'views/reports/sections/DAMAGE_EXTENT.htm' %}
 
                                     </div>
                                      <div class="arches-report-subsection-content">
 
                                         <!-- Disturbance type -->
-                                        {% include 'views/reports/sections/DISTURBANCE_TYPE.htm' %}
+                                        {% include 'views/reports/sections/E24_DISTURBANCE_TYPE.htm' %}
 
-                                    </div>  
+                                    </div>
                                      <div class="arches-report-subsection-content">
 
-                                        <!-- Threat type-->
-                                        {% include 'views/reports/sections/THREAT_TYPE.htm' %}
+                                        <!-- Recommendations -->
+                                        {% include 'views/reports/sections/RECOMMENDATIONS.htm' %}
 
-                                    </div>                                                                              
+                                    </div>                                                                                     
                                 </div>
                                 <!-- End Section Content-->
 
                             </div>
-                            <!-- End Condition Section -->
+                            <!-- End Damage Section -->
+                        
+                            <!-- Risk Section -->
+                            <div class="row">
+
+                                <!-- Section sub-header -->
+                                <div class="col-sm-3">
+                                    <h3 class="arches-report-subsection">{% trans "Risk" %}</h3>
+                                </div>
+                                <!-- End Section sub-header -->
+
+                                 <!-- Section Content -->
+                                <div class="col-sm-9">
+
+                                    <!-- Spacer -->
+                                    <div class="arches-report-spacer hidden-xs"></div>
+
+                                    <div class="arches-report-subsection-content">
+
+                                        <!-- Risk -->
+                                        {% include 'views/reports/sections/RISK_IDENTIFICATION.htm' %}
+
+                                    </div>
+                                     <div class="arches-report-subsection-content">
+
+                                        <!-- Mitigation Strategy -->
+                                        {% include 'views/reports/sections/MITIGATION_STRATEGY.htm' %}
+
+                                    </div>                                                                            
+                                </div>
+                                <!-- End Section Content-->
+
+                            </div>
+                            <!-- End Risk Section -->
 
 
                             <hr class="devider margin-top-10" style="margin-bottom: 5px;"></hr>
-
-
                        
                     </div>
                     <!-- End Project Information -->
