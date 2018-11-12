@@ -1255,9 +1255,36 @@ def get_preflabel_from_conceptid(conceptid, lang):
     return default if ret == None else ret
 
 
-def get_valueid_from_concept_label(label):
+def get_valueids_from_concept_label(label, lang=None):
     se = SearchEngineFactory().create()
-    concept_label = se.search(index='strings', doc_type='concept', q="value:{0}".format(label))
+
+    def exact_val_match(val):
+        dsl = {
+            "query": {
+                "constant_score": {
+                    "filter": {
+                        "terms": {
+                            "value": [val]
+                            }
+                        }
+                    }
+                }
+            }
+        return dsl
+
+    concept_label_results = se.search(index='strings', doc_type='concept',
+                                      body=exact_val_match(label))
+    if concept_label_results is None:
+        return {
+            "category": "",
+            "conceptid": "",
+            "language": "",
+            "value": "",
+            "type": "",
+            "id": ""
+            }
+    return [res['_source'] for res in concept_label_results['hits']['hits']
+            if lang is None or res['_source']['language'] == lang]
 
 
 def get_concept_label_from_valueid(valueid):
