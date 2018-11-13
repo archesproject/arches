@@ -104,7 +104,7 @@ class Command(BaseCommand):
 
         instance = models.DDataType.objects.get(datatype=details["datatype"])
         instance.iconclass = details['iconclass']
-        instance.modulename = details['modulename']
+        instance.modulename=os.path.basename(source)
         instance.classname = details['classname']
         instance.defaultwidget = details["defaultwidget"]
         instance.defaultconfig = details['defaultconfig']
