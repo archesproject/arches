@@ -125,6 +125,11 @@ class StringDataType(BaseDataType):
         g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), Literal(str(edge_info['range_tile_data']))))
         return g
 
+    def from_rdf(self, json_ld_node):
+        # returns an in-memory graph object, containing the domain resource, its
+        # type and the number as a numeric literal (as this is how it is in the JSON)
+        return json_ld_node.get("@value")
+
 
 class NumberDataType(BaseDataType):
 
@@ -167,10 +172,17 @@ class NumberDataType(BaseDataType):
         # returns an in-memory graph object, containing the domain resource, its
         # type and the number as a numeric literal (as this is how it is in the JSON)
         g = Graph()
-        rtd = int(edge_info['range_tile_data']) if edge_info['range_tile_data'].is_integer() else edge_info['range_tile_data']
+        rtd = int(edge_info['range_tile_data']) if edge_info['range_tile_data'].is_integer(
+        ) else edge_info['range_tile_data']
         g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
         g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), Literal(rtd)))
         return g
+
+    def from_rdf(self, json_ld_node):
+        # expects a node taken from an expanded json-ld graph
+        # returns the value, or None if no "@value" key is found
+        return json_ld_node.get("@value")
+
 
 class BooleanDataType(BaseDataType):
 
@@ -206,6 +218,10 @@ class BooleanDataType(BaseDataType):
         g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), Literal(Boolean(edge_info['range_tile_data']))))
         return g
 
+    def from_rdf(self, json_ld_node):
+        # expects a node taken from an expanded json-ld graph
+        # returns the value, or None if no "@value" key is found
+        return json_ld_node.get("@value")
 
 class DateDataType(BaseDataType):
 
@@ -283,6 +299,12 @@ class DateDataType(BaseDataType):
         g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty),
                Literal(str(edge_info['range_tile_data']), datatype=XSD.dateTime)))
         return g
+
+    def from_rdf(self, json_ld_node):
+        # expects a node taken from an expanded json-ld graph
+        # returns the value, or None if no "@value" key is found
+        return json_ld_node.get("@value")
+
 
 class EDTFDataType(BaseDataType):
 
@@ -1044,7 +1066,7 @@ class FileListDataType(BaseDataType):
 
     def to_rdf(self, edge_info, edge, tile):
         # outputs a graph holding an RDF representation of the file stored in the Arches instance
-        
+
         g = Graph()
 
         unit_nt = """
@@ -1078,12 +1100,12 @@ class FileListDataType(BaseDataType):
 
         for f_data in edge_info['range_tile_data']:
             # f_data will be something like:
-            # "{\"accepted\": true, \"content\": \"blob:http://localhost/cccadfd0-64fc-104a-8157-3c96aca0b9bd\", 
+            # "{\"accepted\": true, \"content\": \"blob:http://localhost/cccadfd0-64fc-104a-8157-3c96aca0b9bd\",
             # \"file_id\": \"f4cd6596-cd75-11e8-85e0-0242ac1b0003\", \"height\": 307, \"index\": 0,
-            # \"lastModified\": 1535067185606, \"name\": \"FUjJqP6.jpg\", \"size\": 19350, 
+            # \"lastModified\": 1535067185606, \"name\": \"FUjJqP6.jpg\", \"size\": 19350,
             # \"status\": \"uploaded\", \"type\": \"image/jpeg\", \"url\": \"/files/uploadedfiles/FUjJqP6.jpg\",
             # \"width\": 503}"
-            
+
             # range URI should be the file URL/URI, and the rest of the details should hang off that
             # FIXME - (Poor) assumption that file is on same host as Arches instance host config.
             if f_data['url'].startswith("/"):
@@ -1387,11 +1409,24 @@ class ResourceInstanceDataType(BaseDataType):
 
     def to_rdf(self, edge_info, edge, tile):
         g = Graph()
+
+        def _add_resource(d, p, r, r_type):
+            g.add((r, RDF.type, URIRef(r_type)))
+            g.add((d, URIRef(p), r))
+
         if edge_info['range_tile_data'] is not None:
-            rangenode = URIRef(archesproject['resources/%s' % edge_info['range_tile_data']])
-            g.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
-            g.add((domainnode, URIRef(edge.ontologyproperty), rangenode))
+            res_insts = edge_info['range_tile_data']
+            if not isinstance(list, res_insts):
+                res_insts = [res_insts]
+
+            for res_inst in res_insts:
+                rangenode = URIRef(archesproject['resources/%s' % res_inst])
+                # FIXME: should be the class of the Resource Instance, rather than the expected class
+                # from the edge.
+                _add_resource(edge_info['d_uri'], edge.ontologyproperty,
+                              rangenode, edge.rangenode.ontologyclass)
         return g
+
 
 class NodeValueDataType(BaseDataType):
     def validate(self, value, row_number=None, source=''):

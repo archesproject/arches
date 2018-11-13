@@ -2,6 +2,7 @@ import json
 from django.core.urlresolvers import reverse
 from arches.app.models import models
 
+
 class BaseDataType(object):
 
     def __init__(self, model=None):
@@ -278,6 +279,7 @@ class BaseDataType(object):
         # for this tile data
         from rdflib import Namespace, URIRef, Literal, Graph, BNode
         from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS
+        from arches.app.utils.betterJSONSerializer import JSONSerializer
 
         g = Graph()
 
