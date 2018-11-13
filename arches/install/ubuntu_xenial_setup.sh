@@ -42,8 +42,8 @@ function install_couchdb {
 
 function install_yarn {
     sudo apt-get update -y
-    sudo apt-get install nodejs-legacy -y
-    sudo apt-get install npm -y
+    curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+    sudo apt-get install -y nodejs
     sudo npm install -g yarn
 }
 
