@@ -132,6 +132,7 @@ define([
             multiselect: params.multiselect,
             widgets: cardModel.widgets,
             parent: params.tile,
+            parentCard: params.parentCard,
             expanded: ko.observable(false),
             perms: perms,
             permsLiteral: permsLiteral,
@@ -220,7 +221,8 @@ define([
                     provisionalTileViewModel: params.provisionalTileViewModel,
                     cardwidgets: params.cardwidgets,
                     perms: perms,
-                    permsLiteral: permsLiteral
+                    permsLiteral: permsLiteral,
+                    parentCard: self
                 });
             })),
             hasprovisionaledits: ko.computed(function() {
@@ -381,6 +383,11 @@ define([
         this.disposables.push(this.canAdd);
         this.disposables.push(this.isChildSelected);
         this.disposables.push(this.doesChildHaveProvisionalEdits);
+        this.disposables.push(
+            this.cards.subscribe(function() {
+                this.model.parseNodes.call(this.model);
+            }, this)
+        );
         this.disposables.push(this.model);
 
         this.dispose = function() {

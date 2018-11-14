@@ -117,6 +117,7 @@ define([
                 return !!self.get('cards')().length;
             });
 
+            this.sourceData = attributes;
             this.parse(attributes);
             this.parseNodes.call(this, attributes);
 
@@ -132,15 +133,18 @@ define([
                 });
             });
 
-            var nodesSubscription = attributes.data.nodes.subscribe(function(){
-                this.parseNodes(attributes);
-                this._card(JSON.stringify(this.toJSON()));
-            }, this);
+            var nodes = ko.computed(function() {
+                return attributes.data.nodes();
+            }, this).extend({ throttle: 100 });
 
+            var nodesSubscription = nodes.subscribe(function(){
+                this.parseNodes(attributes);
+            }, this);
 
             this.disposables.push(componentIdSubscription);
             this.disposables.push(cardSubscription);
             this.disposables.push(widgetSubscription);
+            this.disposables.push(nodes);
             this.disposables.push(nodesSubscription);
             this.disposables.push(this.configJSON);
             this.disposables.push(this.dirty);
@@ -225,12 +229,16 @@ define([
             this._card(JSON.stringify(this.toJSON()));
         },
 
-        parseNodes: function(attributes) {
-            var widgets = [];
+        parseNodes: function() {
+            var attributes = this.sourceData;
+            var self = this;
+            var _nodeIDs = ko.unwrap(this.get('widgets')).map(function(widget) {
+                return ko.unwrap(widget.node_id);
+            });
             ko.unwrap(this.nodes).forEach(function(node) {
+                var widget;
                 // TODO: it would be nice to normalize the nodegroup_id names (right now we have several different versions)
-                if((ko.unwrap(node.nodeGroupId) || ko.unwrap(node.nodegroup_id)) === ko.unwrap(attributes.data.nodegroup_id)){
-
+                if((ko.unwrap(node.nodeGroupId) || ko.unwrap(node.nodegroup_id)) === ko.unwrap(attributes.data.nodegroup_id) && _nodeIDs.indexOf(node.nodeid) < 0){
                     var datatype = attributes.datatypelookup[ko.unwrap(node.datatype)];
                     var nodeDatatypeSubscription = node.datatype.subscribe(function(){
                         this._card(JSON.stringify(this.toJSON()));
@@ -242,23 +250,24 @@ define([
                         var cardWidgetData = _.find(attributes.data.widgets, function(widget) {
                             return widget.node_id === node.nodeid;
                         });
-                        var widget = new CardWidgetModel(cardWidgetData, {
+                        widget = new CardWidgetModel(cardWidgetData, {
                             node: node,
                             card: this,
                             datatype: datatype,
                             disabled: attributes.data.disabled
                         });
-                        widgets.push(widget);
+                        this.get('widgets').push(widget);
                     }
+                } else if (_nodeIDs.indexOf(node.nodeid) >= 0 && (ko.unwrap(node.nodeGroupId) || ko.unwrap(node.nodegroup_id)) !== ko.unwrap(attributes.data.nodegroup_id)) {
+                    widget = ko.unwrap(this.get('widgets')).find(function(widget) {
+                        return ko.unwrap(widget.node_id) === node.nodeid;
+                    });
+                    this.get('widgets').remove(widget);
                 }
             }, this);
-            widgets.sort(function(w, ww) {
-                return w.get('sortorder')() > ww.get('sortorder')();
+            this.get('widgets').sort(function(w, ww) {
+                return w.get('sortorder')() - ww.get('sortorder')();
             });
-            this.get('widgets')().forEach(function(widget){
-                widget.dispose();
-            });
-            this.get('widgets')(widgets);
             this._card(JSON.stringify(this.toJSON()));
         },
 

@@ -220,8 +220,11 @@ class NewResourceEditorView(MapBaseManagerView):
     def delete(self, request, resourceid=None):
         if resourceid is not None:
             ret = Resource.objects.get(pk=resourceid)
-            ret.delete(user=request.user)
-            return JSONResponse(ret)
+            deleted = ret.delete(user=request.user)
+            if deleted is True:
+                return JSONResponse(ret)
+            else:
+                return JSONResponse({'status': 'false', 'success': False, 'message': 'Provisional users cannot delete resources with authoritative data', 'title': 'Unable to Delete Resource'}, status=500)
         return HttpResponseNotFound()
 
     def copy(self, request, resourceid=None):
@@ -332,6 +335,7 @@ class ResourceEditorView(MapBaseManagerView):
             ret = Resource.objects.get(pk=resourceid)
             ret.delete(user=request.user)
             return JSONResponse(ret)
+
         return HttpResponseNotFound()
 
     def copy(self, request, resourceid=None):

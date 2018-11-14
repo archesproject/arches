@@ -31,6 +31,7 @@ services:
         - DJANGO_DEBUG=False
         # - DJANGO_REMOTE_DEBUG=False
         - DOMAIN_NAMES=localhost
+        - PYTHONUNBUFFERED=0
         - TZ=PST
       ports:
         - '8000:8000'

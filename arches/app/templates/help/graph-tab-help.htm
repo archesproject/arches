@@ -13,11 +13,7 @@
         <div class="ep-help-topic-content" style="display:block;">
             <p>{% blocktrans %}In this tab you will design the graph&mdash;the core of a Resource Model or Branch. In fact, sometimes Resource Models and Branches are generically referred to as "graphs".{% endblocktrans %}</p>
             <p>{% blocktrans %}For the first step in building a graph, you should fill out the <strong>top-level settings</strong>. Some of these may be changed later while others can't, so make sure to do a lot of testing while developing a graph. With the top-level settings in place, it's time to <strong>construct the graph</strong> by adding nodes (or full Branches) to the graph tree. Along the way, you'll need to set the <strong>node-level settings</strong> for each node you create.{% endblocktrans %}</p>
-            {% if graph.isresource %}
-            <p>{% blocktrans %}Once you've finished creating this Resource Model&mdash;and set its status to "active")&mdash;data entry users will be able to use it to create resources in the database.{% endblocktrans %}</p>
-            {% else %}
-            <p>{% blocktrans %}Once you've finished creating this Branch&mdash;and set its status to "active")&mdash;you will be able to add it to the graph tree for a Resource Model or another Branch.{% endblocktrans %}</p>
-            {% endif %}
+            <p>{% blocktrans %}Once you've finished creating this Resource Model or Branch make sure to set its status to "active".{% endblocktrans %}</p>
         </div>
     </div>
     <div>
@@ -191,7 +187,7 @@
                 </tr>
                 <tr>
                     <td>{% trans "edtf" %}</td>
-                    <td>{% trans "Stores an <a href='https://www.loc.gov/standards/datetime/' target='_blank'>Extended Date/Time Format</a> value. Use this data type for BCE dates or dates with uncertainty. You'll be prompted to enter a number of extra configuration that inform the database search methods how to interpret EDTF values." %}</td>
+                    <td>{% trans "Stores an <a href='https://www.loc.gov/standards/datetime/' target='_blank'>Extended Date/Time Format</a> value. Use this data type for BCE dates or dates with uncertainty. This datatype requires extra configuration to inform the database search methods how to interpret EDTF values. Data entry users can enter edtf dates using formats listed in the <a href='https://www.loc.gov/standards/datetime/pre-submission.html' target='_blank'>EDTF draft specification</a>." %}</td>
                 </tr>
                 <tr>
                     <td>{% trans "file-list" %}</td>

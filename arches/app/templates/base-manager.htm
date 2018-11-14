@@ -231,7 +231,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     <strong>{% trans "Manage System Settings" %}</strong>
                                                 </span>
                                             </a>
-                                            <ul class="collapse in pop-in" data-bind="css:{'expanded-nav': navExpanded()}">
+                                            <ul class="collapse in pop-in arches" data-bind="css:{'expanded-nav': navExpanded()}">
                                                 <li class="link-submenu-item">
                                                     <a class="link-submenu" href="{% url 'config' %}" data-bind="click: navigate.bind(this, '{% url 'config' %}')">{% trans "System Settings" %}</a>
                                                 </li>
@@ -252,7 +252,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     <strong>{% trans "Add New Resource" %}</strong>
                                                 </span>
                                             </a>
-                                            <ul class="collapse in pop-in" data-bind="css:{'expanded-nav': navExpanded()}">
+                                            <ul class="collapse in pop-in arches" data-bind="css:{'expanded-nav': navExpanded()}">
                                                 <!-- ko foreach: createableResources -->
                                                 <li class="link-submenu-item">
                                                     <a class="link-submenu" href="#" data-bind="click: disable_instance_creation ? null: $parent.navigate.bind(this, '{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}'.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)),
@@ -276,7 +276,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     <strong>{% trans "Arches Designer" %}</strong>
                                                 </span>
                                             </a>
-                                            <ul class="collapse in pop-in" data-bind="css:{'expanded-nav': navExpanded()}">
+                                            <ul class="collapse in pop-in arches" data-bind="css:{'expanded-nav': navExpanded()}">
                                                 <li class="link-submenu-item">
                                                     <a class="link-submenu"  href="{% url 'graph' '' %}" data-bind="click: navigate.bind(this, '{% url 'graph' '' %}')">{% trans "Resource Models" %}</a>
                                                 </li>
@@ -296,7 +296,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     <strong>{% trans "Map Layer Manager" %}</strong>
                                                 </span>
                                             </a>
-                                            <ul class="collapse in pop-in" data-bind="css:{'expanded-nav': navExpanded()}">
+                                            <ul class="collapse in pop-in arches" data-bind="css:{'expanded-nav': navExpanded()}">
                                                 <li class="link-submenu-item">
                                                     <a class="link-submenu" href="{% url 'map_layer_manager' %}" data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}')">{% trans "Resource Layers" %}</a>
                                                 </li>
@@ -344,12 +344,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </li>
                                         {% endif %}
 
-                                        {% if request.user|has_group:"RDM Administrator" %}
                                         <li class="list-divider-dark"></li>
 
                                         <!-- Tools -->
                                         <li class="list-header">{% trans "Modules" %}</li>
 
+                                        {% if request.user|has_group:"RDM Administrator" %}
                                         <!--Menu list item-->
                                         <li{% if main_script == "rdm" %} class="active-sub"{% endif %}>
                                             <a href="{% url 'rdm' '' %}" data-bind="click: navigate.bind(this, '{% url 'rdm' '' %}') ">
@@ -361,6 +361,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </li>
                                         {% endif %}
 
+                                        {% for p in plugins %}
+                                        <li{% if main_script == "views/plugin" and plugin.pluginid == p.pluginid  %} class="active-sub"{% endif %}>
+                                            {% if p.slug is not None %}
+                                            <a href="{% url 'plugins' p.slug %}" data-bind="click: navigate.bind(this, '{% url 'plugins' p.slug %}') ">
+                                            {% else %}
+                                            <a href="{% url 'plugins' p.pluginid %}" data-bind="click: navigate.bind(this, '{% url 'plugins' p.pluginid %}') ">
+                                            {% endif %}
+                                                <i class="{{p.icon}}"></i>
+                                                <span class="menu-title">
+                                                    {{p.name}}
+                                                </span>
+                                            </a>
+                                        </li>
+                                        {% endfor %}
                                     </ul>
                                 </div>
                             </div>

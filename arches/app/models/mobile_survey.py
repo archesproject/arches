@@ -16,11 +16,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import uuid
 import json
 import couchdb
+import urlparse
 from copy import copy, deepcopy
 from django.db import transaction
 from arches.app.models import models
+from arches.app.models.concept import Concept
 from arches.app.models.tile import Tile
 from arches.app.models.graph import Graph
+from arches.app.models.models import ResourceInstance
 from arches.app.models.system_settings import settings
 from django.http import HttpRequest
 from arches.app.utils.couch import Couch
@@ -51,6 +54,7 @@ class MobileSurvey(models.MobileSurveyModel):
         # self.description = models.TextField(null=True)
         # self.bounds = models.MultiPolygonField(null=True)
         # self.tilecache = models.TextField(null=True)
+        # self.onlinebasemaps = JSONField(blank=True, null=True, db_column='onlinebasemaps')
         # self.datadownloadconfig = JSONField(blank=True, null=True, default='{"download":false, "count":1000, "resources":[]}')
         # end from models.MobileSurvey
 
@@ -59,7 +63,6 @@ class MobileSurvey(models.MobileSurveyModel):
     def save(self):
         super(MobileSurvey, self).save()
         db = self.couch.create_db('project_' + str(self.id))
-
         # need to serialize to JSON and then back again because UUID's
         # cause the couch update_doc method to throw an error
         survey = JSONSerializer().serialize(self)
@@ -75,7 +78,7 @@ class MobileSurvey(models.MobileSurveyModel):
 
     def serialize(self, fields=None, exclude=None):
         """
-        serialize to a different form then used by the internal class structure
+        serialize to a different form than used by the internal class structure
         used to append additional values (like parent ontology properties) that
         internal objects (like models.Nodes) don't support
         """
@@ -91,8 +94,39 @@ class MobileSurvey(models.MobileSurveyModel):
                 graphids.append(card.graph_id)
                 #we may want the full proxy model at some point, but for now just the root node color
                 graph = Graph.objects.get(pk=card.graph_id)
-                graph_obj = graph.serialize(exclude=['domain_connections', 'functions', 'edges', 'relatable_resource_model_ids'])
-                graph_obj['widgets'] = models.CardXNodeXWidget.objects.filter(card__graph=graph).distinct()
+                graph_obj = graph.serialize(exclude=['domain_connections', 'edges', 'relatable_resource_model_ids'])
+                graph_obj['widgets'] = list(models.CardXNodeXWidget.objects.filter(card__graph=graph).distinct())
+                for node in graph_obj['nodes']:
+                    found = False
+                    for widget in graph_obj['widgets']:
+                        if node['nodeid'] == str(widget.node_id):
+                            found = True
+                            try:
+                                collection_id = node['config']['rdmCollection']
+                                concept_collection = Concept().get_child_collections_hierarchically(collection_id)
+                                widget.config['options'] = concept_collection
+                            except:
+                                pass
+                            break
+                    if not found:
+                        for card in graph_obj['cards']:
+                            if card['nodegroup_id'] == node['nodegroup_id']:
+                                widget = models.DDataType.objects.get(pk=node['datatype']).defaultwidget
+                                if widget:
+                                    widget_model = models.CardXNodeXWidget()
+                                    widget_model.node_id = node['nodeid']
+                                    widget_model.card_id = card['cardid']
+                                    widget_model.widget_id = widget.pk
+                                    widget_model.config = widget.defaultconfig
+                                    try:
+                                        collection_id = node['config']['rdmCollection']
+                                        concept_collection = Concept().get_child_collections_hierarchically(collection_id)
+                                        widget_model.config['options'] = concept_collection
+                                    except:
+                                        pass
+                                    widget_model.label = node['name']
+                                    graph_obj['widgets'].append(widget_model)
+                                break
                 graphs.append(graph_obj)
 
         ret['graphs'] = graphs
@@ -114,14 +148,71 @@ class MobileSurvey(models.MobileSurveyModel):
         # save back to postgres db
         db = self.couch.create_db('project_' + str(self.id))
         ret = []
-        for row in db.view('_all_docs', include_docs=True):
-            ret.append(row)
-            if 'tileid' in row.doc:
-                tile = Tile(row.doc)
-                #if tile.filter_by_perm(request.user, 'write_nodegroup'):
-                with transaction.atomic():
-                    tile.save()
-                #tile = models.TileModel.objects.get(pk=row.doc.tileid).update(**row.doc)
+        with transaction.atomic():
+            for row in self.couch.all_docs(db):
+                ret.append(row)
+                if row.doc['type'] == 'resource':
+                    if row.doc['provisional_resource'] == 'true':
+                        resourceinstance, created = ResourceInstance.objects.update_or_create(
+                            resourceinstanceid = uuid.UUID(str(row.doc['resourceinstanceid'])),
+                            defaults = {
+                            'graph_id': uuid.UUID(str(row.doc['graph_id']))
+                            }
+                        )
+                        print('Resource {0} Saved'.format(row.doc['resourceinstanceid']))
+
+            for row in self.couch.all_docs(db):
+                ret.append(row)
+                if row.doc['type'] == 'tile':
+                    if row.doc['provisionaledits'] is not None:
+                        try:
+                            tile = Tile.objects.get(tileid=row.doc['tileid'])
+                            for user_edits in row.doc['provisionaledits'].items():
+                                # user_edits is a dict with the user number as the key and data as the value
+                                # {u'5': {
+                                #     u'action': u'update',
+                                #     u'reviewer': None,
+                                #     u'reviewtimestamp': None,
+                                #     u'status': u'review',
+                                #     u'timestamp': u'2018-11-02T18:38:00.684250Z',
+                                #     u'value': {
+                                #         u'bb97b857-d646-11e8-9f94-acbc32b81a1b': u'Provisional String Value',
+                                #         u'bb98aab8-d646-11e8-922d-acbc32b81a1b': None
+                                #         }
+                                #     }
+                                # }
+                                if tile.provisionaledits is None:
+                                    tile.provisionaledits = {}
+                                    tile.provisionaledits[user_edits[0]] = user_edits[1]
+                                else:
+                                    if user_edits[0] in tile.provisionaledits:
+                                        if user_edits[1]['timestamp'] > tile.provisionaledits[user_edits[0]]['timestamp']:
+                                            # If the mobile user edits are newer by UTC timestamp, overwrite the tile data
+                                            tile.provisionaledits[user_edits[0]] = user_edits[1]
+
+                            # If there are conflicting documents, lets clear those out
+                            if '_conflicts' in row.doc:
+                                for conflict_rev in row.doc['_conflicts']:
+                                    conflict_data = db.get(row.id, rev=conflict_rev)
+                                    for user_edits in conflict_data['provisionaledits'].items():
+                                        if user_edits[0] in tile.provisionaledits:
+                                            if user_edits[1]['timestamp'] > tile.provisionaledits[user_edits[0]]['timestamp']:
+                                                # If the mobile user edits are newer by UTC timestamp, overwrite the tile data
+                                                tile.provisionaledits[user_edits[0]] = user_edits[1]
+                                    # Remove conflicted revision from couch
+                                    db.delete(conflict_data)
+
+                                # TODO: If user is provisional user, apply as provisional edit
+                                # TODO: If user is reviewer, apply as authoritative edit
+                        except Tile.DoesNotExist:
+                            tile = Tile(row.doc)
+
+                        tile.save()
+                        tile_serialized = json.loads(JSONSerializer().serialize(tile))
+                        tile_serialized['type'] = 'tile'
+                        self.couch.update_doc(db, tile_serialized, tile_serialized['tileid'])
+                        print('Tile {0} Saved'.format(row.doc['tileid']))
+                        db.compact()
         return ret
 
     def collect_resource_instances_for_couch(self):

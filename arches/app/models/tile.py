@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import uuid, importlib
 import datetime
 import json
+import pytz
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import ValidationError
 from django.utils import timezone
@@ -135,12 +136,15 @@ class Tile(models.TileModel):
         """
         if self.tile_collects_data() is True and data != {}:
 
+            utc_date_format = '%Y-%m-%dT%H:%M:%S.%fZ'
+            timestamp_utc = unicode(datetime.datetime.now(pytz.utc).strftime(utc_date_format))
+
             provisionaledit =  {
                 "value": data,
                 "status": status,
                 "action": action,
                 "reviewer": None,
-                "timestamp": unicode(timezone.now()),
+                "timestamp": timestamp_utc,
                 "reviewtimestamp": None
             }
 

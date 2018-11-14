@@ -3,13 +3,14 @@ define([
     'underscore',
     'knockout',
     'viewmodels/card',
+    'models/card-widget',
     'arches',
     'graph-designer-data',
     'bindings/sortable',
     'bindings/scrollTo',
     'widgets',
     'card-components'
-], function($, _, ko, CardViewModel, arches, data) {
+], function($, _, ko, CardViewModel, CardWidgetModel, arches, data) {
     var CardTreeViewModel = function(params) {
         var self = this;
         var filter = ko.observable('');
@@ -24,6 +25,7 @@ define([
         var hover = ko.observable();
         var scrollTo = ko.observable();
         var cachedFlatTree;
+        var cardList = data.cards;
 
         this.flattenTree = function(parents, flatList) {
             _.each(ko.unwrap(parents), function(parent) {
@@ -177,49 +179,90 @@ define([
             beforeMove: function(e) {
                 e.cancelDrop = (e.sourceParent!==e.targetParent);
             },
+            updateCard: function(parents, card, data) {
+                var updatedCards = [];
+                _.each(ko.unwrap(parents), function(parent) {
+                    if (parent.nodegroupid === card.parentnodegroupId) {
+                        var newcard = {
+                            card: card,
+                            nodegroup: _.filter(data.nodegroups, function(ng){return data.updated_values.card.nodegroup_id === ng.nodegroupid;})[0]
+                        };
+                        self.addCard(newcard, parent.cards, parent);
+                    } else {
+                        self.updateCard(ko.unwrap(parent.cards), card, data);
+                    }
+                }, this);
+                return updatedCards;
+            },
+            updateNode: function(parents, node) {
+                var updatedCards = [];
+                _.each(ko.unwrap(parents), function(parent) {
+                    if (parent.nodegroupid === node.nodegroup_id) {
+                        var attributes = parent.model.attributes;
+                        _.each(parent.model.nodes(), function(modelnode){
+                            if (modelnode.nodeid === node.nodeid) {
+                                var datatype = attributes.datatypelookup[ko.unwrap(modelnode.datatype)];
+                                if (!modelnode.nodeDatatypeSubscription) {
+                                    modelnode.nodeDatatypeSubscription = modelnode.datatype.subscribe(function(){
+                                        parent.model._card(JSON.stringify(parent.model.toJSON()));
+                                    }, this);
+                                }
+                                if (datatype.defaultwidget_id) {
+                                    var cardWidgetData = _.find(attributes.data.widgets, function(widget) {
+                                        return widget.node_id === node.nodeid;
+                                    });
+                                    var widget = new CardWidgetModel(cardWidgetData, {
+                                        node: modelnode,
+                                        card: parent.model,
+                                        datatype: datatype,
+                                        disabled: attributes.data.disabled
+                                    });
+                                    var widgetIndex;
+                                    _.each(parent.widgets(), function(pw, i){
+                                        if (pw.node_id() === widget.node_id()) {
+                                            widgetIndex = i;
+                                        }
+                                    }, self);
+                                    if (widgetIndex !== undefined) {
+                                        parent.widgets.splice(widgetIndex, 1, widget);
+                                    } else {
+                                        parent.widgets.push(widget);
+                                    }
+                                }
+                            }
+                        });
+                        parent.model._card(JSON.stringify(parent.model.toJSON()));
+                    } else {
+                        self.updateNode(ko.unwrap(parent.cards), node);
+                    }
+                }, this);
+                return updatedCards;
+            },
             updateCards: function(selectedNodegroupId, data) {
-                var cards = data.cards;
-                var nodegroups = data.nodegroups;
-                var existingNodegroupIds = _.pluck(self.graphModel.get('nodegroups'), 'nodegroupid');
-                var newNodegroups = _.filter(nodegroups, function(ng) {return _.contains(existingNodegroupIds, ng.nodegroupid) === false;});
+                if (data.updated_values.card) {
+                    var card = data.updated_values.card;
+                    card.parentnodegroupId = _.filter(data.nodegroups, function(ng){return data.updated_values.card.nodegroup_id === ng.nodegroupid;})[0].parentnodegroup_id;
+                    self.updateCard(self.topCards(), card, data);
+                } else {
+                    self.updateNode(self.topCards(), data.updated_values.node);
+                    if (data.updated_values.node.nodegroup_id !== data.updated_values.node.nodeid) {
+                        var oldCard = _.find(self.flattenTree(self.topCards(), []), function(card) {
+                            return card.nodegroupid === data['updated_values'].node.nodeid;
+                        });
+                        if (oldCard) {
+                            var parentCards = oldCard.parentCard ? oldCard.parentCard.cards : self.topCards;
+                            parentCards.remove(oldCard);
+                            parentCards(
+                                parentCards().concat(
+                                    oldCard.cards()
+                                )
+                            );
+                        }
+                    }
+                }
                 _.each(self.cachedFlatTree, function(cardViewModel) {
                     cardViewModel.dispose();
                 });
-                self.topCards.removeAll();
-                if (newNodegroups.length > 0) {
-                    self.graphModel.set('nodegroups', self.graphModel.get('nodegroups').concat(newNodegroups));
-                }
-                self.topCards(_.filter(cards, function(card) {
-                    var nodegroup = _.find(ko.unwrap(self.graphModel.get('nodegroups')), function(group) {
-                        return ko.unwrap(group.nodegroupid) === card.nodegroup_id;
-                    });
-                    if (nodegroup) {
-                        return !nodegroup || !ko.unwrap(nodegroup.parentnodegroup_id);
-                    }
-                }, self).map(function(card) {
-                    var newCard = new CardViewModel({
-                        card: card,
-                        graphModel: self.graphModel,
-                        tile: null,
-                        resourceId: ko.observable(),
-                        displayname: ko.observable(),
-                        handlers: {},
-                        cards: cards,
-                        tiles: [],
-                        selection: selection,
-                        hover: hover,
-                        scrollTo: scrollTo,
-                        multiselect: self.multiselect,
-                        loading: loading,
-                        filter: filter,
-                        provisionalTileViewModel: null,
-                        cardwidgets: data.cardwidgets,
-                        userisreviewer: true,
-                        perms: ko.observableArray(),
-                        permsLiteral: ko.observableArray()
-                    });
-                    return newCard;
-                }, self));
                 self.cachedFlatTree = self.flattenTree(self.topCards(), []);
                 _.each(self.cachedFlatTree, function(node) {
                     if (node.nodegroupid === selectedNodegroupId) {
@@ -233,17 +276,19 @@ define([
                 removeCard(self.topCards, selectedNodegroupId);
                 if (self.topCards().length){ self.topCards()[0].selected(true); }
             },
-            addCard: function(data) {
-                var cards;
+            addCard: function(data, parentcards, parent) {
+                if (!parentcards) {
+                    parentcards = self.topCards;
+                }
                 self.graphModel.set('nodegroups', self.graphModel.get('nodegroups').concat([data.nodegroup]));
-                self.topCards.push(new CardViewModel({
+                var newCardViewModel = new CardViewModel({
                     card: data.card,
                     graphModel: self.graphModel,
                     tile: null,
                     resourceId: ko.observable(),
                     displayname: ko.observable(),
                     handlers: {},
-                    cards: cards,
+                    cards: cardList,
                     tiles: [],
                     selection: selection,
                     hover: hover,
@@ -255,9 +300,33 @@ define([
                     cardwidgets: data.cardwidgets,
                     userisreviewer: true,
                     perms: ko.observableArray(),
-                    permsLiteral: ko.observableArray()
-                }));
+                    permsLiteral: ko.observableArray(),
+                    parentCard: parent
+                });
+                parentcards.push(newCardViewModel);
+
+                var node = _.find(self.graphModel.get('nodes')(), function(node) {
+                    return node.nodeid === data.card.nodegroup_id;
+                });
+                self.graphModel.getChildNodesAndEdges(node).nodes.forEach(function(node) {
+                    var card = _.find(ko.unwrap(parentcards), function(card) {
+                        return card.nodegroupid === (ko.unwrap(node.nodeGroupId) ||
+                            ko.unwrap(node.nodegroup_id)) &&
+                            card.model.cardid() !== newCardViewModel.model.cardid();
+                    });
+                    if (card) {
+                        parentcards.remove(card);
+                        var cardIDs = newCardViewModel.cards().map(function(card) {
+                            return card.cardid;
+                        });
+                        if (!_.contains(cardIDs, card.cardid)) {
+                            newCardViewModel.cards.push(card);
+                        }
+                    }
+                });
+
                 self.cachedFlatTree = self.flattenTree(self.topCards(), []);
+                return newCardViewModel;
             },
             reorderCards: function() {
                 loading(true);
@@ -291,6 +360,33 @@ define([
                 selection(topCard.tiles().length > 0 ? topCard.tiles()[0] : topCard);
             }
         }
+
+        self.graphModel.get('cards').subscribe(function(graphCards) {
+            var currentCards = self.flattenTree(self.topCards(), []);
+            var cardIds = currentCards.map(function(card) {
+                return card.model.cardid();
+            });
+            var newCards = graphCards.filter(function(card) {
+                return !_.contains(cardIds, card.cardid);
+            });
+            cardList = cardList.concat(newCards);
+
+            newCards.forEach(function(card) {
+                var nodegroup = _.find(ko.unwrap(params.graphModel.get('nodegroups')), function(group) {
+                    return ko.unwrap(group.nodegroupid) === card.nodegroup_id;
+                });
+                var parent = _.find(currentCards, function(currentCard) {
+                    return currentCard.nodegroupid === nodegroup.parentnodegroup_id;
+                });
+                if (parent || !nodegroup.parentnodegroup_id) {
+                    self.addCard({
+                        nodegroup: nodegroup,
+                        card: card,
+                        cardwidgets: self.graphModel.get('cardwidgets')
+                    }, parent ? parent.cards : self.topCards, parent);
+                }
+            });
+        });
     };
     return CardTreeViewModel;
 });

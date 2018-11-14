@@ -179,12 +179,15 @@ define(['arches',
                     response.responseJSON.edges.forEach(function(edge){
                         this.get('edges').push(edge);
                     }, this);
-                    response.responseJSON.nodegroups.forEach(function(nodegroup){
-                        this.get('nodegroups').push(nodegroup);
+                    this.set('nodegroups', response.responseJSON.nodegroups);
+                    response.responseJSON.widgets.forEach(function(widget){
+                        this.get('cardwidgets').push(widget);
                     }, this);
-                    response.responseJSON.cards.forEach(function(card){
-                        this.get('cards').push(card);
-                    }, this);
+                    this.get('cards')(
+                        this.get('cards')().concat(
+                            response.responseJSON.cards
+                        )
+                    );
 
                     if(!this.get('isresource')){
                         this.get('nodes')().forEach(function(node) {
@@ -474,6 +477,8 @@ define(['arches',
                 }
                 return parentCards;
             }, this);
+
+            this.set('cardwidgets', ko.observableArray());
         },
 
         /**
