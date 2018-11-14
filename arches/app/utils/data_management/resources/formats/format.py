@@ -9,6 +9,8 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.views.concept import get_preflabel_from_conceptid
 from django.utils import translation
 
+from arches.app.models import models as archesmodels
+
 class Writer(object):
 
     def __init__(self):
@@ -73,7 +75,8 @@ class Writer(object):
                 alternates = True
                 alternate_entitytypeid = mapping['alternate_entitytypeid']
                 alternate_values = []
-            if entitytypeid.endswith('E55') != True:
+            businesstable = archesmodels.EntityTypes.objects.only("businesstablename").get(pk = mapping['entitytypeid'])
+            if businesstable != 'domains':
                 for entity in child_entities:
                     if alternate_entitytypeid == entity['entitytypeid']:
                         alternate_values.append(entity['value'])
