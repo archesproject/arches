@@ -16,7 +16,7 @@ from rdflib import Namespace
 from rdflib import URIRef, Literal
 from rdflib import Graph
 from rdflib.namespace import RDF, RDFS
-from pyld.jsonld import compact, frame, from_rdf, to_rdf
+from pyld.jsonld import compact, frame, from_rdf, to_rdf, expand
 
 try:
     from cStringIO import StringIO
@@ -256,6 +256,17 @@ class JsonLdReader(Reader):
         self.errors = {}
         self.resources = []
         self.use_ids = False
+        self.datatype_factory = DataTypeFactory()
+        self.resource_model_root_classes = set()
+        self.non_unique_classes = set()
+        for graph in models.GraphModel.objects.filter(isresource=True):
+            node = models.Node.objects.get(graph_id=graph.pk, istopnode=True)
+            if node.ontologyclass in self.resource_model_root_classes:
+                #make a note of non-unique root classes
+                self.non_unique_classes.add(node.ontologyclass)
+            else:
+                self.resource_model_root_classes.add(node.ontologyclass)
+        self.resource_model_root_classes = self.resource_model_root_classes - self.non_unique_classes
         self.ontologyproperties = models.Edge.objects.values_list('ontologyproperty', flat=True).distinct()
 
     def get_graph_id(self, strs_to_test):
@@ -285,6 +296,9 @@ class JsonLdReader(Reader):
 
         for jsonld in data:
             self.errors = {}
+            # import ipdb
+            # ipdb.set_trace()
+            jsonld = expand(jsonld)[0]
             graphid = self.get_graph_id(jsonld["@type"])
             if graphid:
                 graph = GraphProxy.objects.get(graphid=graphid)
@@ -388,13 +402,28 @@ class JsonLdReader(Reader):
             # try to find a node in the graph among a bunch of sibling nodes that has the same incoming edge (propertyclass) as
             # the edge/node combination we're searching for from the json-ld graph
             for node in nodes:
-                if node['parent_edge'].ontologyproperty == ontology_property and node['node'].ontologyclass == jsonld_graph['@type']:
-                    # print "found %s" % node['node'].name
-                    nodes_copy.add((node['node'].name, node['node'].pk))
-                    found.append(node)
-                else:
-                    invalid_nodes.add((node['node'].name, node['node'].pk))
-                    pass
+                # print "node['node'].ontologyclass == jsonld_graph['@type']"
+                # print node['node'].ontologyclass == jsonld_graph['@type']
+                # print node['node'].ontologyclass
+                # print jsonld_graph
+                if '@type' in jsonld_graph:
+                    if node['parent_edge'].ontologyproperty == ontology_property and node['node'].ontologyclass == jsonld_graph['@type'][0]:
+                        # print "found %s" % node['node'].name
+                        nodes_copy.add((node['node'].name, node['node'].pk))
+                        found.append(node)
+                    else:
+                        invalid_nodes.add((node['node'].name, node['node'].pk))
+                        pass
+                if '@value' in jsonld_graph:
+                    if node['parent_edge'].ontologyproperty == ontology_property and node['node'].ontologyclass == str(RDFS.Literal):
+                        # print node['parent_edge'].ontologyproperty == ontology_property and node['node'].ontologyclass == str(RDFS.Literal)
+                        # print node['node'].name
+                        # print node['node'].ontologyclass
+                        # print node['parent_edge'].ontologyproperty
+                        # print ontology_property
+                        # print "found %s" % node['node'].name
+                        nodes_copy.add((node['node'].name, node['node'].pk))
+                        found.append(node)
 
             # print 'found %s branches' % len(found)
             if len(found) == 0:
@@ -402,20 +431,64 @@ class JsonLdReader(Reader):
                 raise self.DataDoesNotMatchGraphException()
 
             # if len(self.findOntologyProperties(jsonld_graph)) == 0:
-                # print 'at a leaf -- unwinding'
+            # print 'at a leaf -- unwinding'
+            
+            def json_data_is_valid(node, json_ld_node):
+                datatype = self.datatype_factory.get_instance(node.datatype)
+                value = datatype.from_rdf(json_ld_node)
+                print 'in json_data_is_valid'
+                print datatype.validate(value)
+                return len(datatype.validate(value)) == 0
 
-            for ontology_prop in self.findOntologyProperties(jsonld_graph):
+            if len(found) > 1:
                 for found_node in found:
-                    try:
-                        # print 'now searching children of %s node' % found_node['node'].name
-                        branch = self.findBranch(found_node['children'], ontology_prop, jsonld_graph[ontology_prop])
-                    except self.DataDoesNotMatchGraphException as e:
-                        found_node['remove'] = True
-                        invalid_nodes.add((found_node['node'].name, found_node['node'].pk))
-                    except self.AmbiguousGraphException as e:
-                        # print 'threw AmbiguousGraphException'
-                        # print nodes_copy
-                        pass
+                    # here we follow the algorithm supplied by the Getty
+                    # If the range in the model is a domain-value, and the incoming data is of the right format and part of the domain-value's enumeration, then accept that node.
+                    # If the range in the model is a number, string, or date, and the incoming data is of the right format, then accept that node.
+                    # If the range in the model is a file-list, and the referenced file already exists, then accept that node.
+                    # If the range in the model is a concept, then consider if the incoming data is a concept that is part of the collection for the node. If it is, then accept that node. If it is a concept, and not part of the collection, then fail. If it is not a concept, then continue.
+                    for datatype in ['domain-value', 'number', 'string', 'date', 'file-list', 'concept']:
+                        if found_node['node'].datatype == datatype and json_data_is_valid(found_node['node'], jsonld_graph):
+                            return found_node
+
+                    # If the range is semantic, then check the class of the incoming node is the same 
+                    # class as the model's node. If it does, then recursively test the edges of the 
+                    # semantic node to determine if it is a candidate (peek-ahead). Remove from the 
+                    # candidate list if it is not.
+                    if found_node['node'].datatype == 'semantic':
+                        for ontology_prop in self.findOntologyProperties(jsonld_graph):
+                            try:
+                                # print 'now searching children of %s node' % found_node['node'].name
+                                branch = self.findBranch(found_node['children'], ontology_prop, jsonld_graph[ontology_prop])
+                            except self.DataDoesNotMatchGraphException as e:
+                                found_node['remove'] = True
+                                invalid_nodes.add((found_node['node'].name, found_node['node'].pk))
+                            except self.AmbiguousGraphException as e:
+                                # print 'threw AmbiguousGraphException'
+                                # print nodes_copy
+                                pass
+
+                    # If the range in the model is a resource-instance, then check that the incoming 
+                    # node has the same class as the top node of any of the referenced models. If more 
+                    # than one model has the same top level class, then fail as the model is ambiguous. 
+                    # If there is exactly one possible model, then accept that node.
+                    if found_node['node'].datatype == 'resource-instance':
+                        if found_node['node'].ontologyclass in self.resource_model_root_classes:
+                            return found_node
+
+            # ORIGINAL CODE - this is probably more flexable to have this here as this allows for non-semantic nodes to have child nodes
+            # for ontology_prop in self.findOntologyProperties(jsonld_graph):
+            #     for found_node in found:
+            #         try:
+            #             # print 'now searching children of %s node' % found_node['node'].name
+            #             branch = self.findBranch(found_node['children'], ontology_prop, jsonld_graph[ontology_prop])
+            #         except self.DataDoesNotMatchGraphException as e:
+            #             found_node['remove'] = True
+            #             invalid_nodes.add((found_node['node'].name, found_node['node'].pk))
+            #         except self.AmbiguousGraphException as e:
+            #             # print 'threw AmbiguousGraphException'
+            #             # print nodes_copy
+            #             pass
 
             valid_nodes = nodes_copy.difference(invalid_nodes)
 
@@ -488,13 +561,21 @@ class JsonLdReader(Reader):
                         else:
                             self.tiles[parent_tileid].tiles.append(self.tiles[tileid])
 
-                    if str(RDF.value) in jsonld_node:
-                        value = jsonld_node[str(RDF.value)]
-                        try:
-                            value = JSONDeserializer().deserialize(value)
-                        except:
-                            pass
-                        self.tiles[tileid].data[str(branch['node'].nodeid)] = value
+                    print 'finding value'
+                    print jsonld_node
+                    datatype = self.datatype_factory.get_instance(branch['node'].datatype)
+                    value = datatype.from_rdf(jsonld_node)
+                    self.tiles[tileid].data[str(branch['node'].nodeid)] = value
+
+                    # if '@value' in jsonld_node:
+                    #     value = jsonld_node['@value']
+                    #     print 'value'
+                    #     print value
+                    #     try:
+                    #         value = JSONDeserializer().deserialize(value)
+                    #     except:
+                    #         pass
+                    #     self.tiles[tileid].data[str(branch['node'].nodeid)] = value
 
                 if len(ontology_properties) > 0:
                     for ontology_property in ontology_properties:
