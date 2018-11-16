@@ -228,17 +228,25 @@ class Resources(APIBase):
     #         return JSONResponse(status=500, reason=e)
 
     def put(self, request, resourceid):
+        try:
+            indent = int(request.PUT.get('indent', None))
+        except:
+            indent = None
+
         if user_can_edit_resources(user=request.user):
             with transaction.atomic():
                 try:
                     # DELETE
                     resource_instance = Resource.objects.get(pk=resourceid)
                     resource_instance.delete()
+                except models.ResourceInstance.DoesNotExist:
+                    pass
 
+                try:
                     # POST
                     data = JSONDeserializer().deserialize(request.body)
                     reader = JsonLdReader()
-                    reader.read_resource(data)
+                    reader.read_resource(data, resourceid=resourceid)
                     if reader.errors:
                         response = []
                         for value in reader.errors.itervalues():

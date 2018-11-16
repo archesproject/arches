@@ -295,3 +295,9 @@ class BaseDataType(object):
             g.add((edge_info['r_uri'], RDF.value, Literal(JSONSerializer().serialize(edge_info['range_tile_data']))))
 
         return g
+
+    def from_rdf(self, json_ld_node):
+        print json_ld_node
+        # expects a node taken from an expanded json-ld graph
+        # returns the value, or None if no "@value" key is found
+        raise NotImplementedError

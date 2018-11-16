@@ -259,8 +259,10 @@ class JsonLdReader(Reader):
         self.datatype_factory = DataTypeFactory()
         self.resource_model_root_classes = set()
         self.non_unique_classes = set()
+        self.graph_id_lookup = {}
         for graph in models.GraphModel.objects.filter(isresource=True):
             node = models.Node.objects.get(graph_id=graph.pk, istopnode=True)
+            self.graph_id_lookup[node.ontologyclass] = graph.pk
             if node.ontologyclass in self.resource_model_root_classes:
                 #make a note of non-unique root classes
                 self.non_unique_classes.add(node.ontologyclass)
@@ -269,14 +271,16 @@ class JsonLdReader(Reader):
         self.resource_model_root_classes = self.resource_model_root_classes - self.non_unique_classes
         self.ontologyproperties = models.Edge.objects.values_list('ontologyproperty', flat=True).distinct()
 
-    def get_graph_id(self, strs_to_test):
-        if not isinstance(strs_to_test, list):
-            strs_to_test = [strs_to_test]
-        for str_to_test in strs_to_test:
-            match = re.match(r'.*?%sgraph/(?P<graphid>%s)' %
-                             (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, settings.UUID_REGEX), str_to_test)
-            if match:
-                return match.group('graphid')
+    def get_graph_id(self, root_ontologyclass):
+        if root_ontologyclass in self.resource_model_root_classes:
+            return self.graph_id_lookup[root_ontologyclass]
+        # if not isinstance(strs_to_test, list):
+        #     strs_to_test = [strs_to_test]
+        # for str_to_test in strs_to_test:
+        #     match = re.match(r'.*?%sgraph/(?P<graphid>%s)' %
+        #                      (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, settings.UUID_REGEX), str_to_test)
+        #     if match:
+        #         return match.group('graphid')
         return None
 
     def get_resource_id(self, strs_to_test):
@@ -289,17 +293,15 @@ class JsonLdReader(Reader):
                 return match.group('resourceid')
         return None
 
-    def read_resource(self, data, use_ids=False):
+    def read_resource(self, data, use_ids=False, resourceid=None):
         self.use_ids = use_ids
         if not isinstance(data, list):
             data = [data]
 
         for jsonld in data:
             self.errors = {}
-            # import ipdb
-            # ipdb.set_trace()
             jsonld = expand(jsonld)[0]
-            graphid = self.get_graph_id(jsonld["@type"])
+            graphid = self.get_graph_id(jsonld["@type"][0])
             if graphid:
                 graph = GraphProxy.objects.get(graphid=graphid)
                 graphtree = graph.get_tree()
@@ -312,6 +314,8 @@ class JsonLdReader(Reader):
                 else:
                     resource = Resource()
                     resource.graph_id = graphid
+                    resource.pk = resourceid
+
                 self.resolve_node_ids(jsonld, graph=graphtree, resource=resource)
                 self.resources.append(resource)
 
@@ -502,7 +506,7 @@ class JsonLdReader(Reader):
             elif len(valid_nodes) > 1:
                 raise self.AmbiguousGraphException()
             else:
-                raise self.DataDoesNotMatchGraphException()
+                raise self.DataDoesNotMatchGraphException(jsonld_graph)
 
     def resolve_node_ids(self, jsonld, ontology_prop=None, graph=None, parent_node=None, tileid=None, parent_tileid=None, resource=None):
         # print "-------------------"
@@ -563,9 +567,15 @@ class JsonLdReader(Reader):
 
                     print 'finding value'
                     print jsonld_node
-                    datatype = self.datatype_factory.get_instance(branch['node'].datatype)
-                    value = datatype.from_rdf(jsonld_node)
-                    self.tiles[tileid].data[str(branch['node'].nodeid)] = value
+                    if (branch['node'].datatype != 'semantic'):
+                        # if (branch['node'].datatype == 'number'):
+                        #     print 'number'
+                        #     import ipdb
+                        #     ipdb.set_trace()
+                        datatype = self.datatype_factory.get_instance(branch['node'].datatype)
+                        value = datatype.from_rdf(jsonld_node)
+                        print ('value found! : ', value)
+                        self.tiles[tileid].data[str(branch['node'].nodeid)] = value
 
                     # if '@value' in jsonld_node:
                     #     value = jsonld_node['@value']

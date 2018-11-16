@@ -172,7 +172,7 @@ class NumberDataType(BaseDataType):
         # returns an in-memory graph object, containing the domain resource, its
         # type and the number as a numeric literal (as this is how it is in the JSON)
         g = Graph()
-        rtd = int(range_tile_data) if type(range_tile_data) == float and range_tile_data.is_integer() else range_tile_data
+        rtd = int(edge_info['range_tile_data']) if type(edge_info['range_tile_data']) == float and edge_info['range_tile_data'].is_integer() else edge_info['range_tile_data']
         g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
         g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), Literal(rtd)))
         return g
