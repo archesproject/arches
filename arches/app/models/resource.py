@@ -29,6 +29,7 @@ from arches.app.models.system_settings import settings
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.exceptions import InvalidNodeNameException, MultipleNodesFoundException
 from arches.app.datatypes.datatypes import DataTypeFactory
 from django.db import transaction
 
@@ -390,10 +391,10 @@ class Resource(models.ResourceInstance):
             name=node_name, graph_id=self.graph_id)
 
         if len(nodes) > 1:
-            raise Resource.MultipleNodesFoundException(node_name, nodes)
+            raise MultipleNodesFoundException(node_name, nodes)
 
         if len(nodes) == 0:
-            raise Resource.InvalidNodeNameException(node_name, nodes)
+            raise InvalidNodeNameException(node_name)
 
         tiles = self.tilemodel_set.filter(
             nodegroup_id=nodes[0].nodegroup_id)

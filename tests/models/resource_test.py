@@ -38,6 +38,7 @@ from arches.app.models.tile import Tile
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as resource_graph_importer
+from arches.app.utils.exceptions import InvalidNodeNameException, MultipleNodesFoundException
 from tests.base_test import ArchesTestCase
 
 
@@ -192,6 +193,13 @@ class ResourceTests(ArchesTestCase):
         node_name = "Cultural Period Concept"
         result = self.test_resource.get_node_values(node_name)
         self.assertEqual('Mock concept', result[0])
+
+    def test_get_not_existing_node_value_concept(self):
+        """
+        Query a concept value that does not exist
+        """
+        node_name = "Not Existing Concept"
+        self.assertRaises(InvalidNodeNameException, self.test_resource.get_node_values(node_name))        
 
     def test_get_node_value_geometry(self):
         """
