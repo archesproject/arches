@@ -199,7 +199,8 @@ class ResourceTests(ArchesTestCase):
         Query a concept value that does not exist
         """
         node_name = "Not Existing Concept"
-        self.assertRaises(InvalidNodeNameException, self.test_resource.get_node_values(node_name))        
+        with self.assertRaises(InvalidNodeNameException):
+            self.test_resource.get_node_values(node_name)    
 
     def test_get_node_value_geometry(self):
         """

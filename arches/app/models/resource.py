@@ -385,6 +385,7 @@ class Resource(models.ResourceInstance):
         Take a node_name (string) as an argument and return a list of values.
         If an invalid node_name is used, or if multiple nodes with the same
         name are found, the method returns False.
+        Current supported (tested) node types are: string, date, concept, geometry
         """
 
         nodes = models.Node.objects.filter(
