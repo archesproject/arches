@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import uuid
 import importlib
 import datetime
+from uuid import UUID
 from django.db.models import Q
 from arches.app.models import models
 from arches.app.models.models import EditLog
@@ -403,8 +404,22 @@ class Resource(models.ResourceInstance):
                 if node_id == str(nodes[0].nodeid):
                     if type(value) is list:
                         for v in value:
-                            values.append(v)
+                            values.append(parse_node_value(v))
                     else:
-                        values.append(value)
+                        values.append(parse_node_value(value))
 
         return values
+
+        
+
+def parse_node_value(value):
+    if is_uuid(value):
+        return models.Value.objects.get(pk=value).value
+    return value
+
+def is_uuid(value_to_test):
+    try:
+        UUID(value_to_test)
+        return True
+    except:
+        return False
