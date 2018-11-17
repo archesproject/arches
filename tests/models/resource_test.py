@@ -202,6 +202,14 @@ class ResourceTests(ArchesTestCase):
         with self.assertRaises(InvalidNodeNameException):
             self.test_resource.get_node_values(node_name)    
 
+    def test_get_duplicate_node_value_concept(self):
+        """
+        Query a concept value on a node that exists twice
+        """
+        node_name = "Duplicate Node Concept"
+        with self.assertRaises(MultipleNodesFoundException):
+            self.test_resource.get_node_values(node_name)   
+
     def test_get_node_value_geometry(self):
         """
         Query a geometry value
