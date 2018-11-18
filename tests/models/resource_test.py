@@ -168,7 +168,7 @@ class ResourceTests(ArchesTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        pass
+        cls.user.delete()
 
     def test_get_node_value_string(self):
         """
