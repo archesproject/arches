@@ -4053,7 +4053,7 @@ input.cmn-toggle-yes-no:checked+label:after {
 }
 
 .cls-content.arches-signin {
-    padding-top: 40px;
+    padding-top: 20px;
 }
 
 .login-panel-header.arches-signin {
@@ -4061,7 +4061,7 @@ input.cmn-toggle-yes-no:checked+label:after {
 }
 
 .arches-signin-subtext {
-    padding: 10px 5px;
+    padding: 0px 5px 10px 5px;
     color: #888;
 }
 
@@ -5143,7 +5143,8 @@ ul.jqtree_common li.jqtree-folder {
 }
 
 .password-rules {
-    font-size: 14px;
+    margin-top: -5px;
+    font-size: 12px;
     color: #555;
 }
 
@@ -5156,6 +5157,11 @@ ul.jqtree_common li.jqtree-folder {
 
 .password-rule span {
 	padding-left: 3px;
+    font-size: 12px;
+}
+
+.password-rule i {
+    font-size: 11px;
 }
 
 .device-summary {
