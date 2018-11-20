@@ -120,22 +120,21 @@ class MobileSurvey(models.MobileSurveyModel):
                                     widget_model.config = widget.defaultconfig
                                     try:
                                         collection_id = node['config']['rdmCollection']
-                                        concept_collection = Concept().get_child_collections_hierarchically(collection_id)
-                                        widget_model.config['options'] = concept_collection
-                                    except:
+                                        if collection_id:
+                                            concept_collection = Concept().get_child_collections_hierarchically(collection_id)
+                                            widget_model.config['options'] = concept_collection
+                                    except Exception as e:
                                         pass
                                     widget_model.label = node['name']
                                     graph_obj['widgets'].append(widget_model)
                                 break
                 graphs.append(graph_obj)
-
         ret['graphs'] = graphs
         ret['cards'] = ordered_cards
         try:
             ret['bounds'] = json.loads(ret['bounds'])
         except TypeError as e:
             print 'Could not parse', ret['bounds'], e
-
         return ret
 
     def get_ordered_cards(self):
