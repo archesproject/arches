@@ -57,7 +57,6 @@ class Writer(object):
         collects values that correspond each entitytypeid in the field map.  Inserts those
         values into the template record's corresponding list of values.
         """
-
         domains = resource['_source']['domains']
         child_entities = resource['_source']['child_entities']
         child_entities += resource['_source']['dates']
@@ -75,18 +74,23 @@ class Writer(object):
                 alternates = True
                 alternate_entitytypeid = mapping['alternate_entitytypeid']
                 alternate_values = []
-            businesstable = archesmodels.EntityTypes.objects.only("businesstablename").get(pk = mapping['entitytypeid'])
-            if businesstable != 'domains':
-                for entity in child_entities:
-                    if alternate_entitytypeid == entity['entitytypeid']:
-                        alternate_values.append(entity['value'])
-                    if entitytypeid == entity['entitytypeid'] and conceptid == '':
-                        template_record[mapping['field_name']].append(entity['value'])
-                    elif entitytypeid == entity['entitytypeid'] and conceptid != '':
-                        for domain in domains:
-                            if conceptid == domain['conceptid']:
-                                if entity['entityid'] == domain['parentid']:
-                                    template_record[mapping['field_name']].append(entity['value'])
+            businesstable = archesmodels.EntityTypes.objects.get(pk = mapping['entitytypeid'])
+            if businesstable.businesstablename != 'domains':
+                if businesstable.businesstablename == 'geometries':
+                    geometries = resource['_source']['geometries']
+                    for g in geometries:
+                        template_record[mapping['field_name']].append(g['value'])
+                else:
+                    for entity in child_entities:
+                        if alternate_entitytypeid == entity['entitytypeid']:
+                            alternate_values.append(entity['value'])
+                        if entitytypeid == entity['entitytypeid'] and conceptid == '':
+                            template_record[mapping['field_name']].append(entity['value'])
+                        elif entitytypeid == entity['entitytypeid'] and conceptid != '':
+                            for domain in domains:
+                                if conceptid == domain['conceptid']:
+                                    if entity['entityid'] == domain['parentid']:
+                                        template_record[mapping['field_name']].append(entity['value'])
             else:
                 for domain in domains:
                     if entitytypeid == domain['entitytypeid'] and conceptid == '':
@@ -102,8 +106,8 @@ class Writer(object):
             if alternates == True and len(template_record[mapping['field_name']]) == 0:
                 if len(alternate_values) > 0:
                     template_record[mapping['field_name']] = alternate_values
-        return template_record
-
+        return dict((k,v) for k,v in template_record.items() if v)
+    
     def concatenate_value_lists(self, template_record):
         """
         If multiple values are found for a column, joins them into a semi-colon concatenated string.
@@ -152,5 +156,4 @@ class Writer(object):
                 result.append({'type':'Feature','geometry': MultiLineString(sorted_geoms['lines']),'properties': properties})
             if len(sorted_geoms['polys']) > 0:
                 result.append({'type':'Feature','geometry': MultiPolygon(sorted_geoms['polys']),'properties': properties})
-
         return result
