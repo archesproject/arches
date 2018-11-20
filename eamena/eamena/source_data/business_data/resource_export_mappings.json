@@ -1,0 +1,902 @@
+{
+    "csv": {
+        "NAME": "EAMENA",
+        "SCHEMA": [
+            {"field_name": "PRIMARY NAME","source": "primaryname"},
+            {"field_name": "ARCHES ID","source": "entityid"},
+            {"field_name": "NAME.E41","source": "field_map"},
+            {"field_name": "NAME_TYPE.E55","source": "field_map"},
+            {"field_name": "GEOMETRIC_PLACE_EXPRESSION.SP5","source": "field_map"},
+            {"field_name": "LOCATION_CERTAINTY.I6","source": "field_map"},
+            {"field_name": "HERITAGE_PLACE_TYPE.E55","source": "field_map"},
+            {"field_name": "HERITAGE_CLASSIFICATION_TYPE.E55","source": "field_map"},
+            {"field_name": "OVERALL_ARCHAEOLOGICAL_CERTAINTY_VALUE.I6","source": "field_map"},
+            {"field_name": "FEATURE_MORPHOLOGY_TYPE.E55","source": "field_map"},
+            {"field_name": "SITE_OVERALL_SHAPE_TYPE.E55","source": "field_map"},
+            {"field_name": "GEOMETRY_EXTENT_CERTAINTY.I6","source": "field_map"},
+            {"field_name": "MEASUREMENT_UNIT.E58","source": "field_map"},
+            {"field_name": "MEASUREMENT_NUMBER.E60", "source": "field_map"},
+            {"field_name": "DIMENSION_TYPE.E55", "source": "field_map"},
+            {"field_name": "MEASUREMENT_SOURCE_TYPE.E55", "source": "field_map"},
+            {"field_name": "GRID_ID.E42", "source": "field_map"},
+            {"field_name": "TOPOGRAPHY_TYPE.E55", "source": "field_map"},
+            {"field_name": "CULTURAL_PERIOD_TYPE.I4", "source": "field_map"},
+            {"field_name": "CULTURAL_PERIOD_DETAIL_TYPE.E55", "source": "field_map"},
+            {"field_name": "CULTURAL_PERIOD_CERTAINTY.I6", "source": "field_map"},
+            {"field_name": "FEATURE_FORM_TYPE.I4", "source": "field_map"},
+            {"field_name": "FEATURE_FORM_TYPE_CERTAINTY.I6", "source": "field_map"},
+            {"field_name": "FEATURE_SHAPE_TYPE.E55", "source": "field_map"},
+            {"field_name": "FEATURE_ARRANGEMENT_TYPE.E55", "source": "field_map"},
+            {"field_name": "FEATURE_NUMBER_TYPE.E55", "source": "field_map"},
+            {"field_name": "INTERPRETATION_TYPE.I4", "source": "field_map"},
+            {"field_name": "INTERPRETATION_CERTAINTY.I6", "source": "field_map"},
+            {"field_name": "INTERPRETATION_NUMBER_TYPE.E55", "source": "field_map"},
+            {"field_name": "FUNCTION_TYPE.I4", "source": "field_map"},
+            {"field_name": "FUNCTION_CERTAINTY.I6", "source": "field_map"},
+            {"field_name": "THREAT_CATEGORY.I4", "source": "field_map"},
+            {"field_name": "THREAT_TYPE.I4", "source": "field_map"},
+            {"field_name": "THREAT_PROBABILITY.I6", "source": "field_map"},
+            {"field_name": "OVERALL_CONDITION_STATE_TYPE.E55", "source": "field_map"},
+            {"field_name": "DAMAGE_EXTENT_TYPE.E55", "source": "field_map"},
+            {"field_name": "DISTURBANCE_CAUSE_CATEGORY_TYPE.E55", "source": "field_map"},
+            {"field_name": "DISTURBANCE_CAUSE_TYPE.I4", "source": "field_map"},
+            {"field_name": "DISTURBANCE_CAUSE_CERTAINTY.I6", "source": "field_map"},
+            {"field_name": "EFFECT_TYPE.I4", "source": "field_map"},
+            {"field_name": "EFFECT_CERTAINTY.I6", "source": "field_map"},
+            {"field_name": "DISTURBANCE_DATE_FROM.E61", "source": "field_map"},
+            {"field_name": "DISTURBANCE_DATE_TO.E61", "source": "field_map"},
+            {"field_name": "DISTURBANCE_DATE_OCCURRED_BEFORE.E61", "source": "field_map"},
+            {"field_name": "DISTURBANCE_DATE_OCCURRED_ON.E61", "source": "field_map"},
+            {"field_name": "GENERAL_DESCRIPTION_TYPE.E55", "source": "field_map"},
+            {"field_name": "GENERAL_DESCRIPTION.E62", "source": "field_map"},
+            {"field_name": "INVESTIGATOR_NAME.E41", "source": "field_map"},
+            {"field_name": "INVESTIGATOR_ROLE_TYPE.E55", "source": "field_map"},
+            {"field_name": "ASSESSMENT_ACTIVITY_TYPE.E55", "source": "field_map"},
+            {"field_name": "ASSESSMENT_ACTIVITY_DATE.E49", "source": "field_map"},
+            {"field_name": "HERITAGE_FEATURE_USE_TYPE.E55", "source": "field_map"},
+            {"field_name": "DESIGNATION_TYPE.E55", "source": "field_map"},
+            {"field_name": "DESIGNATION_FROM_DATE.E61", "source": "field_map"},
+            {"field_name": "DESIGNATION_TO_DATE.E61", "source": "field_map"},
+            {"field_name": "FORM_TYPE_PROPOSITION_SET.I4", "source": "field_map"},
+            {"field_name": "FORM_CERTAINTY_BELIEF_VALUE.I6", "source": "field_map"},
+            {"field_name": "FORM_SHAPE_TYPE.E55", "source": "field_map"},
+            {"field_name": "FORM_ARRANGEMENT.E55", "source": "field_map"},
+            {"field_name": "FORM_NUMBER.E55", "source": "field_map"},
+            {"field_name": "MODIFICATION_TYPE.E55", "source": "field_map"},
+            {"field_name": "MODIFICATION_DATE.E49", "source": "field_map"},
+            {"field_name": "MODIFICATION_DESCRIPTION.E62", "source": "field_map"},
+            {"field_name": "CONSTRUCTION_MATERIAL.E57", "source": "field_map"},
+            {"field_name": "CONSTRUCTION_TECHNIQUE_TYPE.E55", "source": "field_map"},
+            {"field_name": "CONSTRUCTION_NOTE.E62", "source": "field_map"},
+            {"field_name": "CONSTRUCTION_NOTE.E62", "source": "field_map"},
+            {"field_name": "EFFECT_TYPE.S9", "source": "field_map"},
+            {"field_name": "DAMAGE_TREND_TYPE.E55", "source": "field_map"},
+            {"field_name": "OVERALL_DAMAGE_SEVERITY_TYPE.E55", "source": "field_map"},
+            {"field_name": "RECOMMENDATION_TYPE.E55", "source": "field_map"},
+            {"field_name": "INTERVENTION_ACTIVITY_TYPE.E55", "source": "field_map"},
+            {"field_name": "PRIORITY_TYPE.E55", "source": "field_map"},
+            {"field_name": "VULNERABILITY_TYPE.E55", "source": "field_map"},
+            {"field_name": "THREAT_PROBABILITY_TYPE.E55", "source": "field_map"},
+            {"field_name": "RISK_EXTENT_TYPE.E55", "source": "field_map"},
+            {"field_name": "RISK_SEVERITY_TYPE.E55", "source": "field_map"},
+            {"field_name": "RISK_LEVEL.I4", "source": "field_map"},
+            {"field_name": "RISK_LEVEL_CERTAINTY.I6", "source": "field_map"},
+            {"field_name": "MITIGATION_STRATEGY_TYPE.E55", "source": "field_map"},
+            {"field_name": "MITIGATION_PRIORITY_TYPE.E55", "source": "field_map"},
+            {"field_name": "OVERALL_CONDITION_TYPE.E55", "source": "field_map"},
+            {"field_name": "OVERALL_PRIORITY_TYPE.E55", "source": "field_map"},
+            {"field_name": "NEXT_ASSESSMENT_DATE_TYPE.E55", "source": "field_map"},
+            {"field_name": "OVERALL_CONDITION_REMARKS_TYPE.E55", "source": "field_map"}            
+        ],
+        "RESOURCE_TYPES": {
+            "INFORMATION_RESOURCE.E73": {
+                "FIELD_MAP": [
+                {
+                "field_name": "INFORMATION_RESOURCE_TYPE.E55",
+                "entitytypeid": "INFORMATION_RESOURCE_TYPE.E55"
+                },
+                {
+                "field_name": "FILE_PATH.E62",
+                "entitytypeid": "FILE_PATH.E62"
+                },             
+                {
+                "field_name": "TITLE.E41",
+                "entitytypeid": "TITLE.E41"
+                },            
+                {
+                "field_name": "GENERAL_DESCRIPTION.E62",
+                "entitytypeid": "GENERAL_DESCRIPTION.E62"
+                },             
+                {
+                "field_name": "CREATOR_APPELLATION.E82",
+                "entitytypeid": "CREATOR_APPELLATION.E82"
+                },             
+                {
+                "field_name": "SPATIAL_COORDINATES_GEOMETRY.E47",
+                "entitytypeid": "SPATIAL_COORDINATES_GEOMETRY.E47"
+                },                             
+                {
+                "field_name": "DATE_OF_PUBLICATION.E50",
+                "entitytypeid": "DATE_OF_PUBLICATION.E50"
+                },                           
+                {
+                "field_name": "PUBLISHER_APPELLATION.E82",
+                "entitytypeid": "PUBLISHER_APPELLATION.E82"
+                },                
+                {
+                "field_name": "RIGHT_TYPE.E55",
+                "entitytypeid": "RIGHT_TYPE.E55"
+                },                                                         
+                {
+                "field_name": "THUMBNAIL.E62",
+                "entitytypeid": "THUMBNAIL.E62"
+                },                
+                {
+                "field_name": "SHARED_DATA_SOURCE_AFFILIATION.E82",
+                "entitytypeid": "SHARED_DATA_SOURCE_AFFILIATION.E82"
+                },                
+                {
+                "field_name": "DATE_OF_CREATION.E50",
+                "entitytypeid": "DATE_OF_CREATION.E50"
+                },                
+                {
+                "field_name": "DATE_OF_UPDATE.E50",
+                "entitytypeid": "DATE_OF_UPDATE.E50"
+                },                
+                {
+                "field_name": "DATE_ACCESSED.E50",
+                "entitytypeid": "DATE_ACCESSED.E50"
+                },    
+                {
+                "field_name": "SOURCE_APPELLATION.E82",
+                "entitytypeid": "SOURCE_APPELLATION.E82"
+                },                
+                {
+                "field_name": "EDITOR_APPELLATION.E82",
+                "entitytypeid": "EDITOR_APPELLATION.E82"
+                },                
+                {
+                "field_name": "BIBLIO_PLACE_APPELLATION.E44",
+                "entitytypeid": "BIBLIO_PLACE_APPELLATION.E44"
+                },                
+                {
+                "field_name": "VOLUME.E62",
+                "entitytypeid": "VOLUME.E62"
+                },                
+                {
+                "field_name": "ISSUE.E62",
+                "entitytypeid": "ISSUE.E62"
+                },                
+                {
+                "field_name": "PAGES.E62",
+                "entitytypeid": "PAGES.E62"
+                },
+                {
+                "field_name": "FIGURE.E62",
+                "entitytypeid": "FIGURE.E62"
+                },                
+                {
+                "field_name": "CATALOGUE_ID.E42",
+                "entitytypeid": "CATALOGUE_ID.E42"
+                },                
+                {
+                "field_name": "MAP_SOURCE_TYPE.E55",
+                "entitytypeid": "MAP_SOURCE_TYPE.E55"
+                },
+                {
+                "field_name": "IMAGERY_PLATFORM_TYPE.E55",
+                "entitytypeid": "IMAGERY_PLATFORM_TYPE.E55"
+                },                
+                {
+                "field_name": "IMAGERY_SENSOR_TYPE.E55",
+                "entitytypeid": "IMAGERY_SENSOR_TYPE.E55"
+                },                
+                {
+                "field_name": "IMAGERY_BANDS_TYPE.E55",
+                "entitytypeid": "IMAGERY_BANDS_TYPE.E55"
+                },
+                {
+                "field_name": "IMAGERY_CAMERA_SENSOR_TYPE.E55",
+                "entitytypeid": "IMAGERY_CAMERA_SENSOR_TYPE.E55"
+                },                
+                {
+                "field_name": "IMAGERY_CAMERA_SENSOR_RESOLUTION_TYPE.E55",
+                "entitytypeid": "IMAGERY_CAMERA_SENSOR_RESOLUTION_TYPE.E55"
+                },                
+                {
+                "field_name": "IMAGERY_SAMPLED_RESOLUTION_TYPE.E55",
+                "entitytypeid": "IMAGERY_SAMPLED_RESOLUTION_TYPE.E55"
+                },
+                {
+                "field_name": "DATE_OF_ACQUISITION.E50",
+                "entitytypeid": "DATE_OF_ACQUISITION.E50"
+                },                
+                {
+                "field_name": "PROCESSING_TYPE.E55",
+                "entitytypeid": "PROCESSING_TYPE.E55"
+                },
+                {
+                "field_name": "PROJECTION_TYPE.E55",
+                "entitytypeid": "PROJECTION_TYPE.E55"
+                },                
+                {
+                "field_name": "SERIES_TYPE.E55",
+                "entitytypeid": "SERIES_TYPE.E55"
+                },
+                {
+                "field_name": "SCALE_TYPE.E55",
+                "entitytypeid": "SCALE_TYPE.E55"
+                },                
+                {
+                "field_name": "TILE_SQUARE_DETAILS.E44",
+                "entitytypeid": "TILE_SQUARE_DETAILS.E44"
+                },
+                {
+                "field_name": "EDITION.E62",
+                "entitytypeid": "EDITION.E62"
+                },                
+                {
+                "field_name": "SOURCE.E39",
+                "entitytypeid": "SOURCE.E39"
+                },
+                {
+                "field_name": "EDITOR.E39",
+                "entitytypeid": "EDITOR.E39"
+                },                
+                {
+                "field_name": "PLACE_OF_PUBLICATION.E53",
+                "entitytypeid": "PLACE_OF_PUBLICATION.E53"
+                },
+                {
+                "field_name": "IMAGERY_DATE_OF_PUBLICATION.E50",
+                "entitytypeid": "IMAGERY_DATE_OF_PUBLICATION.E50"
+                },                
+                {
+                "field_name": "IMAGERY_CREATOR_APPELLATION.E82",
+                "entitytypeid": "IMAGERY_CREATOR_APPELLATION.E82"
+                },
+                {
+                "field_name": "IMAGERY_SOURCE_TYPE.E55",
+                "entitytypeid": "IMAGERY_SOURCE_TYPE.E55"
+                },                
+                {
+                "field_name": "MAP_PLACE_APPELLATION.E44",
+                "entitytypeid": "MAP_PLACE_APPELLATION.E44"
+                },
+                {
+                "field_name": "SHARED_DATA_SOURCE_CREATOR_APPELLATION.E82",
+                "entitytypeid": "SHARED_DATA_SOURCE_CREATOR_APPELLATION.E82"
+                },                
+                {
+                "field_name": "SHARED_DATA_SOURCE_DATE_OF_CREATION.E50",
+                "entitytypeid": "SHARED_DATA_SOURCE_DATE_OF_CREATION.E50"
+                },
+                {
+                "field_name": "SHARED_DATA_SOURCE_APPELLATION.E82",
+                "entitytypeid": "SHARED_DATA_SOURCE_APPELLATION.E82"
+                },                
+                {
+                "field_name": "DATE_OF_FILE.E50",
+                "entitytypeid": "DATE_OF_FILE.E50"
+                },
+                {
+                "field_name": "TILE_SQUARE_APPELLATION.E44",
+                "entitytypeid": "TILE_SQUARE_APPELLATION.E44"
+                },
+                {
+                "field_name": "URL.E51",
+                "entitytypeid": "URL.E51"
+                },                
+                {
+                "field_name": "URL_ACCESS_DATE.E50",
+                "entitytypeid": "URL_ACCESS_DATE.E50"
+                }
+                ]
+            },                      
+            "HERITAGE_RESOURCE_GROUP.E27": {
+                "FIELD_MAP": [
+                {
+                "field_name": "NAME.E41",
+                "entitytypeid": "NAME.E41"
+                },
+                {
+                "field_name": "NAME_TYPE.E55",
+                "entitytypeid": "NAME_TYPE.E55"
+                },
+                {
+                "field_name": "GEOMETRIC_PLACE_EXPRESSION.SP5",
+                "entitytypeid": "GEOMETRIC_PLACE_EXPRESSION.SP5"
+                },
+                {
+                "field_name": "LOCATION_CERTAINTY.I6",
+                "entitytypeid": "LOCATION_CERTAINTY.I6"
+                },                
+                {
+                "field_name": "HERITAGE_PLACE_TYPE.E55",
+                "entitytypeid": "HERITAGE_PLACE_TYPE.E55"
+                },
+                {
+                "field_name": "FEATURE_MORPHOLOGY_TYPE.E55",
+                "entitytypeid": "FEATURE_MORPHOLOGY_TYPE.E55"
+                },
+                {
+                "field_name": "OVERALL_ARCHAEOLOGICAL_CERTAINTY_VALUE.I6",
+                "entitytypeid": "OVERALL_ARCHAEOLOGICAL_CERTAINTY_VALUE.I6"
+                },
+                {
+                "field_name": "SITE_OVERALL_SHAPE_TYPE.E55",
+                "entitytypeid": "SITE_OVERALL_SHAPE_TYPE.E55"
+                },
+                {             
+                "field_name": "GEOMETRY_EXTENT_CERTAINTY.I6",
+                "entitytypeid": "GEOMETRY_EXTENT_CERTAINTY.I6"
+                },
+                {
+                "field_name": "MEASUREMENT_UNIT.E58",
+                "entitytypeid": "MEASUREMENT_UNIT.E58"
+                },
+                {
+                "field_name": "MEASUREMENT_NUMBER.E60",
+                "entitytypeid": "MEASUREMENT_NUMBER.E60"
+                },
+                {
+                "field_name": "DIMENSION_TYPE.E55",
+                "entitytypeid": "DIMENSION_TYPE.E55"
+                },
+                {
+                "field_name": "MEASUREMENT_SOURCE_TYPE.E55",
+                "entitytypeid": "MEASUREMENT_SOURCE_TYPE.E55"
+                },
+                {
+                "field_name": "GRID_ID.E42",
+                "entitytypeid": "GRID_ID.E42"
+                },
+                {
+                "field_name": "TOPOGRAPHY_TYPE.E55",
+                "entitytypeid": "TOPOGRAPHY_TYPE.E55"
+                },
+                {
+                "field_name": "CULTURAL_PERIOD_TYPE.I4",
+                "entitytypeid": "CULTURAL_PERIOD_TYPE.I4"
+                },
+                {
+                "field_name": "CULTURAL_PERIOD_DETAIL_TYPE.E55",
+                "entitytypeid": "CULTURAL_PERIOD_DETAIL_TYPE.E55"
+                },
+                {
+                "field_name": "CULTURAL_PERIOD_CERTAINTY.I6",
+                "entitytypeid": "CULTURAL_PERIOD_CERTAINTY.I6"
+                },
+                {
+                "field_name": "FEATURE_FORM_TYPE.I4",
+                "entitytypeid": "FEATURE_FORM_TYPE.I4"
+                },
+                {
+                "field_name": "FEATURE_FORM_TYPE_CERTAINTY.I6",
+                "entitytypeid": "FEATURE_FORM_TYPE_CERTAINTY.I6"
+                },
+                {
+                "field_name": "FEATURE_SHAPE_TYPE.E55",
+                "entitytypeid": "FEATURE_SHAPE_TYPE.E55"
+                },
+                {
+                "field_name": "FEATURE_ARRANGEMENT_TYPE.E55",
+                "entitytypeid": "FEATURE_ARRANGEMENT_TYPE.E55"
+                },
+                {
+                "field_name": "FEATURE_NUMBER_TYPE.E55",
+                "entitytypeid": "FEATURE_NUMBER_TYPE.E55"
+                },
+                {
+                "field_name": "INTERPRETATION_TYPE.I4",
+                "entitytypeid": "INTERPRETATION_TYPE.I4"
+                },
+                {
+                "field_name": "INTERPRETATION_CERTAINTY.I6",
+                "entitytypeid": "INTERPRETATION_CERTAINTY.I6"
+                },
+                {
+                "field_name": "INTERPRETATION_NUMBER_TYPE.E55",
+                "entitytypeid": "INTERPRETATION_NUMBER_TYPE.E55"
+                },
+                {
+                "field_name": "FUNCTION_TYPE.I4",
+                "entitytypeid": "FUNCTION_TYPE.I4"
+                },
+                {
+                "field_name": "FUNCTION_CERTAINTY.I6",
+                "entitytypeid": "FUNCTION_CERTAINTY.I6"
+                },
+                {
+                "field_name": "THREAT_CATEGORY.I4",
+                "entitytypeid": "THREAT_CATEGORY.I4"
+                }, 
+                {
+                "field_name": "THREAT_TYPE.I4",
+                "entitytypeid": "THREAT_TYPE.I4"
+                },                
+                {
+                "field_name": "THREAT_PROBABILITY.I6",
+                "entitytypeid": "THREAT_PROBABILITY.I6"
+                },
+                {
+                "field_name": "OVERALL_CONDITION_STATE_TYPE.E55",
+                "entitytypeid": "OVERALL_CONDITION_STATE_TYPE.E55"
+                },
+                {
+                "field_name": "DAMAGE_EXTENT_TYPE.E55",
+                "entitytypeid": "DAMAGE_EXTENT_TYPE.E55"
+                },
+                {
+                "field_name": "DISTURBANCE_CAUSE_CATEGORY_TYPE.E55",
+                "entitytypeid": "DISTURBANCE_CAUSE_CATEGORY_TYPE.E55"
+                },
+                {
+                "field_name": "DISTURBANCE_CAUSE_TYPE.I4",
+                "entitytypeid": "DISTURBANCE_CAUSE_TYPE.I4"
+                },
+                {
+                "field_name": "DISTURBANCE_CAUSE_CERTAINTY.I6",
+                "entitytypeid": "DISTURBANCE_CAUSE_CERTAINTY.I6"
+                },
+                {
+                "field_name": "EFFECT_TYPE.I4",
+                "entitytypeid": "EFFECT_TYPE.I4"
+                },                 
+                {
+                "field_name": "EFFECT_CERTAINTY.I6",
+                "entitytypeid": "EFFECT_CERTAINTY.I6"
+                },
+                {
+                "field_name": "DISTURBANCE_DATE_FROM.E61",
+                "entitytypeid": "DISTURBANCE_DATE_FROM.E61"
+                },
+                {
+                "field_name": "DISTURBANCE_DATE_TO.E61",
+                "entitytypeid": "DISTURBANCE_DATE_TO.E61"
+                },
+                {
+                "field_name": "DISTURBANCE_DATE_OCCURRED_BEFORE.E61",
+                "entitytypeid": "DISTURBANCE_DATE_OCCURRED_BEFORE.E61"
+                },
+                {
+                "field_name": "DISTURBANCE_DATE_OCCURRED_ON.E61",
+                "entitytypeid": "DISTURBANCE_DATE_OCCURRED_ON.E61"
+                },                            
+                {
+                "field_name": "GENERAL_DESCRIPTION_TYPE.E55",
+                "entitytypeid": "GENERAL_DESCRIPTION_TYPE.E55"
+                },
+                {
+                "field_name": "GENERAL_DESCRIPTION.E62",
+                "entitytypeid": "GENERAL_DESCRIPTION.E62"
+                }
+                ]
+            },
+            "HERITAGE_FEATURE.E24" :{
+                "FIELD_MAP": [
+                    {
+                    "field_name": "NAME.E41",
+                    "entitytypeid": "NAME.E41"
+                    },
+                    {
+                    "field_name": "NAME_TYPE.E55",
+                    "entitytypeid": "NAME_TYPE.E55"
+                    },
+                    {
+                    "field_name": "GEOMETRIC_PLACE_EXPRESSION.SP5",
+                    "entitytypeid": "GEOMETRIC_PLACE_EXPRESSION.SP5"
+                    },
+                    {
+                    "field_name": "LOCATION_CERTAINTY.I6",
+                    "entitytypeid": "LOCATION_CERTAINTY.I6"
+                    },         
+                    {
+                     "field_name": "INVESTIGATOR_NAME.E41",
+                     "entitytypeid": "INVESTIGATOR_NAME.E41"
+                    },
+                    {
+                     "field_name": "INVESTIGATOR_ROLE_TYPE.E55",
+                     "entitytypeid": "INVESTIGATOR_ROLE_TYPE.E55"
+                    },
+                    {
+                     "field_name": "ASSESSMENT_ACTIVITY_TYPE.E55",
+                     "entitytypeid": "ASSESSMENT_ACTIVITY_TYPE.E55"
+                    },
+                    {
+                     "field_name": "ASSESSMENT_ACTIVITY_DATE.E49",
+                     "entitytypeid": "ASSESSMENT_ACTIVITY_DATE.E49"
+                    },
+                    {
+                     "field_name": "HERITAGE_FEATURE_USE_TYPE.E55",
+                     "entitytypeid": "HERITAGE_FEATURE_USE_TYPE.E55"
+                    },
+                    {
+                     "field_name": "HERITAGE_CLASSIFICATION_TYPE.E55",
+                     "entitytypeid": "HERITAGE_CLASSIFICATION_TYPE.E55"
+                    },
+                    {
+                     "field_name": "DESIGNATION_TYPE.E55",
+                     "entitytypeid": "DESIGNATION_TYPE.E55"
+                    },
+                    {
+                     "field_name": "DESIGNATION_FROM_DATE.E61",
+                     "entitytypeid": "DESIGNATION_FROM_DATE.E61"
+                    },
+                    {
+                     "field_name": "DESIGNATION_TO_DATE.E61",
+                     "entitytypeid": "DESIGNATION_TO_DATE.E61"
+                    },
+                    {
+                     "field_name": "FORM_TYPE_PROPOSITION_SET.I4",
+                     "entitytypeid": "FORM_TYPE_PROPOSITION_SET.I4"
+                    },
+                    {
+                     "field_name": "FORM_CERTAINTY_BELIEF_VALUE.I6",
+                     "entitytypeid": "FORM_CERTAINTY_BELIEF_VALUE.I6"
+                    },
+                    {
+                     "field_name": "FORM_SHAPE_TYPE.E55",
+                     "entitytypeid": "FORM_SHAPE_TYPE.E55"
+                    },
+                    {
+                     "field_name": "FORM_ARRANGEMENT.E55",
+                     "entitytypeid": "FORM_ARRANGEMENT.E55"
+                    },
+                    {
+                     "field_name": "FORM_NUMBER.E55",
+                     "entitytypeid": "FORM_NUMBER.E55"
+                    },
+                    {
+                     "field_name": "MODIFICATION_TYPE.E55",
+                     "entitytypeid": "MODIFICATION_TYPE.E55"
+                    },
+                    {
+                     "field_name": "MODIFICATION_DATE.E49",
+                     "entitytypeid": "MODIFICATION_DATE.E49"
+                    },
+                    {
+                     "field_name": "MODIFICATION_DESCRIPTION.E62",
+                     "entitytypeid": "MODIFICATION_DESCRIPTION.E62"
+                    },
+                    {
+                     "field_name": "CONSTRUCTION_MATERIAL.E57",
+                     "entitytypeid": "CONSTRUCTION_MATERIAL.E57"
+                    },
+                    {
+                     "field_name": "CONSTRUCTION_TECHNIQUE_TYPE.E55",
+                     "entitytypeid": "CONSTRUCTION_TECHNIQUE_TYPE.E55"
+                    },
+                    {
+                     "field_name": "CONSTRUCTION_NOTE.E62",
+                     "entitytypeid": "CONSTRUCTION_NOTE.E62"
+                    },
+                    {
+                     "field_name": "CONSTRUCTION_NOTE.E62",
+                     "entitytypeid": "CONSTRUCTION_NOTE.E62"
+                    },
+                    {
+                     "field_name": "EFFECT_TYPE.S9",
+                     "entitytypeid": "EFFECT_TYPE.S9"
+                    },
+                    {
+                     "field_name": "DAMAGE_TREND_TYPE.E55",
+                     "entitytypeid": "DAMAGE_TREND_TYPE.E55"
+                    },
+                    {
+                     "field_name": "OVERALL_DAMAGE_SEVERITY_TYPE.E55",
+                     "entitytypeid": "OVERALL_DAMAGE_SEVERITY_TYPE.E55"
+                    },
+                    {
+                     "field_name": "RECOMMENDATION_TYPE.E55",
+                     "entitytypeid": "RECOMMENDATION_TYPE.E55"
+                    },
+                    {
+                     "field_name": "INTERVENTION_ACTIVITY_TYPE.E55",
+                     "entitytypeid": "INTERVENTION_ACTIVITY_TYPE.E55"
+                    },
+                    {
+                     "field_name": "PRIORITY_TYPE.E55",
+                     "entitytypeid": "PRIORITY_TYPE.E55"
+                    },
+                    {
+                     "field_name": "VULNERABILITY_TYPE.E55",
+                     "entitytypeid": "VULNERABILITY_TYPE.E55"
+                    },
+                    {
+                     "field_name": "THREAT_PROBABILITY_TYPE.E55",
+                     "entitytypeid": "THREAT_PROBABILITY_TYPE.E55"
+                    },
+                    {
+                     "field_name": "RISK_EXTENT_TYPE.E55",
+                     "entitytypeid": "RISK_EXTENT_TYPE.E55"
+                    },
+                    {
+                     "field_name": "RISK_SEVERITY_TYPE.E55",
+                     "entitytypeid": "RISK_SEVERITY_TYPE.E55"
+                    },
+                    {
+                     "field_name": "RISK_LEVEL.I4",
+                     "entitytypeid": "RISK_LEVEL.I4"
+                    },
+                    {
+                     "field_name": "RISK_LEVEL_CERTAINTY.I6",
+                     "entitytypeid": "RISK_LEVEL_CERTAINTY.I6"
+                    },
+                    {
+                     "field_name": "MITIGATION_STRATEGY_TYPE.E55",
+                     "entitytypeid": "MITIGATION_STRATEGY_TYPE.E55"
+                    },
+                    {
+                     "field_name": "MITIGATION_PRIORITY_TYPE.E55",
+                     "entitytypeid": "MITIGATION_PRIORITY_TYPE.E55"
+                    },
+                    {
+                     "field_name": "OVERALL_CONDITION_TYPE.E55",
+                     "entitytypeid": "OVERALL_CONDITION_TYPE.E55"
+                    },
+                    {
+                     "field_name": "OVERALL_PRIORITY_TYPE.E55",
+                     "entitytypeid": "OVERALL_PRIORITY_TYPE.E55"
+                    },
+                    {
+                     "field_name": "NEXT_ASSESSMENT_DATE_TYPE.E55",
+                     "entitytypeid": "NEXT_ASSESSMENT_DATE_TYPE.E55"
+                    },
+                    {
+                     "field_name": "OVERALL_CONDITION_REMARKS_TYPE.E55",
+                     "entitytypeid": "OVERALL_CONDITION_REMARKS_TYPE.E55"
+                    }
+                ]
+            }     
+        }
+    },
+    "shp": {
+        "NAME": "EAMENA",
+        "SCHEMA": [
+            {"field_name": "Prim_Name","source": "primaryname", "data_type":"str", "data_length":"128"},
+            {"field_name": "ArchesID","source": "entityid", "data_type":"str", "data_length":"128"},
+            {"field_name": "ResType","source": "resource_name", "data_type":"str", "data_length":"128"},
+            {"field_name": "HerType","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "HerUseType","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "Certainty","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "Name","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "Name_Type","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "Function","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "Func_Cert","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "Morphology","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "Shape","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "Grid_ID","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "Geom_Cert","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "Loc_Cert","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "Topography","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "Period","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "Per_Cert","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "Form","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "Form_Cert","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "Arrangement","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "Feature_No","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "Feat_Shape","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "Interpretation","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "Inter_Cert","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "Inter_No","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "Condition","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "Dist_Extent","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "Dist_Type","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "Dist_Cause","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "DistCauseCert","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "DistDateBefore","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "DistDateOn","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "DistDateFrom","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "DistDateTo","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "DistEffect","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "DistEffCert","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "ThreatType","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "ThreatCause","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "ThrCauseCert","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "Desc_Type","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "Description","source": "field_map", "data_type":"str", "data_length":"128"},
+            {"field_name": "Assessor","source": "field_map", "data_type":"str", "data_length":"128"}
+        ],
+        "RESOURCE_TYPES": {
+            "HERITAGE_RESOURCE_GROUP.E27": {
+                "FIELD_MAP": [
+                {
+                "field_name": "HerType",
+                "entitytypeid": "HERITAGE_CLASSIFICATION_TYPE.E55"
+                },
+                {
+                "field_name": "HerUseType",
+                "entitytypeid": "HERITAGE_FEATURE_USE_TYPE.E55"
+                },
+                {
+                "field_name": "Function",
+                "entitytypeid": "FUNCTION_TYPE.I4"
+                },
+                {
+                "field_name": "Func_Cert",
+                "entitytypeid": "FUNCTION_CERTAINTY.I6"
+                },
+                {
+                "field_name": "Shape",
+                "entitytypeid": "SITE_OVERALL_SHAPE_TYPE.E55"
+                },
+                {             
+                "field_name": "Geom_Cert",
+                "entitytypeid": "GEOMETRY_EXTENT_CERTAINTY.I6"
+                },
+                {
+                "field_name": "Name",
+                "entitytypeid": "NAME.E41"
+                },
+                {
+                "field_name": "Name_Type",
+                "entitytypeid": "NAME_TYPE.E55"
+                },
+                {
+                "field_name": "Grid_ID",
+                "entitytypeid": "GRID_ID.E42"
+                },
+                {
+                "field_name": "Loc_Cert",
+                "entitytypeid": "LOCATION_CERTAINTY.I6"
+                },
+                {
+                "field_name": "Topography",
+                "entitytypeid": "TOPOGRAPHY_TYPE.E55"
+                },
+                {
+                "field_name": "Period",
+                "entitytypeid": "CULTURAL_PERIOD_TYPE.I4"
+                },
+                {
+                "field_name": "Per_Cert",
+                "entitytypeid": "CULTURAL_PERIOD_CERTAINTY.I6"
+                },
+                {
+                "field_name": "Arrangement",
+                "entitytypeid": "FEATURE_ARRANGEMENT_TYPE.E55"
+                },
+                {
+                "field_name": "Interpretation",
+                "entitytypeid": "INTERPRETATION_TYPE.I4"
+                },
+                {
+                "field_name": "Inter_Cert",
+                "entitytypeid": "INTERPRETATION_CERTAINTY.I6"
+                },
+                {
+                "field_name": "Inter_No",
+                "entitytypeid": "INTERPRETATION_NUMBER_TYPE.E55"
+                },
+                {
+                "field_name": "Form",
+                "entitytypeid": "FEATURE_FORM_TYPE.I4"
+                },
+                {
+                "field_name": "Form_Cert",
+                "entitytypeid": "FEATURE_FORM_TYPE_CERTAINTY.I6"
+                },
+                {
+                "field_name": "Feature_No",
+                "entitytypeid": "FEATURE_NUMBER_TYPE.E55"
+                },
+                {
+                "field_name": "Feat_Shape",
+                "entitytypeid": "FEATURE_SHAPE_TYPE.E55"
+                },
+                {
+                "field_name": "Condition",
+                "entitytypeid": "OVERALL_CONDITION_STATE_TYPE.E55"
+                },
+                {
+                "field_name": "Dist_Type",
+                "entitytypeid": "DISTURBANCE_CAUSE_CATEGORY_TYPE.E55"
+                },
+                {
+                "field_name": "Dist_Cause",
+                "entitytypeid": "DISTURBANCE_CAUSE_TYPE.I4"
+                },
+                {
+                "field_name": "DistCauseCert",
+                "entitytypeid": "DISTURBANCE_CAUSE_CERTAINTY.I6"
+                },
+                {
+                "field_name": "DistEffCert",
+                "entitytypeid": "EFFECT_CERTAINTY.I6"
+                },
+                {
+                "field_name": "DistEffect",
+                "entitytypeid": "EFFECT_TYPE.I4"
+                },
+                {
+                "field_name": "Dist_Extent",
+                "entitytypeid": "DAMAGE_EXTENT_TYPE.E55"
+                },
+                {
+                "field_name": "DistDateBefore",
+                "entitytypeid": "DISTURBANCE_DATE_OCCURRED_BEFORE.E61"
+                },
+                {
+                "field_name": "DistDateOn",
+                "entitytypeid": "DISTURBANCE_DATE_OCCURRED_ON.E61"
+                },
+                {
+                "field_name": "DistDateFrom",
+                "entitytypeid": "DISTURBANCE_DATE_FROM.E61"
+                },
+                {
+                "field_name": "DistDateTo",
+                "entitytypeid": "DISTURBANCE_DATE_FROM.E61"
+                },
+                {
+                "field_name": "ThreatType",
+                "entitytypeid": "THREAT_CATEGORY.I4"
+                },
+                {
+                "field_name": "ThreatCause",
+                "entitytypeid": "THREAT_TYPE.I4"
+                },
+                {
+                "field_name": "ThrCauseCert",
+                "entitytypeid": "THREAT_PROBABILITY.I6"
+                },
+                {
+                "field_name": "Desc_Type",
+                "entitytypeid": "GENERAL_DESCRIPTION_TYPE.E55"
+                },
+                {
+                "field_name": "Description",
+                "entitytypeid": "GENERAL_DESCRIPTION.E62"
+                },
+                {
+                "field_name": "Assessor",
+                "entitytypeid": "INVESTIGATOR_NAME.E41"
+                }
+                ]
+            },
+        "HERITAGE_FEATURE.E24": {
+            "FIELD_MAP": [
+                {
+                "field_name": "HerType",
+                "entitytypeid": "HERITAGE_CLASSIFICATION_TYPE.E55"
+                },
+                {
+                "field_name": "HerUseType",
+                "entitytypeid": "HERITAGE_FEATURE_USE_TYPE.E55"
+                },                
+                {
+                "field_name": "Shape",
+                "entitytypeid": "SITE_OVERALL_SHAPE_TYPE.E55"
+                },
+                {             
+                "field_name": "Geom_Cert",
+                "entitytypeid": "GEOMETRY_EXTENT_CERTAINTY.I6"
+                },
+                {
+                "field_name": "Name",
+                "entitytypeid": "NAME.E41"
+                },
+                {
+                "field_name": "Name_Type",
+                "entitytypeid": "NAME_TYPE.E55"
+                },
+                {
+                "field_name": "Grid_ID",
+                "entitytypeid": "GRID_ID.E42"
+                },
+                {
+                "field_name": "Loc_Cert",
+                "entitytypeid": "LOCATION_CERTAINTY.I6"
+                },
+                {
+                "field_name": "Topography",
+                "entitytypeid": "TOPOGRAPHY_TYPE.E55"
+                }
+                ]
+            }
+        },
+        "RECORDS": []
+    }
+
+}
