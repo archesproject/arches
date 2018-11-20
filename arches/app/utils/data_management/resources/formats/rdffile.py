@@ -210,7 +210,6 @@ class JsonLdWriter(RdfWriter):
 
         context = self.graph_model.jsonldcontext
         framing = {
-            "@context": context,
             "@omitDefault": True,
             "@omitGraph": False,
             "@id": str(resource_inst_uri),
@@ -218,6 +217,9 @@ class JsonLdWriter(RdfWriter):
                 "@embed": "@always"
             }
         }
+
+        if context:
+            framing["@context"] = context
 
         js = frame(js, framing)
 
