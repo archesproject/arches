@@ -1280,7 +1280,7 @@ def get_valueids_from_concept_label(label, lang=None):
     if concept_label_results is None:
         return
     return [res['_source'] for res in concept_label_results['hits']['hits']
-            if lang is None or res['_source']['language'] == lang]
+            if lang is None or res['_source']['language'].lower() == lang.lower()]
 
 
 def get_concept_label_from_valueid(valueid):
