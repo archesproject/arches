@@ -9,12 +9,13 @@
             <div class = "content">
             {% if 'CONDITION_ASSESSMENT_E14'  in report_info.source.graph %}
                 {% for CONDITION_ASSESSMENT_E14 in report_info.source.graph.CONDITION_ASSESSMENT_E14 %}
+                    
                     {% if 'OVERALL_CONDITION_E3' in CONDITION_ASSESSMENT_E14 %}
                         {% for OVERALL_CONDITION_E3 in CONDITION_ASSESSMENT_E14.OVERALL_CONDITION_E3 %}
-                            {% if 'OVERALL_CONDITION_STATE_TYPE_E55' in OVERALL_CONDITION_E3 %}
-                                {% for OVERALL_CONDITION_STATE_TYPE_E55 in OVERALL_CONDITION_E3.OVERALL_CONDITION_STATE_TYPE_E55 %}
+                            {% if 'OVERALL_CONDITION_TYPE_E55' in OVERALL_CONDITION_E3 %}
+                                {% for OVERALL_CONDITION_TYPE_E55 in OVERALL_CONDITION_E3.OVERALL_CONDITION_TYPE_E55 %}
                                     <dd class="arches-report-subsection-item">
-                                        {{ OVERALL_CONDITION_STATE_TYPE_E55.OVERALL_CONDITION_STATE_TYPE_E55__value }} 
+                                        {{ OVERALL_CONDITION_TYPE_E55.OVERALL_CONDITION_TYPE_E55__value }} 
                                     </dd>
                                 {% endfor %}             
                             {% endif %}
