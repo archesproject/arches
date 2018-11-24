@@ -413,7 +413,6 @@ class Resource(models.ResourceInstance):
 
         return values
 
-        
 
 def parse_node_value(value):
     if is_uuid(value):
@@ -422,6 +421,7 @@ def parse_node_value(value):
         except ObjectDoesNotExist:
             pass
     return value
+
 
 def is_uuid(value_to_test):
     try:

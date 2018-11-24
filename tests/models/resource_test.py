@@ -16,13 +16,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-"""
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
-
-Replace this with more appropriate tests for your application.
-"""
-
 import json
 import os
 import time
@@ -178,7 +171,6 @@ class ResourceTests(ArchesTestCase):
         cls.test_resource_no_value.tiles.append(tile)
         cls.test_resource_no_value.save()
 
-
     def test_get_node_value_string(self):
         """
         Query a string value
@@ -219,7 +211,7 @@ class ResourceTests(ArchesTestCase):
         """
         node_name = "Not Existing Concept"
         with self.assertRaises(InvalidNodeNameException):
-            self.test_resource.get_node_values(node_name)    
+            self.test_resource.get_node_values(node_name)
 
     def test_get_duplicate_node_value_concept(self):
         """
@@ -227,7 +219,7 @@ class ResourceTests(ArchesTestCase):
         """
         node_name = "Duplicate Node Concept"
         with self.assertRaises(MultipleNodesFoundException):
-            self.test_resource.get_node_values(node_name)   
+            self.test_resource.get_node_values(node_name)
 
     def test_get_node_value_geometry(self):
         """
