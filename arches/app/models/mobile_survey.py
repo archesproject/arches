@@ -31,6 +31,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 import arches.app.views.search as search
 from django.utils.translation import ugettext as _
 
+
 class MobileSurvey(models.MobileSurveyModel):
     """
     Used for mapping complete mobile survey objects to and from the database
@@ -92,7 +93,8 @@ class MobileSurvey(models.MobileSurveyModel):
         for card in self.cards.all():
             if card.graph_id not in graphids:
                 graphids.append(card.graph_id)
-                #we may want the full proxy model at some point, but for now just the root node color
+                # we may want the full proxy model at some point,
+                # but for now just the root node color
                 graph = Graph.objects.get(pk=card.graph_id)
                 graph_obj = graph.serialize(exclude=['domain_connections', 'edges', 'relatable_resource_model_ids'])
                 graph_obj['widgets'] = list(models.CardXNodeXWidget.objects.filter(card__graph=graph).distinct())
@@ -105,7 +107,7 @@ class MobileSurvey(models.MobileSurveyModel):
                                 collection_id = node['config']['rdmCollection']
                                 concept_collection = Concept().get_child_collections_hierarchically(collection_id)
                                 widget.config['options'] = concept_collection
-                            except:
+                            except Exception as e:
                                 pass
                             break
                     if not found:
@@ -120,22 +122,21 @@ class MobileSurvey(models.MobileSurveyModel):
                                     widget_model.config = widget.defaultconfig
                                     try:
                                         collection_id = node['config']['rdmCollection']
-                                        concept_collection = Concept().get_child_collections_hierarchically(collection_id)
-                                        widget_model.config['options'] = concept_collection
-                                    except:
+                                        if collection_id:
+                                            concept_collection = Concept().get_child_collections_hierarchically(collection_id)
+                                            widget_model.config['options'] = concept_collection
+                                    except Exception as e:
                                         pass
                                     widget_model.label = node['name']
                                     graph_obj['widgets'].append(widget_model)
                                 break
                 graphs.append(graph_obj)
-
         ret['graphs'] = graphs
         ret['cards'] = ordered_cards
         try:
             ret['bounds'] = json.loads(ret['bounds'])
         except TypeError as e:
             print 'Could not parse', ret['bounds'], e
-
         return ret
 
     def get_ordered_cards(self):
@@ -154,9 +155,9 @@ class MobileSurvey(models.MobileSurveyModel):
                 if row.doc['type'] == 'resource':
                     if row.doc['provisional_resource'] == 'true':
                         resourceinstance, created = ResourceInstance.objects.update_or_create(
-                            resourceinstanceid = uuid.UUID(str(row.doc['resourceinstanceid'])),
-                            defaults = {
-                            'graph_id': uuid.UUID(str(row.doc['graph_id']))
+                            resourceinstanceid=uuid.UUID(str(row.doc['resourceinstanceid'])),
+                            defaults={
+                                'graph_id': uuid.UUID(str(row.doc['graph_id']))
                             }
                         )
                         print('Resource {0} Saved'.format(row.doc['resourceinstanceid']))
@@ -236,8 +237,8 @@ class MobileSurvey(models.MobileSurveyModel):
                     default_bounds['features'][0]['properties']['inverted'] = False
                     request.GET['mapFilter'] = json.dumps(default_bounds)
                 else:
-                    request.GET['mapFilter'] = json.dumps({u'type': u'FeatureCollection', 'features':[{'geometry': json.loads(self.bounds.json)}]})
-                request.GET['typeFilter'] = json.dumps([{'graphid': resourceid, 'inverted': False } for resourceid in self.datadownloadconfig['resources']])
+                    request.GET['mapFilter'] = json.dumps({u'type': u'FeatureCollection', 'features': [{'geometry': json.loads(self.bounds.json)}]})
+                request.GET['typeFilter'] = json.dumps([{'graphid': resourceid, 'inverted': False} for resourceid in self.datadownloadconfig['resources']])
             else:
                 parsed = urlparse.urlparse(query)
                 urlparams = urlparse.parse_qs(parsed.query)
