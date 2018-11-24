@@ -20,7 +20,9 @@ import uuid
 import importlib
 import datetime
 from uuid import UUID
+from django.db import transaction
 from django.db.models import Q
+from django.core.exceptions import ObjectDoesNotExist
 from arches.app.models import models
 from arches.app.models.models import EditLog
 from arches.app.models.models import TileModel
@@ -31,7 +33,6 @@ from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.exceptions import InvalidNodeNameException, MultipleNodesFoundException
 from arches.app.datatypes.datatypes import DataTypeFactory
-from django.db import transaction
 
 
 class Resource(models.ResourceInstance):
@@ -416,7 +417,10 @@ class Resource(models.ResourceInstance):
 
 def parse_node_value(value):
     if is_uuid(value):
-        return models.Value.objects.get(pk=value).value
+        try:
+            return models.Value.objects.get(pk=value).value
+        except ObjectDoesNotExist:
+            pass
     return value
 
 def is_uuid(value_to_test):
