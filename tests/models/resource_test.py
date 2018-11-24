@@ -170,6 +170,15 @@ class ResourceTests(ArchesTestCase):
     def tearDownClass(cls):
         cls.user.delete()
 
+    @classmethod
+    def addNodeWithoutValue(cls):
+        cls.test_resource_no_value = Resource(graph_id=cls.search_model_graphid)
+        tile = Tile(data={cls.search_model_cultural_period_nodeid: ''},
+                    nodegroup_id=cls.search_model_cultural_period_nodeid)
+        cls.test_resource_no_value.tiles.append(tile)
+        cls.test_resource_no_value.save()
+
+
     def test_get_node_value_string(self):
         """
         Query a string value
@@ -194,7 +203,17 @@ class ResourceTests(ArchesTestCase):
         result = self.test_resource.get_node_values(node_name)
         self.assertEqual('Mock concept', result[0])
 
-    def test_get_not_existing_node_value_concept(self):
+    def test_get_not_existing_value_from_concept(self):
+        """
+        Query a concept node without a value
+        """
+        self.addNodeWithoutValue()
+
+        node_name = "Cultural Period Concept"
+        result = self.test_resource_no_value.get_node_values(node_name)
+        self.assertEqual(None, result[0])
+
+    def test_get_value_from_not_existing_concept(self):
         """
         Query a concept value that does not exist
         """
