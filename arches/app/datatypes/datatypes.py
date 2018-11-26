@@ -1427,6 +1427,16 @@ class ResourceInstanceDataType(BaseDataType):
                               rangenode, edge.rangenode.ontologyclass)
         return g
 
+    def from_rdf(self, json_ld_node):
+        res_inst_uri = json_ld_node['id']
+        # should be in the form http(s)://archeshost/resources/{UUID}
+        # FIXME: should any URI in this form be accepted, regardless to a specific Arches host?
+        import re
+        p = re.compile(r"(http|https)://(?P<host>[^/]*)/resources/(?P<res_inst>[A-Fa-f0-9\-]*)/?$")
+        m = p.match(res_inst_uri)
+        if m is not None:
+            return m.groupdict()
+
 
 class NodeValueDataType(BaseDataType):
     def validate(self, value, row_number=None, source=''):
