@@ -156,27 +156,48 @@ class ConceptDataType(BaseConceptDataType):
 
     def from_rdf(self, json_ld_node):
         # Expects a label and a concept URI within the json_ld_node
+
         # FIXME: SHOULD be able to handle cases when the label is not supplied,
         # or if the label does not match any label from the ConceptValue
-        concept_uri = json_ld_node.get('id')
+        # Either by instantiating a keyword without a concept_id or by
+        # or by looking for say an external identifier attached to the concept and
+        # building upon that.
+        concept_id = json_ld_node.get('id')
         label = json_ld_node.get(str(RDFS.label))
+
+        # FIXME: assert that the type of this node is a E55_Type?
+
         # FIXME when pyld supports uppercase lang in strings, include
         # language handling here.
-        if concept_uri and label:
+
+        if label:
+            # Could be:
+            #  - Blank node E55_Type with a label - a Keyword
+            #  - Concept ID URI, with a label - a conventional Concept
             # find a matching Concept Value to the label
-            values = get_valueids_from_concept_label(label)
+            values = get_valueids_from_concept_label(label, concept_id)
+
             if values:
                 return values[0]["id"]
             else:
-                print("FAILED TO FIND MATCHING LABEL '{0}' FOR CONCEPT '{1}'").format(
-                    label, concept_uri)
-                label = None
+                if concept_id:
+                    print("FAILED TO FIND MATCHING LABEL '{0}' FOR CONCEPT '{1}'").format(
+                        label, concept_id)
+                    label = None
+                else:
+                    print("No Concept ID URI supplied for rdf")
 
-        if concept_uri and label is None:
+        if concept_id and label is None:
             # got a concept URI but the label is nonexistant
             # or cannot be resolved in Arches
-            value = get_preflabel_from_conceptid(concept_uri, lang=None)
+            value = get_preflabel_from_conceptid(concept_id, lang=None)
             return value['id']
+
+        if concept_id is None and (label is None or label == ""):
+            # a keyword of some type. If the code execution gets here their either
+            # was no RDFS:label literal value to note or the keyword cannot be found
+            # amongst the current Arches ConceptValues
+            pass
 
 
 class ConceptListDataType(BaseConceptDataType):
