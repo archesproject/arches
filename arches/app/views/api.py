@@ -9,6 +9,7 @@ from django.utils.decorators import method_decorator
 from django.db import transaction
 from django.db.models import Q
 from django.http.request import QueryDict
+from django.core import management
 from django.core.urlresolvers import reverse
 from django.utils.decorators import method_decorator
 from revproxy.views import ProxyView
@@ -63,6 +64,18 @@ class APIBase(View):
         get_params._mutable = False
         request.GET = get_params
         return super(APIBase, self).dispatch(request, *args, **kwargs)
+
+
+class Sync(APIBase):
+
+    def get(self, request, surveyid=None):
+        ret = 'Sync was successful'
+        try:
+            management.call_command('mobile', operation='sync_survey', id=surveyid)
+        except:
+            ret = 'Sync failed'
+
+        return JSONResponse(ret)
 
 
 class Surveys(APIBase):
