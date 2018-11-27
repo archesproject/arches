@@ -17,13 +17,8 @@ function($, _, arches, ko, koMapping, FunctionViewModel, chosen) {
             });
 
             this.graph.cards.forEach(function(card){
-                var found = !!_.find(this.graph.nodegroups, function(nodegroup){
-                    return nodegroup.parentnodegroup_id === card.nodegroup_id;
-                }, this);
-                if(!found && !(card.nodegroup_id in nodegroups)){
-                    this.cards.push(card);
-                    nodegroups[card.nodegroup_id] = true;
-                }
+                this.cards.push(card);
+                nodegroups[card.nodegroup_id] = true;
             }, this);
 
             this.name = params.config.name;
