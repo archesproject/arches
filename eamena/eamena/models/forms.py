@@ -1640,7 +1640,7 @@ class SharedDataForm(ResourceForm):
     @staticmethod
     def get_info():
         return {
-            'id': 'SharedData',
+            'id': 'shareddata',
             'icon': 'fa-flash',
             'name': _('Shared Data'),
             'class': SharedDataForm
