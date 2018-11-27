@@ -15,14 +15,14 @@
     <meta name="author" content="">
 
 	{% block css %}
-        <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.0/css/bootstrap.min.css">
         <link rel="stylesheet" href="{% static 'plugins/line-icons/line-icons.css' %}">
-        <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-        <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/octicons/2.1.2/octicons.min.css">
-        <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" type="text/css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/2.1.2/octicons.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" type="text/css">
         <link rel="stylesheet" href="{% static 'css/main.css' %}">
         <link rel="stylesheet" href="{% static 'css/plugins/smartadmin-production.css' %}" type="text/css" media="screen">
-        <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/3.1.3/css/bootstrap-datetimepicker.min.css" type="text/css" media="screen">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/3.1.3/css/bootstrap-datetimepicker.min.css" type="text/css" media="screen">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/blueimp-gallery/2.15.2/css/blueimp-gallery.min.css" type="text/css" media="screen">
         <link rel="stylesheet" href="{% static 'css/plugins/bootstrap-image-gallery.min.css' %}" type="text/css" media="screen">
         <link rel="stylesheet" href="{% static 'plugins/openlayers/ol.css' %}">
@@ -71,7 +71,7 @@
 
 	{% block javascript %}
     
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js"></script>
     <script src="{{ STATIC_URL }}js/views/crypto/components/core-min.js"></script>
     <script src="{{ STATIC_URL }}js/views/crypto/components/cipher-core.js"></script>
     <script src="{{ STATIC_URL }}js/views/crypto/components/enc-base64.js"></script>
@@ -84,29 +84,29 @@
             baseUrl: '{{ STATIC_URL }}js',
             paths: {
                 'plugins': '{{ STATIC_URL }}plugins',
-                'async': 'http://cdnjs.cloudflare.com/ajax/libs/requirejs-async/0.1.1/async',
-                'jquery': 'http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min',
-                'select2': 'http://cdnjs.cloudflare.com/ajax/libs/select2/3.5.1/select2.min',
-                'bootstrap': 'http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.0/js/bootstrap.min',
-                'jquery-ui': 'http://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min',
-                'flexslider': 'http://cdnjs.cloudflare.com/ajax/libs/flexslider/2.2.2/jquery.flexslider-min',
+                'async': 'https://cdnjs.cloudflare.com/ajax/libs/requirejs-async/0.1.1/async',
+                'jquery': 'https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min',
+                'select2': 'https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.1/select2.min',
+                'bootstrap': 'https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.0/js/bootstrap.min',
+                'jquery-ui': 'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min',
+                'flexslider': 'https://cdnjs.cloudflare.com/ajax/libs/flexslider/2.2.2/jquery.flexslider-min',
                 'openlayers': '{{ STATIC_URL }}plugins/openlayers/ol',
-                'easing': 'http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min',
-                'backbone': 'http://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min',
-                //'underscore': 'http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min',
+                'easing': 'https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min',
+                'backbone': 'https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min',
+                //'underscore': 'https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min',
                 'underscore': 'https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min',
                 'jquery-validate': 'http://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.11.1/jquery.validate.min',
-                'd3': 'http://cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min',
-                'dropzone': 'http://cdnjs.cloudflare.com/ajax/libs/dropzone/3.8.4/dropzone-amd-module.min',
-                'summernote': 'http://cdnjs.cloudflare.com/ajax/libs/summernote/0.5.10/summernote.min',
-                'knockout': 'http://cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-min',
-                //'knockout': 'http://knockoutjs.com/downloads/knockout-3.3.0.debug',
-                'knockout-mapping': 'http://cdnjs.cloudflare.com/ajax/libs/knockout.mapping/2.4.1/knockout.mapping.min',
-                'moment': 'http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min',
-                'bootstrap-datetimepicker': 'http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/3.1.3/js/bootstrap-datetimepicker.min',
+                'd3': 'https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min',
+                'dropzone': 'https://cdnjs.cloudflare.com/ajax/libs/dropzone/3.8.4/dropzone-amd-module.min',
+                'summernote': 'https://cdnjs.cloudflare.com/ajax/libs/summernote/0.5.10/summernote.min',
+                'knockout': 'https://cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-min',
+                //'knockout': 'https://knockoutjs.com/downloads/knockout-3.3.0.debug',
+                'knockout-mapping': 'https://cdnjs.cloudflare.com/ajax/libs/knockout.mapping/2.4.1/knockout.mapping.min',
+                'moment': 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min',
+                'bootstrap-datetimepicker': 'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/3.1.3/js/bootstrap-datetimepicker.min',
                 'shp': 'https://raw.githubusercontent.com/wavded/js-shapefile-to-geojson/master/shapefile',
                 'blueimp-gallery': 'https://cdnjs.cloudflare.com/ajax/libs/blueimp-gallery/2.15.2/js/blueimp-gallery',
-                'blueimp-jquery': 'http://blueimp.github.io/Gallery/js/jquery.blueimp-gallery',
+                'blueimp-jquery': 'https://blueimp.github.io/Gallery/js/jquery.blueimp-gallery',
                 'blueimp-helper': 'https://cdnjs.cloudflare.com/ajax/libs/blueimp-gallery/2.15.2/js/blueimp-helper.min',
                 'gmjs': 'https://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyBPUB3B5aiHQDVyIuhDqDp500IUCIEDdtM',
                 'Highcharts': 'https://code.highcharts.com/highcharts.src',
