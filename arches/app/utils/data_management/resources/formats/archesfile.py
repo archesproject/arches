@@ -197,7 +197,7 @@ class Validator(object):
     def validate_geometries(self, row, rownum):
         try:
             geom = fromstr(row['ATTRIBUTEVALUE'])
-            coord_limit = 1500
+            coord_limit = 4000
             bbox = geos.Polygon(settings.DATA_VALIDATION_BBOX)
 
             if geom.num_coords > coord_limit:

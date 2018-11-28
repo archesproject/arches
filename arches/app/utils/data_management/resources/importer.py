@@ -21,6 +21,9 @@ from formats.archesfile import ArchesReader
 from formats.archesjson import JsonReader
 from formats.shpfile import ShapeReader
 
+## manually increase the csv field size limit
+import sys
+csv.field_size_limit(sys.maxint)
 
 class ResourceLoader(object):
 
