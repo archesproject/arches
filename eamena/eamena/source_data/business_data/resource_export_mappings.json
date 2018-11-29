@@ -528,26 +528,6 @@
                      "entitytypeid": "DESIGNATION_TO_DATE.E61"
                     },
                     {
-                     "field_name": "FORM_TYPE_PROPOSITION_SET.I4",
-                     "entitytypeid": "FORM_TYPE_PROPOSITION_SET.I4"
-                    },
-                    {
-                     "field_name": "FORM_CERTAINTY_BELIEF_VALUE.I6",
-                     "entitytypeid": "FORM_CERTAINTY_BELIEF_VALUE.I6"
-                    },
-                    {
-                     "field_name": "FORM_SHAPE_TYPE.E55",
-                     "entitytypeid": "FORM_SHAPE_TYPE.E55"
-                    },
-                    {
-                     "field_name": "FORM_ARRANGEMENT.E55",
-                     "entitytypeid": "FORM_ARRANGEMENT.E55"
-                    },
-                    {
-                     "field_name": "FORM_NUMBER.E55",
-                     "entitytypeid": "FORM_NUMBER.E55"
-                    },
-                    {
                      "field_name": "MODIFICATION_TYPE.E55",
                      "entitytypeid": "MODIFICATION_TYPE.E55"
                     },
