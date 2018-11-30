@@ -54,6 +54,10 @@ class mappedCSVFileImportTests(ArchesTestCase):
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile['graph'])
 
+        with open(os.path.join('tests/fixtures/data/json/cardinality_test_data/file-list.json'), 'rU') as f:
+            archesfile = JSONDeserializer().deserialize(f)
+        ResourceGraphImporter(archesfile['graph'])
+
     @classmethod
     def tearDownClass(cls):
         pass
@@ -134,3 +138,10 @@ class mappedCSVFileImportTests(ArchesTestCase):
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count
         self.assertEqual(tile_difference, 0)
+
+    def test_file_list_datatype_import(self):
+        og_tile_count = TileModel.objects.count()
+        BusinessDataImporter('tests/fixtures/data/csv/file_list_datatype_import.csv').import_business_data()
+        new_tile_count = TileModel.objects.count()
+        tile_difference = new_tile_count - og_tile_count
+        self.assertEqual(tile_difference, 1)
