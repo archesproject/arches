@@ -18,6 +18,7 @@ import json
 import urlparse
 from copy import copy, deepcopy
 from django.db import transaction
+from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.models.tile import Tile
@@ -30,6 +31,7 @@ from arches.app.utils.couch import Couch
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 import arches.app.views.search as search
 from django.utils.translation import ugettext as _
+
 
 
 class MobileSurvey(models.MobileSurveyModel):
@@ -174,7 +176,16 @@ class MobileSurvey(models.MobileSurveyModel):
                         try:
                             tile = Tile.objects.get(tileid=row.doc['tileid'])
                             for user_edits in row.doc['provisionaledits'].items():
-                                # user_edits is a dict with the user number as the key and data as the value
+                                for nodeid, value in iter(user_edits[1]['value'].items()):
+                                    datatype_factory = DataTypeFactory()
+                                    node = models.Node.objects.get(nodeid=nodeid)
+                                    datatype = datatype_factory.get_instance(node.datatype)
+                                    newvalue = datatype.process_mobile_data(tile, node, db, row.doc, value)
+                                    if newvalue is not None:
+                                        user_edits[1]['value'][nodeid] = newvalue
+
+                                # user_edits is a tuple with the user number in
+                                # position 0, prov. edit data in position 1, eg:
                                 # {u'5': {
                                 #     u'action': u'update',
                                 #     u'reviewer': None,
@@ -192,7 +203,7 @@ class MobileSurvey(models.MobileSurveyModel):
                                     tile.provisionaledits[user_edits[0]] = user_edits[1]
                                 else:
                                     if user_edits[0] in tile.provisionaledits:
-                                        if user_edits[1]['timestamp'] > tile.provisionaledits[user_edits[0]]['timestamp']:
+                                        if user_edits[1]['timestamp'] >= tile.provisionaledits[user_edits[0]]['timestamp']:
                                             # If the mobile user edits are newer by UTC timestamp, overwrite the tile data
                                             tile.provisionaledits[user_edits[0]] = user_edits[1]
 
@@ -212,6 +223,15 @@ class MobileSurvey(models.MobileSurveyModel):
                                 # TODO: If user is reviewer, apply as authoritative edit
                         except Tile.DoesNotExist:
                             tile = Tile(row.doc)
+                            for user_edits in row.doc['provisionaledits'].items():
+                                for nodeid, value in iter(user_edits[1]['value'].items()):
+                                    datatype_factory = DataTypeFactory()
+                                    node = models.Node.objects.get(nodeid=nodeid)
+                                    datatype = datatype_factory.get_instance(node.datatype)
+                                    newvalue = datatype.process_mobile_data(tile, node, db, row.doc, value)
+                                    if newvalue is not None:
+                                        user_edits[1]['value'][nodeid] = newvalue
+                                    tile.provisionaledits[user_edits[0]] = user_edits[1]
 
                         tile.save()
                         tile_serialized = json.loads(JSONSerializer().serialize(tile))
