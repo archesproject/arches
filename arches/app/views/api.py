@@ -71,7 +71,18 @@ class Sync(APIBase):
     def get(self, request, surveyid=None):
         ret = 'Sync was successful'
         try:
-            management.call_command('mobile', operation='sync_survey', id=surveyid)
+            ms = MobileSurvey.objects.get(pk=surveyid)
+            user = request.user
+            can_sync = False
+            if user in ms.users.all():
+                can_sync = True
+            else:
+                users_groups = set([group.id for group in user.groups.all()])
+                ms_groups = set([group.id for group in ms.groups.all()])
+                if len(ms_groups.intersection(users_groups)) > 0:
+                    can_sync = True
+            if can_sync:
+                management.call_command('mobile', operation='sync_survey', id=surveyid)
         except:
             ret = 'Sync failed'
 
