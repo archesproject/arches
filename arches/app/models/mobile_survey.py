@@ -155,7 +155,7 @@ class MobileSurvey(models.MobileSurveyModel):
             for row in self.couch.all_docs(db):
                 ret.append(row)
                 if row.doc['type'] == 'resource':
-                    if row.doc['provisional_resource'] == 'true':
+                    if 'provisional_resource' in row.doc and row.doc['provisional_resource'] == 'true':
                         resourceinstance, created = ResourceInstance.objects.update_or_create(
                             resourceinstanceid=uuid.UUID(str(row.doc['resourceinstanceid'])),
                             defaults={
@@ -167,7 +167,7 @@ class MobileSurvey(models.MobileSurveyModel):
             for row in self.couch.all_docs(db):
                 ret.append(row)
                 if row.doc['type'] == 'tile':
-                    if row.doc['provisionaledits'] is not None:
+                    if 'provisionaledits' in row.doc and row.doc['provisionaledits'] is not None:
                         try:
                             tile = Tile.objects.get(tileid=row.doc['tileid'])
                             for user_edits in row.doc['provisionaledits'].items():
