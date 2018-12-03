@@ -469,6 +469,7 @@ class Command(BaseCommand):
 
         def load_business_data(package_dir):
             config_paths = glob.glob(os.path.join(package_dir, 'package_config.json'))
+            configs = {}
             if len(config_paths) > 0:
                 configs = json.load(open(config_paths[0]))
 
