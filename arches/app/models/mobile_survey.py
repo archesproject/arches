@@ -15,7 +15,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid
 import json
-import couchdb
 import urlparse
 from copy import copy, deepcopy
 from django.db import transaction
@@ -24,6 +23,7 @@ from arches.app.models.concept import Concept
 from arches.app.models.tile import Tile
 from arches.app.models.graph import Graph
 from arches.app.models.models import ResourceInstance
+from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from django.http import HttpRequest
 from arches.app.utils.couch import Couch
@@ -130,6 +130,11 @@ class MobileSurvey(models.MobileSurveyModel):
                                     widget_model.label = node['name']
                                     graph_obj['widgets'].append(widget_model)
                                 break
+                    if node['datatype'] == 'resource-instance':
+                        graph_id = node['config']['graphid'][0]
+                        node['config']['options'] = []
+                        for resource_instance in Resource.objects.filter(graph_id=graph_id):
+                            node['config']['options'].append({'id': str(resource_instance.pk), 'name': resource_instance.displayname})
                 graphs.append(graph_obj)
         ret['graphs'] = graphs
         ret['cards'] = ordered_cards
