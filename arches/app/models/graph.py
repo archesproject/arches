@@ -257,6 +257,7 @@ class Graph(models.GraphModel):
             card.active = cardobj.get('active', '')
             card.visible = cardobj.get('visible', '')
             card.sortorder = cardobj.get('sortorder', '')
+            card.component_id = cardobj.get('component_id', uuid.UUID('f05e4d3a-53c1-11e8-b0ea-784f435179ea'))
             card.nodegroup_id = uuid.UUID(str(cardobj.get('nodegroup_id', '')))
             card.nodegroup = self.get_or_create_nodegroup(nodegroupid=card.nodegroup_id)
 
