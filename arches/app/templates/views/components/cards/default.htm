@@ -252,6 +252,7 @@
             <h5 data-bind="text: card.model.instructions"></h5>
             {% endblock form_header %}
             <!-- ko if: card.widgets().length > 0 -->
+            {% block form_widgets %}
             <form class="widgets" style="margin-bottom: 20px;">
                 <div data-bind="foreach: {
                         data:card.widgets, as: 'widget'
@@ -275,6 +276,7 @@
             }, event: { mouseover: function(){ if (self.preview){widget.hovered(true) } }, mouseout: function(){ if (self.preview){widget.hovered(null)} } }, visible: widget.visible'></div>
                 </div>
             </form>
+            {% endblock form_widgets %}
             <!-- /ko -->
             <!-- ko if: card.widgets().length === 0 -->
             <ul class="card-summary-section" data-bind="css: {disabled: !tile.tileid}">
