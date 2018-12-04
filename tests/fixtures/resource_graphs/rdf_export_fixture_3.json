@@ -1,0 +1,18 @@
+{
+  "@context": "http://localhost:8000/media/contexts/linked-art.json", 
+  "id": "urn:uuid:32e82580-df5e-11e8-b600-a4d18cec433a", 
+  "type": "ManMadeObject", 
+  "note": "Third Test Object", 
+  "classified_as": [
+    {
+      "type": "Type", 
+      "id": "http://localhost:8000/concepts/e7a93d9a-0b5b-4338-9a0f-fdd7c971002c", 
+      "label": "Entirely Distinct Concept"
+    }, 
+    {
+      "type": "Type", 
+      "id": "http://localhost:8000/concepts/54c5c8ac-890d-4f8e-b19a-dfa2401eaea3", 
+      "label": "lunar calendar (dates by calendar)"
+    }
+  ]
+}

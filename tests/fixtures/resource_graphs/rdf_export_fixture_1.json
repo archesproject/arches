@@ -1,0 +1,35 @@
+{
+  "@context": "http://localhost:8000/media/contexts/linked-art.json", 
+  "id": "urn:uuid:7864b88a-df5a-11e8-8dfa-a4d18cec433a", 
+  "type": "ManMadeObject", 
+  "note": "Test Object 1", 
+  "classified_as": [
+    {
+      "type": "Type", 
+      "id": "http://localhost:8000/concepts/86be632e-0dad-4d88-b5da-3d65875d6239", 
+      "label": "Painting"
+    }
+  ], 
+  "produced_by": {
+    "type": "Production",
+    "technique":
+      {
+        "type": "Type", 
+        "id": "http://localhost:8000/concepts/86be632e-0dad-4d88-b5da-3d65875d6239", 
+        "label": "Painting"
+      }
+  }, 
+  "made_of": [
+    {
+      "type": "Material", 
+      "id": "http://localhost:8000/concepts/e0c3542b-5c1c-4a47-b3e3-423b03328be0", 
+      "label": "Example Concept 2"
+    }, 
+    {
+      "type": "Material", 
+      "id": "http://localhost:8000/concepts/134ebaa5-0f96-4153-8d1b-0ba6c7947292", 
+      "label": "Example Concept 1"
+    }
+  ], 
+  "number_of_parts": 5
+}

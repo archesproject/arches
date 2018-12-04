@@ -1,0 +1,21 @@
+{
+  "@context": "http://localhost:8000/media/contexts/linked-art.json", 
+  "id": "urn:uuid:df2fffca-df5c-11e8-93ce-a4d18cec433a", 
+  "type": "ManMadeObject", 
+  "note": "Backward and Forward Reference", 
+  "produced_by": {
+    "type": "Production",
+    "technique": [
+      {
+        "id": "http://vocab.getty.edu/aat/300047196", 
+        "type": "Type", 
+        "label": "junk sculpture"
+      }
+    ],
+    "used_specific_object": "urn:uuid:32e82580-df5e-11e8-b600-a4d18cec433a"
+  }, 
+  "part": {
+    "id": "urn:uuid:7864b88a-df5a-11e8-8dfa-a4d18cec433a",
+    "type": "ManMadeObject"
+  }
+}
