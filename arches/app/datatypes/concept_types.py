@@ -121,7 +121,7 @@ class ConceptDataType(BaseConceptDataType):
         except KeyError, e:
             pass
 
-    def to_rdf(self, edge_info, edge, tile):
+    def to_rdf(self, edge_info, edge):
         g = Graph()
         # logic: No data -> empty graph
         #        concept_id, but no value -> node linked to class of Concept, no label
@@ -247,11 +247,11 @@ class ConceptListDataType(BaseConceptDataType):
         except KeyError, e:
             pass
 
-    def to_rdf(self, edge_info, edge, tile):
+    def to_rdf(self, edge_info, edge):
         g = Graph()
         c = ConceptDataType()
         for r in edge_info['range_tile_data']:
             concept_info = edge_info.copy()
             concept_info['range_tile_data'] = r
-            g += c.to_rdf(concept_info, edge, tile)
+            g += c.to_rdf(concept_info, edge)
         return g

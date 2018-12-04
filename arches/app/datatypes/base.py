@@ -268,7 +268,7 @@ class BaseDataType(object):
         """
         pass
 
-    def to_rdf(self, edge_info, edge, tile):
+    def to_rdf(self, edge_info, edge):
         """
         Outputs an in-memory graph, converting the range tile data JSON into
         an appropriate RDF representation using rdflib
