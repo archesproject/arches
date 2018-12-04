@@ -117,7 +117,7 @@ class StringDataType(BaseDataType):
         except KeyError, e:
             pass
 
-    def to_rdf(self, edge_info, edge, tile):
+    def to_rdf(self, edge_info, edge):
         # returns an in-memory graph object, containing the domain resource, its
         # type and the string as a string literal
         g = Graph()
@@ -168,7 +168,7 @@ class NumberDataType(BaseDataType):
         except KeyError, e:
             pass
 
-    def to_rdf(self, edge_info, edge, tile):
+    def to_rdf(self, edge_info, edge):
         # returns an in-memory graph object, containing the domain resource, its
         # type and the number as a numeric literal (as this is how it is in the JSON)
         g = Graph()
@@ -210,7 +210,7 @@ class BooleanDataType(BaseDataType):
         except KeyError, e:
             pass
 
-    def to_rdf(self, edge_info, edge, tile):
+    def to_rdf(self, edge_info, edge):
         # returns an in-memory graph object, containing the domain resource, its
         # type and the number as a numeric literal (as this is how it is in the JSON)
         g = Graph()
@@ -291,7 +291,7 @@ class DateDataType(BaseDataType):
         if config is not None:
             cache.delete('time_wheel_config_anonymous')
 
-    def to_rdf(self, edge_info, edge, tile):
+    def to_rdf(self, edge_info, edge):
         # returns an in-memory graph object, containing the domain resource, its
         # type and the number as a numeric literal (as this is how it is in the JSON)
         g = Graph()
@@ -1064,7 +1064,7 @@ class FileListDataType(BaseDataType):
         result = json.loads(json.dumps(tile_data))
         return result
 
-    def to_rdf(self, edge_info, edge, tile):
+    def to_rdf(self, edge_info, edge):
         # outputs a graph holding an RDF representation of the file stored in the Arches instance
 
         g = Graph()
@@ -1407,7 +1407,7 @@ class ResourceInstanceDataType(BaseDataType):
         except KeyError, e:
             pass
 
-    def to_rdf(self, edge_info, edge, tile):
+    def to_rdf(self, edge_info, edge):
         g = Graph()
 
         def _add_resource(d, p, r, r_type):
