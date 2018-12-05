@@ -85,7 +85,11 @@ class TileData(View):
                     with transaction.atomic():
                         try:
                             if accepted_provisional == None:
-                                tile.save(request=request)
+                                try:
+                                    tile.save(request=request)
+                                except Exception as e:
+                                    message = "Unable to save. A {0} has occurred. Arguments: {1!r}".format(type(e).__name__, e.args)
+                                    return JSONResponse({'status':'false','message': [message, _('Please contact your system administrator')]}, status=500)
                             else:
                                 if accepted_provisional is not None:
                                     provisional_editor = User.objects.get(pk=accepted_provisional_edit["user"])
