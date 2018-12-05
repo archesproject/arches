@@ -855,6 +855,10 @@ class IIIFManifest(models.Model):
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=16, blank=True)
+
+    def is_reviewer(self):
+        return self.user.groups.filter(name='Resource Reviewer').exists()
+
     class Meta:
         managed = True
         db_table = 'user_profile'
