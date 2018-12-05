@@ -921,13 +921,36 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
 
 class FileListDataType(BaseDataType):
+
+    def get_previously_saved_data(self, user_is_reviewer, user_id, previously_saved_tile):
+        if (user_is_reviewer is False
+            and previously_saved_tile.provisionaledits is not None
+                and user_id in previously_saved_tile.provisionaledits):
+            previously_saved_data = previously_saved_tile.provisionaledits[user_id]['value']
+        else:
+            previously_saved_data = previously_saved_tile.data
+        return previously_saved_data
+
+    def get_current_data(self, user_is_reviewer, user_id, current_tile):
+        if user_is_reviewer is True:
+            current_tile_data = current_tile.data
+        else:
+            current_tile_data = current_tile.provisionaledits[user_id]['value']
+        return current_tile_data
+
     def handle_request(self, current_tile, request, node):
         previously_saved_tile = models.TileModel.objects.filter(pk=current_tile.tileid)
+        user = request.user
+        if hasattr(request.user, 'userprofile') is not True:
+            models.UserProfile.objects.create(user=request.user)
+        user_is_reviewer = request.user.userprofile.is_reviewer()
+        current_tile_data = self.get_current_data(user_is_reviewer, str(user.id), current_tile)
         if previously_saved_tile.count() == 1:
-            if previously_saved_tile[0].data[str(node.pk)] != None:
-                for previously_saved_file in previously_saved_tile[0].data[str(node.pk)]:
+            previously_saved_tile_data = self.get_previously_saved_data(user_is_reviewer, str(user.id), previously_saved_tile[0])
+            if previously_saved_tile_data[str(node.pk)] is not None:
+                for previously_saved_file in previously_saved_tile_data[str(node.pk)]:
                     previously_saved_file_has_been_removed = True
-                    for incoming_file in current_tile.data[str(node.pk)]:
+                    for incoming_file in current_tile_data[str(node.pk)]:
                         if previously_saved_file['file_id'] == incoming_file['file_id']:
                             previously_saved_file_has_been_removed = False
                     if previously_saved_file_has_been_removed:
@@ -942,8 +965,8 @@ class FileListDataType(BaseDataType):
             file_model = models.File()
             file_model.path = file_data
             file_model.save()
-            if current_tile.data[str(node.pk)] != None:
-                for file_json in current_tile.data[str(node.pk)]:
+            if current_tile_data[str(node.pk)] != None:
+                for file_json in current_tile_data[str(node.pk)]:
                     if file_json["name"] == file_data.name and file_json["url"] is None:
                         file_json["file_id"] = str(file_model.pk)
                         file_json["url"] = str(file_model.path.url)
