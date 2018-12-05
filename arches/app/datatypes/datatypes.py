@@ -965,7 +965,7 @@ class FileListDataType(BaseDataType):
             file_model = models.File()
             file_model.path = file_data
             file_model.save()
-            if current_tile_data[str(node.pk)] != None:
+            if current_tile_data[str(node.pk)] is not None:
                 for file_json in current_tile_data[str(node.pk)]:
                     if file_json["name"] == file_data.name and file_json["url"] is None:
                         file_json["file_id"] = str(file_model.pk)
