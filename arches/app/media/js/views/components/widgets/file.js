@@ -56,7 +56,7 @@ define([
                         }
                         if (Array.isArray(self.value())) {
                             var uploaded = _.filter(self.value(), function(val) {
-                                return val.status === 'uploaded';
+                                return ko.unwrap(val.status) === 'uploaded';
                             });
                             self.uploadedFiles(uploaded)
                         }
