@@ -923,9 +923,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 class FileListDataType(BaseDataType):
 
     def get_previously_saved_data(self, user_is_reviewer, user_id, previously_saved_tile):
-        if (user_is_reviewer is False
-            and previously_saved_tile.provisionaledits is not None
-                and user_id in previously_saved_tile.provisionaledits):
+        if user_is_reviewer is False and previously_saved_tile.provisionaledits is not None and user_id in previously_saved_tile.provisionaledits:
             previously_saved_data = previously_saved_tile.provisionaledits[user_id]['value']
         else:
             previously_saved_data = previously_saved_tile.data
@@ -965,7 +963,7 @@ class FileListDataType(BaseDataType):
             file_model = models.File()
             file_model.path = file_data
             file_model.save()
-            if current_tile_data[str(node.pk)] != None:
+            if current_tile_data[str(node.pk)] is not None:
                 for file_json in current_tile_data[str(node.pk)]:
                     if file_json["name"] == file_data.name and file_json["url"] is None:
                         file_json["file_id"] = str(file_model.pk)
