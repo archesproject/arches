@@ -1045,6 +1045,8 @@ class FileListDataType(BaseDataType):
                         file["file_id"] = str(file_model.pk)
                         file["url"] = str(file_model.path.url)
                         file["status"] = 'uploaded'
+                        file["accepted"] = True
+                        file["size"] = file_data.size
                     db.delete_attachment(couch_doc, file['name'])
 
         except KeyError as e:
