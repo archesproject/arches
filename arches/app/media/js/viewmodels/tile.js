@@ -93,10 +93,10 @@ define([
             }),
             expanded: ko.observable(false),
             hasprovisionaledits: ko.pureComputed(function() {
-                return !!self.provisionaledits();
+                return !!ko.unwrap(self.provisionaledits);
             }, this),
             isfullyprovisional: ko.pureComputed(function() {
-                return !!self.provisionaledits() && _.keys(koMapping.toJS(this.data)).length === 0;
+                return !!ko.unwrap(self.provisionaledits()) && _.keys(koMapping.toJS(this.data)).length === 0;
             }, this),
             selected: ko.pureComputed({
                 read: function() {
@@ -189,7 +189,7 @@ define([
                         self.parent.expanded(true);
                         selection(self);
                     }
-                    if (params.userisreviewer === false && !self.provisionaledits()) {
+                    if (params.userisreviewer === false && !ko.unwrap(self.provisionaledits)) {
                         // If the user is provisional ensure their edits are provisional
                         self.provisionaledits(self.data);
                     }

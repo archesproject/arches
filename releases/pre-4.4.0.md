@@ -227,7 +227,7 @@ Note (GeoJson is covered by map widget testing in a different section)
 | Test Subject           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
 | String                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Concepts               |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Concepts               |    ?   |    ?   |    ?    |   ?  | ?   | Make sure collector nodes are not clickable     |
 | Domains                |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Images                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Dates                  |    ?   |    ?   |    ?    |   ?  | ?   | -     |
@@ -338,6 +338,7 @@ Assigned to: Alexei
 | Create graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Delete Instances |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Add/Edit cards   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Reorder widgets  in card |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Add/Edit menus   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Add/Edit reports |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 

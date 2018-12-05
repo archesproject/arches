@@ -392,7 +392,7 @@ class Concept(object):
 
     def get_child_collections_hierarchically(self, conceptid, child_valuetypes=None, offset=0, limit=50, query=None):
         child_valuetypes = child_valuetypes if child_valuetypes else ['prefLabel']
-        columns = "valueidto::text, conceptidto::text, valueto, valuetypeto, depth, count(*) OVER() AS full_count"
+        columns = "valueidto::text, conceptidto::text, valueto, valuetypeto, depth, count(*) OVER() AS full_count, collector"
         return self.get_child_edges(conceptid, ['member'], child_valuetypes, offset=offset, limit=limit, order_hierarchically=True, query=query, columns=columns)
 
     def get_child_collections(self, conceptid, child_valuetypes=None, parent_valuetype='prefLabel', columns=None, depth_limit=''):
@@ -446,7 +446,14 @@ class Concept(object):
                             WHERE conceptid=r.conceptidto
                             AND valuetype in ('sortorder')
                             limit 1
-                        ) as sortorder
+                        ) as sortorder,
+                        (
+                            SELECT value
+                            FROM values
+                            WHERE conceptid=r.conceptidto
+                            AND valuetype in ('collector')
+                            limit 1
+                        ) as collector
                         FROM relations r
                         WHERE r.conceptidfrom = '{conceptid}'
                         and ({relationtypes})
@@ -472,7 +479,14 @@ class Concept(object):
                             WHERE conceptid=r.conceptidto
                             AND valuetype in ('sortorder')
                             limit 1
-                        ) as sortorder
+                        ) as sortorder,
+                        (
+                            SELECT value
+                            FROM values
+                            WHERE conceptid=r.conceptidto
+                            AND valuetype in ('collector')
+                            limit 1
+                        ) as collector
                         FROM relations r
                         JOIN ordered_relationships b ON(b.conceptidto = r.conceptidfrom)
                         WHERE ({relationtypes})
@@ -483,6 +497,7 @@ class Concept(object):
                 children AS (
                     SELECT r.conceptidfrom, r.conceptidto,
                         to_char(row_number() OVER (), 'fm000000') as row,
+                        r.collector,
                         1 AS depth       ---|NonRecursive Part
                         FROM ordered_relationships r
                         WHERE r.conceptidfrom = '{conceptid}'
@@ -490,6 +505,7 @@ class Concept(object):
                     UNION
                         SELECT r.conceptidfrom, r.conceptidto,
                         row || '-' || to_char(row_number() OVER (), 'fm000000'),
+                        r.collector,
                         depth+1      ---|RecursivePart
                         FROM ordered_relationships r
                         JOIN children b ON(b.conceptidto = r.conceptidfrom)
@@ -515,20 +531,20 @@ class Concept(object):
                         ) desc limit 1
                     ) d
                 ) as valueto,
-                depth, count(*) OVER() AS full_count
+                depth, collector, count(*) OVER() AS full_count
 
                FROM {recursive_table} order by row {limit_clause};
 
             """
 
             subquery = """, results as (
-                SELECT c.conceptidfrom, c.conceptidto, c.row, c.depth
+                SELECT c.conceptidfrom, c.conceptidto, c.row, c.depth, c.collector
                 FROM children c
                 JOIN values ON(values.conceptid = c.conceptidto)
                 WHERE LOWER(values.value) like '%%%s%%'
                 AND values.valuetype in ('prefLabel')
                     UNION
-                SELECT c.conceptidfrom, c.conceptidto, c.row, c.depth
+                SELECT c.conceptidfrom, c.conceptidto, c.row, c.depth, c.collector
                 FROM children c
                 JOIN results r on (r.conceptidfrom=c.conceptidto)
             )""" % query.lower() if query is not None else ""
@@ -956,7 +972,7 @@ class Concept(object):
         return {'nodes': nodes, 'links': links}
 
     def get_context(self):
-        """ 
+        """
         get the Top Concept that the Concept particpates in
 
         """
@@ -978,7 +994,7 @@ class Concept(object):
             return self
 
     def get_scheme(self):
-        """ 
+        """
         get the ConceptScheme that the Concept particpates in
 
         """

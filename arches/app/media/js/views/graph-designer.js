@@ -386,11 +386,14 @@ define([
             };
 
             var correspondingNode = function(card, graphTree){
-                var nodeMatch = _.find(graphTree.items(), function(node){
-                    if (card.node) {
-                        return node.nodeid === card.node_id();
-                    } else {
-                        return node.nodeGroupId() === card.nodegroupid && node.nodeid === node.nodeGroupId();
+                var nodeMatch;
+                nodeMatch = _.find(graphTree.items(), function(node){
+                    if (card) {
+                        if (card.node) {
+                            return node.nodeid === card.node_id();
+                        } else {
+                            return node.nodeGroupId() === card.nodegroupid && node.nodeid === node.nodeGroupId();
+                        }
                     }
                 });
                 return nodeMatch;

@@ -24,10 +24,20 @@ else
 	PACKAGE_JSON_FOLDER=${APP_FOLDER}/${ARCHES_PROJECT}
 fi
 
-DJANGO_PORT=${DJANGO_PORT:-8000}
+# Read modules folder from yarn config file
+# Get string after '--install.modules-folder' -> get first word of the result 
+# -> remove line endlings -> trim quotes -> trim leading ./
+YARN_MODULES_FOLDER=${PACKAGE_JSON_FOLDER}/$(awk \
+	-F '--install.modules-folder' '{print $2}' ${PACKAGE_JSON_FOLDER}/.yarnrc \
+	| awk '{print $1}' \
+	| tr -d $'\r' \
+	| tr -d '"' \
+	| sed -e "s/^\.\///g")
+
+export DJANGO_PORT=${DJANGO_PORT:-8000}
 COUCHDB_URL="http://$COUCHDB_USER:$COUCHDB_PASS@$COUCHDB_HOST:$COUCHDB_PORT"
-COMPRESS_STATIC_FILES=${COMPRESS_STATIC_FILES:-False}
 STATIC_ROOT=${STATIC_ROOT:-/static_root}
+
 
 cd_web_root() {
 	cd ${WEB_ROOT}
@@ -173,6 +183,15 @@ set_dev_mode() {
 	python ${ARCHES_ROOT}/setup.py develop
 }
 
+
+# Yarn
+init_yarn_components() {
+	if [[ ! -d ${YARN_MODULES_FOLDER} ]] || [[ ! "$(ls ${YARN_MODULES_FOLDER})" ]]; then
+		echo "Yarn modules do not exist, installing..."
+		install_yarn_components
+	fi
+}
+
 # This is also done in Dockerfile, but that does not include user's custom Arches app package.json
 # Also, the packages folder may have been overlaid by a Docker volume.
 install_yarn_components() {
@@ -269,14 +288,6 @@ run_custom_scripts() {
 	done
 }
 
-compress_static_files() {
-	echo ""
-	echo "Compressing static files..."
-	find ${STATIC_ROOT} -type f -regextype posix-extended -iregex '.*\.(css|js|txt|svg|xml)' -exec zopfli '{}' \;
-	echo "Done compressing static files"
-	echo ""
-}
-
 
 
 
@@ -298,10 +309,6 @@ collect_static(){
 	echo ""
 	cd_app_folder
 	python manage.py collectstatic --noinput
-
-	if [[ ${COMPRESS_STATIC_FILES} == "True" ]]; then
-		compress_static_files
-	fi
 }
 
 
@@ -327,10 +334,14 @@ run_gunicorn_server() {
 	echo "----- *** RUNNING GUNICORN PRODUCTION SERVER *** -----"
 	echo ""
 	cd_app_folder
-    if [[ ! -z ${ARCHES_PROJECT} ]]; then
-        gunicorn arches.wsgi:application -w 2 -b :${DJANGO_PORT} --pythonpath ${ARCHES_PROJECT}
+	
+	if [[ ! -z ${ARCHES_PROJECT} ]]; then
+        gunicorn arches.wsgi:application \
+            --config ${ARCHES_ROOT}/gunicorn_config.py \
+            --pythonpath ${ARCHES_PROJECT}
 	else
-        gunicorn arches.wsgi:application -w 2 -b :${DJANGO_PORT}
+        gunicorn arches.wsgi:application \
+            --config ${ARCHES_ROOT}/gunicorn_config.py
     fi
 }
 
@@ -340,7 +351,8 @@ run_gunicorn_server() {
 run_arches() {
 
 	init_arches
-	install_yarn_components
+
+	init_yarn_components
 
 	if [[ "${DJANGO_MODE}" == "DEV" ]]; then
 		set_dev_mode
@@ -412,6 +424,9 @@ do
 		run_migrations)
 			wait_for_db
 			run_migrations
+		;;
+		install_yarn_components)
+			install_yarn_components
 		;;
 		help|-h)
 			display_help

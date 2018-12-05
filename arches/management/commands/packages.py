@@ -304,6 +304,7 @@ class Command(BaseCommand):
                 'extensions/functions',
                 'extensions/widgets',
                 'extensions/card_components',
+                'extensions/plugins',
                 'graphs/branches',
                 'graphs/resource_models',
                 'map_layers/mapbox_spec_json/overlays',
@@ -469,6 +470,7 @@ class Command(BaseCommand):
 
         def load_business_data(package_dir):
             config_paths = glob.glob(os.path.join(package_dir, 'package_config.json'))
+            configs = {}
             if len(config_paths) > 0:
                 configs = json.load(open(config_paths[0]))
 
@@ -533,6 +535,9 @@ class Command(BaseCommand):
         def load_card_components(package_dir):
             load_extensions(package_dir, 'card_components', 'card_component')
 
+        def load_plugins(package_dir):
+            load_extensions(package_dir, 'plugins', 'plugin')
+
         def load_reports(package_dir):
             load_extensions(package_dir, 'reports', 'report')
 
@@ -586,6 +591,8 @@ class Command(BaseCommand):
         load_widgets(package_location)
         print 'loading card components'
         load_card_components(package_location)
+        print 'loading plugins'
+        load_plugins(package_location)
         print 'loading reports'
         load_reports(package_location)
         print 'loading functions'

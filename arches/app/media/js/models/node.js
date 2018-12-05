@@ -36,7 +36,7 @@ define([
             }
 
             if (options.source.config && _.keys(options.source.config).length === 0) {
-                options.source.config = null
+                options.source.config = null;
             }
 
             self._node = ko.observable('');
@@ -61,7 +61,7 @@ define([
                 },
                 owner: this
             });
-            self.datatypeIsSearchable = ko.computed(function () {
+            self.datatypeIsSearchable = ko.computed(function() {
                 var searchable = false;
                 var datatype = self.datatypelookup[self.datatype()];
                 if (datatype && datatype.configname) {
@@ -155,7 +155,7 @@ define([
                     _.each(keys, function(key) {
                         config[key] = self.config[key]();
                     });
-                };
+                }
                 var jsObj = ko.toJS({
                     name: self.name,
                     datatype: self.datatype,
@@ -165,13 +165,13 @@ define([
                     config: config,
                     issearchable: self.issearchable,
                     isrequired: self.isrequired
-                })
-                return JSON.stringify(_.extend(JSON.parse(self._node()), jsObj))
+                });
+                return JSON.stringify(_.extend(JSON.parse(self._node()), jsObj));
             });
 
             self.dirty = ko.computed(function() {
                 return self.json() !== self._node();
-            });
+            }).extend({ rateLimit: 100 });
 
             self.isCollector = ko.computed(function() {
                 return self.nodeid === self.nodeGroupId();
@@ -181,7 +181,7 @@ define([
                 if (selected) {
                     self.getValidNodesEdges();
                 }
-            })
+            });
 
             self.ontologyclass_friendlyname = ko.computed(function() {
                 return self.getFriendlyOntolgyName(self.ontologyclass());
@@ -201,21 +201,21 @@ define([
         getFriendlyOntolgyName: function(ontologyname){
             if(!!ontologyname){
                 var uri = _.chain(this.ontology_namespaces)
-                .keys()
-                .find(function(namespace){
-                    return ontologyname.indexOf(namespace) !== -1;
-                })
-                .value();
+                    .keys()
+                    .find(function(namespace){
+                        return ontologyname.indexOf(namespace) !== -1;
+                    })
+                    .value();
 
                 if(!!uri){
-                    namespace = this.ontology_namespaces[uri];
+                    var namespace = this.ontology_namespaces[uri];
                     if(!!namespace){
-                        return ontologyname.replace(uri, namespace + ":")
+                        return ontologyname.replace(uri, namespace + ":");
                     }else{
                         return ontologyname.replace(uri, '');
                     }
                 }else{
-                    return ontologyname
+                    return ontologyname;
                 }
             }else{
                 return '';
@@ -255,7 +255,7 @@ define([
             var datatypeRecord = this.datatypelookup[this.datatype()];
             if (datatypeRecord && datatypeRecord.defaultconfig && config) {
                 var defaultConfig = datatypeRecord.defaultconfig;
-                _.each(defaultConfig, function (value, key) {
+                _.each(defaultConfig, function(value, key) {
                     if (!config.hasOwnProperty(key)) {
                         config[key] = value;
                     }
@@ -282,15 +282,15 @@ define([
             this.parse(JSON.parse(this._node()), self);
         },
 
-        save: function (userCallback, scope) {
+        save: function(userCallback, scope) {
             var method = "POST";
-            var callback = function (request, status, model) {
+            var callback = function(request, status, model) {
                 if (typeof userCallback === 'function') {
                     userCallback.call(this, request, status, model);
                 }
                 if (status==='success') {
                     this._node(this.json());
-                };
+                }
             };
             this._doRequest({
                 type: method,
@@ -315,10 +315,17 @@ define([
          */
         toggleIsCollector: function() {
             var nodeGroupId = this.nodeid;
+            var self = this;
             if (this.isCollector()) {
-                var _node = JSON.parse(this._node());
-                nodeGroupId = (this.nodeid === _node.nodegroup_id) ? null : _node.nodegroup_id;
+                nodeGroupId = this.graph.getParentNode(this).nodeGroupId();
             }
+            var children  = this.graph.getChildNodesAndEdges(this).nodes;
+            children.forEach(function(child) {
+                if (child.nodeGroupId() === self.nodeGroupId()) {
+                    child.nodeGroupId(nodeGroupId);
+                    child._node(child.json());
+                }
+            });
             this.nodeGroupId(nodeGroupId);
         },
 
@@ -335,7 +342,7 @@ define([
                             this.ontology_cache.push({
                                 'property': item.ontology_property,
                                 'class': ontologyclass
-                            })
+                            });
                         }, this);
                     }, this);
                 }

@@ -86,6 +86,7 @@ class MobileSurveyManagerView(MapBaseManagerView):
         for mobile_survey in mobile_surveys:
             try:
                 mobile_survey['datadownloadconfig'] = json.loads(mobile_survey['datadownloadconfig'])
+                mobile_survey['onlinebasemaps'] = json.loads(mobile_survey['onlinebasemaps'])
             except TypeError:
                 pass
             multipart = mobile_survey['bounds']
@@ -194,6 +195,7 @@ class MobileSurveyManagerView(MapBaseManagerView):
                 self.notify_mobile_survey_end(request, mobile_survey)
         mobile_survey.name = data['name']
         mobile_survey.description = data['description']
+        mobile_survey.onlinebasemaps = data['onlinebasemaps']
         if data['startdate'] != '':
             mobile_survey.startdate = data['startdate']
         if data['enddate'] != '':
@@ -213,6 +215,15 @@ class MobileSurveyManagerView(MapBaseManagerView):
             for feature in data['bounds']['features']:
                 for coord in feature['geometry']['coordinates']:
                     polygons.append(Polygon(coord))
+
+        elif len(polygons) == 0:
+            try:
+                if data['bounds']['type'] == 'MultiPolygon':
+                    for poly in data['bounds']['coordinates']:
+                        for coords in poly:
+                            polygons.append(Polygon(coords))
+            except AttributeError:
+                print('bounds is not a geojson geometry object')
 
         mobile_survey.bounds = MultiPolygon(polygons)
         mobile_survey.lasteditedby = self.request.user

@@ -1,4 +1,5 @@
 define([
+    'jquery',
     'arches',
     'underscore',
     'knockout',
@@ -7,7 +8,7 @@ define([
     'models/mobile-survey',
     'views/components/widgets/map',
     'bindings/sortable'
-], function(arches, _, ko, IdentityList, ResourceList, MobileSurveyModel) {
+], function($, arches, _, ko, IdentityList, ResourceList, MobileSurveyModel) {
     /**
     * A base viewmodel for mobile survey management
     *
@@ -31,9 +32,9 @@ define([
         this.resizeMap = function() {
             setTimeout(
                 function() {
-                    dispatchEvent(new Event('resize'))
-                }, 200)
-        }
+                    window.dispatchEvent(new window.Event('resize'));
+                }, 200);
+        };
 
         this.defaultCenterX = arches.mapDefaultX;
         this.defaultCenterY = arches.mapDefaultY;
@@ -48,18 +49,18 @@ define([
                 if (card.cards.length > 0) {
                     _.each(card.cards, function(subcard) {
                         subcard.name = card.name + ' - ' + subcard.name;
-                        r.cardsflat.push(subcard)
-                        addedCardIds.push(subcard.cardid)
-                    })
+                        r.cardsflat.push(subcard);
+                        addedCardIds.push(subcard.cardid);
+                    });
                 }
             });
             _.each(r.cards, function(card) {
                 if (_.contains(addedCardIds, card.cardid) === false && card.cards.length == 0) {
-                    addedCardIds.push(card.cardid)
-                    r.cardsflat.push(card)
+                    addedCardIds.push(card.cardid);
+                    r.cardsflat.push(card);
                 }
             });
-        }
+        };
 
         _.each(params.resources, function(r){
             r.cardsflat = ko.observableArray();
@@ -71,34 +72,34 @@ define([
         });
 
         this.processResource = function(data) {
-                    self.resourceList.initCards(data.cards)
-                    self.resourceList.selected().cards(data.cards)
-                    self.flattenCards(self.resourceList.selected())
-        }
+            self.resourceList.initCards(data.cards);
+            self.resourceList.selected().cards(data.cards);
+            self.flattenCards(self.resourceList.selected());
+        };
 
         this.processResources = function(data) {
-            if (_.some(self.resourceList.items(), function(r) {return data.id === r.id}) === false) {
-                data.cards = ko.observableArray(data.cards)
+            if (_.some(self.resourceList.items(), function(r) {return data.id === r.id;}) === false) {
+                data.cards = ko.observableArray(data.cards);
                 data.cardsflat = ko.observableArray();
-                self.resourceList.initCards(data.cards)
-                self.resourceList.items.push(data)
+                self.resourceList.initCards(data.cards);
+                self.resourceList.items.push(data);
             }
-        }
+        };
 
         this.getMobileSurveyResources = function(mobilesurvey){
             var successCallback = function(data){
-                mobilesurvey.collectedResources(true)
-                _.each(data.resources, self.processResources)
-                _.each(self.resourceList.items(), self.flattenCards)
-            }
+                mobilesurvey.collectedResources(true);
+                _.each(data.resources, self.processResources);
+                _.each(self.resourceList.items(), self.flattenCards);
+            };
             if (!mobilesurvey.collectedResources()) {
                 $.ajax({
                     url: arches.urls.mobile_survey_resources(mobilesurvey.id)
                 })
-                .done(successCallback)
-                .fail(function(data){console.log('request failed', data)})
+                    .done(successCallback)
+                    .fail(function(data){console.log('request failed', data);});
             }
-        }
+        };
 
         this.resourceList.selected.subscribe(function(val){
             if (val) {
@@ -106,14 +107,14 @@ define([
                     $.ajax({
                         url: arches.urls.resource_cards.replace('//', '/' + val.id + '/')
                     })
-                    .done(self.processResource)
-                    .fail(function(data){console.log('card request failed', data)})
+                        .done(self.processResource)
+                        .fail(function(data){console.log('card request failed', data);});
                 }
             }
         }, self);
 
         this.mobilesurveys = ko.observableArray(
-            params.mobilesurveys.map(function (mobilesurvey) {
+            params.mobilesurveys.map(function(mobilesurvey) {
                 return new MobileSurveyModel({
                     source: mobilesurvey,
                     identities: params.identities
@@ -123,7 +124,7 @@ define([
 
         this.mobileSurveyFilter = ko.observable('');
 
-        this.filteredMobileSurveys = ko.computed(function () {
+        this.filteredMobileSurveys = ko.computed(function() {
             var filter = self.mobileSurveyFilter();
             var list = self.mobilesurveys();
             if (filter.length === 0) {

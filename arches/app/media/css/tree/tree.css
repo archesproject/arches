@@ -107,7 +107,7 @@ a.filtered > span:hover {
 .jstree-anchor:visited,
 .jstree-anchor:active {
     text-decoration: none;
-    color: #7a878e;
+    color: #576065; /* #7a878e*/
 }
 
 .jstree-anchor:hover,

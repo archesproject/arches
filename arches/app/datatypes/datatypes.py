@@ -3,6 +3,7 @@ import json
 import decimal
 import importlib
 import distutils
+import base64
 from datetime import datetime
 from mimetypes import MimeTypes
 from arches.app.datatypes.base import BaseDataType
@@ -14,6 +15,7 @@ from arches.app.utils.date_utils import ExtendedDateFormat
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Exists, RangeDSLException
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from django.core.cache import cache
+from django.core.files.base import ContentFile
 from django.utils.translation import ugettext as _
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
@@ -1134,6 +1136,31 @@ class FileListDataType(BaseDataType):
 
         return g
 
+    def process_mobile_data(self, tile, node, db, couch_doc, node_value):
+        '''
+        Takes a tile, couch db instance, couch record, and the node value from
+        a provisional edit. Creates a django instance, saves the corresponding
+        attachement as a file, updates the provisional edit value with the
+        file location information and returns the revised provisional edit value
+        '''
+
+        try:
+            for file in node_value:
+                attachment = db.get_attachment(couch_doc['_id'], file['name'])
+                if attachment is not None:
+                    attachment_file = attachment.read()
+                    file_data = ContentFile(attachment_file, name=file['name'])
+                    file_model = models.File()
+                    file_model.path = file_data
+                    file_model.save()
+                    if file["name"] == file_data.name and 'url' not in file.keys():
+                        file["file_id"] = str(file_model.pk)
+                        file["url"] = str(file_model.path.url)
+                        file["status"] = 'uploaded'
+
+        except KeyError as e:
+            pass
+        return node_value
 
 class CSVChartJsonDataType(FileListDataType):
     def __init__(self, model=None):

@@ -14,7 +14,7 @@ define([
 
         var displayName = ko.observable('');
 
-        this.valueList = ko.computed(function () {
+        this.valueList = ko.computed(function() {
             var valueList = self.value();
             displayName();
             if (!self.multiple && valueList) {
@@ -26,7 +26,7 @@ define([
             return [];
         });
 
-        this.valueObjects = ko.computed(function () {
+        this.valueObjects = ko.computed(function() {
             displayName();
             return self.valueList().map(function(value) {
                 return {
@@ -40,7 +40,7 @@ define([
 
         var updateName = function() {
             var names = [];
-            self.valueList().forEach(function (val) {
+            self.valueList().forEach(function(val) {
                 if (val) {
                     if (nameLookup[val]) {
                         names.push(nameLookup[val]);
@@ -56,7 +56,7 @@ define([
                     }
                 }
             });
-        }
+        };
         this.value.subscribe(updateName);
         this.displayValue = ko.computed(function() {
             var val = self.value();
@@ -81,14 +81,19 @@ define([
                 url: arches.urls.paged_dropdown,
                 dataType: 'json',
                 quietMillis: 250,
-                data: function (term, page) {
+                data: function(term, page) {
                     return {
                         conceptid: ko.unwrap(params.node.config.rdmCollection),
                         query: term,
                         page: page
                     };
                 },
-                results: function (data, page) {
+                results: function(data) {
+                    data.results.forEach(function(result) {
+                        if (result.collector) {
+                            delete result.id;
+                        }
+                    });
                     return {
                         results: data.results,
                         more: data.more
@@ -101,7 +106,7 @@ define([
             formatResult: function(item) {
                 var indentation = '';
                 for (var i = 0; i < item.depth-1; i++) {
-                    indentation += '&nbsp;&nbsp;&nbsp;&nbsp;'
+                    indentation += '&nbsp;&nbsp;&nbsp;&nbsp;';
                 }
                 return indentation + item.text;
             },
@@ -110,7 +115,7 @@ define([
             },
             initSelection: function(el, callback) {
                 var valueList = self.valueList();
-                var setSelectionData = function () {
+                var setSelectionData = function() {
                     var valueData = self.valueObjects().map(function(item) {
                         return {
                             id: item.id,
@@ -130,7 +135,7 @@ define([
                             $.ajax(arches.urls.concept_value + '?valueid=' + value, {
                                 dataType: "json"
                             }).done(function(data) {
-                                nameLookup[value] = data.value
+                                nameLookup[value] = data.value;
                                 setSelectionData();
                             });
                         }
