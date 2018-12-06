@@ -225,7 +225,6 @@ class Tile(models.TileModel):
         user_is_reviewer = False
         newprovisionalvalue = None
         oldprovisionalvalue = None
-        self.check_for_missing_nodes(request)
 
         try:
             user = request.user
@@ -259,6 +258,7 @@ class Tile(models.TileModel):
                     if provisional_edit_log_details == None:
                         provisional_edit_log_details={"user": user, "action": "create tile",  "provisional_editor": user}
 
+        self.check_for_missing_nodes(request)
         super(Tile, self).save(*args, **kwargs)
         #We have to save the edit log record after calling save so that the
         #resource's displayname changes are avaliable
