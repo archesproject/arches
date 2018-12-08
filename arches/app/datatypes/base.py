@@ -49,6 +49,12 @@ class BaseDataType(object):
         """
         return None
 
+    def process_mobile_data(self, tile, node, db, couch_doc, node_value):
+        """
+        Transforms data from a mobile device to an Arches friendly format
+        """
+        return None
+
     def should_cache(self, node=None):
         """
         Tells the system if the tileserver should cache for a given node

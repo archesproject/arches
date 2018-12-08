@@ -182,6 +182,7 @@ define([
                         self.tileid = tileData.tileid;
                         self.data = koMapping.fromJS(tileData.data);
                         self.provisionaledits = koMapping.fromJS(tileData.provisionaledits);
+                        self._tileData(koMapping.toJSON(self.data));
                         self.dirty = ko.pureComputed(function() {
                             return self._tileData() !== koMapping.toJSON(self.data);
                         }, self);
