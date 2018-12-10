@@ -70,7 +70,7 @@ define([
                     koMapping.fromJS(this.provisionaledits()[0]['value'], tile.data);
                     this.selectedProvisionalEdit(this.provisionaledits()[0]);
                     tile._tileData.valueHasMutated();
-                } else {
+                } else if (self.selectedProvisionalEdit()) {
                     self.selectedProvisionalEdit(undefined);
                     self.selectedTile().reset();
                 }
