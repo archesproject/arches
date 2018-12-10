@@ -929,20 +929,14 @@ class FileListDataType(BaseDataType):
             previously_saved_data = previously_saved_tile.data
         return previously_saved_data
 
-    def get_current_data(self, user_is_reviewer, user_id, current_tile):
-        if user_is_reviewer is True:
-            current_tile_data = current_tile.data
-        else:
-            current_tile_data = current_tile.provisionaledits[user_id]['value']
-        return current_tile_data
-
     def handle_request(self, current_tile, request, node):
+
         previously_saved_tile = models.TileModel.objects.filter(pk=current_tile.tileid)
         user = request.user
         if hasattr(request.user, 'userprofile') is not True:
             models.UserProfile.objects.create(user=request.user)
         user_is_reviewer = request.user.userprofile.is_reviewer()
-        current_tile_data = self.get_current_data(user_is_reviewer, str(user.id), current_tile)
+        current_tile_data = current_tile.data
         if previously_saved_tile.count() == 1:
             previously_saved_tile_data = self.get_previously_saved_data(user_is_reviewer, str(user.id), previously_saved_tile[0])
             if previously_saved_tile_data[str(node.pk)] is not None:
@@ -959,6 +953,7 @@ class FileListDataType(BaseDataType):
                             print 'file does not exist'
 
         files = request.FILES.getlist('file-list_' + str(node.pk), [])
+
         for file_data in files:
             file_model = models.File()
             file_model.path = file_data
