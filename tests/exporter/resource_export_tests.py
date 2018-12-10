@@ -40,6 +40,7 @@ from mock import Mock
 # these tests can be run from the command line via
 # python manage.py test tests/exporter/resource_export_tests.py --pattern="*.py" --settings="tests.test_settings"
 
+
 def Mock_Edge(s_uri_str, p_uri_str, o_uri_str, domain_tile_data, range_tile_data,
               s_type_str=None, o_type_str=None):
     # (S, P, O triple, tiledata for domainnode, td for rangenode, S's type, O's type)
@@ -55,6 +56,7 @@ def Mock_Edge(s_uri_str, p_uri_str, o_uri_str, domain_tile_data, range_tile_data
     edge_info['range_tile_data'] = range_tile_data
     edge_info['domain_tile_data'] = domain_tile_data
     return edge_info, edge
+
 
 class BusinessDataExportTests(ArchesTestCase):
     @classmethod
@@ -87,13 +89,14 @@ class BusinessDataExportTests(ArchesTestCase):
 
         # Models
         for model_name in ['object_model', 'document_model']:
-            with open(os.path.join('tests/fixtures/resource_graphs/rdf_export_{0}.json'.format(model_name)), 'rU') as f:
+            with open(os.path.join(
+                    'tests/fixtures/resource_graphs/rdf_export_{0}.json'.format(model_name)), 'rU') as f:
                 archesfile = JSONDeserializer().deserialize(f)
             ResourceGraphImporter(archesfile['graph'])
         # Fixture Instance Data for tests
         for instance_name in ['document', 'object']:
-            BusinessDataImporter('tests/fixtures/data/rdf_export_{0}.json'.format(instance_name)).import_business_data()
-
+            BusinessDataImporter(
+                    'tests/fixtures/data/rdf_export_{0}.json'.format(instance_name)).import_business_data()
 
         # for RDF/JSON-LD export tests
         self.DT = DataTypeFactory()
