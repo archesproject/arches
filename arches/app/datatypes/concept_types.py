@@ -136,6 +136,10 @@ class ConceptDataType(BaseConceptDataType):
                 rangenode = URIRef(archesproject['concepts/%s' % c.concept_id])
                 g.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
                 g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), rangenode))
+                # add in external identifiers once the predicate for this rel is chosen:
+                # for ident in Value.objects.all().filter(concept_id = concept_id,
+                #                                         valuetype__category = "identifiers"):
+                #     g.add((edge_info['d_uri'], IDENTIFIER_PREDICATE, URIRef(ident.value)))
             except:
                 # FIXME find out the correct Error that Django throws if this fails
                 rangenode = BNode()
