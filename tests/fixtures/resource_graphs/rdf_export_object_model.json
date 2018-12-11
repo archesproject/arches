@@ -505,7 +505,7 @@
             "is_editable": false, 
             "isactive": true, 
             "isresource": true, 
-            "jsonldcontext": "http://localhost:8000/media/contexts/linked-art.json", 
+            "jsonldcontext": "https://linked.art/ns/v1/linked-art.json", 
             "name": "Import Test - Object", 
             "nodegroups": [
                 {
