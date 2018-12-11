@@ -1151,6 +1151,10 @@ class FileListDataType(BaseDataType):
 
         return g
 
+    def from_rdf(self, json_ld_node):
+        # Currently up in the air about how best to do file imports via JSON-LD
+        pass
+
     def process_mobile_data(self, tile, node, db, couch_doc, node_value):
         '''
         Takes a tile, couch db instance, couch record, and the node value from
@@ -1476,11 +1480,18 @@ class ResourceInstanceDataType(BaseDataType):
         res_inst_uri = json_ld_node['id']
         # should be in the form http(s)://archeshost/resources/{UUID}
         # FIXME: should any URI in this form be accepted, regardless to a specific Arches host?
+
+        # NOTE: This returns a dict including the host and the resource instance UUID as
+        # {"host":..., "res_inst":...}
+        # It may be important in future for resource instance datatypes to deal with externally held ones
+        # rather than require a local copy.
+
         import re
         p = re.compile(r"(http|https)://(?P<host>[^/]*)/resources/(?P<res_inst>[A-Fa-f0-9\-]*)/?$")
         m = p.match(res_inst_uri)
         if m is not None:
             return m.groupdict()
+            # return m.groupdict()['re_inst']  # to return only the UUID
 
 
 class NodeValueDataType(BaseDataType):
