@@ -162,8 +162,15 @@ class ConceptDataType(BaseConceptDataType):
         # Either by instantiating a keyword without a concept_id or by
         # or by looking for say an external identifier attached to the concept and
         # building upon that.
-        concept_id = json_ld_node.get('id')
+        concept_uri = json_ld_node.get('id')
         label = json_ld_node.get(str(RDFS.label))
+
+        concept_id = None
+        import re
+        p = re.compile(r"(http|https)://(?P<host>[^/]*)/concepts/(?P<concept_id>[A-Fa-f0-9\-]*)/?$")
+        m = p.match(concept_uri)
+        if m is not None:
+            concept_id = m.groupdict().get("concept_id")
 
         # FIXME: assert that the type of this node is a E55_Type?
 

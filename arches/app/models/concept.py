@@ -1261,13 +1261,14 @@ def get_preflabel_from_conceptid(conceptid, lang):
     preflabels = query.search(index='strings', doc_type='concept')['hits']['hits']
     for preflabel in preflabels:
         default = preflabel['_source']
-        # get the label in the preferred language, otherwise get the label in the default language
-        if preflabel['_source']['language'] == lang:
-            return preflabel['_source']
-        if preflabel['_source']['language'].split('-')[0] == lang.split('-')[0]:
-            ret = preflabel['_source']
-        if preflabel['_source']['language'] == settings.LANGUAGE_CODE and ret == None:
-            ret = preflabel['_source']
+        if preflabel['_source']['language'] is not None and lang is not None:
+            # get the label in the preferred language, otherwise get the label in the default language
+            if preflabel['_source']['language'] == lang:
+                return preflabel['_source']
+            if preflabel['_source']['language'].split('-')[0] == lang.split('-')[0]:
+                ret = preflabel['_source']
+            if preflabel['_source']['language'] == settings.LANGUAGE_CODE and ret == None:
+                ret = preflabel['_source']
     return default if ret == None else ret
 
 
