@@ -132,7 +132,7 @@ class MobileSurvey(models.MobileSurveyModel):
                                     widget_model.label = node['name']
                                     graph_obj['widgets'].append(widget_model)
                                 break
-                    if node['datatype'] == 'resource-instance':
+                    if node['datatype'] == 'resource-instance' or node['datatype'] == 'resource-instance-list':
                         graph_id = node['config']['graphid'][0]
                         node['config']['options'] = []
                         for resource_instance in Resource.objects.filter(graph_id=graph_id):
