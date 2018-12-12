@@ -17,29 +17,21 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% extends "base.htm" %} {% load staticfiles %} {% load i18n %} {% block loading_mask %} {% endblock loading_mask %} {% block body %}
 
-<div id="container" class="cls-container">
+<div id="container" class="cls-container arches-login">
 
     <!-- BACKGROUND IMAGE -->
-    <!--===================================================-->
+    <!--===================================================
     <div id="bg-overlay" class="bg-img img-login"></div>
-
-
-    <!-- HEADER -->
-    <div class="cls-header cls-header-lg">
-        <div class="cls-brand">
-            <a class="box-inline" href="{% url 'home' %}">
-                <!-- <img alt="Arches Admin" src="img/logo.png" class="brand-icon"> -->
-                <span class="brand-title">{{ app_settings.APP_NAME }} {% trans '<span class="text-thin">Create Account</span>' %}</span>
-            </a>
-        </div>
-    </div>
-
+    -->
 
     <!-- LOGIN FORM -->
-    <div class="cls-content">
-        <div class="cls-content-sm panel login-panel">
+    <div class="cls-content arches-signin">
+        <div class="cls-content-sm panel login-panel" style="width: 350px;">
             <div class="panel-body">
-                <h3 class="login-panel-header">{% trans "Create an Account" %}</h3>
+                <h3 class="login-panel-header arches-signin">{% trans "Create Account" %}</h3>
+                <p class="arches-signin-subtext">
+                    Register to access data modeling, editing, and discovery tools. 
+                </p>
                 <form class="change-password-form" action="?next={{ next }}" method='POST' {% if auth_failed %} autocomplete="off" {% endif %}>
                     {% csrf_token %}
                     <div>
@@ -129,7 +121,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             {% endif %}
                         </div>
 
-                        <div class="password-rules mar-top text-left">
+                        <div class="form-group">
+                            <div class="arches-signin-btn" style="padding-bottom: 0px;">
+                                {% if showform %}
+                                <button class="btn btn-primary btn-lg btn-block" type="submit">{% trans "Signup" %}</button>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="password-rules text-left">
                             {% trans 'Your password must:' %}
                             <ul class="list-unstyled">
                                 {% for message in validation_help %}
@@ -145,20 +145,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         {% endif %}
 
                         {% endif %}
-
-                        <div class="form-group">
-                            <div class="text-right">
-                                <a class="btn btn-link" href="{% url 'home' %}" style="color:#C93011;">{% trans "Exit" %}</a>
-                                {% if showform %}
-                                <button class="btn btn-success text-uppercase" type="submit">{% trans "Signup" %}</button>
-                                {% endif %}
-                            </div>
-                        </div>
-
                     </div>
                 </form>
             </div>
 
+            <div class="panel-footer">
+                Learn more about <a href="archesproject.org">{% trans "Arches" %}</a>
+            </div>
 
         </div>
     </div>

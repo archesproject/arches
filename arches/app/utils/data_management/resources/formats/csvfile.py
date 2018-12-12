@@ -268,7 +268,7 @@ class TileCsvWriter(Writer):
 
                 if csv_record != {'ResourceID': resourceinstanceid}:
                     csv_records.append(csv_record)
-        
+
         dest = StringIO()
         csvwriter = csv.DictWriter(dest, delimiter=',', fieldnames=csv_header)
         csvwriter.writeheader()
@@ -668,8 +668,8 @@ class CsvReader(Reader):
                     source_data = column_names_to_targetids(row, mapping, row_number)
 
                     row_keys = [list(b) for b in zip(*[a.keys() for a in source_data])]
-                    if len(row_keys) > 0:
-                        missing_display_nodes = [n for n in display_nodes if n not in row_keys]
+
+                    missing_display_nodes = [n for n in display_nodes if n not in row_keys]
                     if len(missing_display_nodes) > 0:
                         errors = []
                         for mdn in missing_display_nodes:

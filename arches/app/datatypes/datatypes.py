@@ -3,6 +3,7 @@ import json
 import decimal
 import importlib
 import distutils
+import base64
 from datetime import datetime
 from mimetypes import MimeTypes
 from arches.app.datatypes.base import BaseDataType
@@ -14,6 +15,7 @@ from arches.app.utils.date_utils import ExtendedDateFormat
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Exists, RangeDSLException
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from django.core.cache import cache
+from django.core.files.base import ContentFile
 from django.utils.translation import ugettext as _
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
@@ -981,13 +983,28 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
 
 class FileListDataType(BaseDataType):
+
+    def get_previously_saved_data(self, user_is_reviewer, user_id, previously_saved_tile):
+        if user_is_reviewer is False and previously_saved_tile.provisionaledits is not None and user_id in previously_saved_tile.provisionaledits:
+            previously_saved_data = previously_saved_tile.provisionaledits[user_id]['value']
+        else:
+            previously_saved_data = previously_saved_tile.data
+        return previously_saved_data
+
     def handle_request(self, current_tile, request, node):
+
         previously_saved_tile = models.TileModel.objects.filter(pk=current_tile.tileid)
+        user = request.user
+        if hasattr(request.user, 'userprofile') is not True:
+            models.UserProfile.objects.create(user=request.user)
+        user_is_reviewer = request.user.userprofile.is_reviewer()
+        current_tile_data = current_tile.data
         if previously_saved_tile.count() == 1:
-            if previously_saved_tile[0].data[str(node.pk)] != None:
-                for previously_saved_file in previously_saved_tile[0].data[str(node.pk)]:
+            previously_saved_tile_data = self.get_previously_saved_data(user_is_reviewer, str(user.id), previously_saved_tile[0])
+            if previously_saved_tile_data[str(node.pk)] is not None:
+                for previously_saved_file in previously_saved_tile_data[str(node.pk)]:
                     previously_saved_file_has_been_removed = True
-                    for incoming_file in current_tile.data[str(node.pk)]:
+                    for incoming_file in current_tile_data[str(node.pk)]:
                         if previously_saved_file['file_id'] == incoming_file['file_id']:
                             previously_saved_file_has_been_removed = False
                     if previously_saved_file_has_been_removed:
@@ -998,12 +1015,13 @@ class FileListDataType(BaseDataType):
                             print 'file does not exist'
 
         files = request.FILES.getlist('file-list_' + str(node.pk), [])
+
         for file_data in files:
             file_model = models.File()
             file_model.path = file_data
             file_model.save()
-            if current_tile.data[str(node.pk)] != None:
-                for file_json in current_tile.data[str(node.pk)]:
+            if current_tile_data[str(node.pk)] is not None:
+                for file_json in current_tile_data[str(node.pk)]:
                     if file_json["name"] == file_data.name and file_json["url"] is None:
                         file_json["file_id"] = str(file_model.pk)
                         file_json["url"] = str(file_model.path.url)
@@ -1133,6 +1151,36 @@ class FileListDataType(BaseDataType):
 
         return g
 
+
+    def process_mobile_data(self, tile, node, db, couch_doc, node_value):
+        '''
+        Takes a tile, couch db instance, couch record, and the node value from
+        a provisional edit. Creates a django instance, saves the corresponding
+        attachement as a file, updates the provisional edit value with the
+        file location information and returns the revised provisional edit value
+        '''
+
+        try:
+            for file in node_value:
+                attachment = db.get_attachment(couch_doc['_id'], file['file_id'])
+                if attachment is not None:
+                    attachment_file = attachment.read()
+                    file_data = ContentFile(attachment_file, name=file['name'])
+                    file_model = models.File()
+                    file_model.path = file_data
+                    file_model.pk = file['file_id']
+                    file_model.save()
+                    if file["name"] == file_data.name and 'url' not in file.keys():
+                        file["file_id"] = str(file_model.pk)
+                        file["url"] = str(file_model.path.url)
+                        file["status"] = 'uploaded'
+                        file["accepted"] = True
+                        file["size"] = file_data.size
+                    # db.delete_attachment(couch_doc, file['name'])
+
+        except KeyError as e:
+            pass
+        return node_value
 
 class CSVChartJsonDataType(FileListDataType):
     def __init__(self, model=None):

@@ -15,19 +15,24 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid
 import json
-import couchdb
 import urlparse
 from copy import copy, deepcopy
 from django.db import transaction
+from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
+from arches.app.models.concept import Concept
 from arches.app.models.tile import Tile
 from arches.app.models.graph import Graph
+from arches.app.models.models import ResourceInstance
+from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from django.http import HttpRequest
 from arches.app.utils.couch import Couch
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 import arches.app.views.search as search
 from django.utils.translation import ugettext as _
+
+
 
 class MobileSurvey(models.MobileSurveyModel):
     """
@@ -90,7 +95,8 @@ class MobileSurvey(models.MobileSurveyModel):
         for card in self.cards.all():
             if card.graph_id not in graphids:
                 graphids.append(card.graph_id)
-                #we may want the full proxy model at some point, but for now just the root node color
+                # we may want the full proxy model at some point,
+                # but for now just the root node color
                 graph = Graph.objects.get(pk=card.graph_id)
                 graph_obj = graph.serialize(exclude=['domain_connections', 'edges', 'relatable_resource_model_ids'])
                 graph_obj['widgets'] = list(models.CardXNodeXWidget.objects.filter(card__graph=graph).distinct())
@@ -99,6 +105,12 @@ class MobileSurvey(models.MobileSurveyModel):
                     for widget in graph_obj['widgets']:
                         if node['nodeid'] == str(widget.node_id):
                             found = True
+                            try:
+                                collection_id = node['config']['rdmCollection']
+                                concept_collection = Concept().get_child_collections_hierarchically(collection_id)
+                                widget.config['options'] = concept_collection
+                            except Exception as e:
+                                pass
                             break
                     if not found:
                         for card in graph_obj['cards']:
@@ -110,18 +122,28 @@ class MobileSurvey(models.MobileSurveyModel):
                                     widget_model.card_id = card['cardid']
                                     widget_model.widget_id = widget.pk
                                     widget_model.config = widget.defaultconfig
+                                    try:
+                                        collection_id = node['config']['rdmCollection']
+                                        if collection_id:
+                                            concept_collection = Concept().get_child_collections_hierarchically(collection_id)
+                                            widget_model.config['options'] = concept_collection
+                                    except Exception as e:
+                                        pass
                                     widget_model.label = node['name']
                                     graph_obj['widgets'].append(widget_model)
                                 break
+                    if node['datatype'] == 'resource-instance':
+                        graph_id = node['config']['graphid'][0]
+                        node['config']['options'] = []
+                        for resource_instance in Resource.objects.filter(graph_id=graph_id):
+                            node['config']['options'].append({'id': str(resource_instance.pk), 'name': resource_instance.displayname})
                 graphs.append(graph_obj)
-
         ret['graphs'] = graphs
         ret['cards'] = ordered_cards
         try:
             ret['bounds'] = json.loads(ret['bounds'])
         except TypeError as e:
             print 'Could not parse', ret['bounds'], e
-
         return ret
 
     def get_ordered_cards(self):
@@ -137,48 +159,85 @@ class MobileSurvey(models.MobileSurveyModel):
         with transaction.atomic():
             for row in self.couch.all_docs(db):
                 ret.append(row)
-                if row.doc['type'] == 'tile':
-                    if row.doc['provisionaledits'] is not None:
-                        tile = Tile.objects.get(tileid=row.doc['tileid'])
-                        for user_edits in row.doc['provisionaledits'].items():
-                            # user_edits is a dict with the user number as the key and data as the value
-                            # {u'5': {
-                            #     u'action': u'update',
-                            #     u'reviewer': None,
-                            #     u'reviewtimestamp': None,
-                            #     u'status': u'review',
-                            #     u'timestamp': u'2018-11-02T18:38:00.684250Z',
-                            #     u'value': {
-                            #         u'bb97b857-d646-11e8-9f94-acbc32b81a1b': u'Provisional String Value',
-                            #         u'bb98aab8-d646-11e8-922d-acbc32b81a1b': None
-                            #         }
-                            #     }
-                            # }
-                            if user_edits[0] in tile.provisionaledits:
-                                if user_edits[1]['timestamp'] > tile.provisionaledits[user_edits[0]]['timestamp']:
-                                    # If the mobile user edits are newer by UTC timestamp, overwrite the tile data
-                                    tile.provisionaledits[user_edits[0]] = user_edits[1]
+                if row.doc['type'] == 'resource':
+                    if 'provisional_resource' in row.doc and row.doc['provisional_resource'] == 'true':
+                        resourceinstance, created = ResourceInstance.objects.update_or_create(
+                            resourceinstanceid=uuid.UUID(str(row.doc['resourceinstanceid'])),
+                            defaults={
+                                'graph_id': uuid.UUID(str(row.doc['graph_id']))
+                            }
+                        )
+                        print('Resource {0} Saved'.format(row.doc['resourceinstanceid']))
 
-                        # If there are conflicting documents, lets clear those out
-                        if '_conflicts' in row.doc:
-                            for conflict_rev in row.doc['_conflicts']:
-                                conflict_data = db.get(row.id, rev=conflict_rev)
-                                for user_edits in conflict_data['provisionaledits'].items():
+            for row in self.couch.all_docs(db):
+                ret.append(row)
+                if row.doc['type'] == 'tile':
+                    if 'provisionaledits' in row.doc and row.doc['provisionaledits'] is not None:
+                        try:
+                            tile = Tile.objects.get(tileid=row.doc['tileid'])
+                            for user_edits in row.doc['provisionaledits'].items():
+                                for nodeid, value in iter(user_edits[1]['value'].items()):
+                                    datatype_factory = DataTypeFactory()
+                                    node = models.Node.objects.get(nodeid=nodeid)
+                                    datatype = datatype_factory.get_instance(node.datatype)
+                                    newvalue = datatype.process_mobile_data(tile, node, db, row.doc, value)
+                                    if newvalue is not None:
+                                        user_edits[1]['value'][nodeid] = newvalue
+
+                                # user_edits is a tuple with the user number in
+                                # position 0, prov. edit data in position 1, eg:
+                                # {u'5': {
+                                #     u'action': u'update',
+                                #     u'reviewer': None,
+                                #     u'reviewtimestamp': None,
+                                #     u'status': u'review',
+                                #     u'timestamp': u'2018-11-02T18:38:00.684250Z',
+                                #     u'value': {
+                                #         u'bb97b857-d646-11e8-9f94-acbc32b81a1b': u'Provisional String Value',
+                                #         u'bb98aab8-d646-11e8-922d-acbc32b81a1b': None
+                                #         }
+                                #     }
+                                # }
+                                if tile.provisionaledits is None:
+                                    tile.provisionaledits = {}
+                                    tile.provisionaledits[user_edits[0]] = user_edits[1]
+                                else:
                                     if user_edits[0] in tile.provisionaledits:
-                                        if user_edits[1]['timestamp'] > tile.provisionaledits[user_edits[0]]['timestamp']:
+                                        if user_edits[1]['timestamp'] >= tile.provisionaledits[user_edits[0]]['timestamp']:
                                             # If the mobile user edits are newer by UTC timestamp, overwrite the tile data
                                             tile.provisionaledits[user_edits[0]] = user_edits[1]
-                                # Remove conflicted revision from couch
-                                db.delete(conflict_data)
 
-                            # TODO: If user is provisional user, apply as provisional edit
-                            # TODO: If user is reviewer, apply as authoritative edit
-                        print('Tile {0} Saved'.format(row.doc['tileid']))
+                            # If there are conflicting documents, lets clear those out
+                            if '_conflicts' in row.doc:
+                                for conflict_rev in row.doc['_conflicts']:
+                                    conflict_data = db.get(row.id, rev=conflict_rev)
+                                    for user_edits in conflict_data['provisionaledits'].items():
+                                        if user_edits[0] in tile.provisionaledits:
+                                            if user_edits[1]['timestamp'] > tile.provisionaledits[user_edits[0]]['timestamp']:
+                                                # If the mobile user edits are newer by UTC timestamp, overwrite the tile data
+                                                tile.provisionaledits[user_edits[0]] = user_edits[1]
+                                    # Remove conflicted revision from couch
+                                    db.delete(conflict_data)
+
+                                # TODO: If user is provisional user, apply as provisional edit
+                                # TODO: If user is reviewer, apply as authoritative edit
+                        except Tile.DoesNotExist:
+                            tile = Tile(row.doc)
+                            for user_edits in row.doc['provisionaledits'].items():
+                                for nodeid, value in iter(user_edits[1]['value'].items()):
+                                    datatype_factory = DataTypeFactory()
+                                    node = models.Node.objects.get(nodeid=nodeid)
+                                    datatype = datatype_factory.get_instance(node.datatype)
+                                    newvalue = datatype.process_mobile_data(tile, node, db, row.doc, value)
+                                    if newvalue is not None:
+                                        user_edits[1]['value'][nodeid] = newvalue
+                                    tile.provisionaledits[user_edits[0]] = user_edits[1]
 
                         tile.save()
                         tile_serialized = json.loads(JSONSerializer().serialize(tile))
                         tile_serialized['type'] = 'tile'
                         self.couch.update_doc(db, tile_serialized, tile_serialized['tileid'])
+                        print('Tile {0} Saved'.format(row.doc['tileid']))
                         db.compact()
         return ret
 
@@ -203,8 +262,8 @@ class MobileSurvey(models.MobileSurveyModel):
                     default_bounds['features'][0]['properties']['inverted'] = False
                     request.GET['mapFilter'] = json.dumps(default_bounds)
                 else:
-                    request.GET['mapFilter'] = json.dumps({u'type': u'FeatureCollection', 'features':[{'geometry': json.loads(self.bounds.json)}]})
-                request.GET['typeFilter'] = json.dumps([{'graphid': resourceid, 'inverted': False } for resourceid in self.datadownloadconfig['resources']])
+                    request.GET['mapFilter'] = json.dumps({u'type': u'FeatureCollection', 'features': [{'geometry': json.loads(self.bounds.json)}]})
+                request.GET['typeFilter'] = json.dumps([{'graphid': resourceid, 'inverted': False} for resourceid in self.datadownloadconfig['resources']])
             else:
                 parsed = urlparse.urlparse(query)
                 urlparams = urlparse.parse_qs(parsed.query)
