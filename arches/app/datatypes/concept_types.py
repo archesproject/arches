@@ -12,7 +12,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 # for the RDF graph export helper functions
 from rdflib import Namespace, URIRef, Literal, Graph, BNode
-from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS
+from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS, SKOS
 from arches.app.models.concept import ConceptValue
 archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
@@ -127,34 +127,35 @@ class ConceptDataType(BaseConceptDataType):
         #        concept_id, but no value -> node linked to class of Concept, no label
         #        value but no concept_id -> node linked to BNode, labelled
         #        concept_id + value -> normal expected functionality
+
+        def get_rangenode(arches_uri, ext_ids):
+            rangenode = arches_uri
+
+            for id_uri in ext_ids:
+                if str(id_uri).startswith(settings.PREFERRED_CONCEPT_SCHEME):
+                    rangenode = id_uri
+            return rangenode
+
         if edge_info['range_tile_data'] is not None:
             c = ConceptValue(str(edge_info['range_tile_data']))
 
+            # create a default node
+            arches_uri = BNode()
+            ext_idents = []
             # Use the conceptid URI rather than the pk for the ConceptValue
-            try:
-                assert c.concept_id is not None, "Null concept_id"
-                rangenode = URIRef(archesproject['concepts/%s' % c.concept_id])
-                g.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
-                g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), rangenode))
-                # add in external identifiers once the predicate for this rel is chosen:
-                # for ident in Value.objects.all().filter(concept_id = concept_id,
-                #                                         valuetype__category = "identifiers"):
-                #     g.add((edge_info['d_uri'], IDENTIFIER_PREDICATE, URIRef(ident.value)))
-            except:
-                # FIXME find out the correct Error that Django throws if this fails
-                rangenode = BNode()
-                if c.value:
-                    g.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
-                    g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), rangenode))
-            try:
-                assert c.value is not None, "Null or blank concept value"
-                g.add((rangenode, URIRef(RDFS.label), Literal(c.value)))
-            except:
-                pass
+            if c.conceptid is not None:
+                arches_uri = URIRef(archesproject['concepts/%s' % c.conceptid])
 
-            # FIXME: Add the language back in, once pyld fixes its problem with uppercase lang
-            # tokens -> https://github.com/digitalbazaar/pyld/issues/86
-            # graph.add((rangenode, URIRef(RDFS.label), Literal(info['label'], lang=info['lang'])))
+                # get other identifiers:
+                ext_idents = [ident.value for ident in models.Value.objects.all().filter(concept_id=c.conceptid,
+                                                                                  valuetype__category="identifiers")]
+            rangenode = get_rangenode(arches_uri, ext_idents)
+
+            g.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
+            g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), rangenode))
+
+            assert c.value is not None, "Null or blank concept value"
+            g.add((rangenode, URIRef(RDFS.label), Literal(c.value, lang=c.language)))
 
         return g
 

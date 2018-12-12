@@ -1465,7 +1465,7 @@ class ResourceInstanceDataType(BaseDataType):
 
         if edge_info['range_tile_data'] is not None:
             res_insts = edge_info['range_tile_data']
-            if not isinstance(list, res_insts):
+            if not isinstance(res_insts, list):
                 res_insts = [res_insts]
 
             for res_inst in res_insts:
