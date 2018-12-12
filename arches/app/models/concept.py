@@ -1271,6 +1271,34 @@ def get_preflabel_from_conceptid(conceptid, lang):
     return default if ret == None else ret
 
 
+def get_valueids_from_concept_label(label, lang=None):
+    se = SearchEngineFactory().create()
+
+    def exact_val_match(val):
+        # exact term match, don't care about relevance ordering.
+        # due to language formating issues, and with (hopefully) small result sets
+        # easier to have filter logic in python than to craft it in dsl
+        dsl = {
+            "query": {
+                "constant_score": {
+                    "filter": {
+                        "terms": {
+                            "value": [val]
+                            }
+                        }
+                    }
+                }
+            }
+        return dsl
+
+    concept_label_results = se.search(index='strings', doc_type='concept',
+                                      body=exact_val_match(label))
+    if concept_label_results is None:
+        return
+    return [res['_source'] for res in concept_label_results['hits']['hits']
+            if lang is None or res['_source']['language'] == lang]
+
+
 def get_concept_label_from_valueid(valueid):
     se = SearchEngineFactory().create()
     concept_label = se.search(index='strings', doc_type='concept', id=valueid)
