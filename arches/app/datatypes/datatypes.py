@@ -1165,12 +1165,13 @@ class FileListDataType(BaseDataType):
 
         try:
             for file in node_value:
-                attachment = db.get_attachment(couch_doc['_id'], file['name'])
+                attachment = db.get_attachment(couch_doc['_id'], file['file_id'])
                 if attachment is not None:
                     attachment_file = attachment.read()
                     file_data = ContentFile(attachment_file, name=file['name'])
                     file_model = models.File()
                     file_model.path = file_data
+                    file_model.pk = file['file_id']
                     file_model.save()
                     if file["name"] == file_data.name and 'url' not in file.keys():
                         file["file_id"] = str(file_model.pk)
@@ -1178,7 +1179,7 @@ class FileListDataType(BaseDataType):
                         file["status"] = 'uploaded'
                         file["accepted"] = True
                         file["size"] = file_data.size
-                    db.delete_attachment(couch_doc, file['name'])
+                    # db.delete_attachment(couch_doc, file['name'])
 
         except KeyError as e:
             pass
