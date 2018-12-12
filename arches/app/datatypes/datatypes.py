@@ -119,7 +119,7 @@ class StringDataType(BaseDataType):
         except KeyError, e:
             pass
 
-    def to_rdf(self, edge_info, edge, tile):
+    def to_rdf(self, edge_info, edge):
         # returns an in-memory graph object, containing the domain resource, its
         # type and the string as a string literal
         g = Graph()
@@ -170,7 +170,7 @@ class NumberDataType(BaseDataType):
         except KeyError, e:
             pass
 
-    def to_rdf(self, edge_info, edge, tile):
+    def to_rdf(self, edge_info, edge):
         # returns an in-memory graph object, containing the domain resource, its
         # type and the number as a numeric literal (as this is how it is in the JSON)
         g = Graph()
@@ -211,7 +211,7 @@ class BooleanDataType(BaseDataType):
         except KeyError, e:
             pass
 
-    def to_rdf(self, edge_info, edge, tile):
+    def to_rdf(self, edge_info, edge):
         # returns an in-memory graph object, containing the domain resource, its
         # type and the number as a numeric literal (as this is how it is in the JSON)
         g = Graph()
@@ -292,7 +292,7 @@ class DateDataType(BaseDataType):
         if config is not None:
             cache.delete('time_wheel_config_anonymous')
 
-    def to_rdf(self, edge_info, edge, tile):
+    def to_rdf(self, edge_info, edge):
         # returns an in-memory graph object, containing the domain resource, its
         # type and the number as a numeric literal (as this is how it is in the JSON)
         g = Graph()
@@ -1081,7 +1081,7 @@ class FileListDataType(BaseDataType):
         result = json.loads(json.dumps(tile_data))
         return result
 
-    def to_rdf(self, edge_info, edge, tile):
+    def to_rdf(self, edge_info, edge):
         # outputs a graph holding an RDF representation of the file stored in the Arches instance
 
         g = Graph()
@@ -1151,6 +1151,9 @@ class FileListDataType(BaseDataType):
 
         return g
 
+    def from_rdf(self, json_ld_node):
+        # Currently up in the air about how best to do file imports via JSON-LD
+        pass
 
     def process_mobile_data(self, tile, node, db, couch_doc, node_value):
         '''
@@ -1454,7 +1457,7 @@ class ResourceInstanceDataType(BaseDataType):
         except KeyError, e:
             pass
 
-    def to_rdf(self, edge_info, edge, tile):
+    def to_rdf(self, edge_info, edge):
         g = Graph()
 
         def _add_resource(d, p, r, r_type):
@@ -1463,7 +1466,7 @@ class ResourceInstanceDataType(BaseDataType):
 
         if edge_info['range_tile_data'] is not None:
             res_insts = edge_info['range_tile_data']
-            if not isinstance(list, res_insts):
+            if not isinstance(res_insts, list):
                 res_insts = [res_insts]
 
             for res_inst in res_insts:
@@ -1473,6 +1476,23 @@ class ResourceInstanceDataType(BaseDataType):
                 _add_resource(edge_info['d_uri'], edge.ontologyproperty,
                               rangenode, edge.rangenode.ontologyclass)
         return g
+
+    def from_rdf(self, json_ld_node):
+        res_inst_uri = json_ld_node['id']
+        # should be in the form http(s)://archeshost/resources/{UUID}
+        # FIXME: should any URI in this form be accepted, regardless to a specific Arches host?
+
+        # NOTE: This returns a dict including the host and the resource instance UUID as
+        # {"host":..., "res_inst":...}
+        # It may be important in future for resource instance datatypes to deal with externally held ones
+        # rather than require a local copy.
+
+        import re
+        p = re.compile(r"(http|https)://(?P<host>[^/]*)/resources/(?P<res_inst>[A-Fa-f0-9\-]*)/?$")
+        m = p.match(res_inst_uri)
+        if m is not None:
+            return m.groupdict()
+            # return m.groupdict()['re_inst']  # to return only the UUID
 
 
 class NodeValueDataType(BaseDataType):
