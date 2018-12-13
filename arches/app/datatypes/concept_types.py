@@ -159,7 +159,7 @@ class ConceptDataType(BaseConceptDataType):
         # Expects a label and a concept URI within the json_ld_node
         # FIXME: SHOULD be able to handle cases when the label is not supplied,
         # or if the label does not match any label from the ConceptValue
-        concept_uri = json_ld_node.get('id')
+        concept_uri = json_ld_node.get('@id')
         label = json_ld_node.get(str(RDFS.label))
         # FIXME when pyld supports uppercase lang in strings, include
         # language handling here.
