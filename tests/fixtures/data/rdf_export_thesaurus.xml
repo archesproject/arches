@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+  xmlns:dcterms="http://purl.org/dc/terms/"
+>
+  <skos:Concept rdf:about="http://localhost:8000/86be632e-0dad-4d88-b5da-3d65875d6239">
+    <skos:prefLabel xml:lang="en-us">{"id": "43d75450-7282-4754-af63-02e13032b73a", "value": "Painting"}</skos:prefLabel>
+    <skos:inScheme>
+      <skos:ConceptScheme rdf:about="http://localhost:8000/4a10134e-d594-4102-8edf-2f63e18d3b04">
+        <skos:hasTopConcept rdf:resource="http://localhost:8000/31fa01c9-3f64-4b60-8e91-5ea253dd51f5"/>
+        <dcterms:title xml:lang="en-us">{"id": "cbc1b7d5-5f59-4784-b97f-6bb10af13e43", "value": "Test Thesaurus"}</dcterms:title>
+      </skos:ConceptScheme>
+    </skos:inScheme>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://localhost:8000/0ad97528-0fb0-43bf-afee-0fb9dde78b99">
+    <skos:scopeNote xml:lang="en">{"id": "8324d8bd-25ea-4cca-aa4b-ab7a4cc54300", "value": "Works composed primarily of industrial and modern consumer-culture waste, usually presented as assemblages of found objects."}</skos:scopeNote>
+    <skos:prefLabel xml:lang="de">{"id": "cf96dd59-b652-4c5e-8d54-9ba044281c87", "value": "Ger\u00fcmpelplastik"}</skos:prefLabel>
+    <skos:prefLabel xml:lang="en">{"id": "d75977c1-635b-41d5-b53d-1c82d2237b67", "value": "junk sculpture"}</skos:prefLabel>
+    <skos:scopeNote xml:lang="de">{"id": "da9e2e6f-2de6-4022-bb81-528be3a05329", "value": "Arbeit, die \u00fcberwiegend aus industriellem und zur modernen Konsumkultur geh\u00f6renden M\u00fcll komponiert ist, meist pr\u00e4sentiert in Verbindung mit Fundobjekten."}</skos:scopeNote>
+    <dcterms:identifier xml:lang="en-us">{"id": "ab7e709a-30c4-487f-a061-a5b40cf47f2f", "value": "http://vocab.getty.edu/aat/300047196"}</dcterms:identifier>
+    <skos:inScheme rdf:resource="http://localhost:8000/4a10134e-d594-4102-8edf-2f63e18d3b04"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://localhost:8000/45dc3daf-df1e-430e-a4c3-3152bb15bc15">
+    <skos:inScheme rdf:resource="http://localhost:8000/4a10134e-d594-4102-8edf-2f63e18d3b04"/>
+    <skos:prefLabel xml:lang="en-us">{"id": "664f47f9-9d56-436c-b8f6-4dc25b5246e5", "value": "example statement type"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://localhost:8000/44b052ec-6dd2-47d5-9c53-142ef8bf4492">
+    <skos:prefLabel xml:lang="en-us">{"id": "b64a64ef-2103-4429-9aa4-252f6967b09d", "value": "example measurement unit"}</skos:prefLabel>
+    <skos:inScheme rdf:resource="http://localhost:8000/4a10134e-d594-4102-8edf-2f63e18d3b04"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://localhost:8000/e7a93d9a-0b5b-4338-9a0f-fdd7c971002c">
+    <skos:inScheme rdf:resource="http://localhost:8000/4a10134e-d594-4102-8edf-2f63e18d3b04"/>
+    <skos:prefLabel xml:lang="en-us">{"id": "87049d75-5f35-43fe-ac87-e978cd8ad762", "value": "Entirely Distinct Concept"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://localhost:8000/31fa01c9-3f64-4b60-8e91-5ea253dd51f5">
+    <skos:prefLabel xml:lang="en-us">{"id": "52ca5bfb-68b0-43bf-b086-d07fad2ce821", "value": "Top Concept"}</skos:prefLabel>
+    <skos:narrower rdf:resource="http://localhost:8000/86be632e-0dad-4d88-b5da-3d65875d6239"/>
+    <skos:inScheme rdf:resource="http://localhost:8000/4a10134e-d594-4102-8edf-2f63e18d3b04"/>
+    <skos:narrower>
+      <skos:Concept rdf:about="http://localhost:8000/8846dcac-bd7b-4c39-bd59-a9e15e4b0321">
+        <skos:prefLabel xml:lang="en-us">{"id": "9c721b1d-8a38-425e-9455-41ee5f5edfab", "value": "Example Concept 3"}</skos:prefLabel>
+        <skos:inScheme rdf:resource="http://localhost:8000/4a10134e-d594-4102-8edf-2f63e18d3b04"/>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:narrower rdf:resource="http://localhost:8000/44b052ec-6dd2-47d5-9c53-142ef8bf4492"/>
+    <skos:narrower rdf:resource="http://localhost:8000/0ad97528-0fb0-43bf-afee-0fb9dde78b99"/>
+    <skos:narrower>
+      <skos:Concept rdf:about="http://localhost:8000/037daf4d-054a-44d2-9c0a-108b59e39109">
+        <skos:inScheme rdf:resource="http://localhost:8000/4a10134e-d594-4102-8edf-2f63e18d3b04"/>
+        <skos:prefLabel xml:lang="en-us">{"id": "4beb7055-8a6e-45a3-9bfb-32984b6f82e0", "value": "example document type"}</skos:prefLabel>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:narrower>
+      <skos:Concept rdf:about="http://localhost:8000/e0c3542b-5c1c-4a47-b3e3-423b03328be0">
+        <skos:inScheme rdf:resource="http://localhost:8000/4a10134e-d594-4102-8edf-2f63e18d3b04"/>
+        <skos:prefLabel xml:lang="en-us">{"id": "beb53e39-8c48-4533-a6ef-b04882540be2", "value": "Example Concept 2"}</skos:prefLabel>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:narrower rdf:resource="http://localhost:8000/e7a93d9a-0b5b-4338-9a0f-fdd7c971002c"/>
+    <skos:narrower>
+      <skos:Concept rdf:about="http://localhost:8000/54c5c8ac-890d-4f8e-b19a-dfa2401eaea3">
+        <dcterms:identifier xml:lang="en-us">{"id": "e8ac2e39-b56d-4b8f-984d-32a9808a73e7", "value": "http://vocab.getty.edu/aat/300404569"}</dcterms:identifier>
+        <skos:prefLabel xml:lang="en">{"id": "e098d355-05d1-4951-867d-2d14d9f39407", "value": "lunar calendar (dates by calendar)"}</skos:prefLabel>
+        <skos:scopeNote xml:lang="en">{"id": "c9d9b8ed-3014-4555-b19e-d7169d940a8d", "value": "Dating system based on a year consisting of synodic months, which are complete cycles of phases of the Moon. In every solar year (or year of the seasons), there are about 12.37 synodic months. Therefore, if a lunar-year calendar is to be kept in step with the seasonal year, a periodic intercalation (addition) of days is necessary."}</skos:scopeNote>
+        <dcterms:identifier xml:lang="en-us">{"id": "db8c42bd-97ad-46e5-bfcb-e023ad43e7fc", "value": "lcsh:sh123456"}</dcterms:identifier>
+        <skos:inScheme rdf:resource="http://localhost:8000/4a10134e-d594-4102-8edf-2f63e18d3b04"/>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:narrower>
+      <skos:Concept rdf:about="http://localhost:8000/134ebaa5-0f96-4153-8d1b-0ba6c7947292">
+        <skos:prefLabel xml:lang="en-us">{"id": "20296df9-71b8-462e-846b-338c58b4828a", "value": "Example Concept 1"}</skos:prefLabel>
+        <skos:inScheme rdf:resource="http://localhost:8000/4a10134e-d594-4102-8edf-2f63e18d3b04"/>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:narrower rdf:resource="http://localhost:8000/45dc3daf-df1e-430e-a4c3-3152bb15bc15"/>
+  </skos:Concept>
+</rdf:RDF>

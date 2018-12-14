@@ -28,9 +28,9 @@ define([
                     var hasdata = _.filter(tile.data, function(val, key) {
                         val = ko.unwrap(val);
                         if (val) {
-                            return val
+                            return val;
                         }
-                    })
+                    });
                     if (tile.isParent === true || hasdata.length === 0){
                         if (self.dropzone) {
                             self.dropzone.removeAllFiles(true);
@@ -41,7 +41,7 @@ define([
                         }
                         var data = req.responseJSON.data[self.node.nodeid];
                         if (Array.isArray(data)) {
-                            self.uploadedFiles(data)
+                            self.uploadedFiles(data);
                         }
                         if (self.dropzone) {
                             self.dropzone.removeAllFiles(true);
@@ -56,9 +56,9 @@ define([
                         }
                         if (Array.isArray(self.value())) {
                             var uploaded = _.filter(self.value(), function(val) {
-                                return val.status === 'uploaded';
+                                return ko.unwrap(val.status) === 'uploaded';
                             });
-                            self.uploadedFiles(uploaded)
+                            self.uploadedFiles(uploaded);
                         }
                         if (self.dropzone) {
                             self.dropzone.removeAllFiles(true);
@@ -87,7 +87,7 @@ define([
                 var filesForUpload = self.filesForUpload();
                 var uploadedFiles = self.uploadedFiles();
                 if (file.file_id) {
-                    file = _.find(uploadedFiles, function (uploadedFile) {
+                    file = _.find(uploadedFiles, function(uploadedFile) {
                         return file.file_id ===  ko.unwrap(uploadedFile.file_id);
                     });
                     self.uploadedFiles.remove(file);
@@ -95,9 +95,9 @@ define([
                     file = filesForUpload[file.index];
                     self.filesForUpload.remove(file);
                 }
-            }
+            };
 
-            this.formatSize = function (file) {
+            this.formatSize = function(file) {
                 var bytes = ko.unwrap(file.size);
                 if(bytes == 0) return '0 Byte';
                 var k = 1024;
@@ -150,7 +150,7 @@ define([
             });
 
             this.unique_id = uuid.generate();
-            this.uniqueidClass = ko.computed(function () {
+            this.uniqueidClass = ko.computed(function() {
                 return "unique_id_" + self.unique_id;
             });
 
@@ -173,7 +173,7 @@ define([
 
                     this.on("error", function(file, error) {
                         file.error = error;
-                        self.filesForUpload.valueHasMutated()
+                        self.filesForUpload.valueHasMutated();
                     });
 
                     this.on("removedfile", function(file) {
