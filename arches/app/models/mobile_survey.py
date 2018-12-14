@@ -164,7 +164,9 @@ class MobileSurvey(models.MobileSurveyModel):
             if edit['timestamp'] >= tile.provisionaledits[userid]['timestamp']:
                 # If the mobile user edits are newer by UTC timestamp, overwrite the tile data
                 tile.provisionaledits[userid] = edit
-                self.handle_reviewer_edits(userid, tile)
+        else:
+            tile.provisionaledits[userid] = edit
+        self.handle_reviewer_edits(userid, tile)
 
     def push_edits_to_db(self):
         # read all docs that have changes
@@ -228,8 +230,8 @@ class MobileSurvey(models.MobileSurveyModel):
                                     newvalue = datatype.process_mobile_data(tile, node, db, row.doc, value)
                                     if newvalue is not None:
                                         user_edits[1]['value'][nodeid] = newvalue
-                                    tile.provisionaledits[user_edits[0]] = user_edits[1]
-                                    self.handle_reviewer_edits(user_edits[0], tile)
+                                tile.provisionaledits[user_edits[0]] = user_edits[1]
+                                self.handle_reviewer_edits(user_edits[0], tile)
 
                         tile.save()
                         tile_serialized = json.loads(JSONSerializer().serialize(tile))
