@@ -60,7 +60,7 @@ def fix_v3_value(value,datatype):
         ## handle the fact that file names could be too long, > 100 characters.
         ## a bit more complicated that you would expect, in order to accommodate
         ## iterative development.
-        shortenedpath = None
+        shortenedpath = ""
         if len(filename) > 100:
             shortname = os.path.splitext(filename)[0][:96]+os.path.splitext(filename)[1]
             shortenedpath = fullpath.replace(filename,shortname)
@@ -70,7 +70,7 @@ def fix_v3_value(value,datatype):
             print "all files must be transferred before migration can continue"
             exit()
 
-        if shortenedpath is not None:
+        if shortenedpath != "":
             if not os.path.isfile(shortenedpath):
                 os.rename(fullpath,shortenedpath)
             fullpath = shortenedpath
