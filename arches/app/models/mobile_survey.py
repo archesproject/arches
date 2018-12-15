@@ -17,7 +17,9 @@ import uuid
 import json
 import urlparse
 from copy import copy, deepcopy
+from django.contrib.auth.models import User
 from django.db import transaction
+from django.utils.translation import ugettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from arches.app.models.concept import Concept
@@ -30,7 +32,6 @@ from django.http import HttpRequest
 from arches.app.utils.couch import Couch
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 import arches.app.views.search as search
-from django.utils.translation import ugettext as _
 
 
 
@@ -151,13 +152,30 @@ class MobileSurvey(models.MobileSurveyModel):
         ordered_card_ids = [unicode(mpc.card_id) for mpc in ordered_cards]
         return ordered_card_ids
 
+    def handle_reviewer_edits(self, userid, tile):
+        user = User.objects.get(pk=userid)
+        if hasattr(user, 'userprofile') is not True:
+            models.UserProfile.objects.create(user=user)
+        if user.userprofile.is_reviewer():
+            tile.make_provisional_authoritative(user)
+
+    def assign_provisional_edit(self, userid, edit, tile):
+        if userid in tile.provisionaledits:
+            if edit['timestamp'] >= tile.provisionaledits[userid]['timestamp']:
+                # If the mobile user edits are newer by UTC timestamp, overwrite the tile data
+                tile.provisionaledits[userid] = edit
+        else:
+            tile.provisionaledits[userid] = edit
+        self.handle_reviewer_edits(userid, tile)
+
     def push_edits_to_db(self):
         # read all docs that have changes
         # save back to postgres db
         db = self.couch.create_db('project_' + str(self.id))
         ret = []
         with transaction.atomic():
-            for row in self.couch.all_docs(db):
+            couch_docs = self.couch.all_docs(db)
+            for row in couch_docs:
                 ret.append(row)
                 if row.doc['type'] == 'resource':
                     if 'provisional_resource' in row.doc and row.doc['provisional_resource'] == 'true':
@@ -169,13 +187,15 @@ class MobileSurvey(models.MobileSurveyModel):
                         )
                         print('Resource {0} Saved'.format(row.doc['resourceinstanceid']))
 
-            for row in self.couch.all_docs(db):
+            for row in couch_docs:
                 ret.append(row)
                 if row.doc['type'] == 'tile':
                     if 'provisionaledits' in row.doc and row.doc['provisionaledits'] is not None:
                         try:
                             tile = Tile.objects.get(tileid=row.doc['tileid'])
                             for user_edits in row.doc['provisionaledits'].items():
+                                # user_edits is a tuple with the user number in
+                                # position 0, prov. edit data in position 1
                                 for nodeid, value in iter(user_edits[1]['value'].items()):
                                     datatype_factory = DataTypeFactory()
                                     node = models.Node.objects.get(nodeid=nodeid)
@@ -184,43 +204,22 @@ class MobileSurvey(models.MobileSurveyModel):
                                     if newvalue is not None:
                                         user_edits[1]['value'][nodeid] = newvalue
 
-                                # user_edits is a tuple with the user number in
-                                # position 0, prov. edit data in position 1, eg:
-                                # {u'5': {
-                                #     u'action': u'update',
-                                #     u'reviewer': None,
-                                #     u'reviewtimestamp': None,
-                                #     u'status': u'review',
-                                #     u'timestamp': u'2018-11-02T18:38:00.684250Z',
-                                #     u'value': {
-                                #         u'bb97b857-d646-11e8-9f94-acbc32b81a1b': u'Provisional String Value',
-                                #         u'bb98aab8-d646-11e8-922d-acbc32b81a1b': None
-                                #         }
-                                #     }
-                                # }
                                 if tile.provisionaledits is None:
                                     tile.provisionaledits = {}
                                     tile.provisionaledits[user_edits[0]] = user_edits[1]
+                                    self.handle_reviewer_edits(user_edits[0], tile)
                                 else:
-                                    if user_edits[0] in tile.provisionaledits:
-                                        if user_edits[1]['timestamp'] >= tile.provisionaledits[user_edits[0]]['timestamp']:
-                                            # If the mobile user edits are newer by UTC timestamp, overwrite the tile data
-                                            tile.provisionaledits[user_edits[0]] = user_edits[1]
+                                    self.assign_provisional_edit(user_edits[0], user_edits[1], tile)
 
                             # If there are conflicting documents, lets clear those out
                             if '_conflicts' in row.doc:
                                 for conflict_rev in row.doc['_conflicts']:
                                     conflict_data = db.get(row.id, rev=conflict_rev)
                                     for user_edits in conflict_data['provisionaledits'].items():
-                                        if user_edits[0] in tile.provisionaledits:
-                                            if user_edits[1]['timestamp'] > tile.provisionaledits[user_edits[0]]['timestamp']:
-                                                # If the mobile user edits are newer by UTC timestamp, overwrite the tile data
-                                                tile.provisionaledits[user_edits[0]] = user_edits[1]
+                                        self.assign_provisional_edit(user_edits[0], user_edits[1], tile)
                                     # Remove conflicted revision from couch
                                     db.delete(conflict_data)
 
-                                # TODO: If user is provisional user, apply as provisional edit
-                                # TODO: If user is reviewer, apply as authoritative edit
                         except Tile.DoesNotExist:
                             tile = Tile(row.doc)
                             for user_edits in row.doc['provisionaledits'].items():
@@ -231,7 +230,8 @@ class MobileSurvey(models.MobileSurveyModel):
                                     newvalue = datatype.process_mobile_data(tile, node, db, row.doc, value)
                                     if newvalue is not None:
                                         user_edits[1]['value'][nodeid] = newvalue
-                                    tile.provisionaledits[user_edits[0]] = user_edits[1]
+                                tile.provisionaledits[user_edits[0]] = user_edits[1]
+                                self.handle_reviewer_edits(user_edits[0], tile)
 
                         tile.save()
                         tile_serialized = json.loads(JSONSerializer().serialize(tile))
@@ -239,6 +239,7 @@ class MobileSurvey(models.MobileSurveyModel):
                         self.couch.update_doc(db, tile_serialized, tile_serialized['tileid'])
                         print('Tile {0} Saved'.format(row.doc['tileid']))
                         db.compact()
+
         return ret
 
     def collect_resource_instances_for_couch(self):
