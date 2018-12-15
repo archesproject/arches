@@ -19,6 +19,8 @@ import urlparse
 from copy import copy, deepcopy
 from django.contrib.auth.models import User
 from django.db import transaction
+from django.http import HttpRequest
+from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
@@ -28,7 +30,6 @@ from arches.app.models.graph import Graph
 from arches.app.models.models import ResourceInstance
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
-from django.http import HttpRequest
 from arches.app.utils.couch import Couch
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 import arches.app.views.search as search
@@ -172,6 +173,8 @@ class MobileSurvey(models.MobileSurveyModel):
         # read all docs that have changes
         # save back to postgres db
         db = self.couch.create_db('project_' + str(self.id))
+        user_lookup = {}
+        is_reviewer = False
         ret = []
         with transaction.atomic():
             couch_docs = self.couch.all_docs(db)
@@ -220,6 +223,7 @@ class MobileSurvey(models.MobileSurveyModel):
                                     # Remove conflicted revision from couch
                                     db.delete(conflict_data)
 
+                        # TODO: If user is provisional user, apply as provisional edit
                         except Tile.DoesNotExist:
                             tile = Tile(row.doc)
                             for user_edits in row.doc['provisionaledits'].items():
@@ -232,6 +236,19 @@ class MobileSurvey(models.MobileSurveyModel):
                                         user_edits[1]['value'][nodeid] = newvalue
                                 tile.provisionaledits[user_edits[0]] = user_edits[1]
                                 self.handle_reviewer_edits(user_edits[0], tile)
+
+                        # If user is reviewer, apply as authoritative edit
+                        for user_edits in tile.provisionaledits.items():
+                            if user_edits[0] not in user_lookup:
+                                user = User.objects.get(pk=user_edits[0])
+                                user_lookup[user_edits[0]] = user.groups.filter(name='Resource Reviewer').exists()
+
+                        for user_id, is_reviewer in user_lookup.items():
+                            if is_reviewer:
+                                try:
+                                    tile.data = tile.provisionaledits.pop(user_id)['value']
+                                except KeyError:
+                                    pass
 
                         tile.save()
                         tile_serialized = json.loads(JSONSerializer().serialize(tile))

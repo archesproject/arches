@@ -83,10 +83,13 @@ class Sync(APIBase):
                     can_sync = True
             if can_sync:
                 management.call_command('mobile', operation='sync_survey', id=surveyid)
+                return JSONResponse(ret)
+            else:
+                return JSONResponse('Sync Failed', status=403)
         except:
             ret = 'Sync failed'
 
-        return JSONResponse(ret)
+        return JSONResponse(ret, status=500)
 
 
 class Surveys(APIBase):
