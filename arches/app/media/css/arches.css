@@ -9155,6 +9155,24 @@ a.clear-geojson-button:hover {
     top: 6px
 }
 
+.msm-list-filter {
+    display: flex;
+    padding: 10px;
+}
+
+.msm-list-filter-input {
+    padding-left: 15px;
+    width: 250px;
+    height: 35px;
+    position: relative;
+}
+
+.msm-list-filter-input .clear-node-search {
+    top: 9px;
+    right: 10px;
+}
+
+
 /* End Function Manager Page */
 
 .category-header {
@@ -10581,10 +10599,6 @@ a.search-facet-item.disabled {
 
 .mobile-project-manager-editor .library-card:hover {
     background: #fafafa;
-}
-
-.mobile-project-manager-editor .clear-node-search {
-    top: 50px;
 }
 
 .mobile-project-manager-editor .card-nav-container {
