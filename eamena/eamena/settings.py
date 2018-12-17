@@ -21,6 +21,11 @@ MEDIA_URL = "/files/"
 BULK_UPLOAD_DIR =  os.path.join(PACKAGE_ROOT, 'bulk_upload')
 BULK_UPLOAD_LOG_FILE = os.path.join(PACKAGE_ROOT, 'logs', 'bulk_upload_log.txt')
 
+try:
+    from settings_local import GDAL_LIBRARY_PATH
+except ImportError:
+    pass
+
 ugettext = lambda s: s
 LANGUAGES = (
     ('en-US', ugettext('English')),
