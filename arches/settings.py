@@ -211,6 +211,9 @@ STATICFILES_DIRS = (
     os.path.join(ROOT_DIR, 'app', 'media'),
 )
 
+# Bulk import log file
+BULK_UPLOAD_LOG_FILE = os.path.join(PACKAGE_ROOT, 'logs', 'bulk_upload_log.txt')
+
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (

@@ -18,6 +18,7 @@ LOCALE_PATHS = (os.path.join(PACKAGE_ROOT, '../locale'),)
 
 # Absolute filesystem path to the directory holds bulk upload data
 BULK_UPLOAD_DIR =  os.path.join(PACKAGE_ROOT, 'bulk_upload')
+BULK_UPLOAD_LOG_FILE = os.path.join(PACKAGE_ROOT, 'logs', 'bulk_upload_log.txt')
 
 ugettext = lambda s: s
 LANGUAGES = (

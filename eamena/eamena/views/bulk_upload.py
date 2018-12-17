@@ -58,7 +58,7 @@ def new_upload(request):
 def main(request):
     ''' nothing special here, everything is handled with ajax'''
 
-    loadlog = os.path.join(settings.BULK_UPLOAD_DIR,"_loadlog.txt")
+    loadlog = settings.BULK_UPLOAD_LOG_FILE
     if os.path.isfile(loadlog):
         with open(loadlog,'rb') as loadlog:
             loads = loadlog.readlines()
