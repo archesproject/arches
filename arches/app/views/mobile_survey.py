@@ -226,7 +226,7 @@ class MobileSurveyManagerView(MapBaseManagerView):
             identities=serializer.serialize(identities, sort_keys=False),
             resources=serializer.serialize(resources, sort_keys=False),
             resource_download_limit=settings.MOBILE_DOWNLOAD_RESOURCE_LIMIT,
-            main_script='views/mobile-survey-manager',
+            main_script='views/mobile-survey-editor',
         )
 
         context['nav']['title'] = _('Mobile Survey Manager')
