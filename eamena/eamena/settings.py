@@ -14,7 +14,8 @@ TEMPLATE_DIRS = (os.path.join(PACKAGE_ROOT, 'templates'),os.path.join(PACKAGE_RO
 LOCALE_PATHS = (os.path.join(PACKAGE_ROOT, '../locale'),)
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
-# MEDIA_ROOT =  os.path.join(PACKAGE_ROOT, 'uploadedfiles')
+MEDIA_ROOT =  os.path.join(PACKAGE_ROOT, 'uploadedfiles')
+MEDIA_URL = "/files/"
 
 # Absolute filesystem path to the directory holds bulk upload data
 BULK_UPLOAD_DIR =  os.path.join(PACKAGE_ROOT, 'bulk_upload')
