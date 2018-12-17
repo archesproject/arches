@@ -476,6 +476,10 @@ class Command(BaseCommand):
                             elif datatype == 'dates':
                                 outval = self.validatedate(concept)
 
+                            ## anticipate django's auto renaming of saved files
+                            elif "FILE_PATH" in entitytype:
+                                outval = concept.replace(" ","_")
+
                             else:
                                 outval = concept
                             row = [str(resourceid),resourcetype,entitytype,outval, GroupName]

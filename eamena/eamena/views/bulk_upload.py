@@ -145,14 +145,16 @@ def import_archesfile(request):
     append = request.POST.get('append', 'false')
 
     output = StringIO()
-
-    call_command('packages',
-        operation='load_resources',
-        source=fullpath,
-        appending=append,
-        run_internal=True,
-        stdout = output,
-    )
+    try:
+        call_command('packages',
+            operation='load_resources',
+            source=fullpath,
+            appending=append,
+            run_internal=True,
+            stdout = output,
+        )
+    except Exception as e:
+        print e
 
     val = output.getvalue().strip()
     return HttpResponse(json.dumps({'load_id': val}), content_type="application/json")
@@ -170,8 +172,8 @@ def upload_attachments(request):
 
     if request.method == 'POST':
         resdict = json.loads(request.POST['resdict'])
-
         f = request._files['attachments[]']
+
         filename, ext = os.path.splitext(os.path.basename(str(f)))
         if ext == '.xlsx':
             return HttpResponse(json.dumps({}), content_type="application/json")
@@ -182,7 +184,7 @@ def upload_attachments(request):
             for l in ins:
                 if 'FILE_PATH' in l:
                     data = l.split('|')
-                    if data[3] == str(f):
+                    if data[3] == f._name.replace(" ","_"):
                         if data[0] not in resdict:
                             response_data['foldervalid'] = False
                         resid = resdict[data[0]]
@@ -191,6 +193,12 @@ def upload_attachments(request):
                         thumb = generate_thumbnail(f)
                         if thumb != None:
                             res.set_entity_value('THUMBNAIL.E62', thumb)
+                        res.save()
+                        
+                        ## reset the file names as the paths may have been modified
+                        ## by django during the above save process
+                        res.set_entity_value('FILE_PATH.E62', str(f).replace(" ","_"))
+                        res.set_entity_value('THUMBNAIL.E62', str(thumb).replace(" ","_"))
                         res.save()
 
     return HttpResponse(json.dumps(response_data), content_type="application/json")
