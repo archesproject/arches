@@ -1261,14 +1261,58 @@ def get_preflabel_from_conceptid(conceptid, lang):
     preflabels = query.search(index='strings', doc_type='concept')['hits']['hits']
     for preflabel in preflabels:
         default = preflabel['_source']
-        # get the label in the preferred language, otherwise get the label in the default language
-        if preflabel['_source']['language'] == lang:
-            return preflabel['_source']
-        if preflabel['_source']['language'].split('-')[0] == lang.split('-')[0]:
-            ret = preflabel['_source']
-        if preflabel['_source']['language'] == settings.LANGUAGE_CODE and ret == None:
-            ret = preflabel['_source']
+        if preflabel['_source']['language'] is not None and lang is not None:
+            # get the label in the preferred language, otherwise get the label in the default language
+            if preflabel['_source']['language'] == lang:
+                return preflabel['_source']
+            if preflabel['_source']['language'].split('-')[0] == lang.split('-')[0]:
+                ret = preflabel['_source']
+            if preflabel['_source']['language'] == settings.LANGUAGE_CODE and ret == None:
+                ret = preflabel['_source']
     return default if ret == None else ret
+
+
+def get_valueids_from_concept_label(label, conceptid=None, lang=None):
+    se = SearchEngineFactory().create()
+
+    def exact_val_match(val, conceptid=None):
+        # exact term match, don't care about relevance ordering.
+        # due to language formating issues, and with (hopefully) small result sets
+        # easier to have filter logic in python than to craft it in dsl
+        if conceptid is None:
+            return {
+                "query": {
+                    "constant_score": {
+                        "filter": {
+                            "terms": {
+                                "value": [val]
+                            }
+                        }
+                    }
+                }
+            }
+        else:
+            return {
+                "query": {
+                    "constant_score": {
+                        "filter": {
+                            "bool": {
+                                "must": [
+                                    {"term": {"value": val}},
+                                    {"term": {"conceptid": conceptid}}
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+
+    concept_label_results = se.search(index='strings', doc_type='concept',
+                                      body=exact_val_match(label, conceptid))
+    if concept_label_results is None:
+        return
+    return [res['_source'] for res in concept_label_results['hits']['hits']
+            if lang is None or res['_source']['language'].lower() == lang.lower()]
 
 
 def get_concept_label_from_valueid(valueid):

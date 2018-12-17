@@ -93,7 +93,8 @@ define([
             }),
             expanded: ko.observable(false),
             hasprovisionaledits: ko.pureComputed(function() {
-                return !!ko.unwrap(self.provisionaledits);
+                var edits = ko.unwrap(self.provisionaledits);
+                return !!edits && _.keys(edits).length > 0;
             }, this),
             isfullyprovisional: ko.pureComputed(function() {
                 return !!ko.unwrap(self.provisionaledits()) && _.keys(koMapping.toJS(this.data)).length === 0;
@@ -182,6 +183,7 @@ define([
                         self.tileid = tileData.tileid;
                         self.data = koMapping.fromJS(tileData.data);
                         self.provisionaledits = koMapping.fromJS(tileData.provisionaledits);
+                        self._tileData(koMapping.toJSON(self.data));
                         self.dirty = ko.pureComputed(function() {
                             return self._tileData() !== koMapping.toJSON(self.data);
                         }, self);

@@ -100,6 +100,10 @@ ONTOLOGY_NAMESPACES = {
     'http://www.ics.forth.gr/isl/CRMsci/': '',
 }
 
+# Used in the JSON-LD export for determining which external concept scheme URI
+# to use in preference for the URI of a concept. If there is no match, the default
+# Arches host URI will be used (eg http://localhost/concepts/123f323f-...)
+PREFERRED_CONCEPT_SCHEME = "http://vocab.getty.edu/aat/"
 
 # This is the namespace to use for export of data (for RDF/XML for example)
 # Ideally this should point to the url where you host your site

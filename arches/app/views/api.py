@@ -9,6 +9,7 @@ from django.utils.decorators import method_decorator
 from django.db import transaction
 from django.db.models import Q
 from django.http.request import QueryDict
+from django.core import management
 from django.core.urlresolvers import reverse
 from django.utils.decorators import method_decorator
 from revproxy.views import ProxyView
@@ -63,6 +64,29 @@ class APIBase(View):
         get_params._mutable = False
         request.GET = get_params
         return super(APIBase, self).dispatch(request, *args, **kwargs)
+
+
+class Sync(APIBase):
+
+    def get(self, request, surveyid=None):
+        ret = 'Sync was successful'
+        try:
+            ms = MobileSurvey.objects.get(pk=surveyid)
+            user = request.user
+            can_sync = False
+            if user in ms.users.all():
+                can_sync = True
+            else:
+                users_groups = set([group.id for group in user.groups.all()])
+                ms_groups = set([group.id for group in ms.groups.all()])
+                if len(ms_groups.intersection(users_groups)) > 0:
+                    can_sync = True
+            if can_sync:
+                management.call_command('mobile', operation='sync_survey', id=surveyid)
+        except:
+            ret = 'Sync failed'
+
+        return JSONResponse(ret)
 
 
 class Surveys(APIBase):
@@ -188,44 +212,82 @@ class Resources(APIBase):
         else:
             return JSONResponse(status=403)
 
+    # def put(self, request, resourceid):
+    #     try:
+    #         indent = int(request.POST.get('indent', None))
+    #     except:
+    #         indent = None
+
+    #     try:
+    #         if user_can_edit_resources(user=request.user):
+    #             data = JSONDeserializer().deserialize(request.body)
+    #             reader = JsonLdReader()
+    #             reader.read_resource(data, use_ids=True)
+    #             if reader.errors:
+    #                 response = []
+    #                 for value in reader.errors.itervalues():
+    #                     response.append(value.message)
+    #                 return JSONResponse(data, indent=indent, status=400, reason=response)
+    #             else:
+    #                 response = []
+    #                 for resource in reader.resources:
+    #                     if resourceid != str(resource.pk):
+    #                         raise Exception(
+    #                             'Resource id in the URI does not match the resource @id supplied in the document')
+    #                     old_resource = Resource.objects.get(pk=resource.pk)
+    #                     old_resource.load_tiles()
+    #                     old_tile_ids = set([str(tile.pk) for tile in old_resource.tiles])
+    #                     new_tile_ids = set([str(tile.pk) for tile in resource.get_flattened_tiles()])
+    #                     tileids_to_delete = old_tile_ids.difference(new_tile_ids)
+    #                     tiles_to_delete = models.TileModel.objects.filter(pk__in=tileids_to_delete)
+    #                     with transaction.atomic():
+    #                         tiles_to_delete.delete()
+    #                         resource.save(request=request)
+    #                     response.append(JSONDeserializer().deserialize(
+    #                         self.get(request, resource.resourceinstanceid).content))
+    #                 return JSONResponse(response, indent=indent)
+    #         else:
+    #             return JSONResponse(status=403)
+    #     except Exception as e:
+    #         return JSONResponse(status=500, reason=e)
+
     def put(self, request, resourceid):
         try:
-            indent = int(request.POST.get('indent', None))
+            indent = int(request.PUT.get('indent', None))
         except:
             indent = None
 
-        try:
-            if user_can_edit_resources(user=request.user):
-                data = JSONDeserializer().deserialize(request.body)
-                reader = JsonLdReader()
-                reader.read_resource(data, use_ids=True)
-                if reader.errors:
-                    response = []
-                    for value in reader.errors.itervalues():
-                        response.append(value.message)
-                    return JSONResponse(data, indent=indent, status=400, reason=response)
-                else:
-                    response = []
-                    for resource in reader.resources:
-                        if resourceid != str(resource.pk):
-                            raise Exception(
-                                'Resource id in the URI does not match the resource @id supplied in the document')
-                        old_resource = Resource.objects.get(pk=resource.pk)
-                        old_resource.load_tiles()
-                        old_tile_ids = set([str(tile.pk) for tile in old_resource.tiles])
-                        new_tile_ids = set([str(tile.pk) for tile in resource.get_flattened_tiles()])
-                        tileids_to_delete = old_tile_ids.difference(new_tile_ids)
-                        tiles_to_delete = models.TileModel.objects.filter(pk__in=tileids_to_delete)
-                        with transaction.atomic():
-                            tiles_to_delete.delete()
-                            resource.save(request=request)
-                        response.append(JSONDeserializer().deserialize(
-                            self.get(request, resource.resourceinstanceid).content))
-                    return JSONResponse(response, indent=indent)
-            else:
-                return JSONResponse(status=403)
-        except Exception as e:
-            return JSONResponse(status=500, reason=e)
+        if user_can_edit_resources(user=request.user):
+            with transaction.atomic():
+                try:
+                    # DELETE
+                    resource_instance = Resource.objects.get(pk=resourceid)
+                    resource_instance.delete()
+                except models.ResourceInstance.DoesNotExist:
+                    pass
+
+                try:
+                    # POST
+                    data = JSONDeserializer().deserialize(request.body)
+                    reader = JsonLdReader()
+                    reader.read_resource(data, resourceid=resourceid)
+                    if reader.errors:
+                        response = []
+                        for value in reader.errors.itervalues():
+                            response.append(value.message)
+                        return JSONResponse(data, indent=indent, status=400, reason=response)
+                    else:
+                        response = []
+                        for resource in reader.resources:
+                            with transaction.atomic():
+                                resource.save(request=request)
+                            response.append(JSONDeserializer().deserialize(
+                                self.get(request, resource.resourceinstanceid).content))
+                        return JSONResponse(response, indent=indent, status=201)
+                except models.ResourceInstance.DoesNotExist:
+                    return JSONResponse(status=404)
+        else:
+            return JSONResponse(status=500)
 
     def post(self, request, resourceid=None):
         try:
@@ -250,7 +312,7 @@ class Resources(APIBase):
                             resource.save(request=request)
                         response.append(JSONDeserializer().deserialize(
                             self.get(request, resource.resourceinstanceid).content))
-                    return JSONResponse(response, indent=indent)
+                    return JSONResponse(response, indent=indent, status=201)
             else:
                 return JSONResponse(status=403)
         except Exception as e:

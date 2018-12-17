@@ -2,6 +2,7 @@ import json
 from django.core.urlresolvers import reverse
 from arches.app.models import models
 
+
 class BaseDataType(object):
 
     def __init__(self, model=None):
@@ -46,6 +47,12 @@ class BaseDataType(object):
     def get_layer_config(self, node=None):
         """
         Gets the layer config to generate a map layer (use if spatial)
+        """
+        return None
+
+    def process_mobile_data(self, tile, node, db, couch_doc, node_value):
+        """
+        Transforms data from a mobile device to an Arches friendly format
         """
         return None
 
@@ -266,3 +273,37 @@ class BaseDataType(object):
         Updates files
         """
         pass
+
+    def to_rdf(self, edge_info, edge):
+        """
+        Outputs an in-memory graph, converting the range tile data JSON into
+        an appropriate RDF representation using rdflib
+        """
+
+        # default implementation that encodes the JSON serialisation
+        # as a literal string, linked by 'RDF.value' to the source node
+        # for this tile data
+        from rdflib import Namespace, URIRef, Literal, Graph, BNode
+        from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS
+        from arches.app.utils.betterJSONSerializer import JSONSerializer
+
+        g = Graph()
+
+        g.add((edge_info['r_uri'], RDF.type, URIRef(edge.rangenode.ontologyclass)))
+
+        g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), edge_info['r_uri']))
+        g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
+
+        if edge_info['domain_tile_data'] is not None:
+            g.add((edge_info['d_uri'], RDF.value, Literal(JSONSerializer().serialize(edge_info['domain_tile_data']))))
+
+        if edge_info['range_tile_data'] is not None:
+            g.add((edge_info['r_uri'], RDF.value, Literal(JSONSerializer().serialize(edge_info['range_tile_data']))))
+
+        return g
+
+    def from_rdf(self, json_ld_node):
+        print json_ld_node
+        # expects a node taken from an expanded json-ld graph
+        # returns the value, or None if no "@value" key is found
+        raise NotImplementedError
