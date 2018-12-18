@@ -4,10 +4,10 @@ define([
     'knockout',
     'knockout-mapping',
     'arches',
-    'viewmodels/mobile-survey-manager',
+    'viewmodels/mobile-survey',
     'views/base-manager',
     'profile-manager-data'
-], function($, _, ko, koMapping, arches, MobileSurveyManagerViewModel, BaseManagerView, data) {
+], function($, _, ko, koMapping, arches, MobileSurveyViewModel, BaseManagerView, data) {
 
     var UserProfileManager = BaseManagerView.extend({
         initialize: function(options) {
@@ -32,7 +32,7 @@ define([
             self.viewModel.toggleEditUserForm = function() {
                 this.showEditUserForm(!this.showEditUserForm());
             };
-            self.viewModel.mobileSurveyManager = new MobileSurveyManagerViewModel(data);
+            self.viewModel.mobileSurveyManager = new MobileSurveyViewModel(data);
 
             _.each(self.viewModel.mobileSurveyManager.mobilesurveys(), function(mobilesurvey) {
                 mobilesurvey.resources = ko.computed(function() {

@@ -2,15 +2,15 @@ define([
     'underscore',
     'knockout',
     'views/base-manager',
-    'viewmodels/mobile-survey-manager',
+    'viewmodels/mobile-survey',
     'viewmodels/alert',
     'models/mobile-survey',
     'mobile-survey-manager-data',
     'arches',
     'bindings/datepicker'
-], function(_, ko, BaseManagerView, MobileSurveyManagerViewModel, AlertViewModel, MobileSurveyModel, data, arches) {
+], function(_, ko, BaseManagerView, MobileSurveyViewModel, AlertViewModel, MobileSurveyModel, data, arches) {
 
-    var viewModel = new MobileSurveyManagerViewModel(data);
+    var viewModel = new MobileSurveyViewModel(data);
     viewModel.selectedMobileSurvey(new MobileSurveyModel({source: data.mobilesurveys[0], identities: data.identities}));
     viewModel.arches = arches;
     viewModel.saveMobileSurvey = function() {
