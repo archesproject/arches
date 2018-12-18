@@ -38,7 +38,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="rr-splash-title">{% trans "Arches allows you to define data collection surveys to collect data in the field" %}</div>
 
 
-            <button class="btn btn-shim btn-rr btn-labeled btn-lg fa fa-globe" data-bind="click: function(){console.log('flip bit to show editor')}">{% trans 'Create a Survey' %}</button>
+            <button class="btn btn-shim btn-rr btn-labeled btn-lg fa fa-globe" data-bind="click: newMobileSurvey">{% trans 'Create a Survey' %}</button>
 
             <!-- Splash Instructions -->
             <div class="rr-splash-description">{% trans "Arches allows you to create and edit data in the field using mobile devices such as" %}</div>
@@ -49,8 +49,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <!-- Help Hyperlink -->
             <div class="rr-splash-help-link">{% trans "Show Me How" %}</div>
         </div>
-
-
 
 
         <div data-bind="visible: mobilesurveys().length > 0" style="width: 100%;">
@@ -88,7 +86,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div id="project-listing-panel" class="selected" style="padding-left: 6px">
                     <!-- ko foreach: filteredMobileSurveys() -->
                     <a data-bind="">
-                    <div class="library-card selected selected-card" data-bind="click:function(survey){console.log(self); $parent.navigate($parent.arches.urls.mobile_survey_editor(survey.id)) }">
+                    <div class="library-card selected selected-card" data-bind="click: $parent.navigateToEditor">
                         <div class="mpm-project-card">
                             <a class="mpm-project-name" data-bind="text: name() === '' ? '{% trans "Unnamed Survey" %}' : name()"></a>
                         </div>

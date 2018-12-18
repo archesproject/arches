@@ -19,12 +19,12 @@ define([
                 mobilesurvey.createdbyName = ko.observable('Created by: ' + mobilesurvey.createdby_id);
                 mobilesurvey.name = ko.observable(mobilesurvey.name);
                 mobilesurvey.active = ko.observable(mobilesurvey.active);
-                mobilesurvey.delete = function(successCallback) {
+                mobilesurvey.delete = function(successCallback, errorCallback) {
                     return $.ajax({
                         url: arches.urls.mobile_survey_manager,
                         data: JSON.stringify(this),
                         method: 'DELETE'
-                    }).done(successCallback).fail(function(data){console.log('fail', data);});
+                    }).done(successCallback).fail(errorCallback);
                 };
                 return mobilesurvey;
             })
@@ -48,6 +48,10 @@ define([
 
     var viewModel = new MobileSurveysViewModel(data);
 
+    viewModel.navigateToEditor = function(survey) {
+        window.location = arches.urls.mobile_survey_editor(survey.id);
+    };
+
     viewModel.newMobileSurvey = function() {
         var surveyid = uuid.generate();
         window.location = arches.urls.mobile_survey_editor(surveyid);
@@ -61,14 +65,13 @@ define([
             }, function(){
                 self.loading(true);
                 if (mobilesurvey) {
-                    mobilesurvey.delete(function(data){
-                        if (data.success){
-                            self.mobilesurveys.remove(mobilesurvey);
-                        } else {
-                            pageView.viewModel.alert(new AlertViewModel('ep-alert-red', data.title, data.message));
-                        }
+                    mobilesurvey.delete(function(){
+                        self.mobilesurveys.remove(mobilesurvey);
                         self.loading(false);
-                    });
+                    }, function(err) {
+                        pageView.viewModel.alert(new AlertViewModel('ep-alert-red', err.title, err.message));
+                    }
+                    );
                 }
             }));
         }
