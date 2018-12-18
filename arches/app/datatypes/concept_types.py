@@ -274,3 +274,9 @@ class ConceptListDataType(BaseConceptDataType):
             concept_info['range_tile_data'] = r
             g += c.to_rdf(concept_info, edge)
         return g
+
+    def from_rdf(self, json_ld_node):
+                # returns a list of concept ids
+        ctype = ConceptDataType()
+
+        return [ctype.from_rdf(item) for item in json_ld_node]
