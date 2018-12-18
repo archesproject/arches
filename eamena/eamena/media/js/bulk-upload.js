@@ -309,6 +309,7 @@ $( document ).ready(function() {
         $('#folder-msg').text("Uploading files... this may take a while.");
     });   
     $('#folderupload').fileupload({
+            async: false,
             beforeSend: function(request) {
                 request.setRequestHeader("X-CSRFToken",csrftoken);
             },
