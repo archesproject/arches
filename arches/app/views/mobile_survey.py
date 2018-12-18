@@ -99,11 +99,6 @@ class MobileSurveyManagerView(BaseManagerView):
                 default_perms = default_perms + list(group.permissions.all())
             identities.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions': set(default_perms), 'is_superuser':user.is_superuser, 'group_ids': group_ids, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email})
 
-        map_layers = models.MapLayer.objects.all()
-        map_markers = models.MapMarker.objects.all()
-        map_sources = models.MapSource.objects.all()
-        geocoding_providers = models.Geocoder.objects.all()
-
         mobile_survey_models = models.MobileSurveyModel.objects.order_by('name')
         mobile_surveys, resources = self.get_survey_resources(mobile_survey_models)
 
@@ -119,10 +114,6 @@ class MobileSurveyManagerView(BaseManagerView):
 
         serializer = JSONSerializer()
         context = self.get_context_data(
-            map_layers=map_layers,
-            map_markers=map_markers,
-            map_sources=map_sources,
-            geocoding_providers=geocoding_providers,
             mobile_surveys=serializer.serialize(mobile_surveys, sort_keys=False),
             identities=serializer.serialize(identities, sort_keys=False),
             resources=serializer.serialize(resources, sort_keys=False),
@@ -171,8 +162,6 @@ class MobileSurveyDesignerView(MapBaseManagerView):
 
     def get(self, request, surveyid):
 
-        print "Surveyid", surveyid
-
         def get_last_login(date):
             result = _("Not yet logged in")
             try:
@@ -210,16 +199,16 @@ class MobileSurveyDesignerView(MapBaseManagerView):
             mobile_survey.datadownloadconfig = {"download":False, "count":1000, "resources":[], "custom": None}
 
         mobile_surveys, resources = self.get_survey_resources([mobile_survey])
+        mobile_survey = mobile_surveys[0]
 
-        for mobile_survey in mobile_surveys:
-            try:
-                mobile_survey['datadownloadconfig'] = json.loads(mobile_survey['datadownloadconfig'])
-                mobile_survey['onlinebasemaps'] = json.loads(mobile_survey['onlinebasemaps'])
-            except TypeError:
-                pass
-            multipart = mobile_survey['bounds']
-            singlepart = GeoUtils().convert_multipart_to_singlepart(multipart)
-            mobile_survey['bounds'] = singlepart
+        try:
+            mobile_survey['datadownloadconfig'] = json.loads(mobile_survey['datadownloadconfig'])
+            mobile_survey['onlinebasemaps'] = json.loads(mobile_survey['onlinebasemaps'])
+        except TypeError:
+            pass
+        multipart = mobile_survey['bounds']
+        singlepart = GeoUtils().convert_multipart_to_singlepart(multipart)
+        mobile_survey['bounds'] = singlepart
 
         serializer = JSONSerializer()
         context = self.get_context_data(
@@ -227,7 +216,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
             map_markers=map_markers,
             map_sources=map_sources,
             geocoding_providers=geocoding_providers,
-            mobile_surveys=serializer.serialize(mobile_surveys, sort_keys=False),
+            mobile_survey=serializer.serialize(mobile_survey, sort_keys=False),
             identities=serializer.serialize(identities, sort_keys=False),
             resources=serializer.serialize(resources, sort_keys=False),
             resource_download_limit=settings.MOBILE_DOWNLOAD_RESOURCE_LIMIT,
@@ -289,7 +278,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
     def post(self, request, surveyid):
         data = JSONDeserializer().deserialize(request.body)
         if models.MobileSurveyModel.objects.filter(pk=data['id']).exists() is False:
-            mobile_survey = MobileSurvey()
+            mobile_survey = MobileSurvey(id=surveyid, name=data['name'])
             mobile_survey.createdby = self.request.user
         else:
             mobile_survey = MobileSurvey.objects.get(pk=data['id'])

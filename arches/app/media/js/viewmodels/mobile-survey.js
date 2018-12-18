@@ -13,11 +13,11 @@ define([
     * A base viewmodel for mobile survey management
     *
     * @constructor
-    * @name MobileSurveyManagerViewModel
+    * @name MobileSurveyViewModel
     *
     * @param  {string} params - a configuration object
     */
-    var MobileSurveyManagerViewModel = function(params) {
+    var MobileSurveyViewModel = function(params) {
         var self = this;
         this.dateFormat = 'YYYY-MM-DD';
 
@@ -113,40 +113,9 @@ define([
             }
         }, self);
 
-        this.mobilesurveys = ko.observableArray(
-            params.mobilesurveys.map(function(mobilesurvey) {
-                return new MobileSurveyModel({
-                    source: mobilesurvey,
-                    identities: params.identities
-                });
-            })
-        );
-
-        this.mobileSurveyFilter = ko.observable('');
-
-        this.filteredMobileSurveys = ko.computed(function() {
-            var filter = self.mobileSurveyFilter();
-            var list = self.mobilesurveys();
-            if (filter.length === 0) {
-                return list;
-            }
-            return _.filter(list, function(mobilesurvey) {
-                return mobilesurvey.name().toLowerCase().indexOf(filter.toLowerCase()) >= 0;
-            });
-        });
 
         this.loading = ko.observable(false);
-        this.selectedMobileSurvey = ko.observable(null);
-
-        this.selectedMobileSurvey.subscribe(function(val){
-            if (val) {
-                self.identityList.clearSelection();
-                self.resourceList.clearSelection();
-                self.resourceList.resetCards(ko.unwrap(val.cards));
-                val.update();
-            }
-        });
-
+        this.mobilesurvey = new MobileSurveyModel({source: params.mobilesurvey, identities: params.identities});
     };
-    return MobileSurveyManagerViewModel;
+    return MobileSurveyViewModel;
 });
