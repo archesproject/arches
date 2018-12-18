@@ -22,6 +22,7 @@ from StringIO import StringIO
 from django import forms
 from django.conf import settings
 from django.core.management import call_command
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
@@ -47,6 +48,8 @@ def get_archesfile_path(filepath):
 
     return destpath
 
+@login_required
+@user_passes_test(lambda u: u.groups.filter(name='edit').count() != 0, login_url='/auth/')
 def new_upload(request):
     ''' nothing special here, everything is handled with ajax'''
 
@@ -54,7 +57,9 @@ def new_upload(request):
         {'active_page': 'Bulk Upload'}, # not sure if this is necessary
         context_instance=RequestContext(request) # or this
     )
-    
+
+@login_required
+@user_passes_test(lambda u: u.groups.filter(name='edit').count() != 0, login_url='/auth/')
 def main(request):
     ''' nothing special here, everything is handled with ajax'''
 
