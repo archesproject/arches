@@ -6,7 +6,7 @@ define([
     'arches'
 ], function(_, ko, koMapping, AbstractModel, arches) {
     return AbstractModel.extend({
-        url: arches.urls.mobile_survey_editor,
+        url: arches.urls.mobile_survey_designer,
 
         initialize: function(options) {
             var self = this;

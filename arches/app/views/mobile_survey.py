@@ -48,7 +48,7 @@ import arches.app.views.search as search
 
 
 @method_decorator(group_required('Application Administrator'), name='dispatch')
-class MobileSurveyListView(BaseManagerView):
+class MobileSurveyManagerView(BaseManagerView):
 
     def get_survey_resources(self, mobile_survey_models):
         graphs = models.GraphModel.objects.filter(isresource=True).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
@@ -167,7 +167,7 @@ class MobileSurveyListView(BaseManagerView):
 
 
 @method_decorator(group_required('Application Administrator'), name='dispatch')
-class MobileSurveyManagerView(MapBaseManagerView):
+class MobileSurveyDesignerView(MapBaseManagerView):
 
     def get(self, request, surveyid):
 
@@ -231,7 +231,7 @@ class MobileSurveyManagerView(MapBaseManagerView):
             identities=serializer.serialize(identities, sort_keys=False),
             resources=serializer.serialize(resources, sort_keys=False),
             resource_download_limit=settings.MOBILE_DOWNLOAD_RESOURCE_LIMIT,
-            main_script='views/mobile-survey-editor',
+            main_script='views/mobile-survey-designer',
         )
 
         context['nav']['title'] = _('Mobile Survey Manager')
@@ -241,7 +241,7 @@ class MobileSurveyManagerView(MapBaseManagerView):
             'template': 'mobile-survey-manager-help',
         }
 
-        return render(request, 'views/mobile-survey-editor.htm', context)
+        return render(request, 'views/mobile-survey-designer.htm', context)
 
     def delete(self, request):
         mobile_survey_id = None

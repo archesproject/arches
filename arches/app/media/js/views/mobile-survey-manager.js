@@ -49,12 +49,12 @@ define([
     var viewModel = new MobileSurveysViewModel(data);
 
     viewModel.navigateToEditor = function(survey) {
-        window.location = arches.urls.mobile_survey_editor(survey.id);
+        window.location = arches.urls.mobile_survey_designer(survey.id);
     };
 
     viewModel.newMobileSurvey = function() {
         var surveyid = uuid.generate();
-        window.location = arches.urls.mobile_survey_editor(surveyid);
+        window.location = arches.urls.mobile_survey_designer(surveyid);
     };
 
     viewModel.deleteMobileSurvey = function(mobilesurvey){
