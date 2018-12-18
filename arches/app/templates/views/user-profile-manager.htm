@@ -290,13 +290,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         {% trans 'My Surveys' %}
                     </div>
 
-                    <!--ko ifnot: mobileSurveyManager.mobilesurveys().length -->
+                    <!--ko ifnot: mobilesurveys.length -->
                     <div id="default-mobile-projects" class="profile-default-message-panel">
                         {% trans "Sorry, but you haven't been invited to a survey yet..." %}
                     </div>
                     <!--/ko-->
 
-                    <!--ko if: mobileSurveyManager.mobilesurveys().length -->
+                    <!--ko if: mobilesurveys.length -->
                     <!-- Survey Invitations List -->
                     <div id="mobile-projects-list" class="profile-default-message-panel">
                         <div class="row">
@@ -304,8 +304,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <!-- Find a survey -->
                             <div class="col-sm-9 col-sm-offset-3 relative">
                                 <div class="project-search-widget">
-                                    <input type="text" class="form-control" placeholder="{% trans 'Find a survey...' %}" data-bind="value: mobileSurveyManager.mobileSurveyFilter, valueUpdate: 'keyup'">
-                                    <span class="clear-node-search" data-bind="visible: mobileSurveyManager.mobileSurveyFilter().length > 0, click: function() { mobileSurveyManager.mobileSurveyFilter(''); }"><i class="fa fa-times-circle"></i></span>
+                                    <input type="text" class="form-control" placeholder="{% trans 'Find a survey...' %}" data-bind="value: mobileSurveyFilter, valueUpdate: 'keyup'">
+                                    <span class="clear-node-search" data-bind="visible: mobileSurveyFilter().length > 0, click: function() { mobileSurveyFilter(''); }"><i class="fa fa-times-circle"></i></span>
                                 </div>
                             </div>
                         </div>
@@ -314,30 +314,30 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div id="" class="row">
                             <div class="col-sm-9 col-sm-offset-3 mar-top">
                                 <div class="">
-                                    <!--ko foreach: {data: mobileSurveyManager.filteredMobileSurveys(), as: 'mobilesurvey'} -->
+                                    <!--ko foreach: {data: filteredMobileSurveys(), as: 'vm'} -->
                                     <div class="project-panel">
 
                                         <div class="project-panel-header">
                                             <div class="user-survey">
-                                                <div class="project-status" data-bind="text:mobilesurvey.active() ? '{% trans "Active" %}' : '{% trans "Inactive" %}', css: {active: mobilesurvey.active()}"></div>
+                                                <div class="project-status" data-bind="text:vm.mobilesurvey.active() ? '{% trans "Active" %}' : '{% trans "Inactive" %}', css: {active: vm.mobilesurvey.active()}"></div>
                                                 <ul class="project-metadata">
                                                     <li class="project-metadata-item">
-                                                        <span data-bind="text: mobilesurvey.startdate() || '?'"></span>
+                                                        <span data-bind="text: vm.mobilesurvey.startdate() || '?'"></span>
                                                         {% trans 'to' %}
-                                                        <span data-bind="text: mobilesurvey.enddate() || '?'"></span>
+                                                        <span data-bind="text: vm.mobilesurvey.enddate() || '?'"></span>
                                                     </li>
                                                 </ul>
                                             </div>
-                                            <h3 class="project-panel-title" data-bind="text: mobilesurvey.name() === '' ? '{% trans "Unnamed Survey" %}' : mobilesurvey.name()"></h3>
+                                            <h3 class="project-panel-title" data-bind="text: vm.mobilesurvey.name() === '' ? '{% trans "Unnamed Survey" %}' : vm.mobilesurvey.name()"></h3>
 
                                             <div class="">
                                                 <div class="project-details">
-                                                    <a id="view-project-details-btn" class="text-primary text-semibold" data-bind="click: function(val){val.toggleShowDetails(); $parent.mobileSurveyManager.getMobileSurveyResources(val)}">{% trans 'View Details' %}</a>
+                                                    <a id="view-project-details-btn" class="text-primary text-semibold" data-bind="click: function(val){val.mobilesurvey.toggleShowDetails(); val.getMobileSurveyResources(val)}">{% trans 'View Details' %}</a>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div class='profile-mpm-panel' data-bind="css: {'show-details': mobilesurvey.showDetails}">
+                                        <div class='profile-mpm-panel' data-bind="css: {'show-details': vm.mobilesurvey.showDetails}">
                                             <div class="">
                                                 <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
                                                     {% trans 'Survey Summary' %}
@@ -362,16 +362,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 <ul class="mpm-node-detail-metadata">
                                                     <li class="">
 
-                                                        {% trans 'Groups' %} (<span data-bind="text: mobilesurvey.groups().length"></span>)
-                                                        <ul class="mpm-node-detail-metadata" data-bind="foreach: _.filter(mobilesurvey.identities, function(id){return (id.type === 'group' && _.contains(mobilesurvey.groups(), id.id))})">
+                                                        {% trans 'Groups' %} (<span data-bind="text: vm.mobilesurvey.groups().length"></span>)
+                                                        <ul class="mpm-node-detail-metadata" data-bind="foreach: _.filter(vm.mobilesurvey.identities, function(id){return (id.type === 'group' && _.contains(mobilesurvey.groups(), id.id))})">
                                                             <li class="" data-bind="text: $data.name"></li>
                                                         </ul>
                                                     </li>
                                                 </ul>
                                                 <ul class="mpm-node-detail-metadata">
                                                     <li class="">
-                                                        {% trans 'Users' %} (<span data-bind="text: mobilesurvey.users().length"></span>)
-                                                        <ul class="mpm-node-detail-metadata" data-bind="foreach: _.filter(mobilesurvey.identities, function(id){return (id.type === 'user' && _.contains(mobilesurvey.users(), id.id))})">
+                                                        {% trans 'Users' %} (<span data-bind="text: vm.mobilesurvey.users().length"></span>)
+                                                        <ul class="mpm-node-detail-metadata" data-bind="foreach: _.filter(vm.mobilesurvey.identities, function(id){return (id.type === 'user' && _.contains(vm.mobilesurvey.users(), id.id))})">
                                                             <li class="" data-bind="text: $data.name"></li>
                                                         </ul>
                                                     </li>
@@ -384,7 +384,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </p>
 
                                                     <ul class="mpm-node-detail-metadata">
-                                                        <!--ko foreach: {data: mobilesurvey.resources(), as: 'resource'} -->
+                                                        <!--ko foreach: {data: vm.resources, as: 'resource'} -->
                                                         <li class="">
                                                             <div data-bind="text: resource.name + ' (' + resource.cards.length + ' data entry cards)'"></div>
                                                             <!--ko foreach: {data: resource.cards, as: 'card'} -->

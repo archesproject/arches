@@ -86,15 +86,15 @@ define([
             }
         };
 
-        this.getMobileSurveyResources = function(mobilesurvey){
+        this.getMobileSurveyResources = function(){
             var successCallback = function(data){
-                mobilesurvey.collectedResources(true);
+                self.mobilesurvey.collectedResources(true);
                 _.each(data.resources, self.processResources);
                 _.each(self.resourceList.items(), self.flattenCards);
             };
-            if (!mobilesurvey.collectedResources()) {
+            if (!this.mobilesurvey.collectedResources()) {
                 $.ajax({
-                    url: arches.urls.mobile_survey_resources(mobilesurvey.id)
+                    url: arches.urls.mobile_survey_resources(this.mobilesurvey.id)
                 })
                     .done(successCallback)
                     .fail(function(data){console.log('request failed', data);});
