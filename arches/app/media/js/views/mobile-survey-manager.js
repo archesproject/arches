@@ -1,62 +1,56 @@
 define([
+    'jquery',
     'underscore',
     'knockout',
+    'uuid',
     'views/base-manager',
-    'viewmodels/mobile-survey-manager',
     'viewmodels/alert',
-    'models/mobile-survey',
     'mobile-survey-manager-data',
     'arches',
     'bindings/datepicker'
-], function(_, ko, BaseManagerView, MobileSurveyManagerViewModel, AlertViewModel, MobileSurveyModel, data, arches) {
+], function($, _, ko, uuid, BaseManagerView, AlertViewModel, data, arches) {
 
-    var viewModel = new MobileSurveyManagerViewModel(data);
-    viewModel.arches = arches;
-    viewModel.saveMobileSurvey = function() {
-        this.loading(true);
-        var addMobileSurvey = !this.selectedMobileSurvey().get('id');
-        this.selectedMobileSurvey().save(function(data) {
-            if (data.responseJSON.success) {
-                if (addMobileSurvey) {
-                    self.mobilesurveys.push(self.selectedMobileSurvey());
-                }
-            } else {
-                pageView.viewModel.alert(new AlertViewModel('ep-alert-red', data.responseJSON.title, data.responseJSON.message));
+    var MobileSurveysViewModel = function(params) {
+        var self = this;
+        this.dateFormat = 'YYYY-MM-DD';
+
+        this.mobilesurveys = ko.observableArray(
+            params.mobilesurveys.map(function(mobilesurvey) {
+                mobilesurvey.createdbyName = ko.observable('Created by: ' + mobilesurvey.createdby_id);
+                mobilesurvey.name = ko.observable(mobilesurvey.name);
+                mobilesurvey.active = ko.observable(mobilesurvey.active);
+                mobilesurvey.delete = function(successCallback) {
+                    return $.ajax({
+                        url: arches.urls.mobile_survey_manager,
+                        data: JSON.stringify(this),
+                        method: 'DELETE'
+                    }).done(successCallback).fail(function(data){console.log('fail', data);});
+                };
+                return mobilesurvey;
+            })
+        );
+
+        this.mobileSurveyFilter = ko.observable('');
+
+        this.filteredMobileSurveys = ko.computed(function() {
+            var filter = self.mobileSurveyFilter();
+            var list = self.mobilesurveys();
+            if (filter.length === 0) {
+                return list;
             }
-            self.loading(false);
+            return _.filter(list, function(mobilesurvey) {
+                return mobilesurvey.name().toLowerCase().indexOf(filter.toLowerCase()) >= 0;
+            });
         });
+
+        this.loading = ko.observable(false);
     };
 
-    viewModel.discardEdits = function() {
-        if (!this.selectedMobileSurvey().get('id')) {
-            this.selectedMobileSurvey(null);
-        } else {
-            this.resourceList.resetCards(this.selectedMobileSurvey().get('source').cards);
-            this.selectedMobileSurvey().reset();
-        }
-    };
+    var viewModel = new MobileSurveysViewModel(data);
 
     viewModel.newMobileSurvey = function() {
-        if (!this.selectedMobileSurvey() || !this.selectedMobileSurvey().dirty()) {
-            this.selectedMobileSurvey(new MobileSurveyModel({
-                source: {
-                    name: '',
-                    active: false,
-                    description: '',
-                    startdate: null,
-                    enddate: null,
-                    id: null,
-                    cards: [],
-                    users: [],
-                    groups: [],
-                    bounds: null,
-                    datadownloadconfig: {download:false, count:1000, resources:[], custom: null},
-                    tilecache: '',
-                    onlinebasemap: ''
-                },
-                identities: data.identities
-            }));
-        }
+        var surveyid = uuid.generate();
+        window.location = arches.urls.mobile_survey_editor(surveyid);
     };
 
     viewModel.deleteMobileSurvey = function(mobilesurvey){
@@ -68,13 +62,10 @@ define([
                 self.loading(true);
                 if (mobilesurvey) {
                     mobilesurvey.delete(function(data){
-                        if (data.responseJSON.success){
+                        if (data.success){
                             self.mobilesurveys.remove(mobilesurvey);
-                            if (mobilesurvey === self.selectedMobileSurvey()) {
-                                self.selectedMobileSurvey(undefined);
-                            }
                         } else {
-                            pageView.viewModel.alert(new AlertViewModel('ep-alert-red', data.responseJSON.title, data.responseJSON.message));
+                            pageView.viewModel.alert(new AlertViewModel('ep-alert-red', data.title, data.message));
                         }
                         self.loading(false);
                     });
@@ -88,12 +79,6 @@ define([
             this.deleteMobileSurvey(this.selectedMobileSurvey());
         }
     };
-
-    if (viewModel.mobilesurveys().length === 0) {
-        viewModel.newMobileSurvey();
-    } else {
-        viewModel.selectedMobileSurvey(viewModel.mobilesurveys()[0]);
-    }
 
     var pageView = new BaseManagerView({
         viewModel: viewModel

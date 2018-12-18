@@ -139,7 +139,7 @@ class MobileSurveyListView(BaseManagerView):
 
         return render(request, 'views/mobile-survey-manager.htm', context)
 
-        def delete(self, request):
+    def delete(self, request):
             mobile_survey_id = None
             try:
                 mobile_survey_id = JSONDeserializer().deserialize(request.body)['id']
@@ -203,8 +203,13 @@ class MobileSurveyManagerView(MapBaseManagerView):
         map_sources = models.MapSource.objects.all()
         geocoding_providers = models.Geocoder.objects.all()
 
-        mobile_survey_models = models.MobileSurveyModel.objects.order_by('name')
-        mobile_surveys, resources = self.get_survey_resources(mobile_survey_models)
+        if models.MobileSurveyModel.objects.filter(pk=surveyid).exists():
+            mobile_survey = models.MobileSurveyModel.objects.get(pk=surveyid)
+        else:
+            mobile_survey = models.MobileSurveyModel(id=surveyid, name='unnamed')
+            mobile_survey.datadownloadconfig = {"download":False, "count":1000, "resources":[], "custom": None}
+
+        mobile_surveys, resources = self.get_survey_resources([mobile_survey])
 
         for mobile_survey in mobile_surveys:
             try:
@@ -281,10 +286,9 @@ class MobileSurveyManagerView(MapBaseManagerView):
             else:
                 xmodel.objects.filter(group=identity_model.objects.get(id=identity), mobile_survey=mobile_survey).delete()
 
-    def post(self, request):
+    def post(self, request, surveyid):
         data = JSONDeserializer().deserialize(request.body)
-
-        if data['id'] is None:
+        if models.MobileSurveyModel.objects.filter(pk=data['id']).exists() is False:
             mobile_survey = MobileSurvey()
             mobile_survey.createdby = self.request.user
         else:
@@ -418,7 +422,10 @@ class MobileSurveyManagerView(MapBaseManagerView):
         all_ordered_card_ids = []
 
         for mobile_survey in mobile_survey_models:
-            survey = MobileSurvey.objects.get(id=mobile_survey.id)
+            try:
+                survey = MobileSurvey.objects.get(id=mobile_survey.id)
+            except Exception as e:
+                survey = MobileSurvey(id=mobile_survey.id, name=mobile_survey.name)
             mobile_survey_dict = survey.serialize()
             all_ordered_card_ids += mobile_survey_dict['cards']
             mobile_surveys.append(mobile_survey_dict)

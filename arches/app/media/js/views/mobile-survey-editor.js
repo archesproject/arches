@@ -11,9 +11,11 @@ define([
 ], function(_, ko, BaseManagerView, MobileSurveyManagerViewModel, AlertViewModel, MobileSurveyModel, data, arches) {
 
     var viewModel = new MobileSurveyManagerViewModel(data);
+    viewModel.selectedMobileSurvey(new MobileSurveyModel({source: data.mobilesurveys[0], identities: data.identities}));
     viewModel.arches = arches;
     viewModel.saveMobileSurvey = function() {
         this.loading(true);
+        var self = this;
         var addMobileSurvey = !this.selectedMobileSurvey().get('id');
         this.selectedMobileSurvey().save(function(data) {
             if (data.responseJSON.success) {

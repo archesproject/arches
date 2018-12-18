@@ -142,7 +142,7 @@ define([
             if (val) {
                 self.identityList.clearSelection();
                 self.resourceList.clearSelection();
-                self.resourceList.resetCards(val.cards());
+                self.resourceList.resetCards(ko.unwrap(val.cards));
                 val.update();
             }
         });
