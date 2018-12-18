@@ -304,6 +304,4 @@ class BaseDataType(object):
 
     def from_rdf(self, json_ld_node):
         print json_ld_node
-        # expects a node taken from an expanded json-ld graph
-        # returns the value, or None if no "@value" key is found
         raise NotImplementedError

@@ -167,7 +167,14 @@ class ConceptDataType(BaseConceptDataType):
         # Either by instantiating a keyword without a concept_id or by
         # or by looking for say an external identifier attached to the concept and
         # building upon that.
-        concept_uri = json_ld_node.get('id')
+
+        try:
+            # assume a list, and as this is a ConceptDataType, assume a single entry
+            json_ld_node = json_ld_node[0]
+        except KeyError as e:
+            pass
+
+        concept_uri = json_ld_node.get('@id')
         label = json_ld_node.get(str(RDFS.label))
 
         concept_id = None
