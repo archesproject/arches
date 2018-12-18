@@ -128,9 +128,13 @@ class StringDataType(BaseDataType):
         return g
 
     def from_rdf(self, json_ld_node):
-        # returns an in-memory graph object, containing the domain resource, its
-        # type and the number as a numeric literal (as this is how it is in the JSON)
-        return json_ld_node.get("@value")
+        # returns the string value only
+        # FIXME: Language?
+        value = get_value_from_jsonld(json_ld_node)
+        try:
+            return value[0]
+        except (AttributeError, KeyError) as e:
+            pass
 
 
 class NumberDataType(BaseDataType):
@@ -182,7 +186,11 @@ class NumberDataType(BaseDataType):
     def from_rdf(self, json_ld_node):
         # expects a node taken from an expanded json-ld graph
         # returns the value, or None if no "@value" key is found
-        return json_ld_node.get("@value")
+        value = get_value_from_jsonld(json_ld_node)
+        try:
+            return value[0]  # should already be cast as a number in the JSON
+        except (AttributeError, KeyError) as e:
+            pass
 
 
 class BooleanDataType(BaseDataType):
@@ -222,7 +230,11 @@ class BooleanDataType(BaseDataType):
     def from_rdf(self, json_ld_node):
         # expects a node taken from an expanded json-ld graph
         # returns the value, or None if no "@value" key is found
-        return json_ld_node.get("@value")
+        value = get_value_from_jsonld(json_ld_node)
+        try:
+            return value[0]
+        except (AttributeError, KeyError) as e:
+            pass
 
 class DateDataType(BaseDataType):
 
@@ -304,7 +316,11 @@ class DateDataType(BaseDataType):
     def from_rdf(self, json_ld_node):
         # expects a node taken from an expanded json-ld graph
         # returns the value, or None if no "@value" key is found
-        return json_ld_node.get("@value")
+        value = get_value_from_jsonld(json_ld_node)
+        try:
+            return value[0]
+        except (AttributeError, KeyError) as e:
+            pass
 
 
 class EDTFDataType(BaseDataType):
@@ -1250,6 +1266,13 @@ class BaseDomainDataType(BaseDataType):
                 return option['text']
         return ''
 
+    def get_option_id_from_text(self, value):
+        # this could be better written with most of the logic in SQL tbh
+        for dnode in models.Node.objects.filter(config__options__contains=[{"text": value}]):
+            for option in dnode.config['options']:
+                if option['text'] == value:
+                    yield option['id'], dnode.node_id
+
 
 class DomainDataType(BaseDomainDataType):
 
@@ -1305,6 +1328,26 @@ class DomainDataType(BaseDomainDataType):
 
         except KeyError, e:
             pass
+
+    def to_rdf(self, edge_info, edge):
+        # returns an in-memory graph object, containing the domain resource, its
+        # type and the number as a numeric literal (as this is how it is in the JSON)
+        g = Graph()
+        g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
+        g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty),
+               Literal(str(self.get_option_text(edge.rangenode, edge_info['range_tile_data'])))))
+        return g
+
+    def from_rdf(self, json_ld_node):
+        # depends on how much is passed to the method
+        # if just the 'leaf' node, then not much can be done aside from return the list of nodes it might be from
+        # a string may be present in multiple domains for instance
+        # via models.Node.objects.filter(config__options__contains=[{"text": value}])
+        value = get_value_from_jsonld(json_ld_node)
+        try:
+            return [{'id':v_id, 'n_id': node_id} for v_id, n_id in self.get_option_id_from_text(value[0])]
+        except (AttributeError, KeyError, TypeError) as e:
+            print(e)
 
 
 class DomainListDataType(BaseDomainDataType):
@@ -1385,6 +1428,23 @@ class DomainListDataType(BaseDomainDataType):
 
         except KeyError, e:
             pass
+
+    def to_rdf(self, edge_info, edge):
+        g = Graph()
+        domtype = DomainDataType()
+
+        for domain_id in edge_info['range_tile_data']:
+            indiv_info = edge_info.copy()
+            indiv_info['range_tile_data'] = domain_id
+            g += domtype.to_rdf(indiv_info, edge)
+        return g
+
+    def from_rdf(self, json_ld_node):
+        # returns a list of lists of {domain id, node id}
+        domtype = DomainDataType()
+
+        return [domtype.from_rdf(item) for item in json_ld_node]
+
 
 
 class ResourceInstanceDataType(BaseDataType):
@@ -1520,3 +1580,17 @@ class NodeValueDataType(BaseDataType):
 
     def append_search_filters(self, value, node, query, request):
         pass
+
+
+
+def get_value_from_jsonld(json_ld_node):
+    try:
+        return (json_ld_node[0].get("@value"), json_ld_node[0].get("@language"))
+    except KeyError as e:
+        try:
+            return (json_ld_node.get("@value"), json_ld_node.get("@language"))
+        except AttributeError as e:
+            return
+    except IndexError as e:
+        return
+
