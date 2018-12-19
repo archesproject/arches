@@ -1429,10 +1429,10 @@ flexslider@~2.6.3:
   dependencies:
     jquery ">=1.11.3"
 
-font-awesome@~4.6.3:
-  version "4.6.3"
-  resolved "https://registry.yarnpkg.com/font-awesome/-/font-awesome-4.6.3.tgz#86933651540ee00874c664017f50f2172f6531a2"
-  integrity sha1-hpM2UVQO4Ah0xmQBf1DyFy9lMaI=
+font-awesome@~4.7.0:
+  version "4.7.0"
+  resolved "https://registry.yarnpkg.com/font-awesome/-/font-awesome-4.7.0.tgz#8fa8cf0411a1a31afd07b06d2902bb9fc815a133"
+  integrity sha1-j6jPBBGhoxr9B7BtKQK7n8gVoTM=
 
 foreach@^2.0.5:
   version "2.0.5"
