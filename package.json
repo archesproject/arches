@@ -42,7 +42,7 @@
         "latlon-geohash": "1.1.0",
         "leaflet": "1.0.3",
         "leaflet-draw": "^0.4.9",
-        "leaflet-iiif": "^1.1.1",
+        "leaflet-iiif": "^2.0.1",
         "lt-themify-icons": "^1.1.0",
         "mapbox-gl": "0.48.0",
         "mathjs": "^3.11.4",
