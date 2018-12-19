@@ -1158,10 +1158,10 @@ commander@2:
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.13.0.tgz#6964bca67685df7c1f1430c584f07d7597885b9c"
   integrity sha512-MVuS359B+YzaWqjCL/c+22gfryv+mCBPHAv3zyVI2GN8EY6IRP8VwtasXn8jyyhvvq84R4ImN1OKRtcbIasjYA==
 
-complex.js@2.0.4:
-  version "2.0.4"
-  resolved "https://registry.yarnpkg.com/complex.js/-/complex.js-2.0.4.tgz#d8e7cfb9652d1e853e723386421c1a0ca7a48373"
-  integrity sha512-Syl95HpxUTS0QjwNxencZsKukgh1zdS9uXeXX2Us0pHaqBR6kiZZi0AkZ9VpZFwHJyVIUVzI4EumjWdXP3fy6w==
+complex.js@2.0.11:
+  version "2.0.11"
+  resolved "https://registry.yarnpkg.com/complex.js/-/complex.js-2.0.11.tgz#09a873fbf15ffd8c18c9c2201ccef425c32b8bf1"
+  integrity sha512-6IArJLApNtdg1P1dFtn3dnyzoZBEF0MwMnrfF1exSBRpZYoy4yieMkpZhQDC0uwctw48vii0CFVyHfpgZ/DfGw==
 
 concat-stream@~1.2.1:
   version "1.2.1"
@@ -1306,10 +1306,10 @@ debug@^2.6.3:
   dependencies:
     ms "2.0.0"
 
-decimal.js@9.0.1:
-  version "9.0.1"
-  resolved "https://registry.yarnpkg.com/decimal.js/-/decimal.js-9.0.1.tgz#1cc8b228177da7ab6498c1cc06eb130a290e6e1e"
-  integrity sha512-2h0iKbJwnImBk4TGk7CG1xadoA0g3LDPlQhQzbZ221zvG0p2YVUedbKIPsOZXKZGx6YmZMJKYOalpCMxSdDqTQ==
+decimal.js@10.0.1:
+  version "10.0.1"
+  resolved "https://registry.yarnpkg.com/decimal.js/-/decimal.js-10.0.1.tgz#d04b16b277f0f9af09671cee225c4882e8857c58"
+  integrity sha512-vklWB5C4Cj423xnaOtsUmAv0/7GqlXIgDv2ZKDyR64OV3OSzGHNx2mk4p/1EKnB5s70k73cIOOEcG9YzF0q4Lw==
 
 deep-equal@^1.0.0, deep-equal@^1.0.1:
   version "1.0.1"
@@ -1352,6 +1352,11 @@ eonasdan-bootstrap-datetimepicker@~4.17.43:
     jquery "^1.8.3 || ^2.0 || ^3.0"
     moment "^2.10"
     moment-timezone "^0.4.0"
+
+escape-latex@1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/escape-latex/-/escape-latex-1.2.0.tgz#07c03818cf7dac250cce517f4fda1b001ef2bca1"
+  integrity sha512-nV5aVWW1K0wEiUIEdZ4erkGGH8mDxGyxSeqPzRNtWP7ataw+/olFObw7hujFWlVjNsaDFw5VZ5NzVSIqRgfTiw==
 
 escape-string-regexp@^1.0.2:
   version "1.0.5"
@@ -1439,10 +1444,10 @@ foreach@^2.0.5:
   resolved "https://registry.yarnpkg.com/foreach/-/foreach-2.0.5.tgz#0bee005018aeb260d0a3af3ae658dd0136ec1b99"
   integrity sha1-C+4AUBiusmDQo6865ljdATbsG5k=
 
-fraction.js@4.0.4:
-  version "4.0.4"
-  resolved "https://registry.yarnpkg.com/fraction.js/-/fraction.js-4.0.4.tgz#04e567110718adf7b52974a10434ab4c67a5183e"
-  integrity sha512-aK/oGatyYLTtXRHjfEsytX5fieeR5H4s8sLorzcT12taFS+dbMZejnvm9gRa8mZAPwci24ucjq9epDyaq5u8Iw==
+fraction.js@4.0.11:
+  version "4.0.11"
+  resolved "https://registry.yarnpkg.com/fraction.js/-/fraction.js-4.0.11.tgz#f82474349f7a198b6ad8d713d65621302a0e6f58"
+  integrity sha512-wyQd1A06dTom7vTkf8OsnqXNi5XjleeaDFrvQX3SDIyMsVN1eb8KSGH3fsckF5FMlSWBrMfDCcJWVf99rXbf/g==
 
 function-bind@^1.1.1:
   version "1.1.1"
@@ -1795,18 +1800,19 @@ marchingsquares@1.2.0, marchingsquares@^1.2.0:
   resolved "https://registry.yarnpkg.com/marchingsquares/-/marchingsquares-1.2.0.tgz#36ae2dcc170be576d42579aac3c46da89ab650e6"
   integrity sha1-Nq4tzBcL5XbUJXmqw8RtqJq2UOY=
 
-mathjs@^3.11.4:
-  version "3.20.1"
-  resolved "https://registry.yarnpkg.com/mathjs/-/mathjs-3.20.1.tgz#cdefb0059ef897fe63fea39828e12041ac242765"
-  integrity sha512-cra4iv6Xj5g38TlVX9VQCqaE8UcDGZkIlB2aM3cB5djoD9YAsLVsQPmzfGWGoZIB/qTht93U8mf1BmkteynSOQ==
+mathjs@^5.4.0:
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/mathjs/-/mathjs-5.4.0.tgz#e456ae00e22e352d078cd5f6d87000d5467be1ee"
+  integrity sha512-dhoFsi9SUR5IwUlDRq1KyP/2MhYo5yL8nROx7w0wlHF/yc7h5gAR4P7GRVt5mBBPliRYTLc63wsFVOigJ3YSEg==
   dependencies:
-    complex.js "2.0.4"
-    decimal.js "9.0.1"
-    fraction.js "4.0.4"
+    complex.js "2.0.11"
+    decimal.js "10.0.1"
+    escape-latex "1.2.0"
+    fraction.js "4.0.11"
     javascript-natural-sort "0.7.1"
     seed-random "2.2.0"
     tiny-emitter "2.0.2"
-    typed-function "0.10.6"
+    typed-function "1.1.0"
 
 merge-source-map@1.0.4:
   version "1.0.4"
@@ -2341,10 +2347,10 @@ type-check@~0.3.2:
   dependencies:
     prelude-ls "~1.1.2"
 
-typed-function@0.10.6:
-  version "0.10.6"
-  resolved "https://registry.yarnpkg.com/typed-function/-/typed-function-0.10.6.tgz#314aa0ea72bd586de5920095559683e20b01688b"
-  integrity sha512-PYtsDjxyW3vq7Itn2RMz0cn6CrbybIY6XC2i9c1q1o/H94QW8B1Pf3wSsbBDOCMpN1i5jDRrlDsLXFaqXBpfHQ==
+typed-function@1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/typed-function/-/typed-function-1.1.0.tgz#ea149706e0fb42aca1791c053a6d94ccd6c4fdcb"
+  integrity sha512-TuQzwiT4DDg19beHam3E66oRXhyqlyfgjHB/5fcvsRXbfmWPJfto9B4a0TBdTrQAPGlGmXh/k7iUI+WsObgORA==
 
 typedarray@^0.0.6, typedarray@~0.0.5:
   version "0.0.6"
