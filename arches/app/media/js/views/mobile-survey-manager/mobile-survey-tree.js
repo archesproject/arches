@@ -43,7 +43,7 @@ define([
                 nodes = this.items
             }
             nodes.forEach(function(node){
-                ko.unwrap(node.name) === ko.unwrap(selectednode.name) ? node.selected(true) : node.selected(false);
+                ko.unwrap(node.id) === ko.unwrap(selectednode.id) ? node.selected(true) : node.selected(false);
                 nodes = node.childNodes();
                 if (nodes.length > 0) {
                     self.selectItem(selectednode, nodes);
@@ -54,14 +54,14 @@ define([
         isChildSelected: function(node){
             var isChildSelected = function(parent) {
                 var childSelected = false;
-                // if (!parent.istopnode) {
-                //     parent.childNodes().forEach(function(child) {
-                //         if (child && child.selected() || isChildSelected(child)) {
-                //             childSelected = true;
-                //         }
-                //     });
-                //     return childSelected;
-                // }
+                if (!parent.istopnode) {
+                    parent.childNodes().forEach(function(child) {
+                        if (child && child.selected() || isChildSelected(child)) {
+                            childSelected = true;
+                        }
+                    });
+                    return childSelected;
+                }
             };
 
             return ko.computed(function() {
