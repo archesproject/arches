@@ -5,10 +5,12 @@ define([
     'viewmodels/mobile-survey',
     'viewmodels/alert',
     'models/mobile-survey',
+    'views/mobile-survey-manager/mobile-survey-tree',
     'mobile-survey-manager-data',
     'arches',
-    'bindings/datepicker'
-], function(_, ko, BaseManagerView, MobileSurveyViewModel, AlertViewModel, MobileSurveyModel, data, arches) {
+    'bindings/datepicker',
+    'bindings/resizable-sidepanel',
+], function(_, ko, BaseManagerView, MobileSurveyViewModel, AlertViewModel, MobileSurveyModel, Tree, data, arches) {
 
     var viewModel = new MobileSurveyViewModel(data);
     viewModel.arches = arches;
@@ -17,13 +19,22 @@ define([
         var self = this;
         this.mobilesurvey.save(function(data) {
             if (data.responseJSON.success) {
-                console.log('saved!')
+                console.log('saved!');
             } else {
                 pageView.viewModel.alert(new AlertViewModel('ep-alert-red', data.responseJSON.title, data.responseJSON.message));
             }
             self.loading(false);
         });
     };
+
+    viewModel.tree = new Tree({
+        mobilesurvey: viewModel.mobilesurvey,
+        items: [{name: 'Map Extent'},
+            {name: 'Offline Maps'},
+            {name: 'Models'},
+            {name: 'Data'},
+            {name: 'People'}]
+    });
 
     viewModel.discardEdits = function() {
         this.resourceList.resetCards(this.mobilesurvey.get('source').cards);

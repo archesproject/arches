@@ -30,6 +30,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <div class="content-panel mobile-project-manager-editor">
     <div class="flex">
 
+
+    <!-- Left Panel -->
+    <div class="left-panel graph-designer" data-bind="resizableSidepanel:true">
+        <div class="" data-bind="with: tree">
+            {% include 'views/mobile-survey-manager/mobile-survey-tree.htm' %}
+        </div>
+    </div>
+
+
         <div style="width: 100%;">
 
         <div id="" class="card-form-preview-container library-container">
