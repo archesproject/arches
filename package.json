@@ -53,7 +53,7 @@
         "proj4": "^2.3.15",
         "requirejs": "~2.3.2",
         "requirejs-plugins": "1.0.2",
-        "requirejs-text": "2.0.12",
+        "requirejs-text": "2.0.15",
         "select2": "3.5.1",
         "underscore": "1.9.1",
         "uuidjs": "^3.3.0"

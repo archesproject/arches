@@ -2051,10 +2051,10 @@ requirejs-plugins@1.0.2:
   resolved "https://registry.yarnpkg.com/requirejs-plugins/-/requirejs-plugins-1.0.2.tgz#693b5589d97f8598462fc71826353262aafda836"
   integrity sha1-aTtVidl/hZhGL8cYJjUyYqr9qDY=
 
-requirejs-text@2.0.12:
-  version "2.0.12"
-  resolved "https://registry.yarnpkg.com/requirejs-text/-/requirejs-text-2.0.12.tgz#d7915d50e30ef355a53a8123f12a5e760a601eb8"
-  integrity sha1-15FdUOMO81WlOoEj8SpedgpgHrg=
+requirejs-text@2.0.15:
+  version "2.0.15"
+  resolved "https://registry.yarnpkg.com/requirejs-text/-/requirejs-text-2.0.15.tgz#13138733613fc4457b7e1247e8cb751df7aa5429"
+  integrity sha1-ExOHM2E/xEV7fhJH6Mt1HfeqVCk=
 
 requirejs@~2.3.2:
   version "2.3.5"
