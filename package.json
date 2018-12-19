@@ -13,7 +13,7 @@
         "bootstrap": "3.3.2",
         "bootstrap-colorpicker": "^2.3.6",
         "chosen-js": "1.8.2",
-        "ckeditor": "~4.6.2",
+        "ckeditor": "~4.11.1",
         "codemirror": "^5.24.0",
         "core-js": "^2.5.7",
         "d3": "3.5.17",
