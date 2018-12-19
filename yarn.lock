@@ -1422,10 +1422,10 @@ fast-levenshtein@~2.0.4:
   resolved "https://registry.yarnpkg.com/fast-levenshtein/-/fast-levenshtein-2.0.6.tgz#3d8a5c66883a16a30ca8643e851f19baa7797917"
   integrity sha1-PYpcZog6FqMMqGQ+hR8Zuqd5eRc=
 
-flexslider@~2.6.3:
-  version "2.6.4"
-  resolved "https://registry.yarnpkg.com/flexslider/-/flexslider-2.6.4.tgz#d81fb58b342f9e3e8f497ee8198a35ab8777d9e0"
-  integrity sha1-2B+1izQvnj6PSX7oGYo1q4d32eA=
+flexslider@~2.7.1:
+  version "2.7.1"
+  resolved "https://registry.yarnpkg.com/flexslider/-/flexslider-2.7.1.tgz#6752b0b31c90cde9207ee6406aea70ad299c3ac3"
+  integrity sha512-UkFiHHDjYEkP9yH5KrfEBl+Zhb6enQorY2pL/5dC+Njh7ua3K0IxGTLRuaV99E+o3LLNnNJXpX4gbUzo/4v/YQ==
   dependencies:
     jquery ">=1.11.3"
 
