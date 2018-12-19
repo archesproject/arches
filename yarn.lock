@@ -1060,10 +1060,10 @@ bit-twiddle@^1.0.0:
   resolved "https://registry.yarnpkg.com/bit-twiddle/-/bit-twiddle-1.0.2.tgz#0c6c1fabe2b23d17173d9a61b7b7093eb9e1769e"
   integrity sha1-DGwfq+KyPRcXPZpht7cJPrnhdp4=
 
-blueimp-gallery@2.15.2:
-  version "2.15.2"
-  resolved "https://registry.yarnpkg.com/blueimp-gallery/-/blueimp-gallery-2.15.2.tgz#9a02c1d0ba450b0e8ba70d804f745d9ec9e66004"
-  integrity sha1-mgLB0LpFCw6Lpw2AT3RdnsnmYAQ=
+blueimp-gallery@2.33.0:
+  version "2.33.0"
+  resolved "https://registry.yarnpkg.com/blueimp-gallery/-/blueimp-gallery-2.33.0.tgz#f897912a1bbf65be904454d5990be6155799dd45"
+  integrity sha512-gz++nODmcJkENLXizdazy4z4EqoJCXyOisrH6M/fR3JE507yO+tPgoEsRCBggGwMAmQsu6kWACfldlq7RIa+Lg==
 
 bootstrap-colorpicker@^2.3.6:
   version "2.5.2"
