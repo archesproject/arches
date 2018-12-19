@@ -1628,10 +1628,10 @@ javascript-natural-sort@0.7.1:
   resolved "https://registry.yarnpkg.com/javascript-natural-sort/-/javascript-natural-sort-0.7.1.tgz#f9e2303d4507f6d74355a73664d1440fb5a0ef59"
   integrity sha1-+eIwPUUH9tdDVac2ZNFED7Wg71k=
 
-jqtree@1.3.4:
-  version "1.3.4"
-  resolved "https://registry.yarnpkg.com/jqtree/-/jqtree-1.3.4.tgz#dd56ef3bc96d1098115392d41ef1b1f5aec47469"
-  integrity sha1-3VbvO8ltEJgRU5LUHvGx9a7EdGk=
+jqtree@1.4.9:
+  version "1.4.9"
+  resolved "https://registry.yarnpkg.com/jqtree/-/jqtree-1.4.9.tgz#cc05f5d26867aa575691afb91d7a295513247aad"
+  integrity sha512-XPy3hvpZBxtoL3o74+5pm6SjL+EXZ6lOESH2UgPIn3pbFMFlHKMYW/s+PesvvJ01pBM/Vb3kwWfQ7eRBVUcR2Q==
   dependencies:
     jquery ">=1.9"
 
