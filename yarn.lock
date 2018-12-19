@@ -1815,10 +1815,10 @@ merge-source-map@1.0.4:
   dependencies:
     source-map "^0.5.6"
 
-metismenu@^2.7.2:
-  version "2.7.2"
-  resolved "https://registry.yarnpkg.com/metismenu/-/metismenu-2.7.2.tgz#82495746b0591aaa10aeef3c149c59c3ca02d219"
-  integrity sha512-r36yxQJazMlDbmIQseVuVNUUKTC4vHHqTT4btocvMP8YRDP/kaJfT02L6Q4RMVfn17w8aRVDr44H7fC5uhNzTA==
+metismenu@^3.0.3:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/metismenu/-/metismenu-3.0.3.tgz#961e4c9469144d5078f6228b6e049e58f3137140"
+  integrity sha512-nd3+yxSivGG0a5JZJxzlbXQv9aovf1yLjIYfa/s49PrvgTLlJsoe90kw9RbA6RPbPatJxENX0CegX4Hlbfaw8w==
 
 mgrs@1.0.0:
   version "1.0.0"
