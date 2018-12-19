@@ -31,27 +31,31 @@ define([
         mobilesurvey: viewModel.mobilesurvey,
         items: [{
             name: viewModel.mobilesurvey.name,
-            selected: true,
+            selected: ko.observable(true),
             istopnode: true,
             expanded: ko.observable(true),
             childNodes: ko.observableArray([{
                 name: 'Map Extent',
-                selected: false,
+                selected: ko.observable(false),
+                istopnode: false,
                 childNodes: ko.observableArray([]),
                 expanded: ko.observable(false)
             },
             {
                 name: 'Offline Maps',
-                selected: false,
+                selected: ko.observable(false),
+                istopnode: false,
                 childNodes: ko.observableArray([]),
                 expanded: ko.observable(false)
             },
             {
                 name: 'Models',
-                selected: false,
+                selected: ko.observable(false),
+                istopnode: false,
                 childNodes: ko.observableArray([{
                     name: 'Model 1',
-                    selected: false,
+                    selected: ko.observable(false),
+                    istopnode: false,
                     childNodes: ko.observableArray([]),
                     expanded: ko.observable(false)
                 },]),
@@ -59,13 +63,15 @@ define([
             },
             {
                 name: 'Data',
-                selected: false,
+                selected: ko.observable(false),
+                istopnode: false,
                 childNodes: ko.observableArray([]),
                 expanded: ko.observable(false)
             },
             {
                 name: 'People',
-                selected: false,
+                selected: ko.observable(false),
+                istopnode: false,
                 childNodes: ko.observableArray([]),
                 expanded: ko.observable(false)
             }

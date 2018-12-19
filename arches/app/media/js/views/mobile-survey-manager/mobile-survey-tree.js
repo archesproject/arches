@@ -34,15 +34,26 @@ define([
             }
             TreeView.prototype._initializeItem.apply(this, arguments);
         },
-        selectItem: function(node){
-            console.log('selecting node', node);
-            this.trigger('node-selected', node);
+        selectItem: function(selectednode, childnodes){
+            var self = this;
+            var nodes;
+            if (childnodes.length) {
+                nodes = childnodes;
+            } else {
+                nodes = this.items
+            }
+            nodes.forEach(function(node){
+                ko.unwrap(node.name) === ko.unwrap(selectednode.name) ? node.selected(true) : node.selected(false);
+                nodes = node.childNodes();
+                if (nodes.length > 0) {
+                    self.selectItem(selectednode, nodes);
+                }
+            });
+            return;
         },
         isChildSelected: function(node){
-            console.log(node);
             var isChildSelected = function(parent) {
                 var childSelected = false;
-                console.log(parent);
                 // if (!parent.istopnode) {
                 //     parent.childNodes().forEach(function(child) {
                 //         if (child && child.selected() || isChildSelected(child)) {
