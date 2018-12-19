@@ -29,7 +29,8 @@ define([
 
     viewModel.tree = new Tree({
         mobilesurvey: viewModel.mobilesurvey,
-        items: [{name: 'Map Extent'},
+        items: [{name: viewModel.mobilesurvey.name, selected: true},
+            {name: 'Map Extent'},
             {name: 'Offline Maps'},
             {name: 'Models'},
             {name: 'Data'},

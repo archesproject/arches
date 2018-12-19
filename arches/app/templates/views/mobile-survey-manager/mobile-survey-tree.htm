@@ -14,7 +14,7 @@
             <a class="tree-display-tool" data-bind="click: collapseAll"><i class="ion-minus"></i>{% trans ' Collapse' %}</a>
         </div>
     </div>
-    <div class="left-panel-overflow graph-designer-node-tree">
+    <div class="left-panel-overflow mobile-designer-tree">
         <!-- <div data-bind="sortable: $data"> -->
         <ul class="jstree-container-ul jstree-children" aria-expanded="true">
             <div class="" data-bind="template: {
@@ -29,7 +29,7 @@
 <!-- /ko -->
 
 <template id="mobile-survey-tree">
-    <li role="treeitem" class="jstree-node" data-bind="container: '.graph-designer-node-tree'">
+    <li role="treeitem" class="jstree-node jstree-closed" data-bind="container: '.mobile-designer-tree'">
         <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){node.expanded(!node.expanded())}"></i>
         <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: tree.selectItem.bind(tree), css:{'jstree-clicked': node.selected, 'child-selected': tree.isChildSelected(node), 'filtered': tree.filter().length > 0 && !node.filtered()}">
             <div data-bind="text: node.name"></div>
