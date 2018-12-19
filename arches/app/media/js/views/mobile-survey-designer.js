@@ -29,14 +29,49 @@ define([
 
     viewModel.tree = new Tree({
         mobilesurvey: viewModel.mobilesurvey,
-        items: [{name: viewModel.mobilesurvey.name, selected: true},
-            {name: 'Map Extent'},
-            {name: 'Offline Maps'},
-            {name: 'Models'},
-            {name: 'Data'},
-            {name: 'People'}]
+        items: [{
+            name: viewModel.mobilesurvey.name,
+            selected: true,
+            istopnode: true,
+            expanded: ko.observable(true),
+            childNodes: ko.observableArray([{
+                name: 'Map Extent',
+                selected: false,
+                childNodes: ko.observableArray([]),
+                expanded: ko.observable(false)
+            },
+            {
+                name: 'Offline Maps',
+                selected: false,
+                childNodes: ko.observableArray([]),
+                expanded: ko.observable(false)
+            },
+            {
+                name: 'Models',
+                selected: false,
+                childNodes: ko.observableArray([{
+                    name: 'Model 1',
+                    selected: false,
+                    childNodes: ko.observableArray([]),
+                    expanded: ko.observable(false)
+                },]),
+                expanded: ko.observable(false)
+            },
+            {
+                name: 'Data',
+                selected: false,
+                childNodes: ko.observableArray([]),
+                expanded: ko.observable(false)
+            },
+            {
+                name: 'People',
+                selected: false,
+                childNodes: ko.observableArray([]),
+                expanded: ko.observable(false)
+            }
+            ])
+        }]
     });
-
     viewModel.discardEdits = function() {
         this.resourceList.resetCards(this.mobilesurvey.get('source').cards);
         this.mobilesurvey.reset();

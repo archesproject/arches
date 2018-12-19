@@ -28,24 +28,36 @@ define([
             this.mobilesurvey = options.mobilesurvey;
             this.items = options.items;
         },
-        selectItem: function(node){
-            // if (!this.graphSettings.dirty()) {
-            //     this.graphModel.selectNode(node);
-            //     this.trigger('node-selected', node);
-            // }
+        _initializeItem: function(item){
+            if (!item.expanded) {
+                item.expanded = ko.observable(item.istopnode);
+            }
+            TreeView.prototype._initializeItem.apply(this, arguments);
         },
-        isChildSelected: function(node) {
+        selectItem: function(node){
+            console.log('selecting node', node);
+            this.trigger('node-selected', node);
+        },
+        isChildSelected: function(node){
+            console.log(node);
             var isChildSelected = function(parent) {
                 var childSelected = false;
-                if (!parent.istopnode) {
-                    return childSelected;
-                }
+                console.log(parent);
+                // if (!parent.istopnode) {
+                //     parent.childNodes().forEach(function(child) {
+                //         if (child && child.selected() || isChildSelected(child)) {
+                //             childSelected = true;
+                //         }
+                //     });
+                //     return childSelected;
+                // }
             };
 
             return ko.computed(function() {
                 return isChildSelected(node);
             }, this);
         }
+
     });
     return tree;
 });
