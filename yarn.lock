@@ -1662,10 +1662,10 @@ jqueryui@1.11.1:
   resolved "https://registry.yarnpkg.com/jqueryui/-/jqueryui-1.11.1.tgz#8718550705f5568d1199196169094db73b2291bc"
   integrity sha1-hxhVBwX1Vo0RmRlhaQlNtzsikbw=
 
-js-cookie@2.1.1:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/js-cookie/-/js-cookie-2.1.1.tgz#26ada7902e91fe7f8bb01b4831912c724739f381"
-  integrity sha1-Jq2nkC6R/n+LsBtIMZEsckc584E=
+js-cookie@2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/js-cookie/-/js-cookie-2.2.0.tgz#1b2c279a6eece380a12168b92485265b35b1effb"
+  integrity sha1-Gywnmm7s44ChIWi5JIUmWzWx7/s=
 
 jsonlint-lines@1.7.1:
   version "1.7.1"
