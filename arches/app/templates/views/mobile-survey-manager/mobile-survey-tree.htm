@@ -29,7 +29,7 @@
 <!-- /ko -->
 
 <template id="mobile-survey-tree">
-    <li role="treeitem" data-toggle="tab" href="#project-summary-card" class="jstree-node jstree-open" data-bind="css: {'jstree-open': (node.childNodes().length > 0 && node.expanded), 'jstree-closed' : (node.childNodes().length > 0 && !node.expanded()), 'jstree-leaf': node.childNodes().length === 0}, container: '.mobile-survey-tree'">
+    <li role="treeitem" class="jstree-node jstree-open" data-bind="css: {'jstree-open': (node.childNodes().length > 0 && node.expanded), 'jstree-closed' : (node.childNodes().length > 0 && !node.expanded()), 'jstree-leaf': node.childNodes().length === 0}, container: '.mobile-survey-tree'">
         <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){node.expanded(!node.expanded())}"></i>
         <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: tree.selectItem.bind(tree), css:{'jstree-clicked': node.selected, 'child-selected': tree.isChildSelected(node), 'filtered': tree.filter().length > 0 && !node.filtered()}">
             <div data-bind="text: node.name"></div>

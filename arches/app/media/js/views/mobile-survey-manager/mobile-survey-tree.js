@@ -27,6 +27,7 @@ define([
         initialize: function(options) {
             this.mobilesurvey = options.mobilesurvey;
             this.items = options.items;
+            this.activepage = options.activepage;
         },
         _initializeItem: function(item){
             if (!item.expanded) {
@@ -40,10 +41,13 @@ define([
             if (childnodes.length) {
                 nodes = childnodes;
             } else {
-                nodes = this.items
+                nodes = this.items;
             }
             nodes.forEach(function(node){
                 ko.unwrap(node.id) === ko.unwrap(selectednode.id) ? node.selected(true) : node.selected(false);
+                if (node.selected() === true) {
+                    self.activepage(node.pageid || node.id);
+                }
                 nodes = node.childNodes();
                 if (nodes.length > 0) {
                     self.selectItem(selectednode, nodes);

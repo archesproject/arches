@@ -26,20 +26,23 @@ define([
             self.loading(false);
         });
     };
-
+    viewModel.activePage = ko.observable('root');
     viewModel.tree = new Tree({
+        activepage: viewModel.activePage,
         mobilesurvey: viewModel.mobilesurvey,
         items: [{
             name: viewModel.mobilesurvey.name,
             id: 'root',
             selected: ko.observable(true),
             istopnode: true,
+            pageactive: ko.observable(true),
             expanded: ko.observable(true),
             childNodes: ko.observableArray([{
                 name: 'Map Extent',
                 id: 'mapextent',
                 selected: ko.observable(false),
                 istopnode: false,
+                pageactive: ko.observable(false),
                 childNodes: ko.observableArray([]),
                 expanded: ko.observable(false)
             },
@@ -48,6 +51,7 @@ define([
                 id: 'mapsources',
                 selected: ko.observable(false),
                 istopnode: false,
+                pageactive: ko.observable(false),
                 childNodes: ko.observableArray([]),
                 expanded: ko.observable(false)
             },
@@ -56,9 +60,11 @@ define([
                 id: 'models',
                 selected: ko.observable(false),
                 istopnode: false,
+                pageactive: ko.observable(false),
                 childNodes: ko.observableArray([{
                     name: 'Model 1',
                     id: 'model1',
+                    pageid: 'models',
                     selected: ko.observable(false),
                     istopnode: false,
                     childNodes: ko.observableArray([]),
@@ -71,6 +77,7 @@ define([
                 id: 'data',
                 selected: ko.observable(false),
                 istopnode: false,
+                pageactive: ko.observable(false),
                 childNodes: ko.observableArray([]),
                 expanded: ko.observable(false)
             },
@@ -79,12 +86,14 @@ define([
                 id: 'people',
                 selected: ko.observable(false),
                 istopnode: false,
+                pageactive: ko.observable(false),
                 childNodes: ko.observableArray([]),
                 expanded: ko.observable(false)
             }
             ])
         }]
     });
+
     viewModel.discardEdits = function() {
         this.resourceList.resetCards(this.mobilesurvey.get('source').cards);
         this.mobilesurvey.reset();

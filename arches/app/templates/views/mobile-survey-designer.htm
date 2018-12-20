@@ -86,45 +86,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <div id="card-preview-crud" class="panel-body card-body fade in" style="padding: 0px; margin: 0px;">
                                 <div id="cards" class="tab-base card-content-container outline" style="margin: 0px; margin-top: 0px;">
 
-                                    <!--Nav Tabs-->
-                                    <ul class="nav nav-tabs card-nav-container" style="">
-                                        <li id="summary-group" class="active">
-                                            <a id="summary-tab" data-toggle="tab" href="#summary-card" class="card-tab-title" aria-expanded="true">
-                                                                {% trans 'Basic Settings' %}
-                                                            </a>
-                                        </li>
-                                        <li id="card-group" class="">
-                                            <a id="map-tab" data-toggle="tab" href="#location-card" class="card-tab-title" aria-expanded="false" data-bind="click: resizeMap">
-                                                                {% trans 'Location' %}
-                                                            </a>
-                                        </li>
-                                        <li id="icon-group" class="">
-                                            <a id="map-tab" data-toggle="tab" href="#models-card" class="card-tab-title" aria-expanded="false">
-                                                                {% trans 'Resources' %}
-                                                            </a>
-                                        </li>
-                                        <li id="icon-group" class="">
-                                            <a id="map-tab" data-toggle="tab" href="#data-card" class="card-tab-title" aria-expanded="false">
-                                                                {% trans 'Data' %}
-                                                            </a>
-                                        </li>
-                                        <li id="status-group" class="">
-                                            <a id="map-tab" data-toggle="tab" href="#identities-card" class="card-tab-title" aria-expanded="false">
-                                                                {% trans 'People' %}
-                                                            </a>
-                                        </li>
-                                        <li id="activation-group" class="">
-                                            <a id="project-summary-tab" data-toggle="tab" href="#project-summary-card" class="card-tab-title" aria-expanded="false">
-                                                                {% trans 'Activate Survey' %}
-                                                            </a>
-                                        </li>
-                                    </ul>
-
                                     <!--Tabs Content-->
                                     <div class="tab-content card-content-tab" style="margin-left: 0px;">
 
                                         <!-- Summary Card -->
-                                        <div id="summary-card" class="mpm-card tab-pane fade active in" style="">
+                                        <!--ko if: activePage() === 'root'-->
+                                        <div id="summary-card" class="mpm-card" style="">
                                             <div class="mpm-card-content">
                                                 <div class="panel-body card-panel-body project-card-body">
                                                     <div id="" class="card-content">
@@ -203,9 +170,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </div>
                                             </div>
                                         </div>
-
+                                        <!--/ko-->
                                         <!-- Map Card -->
-                                        <div id="location-card" class="mpm-card tab-pane fade msm-location-card ">
+                                        <!--ko if: activePage() === 'mapextent'-->
+                                        <div id="location-card" class="mpm-card msm-location-card ">
                                             <div class="msm-map-container">
                                                 <div class="col-sm-12 msm-basemap-location">
                                                     <div class="form-group" style="margin-bottom: 10px;">
@@ -255,9 +223,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </div>
                                             </div>
                                         </div>
+                                        <!--/ko-->
 
                                         <!-- Models Card -->
-                                        <div id="models-card" class="identities-list tab-pane fade">
+                                        <!--ko if: activePage() === 'models'-->
+                                        <div id="models-card" class="identities-list">
                                             <div class="mpm-card-content">
                                                 <div>
                                                     <div class="flex relative">
@@ -368,10 +338,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </div>
                                             </div>
                                         </div>
+                                        <!--/ko-->
                                         <!-- End Models Card -->
 
                                         <!-- Data Card -->
-                                        <div id="data-card" class="mpm-card tab-pane fade">
+                                        <!--ko if: activePage() === 'data'-->
+                                        <div id="data-card" class="mpm-card">
                                             <div class="mpm-card-content">
                                                 <div class="panel-body card-panel-body project-card-body">
                                                     <div class="card-content">
@@ -444,11 +416,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </div>
                                             </div>
                                         </div>
-                                        <!-- End Data Card -->
+                                        <!--/ko-->
+
 
 
                                         <!-- Summary Card -->
-                                        <div id="project-summary-card" class="mpm-card tab-pane fade">
+                                        <!--ko if: activePage() === 'summary'-->
+                                        <div id="project-summary-card" class="mpm-card">
                                             <div class="panel-body card-panel-body" style="">
                                                 <div id="" class="card-content" style="">
 
@@ -562,11 +536,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </div>
                                             </div>
                                         </div>
+                                        <!--/ko-->
                                         <!-- End Summary Card -->
 
 
                                         <!-- Groups/Users Card -->
-                                        <div id="identities-card" class="identities-list tab-pane fade">
+                                        <!--ko if: activePage() === 'people'-->
+                                        <div id="identities-card" class="identities-list">
                                             <div class="mpm-card-content">
                                                 <div>
                                                     <div class="flex relative">
@@ -833,6 +809,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </div>
                                             </div>
                                         </div>
+                                        <!--/ko-->
                                         <!-- End Groups/Users Card -->
 
                                     </div>
