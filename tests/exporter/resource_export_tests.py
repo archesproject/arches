@@ -119,6 +119,7 @@ class BusinessDataExportTests(ArchesTestCase):
 
         self.assertDictEqual(json_export, json_truth)
 
+
 class RDFExportTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
@@ -225,7 +226,7 @@ class RDFExportTests(ArchesTestCase):
                 (edge_info['d_uri'], edge.ontologyproperty, Literal("Not Domain Text")) in graph
             )
 
-    def test_concept(self):
+    def test_rdf_concept(self):
         dt = self.DT.get_instance("concept")
         # d75977c1-635b-41d5-b53d-1c82d2237b67 should be the ConceptValue for "junk sculpture"
         # Main concept should be 0ad97528-0fb0-43bf-afee-0fb9dde78b99
@@ -240,7 +241,7 @@ class RDFExportTests(ArchesTestCase):
             (URIRef("http://vocab.getty.edu/aat/300047196"), RDFS.label, Literal("junk sculpture", lang="en")) in graph
         )
 
-    def test_concept_list(self):
+    def test_rdf_concept_list(self):
         dt = self.DT.get_instance("concept-list")
         concept_list = [
             "d75977c1-635b-41d5-b53d-1c82d2237b67", # junk sculpture@en, has aat identifier
@@ -263,6 +264,81 @@ class RDFExportTests(ArchesTestCase):
             (ARCHES_NS["concepts/037daf4d-054a-44d2-9c0a-108b59e39109"], RDFS.label, 
                 Literal("example document type", lang="en-us")) in graph
         )
+
+    def test_jsonld_string(self):
+        dt = self.DT.get_instance("string")
+        # expected fragment, based on conversations about the from_rdf method
+        jf = [{"@value": "test string"}]
+        resp = dt.from_rdf(jf)
+        self.assertTrue(isinstance(resp, basestring))
+        self.assertTrue(resp == "test string")
+
+    def test_jsonld_number(self):
+        dt = self.DT.get_instance("number")
+        # expected fragment, based on conversations about the from_rdf method
+        jf = [{"@value": 42.3}]
+        resp = dt.from_rdf(jf)
+        self.assertTrue(resp == 42.3)
+
+    def test_jsonld_bool(self):
+        dt = self.DT.get_instance("boolean")
+        # expected fragment, based on conversations about the from_rdf method
+        jf = [{"@value": True}]
+        resp = dt.from_rdf(jf)
+        self.assertTrue(isinstance(resp, bool))
+        self.assertTrue(resp)
+
+    def test_jsonld_date(self):
+        dt = self.DT.get_instance("date")
+        # expected fragment, based on conversations about the from_rdf method
+        jf = [{
+                "@value": "2018-12-18",
+                "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+              }]
+        resp = dt.from_rdf(jf)
+        self.assertTrue(resp == "2018-12-18")
+
+    def test_jsonld_concept_internal(self):
+        dt = self.DT.get_instance("concept")
+        # from the thesaurus that should be loaded into Arches,
+        # the following concept value should have a key of 4beb7055-8a6e-45a3-9bfb-32984b6f82e0
+        jf = [
+              {
+                "@id": "http://localhost:8000/concepts/037daf4d-054a-44d2-9c0a-108b59e39109",
+                "http://www.w3.org/2000/01/rdf-schema#label": [
+                  {
+                    "@language": "en-us",
+                    "@value": "example document type"
+                  }
+                ],
+                "@type": [
+                  "http://www.cidoc-crm.org/cidoc-crm/E55_Type"
+                ]
+              }
+            ]
+        resp = dt.from_rdf(jf)
+        print(resp)
+        self.assertTrue(resp == "4beb7055-8a6e-45a3-9bfb-32984b6f82e0")
+
+    def test_jsonld_concept_external(self):
+        dt = self.DT.get_instance("concept")
+        jf = [
+              {
+                "@id": "http://vocab.getty.edu/aat/300047196",
+                "http://www.w3.org/2000/01/rdf-schema#label": [
+                  {
+                    "@language": "en",
+                    "@value": "junk sculpture"
+                  }
+                ],
+                "@type": [
+                  "http://www.cidoc-crm.org/cidoc-crm/E55_Type"
+                ]
+              }
+            ]
+        resp = dt.from_rdf(jf)
+        self.assertTrue(resp == "d75977c1-635b-41d5-b53d-1c82d2237b67")
+
 
 def append_domain_config_to_node(node):
     node.config = {
