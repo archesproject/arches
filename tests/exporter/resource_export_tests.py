@@ -317,7 +317,6 @@ class RDFExportTests(ArchesTestCase):
               }
             ]
         resp = dt.from_rdf(jf)
-        print(resp)
         self.assertTrue(resp == "4beb7055-8a6e-45a3-9bfb-32984b6f82e0")
 
     def test_jsonld_concept_external(self):
