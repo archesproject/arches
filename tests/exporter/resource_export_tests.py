@@ -47,24 +47,7 @@ CIDOC_NS = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
 class BusinessDataExportTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
-        ResourceInstance.objects.all().delete()
-
-        for skospath in ['tests/fixtures/data/rdf_export_thesaurus.xml',
-                         'tests/fixtures/data/rdf_export_collections.xml']:
-            skos = SKOSReader()
-            rdf = skos.read_file(skospath)
-            ret = skos.save_concepts_from_skos(rdf)
-
-        # Models
-        for model_name in ['object_model', 'document_model']:
-            with open(os.path.join(
-                    'tests/fixtures/resource_graphs/rdf_export_{0}.json'.format(model_name)), 'rU') as f:
-                archesfile = JSONDeserializer().deserialize(f)
-            ResourceGraphImporter(archesfile['graph'])
-        # Fixture Instance Data for tests
-        #for instance_name in ['document', 'object']:
-        #    BusinessDataImporter(
-        #            'tests/fixtures/data/rdf_export_{0}.json'.format(instance_name)).import_business_data()
+        pass
 
     def setUp(self):
         skos = SKOSReader()
@@ -78,9 +61,6 @@ class BusinessDataExportTests(ArchesTestCase):
         with open(os.path.join('tests/fixtures/resource_graphs/resource_export_test.json'), 'rU') as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile['graph'])
-
-        # for RDF/JSON-LD export tests
-        self.DT = DataTypeFactory()
 
     @classmethod
     def tearDownClass(cls):
@@ -139,6 +119,36 @@ class BusinessDataExportTests(ArchesTestCase):
 
         self.assertDictEqual(json_export, json_truth)
 
+class RDFExportTests(ArchesTestCase):
+    @classmethod
+    def setUpClass(cls):
+        ResourceInstance.objects.all().delete()
+
+        for skospath in ['tests/fixtures/data/rdf_export_thesaurus.xml',
+                         'tests/fixtures/data/rdf_export_collections.xml']:
+            skos = SKOSReader()
+            rdf = skos.read_file(skospath)
+            ret = skos.save_concepts_from_skos(rdf)
+
+        # Models
+        for model_name in ['object_model', 'document_model']:
+            with open(os.path.join(
+                    'tests/fixtures/resource_graphs/rdf_export_{0}.json'.format(model_name)), 'rU') as f:
+                archesfile = JSONDeserializer().deserialize(f)
+            ResourceGraphImporter(archesfile['graph'])
+        # Fixture Instance Data for tests
+        #for instance_name in ['document', 'object']:
+        #    BusinessDataImporter(
+        #            'tests/fixtures/data/rdf_export_{0}.json'.format(instance_name)).import_business_data()
+
+    def setUp(self):
+        # for RDF/JSON-LD export tests
+        self.DT = DataTypeFactory()
+
+    @classmethod
+    def tearDownClass(cls):
+        pass
+
     # test_rdf_* - * = datatype (rdf fragment) or full graph
     # test_jsonld_* -> focus on jsonld correct framing and export
 
@@ -176,6 +186,80 @@ class BusinessDataExportTests(ArchesTestCase):
         graph = dt.to_rdf(edge_info, edge)
         self.assertTrue((edge_info['d_uri'], edge.ontologyproperty, edge_info['r_uri']) in graph)
 
+    def test_rdf_resource_list(self):
+        dt = self.DT.get_instance("resource-instance-list")
+        res_inst_list = [2,3,4,5]
+        edge_info, edge = mock_edge(1, CIDOC_NS['some_value'],None,'', res_inst_list)
+        graph = dt.to_rdf(edge_info, edge)
+        for res_inst in res_inst_list:
+            self.assertTrue(
+                (edge_info['d_uri'], edge.ontologyproperty, ARCHES_NS['resources/{0}'.format(res_inst)]) in graph
+                )
+
+    def test_rdf_domain(self):
+        dt = self.DT.get_instance("domain-value")
+        edge_info, edge = mock_edge(1, CIDOC_NS['some_value'],None,'', "3f0aaf74-f7d9-44ae-82cf-196c76d8cbc3")
+        # will have to further mock the range node for domain
+        append_domain_config_to_node(edge.rangenode)
+        graph = dt.to_rdf(edge_info, edge)
+        self.assertTrue((edge_info['d_uri'], edge.ontologyproperty, Literal("one")) in graph)
+
+    def test_rdf_domain_list(self):
+        dt = self.DT.get_instance("domain-value-list")
+        dom_list = [
+            "3f0aaf74-f7d9-44ae-82cf-196c76d8cbc3",
+            "11755d2b-36ee-4de7-8639-6914925a1f86",
+            "ebd99837-c7d9-4be0-b5f5-87f387ae0661"
+        ]
+        dom_text = ["one", "four", "six"]
+
+        edge_info, edge = mock_edge(1, CIDOC_NS['some_value'],None,'', dom_list)
+        # will have to further mock the range node for domain
+        append_domain_config_to_node(edge.rangenode)
+        graph = dt.to_rdf(edge_info, edge)
+        print(graph.serialize(format="nt"))
+        for item in dom_text:
+            self.assertTrue(
+                (edge_info['d_uri'], edge.ontologyproperty, Literal(item)) in graph
+                )
+        self.assertFalse(
+                (edge_info['d_uri'], edge.ontologyproperty, Literal("Not Domain Text")) in graph
+            )
+
+def append_domain_config_to_node(node):
+    node.config = {
+            "options": [{
+                            "id": "3f0aaf74-f7d9-44ae-82cf-196c76d8cbc3", 
+                            "selected": False, 
+                            "text": "one"
+                        }, 
+                        {
+                            "id": "eccaa586-284b-4f98-b4db-bdf8bdc9efcb", 
+                            "selected": False, 
+                            "text": "two"
+                        }, 
+                        {
+                            "id": "ac843999-864a-4d43-9bb9-aa3197958c7a", 
+                            "selected": False, 
+                            "text": "three"
+                        }, 
+                        {
+                            "id": "11755d2b-36ee-4de7-8639-6914925a1f86", 
+                            "selected": False, 
+                            "text": "four"
+                        }, 
+                        {
+                            "id": "848a65b7-51f6-47f2-8ced-4c5398e956d4", 
+                            "selected": False, 
+                            "text": "five"
+                        }, 
+                        {
+                            "id": "ebd99837-c7d9-4be0-b5f5-87f387ae0661", 
+                            "selected": False, 
+                            "text": "six"
+                        }
+                    ]
+                }
 
 def mock_edge(s_id, p_uri_str, o_id, domain_tile_data, range_tile_data,
               s_type_str=CIDOC_NS['E22_Man-Made_Object'], o_type_str=None):
