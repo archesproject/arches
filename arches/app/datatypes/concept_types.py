@@ -147,8 +147,8 @@ class ConceptDataType(BaseConceptDataType):
                 arches_uri = URIRef(archesproject['concepts/%s' % c.conceptid])
 
                 # get other identifiers:
-                ext_idents = [ident.value for ident in models.Value.objects.all().filter(concept_id__exact=c.conceptid,
-                                                                                  valuetype__category="identifiers")]
+                ext_idents = [ident.value for ident in models.Value.objects.all().filter(
+                        concept_id__exact=c.conceptid, valuetype__category="identifiers")]
             rangenode = get_rangenode(arches_uri, ext_idents)
 
             g.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))

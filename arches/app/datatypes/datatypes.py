@@ -224,8 +224,8 @@ class BooleanDataType(BaseDataType):
         # type and the number as a numeric literal (as this is how it is in the JSON)
         g = Graph()
         g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
-        g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), 
-                                          Literal(edge_info['range_tile_data'])))
+        g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty),
+               Literal(edge_info['range_tile_data'])))
         return g
 
     def from_rdf(self, json_ld_node):
@@ -1260,6 +1260,7 @@ class IIIFDrawingDataType(BaseDataType):
                     terms.append(string_item)
         return terms
 
+
 class BaseDomainDataType(BaseDataType):
     def get_option_text(self, node, option_id):
         for option in node.config['options']:
@@ -1346,7 +1347,7 @@ class DomainDataType(BaseDomainDataType):
         # via models.Node.objects.filter(config__options__contains=[{"text": value}])
         value = get_value_from_jsonld(json_ld_node)
         try:
-            return [{'id':v_id, 'n_id': node_id} for v_id, n_id in self.get_option_id_from_text(value[0])]
+            return [{'id': v_id, 'n_id': node_id} for v_id, n_id in self.get_option_id_from_text(value[0])]
         except (AttributeError, KeyError, TypeError) as e:
             print(e)
 
