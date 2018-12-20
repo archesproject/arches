@@ -11944,6 +11944,12 @@ a.jstree-anchor.permissions-widget {
     cursor: pointer;
 }
 
+.report-expander {
+    cursor: pointer;
+    padding-left: 6px;
+    font-weight:bold;
+    font-size: 18px;
+}
 
 @keyframes loader {
     0% {
