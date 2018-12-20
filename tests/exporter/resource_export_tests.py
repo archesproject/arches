@@ -40,9 +40,9 @@ from mock import Mock
 # these tests can be run from the command line via
 # python manage.py test tests/exporter/resource_export_tests.py --pattern="*.py" --settings="tests.test_settings"
 
-
 ARCHES_NS = Namespace(test_settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 CIDOC_NS = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
+
 
 class BusinessDataExportTests(ArchesTestCase):
     @classmethod
@@ -138,9 +138,9 @@ class RDFExportTests(ArchesTestCase):
                 archesfile = JSONDeserializer().deserialize(f)
             ResourceGraphImporter(archesfile['graph'])
         # Fixture Instance Data for tests
-        #for instance_name in ['document', 'object']:
-        #    BusinessDataImporter(
-        #            'tests/fixtures/data/rdf_export_{0}.json'.format(instance_name)).import_business_data()
+        # for instance_name in ['document', 'object']:
+        #     BusinessDataImporter(
+        #             'tests/fixtures/data/rdf_export_{0}.json'.format(instance_name)).import_business_data()
 
     def setUp(self):
         # for RDF/JSON-LD export tests
@@ -155,42 +155,42 @@ class RDFExportTests(ArchesTestCase):
 
     def test_rdf_string(self):
         dt = self.DT.get_instance("string")
-        edge_info, edge = mock_edge(1, CIDOC_NS['name'],None,'',"test string")
+        edge_info, edge = mock_edge(1, CIDOC_NS['name'], None, '', "test string")
         graph = dt.to_rdf(edge_info, edge)
         obj = Literal(edge_info['range_tile_data'])
         self.assertTrue((edge_info['d_uri'], edge.ontologyproperty, obj) in graph)
 
     def test_rdf_number(self):
         dt = self.DT.get_instance("number")
-        edge_info, edge = mock_edge(1, CIDOC_NS['some_value'],None,'',42)
+        edge_info, edge = mock_edge(1, CIDOC_NS['some_value'], None, '', 42)
         graph = dt.to_rdf(edge_info, edge)
         obj = Literal(edge_info['range_tile_data'])
         self.assertTrue((edge_info['d_uri'], edge.ontologyproperty, obj) in graph)
 
     def test_rdf_bool(self):
         dt = self.DT.get_instance("boolean")
-        edge_info, edge = mock_edge(1, CIDOC_NS['some_value'],None,'', True)
+        edge_info, edge = mock_edge(1, CIDOC_NS['some_value'], None, '', True)
         graph = dt.to_rdf(edge_info, edge)
         obj = Literal(edge_info['range_tile_data'])
         self.assertTrue((edge_info['d_uri'], edge.ontologyproperty, obj) in graph)
 
     def test_rdf_date(self):
         dt = self.DT.get_instance("date")
-        edge_info, edge = mock_edge(1, CIDOC_NS['some_value'],None,'', "2018-12-11")
+        edge_info, edge = mock_edge(1, CIDOC_NS['some_value'], None, '', "2018-12-11")
         graph = dt.to_rdf(edge_info, edge)
         obj = Literal(edge_info['range_tile_data'], datatype=XSD.dateTime)
         self.assertTrue((edge_info['d_uri'], edge.ontologyproperty, obj) in graph)
 
     def test_rdf_resource(self):
         dt = self.DT.get_instance("resource-instance")
-        edge_info, edge = mock_edge(1, CIDOC_NS['some_value'],None,'', 2)
+        edge_info, edge = mock_edge(1, CIDOC_NS['some_value'], None, '', 2)
         graph = dt.to_rdf(edge_info, edge)
         self.assertTrue((edge_info['d_uri'], edge.ontologyproperty, edge_info['r_uri']) in graph)
 
     def test_rdf_resource_list(self):
         dt = self.DT.get_instance("resource-instance-list")
-        res_inst_list = [2,3,4,5]
-        edge_info, edge = mock_edge(1, CIDOC_NS['some_value'],None,'', res_inst_list)
+        res_inst_list = [2, 3, 4, 5]
+        edge_info, edge = mock_edge(1, CIDOC_NS['some_value'], None, '', res_inst_list)
         graph = dt.to_rdf(edge_info, edge)
         for res_inst in res_inst_list:
             self.assertTrue(
@@ -199,7 +199,7 @@ class RDFExportTests(ArchesTestCase):
 
     def test_rdf_domain(self):
         dt = self.DT.get_instance("domain-value")
-        edge_info, edge = mock_edge(1, CIDOC_NS['some_value'],None,'', "3f0aaf74-f7d9-44ae-82cf-196c76d8cbc3")
+        edge_info, edge = mock_edge(1, CIDOC_NS['some_value'], None, '', "3f0aaf74-f7d9-44ae-82cf-196c76d8cbc3")
         # will have to further mock the range node for domain
         append_domain_config_to_node(edge.rangenode)
         graph = dt.to_rdf(edge_info, edge)
@@ -214,7 +214,7 @@ class RDFExportTests(ArchesTestCase):
         ]
         dom_text = ["one", "four", "six"]
 
-        edge_info, edge = mock_edge(1, CIDOC_NS['some_value'],None,'', dom_list)
+        edge_info, edge = mock_edge(1, CIDOC_NS['some_value'], None, '', dom_list)
         # will have to further mock the range node for domain
         append_domain_config_to_node(edge.rangenode)
         graph = dt.to_rdf(edge_info, edge)
@@ -231,7 +231,7 @@ class RDFExportTests(ArchesTestCase):
         # d75977c1-635b-41d5-b53d-1c82d2237b67 should be the ConceptValue for "junk sculpture"
         # Main concept should be 0ad97528-0fb0-43bf-afee-0fb9dde78b99
         # should also have an identifier of http://vocab.getty.edu/aat/300047196
-        edge_info, edge = mock_edge(1, CIDOC_NS['some_value'],None,'', "d75977c1-635b-41d5-b53d-1c82d2237b67",
+        edge_info, edge = mock_edge(1, CIDOC_NS['some_value'], None, '', "d75977c1-635b-41d5-b53d-1c82d2237b67",
                                     o_type_str=CIDOC_NS['E55_Type'])
         graph = dt.to_rdf(edge_info, edge)
         self.assertTrue(
@@ -244,10 +244,10 @@ class RDFExportTests(ArchesTestCase):
     def test_rdf_concept_list(self):
         dt = self.DT.get_instance("concept-list")
         concept_list = [
-            "d75977c1-635b-41d5-b53d-1c82d2237b67", # junk sculpture@en, has aat identifier
-            "4beb7055-8a6e-45a3-9bfb-32984b6f82e0", # "example document type"@en-us, no ext id}
+            "d75977c1-635b-41d5-b53d-1c82d2237b67",  # junk sculpture@en, has aat identifier
+            "4beb7055-8a6e-45a3-9bfb-32984b6f82e0",  # "example document type"@en-us, no ext id}
         ]
-        edge_info, edge = mock_edge(1, CIDOC_NS['some_value'],None,'', concept_list,
+        edge_info, edge = mock_edge(1, CIDOC_NS['some_value'], None, '', concept_list,
                                     o_type_str=CIDOC_NS['E55_Type'])
         graph = dt.to_rdf(edge_info, edge)
         self.assertTrue(
@@ -261,7 +261,7 @@ class RDFExportTests(ArchesTestCase):
                 ARCHES_NS["concepts/037daf4d-054a-44d2-9c0a-108b59e39109"]) in graph
         )
         self.assertTrue(
-            (ARCHES_NS["concepts/037daf4d-054a-44d2-9c0a-108b59e39109"], RDFS.label, 
+            (ARCHES_NS["concepts/037daf4d-054a-44d2-9c0a-108b59e39109"], RDFS.label,
                 Literal("example document type", lang="en-us")) in graph
         )
 
@@ -342,40 +342,41 @@ class RDFExportTests(ArchesTestCase):
 def append_domain_config_to_node(node):
     node.config = {
             "options": [{
-                            "id": "3f0aaf74-f7d9-44ae-82cf-196c76d8cbc3", 
-                            "selected": False, 
+                            "id": "3f0aaf74-f7d9-44ae-82cf-196c76d8cbc3",
+                            "selected": False,
                             "text": "one"
-                        }, 
+                        },
                         {
-                            "id": "eccaa586-284b-4f98-b4db-bdf8bdc9efcb", 
-                            "selected": False, 
+                            "id": "eccaa586-284b-4f98-b4db-bdf8bdc9efcb",
+                            "selected": False,
                             "text": "two"
-                        }, 
+                        },
                         {
-                            "id": "ac843999-864a-4d43-9bb9-aa3197958c7a", 
-                            "selected": False, 
+                            "id": "ac843999-864a-4d43-9bb9-aa3197958c7a",
+                            "selected": False,
                             "text": "three"
-                        }, 
+                        },
                         {
-                            "id": "11755d2b-36ee-4de7-8639-6914925a1f86", 
-                            "selected": False, 
+                            "id": "11755d2b-36ee-4de7-8639-6914925a1f86",
+                            "selected": False,
                             "text": "four"
-                        }, 
+                        },
                         {
-                            "id": "848a65b7-51f6-47f2-8ced-4c5398e956d4", 
-                            "selected": False, 
+                            "id": "848a65b7-51f6-47f2-8ced-4c5398e956d4",
+                            "selected": False,
                             "text": "five"
-                        }, 
+                        },
                         {
-                            "id": "ebd99837-c7d9-4be0-b5f5-87f387ae0661", 
-                            "selected": False, 
+                            "id": "ebd99837-c7d9-4be0-b5f5-87f387ae0661",
+                            "selected": False,
                             "text": "six"
                         }
-                    ]
-                }
+                        ]
+                    }
+
 
 def mock_edge(s_id, p_uri_str, o_id, domain_tile_data, range_tile_data,
-              s_type_str=CIDOC_NS['E22_Man-Made_Object'], o_type_str=None, 
+              s_type_str=CIDOC_NS['E22_Man-Made_Object'], o_type_str=None,
               s_pref="resources", o_pref="resources"):
     # (S, P, O triple, tiledata for domainnode, td for rangenode, S's type, O's type)
     edge = Mock()
