@@ -31,8 +31,14 @@
 <template id="mobile-survey-tree">
     <li role="treeitem" class="jstree-node jstree-open" data-bind="css: {'jstree-open': (node.childNodes().length > 0 && node.expanded), 'jstree-closed' : (node.childNodes().length > 0 && !node.expanded()), 'jstree-leaf': node.childNodes().length === 0}, container: '.mobile-survey-tree'">
         <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){node.expanded(!node.expanded())}"></i>
-        <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: tree.selectItem.bind(tree), css:{'jstree-clicked': node.selected, 'child-selected': tree.isChildSelected(node), 'filtered': tree.filter().length > 0 && !node.filtered()}">
-            <div data-bind="text: node.name"></div>
+        <a class="jstree-anchor" href="#" data-bind="click: tree.selectItem.bind(tree), css:{'jstree-clicked': node.selected, 'child-selected': tree.isChildSelected(node), 'filtered': tree.filter().length > 0 && !node.filtered()}">
+            <div style="display:flex; align-items: center;">
+                <i data-bind="css: node.iconclass" role="presentation"></i>
+                <div data-bind="text: node.name" style="padding-left:5px"></div>
+            <!-- ko if: node.istopnode -->
+            <i class="jstree-node-action-icon fa fa-trash" role="presentation" data-bind="" data-toggle="tooltip" data-original-title="{% trans "Delete Survey" %}"></i>
+            <!-- /ko -->
+            </div>
         </a>
         <ul class="jstree-children" aria-expanded="true" data-bind="if: node.childNodes().length > 0">
             <div data-bind="sortable: {

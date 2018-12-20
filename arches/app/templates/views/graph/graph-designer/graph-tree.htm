@@ -32,7 +32,7 @@
     <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (node.childNodes().length > 0 && node.expanded), 'jstree-closed' : (node.childNodes().length > 0 && !node.expanded()), 'jstree-leaf': node.childNodes().length === 0}, scrollTo: graphTree.scrollTo() == node, container: '.graph-designer-node-tree'">
         <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){node.expanded(!node.expanded())}"></i>
         <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: graphTree.selectItem.bind(graphTree), css:{'jstree-clicked': node.selected, 'child-selected': graphTree.isChildSelected(node), 'filtered': graphTree.filter().length > 0 && !node.filtered()}">
-            <i data-bind="css: node.iconclass" role="presentation"></i>
+            <i data-bind="css: 'node.iconclass'" role="presentation"></i>
             <span style="padding-right: 10px;" data-bind="text: graphTree.getDisplayName(node)"></span>
             <!--ko if: _.contains(graphTree.restrictedNodegroups, node.nodeGroupId()) === false -->
             <i class="jstree-node-action-icon fa fa-plus-circle" role="presentation" data-bind="click: graphTree.addChildNode.bind(graphTree)" data-toggle="tooltip" data-original-title="{% trans "Add Child Node" %}"></i>

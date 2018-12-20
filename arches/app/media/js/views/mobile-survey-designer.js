@@ -35,6 +35,7 @@ define([
             id: 'root',
             selected: ko.observable(true),
             istopnode: true,
+            iconclass: 'fa fa-globe',
             pageactive: ko.observable(true),
             expanded: ko.observable(true),
             childNodes: ko.observableArray([{
@@ -42,6 +43,7 @@ define([
                 id: 'mapextent',
                 selected: ko.observable(false),
                 istopnode: false,
+                iconclass: 'fa fa-map-marker',
                 pageactive: ko.observable(false),
                 childNodes: ko.observableArray([]),
                 expanded: ko.observable(false)
@@ -51,6 +53,7 @@ define([
                 id: 'mapsources',
                 selected: ko.observable(false),
                 istopnode: false,
+                iconclass: 'fa fa-th',
                 pageactive: ko.observable(false),
                 childNodes: ko.observableArray([]),
                 expanded: ko.observable(false)
@@ -60,6 +63,7 @@ define([
                 id: 'models',
                 selected: ko.observable(false),
                 istopnode: false,
+                iconclass: 'fa fa-bookmark',
                 pageactive: ko.observable(false),
                 childNodes: ko.observableArray([{
                     name: 'Model 1',
@@ -67,6 +71,7 @@ define([
                     pageid: 'models',
                     selected: ko.observable(false),
                     istopnode: false,
+                    iconclass: 'fa fa-globe',
                     childNodes: ko.observableArray([]),
                     expanded: ko.observable(false)
                 },]),
@@ -77,6 +82,7 @@ define([
                 id: 'data',
                 selected: ko.observable(false),
                 istopnode: false,
+                iconclass: 'fa fa-bar-chart-o',
                 pageactive: ko.observable(false),
                 childNodes: ko.observableArray([]),
                 expanded: ko.observable(false)
@@ -86,6 +92,7 @@ define([
                 id: 'people',
                 selected: ko.observable(false),
                 istopnode: false,
+                iconclass: 'fa fa-group',
                 pageactive: ko.observable(false),
                 childNodes: ko.observableArray([]),
                 expanded: ko.observable(false)
