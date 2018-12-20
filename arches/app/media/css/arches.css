@@ -15,6 +15,7 @@
 @import url(../packages/codemirror/theme/monokai.css);
 @import url(../packages/datatables.net-bs/css/dataTables.bootstrap.css);
 @import url(../packages/datatables.net-responsive-bs/css/responsive.bootstrap.css);
+@import url(../packages/datatables.net-buttons-bs/css/buttons.bootstrap.min.css);
 @import url(../packages/nvd3/build/nv.d3.min.css);
 @import url(../packages/leaflet/dist/leaflet.css);
 @import url(../packages/leaflet-draw/dist/leaflet.draw.css);

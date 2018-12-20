@@ -283,7 +283,7 @@ run_custom_scripts() {
 			echo ""
 			echo "----- RUNNING CUSTUM SCRIPT: ${file} -----"
 			echo ""
-			${file}
+			source ${file}
 		fi
 	done
 }

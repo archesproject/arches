@@ -29,7 +29,7 @@ require([
                     { "visible": false }
                 ]
             };
-            BaseManagerView.prototype.initialize.call(this, options)
+            BaseManagerView.prototype.initialize.call(this, options);
         }
     });
     return new EditHistory();
