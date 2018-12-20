@@ -12204,4 +12204,8 @@ a.jstree-anchor.permissions-widget {
         width: 100%;
         height: 100%;
     }
+    .print-hide {
+        display: none;
+        height: 0;
+    }
 }
