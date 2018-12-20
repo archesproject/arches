@@ -19,17 +19,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load staticfiles %}
 {% load i18n %}
 
-
-{% block title %}
-{{ block.super }}
-{% trans "Mobile Survey Manager" %}
-{% endblock title %}
-
-
 {% block main_content %}
 <div class="content-panel mobile-project-manager-editor">
     <div class="flex">
-
 
         <div id="rr-splash" class="rr-splash" data-bind="visible: mobilesurveys().length === 0">
 

@@ -20,11 +20,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load i18n %}
 
 
-{% block title %}
-{{ block.super }}
-{% trans "Mobile Survey Manager" %}
-{% endblock title %}
-
+{% block graph_title %}
+<div class="ep-tools-title">
+    <h1 class="page-header text-overflow mobile-designer-title">
+        <span data-bind="text: mobilesurvey.name()"></span>
+    </h1>
+</div>
+{% endblock graph_title %}
 
 {% block main_content %}
 <div class="content-panel mobile-project-manager-editor">
@@ -38,7 +40,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </div>
     </div>
 
-
         <div style="width: 100%;">
 
         <div id="" class="card-form-preview-container library-container">
@@ -48,38 +49,25 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="relative library-header" style="height: 55px;">
 
                     <!-- Add Project -->
-                    <div class="library-panel-search-bar">
+                    <div>
                         <!--ko if: mobilesurvey-->
-                        <button id="" class="btn btn-lg btn-danger btn-active-dark btn-labeled ion-minus-round" data-bind="click: deleteSelectedMobileSurvey, attr: {disabled: mobilesurvey.active() === true}">{% trans "Delete Survey" %}</button>
+                        <ul class="msm-edit-buttons mobile-project-category-header">
+                            <!--ko if: selectedNode().selected()-->
+                            <div data-bind="text: selectedNode().namelong"></div>
+                            <div class="description" data-bind="text: selectedNode().description"></div>
+                            <!--/ko-->
+                        </ul>
+                        <ul class="msm-edit-buttons">
+                            <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo" data-bind="click: discardEdits, css: {'disabled': mobilesurvey.dirty()==false}">{% trans 'Discard Edits' %}</button>
+                            <button id="btn-save-edits" class="btn btn-primary btn-labeled btn-active-dark fa fa-check" data-bind="click: saveMobileSurvey, css: {'disabled': mobilesurvey.dirty()==false}">{% trans 'Save Edits' %}</button>
+                        </ul>
                         <!--/ko-->
                     </div>
                 </div>
 
-                <div id="" class="library-grid" style="display:none;" data-bind="visible: true">
+                <div style="display:none;" data-bind="visible: true">
 
                     <!-- ko if: mobilesurvey -->
-                    <div id="sample-project" class="project-panel">
-
-                        <!--Project heading-->
-                        <div class="project-panel-header edit-mode">
-                            <h3 class="project-panel-title" data-bind="text: mobilesurvey.name() === '' ? '{% trans "Unnamed Survey" %}' : mobilesurvey.name()"></h3>
-                            <ul class="msm-edit-buttons">
-                                <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo" data-bind="click: discardEdits, css: {'disabled': mobilesurvey.dirty()==false}">{% trans 'Discard Edits' %}</button>
-                                <button id="btn-save-edits" class="btn btn-primary btn-labeled btn-active-dark fa fa-check" data-bind="click: saveMobileSurvey, css: {'disabled': mobilesurvey.dirty()==false}">{% trans 'Save Edits' %}</button>
-                            </ul>
-
-                            <div class="">
-                                <div class="project-details">
-                                    <div class="project-status" data-bind="css: mobilesurvey.active() ? 'active' : 'inactive', text: mobilesurvey.active() ? '{% trans "Active" %}' : '{% trans "Inactive" %}'"></div>
-                                    <li class="project-metadata-item">
-                                        <span data-bind="text: mobilesurvey.startdate() || '?'"></span>
-                                        {% trans 'to' %}
-                                        <span data-bind="text: mobilesurvey.enddate() || '?'"></span>
-                                    </li>
-                                </div>
-                            </div>
-                        </div>
-
                         <!--Project Details-->
                         <div id="project-details" class="project-panel-body" style="">
 
@@ -89,8 +77,127 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <!--Tabs Content-->
                                     <div class="tab-content card-content-tab" style="margin-left: 0px;">
 
+
                                         <!-- Summary Card -->
                                         <!--ko if: activePage() === 'root'-->
+                                        <div id="project-summary-card" class="mpm-card">
+                                            <div class="panel-body card-panel-body" style="">
+                                                <div id="" class="card-content" style="">
+
+                                                    <!-- Project Summary Panel -->
+                                                    <div class="mpm-activation-panel">
+                                                        <!-- Activate Project -->
+                                                        <div class="row pad-btm">
+                                                            <!-- Activate Switch -->
+                                                            <div class="col-sm-5 col-md-3">
+
+                                                                <div class="box-inline">
+                                                                    <p class="mpm-item-listing-header" style="margin-bottom: 0px;">{% trans 'Activate Survey' %}</p>
+
+                                                                    <div class="toggle-container">
+                                                                        <span class="switch switch-small" data-bind="css: {'on': mobilesurvey.active()}, click: function(){
+                                                                            mobilesurvey.active(!mobilesurvey.active());
+                                                                        }"><small></small></span>
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Help Message-->
+                                                            <div class="col-sm-6 col-md-9">
+                                                                <p class="account-tips" style="margin-top: 20px;">
+                                                                    By activating the survey you will send users an email with the information needed to begin data editing activitites.
+                                                                </p>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Survey Summary -->
+                                                        <div class="msm-settings-summary">
+
+                                                            <!-- Survey Settings -->
+                                                            <div class="mpm-summary-panel">
+                                                                <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
+                                                                    {% trans 'Summary' %}
+                                                                </p>
+                                                                <ul class="mpm-node-detail-metadata">
+                                                                    <li class="">
+                                                                        Number of edits: 0
+                                                                    </li>
+                                                                    <li class="">
+                                                                        Contributors: 0
+                                                                    </li>
+                                                                    <li class="">
+                                                                        Offline Basemap: Streets-Grey
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+
+                                                            <!-- User Summary -->
+                                                            <div class="mpm-summary-panel">
+                                                                <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
+                                                                    {% trans 'Groups/Users' %}
+                                                                </p>
+                                                                <ul class="mpm-node-detail-metadata">
+                                                                    <li class="">
+                                                                        {% trans 'Groups' %} (<span data-bind="text: mobilesurvey.approvedGroupNames().length"></span>)
+                                                                        <ul class="mpm-node-detail-metadata">
+                                                                            <li class="" data-bind="text:  mobilesurvey.approvedGroupNames().join(', ')">
+                                                                            </li>
+                                                                        </ul>
+                                                                    </li>
+                                                                </ul>
+                                                                <ul class="mpm-node-detail-metadata">
+                                                                    <li class="">
+                                                                        {% trans 'Users' %} (<span data-bind="text: mobilesurvey.approvedUserNames().length"></span>)
+                                                                        <ul class="mpm-node-detail-metadata">
+                                                                            <li class="" data-bind="text: mobilesurvey.approvedUserNames().join(', ')">
+
+                                                                            </li>
+                                                                        </ul>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+
+                                                            <!-- Model/Card Summary -->
+                                                            <div class="mpm-summary-panel">
+                                                                <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
+                                                                    {% trans 'Models and Data Entry Cards' %}
+                                                                </p>
+                                                                <!--ko if: resourceList.hasCards() -->
+                                                                <!--ko foreach: {data: resourceList.items, as: 'resource'} -->
+                                                                <!--ko if: resource.added() === true -->
+                                                                <ul class="mpm-node-detail-metadata">
+                                                                    <li class="">
+                                                                        <div data-bind="text: resource.name + ' (' + resource.cardcount() + ' data entry cards)'"></div>
+                                                                        <!--ko foreach: {data: resource.cards, as: 'card'} -->
+                                                                        <ul class="mpm-node-detail-metadata">
+                                                                            <!--ko if: card.approved -->
+                                                                            <li data-bind="text: card.name"></li>
+                                                                            <!--/ko-->
+                                                                        </ul>
+                                                                        <!--/ko-->
+                                                                    </li>
+                                                                </ul>
+                                                                <!--/ko-->
+                                                                <!--/ko-->
+                                                                <!--/ko-->
+                                                                <!--ko ifnot: resourceList.hasCards() -->
+                                                                <ul class="mpm-node-detail-metadata">
+                                                                    <li class="">
+                                                                        <div>{% trans 'No forms selected' %}</div>
+                                                                    </li>
+                                                                </ul>
+                                                                <!--/ko-->
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--/ko-->
+
+                                        <!-- Summary Card -->
+                                        <!--ko if: activePage() === 'settings'-->
                                         <div id="summary-card" class="mpm-card" style="">
                                             <div class="mpm-card-content">
                                                 <div class="panel-body card-panel-body project-card-body">
@@ -175,18 +282,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <!--ko if: activePage() === 'mapextent'-->
                                         <div id="location-card" class="mpm-card msm-location-card ">
                                             <div class="msm-map-container">
-                                                <div class="col-sm-12 msm-basemap-location">
-                                                    <div class="form-group" style="margin-bottom: 10px;">
-                                                        <label class="control-label account-label">{% trans 'Basemap location (MBTiles file url)' %}</label>
-                                                        <input type="text" class="form-control input-lg" data-bind="value: mobilesurvey.tilecache, valueUpdate: 'keyup'">
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-12 msm-basemap-location">
-                                                    <div class="form-group" style="margin-bottom: 0px;">
-                                                        <label class="control-label account-label">{% trans 'Online Basemap URL' %}</label>
-                                                        <input type="text" class="form-control input-lg" data-bind="value: mobilesurvey.onlinebasemap, valueUpdate: 'keyup'">
-                                                    </div>
-                                                </div>
 
                                                 <div>
                                                   <!-- ko component: {
@@ -220,6 +315,27 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                         }
                                                     }
                                                   } --><!-- /ko -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--/ko-->
+
+                                        <!--ko if: activePage() === 'mapsources'-->
+                                        <div id="location-card" class="mpm-card msm-location-card ">
+                                            <div class="mpm-card-content">
+                                                <div class="panel-body card-panel-body project-card-body">
+                                                    <div class="col-sm-12 msm-basemap-location">
+                                                        <div class="form-group" style="margin-bottom: 10px;">
+                                                            <label class="control-label account-label">{% trans 'Basemap location (MBTiles file url)' %}</label>
+                                                            <input type="text" class="form-control input-lg" data-bind="value: mobilesurvey.tilecache, valueUpdate: 'keyup'">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12 msm-basemap-location">
+                                                        <div class="form-group" style="margin-bottom: 0px;">
+                                                            <label class="control-label account-label">{% trans 'Online Basemap URL' %}</label>
+                                                            <input type="text" class="form-control input-lg" data-bind="value: mobilesurvey.onlinebasemap, valueUpdate: 'keyup'">
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -417,127 +533,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             </div>
                                         </div>
                                         <!--/ko-->
-
-
-
-                                        <!-- Summary Card -->
-                                        <!--ko if: activePage() === 'summary'-->
-                                        <div id="project-summary-card" class="mpm-card">
-                                            <div class="panel-body card-panel-body" style="">
-                                                <div id="" class="card-content" style="">
-
-                                                    <!-- Project Summary Panel -->
-                                                    <div class="mpm-activation-panel">
-                                                        <!-- Activate Project -->
-                                                        <div class="row pad-btm">
-                                                            <!-- Activate Switch -->
-                                                            <div class="col-sm-5 col-md-3">
-
-                                                                <div class="box-inline">
-                                                                    <p class="mpm-item-listing-header" style="margin-bottom: 0px;">{% trans 'Activate Survey' %}</p>
-
-                                                                    <div class="toggle-container">
-                                                                        <span class="switch switch-small" data-bind="css: {'on': mobilesurvey.active()}, click: function(){
-                                                                            mobilesurvey.active(!mobilesurvey.active());
-                                                                        }"><small></small></span>
-                                                                    </div>
-
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Help Message-->
-                                                            <div class="col-sm-6 col-md-9">
-                                                                <p class="account-tips" style="margin-top: 20px;">
-                                                                    By activating the survey you will send users an email with the information needed to begin data editing activitites.
-                                                                </p>
-                                                            </div>
-                                                        </div>
-
-                                                        <!-- Survey Summary -->
-                                                        <div class="msm-settings-summary">
-
-                                                            <!-- Survey Settings -->
-                                                            <div class="mpm-summary-panel">
-                                                                <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-                                                                    {% trans 'Summary' %}
-                                                                </p>
-                                                                <ul class="mpm-node-detail-metadata">
-                                                                    <li class="">
-                                                                        Number of edits: 0
-                                                                    </li>
-                                                                    <li class="">
-                                                                        Contributors: 0
-                                                                    </li>
-                                                                    <li class="">
-                                                                        Offline Basemap: Streets-Grey
-                                                                    </li>
-                                                                </ul>
-                                                            </div>
-
-                                                            <!-- User Summary -->
-                                                            <div class="mpm-summary-panel">
-                                                                <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-                                                                    {% trans 'Groups/Users' %}
-                                                                </p>
-                                                                <ul class="mpm-node-detail-metadata">
-                                                                    <li class="">
-                                                                        {% trans 'Groups' %} (<span data-bind="text: mobilesurvey.approvedGroupNames().length"></span>)
-                                                                        <ul class="mpm-node-detail-metadata">
-                                                                            <li class="" data-bind="text:  mobilesurvey.approvedGroupNames().join(', ')">
-                                                                            </li>
-                                                                        </ul>
-                                                                    </li>
-                                                                </ul>
-                                                                <ul class="mpm-node-detail-metadata">
-                                                                    <li class="">
-                                                                        {% trans 'Users' %} (<span data-bind="text: mobilesurvey.approvedUserNames().length"></span>)
-                                                                        <ul class="mpm-node-detail-metadata">
-                                                                            <li class="" data-bind="text: mobilesurvey.approvedUserNames().join(', ')">
-
-                                                                            </li>
-                                                                        </ul>
-                                                                    </li>
-                                                                </ul>
-                                                            </div>
-
-                                                            <!-- Model/Card Summary -->
-                                                            <div class="mpm-summary-panel">
-                                                                <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-                                                                    {% trans 'Models and Data Entry Cards' %}
-                                                                </p>
-                                                                <!--ko if: resourceList.hasCards() -->
-                                                                <!--ko foreach: {data: resourceList.items, as: 'resource'} -->
-                                                                <!--ko if: resource.added() === true -->
-                                                                <ul class="mpm-node-detail-metadata">
-                                                                    <li class="">
-                                                                        <div data-bind="text: resource.name + ' (' + resource.cardcount() + ' data entry cards)'"></div>
-                                                                        <!--ko foreach: {data: resource.cards, as: 'card'} -->
-                                                                        <ul class="mpm-node-detail-metadata">
-                                                                            <!--ko if: card.approved -->
-                                                                            <li data-bind="text: card.name"></li>
-                                                                            <!--/ko-->
-                                                                        </ul>
-                                                                        <!--/ko-->
-                                                                    </li>
-                                                                </ul>
-                                                                <!--/ko-->
-                                                                <!--/ko-->
-                                                                <!--/ko-->
-                                                                <!--ko ifnot: resourceList.hasCards() -->
-                                                                <ul class="mpm-node-detail-metadata">
-                                                                    <li class="">
-                                                                        <div>{% trans 'No forms selected' %}</div>
-                                                                    </li>
-                                                                </ul>
-                                                                <!--/ko-->
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <!--/ko-->
-                                        <!-- End Summary Card -->
 
 
                                         <!-- Groups/Users Card -->
@@ -811,15 +806,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </div>
                                         <!--/ko-->
                                         <!-- End Groups/Users Card -->
-
                                     </div>
                                 </div>
                             </div>
-                        </div>
                     </div>
                     <!-- /ko -->
-
-
                 </div>
             </div>
         </div>

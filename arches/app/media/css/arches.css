@@ -10824,6 +10824,26 @@ a.search-facet-item.disabled {
     padding:1px;
 }
 
+
+.mobile-designer-title {
+    font-size: 1.6em;
+    padding-left: 15px;
+    padding-top: 12px;
+}
+
+.msm-edit-buttons.mobile-project-category-header {
+    left: 0;
+    margin-left: 0px;
+    padding-left: 15px;
+}
+
+.msm-edit-buttons.mobile-project-category-header .description {
+    font-size: 0.8em;
+}
+
+
+
+
 .identities-list .mpm-left-panel .user .project-status {
     top: 33px;
 }

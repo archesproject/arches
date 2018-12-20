@@ -28,6 +28,7 @@ define([
             this.mobilesurvey = options.mobilesurvey;
             this.items = options.items;
             this.activepage = options.activepage;
+            this.selectednode = options.selectednode;
         },
         _initializeItem: function(item){
             if (!item.expanded) {
@@ -47,6 +48,7 @@ define([
                 ko.unwrap(node.id) === ko.unwrap(selectednode.id) ? node.selected(true) : node.selected(false);
                 if (node.selected() === true) {
                     self.activepage(node.pageid || node.id);
+                    self.selectednode(node);
                 }
                 nodes = node.childNodes();
                 if (nodes.length > 0) {
