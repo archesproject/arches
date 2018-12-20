@@ -1522,7 +1522,8 @@ class ResourceInstanceDataType(BaseDataType):
         g = Graph()
 
         def _add_resource(d, p, r, r_type):
-            g.add((r, RDF.type, URIRef(r_type)))
+            if r_type is not None:
+                g.add((r, RDF.type, URIRef(r_type)))
             g.add((d, URIRef(p), r))
 
         if edge_info['range_tile_data'] is not None:

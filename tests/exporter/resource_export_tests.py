@@ -47,31 +47,13 @@ CIDOC_NS = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
 class BusinessDataExportTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
-        pass
-
-    def setUp(self):
         ResourceInstance.objects.all().delete()
 
-        skos = SKOSReader()
-        rdf = skos.read_file('tests/fixtures/data/concept_label_test_scheme.xml')
-        ret = skos.save_concepts_from_skos(rdf)
-
-        skos = SKOSReader()
-        rdf = skos.read_file('tests/fixtures/data/concept_label_test_collection.xml')
-        ret = skos.save_concepts_from_skos(rdf)
-
-        with open(os.path.join('tests/fixtures/resource_graphs/resource_export_test.json'), 'rU') as f:
-            archesfile = JSONDeserializer().deserialize(f)
-        ResourceGraphImporter(archesfile['graph'])
-
-        # loading RDF/JSONLD export fixtures
-        skos = SKOSReader()
-        rdf = skos.read_file('tests/fixtures/data/rdf_export_thesaurus.xml')
-        ret = skos.save_concepts_from_skos(rdf)
-
-        skos = SKOSReader()
-        rdf = skos.read_file('tests/fixtures/data/rdf_export_collections.xml')
-        ret = skos.save_concepts_from_skos(rdf)
+        for skospath in ['tests/fixtures/data/rdf_export_thesaurus.xml',
+                         'tests/fixtures/data/rdf_export_collections.xml']:
+            skos = SKOSReader()
+            rdf = skos.read_file(skospath)
+            ret = skos.save_concepts_from_skos(rdf)
 
         # Models
         for model_name in ['object_model', 'document_model']:
@@ -83,6 +65,19 @@ class BusinessDataExportTests(ArchesTestCase):
         #for instance_name in ['document', 'object']:
         #    BusinessDataImporter(
         #            'tests/fixtures/data/rdf_export_{0}.json'.format(instance_name)).import_business_data()
+
+    def setUp(self):
+        skos = SKOSReader()
+        rdf = skos.read_file('tests/fixtures/data/concept_label_test_scheme.xml')
+        ret = skos.save_concepts_from_skos(rdf)
+
+        skos = SKOSReader()
+        rdf = skos.read_file('tests/fixtures/data/concept_label_test_collection.xml')
+        ret = skos.save_concepts_from_skos(rdf)
+
+        with open(os.path.join('tests/fixtures/resource_graphs/resource_export_test.json'), 'rU') as f:
+            archesfile = JSONDeserializer().deserialize(f)
+        ResourceGraphImporter(archesfile['graph'])
 
         # for RDF/JSON-LD export tests
         self.DT = DataTypeFactory()
@@ -149,36 +144,37 @@ class BusinessDataExportTests(ArchesTestCase):
 
     def test_rdf_string(self):
         dt = self.DT.get_instance("string")
-        edge_info, edge = mock_edge(1, CIDOC_NS['name'],2,'',"test string")
+        edge_info, edge = mock_edge(1, CIDOC_NS['name'],None,'',"test string")
         graph = dt.to_rdf(edge_info, edge)
-
-        for item in graph.triples((edge_info['d_uri'], edge.ontologyproperty, None)):
-            self.assertEquals(str(item[2]), edge_info['range_tile_data'])
+        obj = Literal(edge_info['range_tile_data'])
+        self.assertTrue((edge_info['d_uri'], edge.ontologyproperty, obj) in graph)
 
     def test_rdf_number(self):
         dt = self.DT.get_instance("number")
-        edge_info, edge = mock_edge(1, CIDOC_NS['some_value'],2,'',42)
+        edge_info, edge = mock_edge(1, CIDOC_NS['some_value'],None,'',42)
         graph = dt.to_rdf(edge_info, edge)
-
-        for item in graph.triples((edge_info['d_uri'], edge.ontologyproperty, None)):
-            self.assertEquals(int(item[2]), edge_info['range_tile_data'])
+        obj = Literal(edge_info['range_tile_data'])
+        self.assertTrue((edge_info['d_uri'], edge.ontologyproperty, obj) in graph)
 
     def test_rdf_bool(self):
         dt = self.DT.get_instance("boolean")
-        edge_info, edge = mock_edge(1, CIDOC_NS['some_value'],2,'', True)
+        edge_info, edge = mock_edge(1, CIDOC_NS['some_value'],None,'', True)
         graph = dt.to_rdf(edge_info, edge)
-
-        for item in graph.triples((edge_info['d_uri'], edge.ontologyproperty, None)):
-            self.assertEquals(bool(item[2]), edge_info['range_tile_data'])
+        obj = Literal(edge_info['range_tile_data'])
+        self.assertTrue((edge_info['d_uri'], edge.ontologyproperty, obj) in graph)
 
     def test_rdf_date(self):
         dt = self.DT.get_instance("date")
-        edge_info, edge = mock_edge(1, CIDOC_NS['some_value'],2,'', "2018-12-11")
+        edge_info, edge = mock_edge(1, CIDOC_NS['some_value'],None,'', "2018-12-11")
         graph = dt.to_rdf(edge_info, edge)
+        obj = Literal(edge_info['range_tile_data'], datatype=XSD.dateTime)
+        self.assertTrue((edge_info['d_uri'], edge.ontologyproperty, obj) in graph)
 
-        for item in graph.triples((edge_info['d_uri'], edge.ontologyproperty, None)):
-            self.assertEquals(str(item[2]), edge_info['range_tile_data'])
-
+    def test_rdf_resource(self):
+        dt = self.DT.get_instance("resource-instance")
+        edge_info, edge = mock_edge(1, CIDOC_NS['some_value'],None,'', 2)
+        graph = dt.to_rdf(edge_info, edge)
+        self.assertTrue((edge_info['d_uri'], edge.ontologyproperty, edge_info['r_uri']) in graph)
 
 
 def mock_edge(s_id, p_uri_str, o_id, domain_tile_data, range_tile_data,
@@ -186,10 +182,12 @@ def mock_edge(s_id, p_uri_str, o_id, domain_tile_data, range_tile_data,
     # (S, P, O triple, tiledata for domainnode, td for rangenode, S's type, O's type)
     edge = Mock()
     edge_info = {}
-    edge.rangenode_id = edge.rangenode.pk = o_id
     edge.domainnode_id = edge.domainnode.pk = s_id
-    edge_info['r_uri'] = ARCHES_NS['resources/{0}'.format(o_id)]
     edge_info['d_uri'] = ARCHES_NS['resources/{0}'.format(s_id)]
+    edge_info['r_uri'] = None
+    edge.rangenode_id = edge.rangenode.pk = o_id
+    if o_id:
+        edge_info['r_uri'] = ARCHES_NS['resources/{0}'.format(o_id)]
     edge.ontologyproperty = p_uri_str
     edge.domainnode.ontologyclass = s_type_str
     edge.rangenode.ontologyclass = o_type_str
