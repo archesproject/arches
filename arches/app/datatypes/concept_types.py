@@ -133,7 +133,7 @@ class ConceptDataType(BaseConceptDataType):
 
             for id_uri in ext_ids:
                 if str(id_uri).startswith(settings.PREFERRED_CONCEPT_SCHEME):
-                    rangenode = id_uri
+                    rangenode = URIRef(id_uri)
             return rangenode
 
         if edge_info['range_tile_data'] is not None:
@@ -155,7 +155,7 @@ class ConceptDataType(BaseConceptDataType):
             g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), rangenode))
 
             assert c.value is not None, "Null or blank concept value"
-            g.add((rangenode, URIRef(RDFS.label), Literal(c.value, lang=c.language)))
+            g.add((rangenode, URIRef(RDFS.label), Literal(c.value, lang=c.language or '')))
 
         return g
 
