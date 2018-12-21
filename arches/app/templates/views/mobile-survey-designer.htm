@@ -341,10 +341,25 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </div>
                                         <!--/ko-->
 
+                                        <!--ko if: activePage() === 'resourcemodel'-->
+                                        <div id="models-card" class="identities-list">
+                                            <div class="mpm-card-content">
+                                                <div data-bind="text: selectedNode().name"></div>
+                                            </div>
+                                        </div>
+                                        <!--/ko-->
+
+
                                         <!-- Models Card -->
                                         <!--ko if: activePage() === 'models'-->
                                         <div id="models-card" class="identities-list">
                                             <div class="mpm-card-content">
+                                                <div class="">
+                                                    <input style="width:30%; display:inline-block;"
+                                                    data-bind="select2Query: {
+                                                        select2Config: select2Config
+                                                    }">
+                                                </div>
                                                 <div>
                                                     <div class="flex relative">
 
@@ -500,6 +515,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                                                 <!-- Standard Download -->
                                                                 <div id="standard-download-panel" class="msm-download-panel" data-bind="visible: mobilesurvey.showCustomDataDownload() === false">
+
                                                                     <p class="text-muted">
                                                                         {% trans 'Allow users to download the' %} <strong> {% trans 'first' %} {{ resource_download_limit }} {% trans 'records in the project extent' %} </strong> {% trans "for the resource models you've associated with this project." %}
                                                                     </p>
@@ -624,17 +640,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                                             </div>
                                                                                         </div>
                                                                                         <!-- /ko -->
-
-
-
-
-
-
                                                                                     </div>
                                                                                 </div>
-
-
-
                                                                             </div>
 
                                                                             <!-- ko if: mobilesurvey.selectedUser() -->

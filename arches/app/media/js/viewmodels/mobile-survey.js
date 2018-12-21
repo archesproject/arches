@@ -63,6 +63,11 @@ define([
         };
 
         _.each(params.resources, function(r){
+            r.istopnode = false;
+            r.childNodes = ko.observableArray([]);
+            r.pageid = 'resourcemodel';
+            r.namelong = 'Model Details';
+            r.description = 'Summary of how this model participates in the survey';
             r.cardsflat = ko.observableArray();
             self.flattenCards(r);
         });
@@ -113,9 +118,117 @@ define([
             }
         }, self);
 
+        // viewModel.selectedResourceIds = ko.computed(function(val){
+        //     return [];
+        // });
+        //
+        this.selectedResources = ko.computed(function(){
+            var resources = params.resources.filter(function(r){
+                if (r.cards().length > 0) {
+                    return r;
+                }
+            });
+            return resources;
+        });
+
+        this.select2Config = {
+            clickBubble: true,
+            disabled: false,
+            data: {results: params.resources.map(function(r){return {text: r.name, id: r.id};})},
+            value: ko.observableArray([]),
+            multiple: true,
+            placeholder: "select a model",
+            allowClear: true
+        };
 
         this.loading = ko.observable(false);
         this.mobilesurvey = new MobileSurveyModel({source: params.mobilesurvey, identities: params.identities});
+
+        this.treenodes = [{
+            name: this.mobilesurvey.name,
+            namelong: 'Summary',
+            description: 'Survey summary and status',
+            id: 'root',
+            selected: ko.observable(true),
+            istopnode: true,
+            iconclass: 'fa fa-globe',
+            pageactive: ko.observable(true),
+            expanded: ko.observable(true),
+            childNodes: ko.observableArray([{
+                name: 'Settings',
+                namelong: 'Survey Settings',
+                description: 'Define data collection parameters for your survey',
+                id: 'settings',
+                selected: ko.observable(false),
+                istopnode: false,
+                iconclass: 'fa fa-wrench',
+                pageactive: ko.observable(false),
+                childNodes: ko.observableArray([]),
+                expanded: ko.observable(false)
+            },
+            {
+                name: 'Map Extent',
+                namelong: 'Map Extent',
+                description: 'Draw a polygon to define the area over which you want to collect data in this survery',
+                id: 'mapextent',
+                selected: ko.observable(false),
+                istopnode: false,
+                iconclass: 'fa fa-map-marker',
+                pageactive: ko.observable(false),
+                childNodes: ko.observableArray([]),
+                expanded: ko.observable(false)
+            },
+            {
+                name: 'Map Sources',
+                namelong: 'Basemap Source',
+                description: 'Provide a basemap source url. Use an offline source for users without access to cell/wi-fi service',
+                id: 'mapsources',
+                selected: ko.observable(false),
+                istopnode: false,
+                iconclass: 'fa fa-th',
+                pageactive: ko.observable(false),
+                childNodes: ko.observableArray([]),
+                expanded: ko.observable(false)
+            },
+            {
+                name: 'Models',
+                namelong: 'Models',
+                description: 'Summary of models in this survey',
+                id: 'models',
+                selected: ko.observable(false),
+                istopnode: false,
+                iconclass: 'fa fa-bookmark',
+                pageactive: ko.observable(false),
+                childNodes: this.selectedResources,
+                expanded: ko.observable(false)
+            },
+            {
+                name: 'Data',
+                namelong: 'Data download',
+                description: 'Define the data you will allow users to download',
+                id: 'data',
+                selected: ko.observable(false),
+                istopnode: false,
+                iconclass: 'fa fa-bar-chart-o',
+                pageactive: ko.observable(false),
+                childNodes: ko.observableArray([]),
+                expanded: ko.observable(false)
+            },
+            {
+                name: 'People',
+                namelong: 'People',
+                description: 'Summary of people invited to participate in this survey',
+                id: 'people',
+                selected: ko.observable(false),
+                istopnode: false,
+                iconclass: 'fa fa-group',
+                pageactive: ko.observable(false),
+                childNodes: ko.observableArray([]),
+                expanded: ko.observable(false)
+            }
+            ])
+        }];
+
     };
     return MobileSurveyViewModel;
 });
