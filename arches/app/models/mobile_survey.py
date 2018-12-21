@@ -134,10 +134,11 @@ class MobileSurvey(models.MobileSurveyModel):
                                     graph_obj['widgets'].append(widget_model)
                                 break
                     if node['datatype'] == 'resource-instance' or node['datatype'] == 'resource-instance-list':
-                        graph_id = node['config']['graphid'][0]
-                        node['config']['options'] = []
-                        for resource_instance in Resource.objects.filter(graph_id=graph_id):
-                            node['config']['options'].append({'id': str(resource_instance.pk), 'name': resource_instance.displayname})
+                        if node['config']['graphid'] is not None:
+                            graph_id = node['config']['graphid'][0]
+                            node['config']['options'] = []
+                            for resource_instance in Resource.objects.filter(graph_id=graph_id):
+                                node['config']['options'].append({'id': str(resource_instance.pk), 'name': resource_instance.displayname})
                 graphs.append(graph_obj)
         ret['graphs'] = graphs
         ret['cards'] = ordered_cards
