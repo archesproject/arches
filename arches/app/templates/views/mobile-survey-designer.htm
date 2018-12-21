@@ -346,7 +346,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <ul style="list-style-type: none;">
                                                 <!--ko if: selectedNode().cards -->
                                                 <!--ko foreach: {data: selectedNode().cards, as: 'card'} -->
-                                                    <li style="display:flex; align-items:center; padding"><input style="height:15px; width:15px; padding-right: 10px" type="checkbox" value="card.approved" data-bind="checked: card.approved()"/><span data-bind="text: card.name"></span></li>
+                                                    <li style="display:flex; align-items:center; padding">
+                                                        <input style="height:15px; width:15px; padding-right: 10px" type="checkbox" value="card.approved" data-bind="checked: card.approved"/>
+                                                        <span data-bind="text: card.name"></span>
+                                                    </li>
                                                 <!--/ko-->
                                                 <!--/ko-->
                                             </ul>

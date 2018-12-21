@@ -57,12 +57,15 @@ define([
                         });
                     }
                 });
-            }
+            };
             getSubCardIds(r.cards);
             rootCards = r.cards.filter(function(card){
                 var isRootCard = _.contains(subCardIds, card.cardid) === false;
                 if (isRootCard) {
-                    card.approved = ko.observable(_.contains(self.mobilesurvey.cards(), card.cardid))
+                    card.approved = ko.observable(_.contains(self.mobilesurvey.cards(), card.cardid));
+                    card.approved.subscribe(function(val){
+                        val === true ? self.mobilesurvey.cards.push(card.cardid) : self.mobilesurvey.cards.remove(card.cardid);
+                    });
                 }
                 return isRootCard;
             });
@@ -77,7 +80,6 @@ define([
             r.namelong = 'Model Details';
             r.description = 'Summary of how this model participates in the survey';
             r.cards = self.getRootCards(r);
-            console.log(r.cards());
         });
 
         this.resourceList = ko.observableArray(params.resources);
