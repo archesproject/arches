@@ -43,38 +43,44 @@ define([
         this.mapDefaultMaxZoom = arches.mapDefaultMaxZoom;
         this.mapDefaultMinZoom = arches.mapDefaultMinZoom;
 
-        this.flattenCards = function(r) {
-            var addedCardIds = [];
-            _.each(r.cards, function(card) {
-                if (card.cards.length > 0) {
-                    _.each(card.cards, function(subcard) {
-                        subcard.name = card.name + ' - ' + subcard.name;
-                        r.cardsflat.push(subcard);
-                        addedCardIds.push(subcard.cardid);
-                    });
+        this.mobilesurvey = new MobileSurveyModel({source: params.mobilesurvey, identities: params.identities});
+
+        this.getRootCards = function(r) {
+            var subCardIds = [];
+            var rootCards;
+            var getSubCardIds = function(cards){
+                _.each(cards, function(card) {
+                    if (card.cards.length > 0) {
+                        _.each(card.cards, function(subcard) {
+                            subCardIds.push(subcard.cardid);
+                            getSubCardIds(subcard.cards);
+                        });
+                    }
+                });
+            }
+            getSubCardIds(r.cards);
+            rootCards = r.cards.filter(function(card){
+                var isRootCard = _.contains(subCardIds, card.cardid) === false;
+                if (isRootCard) {
+                    card.approved = ko.observable(_.contains(self.mobilesurvey.cards(), card.cardid))
                 }
+                return isRootCard;
             });
-            _.each(r.cards, function(card) {
-                if (_.contains(addedCardIds, card.cardid) === false && card.cards.length == 0) {
-                    addedCardIds.push(card.cardid);
-                    r.cardsflat.push(card);
-                }
-            });
+            return ko.observableArray(rootCards);
         };
 
         _.each(params.resources, function(r){
             r.istopnode = false;
             r.childNodes = ko.observableArray([]);
             r.pageid = 'resourcemodel';
+            r.selected = ko.observable(false);
             r.namelong = 'Model Details';
             r.description = 'Summary of how this model participates in the survey';
-            r.cardsflat = ko.observableArray();
-            self.flattenCards(r);
+            r.cards = self.getRootCards(r);
+            console.log(r.cards());
         });
 
-        this.resourceList = new ResourceList({
-            items: ko.observableArray(params.resources)
-        });
+        this.resourceList = ko.observableArray(params.resources);
 
         this.processResource = function(data) {
             self.resourceList.initCards(data.cards);
@@ -106,7 +112,7 @@ define([
             }
         };
 
-        this.resourceList.selected.subscribe(function(val){
+        this.resourceList.subscribe(function(val){
             if (val) {
                 if (ko.unwrap(val.cards).length === 0) {
                     $.ajax({
@@ -142,7 +148,6 @@ define([
         };
 
         this.loading = ko.observable(false);
-        this.mobilesurvey = new MobileSurveyModel({source: params.mobilesurvey, identities: params.identities});
 
         this.treenodes = [{
             name: this.mobilesurvey.name,

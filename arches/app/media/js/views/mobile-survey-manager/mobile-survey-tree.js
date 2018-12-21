@@ -2,12 +2,9 @@ define([
     'jquery',
     'knockout',
     'underscore',
-    'views/tree-view',
-    'arches'
-], function($, ko, _, TreeView, arches) {
+    'views/tree-view'
+], function($, ko, _, TreeView) {
     var loading = ko.observable(false);
-
-
     var tree = TreeView.extend({
         filter: ko.observable(''),
         filterFunction: function(){

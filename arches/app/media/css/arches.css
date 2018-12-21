@@ -9156,6 +9156,11 @@ a.clear-geojson-button:hover {
     top: 6px
 }
 
+.msm-designer-panel {
+    width: 100%;
+    background-color: #fff;
+}
+
 .msm-list-filter {
     display: flex;
     padding: 10px;
