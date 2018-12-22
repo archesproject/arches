@@ -107,9 +107,6 @@ define([
                 return selected.length > 0 ? selected[0] : undefined;
             });
 
-
-
-
             self.approvedUserNames = ko.computed(function() {
                 var names = [];
                 _.each(self.identities, function(identity) {
@@ -315,7 +312,6 @@ define([
         _getURL: function(method) {
             return this.url(this.id);
         },
-
 
         save: function(userCallback, scope) {
             var self = this;

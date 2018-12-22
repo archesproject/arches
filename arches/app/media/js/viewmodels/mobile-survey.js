@@ -43,7 +43,8 @@ define([
         this.mapDefaultMinZoom = arches.mapDefaultMinZoom;
         this.mobilesurvey = new MobileSurveyModel({source: params.mobilesurvey, identities: params.identities});
 
-        this.getRootCards = function(allcards) {
+        this.getRootCards = function(flatcards) {
+            var allcards = ko.unwrap(flatcards);
             var subCardIds = [];
             var rootCards;
             var getSubCardIds = function(cards){
@@ -57,7 +58,6 @@ define([
                 });
             };
             getSubCardIds(allcards);
-
             rootCards = allcards.filter(function(card){
                 var isRootCard = _.contains(subCardIds, card.cardid) === false;
                 if (isRootCard) {
