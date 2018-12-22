@@ -200,7 +200,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
         if models.MobileSurveyModel.objects.filter(pk=surveyid).exists():
             mobile_survey = models.MobileSurveyModel.objects.get(pk=surveyid)
         else:
-            mobile_survey = models.MobileSurveyModel(id=surveyid, name='unnamed')
+            mobile_survey = models.MobileSurveyModel(id=surveyid, name='Unnamed')
             mobile_survey.datadownloadconfig = {"download":False, "count":1000, "resources":[], "custom": None}
 
         mobile_surveys, resources = get_survey_resources([mobile_survey])
