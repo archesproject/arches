@@ -47,30 +47,35 @@ from arches.app.views.base import MapBaseManagerView
 import arches.app.views.search as search
 
 
+
+def get_survey_resources(mobile_survey_models):
+    graphs = models.GraphModel.objects.filter(isresource=True).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+    resources = []
+    mobile_surveys = []
+    all_ordered_card_ids = []
+
+    for mobile_survey in mobile_survey_models:
+        try:
+            survey = MobileSurvey.objects.get(id=mobile_survey.id)
+        except Exception as e:
+            survey = MobileSurvey(id=mobile_survey.id, name=mobile_survey.name)
+        mobile_survey_dict = survey.serialize()
+        all_ordered_card_ids += mobile_survey_dict['cards']
+        mobile_surveys.append(mobile_survey_dict)
+
+    active_graphs = set([unicode(card.graph_id) for card in models.CardModel.objects.filter(cardid__in=all_ordered_card_ids)])
+
+    for i, graph in enumerate(graphs):
+        cards = []
+        if i == 0 or unicode(graph.graphid) in active_graphs:
+            cards = [Card.objects.get(pk=card.cardid) for card in models.CardModel.objects.filter(graph=graph)]
+        resources.append({'name': graph.name, 'id': graph.graphid, 'subtitle': graph.subtitle, 'iconclass': graph.iconclass, 'cards': cards})
+
+    return mobile_surveys, resources
+
+
 @method_decorator(group_required('Application Administrator'), name='dispatch')
 class MobileSurveyManagerView(BaseManagerView):
-
-    def get_survey_resources(self, mobile_survey_models):
-        graphs = models.GraphModel.objects.filter(isresource=True).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-        resources = []
-        mobile_surveys = []
-        all_ordered_card_ids = []
-
-        for mobile_survey in mobile_survey_models:
-            survey = MobileSurvey.objects.get(id=mobile_survey.id)
-            mobile_survey_dict = survey.serialize()
-            all_ordered_card_ids += mobile_survey_dict['cards']
-            mobile_surveys.append(mobile_survey_dict)
-
-        active_graphs = set([unicode(card.graph_id) for card in models.CardModel.objects.filter(cardid__in=all_ordered_card_ids)])
-
-        for i, graph in enumerate(graphs):
-            cards = []
-            if i == 0 or unicode(graph.graphid) in active_graphs:
-                cards = [Card.objects.get(pk=card.cardid) for card in models.CardModel.objects.filter(graph=graph)]
-            resources.append({'name': graph.name, 'id': graph.graphid, 'subtitle': graph.subtitle, 'iconclass': graph.iconclass, 'cards': cards})
-
-        return mobile_surveys, resources
 
     def get(self, request):
 
@@ -100,7 +105,7 @@ class MobileSurveyManagerView(BaseManagerView):
             identities.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions': set(default_perms), 'is_superuser':user.is_superuser, 'group_ids': group_ids, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email})
 
         mobile_survey_models = models.MobileSurveyModel.objects.order_by('name')
-        mobile_surveys, resources = self.get_survey_resources(mobile_survey_models)
+        mobile_surveys, resources = get_survey_resources(mobile_survey_models)
 
         for mobile_survey in mobile_surveys:
             try:
@@ -198,7 +203,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
             mobile_survey = models.MobileSurveyModel(id=surveyid, name='unnamed')
             mobile_survey.datadownloadconfig = {"download":False, "count":1000, "resources":[], "custom": None}
 
-        mobile_surveys, resources = self.get_survey_resources([mobile_survey])
+        mobile_surveys, resources = get_survey_resources([mobile_survey])
         mobile_survey = mobile_surveys[0]
 
         try:
@@ -403,31 +408,6 @@ class MobileSurveyDesignerView(MapBaseManagerView):
             msg = EmailMultiAlternatives(_('There\'s been a change to an {app_name} Survey that you\'re part of!'.format(app_name=settings.APP_NAME)), text_content, admin_email, [user.email])
             msg.attach_alternative(html_content, "text/html")
             msg.send()
-
-    def get_survey_resources(self, mobile_survey_models):
-        graphs = models.GraphModel.objects.filter(isresource=True).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-        resources = []
-        mobile_surveys = []
-        all_ordered_card_ids = []
-
-        for mobile_survey in mobile_survey_models:
-            try:
-                survey = MobileSurvey.objects.get(id=mobile_survey.id)
-            except Exception as e:
-                survey = MobileSurvey(id=mobile_survey.id, name=mobile_survey.name)
-            mobile_survey_dict = survey.serialize()
-            all_ordered_card_ids += mobile_survey_dict['cards']
-            mobile_surveys.append(mobile_survey_dict)
-
-        active_graphs = set([unicode(card.graph_id) for card in models.CardModel.objects.filter(cardid__in=all_ordered_card_ids)])
-
-        for i, graph in enumerate(graphs):
-            cards = []
-            if i == 0 or unicode(graph.graphid) in active_graphs:
-                cards = [Card.objects.get(pk=card.cardid) for card in models.CardModel.objects.filter(graph=graph)]
-            resources.append({'name': graph.name, 'id': graph.graphid, 'subtitle': graph.subtitle, 'iconclass': graph.iconclass, 'cards': cards})
-
-        return mobile_surveys, resources
 
 
 # @method_decorator(can_read_resource_instance(), name='dispatch')
