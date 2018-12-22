@@ -38,8 +38,10 @@ define([
     });
 
     viewModel.discardEdits = function() {
-        this.resourceList.resetCards(this.mobilesurvey.get('source').cards);
         this.mobilesurvey.reset();
+        this.resetCards(this.mobilesurvey.cards);
+        this.treenodes[0].selected(true);
+        this.activePage('root');
     };
 
     viewModel.deleteMobileSurvey = function(mobilesurvey){

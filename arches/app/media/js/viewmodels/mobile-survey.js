@@ -21,7 +21,6 @@ define([
         var self = this;
         this.dateFormat = 'YYYY-MM-DD';
         this.allResources = params.resources;
-
         this.identityList = new IdentityList({
             items: ko.observableArray(params.identities)
         });
@@ -43,7 +42,6 @@ define([
         this.mapDefaultZoom = arches.mapDefaultZoom;
         this.mapDefaultMaxZoom = arches.mapDefaultMaxZoom;
         this.mapDefaultMinZoom = arches.mapDefaultMinZoom;
-
         this.mobilesurvey = new MobileSurveyModel({source: params.mobilesurvey, identities: params.identities});
 
         this.getRootCards = function(allcards) {
@@ -107,6 +105,16 @@ define([
                 }
             });
         };
+
+
+        this.resetCards = function(cards){
+            _.each(self.allResources, function(r){
+                _.each(r.cards(), function(c){
+                    c.approved(_.contains(cards(), c.cardid));
+                });
+                r.hasApprovedCards() ? r.added(true) : r.added(false);
+            });
+        }
 
         _.each(this.allResources, this.initializeResource);
 
