@@ -329,8 +329,8 @@ class MobileSurveyDesignerView(MapBaseManagerView):
         try:
             data['bounds'].upper()
             data['bounds'] = json.loads(data['bounds'])
-        except AttributeError:
-            pass
+        except AttributeError as e:
+            print('bounds is not a string')
 
         if 'features' in data['bounds']:
             for feature in data['bounds']['features']:
@@ -343,7 +343,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
                     for poly in data['bounds']['coordinates']:
                         for coords in poly:
                             polygons.append(Polygon(coords))
-            except AttributeError:
+            except AttributeError as e:
                 print('bounds is not a geojson geometry object')
 
         mobile_survey.bounds = MultiPolygon(polygons)
