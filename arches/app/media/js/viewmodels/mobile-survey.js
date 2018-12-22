@@ -4,11 +4,10 @@ define([
     'underscore',
     'knockout',
     'views/mobile-survey-manager/identity-list',
-    'views/mobile-survey-manager/resource-list',
     'models/mobile-survey',
     'views/components/widgets/map',
     'bindings/sortable'
-], function($, arches, _, ko, IdentityList, ResourceList, MobileSurveyModel) {
+], function($, arches, _, ko, IdentityList, MobileSurveyModel) {
     /**
     * A base viewmodel for mobile survey management
     *
@@ -106,7 +105,6 @@ define([
             });
         };
 
-
         this.resetCards = function(cards){
             _.each(self.allResources, function(r){
                 _.each(r.cards(), function(c){
@@ -114,7 +112,7 @@ define([
                 });
                 r.hasApprovedCards() ? r.added(true) : r.added(false);
             });
-        }
+        };
 
         _.each(this.allResources, this.initializeResource);
 

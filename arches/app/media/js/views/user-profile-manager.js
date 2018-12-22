@@ -43,6 +43,7 @@ define([
             this.viewModel.mobilesurveys =
                 data.mobilesurveys.map(function(mobilesurvey) {
                     return new MobileSurveyViewModel({
+                        resources: data.resources,
                         mobilesurvey: mobilesurvey,
                         identities: data.identities
                     });
@@ -65,7 +66,7 @@ define([
                 mobilesurvey.resources = ko.computed(function() {
                     var resources = [];
                     var resourceLookup = {};
-                    _.each(mobilesurvey.resourceList.items(), function(resource) {
+                    _.each(mobilesurvey.allResources, function(resource) {
                         _.each(resource.cards(), function(card) {
                             if (_.contains(mobilesurvey.mobilesurvey.cards(), card.cardid)) {
                                 if (resourceLookup[resource.id]) {
