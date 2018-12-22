@@ -20,6 +20,7 @@ define([
     var MobileSurveyViewModel = function(params) {
         var self = this;
         this.dateFormat = 'YYYY-MM-DD';
+        this.allResources = params.resources;
 
         this.identityList = new IdentityList({
             items: ko.observableArray(params.identities)
@@ -45,7 +46,7 @@ define([
 
         this.mobilesurvey = new MobileSurveyModel({source: params.mobilesurvey, identities: params.identities});
 
-        this.getRootCards = function(r) {
+        this.getRootCards = function(allcards) {
             var subCardIds = [];
             var rootCards;
             var getSubCardIds = function(cards){
@@ -58,8 +59,9 @@ define([
                     }
                 });
             };
-            getSubCardIds(r.cards);
-            rootCards = r.cards.filter(function(card){
+            getSubCardIds(allcards);
+
+            rootCards = allcards.filter(function(card){
                 var isRootCard = _.contains(subCardIds, card.cardid) === false;
                 if (isRootCard) {
                     card.approved = ko.observable(_.contains(self.mobilesurvey.cards(), card.cardid));
@@ -72,81 +74,77 @@ define([
             return ko.observableArray(rootCards);
         };
 
-        _.each(params.resources, function(r){
+        this.updateResourceCards = function(resource){
+            $.ajax({
+                url: arches.urls.resource_cards.replace('//', '/' + resource.id + '/')
+            })
+                .done(function(data){
+                    var rootCards = self.getRootCards(data.cards);
+                    resource.cards(ko.unwrap(rootCards));
+                })
+                .fail(function(data){console.log('card request failed', data);});
+        };
+
+        this.initializeResource = function(r) {
             r.istopnode = false;
             r.childNodes = ko.observableArray([]);
             r.pageid = 'resourcemodel';
             r.selected = ko.observable(false);
             r.namelong = 'Model Details';
             r.description = 'Summary of how this model participates in the survey';
-            r.cards = self.getRootCards(r);
+            r.cards = self.getRootCards(r.cards);
+            r.added = ko.observable(r.cards().length > 0);
+            r.hasApprovedCards = ko.pureComputed(function(){
+                return r.cards().filter(function(c){return ko.unwrap(c.approved) === true;}).length > 0;
+            });
+            r.added.subscribe(function(val){
+                if (val === true && r.cards().length === 0) {
+                    self.updateResourceCards(r);
+                } else if (val === false) {
+                    r.cards().forEach(function(c){
+                        c.approved(false);
+                    });
+                }
+            });
+        };
+
+        _.each(this.allResources, this.initializeResource);
+
+        this.selectedResourceIds = ko.computed({
+            read: function() {
+                return this.allResources.filter(function(r) {
+                    if (r.added()) {
+                        return r;
+                    }
+                }).map(function(rr){return rr.id;});
+            },
+            write: function(value) {
+                _.each(this.allResources, function(r){
+                    r.added(_.contains(value, r.id));
+                });
+            },
+            owner: this
         });
 
-        this.resourceList = ko.observableArray(params.resources);
-
-        this.processResource = function(data) {
-            self.resourceList.initCards(data.cards);
-            self.resourceList.selected().cards(data.cards);
-            self.flattenCards(self.resourceList.selected());
-        };
-
-        this.processResources = function(data) {
-            if (_.some(self.resourceList.items(), function(r) {return data.id === r.id;}) === false) {
-                data.cards = ko.observableArray(data.cards);
-                data.cardsflat = ko.observableArray();
-                self.resourceList.initCards(data.cards);
-                self.resourceList.items.push(data);
-            }
-        };
-
-        this.getMobileSurveyResources = function(){
-            var successCallback = function(data){
-                self.mobilesurvey.collectedResources(true);
-                _.each(data.resources, self.processResources);
-                _.each(self.resourceList.items(), self.flattenCards);
-            };
-            if (!this.mobilesurvey.collectedResources()) {
-                $.ajax({
-                    url: arches.urls.mobile_survey_resources(this.mobilesurvey.id)
-                })
-                    .done(successCallback)
-                    .fail(function(data){console.log('request failed', data);});
-            }
-        };
-
-        this.resourceList.subscribe(function(val){
-            if (val) {
-                if (ko.unwrap(val.cards).length === 0) {
-                    $.ajax({
-                        url: arches.urls.resource_cards.replace('//', '/' + val.id + '/')
-                    })
-                        .done(self.processResource)
-                        .fail(function(data){console.log('card request failed', data);});
-                }
-            }
-        }, self);
-
-        // viewModel.selectedResourceIds = ko.computed(function(val){
-        //     return [];
-        // });
-        //
-        this.selectedResources = ko.computed(function(){
-            var resources = params.resources.filter(function(r){
-                if (r.cards().length > 0) {
+        this.selectedResources = ko.pureComputed(function(){
+            var resources = this.allResources.filter(function(r){
+                if (r.added() || (r.cards().length > 0 && r.hasApprovedCards())) {
                     return r;
                 }
             });
             return resources;
-        });
+        }, this);
 
-        this.select2Config = {
-            clickBubble: true,
-            disabled: false,
-            data: {results: params.resources.map(function(r){return {text: r.name, id: r.id};})},
-            value: ko.observableArray([]),
-            multiple: true,
-            placeholder: "select a model",
-            allowClear: true
+        this.getSelect2Config = function(){
+            return {
+                clickBubble: true,
+                disabled: false,
+                data: {results: this.allResources.map(function(r){return {text: r.name, id: r.id};})},
+                value: this.selectedResourceIds,
+                multiple: true,
+                placeholder: "select a model",
+                allowClear: true
+            };
         };
 
         this.loading = ko.observable(false);
