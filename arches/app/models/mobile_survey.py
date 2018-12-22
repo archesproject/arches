@@ -135,7 +135,12 @@ class MobileSurvey(models.MobileSurveyModel):
                                 break
                     if node['datatype'] == 'resource-instance' or node['datatype'] == 'resource-instance-list':
                         if node['config']['graphid'] is not None:
-                            graph_id = node['config']['graphid'][0]
+                            try:
+                                graphuuid = uuid.UUID(node['config']['graphid'][0])
+                                graph_id = unicode(graphuuid)
+                            except ValueError as e:
+                                graphuuid = uuid.UUID(node['config']['graphid'])
+                                graph_id = unicode(graphuuid)
                             node['config']['options'] = []
                             for resource_instance in Resource.objects.filter(graph_id=graph_id):
                                 node['config']['options'].append({'id': str(resource_instance.pk), 'name': resource_instance.displayname})
