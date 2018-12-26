@@ -11421,7 +11421,6 @@ a.search-facet-item.disabled {
 }
 
 .mpm-activation-panel {
-    margin-top: -30px;
     padding: 20px 40px;
 }
 
@@ -11435,7 +11434,7 @@ a.search-facet-item.disabled {
 }
 
 .msm-settings-summary {
-    min-height: 500px;
+    height:100%;
     overflow-y: scroll;
 }
 
