@@ -92,7 +92,11 @@ define([
             r.cards = self.getRootCards(r.cards);
             r.added = ko.observable(r.cards().length > 0);
             r.hasApprovedCards = ko.pureComputed(function(){
-                return r.cards().filter(function(c){return ko.unwrap(c.approved) === true;}).length > 0;
+                var result = r.cards().filter(function(c){return ko.unwrap(c.approved) === true;}).length > 0;
+                if (result === false) {
+                    self.mobilesurvey.datadownloadconfig.resources.remove(r.id);
+                }
+                return result;
             });
             r.added.subscribe(function(val){
                 if (val === true && r.cards().length === 0) {
