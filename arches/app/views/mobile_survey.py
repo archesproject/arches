@@ -211,9 +211,11 @@ class MobileSurveyDesignerView(MapBaseManagerView):
             mobile_survey['onlinebasemaps'] = json.loads(mobile_survey['onlinebasemaps'])
         except TypeError:
             pass
-        multipart = mobile_survey['bounds']
-        singlepart = GeoUtils().convert_multipart_to_singlepart(multipart)
-        mobile_survey['bounds'] = singlepart
+
+        if mobile_survey['bounds']['type'] == 'MultiPolygon':
+            multipart = mobile_survey['bounds']
+            singlepart = GeoUtils().convert_multipart_to_singlepart(multipart)
+            mobile_survey['bounds'] = singlepart
 
         serializer = JSONSerializer()
         context = self.get_context_data(

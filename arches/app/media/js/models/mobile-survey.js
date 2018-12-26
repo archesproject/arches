@@ -222,7 +222,6 @@ define([
 
             self.parse(options.source);
             self.setIdentityApproval();
-
             self.json = ko.computed(function() {
                 var jsObj = ko.toJS({
                     name: self.name,

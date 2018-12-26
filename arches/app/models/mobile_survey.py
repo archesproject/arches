@@ -19,6 +19,7 @@ import urlparse
 from copy import copy, deepcopy
 from django.contrib.auth.models import User
 from django.db import transaction
+from django.http import HttpRequest
 from django.utils.translation import ugettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
@@ -28,7 +29,7 @@ from arches.app.models.graph import Graph
 from arches.app.models.models import ResourceInstance
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
-from django.http import HttpRequest
+from arches.app.utils.geo_utils import GeoUtils
 from arches.app.utils.couch import Couch
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 import arches.app.views.search as search
@@ -148,7 +149,11 @@ class MobileSurvey(models.MobileSurveyModel):
         ret['graphs'] = graphs
         ret['cards'] = ordered_cards
         try:
-            ret['bounds'] = json.loads(ret['bounds'])
+            bounds = json.loads(ret['bounds'])
+            ret['bounds'] = bounds
+            if (bounds['type'] == 'MultiPolygon'):
+                singlepart = GeoUtils().convert_multipart_to_singlepart(bounds)
+                ret['bounds'] = singlepart
         except TypeError as e:
             print 'Could not parse', ret['bounds'], e
         return ret
