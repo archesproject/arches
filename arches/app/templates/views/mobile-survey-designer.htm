@@ -360,8 +360,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <!-- Models Card -->
                                         <!--ko if: activePage() === 'models'-->
                                         <div id="models-card">
-                                            <div class="mpm-card-content">
-                                                <div class="">
+
+
+                                        <div id="rr-splash" class="rr-splash">
+
+                                            <!-- Splash Title -->
+                                            <div class="rr-splash-title">{% trans "Mobile Data Collection" %}</div>
+                                            <div class="rr-splash-title">{% trans "Define the resource types for your survey" %}</div>
+
+                                            <div class="mpm-resource-selection">
+                                                <div class="resource-dropdown">
                                                     <input style="width:30%; display:inline-block;"
                                                     data-bind="select2Query: {
                                                         select2Config: getSelect2Config()
@@ -370,6 +378,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 <div>
                                                 </div>
                                             </div>
+
+                                            <!-- Splash Instructions -->
+                                            <div class="rr-splash-description">{% trans "Arches allows you to create and edit data in the field using mobile devices such as" %}</div>
+                                            <div class="rr-splash-description">{% trans "Select those resources that should participate in the survey" %}</div>
+                                        </div>
+
+
+
+
                                         </div>
                                         <!--/ko-->
                                         <!-- End Models Card -->

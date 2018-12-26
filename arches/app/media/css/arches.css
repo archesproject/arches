@@ -10657,6 +10657,17 @@ a.search-facet-item.disabled {
     padding: 10px;
 }
 
+.mpm-resource-selection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+}
+
+.mpm-resource-selection .resource-dropdown {
+    width: 300px;
+}
+
 .account-wrapper {
     padding-top: 20px;
 }
