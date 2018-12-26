@@ -199,16 +199,6 @@ define([
                 self.cards(_.union(diff, approvedCards));
             };
 
-            self.updateApproved = function(val){
-                val.item.approved(true);
-                self.updateCards(val.targetParent());
-            };
-
-            self.updateUnapproved = function(val){
-                val.item.approved(false);
-                self.cards.remove(val.item.cardid);
-            };
-
             self.addAllCardsByResource = function(val) {
                 var resource = val.resourceList.selected();
                 _.each(resource.cards(), function(card){
