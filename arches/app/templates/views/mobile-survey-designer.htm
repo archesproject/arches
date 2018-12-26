@@ -357,6 +357,25 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </div>
                                         <!--/ko-->
 
+
+                                        <!--ko if: activePage() === 'identity'-->
+                                        <div id="models-card">
+                                            <div class="mpm-card-content">
+                                            <div data-bind="text: selectedNode().name"></div>
+                                            <ul style="list-style-type: none;">
+                                                <!--ko if: selectedNode().type === 'group' -->
+                                                <!--ko foreach: {data: selectedNode().fullusers, as: 'user'} -->
+                                                <li style="display:flex; align-items:center; padding">
+                                                    <input style="height:15px; width:15px; padding-right: 10px" type="checkbox" value="user.approved" data-bind="checked: user.approved"/>
+                                                    <span data-bind="text: user.name"></span>
+                                                </li>
+                                                <!--/ko-->
+                                                <!--/ko-->
+                                            </ul>
+                                        </div>
+                                        </div>
+                                        <!--/ko-->
+
                                         <!-- Models Card -->
                                         <!--ko if: activePage() === 'models'-->
                                         <div id="models-card">
@@ -372,7 +391,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 <div class="resource-dropdown">
                                                     <input style="width:30%; display:inline-block;"
                                                     data-bind="select2Query: {
-                                                        select2Config: getSelect2Config()
+                                                        select2Config: getSelect2ResourcesConfig()
                                                     }">
                                                 </div>
                                                 <div>

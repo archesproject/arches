@@ -20,6 +20,7 @@ define([
         var self = this;
         this.dateFormat = 'YYYY-MM-DD';
         this.allResources = params.resources;
+        this.allIdentities = params.identities;
         this.identityList = new IdentityList({
             items: ko.observableArray(params.identities)
         });
@@ -109,6 +110,15 @@ define([
             });
         };
 
+        this.initializeIdentities = function(identity) {
+            identity.istopnode = false;
+            identity.childNodes = ko.observableArray([]);
+            identity.pageid = 'identity';
+            identity.namelong = 'User Account';
+            identity.iconclass = identity.type === 'group' ? 'fa fa-users' : 'fa fa-user';
+            identity.description = 'Users and Groups that participate in a survey';
+        };
+
         this.resetCards = function(cards){
             _.each(self.allResources, function(r){
                 _.each(r.cards(), function(c){
@@ -119,8 +129,9 @@ define([
         };
 
         _.each(this.allResources, this.initializeResource);
+        _.each(this.allIdentities, this.initializeIdentities);
 
-        this.selectedResourceIds = ko.computed({
+        this.selectedResourceIds = ko.pureComputed({
             read: function() {
                 return this.allResources.filter(function(r) {
                     if (r.added()) {
@@ -145,11 +156,48 @@ define([
             return resources;
         }, this);
 
-        this.getSelect2Config = function(){
+        this.selectedGroups = ko.pureComputed(function(){
+            var ids = this.allIdentities.filter(function(id){
+                if (ko.unwrap(id.approved) && id.type === 'group') {
+                    return id;
+                }
+            });
+            return ids;
+        }, this);
+
+        this.getSelect2ResourcesConfig = function(){
             return {
                 clickBubble: true,
                 disabled: false,
                 data: {results: this.allResources.map(function(r){return {text: r.name, id: r.id};})},
+                value: this.selectedResourceIds,
+                multiple: true,
+                placeholder: "select a model",
+                allowClear: true
+            };
+        };
+
+        this.selectedGroupsIds = ko.computed({
+            read: function() {
+                return this.allResources.filter(function(r) {
+                    if (r.added()) {
+                        return r;
+                    }
+                }).map(function(rr){return rr.id;});
+            },
+            write: function(value) {
+                _.each(this.allResources, function(r){
+                    r.added(_.contains(value, r.id));
+                });
+            },
+            owner: this
+        });
+
+        this.getSelect2UserGroupsConfig = function(){
+            return {
+                clickBubble: true,
+                disabled: false,
+                data: {results: this.identites.map(function(r){return {text: r.name, id: r.id};})},
                 value: this.selectedResourceIds,
                 multiple: true,
                 placeholder: "select a model",
@@ -236,9 +284,9 @@ define([
                 id: 'people',
                 selected: ko.observable(false),
                 istopnode: false,
-                iconclass: 'fa fa-group',
+                iconclass: 'fa fa-user-plus',
                 pageactive: ko.observable(false),
-                childNodes: ko.observableArray([]),
+                childNodes: this.selectedGroups,
                 expanded: ko.observable(false)
             }
             ])

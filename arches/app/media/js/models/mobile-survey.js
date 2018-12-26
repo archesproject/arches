@@ -51,11 +51,14 @@ define([
 
             _.each(this.identities, function(item) {
                 if (item.type === 'group') {
+                    item.fullusers = _.filter(self.identities, function(id) {
+                        return (id.type === 'user' && _.contains(id.group_ids, item.id));
+                    });
                     _.each(item.users, function(user){
                         if (!user.expanded) {
                             user.expanded = ko.observable(false);
                         }
-                    });
+                    }, this);
                 }
             });
 
