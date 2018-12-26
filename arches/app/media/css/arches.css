@@ -11983,6 +11983,12 @@ a.jstree-anchor.permissions-widget {
     cursor: pointer;
 }
 
+.report-expander {
+    cursor: pointer;
+    padding-left: 6px;
+    font-weight:bold;
+    font-size: 18px;
+}
 
 @keyframes loader {
     0% {
@@ -12236,5 +12242,9 @@ a.jstree-anchor.permissions-widget {
         display: block;
         width: 100%;
         height: 100%;
+    }
+    .print-hide {
+        display: none;
+        height: 0;
     }
 }
