@@ -177,21 +177,38 @@ define([
             };
         };
 
+        this.getSelectedGroupIds = function(){
+            return this.allIdentities.filter(function(id) {
+                if (ko.unwrap(id.approved) && id.type === 'group') {
+                    return id;
+                }
+            }).map(function(idobj){return String(idobj.id);});
+        };
+
         this.selectedGroupsIds = ko.computed({
             read: function() {
-                return this.allIdentities.filter(function(id) {
-                    if (ko.unwrap(id.approved) && id.type === 'group') {
-                        return id;
-                    }
-                }).map(function(idobj){return idobj.id;});
+                return this.getSelectedGroupIds();
             },
             write: function(value) {
+                var longer;
+                var shorter;
+                var previousValue = this.getSelectedGroupIds();
+                if (previousValue.length > value.length) {
+                    longer = previousValue;
+                    shorter = value;
+                } else if (previousValue.length < value.length) {
+                    longer = value;
+                    shorter = previousValue;
+                }
+                var diff = _.difference(longer, shorter)[0];
                 var group = _.find(this.allIdentities, function(id){
-                    return (id.type === 'group' && id.id === value.id);
+                    return (id.type === 'group' && Number(diff) === id.id);
                 });
+                group.approved(!group.approved());
                 this.mobilesurvey.toggleIdentity(group);
             },
-            owner: this
+            owner: this,
+            beforeChange: true
         });
 
         this.getSelect2GroupsConfig = function(){

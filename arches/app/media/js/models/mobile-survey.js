@@ -143,10 +143,7 @@ define([
                     var currentIdentities = identity.type === 'user' ? self.users : self.groups;
                     if (self.hasIdentity(identity) === false) {
                         currentIdentities.remove(identity.id);
-                        if (identity.type === 'user') {
-                            identity.approved(false);
-                        } else {
-                            identity.approved(false);
+                        if (identity.type === 'group') {
                             _.chain(self.identities).filter(function(id) {
                                 return id.type === 'user' && _.contains(_.pluck(identity.users, 'id'), id.id);
                             }, this).each(function(user) {
@@ -165,9 +162,8 @@ define([
                             self.users.push(identity.id);
                         } else {
                             _.chain(self.identities).filter(function(id) {
-                                var identity = identity;
-                                return id.type === 'user';
-                            }).each(function(user) {
+                                return id.type === 'user' && _.contains(_.pluck(identity.users, 'id'), id.id);
+                            }, this).each(function(user) {
                                 if (_.intersection(user.group_ids, self.groups()).length > 0) {
                                     user.approved(true);
                                     if (!_.contains(self.users(), user.id)) {
