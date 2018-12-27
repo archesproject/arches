@@ -179,26 +179,27 @@ define([
 
         this.selectedGroupsIds = ko.computed({
             read: function() {
-                return this.allResources.filter(function(r) {
-                    if (r.added()) {
-                        return r;
+                return this.allIdentities.filter(function(id) {
+                    if (ko.unwrap(id.approved) && id.type === 'group') {
+                        return id;
                     }
-                }).map(function(rr){return rr.id;});
+                }).map(function(idobj){return idobj.id;});
             },
             write: function(value) {
-                _.each(this.allResources, function(r){
-                    r.added(_.contains(value, r.id));
+                var group = _.find(this.allIdentities, function(id){
+                    return (id.type === 'group' && id.id === value.id);
                 });
+                this.mobilesurvey.toggleIdentity(group);
             },
             owner: this
         });
 
-        this.getSelect2UserGroupsConfig = function(){
+        this.getSelect2GroupsConfig = function(){
             return {
                 clickBubble: true,
                 disabled: false,
-                data: {results: this.identites.map(function(r){return {text: r.name, id: r.id};})},
-                value: this.selectedResourceIds,
+                data: {results: this.allIdentities.map(function(r){return {text: r.name, id: r.id};})},
+                value: this.selectedGroupsIds,
                 multiple: true,
                 placeholder: "select a model",
                 allowClear: true

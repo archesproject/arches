@@ -402,10 +402,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <div class="rr-splash-description">{% trans "Arches allows you to create and edit data in the field using mobile devices such as" %}</div>
                                             <div class="rr-splash-description">{% trans "Select those resources that should participate in the survey" %}</div>
                                         </div>
-
-
-
-
                                         </div>
                                         <!--/ko-->
                                         <!-- End Models Card -->
@@ -488,268 +484,34 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <!--/ko-->
 
 
-                                        <!-- Groups/Users Card -->
                                         <!--ko if: activePage() === 'people'-->
-                                        <div id="identities-card" class="identities-list">
-                                            <div class="mpm-card-content">
+                                        <div id="models-card">
+
+
+                                        <div id="rr-splash" class="rr-splash">
+
+                                            <!-- Splash Title -->
+                                            <div class="rr-splash-title">{% trans "Mobile Data Collection" %}</div>
+                                            <div class="rr-splash-title">{% trans "Define the resource types for your survey" %}</div>
+
+                                            <div class="mpm-resource-selection">
+                                                <div class="resource-dropdown">
+                                                    <input style="width:30%; display:inline-block;"
+                                                    data-bind="select2Query: {
+                                                        select2Config: getSelect2GroupsConfig()
+                                                    }">
+                                                </div>
                                                 <div>
-                                                    <div class="flex relative">
-
-                                                        <div class="msm-resource-panel identities" style="" data-bind="with:identityList">
-                                                            {% include 'views/mobile-survey-manager/identity-list.htm' %}
-                                                        </div>
-
-                                                        <!-- start identity content -->
-                                                        <div class="msm-resource-cards identities" data-bind="style: {top: ((identityList.selectedIndex() * 60 + 120) + (identityList.selectedIndex() * 15.0)) + 'px' }, visible: identityList.selected()  && identityList.hideIdentityDetails() != true">
-
-                                                            <div class="relative">
-
-                                                                <div class="row">
-                                                                    <div class="col-sm-6" style="" data-bind="">
-                                                                        <div class="box-inline">
-
-                                                                            <!-- ko if: identityList.selected().type === 'user' -->
-                                                                            <div class="">
-                                                                                <span class="switch switch-small mpm-account-switch" data-bind="css: {'on': mobilesurvey.hasIdentity()}, click: function(){mobilesurvey.toggleIdentity()}"><small></small>
-
-                                                                                </span>
-                                                                                <p class="mpm-account-switch-text" style="margin-bottom: 0px;">{% trans 'Add this user to survey' %}</p>
-                                                                                        <div style="display:flex; flex-direction:row;">
-                                                                                        <div class="arches-toggle-sm"></div>
-                                                                                            <div style="margin-top: -17px;"></div>
-                                                                                        </div>
-                                                                                <span class="arches-toggle-subtitle"></span>
-                                                                            </div>
-                                                                            <!-- /ko -->
-
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-
-                                                                <!-- Users in this Account -->
-                                                                <div class="mpm-account-detail-panel">
-
-                                                                    <!-- User Listing -->
-                                                                    <div id="user-cards" class="list-group user-cards">
-                                                                        <!-- Title/Filter/Pagination -->
-                                                                        <!--ko if: identityList.selected().type === 'group' -->
-
-                                                                        <div class="msm-user-summary">
-                                                                            <div class='msm-group-users'>
-
-
-                                                                                <div class="mpm-selector-header relative">
-
-                                                                                    <!-- Panel Header -->
-                                                                                    <div class="mpm-selector-header-txt">
-                                                                                        <input class="form-control input-lg" style="    margin-top: -13px;width: 300px;" placeholder="{% trans 'find a user in this group...' %}"  type="text" data-bind="value: mobilesurvey.userFilter, valueUpdate: 'keyup'">
-                                                                                    </div>
-
-                                                                                    <div class="mpm-selector-btns">
-                                                                                        <a class="" href="">Select all</a>
-                                                                                        <span class="switch switch-small" data-bind="css: {'on': mobilesurvey.hasIdentity()}, click: function(){mobilesurvey.toggleIdentity()}"><small></small></span>
-                                                                                    </div>
-
-                                                                                    <!-- Info panel -->
-                                                                                    <div class="mpm-user-info-panel" style="padding: 0px;">
-
-                                                                                        <!-- ko foreach: mobilesurvey.filteredUsers() -->
-                                                                                        <div href="#" class="list-group-item get-user-detail" data-bind="click: function(){ $data.expanded(!$data.expanded());  $parent.mobilesurvey.selectedUser($data)}, css: {selected: $parent.mobilesurvey.selectedUser() == $data}">
-
-                                                                                            <div class="mpm-user-title mpm-user-name">
-
-                                                                                                <h4 data-bind='text: $data.username'></h4>
-
-                                                                                                <!--ko if: $data.groups-->
-                                                                                                <div class='mpm-user-status pull-right' data-bind="css: {invited : _.contains($parent.mobilesurvey.users(), $data.id)}">
-                                                                                                    <span data-bind="text: _.contains($parent.mobilesurvey.users(), $data.id) ? '{% trans 'Approved' %}': '{% trans 'Not Approved' %}'"></span>
-                                                                                                </div>
-                                                                                                <!--/ko-->
-                                                                                            </div>
-
-                                                                                            <div class="mpm-user-subtitle">
-                                                                                                <p>{% trans 'Activity: 0 edits' %}</p>
-
-                                                                                                <div>
-                                                                                                    <span>{% trans 'Last Login:' %}</span>
-                                                                                                    <span class="last-login" data-bind="text: $data.last_login"></span>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        <!-- /ko -->
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-
-                                                                            <!-- ko if: mobilesurvey.selectedUser() -->
-                                                                            <div class="mpm-user-summary">
-                                                                                <div class="mpm-model-detail-panel">
-
-                                                                                    <!-- User Info -->
-                                                                                    <div class="mpm-selector-header relative">
-
-                                                                                        <!-- Panel Header -->
-                                                                                        <div class="mpm-selector-header-txt">
-                                                                                            <strong>{% trans 'User Summary' %}</strong>
-                                                                                        </div>
-
-                                                                                        <!-- Info panel -->
-                                                                                        <div class="mpm-user-info-panel" style="margin-top: 8px;">
-
-                                                                                            <div class="mpm-node-name">
-                                                                                                User
-                                                                                            </div>
-                                                                                            <ul class="mpm-node-detail-metadata">
-                                                                                                <li class="">
-                                                                                                    <span>{% trans 'Name:' %}
-                                                                                                        <span class="last-login" data-bind="text: mobilesurvey.selectedUser().first_name"></span>
-                                                                                                        <span class="last-login" data-bind="text: mobilesurvey.selectedUser().last_name"></span>
-                                                                                                    </span>
-                                                                                                </li>
-                                                                                                <li class="">
-                                                                                                    {% trans 'Email:' %} <a href="" data-bind="text: mobilesurvey.selectedUser().email"></a>
-                                                                                                </li>
-                                                                                                <li class="">
-                                                                                                    {% trans 'Groups:' %}
-                                                                                                    <span class="last-login" data-bind="text: mobilesurvey.selectedUser().group_names"></span>
-                                                                                                </li>
-                                                                                            </ul>
-
-                                                                                            <div class="mpm-node-name">
-                                                                                                Contributions
-                                                                                            </div>
-                                                                                            <ul class="mpm-node-detail-metadata">
-                                                                                                <li class="">
-                                                                                                    Edits: 0
-                                                                                                </li>
-                                                                                                <li>
-                                                                                                    Devices (1)
-                                                                                                    <ul class="mpm-node-detail-metadata">
-                                                                                                        <li class="">
-                                                                                                            <span>Name: iPhone (last login:<span class="last-login" data-bind="text: mobilesurvey.selectedUser().last_login"></span>)</span>
-                                                                                                        </li>
-                                                                                                    </ul>
-                                                                                                </li>
-                                                                                            </ul>
-
-                                                                                        </div>
-                                                                                    </div>
-
-                                                                                </div>
-
-
-
-                                                                                <div class="mpm-model-detail-panel">
-
-                                                                                </div>
-                                                                            </div>
-                                                                        <!-- /ko -->
-                                                                        </div>
-
-                                                                        <!--/ko-->
-                                                                        <!--ko if: identityList.selected().type === 'user' -->
-                                                                        <a href="#" class="get-user-detail">
-                                                                            <div class="mpm-user-title mpm-user-name">
-                                                                                <!--ko if: identityList.selected().approved() -->
-                                                                                <div class='mpm-user-status invited user'>
-                                                                                    <span>{% trans 'Approved' %}</span>
-                                                                                </div>
-                                                                                <!--/ko-->
-                                                                                <!--ko ifnot: identityList.selected().approved() -->
-                                                                                <div class='mpm-user-status user pull-right'>
-                                                                                    <span>{% trans 'Not Approved' %}</span>
-                                                                                </div>
-                                                                                <!--/ko-->
-                                                                            </div>
-
-                                                                            <div class="mpm-user-subtitle user">
-                                                                                <div class="mpm-user-summary">
-                                                                                    <div class="mpm-model-detail-panel">
-                                                                                        <div class="mpm-node-name">
-                                                                                            {% trans 'User Information' %}
-                                                                                        </div>
-                                                                                        <ul class="mpm-node-detail-metadata">
-                                                                                            <li class="">
-                                                                                                <span>{% trans 'Name:' %}
-                                                                                                    <span class="last-login" data-bind="text: identityList.selected().first_name"></span>
-                                                                                                    <span class="last-login" data-bind="text: identityList.selected().last_name"></span>
-                                                                                                </span>
-                                                                                            </li>
-                                                                                            <li class="">
-                                                                                                {% trans 'Email:' %} <a href="" data-bind="text: identityList.selected().email"></a>
-                                                                                            </li>
-                                                                                            <li class="">
-                                                                                                {% trans 'Groups:' %}
-                                                                                                <span class="last-login" data-bind="text: identityList.selected().groups"></span>
-                                                                                            </li>
-                                                                                        </ul>
-                                                                                    </div>
-
-                                                                                    <div class="mpm-model-detail-panel">
-                                                                                        <div class="mpm-node-name">
-                                                                                            Contributions
-                                                                                        </div>
-                                                                                        <ul class="mpm-node-detail-metadata">
-                                                                                            <li class="">
-                                                                                                Edits: 0
-                                                                                            </li>
-                                                                                            <li>
-                                                                                                Devices (1)
-                                                                                                <ul class="mpm-node-detail-metadata">
-                                                                                                    <li class="">
-                                                                                                        <span>Name: iPhone (last login:<span class="last-login" data-bind="text: identityList.selected().last_login"></span>)</span>
-                                                                                                    </li>
-                                                                                                </ul>
-                                                                                            </li>
-                                                                                        </ul>
-                                                                                    </div>
-
-                                                                                    <div class="mpm-model-detail-panel">
-                                                                                        <div class="mpm-node-name">
-                                                                                            Security
-                                                                                        </div>
-                                                                                        <ul class="mpm-node-detail-metadata">
-                                                                                            <li class="">
-                                                                                                Remove survey data from from user's device on next login?
-                                                                                            </li>
-                                                                                            <li class="">
-                                                                                                <!--Switchery : Unchecked-->
-                                                                                                <!--===================================================-->
-                                                                                                <input id="wipe-project" class="js-switch-small" type="checkbox" style="margin-top: 0px; display: none;" data-switchery="true"><span class="switchery switchery-small" style="box-shadow: rgb(223, 223, 223) 0px 0px 0px 0px inset; border-color: rgb(223, 223, 223); background-color: rgb(255, 255, 255); transition: border 0.4s, box-shadow 0.4s;"><small style="left: 0px; background-color: rgb(255, 255, 255); transition: left 0.2s;"></small></span>
-                                                                                                <!--===================================================-->
-                                                                                            </li>
-                                                                                        </ul>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </a>
-
-                                                                        <!--ko if: _.filter(identityList.usersGroups(), function(u){return u.approved()}).length > 0 -->
-                                                                        <div class="mpm-user-groups">{% trans 'Belongs to the following approved groups:' %}
-                                                                            <ul class="user-group-list">
-                                                                                <!-- ko foreach: identityList.usersGroups() -->
-                                                                                <!-- ko if: $data.approved -->
-                                                                                <li>
-                                                                                    <span class='mpm-user-subtitle' data-bind="text:$data.name"></span>
-                                                                                </li>
-                                                                                <!--/ko -->
-                                                                                <!--/ko -->
-                                                                            </ul>
-                                                                        </div>
-                                                                        <!--/ko-->
-                                                                        <!--/ko-->
-
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <!-- end identity content -->
-                                                    </div>
                                                 </div>
                                             </div>
+
+                                            <!-- Splash Instructions -->
+                                            <div class="rr-splash-description">{% trans "Arches allows you to create and edit data in the field using mobile devices such as" %}</div>
+                                            <div class="rr-splash-description">{% trans "Select those resources that should participate in the survey" %}</div>
+                                        </div>
                                         </div>
                                         <!--/ko-->
-                                        <!-- End Groups/Users Card -->
+                                        <!-- End Models Card -->
                                     </div>
                                 </div>
                             </div>
