@@ -130,27 +130,25 @@ define([
                 return names;
             });
 
-            self.hasIdentity = function() {
+            self.hasIdentity = function(identity) {
                 var approved = false;
-                var identity = self.selectedIdentity();
                 if (identity) {
                     approved = identity.approved();
                 }
                 return approved;
             };
 
-            self.toggleIdentity = function() {
-                var identity = self.selectedIdentity();
+            self.toggleIdentity = function(identity) {
                 if (identity) {
                     var currentIdentities = identity.type === 'user' ? self.users : self.groups;
-                    if (self.hasIdentity()) {
+                    if (self.hasIdentity(identity) === false) {
                         currentIdentities.remove(identity.id);
                         if (identity.type === 'user') {
                             identity.approved(false);
                         } else {
                             identity.approved(false);
                             _.chain(self.identities).filter(function(id) {
-                                return id.type === 'user' && _.contains(_.pluck(this.selectedIdentity().users, 'id'), id.id);
+                                return id.type === 'user' && _.contains(_.pluck(identity.users, 'id'), id.id);
                             }, this).each(function(user) {
                                 if (_.intersection(user.group_ids, self.groups()).length === 0) { // user does not belong to any accepted groups
                                     user.approved(false);

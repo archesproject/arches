@@ -366,7 +366,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 <!--ko if: selectedNode().type === 'group' -->
                                                 <!--ko foreach: {data: selectedNode().fullusers, as: 'user'} -->
                                                 <li style="display:flex; align-items:center; padding">
-                                                    <input style="height:15px; width:15px; padding-right: 10px" type="checkbox" value="user.approved" data-bind="checked: user.approved"/>
+                                                    <input style="height:15px; width:15px; padding-right: 10px" type="checkbox" value="user.approved()" data-bind="checked: user.approved, event: {'change': $parent.mobilesurvey.toggleIdentity}"/>
                                                     <span data-bind="text: user.name"></span>
                                                 </li>
                                                 <!--/ko-->
