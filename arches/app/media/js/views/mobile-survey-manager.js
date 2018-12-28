@@ -16,7 +16,7 @@ define([
 
         this.mobilesurveys = ko.observableArray(
             params.mobilesurveys.map(function(mobilesurvey) {
-                mobilesurvey.createdbyName = ko.observable('Created by: ' + mobilesurvey.createdby_id);
+                mobilesurvey.createdbyName = mobilesurvey.created_by.first + ' ' + mobilesurvey.created_by.last;
                 mobilesurvey.name = ko.observable(mobilesurvey.name);
                 mobilesurvey.active = ko.observable(mobilesurvey.active);
                 mobilesurvey.delete = function(successCallback, errorCallback) {

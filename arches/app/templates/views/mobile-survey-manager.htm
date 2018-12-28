@@ -84,7 +84,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </div>
                         <div class="mpm-project-status" data-bind="text: active() ? '{% trans "Active" %}' : '{% trans "Inactive" %}'"></div>
                         <a class="mpm-project-delete" data-bind="click: function(val){$parent.deleteMobileSurvey(val)}, clickBubble: false, css: {'disabled': active()}" href="" class="" aria-expanded="true">{% trans 'delete' %}</a>
-                        <div class="mpm-project-subtitle" data-bind="text: createdbyName"></div>
+                        <div class="mpm-project-subtitle" data-bind="text: '{% trans "Created by: " %}' + createdbyName"></div>
                     </div>
                     </a>
                     <!-- /ko -->

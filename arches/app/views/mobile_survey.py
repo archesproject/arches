@@ -89,9 +89,26 @@ class MobileSurveyManagerView(BaseManagerView):
             return result
 
         mobile_survey_models = models.MobileSurveyModel.objects.order_by('name')
+        mobile_surveys = []
         serializer = JSONSerializer()
+        for survey in mobile_survey_models:
+            serialized_survey = serializer.serializeToPython(survey)
+            serialized_survey['edited_by'] = {
+                'username': survey.lasteditedby.username,
+                'first': survey.lasteditedby.first_name,
+                'last': survey.lasteditedby.last_name,
+                'id': survey.lasteditedby.id
+                }
+            serialized_survey['created_by'] = created_by = {
+                'username': survey.createdby.username,
+                'first': survey.createdby.first_name,
+                'last': survey.createdby.last_name,
+                'id': survey.createdby.id
+                }
+            mobile_surveys.append(serialized_survey)
+
         context = self.get_context_data(
-            mobile_surveys=serializer.serialize(mobile_survey_models, sort_keys=False),
+            mobile_surveys=serializer.serialize(mobile_surveys, sort_keys=False),
             main_script='views/mobile-survey-manager',
         )
 
