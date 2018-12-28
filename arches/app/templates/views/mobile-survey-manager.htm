@@ -20,8 +20,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load i18n %}
 
 {% block main_content %}
-<div class="content-panel mobile-project-manager-editor">
-    <div class="flex">
+
+<div>
 
         <div id="rr-splash" class="rr-splash" data-bind="visible: mobilesurveys().length === 0">
 
@@ -44,11 +44,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
         <div data-bind="visible: mobilesurveys().length > 0" style="width: 100%;">
-        <!-- Left Panel: Groups/Accounts -->
-        <div class="panel ep-card-tools-panel">
-
                 <!-- Layer Filter -->
-                <div class="list-filter" data-bind="">
+                <div class="list-filter mpm" data-bind="">
                     <div class="msm-list-filter">
                     <div>
                         <button id="" class="btn btn-lg btn-mint btn-active-dark btn-labeled ion-plus-round" data-bind="click: newMobileSurvey">{% trans "New Survey" %}</button>
@@ -63,8 +60,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
             <!-- Survey Listing Panel-->
-            <div id="user-grid" class="grid" style="display:none;" data-bind="visible: true">
-
+            <div class="mpm-list">
+            <div class="grid mpm" style="display:none;" data-bind="visible: true">
                 <!-- ko if: mobilesurveys().length ===  0 -->
                 <div id="default-message-panel" class="left-column-message" style="">
                     {% trans "You haven't saved any surveys." %}
@@ -75,27 +72,48 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- /ko -->
 
                 <!-- ko if: mobilesurveys().length >  0 -->
-                <div id="project-listing-panel" class="selected" style="padding-left: 6px">
-                    <!-- ko foreach: filteredMobileSurveys() -->
-                    <a data-bind="">
-                    <div class="library-card selected selected-card" data-bind="click: $parent.navigateToEditor">
-                        <div class="mpm-project-card">
-                            <a class="mpm-project-name" data-bind="text: name() === '' ? '{% trans "Unnamed Survey" %}' : name()"></a>
+                <div id="page-content" style="padding: 0 50px 240px; margin-top: -1px;">
+
+                    <div class="report-image-grid mpm">
+
+                        <!-- ko foreach: filteredMobileSurveys() -->
+                        <div class="resource-grid-item mpm-manager relative">
+                            <div class="resource-grid-main-container mpm" data-bind="click: $parent.navigateToEditor">
+                                <div class="resource-grid-main mpm-manager">
+                                    <div class="title-items" style="display:flex; flex-direction: column;">
+                                        <div class="mpm-title"><span data-bind="text: name() === '' ? '{% trans "Unnamed Survey" %}' : name()"></span></div>
+                                        <!--ko if: description -->
+                                        <div class="mpm-subtitle" data-bind="text: description"></div>
+                                        <!--/ko -->
+                                        <!--ko if: enddate && startdate -->
+                                        <div class="mpm-subtitle" data-bind="text: starts + '{% trans " through " %}' + ends"></div>
+                                        <!--/ko -->
+                                        <!--ko ifnot: enddate && startdate -->
+                                        <div class="mpm-subtitle" data-bind="text: '{% trans "Date range unspecified" %}'"></div>
+                                        <!--/ko -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="resource-grid-tools-container mpm-manager">
+                                    <button class="btn btn-shim btn-rr btn-labeled btn-sm fa fa-trash" data-bind="click: function(val){$parent.deleteMobileSurvey(val)}, clickBubble: false, css: {'disabled': active()}" aria-expanded="true">{% trans 'delete' %}</button>
+                                    <div class="resource-status-label">{% trans "Status" %}: <span class="resource-status" data-bind="text:active()?'{% trans "Active" %}':'{% trans "Inactive" %}'"></span></div>
+                            </div>
                         </div>
-                        <div class="mpm-project-status" data-bind="text: active() ? '{% trans "Active" %}' : '{% trans "Inactive" %}'"></div>
-                        <a class="mpm-project-delete" data-bind="click: function(val){$parent.deleteMobileSurvey(val)}, clickBubble: false, css: {'disabled': active()}" href="" class="" aria-expanded="true">{% trans 'delete' %}</a>
-                        <div class="mpm-project-subtitle" data-bind="text: '{% trans "Created by: " %}' + createdbyName"></div>
+                        <!-- /ko -->
+
                     </div>
-                    </a>
-                    <!-- /ko -->
+
                 </div>
+
+
+
+
                 <!-- /ko -->
             </div>
-        </div>
-
-    </div>
+            </div>
     </div>
 </div>
+
 {% endblock main_content %}
 
 {% block tabs %}{% endblock tabs %}

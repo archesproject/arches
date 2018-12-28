@@ -198,10 +198,13 @@ class MobileSurveyDesignerView(MapBaseManagerView):
         except TypeError:
             pass
 
-        if mobile_survey['bounds']['type'] == 'MultiPolygon':
-            multipart = mobile_survey['bounds']
-            singlepart = GeoUtils().convert_multipart_to_singlepart(multipart)
-            mobile_survey['bounds'] = singlepart
+        try:
+            if mobile_survey['bounds']['type'] == 'MultiPolygon':
+                multipart = mobile_survey['bounds']
+                singlepart = GeoUtils().convert_multipart_to_singlepart(multipart)
+                mobile_survey['bounds'] = singlepart
+        except TypeError as e:
+            print('no bounds available')
 
         serializer = JSONSerializer()
         context = self.get_context_data(

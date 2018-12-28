@@ -10753,11 +10753,66 @@ a.search-facet-item.disabled {
     border-right: 1px solid #ddd;
 }
 
+
 .msm-data-selection .form-text.form-checkbox:not(.btn), .form-text.form-radio:not(.btn) {
     margin-top: 1px;
 }
 
+.resource-grid-main.mpm-manager {
+    height: 100%;
+    padding-top: 20px;
+    padding-left: 20px;
+}
 
+.resource-grid-tools-container.mpm-manager {
+    display: flex;
+    flex-direction: column;
+}
+
+
+.resource-grid-main-container.mpm {
+    background: none;
+}
+
+.grid.mpm {
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+    max-width: none;
+}
+
+.list-filter.mpm {
+    background-color: #f4f4f4;
+    margin-bottom: 0;
+}
+
+.mpm-subtitle {
+    color: #999;
+    font-size: 12px;
+    width: 500px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mpm-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.resource-grid-item.mpm-manager:hover {
+    background-color: #f5f5f5;
+}
+
+.resource-grid-main.mpm-manager .mpm-title {
+    font-weight: 550;
+    font-size: 1.3em;
+}
+
+.report-image-grid.mpm {
+    overflow-y: auto;
+}
 
 .nav-tabs li a.graph-designer-tab {
     padding: 15px 10px 15px 10px;
@@ -11355,17 +11410,6 @@ a.search-facet-item.disabled {
     color: #999;
 }
 
-.mpm-project-delete {
-    position: absolute;
-    top: 31px;
-    right: 12px;
-    font-size: 12px;
-}
-
-.mpm-project-delete.disabled {
-    color: #ccc;
-}
-
 .mpm-user-status {
     color: #ccc;
     padding: 4px 10px;
@@ -11381,6 +11425,10 @@ a.search-facet-item.disabled {
     text-align: left;
 }
 
+
+.mpm-manager .btn-rr {
+    margin: 0;
+}
 
 .mpm-instructions {
     display: table-cell;

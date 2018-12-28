@@ -7,18 +7,20 @@ define([
     'viewmodels/alert',
     'mobile-survey-manager-data',
     'arches',
-    'bindings/datepicker'
-], function($, _, ko, uuid, BaseManagerView, AlertViewModel, data, arches) {
+    'moment',
+    'bindings/datepicker',
+], function($, _, ko, uuid, BaseManagerView, AlertViewModel, data, arches, moment) {
 
     var MobileSurveysViewModel = function(params) {
         var self = this;
         this.dateFormat = 'YYYY-MM-DD';
-
         this.mobilesurveys = ko.observableArray(
             params.mobilesurveys.map(function(mobilesurvey) {
                 mobilesurvey.createdbyName = mobilesurvey.created_by.first + ' ' + mobilesurvey.created_by.last;
                 mobilesurvey.name = ko.observable(mobilesurvey.name);
                 mobilesurvey.active = ko.observable(mobilesurvey.active);
+                mobilesurvey.ends = moment(mobilesurvey.enddate).format('D MMMM YYYY');
+                mobilesurvey.starts = moment(mobilesurvey.startdate).format('D MMMM YYYY');
                 mobilesurvey.delete = function(successCallback, errorCallback) {
                     return $.ajax({
                         url: arches.urls.mobile_survey_manager,
