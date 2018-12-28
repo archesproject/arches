@@ -496,7 +496,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                         <!--ko if: selectedNode().type === 'group' -->
                                                         <div style="border-top: solid 1px #ccc;">
                                                         <!--ko foreach: {data: selectedNode().fullusers, as: 'user'} -->
-                                                        <div data-bind="click: function(){$parent.mobilesurvey.selectedUser(user)};, css: {oddrow: ($parent.selectedNode().fullusers.indexOf(user) % 2 === 1), selected: user.id === $parent.mobilesurvey.selectedUser().id}, visible: user.filtered() === false" class="userrow">
+                                                        <div data-bind="click: function(){$parent.mobilesurvey.selectedUser(user); return true;};, css: {oddrow: ($parent.selectedNode().fullusers.indexOf(user) % 2 === 1), selected: user.id === $parent.mobilesurvey.selectedUser().id}, visible: user.filtered() === false" class="userrow">
                                                             <input style="height:15px; width:15px; padding-right: 10px" type="checkbox" value="user.approved()" data-bind="checked: user.approved, event: {'change': $parent.mobilesurvey.toggleIdentity}" />
                                                             <span data-bind="text: user.name"></span>
                                                         </div>
