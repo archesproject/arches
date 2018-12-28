@@ -194,6 +194,7 @@ define([
             };
 
             self.toggleShowDetails = function() {
+                //used in the profile manager
                 self.setIdentityApproval();
                 self.showDetails(!self.showDetails());
             };
