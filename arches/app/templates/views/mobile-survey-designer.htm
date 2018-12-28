@@ -75,7 +75,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <div id="cards" style="margin: 0px; margin-top: 0px;">
 
                                     <!--Tabs Content-->
-                                    <div class="tab-content" style="margin-left: 0px;">
+                                    <div style="margin-left: 0px;">
 
 
                                         <!-- Summary Card -->
@@ -357,36 +357,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </div>
                                         <!--/ko-->
 
-
-                                        <!--ko if: activePage() === 'identity'-->
-                                        <div id="models-card">
-                                            <div class="mpm-card-content">
-                                            <div data-bind="text: selectedNode().name"></div>
-                                            <ul style="list-style-type: none;">
-                                                <!--ko if: selectedNode().type === 'group' -->
-                                                <!--ko foreach: {data: selectedNode().fullusers, as: 'user'} -->
-                                                <li style="display:flex; align-items:center; padding">
-                                                    <input style="height:15px; width:15px; padding-right: 10px" type="checkbox" value="user.approved()" data-bind="checked: user.approved, event: {'change': $parent.mobilesurvey.toggleIdentity}"/>
-                                                    <span data-bind="text: user.name"></span>
-                                                </li>
-                                                <!--/ko-->
-                                                <!--/ko-->
-                                            </ul>
-                                        </div>
-                                        </div>
-                                        <!--/ko-->
-
                                         <!-- Models Card -->
                                         <!--ko if: activePage() === 'models'-->
                                         <div id="models-card">
-
-
-                                        <div id="rr-splash" class="rr-splash">
-
+                                        <div class="mpm-card-content">
                                             <!-- Splash Title -->
                                             <div class="rr-splash-title">{% trans "Mobile Data Collection" %}</div>
                                             <div class="rr-splash-title">{% trans "Define the resource types for your survey" %}</div>
-
                                             <div class="mpm-resource-selection">
                                                 <div class="resource-dropdown">
                                                     <input style="width:30%; display:inline-block;"
@@ -397,7 +374,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 <div>
                                                 </div>
                                             </div>
-
                                             <!-- Splash Instructions -->
                                             <div class="rr-splash-description">{% trans "Arches allows you to create and edit data in the field using mobile devices such as" %}</div>
                                             <div class="rr-splash-description">{% trans "Select those resources that should participate in the survey" %}</div>
@@ -483,17 +459,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </div>
                                         <!--/ko-->
 
-
                                         <!--ko if: activePage() === 'people'-->
                                         <div id="models-card">
-
-
-                                        <div id="rr-splash" class="rr-splash">
-
+                                        <div class="mpm-card-content">
                                             <!-- Splash Title -->
                                             <div class="rr-splash-title">{% trans "Mobile Data Collection" %}</div>
-                                            <div class="rr-splash-title">{% trans "Define the resource types for your survey" %}</div>
-
+                                            <div class="rr-splash-title">{% trans "Define the user groups participating in your survey" %}</div>
                                             <div class="mpm-resource-selection">
                                                 <div class="resource-dropdown">
                                                     <input style="width:30%; display:inline-block;"
@@ -504,14 +475,56 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 <div>
                                                 </div>
                                             </div>
-
                                             <!-- Splash Instructions -->
                                             <div class="rr-splash-description">{% trans "Arches allows you to create and edit data in the field using mobile devices such as" %}</div>
                                             <div class="rr-splash-description">{% trans "Select those resources that should participate in the survey" %}</div>
                                         </div>
                                         </div>
                                         <!--/ko-->
-                                        <!-- End Models Card -->
+
+                                        <!--ko if: activePage() === 'identity'-->
+                                        <div id="models-card">
+                                            <div class="mpm-card-content group-page">
+                                                <div style="display: flex">
+                                                    <div style="display: flex; flex-direction: column; flex: 1;">
+                                                    <div class="list-filter mpm-group-panel-header">
+                                                        <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a user...' %}" data-bind="textInput: mobilesurvey.userFilter">
+                                                        <!-- Clear Search -->
+                                                        <span class="clear-node-search" data-bind="visible: true, click: function() { mobilesurvey.userFilter(''); }"><i class="fa fa-times-circle"></i></span>
+                                                    </div>
+                                                    <div class="mpm-group-panel-content">
+                                                        <!--ko if: selectedNode().type === 'group' -->
+                                                        <div style="border-top: solid 1px #ccc;">
+                                                        <!--ko foreach: {data: selectedNode().fullusers, as: 'user'} -->
+                                                        <div data-bind="click: function(){$parent.mobilesurvey.selectedUser(user)};, css: {oddrow: ($parent.selectedNode().fullusers.indexOf(user) % 2 === 1), selected: user.id === $parent.mobilesurvey.selectedUser().id}, visible: user.filtered() === false" class="userrow">
+                                                            <input style="height:15px; width:15px; padding-right: 10px" type="checkbox" value="user.approved()" data-bind="checked: user.approved, event: {'change': $parent.mobilesurvey.toggleIdentity}" />
+                                                            <span data-bind="text: user.name"></span>
+                                                        </div>
+                                                        <!--/ko-->
+                                                        </div>
+                                                        <!--/ko-->
+                                                    </div>
+                                                </div>
+                                                    <div style="display: flex; flex-direction: column; flex: 1; border-left: solid 1px #ccc;">
+                                                        <div class="list-filter mpm-group-panel-header">
+                                                        <h4>{% trans "Account Summary" %}</h4>
+                                                        </div>
+                                                        <div class="mpm-group-panel-content">
+                                                        <!--ko if: mobilesurvey.selectedUser() -->
+                                                        <dl>
+                                                            <dt>{% trans 'User Information' %}</dt>
+                                                            <dd data-bind="text: mobilesurvey.selectedUser().first_name + ' ' + mobilesurvey.selectedUser().last_name"></dd>
+                                                            <dd data-bind="text: mobilesurvey.selectedUser().name"></dd>
+                                                            <dd data-bind="text: mobilesurvey.selectedUser().email"></dd>
+                                                        </dl>
+                                                        <!--/ko-->
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--/ko-->
+
                                     </div>
                                 </div>
                             </div>

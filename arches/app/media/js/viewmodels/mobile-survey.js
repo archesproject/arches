@@ -114,10 +114,12 @@ define([
             identity.istopnode = false;
             identity.childNodes = ko.observableArray([]);
             identity.pageid = 'identity';
-            identity.namelong = 'User Account';
+            identity.namelong = identity.name;
             identity.iconclass = identity.type === 'group' ? 'fa fa-users' : 'fa fa-user';
-            identity.description = 'Users and Groups that participate in a survey';
+            identity.description = 'Manage users that participate in this survey';
         };
+
+        this.displayUser = ko.observable();
 
         this.resetCards = function(cards){
             _.each(self.allResources, function(r){

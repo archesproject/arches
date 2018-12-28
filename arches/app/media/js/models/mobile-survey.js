@@ -49,16 +49,19 @@ define([
                 });
             };
 
+            self.selectedUser = ko.observable();
+
             _.each(this.identities, function(item) {
+                item.filtered(false);
                 if (item.type === 'group') {
                     item.fullusers = _.filter(self.identities, function(id) {
                         return (id.type === 'user' && _.contains(id.group_ids, item.id));
                     });
-                    _.each(item.users, function(user){
-                        if (!user.expanded) {
-                            user.expanded = ko.observable(false);
+                    item.selected.subscribe(function(val){
+                        if(val) {
+                            self.selectedUser(item.fullusers[0]);
                         }
-                    }, this);
+                    });
                 }
             });
 
@@ -76,38 +79,16 @@ define([
             });
 
             self.userFilter = ko.observable('');
-            self.selectedUser = ko.observable();
 
-            self.filteredUsers = ko.computed(function() {
-                var filter = self.userFilter();
-                this.selected = _.filter(self.identities, function(identity) {
-                    return ko.unwrap(identity.selected);
-                });
-                var list = [];
-
-                if (this.selected.length === 1) {
-                    list = this.selected[0].users;
-                    if (filter.length === 0) {
-                        return list;
-                    }
-                }
-
-                return _.filter(list, function(user) {
-                    if (user.username.startsWith(filter)) {
-                        return user;
+            self.userFilter.subscribe(function(filter){
+                _.each(self.identities, function(id) {
+                    var regex = new RegExp(filter);
+                    if (id.type && id.type === 'user' && regex.test(id.name)) {
+                        id.filtered(false);
+                    } else {
+                        id.filtered(true);
                     }
                 });
-
-            });
-
-            self.selectedIdentity = ko.computed(function() {
-                var selected = _.filter(self.identities, function(identity) {
-                    return ko.unwrap(identity.selected);
-                });
-                if (selected.length === 1 && selected[0].users) {
-                    self.selectedUser(selected[0].users.length > 0 ? selected[0].users[0] : undefined);
-                }
-                return selected.length > 0 ? selected[0] : undefined;
             });
 
             self.approvedUserNames = ko.computed(function() {

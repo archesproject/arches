@@ -10654,7 +10654,45 @@ a.search-facet-item.disabled {
 }
 
 .mpm-card-content {
-    padding: 10px;
+    margin: 15px;
+    border: 1px solid #ddd;
+    padding: 15px;
+    background: #f6f6f6;
+    border-radius: 4px;
+}
+
+.mpm-group-panel-header {
+    margin: 10px;
+    height: 35px;
+}
+
+.mpm-group-panel-content {
+    border-top: solid 1px #ccc;
+    padding: 5px;
+}
+
+.mpm-card-content .userrow {
+    display: flex;
+    padding: 5px;
+    border-bottom: solid 1px #ccc;
+    border-left: solid 1px #ccc;
+    border-right: solid 1px #ccc;
+}
+
+.mpm-card-content .userrow:hover {
+    font-weight: 600;
+}
+
+.mpm-card-content .userrow.selected {
+    font-weight: 600;
+}
+
+.mpm-card-content.group-page{
+    padding: 0;
+}
+
+.mpm-card-content .oddrow {
+    background: #fff;
 }
 
 .mpm-resource-selection {
