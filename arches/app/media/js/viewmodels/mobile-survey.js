@@ -220,12 +220,26 @@ define([
                 data: {results: this.allIdentities.map(function(r){return {text: r.name, id: r.id};})},
                 value: this.selectedGroupsIds,
                 multiple: true,
-                placeholder: "select a model",
+                placeholder: "select a group",
                 allowClear: true
             };
         };
 
         this.loading = ko.observable(false);
+
+        this.surveyReady = ko.pureComputed(function(){
+            var status = {
+                cards: this.mobilesurvey.cards().length > 0,
+                identities: this.mobilesurvey.users().length > 0 || this.mobilesurvey.groups().length > 0,
+                daterange: !!this.mobilesurvey.startdate() && !!this.mobilesurvey.enddate(),
+                mapsources: !!this.mobilesurvey.onlinebasemaps().default || !!this.mobilesurvey.tilecache()
+            };
+            status.incomplete =  [status.cards, status.identities, status.daterage, status.mapsources].includes(false);
+            if (status.incomplete) {
+                this.mobilesurvey.active(false);
+            }
+            return status;
+        }, this);
 
         this.treenodes = [{
             name: this.mobilesurvey.name,

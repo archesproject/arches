@@ -86,6 +86,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                                     <!-- Project Summary Panel -->
                                                     <div class="mpm-activation-panel">
+                                                        <!--ko if: surveyReady().incomplete -->
+                                                        <div class="mpm-item-listing-header"><i class="fa fa-exclamation-triangle" style="color:orange; padding-right:5px;"></i>{% trans 'Survey Status' %}</div>
+                                                        <div class="mpm-card-content">
+                                                        <div style="padding-left: 10px">{% trans 'You won’t be able to activate this survey until you have addressed the following items:' %}</div>
+                                                        <ul class="">
+                                                            <li data-bind = "visible: surveyReady().cards == false">{% trans 'Select the Model(s) and associated data entry cards to include in the survey' %}</li>
+                                                            <li data-bind = "visible: surveyReady().identities == false">{% trans 'Select the People that you want to invite to the survey' %}</li>
+                                                            <li data-bind = "visible: surveyReady().daterange == false">{% trans 'Define the start and end dates of your survey' %}</li>
+                                                            <li data-bind = "visible: surveyReady().mapsources == false">{% trans 'Define either an online or offline basemap source' %}</li>
+                                                        </ul>
+                                                    </div>
+                                                        <!--/ko-->
                                                         <!-- Activate Project -->
                                                         <div class="row pad-btm">
                                                             <!-- Activate Switch -->
@@ -95,15 +107,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                     <p class="mpm-item-listing-header" style="margin-bottom: 0px;">{% trans 'Activate Survey' %}</p>
 
                                                                     <div class="toggle-container">
-                                                                        <span class="switch switch-small" data-bind="css: {'on': mobilesurvey.active()}, click: function(){
-                                                                            mobilesurvey.active(!mobilesurvey.active());
-                                                                        }"><small></small></span>
+                                                                        <span class="switch switch-small" data-bind="css: {'on': mobilesurvey.active(), 'disabled': surveyReady().incomplete}, click: function(){
+                                                                            if (!surveyReady().incomplete) {mobilesurvey.active(!mobilesurvey.active())};}"><small></small></span>
                                                                     </div>
-
                                                                 </div>
+
+
                                                             </div>
 
-                                                            <!-- Help Message-->
                                                             <div class="col-sm-6 col-md-9">
                                                                 <p class="account-tips" style="margin-top: 20px;">
                                                                     By activating the survey you will send users an email with the information needed to begin data editing activitites.
@@ -492,11 +503,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                         <!-- Clear Search -->
                                                         <span class="clear-node-search" data-bind="visible: true, click: function() { mobilesurvey.userFilter(''); }"><i class="fa fa-times-circle"></i></span>
                                                     </div>
-                                                    <div class="mpm-group-panel-content">
+                                                    <div class="mpm-group-panel-content list">
                                                         <!--ko if: selectedNode().type === 'group' -->
                                                         <div style="border-top: solid 1px #ccc;">
                                                         <!--ko foreach: {data: selectedNode().fullusers, as: 'user'} -->
-                                                        <div data-bind="click: function(){$parent.mobilesurvey.selectedUser(user); return true;};, css: {oddrow: ($parent.selectedNode().fullusers.indexOf(user) % 2 === 1), selected: user.id === $parent.mobilesurvey.selectedUser().id}, visible: user.filtered() === false" class="userrow">
+                                                        <div data-bind="click: function(){$parent.mobilesurvey.selectedUser(user); return true;};, css: {oddrow: ($parent.selectedNode().fullusers.indexOf(user) % 2 === 0), selected: user.id === $parent.mobilesurvey.selectedUser().id}, visible: user.filtered() === false" class="userrow">
                                                             <input style="height:15px; width:15px; padding-right: 10px" type="checkbox" value="user.approved()" data-bind="checked: user.approved, event: {'change': $parent.mobilesurvey.toggleIdentity}" />
                                                             <span data-bind="text: user.name"></span>
                                                         </div>
