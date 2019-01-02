@@ -47,7 +47,6 @@ from arches.app.views.base import MapBaseManagerView
 import arches.app.views.search as search
 
 
-
 def get_survey_resources(mobile_survey_models):
     graphs = models.GraphModel.objects.filter(isresource=True).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
     resources = []
@@ -136,13 +135,13 @@ class MobileSurveyManagerView(BaseManagerView):
                         ret.delete()
                         return JSONResponse({'success': True})
             except Exception as e:
-                if connection_error == False:
+                if connection_error is False:
                     error_title = _('Unable to delete survey')
                     if e.strerror == 'Connection refused':
                         error_message = "Unable to connect to CouchDB"
                     else:
                         error_message = e.message
-                    connection_error = JSONResponse({'success':False,'message': error_message,'title': error_title}, status=500)
+                    connection_error = JSONResponse({'success': False, 'message': error_message, 'title': error_title}, status=500)
                 return connection_error
 
             return HttpResponseNotFound()
@@ -166,7 +165,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
         for group in Group.objects.all():
             users = group.user_set.all()
             if len(users) > 0:
-                groupUsers = [{'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email, 'last_login': get_last_login(user.last_login), 'username': user.username, 'groups': [g.id for g in user.groups.all()], 'group_names': ', '.join([g.name for g in user.groups.all()]) } for user in users]
+                groupUsers = [{'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email, 'last_login': get_last_login(user.last_login), 'username': user.username, 'groups': [g.id for g in user.groups.all()], 'group_names': ', '.join([g.name for g in user.groups.all()])} for user in users]
             identities.append({'name': group.name, 'type': 'group', 'id': group.pk, 'users': groupUsers, 'default_permissions': group.permissions.all()})
         for user in User.objects.filter():
             groups = []
@@ -176,7 +175,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
                 groups.append(group.name)
                 group_ids.append(group.id)
                 default_perms = default_perms + list(group.permissions.all())
-            identities.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions': set(default_perms), 'is_superuser':user.is_superuser, 'group_ids': group_ids, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email})
+            identities.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions': set(default_perms), 'is_superuser': user.is_superuser, 'group_ids': group_ids, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email})
 
         map_layers = models.MapLayer.objects.all()
         map_markers = models.MapMarker.objects.all()
@@ -187,7 +186,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
             mobile_survey = models.MobileSurveyModel.objects.get(pk=surveyid)
         else:
             mobile_survey = models.MobileSurveyModel(id=surveyid, name='Unnamed')
-            mobile_survey.datadownloadconfig = {"download":False, "count":1000, "resources":[], "custom": None}
+            mobile_survey.datadownloadconfig = {"download": False, "count": 1000, "resources": [], "custom": None}
 
         mobile_surveys, resources = get_survey_resources([mobile_survey])
         mobile_survey = mobile_surveys[0]
@@ -243,13 +242,13 @@ class MobileSurveyDesignerView(MapBaseManagerView):
                     ret.delete()
                     return JSONResponse({'success': True})
         except Exception as e:
-            if connection_error == False:
+            if connection_error is False:
                 error_title = _('Unable to delete survey')
                 if e.strerror == 'Connection refused':
                     error_message = "Unable to connect to CouchDB"
                 else:
                     error_message = e.message
-                connection_error = JSONResponse({'success':False,'message': error_message,'title': error_title}, status=500)
+                connection_error = JSONResponse({'success': False, 'message': error_message, 'title': error_title}, status=500)
             return connection_error
 
         return HttpResponseNotFound()
@@ -292,12 +291,11 @@ class MobileSurveyDesignerView(MapBaseManagerView):
 
             for card_id in cards_to_update:
                 mobile_survey_card = models.MobileSurveyXCard.objects.filter(mobile_survey=mobile_survey).get(card=models.CardModel.objects.get(cardid=card_id))
-                mobile_survey_card.sortorder=data['cards'].index(card_id)
+                mobile_survey_card.sortorder = data['cards'].index(card_id)
                 mobile_survey_card.save()
 
             for card_id in cards_to_remove:
                 models.MobileSurveyXCard.objects.filter(card=models.CardModel.objects.get(cardid=card_id), mobile_survey=mobile_survey).delete()
-
 
         if mobile_survey.active != data['active']:
             # notify users in the mobile_survey that the state of the mobile_survey has changed
@@ -345,16 +343,16 @@ class MobileSurveyDesignerView(MapBaseManagerView):
             with transaction.atomic():
                 mobile_survey.save()
         except Exception as e:
-            if connection_error == False:
+            if connection_error is False:
                 error_title = _('Unable to save survey')
                 if 'strerror' in e and e.strerror == 'Connection refused':
                     error_message = "Unable to connect to CouchDB"
                 else:
                     error_message = e.message
-                connection_error = JSONResponse({'success':False,'message': error_message,'title': error_title}, status=500)
+                connection_error = JSONResponse({'success': False, 'message': error_message, 'title': error_title}, status=500)
             return connection_error
 
-        return JSONResponse({'success':True, 'mobile_survey': mobile_survey})
+        return JSONResponse({'success': True, 'mobile_survey': mobile_survey})
 
     def get_mobile_survey_users(self, mobile_survey):
         users = set(mobile_survey.users.all())
@@ -368,13 +366,13 @@ class MobileSurveyDesignerView(MapBaseManagerView):
         admin_email = settings.ADMINS[0][1] if settings.ADMINS else ''
         email_context = {
             'button_text': _('Logon to {app_name}'.format(app_name=settings.APP_NAME)),
-            'link':request.build_absolute_uri(reverse('home')),
+            'link': request.build_absolute_uri(reverse('home')),
             'greeting': _('Welcome to Arches!  You\'ve just been added to a Mobile Survey.  Please take a moment to review the mobile_survey description and mobile_survey start and end dates.'),
             'closing': _('If you have any qustions contact the site administrator at {admin_email}.'.format(admin_email=admin_email)),
         }
 
         html_content = render_to_string('email/general_notification.htm', email_context)
-        text_content = strip_tags(html_content) # this strips the html, so people will have the text as well.
+        text_content = strip_tags(html_content)  # this strips the html, so people will have the text as well.
 
         # create the email, and attach the HTML version as well.
         for user in self.get_mobile_survey_users(mobile_survey):
@@ -386,7 +384,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
         admin_email = settings.ADMINS[0][1] if settings.ADMINS else ''
         email_context = {
             'button_text': _('Logon to {app_name}'.format(app_name=settings.APP_NAME)),
-            'link':request.build_absolute_uri(reverse('home')),
+            'link': request.build_absolute_uri(reverse('home')),
             'greeting': _('Hi!  The Mobile Survey you were part of has ended or is temporarily suspended.  Please permform a final sync of your local dataset as soon as possible.'),
             'closing': _('If you have any qustions contact the site administrator at {admin_email}.'.format(admin_email=admin_email)),
         }
@@ -418,4 +416,4 @@ class MobileSurveyResources(View):
                 cards = [Card.objects.get(pk=card.cardid) for card in models.CardModel.objects.filter(graph=graph)]
                 resources.append({'name': graph.name, 'id': graph.graphid, 'subtitle': graph.subtitle, 'iconclass': graph.iconclass, 'cards': cards})
 
-        return JSONResponse({'success':True, 'resources': resources})
+        return JSONResponse({'success': True, 'resources': resources})
