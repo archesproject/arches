@@ -79,8 +79,11 @@ define([
                 .done(function(data){
                     var rootCards = self.getRootCards(data.cards);
                     resource.cards(ko.unwrap(rootCards));
-                })
-                .fail(function(data){console.log('card request failed', data);});
+                });
+        };
+
+        this.navigateToManager = function() {
+            window.location = arches.urls.mobile_survey;
         };
 
         this.initializeResource = function(r) {
