@@ -9156,6 +9156,29 @@ a.clear-geojson-button:hover {
     top: 6px
 }
 
+.msm-designer-panel {
+    width: 100%;
+    background-color: #fff;
+}
+
+.msm-list-filter {
+    display: flex;
+    padding: 10px;
+}
+
+.msm-list-filter-input {
+    padding-left: 15px;
+    width: 250px;
+    height: 35px;
+    position: relative;
+}
+
+.msm-list-filter-input .clear-node-search {
+    top: 9px;
+    right: 10px;
+}
+
+
 /* End Function Manager Page */
 
 .category-header {
@@ -10584,10 +10607,6 @@ a.search-facet-item.disabled {
     background: #fafafa;
 }
 
-.mobile-project-manager-editor .clear-node-search {
-    top: 50px;
-}
-
 .mobile-project-manager-editor .card-nav-container {
     margin-bottom: 0;
 }
@@ -10635,7 +10654,84 @@ a.search-facet-item.disabled {
 }
 
 .mpm-card-content {
+    margin: 15px;
+    border: 1px solid #ddd;
+    padding: 15px;
+    background: #f6f6f6;
+    border-radius: 4px;
+}
+
+.mpm-group-panel-header {
+    margin: 10px;
+    height: 35px;
+}
+
+.mpm-group-panel-content {
+    border-top: solid 1px #ccc;
     padding: 10px;
+}
+
+.mpm-group-panel-content.list {
+    border-top: solid 0px #ccc;
+    padding: 0px;
+}
+
+
+.mpm-card-content .userrow {
+    display: flex;
+    padding: 5px;
+    border-bottom: solid 1px #ccc;
+}
+
+.mpm-card-content .userrow:hover {
+    font-weight: 600;
+}
+
+.mpm-card-content .userrow.selected {
+    font-weight: 600;
+}
+
+.mpm-card-content.group-page {
+    padding: 0;
+}
+
+.mpm-card-content {
+    padding: 0;
+}
+
+.mpm-card-content .title {
+    font-size: 22px;
+    font-weight: 525;
+    text-align: center;
+    padding: 10px;
+}
+
+.mpm-card-content .sub-title {
+    font-size: 18px;
+    font-weight: 500;
+    text-align: center;
+}
+
+.mpm-card-content .description {
+    font-size: 14px;
+    text-align: center;
+    margin: 15px 100px 15px 100px;
+}
+
+.mpm-card-content .oddrow {
+    background: #fff;
+    border-left: solid 1px #ccc;
+}
+
+.mpm-resource-selection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+}
+
+.mpm-resource-selection .resource-dropdown {
+    width: 300px;
 }
 
 .account-wrapper {
@@ -10685,11 +10781,70 @@ a.search-facet-item.disabled {
     border-right: 1px solid #ddd;
 }
 
+
 .msm-data-selection .form-text.form-checkbox:not(.btn), .form-text.form-radio:not(.btn) {
     margin-top: 1px;
 }
 
+.resource-grid-main.mpm-manager {
+    height: 100%;
+    padding-top: 20px;
+    padding-left: 20px;
+}
 
+.resource-grid-tools-container.mpm-manager {
+    display: flex;
+    flex-direction: column;
+}
+
+
+.resource-grid-main-container.mpm {
+    background: none;
+}
+
+.grid.mpm {
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+    max-width: none;
+}
+
+.list-filter.mpm {
+    background-color: #f4f4f4;
+    margin-bottom: 0;
+}
+
+.mpm-subtitle {
+    color: #999;
+    font-size: 12px;
+    width: 500px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mpm-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.map-search-container div .map-widget-panel {
+    height: calc(100vh - 110px);
+}
+
+.resource-grid-item.mpm-manager:hover {
+    background-color: #f5f5f5;
+}
+
+.resource-grid-main.mpm-manager .mpm-title {
+    font-weight: 550;
+    font-size: 1.3em;
+}
+
+.report-image-grid.mpm {
+    overflow-y: auto;
+}
 
 .nav-tabs li a.graph-designer-tab {
     padding: 15px 10px 15px 10px;
@@ -10808,6 +10963,30 @@ a.search-facet-item.disabled {
 
 .mobile-project-manager-editor .tab-content {
     padding:1px;
+}
+
+.mobile-designer-title {
+    font-size: 1.6em;
+    padding-left: 15px;
+    padding-top: 12px;
+}
+
+.msm-edit-buttons.mobile-project-category-header {
+    left: 0;
+    margin-left: 0px;
+    padding-left: 15px;
+}
+
+.msm-edit-buttons.mobile-project-category-header .description {
+    font-size: 0.8em;
+}
+
+.msm-tree {
+    height: 100%;
+}
+
+.left-panel-overflow.mobile-designer-tree {
+    height: inherit;
 }
 
 .identities-list .mpm-left-panel .user .project-status {
@@ -11267,17 +11446,6 @@ a.search-facet-item.disabled {
     color: #999;
 }
 
-.mpm-project-delete {
-    position: absolute;
-    top: 31px;
-    right: 12px;
-    font-size: 12px;
-}
-
-.mpm-project-delete.disabled {
-    color: #ccc;
-}
-
 .mpm-user-status {
     color: #ccc;
     padding: 4px 10px;
@@ -11293,6 +11461,10 @@ a.search-facet-item.disabled {
     text-align: left;
 }
 
+
+.mpm-manager .btn-rr {
+    margin: 0;
+}
 
 .mpm-instructions {
     display: table-cell;
@@ -11371,7 +11543,6 @@ a.search-facet-item.disabled {
 }
 
 .mpm-activation-panel {
-    margin-top: -30px;
     padding: 20px 40px;
 }
 
@@ -11385,7 +11556,7 @@ a.search-facet-item.disabled {
 }
 
 .msm-settings-summary {
-    min-height: 500px;
+    height:100%;
     overflow-y: scroll;
 }
 
