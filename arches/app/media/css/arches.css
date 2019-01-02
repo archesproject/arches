@@ -10965,7 +10965,6 @@ a.search-facet-item.disabled {
     padding:1px;
 }
 
-
 .mobile-designer-title {
     font-size: 1.6em;
     padding-left: 15px;
@@ -10982,8 +10981,13 @@ a.search-facet-item.disabled {
     font-size: 0.8em;
 }
 
+.msm-tree {
+    height: 100%;
+}
 
-
+.left-panel-overflow.mobile-designer-tree {
+    height: inherit;
+}
 
 .identities-list .mpm-left-panel .user .project-status {
     top: 33px;
