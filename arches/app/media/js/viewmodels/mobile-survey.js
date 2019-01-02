@@ -217,7 +217,7 @@ define([
             return {
                 clickBubble: true,
                 disabled: false,
-                data: {results: this.allIdentities.map(function(r){return {text: r.name, id: r.id};})},
+                data: {results: this.allIdentities.filter(function(id){return id.type==='group';}).map(function(g){return {text: g.name, id: g.id};})},
                 value: this.selectedGroupsIds,
                 multiple: true,
                 placeholder: "select a group",
@@ -232,9 +232,10 @@ define([
                 cards: this.mobilesurvey.cards().length > 0,
                 identities: this.mobilesurvey.users().length > 0 || this.mobilesurvey.groups().length > 0,
                 daterange: !!this.mobilesurvey.startdate() && !!this.mobilesurvey.enddate(),
-                mapsources: !!this.mobilesurvey.onlinebasemaps().default || !!this.mobilesurvey.tilecache()
+                mapsources: !!this.mobilesurvey.onlinebasemaps().default || !!this.mobilesurvey.tilecache(),
+                bounds: this.mobilesurvey.bounds().features.length > 0,
             };
-            status.incomplete =  [status.cards, status.identities, status.daterage, status.mapsources].includes(false);
+            status.incomplete =  [status.cards, status.identities, status.daterage, status.mapsources, status.bounds].includes(false);
             if (status.incomplete) {
                 this.mobilesurvey.active(false);
             }
@@ -249,6 +250,7 @@ define([
             selected: ko.observable(true),
             istopnode: true,
             iconclass: 'fa fa-globe',
+            status: this.surveyReady,
             pageactive: ko.observable(true),
             expanded: ko.observable(true),
             childNodes: ko.observableArray([{

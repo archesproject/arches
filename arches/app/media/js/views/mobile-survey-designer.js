@@ -34,7 +34,8 @@ define([
         activepage: viewModel.activePage,
         mobilesurvey: viewModel.mobilesurvey,
         items: viewModel.treenodes,
-        selectednode: viewModel.selectedNode
+        selectednode: viewModel.selectedNode,
+        status: viewModel.surveyReady
     });
 
     viewModel.discardEdits = function() {

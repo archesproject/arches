@@ -33,7 +33,13 @@
         <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){node.expanded(!node.expanded())}"></i>
         <a class="jstree-anchor" href="#" data-bind="click: tree.selectItem.bind(tree), css:{'jstree-clicked': node.selected, 'child-selected': tree.isChildSelected(node), 'filtered': tree.filter().length > 0 && !node.filtered()}">
             <div style="display:flex; align-items: center;">
+                <!--ko if: node.id === 'root' && tree.status().incomplete -->
+                <i class="fa fa-exclamation-triangle" style="color: orange" role="presentation"></i>
+                <!--/ko-->
+                <!--ko ifnot: node.id === 'root' && tree.status().incomplete -->
                 <i data-bind="css: node.iconclass" role="presentation"></i>
+                <!--/ko-->
+
                 <div data-bind="text: node.name" style="padding-left:5px"></div>
             <!-- ko if: node.istopnode -->
             <i class="jstree-node-action-icon fa fa-trash" role="presentation" data-bind="" data-toggle="tooltip" data-original-title="{% trans "Delete Survey" %}"></i>

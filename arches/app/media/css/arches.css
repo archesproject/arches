@@ -10691,8 +10691,31 @@ a.search-facet-item.disabled {
     font-weight: 600;
 }
 
-.mpm-card-content.group-page{
+.mpm-card-content.group-page {
     padding: 0;
+}
+
+.mpm-card-content {
+    padding: 0;
+}
+
+.mpm-card-content .title {
+    font-size: 22px;
+    font-weight: 525;
+    text-align: center;
+    padding: 10px;
+}
+
+.mpm-card-content .sub-title {
+    font-size: 18px;
+    font-weight: 500;
+    text-align: center;
+}
+
+.mpm-card-content .description {
+    font-size: 14px;
+    text-align: center;
+    margin: 15px 100px 15px 100px;
 }
 
 .mpm-card-content .oddrow {
@@ -10803,6 +10826,10 @@ a.search-facet-item.disabled {
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+.map-search-container div .map-widget-panel {
+    height: calc(100vh - 110px);
 }
 
 .resource-grid-item.mpm-manager:hover {

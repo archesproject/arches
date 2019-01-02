@@ -207,7 +207,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <!-- Summary Card -->
                                         <!--ko if: activePage() === 'settings'-->
                                         <div id="summary-card" class="mpm-card" style="">
-                                            <div class="mpm-card-content">
+                                            <div>
                                                 <div class="panel-body project-card-body">
                                                     <div id="" class="card-content">
 
@@ -286,51 +286,48 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             </div>
                                         </div>
                                         <!--/ko-->
-                                        <!-- Map Card -->
-                                        <!--ko if: activePage() === 'mapextent'-->
-                                        <div id="location-card" class="mpm-card msm-location-card ">
-                                            <div class="msm-map-container">
 
-                                                <div>
-                                                  <!-- ko component: {
-                                                      name: 'map-widget',
-                                                      params: {
-                                                        type: 'survey-bounds',
-                                                        configForm: false,
-                                                        node: null,
-                                                        value: mobilesurvey.bounds,
-                                                        state: 'form',
-                                                        config: {
-                                                            basemap: basemap.name,
-                                                            bearing: 0,
-                                                            centerX: defaultCenterX,
-                                                            centerY: defaultCenterY,
-                                                            featureColor: "rgba(55,32,196,0.85)",
-                                                            featureEditingDisabled: false,
-                                                            featureLineWidth: 2,
-                                                            featurePointSize: 6,
-                                                            geocodePlaceholder: "Locate a Place or Address",
-                                                            geocodeProvider: geocoderDefault,
-                                                            geocoderVisible: true,
-                                                            geometryTypes: [{'id':'Polygon','text':'Polygon'}],
-                                                            mapControlsHidden: false,
-                                                            maxZoom: mapDefaultMaxZoom,
-                                                            minZoom: mapDefaultMinZoom,
-                                                            overlayConfigs: [],
-                                                            overlayOpacity: 0,
-                                                            pitch: 0,
-                                                            zoom: mapDefaultZoom
-                                                        }
-                                                    }
-                                                  } --><!-- /ko -->
-                                                </div>
-                                            </div>
+                                        <!--ko if: activePage() === 'mapextent'-->
+                                        <div class="mapboxgl-map map-search-container">
+                                            <div class="msm-map-container">
+                                          <!-- ko component: {
+                                              name: 'map-widget',
+                                              params: {
+                                                type: 'survey-bounds',
+                                                configForm: false,
+                                                node: null,
+                                                value: mobilesurvey.bounds,
+                                                state: 'form',
+                                                config: {
+                                                    basemap: basemap.name,
+                                                    bearing: 0,
+                                                    centerX: defaultCenterX,
+                                                    centerY: defaultCenterY,
+                                                    featureColor: "rgba(55,32,196,0.85)",
+                                                    featureEditingDisabled: false,
+                                                    featureLineWidth: 2,
+                                                    featurePointSize: 6,
+                                                    geocodePlaceholder: "Locate a Place or Address",
+                                                    geocodeProvider: geocoderDefault,
+                                                    geocoderVisible: true,
+                                                    geometryTypes: [{'id':'Polygon','text':'Polygon'}],
+                                                    mapControlsHidden: false,
+                                                    maxZoom: mapDefaultMaxZoom,
+                                                    minZoom: mapDefaultMinZoom,
+                                                    overlayConfigs: [],
+                                                    overlayOpacity: 0,
+                                                    pitch: 0,
+                                                    zoom: mapDefaultZoom
+                                                }
+                                            }
+                                          } --><!-- /ko -->
+                                      </div>
                                         </div>
                                         <!--/ko-->
 
                                         <!--ko if: activePage() === 'mapsources'-->
-                                        <div id="location-card" class="mpm-card msm-location-card ">
-                                            <div class="mpm-card-content">
+                                        <div class="mpm-card msm-location-card ">
+                                            <div>
                                                 <div class="panel-body project-card-body">
                                                     <div class="col-sm-12 msm-basemap-location">
                                                         <div class="form-group" style="margin-bottom: 10px;">
@@ -350,10 +347,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <!--/ko-->
 
                                         <!--ko if: activePage() === 'resourcemodel'-->
-                                        <div id="models-card">
+                                        <div>
                                             <div class="mpm-card-content">
-
-                                            <div data-bind="text: selectedNode().name"></div>
+                                            <div style='padding-bottom: 10px; font-weight: 550'>{% trans 'Data entry cards selected for this survey:' %}</div>
                                             <ul style="list-style-type: none;">
                                                 <!--ko if: selectedNode().cards -->
                                                 <!--ko foreach: {data: selectedNode().cards, as: 'card'} -->
@@ -370,11 +366,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!-- Models Card -->
                                         <!--ko if: activePage() === 'models'-->
-                                        <div id="models-card">
+                                        <div>
                                         <div class="mpm-card-content">
                                             <!-- Splash Title -->
-                                            <div class="rr-splash-title">{% trans "Mobile Data Collection" %}</div>
-                                            <div class="rr-splash-title">{% trans "Define the resource types for your survey" %}</div>
+                                            <div class="title">{% trans "Mobile Data Collection" %}</div>
+                                            <div class="sub-title">{% trans "Define the resource types for your survey" %}</div>
                                             <div class="mpm-resource-selection">
                                                 <div class="resource-dropdown">
                                                     <input style="width:30%; display:inline-block;"
@@ -386,8 +382,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </div>
                                             </div>
                                             <!-- Splash Instructions -->
-                                            <div class="rr-splash-description">{% trans "Arches allows you to create and edit data in the field using mobile devices such as" %}</div>
-                                            <div class="rr-splash-description">{% trans "Select those resources that should participate in the survey" %}</div>
+                                            <div class="description">{% trans "Arches allows you to create and edit data in the field using mobile devices. Select those resources that should participate in the survey." %}</div>
                                         </div>
                                         </div>
                                         <!--/ko-->
@@ -395,8 +390,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!-- Data Card -->
                                         <!--ko if: activePage() === 'data'-->
-                                        <div id="data-card" class="mpm-card">
-                                            <div class="mpm-card-content">
+                                        <div class="mpm-card">
+                                            <div>
                                                 <div class="panel-body project-card-body">
                                                     <div class="card-content">
                                                         <div class="mpm-activation-panel">
@@ -474,8 +469,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <div id="models-card">
                                         <div class="mpm-card-content">
                                             <!-- Splash Title -->
-                                            <div class="rr-splash-title">{% trans "Mobile Data Collection" %}</div>
-                                            <div class="rr-splash-title">{% trans "Define the user groups participating in your survey" %}</div>
+                                            <div class="title">{% trans "Mobile Data Collection" %}</div>
+                                            <div class="sub-title">{% trans "Define the user groups participating in your survey" %}</div>
                                             <div class="mpm-resource-selection">
                                                 <div class="resource-dropdown">
                                                     <input style="width:30%; display:inline-block;"
@@ -487,8 +482,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </div>
                                             </div>
                                             <!-- Splash Instructions -->
-                                            <div class="rr-splash-description">{% trans "Arches allows you to create and edit data in the field using mobile devices such as" %}</div>
-                                            <div class="rr-splash-description">{% trans "Select those resources that should participate in the survey" %}</div>
+                                            <div class="description">{% trans "Arches allows you to create and edit data in the field using mobile devices. Select those people that should participate in the survey" %}</div>
                                         </div>
                                         </div>
                                         <!--/ko-->

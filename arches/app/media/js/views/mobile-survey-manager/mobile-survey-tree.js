@@ -26,6 +26,7 @@ define([
             this.items = options.items;
             this.activepage = options.activepage;
             this.selectednode = options.selectednode;
+            this.status = options.status;
         },
         _initializeItem: function(item){
             if (!item.expanded) {
