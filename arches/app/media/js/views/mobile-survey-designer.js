@@ -19,9 +19,7 @@ define([
         this.loading(true);
         var self = this;
         this.mobilesurvey.save(function(data) {
-            if (data.responseJSON.success) {
-                console.log('saved!');
-            } else {
+            if (!data.responseJSON.success) {
                 pageView.viewModel.alert(new AlertViewModel('ep-alert-red', data.responseJSON.title, data.responseJSON.message));
             }
             self.loading(false);
