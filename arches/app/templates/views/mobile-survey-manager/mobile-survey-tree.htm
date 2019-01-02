@@ -1,19 +1,6 @@
 {% load i18n %}
 <!-- ko foreach: { data: [$data], as: 'tree' } -->
 <div class="jstree jstree-default">
-    <div class="header" style="padding-bottom: 55px">
-        <!-- Layer Filter -->
-        <div class="list-filter" data-bind="">
-            <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a node, datatype, card...' %}" data-bind="textInput: tree.filter, event: {keypress: tree.filterEnterKeyHandler}">
-
-            <!-- Clear Search -->
-            <span class="clear-node-search" data-bind="visible: true, click: function() { tree.filter(''); }"><i class="fa fa-times-circle"></i></span>
-        </div>
-        <div class="tree-display-tools-panel">
-            <a class="tree-display-tool" data-bind="click: expandAll"><i class="ion-plus"></i>{% trans ' Expand' %}</a>
-            <a class="tree-display-tool" data-bind="click: collapseAll"><i class="ion-minus"></i>{% trans ' Collapse' %}</a>
-        </div>
-    </div>
     <div class="left-panel-overflow mobile-designer-tree">
         <!-- <div data-bind="sortable: $data"> -->
         <ul class="jstree-container-ul jstree-children" aria-expanded="true">
