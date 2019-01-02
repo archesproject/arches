@@ -10720,6 +10720,7 @@ a.search-facet-item.disabled {
 
 .mpm-card-content .oddrow {
     background: #fff;
+    border-left: solid 1px #ccc;
 }
 
 .mpm-resource-selection {
