@@ -19,7 +19,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load staticfiles %}
 {% load i18n %}
 
-
 {% block graph_title %}
 <div class="ep-tools-title">
     <h1 class="page-header text-overflow mobile-designer-title">
@@ -44,7 +43,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
         <div>
             <div>
-
                 <!-- Header -->
                 <div class="relative library-header" style="height: 55px;">
 
@@ -60,7 +58,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <ul class="msm-edit-buttons">
                             <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo" data-bind="click: discardEdits, css: {'disabled': mobilesurvey.dirty()==false}">{% trans 'Discard Edits' %}</button>
                             <button id="btn-save-edits" class="btn btn-primary btn-labeled btn-active-dark fa fa-check" data-bind="click: saveMobileSurvey, css: {'disabled': mobilesurvey.dirty()==false}">{% trans 'Save Edits' %}</button>
-                            <button id="btn-save-edits" class="btn btn-mint btn-labeled btn-active-dark fa fa-check" data-bind="click: navigateToManager">{% trans 'Exit Survey' %}</button>
                         </ul>
                         <!--/ko-->
                     </div>

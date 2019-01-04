@@ -43,17 +43,17 @@ define([
         this.activePage('root');
     };
 
-    viewModel.deleteMobileSurvey = function(mobilesurvey){
-        if (!mobilesurvey.active()) {
+    viewModel.deleteMobileSurvey = function(){
+        if (!this.mobilesurvey.active()) {
             var self = this;
             pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmSurveyDelete.title, arches.confirmSurveyDelete.text, function() {
                 return;
             }, function(){
                 self.loading(true);
-                if (mobilesurvey) {
-                    mobilesurvey.delete(function(data){
+                if (self.mobilesurvey) {
+                    self.mobilesurvey.delete(function(data){
                         if (data.responseJSON.success){
-                            console.log('navigate back to manager page');
+                            self.navigateToManager();
                         } else {
                             pageView.viewModel.alert(new AlertViewModel('ep-alert-red', data.responseJSON.title, data.responseJSON.message));
                         }
