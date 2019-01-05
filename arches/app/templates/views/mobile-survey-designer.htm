@@ -490,10 +490,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <div class="mpm-card-content group-page">
                                                 <div style="display: flex">
                                                     <div style="display: flex; flex-direction: column; flex: 1;">
-                                                    <div class="list-filter mpm-group-panel-header">
-                                                        <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a user...' %}" data-bind="textInput: mobilesurvey.userFilter">
-                                                        <!-- Clear Search -->
-                                                        <span class="clear-node-search" data-bind="visible: true, click: function() { mobilesurvey.userFilter(''); }"><i class="fa fa-times-circle"></i></span>
+                                                    <div class="list-filter mpm-group-panel-header" style="display: flex; align-items: center;">
+                                                        <div style="position: relative; width: 100%; margin-right: 10px;">
+                                                            <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a user...' %}" data-bind="textInput: mobilesurvey.userFilter">
+                                                            <span class="clear-node-search" data-bind="visible: true, click: function() { mobilesurvey.userFilter(''); }"><i class="fa fa-times-circle"></i></span>
+                                                        </div>
                                                     </div>
                                                     <div class="mpm-group-panel-content list">
                                                         <!--ko if: selectedNode().type === 'group' -->
