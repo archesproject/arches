@@ -9159,6 +9159,7 @@ a.clear-geojson-button:hover {
 .msm-designer-panel {
     width: 100%;
     background-color: #fff;
+    overflow-y: auto;
 }
 
 .msm-list-filter {
@@ -11553,7 +11554,6 @@ a.search-facet-item.disabled {
 
 .msm-settings-summary {
     height:100%;
-    overflow-y: scroll;
 }
 
 .msm-map-container {
