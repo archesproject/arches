@@ -39,8 +39,13 @@ define([
     viewModel.discardEdits = function() {
         this.mobilesurvey.reset();
         this.resetCards(this.mobilesurvey.cards);
+        this.resetIdentities(this.mobilesurvey);
         this.treenodes[0].selected(true);
         this.activePage('root');
+        _.each(this.treenodes[0].childNodes(), function(node){
+            node.selected(false);
+            node.expanded(false);
+        });
     };
 
     viewModel.deleteMobileSurvey = function(){
