@@ -133,6 +133,18 @@ define([
             });
         };
 
+        this.resetIdentities = function(mobilesurvey){
+            var groups = mobilesurvey.groups;
+            var users = mobilesurvey.users;
+            if (this.identityList.selected()) {
+                this.identityList.selected().selected(false);
+            }
+            _.each(this.identityList.items(), function(item){
+                var identitytype = item.type === 'user' ? users : groups;
+                item.approved(_.contains(identitytype(), item.id));
+            });
+        };
+
         _.each(this.allResources, this.initializeResource);
         _.each(this.allIdentities, this.initializeIdentities);
 

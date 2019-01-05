@@ -19,7 +19,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load staticfiles %}
 {% load i18n %}
 
-
 {% block graph_title %}
 <div class="ep-tools-title">
     <h1 class="page-header text-overflow mobile-designer-title">
@@ -44,7 +43,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
         <div>
             <div>
-
                 <!-- Header -->
                 <div class="relative library-header" style="height: 55px;">
 
@@ -60,7 +58,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <ul class="msm-edit-buttons">
                             <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo" data-bind="click: discardEdits, css: {'disabled': mobilesurvey.dirty()==false}">{% trans 'Discard Edits' %}</button>
                             <button id="btn-save-edits" class="btn btn-primary btn-labeled btn-active-dark fa fa-check" data-bind="click: saveMobileSurvey, css: {'disabled': mobilesurvey.dirty()==false}">{% trans 'Save Edits' %}</button>
-                            <button id="btn-save-edits" class="btn btn-mint btn-labeled btn-active-dark fa fa-check" data-bind="click: navigateToManager">{% trans 'Exit Survey' %}</button>
                         </ul>
                         <!--/ko-->
                     </div>
@@ -493,17 +490,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <div class="mpm-card-content group-page">
                                                 <div style="display: flex">
                                                     <div style="display: flex; flex-direction: column; flex: 1;">
-                                                    <div class="list-filter mpm-group-panel-header">
-                                                        <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a user...' %}" data-bind="textInput: mobilesurvey.userFilter">
-                                                        <!-- Clear Search -->
-                                                        <span class="clear-node-search" data-bind="visible: true, click: function() { mobilesurvey.userFilter(''); }"><i class="fa fa-times-circle"></i></span>
+                                                    <div class="list-filter mpm-group-panel-header" style="display: flex; align-items: center;">
+                                                        <div style="position: relative; width: 100%; margin-right: 10px;">
+                                                            <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a user...' %}" data-bind="textInput: mobilesurvey.userFilter">
+                                                            <span class="clear-node-search" data-bind="visible: true, click: function() { mobilesurvey.userFilter(''); }"><i class="fa fa-times-circle"></i></span>
+                                                        </div>
                                                     </div>
                                                     <div class="mpm-group-panel-content list">
                                                         <!--ko if: selectedNode().type === 'group' -->
                                                         <div style="border-top: solid 1px #ccc;">
                                                         <!--ko foreach: {data: selectedNode().fullusers, as: 'user'} -->
                                                         <div data-bind="click: function(){$parent.mobilesurvey.selectedUser(user); return true;};, css: {oddrow: ($parent.selectedNode().fullusers.indexOf(user) % 2 === 0), selected: user.id === $parent.mobilesurvey.selectedUser().id}, visible: user.filtered() === false" class="userrow">
-                                                            <input style="height:15px; width:15px; padding-right: 10px" type="checkbox" value="user.approved()" data-bind="checked: user.approved, event: {'change': $parent.mobilesurvey.toggleIdentity}" />
+                                                            <input style="height:15px; width:15px; margin-right: 5px;" type="checkbox" value="user.approved()" data-bind="checked: user.approved, event: {'change': $parent.mobilesurvey.toggleIdentity}" />
                                                             <span data-bind="text: user.name"></span>
                                                         </div>
                                                         <!--/ko-->

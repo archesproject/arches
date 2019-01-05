@@ -218,6 +218,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
             main_script='views/mobile-survey-designer',
         )
 
+        context['nav']['menu'] = True
         context['nav']['title'] = _('Mobile Survey Manager')
         context['nav']['icon'] = 'fa-server'
         context['nav']['help'] = {
@@ -227,18 +228,12 @@ class MobileSurveyDesignerView(MapBaseManagerView):
 
         return render(request, 'views/mobile-survey-designer.htm', context)
 
-    def delete(self, request):
-        mobile_survey_id = None
-        try:
-            mobile_survey_id = JSONDeserializer().deserialize(request.body)['id']
-        except Exception as e:
-            print e
-
+    def delete(self, request, surveyid):
         try:
             connection_error = False
             with transaction.atomic():
-                if mobile_survey_id is not None:
-                    ret = MobileSurvey.objects.get(pk=mobile_survey_id)
+                if surveyid is not None:
+                    ret = MobileSurvey.objects.get(pk=surveyid)
                     ret.delete()
                     return JSONResponse({'success': True})
         except Exception as e:

@@ -39,21 +39,26 @@ define([
     viewModel.discardEdits = function() {
         this.mobilesurvey.reset();
         this.resetCards(this.mobilesurvey.cards);
+        this.resetIdentities(this.mobilesurvey);
         this.treenodes[0].selected(true);
         this.activePage('root');
+        _.each(this.treenodes[0].childNodes(), function(node){
+            node.selected(false);
+            node.expanded(false);
+        });
     };
 
-    viewModel.deleteMobileSurvey = function(mobilesurvey){
-        if (!mobilesurvey.active()) {
+    viewModel.deleteMobileSurvey = function(){
+        if (!this.mobilesurvey.active()) {
             var self = this;
             pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmSurveyDelete.title, arches.confirmSurveyDelete.text, function() {
                 return;
             }, function(){
                 self.loading(true);
-                if (mobilesurvey) {
-                    mobilesurvey.delete(function(data){
+                if (self.mobilesurvey) {
+                    self.mobilesurvey.delete(function(data){
                         if (data.responseJSON.success){
-                            console.log('navigate back to manager page');
+                            self.navigateToManager();
                         } else {
                             pageView.viewModel.alert(new AlertViewModel('ep-alert-red', data.responseJSON.title, data.responseJSON.message));
                         }
