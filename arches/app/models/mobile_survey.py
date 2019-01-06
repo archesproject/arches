@@ -268,6 +268,7 @@ class MobileSurvey(models.MobileSurveyModel):
             request = HttpRequest()
             request.user = self.lasteditedby
             request.GET['mobiledownload'] = True
+            request.GET['resourcecount'] = self.datadownloadconfig['count']
             if query in ('', None):
                 if len(self.bounds.coords) == 0:
                     default_bounds = settings.DEFAULT_BOUNDS

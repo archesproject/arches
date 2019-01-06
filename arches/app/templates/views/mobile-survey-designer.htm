@@ -432,9 +432,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                 <div id="standard-download-panel" class="msm-download-panel" data-bind="visible: mobilesurvey.showCustomDataDownload() === false">
 
                                                                     <p class="text-muted">
-                                                                        {% trans 'Allow users to download the' %} <strong> {% trans 'first' %} {{ resource_download_limit }} {% trans 'records in the project extent' %} </strong> {% trans "for the resource models you've associated with this project." %}
+                                                                        {% trans "Allow users to download instances for the resource models you've associated with this project." %}
                                                                     </p>
-
+                                                                    <label style="display:flex; align-items:center">{% trans 'Limit ' %}<input type="number" class="form-control" style="width: 100px; margin-left: 7px;" placeholder="Search query URL" data-bind="textInput: mobilesurvey.datadownloadconfig.count"></input></label>
                                                                     <div class="form-group pad-ver msm-data-selection">
                                                                         <!-- Inline Checkboxes -->
                                                                         <div class="checkbox">

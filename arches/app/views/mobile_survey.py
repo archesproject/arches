@@ -186,7 +186,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
             mobile_survey = models.MobileSurveyModel.objects.get(pk=surveyid)
         else:
             mobile_survey = models.MobileSurveyModel(id=surveyid, name='Unnamed')
-            mobile_survey.datadownloadconfig = {"download": False, "count": 1000, "resources": [], "custom": None}
+            mobile_survey.datadownloadconfig = {"download": False, "count": 50, "resources": [], "custom": None}
 
         mobile_surveys, resources = get_survey_resources([mobile_survey])
         mobile_survey = mobile_surveys[0]
@@ -214,7 +214,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
             mobile_survey=serializer.serialize(mobile_survey, sort_keys=False),
             identities=serializer.serialize(identities, sort_keys=False),
             resources=serializer.serialize(resources, sort_keys=False),
-            resource_download_limit=settings.MOBILE_DOWNLOAD_RESOURCE_LIMIT,
+            resource_download_limit=mobile_survey['datadownloadconfig']['count'],
             main_script='views/mobile-survey-designer',
         )
 
