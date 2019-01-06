@@ -6233,6 +6233,107 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     overflow-y: auto;
 }
 
+
+/*  Start card/widget manager Classes
+    used to manage placement and display of elements inside of the Card 
+    and Widget Management forms
+*/
+.panel-config {
+    flex-direction: row-reverse;
+}
+
+.panel-config .middle-column-container {
+    border-right: transparent;
+    border-left: 1px solid #ddd;
+    background: #f4f4f4; /*#2d3c4b*/
+    color: #2d3c4b; /*#f1f1f1*/
+}
+
+.panel-config .toggle-container {
+    padding-bottom: 5px;
+}
+
+.panel-config .form-divider {
+    border-top: 1px solid #ccc;
+}
+
+.panel-config .widget-config-container {
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.panel-config .widget-config-container .control-label {
+    padding-top: 5px;
+    padding-left: 5px;
+}
+
+/* panel styling in widget manager for radio groups */
+.panel-config .widget-config-container .radio-panel {
+    background: #fff;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-top: 0px;
+    margin-left: -10px;
+    margin-right: -10px;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+}
+
+/* panel styling in widget manager for checkbox groups */
+.panel-config .widget-config-container .checkbox-panel {
+    background: #fff;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-top: 0px;
+    margin-left: -10px;
+    margin-right: -10px;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+}
+
+    /* Color changes if you want to use a dark (#2d3c4b) background panel color
+    for the .panel-config .middle-column-container classes
+
+    .panel-config .panel-section-title {
+        color: #f1f1f1;
+    }
+
+    .panel-config .form-radio.form-normal:hover:after {
+        background: #fff;
+    }
+
+    .panel-config .form-radio.form-normal.active:after {
+        background: #fff;
+    }
+
+    .panel-config .tertiary-panel-content .control-label {
+        color: #2d3c4b;
+    }
+
+    .panel-config .accordion-body .control-label {
+        color: #2d3c4b;
+    }
+
+    .panel-config .accordion .panel-title a:focus {
+        color: #2d3c4b;
+    }
+
+    .panel-config .accordion .panel-title a:hover {
+        color: #2d3c4b;
+    }
+
+    .panel-config .input-group-addon {
+        color: #f1f1f1;
+    }
+
+    .panel-config .bootstrap-datetimepicker-widget {
+        color: #2d3c4b;
+    }
+
+    End color changes if you want to use a dark (#2d3c4b) background panel color */
+
+/*End card/widget manager Classes*/
+
 .card-form-preview-container {
     -ms-flex: 1;
     -webkit-flex: 1;
@@ -10862,7 +10963,7 @@ a.search-facet-item.disabled {
 }
 
 .graph-designer-tab-container .nav-tabs>li.active>a {
-    background: #f4f4f4;
+    background: #ecf0f5;
     border: 1px solid #f4f4f4;
 }
 
@@ -10873,6 +10974,7 @@ a.search-facet-item.disabled {
 .graph-designer-tab-container .nav-tabs>li:not(.active)>a:hover {
     cursor: pointer;
     color: #666;
+    background: #ecf0f5;
 }
 
 .viewstate-btn {
@@ -11846,7 +11948,7 @@ ul.select2-choices:after {
 .left-panel-overflow {
     height: calc(100vh - 225px);
     overflow-y: auto;
-    background: #f4f4f4;
+    background: #ecf0f5;
 }
 
 .main-panel{
@@ -11952,7 +12054,7 @@ ul.select2-choices:after {
 .resource-editor-tree {
     overflow-y: auto;
     height: 100%;
-    background: #f4f4f4;
+    background: #ecf0f5;
 }
 
 a.jstree-anchor strong {

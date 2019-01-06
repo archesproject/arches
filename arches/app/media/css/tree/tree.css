@@ -3,7 +3,7 @@
     height: 75px;
     padding-left: 13px;
     padding-right: 13px;
-    background-color: #f4f4f4;
+    background-color: #ecf0f5;
     border-bottom: 1px solid #ddd;
     padding-top: 10px;
     font-size: 11px;
@@ -14,7 +14,7 @@
 }
 
 .jstree.jstree-default {
-    background: #fbfbfb;
+    background: #ecf0f5;
 }
 
 .tree-display-tools-panel {
