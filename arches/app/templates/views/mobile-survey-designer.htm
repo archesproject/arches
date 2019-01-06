@@ -87,12 +87,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                         <!--ko if: surveyReady().incomplete -->
                                                         <div class="mpm-item-listing-header"><i class="fa fa-exclamation-triangle" style="color:orange; padding-right:5px;"></i>{% trans 'Survey Status' %}</div>
                                                         <div class="mpm-card-content">
-                                                        <div style="padding-left: 10px">{% trans 'You won’t be able to activate this survey until you have addressed the following items:' %}</div>
-                                                        <ul class="">
+                                                        <div style="padding-left: 10px; padding-bottom: 10px;">{% trans 'You won’t be able to activate this survey until you have addressed the following items:' %}</div>
+                                                        <ul>
                                                             <li data-bind = "visible: surveyReady().cards == false">{% trans 'Select the Model(s) and associated data entry cards to include in the survey' %}</li>
                                                             <li data-bind = "visible: surveyReady().identities == false">{% trans 'Select the People that you want to invite to the survey' %}</li>
                                                             <li data-bind = "visible: surveyReady().daterange == false">{% trans 'Define the start and end dates of your survey' %}</li>
                                                             <li data-bind = "visible: surveyReady().mapsources == false">{% trans 'Define either an online or offline basemap source' %}</li>
+                                                            <li data-bind = "visible: surveyReady().bounds == false">{% trans 'Define a map extent' %}</li>
                                                         </ul>
                                                     </div>
                                                         <!--/ko-->
@@ -491,10 +492,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 <div style="display: flex">
                                                     <div style="display: flex; flex-direction: column; flex: 1;">
                                                     <div class="list-filter mpm-group-panel-header" style="display: flex; align-items: center;">
-                                                        <div style="position: relative; width: 100%; margin-right: 10px;">
+                                                        <span class="msm-identity-filter">
                                                             <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a user...' %}" data-bind="textInput: mobilesurvey.userFilter">
                                                             <span class="clear-node-search" data-bind="visible: true, click: function() { mobilesurvey.userFilter(''); }"><i class="fa fa-times-circle"></i></span>
-                                                        </div>
+                                                        </span>
+                                                        <a class="filter-tools" data-bind="click: selectAllGroupUsers"><i class="ion-checkmark"></i>{% trans 'Select all' %}</a>
+                                                        <a class="filter-tools" data-bind="click: clearAllGroupUsers"><i class="ion-close"></i>{% trans 'Clear all' %}</a>
                                                     </div>
                                                     <div class="mpm-group-panel-content list">
                                                         <!--ko if: selectedNode().type === 'group' -->
