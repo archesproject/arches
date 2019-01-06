@@ -6233,6 +6233,67 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     overflow-y: auto;
 }
 
+
+/*  Start card/widget manager Classes
+    used to manage placement and display of elements inside of the Card 
+    and Widget Management forms
+*/
+.panel-config {
+    flex-direction: row-reverse;
+}
+
+.panel-config .middle-column-container {
+    border-right: transparent;
+    border-left: 1px solid #ddd;
+    background: #2d3c4b;
+    color: #f1f1f1;
+}
+
+.panel-config .panel-section-title {
+    color: #f1f1f1;
+}
+
+.panel-config .form-radio.form-normal:hover:after {
+    background: #fff;
+}
+
+.panel-config .form-radio.form-normal.active:after {
+    background: #fff;
+}
+
+.panel-config .tertiary-panel-content .control-label {
+    color: #2d3c4b;
+}
+
+.panel-config .accordion-body .control-label {
+    color: #2d3c4b;
+}
+
+.panel-config .accordion .panel-title a:focus {
+    color: #2d3c4b;
+}
+
+.panel-config .accordion .panel-title a:hover {
+    color: #2d3c4b;
+}
+
+.panel-config .form-divider {
+    border-top: 1px solid #ccc;
+}
+
+.panel-config .toggle-container {
+    padding-bottom: 5px;
+}
+
+.panel-config .input-group-addon {
+    color: #f1f1f1;
+}
+
+.panel-config .bootstrap-datetimepicker-widget {
+    color: #2d3c4b;
+}
+/*End card/widget manager Classes*/
+
 .card-form-preview-container {
     -ms-flex: 1;
     -webkit-flex: 1;
