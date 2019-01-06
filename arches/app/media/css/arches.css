@@ -6245,53 +6245,90 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 .panel-config .middle-column-container {
     border-right: transparent;
     border-left: 1px solid #ddd;
-    background: #2d3c4b;
-    color: #f1f1f1;
-}
-
-.panel-config .panel-section-title {
-    color: #f1f1f1;
-}
-
-.panel-config .form-radio.form-normal:hover:after {
-    background: #fff;
-}
-
-.panel-config .form-radio.form-normal.active:after {
-    background: #fff;
-}
-
-.panel-config .tertiary-panel-content .control-label {
-    color: #2d3c4b;
-}
-
-.panel-config .accordion-body .control-label {
-    color: #2d3c4b;
-}
-
-.panel-config .accordion .panel-title a:focus {
-    color: #2d3c4b;
-}
-
-.panel-config .accordion .panel-title a:hover {
-    color: #2d3c4b;
-}
-
-.panel-config .form-divider {
-    border-top: 1px solid #ccc;
+    background: #f4f4f4; /*#2d3c4b*/
+    color: #2d3c4b; /*#f1f1f1*/
 }
 
 .panel-config .toggle-container {
     padding-bottom: 5px;
 }
 
-.panel-config .input-group-addon {
-    color: #f1f1f1;
+.panel-config .form-divider {
+    border-top: 1px solid #ccc;
 }
 
-.panel-config .bootstrap-datetimepicker-widget {
-    color: #2d3c4b;
+.panel-config .widget-config-container {
+    margin-left: 5px;
+    margin-right: 5px;
 }
+
+.panel-config .widget-config-container .control-label {
+    padding-top: 5px;
+    padding-left: 5px;
+}
+
+/* panel styling in widget manager for radio groups */
+.panel-config .widget-config-container .radio-panel {
+    background: #fff;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-top: 0px;
+    margin-left: -10px;
+    margin-right: -10px;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+}
+
+/* panel styling in widget manager for checkbox groups */
+.panel-config .widget-config-container .checkbox-panel {
+    background: #fff;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-top: 0px;
+    margin-left: -10px;
+    margin-right: -10px;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+}
+
+    /* Color changes if you want to use a dark (#2d3c4b) background panel color
+    .panel-config .panel-section-title {
+        color: #f1f1f1;
+    }
+
+    .panel-config .form-radio.form-normal:hover:after {
+        background: #fff;
+    }
+
+    .panel-config .form-radio.form-normal.active:after {
+        background: #fff;
+    }
+
+    .panel-config .tertiary-panel-content .control-label {
+        color: #2d3c4b;
+    }
+
+    .panel-config .accordion-body .control-label {
+        color: #2d3c4b;
+    }
+
+    .panel-config .accordion .panel-title a:focus {
+        color: #2d3c4b;
+    }
+
+    .panel-config .accordion .panel-title a:hover {
+        color: #2d3c4b;
+    }
+
+    .panel-config .input-group-addon {
+        color: #f1f1f1;
+    }
+
+    .panel-config .bootstrap-datetimepicker-widget {
+        color: #2d3c4b;
+    }
+    end color changes if you want to use a dark (#2d3c4b) background panel color */
+
 /*End card/widget manager Classes*/
 
 .card-form-preview-container {
