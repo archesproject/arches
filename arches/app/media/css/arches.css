@@ -6292,6 +6292,8 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
     /* Color changes if you want to use a dark (#2d3c4b) background panel color
+    for the .panel-config .middle-column-container classes
+
     .panel-config .panel-section-title {
         color: #f1f1f1;
     }
@@ -6327,7 +6329,8 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     .panel-config .bootstrap-datetimepicker-widget {
         color: #2d3c4b;
     }
-    end color changes if you want to use a dark (#2d3c4b) background panel color */
+
+    End color changes if you want to use a dark (#2d3c4b) background panel color */
 
 /*End card/widget manager Classes*/
 
