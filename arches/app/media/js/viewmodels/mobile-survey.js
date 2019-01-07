@@ -202,6 +202,28 @@ define([
             }).map(function(idobj){return String(idobj.id);});
         };
 
+        this.selectAllGroupUsers = function() {
+            if (self.selectedNode) {
+                self.selectedNode().fullusers.forEach(function(user) {
+                    if (user.approved() === false) {
+                        user.approved(true);
+                        self.mobilesurvey.toggleIdentity(user);
+                    }
+                });
+            }
+        };
+
+        this.clearAllGroupUsers = function() {
+            if (self.selectedNode) {
+                self.selectedNode().fullusers.forEach(function(user) {
+                    if (user.approved() === true) {
+                        user.approved(false);
+                        self.mobilesurvey.toggleIdentity(user);
+                    }
+                });
+            }
+        };
+
         this.selectedGroupsIds = ko.computed({
             read: function() {
                 return this.getSelectedGroupIds();

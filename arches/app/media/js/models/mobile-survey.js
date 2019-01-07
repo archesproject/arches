@@ -139,9 +139,7 @@ define([
                             currentIdentities.push(identity.id);
                         }
                         identity.approved(true);
-                        if (identity.type === 'user') {
-                            self.users.push(identity.id);
-                        } else {
+                        if (identity.type === 'group') {
                             _.chain(self.identities).filter(function(id) {
                                 return id.type === 'user' && _.contains(_.pluck(identity.users, 'id'), id.id);
                             }, this).each(function(user) {
@@ -154,6 +152,7 @@ define([
                             });
                         }
                     }
+                    currentIdentities.sort();
                 }
             };
 

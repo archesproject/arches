@@ -333,7 +333,7 @@ def build_search_results_dsl(request):
     if export != None:
         limit = settings.SEARCH_EXPORT_ITEMS_PER_PAGE
     elif mobile_download != None:
-        limit = settings.MOBILE_DOWNLOAD_RESOURCE_LIMIT
+        limit = request.GET['resourcecount']
     else:
         limit = settings.SEARCH_ITEMS_PER_PAGE
     limit = int(request.GET.get('limit', limit))

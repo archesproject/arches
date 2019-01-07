@@ -9260,6 +9260,7 @@ a.clear-geojson-button:hover {
 .msm-designer-panel {
     width: 100%;
     background-color: #fff;
+    overflow-y: auto;
 }
 
 .msm-list-filter {
@@ -10809,6 +10810,26 @@ a.search-facet-item.disabled {
     text-align: center;
 }
 
+.msm-identity-filter {
+    position: relative;
+    width: 100%;
+    margin-right: 10px;
+    flex: 1;
+}
+
+a.filter-tools {
+    margin-left: 0px;
+    padding: 3px 6px;
+    color: #888;
+    font-size: 12px;
+}
+
+a.filter-tools:hover {
+    cursor: pointer;
+    background: #ddd;
+    color: #454545;
+}
+
 .mpm-card-content .description {
     font-size: 14px;
     text-align: center;
@@ -11655,7 +11676,6 @@ a.search-facet-item.disabled {
 
 .msm-settings-summary {
     height:100%;
-    overflow-y: scroll;
 }
 
 .msm-map-container {
