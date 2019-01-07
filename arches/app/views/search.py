@@ -224,6 +224,8 @@ def search_results(request):
     dsl.include('displaydescription')
     dsl.include('map_popup')
     dsl.include('provisional_resource')
+    if request.GET.get('tiles', None) is not None:
+        dsl.include('tiles')
 
     results = dsl.search(index='resource', doc_type=get_doc_type(request))
 
@@ -237,10 +239,19 @@ def search_results(request):
 
         # only reuturn points and geometries a user is allowed to view
         geojson_nodes = get_nodegroups_by_datatype_and_perm(request, 'geojson-feature-collection', 'read_nodegroup')
+        permitted_nodegroups = get_permitted_nodegroups(request.user)
 
         for result in results['hits']['hits']:
             result['_source']['points'] = select_geoms_for_results(result['_source']['points'], geojson_nodes, user_is_reviewer)
             result['_source']['geometries'] = select_geoms_for_results(result['_source']['geometries'], geojson_nodes, user_is_reviewer)
+            try:
+                permitted_tiles = []
+                for tile in result['_source']['tiles']:
+                    if tile['nodegroup_id'] in permitted_nodegroups:
+                        permitted_tiles.append(tile)
+                result['_source']['tiles'] = permitted_tiles
+            except KeyError:
+                pass
 
         ret = {}
         ret['results'] = results
@@ -322,9 +333,10 @@ def build_search_results_dsl(request):
     if export != None:
         limit = settings.SEARCH_EXPORT_ITEMS_PER_PAGE
     elif mobile_download != None:
-        limit = settings.MOBILE_DOWNLOAD_RESOURCE_LIMIT
+        limit = request.GET['resourcecount']
     else:
         limit = settings.SEARCH_ITEMS_PER_PAGE
+    limit = int(request.GET.get('limit', limit))
 
     query = Query(se, start=limit*int(page-1), limit=limit)
     search_query = Bool()

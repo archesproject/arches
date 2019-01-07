@@ -4,10 +4,12 @@ define([
     'knockout',
     'knockout-mapping',
     'arches',
-    'viewmodels/mobile-survey-manager',
+    'viewmodels/mobile-survey',
+    'models/mobile-survey',
     'views/base-manager',
+    'views/mobile-survey-manager/identity-list',
     'profile-manager-data'
-], function($, _, ko, koMapping, arches, MobileSurveyManagerViewModel, BaseManagerView, data) {
+], function($, _, ko, koMapping, arches, MobileSurveyViewModel, MobileSurveyModel, BaseManagerView, IdentityList, data) {
 
     var UserProfileManager = BaseManagerView.extend({
         initialize: function(options) {
@@ -32,15 +34,41 @@ define([
             self.viewModel.toggleEditUserForm = function() {
                 this.showEditUserForm(!this.showEditUserForm());
             };
-            self.viewModel.mobileSurveyManager = new MobileSurveyManagerViewModel(data);
 
-            _.each(self.viewModel.mobileSurveyManager.mobilesurveys(), function(mobilesurvey) {
+
+            this.identityList = new IdentityList({
+                items: ko.observableArray(data.identities)
+            });
+
+            this.viewModel.mobilesurveys =
+                data.mobilesurveys.map(function(mobilesurvey) {
+                    return new MobileSurveyViewModel({
+                        resources: data.resources,
+                        mobilesurvey: mobilesurvey,
+                        identities: data.identities
+                    });
+                });
+
+            this.viewModel.mobileSurveyFilter = ko.observable('');
+
+            this.viewModel.filteredMobileSurveys = ko.computed(function() {
+                var filter = self.viewModel.mobileSurveyFilter();
+                var list = self.viewModel.mobilesurveys;
+                if (filter.length === 0) {
+                    return list;
+                }
+                return _.filter(list, function(mobilesurvey) {
+                    return mobilesurvey.mobilesurvey.name().toLowerCase().indexOf(filter.toLowerCase()) >= 0;
+                });
+            });
+
+            _.each(self.viewModel.mobilesurveys, function(mobilesurvey) {
                 mobilesurvey.resources = ko.computed(function() {
                     var resources = [];
                     var resourceLookup = {};
-                    _.each(self.viewModel.mobileSurveyManager.resourceList.items(), function(resource) {
+                    _.each(mobilesurvey.allResources, function(resource) {
                         _.each(resource.cards(), function(card) {
-                            if (_.contains(mobilesurvey.cards(), card.cardid)) {
+                            if (_.contains(mobilesurvey.mobilesurvey.cards(), card.cardid)) {
                                 if (resourceLookup[resource.id]) {
                                     resourceLookup[resource.id].cards.push(card);
                                 } else {

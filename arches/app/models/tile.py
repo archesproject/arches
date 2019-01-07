@@ -430,7 +430,7 @@ class Tile(models.TileModel):
 
     def filter_by_perm(self, user, perm):
         if user:
-            if user.has_perm(perm, self.nodegroup):
+            if self.nodegroup_id is not None and user.has_perm(perm, self.nodegroup):
                 self.tiles = filter(lambda tile: tile.filter_by_perm(user, perm), self.tiles)
             else:
                 return None

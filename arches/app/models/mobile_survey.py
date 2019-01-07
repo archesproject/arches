@@ -20,7 +20,6 @@ from copy import copy, deepcopy
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.http import HttpRequest
-from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
@@ -30,6 +29,7 @@ from arches.app.models.graph import Graph
 from arches.app.models.models import ResourceInstance
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
+from arches.app.utils.geo_utils import GeoUtils
 from arches.app.utils.couch import Couch
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 import arches.app.views.search as search
@@ -135,15 +135,25 @@ class MobileSurvey(models.MobileSurveyModel):
                                     graph_obj['widgets'].append(widget_model)
                                 break
                     if node['datatype'] == 'resource-instance' or node['datatype'] == 'resource-instance-list':
-                        graph_id = node['config']['graphid'][0]
-                        node['config']['options'] = []
-                        for resource_instance in Resource.objects.filter(graph_id=graph_id):
-                            node['config']['options'].append({'id': str(resource_instance.pk), 'name': resource_instance.displayname})
+                        if node['config']['graphid'] is not None:
+                            try:
+                                graphuuid = uuid.UUID(node['config']['graphid'][0])
+                                graph_id = unicode(graphuuid)
+                            except ValueError as e:
+                                graphuuid = uuid.UUID(node['config']['graphid'])
+                                graph_id = unicode(graphuuid)
+                            node['config']['options'] = []
+                            for resource_instance in Resource.objects.filter(graph_id=graph_id):
+                                node['config']['options'].append({'id': str(resource_instance.pk), 'name': resource_instance.displayname})
                 graphs.append(graph_obj)
         ret['graphs'] = graphs
         ret['cards'] = ordered_cards
         try:
-            ret['bounds'] = json.loads(ret['bounds'])
+            bounds = json.loads(ret['bounds'])
+            ret['bounds'] = bounds
+            if (bounds['type'] == 'MultiPolygon'):
+                singlepart = GeoUtils().convert_multipart_to_singlepart(bounds)
+                ret['bounds'] = singlepart
         except TypeError as e:
             print 'Could not parse', ret['bounds'], e
         return ret
@@ -274,6 +284,7 @@ class MobileSurvey(models.MobileSurveyModel):
             request = HttpRequest()
             request.user = self.lasteditedby
             request.GET['mobiledownload'] = True
+            request.GET['resourcecount'] = self.datadownloadconfig['count']
             if query in ('', None):
                 if len(self.bounds.coords) == 0:
                     default_bounds = settings.DEFAULT_BOUNDS
