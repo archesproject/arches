@@ -13,6 +13,7 @@ from django.core import management
 from django.core.urlresolvers import reverse
 from django.utils.decorators import method_decorator
 from revproxy.views import ProxyView
+from oauth2_provider.views import ProtectedResourceView
 from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.models.graph import Graph
@@ -39,7 +40,7 @@ except ImportError:
     from StringIO import StringIO
 
 
-class CouchdbProxy(ProxyView):
+class CouchdbProxy(ProtectedResourceView, ProxyView):
     # check user credentials here
     upstream = settings.COUCHDB_URL
 
@@ -66,7 +67,7 @@ class APIBase(View):
         return super(APIBase, self).dispatch(request, *args, **kwargs)
 
 
-class Sync(APIBase):
+class Sync(ProtectedResourceView, APIBase):
 
     def get(self, request, surveyid=None):
         ret = 'Sync was successful'
@@ -83,10 +84,13 @@ class Sync(APIBase):
                     can_sync = True
             if can_sync:
                 management.call_command('mobile', operation='sync_survey', id=surveyid)
+                return JSONResponse(ret)
+            else:
+                return JSONResponse('Sync Failed', status=403)
         except:
             ret = 'Sync failed'
 
-        return JSONResponse(ret)
+        return JSONResponse(ret, status=500)
 
 
 class Surveys(APIBase):
