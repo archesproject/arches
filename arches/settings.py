@@ -413,6 +413,10 @@ API_MAX_PAGE_SIZE = 500
 
 UUID_REGEX = '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
 
+OAUTH2_PROVIDER = {
+    'ACCESS_TOKEN_EXPIRE_SECONDS': 604800  # one week
+}
+
 #######################################
 ###       END STATIC SETTINGS       ###
 #######################################
