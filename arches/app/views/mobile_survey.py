@@ -340,8 +340,8 @@ class MobileSurveyDesignerView(MapBaseManagerView):
         except Exception as e:
             if connection_error is False:
                 error_title = _('Unable to save survey')
-                if 'strerror' in e and e.strerror == 'Connection refused':
-                    error_message = "Unable to connect to CouchDB"
+                if 'strerror' in e and e.strerror == 'Connection refused' or 'Connection refused' in e:
+                    error_message = _("Unable to connect to CouchDB")
                 else:
                     error_message = e.message
                 connection_error = JSONResponse({'success': False, 'message': error_message, 'title': error_title}, status=500)
