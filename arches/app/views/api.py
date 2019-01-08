@@ -129,7 +129,7 @@ class Resources(APIBase):
     #     "@context": "https://linked.art/ns/v1/linked-art.json"
     # }]
 
-    def get(self, request, resourceid=None):
+    def get(self, request, resourceid=None, slug=None, graphid=None):
         if user_can_read_resources(user=request.user):
             allowed_formats = ['json', 'json-ld']
             format = request.GET.get('format', 'json-ld')
@@ -251,7 +251,7 @@ class Resources(APIBase):
     #     except Exception as e:
     #         return JSONResponse(status=500, reason=e)
 
-    def put(self, request, resourceid):
+    def put(self, request, resourceid, slug=None, graphid=None):
         try:
             indent = int(request.PUT.get('indent', None))
         except:
@@ -289,7 +289,7 @@ class Resources(APIBase):
         else:
             return JSONResponse(status=500)
 
-    def post(self, request, resourceid=None):
+    def post(self, request, resourceid=None, slug=None, graphid=None):
         try:
             indent = int(request.POST.get('indent', None))
         except:
@@ -318,7 +318,7 @@ class Resources(APIBase):
         except Exception as e:
             return JSONResponse(status=500, reason=e)
 
-    def delete(self, request, resourceid):
+    def delete(self, request, resourceid, slug=None, graphid=None):
         if user_can_edit_resources(user=request.user):
             try:
                 resource_instance = Resource.objects.get(pk=resourceid)

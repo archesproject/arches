@@ -137,7 +137,8 @@ class Graph(models.GraphModel):
             isresource=is_resource,
             isactive=not is_resource,
             iconclass="",
-            ontology=None
+            ontology=None,
+            slug=None
         )
         if not is_resource:
             nodegroup = models.NodeGroup.objects.create(

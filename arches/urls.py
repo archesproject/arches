@@ -141,6 +141,8 @@ urlpatterns = [
     url(r'^couchdb/(?P<path>.*)$', api.CouchdbProxy.as_view()),
     url(r'^surveys$', api.Surveys.as_view(), name='surveys'),
     url(r'^sync/(?P<surveyid>%s|())$' % uuid_regex, api.Sync.as_view(), name='sync'),
+    url(r'^resources/(?P<graphid>%s)/(?P<resourceid>%s|())$' % (uuid_regex, uuid_regex), api.Resources.as_view(), name='resources_graphid'),
+    url(r'^resources/(?P<slug>[-\w]+)/(?P<resourceid>%s|())$' % uuid_regex, api.Resources.as_view(), name='resources_slug'),
     url(r'^resources/(?P<resourceid>%s|())$' % uuid_regex, api.Resources.as_view(), name='resources'),
     url(r'^rdm/concepts/(?P<conceptid>%s|())$' % uuid_regex, api.Concepts.as_view(), name='concepts'),
     url(r'^plugins/(?P<pluginid>%s)$' % uuid_regex, PluginView.as_view(), name='plugins'),

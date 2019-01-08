@@ -329,6 +329,7 @@ class GraphModel(models.Model):
         default='50000000-0000-0000-0000-000000000001'
     )
     config = JSONField(db_column='config', default={})
+    slug = models.TextField(validators=[validate_slug], unique=True, null=True)
 
     @property
     def disable_instance_creation(self):
