@@ -78,7 +78,10 @@ class MobileSurvey(models.MobileSurveyModel):
         return db
 
     def delete(self):
-        self.couch.delete_db('project_' + str(self.id))
+        try:
+            self.couch.delete_db('project_' + str(self.id))
+        except Exception as e:
+            print(e), _("Could not delete database in CouchDB")
         super(MobileSurvey, self).delete()
 
     def serialize(self, fields=None, exclude=None):
