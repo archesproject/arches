@@ -170,7 +170,7 @@ class RdfWriter(Writer):
                         dt = dt_factory.get_instance(edge_info['r_datatype'])
 
                         # append graph returned from datatype to_rdf function to main graph
-                        g += dt.to_rdf(edge_info, edge, tile)
+                        g += dt.to_rdf(edge_info, edge)
 
                 # add the edge from the parent node to this tile's root node
                 # where the tile has no parent tile, which means the domain node has no tile_id
@@ -187,11 +187,11 @@ class RdfWriter(Writer):
                     raise Exception("No idea why root no parent whatevs code would be used")
                     edge_info['d_uri'] = archesproject[str(in_edge.domainnode.pk)]
                     edge_info['domain_tile_data'] = edge_info['domain_tile_data'][1]
-                    g += dt.to_rdf(edge_info, in_edge, tile)
+                    g += dt.to_rdf(edge_info, in_edge)
                     # add_tile_information_to_graph(g, (domainnode,
                     # domain_info[1]), range_info,in_edge, tile, graph_uri)
                 else:
-                    g += dt.to_rdf(edge_info, in_edge, tile)
+                    g += dt.to_rdf(edge_info, in_edge)
         return g
 
 
@@ -210,7 +210,6 @@ class JsonLdWriter(RdfWriter):
 
         context = self.graph_model.jsonldcontext
         framing = {
-            "@context": context,
             "@omitDefault": True,
             "@omitGraph": False,
             "@id": str(resource_inst_uri),
@@ -218,6 +217,9 @@ class JsonLdWriter(RdfWriter):
                 "@embed": "@always"
             }
         }
+
+        if context:
+            framing["@context"] = context
 
         js = frame(js, framing)
 
