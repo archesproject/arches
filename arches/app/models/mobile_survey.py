@@ -305,7 +305,7 @@ class MobileSurvey(models.MobileSurveyModel):
                 # if we didn't get our limit of resource instances using a spatial filter
                 # let's try to get resource instances that don't have spatial data
                 if len(instances.keys()) < self.datadownloadconfig['count']:
-                    request.GET['mapFilter'] = '{}';
+                    request.GET['mapFilter'] = '{}'
                     request.GET['resourcecount'] = self.datadownloadconfig['count'] - len(instances.keys())
                     geometric_datatypes = list(models.DDataType.objects.filter(isgeometric=True).values_list('datatype', flat=True))
                     nonspatial_resources = []
