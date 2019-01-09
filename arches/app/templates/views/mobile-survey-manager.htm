@@ -23,8 +23,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 <div>
 
-        <div id="rr-splash" class="rr-splash" data-bind="visible: mobilesurveys().length === 0">
-
+    <!--ko if: mobilesurveys().length === 0 -->
+        <div id="rr-splash" class="rr-splash">
             <!-- Splash Title -->
             <div class="rr-splash-title">{% trans "Mobile Data Collection" %}</div>
             <div class="rr-splash-title">{% trans "Arches allows you to define data collection surveys to collect data in the field" %}</div>
@@ -41,8 +41,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <!-- Help Hyperlink -->
             <div class="rr-splash-help-link">{% trans "Show Me How" %}</div>
         </div>
+    <!--/ko-->
 
-
+    <!--ko if: mobilesurveys().length > 0 -->
         <div data-bind="visible: mobilesurveys().length > 0" style="width: 100%;">
                 <!-- Layer Filter -->
                 <div class="list-filter mpm" data-bind="">
@@ -112,6 +113,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </div>
             </div>
     </div>
+    <!--/ko-->
+
 </div>
 
 {% endblock main_content %}
