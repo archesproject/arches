@@ -10953,11 +10953,13 @@ a.filter-tools:hover {
 
 .resource-grid-item.mpm-manager:hover {
     background-color: #f5f5f5;
+    border-radius: 3px;
 }
 
 .resource-grid-main.mpm-manager .mpm-title {
-    font-weight: 550;
-    font-size: 1.3em;
+    font-weight: 400;
+    color: #454545;
+    font-size: 1.416em;
 }
 
 .report-image-grid.mpm {
