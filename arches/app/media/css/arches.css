@@ -9282,6 +9282,10 @@ a.clear-geojson-button:hover {
 
 .msm-summary-panel {
     height: 100vh;
+    background: #fff;
+}
+
+.msm-summary-panel #cards {
     background: #fafafa;
 }
 
@@ -10758,6 +10762,7 @@ a.search-facet-item.disabled {
 
 .mpm-card {
     min-height: 550px;
+    background: #fff;
 }
 
 .mpm-card-content {
