@@ -198,16 +198,6 @@ class MobileSurvey(models.MobileSurveyModel):
         obj = serializer.handle_model(self)
         ordered_cards = self.get_ordered_cards()
         ret = JSONSerializer().serializeToPython(obj)
-        graphs = []
-        graphids = []
-        for card in self.cards.all():
-            if card.graph_id not in graphids:
-                graphids.append(card.graph_id)
-                graph = Graph.objects.get(pk=card.graph_id)
-                graph_obj = graph.serialize(exclude=['domain_connections', 'edges', 'relatable_resource_model_ids'])
-                graph_obj['widgets'] = list(models.CardXNodeXWidget.objects.filter(card__graph=graph).distinct())
-                graphs.append(graph_obj)
-        ret['graphs'] = graphs
         ret['cards'] = ordered_cards
         try:
             bounds = json.loads(ret['bounds'])
