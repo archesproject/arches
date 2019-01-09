@@ -112,7 +112,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     </div>
 
                                     <div class="account-tips" style="margin-left: 10px; margin-top: 10px;">
-                                        By activating the survey you will send users an email with the information needed to begin data editing activitites.
+                                        {% trans 'By activating the survey you will send users an email with the information needed to begin data editing activitites.' %}
                                     </div>
                                 </div>
 
@@ -122,19 +122,39 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <!-- Survey Settings -->
                                     <div class="msm-report-section">
                                         <p class="mpm-item-listing-header">
-                                            {% trans 'Summary' %}
+                                            {% trans 'Survey Status Summary' %}
                                         </p>
-                                        <ul class="mpm-node-detail-metadata">
-                                            <li class="">
-                                                Number of edits: 0
-                                            </li>
-                                            <li class="">
-                                                Contributors: 0
-                                            </li>
-                                            <li class="">
-                                                Offline Basemap: Streets-Grey
-                                            </li>
-                                        </ul>
+
+                                        <!-- Survey Stats -->
+                                        <div class="msm-stats-panel">
+                                            <div class="col-xs-3">
+                                                <div class="msm-stat">
+                                                    0
+                                                </div>
+                                                <div class="msm-stat-label">
+                                                    {% trans 'Edits Made' %}
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-3">
+                                                <div class="msm-stat">
+                                                    0
+                                                </div>
+                                                <div class="msm-stat-label">
+                                                    {% trans 'Editors' %}
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-6">
+                                                <div class="msm-stat">
+                                                    <span class="msm-stat-date">No data synched</span>
+                                                    <span class="msm-stat-time"></span>
+                                                </div>
+                                                <div class="msm-stat-label">
+                                                    {% trans 'Last Synch' %}
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <!-- User Summary -->

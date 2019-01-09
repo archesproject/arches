@@ -11736,6 +11736,29 @@ a.filter-tools:hover {
     padding: 20px;
 }
 
+.msm-stats-panel {
+    padding: 10px 5px;
+    min-height: 80px;
+    margin-top: -15px;
+}
+
+.msm-stat {
+    color: #2d3c4b;
+    font-size: 36px;
+}
+
+.msm-stat-label {
+    color: #999;
+    font-size: 13px;
+}
+
+.msm-stat-date {
+
+}
+
+.msm-stat-time {
+    font-size: 17px;
+}
 
 .profile-mpm-panel {
     margin-left: 20px;
