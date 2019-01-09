@@ -10761,10 +10761,7 @@ a.search-facet-item.disabled {
 }
 
 .mpm-card-content {
-    margin-top: -25px;
-    margin-left: -40px;
-    margin-right: -40px;
-    margin-bottom: 20px;
+    margin: 0px;
     border-bottom: 1px solid #ddd;
     padding: 40px 25px 50px 25px;
     background: #f6f6f6;
@@ -11645,6 +11642,7 @@ a.filter-tools:hover {
 }
 
 .mpm-item-listing-header {
+    font-size: 15px;
     padding-left: 10px;
     margin-top: 0px;
     color: #454545;
@@ -11672,6 +11670,16 @@ a.filter-tools:hover {
 .msm-survey-issues {
     font-size: 15px;
     color: #888;
+}
+
+.msm-report-section {
+    padding: 40px 30px;
+    background: #fbfbfb;
+    border-bottom: 1px solid #ddd;
+}
+
+.msm-report-section.active {
+    background: #fff;
 }
 
 .mpm-item-listing-header.data-panel {
@@ -11717,16 +11725,7 @@ a.filter-tools:hover {
 }
 
 .mpm-activation-panel {
-    padding: 20px 40px;
-}
-
-.mpm-summary-panel {
-    margin-top: 10px;
-    margin-left: -10px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    border-top: 1px solid #eee;
-    height: 135px;
+    padding: 0px;
 }
 
 .msm-settings-summary {
