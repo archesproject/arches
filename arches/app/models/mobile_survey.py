@@ -25,6 +25,7 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.models.tile import Tile
+from arches.app.models.card import Card
 from arches.app.models.graph import Graph
 from arches.app.models.models import ResourceInstance
 from arches.app.models.resource import Resource
@@ -68,18 +69,123 @@ class MobileSurvey(models.MobileSurveyModel):
     def save(self):
         super(MobileSurvey, self).save()
         db = self.couch.create_db('project_' + str(self.id))
-        # need to serialize to JSON and then back again because UUID's
-        # cause the couch update_doc method to throw an error
-        survey = JSONSerializer().serialize(self)
-        survey = JSONDeserializer().deserialize(survey)
+        survey = self.serialize_for_couch()
         survey['type'] = 'metadata'
         self.couch.update_doc(db, survey, 'metadata')
         self.load_data_into_couch()
         return db
 
     def delete(self):
-        self.couch.delete_db('project_' + str(self.id))
+        try:
+            self.couch.delete_db('project_' + str(self.id))
+        except Exception as e:
+            print(e), _("Could not delete database in CouchDB")
         super(MobileSurvey, self).delete()
+
+    def collect_card_widget_node_data(self, graph_obj, graph, parentcard, nodegroupids=[]):
+        nodegroupids.append(str(parentcard.nodegroup_id))
+        for node in graph_obj['nodes']:
+            if node['nodegroup_id'] == str(parentcard.nodegroup_id):
+                found = False
+                for widget in graph_obj['widgets']:
+                    if node['nodeid'] == str(widget.node_id):
+                        found = True
+                        try:
+                            collection_id = node['config']['rdmCollection']
+                            concept_collection = Concept().get_child_collections_hierarchically(collection_id)
+                            widget.config['options'] = concept_collection
+                        except Exception as e:
+                            pass
+                        break
+                if not found:
+                    for card in graph_obj['cards']:
+                        if card['nodegroup_id'] == node['nodegroup_id']:
+                            widget = models.DDataType.objects.get(pk=node['datatype']).defaultwidget
+                            if widget:
+                                widget_model = models.CardXNodeXWidget()
+                                widget_model.node_id = node['nodeid']
+                                widget_model.card_id = card['cardid']
+                                widget_model.widget_id = widget.pk
+                                widget_model.config = widget.defaultconfig
+                                try:
+                                    collection_id = node['config']['rdmCollection']
+                                    if collection_id:
+                                        concept_collection = Concept().get_child_collections_hierarchically(collection_id)
+                                        widget_model.config['options'] = concept_collection
+                                except Exception as e:
+                                    pass
+                                widget_model.label = node['name']
+                                graph_obj['widgets'].append(widget_model)
+                            break
+
+                if node['datatype'] == 'resource-instance' or node['datatype'] == 'resource-instance-list':
+                    if node['config']['graphid'] is not None:
+                        try:
+                            graphuuid = uuid.UUID(node['config']['graphid'][0])
+                            graph_id = unicode(graphuuid)
+                        except ValueError as e:
+                            graphuuid = uuid.UUID(node['config']['graphid'])
+                            graph_id = unicode(graphuuid)
+                        node['config']['options'] = []
+                        for resource_instance in Resource.objects.filter(graph_id=graph_id):
+                            node['config']['options'].append({'id': str(resource_instance.pk), 'name': resource_instance.displayname})
+
+        for subcard in parentcard.cards:
+            self.collect_card_widget_node_data(graph_obj, graph, subcard, nodegroupids)
+
+        return graph_obj
+
+    def serialize_for_couch(self):
+        """
+        serialize to a different form than used by the internal class structure
+        used to append additional values (like parent ontology properties) that
+        internal objects (like models.Nodes) don't support
+        """
+        serializer = JSONSerializer()
+        serializer.geom_format = 'geojson'
+        obj = serializer.handle_model(self)
+        ordered_cards = self.get_ordered_cards()
+        ret = JSONSerializer().serializeToPython(obj)
+        graphs = []
+        card_lookup = {}
+        for card in self.cards.all():
+            if str(card.graph_id) in card_lookup:
+                card_lookup[str(card.graph_id)].append(card)
+            else:
+                card_lookup[str(card.graph_id)] = [card]
+        for graphid, cards in iter(card_lookup.items()):
+            graph = Graph.objects.get(pk=graphid)
+            graph_obj = graph.serialize(exclude=['domain_connections', 'edges', 'relatable_resource_model_ids'])
+            graph_obj['widgets'] = list(models.CardXNodeXWidget.objects.filter(card__graph=graph).distinct())
+            nodegroupids = []
+            for card in cards:
+                topcard = Card.objects.get(pk=card.cardid)
+                self.collect_card_widget_node_data(graph_obj, graph, topcard, nodegroupids)
+            graph_obj['widgets'] = serializer.serializeToPython(graph_obj['widgets'])
+
+            nodegroup_filters = {'nodes': 'nodegroup_id', 'cards': 'nodegroup_id', 'nodegroups': 'nodegroupid'}
+
+            for prop, id in iter(nodegroup_filters.items()):
+                relevant_items = [item for item in graph_obj[prop] if item[id] in nodegroupids]
+                graph_obj[prop] = relevant_items
+
+            relevant_cardids = [card['cardid'] for card in graph_obj['cards']]
+            relevant_widgets = [widget for widget in graph_obj['widgets'] if str(widget['card_id']) in relevant_cardids]
+            graph_obj['widgets'] = relevant_widgets
+
+            graphs.append(serializer.serializeToPython(graph_obj))
+
+        ret['graphs'] = graphs
+        ret['cards'] = ordered_cards
+        try:
+            bounds = json.loads(ret['bounds'])
+            ret['bounds'] = bounds
+            if (bounds['type'] == 'MultiPolygon'):
+                singlepart = GeoUtils().convert_multipart_to_singlepart(bounds)
+                ret['bounds'] = singlepart
+        except TypeError as e:
+            print 'Could not parse', ret['bounds'], e
+        return ret
 
     def serialize(self, fields=None, exclude=None):
         """
@@ -97,54 +203,9 @@ class MobileSurvey(models.MobileSurveyModel):
         for card in self.cards.all():
             if card.graph_id not in graphids:
                 graphids.append(card.graph_id)
-                # we may want the full proxy model at some point,
-                # but for now just the root node color
                 graph = Graph.objects.get(pk=card.graph_id)
                 graph_obj = graph.serialize(exclude=['domain_connections', 'edges', 'relatable_resource_model_ids'])
                 graph_obj['widgets'] = list(models.CardXNodeXWidget.objects.filter(card__graph=graph).distinct())
-                for node in graph_obj['nodes']:
-                    found = False
-                    for widget in graph_obj['widgets']:
-                        if node['nodeid'] == str(widget.node_id):
-                            found = True
-                            try:
-                                collection_id = node['config']['rdmCollection']
-                                concept_collection = Concept().get_child_collections_hierarchically(collection_id)
-                                widget.config['options'] = concept_collection
-                            except Exception as e:
-                                pass
-                            break
-                    if not found:
-                        for card in graph_obj['cards']:
-                            if card['nodegroup_id'] == node['nodegroup_id']:
-                                widget = models.DDataType.objects.get(pk=node['datatype']).defaultwidget
-                                if widget:
-                                    widget_model = models.CardXNodeXWidget()
-                                    widget_model.node_id = node['nodeid']
-                                    widget_model.card_id = card['cardid']
-                                    widget_model.widget_id = widget.pk
-                                    widget_model.config = widget.defaultconfig
-                                    try:
-                                        collection_id = node['config']['rdmCollection']
-                                        if collection_id:
-                                            concept_collection = Concept().get_child_collections_hierarchically(collection_id)
-                                            widget_model.config['options'] = concept_collection
-                                    except Exception as e:
-                                        pass
-                                    widget_model.label = node['name']
-                                    graph_obj['widgets'].append(widget_model)
-                                break
-                    if node['datatype'] == 'resource-instance' or node['datatype'] == 'resource-instance-list':
-                        if node['config']['graphid'] is not None:
-                            try:
-                                graphuuid = uuid.UUID(node['config']['graphid'][0])
-                                graph_id = unicode(graphuuid)
-                            except ValueError as e:
-                                graphuuid = uuid.UUID(node['config']['graphid'])
-                                graph_id = unicode(graphuuid)
-                            node['config']['options'] = []
-                            for resource_instance in Resource.objects.filter(graph_id=graph_id):
-                                node['config']['options'].append({'id': str(resource_instance.pk), 'name': resource_instance.displayname})
                 graphs.append(graph_obj)
         ret['graphs'] = graphs
         ret['cards'] = ordered_cards

@@ -94,7 +94,6 @@ define([
             r.namelong = 'Model Details';
             r.description = 'Summary of how this model participates in the survey';
             r.cards = self.getRootCards(r.cards);
-            r.added = ko.observable(r.cards().length > 0);
             r.hasApprovedCards = ko.pureComputed(function(){
                 var result = r.cards().filter(function(c){return ko.unwrap(c.approved) === true;}).length > 0;
                 if (result === false) {
@@ -102,6 +101,7 @@ define([
                 }
                 return result;
             });
+            r.added = ko.observable(r.hasApprovedCards());
             r.added.subscribe(function(val){
                 if (val === true && r.cards().length === 0) {
                     self.updateResourceCards(r);
