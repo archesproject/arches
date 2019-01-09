@@ -59,8 +59,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           </div>
 
 
-            <!-- Survey Listing Panel-->
-            <div class="mpm-list">
+        <!-- Survey Listing Panel-->
+        <div class="mpm-list">
             <div class="grid mpm" style="display:none;" data-bind="visible: true">
                 <!-- ko if: mobilesurveys().length ===  0 -->
                 <div id="default-message-panel" class="left-column-message" style="">
@@ -81,12 +81,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <div class="resource-grid-main-container mpm" data-bind="click: $parent.navigateToEditor">
                                 <div class="resource-grid-main mpm-manager">
                                     <div class="title-items" style="display:flex; flex-direction: column;">
+
+                                        <i class="icon-wrap resource-grid-icon fa fa-server"></i>
+
+
                                         <div class="mpm-title"><span data-bind="text: name() === '' ? '{% trans "Unnamed Survey" %}' : name()"></span></div>
                                         <!--ko if: description -->
                                         <div class="mpm-subtitle" data-bind="text: description"></div>
                                         <!--/ko -->
                                         <!--ko if: enddate && startdate -->
-                                        <div class="mpm-subtitle" data-bind="text: starts + '{% trans " through " %}' + ends"></div>
+                                        <div class="mpm-subtitle" data-bind="text: starts + '{% trans " to " %}' + ends"></div>
                                         <!--/ko -->
                                         <!--ko ifnot: enddate && startdate -->
                                         <div class="mpm-subtitle" data-bind="text: '{% trans "Date range unspecified" %}'"></div>
@@ -100,17 +104,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </div>
                         </div>
                         <!-- /ko -->
-
                     </div>
-
                 </div>
-
-
-
-
                 <!-- /ko -->
             </div>
-            </div>
+        </div>
     </div>
 </div>
 

@@ -9270,7 +9270,7 @@ a.clear-geojson-button:hover {
 
 .msm-list-filter-input {
     padding-left: 15px;
-    width: 250px;
+    width: 350px;
     height: 35px;
     position: relative;
 }
@@ -10933,6 +10933,9 @@ a.filter-tools:hover {
 }
 
 .mpm-subtitle {
+    position: relative;
+    left: 55px;
+    top: -45px;
     color: #999;
     font-size: 12px;
     width: 500px;
@@ -10952,14 +10955,23 @@ a.filter-tools:hover {
 }
 
 .resource-grid-item.mpm-manager:hover {
-    background-color: #f5f5f5;
+    /*background-color: #f5f5f5;*/
     border-radius: 3px;
+    color: #000;
 }
 
 .resource-grid-main.mpm-manager .mpm-title {
     font-weight: 400;
     color: #454545;
     font-size: 1.416em;
+    position: relative;
+    left: 55px;
+    top: -45px;
+}
+
+.mpm-manager .resource-grid-icon {
+    margin-top: -2px;
+    font-size: 19px;
 }
 
 .report-image-grid.mpm {
