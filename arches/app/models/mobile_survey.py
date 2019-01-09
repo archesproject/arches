@@ -170,7 +170,7 @@ class MobileSurvey(models.MobileSurveyModel):
                 graph_obj[prop] = relevant_items
 
             relevant_cardids = [card['cardid'] for card in graph_obj['cards']]
-            relevant_widgets = [widget for widget in  graph_obj['widgets'] if str(widget['card_id']) in relevant_cardids]
+            relevant_widgets = [widget for widget in graph_obj['widgets'] if str(widget['card_id']) in relevant_cardids]
             graph_obj['widgets'] = relevant_widgets
 
             graphs.append(serializer.serializeToPython(graph_obj))
