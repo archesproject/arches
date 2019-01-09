@@ -9265,7 +9265,7 @@ a.clear-geojson-button:hover {
 
 .msm-list-filter {
     display: flex;
-    padding: 10px;
+    padding: 12px 10px 13px 65px;
 }
 
 .msm-list-filter-input {
@@ -9276,7 +9276,7 @@ a.clear-geojson-button:hover {
 }
 
 .msm-list-filter-input .clear-node-search {
-    top: 9px;
+    top: 8px;
     right: 10px;
 }
 
