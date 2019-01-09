@@ -9280,6 +9280,11 @@ a.clear-geojson-button:hover {
     right: 10px;
 }
 
+.msm-summary-panel {
+    height: 100vh;
+    background: #fafafa;
+}
+
 
 /* End Function Manager Page */
 
@@ -10756,9 +10761,9 @@ a.search-facet-item.disabled {
 }
 
 .mpm-card-content {
-    margin: 15px;
+    margin-bottom: 20px;
     border: 1px solid #ddd;
-    padding: 15px;
+    padding: 40px 25px 50px 25px;
     background: #f6f6f6;
     border-radius: 4px;
 }
@@ -10815,6 +10820,17 @@ a.search-facet-item.disabled {
     width: 100%;
     margin-right: 10px;
     flex: 1;
+}
+
+.msm-icon-wrap {
+    height: 60px;
+    width: 60px;
+    border-radius: 50%;
+    border: 1px solid #C68000;
+    background: #FFDA39;
+    font-size: 28px;
+    padding-top: 12px;
+    padding-left: 6px;
 }
 
 a.filter-tools {
@@ -11106,13 +11122,13 @@ a.filter-tools:hover {
 
 .msm-edit-buttons.mobile-project-category-header {
     left: 0;
+    top: 15px;
+    font-size: 17px;
     margin-left: 0px;
     padding-left: 15px;
 }
 
-.msm-edit-buttons.mobile-project-category-header .description {
-    font-size: 0.8em;
-}
+
 
 .msm-tree {
     height: 100%;
@@ -11629,8 +11645,30 @@ a.filter-tools:hover {
     padding-left: 10px;
     margin-top: 0px;
     color: #454545;
-    font-size: 15px;
     font-weight: 500;
+}
+
+.mpm-survey-status-header {
+    padding-left: 10px;
+    margin-top: 0px;
+    color: #454545;
+    font-size: 24px;
+    font-weight: 500;
+    text-align: center;
+}
+
+.msm-survey-status-text {
+    margin-top: 20px;
+}
+
+.msm-survey-status-instructions {
+    padding: 20px 10px 5px 10px; 
+    font-size: 19px;
+}
+
+.msm-survey-issues {
+    font-size: 15px;
+    color: #888;
 }
 
 .mpm-item-listing-header.data-panel {
