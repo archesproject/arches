@@ -5111,7 +5111,7 @@ ul.jqtree_common li.jqtree-folder {
 .account-tips {
     margin-top: 10px;
     font-size: 13px;
-    color: #777;
+    color: #999;
 }
 
 .account-input {
@@ -10769,7 +10769,7 @@ a.search-facet-item.disabled {
     margin: 0px;
     border-bottom: 1px solid #ddd;
     padding: 40px 25px 50px 25px;
-    background: #f6f6f6;
+    background: #f9f9f9;
     
 }
 
@@ -11174,8 +11174,18 @@ a.filter-tools:hover {
 }
 
 .msm-basemap-location {
-    z-index: 100;
-    background-color: #fff;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+.msm-basemap-location:last-child {
+    border-bottom: transparent;
+}
+
+.msm-basemap-subtitle {
+    font-size: 13px;
+    color: #999;
+    padding-bottom: 25px;
 }
 
 .msm-location-card .row.widget-wrapper {
@@ -11738,7 +11748,20 @@ a.filter-tools:hover {
 }
 
 .msm-map-container {
-    padding: 20px;
+    padding: 0px;
+    height: 100vh;
+    margin-left: -10px;
+    margin-right: -20px;
+    margin-top: -30px;
+}
+
+.msm-map-container .widget-wrapper .mapboxgl-map {
+    height: 100vh;
+}
+
+.msm-map-container .geometry-tools-container {
+    top: 60px;
+    left: 10px;
 }
 
 .msm-stats-panel {
