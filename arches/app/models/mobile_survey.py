@@ -355,21 +355,13 @@ class MobileSurvey(models.MobileSurveyModel):
                 instances = {hit['_source']['resourceinstanceid']: hit['_source'] for hit in search_res['results']['hits']['hits']}
                 # if we didn't get our limit of resource instances using a spatial filter
                 # let's try to get resource instances that don't have spatial data
-                if len(instances.keys()) < self.datadownloadconfig['count']:
+                if len(instances.keys()) < int(self.datadownloadconfig['count']):
                     request.GET['mapFilter'] = '{}'
-                    request.GET['resourcecount'] = self.datadownloadconfig['count'] - len(instances.keys())
-                    geometric_datatypes = list(models.DDataType.objects.filter(isgeometric=True).values_list('datatype', flat=True))
-                    nonspatial_resources = []
-                    for resourceid in self.datadownloadconfig['resources']:
-                        exists = models.Node.objects.filter(datatype__in=geometric_datatypes, graph_id=resourceid).exists()
-                        if not exists:
-                            nonspatial_resources.append(resourceid)
-                    if len(nonspatial_resources) > 0:
-                        request.GET['typeFilter'] = json.dumps([{'graphid': resourceid, 'inverted': False} for resourceid in nonspatial_resources])
-                        search_res_json = search.search_results(request)
-                        search_res = JSONDeserializer().deserialize(search_res_json.content)
-                        for hit in search_res['results']['hits']['hits']:
-                            instances[hit['_source']['resourceinstanceid']] = hit['_source']
+                    request.GET['resourcecount'] = int(self.datadownloadconfig['count']) - len(instances.keys())
+                    search_res_json = search.search_results(request)
+                    search_res = JSONDeserializer().deserialize(search_res_json.content)
+                    for hit in search_res['results']['hits']['hits']:
+                        instances[hit['_source']['resourceinstanceid']] = hit['_source']
             except KeyError:
                 print 'no instances found in', search_res
         return instances
