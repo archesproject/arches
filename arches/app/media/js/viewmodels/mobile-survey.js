@@ -73,6 +73,11 @@ define([
             return ko.observableArray(rootCards);
         };
 
+        this.convertCountToInt = function() {
+            var count = this.mobilesurvey.datadownloadconfig.count;
+            count(parseInt(count()));
+        };
+
         this.updateResourceCards = function(resource){
             $.ajax({
                 url: arches.urls.resource_cards.replace('//', '/' + resource.id + '/')

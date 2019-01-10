@@ -408,7 +408,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                                 mobilesurvey.datadownloadconfig.download(!mobilesurvey.datadownloadconfig.download());
                                                                             }"><small></small></span>
                                                                         </div>
-                                                                        <div class="text-muted" data-bind="visible: mobilesurvey.datadownloadconfig.download()"><label style="display:flex; align-items:center; margin-top: 10px;">{% trans 'Limit ' %}<input type="number" class="form-control" style="width: 100px; margin-left: 7px;" placeholder="Search query URL" data-bind="textInput: mobilesurvey.datadownloadconfig.count"></input></label></div>
+                                                                        <div class="text-muted" data-bind="visible: mobilesurvey.datadownloadconfig.download()"><label style="display:flex; align-items:center; margin-top: 10px;">{% trans 'Limit ' %}<input type="number" class="form-control" style="width: 100px; margin-left: 7px;" placeholder="Search query URL" data-bind="textInput: mobilesurvey.datadownloadconfig.count, event: {'change': convertCountToInt}"></input></label></div>
                                                                     </div>
                                                                 </div>
 
