@@ -408,7 +408,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                                 mobilesurvey.datadownloadconfig.download(!mobilesurvey.datadownloadconfig.download());
                                                                             }"><small></small></span>
                                                                         </div>
-                                                                        <div class="text-muted" data-bind="visible: mobilesurvey.datadownloadconfig.download()"><label style="display:flex; align-items:center; margin-top: 10px;">{% trans 'Limit ' %}<input type="number" class="form-control" style="width: 100px; margin-left: 7px;" placeholder="Search query URL" data-bind="textInput: mobilesurvey.datadownloadconfig.count"></input></label></div>
+                                                                        <div class="text-muted" data-bind="visible: mobilesurvey.datadownloadconfig.download()"><label style="display:flex; align-items:center; margin-top: 10px;">{% trans 'Limit ' %}<input type="number" class="form-control" style="width: 100px; margin-left: 7px;" placeholder="Search query URL" data-bind="textInput: mobilesurvey.datadownloadconfig.count, event: {'change': convertCountToInt}"></input></label></div>
                                                                     </div>
                                                                 </div>
 
@@ -555,7 +555,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             return {
                 mobilesurvey: {{mobile_survey}},
                 resources: {{resources}},
-                identities: {{identities}}
+                identities: {{identities}},
+                transstrings: {
+                    identity: {name: {% trans "'Name'" %}, namelong: {% trans "'Name'" %}, description: {% trans "'Manage users that participate in this survey'" %}},
+                    resourcemodel: {name: {% trans "'Model Details'" %}, namelong: {% trans "'Model Details'" %}, description: {% trans "'Summary of how this model participates in the survey'" %}},
+                    root: {name: {% trans "'Summary'" %}, namelong: {% trans "'Summary'" %}, description: {% trans "'Survey summary and status'" %}},
+                    settings: {name: {% trans "'Settings'" %}, namelong: {% trans "'Survey Settings'" %}, description: {% trans "'Define data collection parameters for your survey'" %}},
+                    mapextent: {name: {% trans "'Map Extent'" %}, namelong: {% trans "'Map Extent'" %}, description: {% trans "'Draw a polygon to define the area over which you want to collect data in this survery'" %}},
+                    mapsources: {name: {% trans "'Map Sources'" %}, namelong: {% trans "'Basemap Source'" %}, description: {% trans "'Provide a basemap source url. Use an offline source for users without access to cell/wi-fi service'" %}},
+                    models: {name: {% trans "'Models'" %}, namelong: {% trans "'Models'" %}, description: {% trans "'Summary of models in this survey'" %}},
+                    data: {name: {% trans "'Data'" %}, namelong: {% trans "'Data Download'" %}, description: {% trans "'Define the data you will allow users to download'" %}},
+                    people: {name: {% trans "'People'" %}, namelong: {% trans "'People'" %}, description: {% trans "'Summary of people invited to participate in this survey'" %}},
+                    groupplaceholder: {% trans "'Select one or more groups...'" %},
+                    modelplaceholder: {% trans "'Select one or more resource models...'" %}
+                }
             };
         });{% endautoescape %}
     </script>
