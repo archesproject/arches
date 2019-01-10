@@ -184,7 +184,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
                     onlinebasemaps=settings.MOBILE_DEFAULT_ONLINE_BASEMAP,
                 )
             mobile_survey = survey.serialize()
-            mobile_survey['bounds']=settings.DEFAULT_BOUNDS
+            mobile_survey['bounds'] = settings.DEFAULT_BOUNDS
 
         resources = get_survey_resources(mobile_survey)
 
