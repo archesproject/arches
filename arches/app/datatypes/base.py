@@ -274,7 +274,7 @@ class BaseDataType(object):
         """
         pass
 
-    def to_rdf(self, edge_info, edge, tile):
+    def to_rdf(self, edge_info, edge):
         """
         Outputs an in-memory graph, converting the range tile data JSON into
         an appropriate RDF representation using rdflib
@@ -304,6 +304,4 @@ class BaseDataType(object):
 
     def from_rdf(self, json_ld_node):
         print json_ld_node
-        # expects a node taken from an expanded json-ld graph
-        # returns the value, or None if no "@value" key is found
         raise NotImplementedError
