@@ -10971,6 +10971,11 @@ a.filter-tools:hover {
     align-items: center;
 }
 
+.mpm-summary-panel {
+    background: #fff;
+    padding: 0px 40px;
+}
+
 .map-search-container div .map-widget-panel {
     height: calc(100vh - 110px);
 }
@@ -11194,8 +11199,13 @@ a.filter-tools:hover {
 }
 
 .msm-download-panel {
-    padding-top: 15px;
-    padding-bottom: 15px;
+    padding-top: 5px;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+#custom-download-panel {
+    padding-top: 20px;
     padding-left: 15px;
 }
 
@@ -11696,6 +11706,7 @@ a.filter-tools:hover {
 .msm-crud-section {
     padding: 40px 40px;
     min-height: 150px;
+    background: #fff;
     border-bottom: 1px solid #ddd;
 }
 

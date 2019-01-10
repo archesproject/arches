@@ -261,7 +261,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <div class="row">
                                                 <div class="col-sm-5">
                                                     <div class="form-group">
-                                                        <label class="control-label account-label">{% trans 'Survey end' %}</label>
+                                                        <label class="control-label account-label">{% trans 'Survey end date' %}</label>
                                                         <input class="form-control input-lg account-input" data-bind="datepicker: {format: dateFormat, minDate: mobilesurvey.startdate, maxDate: false}, value: mobilesurvey.enddate">
                                                     </div>
                                                 </div>
@@ -321,7 +321,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!--/ko-->
 
                         <!--ko if: activePage() === 'mapsources'-->
-                        <div class="mpm-card msm-location-card ">
+                        <div class="msm-location-card ">
                             
                             <div class="msm-crud-section">
                                 <div class="form-group" style="margin-bottom: 10px;">
@@ -382,77 +382,85 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <!-- Data Card -->
                         <!--ko if: activePage() === 'data'-->
-                        <div class="mpm-card">
-                            <div class="panel-body project-card-body">
-                                <div class="card-content">
-                                    <div class="mpm-activation-panel">
-                                        <div class="row pad-btm">
-                                            <!-- Activate Switch -->
-                                            <div class="col-sm-5 col-md-3">
+                        
+                        <div class="msm-crud-section" style="height: 200px; border-bottom: transparent;">
+                            <!-- Activate Switch -->
+                            <div class="">
+                                <div class="col-sm-5">
+                                    <div class="box-inline">
+                                        <p class="mpm-item-listing-header data-panel" style="margin-bottom: 0px;">
+                                            {% trans 'Allow users to download data' %}
+                                        </p>
 
-                                                <div class="box-inline">
-                                                    <p class="mpm-item-listing-header data-panel" style="margin-bottom: 0px;">
-                                                        {% trans 'Allow users to download data' %}
-                                                    </p>
-
-                                                    <div class="toggle-container">
-                                                        <span class="switch switch-small" data-bind="css: {'on': mobilesurvey.datadownloadconfig.download()}, click: function(){
-                                                            mobilesurvey.datadownloadconfig.download(!mobilesurvey.datadownloadconfig.download());
-                                                        }"><small></small></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- Help Message-->
-                                            <div class="col-sm-6 col-md-9">
-                                                <p class="account-tips" style="margin-top: 20px;">
-                                                    {% trans 'Downloading data allows users to access and edit existing Arches information in the field' %}
-                                                </p>
-                                            </div>
+                                        <div class="toggle-container">
+                                            <span class="switch switch-small" data-bind="css: {'on': mobilesurvey.datadownloadconfig.download()}, click: function(){
+                                                mobilesurvey.datadownloadconfig.download(!mobilesurvey.datadownloadconfig.download());
+                                            }"><small></small></span>
                                         </div>
-                                        
-                                        <!-- ko if: mobilesurvey.datadownloadconfig.download() -->
-                                        <div id="data-definition" class="mpm-summary-panel">
+                                    </div>
+                                </div>
 
-                                            <!-- Download Selector -->
-                                            <div class="msm-download-selector" style="display: block;">
-                                                <div id="standard-download" class="category-title" href="" data-bind="css: {active: mobilesurvey.showCustomDataDownload() === false }, click: function(){ mobilesurvey.showCustomDataDownload(false)}">{% trans 'Download Records' %}</div>
-                                                <div id="custom-download" class="category-title" href="" data-bind="css: {active: mobilesurvey.showCustomDataDownload() === true}, click: function(){ mobilesurvey.showCustomDataDownload(true)}">{% trans 'Custom Download' %}</div>
-                                            </div>
+                                <!-- Help Message-->
+                                <div class="col-sm-7">
+                                    <p class="account-tips" style="margin-top: 20px;">
+                                        {% trans 'Downloading data allows users to access and edit existing Arches information in the field' %}
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="col-sm-5" style="padding-top: 10px; padding-bottom: 10px;">
+                                    <label style="display:flex; align-items:center">{% trans 'Limit ' %}
+                                        <input type="number" class="form-control" style="width: 100px; margin-left: 7px;" placeholder="Search query URL" data-bind="textInput: mobilesurvey.datadownloadconfig.count"></input>
+                                    </label>
+                                </div>
 
-                                            <!-- Standard Download -->
-                                            <div id="standard-download-panel" class="msm-download-panel" data-bind="visible: mobilesurvey.showCustomDataDownload() === false">
+                                <div class="col-sm-7" style="padding-top: 10px; padding-bottom: 10px;">
+                                    <p class="text-muted">
+                                        {% trans "Total number of instances to download for the resource models you've associated with this project." %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- ko if: mobilesurvey.datadownloadconfig.download() -->
+                        <div id="data-definition" class="mpm-summary-panel">
 
-                                                <p class="text-muted">
-                                                    {% trans "Allow users to download instances for the resource models you've associated with this project." %}
-                                                </p>
-                                                <label style="display:flex; align-items:center">{% trans 'Limit ' %}<input type="number" class="form-control" style="width: 100px; margin-left: 7px;" placeholder="Search query URL" data-bind="textInput: mobilesurvey.datadownloadconfig.count"></input></label>
-                                                <div class="form-group pad-ver msm-data-selection">
-                                                    <!-- Inline Checkboxes -->
-                                                    <div class="checkbox">
-                                                        <!-- ko foreach: {data:allResources, as: 'resource'} -->
-                                                        <label class="form-checkbox form-normal form-primary" data-bind="text: resource.name, css: {'form-text' : true, active: _.contains($parent.mobilesurvey.datadownloadconfig.resources(), resource.id), disabled: resource.hasApprovedCards() === false}, click: function(r){if (r.hasApprovedCards()){$parent.mobilesurvey.updateResourceDownloadList(r)}}"><input type="checkbox"></label>
-                                                        <!-- /ko -->
-                                                    </div>
-                                                </div>
-                                            </div>
+                            <!-- Download Selector -->
+                            <div class="msm-download-selector" style="display: block;">
+                                <div id="standard-download" class="category-title" href="" data-bind="css: {active: mobilesurvey.showCustomDataDownload() === false }, click: function(){ mobilesurvey.showCustomDataDownload(false)}">
+                                    {% trans 'Download Records' %}
+                                </div>
+                                <div id="custom-download" class="category-title" href="" data-bind="css: {active: mobilesurvey.showCustomDataDownload() === true}, click: function(){ mobilesurvey.showCustomDataDownload(true)}">
+                                    {% trans 'Custom Download' %}
+                                </div>
+                            </div>
 
-                                            <!-- Custom Query -->
-                                            <div id="custom-download-panel" class="msm-download-panel" data-bind="visible: mobilesurvey.showCustomDataDownload() === true">
-                                                <p class="text-muted">
-                                                    {% trans 'To define records for download' %} <strong> {% trans 'copy and paste the URL from Arches search page' %}</strong>
-                                                </p>
+                            <!-- Standard Download -->
+                            <div id="standard-download-panel" class="msm-download-panel" data-bind="visible: mobilesurvey.showCustomDataDownload() === false">
 
-                                                <div class="form-group">
-                                                    <input type="text" id="" class="form-control" placeholder="Search query URL" data-bind="textInput: mobilesurvey.datadownloadconfig.custom">
-                                                </div>
-                                            </div>
-                                        </div>
+                                <div class="form-group msm-data-selection">
+                                    <!-- Inline Checkboxes -->
+                                    <div class="checkbox">
+                                        <!-- ko foreach: {data:allResources, as: 'resource'} -->
+                                        <label class="form-checkbox form-normal form-primary" data-bind="text: resource.name, css: {'form-text' : true, active: _.contains($parent.mobilesurvey.datadownloadconfig.resources(), resource.id), disabled: resource.hasApprovedCards() === false}, click: function(r){if (r.hasApprovedCards()){$parent.mobilesurvey.updateResourceDownloadList(r)}}"><input type="checkbox"></label>
                                         <!-- /ko -->
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Custom Query -->
+                            <div id="custom-download-panel" class="msm-download-panel" data-bind="visible: mobilesurvey.showCustomDataDownload() === true">
+                                <p class="text-muted">
+                                    {% trans 'To define records for download' %} <strong> {% trans 'copy and paste the URL from Arches search page' %}</strong>
+                                </p>
+
+                                <div class="form-group">
+                                    <input type="text" id="" class="form-control" placeholder="Search query URL" data-bind="textInput: mobilesurvey.datadownloadconfig.custom">
+                                </div>
+                            </div>
                         </div>
+                        <!-- /ko -->
                         <!--/ko-->
 
                         <!--ko if: activePage() === 'people'-->
