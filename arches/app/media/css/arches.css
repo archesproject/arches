@@ -11175,7 +11175,7 @@ a.filter-tools:hover {
 
 .msm-basemap-location {
     margin-bottom: 15px;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #eee;
 }
 
 .msm-basemap-location:last-child {
@@ -11185,7 +11185,7 @@ a.filter-tools:hover {
 .msm-basemap-subtitle {
     font-size: 13px;
     color: #999;
-    padding-bottom: 25px;
+    padding-bottom: 35px;
 }
 
 .msm-location-card .row.widget-wrapper {
@@ -11693,6 +11693,16 @@ a.filter-tools:hover {
     border-bottom: 1px solid #ddd;
 }
 
+.msm-crud-section {
+    padding: 40px 40px;
+    min-height: 150px;
+    border-bottom: 1px solid #ddd;
+}
+
+.msm-crud-section:last-child {
+    border-bottom: transparent;
+}
+
 .msm-report-section.active {
     background: #fff;
 }
@@ -12048,7 +12058,7 @@ ul.select2-choices:after {
     border-right: solid 1px gainsboro;
     height:100%;
     z-index: 3;
-    font-size: 11px;
+    font-size: 10px;
 }
 
 .sidepanel-draggable div {

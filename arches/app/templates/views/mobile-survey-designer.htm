@@ -224,72 +224,59 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <div id="" class="card-content">
 
                                     <!-- Project Info -->
-                                    <section id="" class="profile-list edit-mode">
-                                        <div class="account-wrapper">
-                                            <div class="row relative">
+                                    <div id="account-crud" class="">
+                                        <div class="msm-crud-section">
+                                            <div class="row">
+                                                <div class="col-sm-5">
+                                                    <div class="form-group">
+                                                        <label class="control-label account-label">{% trans 'Survey name' %}</label>
+                                                        <input type="text" class="form-control input-lg account-input" data-bind="value: mobilesurvey.name, valueUpdate: 'keyup'">
+                                                    </div>
+                                                </div>
 
-                                                <!-- Section Content -->
-                                                <div class="col-sm-12">
+                                                <div class="col-sm-6">
+                                                    <p class="account-tips">
+                                                        {% trans 'Pick a concise name that makes it easy for people to find your survey' %}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
 
-                                                    <div id="account-crud" class="" style="">
-                                                        <div class="row">
-                                                            <div class="col-sm-5">
-                                                                <div class="form-group">
-                                                                    <label class="control-label account-label">{% trans 'Survey name' %}</label>
-                                                                    <input type="text" class="form-control input-lg account-input" data-bind="value: mobilesurvey.name, valueUpdate: 'keyup'">
-                                                                </div>
-                                                            </div>
+                                        <div class="msm-crud-section">
+                                            <div class="row">
+                                                <div class="col-sm-5">
+                                                    <div class="form-group">
+                                                        <label class="control-label account-label">{% trans 'Survey start date' %}</label>
+                                                        <input class="form-control input-lg account-input" data-bind="datepicker: {format: dateFormat, minDate: false, maxDate: mobilesurvey.enddate}, value: mobilesurvey.startdate">
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="col-sm-6">
+                                                    <p class="account-tips">
+                                                        {% trans 'The survey start and end dates are used to limit when people can add or edit data to your project. Use these dates to enfore the beginning and end of your field data collection effort' %}
+                                                    </p>
+                                                </div>
+                                            </div>
 
-                                                            <div class="col-sm-6">
-                                                                <p class="account-tips">
-                                                                    {% trans 'Pick a concise name that makes it easy for people to find your survey' %}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-
-                                                        <hr style="border-color: #ddd;">
-
-                                                        <div class="row">
-                                                            <div class="col-sm-5">
-                                                                <div class="form-group">
-                                                                    <label class="control-label account-label">{% trans 'Survey start date' %}</label>
-                                                                    <input class="form-control input-lg account-input" data-bind="datepicker: {format: dateFormat, minDate: false, maxDate: mobilesurvey.enddate}, value: mobilesurvey.startdate">
-                                                                </div>
-                                                            </div>
-                                                            
-                                                            <div class="col-sm-6">
-                                                                <p class="account-tips">
-                                                                    {% trans 'The survey start and end dates are used to limit when people can add or edit data to your project. Use these dates to enfore the beginning and end of your field data collection effort' %}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="row">
-                                                            <div class="col-sm-5">
-                                                                <div class="form-group">
-                                                                    <label class="control-label account-label">{% trans 'Survey end' %}</label>
-                                                                    <input class="form-control input-lg account-input" data-bind="datepicker: {format: dateFormat, minDate: mobilesurvey.startdate, maxDate: false}, value: mobilesurvey.enddate">
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <hr style="border-color: #ddd;">
-
-                                                        <div class="row">
-                                                            <div class="col-sm-12">
-                                                                <div class="form-group">
-                                                                    <label class="control-label account-label">{% trans 'Description' %}</label>
-                                                                    <div>
-                                                                        <textarea class="form-control textarea textarea-resizable" rows="3" type="text" data-bind="value: mobilesurvey.description, valueUpdate: 'keyup'"></textarea>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
+                                            <div class="row">
+                                                <div class="col-sm-5">
+                                                    <div class="form-group">
+                                                        <label class="control-label account-label">{% trans 'Survey end' %}</label>
+                                                        <input class="form-control input-lg account-input" data-bind="datepicker: {format: dateFormat, minDate: mobilesurvey.startdate, maxDate: false}, value: mobilesurvey.enddate">
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </section>
+
+                                        <div class="msm-crud-section">
+                                            <div class="form-group">
+                                                <label class="control-label account-label">{% trans 'Description' %}</label>
+                                                <div>
+                                                    <textarea class="form-control textarea textarea-resizable" rows="3" type="text" data-bind="value: mobilesurvey.description, valueUpdate: 'keyup'"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -335,24 +322,23 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <!--ko if: activePage() === 'mapsources'-->
                         <div class="mpm-card msm-location-card ">
-                            <div class="panel-body project-card-body">
-                                <div class="msm-basemap-location">
-                                    <div class="form-group" style="margin-bottom: 10px;">
-                                        <label class="control-label account-label">{% trans 'Basemap location (MBTiles file url)' %}</label>
-                                        <input type="text" class="form-control input-lg" data-bind="value: mobilesurvey.tilecache, valueUpdate: 'keyup'" placeholder="e.g.: http://arches_domain_name/media/lincoln.mbtiles">
-                                    </div>
-                                    <div class="msm-basemap-subtitle">
-                                        Arches uses the mbtiles that you specific to ensure that your field crew has a basemap, even when they don't have access to a cell network or WiFi connection.  You can create an mbtile file using your own geospatial data and GIS tools.  Or you can obtain high quality and inexpensive mbtiles from www.XXXX.org.  Note that large files will require longer downloads and more storage space on your field team's mobile devices.
-                                    </div>
+                            
+                            <div class="msm-crud-section">
+                                <div class="form-group" style="margin-bottom: 10px;">
+                                    <label class="control-label account-label">{% trans 'Basemap location (MBTiles file url)' %}</label>
+                                    <input type="text" class="form-control input-lg" data-bind="value: mobilesurvey.tilecache, valueUpdate: 'keyup'" placeholder="e.g.: http://arches_domain_name/media/lincoln.mbtiles">
                                 </div>
-                                <div class="msm-basemap-location">
-                                    <div class="form-group" style="margin-bottom: 10px;">
-                                        <label class="control-label account-label">{% trans 'Online Basemap URL' %}</label>
-                                        <input type="text" class="form-control input-lg" data-bind="value: mobilesurvey.onlinebasemap, valueUpdate: 'keyup'" placeholder="e.g.: mapbox://styles/mapbox/light-v9">
-                                    </div>
-                                    <div class="msm-basemap-subtitle">
-                                        {% trans 'Arches uses the Online Basemap URL that you specify as the default basemap for your field team when a cell network or WiFi connection is available. You may use you own map service, or any online basemap service compatible with MapBox (see www.XXXXX.com for a summary of basemap service requirements)' %}
-                                    </div>
+                                <div class="msm-basemap-subtitle">
+                                    Arches uses the mbtiles that you specific to ensure that your field crew has a basemap, even when they don't have access to a cell network or WiFi connection.  You can create an mbtile file using your own geospatial data and GIS tools.  Or you can obtain high quality and inexpensive mbtiles from www.XXXX.org.  Note that large files will require longer downloads and more storage space on your field team's mobile devices.
+                                </div>
+                            </div>
+                            <div class="msm-crud-section">
+                                <div class="form-group" style="margin-bottom: 10px;">
+                                    <label class="control-label account-label">{% trans 'Online Basemap URL' %}</label>
+                                    <input type="text" class="form-control input-lg" data-bind="value: mobilesurvey.onlinebasemap, valueUpdate: 'keyup'" placeholder="e.g.: mapbox://styles/mapbox/light-v9">
+                                </div>
+                                <div class="msm-basemap-subtitle">
+                                    {% trans 'Arches uses the Online Basemap URL that you specify as the default basemap for your field team when a cell network or WiFi connection is available. You may use you own map service, or any online basemap service compatible with MapBox (see www.XXXXX.com for a summary of basemap service requirements)' %}
                                 </div>
                             </div>
                         </div>
