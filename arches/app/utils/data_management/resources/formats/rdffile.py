@@ -293,7 +293,7 @@ class JsonLdReader(Reader):
                 return match.group('resourceid')
         return None
 
-    def read_resource(self, data, use_ids=False, resourceid=None):
+    def read_resource(self, data, use_ids=False, resourceid=None, graph=None):
         self.use_ids = use_ids
         if not isinstance(data, list):
             data = [data]
@@ -301,7 +301,10 @@ class JsonLdReader(Reader):
         for jsonld in data:
             self.errors = {}
             jsonld = expand(jsonld)[0]
-            graphid = self.get_graph_id(jsonld["@type"][0])
+            if graph is None:
+                graphid = self.get_graph_id(jsonld["@type"][0])
+            else:
+                graphid = graph.pk
             if graphid:
                 graph = GraphProxy.objects.get(graphid=graphid)
                 graphtree = graph.get_tree()
@@ -436,7 +439,7 @@ class JsonLdReader(Reader):
 
             # if len(self.findOntologyProperties(jsonld_graph)) == 0:
             # print 'at a leaf -- unwinding'
-            
+
             def json_data_is_valid(node, json_ld_node):
                 datatype = self.datatype_factory.get_instance(node.datatype)
                 value = datatype.from_rdf(json_ld_node)
@@ -455,9 +458,9 @@ class JsonLdReader(Reader):
                         if found_node['node'].datatype == datatype and json_data_is_valid(found_node['node'], jsonld_graph):
                             return found_node
 
-                    # If the range is semantic, then check the class of the incoming node is the same 
-                    # class as the model's node. If it does, then recursively test the edges of the 
-                    # semantic node to determine if it is a candidate (peek-ahead). Remove from the 
+                    # If the range is semantic, then check the class of the incoming node is the same
+                    # class as the model's node. If it does, then recursively test the edges of the
+                    # semantic node to determine if it is a candidate (peek-ahead). Remove from the
                     # candidate list if it is not.
                     if found_node['node'].datatype == 'semantic':
                         for ontology_prop in self.findOntologyProperties(jsonld_graph):
@@ -472,9 +475,9 @@ class JsonLdReader(Reader):
                                 # print nodes_copy
                                 pass
 
-                    # If the range in the model is a resource-instance, then check that the incoming 
-                    # node has the same class as the top node of any of the referenced models. If more 
-                    # than one model has the same top level class, then fail as the model is ambiguous. 
+                    # If the range in the model is a resource-instance, then check that the incoming
+                    # node has the same class as the top node of any of the referenced models. If more
+                    # than one model has the same top level class, then fail as the model is ambiguous.
                     # If there is exactly one possible model, then accept that node.
                     if found_node['node'].datatype == 'resource-instance':
                         if found_node['node'].ontologyclass in self.resource_model_root_classes:

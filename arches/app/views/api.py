@@ -270,7 +270,12 @@ class Resources(APIBase):
                     # POST
                     data = JSONDeserializer().deserialize(request.body)
                     reader = JsonLdReader()
-                    reader.read_resource(data, resourceid=resourceid)
+                    graph = None
+                    if slug is not None:
+                        graph = models.Graph.objects.get(slug=slug)
+                    else if graphid is not None:
+                        graph = models.Graph.objects.get(pk=graphid)
+                    reader.read_resource(data, resourceid=resourceid, graph=graph)
                     if reader.errors:
                         response = []
                         for value in reader.errors.itervalues():
@@ -299,7 +304,11 @@ class Resources(APIBase):
             if user_can_edit_resources(user=request.user):
                 data = JSONDeserializer().deserialize(request.body)
                 reader = JsonLdReader()
-                reader.read_resource(data)
+                if slug is not None:
+                    graph = models.Graph.objects.get(slug=slug)
+                else if graphid is not None:
+                    graph = models.Graph.objects.get(pk=graphid)
+                reader.read_resource(data, graph=graph)
                 if reader.errors:
                     response = []
                     for value in reader.errors.itervalues():
