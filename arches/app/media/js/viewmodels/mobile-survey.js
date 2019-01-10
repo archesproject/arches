@@ -24,6 +24,7 @@ define([
         this.identityList = new IdentityList({
             items: ko.observableArray(params.identities)
         });
+        this.transStrings = params.transstrings;
 
         this.basemap = _.filter(arches.mapLayers, function(layer) {
             return !layer.isoverlay;
@@ -119,7 +120,7 @@ define([
             identity.pageid = 'identity';
             identity.namelong = identity.name;
             identity.iconclass = identity.type === 'group' ? 'fa fa-users' : 'fa fa-user';
-            identity.description = 'Manage users that participate in this survey';
+            identity.description = self.transStrings.identity.description;
         };
 
         this.displayUser = ko.observable();
@@ -189,7 +190,7 @@ define([
                 data: {results: this.allResources.map(function(r){return {text: r.name, id: r.id};})},
                 value: this.selectedResourceIds,
                 multiple: true,
-                placeholder: "select a model",
+                placeholder: this.transStrings.modelplaceholder,
                 allowClear: true
             };
         };
@@ -257,7 +258,7 @@ define([
                 data: {results: this.allIdentities.filter(function(id){return id.type==='group';}).map(function(g){return {text: g.name, id: g.id};})},
                 value: this.selectedGroupsIds,
                 multiple: true,
-                placeholder: "select a group",
+                placeholder: this.transStrings.groupplaceholder,
                 allowClear: true
             };
         };
@@ -281,8 +282,8 @@ define([
 
         this.treenodes = [{
             name: this.mobilesurvey.name,
-            namelong: 'Summary',
-            description: 'Survey summary and status',
+            namelong: this.transStrings.root.namelong,
+            description: this.transStrings.root.description,
             id: 'root',
             selected: ko.observable(true),
             istopnode: true,
@@ -291,9 +292,9 @@ define([
             pageactive: ko.observable(true),
             expanded: ko.observable(true),
             childNodes: ko.observableArray([{
-                name: 'Settings',
-                namelong: 'Survey Settings',
-                description: 'Define data collection parameters for your survey',
+                name: this.transStrings.settings.name,
+                namelong: this.transStrings.settings.namelong,
+                description: this.transStrings.settings.description,
                 id: 'settings',
                 selected: ko.observable(false),
                 istopnode: false,
@@ -303,9 +304,9 @@ define([
                 expanded: ko.observable(false)
             },
             {
-                name: 'Map Extent',
-                namelong: 'Map Extent',
-                description: 'Draw a polygon to define the area over which you want to collect data in this survery',
+                name: this.transStrings.mapextent.name,
+                namelong: this.transStrings.mapextent.namelong,
+                description: this.transStrings.mapextent.description,
                 id: 'mapextent',
                 selected: ko.observable(false),
                 istopnode: false,
@@ -315,9 +316,9 @@ define([
                 expanded: ko.observable(false)
             },
             {
-                name: 'Map Sources',
-                namelong: 'Basemap Source',
-                description: 'Provide a basemap source url. Use an offline source for users without access to cell/wi-fi service',
+                name: this.transStrings.mapsources.name,
+                namelong: this.transStrings.mapsources.namelong,
+                description: this.transStrings.mapsources.description,
                 id: 'mapsources',
                 selected: ko.observable(false),
                 istopnode: false,
@@ -327,21 +328,21 @@ define([
                 expanded: ko.observable(false)
             },
             {
-                name: 'Models',
-                namelong: 'Models',
-                description: 'Summary of models in this survey',
+                name: this.transStrings.models.name,
+                namelong: this.transStrings.models.namelong,
+                description: this.transStrings.models.description,
                 id: 'models',
                 selected: ko.observable(false),
                 istopnode: false,
                 iconclass: 'fa fa-bookmark',
                 pageactive: ko.observable(false),
                 childNodes: this.selectedResources,
-                expanded: ko.observable(false)
+                expanded: ko.observable(true)
             },
             {
-                name: 'Data',
-                namelong: 'Data download',
-                description: 'Define the data you will allow users to download',
+                name: this.transStrings.data.name,
+                namelong: this.transStrings.data.namelong,
+                description: this.transStrings.data.description,
                 id: 'data',
                 selected: ko.observable(false),
                 istopnode: false,
@@ -351,16 +352,16 @@ define([
                 expanded: ko.observable(false)
             },
             {
-                name: 'People',
-                namelong: 'People',
-                description: 'Summary of people invited to participate in this survey',
+                name: this.transStrings.people.name,
+                namelong: this.transStrings.people.namelong,
+                description: this.transStrings.people.description,
                 id: 'people',
                 selected: ko.observable(false),
                 istopnode: false,
                 iconclass: 'fa fa-user-plus',
                 pageactive: ko.observable(false),
                 childNodes: this.selectedGroups,
-                expanded: ko.observable(false)
+                expanded: ko.observable(true)
             }
             ])
         }];
