@@ -66,21 +66,47 @@ define(['jquery',
             });
             return valid;
         },
-        //this now has the same syntax as validateHasValues.
-        nodesHaveValues: function(nodes, node_names) {
-            var valid = nodes != undefined && nodes.length > 0;
+
+        // check for whether specific nodes are populated. if no options are provided
+        // then all nodes must have a value. If options.canBeEmpty is provided (as an
+        // array) then those nodes can be empty. If options.mustBeFilled is provided
+        // (as an array) then validation will fail if one of those nodes does not have
+        // a value.
+        nodesHaveValues: function(nodes, options) {
+            if (options == undefined) {
+                var options = {"canBeEmpty":[],"mustBeFilled":[]}
+            }
+
+            var valid = true;
             _.each(nodes, function (node) {
-                if (canBeEmpty) {
-                    if (node.entityid === '' && node.value === '' && canBeEmpty.indexOf(node.entitytypeid) == -1){
+
+                // use optional canBeEmpty and/or mustBeFilled arrays if provided
+                if (options.canBeEmpty || options.mustBeFilled) {
+                    if (options.canBeEmpty){
+                        // if a node is not in the list of canBeEmpty, it must have a value
+                        if (options.canBeEmpty.indexOf(node.entitytypeid) == -1 && node.value === ""){
+                            valid = false;
+                            return
+                        }
+                    }
+                    if (options.mustBeFilled) {
+                        // if a node is in the list of mustBeFilled, it must have a value
+                        if (options.mustBeFilled.indexOf(node.entitytypeid) != -1 && node.value === "") {
+                            valid = false;
+                            return
+                        }
+                    }
+                }
+                // otherwise, all nodes must have values
+                else {
+                    if (node.entityid === '' && node.value === '') {
                         valid = false;
                     }
-                } else if (node.entityid === '' && node.value === '') {
-                        valid = false;
                 }
             }, this);
             return valid;
         },
-        
+
         // pass in a list of nodes where at least one must be populated
         mustHaveAtLeastOneOf: function(nodes, node_names) {
             var valid = false;
