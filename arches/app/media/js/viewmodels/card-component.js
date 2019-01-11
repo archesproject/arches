@@ -11,6 +11,7 @@ define([
         this.loading = params.loading || ko.observable(false);
         this.card = params.card;
         this.tile = params.tile;
+        this.reportExpanded = ko.observable(true);
         if (this.preview) {
             if (!this.card.newTile) {
                 this.card.newTile = this.card.getNewTile();

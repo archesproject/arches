@@ -30,7 +30,7 @@ from arches.app.views.concept import RDMView
 from arches.app.views.user import UserManagerView
 from arches.app.views.tile import TileData
 from arches.app.views.map import MapLayerManagerView
-from arches.app.views.mobile_survey import MobileSurveyManagerView, MobileSurveyResources
+from arches.app.views.mobile_survey import MobileSurveyManagerView, MobileSurveyResources, MobileSurveyDesignerView
 from arches.app.views.auth import LoginView, SignupView, ConfirmSignupView, ChangePasswordView, GetTokenView, GetClientIdView
 from arches.app.models.system_settings import settings
 from arches.app.utils.forms import ArchesPasswordResetForm
@@ -136,8 +136,9 @@ urlpatterns = [
     url(r'^feature_popup_content$', main.feature_popup_content, name="feature_popup_content"),
     url(r'^user$', UserManagerView.as_view(), name="user_profile_manager"),
     url(r'^user/get_user_names$', UserManagerView.as_view(action='get_user_names'), name="get_user_names"),
-    url(r'^mobile_survey_resources/(?P<surveyid>%s)/resources$' % uuid_regex, MobileSurveyResources.as_view(), name='mobile_survey_resources'),
     url(r'^mobile_survey_manager/*', MobileSurveyManagerView.as_view(), name="mobile_survey_manager"),
+    url(r'^mobile_survey_designer/(?P<surveyid>%s)$' % uuid_regex, MobileSurveyDesignerView.as_view(), name='mobile_survey_designer'),
+    url(r'^mobile_survey_resources/(?P<surveyid>%s)/resources$' % uuid_regex, MobileSurveyResources.as_view(), name='mobile_survey_resources'),
     url(r'^couchdb/(?P<path>.*)$', api.CouchdbProxy.as_view()),
     url(r'^surveys$', api.Surveys.as_view(), name='surveys'),
     url(r'^sync/(?P<surveyid>%s|())$' % uuid_regex, api.Sync.as_view(), name='sync'),

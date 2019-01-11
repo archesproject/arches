@@ -42,6 +42,9 @@
             'blueimp-helper': '{{ STATIC_URL }}packages/blueimp-gallery/js/blueimp-helper.min',
             'datatables.net': '{{ STATIC_URL }}packages/datatables.net/js/jquery.dataTables',
             'datatables.net-bs': '{{ STATIC_URL }}packages/datatables.net-bs/js/dataTables.bootstrap',
+            'datatables.net-buttons': '{{ STATIC_URL }}packages/datatables.net-buttons/js/dataTables.buttons.min',
+            'datatables.net-buttons-print': '{{ STATIC_URL }}packages/datatables.net-buttons/js/buttons.print.min',
+            'datatables.net-buttons-bs': '{{ STATIC_URL }}packages/datatables.net-buttons-bs/js/buttons.bootstrap.min',
             'datatables.net-responsive': '{{ STATIC_URL }}packages/datatables.net-responsive/js/dataTables.responsive',
             'datatables.net-responsive-bs': '{{ STATIC_URL }}packages/datatables.net-responsive-bs/js/responsive.bootstrap',
             'chosen': '{{ STATIC_URL }}packages/chosen-js/chosen.jquery',
@@ -101,6 +104,9 @@
             },
             'datatables.net': {
                 deps: ['jquery']
+            },
+            'datatables.net-buttons-bs': {
+                deps: ['datatables.net-buttons']
             },
             'noUiSlider': {
                 deps: ['jquery'],
@@ -218,7 +224,8 @@
                 export_mapping_file: function(graphid){return "{% url 'export_mapping_file' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 add_resource: function(graphid){return "{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 function_manager: function(graphid){return "{% url 'function_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
-                mobile_survey_resources: function(surveyid){return "{% url 'mobile_survey_resources' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', surveyid)}, 
+                mobile_survey_resources: function(surveyid){return "{% url 'mobile_survey_resources' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', surveyid)},
+                mobile_survey_designer: function(surveyid){return "{% url 'mobile_survey_designer' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', surveyid)},
                 mobile_survey: "{% url 'mobile_survey_manager' %}",
                 help_template: "{% url 'help_templates' %}"
             },

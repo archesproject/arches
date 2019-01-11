@@ -13,6 +13,7 @@ from django.core import management
 from django.core.urlresolvers import reverse
 from django.utils.decorators import method_decorator
 from revproxy.views import ProxyView
+from oauth2_provider.views import ProtectedResourceView
 from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.models.graph import Graph
@@ -39,9 +40,35 @@ except ImportError:
     from StringIO import StringIO
 
 
-class CouchdbProxy(ProxyView):
-    # check user credentials here
+def userCanAccessMobileSurvey(request, surveyid=None):
+    ms = MobileSurvey.objects.get(pk=surveyid)
+    user = request.user
+    allowed = False
+    if user in ms.users.all():
+        allowed = True
+    else:
+        users_groups = set([group.id for group in user.groups.all()])
+        ms_groups = set([group.id for group in ms.groups.all()])
+        if len(ms_groups.intersection(users_groups)) > 0:
+            allowed = True
+
+    return allowed
+
+
+class CouchdbProxy(ProtectedResourceView, ProxyView):
     upstream = settings.COUCHDB_URL
+
+    def dispatch(self, request, path):
+        if path is None or path == '':
+            return super(CouchdbProxy, self).dispatch(request, path)
+        else:
+            try:
+                if userCanAccessMobileSurvey(request, path.replace('project_', '')[:36]):
+                    return super(CouchdbProxy, self).dispatch(request, path)
+                else:
+                    return JSONResponse('Sync Failed', status=403)
+            except:
+                return JSONResponse('Sync failed', status=500)
 
 
 class APIBase(View):
@@ -66,27 +93,21 @@ class APIBase(View):
         return super(APIBase, self).dispatch(request, *args, **kwargs)
 
 
-class Sync(APIBase):
+class Sync(ProtectedResourceView, APIBase):
 
     def get(self, request, surveyid=None):
         ret = 'Sync was successful'
         try:
-            ms = MobileSurvey.objects.get(pk=surveyid)
-            user = request.user
-            can_sync = False
-            if user in ms.users.all():
-                can_sync = True
-            else:
-                users_groups = set([group.id for group in user.groups.all()])
-                ms_groups = set([group.id for group in ms.groups.all()])
-                if len(ms_groups.intersection(users_groups)) > 0:
-                    can_sync = True
+            can_sync = userCanAccessMobileSurvey(request, surveyid)
             if can_sync:
                 management.call_command('mobile', operation='sync_survey', id=surveyid)
+                return JSONResponse(ret)
+            else:
+                return JSONResponse('Sync Failed', status=403)
         except:
             ret = 'Sync failed'
 
-        return JSONResponse(ret)
+        return JSONResponse(ret, status=500)
 
 
 class Surveys(APIBase):
@@ -94,7 +115,8 @@ class Surveys(APIBase):
     def get(self, request):
         group_ids = list(request.user.groups.values_list('id', flat=True))
         projects = MobileSurvey.objects.filter(Q(users__in=[request.user]) | Q(groups__in=group_ids), active=True).distinct()
-        response = JSONResponse(projects, indent=4)
+        projects_for_couch = [project.serialize_for_couch() for project in projects]
+        response = JSONResponse(projects_for_couch, indent=4)
         return response
 
 

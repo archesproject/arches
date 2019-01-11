@@ -190,6 +190,12 @@ class Tile(models.TileModel):
                 edit = edits[str(user.id)]
         return edit
 
+    def make_provisional_authoritative(self, user):
+        user_id = str(user.id)
+        if user_id in self.provisionaledits:
+            self.data = self.provisionaledits[user_id]['value']
+            self.provisionaledits.pop(user_id, None)
+
     def check_for_missing_nodes(self, request):
         missing_nodes = []
         for nodeid, value in self.data.iteritems():
@@ -424,7 +430,7 @@ class Tile(models.TileModel):
 
     def filter_by_perm(self, user, perm):
         if user:
-            if user.has_perm(perm, self.nodegroup):
+            if self.nodegroup_id is not None and user.has_perm(perm, self.nodegroup):
                 self.tiles = filter(lambda tile: tile.filter_by_perm(user, perm), self.tiles)
             else:
                 return None

@@ -16,21 +16,26 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import uuid
 import json
 import urlparse
+from datetime import datetime
+from datetime import timedelta
 from copy import copy, deepcopy
+from django.contrib.auth.models import User
 from django.db import transaction
+from django.http import HttpRequest
+from django.utils.translation import ugettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.models.tile import Tile
+from arches.app.models.card import Card
 from arches.app.models.graph import Graph
 from arches.app.models.models import ResourceInstance
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
-from django.http import HttpRequest
+from arches.app.utils.geo_utils import GeoUtils
 from arches.app.utils.couch import Couch
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 import arches.app.views.search as search
-from django.utils.translation import ugettext as _
 
 
 
@@ -66,18 +71,129 @@ class MobileSurvey(models.MobileSurveyModel):
     def save(self):
         super(MobileSurvey, self).save()
         db = self.couch.create_db('project_' + str(self.id))
-        # need to serialize to JSON and then back again because UUID's
-        # cause the couch update_doc method to throw an error
-        survey = JSONSerializer().serialize(self)
-        survey = JSONDeserializer().deserialize(survey)
+        survey = self.serialize_for_couch()
         survey['type'] = 'metadata'
         self.couch.update_doc(db, survey, 'metadata')
         self.load_data_into_couch()
         return db
 
     def delete(self):
-        self.couch.delete_db('project_' + str(self.id))
+        try:
+            self.couch.delete_db('project_' + str(self.id))
+        except Exception as e:
+            print(e), _("Could not delete database in CouchDB")
         super(MobileSurvey, self).delete()
+
+    def collect_card_widget_node_data(self, graph_obj, graph, parentcard, nodegroupids=[]):
+        nodegroupids.append(str(parentcard.nodegroup_id))
+        for node in graph_obj['nodes']:
+            if node['nodegroup_id'] == str(parentcard.nodegroup_id):
+                found = False
+                for widget in graph_obj['widgets']:
+                    if node['nodeid'] == str(widget.node_id):
+                        found = True
+                        try:
+                            collection_id = node['config']['rdmCollection']
+                            concept_collection = Concept().get_child_collections_hierarchically(collection_id)
+                            widget.config['options'] = concept_collection
+                        except Exception as e:
+                            pass
+                        break
+                if not found:
+                    for card in graph_obj['cards']:
+                        if card['nodegroup_id'] == node['nodegroup_id']:
+                            widget = models.DDataType.objects.get(pk=node['datatype']).defaultwidget
+                            if widget:
+                                widget_model = models.CardXNodeXWidget()
+                                widget_model.node_id = node['nodeid']
+                                widget_model.card_id = card['cardid']
+                                widget_model.widget_id = widget.pk
+                                widget_model.config = widget.defaultconfig
+                                try:
+                                    collection_id = node['config']['rdmCollection']
+                                    if collection_id:
+                                        concept_collection = Concept().get_child_collections_hierarchically(collection_id)
+                                        widget_model.config['options'] = concept_collection
+                                except Exception as e:
+                                    pass
+                                widget_model.label = node['name']
+                                graph_obj['widgets'].append(widget_model)
+                            break
+
+                if node['datatype'] == 'resource-instance' or node['datatype'] == 'resource-instance-list':
+                    if node['config']['graphid'] is not None:
+                        try:
+                            graphuuid = uuid.UUID(node['config']['graphid'][0])
+                            graph_id = unicode(graphuuid)
+                        except ValueError as e:
+                            graphuuid = uuid.UUID(node['config']['graphid'])
+                            graph_id = unicode(graphuuid)
+                        node['config']['options'] = []
+                        for resource_instance in Resource.objects.filter(graph_id=graph_id):
+                            node['config']['options'].append({'id': str(resource_instance.pk), 'name': resource_instance.displayname})
+
+        for subcard in parentcard.cards:
+            self.collect_card_widget_node_data(graph_obj, graph, subcard, nodegroupids)
+
+        return graph_obj
+
+    def serialize_for_couch(self):
+        """
+        serialize to a different form than used by the internal class structure
+        used to append additional values (like parent ontology properties) that
+        internal objects (like models.Nodes) don't support
+        """
+        serializer = JSONSerializer()
+        serializer.geom_format = 'geojson'
+        obj = serializer.handle_model(self)
+        ordered_cards = self.get_ordered_cards()
+        enddate = datetime.strftime(self.enddate, '%Y-%m-%d')
+        expired = (datetime.strptime(enddate, '%Y-%m-%d') - datetime.now() + timedelta(hours=24)).days < 0
+        ret = JSONSerializer().serializeToPython(obj)
+        if expired:
+            self.active = False
+            super(MobileSurvey, self).save()
+            ret['active'] = False
+        graphs = []
+        card_lookup = {}
+        for card in self.cards.all():
+            if str(card.graph_id) in card_lookup:
+                card_lookup[str(card.graph_id)].append(card)
+            else:
+                card_lookup[str(card.graph_id)] = [card]
+        for graphid, cards in iter(card_lookup.items()):
+            graph = Graph.objects.get(pk=graphid)
+            graph_obj = graph.serialize(exclude=['domain_connections', 'edges', 'relatable_resource_model_ids'])
+            graph_obj['widgets'] = list(models.CardXNodeXWidget.objects.filter(card__graph=graph).distinct())
+            nodegroupids = []
+            for card in cards:
+                topcard = Card.objects.get(pk=card.cardid)
+                self.collect_card_widget_node_data(graph_obj, graph, topcard, nodegroupids)
+            graph_obj['widgets'] = serializer.serializeToPython(graph_obj['widgets'])
+
+            nodegroup_filters = {'nodes': 'nodegroup_id', 'cards': 'nodegroup_id', 'nodegroups': 'nodegroupid'}
+
+            for prop, id in iter(nodegroup_filters.items()):
+                relevant_items = [item for item in graph_obj[prop] if item[id] in nodegroupids]
+                graph_obj[prop] = relevant_items
+
+            relevant_cardids = [card['cardid'] for card in graph_obj['cards']]
+            relevant_widgets = [widget for widget in graph_obj['widgets'] if str(widget['card_id']) in relevant_cardids]
+            graph_obj['widgets'] = relevant_widgets
+
+            graphs.append(serializer.serializeToPython(graph_obj))
+
+        ret['graphs'] = graphs
+        ret['cards'] = ordered_cards
+        try:
+            bounds = json.loads(ret['bounds'])
+            ret['bounds'] = bounds
+            if (bounds['type'] == 'MultiPolygon'):
+                singlepart = GeoUtils().convert_multipart_to_singlepart(bounds)
+                ret['bounds'] = singlepart
+        except TypeError as e:
+            print 'Could not parse', ret['bounds'], e
+        return ret
 
     def serialize(self, fields=None, exclude=None):
         """
@@ -90,58 +206,13 @@ class MobileSurvey(models.MobileSurveyModel):
         obj = serializer.handle_model(self)
         ordered_cards = self.get_ordered_cards()
         ret = JSONSerializer().serializeToPython(obj)
-        graphs = []
-        graphids = []
-        for card in self.cards.all():
-            if card.graph_id not in graphids:
-                graphids.append(card.graph_id)
-                # we may want the full proxy model at some point,
-                # but for now just the root node color
-                graph = Graph.objects.get(pk=card.graph_id)
-                graph_obj = graph.serialize(exclude=['domain_connections', 'edges', 'relatable_resource_model_ids'])
-                graph_obj['widgets'] = list(models.CardXNodeXWidget.objects.filter(card__graph=graph).distinct())
-                for node in graph_obj['nodes']:
-                    found = False
-                    for widget in graph_obj['widgets']:
-                        if node['nodeid'] == str(widget.node_id):
-                            found = True
-                            try:
-                                collection_id = node['config']['rdmCollection']
-                                concept_collection = Concept().get_child_collections_hierarchically(collection_id)
-                                widget.config['options'] = concept_collection
-                            except Exception as e:
-                                pass
-                            break
-                    if not found:
-                        for card in graph_obj['cards']:
-                            if card['nodegroup_id'] == node['nodegroup_id']:
-                                widget = models.DDataType.objects.get(pk=node['datatype']).defaultwidget
-                                if widget:
-                                    widget_model = models.CardXNodeXWidget()
-                                    widget_model.node_id = node['nodeid']
-                                    widget_model.card_id = card['cardid']
-                                    widget_model.widget_id = widget.pk
-                                    widget_model.config = widget.defaultconfig
-                                    try:
-                                        collection_id = node['config']['rdmCollection']
-                                        if collection_id:
-                                            concept_collection = Concept().get_child_collections_hierarchically(collection_id)
-                                            widget_model.config['options'] = concept_collection
-                                    except Exception as e:
-                                        pass
-                                    widget_model.label = node['name']
-                                    graph_obj['widgets'].append(widget_model)
-                                break
-                    if node['datatype'] == 'resource-instance':
-                        graph_id = node['config']['graphid'][0]
-                        node['config']['options'] = []
-                        for resource_instance in Resource.objects.filter(graph_id=graph_id):
-                            node['config']['options'].append({'id': str(resource_instance.pk), 'name': resource_instance.displayname})
-                graphs.append(graph_obj)
-        ret['graphs'] = graphs
         ret['cards'] = ordered_cards
         try:
-            ret['bounds'] = json.loads(ret['bounds'])
+            bounds = json.loads(ret['bounds'])
+            ret['bounds'] = bounds
+            if (bounds['type'] == 'MultiPolygon'):
+                singlepart = GeoUtils().convert_multipart_to_singlepart(bounds)
+                ret['bounds'] = singlepart
         except TypeError as e:
             print 'Could not parse', ret['bounds'], e
         return ret
@@ -151,13 +222,32 @@ class MobileSurvey(models.MobileSurveyModel):
         ordered_card_ids = [unicode(mpc.card_id) for mpc in ordered_cards]
         return ordered_card_ids
 
+    def handle_reviewer_edits(self, userid, tile):
+        user = User.objects.get(pk=userid)
+        if hasattr(user, 'userprofile') is not True:
+            models.UserProfile.objects.create(user=user)
+        if user.userprofile.is_reviewer():
+            tile.make_provisional_authoritative(user)
+
+    def assign_provisional_edit(self, userid, edit, tile):
+        if userid in tile.provisionaledits:
+            if edit['timestamp'] >= tile.provisionaledits[userid]['timestamp']:
+                # If the mobile user edits are newer by UTC timestamp, overwrite the tile data
+                tile.provisionaledits[userid] = edit
+        else:
+            tile.provisionaledits[userid] = edit
+        self.handle_reviewer_edits(userid, tile)
+
     def push_edits_to_db(self):
         # read all docs that have changes
         # save back to postgres db
         db = self.couch.create_db('project_' + str(self.id))
+        user_lookup = {}
+        is_reviewer = False
         ret = []
         with transaction.atomic():
-            for row in self.couch.all_docs(db):
+            couch_docs = self.couch.all_docs(db)
+            for row in couch_docs:
                 ret.append(row)
                 if row.doc['type'] == 'resource':
                     if 'provisional_resource' in row.doc and row.doc['provisional_resource'] == 'true':
@@ -169,13 +259,15 @@ class MobileSurvey(models.MobileSurveyModel):
                         )
                         print('Resource {0} Saved'.format(row.doc['resourceinstanceid']))
 
-            for row in self.couch.all_docs(db):
+            for row in couch_docs:
                 ret.append(row)
                 if row.doc['type'] == 'tile':
                     if 'provisionaledits' in row.doc and row.doc['provisionaledits'] is not None:
                         try:
                             tile = Tile.objects.get(tileid=row.doc['tileid'])
                             for user_edits in row.doc['provisionaledits'].items():
+                                # user_edits is a tuple with the user number in
+                                # position 0, prov. edit data in position 1
                                 for nodeid, value in iter(user_edits[1]['value'].items()):
                                     datatype_factory = DataTypeFactory()
                                     node = models.Node.objects.get(nodeid=nodeid)
@@ -184,43 +276,23 @@ class MobileSurvey(models.MobileSurveyModel):
                                     if newvalue is not None:
                                         user_edits[1]['value'][nodeid] = newvalue
 
-                                # user_edits is a tuple with the user number in
-                                # position 0, prov. edit data in position 1, eg:
-                                # {u'5': {
-                                #     u'action': u'update',
-                                #     u'reviewer': None,
-                                #     u'reviewtimestamp': None,
-                                #     u'status': u'review',
-                                #     u'timestamp': u'2018-11-02T18:38:00.684250Z',
-                                #     u'value': {
-                                #         u'bb97b857-d646-11e8-9f94-acbc32b81a1b': u'Provisional String Value',
-                                #         u'bb98aab8-d646-11e8-922d-acbc32b81a1b': None
-                                #         }
-                                #     }
-                                # }
                                 if tile.provisionaledits is None:
                                     tile.provisionaledits = {}
                                     tile.provisionaledits[user_edits[0]] = user_edits[1]
+                                    self.handle_reviewer_edits(user_edits[0], tile)
                                 else:
-                                    if user_edits[0] in tile.provisionaledits:
-                                        if user_edits[1]['timestamp'] >= tile.provisionaledits[user_edits[0]]['timestamp']:
-                                            # If the mobile user edits are newer by UTC timestamp, overwrite the tile data
-                                            tile.provisionaledits[user_edits[0]] = user_edits[1]
+                                    self.assign_provisional_edit(user_edits[0], user_edits[1], tile)
 
                             # If there are conflicting documents, lets clear those out
                             if '_conflicts' in row.doc:
                                 for conflict_rev in row.doc['_conflicts']:
                                     conflict_data = db.get(row.id, rev=conflict_rev)
                                     for user_edits in conflict_data['provisionaledits'].items():
-                                        if user_edits[0] in tile.provisionaledits:
-                                            if user_edits[1]['timestamp'] > tile.provisionaledits[user_edits[0]]['timestamp']:
-                                                # If the mobile user edits are newer by UTC timestamp, overwrite the tile data
-                                                tile.provisionaledits[user_edits[0]] = user_edits[1]
+                                        self.assign_provisional_edit(user_edits[0], user_edits[1], tile)
                                     # Remove conflicted revision from couch
                                     db.delete(conflict_data)
 
-                                # TODO: If user is provisional user, apply as provisional edit
-                                # TODO: If user is reviewer, apply as authoritative edit
+                        # TODO: If user is provisional user, apply as provisional edit
                         except Tile.DoesNotExist:
                             tile = Tile(row.doc)
                             for user_edits in row.doc['provisionaledits'].items():
@@ -231,7 +303,21 @@ class MobileSurvey(models.MobileSurveyModel):
                                     newvalue = datatype.process_mobile_data(tile, node, db, row.doc, value)
                                     if newvalue is not None:
                                         user_edits[1]['value'][nodeid] = newvalue
-                                    tile.provisionaledits[user_edits[0]] = user_edits[1]
+                                tile.provisionaledits[user_edits[0]] = user_edits[1]
+                                self.handle_reviewer_edits(user_edits[0], tile)
+
+                        # If user is reviewer, apply as authoritative edit
+                        for user_edits in tile.provisionaledits.items():
+                            if user_edits[0] not in user_lookup:
+                                user = User.objects.get(pk=user_edits[0])
+                                user_lookup[user_edits[0]] = user.groups.filter(name='Resource Reviewer').exists()
+
+                        for user_id, is_reviewer in user_lookup.items():
+                            if is_reviewer:
+                                try:
+                                    tile.data = tile.provisionaledits.pop(user_id)['value']
+                                except KeyError:
+                                    pass
 
                         tile.save()
                         tile_serialized = json.loads(JSONSerializer().serialize(tile))
@@ -239,6 +325,7 @@ class MobileSurvey(models.MobileSurveyModel):
                         self.couch.update_doc(db, tile_serialized, tile_serialized['tileid'])
                         print('Tile {0} Saved'.format(row.doc['tileid']))
                         db.compact()
+
         return ret
 
     def collect_resource_instances_for_couch(self):
@@ -256,6 +343,7 @@ class MobileSurvey(models.MobileSurveyModel):
             request = HttpRequest()
             request.user = self.lasteditedby
             request.GET['mobiledownload'] = True
+            request.GET['resourcecount'] = self.datadownloadconfig['count']
             if query in ('', None):
                 if len(self.bounds.coords) == 0:
                     default_bounds = settings.DEFAULT_BOUNDS
@@ -273,6 +361,23 @@ class MobileSurvey(models.MobileSurveyModel):
             search_res = JSONDeserializer().deserialize(search_res_json.content)
             try:
                 instances = {hit['_source']['resourceinstanceid']: hit['_source'] for hit in search_res['results']['hits']['hits']}
+                # if we didn't get our limit of resource instances using a spatial filter
+                # let's try to get resource instances that don't have spatial data
+                if len(instances.keys()) < self.datadownloadconfig['count']:
+                    request.GET['mapFilter'] = '{}'
+                    request.GET['resourcecount'] = self.datadownloadconfig['count'] - len(instances.keys())
+                    geometric_datatypes = list(models.DDataType.objects.filter(isgeometric=True).values_list('datatype', flat=True))
+                    nonspatial_resources = []
+                    for resourceid in self.datadownloadconfig['resources']:
+                        exists = models.Node.objects.filter(datatype__in=geometric_datatypes, graph_id=resourceid).exists()
+                        if not exists:
+                            nonspatial_resources.append(resourceid)
+                    if len(nonspatial_resources) > 0:
+                        request.GET['typeFilter'] = json.dumps([{'graphid': resourceid, 'inverted': False} for resourceid in nonspatial_resources])
+                        search_res_json = search.search_results(request)
+                        search_res = JSONDeserializer().deserialize(search_res_json.content)
+                        for hit in search_res['results']['hits']['hits']:
+                            instances[hit['_source']['resourceinstanceid']] = hit['_source']
             except KeyError:
                 print 'no instances found in', search_res
         return instances
