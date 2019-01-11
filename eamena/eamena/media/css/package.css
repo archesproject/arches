@@ -435,3 +435,34 @@ input.file {
     margin-top: 10px;
 }
 /* end bulk upload style */
+
+
+.required-input span {
+    color: green;
+}
+
+.required-input input {
+    color: green;
+}
+
+.required-input ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+    color: green;
+}
+.required-input :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+    color: green;
+    opacity:  1;
+}
+.required-input ::-moz-placeholder { /* Mozilla Firefox 19+ */
+    color: green;
+    opacity:  1;
+}
+.required-input :-ms-input-placeholder { /* Internet Explorer 10-11 */
+    color: green;
+}
+.required-input ::-ms-input-placeholder { /* Microsoft Edge */
+    color: green;
+}
+
+.required-input ::placeholder { /* Most modern browsers support this now. */
+    color: green;
+}
