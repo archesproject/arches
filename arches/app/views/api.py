@@ -295,7 +295,7 @@ class Resources(APIBase):
                     graph = None
                     if slug is not None:
                         graph = models.Graph.objects.get(slug=slug)
-                    else if graphid is not None:
+                    elif graphid is not None:
                         graph = models.Graph.objects.get(pk=graphid)
                     reader.read_resource(data, resourceid=resourceid, graph=graph)
                     if reader.errors:
@@ -329,7 +329,7 @@ class Resources(APIBase):
                 graph = None
                 if slug is not None:
                     graph = models.Graph.objects.get(slug=slug)
-                else if graphid is not None:
+                elif graphid is not None:
                     graph = models.Graph.objects.get(pk=graphid)
                 reader.read_resource(data, graph=graph)
                 if reader.errors:
