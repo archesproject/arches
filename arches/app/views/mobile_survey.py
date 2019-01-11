@@ -64,7 +64,7 @@ def get_survey_resources(mobile_survey):
 
 def deactivate_expired_survey(mobile_survey):
     result = False
-    if mobile_survey.enddate != None:
+    if mobile_survey.enddate is not None:
         enddate = datetime.strftime(mobile_survey.enddate, '%Y-%m-%d')
         expired = (datetime.strptime(enddate, '%Y-%m-%d') - datetime.now() + timedelta(hours=24)).days < 0
         if expired:
