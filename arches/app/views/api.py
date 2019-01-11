@@ -114,8 +114,9 @@ class Surveys(APIBase):
 
     def get(self, request):
         group_ids = list(request.user.groups.values_list('id', flat=True))
-        projects = MobileSurvey.objects.filter(Q(users__in=[request.user]) | Q(groups__in=group_ids), active=True).distinct()
-        projects_for_couch = [project.serialize_for_couch() for project in projects]
+        project_models = MobileSurvey.objects.filter(Q(users__in=[request.user]) | Q(groups__in=group_ids), active=True).distinct()
+        projects = [project.serialize_for_couch() for project in project_models]
+        projects_for_couch = [project for project in projects if project['active'] is True] # Filter projects deactivated during serialization
         response = JSONResponse(projects_for_couch, indent=4)
         return response
 
