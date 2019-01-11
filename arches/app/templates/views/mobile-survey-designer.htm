@@ -129,31 +129,31 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!-- Survey Stats -->
                                         <div class="msm-stats-panel">
-                                            <div class="col-xs-3">
+                                            <div class="col-xs-12 col-sm-4">
                                                 <div class="msm-stat">
-                                                    0
+                                                    <span class="msm-stat-time">15:32:47</span>
+                                                    <span class="msm-stat-date">January 12, 2019</span>
+                                                </div>
+                                                <div class="msm-stat-label">
+                                                    {% trans 'Last Synch' %}
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-12 col-sm-3">
+                                                <div class="msm-stat">
+                                                    143
                                                 </div>
                                                 <div class="msm-stat-label">
                                                     {% trans 'Edits Made' %}
                                                 </div>
                                             </div>
 
-                                            <div class="col-xs-3">
+                                            <div class="col-xs-12 col-sm-3">
                                                 <div class="msm-stat">
-                                                    0
+                                                    7
                                                 </div>
                                                 <div class="msm-stat-label">
                                                     {% trans 'Editors' %}
-                                                </div>
-                                            </div>
-
-                                            <div class="col-xs-6">
-                                                <div class="msm-stat">
-                                                    <span class="msm-stat-date">No data synched</span>
-                                                    <span class="msm-stat-time"></span>
-                                                </div>
-                                                <div class="msm-stat-label">
-                                                    {% trans 'Last Synch' %}
                                                 </div>
                                             </div>
                                         </div>
@@ -364,20 +364,31 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <!-- Models Card -->
                         <!--ko if: activePage() === 'models'-->
-                        <div class="mpm-card-content">
-                            <!-- Splash Title -->
-                            <div class="title">{% trans "Mobile Data Collection" %}</div>
-                            <div class="sub-title">{% trans "Define the resource types for your survey" %}</div>
+                        <div class="mpm-card-content selection-page model-selection">
+
+                            <!-- Icon and Title -->
+                            <div class="mpm-survey-status-header">
+                                <i class="msm-icon-wrap fa fa-code-fork"></i>
+                                <div class="msm-survey-status-text">{% trans 'Model Data Collection' %}</div>
+                            </div>
+
+                            <!-- Model Selection Dropdown -->
                             <div class="mpm-resource-selection">
                                 <div class="resource-dropdown">
-                                    <input style="width:30%; display:inline-block;"
+                                    <input class="" style="display:inline-block;"
                                     data-bind="select2Query: {
                                         select2Config: getSelect2ResourcesConfig()
                                     }">
                                 </div>
                             </div>
-                            <!-- Splash Instructions -->
-                            <div class="description">{% trans "Arches allows you to create and edit data in the field using mobile devices. Select those resources that should participate in the survey." %}</div>
+
+                            <!-- Model Selection Instructions -->
+                            <div class="msm-survey-status-instructions">{% trans 'Select the Resource Models for your project' %}</div>
+                            <div class="text-center">
+                                <ul class="msm-survey-issues msm-splash-instruction">
+                                    <li>{% trans "Arches allows you to create and edit data in the field using mobile devices. Select those resources that should participate in the survey.  Once you have selected the models, click on a model in the tree to select which data entry forms to include your project." %}</li>
+                                </ul>
+                            </div>
                         </div>
                         <!--/ko-->
                         <!-- End Models Card -->

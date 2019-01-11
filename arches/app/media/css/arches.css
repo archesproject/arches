@@ -10773,6 +10773,14 @@ a.search-facet-item.disabled {
     
 }
 
+.mpm-card-content.selection-page {
+    border-bottom: transparent;
+}
+
+.msm-summary-panel .selection-page {
+    height: 100vh;
+}
+
 .mpm-group-panel-header {
     margin: 10px;
     height: 35px;
@@ -10838,6 +10846,13 @@ a.search-facet-item.disabled {
     padding-left: 6px;
 }
 
+.model-selection .msm-icon-wrap {
+    background: #fff; 
+    color:#2d3c4b; 
+    padding-top: 15px; 
+    border: 1px solid #2d3c4b;
+}
+
 a.filter-tools {
     margin-left: 0px;
     padding: 3px 6px;
@@ -10870,7 +10885,7 @@ a.filter-tools:hover {
 }
 
 .mpm-resource-selection .resource-dropdown {
-    width: 300px;
+    width: 80%;
 }
 
 .account-wrapper {
@@ -11703,9 +11718,13 @@ a.filter-tools:hover {
     list-style-type: none;
 }
 
+.msm-splash-instruction {
+    padding: 0px 60px;
+}
+
 .msm-report-section {
     padding: 40px 30px;
-    background: #fbfbfb;
+    background: #fefefe;
     border-bottom: 1px solid #ddd;
 }
 
@@ -11740,7 +11759,7 @@ a.filter-tools:hover {
 .msm-download-header {
     font-size: 15px;
     padding-left: 0px;
-    margin-top: 10px;
+    margin-top: 30px;
     color: #454545;
     font-weight: 500;
 }
@@ -11815,11 +11834,11 @@ a.filter-tools:hover {
     font-size: 13px;
 }
 
-.msm-stat-date {
+.msm-stat-time {
 
 }
 
-.msm-stat-time {
+.msm-stat-date {
     font-size: 17px;
 }
 
