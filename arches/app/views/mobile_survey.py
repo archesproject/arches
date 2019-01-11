@@ -67,7 +67,6 @@ def deactivate_expired_survey(mobile_survey):
     if mobile_survey.enddate != None:
         enddate = datetime.strftime(mobile_survey.enddate, '%Y-%m-%d')
         expired = (datetime.strptime(enddate, '%Y-%m-%d') - datetime.now() + timedelta(hours=24)).days < 0
-        print expired
         if expired:
             mobile_survey.active = False
             try:
@@ -76,6 +75,7 @@ def deactivate_expired_survey(mobile_survey):
                 mobile_survey.save()
             result = True
     return result
+
 
 @method_decorator(group_required('Application Administrator'), name='dispatch')
 class MobileSurveyManagerView(BaseManagerView):
