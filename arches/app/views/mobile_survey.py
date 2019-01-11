@@ -65,16 +65,6 @@ def get_survey_resources(mobile_survey):
 class MobileSurveyManagerView(BaseManagerView):
 
     def get(self, request):
-
-        def get_last_login(date):
-            result = _("Not yet logged in")
-            try:
-                if date is not None:
-                    result = datetime.strftime(date, '%Y-%m-%d %H:%M')
-            except TypeError as e:
-                print e
-            return result
-
         mobile_survey_models = models.MobileSurveyModel.objects.order_by('name')
         mobile_surveys = []
         serializer = JSONSerializer()
