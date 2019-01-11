@@ -212,10 +212,7 @@ class JsonLdWriter(RdfWriter):
         framing = {
             "@omitDefault": True,
             "@omitGraph": False,
-            "@id": str(resource_inst_uri),
-            "classified_as": {
-                "@embed": "@always"
-            }
+            "@id": str(resource_inst_uri)
         }
 
         if context:

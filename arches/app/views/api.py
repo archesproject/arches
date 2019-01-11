@@ -34,6 +34,8 @@ from pyld.jsonld import compact, frame, from_rdf
 from rdflib import RDF
 from rdflib.namespace import SKOS, DCTERMS
 
+import traceback
+
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -328,9 +330,9 @@ class Resources(APIBase):
                 reader = JsonLdReader()
                 graph = None
                 if slug is not None:
-                    graph = models.Graph.objects.get(slug=slug)
+                    graph = Graph.objects.get(slug=slug)
                 elif graphid is not None:
-                    graph = models.Graph.objects.get(pk=graphid)
+                    graph = Graph.objects.get(pk=graphid)
                 reader.read_resource(data, graph=graph)
                 if reader.errors:
                     response = []
@@ -348,7 +350,7 @@ class Resources(APIBase):
             else:
                 return JSONResponse(status=403)
         except Exception as e:
-            return JSONResponse(status=500, reason=e)
+            return JSONResponse({"error": traceback.format_exc()}, status=500, reason=e)
 
     def delete(self, request, resourceid, slug=None, graphid=None):
         if user_can_edit_resources(user=request.user):
