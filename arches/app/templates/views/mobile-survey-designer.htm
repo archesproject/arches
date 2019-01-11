@@ -384,31 +384,29 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!--ko if: activePage() === 'data'-->
                         
                         <div class="msm-crud-section" style="height: 200px; border-bottom: transparent;">
-                            <!-- Activate Switch -->
-                            <div class="">
-                                <div class="col-sm-5">
-                                    <div class="box-inline">
-                                        <p class="mpm-item-listing-header data-panel" style="margin-bottom: 0px;">
-                                            {% trans 'Allow users to download data' %}
-                                        </p>
-
-                                        <div class="toggle-container">
-                                            <span class="switch switch-small" data-bind="css: {'on': mobilesurvey.datadownloadconfig.download()}, click: function(){
-                                                mobilesurvey.datadownloadconfig.download(!mobilesurvey.datadownloadconfig.download());
-                                            }"><small></small></span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Help Message-->
-                                <div class="col-sm-7">
-                                    <p class="account-tips" style="margin-top: 20px;">
-                                        {% trans 'Downloading data allows users to access and edit existing Arches information in the field' %}
-                                    </p>
-                                </div>
+                            <!-- Allow Data Downloads Switch -->
+                            <div class="mpm-item-listing-header data-panel">
+                                {% trans 'Allow users to download data' %}
+                                <span class="toggle-container">
+                                    <span class="switch switch-small" data-bind="css: {'on': mobilesurvey.datadownloadconfig.download()}, click: function(){
+                                        mobilesurvey.datadownloadconfig.download(!mobilesurvey.datadownloadconfig.download());
+                                    }"><small></small></span>
+                                </span>
                             </div>
                             
-                            <div>
+                            <!-- Help Message-->
+                            <div class="">
+                                <p class="account-tips">
+                                    {% trans 'Downloading data allows users to access and edit existing Arches information in the field. You can decide which models your field team can access, and the number of resources to download.' %}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- ko if: mobilesurvey.datadownloadconfig.download() -->
+                        <div id="data-definition" class="mpm-summary-panel">
+
+
+                            <div class="row pad-top">
                                 <div class="col-sm-5" style="padding-top: 10px; padding-bottom: 10px;">
                                     <label style="display:flex; align-items:center">{% trans 'Limit ' %}
                                         <input type="number" class="form-control" style="width: 100px; margin-left: 7px;" placeholder="Search query URL" data-bind="textInput: mobilesurvey.datadownloadconfig.count"></input>
@@ -421,10 +419,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     </p>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <!-- ko if: mobilesurvey.datadownloadconfig.download() -->
-                        <div id="data-definition" class="mpm-summary-panel">
 
                             <!-- Download Selector -->
                             <div class="msm-download-selector" style="display: block;">

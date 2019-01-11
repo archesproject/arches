@@ -10974,6 +10974,10 @@ a.filter-tools:hover {
 .mpm-summary-panel {
     background: #fff;
     padding: 0px 40px;
+    margin-top: -60px;
+    margin-left: 10px;
+    border-top: 1px solid #ddd;
+    margin-right: 10px;
 }
 
 .map-search-container div .map-widget-panel {
