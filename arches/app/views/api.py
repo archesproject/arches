@@ -304,6 +304,7 @@ class Resources(APIBase):
             if user_can_edit_resources(user=request.user):
                 data = JSONDeserializer().deserialize(request.body)
                 reader = JsonLdReader()
+                graph = None
                 if slug is not None:
                     graph = models.Graph.objects.get(slug=slug)
                 else if graphid is not None:
