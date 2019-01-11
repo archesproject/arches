@@ -2,12 +2,13 @@ define([
     'jquery',
     'arches',
     'underscore',
+    'moment',
     'knockout',
     'views/mobile-survey-manager/identity-list',
     'models/mobile-survey',
     'views/components/widgets/map',
     'bindings/sortable'
-], function($, arches, _, ko, IdentityList, MobileSurveyModel) {
+], function($, arches, _, moment, ko, IdentityList, MobileSurveyModel) {
     /**
     * A base viewmodel for mobile survey management
     *
@@ -275,10 +276,19 @@ define([
                 cards: this.mobilesurvey.cards().length > 0,
                 identities: this.mobilesurvey.users().length > 0 || this.mobilesurvey.groups().length > 0,
                 daterange: !!this.mobilesurvey.startdate() && !!this.mobilesurvey.enddate(),
+                unexpired: !!this.mobilesurvey.enddate() && ((moment(this.mobilesurvey.enddate()).add(1, 'days') - moment()) > 0),
                 mapsources: !!this.mobilesurvey.onlinebasemaps().default || !!this.mobilesurvey.tilecache(),
-                bounds: this.mobilesurvey.bounds().features.length > 0,
+                bounds: this.mobilesurvey.bounds().features.length > 0
             };
-            status.incomplete =  [status.cards, status.identities, status.daterage, status.mapsources, status.bounds].includes(false);
+            status.incomplete =  [
+                status.cards,
+                status.identities,
+                status.daterage,
+                status.mapsources,
+                status.bounds,
+                status.unexpired
+            ].includes(false);
+
             if (status.incomplete) {
                 this.mobilesurvey.active(false);
             }
