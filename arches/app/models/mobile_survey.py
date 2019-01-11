@@ -147,7 +147,7 @@ class MobileSurvey(models.MobileSurveyModel):
         serializer.geom_format = 'geojson'
         obj = serializer.handle_model(self)
         ordered_cards = self.get_ordered_cards()
-        expired = (datetime.strptime(self.enddate, '%Y-%m-%d') - datetime.now() + timedelta(hours=24)).days < 0
+        expired = (datetime.strptime(str(self.enddate), '%Y-%m-%d') - datetime.now() + timedelta(hours=24)).days < 0
         ret = JSONSerializer().serializeToPython(obj)
         if expired:
             self.active = False
