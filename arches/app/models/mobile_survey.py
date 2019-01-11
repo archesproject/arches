@@ -16,6 +16,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import uuid
 import json
 import urlparse
+from datetime import datetime
+from datetime import timedelta
 from copy import copy, deepcopy
 from django.contrib.auth.models import User
 from django.db import transaction
@@ -145,7 +147,13 @@ class MobileSurvey(models.MobileSurveyModel):
         serializer.geom_format = 'geojson'
         obj = serializer.handle_model(self)
         ordered_cards = self.get_ordered_cards()
+        enddate = datetime.strftime(self.enddate, '%Y-%m-%d')
+        expired = (datetime.strptime(enddate, '%Y-%m-%d') - datetime.now() + timedelta(hours=24)).days < 0
         ret = JSONSerializer().serializeToPython(obj)
+        if expired:
+            self.active = False
+            super(MobileSurvey, self).save()
+            ret['active'] = False
         graphs = []
         card_lookup = {}
         for card in self.cards.all():

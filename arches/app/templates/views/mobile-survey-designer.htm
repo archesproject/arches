@@ -94,6 +94,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             <li data-bind = "visible: surveyReady().daterange == false">{% trans 'Define the start and end dates of your survey' %}</li>
                                                             <li data-bind = "visible: surveyReady().mapsources == false">{% trans 'Define either an online or offline basemap source' %}</li>
                                                             <li data-bind = "visible: surveyReady().bounds == false">{% trans 'Define a map extent' %}</li>
+                                                            <li data-bind = "visible: surveyReady().unexpired == false">{% trans 'End date must be after the current date' %}</li>
                                                         </ul>
                                                     </div>
                                                         <!--/ko-->
