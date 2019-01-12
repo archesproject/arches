@@ -386,7 +386,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <div class="msm-survey-status-instructions">{% trans 'Select the Resource Models for your project' %}</div>
                             <div class="text-center">
                                 <ul class="msm-survey-issues msm-splash-instruction">
-                                    <li>{% trans "Arches allows you to create and edit data in the field using mobile devices. Select those resources that should participate in the survey.  Once you have selected the models, click on a model in the tree to select which data entry forms to include your project." %}</li>
+                                    <li>{% trans "Arches allows you to create and edit data in the field using mobile devices. Select those resources that should participate in the survey.  Once you have selected the models, click on a model in the tree to select which data entry forms to include in your project." %}</li>
                                 </ul>
                             </div>
                         </div>
@@ -395,7 +395,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <!-- Data Card -->
                         <!--ko if: activePage() === 'data'-->
-                        
                         <div class="msm-crud-section" style="height: 200px; border-bottom: transparent;">
                             <!-- Allow Data Downloads Switch -->
                             <div class="mpm-item-listing-header data-panel">
@@ -477,10 +476,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <!--ko if: activePage() === 'people'-->
                         <div id="models-card">
-                            <div class="mpm-card-content">
-                                <!-- Splash Title -->
-                                <div class="title">{% trans "Mobile Data Collection" %}</div>
-                                <div class="sub-title">{% trans "Define the user groups participating in your survey" %}</div>
+                            <div class="mpm-card-content selection-page model-selection">
+                                
+                                <!-- Icon and Title -->
+                                <div class="mpm-survey-status-header">
+                                    <i class="msm-icon-wrap fa fa-group" style="padding-left: 3px;"></i>
+                                    <div class="msm-survey-status-text">{% trans 'Survey Participants' %}</div>
+                                </div>
+
+                                <!-- Group Selection Dropdown -->
                                 <div class="mpm-resource-selection">
                                     <div class="resource-dropdown">
                                         <input style="width:30%; display:inline-block;"
@@ -489,8 +493,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         }">
                                     </div>
                                 </div>
-                                <!-- Splash Instructions -->
-                                <div class="description">{% trans "Arches allows you to create and edit data in the field using mobile devices. Select those people that should participate in the survey" %}</div>
+
+                                <!-- Group Selection Instructions -->
+                                <div class="msm-survey-status-instructions">{% trans 'Select the User Groups for your project' %}</div>
+                                <div class="text-center">
+                                    <ul class="msm-survey-issues msm-splash-instruction">
+                                        <li>{% trans "Arches allows you to select the user groups you want to include in a field data collection effort.  Select the groups that should participate in the survey.  Once you have selected the groups, click on a group in the tree to select specific users who should join your survery." %}</li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                         <!--/ko-->
