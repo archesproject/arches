@@ -281,7 +281,9 @@ class Resources(APIBase):
         except:
             indent = None
 
-        if user_can_edit_resources(user=request.user):
+        if not user_can_edit_resources(user=request.user):
+            return JSONResponse(status=403)
+        else:
             with transaction.atomic():
                 try:
                     # DELETE
@@ -296,15 +298,15 @@ class Resources(APIBase):
                     reader = JsonLdReader()
                     graph = None
                     if slug is not None:
-                        graph = models.Graph.objects.get(slug=slug)
+                        graph = Graph.objects.get(slug=slug)
                     elif graphid is not None:
-                        graph = models.Graph.objects.get(pk=graphid)
+                        graph = Graph.objects.get(pk=graphid)
                     reader.read_resource(data, resourceid=resourceid, graph=graph)
                     if reader.errors:
                         response = []
                         for value in reader.errors.itervalues():
                             response.append(value.message)
-                        return JSONResponse(data, indent=indent, status=400, reason=response)
+                        return JSONResponse({"error": response}, indent=indent, status=400)
                     else:
                         response = []
                         for resource in reader.resources:
@@ -315,8 +317,10 @@ class Resources(APIBase):
                         return JSONResponse(response, indent=indent, status=201)
                 except models.ResourceInstance.DoesNotExist:
                     return JSONResponse(status=404)
-        else:
-            return JSONResponse(status=500)
+                except Exception as e:  
+                    return JSONResponse({"error": traceback.format_exc()}, status=500, reason=e)
+                    
+
 
     def post(self, request, resourceid=None, slug=None, graphid=None):
         try:
@@ -338,7 +342,7 @@ class Resources(APIBase):
                     response = []
                     for value in reader.errors.itervalues():
                         response.append(value.message)
-                    return JSONResponse(data, indent=indent, status=400, reason=response)
+                    return JSONResponse({"error": response}, indent=indent, status=400)
                 else:
                     response = []
                     for resource in reader.resources:
