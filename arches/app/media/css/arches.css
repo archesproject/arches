@@ -10770,7 +10770,11 @@ a.search-facet-item.disabled {
     border-bottom: 1px solid #ddd;
     padding: 40px 25px 50px 25px;
     background: #f9f9f9;
-    
+}
+
+.mpm-card-content.mpm-crud-section {
+    background: #fff;
+    padding-left: 40px;
 }
 
 .mpm-card-content.selection-page {
@@ -10782,8 +10786,14 @@ a.search-facet-item.disabled {
 }
 
 .mpm-group-panel-header {
-    margin: 10px;
-    height: 35px;
+    height: 80px;
+    background: #f9f9f9;
+}
+
+.msm-filter-panel {
+    padding: 5px 10px;
+    width: 100%;
+    position: relative;
 }
 
 .mpm-group-panel-content {
@@ -10829,10 +10839,22 @@ a.search-facet-item.disabled {
 }
 
 .msm-identity-filter {
-    position: relative;
     width: 100%;
-    margin-right: 10px;
     flex: 1;
+}
+
+.msm-account-listing-panel {
+    display: flex; 
+    flex-direction: column; 
+    flex: 1;
+    background: #fff;
+}
+
+.msm-account-summary-panel {
+    display: flex; 
+    flex-direction: column; 
+    flex: 1; 
+    border-left: solid 1px #ccc;
 }
 
 .msm-icon-wrap {

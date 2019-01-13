@@ -347,18 +347,33 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!--/ko-->
 
                         <!--ko if: activePage() === 'resourcemodel'-->
-                        <div class="mpm-card-content">
-                            <div style='padding-bottom: 10px; font-weight: 550'>{% trans 'Data entry cards selected for this survey:' %}</div>
-                            <ul style="list-style-type: none;">
+                        <div class="mpm-card-content mpm-crud-section">
+                            
+                            <div class="account-label">{% trans 'Data entry cards selected for this survey:' %}</div>
+                            
+                            <!--ko if: selectedNode().cards -->
+                            <!--ko foreach: {data: selectedNode().cards, as: 'card'} -->
+                            <div class="checkbox">
+                                <label class="form-checkbox form-normal form-primary" style="padding-left: 25px;" data-bind="text: card.name">
+                                    <input type="checkbox" value="card.approved" data-bind="checked: card.approved"/>
+                                </label>
+                            </div> 
+                            <!--/ko-->
+                            <!--/ko-->
+                                
+                        
+                             <ul style="list-style-type: none;">
                                 <!--ko if: selectedNode().cards -->
                                 <!--ko foreach: {data: selectedNode().cards, as: 'card'} -->
                                     <li style="display:flex; align-items:center; padding">
-                                        <input style="height:15px; width:15px; padding-right: 10px" type="checkbox" value="card.approved" data-bind="checked: card.approved"/>
+                                        <input type="checkbox" value="card.approved" data-bind="checked: card.approved"/>
                                         <span data-bind="text: card.name"></span>
                                     </li>
                                 <!--/ko-->
                                 <!--/ko-->
                             </ul>
+
+
                         </div>
                         <!--/ko-->
 
@@ -506,17 +521,24 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!--/ko-->
 
                         <!--ko if: activePage() === 'identity'-->
+                        <!-- Account Page -->
                         <div id="models-card">
                             <div class="mpm-card-content group-page">
                                 <div style="display: flex">
-                                    <div style="display: flex; flex-direction: column; flex: 1;">
-                                        <div class="list-filter mpm-group-panel-header" style="display: flex; align-items: center;">
-                                            <span class="msm-identity-filter">
-                                                <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a user...' %}" data-bind="textInput: mobilesurvey.userFilter">
-                                                <span class="clear-node-search" data-bind="visible: true, click: function() { mobilesurvey.userFilter(''); }"><i class="fa fa-times-circle"></i></span>
-                                            </span>
-                                            <a class="filter-tools" data-bind="click: selectAllGroupUsers"><i class="ion-checkmark"></i>{% trans 'Select all' %}</a>
-                                            <a class="filter-tools" data-bind="click: clearAllGroupUsers"><i class="ion-close"></i>{% trans 'Clear all' %}</a>
+                                    
+                                    <!-- Account Listing -->
+                                    <div class="msm-account-listing-panel">
+                                        <div class="mpm-group-panel-header" style="display: flex; align-items: center;">
+
+                                            <!-- User filter panel -->
+                                            <div class="msm-filter-panel">
+                                                <span class="msm-identity-filter">
+                                                    <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a user...' %}" data-bind="textInput: mobilesurvey.userFilter">
+                                                    <span class="clear-node-search" style="top: 11px; right: 15px;" data-bind="visible: true, click: function() { mobilesurvey.userFilter(''); }"><i class="fa fa-times-circle"></i></span>
+                                                </span>
+                                                <a class="filter-tools" data-bind="click: selectAllGroupUsers"><i class="ion-checkmark"></i>{% trans 'Select all' %}</a>
+                                                <a class="filter-tools" data-bind="click: clearAllGroupUsers"><i class="ion-close"></i>{% trans 'Clear all' %}</a>
+                                            </div>
                                         </div>
                                     
                                         <div class="mpm-group-panel-content list">
@@ -533,8 +555,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </div>
                                     </div>
 
-                                    <div style="display: flex; flex-direction: column; flex: 1; border-left: solid 1px #ccc;">
-                                        <div class="list-filter mpm-group-panel-header">
+                                    <!-- Account Summary Panel -->
+                                    <div class="msm-account-summary-panel" style="">
+                                        <div class="mpm-group-panel-header">
                                             <h4>{% trans "Account Summary" %}</h4>
                                         </div>
                                         
