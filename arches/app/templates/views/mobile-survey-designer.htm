@@ -528,6 +528,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     
                                     <!-- Account Listing -->
                                     <div class="msm-account-listing-panel">
+
                                         <div class="mpm-group-panel-header" style="display: flex; align-items: center;">
 
                                             <!-- User filter panel -->
@@ -543,9 +544,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     
                                         <div class="mpm-group-panel-content list">
                                             <!--ko if: selectedNode().type === 'group' -->
-                                            <div style="border-top: solid 1px #ccc;">
+                                            <div class="msm-user-account-panel">
                                                 <!--ko foreach: {data: selectedNode().fullusers, as: 'user'} -->
-                                                <div data-bind="click: function(){$parent.mobilesurvey.selectedUser(user); return true;};, css: {oddrow: ($parent.selectedNode().fullusers.indexOf(user) % 2 === 0), selected: user.id === $parent.mobilesurvey.selectedUser().id}, visible: user.filtered() === false" class="userrow">
+                                                <div class="msm-user-account-item" data-bind="click: function(){$parent.mobilesurvey.selectedUser(user); return true;};, css: {selected: user.id === $parent.mobilesurvey.selectedUser().id}, visible: user.filtered() === false" class="userrow">
                                                     <input style="height:15px; width:15px; margin-right: 5px;" type="checkbox" value="user.approved()" data-bind="checked: user.approved, event: {'change': $parent.mobilesurvey.toggleIdentity}" />
                                                     <span data-bind="text: user.name"></span>
                                                 </div>
@@ -559,16 +560,39 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <div class="msm-account-summary-panel" style="">
                                         <div class="mpm-group-panel-header">
                                             <h4>{% trans "Account Summary" %}</h4>
+                                            <div class="msm-basemap-subtitle">
+                                                {% trans "User identification and data editing statistics" %}
+                                            </div>
                                         </div>
                                         
                                         <div class="mpm-group-panel-content">
                                             <!--ko if: mobilesurvey.selectedUser() -->
-                                            <dl>
-                                                <dt>{% trans 'User Information' %}</dt>
-                                                <dd data-bind="text: mobilesurvey.selectedUser().first_name + ' ' + mobilesurvey.selectedUser().last_name"></dd>
-                                                <dd data-bind="text: mobilesurvey.selectedUser().name"></dd>
-                                                <dd data-bind="text: mobilesurvey.selectedUser().email"></dd>
-                                            </dl>
+                                            <!-- User Name -->
+                                            <div class="msm-stat-user-panel">
+                                                <span class="msm-stat-user" data-bind="text: mobilesurvey.selectedUser().first_name + ' ' + mobilesurvey.selectedUser().last_name"></span>
+                                            </div>
+                                            <div class="msm-stat-label">
+                                                {% trans 'User Name' %}
+                                            </div>
+
+                                            <!-- User Email -->
+                                            <div class="msm-stat-user-panel">
+                                                <span class="msm-stat-user" data-bind="text: mobilesurvey.selectedUser().email"></span>
+                                            </div>
+                                            <div class="msm-stat-label">
+                                                {% trans 'User Email' %}
+                                            </div>
+                                            
+                                            <!-- Last Synch -->
+                                             <div class="msm-stat-user-panel">
+                                                <div class="msm-stat">
+                                                    <span class="msm-stat-time">15:32:47</span>
+                                                    <span class="msm-stat-date">January 12, 2019</span>
+                                                </div>
+                                                <div class="msm-stat-label">
+                                                    {% trans 'Last Synch' %}
+                                                </div>
+                                            </div>   
                                             <!--/ko-->
                                             
                                         </div>

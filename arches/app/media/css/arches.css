@@ -10787,7 +10787,12 @@ a.search-facet-item.disabled {
 
 .mpm-group-panel-header {
     height: 80px;
-    background: #f9f9f9;
+    padding: 20px 25px;
+    background: #fcfcfc;
+}
+
+.mpm-group-panel-header h4 {
+    margin-bottom: 5px;
 }
 
 .msm-filter-panel {
@@ -10797,8 +10802,11 @@ a.search-facet-item.disabled {
 }
 
 .mpm-group-panel-content {
-    border-top: solid 1px #ccc;
-    padding: 10px;
+    padding: 0px 25px 20px 25px;
+}
+
+.mpm-group-panel-content .account-label {
+    font-weight: 600;
 }
 
 .mpm-group-panel-content.list {
@@ -10806,6 +10814,9 @@ a.search-facet-item.disabled {
     padding: 0px;
 }
 
+.msm-user-edit-stats-panel {
+    margin-top: 25px;
+}
 
 .mpm-card-content .userrow {
     display: flex;
@@ -10818,7 +10829,28 @@ a.search-facet-item.disabled {
 }
 
 .mpm-card-content .userrow.selected {
-    font-weight: 600;
+    font-weight: 400;
+}
+
+.msm-user-account-item {
+    background: #fff;
+    height: 40px;
+    padding: 8px 15px;
+    border: transparent;
+    border-bottom: 1px solid #ddd;
+}
+
+.msm-user-account-item:nth-child(even) {
+    background: #fafafa;
+}
+
+.msm-user-account-item:hover {
+    cursor: pointer;
+    background: #F5FAFE;
+}
+
+.msm-user-account-item.selected {
+    background: #CAE2F5;
 }
 
 .mpm-card-content.group-page {
@@ -10843,6 +10875,12 @@ a.search-facet-item.disabled {
     flex: 1;
 }
 
+.msm-user-account-panel {
+    border-top: 1px solid #ddd;
+    height: 600px;
+    background: #fafafa;
+}
+
 .msm-account-listing-panel {
     display: flex; 
     flex-direction: column; 
@@ -10853,8 +10891,18 @@ a.search-facet-item.disabled {
 .msm-account-summary-panel {
     display: flex; 
     flex-direction: column; 
+    background: #fcfcfc;
     flex: 1; 
     border-left: solid 1px #ccc;
+}
+
+.msm-user-summary-item-panel {
+    margin-bottom: 3px;
+}
+
+.msm-user-summary-label {
+    font-size: 13px;
+    color: #565656;
 }
 
 .msm-icon-wrap {
@@ -11849,11 +11897,23 @@ a.filter-tools:hover {
 .msm-stat {
     color: #2d3c4b;
     font-size: 36px;
+    margin-top: 2px;
 }
 
 .msm-stat-label {
     color: #999;
     font-size: 13px;
+    margin-top: -5px;
+}
+
+.msm-stat-user {
+    color: #2d3c4b;
+    font-size: 24px;
+    margin-top: 2px;
+}
+
+.msm-stat-user-panel {
+    margin-top: 10px;
 }
 
 .msm-stat-time {
