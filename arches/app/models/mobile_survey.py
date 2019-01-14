@@ -71,9 +71,6 @@ class MobileSurvey(models.MobileSurveyModel):
     def save(self):
         super(MobileSurvey, self).save()
         db = self.couch.create_db('project_' + str(self.id))
-        survey = self.serialize_for_couch()
-        survey['type'] = 'metadata'
-        self.couch.update_doc(db, survey, 'metadata')
         self.load_data_into_couch()
         return db
 
@@ -137,7 +134,7 @@ class MobileSurvey(models.MobileSurveyModel):
 
         return graph_obj
 
-    def serialize_for_couch(self):
+    def serialize_for_mobile(self):
         """
         serialize to a different form than used by the internal class structure
         used to append additional values (like parent ontology properties) that
