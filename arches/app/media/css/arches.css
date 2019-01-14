@@ -10786,8 +10786,7 @@ a.search-facet-item.disabled {
 }
 
 .mpm-group-panel-header {
-    height: 80px;
-    padding: 20px 25px;
+    padding: 10px 20px;
     background: #fcfcfc;
 }
 
@@ -10796,7 +10795,7 @@ a.search-facet-item.disabled {
 }
 
 .msm-filter-panel {
-    padding: 5px 10px;
+    padding: 5px 0px;
     width: 100%;
     position: relative;
 }
@@ -10847,10 +10846,16 @@ a.search-facet-item.disabled {
 .msm-user-account-item:hover {
     cursor: pointer;
     background: #F5FAFE;
+    border-bottom: 1px solid steelblue;
 }
 
 .msm-user-account-item.selected {
     background: #CAE2F5;
+    border-bottom: 1px solid steelblue;
+}
+
+.msm-filter-tools-panel {
+    margin-top: 10px;
 }
 
 .mpm-card-content.group-page {
