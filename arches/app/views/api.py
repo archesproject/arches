@@ -116,7 +116,7 @@ class Surveys(APIBase):
         permitted_cards = request.user.userprofile.permitted_cards
         group_ids = list(request.user.groups.values_list('id', flat=True))
         projects = MobileSurvey.objects.filter(Q(users__in=[request.user]) | Q(groups__in=group_ids), active=True).distinct()
-        projects_for_couch = [project.serialize_for_couch() for project in projects]
+        projects_for_couch = [project.serialize_for_mobile() for project in projects]
         for project in projects_for_couch:
             project['cards'] = list(permitted_cards.intersection(set(project['cards'])))
             for graph in project['graphs']:

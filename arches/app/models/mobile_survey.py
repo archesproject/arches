@@ -134,7 +134,7 @@ class MobileSurvey(models.MobileSurveyModel):
 
         return graph_obj
 
-    def serialize_for_couch(self):
+    def serialize_for_mobile(self):
         """
         serialize to a different form than used by the internal class structure
         used to append additional values (like parent ontology properties) that
