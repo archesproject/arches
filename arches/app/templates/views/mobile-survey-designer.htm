@@ -531,7 +531,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <div class="mpm-group-panel-header" style="">
 
-                                            <div class="">
+                                            <div class="msm-group-label">
                                                 {% trans 'Accounts in this group' %}
                                             </div>
 
@@ -539,7 +539,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <div class="msm-filter-panel">
                                                 <span class="msm-identity-filter">
                                                     <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a user...' %}" data-bind="textInput: mobilesurvey.userFilter">
-                                                    <span class="clear-node-search" style="top: 11px; right: 15px;" data-bind="visible: true, click: function() { mobilesurvey.userFilter(''); }"><i class="fa fa-times-circle"></i></span>
+                                                    <span class="clear-node-search" style="top: 11px; right: 10px;" data-bind="visible: true, click: function() { mobilesurvey.userFilter(''); }"><i class="fa fa-times-circle"></i></span>
                                                 </span>
                                                 <div class="msm-filter-tools-panel">
                                                     <a class="filter-tools" data-bind="click: selectAllGroupUsers"><i class="ion-checkmark"></i> {% trans 'Select all' %}</a>
@@ -565,13 +565,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <!-- Account Summary Panel -->
                                     <div class="msm-account-summary-panel" style="">
                                         <div class="mpm-group-panel-header">
-                                            <h4>{% trans "Account Summary" %}</h4>
+                                            <h4 class="msm-group-label">{% trans "Account Summary" %}</h4>
                                             <div class="msm-basemap-subtitle">
                                                 {% trans "User identification and data editing statistics" %}
                                             </div>
                                         </div>
                                         
-                                        <div class="mpm-group-panel-content">
+                                        <div class="mpm-user-panel-content">
                                             <!--ko if: mobilesurvey.selectedUser() -->
                                             <!-- User Name -->
                                             <div class="msm-stat-user-panel">

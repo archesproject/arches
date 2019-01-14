@@ -10790,8 +10790,15 @@ a.search-facet-item.disabled {
     background: #fcfcfc;
 }
 
+.msm-group-label {
+    font-size: 15px;
+    color: #454545;
+    font-weight: 600;
+}
+
 .mpm-group-panel-header h4 {
     margin-bottom: 5px;
+    margin-top: 0px;
 }
 
 .msm-filter-panel {
@@ -10802,6 +10809,11 @@ a.search-facet-item.disabled {
 
 .mpm-group-panel-content {
     padding: 0px 25px 20px 25px;
+}
+
+.mpm-user-panel-content {
+    padding: 0px 25px 20px 20px;
+    margin-top: -5px;
 }
 
 .mpm-group-panel-content .account-label {
@@ -10850,7 +10862,7 @@ a.search-facet-item.disabled {
 }
 
 .msm-user-account-item.selected {
-    background: #CAE2F5;
+    background: #F6F6FF;
     border-bottom: 1px solid steelblue;
 }
 
