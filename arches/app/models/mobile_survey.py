@@ -71,9 +71,6 @@ class MobileSurvey(models.MobileSurveyModel):
     def save(self):
         super(MobileSurvey, self).save()
         db = self.couch.create_db('project_' + str(self.id))
-        survey = self.serialize_for_couch()
-        survey['type'] = 'metadata'
-        self.couch.update_doc(db, survey, 'metadata')
         self.load_data_into_couch()
         return db
 
