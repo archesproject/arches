@@ -40,7 +40,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
         <div class="msm-designer-panel">
-   
+
             <!-- Header -->
             <div class="relative library-header" style="height: 55px;">
 
@@ -63,7 +63,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="msm-summary-panel" style="display:none;" data-bind="visible: true">
                 <!-- ko if: mobilesurvey -->
                 <!--Project Details-->
-                
+
                 <div id="cards" style="margin: 0px; margin-top: 0px;">
 
                     <!--Tabs Content-->
@@ -72,11 +72,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!-- Report Page -->
                         <!--ko if: activePage() === 'root'-->
                         <div id="project-summary-card" class="mpm-card">
-                            
+
                             <!-- Project Summary Panel -->
                             <div class="mpm-activation-panel">
                                 <!--ko if: surveyReady().incomplete -->
-                                
+
                                 <!-- Survey Status Panel -->
                                 <div class="mpm-card-content">
 
@@ -95,6 +95,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <li data-bind = "visible: surveyReady().daterange == false">{% trans 'Define the start and end dates of your survey' %}</li>
                                             <li data-bind = "visible: surveyReady().mapsources == false">{% trans 'Define either an online or offline basemap source' %}</li>
                                             <li data-bind = "visible: surveyReady().bounds == false">{% trans 'Define a map extent' %}</li>
+                                            <li data-bind = "visible: surveyReady().unexpired == false">{% trans 'End date must be after the current date' %}</li>
                                         </ul>
                                     </div>
                                 </div>
@@ -221,7 +222,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!-- Data Entry Pages -->
                         <!--ko if: activePage() === 'settings'-->
                         <div id="summary-card" class="mpm-card" style="">
-                            
+
                             <div class="panel-body project-card-body">
                                 <div id="" class="card-content">
 
@@ -243,7 +244,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </div>
                                             </div>
                                         </div>
-
                                         <div class="msm-crud-section">
                                             <div class="row">
                                                 <div class="col-sm-5">
@@ -252,7 +252,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                         <input class="form-control input-lg account-input" data-bind="datepicker: {format: dateFormat, minDate: false, maxDate: mobilesurvey.enddate}, value: mobilesurvey.startdate">
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div class="col-sm-6">
                                                     <p class="account-tips">
                                                         {% trans 'The survey start and end dates are used to limit when people can add or edit data to your project. Use these dates to enfore the beginning and end of your field data collection effort' %}
@@ -324,7 +324,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <!--ko if: activePage() === 'mapsources'-->
                         <div class="msm-location-card ">
-                            
+
                             <div class="msm-crud-section">
                                 <div class="form-group" style="margin-bottom: 10px;">
                                     <label class="control-label account-label">{% trans 'Basemap location (MBTiles file url)' %}</label>
@@ -348,20 +348,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <!--ko if: activePage() === 'resourcemodel'-->
                         <div class="mpm-card-content mpm-crud-section">
-                            
+
                             <div class="account-label">{% trans 'Data entry cards selected for this survey:' %}</div>
-                            
+
                             <!--ko if: selectedNode().cards -->
                             <!--ko foreach: {data: selectedNode().cards, as: 'card'} -->
                             <div class="checkbox">
                                 <label class="form-checkbox form-normal form-primary" style="padding-left: 25px;" data-bind="text: card.name">
                                     <input type="checkbox" value="card.approved" data-bind="checked: card.approved"/>
                                 </label>
-                            </div> 
+                            </div>
                             <!--/ko-->
                             <!--/ko-->
-                                
-                        
+
+
                              <ul style="list-style-type: none;">
                                 <!--ko if: selectedNode().cards -->
                                 <!--ko foreach: {data: selectedNode().cards, as: 'card'} -->
@@ -420,7 +420,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     }"><small></small></span>
                                 </span>
                             </div>
-                            
+
                             <!-- Help Message-->
                             <div class="">
                                 <p class="account-tips">
@@ -428,7 +428,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 </p>
                             </div>
                         </div>
-                        
+
                         <!-- ko if: mobilesurvey.datadownloadconfig.download() -->
                         <div id="data-definition" class="mpm-summary-panel">
 
@@ -441,7 +441,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <div>
                                 <div class="pad-top">
                                     <label style="display:flex; align-items:center">{% trans 'Limit ' %}
-                                        <input type="number" class="form-control" style="width: 100px; margin-left: 7px;" placeholder="Search query URL" data-bind="textInput: mobilesurvey.datadownloadconfig.count"></input>
+                                        <input type="number" class="form-control" style="width: 100px; margin-left: 7px;" placeholder="Search query URL" data-bind="textInput: mobilesurvey.datadownloadconfig.count, event: {'change': convertCountToInt}"></input>
                                     </label>
                                 </div>
 
@@ -492,7 +492,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!--ko if: activePage() === 'people'-->
                         <div id="models-card">
                             <div class="mpm-card-content selection-page model-selection">
-                                
+
                                 <!-- Icon and Title -->
                                 <div class="mpm-survey-status-header">
                                     <i class="msm-icon-wrap fa fa-group" style="padding-left: 3px;"></i>
@@ -525,7 +525,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div id="models-card">
                             <div class="mpm-card-content group-page">
                                 <div style="display: flex">
-                                    
+
                                     <!-- Account Listing -->
                                     <div class="msm-account-listing-panel">
 
@@ -547,7 +547,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </div>
                                             </div>
                                         </div>
-                                    
+
                                         <div class="mpm-group-panel-content list">
                                             <!--ko if: selectedNode().type === 'group' -->
                                             <div class="msm-user-account-panel">
@@ -570,7 +570,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 {% trans "User identification and data editing statistics" %}
                                             </div>
                                         </div>
-                                        
+
                                         <div class="mpm-user-panel-content">
                                             <!--ko if: mobilesurvey.selectedUser() -->
                                             <!-- User Name -->
@@ -588,7 +588,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <div class="msm-stat-label">
                                                 {% trans 'User Email' %}
                                             </div>
-                                            
+
                                             <!-- Last Synch -->
                                              <div class="msm-stat-user-panel">
                                                 <div class="msm-stat">
@@ -598,9 +598,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 <div class="msm-stat-label">
                                                     {% trans 'Last Synch' %}
                                                 </div>
-                                            </div>   
+                                            </div>
                                             <!--/ko-->
-                                            
+
                                         </div>
                                     </div>
                                 </div>
@@ -610,7 +610,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     </div>
                 </div>
-                    
+
                 <!-- /ko -->
 
             </div>
@@ -628,7 +628,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             return {
                 mobilesurvey: {{mobile_survey}},
                 resources: {{resources}},
-                identities: {{identities}}
+                identities: {{identities}},
+                transstrings: {
+                    identity: {name: {% trans "'Name'" %}, namelong: {% trans "'Name'" %}, description: {% trans "'Manage users that participate in this survey'" %}},
+                    resourcemodel: {name: {% trans "'Model Details'" %}, namelong: {% trans "'Model Details'" %}, description: {% trans "'Summary of how this model participates in the survey'" %}},
+                    root: {name: {% trans "'Summary'" %}, namelong: {% trans "'Summary'" %}, description: {% trans "'Survey summary and status'" %}},
+                    settings: {name: {% trans "'Settings'" %}, namelong: {% trans "'Survey Settings'" %}, description: {% trans "'Define data collection parameters for your survey'" %}},
+                    mapextent: {name: {% trans "'Map Extent'" %}, namelong: {% trans "'Map Extent'" %}, description: {% trans "'Draw a polygon to define the area over which you want to collect data in this survery'" %}},
+                    mapsources: {name: {% trans "'Map Sources'" %}, namelong: {% trans "'Basemap Source'" %}, description: {% trans "'Provide a basemap source url. Use an offline source for users without access to cell/wi-fi service'" %}},
+                    models: {name: {% trans "'Models'" %}, namelong: {% trans "'Models'" %}, description: {% trans "'Summary of models in this survey'" %}},
+                    data: {name: {% trans "'Data'" %}, namelong: {% trans "'Data Download'" %}, description: {% trans "'Define the data you will allow users to download'" %}},
+                    people: {name: {% trans "'People'" %}, namelong: {% trans "'People'" %}, description: {% trans "'Summary of people invited to participate in this survey'" %}},
+                    groupplaceholder: {% trans "'Select one or more groups...'" %},
+                    modelplaceholder: {% trans "'Select one or more resource models...'" %}
+                }
             };
         });{% endautoescape %}
     </script>

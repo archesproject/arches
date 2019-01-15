@@ -25,7 +25,7 @@ define([
             self.cards = ko.observableArray([]);
             self.datadownloadconfig = koMapping.fromJS(options.source.datadownloadconfig) || ko.observable();
             self.tilecache = ko.observable('');
-            self.onlinebasemap = ko.observable('');
+            self.onlinebasemap = ko.observable(options.source.onlinebasemaps || ko.observable());
             self.bounds = ko.observable(self.getDefaultBounds(null));
             self.collectedResources = ko.observable(false);
             self.showCustomDataDownload = ko.observable(false);
@@ -267,8 +267,8 @@ define([
             self.users(source.users);
             self.cards(source.cards);
             self.tilecache(source.tilecache);
-            self.onlinebasemap(source.onlinebasemaps ? source.onlinebasemaps['default'] : source.onlinebasemaps);
             self.bounds(self.getDefaultBounds(source.bounds));
+            self.onlinebasemap(source.onlinebasemaps ? source.onlinebasemaps['default'] : source.onlinebasemaps);
             self.set('id', source.id);
         },
 

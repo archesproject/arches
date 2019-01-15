@@ -20,6 +20,7 @@ import json
 import couchdb
 import urlparse
 from datetime import datetime
+from datetime import timedelta
 from django.db import transaction
 from django.shortcuts import render
 from django.contrib.auth.models import User, Group
@@ -47,51 +48,48 @@ from arches.app.views.base import MapBaseManagerView
 import arches.app.views.search as search
 
 
-def get_survey_resources(mobile_survey_models):
+def get_survey_resources(mobile_survey):
     graphs = models.GraphModel.objects.filter(isresource=True).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
     resources = []
-    mobile_surveys = []
-    all_ordered_card_ids = []
-
-    for mobile_survey in mobile_survey_models:
-        try:
-            survey = MobileSurvey.objects.get(id=mobile_survey.id)
-        except Exception as e:
-            survey = MobileSurvey(id=mobile_survey.id, name=mobile_survey.name)
-        mobile_survey_dict = survey.serialize()
-        all_ordered_card_ids += mobile_survey_dict['cards']
-        mobile_surveys.append(mobile_survey_dict)
-
+    all_ordered_card_ids = mobile_survey['cards']
     active_graphs = set([unicode(card.graph_id) for card in models.CardModel.objects.filter(cardid__in=all_ordered_card_ids)])
-
     for i, graph in enumerate(graphs):
         cards = []
         if i == 0 or unicode(graph.graphid) in active_graphs:
             cards = [Card.objects.get(pk=card.cardid) for card in models.CardModel.objects.filter(graph=graph)]
         resources.append({'name': graph.name, 'id': graph.graphid, 'subtitle': graph.subtitle, 'iconclass': graph.iconclass, 'cards': cards})
 
-    return mobile_surveys, resources
+    return resources
+
+
+def deactivate_expired_survey(mobile_survey):
+    result = False
+    if mobile_survey.enddate is not None:
+        enddate = datetime.strftime(mobile_survey.enddate, '%Y-%m-%d')
+        expired = (datetime.strptime(enddate, '%Y-%m-%d') - datetime.now() + timedelta(hours=24)).days < 0
+        if expired:
+            mobile_survey.active = False
+            try:
+                super(MobileSurvey, mobile_survey).save()
+            except TypeError as e:
+                mobile_survey.save()
+            result = True
+    return result
 
 
 @method_decorator(group_required('Application Administrator'), name='dispatch')
 class MobileSurveyManagerView(BaseManagerView):
 
     def get(self, request):
-
-        def get_last_login(date):
-            result = _("Not yet logged in")
-            try:
-                if date is not None:
-                    result = datetime.strftime(date, '%Y-%m-%d %H:%M')
-            except TypeError as e:
-                print e
-            return result
-
         mobile_survey_models = models.MobileSurveyModel.objects.order_by('name')
         mobile_surveys = []
         serializer = JSONSerializer()
         for survey in mobile_survey_models:
+            expired = deactivate_expired_survey(survey)
             serialized_survey = serializer.serializeToPython(survey)
+            serialized_survey['expired'] = expired
+            if expired is True:
+                serialized_survey['active'] = False
             serialized_survey['edited_by'] = {
                 'username': survey.lasteditedby.username,
                 'first': survey.lasteditedby.first_name,
@@ -137,8 +135,8 @@ class MobileSurveyManagerView(BaseManagerView):
             except Exception as e:
                 if connection_error is False:
                     error_title = _('Unable to delete survey')
-                    if e.strerror == 'Connection refused':
-                        error_message = "Unable to connect to CouchDB"
+                    if 'strerror' in e and e.strerror == 'Connection refused' or 'Connection refused' in e:
+                        error_message = _("Unable to connect to CouchDB")
                     else:
                         error_message = e.message
                     connection_error = JSONResponse({'success': False, 'message': error_message, 'title': error_title}, status=500)
@@ -182,18 +180,26 @@ class MobileSurveyDesignerView(MapBaseManagerView):
         map_sources = models.MapSource.objects.all()
         geocoding_providers = models.Geocoder.objects.all()
 
-        if models.MobileSurveyModel.objects.filter(pk=surveyid).exists():
-            mobile_survey = models.MobileSurveyModel.objects.get(pk=surveyid)
-        else:
-            mobile_survey = models.MobileSurveyModel(id=surveyid, name='Unnamed')
-            mobile_survey.datadownloadconfig = {"download": False, "count": 50, "resources": [], "custom": None}
+        survey_exists = models.MobileSurveyModel.objects.filter(pk=surveyid).exists()
 
-        mobile_surveys, resources = get_survey_resources([mobile_survey])
-        mobile_survey = mobile_surveys[0]
+        if survey_exists is True:
+            survey = MobileSurvey.objects.get(pk=surveyid)
+            mobile_survey = survey.serialize()
+            resources = get_survey_resources(mobile_survey)
+        else:
+            survey = MobileSurvey(
+                    id=surveyid,
+                    name=_('Unnamed'),
+                    datadownloadconfig={"download": False, "count": 100, "resources": [], "custom": None},
+                    onlinebasemaps=settings.MOBILE_DEFAULT_ONLINE_BASEMAP,
+                )
+            mobile_survey = survey.serialize()
+            mobile_survey['bounds'] = settings.DEFAULT_BOUNDS
+
+        resources = get_survey_resources(mobile_survey)
 
         try:
             mobile_survey['datadownloadconfig'] = json.loads(mobile_survey['datadownloadconfig'])
-            mobile_survey['onlinebasemaps'] = json.loads(mobile_survey['onlinebasemaps'])
         except TypeError:
             pass
 
@@ -203,7 +209,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
                 singlepart = GeoUtils().convert_multipart_to_singlepart(multipart)
                 mobile_survey['bounds'] = singlepart
         except TypeError as e:
-            print('no bounds available')
+            pass
 
         serializer = JSONSerializer()
         context = self.get_context_data(
@@ -239,8 +245,8 @@ class MobileSurveyDesignerView(MapBaseManagerView):
         except Exception as e:
             if connection_error is False:
                 error_title = _('Unable to delete survey')
-                if e.strerror == 'Connection refused':
-                    error_message = "Unable to connect to CouchDB"
+                if 'strerror' in e and e.strerror == 'Connection refused' or 'Connection refused' in e:
+                    error_message = _("Unable to connect to CouchDB")
                 else:
                     error_message = e.message
                 connection_error = JSONResponse({'success': False, 'message': error_message, 'title': error_title}, status=500)
