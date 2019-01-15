@@ -18,14 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load staticfiles %}
 {% load i18n %}   
 <dl class="">
-    <div data-bind="if: selectedResource()['entitytypeid'] === 'HERITAGE_RESOURCE.E18'">
-        <dt class="txt-color-blue">{% trans 'Archaeological certainty' %}</dt>
-        <dd class="txt-color-blue arches-map-panel-list" data-bind="text:selectedResource() ? selectedResource().certainty_type : ''"></dd>
-        <dt class="txt-color-blue">{% trans 'Site function(s)' %}</dt>
-        <dd class="txt-color-blue arches-map-panel-list" data-bind="text:selectedResource() ? selectedResource().site_function : ''"></dd>
-        <dt class="txt-color-blue">{% trans 'Disturbance(s)' %}</dt>
-        <dd class="txt-color-blue arches-map-panel-list" data-bind="text:selectedResource() ? selectedResource().disturbance_type : ''"></dd>        
-    </div>
+
     <div data-bind="if: selectedResource()['entitytypeid'] === 'HERITAGE_RESOURCE_GROUP.E27'">
         <dt class="txt-color-blue">{% trans 'Archaeological certainty' %}</dt>
         <dd class="txt-color-blue arches-map-panel-list" data-bind="text:selectedResource() ? selectedResource().certainty_type: ''"></dd>
@@ -34,24 +27,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <dt class="txt-color-blue">{% trans 'Disturbance(s)' %}</dt>
         <dd class="txt-color-blue arches-map-panel-list" data-bind="text:selectedResource() ? selectedResource().disturbance_type : ''"></dd>        
     </div>
-    <div data-bind="if: selectedResource()['entitytypeid'] === 'ACTIVITY.E7'">
-        <dt class="txt-color-blue">{% trans 'Activity Type' %}</dt>
-        <dd class="txt-color-blue arches-map-panel-list" data-bind="text:selectedResource() ? selectedResource().resource_type : ''"></dd>
-
-        <dt class="txt-color-blue">{% trans 'Start of Occurrence' %}</dt>
-        <dd class="txt-color-blue arches-map-panel-list" data-bind="text:selectedResource() ? selectedResource().start_date : ''"></dd>
-
-        <dt class="txt-color-blue">{% trans 'End of Occurrence' %}</dt>
-        <dd class="txt-color-blue arches-map-panel-list" data-bind="text:selectedResource() ? selectedResource().end_date : ''"></dd>
+    
+    <div data-bind="if: selectedResource()['entitytypeid'] === 'HERITAGE_FEATURE.E24'">
+        <dt class="txt-color-blue">{% trans 'Feature interpretation(s)' %}</dt>
+        <dd class="txt-color-blue arches-map-panel-list" data-bind="text:selectedResource() ? selectedResource().feature_interpretation : ''"></dd>
+        <dt class="txt-color-blue">{% trans 'Overall condition(s)' %}</dt>
+        <dd class="txt-color-blue arches-map-panel-list" data-bind="text:selectedResource() ? selectedResource().overall_condition : ''"></dd>        
     </div>
-    <div data-bind="if: selectedResource()['entitytypeid'] === 'HISTORICAL_EVENT.E5'">
-
-        <dt class="txt-color-blue">{% trans 'Start of Occurrence' %}</dt>
-        <dd class="txt-color-blue arches-map-panel-list" data-bind="text:selectedResource() ? selectedResource().start_date : ''"></dd>
-
-        <dt class="txt-color-blue">{% trans 'End of Occurrence' %}</dt>
-        <dd class="txt-color-blue arches-map-panel-list" data-bind="text:selectedResource() ? selectedResource().end_date : ''"></dd>
-    </div>
+    
     <div data-bind="if: selectedResource()['entitytypeid'] === 'ACTOR.E39'">
         <dt class="txt-color-blue">{% trans 'Person/Organization Name' %}</dt>
         <dd class="txt-color-blue arches-map-panel-list" data-bind="text:selectedResource() ? selectedResource().resource_type : ''"></dd>

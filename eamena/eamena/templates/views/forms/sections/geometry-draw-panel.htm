@@ -1,0 +1,117 @@
+{% load i18n %}
+<div class="row">
+    <div class="col-xs-4 {% if LANGUAGE_BIDI %}col-xs-offset-7{%else %} col-xs-offset-1{% endif %}" style="">
+
+        <div id="overlay-panel" class="tools-panel hidden" style="margin-top: -490px; overflow-x: hidden; height: 412px;">
+            <div class="modal-header arches-modal-header">
+
+                <button type="button" class="close pull-right" data-dismiss="modal" aria-hidden="true">
+                    ×
+                </button>
+
+                <h4 class="modal-title">
+                    {% trans 'Geometry Tools' %}
+                </h4>
+            </div>
+            
+            <div class="modal-body padding-top-10 padding-bottom-0" style="padding-left: 5px; padding-right: 5px;">
+                                        
+                <!-- List overlays -->
+                <div class="row">
+                    <div class="col-xs-12">
+                        
+                        <dl>
+                            
+                            <dd class="">
+                                <div class="arches-tool-item">
+                                    
+                                    <a href="javascript:void(0);" data-geometrytype="Point" class="arches-tool-text geometry-btn info-link" title="">
+                                        <i class="fa fa-dot-circle-o"></i>
+                                        {% trans 'Draw new point' %}
+                                    </a>
+                                </div>
+                            </dd>
+
+                            <dd class="">
+                                <div class="arches-tool-item">
+                                    
+                                    <a href="javascript:void(0);" data-geometrytype="LineString" class="arches-tool-text geometry-btn info-link" title="">
+                                        <i class="fa fa-minus"></i>
+                                        {% trans 'Draw new line' %}
+                                    </a>
+                                </div>
+                            </dd>
+
+                            <dd class="">
+                                <div class="arches-tool-item">
+                                    
+                                    <a href="javascript:void(0);" data-geometrytype="Polygon" class="arches-tool-text geometry-btn info-link" title="">
+                                        <i class="fa fa-square-o"></i>
+                                        {% trans 'Draw new polygon' %}
+                                    </a>
+                                </div>
+                            </dd>
+
+                            <dd class="">
+                                <div class="arches-tool-item file-upload">
+                                    
+                                    <a href="javascript:void(0);" data-geometrytype="Polygon" class="arches-tool-text geometry-btn info-link" title="">
+                                        <i class="fa fa-upload"></i>
+                                        {% trans 'Add from gpx, kml, or geojson' %}
+                                    </a>
+                                    <input type="file" class="upload geom-upload" accept=".gpx, .kml, .geojson, .json"/>
+                                </div>
+                            </dd>
+
+                            <dd class="geom-file-instructions">
+                                {% trans '(or drag and drop the file onto the map)' %}
+                            </dd>
+                            <dd>
+                                <div class="arches-tool-item">
+                                    
+                                    <i class="fa fa-compass"></i>
+                                    {% trans 'Enter latitude/longitude' %}
+                                    <p class="geom-file-instructions">{% trans 'use decimal degrees: dd.ddddd' %}</p>
+                                    
+                                    <div class="row">
+                                        <div class="col-xs-12 col-sm-6">
+                                            <input class="form-control coord-input" style="width:100%" id="latinput" placeholder="latitude" maxlength="8" type="text" autocomplete="off"/>
+                                            <input class="form-control coord-input" style="width:100%" id="longinput" placeholder="longitude" maxlength="8" type="text" autocomplete="off"/>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <input type="button" id="add-lat-long" value="Add to Map">
+                                        </div>
+                                    </div>
+                                </div>
+                            </dd>
+                            <dd>
+                                <div class="arches-tool-item">
+                                    
+                                    <i class="fa fa-map"></i>
+                                    {% trans 'Enter UTM Coordinates' %}
+                                    <p class="geom-file-instructions">{% trans 'adjust zone if necessary' %}</p>
+                                    
+                                    <div class="row">
+                                        <div class="col-xs-12 col-sm-6">
+                                            <input class="form-control coord-input" style="width:100%" id="utmx" placeholder="UTM easting" maxlength="9" type="text" autocomplete="off"/>
+                                            <input class="form-control coord-input" style="width:100%" id="utmy" placeholder="UTM northing" maxlength="11" type="text" autocomplete="off"/>
+                                            <input class="form-control" style="width:100%" id="utmzone" placeholder="zone" value="37" maxlength="2" type="text" autocomplete="off"/>
+                                            <select class="form-control" style="width:100%" id="utmhemisphere">
+                                                  <option value="north" selected>North</option>
+                                                  <option value="south">South</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <input type="button" id="add-utm" value="Add to Map">
+                                        </div>
+                                    </div>
+                                </div>
+                            </dd>
+                        </dl>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

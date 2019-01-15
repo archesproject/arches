@@ -20,7 +20,6 @@ import re
 from django.template import RequestContext
 from django.shortcuts import render_to_response, redirect
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.decorators import permission_required
 from django.conf import settings
 from django.db import transaction
 from arches.app.models import models
@@ -34,13 +33,14 @@ from arches.app.models.concept import Concept
 from django.http import HttpResponseNotFound
 from django.contrib.gis.geos import GEOSGeometry
 from django.db.models import Max, Min
-from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 
 def report(request, resourceid):
     raise NotImplementedError('Reports are not yet implemented.')
 
-@permission_required('edit')
+@login_required
+@user_passes_test(lambda u: u.groups.filter(name='edit').count() != 0, login_url='/auth/')
 @csrf_exempt
 def resource_manager(request, resourcetypeid='', form_id='default', resourceid=''):
 

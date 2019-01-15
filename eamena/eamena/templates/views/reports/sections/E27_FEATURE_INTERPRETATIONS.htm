@@ -1,0 +1,51 @@
+{% load i18n %}
+<div class="row">
+    <div class="col-xs-12">
+        <dl>
+            <dt>
+                <h5 id="" class="arches-report-subsection-title">{% trans "Feature intepretations within Heritage Place" %}</h5>
+            </dt>
+            <dd class="arches-report-subsection-item dataalert">{% trans "No feature interpretations recorded" %}</dd>
+            <div class = "content">
+             {% for FEATURE_COLLECTION_E24 in report_info.source.graph.FEATURE_COLLECTION_E24|dictsort:"orderby" %}
+                 {% for PRODUCTION_E12 in FEATURE_COLLECTION_E24.PRODUCTION_E12 %}
+                     {% if 'FUNCTION_INTERPRETATION_INFERENCE_MAKING_I5' in PRODUCTION_E12 %}
+                         {% for FUNCTION_INTERPRETATION_INFERENCE_MAKING_I5 in PRODUCTION_E12.FUNCTION_INTERPRETATION_INFERENCE_MAKING_I5 %}
+                                 {% if 'INTERPRETATION_BELIEF_I2' in FUNCTION_INTERPRETATION_INFERENCE_MAKING_I5 %}
+                                    <dd class="arches-report-subsection-item">
+                                    {% for INTERPRETATION_BELIEF_I2 in FUNCTION_INTERPRETATION_INFERENCE_MAKING_I5.INTERPRETATION_BELIEF_I2  %}
+                                        {% for INTERPRETATION_TYPE_I4 in INTERPRETATION_BELIEF_I2.INTERPRETATION_TYPE_I4 %}
+                                            {{ INTERPRETATION_TYPE_I4.INTERPRETATION_TYPE_I4__value }}  <span class="arches-report-subsection-item-type">( {% trans "Type" %} )</span>
+                                            {{ INTERPRETATION_TYPE_I4.INTERPRETATION_NUMBER_TYPE_E55__value }} <span class="arches-report-subsection-item-type">( {% trans "Number" %} )</span>
+                                        {% endfor %}
+                                        
+                                        {% for INTERPRETATION_CERTAINTY_I6 in INTERPRETATION_BELIEF_I2.INTERPRETATION_CERTAINTY_I6  %}
+                                           {{ INTERPRETATION_CERTAINTY_I6.INTERPRETATION_CERTAINTY_I6__value }}  <span class="arches-report-subsection-item-type">( {% trans "Certainty" %} )</span>
+                
+                                        {% empty %}
+                                        {% endfor %}    
+                                    {% endfor %} 
+        
+                                   
+                                {% endif %}
+                                {% if 'FUNCTION_BELIEF_I2' in FUNCTION_INTERPRETATION_INFERENCE_MAKING_I5 %}
+                                     {% for FUNCTION_BELIEF_I2 in FUNCTION_INTERPRETATION_INFERENCE_MAKING_I5.FUNCTION_BELIEF_I2  %}
+                                        {% for FUNCTION_TYPE_I4 in FUNCTION_BELIEF_I2.FUNCTION_TYPE_I4 %}
+                                            {{ FUNCTION_TYPE_I4.FUNCTION_TYPE_I4__value}}<span class="arches-report-subsection-item-type">( {% trans "Function" %} )</span>
+                                        {% endfor %}
+                                        {% for FUNCTION_CERTAINTY_I6 in FUNCTION_BELIEF_I2.FUNCTION_CERTAINTY_I6 %}
+                                            {{ FUNCTION_CERTAINTY_I6.FUNCTION_CERTAINTY_I6__value }}<span class="arches-report-subsection-item-type">( {% trans " Function Certainty" %} )</span>
+                                        {% endfor %}
+                                     {% endfor %}
+                                {% endif %} 
+                                </dd>
+                                <hr class="devider margin-top-10" style="margin-bottom: 5px;"></hr>
+                        {% endfor %} 
+                    {% endif %}
+                {% endfor %}      
+            {% endfor %}
+            </div>  
+        </dl>
+
+    </div>
+</div>

@@ -28,7 +28,11 @@ define([
                 var locationBranchList = new LocationBranchList({
                     el: this.$el.find('#geom-list-section')[0],
                     data: this.data,
-                    dataKey: 'GEOMETRIC_PLACE_EXPRESSION.SP5'
+                    dataKey: 'GEOMETRIC_PLACE_EXPRESSION.SP5',
+                    rules: true,
+                    validateBranch: function (nodes) {
+                        return this.validateHasValues(nodes);
+                    }
                 });
                 locationBranchList.on('geometryadded', function(feature, wkt) {
                     $.ajax({
@@ -54,6 +58,7 @@ define([
                 el: this.$el.find('#certainty-of-geometry')[0],
                 data: this.data,
                 dataKey: 'GEOMETRY_EXTENT_CERTAINTY.I6',
+                rules: true,
                 validateBranch: function (nodes) {
                     return this.validateHasValues(nodes);
                 }
@@ -75,7 +80,7 @@ define([
                 el: this.$el.find('#siteshape-section')[0],
                 data: this.data,
                 dataKey: 'SITE_OVERALL_SHAPE_TYPE.E55',
-
+                rules: true,
                 validateBranch: function (nodes) {
                     return this.validateHasValues(nodes);
                 }
@@ -85,7 +90,7 @@ define([
                 el: this.$el.find('#topography')[0],
                 data: this.data,
                 dataKey: 'TOPOGRAPHY_TYPE.E55',
-
+                rules: true,
                 validateBranch: function (nodes) {
                     return this.validateHasValues(nodes);
                 }
@@ -124,7 +129,34 @@ define([
                     return this.validateHasValues(nodes);
                 }
             }));
-        },    
+        },
+        checkForRequiredBranchlists: function() {
+            var isValid = true
+            var canBeEmpty = ['SPATIAL_COORDINATES_REF_SYSTEM.SP4'] //can be removed once this node is pruned
+            _.each(this.branchLists, function(branchList){
+                if (branchList.rules === true && branchList.getData().length === 0 && branchList.singleEdit === false) {
+                    isValid = false;
+                    this.showAlert(branchList);
+                } else if (branchList.rules === true && branchList.singleEdit === false) {
+                    if (branchList.getData().length === 0) {
+                        isValid = false;
+                    } else {
+                        _.each(branchList.getData(), function(nodes) {
+                            _.each(nodes, function(node) {
+                                _.each(node, function(n) {
+                                    if (n.value === '' && n.entityid === '' && canBeEmpty.indexOf(n.entitytypeid) == -1) {
+                                        isValid = false;
+                                        this.showAlert(branchList);
+                                    }
+                                }, this)
+                            }, this)
+                        }, this)
+                    }
+                }
+            }, this); 
+            return isValid;
+        }, 
+    
     });
 });
 

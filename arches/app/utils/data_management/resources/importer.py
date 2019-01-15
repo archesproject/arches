@@ -150,7 +150,7 @@ class ResourceLoader(object):
             log_msg = "\n~~~~~\n{}\nfile: {}\nresources: {}\nloadid: {}".format(
                 d.strftime("%d/%m/%Y - %H:%M"),filename,len(resource_list),load_id
             )
-            with open(os.path.join(settings.BULK_UPLOAD_DIR,'_loadlog.txt'), "a") as loadlog:
+            with open(settings.BULK_UPLOAD_LOG_FILE, "a") as loadlog:
                 loadlog.write(log_msg)
         return ret
 

@@ -44,18 +44,30 @@ define(['jquery',
                     rules: true,
                     validateBranch: function (nodes) {
                         var canBeEmpty = [
+                            'DISTURBANCE_CAUSE_ASSIGNMENT_ASSESSOR_NAME.E41',
                             'DISTURBANCE_DATE_FROM.E61',
                             'DISTURBANCE_DATE_TO.E61',
                             'DISTURBANCE_DATE_OCCURRED_BEFORE.E61',
                             'DISTURBANCE_DATE_OCCURRED_ON.E61',
-                            'DISTURBANCE_CAUSE_ASSIGNMENT_ASSESSOR_NAME.E41',
+                        ];
+                        var mustHaveOneOf = [
+                            'DISTURBANCE_DATE_FROM.E61',
+                            'DISTURBANCE_DATE_TO.E61',
+                            'DISTURBANCE_DATE_OCCURRED_BEFORE.E61',
+                            'DISTURBANCE_DATE_OCCURRED_ON.E61',
+                        ];
+                        var datePair = [
+                            'DISTURBANCE_DATE_FROM.E61',
+                            'DISTURBANCE_DATE_TO.E61',
                         ]
                         var ck0 = this.validateHasValues(nodes, canBeEmpty);
                         var ck1 = vt.isValidDate(nodes,'DISTURBANCE_DATE_FROM.E61');
                         var ck2 = vt.isValidDate(nodes,'DISTURBANCE_DATE_TO.E61');
                         var ck3 = vt.isValidDate(nodes,'DISTURBANCE_DATE_OCCURRED_BEFORE.E61');
                         var ck4 = vt.isValidDate(nodes,'DISTURBANCE_DATE_OCCURRED_ON.E61');
-                        return ck0 && ck1 && ck2 && ck3 && ck4;
+                        var ck5 = vt.mustHaveAtLeastOneOf(nodes, mustHaveOneOf);
+                        var ck6 = vt.ifOneThenAll(nodes, datePair);
+                        return ck0 && ck1 && ck2 && ck3 && ck4 && ck5 && ck6;
                     }
                 }));
                 

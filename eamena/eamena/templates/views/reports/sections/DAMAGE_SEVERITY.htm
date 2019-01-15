@@ -1,0 +1,31 @@
+{% load i18n %}
+<div class="row">
+     <div class="col-xs-12">
+        <dl>
+            <dt>
+                <h5 id="" class="arches-report-subsection-title">{% trans "Overall damage severity" %}</h5>
+            </dt>
+                 <dd class="arches-report-subsection-item dataalert">{% trans "No overall damage severity recorded" %}</dd>
+            <div class = "content"> 
+            {% if 'CONDITION_ASSESSMENT_E14'  in report_info.source.graph %}
+                {% for CONDITION_ASSESSMENT_E14 in report_info.source.graph.CONDITION_ASSESSMENT_E14 %}
+                    {% if 'DAMAGE_STATE_E3' in CONDITION_ASSESSMENT_E14 %}
+                        {% for DAMAGE_STATE_E3 in CONDITION_ASSESSMENT_E14.DAMAGE_STATE_E3 %}
+                            {% if 'OVERALL_DAMAGE_EVALUATION_E16' in DAMAGE_STATE_E3 %}
+                                {% for OVERALL_DAMAGE_EVALUATION_E16 in DAMAGE_STATE_E3.OVERALL_DAMAGE_EVALUATION_E16 %}
+                                    {% for OVERALL_DAMAGE_SEVERITY_TYPE_E55 in OVERALL_DAMAGE_EVALUATION_E16.OVERALL_DAMAGE_SEVERITY_TYPE_E55 %}
+                                        <dd class="arches-report-subsection-item">
+                                            {{ OVERALL_DAMAGE_SEVERITY_TYPE_E55.OVERALL_DAMAGE_SEVERITY_TYPE_E55__value }} 
+                                        </dd>
+                                    {% endfor %}
+                    
+                                {% endfor %}
+                            {% endif %} 
+                        {% endfor %}    
+                    {% endif %}
+                {% endfor %}    
+            {% endif %}
+            </div>
+        </dl>
+    </div>
+</div>

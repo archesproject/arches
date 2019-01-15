@@ -221,6 +221,8 @@
                                     
                                     <span data-bind="foreach: $data.nodes">
                                             <span data-bind="visible: $data.entitytypeid() ==='EFFECT_TYPE.I4' "><span data-bind="{text: $data.label}"></span><span class="text-muted">{% trans '( Effect )' %}</span></span>
+                                    </span>
+                                    <span data-bind="foreach: $data.nodes">
                                             <span data-bind="visible: $data.entitytypeid() ==='EFFECT_CERTAINTY.I6' "><span data-bind="{text: $data.label}"></span><span class="text-muted">{% trans '( Effect Certainty )' %}</span></span>
                                     </span>
                                     <span class="text-muted" data-bind="visible: nodes.get('DISTURBANCE_DATE_FROM.E61', 'value').length > 0">{% trans ' From ' %}</span><span data-bind="{text:nodes.get('DISTURBANCE_DATE_FROM.E61', 'value')}" style="padding-right:2px"></span>

@@ -1,0 +1,41 @@
+{% load i18n %}
+<div class="row">
+     <div class="col-xs-12">
+        <dl>
+            <dt>
+                <h5 id="" class="arches-report-subsection-title">{% trans "Mitigation strategies identified" %}</h5>
+            </dt>
+            <dd class="arches-report-subsection-item dataalert">{% trans "No mitigation strategies recorded" %}</dd>
+            <div class ="content">
+            {% if 'CONDITION_ASSESSMENT_E14'  in report_info.source.graph %}
+                {% for CONDITION_ASSESSMENT_E14 in report_info.source.graph.CONDITION_ASSESSMENT_E14|dictsort:"orderby" %}
+                	{% if 'POTENTIAL_STATE_PREDICTION_XX1' in CONDITION_ASSESSMENT_E14 %}
+                    		{% for POTENTIAL_STATE_PREDICTION_XX1 in CONDITION_ASSESSMENT_E14.POTENTIAL_STATE_PREDICTION_XX1  %}
+		                    	{% if 'RISK_PLAN_E100' in POTENTIAL_STATE_PREDICTION_XX1 %}
+		                    		{% for RISK_PLAN_E100 in POTENTIAL_STATE_PREDICTION_XX1.RISK_PLAN_E100 %}
+			                    		<dt class="arches-report-subsection-item">
+		                    			<div class="row">
+		                    				<div class="col-xs-12 text-left">
+								{% for MITIGATION_STRATEGY_TYPE_E55 in RISK_PLAN_E100.MITIGATION_STRATEGY_TYPE_E55 %}
+									<span class="arches-report-subsection-item-type"> {% trans "Strategy Type: " %} </span>{{ MITIGATION_STRATEGY_TYPE_E55.MITIGATION_STRATEGY_TYPE_E55__value }}
+								{% endfor %}
+								{% for MITIGATION_PRIORITY_ASSIGNMENT_E13 in RISK_PLAN_E100.MITIGATION_PRIORITY_ASSIGNMENT_E13 %}
+									{% for MITIGATION_PRIORITY_TYPE_E55 in MITIGATION_PRIORITY_ASSIGNMENT_E13.MITIGATION_PRIORITY_TYPE_E55 %}
+										<span class="arches-report-subsection-item-type"> {% trans "Priority Type: " %} </span>{{ MITIGATION_PRIORITY_TYPE_E55.MITIGATION_PRIORITY_TYPE_E55__value }}					
+									{% endfor %}
+								{% endfor %}				
+								</div>
+							</div>
+							</dt>
+							<hr class="devider margin-top-10" style="margin-bottom: 5px;"></hr> 					
+		                    		{% endfor %}
+		                    	{% endif %}
+            			{% endfor %}
+            		{% endif %}
+            	{% endfor %}
+            {% endif %}
+            </div>
+         </dl>
+     </div>
+</div>     
+	    

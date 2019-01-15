@@ -6,6 +6,8 @@ from arches.app.models.concept import Concept
 import codecs
 from format import Writer
 
+
+
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -21,6 +23,22 @@ class CsvWriter(Writer):
         or the default mapping (which includes only resource type, primaryname and entityid)
         writes a csv file to a temporary directory for export.
         """
+        def writeheader(schema,csv_records):
+            populated_columns = None
+            header = []
+            fullschema = [column['field_name'] for column in schema]
+            for r in csv_records:
+                if populated_columns:
+                    for k in r.keys():
+                        if k not in populated_columns:
+                            populated_columns.append(k) 
+                else:
+                    populated_columns = r.keys()
+            for c in fullschema:
+                if c in populated_columns:
+                    header.append(c)
+            return header
+            
         using_default_mapping = False
         if resource_export_configs == '':
             resource_export_configs = self.default_mapping
@@ -34,9 +52,7 @@ class CsvWriter(Writer):
         schema = resource_export_configs['SCHEMA']
         resource_types = resource_export_configs['RESOURCE_TYPES']
         csv_name_prefix = resource_export_configs['NAME']
-        csv_header = [column['field_name'] for column in schema]
         csvs_for_export = []
-
         csv_records = []
         for resource_type, data in resource_types.iteritems():
             field_map = data['FIELD_MAP']
@@ -50,7 +66,8 @@ class CsvWriter(Writer):
                 complete_record = self.create_template_record(schema, resource, resource_type=None)
                 csv_record = self.concatenate_value_lists(complete_record)
                 csv_records.append(csv_record)
-
+        
+        csv_header = writeheader(schema,csv_records)
         iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         csv_name = os.path.join('{0}_{1}.{2}'.format(csv_name_prefix, iso_date, 'csv'))
         dest = StringIO()
@@ -60,3 +77,6 @@ class CsvWriter(Writer):
         for csv_record in csv_records:
             csvwriter.writerow({k:v.encode('utf8') for k,v in csv_record.items()})
         return csvs_for_export
+        
+
+        

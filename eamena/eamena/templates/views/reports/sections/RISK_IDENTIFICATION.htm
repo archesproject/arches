@@ -1,0 +1,85 @@
+{% load i18n %}
+<div class="row">
+     <div class="col-xs-12">
+        <dl>
+            <dt>
+                <h5 id="" class="arches-report-subsection-title">{% trans "Threat and risks identified" %}</h5>
+            </dt>
+            <dd class="arches-report-subsection-item dataalert">{% trans "No risk assessment recorded" %}</dd>
+            <div class ="content">
+            {% if 'CONDITION_ASSESSMENT_E14'  in report_info.source.graph %}
+                {% for CONDITION_ASSESSMENT_E14 in report_info.source.graph.CONDITION_ASSESSMENT_E14|dictsort:"orderby" %}
+                    {% if 'POTENTIAL_STATE_PREDICTION_XX1' in CONDITION_ASSESSMENT_E14 %}
+                    	{% for POTENTIAL_STATE_PREDICTION_XX1 in CONDITION_ASSESSMENT_E14.POTENTIAL_STATE_PREDICTION_XX1  %}
+                    	<hr class="devider margin-top-10" style="margin-bottom: 5px;"></hr>  
+	                    	{% if 'THREAT_EVENT_E5' in POTENTIAL_STATE_PREDICTION_XX1 %}
+	                    		<dt class="arches-report-subsection-item">
+	                    			<div class="row">
+	                    				<div class="col-xs-12 text-left">
+	                    		{% for THREAT_EVENT_E5 in POTENTIAL_STATE_PREDICTION_XX1.THREAT_EVENT_E5 %}
+	                    		
+	                    			{% for THREAT_TYPE_E55 in THREAT_EVENT_E5.THREAT_TYPE_E55 %}
+	                    					<span class="arches-report-subsection-item-type"> {% trans "Threat: " %} </span>{{ THREAT_TYPE_E55.THREAT_TYPE_E55__value }}
+	                    			{% endfor %}
+	                    		{% endfor %}
+	                    		{% for POTENTIAL_IMPACT_TYPE_E55 in POTENTIAL_STATE_PREDICTION_XX1.POTENTIAL_IMPACT_TYPE_E55 %}
+								<span class="arches-report-subsection-item-type"> {% trans "Potential Impact: " %} </span>{{ POTENTIAL_IMPACT_TYPE_E55.POTENTIAL_IMPACT_TYPE_E55__value }}
+	                    		{% endfor %}
+	                    				</div>
+	                    			</div>	
+	                    		</dt>                    		
+	                    	{% endif %}
+				{% if 'RISK_PREDICTION_EVALUATION_XX2' in POTENTIAL_STATE_PREDICTION_XX1 %}
+					{% for RISK_PREDICTION_EVALUATION_XX2 in POTENTIAL_STATE_PREDICTION_XX1.RISK_PREDICTION_EVALUATION_XX2 %}                 
+		                    		<dd class="arches-report-subsection-item">
+		                                        <div class="row">
+		                                        	<div class="col-xs-12 text-left">
+                    					{% for OBSERVED_VULNERABILITY_EXPOSURE_S15  in RISK_PREDICTION_EVALUATION_XX2.OBSERVED_VULNERABILITY_EXPOSURE_S15  %}
+	                    					
+                    						{% for EXPOSURE_E62 in OBSERVED_VULNERABILITY_EXPOSURE_S15.EXPOSURE_E62 %}
+                    							<span class="arches-report-subsection-item-type"> {% trans "Exposure: " %} </span>{{ EXPOSURE_E62.EXPOSURE_E62__value }}
+                    						{% endfor %}
+                    						{% for VULNERABILITY_TYPE_E55 in OBSERVED_VULNERABILITY_EXPOSURE_S15.VULNERABILITY_TYPE_E55 %}
+                    							<span class="arches-report-subsection-item-type"> {% trans "Vulnerability: " %} </span>{{ VULNERABILITY_TYPE_E55.VULNERABILITY_TYPE_E55__value }}
+                    						{% endfor %}
+                    						</div>
+                    					</div>
+                    					{% endfor %}
+                    					<div class="row">
+                    						<div class="col-xs-12 text-left">
+                    					{% for THREAT_PROBABILITY_TYPE_E55 in RISK_PREDICTION_EVALUATION_XX2.THREAT_PROBABILITY_TYPE_E55 %}
+                    						<span class="arches-report-subsection-item-type"> {% trans "Probability: " %} </span>{{ THREAT_PROBABILITY_TYPE_E55.THREAT_PROBABILITY_TYPE_E55__value }}
+                    					{% endfor %}
+                    					{% for RISK_EXTENT_TYPE_E55  in RISK_PREDICTION_EVALUATION_XX2.RISK_EXTENT_TYPE_E55%}
+                    						<span class="arches-report-subsection-item-type"> {% trans "Risk Extent: " %} </span>{{ RISK_EXTENT_TYPE_E55.RISK_EXTENT_TYPE_E55__value }}
+                    					{% endfor %}
+                    					{% for RISK_SEVERITY_TYPE_E55 in RISK_PREDICTION_EVALUATION_XX2.RISK_SEVERITY_TYPE_E55 %}
+                    						<span class="arches-report-subsection-item-type"> {% trans "Risk Severity: " %} </span>{{ RISK_SEVERITY_TYPE_E55.RISK_SEVERITY_TYPE_E55__value }}
+                    						
+                    					{% endfor %}
+                    						</div>
+                    					</div>
+                    					<div class="row">
+                    					{% for RISK_LEVEL_BELIEF_I2 in RISK_PREDICTION_EVALUATION_XX2.RISK_LEVEL_BELIEF_I2  %}
+	                    					<div class="col-xs-12 text-left">
+                    						{% for RISK_LEVEL_I4 in RISK_LEVEL_BELIEF_I2.RISK_LEVEL_I4 %}
+                    							<span class="arches-report-subsection-item-type"> {% trans "Risk Level: " %} </span>{{ RISK_LEVEL_I4.RISK_LEVEL_I4__value }}
+                    						{% endfor %}  
+                    						{% for RISK_LEVEL_CERTAINTY_I6 in RISK_LEVEL_BELIEF_I2.RISK_LEVEL_CERTAINTY_I6 %}
+                							<span class="arches-report-subsection-item-type"> {% trans "Risk Level Certainty: " %} </span>{{ RISK_LEVEL_CERTAINTY_I6.RISK_LEVEL_CERTAINTY_I6__value }}
+								{% endfor %}
+                    						</div>
+                    					{% endfor %}        					
+                    					</div>
+                    				</dd>
+                    				
+                    			{% endfor %}
+                    		{% endif %}	         		 
+                    	{% endfor %}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            </div>
+        </dl>
+    </div>
+</div>

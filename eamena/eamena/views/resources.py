@@ -196,35 +196,37 @@ def report(request, resourceid):
         VirtualGlobe = False
         OtherImagery = True
         information_resource_type = 'DOCUMENT'
-        related_resource['relationship'] = []
-        related_resource['datefrom'] = []
-        related_resource['dateto'] = []
-        related_resource['notes'] = []
-        related_resource['date'] = []
-        if related_resource['entitytypeid'] == 'HERITAGE_RESOURCE.E18':
-            for entity in related_resource['domains']:
-                if entity['entitytypeid'] == 'RESOURCE_TYPE_CLASSIFICATION.E55':
-                    related_resource['relationship'].append(get_preflabel_from_valueid(entity['value'], lang)['value'])
-        elif related_resource['entitytypeid'] == 'HERITAGE_RESOURCE_GROUP.E27':
-            for entity in related_resource['domains']:
+        related_res = {}
+        related_res['relationship'] = []
+        related_res['datefrom'] = []
+        related_res['dateto'] = []
+        related_res['notes'] = []
+        related_res['date'] = []
+        related_res['identifier'] = []
+        related_res['entitytypeid'] = related_resource['entitytypeid']
+        related_res['entityid'] = related_resource['entityid']
+        related_res['primaryname'] = related_resource['primaryname']
+        if related_resource['entitytypeid'] == 'HERITAGE_RESOURCE_GROUP.E27':
+            print JSONResponse(related_resource, indent=4)
+            for entity in related_resource['child_entities']:
                 if entity['entitytypeid'] == 'NAME.E41':
-                    related_resource['relationship'].append(get_preflabel_from_valueid(entity['value'], lang)['value'])
+                    related_res['identifier'].append(entity['value'])
         elif related_resource['entitytypeid'] == 'HERITAGE_FEATURE.E24':
             for entity in related_resource['domains']:
                 if entity['entitytypeid'] == 'INTERPRETATION_TYPE.I4':
-                    related_resource['relationship'].append(get_preflabel_from_valueid(entity['value'], lang)['value'])
+                    related_res['identifier'].append(get_preflabel_from_valueid(entity['value'], lang)['value'])
         elif related_resource['entitytypeid'] == 'HERITAGE_COMPONENT.B2':
             for entity in related_resource['domains']:
                 if entity['entitytypeid'] == 'COMPONENT_TYPE.E55':
-                    related_resource['relationship'].append(get_preflabel_from_valueid(entity['value'], lang)['value'])
+                    related_res['identifier'].append(get_preflabel_from_valueid(entity['value'], lang)['value'])
         elif related_resource['entitytypeid'] == 'ACTIVITY.E7':
             for entity in related_resource['domains']:
                 if entity['entitytypeid'] == 'ACTIVITY_TYPE.E55':
-                    related_resource['relationship'].append(get_preflabel_from_valueid(entity['value'], lang)['value'])
+                    related_res['relationship'].append(get_preflabel_from_valueid(entity['value'], lang)['value'])
         elif related_resource['entitytypeid'] == 'ACTOR.E39':
             for entity in related_resource['domains']:
                 if entity['entitytypeid'] == 'ACTOR_TYPE.E55':
-                    related_resource['relationship'].append(get_preflabel_from_conceptid(entity['conceptid'], lang)['value'])
+                    related_res['relationship'].append(get_preflabel_from_conceptid(entity['conceptid'], lang)['value'])
                     related_resource['actor_relationshiptype'] = ''
             for entity in related_resource['child_entities']:
                 if entity['entitytypeid'] == 'ACTOR_APPELLATION.E82':
@@ -232,20 +234,20 @@ def report(request, resourceid):
         elif related_resource['entitytypeid'] == 'HISTORICAL_EVENT.E5':
             for entity in related_resource['domains']:
                 if entity['entitytypeid'] == 'HISTORICAL_EVENT_TYPE.E55':
-                    related_resource['relationship'].append(get_preflabel_from_conceptid(entity['conceptid'], lang)['value'])
+                    related_res['relationship'].append(get_preflabel_from_conceptid(entity['conceptid'], lang)['value'])
         elif related_resource['entitytypeid'] == 'INFORMATION_RESOURCE.E73':
             for entity in related_resource['domains']:
                 if entity['entitytypeid'] == 'INFORMATION_RESOURCE_TYPE.E55':                            
-                    related_resource['relationship'].append(get_preflabel_from_valueid(entity['value'], lang)['value'])
+                    related_res['relationship'].append(get_preflabel_from_valueid(entity['value'], lang)['value'])
   
             for entity in related_resource['child_entities']:
                 if entity['entitytypeid'] == 'FILE_PATH.E62':
-                    related_resource['file_path'] = settings.MEDIA_URL + entity['label']
+                    related_res['file_path'] = settings.MEDIA_URL + entity['label']
                 if entity['entitytypeid'] == 'THUMBNAIL.E62':
-                    related_resource['thumbnail'] = settings.MEDIA_URL + entity['label']
+                    related_res['thumbnail'] = settings.MEDIA_URL + entity['label']
                     information_resource_type = 'IMAGE'
                 if entity['entitytypeid'] == 'TILE_SQUARE_DETAILS.E44' or entity['entitytypeid'] == 'TILE_SQUARE_APPELLATION.E44': #If this node is populated, the Info resource is assumed to be a Map and its default name is set to Sheet Name
-                    related_resource['primaryname'] = entity['label']
+                    related_res['primaryname'] = entity['label']
                     information_resource_type = 'MAP'                      
                 elif entity['entitytypeid'] == 'SHARED_DATA_SOURCE_APPELLATION.E82' or entity['entitytypeid'] == 'SHARED_DATA_SOURCE_AFFILIATION.E82' or entity['entitytypeid'] == 'SHARED_DATA_SOURCE_CREATOR_APPELLATION.E82': #If this node is populated, the Info resource is assumed to be a Shared Dataset and its default name is set to Shared Dated Source
                     SharedDataset.append(entity['label'])
@@ -259,11 +261,11 @@ def report(request, resourceid):
                     VirtualGlobeName.append(entity['label'])
                     information_resource_type = 'SATELLITE'
                 elif entity['entitytypeid'] == 'TITLE.E41':
-                    related_resource['primaryname'] = entity['value']
+                    related_res['primaryname'] = entity['value']
 
             for entity in related_resource['dates']:
                 if entity['entitytypeid'] == 'DATE_OF_ACQUISITION.E50':                 
-                    related_resource['date'] = validatedates(entity['label'])                                
+                    related_res['date'] = validatedates(entity['label'])                                
             if VirtualGlobe == True and OtherImagery == True: #This routine creates the concatenated primary name for a Virtual Globe related resource
                 for entity in related_resource['domains']:
                     if entity['entitytypeid'] == 'IMAGERY_SOURCE_TYPE.E55':
@@ -271,27 +273,26 @@ def report(request, resourceid):
                 for entity in related_resource['dates']:
                     if entity['entitytypeid'] == 'DATE_OF_ACQUISITION.E50':
                         VirtualGlobeName.append(entity['label'])
-                related_resource['primaryname'] = " - ".join(VirtualGlobeName)
+                related_res['primaryname'] = " - ".join(VirtualGlobeName)
             elif OtherImagery == False: #This routine creates the concatenated primary name for Imagery related resource
                 for entity in related_resource['dates']:
                     if entity['entitytypeid'] == 'DATE_OF_ACQUISITION.E50':
                         OtherImageryName.append(entity['label'])
-                related_resource['primaryname'] = " - ".join(OtherImageryName)
+                related_res['primaryname'] = " - ".join(OtherImageryName)
             if  information_resource_type == 'SHARED':  #This routine creates the concatenated primary name for a Shared dataset
-                related_resource['primaryname'] = " - ".join(SharedDataset)
+                related_res['primaryname'] = " - ".join(SharedDataset)
         # get the relationship between the two entities as well as the notes and dates, if the exist
         
         for relationship in related_resource_info['resource_relationships']:
             if relationship['entityid1'] == related_resource['entityid'] or relationship['entityid2'] == related_resource['entityid']: 
-                related_resource['relationship'].append(get_preflabel_from_valueid(relationship['relationshiptype'], lang)['value'])
-                if relationship['datestarted']: related_resource['datefrom'] = relationship['datestarted']
-                if relationship['dateended']: related_resource['dateto'] = relationship['dateended']
-                if relationship['notes']: related_resource['notes'] = relationship['notes']
+                related_res['relationship'].append(get_preflabel_from_valueid(relationship['relationshiptype'], lang)['value'])
+                if relationship['datestarted']: related_res['datefrom'] = relationship['datestarted']
+                if relationship['dateended']: related_res['dateto'] = relationship['dateended']
+                if relationship['notes']: related_res['notes'] = relationship['notes']
         entitytypeidkey = related_resource['entitytypeid'].split('.')[0]
         if entitytypeidkey == 'INFORMATION_RESOURCE':
             entitytypeidkey = '%s_%s' % (entitytypeidkey, information_resource_type)
-        related_resource_dict[entitytypeidkey].append(related_resource)
-
+        related_resource_dict[entitytypeidkey].append(related_res)
     return render_to_response('resource-report.htm', {
             'geometry': JSONSerializer().serialize(result),
 #             'geometry': JSONSerializer().serialize(report_info['source']['geometry']),

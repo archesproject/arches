@@ -1,0 +1,38 @@
+{% load i18n %}
+<div class="row">
+    <div class="col-xs-12">
+        <dl>
+            <dt>
+                <h5 id="" class="arches-report-subsection-title">{% trans "Recommendations to address damage(s)" %}</h5>
+            </dt>
+            <dd class="arches-report-subsection-item dataalert">{% trans "No recommendations recorded" %}</dd>
+            <div class = "content"> 
+             {% for CONDITION_ASSESSMENT_E14 in report_info.source.graph.CONDITION_ASSESSMENT_E14|dictsort:"orderby" %}
+                {% if 'DAMAGE_STATE_E3' in CONDITION_ASSESSMENT_E14 %}
+                    {% for DAMAGE_STATE_E3 in CONDITION_ASSESSMENT_E14.DAMAGE_STATE_E3 %}
+                        {% if 'RECOMMENDATION_PLAN_E100' in DAMAGE_STATE_E3 %}
+                            {% for RECOMMENDATION_PLAN_E100 in DAMAGE_STATE_E3.RECOMMENDATION_PLAN_E100 %}
+                                <dd class="arches-report-subsection-item"> 
+                                {% for RECOMMENDATION_TYPE_E55 in RECOMMENDATION_PLAN_E100.RECOMMENDATION_TYPE_E55 %}
+                                    {{ RECOMMENDATION_TYPE_E55.RECOMMENDATION_TYPE_E55__value }}  <span class="arches-report-subsection-item-type"> ( {% trans "Recommendation" %} )</span>
+                                {% endfor %}
+                                {% for INTERVENTION_ACTIVITY_TYPE_E55 in RECOMMENDATION_PLAN_E100.INTERVENTION_ACTIVITY_TYPE_E55 %}
+                                    {{ INTERVENTION_ACTIVITY_TYPE_E55.INTERVENTION_ACTIVITY_TYPE_E55__value }}  <span class="arches-report-subsection-item-type"> ( {% trans "Intervention" %} )</span>                                    
+                                {% endfor %}
+                                {% for PRIORITY_ASSIGNMENT_E13 in RECOMMENDATION_PLAN_E100.PRIORITY_ASSIGNMENT_E13 %}
+                                    {% for PRIORITY_TYPE_E55 in PRIORITY_ASSIGNMENT_E13.PRIORITY_TYPE_E55 %}
+                                        {{ PRIORITY_TYPE_E55.PRIORITY_TYPE_E55__value }}  <span class="arches-report-subsection-item-type"> ( {% trans "Priority" %} )</span>          
+                                    {% endfor %}
+                                {% endfor %}     
+                                </dd>
+                                <hr class="devider margin-top-10" style="margin-bottom: 5px;"></hr>      
+                            {% endfor %}
+                        {% endif %} 
+                    {% endfor %}
+                {% endif %}             
+            {% endfor %}  
+            </div>
+        </dl>
+
+    </div>
+</div>

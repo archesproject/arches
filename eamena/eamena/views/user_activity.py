@@ -22,13 +22,14 @@ from django.template import RequestContext
 from django.shortcuts import render_to_response
 from arches.app.models import models
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from arches.app.utils.JSONResponse import JSONResponse
 import json
 import logging
 from django.utils.translation import ugettext as _
 
-@permission_required('edit')
+@login_required
+@user_passes_test(lambda u: u.groups.filter(name='editplus').count() != 0, login_url='/auth/')
 def user_activity(request, userid):
     return render_to_response('user_activity.htm', {
             'userid': userid,

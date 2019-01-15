@@ -1,0 +1,87 @@
+{% load i18n %}
+<div class="row">
+     <div class="col-xs-12">
+        <dl>
+            <dt>
+                <h5 id="" class="arches-report-subsection-title">{% trans "Types of disturbances affecting the resource" %}</h5>
+            </dt>
+            <dd class="arches-report-subsection-item dataalert">{% trans "No disturbance assessment recorded" %}</dd>
+            <div class ="content">
+            {% if 'CONDITION_ASSESSMENT_E14'  in report_info.source.graph %}
+                {% for CONDITION_ASSESSMENT_E14 in report_info.source.graph.CONDITION_ASSESSMENT_E14|dictsort:"orderby" %}
+                    {% if 'DAMAGE_STATE_E3' in CONDITION_ASSESSMENT_E14 %}
+                        {% for DAMAGE_STATE_E3 in CONDITION_ASSESSMENT_E14.DAMAGE_STATE_E3 %}
+                            {% if 'DISTURBANCE_EVENT_E5' in DAMAGE_STATE_E3 %}
+                                {% for DISTURBANCE_EVENT_E5 in DAMAGE_STATE_E3.DISTURBANCE_EVENT_E5 %}
+                                    <dt class="arches-report-subsection-item">
+                                    {% if 'DISTURBANCE_CAUSE_CATEGORY_TYPE_E55' in DISTURBANCE_EVENT_E5 %}
+                                        {% for DISTURBANCE_CAUSE_CATEGORY_TYPE_E55 in DISTURBANCE_EVENT_E5.DISTURBANCE_CAUSE_CATEGORY_TYPE_E55 %}
+                                            <span class="arches-report-subsection-item-type"> {% trans "Category: " %} </span>{{ DISTURBANCE_CAUSE_CATEGORY_TYPE_E55.DISTURBANCE_CAUSE_CATEGORY_TYPE_E55__value }}
+                                        {% endfor %}
+                                    {% endif %}
+                                    {% if 'DISTURBANCE_CAUSE_ASSIGNMENT_E13' in  DISTURBANCE_EVENT_E5 %}
+                                        {% for DISTURBANCE_CAUSE_ASSIGNMENT_E13 in DISTURBANCE_EVENT_E5.DISTURBANCE_CAUSE_ASSIGNMENT_E13%}
+                                            {% for DISTURBANCE_CAUSE_BELIEF_I2 in DISTURBANCE_CAUSE_ASSIGNMENT_E13.DISTURBANCE_CAUSE_BELIEF_I2 %}
+                                                {% for DISTURBANCE_CAUSE_TYPE_I4 in DISTURBANCE_CAUSE_BELIEF_I2.DISTURBANCE_CAUSE_TYPE_I4 %}
+                                                    <span class="arches-report-subsection-item-type"> - {% trans "Cause: " %} </span>{{ DISTURBANCE_CAUSE_TYPE_I4.DISTURBANCE_CAUSE_TYPE_I4__value }}
+                                                {% endfor %}
+                                                
+                                                {% for DISTURBANCE_CAUSE_CERTAINTY_I6 in DISTURBANCE_CAUSE_BELIEF_I2.DISTURBANCE_CAUSE_CERTAINTY_I6 %}
+                                                    <span class="arches-report-subsection-item-type"> - {% trans "Cause certainty: " %} </span>{{ DISTURBANCE_CAUSE_CERTAINTY_I6.DISTURBANCE_CAUSE_CERTAINTY_I6__value }}                                                     
+                                                {% endfor %}
+                                            {% endfor %}
+                                        {% endfor %}
+                                    {% endif %}
+                                    {% if 'DISTURBANCE_EVENT_TIMESPAN_E52' in DISTURBANCE_EVENT_E5 %}
+                                        {% for DISTURBANCE_EVENT_TIMESPAN_E52 in  DISTURBANCE_EVENT_E5.DISTURBANCE_EVENT_TIMESPAN_E52 %}
+                                            {% if 'DISTURBANCE_DATE_FROM_E61' in DISTURBANCE_EVENT_TIMESPAN_E52 %}
+                                                {% for DISTURBANCE_DATE_FROM_E61 in DISTURBANCE_EVENT_TIMESPAN_E52.DISTURBANCE_DATE_FROM_E61 %}
+                                                    <span class="arches-report-subsection-item-type"> - {% trans "From: " %} </span>{{ DISTURBANCE_DATE_FROM_E61.DISTURBANCE_DATE_FROM_E61__value|cut:"T00:00:00" }}
+                                                {% endfor %}
+                                                
+                                                {% for DISTURBANCE_DATE_TO_E61 in DISTURBANCE_EVENT_TIMESPAN_E52.DISTURBANCE_DATE_TO_E61 %}
+                                                    <span class="arches-report-subsection-item-type"> - {% trans "To: " %} </span>{{ DISTURBANCE_DATE_TO_E61.DISTURBANCE_DATE_TO_E61__value|cut:"T00:00:00" }}
+                                                {% endfor %}                                                        
+                                            {% endif %}
+                                            {% if 'DISTURBANCE_DATE_OCCURRED_BEFORE_E61' in DISTURBANCE_EVENT_TIMESPAN_E52 %}
+                                                {% for DISTURBANCE_DATE_OCCURRED_BEFORE_E61 in DISTURBANCE_EVENT_TIMESPAN_E52.DISTURBANCE_DATE_OCCURRED_BEFORE_E61 %}
+                                                    <span class="arches-report-subsection-item-type"> - {% trans "Before: " %} </span>{{ DISTURBANCE_DATE_OCCURRED_BEFORE_E61.DISTURBANCE_DATE_OCCURRED_BEFORE_E61__value|cut:"T00:00:00" }}
+                                                {% endfor %}                                                              
+                                            {% endif %}
+                                            {% if 'DISTURBANCE_DATE_OCCURRED_ON_E61' in DISTURBANCE_EVENT_TIMESPAN_E52 %}
+                                                {% for DISTURBANCE_DATE_OCCURRED_ON_E61 in DISTURBANCE_EVENT_TIMESPAN_E52.DISTURBANCE_DATE_OCCURRED_ON_E61 %}
+                                                    <span class="arches-report-subsection-item-type"> - {% trans "On: " %} </span>{{ DISTURBANCE_DATE_OCCURRED_ON_E61.DISTURBANCE_DATE_OCCURRED_ON_E61__value|cut:"T00:00:00" }}
+                                                {% endfor %}    
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                    </dt>
+                                {% endfor %}
+                            {% endif %}
+                            {% if 'DAMAGE_OBSERVATION_S4' in DAMAGE_STATE_E3 %}
+                                {% for DAMAGE_OBSERVATION_S4 in DAMAGE_STATE_E3.DAMAGE_OBSERVATION_S4 %}
+                                    <dd class="arches-report-subsection-item">
+                                        <div class="row">
+                                            <div class="col-xs-6 text-right">
+                                            {% for EFFECT_TYPE_S9 in DAMAGE_OBSERVATION_S4.EFFECT_TYPE_S9 %} 
+                                                <span class="arches-report-subsection-item-type"> {% trans "Effect type: " %} </span>{{ EFFECT_TYPE_S9.EFFECT_TYPE_S9__value }} </br>
+                                            </div>
+                                            {% endfor %}
+                                {% endfor %}
+                                {% for DAMAGE_TREND_TYPE_E55 in DAMAGE_STATE_E3.DAMAGE_TREND_TYPE_E55 %}
+                                            <div class="col-xs-6 text-left">
+                                                <span class="arches-report-subsection-item-type"> {% trans "Effect trend: " %} </span>{{ DAMAGE_TREND_TYPE_E55.DAMAGE_TREND_TYPE_E55__value }} </br>
+                                            </div>
+                                        </div>        
+                                    </dd>
+                                    <hr class="devider margin-top-10" style="margin-bottom: 5px;"></hr>         
+                                {% endfor %}
+                            {% endif %}             
+                        {% endfor %}    
+                    {% endif %}
+                {% endfor %}    
+            {% endif %}
+            </div>
+        </dl>
+    </div>
+</div>

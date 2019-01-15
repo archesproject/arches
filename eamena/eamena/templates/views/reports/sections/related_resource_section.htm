@@ -62,6 +62,9 @@
                                                 <dd class="arches-report-subsection-item">
                                                     <a href={% if 'edit' in user.user_groups %}"{% url 'report' related_resource.entityid %}" class="" title="{% trans "View Report" %}"> {% else %} "#" > {% endif %}
                                                         {{related_resource.primaryname}}
+                                                        {% if related_resource.identifier|length > 0 %}
+                                                            ({% trans "Name(s): " %}{{related_resource.identifier|join:", "}})
+                                                        {% endif %}
                                                     </a>
                                                     <span class="arches-report-subsection-item-type">
                                                         {% if related_resource.relationship|length > 0 %}
@@ -139,6 +142,9 @@
                                                 <dd class="arches-report-subsection-item">
                                                     <a href={% if 'edit' in user.user_groups %}"{% url 'report' related_resource.entityid %}" class="" title="{% trans "View Report" %}"> {% else %} "#" > {% endif %}
                                                         {{related_resource.primaryname}}
+                                                        {% if related_resource.identifier|length > 0 %}
+                                                            ({% trans "Type(s): " %}{{related_resource.identifier|join:", "}})
+                                                        {% endif %}
                                                     </a>
                                                     <span class="arches-report-subsection-item-type">
                                                         {% if related_resource.relationship|length > 0 %}
@@ -216,6 +222,9 @@
                                                 <dd class="arches-report-subsection-item">
                                                     <a href={% if 'edit' in user.user_groups %}"{% url 'report' related_resource.entityid %}" class="" title="{% trans "View Report" %}"> {% else %} "#" > {% endif %}
                                                         {{related_resource.primaryname}}
+                                                        {% if related_resource.identifier|length > 0 %}
+                                                            ({% trans "Type(s): " %}{{related_resource.identifier|join:", "}})
+                                                        {% endif %}
                                                     </a>
                                                     <span class="arches-report-subsection-item-type">
                                                         {% if related_resource.relationship|length > 0 %}

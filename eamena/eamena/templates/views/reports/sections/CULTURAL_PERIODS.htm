@@ -5,30 +5,35 @@
             <dt>
                 <h5 id="" class="arches-report-subsection-title">{% trans "Cultural periods" %}</h5>
             </dt>
-    {% for FEATURE_COLLECTION_E24 in report_info.source.graph.FEATURE_COLLECTION_E24 %}
-        {% for PRODUCTION_E12 in FEATURE_COLLECTION_E24.PRODUCTION_E12 %}
-            {% if 'DATE_INFERENCE_MAKING_I5' in  PRODUCTION_E12 %} 
-                {% for DATE_INFERENCE_MAKING_I5 in PRODUCTION_E12.DATE_INFERENCE_MAKING_I5 %}
-                        {% if 'CULTURAL_PERIOD_BELIEF_I2'  in DATE_INFERENCE_MAKING_I5%}        
-                            {% for CULTURAL_PERIOD_BELIEF_I2 in DATE_INFERENCE_MAKING_I5.CULTURAL_PERIOD_BELIEF_I2 %}
-                                    <dd class="arches-report-subsection-item">
-                                         {{CULTURAL_PERIOD_BELIEF_I2.CULTURAL_PERIOD_TYPE_I4.CULTURAL_PERIOD_TYPE_I4__value}}<span class="arches-report-subsection-item-type"> ( {% trans "Period" %} )</span>
-                                         {% for CULTURAL_PERIOD_TYPE_I4 in CULTURAL_PERIOD_BELIEF_I2.CULTURAL_PERIOD_TYPE_I4 %}
-                                            {% if 'CULTURAL_PERIOD_DETAIL_TYPE_E55' in CULTURAL_PERIOD_TYPE_I4 %}
-                                                {% for CULTURAL_PERIOD_DETAIL_TYPE_E55 in CULTURAL_PERIOD_TYPE_I4.CULTURAL_PERIOD_DETAIL_TYPE_E55 %}
-                                                    {{ CULTURAL_PERIOD_DETAIL_TYPE_E55.CULTURAL_PERIOD_DETAIL_TYPE_E55__value }} <span class="arches-report-subsection-item-type"> ( {% trans "Period Detail" %} )</span>
-                                                {% endfor %}
-                                            {% endif %}
-                                        {% endfor %}
-                                      {{ CULTURAL_PERIOD_BELIEF_I2.CULTURAL_PERIOD_CERTAINTY_I6.CULTURAL_PERIOD_CERTAINTY_I6__value }} <span class="arches-report-subsection-item-type"> ( {% trans "Certainty" %} )</span>
-                                    </dd>
-                                    {% empty %}
-                            {% endfor %}            
-                        {% endif %}
-                {% endfor %}
-            {% endif %}
-        {% endfor %}  
-    {% endfor %}  
+            <dd class="arches-report-subsection-item dataalert">{% trans "No cultural period  recorded" %}</dd>
+            <div class ="content">
+            {% for FEATURE_COLLECTION_E24 in report_info.source.graph.FEATURE_COLLECTION_E24 %}
+                {% for PRODUCTION_E12 in FEATURE_COLLECTION_E24.PRODUCTION_E12 %}
+                    {% if 'DATE_INFERENCE_MAKING_I5' in  PRODUCTION_E12 %} 
+                        {% for DATE_INFERENCE_MAKING_I5 in PRODUCTION_E12.DATE_INFERENCE_MAKING_I5 %}
+                                {% if 'CULTURAL_PERIOD_BELIEF_I2'  in DATE_INFERENCE_MAKING_I5%}        
+                                    {% for CULTURAL_PERIOD_BELIEF_I2 in DATE_INFERENCE_MAKING_I5.CULTURAL_PERIOD_BELIEF_I2 %}
+                                            {% for CULTURAL_PERIOD_TYPE_I4 in CULTURAL_PERIOD_BELIEF_I2.CULTURAL_PERIOD_TYPE_I4 %}
+                                                <dd class="arches-report-subsection-item">
+                                                    
+                                                     {{CULTURAL_PERIOD_TYPE_I4.CULTURAL_PERIOD_TYPE_I4__value}}<span class="arches-report-subsection-item-type"> ( {% trans "Period" %} )</span> 
+                                                     
+                                                    {% if 'CULTURAL_PERIOD_DETAIL_TYPE_E55__value' in CULTURAL_PERIOD_TYPE_I4 %}     
+                                                            {{ CULTURAL_PERIOD_TYPE_I4.CULTURAL_PERIOD_DETAIL_TYPE_E55__value }} <span class="arches-report-subsection-item-type"> ( {% trans "Period Detail" %} )</span>
+                                                    {% endif %}
+                                                {% empty %}
+                                            {% endfor %}
+                                            {% for CULTURAL_PERIOD_CERTAINTY_I6 in CULTURAL_PERIOD_BELIEF_I2.CULTURAL_PERIOD_CERTAINTY_I6 %}
+                                                {{ CULTURAL_PERIOD_CERTAINTY_I6.CULTURAL_PERIOD_CERTAINTY_I6__value }} <span class="arches-report-subsection-item-type"> ( {% trans "Certainty" %} )</span>
+                                                </dd>
+                                            {% endfor %}
+                                    {% endfor %}            
+                                {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}  
+            {% endfor %}
+            </div>  
         </dl>
 
     </div>

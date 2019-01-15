@@ -28,7 +28,7 @@ define([
         layer: new ol.layer.Tile({
             visible: false,
             source: new ol.source.XYZ({
-                url: 'http://mt0.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}&s=Ga'
+                url: 'https://mt0.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}&s=Ga'
             })
         })
     });

@@ -1,0 +1,25 @@
+{% load i18n %}
+<div class="row">
+     <div class="col-xs-12">
+        <dl>
+            <dt>
+                <h5 id="" class="arches-report-subsection-title">{% trans "Feature(s) Classification(s)" %}</h5>
+            </dt>
+                <dd class="arches-report-subsection-item dataalert">
+                        {% trans "No Feature Classification recorded" %}
+                </dd>
+            <div class = "content">
+            {% for HERITAGE_FEATURE_CLASSIFICATION_ASSIGNMENT_E17 in report_info.source.graph.HERITAGE_FEATURE_CLASSIFICATION_ASSIGNMENT_E17 %}
+                {% if 'HERITAGE_CLASSIFICATION_TYPE_E55' in HERITAGE_FEATURE_CLASSIFICATION_ASSIGNMENT_E17 %}
+
+                    {% for HERITAGE_CLASSIFICATION_TYPE_E55 in HERITAGE_FEATURE_CLASSIFICATION_ASSIGNMENT_E17.HERITAGE_CLASSIFICATION_TYPE_E55 %}
+                        <dd class="arches-report-subsection-item">
+                            {{ HERITAGE_CLASSIFICATION_TYPE_E55.HERITAGE_CLASSIFICATION_TYPE_E55__value }}
+                        </dd>
+                    {% endfor %}            
+                {% endif %}
+            {% endfor %}
+            </div>
+        </dl>
+    </div>
+</div>

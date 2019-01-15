@@ -67,21 +67,23 @@
                         <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "No Descriptions Defined" %}</div>   
                         
                         <div data-bind='foreach: getBranchLists()'>
-                            {% if resourcetypeid != 'INFORMATION_RESOURCE.E73' %}
+                            
                             <dl class="margin-bottom-0"> 
                             
                                 <dd>
                                     <div class="">
                                         <a href="#" title="{% trans "Remove this description" %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                        {% if resourcetypeid != 'INFORMATION_RESOURCE.E73' %}
                                         <a href="#" class="arches-CRUD-child arches-CRUD-edit" title="{% trans "Edit this description" %}" data-bind='text: nodes.get("DESCRIPTION_TYPE.E55", "label"), click: $parent.editItem.bind($parent)'></a>
+                                        {% endif %}
                                     </div>
                                 </dd>
                             </dl>
-                            {% endif %}
+                            
                             <dl> 
-
+                            
                                 <dd>
-                                    <div class="note-editable custom-scroll arches-evaluation-content" contenteditable="true" data-bind='{html: nodes.get("DESCRIPTION.E62", "value")}'></div>
+                                    <div class="note-editable custom-scroll arches-evaluation-content" contenteditable="true" data-bind='{html: nodes.get("DESCRIPTION.E62", "value"), click: $parent.editItem.bind($parent)}'></div>
                                 </dd>
                             </dl>
 

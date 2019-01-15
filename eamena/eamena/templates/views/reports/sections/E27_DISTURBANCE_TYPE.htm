@@ -5,7 +5,8 @@
             <dt>
                 <h5 id="" class="arches-report-subsection-title">{% trans "Types of disturbances affecting the resource" %}</h5>
             </dt>
-
+            <dd class="arches-report-subsection-item dataalert">{% trans "No disturbance assessment recorded" %}</dd>
+            <div class ="content">
             {% if 'CONDITION_ASSESSMENT_E14'  in report_info.source.graph %}
                 {% for CONDITION_ASSESSMENT_E14 in report_info.source.graph.CONDITION_ASSESSMENT_E14|dictsort:"orderby" %}
                     {% if 'CONDITION_STATE_E3' in CONDITION_ASSESSMENT_E14 %}
@@ -18,7 +19,7 @@
                                             {% if 'DISTURBANCE_CAUSE_CATEGORY_TYPE_E55' in DISTURBANCE_EVENT_E5 %}
                                                 {% for DISTURBANCE_CAUSE_CATEGORY_TYPE_E55 in DISTURBANCE_EVENT_E5.DISTURBANCE_CAUSE_CATEGORY_TYPE_E55 %}
                                                             
-                                                    <span class="arches-report-subsection-item-type"> - {% trans "Category: " %} </span>{{ DISTURBANCE_CAUSE_CATEGORY_TYPE_E55.DISTURBANCE_CAUSE_CATEGORY_TYPE_E55__value }}
+                                                    <span class="arches-report-subsection-item-type"> {% trans "Category: " %} </span>{{ DISTURBANCE_CAUSE_CATEGORY_TYPE_E55.DISTURBANCE_CAUSE_CATEGORY_TYPE_E55__value }}
                                                 {% endfor %}
                                             {% endif %}
                                             {% if 'DISTURBANCE_CAUSE_ASSIGNMENT_E13' in  DISTURBANCE_EVENT_E5 %}
@@ -62,24 +63,36 @@
                                     {% endif %}
                                     {% if 'DAMAGE_OBSERVATION_S4' in DAMAGE_STATE_E3 %}
                                         {% for DAMAGE_OBSERVATION_S4 in DAMAGE_STATE_E3.DAMAGE_OBSERVATION_S4 %}
-                                            <dd class="arches-report-subsection-item"><span class="arches-report-subsection-item-type"> - {% trans "Effects: " %} </span>
+                                            <dd class="arches-report-subsection-item">
                                             {% for DAMAGE_EFFECT_BELIEF_I2 in DAMAGE_OBSERVATION_S4.DAMAGE_EFFECT_BELIEF_I2 %}
-                                                {% for EFFECT_TYPE_I4 in DAMAGE_EFFECT_BELIEF_I2.EFFECT_TYPE_I4 %}
-                                                    {{ EFFECT_TYPE_I4.EFFECT_TYPE_I4__value }}     
-                                                {% endfor %}
+                                                <div class="row">
+                                                    <div class="col-xs-6 text-right">
+                                                    {% for EFFECT_TYPE_I4 in DAMAGE_EFFECT_BELIEF_I2.EFFECT_TYPE_I4 %}
+                                                        
+                                                            
+                                                            <span class="arches-report-subsection-item-type"> {% trans "Effect type: " %} </span>{{ EFFECT_TYPE_I4.EFFECT_TYPE_I4__value }} </br>
+                                                    {% endfor %}
+                                                    </div>
+                                                
+                                                    <div class="col-xs-6">
+                                                    {% for EFFECT_CERTAINTY_I6 in DAMAGE_EFFECT_BELIEF_I2.EFFECT_CERTAINTY_I6 %}
+                                                        
+                                                            <span class="arches-report-subsection-item-type"> {% trans "Effect certainty: " %} </span>{{ EFFECT_CERTAINTY_I6.EFFECT_CERTAINTY_I6__value }}</br>
+                                                    {% endfor %}
+                                                    </div>
+                                                </div> 
                                             {% endfor %}
                                             </dd>
                                         {% endfor %}
-                                    {% endif %}                       
+                                    {% endif %} 
+                                    <hr class="devider margin-top-10" style="margin-bottom: 5px;"></hr>                      
                                 {% endfor %}    
-                            {% else %}
-                                 <dt class="arches-report-subsection-item">{% trans "No disturbance assessment recorded" %}</dt>
                             {% endif %}
                         {% endfor %}    
                     {% endif %}
                 {% endfor %}    
             {% endif %}
-
+            </div>
         </dl>
     </div>
 </div>

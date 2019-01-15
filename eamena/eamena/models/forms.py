@@ -60,6 +60,19 @@ def add_actor( observed_field, actor_field, data, user):
         
     return data
 
+def handle_relationship_object(object):
+    """helper method to properly serialize relationship objects to prepare them
+    for elasticsearch indexing."""
+
+    mdict = model_to_dict(object)
+    ret = {}
+    for k, v in mdict.iteritems():
+        if isinstance(v, uuid.UUID):
+            v = str(v)
+        ret[k] = v
+
+    return ret
+
 def datetime_nodes_to_dates(branch_list):
     for branch in branch_list:
         for node in branch['nodes']:
@@ -657,7 +670,8 @@ class ManMadeForm(ResourceForm):
             except:
                 continue
         relationship = self.resource.create_resource_relationship(resource.entityid, relationship_type_id=relation_id)
-        se.index_data(index='resource_relations', doc_type='all', body=model_to_dict(relationship), idfield='resourcexid')
+        relationship_doc = handle_relationship_object(relationship)
+        se.index_data(index='resource_relations', doc_type='all', body=relationship_doc, idfield='resourcexid')
 
         return
 
@@ -682,9 +696,11 @@ class ManMadeForm(ResourceForm):
     def load(self, lang):        
         data = []
         for relatedentity in self.resource.get_related_resources(entitytypeid='HERITAGE_FEATURE.E24'):
+            descriptivename = relatedentity['related_entity'].get_descriptive_name()
             nodes = relatedentity['related_entity'].flatten()
             data.append({
-                'nodes': nodes, 
+                'descriptivename':descriptivename,
+                'nodes': nodes,
                 'relationship': relatedentity['relationship'], 
                 'relatedresourcename':relatedentity['related_entity'].get_primary_name(),
                 'relatedresourceidlink': '/resources/HERITAGE_FEATURE.E24/default/' + relatedentity['related_entity'].entityid,
@@ -775,7 +791,8 @@ class ManMadeComponentForm(ResourceForm):
             except:
                 continue
         relationship = self.resource.create_resource_relationship(resource.entityid, relationship_type_id=relation_id)
-        se.index_data(index='resource_relations', doc_type='all', body=model_to_dict(relationship), idfield='resourcexid')
+        relationship_doc = handle_relationship_object(relationship)
+        se.index_data(index='resource_relations', doc_type='all', body=relationship_doc, idfield='resourcexid')
 
         return
 
@@ -869,6 +886,8 @@ class FeatureConditionAssessmentForm(ResourceForm):
         
         ## step 3
         self.update_nodes('OVERALL_CONDITION_TYPE.E55',data)
+        self.update_nodes('NEXT_ASSESSMENT_DATE_TYPE.E55',data)
+        self.update_nodes('CONDITION_REMARKS_ASSIGNMENT.E13',data)
 
     def load(self, lang):
         if self.resource:
@@ -1621,7 +1640,7 @@ class SharedDataForm(ResourceForm):
     @staticmethod
     def get_info():
         return {
-            'id': 'SharedData',
+            'id': 'shareddata',
             'icon': 'fa-flash',
             'name': _('Shared Data'),
             'class': SharedDataForm

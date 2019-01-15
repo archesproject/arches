@@ -14,10 +14,17 @@ TEMPLATE_DIRS = (os.path.join(PACKAGE_ROOT, 'templates'),os.path.join(PACKAGE_RO
 LOCALE_PATHS = (os.path.join(PACKAGE_ROOT, '../locale'),)
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
-# MEDIA_ROOT =  os.path.join(PACKAGE_ROOT, 'uploadedfiles')
+MEDIA_ROOT =  os.path.join(PACKAGE_ROOT, 'uploadedfiles')
+MEDIA_URL = "/files/"
 
 # Absolute filesystem path to the directory holds bulk upload data
 BULK_UPLOAD_DIR =  os.path.join(PACKAGE_ROOT, 'bulk_upload')
+BULK_UPLOAD_LOG_FILE = os.path.join(PACKAGE_ROOT, 'logs', 'bulk_upload_log.txt')
+
+try:
+    from settings_local import GDAL_LIBRARY_PATH
+except ImportError:
+    pass
 
 ugettext = lambda s: s
 LANGUAGES = (
@@ -30,7 +37,8 @@ USE_L10N = True
 
 RESOURCE_MODEL = {'default': 'eamena.models.resource.Resource'}
 
-
+MAP_MAX_UNLOGGED_ZOOM = 10 # This is the max level of zoom for anonymous users
+REPORT_MIN_UNLOGGED_ZOOM = 16
 
 EAMENA_RESOURCES = ['HERITAGE_RESOURCE_GROUP.E27'] #Specify which resource types should take on the identifier EAMENA-. All other resource types will take on an identifier beginning with their truncated EntityType, e.g. ACTOR for ACTOR.E39, INFORMATION for INFORMATION_RESOURCE.E73
 ID_LENGTH = 7 #Indicates the length of the Unique Resource IDs after the set tag, e.g. 7 -> EAMENA-0000001. MUST BE GIVEN, AND BE 2 OR OVER.
@@ -193,6 +201,8 @@ ACTOR_NODES = [
 
 APP_NAME = 'eamena'
 
+DATE_PARSING_FORMAT = ['%B %d, %Y', '%Y-%m-%d', '%Y-%m-%d %H:%M:%S']
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -240,6 +250,7 @@ SEARCH_GROUP_ROOTS= [
 
 EXPORT_CONFIG = os.path.normpath(os.path.join(PACKAGE_ROOT, 'source_data', 'business_data', 'resource_export_mappings.json'))
 
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -275,4 +286,4 @@ except ImportError:
 
 
 #Radius in metres to be used to calculate the existence of pre-existing resources in the database. If, upon resource creation, other pre-existing resources fall within this radius, an alert is returned before save.
-METER_RADIUS = 1000
+METER_RADIUS = 50
