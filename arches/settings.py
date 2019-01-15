@@ -137,7 +137,7 @@ RESOURCE_EDITOR_GROUPS = (
 # EMAIL_HOST_USER = 'xxxx@xxx.com'
 # EMAIL_HOST_PASSWORD = 'xxxxxxx'
 # EMAIL_PORT = 587
-PRTEST = ''
+
 POSTGIS_VERSION = (2, 0, 0)
 
 # If you set this to False, Django will make some optimizations so as not
