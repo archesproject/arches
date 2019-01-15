@@ -71,9 +71,6 @@ class MobileSurvey(models.MobileSurveyModel):
     def save(self):
         super(MobileSurvey, self).save()
         db = self.couch.create_db('project_' + str(self.id))
-        survey = self.serialize_for_couch()
-        survey['type'] = 'metadata'
-        self.couch.update_doc(db, survey, 'metadata')
         self.load_data_into_couch()
         return db
 
@@ -137,7 +134,7 @@ class MobileSurvey(models.MobileSurveyModel):
 
         return graph_obj
 
-    def serialize_for_couch(self):
+    def serialize_for_mobile(self):
         """
         serialize to a different form than used by the internal class structure
         used to append additional values (like parent ontology properties) that
@@ -147,8 +144,7 @@ class MobileSurvey(models.MobileSurveyModel):
         serializer.geom_format = 'geojson'
         obj = serializer.handle_model(self)
         ordered_cards = self.get_ordered_cards()
-        enddate = datetime.strftime(self.enddate, '%Y-%m-%d')
-        expired = (datetime.strptime(enddate, '%Y-%m-%d') - datetime.now() + timedelta(hours=24)).days < 0
+        expired = (datetime.strptime(str(self.enddate), '%Y-%m-%d') - datetime.now() + timedelta(hours=24)).days < 0
         ret = JSONSerializer().serializeToPython(obj)
         if expired:
             self.active = False
@@ -363,21 +359,13 @@ class MobileSurvey(models.MobileSurveyModel):
                 instances = {hit['_source']['resourceinstanceid']: hit['_source'] for hit in search_res['results']['hits']['hits']}
                 # if we didn't get our limit of resource instances using a spatial filter
                 # let's try to get resource instances that don't have spatial data
-                if len(instances.keys()) < self.datadownloadconfig['count']:
+                if len(instances.keys()) < int(self.datadownloadconfig['count']):
                     request.GET['mapFilter'] = '{}'
-                    request.GET['resourcecount'] = self.datadownloadconfig['count'] - len(instances.keys())
-                    geometric_datatypes = list(models.DDataType.objects.filter(isgeometric=True).values_list('datatype', flat=True))
-                    nonspatial_resources = []
-                    for resourceid in self.datadownloadconfig['resources']:
-                        exists = models.Node.objects.filter(datatype__in=geometric_datatypes, graph_id=resourceid).exists()
-                        if not exists:
-                            nonspatial_resources.append(resourceid)
-                    if len(nonspatial_resources) > 0:
-                        request.GET['typeFilter'] = json.dumps([{'graphid': resourceid, 'inverted': False} for resourceid in nonspatial_resources])
-                        search_res_json = search.search_results(request)
-                        search_res = JSONDeserializer().deserialize(search_res_json.content)
-                        for hit in search_res['results']['hits']['hits']:
-                            instances[hit['_source']['resourceinstanceid']] = hit['_source']
+                    request.GET['resourcecount'] = int(self.datadownloadconfig['count']) - len(instances.keys())
+                    search_res_json = search.search_results(request)
+                    search_res = JSONDeserializer().deserialize(search_res_json.content)
+                    for hit in search_res['results']['hits']['hits']:
+                        instances[hit['_source']['resourceinstanceid']] = hit['_source']
             except KeyError:
                 print 'no instances found in', search_res
         return instances
