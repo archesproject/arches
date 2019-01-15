@@ -167,6 +167,15 @@ class Command(BaseCommand):
                 for msg in ret:
                    result['errors'].append(msg)
 
+            ## now iterate the normal way to find empty cells
+            for n,row in enumerate(list(sheet.rows)):
+                if n+1 == num_rows:
+                    break
+                for cell in row:
+                    if cell.value.rstrip() == "":
+                        result['errors'].append("Blank value in:"\
+                            " {} row {}".format(sheet_name,n+1))
+
         if (rows_count/sheet_count).is_integer() is not True:
             result['errors'].append("Inconsistent number of rows across "\
             "workbook sheets.")
