@@ -37,6 +37,7 @@ from django.shortcuts import render, redirect
 import django.contrib.auth.password_validation as validation
 from arches.app.utils.response import JSONResponse, Http401Response
 from arches.app.utils.forms import ArchesUserCreationForm
+from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils.arches_crypto import AESCipher
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -243,6 +244,8 @@ class GetClientIdView(View):
             response = HttpResponse('Make sure to set your MOBILE_OAUTH_CLIENT_ID in settings.py', status=500)
         else:
             if user:
+                if hasattr(user, 'userprofile') is not True:
+                    models.UserProfile.objects.create(user=user)
                 is_reviewer = user.userprofile.is_reviewer()
                 user = JSONSerializer().serializeToPython(user)
                 user['password'] = None
