@@ -303,12 +303,14 @@ class MobileSurveyDesignerView(MapBaseManagerView):
         for card_id in cards_to_remove:
             models.MobileSurveyXCard.objects.filter(card=models.CardModel.objects.get(cardid=card_id), mobile_survey=mobile_survey).delete()
 
-        if mobile_survey.active != data['active']:
+        # TODO Disabling the following section until we make emailing users optional
+        # if mobile_survey.active != data['active']:
             # notify users in the mobile_survey that the state of the mobile_survey has changed
-            if data['active']:
-                self.notify_mobile_survey_start(request, mobile_survey)
-            else:
-                self.notify_mobile_survey_end(request, mobile_survey)
+            # if data['active']:
+            #     self.notify_mobile_survey_start(request, mobile_survey)
+            # else:
+            #     self.notify_mobile_survey_end(request, mobile_survey)
+
         mobile_survey.name = data['name']
         mobile_survey.description = data['description']
         mobile_survey.onlinebasemaps = data['onlinebasemaps']
