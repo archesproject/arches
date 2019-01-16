@@ -39,6 +39,9 @@ define([
         _.each(this.configKeys, function(key) {
             self[key] = self.config[key];
         });
+        this.showChildCards = ko.computed(function() {
+            return this.card.widgets().length === 0;
+        }, this);
         this.getValuesByDatatype = function(type) {
             var values = {};
             if (self.tile && self.form) {
@@ -57,12 +60,12 @@ define([
         };
         this.tiles = ko.computed(function() {
             var tiles = [];
-            if (self.state === 'report') {
+            if (self.tile) {
+                return getTiles(self.tile);
+            } else {
                 self.card.tiles().forEach(function(tile) {
                     getTiles(tile, tiles);
                 });
-            } else if (self.tile) {
-                return getTiles(self.tile);
             }
             return tiles;
         }, this);
