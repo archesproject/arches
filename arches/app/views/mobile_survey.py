@@ -305,10 +305,13 @@ class MobileSurveyDesignerView(MapBaseManagerView):
 
         if mobile_survey.active != data['active']:
             # notify users in the mobile_survey that the state of the mobile_survey has changed
-            if data['active']:
-                self.notify_mobile_survey_start(request, mobile_survey)
-            else:
-                self.notify_mobile_survey_end(request, mobile_survey)
+
+            # TODO Disabling the following section until we make emailing users optional
+            # if data['active']:
+            #     self.notify_mobile_survey_start(request, mobile_survey)
+            # else:
+            #     self.notify_mobile_survey_end(request, mobile_survey)
+
         mobile_survey.name = data['name']
         mobile_survey.description = data['description']
         mobile_survey.onlinebasemaps = data['onlinebasemaps']
