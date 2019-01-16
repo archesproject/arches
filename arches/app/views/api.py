@@ -55,7 +55,7 @@ def userCanAccessMobileSurvey(request, surveyid=None):
     return allowed
 
 
-class CouchdbProxy(ProtectedResourceView, ProxyView):
+class CouchdbProxy(ProxyView):
     upstream = settings.COUCHDB_URL
 
     # def dispatch(self, request, path):
