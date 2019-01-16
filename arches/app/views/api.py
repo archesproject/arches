@@ -113,6 +113,8 @@ class Sync(ProtectedResourceView, APIBase):
 class Surveys(APIBase):
 
     def get(self, request):
+        if hasattr(request.user, 'userprofile') is not True:
+            models.UserProfile.objects.create(user=request.user)
         permitted_cards = request.user.userprofile.permitted_cards
         group_ids = list(request.user.groups.values_list('id', flat=True))
         projects = MobileSurvey.objects.filter(Q(users__in=[request.user]) | Q(groups__in=group_ids), active=True).distinct()
