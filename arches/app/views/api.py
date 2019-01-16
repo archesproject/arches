@@ -55,20 +55,20 @@ def userCanAccessMobileSurvey(request, surveyid=None):
     return allowed
 
 
-class CouchdbProxy(ProtectedResourceView, ProxyView):
+class CouchdbProxy(ProxyView):
     upstream = settings.COUCHDB_URL
 
-    def dispatch(self, request, path):
-        if path is None or path == '':
-            return super(CouchdbProxy, self).dispatch(request, path)
-        else:
-            try:
-                if userCanAccessMobileSurvey(request, path.replace('project_', '')[:36]):
-                    return super(CouchdbProxy, self).dispatch(request, path)
-                else:
-                    return JSONResponse('Sync Failed', status=403)
-            except:
-                return JSONResponse('Sync failed', status=500)
+    # def dispatch(self, request, path):
+    #     if path is None or path == '':
+    #         return super(CouchdbProxy, self).dispatch(request, path)
+    #     else:
+    #         try:
+    #             if True: # userCanAccessMobileSurvey(request, path.replace('project_', '')[:36]):
+    #                 return super(CouchdbProxy, self).dispatch(request, path)
+    #             else:
+    #                 return JSONResponse('Sync Failed', status=403)
+    #         except:
+    #             return JSONResponse('Sync failed', status=500)
 
 
 class APIBase(View):
