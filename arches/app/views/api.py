@@ -113,10 +113,20 @@ class Sync(ProtectedResourceView, APIBase):
 class Surveys(APIBase):
 
     def get(self, request):
+        if hasattr(request.user, 'userprofile') is not True:
+            models.UserProfile.objects.create(user=request.user)
+        permitted_cards = request.user.userprofile.permitted_cards
         group_ids = list(request.user.groups.values_list('id', flat=True))
-        project_models = MobileSurvey.objects.filter(Q(users__in=[request.user]) | Q(groups__in=group_ids), active=True).distinct()
-        projects = [project.serialize_for_couch() for project in project_models]
-        projects_for_couch = [project for project in projects if project['active'] is True] # Filter projects deactivated during serialization
+        projects = MobileSurvey.objects.filter(Q(users__in=[request.user]) | Q(groups__in=group_ids), active=True).distinct()
+        projects_for_couch = [project.serialize_for_mobile() for project in projects]
+        for project in projects_for_couch:
+            project['cards'] = list(permitted_cards.intersection(set(project['cards'])))
+            for graph in project['graphs']:
+                cards = []
+                for card in graph['cards']:
+                    if card['cardid'] in permitted_cards:
+                        cards.append(card)
+                graph['cards'] = cards
         response = JSONResponse(projects_for_couch, indent=4)
         return response
 
