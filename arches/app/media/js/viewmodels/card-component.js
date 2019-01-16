@@ -5,6 +5,16 @@ define([
 ], function(ko, _) {
     return function(params) {
         var self = this;
+        var getTiles = function(tile, tiles) {
+            tiles = tiles || [tile];
+            tile.cards.forEach(function(card) {
+                card.tiles().forEach(function(tile) {
+                    tiles.push(tile);
+                    getTiles(tile, tiles);
+                });
+            });
+            return tiles;
+        };
         this.configKeys = params.configKeys || [];
         this.state = params.state || 'form';
         this.preview = params.preview;
@@ -45,5 +55,16 @@ define([
             }
             return values;
         };
+        this.tiles = ko.computed(function() {
+            var tiles = [];
+            if (self.state === 'report') {
+                self.card.tiles().forEach(function(tile) {
+                    getTiles(tile, tiles);
+                });
+            } else if (self.tile) {
+                return getTiles(self.tile);
+            }
+            return tiles;
+        }, this);
     };
 });

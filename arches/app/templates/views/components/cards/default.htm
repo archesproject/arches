@@ -382,6 +382,7 @@
             <!-- ko if: reportExpanded() -->
             <!-- ko foreach: { data: self.preview ? [card.newTile] : card.tiles, as: 'tile' } -->
                 <div class="rp-card-section" data-bind="css: {'provisional': tile.provisionaledits() !== null && tile.userisreviewer === false, 'fullyprovisional': tile.isfullyprovisional()}">
+                    {% block report_widgets %}
                     <!-- ko if: card.model.get('widgets')().length > 0 -->
                         <div class="rp-report-tile" data-bind="attr: { id: tile.tileid }">
                             <!-- ko if: tile.provisionaledits() !== null && tile.userisreviewer === false -->
@@ -404,8 +405,10 @@
                                 <!-- /ko -->
                             </dl>
                         </div>
-                        <!-- /ko -->
+                    <!-- /ko -->
+                    {% endblock report_widgets %}
 
+                    {% block report_cards %}
                     <div class="rp-report-container-tile" data-bind="visible: card.cards().length > 0">
                         <!-- ko foreach: { data: self.preview ? card.cards : tile.cards, as: 'card' } -->
                                 <!-- ko component: {
@@ -418,6 +421,7 @@
                                 } --> <!-- /ko -->
                         <!-- /ko -->
                     </div>
+                    {% endblock report_cards %}
                 </div>
             <!-- /ko -->
             <!-- /ko -->
