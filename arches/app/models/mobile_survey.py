@@ -258,7 +258,7 @@ class MobileSurvey(models.MobileSurveyModel):
             for row in couch_docs:
                 ret.append(row)
                 if row.doc['type'] == 'tile':
-                    if 'provisionaledits' in row.doc and row.doc['provisionaledits'] not in [None, '']:
+                    if 'provisionaledits' in row.doc and row.doc['provisionaledits'] is not None:
                         try:
                             tile = Tile.objects.get(tileid=row.doc['tileid'])
                             if row.doc['provisionaledits'] != '':
@@ -306,17 +306,18 @@ class MobileSurvey(models.MobileSurveyModel):
                                     self.handle_reviewer_edits(user_edits[0], tile)
 
                         # If user is reviewer, apply as authoritative edit
-                        for user_edits in tile.provisionaledits.items():
-                            if user_edits[0] not in user_lookup:
-                                user = User.objects.get(pk=user_edits[0])
-                                user_lookup[user_edits[0]] = user.groups.filter(name='Resource Reviewer').exists()
+                        if tile.provisionaledits != '':
+                            for user_edits in tile.provisionaledits.items():
+                                if user_edits[0] not in user_lookup:
+                                    user = User.objects.get(pk=user_edits[0])
+                                    user_lookup[user_edits[0]] = user.groups.filter(name='Resource Reviewer').exists()
 
-                        for user_id, is_reviewer in user_lookup.items():
-                            if is_reviewer:
-                                try:
-                                    tile.data = tile.provisionaledits.pop(user_id)['value']
-                                except KeyError:
-                                    pass
+                            for user_id, is_reviewer in user_lookup.items():
+                                if is_reviewer:
+                                    try:
+                                        tile.data = tile.provisionaledits.pop(user_id)['value']
+                                    except KeyError:
+                                        pass
 
                         tile.save()
                         tile_serialized = json.loads(JSONSerializer().serialize(tile))
