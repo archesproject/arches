@@ -1,7 +1,9 @@
 import os
+import sys
 import json
 import uuid
 import re
+import traceback
 from django.shortcuts import render
 from django.views.generic import View
 from django.views.decorators.csrf import csrf_exempt
@@ -121,8 +123,12 @@ class Sync(APIBase):
             else:
                 return JSONResponse('Sync Failed', status=403)
         except Exception as e:
-            print('Sync error: {0}'.format(e))
-            ret = 'Sync failed'
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            formatted = traceback.format_exception(exc_type, exc_value, exc_traceback)
+            if len(formatted):
+                for message in formatted:
+                    print message
+            ret = {'Syncfailed': {'stacktrace': formatted}}
 
         return JSONResponse(ret, status=500)
 
