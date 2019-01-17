@@ -120,7 +120,8 @@ class Sync(APIBase):
                 return JSONResponse(ret)
             else:
                 return JSONResponse('Sync Failed', status=403)
-        except:
+        except Exception as e:
+            print('Sync error: {0}'.format(e))
             ret = 'Sync failed'
 
         return JSONResponse(ret, status=500)
