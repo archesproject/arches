@@ -200,6 +200,7 @@ class ConceptDataType(BaseConceptDataType):
         label, lang = get_value_from_jsonld(label_node)
 
         if label:
+            print("Got label: '{0}'".format(label))
             # Could be:
             #  - Blank node E55_Type with a label - a Keyword
             #  - Concept ID URI, with a label - a conventional Concept
@@ -222,6 +223,7 @@ class ConceptDataType(BaseConceptDataType):
                     print("No Concept ID URI supplied for rdf")
 
         if concept_id and label is None:
+            print("Using just the concept_id: '{0}'".format(concept_id))
             # got a concept URI but the label is nonexistant
             # or cannot be resolved in Arches
             value = get_preflabel_from_conceptid(concept_id, lang=lang)

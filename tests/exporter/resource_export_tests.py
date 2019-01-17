@@ -319,6 +319,57 @@ class RDFExportTests(ArchesTestCase):
         resp = dt.from_rdf(jf)
         self.assertTrue(resp == "4beb7055-8a6e-45a3-9bfb-32984b6f82e0")
 
+    def test_jsonld_concept_match(self):
+        dt = self.DT.get_instance("concept")
+        # from the thesaurus that should be loaded into Arches,
+        # the following concept value should have a key of 4beb7055-8a6e-45a3-9bfb-32984b6f82e0
+        jf = [
+              {
+                "http://www.cidoc-crm.org/cidoc-crm/P2_has_type": [
+                  {
+                    "@id": "http://localhost:8000/concepts/86be632e-0dad-4d88-b5da-3d65875d6239",
+                    "http://www.w3.org/2000/01/rdf-schema#label": [
+                      {
+                        "@value": "Painting"
+                      }
+                    ],
+                    "@type": [
+                      "http://www.cidoc-crm.org/cidoc-crm/E55_Type"
+                    ]
+                  }
+                ],
+                "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": [
+                  {
+                    "@value": "String 2"
+                  }
+                ],
+                "http://www.cidoc-crm.org/cidoc-crm/P57_has_number_of_parts": [
+                  {
+                    "@value": 10
+                  }
+                ],
+                "@type": [
+                  "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object"
+                ]
+              }
+            ]
+        concept_node = jf[0]["http://www.cidoc-crm.org/cidoc-crm/P2_has_type"][0]
+        resp = dt.from_rdf(concept_node)
+        self.assertTrue(resp == "43d75450-7282-4754-af63-02e13032b73a")
+
+    def test_jsonld_concept_match_no_label(self):
+        dt = self.DT.get_instance("concept")
+        # from the thesaurus that should be loaded into Arches,
+        # the following concept value should have a key of 4beb7055-8a6e-45a3-9bfb-32984b6f82e0
+        jf = {
+                    "@id": "http://localhost:8000/concepts/86be632e-0dad-4d88-b5da-3d65875d6239",
+                    "@type": [
+                      "http://www.cidoc-crm.org/cidoc-crm/E55_Type"
+                    ]
+                  }
+        resp = dt.from_rdf(jf)
+        self.assertTrue(resp == "43d75450-7282-4754-af63-02e13032b73a")
+
     def test_jsonld_concept_external(self):
         dt = self.DT.get_instance("concept")
         jf = [
