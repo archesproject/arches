@@ -212,10 +212,7 @@ class JsonLdWriter(RdfWriter):
         framing = {
             "@omitDefault": True,
             "@omitGraph": False,
-            "@id": str(resource_inst_uri),
-            "classified_as": {
-                "@embed": "@always"
-            }
+            "@id": str(resource_inst_uri)
         }
 
         if context:
@@ -295,7 +292,7 @@ class JsonLdReader(Reader):
                 return match.group('resourceid')
         return None
 
-    def read_resource(self, data, use_ids=False, resourceid=None, graph=None):
+    def read_resource(self, data, use_ids=False, resourceid=None, graphid=None):
         self.use_ids = use_ids
         if not isinstance(data, list):
             data = [data]
@@ -303,10 +300,8 @@ class JsonLdReader(Reader):
         for jsonld in data:
             self.errors = {}
             jsonld = expand(jsonld)[0]
-            if graph is None:
+            if graphid is None:
                 graphid = self.get_graph_id(jsonld["@type"][0])
-            else:
-                graphid = graph.pk
             if graphid:
                 graph = GraphProxy.objects.get(graphid=graphid)
                 graphtree = graph.get_tree()

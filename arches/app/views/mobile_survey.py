@@ -274,29 +274,34 @@ class MobileSurveyDesignerView(MapBaseManagerView):
     def post(self, request, surveyid):
         data = JSONDeserializer().deserialize(request.body)
         if models.MobileSurveyModel.objects.filter(pk=data['id']).exists() is False:
-            mobile_survey = MobileSurvey(id=surveyid, name=data['name'])
-            mobile_survey.createdby = self.request.user
-        else:
-            mobile_survey = MobileSurvey.objects.get(pk=data['id'])
-            self.update_identities(data, mobile_survey, mobile_survey.users.all(), 'users', User, models.MobileSurveyXUser)
-            self.update_identities(data, mobile_survey, mobile_survey.groups.all(), 'groups', Group, models.MobileSurveyXGroup)
+            mobile_survey_model = models.MobileSurveyModel(
+                id=surveyid,
+                name=data['name'],
+                createdby=self.request.user,
+                lasteditedby=self.request.user
+                )
+            mobile_survey_model.save()
 
-            mobile_survey_card_ids = set([unicode(c.cardid) for c in mobile_survey.cards.all()])
-            form_card_ids = set(data['cards'])
-            cards_to_remove = mobile_survey_card_ids - form_card_ids
-            cards_to_add = form_card_ids - mobile_survey_card_ids
-            cards_to_update = mobile_survey_card_ids & form_card_ids
+        mobile_survey = MobileSurvey.objects.get(pk=data['id'])
+        self.update_identities(data, mobile_survey, mobile_survey.users.all(), 'users', User, models.MobileSurveyXUser)
+        self.update_identities(data, mobile_survey, mobile_survey.groups.all(), 'groups', Group, models.MobileSurveyXGroup)
 
-            for card_id in cards_to_add:
-                models.MobileSurveyXCard.objects.create(card=models.CardModel.objects.get(cardid=card_id), mobile_survey=mobile_survey, sortorder=data['cards'].index(card_id))
+        mobile_survey_card_ids = set([unicode(c.cardid) for c in mobile_survey.cards.all()])
+        form_card_ids = set(data['cards'])
+        cards_to_remove = mobile_survey_card_ids - form_card_ids
+        cards_to_add = form_card_ids - mobile_survey_card_ids
+        cards_to_update = mobile_survey_card_ids & form_card_ids
 
-            for card_id in cards_to_update:
-                mobile_survey_card = models.MobileSurveyXCard.objects.filter(mobile_survey=mobile_survey).get(card=models.CardModel.objects.get(cardid=card_id))
-                mobile_survey_card.sortorder = data['cards'].index(card_id)
-                mobile_survey_card.save()
+        for card_id in cards_to_add:
+            models.MobileSurveyXCard.objects.create(card=models.CardModel.objects.get(cardid=card_id), mobile_survey=mobile_survey, sortorder=data['cards'].index(card_id))
 
-            for card_id in cards_to_remove:
-                models.MobileSurveyXCard.objects.filter(card=models.CardModel.objects.get(cardid=card_id), mobile_survey=mobile_survey).delete()
+        for card_id in cards_to_update:
+            mobile_survey_card = models.MobileSurveyXCard.objects.filter(mobile_survey=mobile_survey).get(card=models.CardModel.objects.get(cardid=card_id))
+            mobile_survey_card.sortorder = data['cards'].index(card_id)
+            mobile_survey_card.save()
+
+        for card_id in cards_to_remove:
+            models.MobileSurveyXCard.objects.filter(card=models.CardModel.objects.get(cardid=card_id), mobile_survey=mobile_survey).delete()
 
         if mobile_survey.active != data['active']:
             # notify users in the mobile_survey that the state of the mobile_survey has changed

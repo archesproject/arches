@@ -2,6 +2,7 @@ import os
 import json
 import uuid
 import re
+import logging
 from django.shortcuts import render
 from django.views.generic import View
 from django.views.decorators.csrf import csrf_exempt
@@ -33,6 +34,8 @@ from arches.app.utils.decorators import group_required
 from pyld.jsonld import compact, frame, from_rdf
 from rdflib import RDF
 from rdflib.namespace import SKOS, DCTERMS
+
+logger = logging.getLogger(__name__)
 
 try:
     from cStringIO import StringIO
@@ -113,9 +116,18 @@ class Sync(ProtectedResourceView, APIBase):
 class Surveys(APIBase):
 
     def get(self, request):
+        permitted_cards = request.user.userprofile.permitted_cards
         group_ids = list(request.user.groups.values_list('id', flat=True))
         projects = MobileSurvey.objects.filter(Q(users__in=[request.user]) | Q(groups__in=group_ids), active=True).distinct()
-        projects_for_couch = [project.serialize_for_couch() for project in projects]
+        projects_for_couch = [project.serialize_for_mobile() for project in projects]
+        for project in projects_for_couch:
+            project['cards'] = list(permitted_cards.intersection(set(project['cards'])))
+            for graph in project['graphs']:
+                cards = []
+                for card in graph['cards']:
+                    if card['cardid'] in permitted_cards:
+                        cards.append(card)
+                graph['cards'] = cards
         response = JSONResponse(projects_for_couch, indent=4)
         return response
 
@@ -279,7 +291,9 @@ class Resources(APIBase):
         except:
             indent = None
 
-        if user_can_edit_resources(user=request.user):
+        if not user_can_edit_resources(user=request.user):
+            return JSONResponse(status=403)
+        else:
             with transaction.atomic():
                 try:
                     # DELETE
@@ -292,17 +306,14 @@ class Resources(APIBase):
                     # POST
                     data = JSONDeserializer().deserialize(request.body)
                     reader = JsonLdReader()
-                    graph = None
                     if slug is not None:
-                        graph = models.Graph.objects.get(slug=slug)
-                    elif graphid is not None:
-                        graph = models.Graph.objects.get(pk=graphid)
-                    reader.read_resource(data, resourceid=resourceid, graph=graph)
+                        graphid = models.GraphModel.objects.get(slug=slug).pk
+                    reader.read_resource(data, resourceid=resourceid, graphid=graphid)
                     if reader.errors:
                         response = []
                         for value in reader.errors.itervalues():
                             response.append(value.message)
-                        return JSONResponse(data, indent=indent, status=400, reason=response)
+                        return JSONResponse({"error": response}, indent=indent, status=400)
                     else:
                         response = []
                         for resource in reader.resources:
@@ -313,8 +324,11 @@ class Resources(APIBase):
                         return JSONResponse(response, indent=indent, status=201)
                 except models.ResourceInstance.DoesNotExist:
                     return JSONResponse(status=404)
-        else:
-            return JSONResponse(status=500)
+                except Exception as e:
+                    logger.exception("error in resource PUT API")
+                    return JSONResponse({"error": "resource data could not be saved"}, status=500, reason=e)
+
+
 
     def post(self, request, resourceid=None, slug=None, graphid=None):
         try:
@@ -326,17 +340,14 @@ class Resources(APIBase):
             if user_can_edit_resources(user=request.user):
                 data = JSONDeserializer().deserialize(request.body)
                 reader = JsonLdReader()
-                graph = None
                 if slug is not None:
-                    graph = models.Graph.objects.get(slug=slug)
-                elif graphid is not None:
-                    graph = models.Graph.objects.get(pk=graphid)
-                reader.read_resource(data, graph=graph)
+                    graphid = models.GraphModel.objects.get(slug=slug).pk
+                reader.read_resource(data, graphid=graphid)
                 if reader.errors:
                     response = []
                     for value in reader.errors.itervalues():
                         response.append(value.message)
-                    return JSONResponse(data, indent=indent, status=400, reason=response)
+                    return JSONResponse({"error": response}, indent=indent, status=400)
                 else:
                     response = []
                     for resource in reader.resources:
@@ -348,7 +359,8 @@ class Resources(APIBase):
             else:
                 return JSONResponse(status=403)
         except Exception as e:
-            return JSONResponse(status=500, reason=e)
+            logger.exception("error in resource POST API")
+            return JSONResponse({"error": "resource data could not be saved"}, status=500, reason=e)
 
     def delete(self, request, resourceid, slug=None, graphid=None):
         if user_can_edit_resources(user=request.user):

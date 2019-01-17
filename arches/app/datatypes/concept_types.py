@@ -285,10 +285,11 @@ class ConceptListDataType(BaseConceptDataType):
     def to_rdf(self, edge_info, edge):
         g = Graph()
         c = ConceptDataType()
-        for r in edge_info['range_tile_data'] or []:
-            concept_info = edge_info.copy()
-            concept_info['range_tile_data'] = r
-            g += c.to_rdf(concept_info, edge)
+        if edge_info['range_tile_data']:
+            for r in edge_info['range_tile_data']:
+                concept_info = edge_info.copy()
+                concept_info['range_tile_data'] = r
+                g += c.to_rdf(concept_info, edge)
         return g
 
     def from_rdf(self, json_ld_node):

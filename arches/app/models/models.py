@@ -861,6 +861,13 @@ class UserProfile(models.Model):
     def is_reviewer(self):
         return self.user.groups.filter(name='Resource Reviewer').exists()
 
+    @property
+    def permitted_cards(self):
+        from arches.app.utils.permission_backend import get_nodegroups_by_perm
+        permitted_nodegroups = [str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(self.user, ['models.read_nodegroup', 'models.write_nodegroup'], any_perm=False)]
+        ret = set([str(cardid) for cardid in CardModel.objects.filter(nodegroup_id__in=permitted_nodegroups).values_list('cardid', flat=True)])
+        return ret
+
     class Meta:
         managed = True
         db_table = 'user_profile'
