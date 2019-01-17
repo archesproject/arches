@@ -238,6 +238,43 @@ class ModificationForm(ResourceForm):
                 }
             }
 
+class ComponentModificationForm(ResourceForm):
+    @staticmethod
+    def get_info():
+        return {
+            'id': 'component-modification',
+            'icon': 'fa-plus',
+            'name': _('Modification and Construction'),
+            'class': ComponentModificationForm
+        }
+
+    def update(self, data, files):
+        self.update_nodes('MODIFICATION_TYPE.E55', data)
+        self.update_nodes('MODIFICATION_REMARK.E62', data)
+        self.update_nodes('MODIFICATION_TECHNIQUE_TYPE.E55', data)
+
+    def load(self, lang):
+        if self.resource:
+            self.data['MODIFICATION_TYPE.E55'] = {
+                'branch_lists': datetime_nodes_to_dates(exclude_empty_branches(self.get_nodes('MODIFICATION.E11'), 'MODIFICATION_TYPE.E55')),
+                'domains': {
+                    'MODIFICATION_TYPE.E55': Concept().get_e55_domain('MODIFICATION_TYPE.E55'),
+                }
+            }
+
+            self.data['MODIFICATION_REMARK.E62'] = {
+                'branch_lists': exclude_empty_branches(self.get_nodes('MODIFICATION.E11'), 'MODIFICATION_REMARK.E62'),
+                'domains': {}
+            }
+
+            self.data['MODIFICATION_TECHNIQUE_TYPE.E55'] = {
+                'branch_lists': exclude_empty_branches(self.get_nodes('MODIFICATION.E11'), 'MODIFICATION_TECHNIQUE_TYPE.E55'),
+                'domains': {
+                    'MODIFICATION_TECHNIQUE_TYPE.E55' : Concept().get_e55_domain('MODIFICATION_TECHNIQUE_TYPE.E55'),
+                    'CONSTRUCTION_MATERIAL.E57': Concept().get_e55_domain('CONSTRUCTION_MATERIAL.E57')
+                }
+            }
+
 # --- Assessment  Summary -> AssessmentSummaryForm ------------------------------------------
 class AssessmentSummaryForm(ResourceForm):
     @staticmethod

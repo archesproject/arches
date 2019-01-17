@@ -91,6 +91,7 @@ class Resource(ArchesResource):
                 forms.ComponentAssessmentForm.get_info(),
                 forms.ComponentClassification.get_info(),
                 forms.ComponentLocationForm.get_info(),
+                forms.ComponentModificationForm.get_info(),
                 forms.MeasurementvaluesForm.get_info(),
                 forms.RelatedFilesForm.get_info(),
                 forms.RelatedResourcesForm.get_info(),
