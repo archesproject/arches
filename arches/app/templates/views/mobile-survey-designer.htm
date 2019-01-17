@@ -202,14 +202,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     <!--/ko-->
                                                 </ul>
                                                 <!--/ko-->
+                                                <div class="mpm-node-detail-metadata" style="padding-left:20px;" data-bind="visible: resource.hasApprovedCards() === false">{% trans 'No cards added' %}</div>
                                             </li>
                                         </ul>
                                         <!--/ko-->
                                         <!--/ko-->
-                                        <!--ko ifnot: selectedResources.length > 0 -->
+                                        <!--ko ifnot: selectedResources().length > 0 -->
                                         <ul class="mpm-node-detail-metadata">
                                             <li class="">
-                                                <div>{% trans 'No forms selected' %}</div>
+                                                <div>{% trans 'No models selected' %}</div>
                                             </li>
                                         </ul>
                                         <!--/ko-->
