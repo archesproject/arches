@@ -324,8 +324,6 @@ class MobileSurvey(models.MobileSurveyModel):
                         self.couch.update_doc(db, tile_serialized, tile_serialized['tileid'])
                         print('Tile {0} Saved'.format(row.doc['tileid']))
                         db.compact()
-                    elif 'provisionaledits' in row.doc and row.doc['provisionaledits'] == '':
-                        print row.doc
         return ret
 
     def collect_resource_instances_for_couch(self):
