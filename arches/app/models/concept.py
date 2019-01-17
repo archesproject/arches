@@ -1285,7 +1285,7 @@ def get_valueids_from_concept_label(label, conceptid=None, lang=None):
                     "constant_score": {
                         "filter": {
                             "terms": {
-                                "value": [val]
+                                "value.raw": [val]
                             }
                         }
                     }
@@ -1298,7 +1298,7 @@ def get_valueids_from_concept_label(label, conceptid=None, lang=None):
                         "filter": {
                             "bool": {
                                 "must": [
-                                    {"term": {"value": val}},
+                                    {"term": {"value.raw": val}},
                                     {"term": {"conceptid": conceptid}}
                                 ]
                             }
