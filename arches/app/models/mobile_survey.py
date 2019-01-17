@@ -261,59 +261,63 @@ class MobileSurvey(models.MobileSurveyModel):
                     if 'provisionaledits' in row.doc and row.doc['provisionaledits'] is not None:
                         try:
                             tile = Tile.objects.get(tileid=row.doc['tileid'])
-                            for user_edits in row.doc['provisionaledits'].items():
-                                # user_edits is a tuple with the user number in
-                                # position 0, prov. edit data in position 1
-                                for nodeid, value in iter(user_edits[1]['value'].items()):
-                                    datatype_factory = DataTypeFactory()
-                                    node = models.Node.objects.get(nodeid=nodeid)
-                                    datatype = datatype_factory.get_instance(node.datatype)
-                                    newvalue = datatype.process_mobile_data(tile, node, db, row.doc, value)
-                                    if newvalue is not None:
-                                        user_edits[1]['value'][nodeid] = newvalue
+                            if row.doc['provisionaledits'] != '':
+                                for user_edits in row.doc['provisionaledits'].items():
+                                    # user_edits is a tuple with the user number in
+                                    # position 0, prov. edit data in position 1
+                                    for nodeid, value in iter(user_edits[1]['value'].items()):
+                                        datatype_factory = DataTypeFactory()
+                                        node = models.Node.objects.get(nodeid=nodeid)
+                                        datatype = datatype_factory.get_instance(node.datatype)
+                                        newvalue = datatype.process_mobile_data(tile, node, db, row.doc, value)
+                                        if newvalue is not None:
+                                            user_edits[1]['value'][nodeid] = newvalue
 
-                                if tile.provisionaledits is None:
-                                    tile.provisionaledits = {}
-                                    tile.provisionaledits[user_edits[0]] = user_edits[1]
-                                    self.handle_reviewer_edits(user_edits[0], tile)
-                                else:
-                                    self.assign_provisional_edit(user_edits[0], user_edits[1], tile)
+                                    if tile.provisionaledits is None:
+                                        tile.provisionaledits = {}
+                                        tile.provisionaledits[user_edits[0]] = user_edits[1]
+                                        self.handle_reviewer_edits(user_edits[0], tile)
+                                    else:
+                                        self.assign_provisional_edit(user_edits[0], user_edits[1], tile)
 
                             # If there are conflicting documents, lets clear those out
                             if '_conflicts' in row.doc:
                                 for conflict_rev in row.doc['_conflicts']:
                                     conflict_data = db.get(row.id, rev=conflict_rev)
-                                    for user_edits in conflict_data['provisionaledits'].items():
-                                        self.assign_provisional_edit(user_edits[0], user_edits[1], tile)
+                                    if conflict_data['provisionaledits'] != '':
+                                        for user_edits in conflict_data['provisionaledits'].items():
+                                            self.assign_provisional_edit(user_edits[0], user_edits[1], tile)
                                     # Remove conflicted revision from couch
                                     db.delete(conflict_data)
 
                         # TODO: If user is provisional user, apply as provisional edit
                         except Tile.DoesNotExist:
                             tile = Tile(row.doc)
-                            for user_edits in row.doc['provisionaledits'].items():
-                                for nodeid, value in iter(user_edits[1]['value'].items()):
-                                    datatype_factory = DataTypeFactory()
-                                    node = models.Node.objects.get(nodeid=nodeid)
-                                    datatype = datatype_factory.get_instance(node.datatype)
-                                    newvalue = datatype.process_mobile_data(tile, node, db, row.doc, value)
-                                    if newvalue is not None:
-                                        user_edits[1]['value'][nodeid] = newvalue
-                                tile.provisionaledits[user_edits[0]] = user_edits[1]
-                                self.handle_reviewer_edits(user_edits[0], tile)
+                            if row.doc['provisionaledits'] != '':
+                                for user_edits in row.doc['provisionaledits'].items():
+                                    for nodeid, value in iter(user_edits[1]['value'].items()):
+                                        datatype_factory = DataTypeFactory()
+                                        node = models.Node.objects.get(nodeid=nodeid)
+                                        datatype = datatype_factory.get_instance(node.datatype)
+                                        newvalue = datatype.process_mobile_data(tile, node, db, row.doc, value)
+                                        if newvalue is not None:
+                                            user_edits[1]['value'][nodeid] = newvalue
+                                    tile.provisionaledits[user_edits[0]] = user_edits[1]
+                                    self.handle_reviewer_edits(user_edits[0], tile)
 
                         # If user is reviewer, apply as authoritative edit
-                        for user_edits in tile.provisionaledits.items():
-                            if user_edits[0] not in user_lookup:
-                                user = User.objects.get(pk=user_edits[0])
-                                user_lookup[user_edits[0]] = user.groups.filter(name='Resource Reviewer').exists()
+                        if tile.provisionaledits != '':
+                            for user_edits in tile.provisionaledits.items():
+                                if user_edits[0] not in user_lookup:
+                                    user = User.objects.get(pk=user_edits[0])
+                                    user_lookup[user_edits[0]] = user.groups.filter(name='Resource Reviewer').exists()
 
-                        for user_id, is_reviewer in user_lookup.items():
-                            if is_reviewer:
-                                try:
-                                    tile.data = tile.provisionaledits.pop(user_id)['value']
-                                except KeyError:
-                                    pass
+                            for user_id, is_reviewer in user_lookup.items():
+                                if is_reviewer:
+                                    try:
+                                        tile.data = tile.provisionaledits.pop(user_id)['value']
+                                    except KeyError:
+                                        pass
 
                         tile.save()
                         tile_serialized = json.loads(JSONSerializer().serialize(tile))
@@ -321,7 +325,6 @@ class MobileSurvey(models.MobileSurveyModel):
                         self.couch.update_doc(db, tile_serialized, tile_serialized['tileid'])
                         print('Tile {0} Saved'.format(row.doc['tileid']))
                         db.compact()
-
         return ret
 
     def collect_resource_instances_for_couch(self):
