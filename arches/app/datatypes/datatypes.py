@@ -1585,15 +1585,16 @@ class NodeValueDataType(BaseDataType):
         pass
 
 
-
 def get_value_from_jsonld(json_ld_node):
+    if json_ld_node is None:
+        return None, None
     try:
         return (json_ld_node[0].get("@value"), json_ld_node[0].get("@language"))
     except KeyError as e:
         try:
             return (json_ld_node.get("@value"), json_ld_node.get("@language"))
         except AttributeError as e:
-            return
+            return None, None
     except IndexError as e:
-        return
+        return None, None
 
