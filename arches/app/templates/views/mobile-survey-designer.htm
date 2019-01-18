@@ -75,19 +75,30 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                             <!-- Project Summary Panel -->
                             <div class="mpm-activation-panel">
-                                <!--ko if: surveyReady().incomplete -->
 
                                 <!-- Survey Status Panel -->
                                 <div class="mpm-card-content">
 
                                     <!-- Icon and Status warning -->
                                     <div class="mpm-survey-status-header">
+                                        <!--ko if: surveyReady().incomplete === false && mobilesurvey.active() === true -->
+                                        <i class="msm-icon-wrap fa fa-check" style="color:forestgreen; background: #a4e2a4; border: 1px solid forestgreen; padding-right:5px;"></i>
+                                        <div class="msm-survey-status-text">{% trans 'Survey Status: Ready' %}</div>
+                                        <div class="msm-survey-status-instructions">{% trans 'Users can download survey and collect data' %}</div>
+                                        <!--/ko-->
+                                        <!--ko if: surveyReady().incomplete === false && mobilesurvey.active() === false -->
+                                        <i class="msm-icon-wrap fa fa-check" style="color:#333; background: #eee; border: 1px solid #333; padding-right:5px;"></i>
+                                        <div class="msm-survey-status-text">{% trans 'Survey Status: Complete, but inactive' %}</div>
+                                        <div class="msm-survey-status-instructions">{% trans 'Survey must be activated to be available to users' %}</div>
+                                        <!--/ko-->
+                                        <!--ko if: surveyReady().incomplete -->
                                         <i class="msm-icon-wrap fa fa-exclamation-triangle" style="color:orange; padding-right:5px;"></i>
                                         <div class="msm-survey-status-text">{% trans 'Survey Status: Incomplete' %}</div>
+                                        <div class="msm-survey-status-instructions">{% trans 'You won’t be able to activate this survey until you have addressed the following items:' %}</div>
+                                        <!--/ko-->
                                     </div>
 
                                     <!-- Survey Items that need to be addressed -->
-                                    <div class="msm-survey-status-instructions">{% trans 'You won’t be able to activate this survey until you have addressed the following items:' %}</div>
                                     <div class="text-center">
                                         <ul class="msm-survey-issues">
                                             <li data-bind = "visible: surveyReady().cards == false">{% trans 'Select the Model(s) and associated data entry cards to include in the survey' %}</li>
@@ -99,7 +110,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </ul>
                                     </div>
                                 </div>
-                                <!--/ko-->
+
 
                                 <!-- Activate Project -->
                                 <div class="msm-report-section active">
