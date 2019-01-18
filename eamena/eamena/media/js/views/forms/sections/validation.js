@@ -117,6 +117,17 @@ define(['jquery',
             });
             return valid
         },
+
+        // pass in a list of nodes where at least one is populated
+        mustHaveAtLeastOne: function(nodes) {
+            var valid = false;
+            _.each(nodes, function(node) {
+                if (node.value !== ''){
+                    valid = true
+                }
+            });
+            return valid
+        },
         
         // pass in a list of nodes where if one is populated, then all of them
         // must be. if all are empty, that is fine.
