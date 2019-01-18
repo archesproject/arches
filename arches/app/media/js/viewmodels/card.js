@@ -331,6 +331,13 @@ define([
             }
         });
 
+        this.selected.subscribe(function(selected) {
+            if (selected) this.expanded(true);
+        }, this);
+        this.expanded.subscribe(function(expanded) {
+            if (expanded && this.parent) this.parent.expanded(true);
+        }, this);
+
         this.isChildSelected = ko.computed(function() {
             return isChildSelected(this);
         }, this);
