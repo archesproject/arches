@@ -12,7 +12,8 @@ pwh.close()
 gh = Github(userName, pw)
 repo = gh.get_repo("%s/%s" % (orgName, repoName))
 
-MAINTAINERS = ["dwuthrich", "apeters", "adamlodge", "chiatt", "robgaston", "jmunowitch"]
+MAINTAINERS = ["dwuthrich", "apeters", "adamlodge", "chiatt", 
+				"robgaston", "jmunowitch", "veuncent", "azaroth42"]
 START_DATE = datetime.datetime(year=2018, month=1, day=1)
 
 # NOTE - This takes quite a while to run, as it involves a LOT of http traffic
@@ -67,6 +68,9 @@ for issue in list(issuelist):
 	# Increase weight if no reactions  (+1, -1, etc)
 	if not reactions:
 		weight += 5
+
+	# XXX Increase weight if the issue references other issues
+
 	# Increase weight if no labels
 	if not labels:
 		weight += 10
@@ -80,7 +84,7 @@ for issue in list(issuelist):
 	if "bug" in title.lower() or "bug" in body.lower():
 		weight += 5
 
-	# Check if body contains image
+	# Check if body contains image?
 
 	# Decrease weight if labeled by someone other than the submitter
 	for e in events:
@@ -90,6 +94,7 @@ for issue in list(issuelist):
 	# Decrease weight if referenced from somewhere
 	for e in events:
 		if e.event == "referenced":
+			# XXX Check that not from the submitter
 			weight -= 10
 	# Decrease weight if it's in a milestone
 	if milestone:
@@ -98,11 +103,18 @@ for issue in list(issuelist):
 	if assignees:
 		weight -= 20
 
+	# If PR has reviewers assigned, then @bump them in a comment to please close
+
+	# XXX Decrease weight of issues based on pipelines in zenhub
+
 	issue_data[num] = {"title": title, "url": url, "weight": weight, "user": who.login}
 
 
 issues = list(issue_data.items())
 # Decrease weight if the submitter is a frequent submitter
+
+# XXX - Reimplement based on days on which issues are submitted
+
 for a in issues:
 	w = a[1]['user']
 	weight = a[1]['weight']
@@ -110,7 +122,7 @@ for a in issues:
 		weight -= 25
 	elif user_counts[w] > 10:
 		weight -= 10
-	elif user_counts[w] > 4:
+	elif user_counts[w] < 4:
 		weight += 5
 	a[1]['weight'] = weight
 
