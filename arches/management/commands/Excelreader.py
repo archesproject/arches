@@ -167,6 +167,22 @@ class Command(BaseCommand):
                 for msg in ret:
                    result['errors'].append(msg)
 
+            ## get the number of real columns based on the headers
+            headers = [i.value for i in list(sheet.rows)[0] if i.value]
+
+            ## now iterate the row normal direction to find empty cells
+            for n,row in enumerate(list(sheet.rows)):
+                if n+1 == num_rows:
+                    break
+                for cell in row[:len(headers)]:
+                    msg = "Blank value in: {} row {}".format(sheet_name,n+1)
+                    try:
+                        if cell.value is None or str(cell.value).rstrip() == "":
+                            result['errors'].append(msg)
+                    except UnicodeEncodeError:
+                        if cell.value.encode('ascii', 'ignore').rstrip() == "":
+                            result['errors'].append(msg)
+
         if (rows_count/sheet_count).is_integer() is not True:
             result['errors'].append("Inconsistent number of rows across "\
             "workbook sheets.")
