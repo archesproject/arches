@@ -31,7 +31,8 @@ class ResourceExporter(object):
             configs = self.read_export_configs()
             result = self.writer.write_resources(resources, configs)
         else:
-            self.writer.write_resources(dest_dir)
+            configs = False
+            self.writer.write_resources(dest_dir, configs)
         return result
 
     def read_export_configs(self):
