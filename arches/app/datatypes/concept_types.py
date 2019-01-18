@@ -209,6 +209,8 @@ class ConceptDataType(BaseConceptDataType):
             values = get_valueids_from_concept_label(label, concept_id, lang)
 
             if values:
+                print("Match using label found following hits:{0}".format(values))
+                print("Returning:{0}".format(values[0]['id']))
                 return values[0]["id"]
             else:
                 if concept_id:

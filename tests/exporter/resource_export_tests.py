@@ -322,7 +322,7 @@ class RDFExportTests(ArchesTestCase):
     def test_jsonld_concept_match(self):
         dt = self.DT.get_instance("concept")
         # from the thesaurus that should be loaded into Arches,
-        # the following concept value should have a key of 4beb7055-8a6e-45a3-9bfb-32984b6f82e0
+        # the following concept value should have a key of 43d75450-7282-4754-af63-02e13032b73a
         jf = [
               {
                 "http://www.cidoc-crm.org/cidoc-crm/P2_has_type": [
@@ -360,7 +360,7 @@ class RDFExportTests(ArchesTestCase):
     def test_jsonld_concept_match_no_label(self):
         dt = self.DT.get_instance("concept")
         # from the thesaurus that should be loaded into Arches,
-        # the following concept value should have a key of 4beb7055-8a6e-45a3-9bfb-32984b6f82e0
+        # the following concept value should have a key of 43d75450-7282-4754-af63-02e13032b73a
         jf = {
                     "@id": "http://localhost:8000/concepts/86be632e-0dad-4d88-b5da-3d65875d6239",
                     "@type": [
@@ -368,6 +368,7 @@ class RDFExportTests(ArchesTestCase):
                     ]
                   }
         resp = dt.from_rdf(jf)
+        print(resp)
         self.assertTrue(resp == "43d75450-7282-4754-af63-02e13032b73a")
 
     def test_jsonld_concept_external(self):
