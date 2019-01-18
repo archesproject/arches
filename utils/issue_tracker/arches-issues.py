@@ -48,6 +48,9 @@ for issue in list(issuelist):
 	weight = 0
 
 
+	# XXX Check that comments on PRs from bots are ignored
+	# issue.user.type == "Bot"
+
 	# Reduce weight of issues commented on by maintainers
 	comment_ok = False
 	for c in comments:
@@ -96,6 +99,9 @@ for issue in list(issuelist):
 		if e.event == "referenced":
 			# XXX Check that not from the submitter
 			weight -= 10
+			# XXX If the reference is a merged PR
+			# decrease weight, but record as possibly closeable
+
 	# Decrease weight if it's in a milestone
 	if milestone:
 		weight -= 10
