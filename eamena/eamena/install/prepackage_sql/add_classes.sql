@@ -42,4 +42,5 @@ INSERT INTO ontology.properties VALUES ('-YY3', 'XX1', 'E5', 'Would be produced 
 -- Add the following missing properties in order to load 3-tier graphs.
 -- The values below should be inspected and in some case must be updated.
 INSERT INTO ontology.properties VALUES ('O14', 'S16', 'E5', '<needs to be updated>');
-INSERT INTO ontology.properties VALUES ('J3', 'S16', 'E5', '<needs to be updated>');
+INSERT INTO ontology.properties VALUES ('YY2', 'S16', 'E5', '<needs to be updated>');
+INSERT INTO ontology.properties VALUES ('YY3', 'S16', 'E5', '<needs to be updated>');
