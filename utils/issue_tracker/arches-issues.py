@@ -12,16 +12,16 @@ pwh.close()
 gh = Github(userName, pw)
 repo = gh.get_repo("%s/%s" % (orgName, repoName))
 
-MAINTAINERS = ["dwuthrich", "apeters", "adamlodge", "chiatt", 
-				"robgaston", "jmunowitch", "veuncent", "azaroth42"]
-START_DATE = datetime.datetime(year=2018, month=1, day=1)
-
 # NOTE - This takes quite a while to run, as it involves a LOT of http traffic
 
-issue_data = {}
-# Find the issues for the current call
-issuelist = repo.get_issues(state="open", since=START_DATE)
+collabs = list(repo.get_collaborators())
+MAINTAINERS = [x.login for x in collabs if x.permissions.push]
+ADMINS = [x.login for x in collabs if x.permissions.admin]
+START_DATE = datetime.datetime(year=2018, month=1, day=1)
+DO_REVIEW_NUDGE = False
 
+issue_data = {}
+issuelist = repo.get_issues(state="open", since=START_DATE)
 user_counts = {}
 
 for issue in list(issuelist):
@@ -39,17 +39,17 @@ for issue in list(issuelist):
 	url = issue.html_url
 	is_pr = issue.pull_request and True
 
-	# Count the number of issues per user
+	# Count the number of days on which the submitter submitted issues
 	try:
-		user_counts[who.login] += 1
+		user_counts[who.login]["%s-%s-%s" % (created.year, created.month, created.day)] = 1
 	except:
-		user_counts[who.login] = 1
+		user_counts[who.login] = {"%s-%s-%s" % (created.year, created.month, created.day): 1}
 
 	weight = 0
 
-
-	# XXX Check that comments on PRs from bots are ignored
-	# issue.user.type == "Bot"
+	# Completely ignore issues that come from bots
+	if who.type == "Bot":
+		continue
 
 	# Reduce weight of issues commented on by maintainers
 	comment_ok = False
@@ -67,12 +67,25 @@ for issue in list(issuelist):
 		weight += 10
 	# Increase weight of pull requests
 	if is_pr:
-		weight += 15
+		weight += 20
+		# But less if review has been requested
+		pr = issue.as_pull_request()
+		reviewers = list(pr.get_review_requests()[0])
+		if reviewers:
+			weight -= 10
+			if DO_REVIEW_NUDGE:
+				nudge = ["@%s" % x.login for x in reviewers]
+				nudge.append(" Can you please review?")
+				issue.create_comment(" ".join(nudge))
+
 	# Increase weight if no reactions  (+1, -1, etc)
 	if not reactions:
 		weight += 5
 
-	# XXX Increase weight if the issue references other issues
+	# ENHANCEMENT: Increase weight if the issue references other issues
+	# It's not evident from the GH API how to extract references to issues
+	# It could be hackily done with regexps over the body...
+	# ... but that's a terrible idea.
 
 	# Increase weight if no labels
 	if not labels:
@@ -83,24 +96,22 @@ for issue in list(issuelist):
 			if "priority" in l.name.lower() or "roadmap" in l.name.lower():
 				weight -= 15
 				break
-	# Increase weight if it mentions a bug
-	if "bug" in title.lower() or "bug" in body.lower():
-		weight += 5
 
-	# Check if body contains image?
+	# ENHANCEMENT: Check if body contains image?
+	# ENHANCEMENT: Check if body conforms to existing template?
 
 	# Decrease weight if labeled by someone other than the submitter
 	for e in events:
 		if e.event == "labeled" and e.actor != who:
 			weight -= 5
 			break
-	# Decrease weight if referenced from somewhere
+	# Decrease weight if referenced from somewhere, by a Maintainer
+	ref_weight = 0
 	for e in events:
-		if e.event == "referenced":
-			# XXX Check that not from the submitter
+		if e.event == "referenced" and e.actor in MAINTAINERS:			
 			weight -= 10
-			# XXX If the reference is a merged PR
-			# decrease weight, but record as possibly closeable
+			break
+			# ENHANCEMENT: Determine if reference is from a merged PR somehow?
 
 	# Decrease weight if it's in a milestone
 	if milestone:
@@ -109,27 +120,26 @@ for issue in list(issuelist):
 	if assignees:
 		weight -= 20
 
-	# If PR has reviewers assigned, then @bump them in a comment to please close
-
-	# XXX Decrease weight of issues based on pipelines in zenhub
+	# ENHANCEMENT: Decrease weight of issues based on pipelines in zenhub
+	# This means interacting with zenhub API, or configuring Zenhub to
+	# magically add a milestone or label to track off of
 
 	issue_data[num] = {"title": title, "url": url, "weight": weight, "user": who.login}
 
 
 issues = list(issue_data.items())
-# Decrease weight if the submitter is a frequent submitter
 
-# XXX - Reimplement based on days on which issues are submitted
-
+# Decrease weight if the submitter comes back repeatedly
 for a in issues:
 	w = a[1]['user']
 	weight = a[1]['weight']
-	if user_counts[w] > 25:
-		weight -= 25
-	elif user_counts[w] > 10:
+	n = len(user_counts[w])
+	if n > 25:
+		weight -= 20
+	elif n > 10:
 		weight -= 10
-	elif user_counts[w] < 4:
-		weight += 5
+	elif n < 3:
+		weight += 10
 	a[1]['weight'] = weight
 
 issues.sort(key=lambda x: x[1]['weight'], reverse=True)
