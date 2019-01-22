@@ -11,6 +11,7 @@ from django.contrib.gis.db.models.functions import MakeValid
 from arches.app.models.graph import Graph
 from arches.app.models.models import Node, File
 from arches.app.models.tile import Tile
+from arches.app.utils import v3utils
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.models.system_settings import settings
 settings.update_from_db()
@@ -485,22 +486,25 @@ class v3Importer:
         self.v4_graph_name = v4_graph_name
         self.v4_nodes = Node.objects.filter(graph=self.v4_graph)
 
-        conf_file = os.path.join(v3_data_dir,"rm_configs.json")
-        with open(conf_file,'rb') as openfile:
-            v3_config = json.loads(openfile.read())[v4_graph_name]
+        ## use this method to acquire the v3 configs, and full lookup paths
+        v3_config = v3utils.get_v3_config_info(v3_data_dir,v4_graph_name=v4_graph_name)
 
-        self.v3_config = v3_config
-        self.v3_graph_name = v3_config['v3_entitytypeid']
+        ## load the info stored in the rm_configs file
+        self.v3_graph_name = v3_config["v3_entitytypeid"]
         self.v3_nodes_csv = v3_config["v3_nodes_csv"]
-        self.v3_resources = self.load_v3_data(truncate=truncate,exclude=exclude)
+        self.v3_v4_node_lookup = v3_config["v3_v4_node_lookup"]
 
+        ## create better node_lookup that holds more information
         self.node_lookup = self.augment_node_lookup()
+
+        ## finally, do the actual loading of the v3 data into this class
+        self.v3_resources = self.load_v3_data(truncate=truncate,exclude=exclude)
 
     def augment_node_lookup(self):
         """takes the node lookup csv and converts to a dictionary
         with more information added to it for each node."""
 
-        lookup_path = self.v3_config["v3_v4_node_lookup"]
+        lookup_path = self.v3_v4_node_lookup
         new_and_improved = {}
         with open(lookup_path,'rb') as openfile:
             reader = csv.DictReader(openfile)
