@@ -35,6 +35,9 @@ define([
         this.beforeMove = function(e) {
             e.cancelDrop = (e.sourceParent!==e.targetParent);
         };
+        this.startDrag = function(e, ui) {
+            ko.utils.domData.get(ui.item[0], 'ko_sortItem').selected(true);
+        };
         this.config = this.card.model ? this.card.model.get('config') : {};
         _.each(this.configKeys, function(key) {
             self[key] = self.config[key];
