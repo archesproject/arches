@@ -202,15 +202,162 @@
                                                     <i class="fa-fw fa fa-info"></i>
                                                     {% trans "Upload image of component condition." %}
                                                 </div>
+                                                <div class="row margin-top-minus-5 margin-bottom-10" id="current-files-section" style="display: none;" data-bind="visible: true">
+                                                    <div class="row">
+                                                        <div class="col-xs-12">
+
+                                                            <div style="margin-left: 20px; padding-top: 5px;" id="links">
+                                                                <div data-bind="foreach: getBranchLists()">
+                                                                    <div data-bind="if: nodes.get('CONDITION_ASSESSMENT_IMAGE_FILE_PATH.E62', 'value') !== ''" style="position: relative; display: inline-block; margin:1px;">
+                                                                        <a style="position:absolute; background-color:rgba(0, 0, 0, 0.5); padding-left: 4px; width: 20px;" data-bind="click: $parent.editItem.bind($parent)"><i class="fa fa-edit" style="color:white;"></i></a>
+                                                                        <a title="" data-gallery="links2" data-bind="attr: { href: nodes.get('CONDITION_ASSESSMENT_IMAGE_FILE_PATH.E62', 'value'), title: 'test'}" target="_blank">
+                                                                            <img alt="" data-bind="attr: { src: nodes.get('CONDITION_ASSESSMENT_IMAGE_FILE_PATH.E62', 'value')}">
+                                                                        </a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
                                                 <div class="row margin-bottom-20">
                                                     <dl id="image-section">
                                                         <dt>
                                                             <div class="col-xs-12">
-                                                                <h5 id="arches-names-form" class="section-headline">{% trans "Image" %}</h5>
+                                                                <h5 id="arches-names-form" class="section-headline">{% trans "File Upload" %}</h5>
                                                             </div>
                                                         </dt>
-                                                    </dl>
+                                                        <div class="col-xs-12">
+                                                            <!-- TODO: Need to check if a current file already exists before showing dropzone -->
+                                                            <div class="dropzone" id="mydropzone">
 
+                                                            </div>
+                                                        </div>
+                                                    </dl>
+                                                </div>
+                                                <div class="row margin-bottom-20">
+                                                    <dl id="image-title-section">
+                                                        <dt>
+                                                            <div class="col-xs-12">
+                                                                <h5 id="arches-names-form" class="section-headline">{% trans "Title" %}</h5>
+                                                            </div>
+                                                        </dt>
+                                                        <dd>
+                                                            <div class="col-xs-12 col-sm-9">
+                                                                <div class="col-xs-12 form-section-input">
+                                                                    <div class="form-group">
+                                                                        <input class="form-control arches-form-input" style="width:100%" placeholder='{% trans "Image Title" %}' data-bind='value: getEditedNode("CONDITION_ASSESSMENT_IMAGE_TITLE.E41", "value")'>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-xs-12 col-sm-3 add-button-column add-margin-top">
+                                                                {% include 'views/components/add-item-button.htm' %}
+                                                            </div>
+                                                            <div class="col-xs-12 col-sm-9">
+                                                                <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "You must enter a value." %}</div>
+                                                            </div>
+                                                            <div class="col-xs-12">
+                                                                <div class="margin-left-10 margin-top-5" style="display: none;" data-bind="visible: true">
+                                                                    <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "None" %}</div>
+                                                                    <div data-bind="foreach: getBranchLists()">
+                                                                        <div class="arches-crud-record">
+                                                                            <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans 'Delete this value' %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                                                            <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans 'Edit' %}"><span data-bind='text: nodes.get("CONDITION_ASSESSMENT_IMAGE_TITLE.E41", "value")'></span></a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </dd>
+                                                    </dl>
+                                                </div>
+                                                <div class="row margin-bottom-20">
+                                                    <dl id="image-caption-section">
+                                                        <dt>
+                                                            <div class="col-xs-12">
+                                                                <h5 id="arches-names-form" class="section-headline">{% trans "Caption" %}</h5>
+                                                            </div>
+                                                        </dt>
+                                                        <dd>
+                                                            <div class="col-xs-12 col-sm-9">
+                                                                <div class="col-xs-12 form-section-input">
+                                                                    <div class="form-group">
+                                                                        <div class="arches-html-editor margin-top-5" style="width: 100%;">
+                                                                            <div class="summernote" data-bind="summernote: {value: getEditedNode('CONDITION_ASSESSMENT_IMAGE_DESCRIPTION.E62', 'value'), options:{}}"></div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-xs-12 col-sm-3 add-button-column add-margin-top">
+                                                                {% include 'views/components/add-item-button.htm' %}
+                                                            </div>
+                                                            <div class="col-xs-12 col-sm-9">
+                                                                <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "You must enter a value." %}</div>
+                                                            </div>
+                                                            <div class="col-xs-12">
+                                                                <div class="margin-left-10 margin-top-5" style="display: none;" data-bind="visible: true">
+                                                                    <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "None" %}</div>
+                                                                    <div data-bind="foreach: getBranchLists()">
+                                                                        <div class="arches-crud-record">
+                                                                            <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans 'Delete this value' %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                                                            <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans 'Edit' %}"><span data-bind='html: nodes.get("CONDITION_ASSESSMENT_IMAGE_DESCRIPTION.E62", "value")'></span></a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </dd>
+                                                    </dl>
+                                                </div>
+                                                <div class="row margin-bottom-20">
+                                                    <dl id="image-information-section">
+                                                        <dt>
+                                                            <div class="col-xs-12">
+                                                                <h5 id="arches-names-form" class="section-headline">{% trans "Other Information" %}</h5>
+                                                            </div>
+                                                        </dt>
+                                                        <dd>
+                                                            <div class="col-xs-12 col-sm-9">
+                                                                <div class="col-xs-6 form-section-input add-padding-right">
+                                                                    <div class="form-group datetimepicker">
+                                                                        <div class="input-group">
+                                                                            <input type="text" name="imagedate" placeholder='{% trans "Date (yyyy-mm-dd)" %}' class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('CONDITION_ASSESSMENT_IMAGE_IMAGE_DATE.E49', 'value')} ">
+                                                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-6 form-section-input">
+                                                                    <div class="form-group">
+                                                                        <input class="form-control arches-form-input" style="width:100%" placeholder='{% trans "Creator" %}' data-bind='value: getEditedNode("CONDITION_ASSESSMENT_IMAGE_CREATOR_NAME.E41", "value")'>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-12 form-section-input margin-top-5">
+                                                                    <div class="form-group">
+                                                                        <input class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('CONDITION_ASSESSMENT_IMAGE_RIGHT_TYPE.E55', 'value'), placeholder: '{% trans 'Copyright' %}', dataKey: 'CONDITION_ASSESSMENT_IMAGE_RIGHT_TYPE.E55'}">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-xs-12 col-sm-3 add-button-column add-margin-top">
+                                                                {% include 'views/components/add-item-button.htm' %}
+                                                            </div>
+                                                            <div class="col-xs-12 col-sm-9">
+                                                                <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "You must enter a value." %}</div>
+                                                            </div>
+                                                            <div class="col-xs-12">
+                                                                <div class="margin-left-10 margin-top-5" style="display: none;" data-bind="visible: true">
+                                                                    <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "None" %}</div>
+                                                                    <div data-bind="foreach: getBranchLists()">
+                                                                        <div class="arches-crud-record">
+                                                                            <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans 'Delete this value' %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                                                            <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans 'Edit' %}">
+                                                                                <span data-bind='text: nodes.get("CONDITION_ASSESSMENT_IMAGE_CREATOR_NAME.E41", "value")'></span><span class="text-muted" data-bind="visible: nodes.get('CONDITION_ASSESSMENT_IMAGE_CREATOR_NAME.E41', 'value').length > 0"> ( {% trans 'Creator' %} )</span>
+                                                                                <span data-bind='text: nodes.get("CONDITION_ASSESSMENT_IMAGE_RIGHT_TYPE.E55", "label")'></span><span class="text-muted" data-bind="visible: nodes.get('CONDITION_ASSESSMENT_IMAGE_RIGHT_TYPE.E55', 'value').length > 0"> ( {% trans 'Copyright' %} )</span>
+                                                                                <span class="text-muted" data-bind="visible: nodes.get('CONDITION_ASSESSMENT_IMAGE_IMAGE_DATE.E49', 'value').length > 0">{% trans 'On: ' %}</span><span data-bind="{text: nodes.get('CONDITION_ASSESSMENT_IMAGE_IMAGE_DATE.E49', 'value')}"></span>
+                                                                            </a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </dd>
+                                                    </dl>
                                                 </div>
                                             </div>
 
