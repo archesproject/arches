@@ -61,6 +61,7 @@ class Command(BaseCommand):
                 dir_path = settings.PACKAGE_DIR
                 if not os.path.isdir(dir_path):
                     print "\nCurrent PACKAGE_DIR value: "+settings.PACKAGE_DIR
+                    print "This directory does not exist."
                     raise AttributeError
             except AttributeError:
                 print "\nYou must correctly set PACKAGE_DIR in your project's "\
@@ -158,8 +159,8 @@ class Command(BaseCommand):
         for name in graph_names:
             configs[name] = {
                 "v3_entitytypeid":"<fill out manually>",
-                "v3_nodes_csv":"<run 'python manage.py v3data configs --generate_lookups'>",
-                "v3_v4_node_lookup":"<run 'python manage.py v3data configs --generate_lookups'>",
+                "v3_nodes_csv":"<run 'python manage.py v3 generate-lookups'>",
+                "v3_v4_node_lookup":"<run 'python manage.py v3 generate-lookups'>",
             }
 
         with open(os.path.join(v3_dir,"rm_configs.json"),"wb") as openfile:
