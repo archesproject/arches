@@ -25,6 +25,7 @@ class Command(BaseCommand):
         parser.add_argument('operation', choices=[
             'start-migration',
             'generate-lookups',
+            'test-lookups',
             'write-v4-json',
             'write-v4-relations',
             'convert-v3-skos',
@@ -82,6 +83,9 @@ class Command(BaseCommand):
 
         if op == 'generate-lookups':
             self.generate_lookups(dir_path,overwrite=ow)
+            
+        if op == 'test-lookups':
+            self.test_lookups(dir_path)
 
         if op == 'write-v4-json':
             resource_models = options['resource-models']
@@ -209,6 +213,19 @@ class Command(BaseCommand):
 
         with open(config_file,"wb") as openfile:
             json.dump(configs,openfile,indent=4,sort_keys=True)
+            
+    def test_lookups(self, package_dir):
+        
+        v3_data_dir = os.path.join(package_dir,"v3data")
+        errors = v3utils.test_rm_configs(v3_data_dir)
+        if len(errors) > 0:
+            print "FAIL"
+            for e in errors:
+                print e
+            exit()
+        
+        print "PASS"
+        
 
     def write_v4_json(self, package_dir, resource_models,
         direct_import=False, truncate=None, verbose=False, exclude=[]):
