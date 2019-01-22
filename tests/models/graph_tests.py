@@ -34,8 +34,7 @@ class GraphTests(ArchesTestCase):
     def setUpClass(cls):
 
         for path in test_settings.RESOURCE_GRAPH_LOCATIONS:
-            management.call_command('packages', operation='import_graphs',
-                                source=path)
+            management.call_command('packages', operation='import_graphs', source=path)
 
         cls.NODE_NODETYPE_GRAPHID = '22000000-0000-0000-0000-000000000001'
         cls.SINGLE_NODE_GRAPHID = '22000000-0000-0000-0000-000000000000'
