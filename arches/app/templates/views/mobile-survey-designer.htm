@@ -141,7 +141,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!-- Survey Stats -->
                                         <div class="msm-stats-panel">
-                                            <div class="col-xs-12 col-sm-4">
+                                            <div class="col-xs-16 col-sm-4">
                                                 <div class="msm-stat">
                                                     <span class="msm-stat-time">15:32:47</span>
                                                     <span class="msm-stat-date">January 12, 2019</span>
@@ -196,6 +196,28 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             </li>
                                         </ul>
                                     </div>
+
+                                    <!-- Data Summary -->
+                                    <div class="msm-report-section">
+                                        <p class="mpm-item-listing-header">
+                                            {% trans 'Data download' %}
+                                        </p>
+                                        <ul class="mpm-node-detail-metadata">
+                                            <li class="">
+                                                {% trans 'Limit:' %} <span data-bind="text: mobilesurvey.datadownloadconfig.count()"></span>
+                                            </li>
+                                        </ul>
+                                        <div class="mpm-node-detail-metadata">
+                                            <ul>{% trans 'Resource Types:' %}
+                                                <ul class="mpm-node-detail-metadata">
+                                                    <!-- ko foreach: {data:allResources, as: 'resource'} -->
+                                                    <li class="" data-bind="text: resource.name, visible: _.contains($parent.mobilesurvey.datadownloadconfig.resources(), resource.id)"></li>
+                                                    <!-- /ko -->
+                                                </ul>
+                                            </ul>
+                                        </div>
+                                    </div>
+
 
                                     <div class="msm-report-section">
                                         <p class="mpm-item-listing-header">

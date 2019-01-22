@@ -6235,7 +6235,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 
 /*  Start card/widget manager Classes
-    used to manage placement and display of elements inside of the Card 
+    used to manage placement and display of elements inside of the Card
     and Widget Management forms
 */
 .panel-config {
@@ -10899,17 +10899,17 @@ a.search-facet-item.disabled {
 }
 
 .msm-account-listing-panel {
-    display: flex; 
-    flex-direction: column; 
+    display: flex;
+    flex-direction: column;
     flex: 1;
     background: #fff;
 }
 
 .msm-account-summary-panel {
-    display: flex; 
-    flex-direction: column; 
+    display: flex;
+    flex-direction: column;
     background: #fcfcfc;
-    flex: 1; 
+    flex: 1;
     border-left: solid 1px #ccc;
 }
 
@@ -10934,9 +10934,9 @@ a.search-facet-item.disabled {
 }
 
 .model-selection .msm-icon-wrap {
-    background: #fff; 
-    color:#2d3c4b; 
-    padding-top: 15px; 
+    background: #fff;
+    color:#2d3c4b;
+    padding-top: 15px;
     border: 1px solid #2d3c4b;
 }
 
@@ -11794,7 +11794,7 @@ a.filter-tools:hover {
 }
 
 .msm-survey-status-instructions {
-    padding: 20px 10px 5px 10px; 
+    padding: 20px 10px 5px 10px;
     font-size: 19px;
     text-align: center;
 }
@@ -11939,6 +11939,7 @@ a.filter-tools:hover {
 
 .msm-stat-date {
     font-size: 17px;
+    white-space: nowrap;
 }
 
 .profile-mpm-panel {
