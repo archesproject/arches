@@ -8,6 +8,7 @@ from django.core import management
 from django.core.management.base import BaseCommand, CommandError
 from arches.app.models.graph import Graph
 from arches.app.models.models import TileModel, Node
+from arches.app.utils import v3utils
 from arches.app.utils.v3migration import v3Importer, v3SkosConverter
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.models.system_settings import settings
@@ -203,8 +204,8 @@ class Command(BaseCommand):
                 for node in v3_business_nodes:
                     writer.writerow([node,''])
 
-            config['v3_nodes_csv'] = os.path.relpath(csv_file)
-            config['v3_v4_node_lookup'] = os.path.relpath(lookup_file)
+            config['v3_nodes_csv'] = os.path.basename(csv_file)
+            config['v3_v4_node_lookup'] = os.path.basename(lookup_file)
 
         with open(config_file,"wb") as openfile:
             json.dump(configs,openfile,indent=4,sort_keys=True)
