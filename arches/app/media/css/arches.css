@@ -2801,6 +2801,17 @@ div.dropdown-menu.open {
     z-index: 100000001;
 }
 
+
+.loading-mask-string {
+    font-size: 45px;
+    font-weight: 600;
+    width: 100%;
+    text-align: center;
+    top: 25%;
+    position: absolute;
+    color: #222;
+}
+
 .graph-designer-loading-mask {
     position: relative;
     opacity: .5;
