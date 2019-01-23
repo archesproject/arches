@@ -16,7 +16,7 @@ define([
     var viewModel = new MobileSurveyViewModel(data);
     viewModel.arches = arches;
     viewModel.saveMobileSurvey = function() {
-        this.loading(true);
+        this.loading(data.transstrings.loadingmessage);
         var self = this;
         this.mobilesurvey.save(function(data) {
             if (!data.responseJSON.success) {
