@@ -202,6 +202,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <p class="mpm-item-listing-header">
                                             {% trans 'Data download' %}
                                         </p>
+                                        <!--ko if: mobilesurvey.datadownloadconfig.resources().length === 0 -->
+                                        <ul class="mpm-node-detail-metadata">{% trans 'No data selected for download' %}</ul>
+                                        <!--/ko-->
+                                        <!--ko if: mobilesurvey.datadownloadconfig.resources().length > 0 -->
                                         <ul class="mpm-node-detail-metadata">
                                             <li class="">
                                                 {% trans 'Limit:' %} <span data-bind="text: mobilesurvey.datadownloadconfig.count()"></span>
@@ -216,6 +220,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </ul>
                                             </ul>
                                         </div>
+                                        <!--/ko-->
                                     </div>
 
 
