@@ -587,8 +587,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     </div>
 
                                     <!-- Account Summary Panel -->
-                                    <div class="msm-account-summary-panel" style="">
-                                        <div class="mpm-group-panel-header">
+                                    <div class="msm-account-summary-panel">
+                                        <div class="mpm-group-panel-header" style="border-left: 1px solid #ccc;">
                                             <h4 class="msm-group-label">{% trans "Account Summary" %}</h4>
                                             <div class="msm-basemap-subtitle">
                                                 {% trans "User identification and data editing statistics" %}
@@ -598,20 +598,34 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <div class="mpm-user-panel-content">
                                             <!--ko if: mobilesurvey.selectedUser() -->
                                             <!-- User Name -->
+                                            <!--ko if: mobilesurvey.selectedUser().first_name || mobilesurvey.selectedUser().last_name-->
                                             <div class="msm-stat-user-panel">
                                                 <span class="msm-stat-user" data-bind="text: mobilesurvey.selectedUser().first_name + ' ' + mobilesurvey.selectedUser().last_name"></span>
                                             </div>
                                             <div class="msm-stat-label">
                                                 {% trans 'User Name' %}
                                             </div>
+                                            <!--/ko-->
+                                            <!--ko ifnot: mobilesurvey.selectedUser().first_name || mobilesurvey.selectedUser().last_name-->
+                                            <div class="msm-stat-label">
+                                                {% trans 'No user name' %}
+                                            </div>
+                                            <!--/ko-->
 
-                                            <!-- User Email -->
+                                            <!--ko if: mobilesurvey.selectedUser().email -->
                                             <div class="msm-stat-user-panel">
                                                 <span class="msm-stat-user" data-bind="text: mobilesurvey.selectedUser().email"></span>
                                             </div>
                                             <div class="msm-stat-label">
                                                 {% trans 'User Email' %}
                                             </div>
+                                            <!--/ko-->
+                                            <!--ko if: mobilesurvey.selectedUser().email -->
+                                            <div class="msm-stat-label">
+                                                {% trans 'No user email' %}
+                                            </div>
+                                            <!--/ko-->
+
 
                                             <!-- Last Synch -->
                                              <div class="msm-stat-user-panel">
@@ -664,7 +678,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     data: {name: {% trans "'Data'" %}, namelong: {% trans "'Data Download'" %}, description: {% trans "'Define the data you will allow users to download'" %}},
                     people: {name: {% trans "'People'" %}, namelong: {% trans "'People'" %}, description: {% trans "'Summary of people invited to participate in this survey'" %}},
                     groupplaceholder: {% trans "'Select one or more groups...'" %},
-                    modelplaceholder: {% trans "'Select one or more resource models...'" %}
+                    modelplaceholder: {% trans "'Select one or more resource models...'" %},
+                    loadingmessage: {% trans "'Saving survey - this may take a few minutes'" %}
                 }
             };
         });{% endautoescape %}
