@@ -2803,13 +2803,15 @@ div.dropdown-menu.open {
 
 
 .loading-mask-string {
-    font-size: 45px;
+    font-size: 35px;
     font-weight: 600;
     width: 100%;
     text-align: center;
     top: 25%;
     position: absolute;
     color: #222;
+    background-color: #999;
+    z-index: 8000;
 }
 
 .graph-designer-loading-mask {

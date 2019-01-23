@@ -49,15 +49,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <body {% block body_attributes %}class="scroll-y-auto"{% endblock %}>
     {% block loading_mask %}
 
-    <!--ko if: typeof loading() === "boolean" -->
-    <div class="loading-mask" data-bind="visible: loading()"></div>
-    <!--/ko-->
+    <div class="loading-mask" data-bind="visible: typeof(loading()) === 'boolean' && loading()"></div>
 
-    <!--ko if: typeof loading() === "string" -->
-    <div class="loading-mask" data-bind="visible: loading()">
+    <div class="loading-mask" style="display: none;" data-bind="visible: typeof(loading()==='string') && loading().length > 0">
         <div class="loading-mask-string" data-bind="text: loading"></div>
     </div>
-    <!--/ko-->
+
 
     {% endblock loading_mask %}
     {% block body %}
