@@ -257,7 +257,7 @@ class MobileSurvey(models.MobileSurveyModel):
 
             for row in couch_docs:
                 ret.append(row)
-                if row.doc['type'] == 'tile':
+                if row.doc['type'] == 'tile' and ResourceInstance.objects.filter(pk=row.doc['resourceinstance_id']).exists():
                     if 'provisionaledits' in row.doc and row.doc['provisionaledits'] is not None:
                         try:
                             tile = Tile.objects.get(tileid=row.doc['tileid'])
