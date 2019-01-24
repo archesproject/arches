@@ -602,34 +602,45 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <div class="mpm-user-panel-content">
                                             <!--ko if: mobilesurvey.selectedUser() -->
-                                            <!-- User Name -->
-                                            <!--ko if: mobilesurvey.selectedUser().first_name || mobilesurvey.selectedUser().last_name-->
-                                            <div class="msm-stat-user-panel">
-                                                <span class="msm-stat-user" data-bind="text: mobilesurvey.selectedUser().first_name + ' ' + mobilesurvey.selectedUser().last_name"></span>
-                                            </div>
-                                            <div class="msm-stat-label">
-                                                {% trans 'User Name' %}
-                                            </div>
-                                            <!--/ko-->
-                                            <!--ko ifnot: mobilesurvey.selectedUser().first_name || mobilesurvey.selectedUser().last_name-->
-                                            <div class="msm-stat-label">
-                                                {% trans 'No user name' %}
-                                            </div>
-                                            <!--/ko-->
+                                                <!-- User Name -->
+                                                <!--ko if: mobilesurvey.selectedUser().first_name || mobilesurvey.selectedUser().last_name-->
+                                                <div class="msm-stat-user-panel">
+                                                    <span class="msm-stat-user" data-bind="text: mobilesurvey.selectedUser().first_name + ' ' + mobilesurvey.selectedUser().last_name"></span>
+                                                </div>
+                                                <!--/ko-->
+                                                <!--ko ifnot: mobilesurvey.selectedUser().first_name || mobilesurvey.selectedUser().last_name-->
+                                                <div class="msm-stat-user-panel">
+                                                    <span class="msm-stat-user">{% trans 'No user name' %}</span>
+                                                </div>
+                                                <!--/ko-->
+                                                <div class="msm-stat-label">
+                                                    {% trans 'User Name' %}
+                                                </div>
 
-                                            <!--ko if: mobilesurvey.selectedUser().email -->
-                                            <div class="msm-stat-user-panel">
-                                                <span class="msm-stat-user" data-bind="text: mobilesurvey.selectedUser().email"></span>
-                                            </div>
-                                            <div class="msm-stat-label">
-                                                {% trans 'User Email' %}
-                                            </div>
-                                            <!--/ko-->
-                                            <!--ko if: mobilesurvey.selectedUser().email -->
-                                            <div class="msm-stat-label">
-                                                {% trans 'No user email' %}
-                                            </div>
-                                            <!--/ko-->
+                                                <!--ko ifnot: mobilesurvey.selectedUser().email -->
+                                                <div class="msm-stat-user-panel">
+                                                    <span class="msm-stat-user">{% trans 'No user email' %}</span>
+                                                </div>
+                                                <!--/ko-->
+                                                <!--ko if: mobilesurvey.selectedUser().email -->
+                                                <div class="msm-stat-user-panel">
+                                                    <span class="msm-stat-user" data-bind="text: mobilesurvey.selectedUser().email"></span>
+                                                </div>
+                                                <!--/ko-->
+                                                <div class="msm-stat-label">
+                                                    {% trans 'User Email' %}
+                                                </div>
+
+                                                <div class="msm-stat-user-panel">
+                                                    <span class="msm-stat-user" style="font-size:18px" data-bind="text:mobilesurvey.selectedUser().groups"></span>
+                                                </div>
+                                                <div class="msm-stat-label">
+                                                    {% trans 'Assigned Groups' %}
+                                                </div>
+
+                                                <!--/ko-->
+
+
 
 
                                             <!-- Last Synch -->

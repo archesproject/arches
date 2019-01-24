@@ -105,6 +105,8 @@ define([
                 var result = r.cards().filter(function(c){return ko.unwrap(c.approved) === true;}).length > 0;
                 if (result === false) {
                     self.mobilesurvey.datadownloadconfig.resources.remove(r.id);
+                } else if (_.contains(self.mobilesurvey.datadownloadconfig.resources(), r.id) === false) {
+                    self.mobilesurvey.datadownloadconfig.resources.push(r.id);
                 }
                 return result;
             });
