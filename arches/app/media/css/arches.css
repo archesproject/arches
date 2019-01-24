@@ -10794,6 +10794,10 @@ a.search-facet-item.disabled {
     border-bottom: transparent;
 }
 
+.mpm-card-content.active-survey {
+    background: #f3f3f3;
+}
+
 .msm-summary-panel .selection-page {
     height: 100vh;
 }

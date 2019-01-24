@@ -76,40 +76,69 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <!-- Project Summary Panel -->
                             <div class="mpm-activation-panel">
 
-                                <!-- Survey Status Panel -->
-                                <div class="mpm-card-content">
+                            <!--ko if: surveyReady().incomplete === false-->
+                            <!-- Survey Status Panel -->
+                            <div class="mpm-card-content" data-bind="css: {'active-survey': mobilesurvey.activatedOnServer()}">
 
-                                    <!-- Icon and Status warning -->
-                                    <div class="mpm-survey-status-header">
-                                        <!--ko if: surveyReady().incomplete === false && mobilesurvey.active() === true -->
-                                        <i class="msm-icon-wrap fa fa-check" style="color:forestgreen; background: #a4e2a4; border: 1px solid forestgreen; padding-right:5px;"></i>
-                                        <div class="msm-survey-status-text">{% trans 'Survey Status: Ready' %}</div>
-                                        <div class="msm-survey-status-instructions">{% trans 'Users can download survey and collect data' %}</div>
-                                        <!--/ko-->
-                                        <!--ko if: surveyReady().incomplete === false && mobilesurvey.active() === false -->
-                                        <i class="msm-icon-wrap fa fa-check" style="color:#333; background: #eee; border: 1px solid #333; padding-right:5px;"></i>
-                                        <div class="msm-survey-status-text">{% trans 'Survey Status: Complete, but inactive' %}</div>
-                                        <div class="msm-survey-status-instructions">{% trans 'Survey must be activated to be available to users' %}</div>
-                                        <!--/ko-->
-                                        <!--ko if: surveyReady().incomplete -->
-                                        <i class="msm-icon-wrap fa fa-exclamation-triangle" style="color:orange; padding-right:5px;"></i>
-                                        <div class="msm-survey-status-text">{% trans 'Survey Status: Incomplete' %}</div>
-                                        <div class="msm-survey-status-instructions">{% trans 'You won’t be able to activate this survey until you have addressed the following items:' %}</div>
-                                        <!--/ko-->
-                                    </div>
-
-                                    <!-- Survey Items that need to be addressed -->
-                                    <div class="text-center">
-                                        <ul class="msm-survey-issues">
-                                            <li data-bind = "visible: surveyReady().cards == false">{% trans 'Select the Model(s) and associated data entry cards to include in the survey' %}</li>
-                                            <li data-bind = "visible: surveyReady().identities == false">{% trans 'Select the People that you want to invite to the survey' %}</li>
-                                            <li data-bind = "visible: surveyReady().daterange == false">{% trans 'Define the start and end dates of your survey' %}</li>
-                                            <li data-bind = "visible: surveyReady().mapsources == false">{% trans 'Define either an online or offline basemap source' %}</li>
-                                            <li data-bind = "visible: surveyReady().bounds == false">{% trans 'Define a map extent' %}</li>
-                                            <li data-bind = "visible: surveyReady().unexpired == false">{% trans 'End date must be after the current date' %}</li>
-                                        </ul>
-                                    </div>
+                                <!-- Icon and Status warning -->
+                                <div class="mpm-survey-status-header">
+                                    <i class="msm-icon-wrap fa fa-check" style="color:#333; background: #eee; border: 1px solid #333; padding-right:5px;"></i>
+                                    <div class="msm-survey-status-text">{% trans 'Survey Requirements: Complete' %}</div>
+                                    <div class="msm-survey-status-text" data-bind="text: mobilesurvey.activatedOnServer() === true ? '{% trans "Survey Status: Active" %}' : '{% trans " Survey Status: Inactive" %}'"></div>
                                 </div>
+
+                                <!--ko if: mobilesurvey.activatedOnServer() === false && mobilesurvey.active() === true -->
+                                <div class="msm-survey-status-instructions">{% trans 'You are activating this survey. Users will be able to download this survey and begin collecting data.' %}</div>
+                                <!--/ko-->
+
+                                <!--ko if: mobilesurvey.activatedOnServer() === true && mobilesurvey.active() === false -->
+                                <div class="msm-survey-status-instructions">{% trans 'You are deactivating this survey. Users will be unable to download this survey.' %}</div>
+                                <!--/ko-->
+
+                                <!--ko if: mobilesurvey.dirty() === true -->
+                                <div class="msm-survey-status-instructions">{% trans 'Save to commit your changes' %}</div>
+                                <!--/ko-->
+
+                            </div>
+                            <!--/ko-->
+
+                            <!-- Survey Status Panel -->
+                            <!--ko if: surveyReady().incomplete -->
+                            <div class="mpm-card-content incomplete" data-bind="css: {'active-survey': mobilesurvey.activatedOnServer()}">
+
+                                <!-- Icon and Status warning -->
+                                <div class="mpm-survey-status-header">
+                                    <i class="msm-icon-wrap fa fa-exclamation-triangle" style="color:orange; padding-right:5px;"></i>
+                                    <div class="msm-survey-status-text">{% trans 'Survey Requirements: Incomplete' %}</div>
+                                    <div class="msm-survey-status-text" data-bind="text: mobilesurvey.activatedOnServer() === true ? '{% trans "Survey Status: Active" %}' : '{% trans " Survey Status: Inactive" %}'"></div>
+                                </div>
+
+                                <!--ko if: mobilesurvey.activatedOnServer() === true && mobilesurvey.active() === false -->
+                                <div class="msm-survey-status-instructions" style="display: flex; flex-direction: column">
+                                    <span>{% trans 'Incomplete surveys cannot be active.' %}</span>
+                                    <span>{% trans 'By saving an incomplete survey it will be deactivated.' %}</span>
+                                    <span>{% trans 'You must complete the following before saving this survey as active:' %}
+                                </div>
+                                <!--/ko-->
+
+                                <!--ko if: mobilesurvey.activatedOnServer() === false -->
+                                <div class="msm-survey-status-instructions">{% trans 'You won’t be able to activate this survey until you have addressed the following items:' %}</div>
+                                <!--/ko-->
+
+                                <!-- Survey items that need to be addressed -->
+                                <div class="text-center">
+                                    <ul class="msm-survey-issues">
+                                        <li data-bind = "visible: surveyReady().cards == false">{% trans 'Select the Model(s) and associated data entry cards to include in the survey' %}</li>
+                                        <li data-bind = "visible: surveyReady().identities == false">{% trans 'Select the People that you want to invite to the survey' %}</li>
+                                        <li data-bind = "visible: surveyReady().daterange == false">{% trans 'Define the start and end dates of your survey' %}</li>
+                                        <li data-bind = "visible: surveyReady().mapsources == false">{% trans 'Define either an online or offline basemap source' %}</li>
+                                        <li data-bind = "visible: surveyReady().bounds == false">{% trans 'Define a map extent' %}</li>
+                                        <li data-bind = "visible: surveyReady().unexpired == false">{% trans 'End date must be after the current date' %}</li>
+                                    </ul>
+                                </div>
+
+                            </div>
+                            <!--/ko-->
 
 
                                 <!-- Activate Project -->
@@ -610,7 +639,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 <!--/ko-->
                                                 <!--ko ifnot: mobilesurvey.selectedUser().first_name || mobilesurvey.selectedUser().last_name-->
                                                 <div class="msm-stat-user-panel">
-                                                    <span class="msm-stat-user">{% trans 'No user name' %}</span>
+                                                    <span class="msm-stat-user">{% trans 'Not set' %}</span>
                                                 </div>
                                                 <!--/ko-->
                                                 <div class="msm-stat-label">
@@ -619,7 +648,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                                 <!--ko ifnot: mobilesurvey.selectedUser().email -->
                                                 <div class="msm-stat-user-panel">
-                                                    <span class="msm-stat-user">{% trans 'No user email' %}</span>
+                                                    <span class="msm-stat-user">{% trans 'Not set' %}</span>
                                                 </div>
                                                 <!--/ko-->
                                                 <!--ko if: mobilesurvey.selectedUser().email -->

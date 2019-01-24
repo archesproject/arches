@@ -16,14 +16,40 @@ define([
     var viewModel = new MobileSurveyViewModel(data);
     viewModel.arches = arches;
     viewModel.saveMobileSurvey = function() {
-        this.loading(data.transstrings.loadingmessage);
         var self = this;
-        this.mobilesurvey.save(function(data) {
-            if (!data.responseJSON.success) {
-                pageView.viewModel.alert(new AlertViewModel('ep-alert-red', data.responseJSON.title, data.responseJSON.message));
-            }
-            self.loading(false);
-        });
+        var title;
+        var message;
+
+        if (this.mobilesurvey.activatedOnServer() === this.mobilesurvey.active()) {
+            this.loading(data.transstrings.loadingmessage);
+            this.mobilesurvey.save(function(data) {
+                if (!data.responseJSON.success) {
+                    pageView.viewModel.alert(new AlertViewModel('ep-alert-red', data.responseJSON.title, data.responseJSON.message));
+                }
+                self.loading(false);
+            });
+            return;
+        }
+
+        if (this.mobilesurvey.activatedOnServer() === true && this.mobilesurvey.active() === false) {
+            title = "You are deactivating an active survey";
+            message = "Users will not be able to download this survey to their device";
+        } else if (this.mobilesurvey.activatedOnServer() === false && this.mobilesurvey.active() === true) {
+            title = "You are activating this survey";
+            message = "Users will immediately be able to download this survey and begin collecting data";
+        }
+        pageView.viewModel.alert(new AlertViewModel('ep-alert-blue', title, message, function() {
+            return;
+        }, function(){
+            self.loading(data.transstrings.loadingmessage);
+            self.mobilesurvey.save(function(data) {
+                if (!data.responseJSON.success) {
+                    pageView.viewModel.alert(new AlertViewModel('ep-alert-red', data.responseJSON.title, data.responseJSON.message));
+                }
+                self.loading(false);
+            });
+            return;
+        }));
     };
 
     viewModel.activePage = ko.observable('root');
