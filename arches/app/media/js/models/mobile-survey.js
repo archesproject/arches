@@ -29,6 +29,7 @@ define([
             self.bounds = ko.observable(self.getDefaultBounds(null));
             self.collectedResources = ko.observable(false);
             self.showCustomDataDownload = ko.observable(false);
+            self.datadownloadconfig.resources.extend({ rateLimit: 50 });
 
             var getUserName = function(id) {
                 var user = _.find(self.identities, function(i) {
