@@ -17,6 +17,7 @@ define([
             self.startdate = ko.observable(null);
             self.enddate = ko.observable(null);
             self.active = ko.observable(false);
+            self.activatedOnServer = ko.observable(options.source.active);
             self.createdby = ko.observable(null);
             self.lasteditedby = ko.observable(null);
             self.users = ko.observableArray([]);
@@ -262,6 +263,7 @@ define([
             self.startdate(source.startdate);
             self.enddate(source.enddate);
             self.active(source.active);
+            self.activatedOnServer(source.active);
             self.createdby(source.createdby_id);
             self.lasteditedby(source.lasteditedby_id);
             self.groups(source.groups);
@@ -301,6 +303,7 @@ define([
                     self.datadownloadconfig.count(request.responseJSON.mobile_survey.datadownloadconfig.count);
                     self.datadownloadconfig.resources(request.responseJSON.mobile_survey.datadownloadconfig.resources);
                     self.datadownloadconfig.custom(request.responseJSON.mobile_survey.datadownloadconfig.custom);
+                    self.activatedOnServer(request.responseJSON.mobile_survey.active);
                     this._mobilesurvey(this.json());
                 }
             };

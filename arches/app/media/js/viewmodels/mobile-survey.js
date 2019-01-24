@@ -291,10 +291,18 @@ define([
                 status.unexpired
             ].includes(false);
 
-            if (status.incomplete) {
+            return status;
+        }, this);
+
+        this.surveyReady.subscribe(function(val){
+            if (val.incomplete) {
                 this.mobilesurvey.active(false);
             }
-            return status;
+            //TODO: Switch the active status back to true if activatedOnServer is True
+            // Currently this does not work properly because activatedOnServer() is not updating in time.
+            //else if (!status.incomplete && this.mobilesurvey.activatedOnServer() === true) {
+            //     this.mobilesurvey.active(true);
+            // }
         }, this);
 
         this.treenodes = [{
