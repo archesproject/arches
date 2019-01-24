@@ -610,7 +610,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 <!--/ko-->
                                                 <!--ko ifnot: mobilesurvey.selectedUser().first_name || mobilesurvey.selectedUser().last_name-->
                                                 <div class="msm-stat-user-panel">
-                                                    <span class="msm-stat-user">{% trans 'No user name' %}</span>
+                                                    <span class="msm-stat-user">{% trans 'Not set' %}</span>
                                                 </div>
                                                 <!--/ko-->
                                                 <div class="msm-stat-label">
@@ -619,7 +619,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                                 <!--ko ifnot: mobilesurvey.selectedUser().email -->
                                                 <div class="msm-stat-user-panel">
-                                                    <span class="msm-stat-user">{% trans 'No user email' %}</span>
+                                                    <span class="msm-stat-user">{% trans 'Not set' %}</span>
                                                 </div>
                                                 <!--/ko-->
                                                 <!--ko if: mobilesurvey.selectedUser().email -->
