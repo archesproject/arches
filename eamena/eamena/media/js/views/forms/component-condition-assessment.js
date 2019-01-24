@@ -45,7 +45,7 @@ define(['jquery',
             this.count = undefined;
             this.newfiles = ko.observableArray();
 
-            ko.applyBindings(this.newfiles, this.$el.find('#image-section')[0]);
+            ko.applyBindings(this.newfiles, this.$el.find('#new-image-section')[0]);
 
             // detect if dropzone is attached, and if not init
             if (!dropzoneEl.hasClass('dz-clickable')) {
@@ -127,63 +127,12 @@ define(['jquery',
             }
 
             this.addBranchList(new BranchList({
-                el: this.$el.find('#current-files-section')[0],
+                el: this.$el.find('#image-file-section')[0],
                 data: this.data,
                 dataKey: 'current-files',
                 validateBranch: function (nodes) {
                     return true;
-                },
-                // editItem: function(branch){
-                //     var self = this;
-                //     BranchList.prototype.editItem.call(this, branch);
-                //     $('#title_box').show();
-                //     $('#title_h5').show();
-                //     $('#catalogue_box').show();
-                //     $('#catalogue_h5').show();
-                //     _.each(branch.nodes(), function(node){
-                //             if (node.entitytypeid() === 'TITLE.E41'){
-                //                 $('#catalogue_box').hide();
-                //                 $('#catalogue_h5').hide();
-                //             }else if (node.entitytypeid() === 'CATALOGUE_ID.E42') {
-                //                 $('#title_box').hide();
-                //                 $('#title_h5').hide();
-                //             }
-                //     }, this);
-                //     $('#deletewarning').slideUp();
-                //     $('#editform').slideDown();
-                //     $('#savebtn').show();
-                //     $('#deletebtn').hide();
-                //
-                //     var modaldialog = $('#edit_file_resource_modal');
-                //     modaldialog.modal().show();
-                // },
-                // updateItem: function(branchlist, evt){
-                //     var data = koMapping.toJS(this.getEditedBranch());
-                //     evt.preventDefault();
-                //     $('.form-load-mask').show();
-                //     self.form.find('#formdata').val(JSON.stringify({'current-files': data}));
-                //     self.form.submit();
-                // },
-                // confirmDelete: function(branchlist, evt){
-                //     $('#deletewarning').slideDown(500);
-                //     $('#editform').slideUp(500);
-                //     $('#savebtn').hide(500);
-                //     $('#deletebtn').show(500);
-                // },
-                // deleteItem: function(branchlist, evt){
-                //     var relationship = koMapping.toJS(branchlist.getEditedBranch().nodes.get('ARCHES_RESOURCE_CROSS-REFERENCE_RELATIONSHIP_TYPES.E55'));
-                //     $.ajax({
-                //         url: arches.urls.related_resources + relationship.entityid1,
-                //         method: 'DELETE',
-                //         data: JSON.stringify(relationship),
-                //         success: function(response) {
-                //             branchlist.removeEditedBranch();
-                //         }
-                //     });
-                // },
-                // getData: function(){
-                //     return [];
-                // }
+                }
             }));
 
             this.newfilebranchlist = this.addBranchList(new BranchList({
@@ -233,7 +182,7 @@ define(['jquery',
             this.addBranchList(new BranchList({
                 el: this.$el.find('#image-information-section')[0],
                 data: this.data,
-                dataKey: 'CONDITION_ASSESSMENT_IMAGE.E38',
+                dataKey: 'CONDITION_ASSESSMENT_IMAGE_CREATION.E65',
                 validateBranch: function(nodes) {
                     return vt.mustHaveAtLeastOne(nodes)
                 }
@@ -360,20 +309,24 @@ define(['jquery',
             this.cancel(); 
         },
         submit: function(evt){
-            console.log("IN NEW SUBMIT");
+            evt.preventDefault();
             var validationAlert = this.$el.find('.wizard-invalid-alert');
-            console.log("branches");
-            console.log(this.branchLists);
-            console.log("data");
-            console.log(this.getData());
+            var hasnewdata = false;
+            _.each(this.branchLists, function(branchList){
+               if(branchList.dataKey === 'new-files' && branchList.getData().length > 0){
+                   hasnewdata = true;
+               }
+            });
 
             if (this.validate()){
                 this.$el.find('.form-load-mask').show();
                 this.form.find('#formdata').val(this.getData());
-                evt.preventDefault();
-                evt.stopPropagation();
-                this.dropzoneInstance.processQueue();
-                // TODO: Need to add choice of submit depending if image is uploaded or not.
+                if(hasnewdata === true) {
+                    evt.stopPropagation();
+                    this.dropzoneInstance.processQueue();
+                }else{
+                    this.form.submit();
+                }
 
             }else {
                 validationAlert.show(300);

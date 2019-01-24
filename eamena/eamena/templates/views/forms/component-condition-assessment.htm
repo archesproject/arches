@@ -202,37 +202,31 @@
                                                     <i class="fa-fw fa fa-info"></i>
                                                     {% trans "Upload image of component condition." %}
                                                 </div>
-                                                <div class="row margin-top-minus-5 margin-bottom-10" id="current-files-section" style="display: none;" data-bind="visible: true">
-                                                    <div class="row">
-                                                        <div class="col-xs-12">
 
-                                                            <div style="margin-left: 20px; padding-top: 5px;" id="links">
-                                                                <div data-bind="foreach: getBranchLists()">
-                                                                    <div data-bind="if: nodes.get('CONDITION_ASSESSMENT_IMAGE_FILE_PATH.E62', 'value') !== ''" style="position: relative; display: inline-block; margin:1px;">
-                                                                        <a style="position:absolute; background-color:rgba(0, 0, 0, 0.5); padding-left: 4px; width: 20px;" data-bind="click: $parent.editItem.bind($parent)"><i class="fa fa-edit" style="color:white;"></i></a>
-                                                                        <a title="" data-gallery="links2" data-bind="attr: { href: nodes.get('CONDITION_ASSESSMENT_IMAGE_FILE_PATH.E62', 'value'), title: 'test'}" target="_blank">
-                                                                            <img alt="" data-bind="attr: { src: nodes.get('CONDITION_ASSESSMENT_IMAGE_FILE_PATH.E62', 'value')}">
-                                                                        </a>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                        </div>
-                                                    </div>
-                                                </div>
                                                 <div class="row margin-bottom-20">
-                                                    <dl id="image-section">
+                                                    <dl id="image-file-section">
                                                         <dt>
                                                             <div class="col-xs-12">
                                                                 <h5 id="arches-names-form" class="section-headline">{% trans "File Upload" %}</h5>
                                                             </div>
                                                         </dt>
-                                                        <div class="col-xs-12">
-                                                            <!-- TODO: Need to check if a current file already exists before showing dropzone -->
-                                                            <div class="dropzone" id="mydropzone">
-
+                                                        <dd>
+                                                            <div class="col-xs-12 col-sm-9">
+                                                                <div data-bind="visible: getBranchLists().length == 0">
+                                                                    <div class="dropzone" id="dropzone"></div>
+                                                                </div>
+                                                                <div class="col-xs-6">
+                                                                    <div data-bind="foreach: getBranchLists()">
+                                                                        <div data-bind="if: nodes.get('CONDITION_ASSESSMENT_IMAGE_FILE_PATH.E62', 'value') !== ''" style="position: relative; display: inline-block; margin:1px;">
+                                                                            <a style="position:absolute; padding-left: 4px; width: 20px;" data-bind="click: $parent.deleteItem.bind($parent)"><i class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                                                            <a title="" data-gallery="links2" data-bind="attr: { href: nodes.get('CONDITION_ASSESSMENT_IMAGE_FILE_PATH.E62', 'value'), title: 'Uploaded image'}" target="_blank">
+                                                                                <img alt="" data-bind="attr: { src: nodes.get('CONDITION_ASSESSMENT_IMAGE_FILE_PATH.E62', 'value')}" style="width:100%;max-height: 100%;object-fit: cover;">
+                                                                            </a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                        </div>
+                                                        </dd>
                                                     </dl>
                                                 </div>
                                                 <div class="row margin-bottom-20">
@@ -269,6 +263,7 @@
                                                             </div>
                                                         </dd>
                                                     </dl>
+                                                    <div id="new-image-section"></div>
                                                 </div>
                                                 <div class="row margin-bottom-20">
                                                     <dl id="image-caption-section">

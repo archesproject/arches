@@ -1034,7 +1034,8 @@ class ComponentConditionAssessmentForm(ResourceForm):
         self.update_nodes('DAMAGE_STATE.E3', data)
 
         # step 2
-        self.update_nodes('CONDITION_ASSESSMENT_IMAGE.E38', data)
+        # Can't run update_nodes on CONDITION_ASSESSMENT_IMAGE.E38 or it will delete the entityid of the image file.
+        self.update_nodes('CONDITION_ASSESSMENT_IMAGE_CREATION.E65', data)
         self.update_nodes('CONDITION_ASSESSMENT_IMAGE_TITLE.E41', data)
         self.update_nodes('CONDITION_ASSESSMENT_IMAGE_DESCRIPTION.E62', data)
 
@@ -1045,63 +1046,13 @@ class ComponentConditionAssessmentForm(ResourceForm):
         self.update_nodes('ACTIVITY_PLAN.E100', data)
         self.update_nodes('ACTIVITY_PLAN_PRIORITY_ASSIGNMENT.E13', data)
 
-        filedict = {}
-        for name in files:
-            for f in files.getlist(name):
-                filedict[f.name] = f
+        if files:
+            self.resource.prune(entitytypes=['CONDITION_ASSESSMENT_IMAGE_FILE_PATH.E62'])
+            self.resource.trim()
 
-        for newfile in data.get('new-files', []):
-            print "%s" % newfile
-            if newfile['id'] not in filedict:
-                continue
-            print "Have ID - will try to save value to resource"
-            self.resource.set_entity_value('CONDITION_ASSESSMENT_IMAGE_FILE_PATH.E62', filedict[newfile['id']])
-            self.resource.save()
-            print "Saved resource"
-            print "%s" % self.resource
+            for key, value in files.items():
+                self.resource.set_entity_value('CONDITION_ASSESSMENT_IMAGE_FILE_PATH.E62', value)
 
-
-        edited_file = data.get('current-files', None)
-        if edited_file:
-            print "Edited file!!"
-            # TODO: Will we have this section? Can an uploaded file be edited - or just deleted?
-            title = ''
-            title_type = ''
-            description = ''
-            description_type = ''
-            is_image = False
-            # for node in edited_file.get('nodes'):
-            #     if node['entitytypeid'] == 'TITLE.E41' and node.get('value') != '':
-            #         title = node.get('value')
-            #     if node['entitytypeid'] == 'CATALOGUE_ID.E42' and node.get('value') != '':
-            #         title = node.get('value')
-            #         is_image = True
-            #     elif node['entitytypeid'] == 'INFORMATION_RESOURCE_TYPE.E55':
-            #         title_type = node.get('value')
-            #     elif node['entitytypeid'] == 'DESCRIPTION.E62':
-            #         description = node.get('value')
-            #     elif node['entitytypeid'] == 'ARCHES_RESOURCE_CROSS-REFERENCE_RELATIONSHIP_TYPES.E55':
-            #         resourcexid = node.get('resourcexid')
-            #         entityid1 = node.get('entityid1')
-            #         entityid2 = node.get('entityid2')
-            #         relationship = RelatedResource.objects.get(pk=resourcexid)
-            #         relationship.relationshiptype = node.get('value')
-            #         relationship.save()
-            #         se.delete(index='resource_relations', doc_type='all', id=resourcexid)
-            #         se.index_data(index='resource_relations', doc_type='all', body=model_to_dict(relationship),
-            #                       idfield='resourcexid')
-            #
-            # relatedresourceid = entityid2 if self.resource.entityid == entityid1 else entityid1
-            # relatedresource = Resource().get(relatedresourceid)
-            # relatedresource.set_entity_value('INFORMATION_RESOURCE_TYPE.E55', title_type)
-            # relatedresource.set_entity_value('CATALOGUE_ID.E42',
-            #                                  title) if is_image == True else relatedresource.set_entity_value(
-            #     'TITLE.E41', title)
-            # if description != '':
-            #     #                 relatedresource.set_entity_value('INFORMATION_RESOURCE_TYPE.E55', description_type)
-            #     relatedresource.set_entity_value('DESCRIPTION.E62', description)
-            # relatedresource.save()
-            # relatedresource.index()
 
     def load(self, lang):
         if self.resource:
@@ -1123,8 +1074,8 @@ class ComponentConditionAssessmentForm(ResourceForm):
                 'branch_lists': self.get_nodes('CONDITION_ASSESSMENT_IMAGE_FILE_PATH.E62'),
                 'domains': {}
             }
-            self.data['CONDITION_ASSESSMENT_IMAGE.E38'] = {
-                'branch_lists': self.get_nodes('CONDITION_ASSESSMENT_IMAGE.E38'),
+            self.data['CONDITION_ASSESSMENT_IMAGE_CREATION.E65'] = {
+                'branch_lists': datetime_nodes_to_dates(self.get_nodes('CONDITION_ASSESSMENT_IMAGE_CREATION.E65')),
                 'domains': {
                     'CONDITION_ASSESSMENT_IMAGE_RIGHT_TYPE.E55':
                         Concept().get_e55_domain('CONDITION_ASSESSMENT_IMAGE_RIGHT_TYPE.E55'),
