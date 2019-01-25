@@ -127,7 +127,7 @@ class Command(BaseCommand):
     def prepare_package(self, full_path, overwrite=False):
         """
         Creates a directory structure that will be used throughout the v3 data
-        import process. Populates with some content based on existing installation.
+        import process. Also creates a blank v3topconcept_lookup file.
         """
 
         v3_dir = os.path.join(full_path,"v3data")
@@ -145,7 +145,7 @@ class Command(BaseCommand):
                 print e
                 exit()
         elif os.path.isdir(v3_dir) or os.path.isfile(v3_dir):
-            print "The v3data directory exists at this location:\n    "\
+            print "The v3data directory already exists at this location:\n    "\
             +v3_dir+"\nEither change your path, or re-run command with "\
             "--overwrite to replace the existing file or directory."
             exit()
@@ -157,6 +157,8 @@ class Command(BaseCommand):
         os.mkdir(os.path.join(v3_dir,'reference_data'))
         os.mkdir(os.path.join(v3_dir,'graph_data'))
 
+        with open(os.path.join(full_path,"reference_data","v3topconcept_lookup.json"),"wb") as openfile:
+            json.dump({},openfile)
 
     def generate_rm_configs(self,pkg_path):
         """generate the template for the rm_configs.json file."""
@@ -172,6 +174,7 @@ class Command(BaseCommand):
                 "v3_v4_node_lookup":"<run 'python manage.py v3 generate-lookups'>",
             }
 
+        v3_dir = os.path.join(pkg_path,"v3data")
         with open(os.path.join(v3_dir,"rm_configs.json"),"wb") as openfile:
             json.dump(configs,openfile,indent=4,sort_keys=True)
 
@@ -318,6 +321,18 @@ class Command(BaseCommand):
 
     def convert_v3_skos(self, package_dir, direct_import=False):
 
+        uuid_collection_file = os.path.join(package_dir, "reference_data", "v3topconcept_lookup.json")
+        if not os.path.isfile(uuid_collection_file):
+            with open(uuid_collection_file,"wb") as openfile:
+                json.dump({},openfile)
+        try:
+            with open(uuid_collection_file, "rb") as openfile:
+                data = json.loads(openfile.read())
+        except ValueError as e:
+            print "\n  -- JSON parse error in " + uuid_collection_file +\
+                ":\n\n    " + e.message
+            exit()
+
         v3_ref_dir = os.path.join(package_dir,'v3data','reference_data')
         v4_ref_dir = os.path.join(package_dir,'reference_data')
 
@@ -331,16 +346,14 @@ class Command(BaseCommand):
             skos_file = v3_skos_files[0]
 
         if len(v3_skos_files) > 1:
-            print "\nOnly one v3 file can be imported. This file will be used"\
+            print "\nOnly one v3 file can be converted. This file will be used"\
                 ":\n\n  {}".format(skos_file)
-
-        uuid_collection_file = os.path.join(v3_ref_dir,"collection_uuids.json")
-        if not os.path.isfile(uuid_collection_file):
-            uuid_collection_file = None
 
         skos_importer = v3SkosConverter(skos_file,
             name_space=settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
         skos_importer.write_skos(v4_ref_dir,uuid_collection_file=uuid_collection_file)
+        skos_importer.write_uuid_lookup(uuid_collection_file)
+
         if direct_import:
 
             theaurus_file = os.path.join(v4_ref_dir,"concepts","thesaurus.xml")
