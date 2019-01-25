@@ -25,6 +25,7 @@ class Command(BaseCommand):
 
         parser.add_argument('operation', choices=[
             'start-migration',
+            'generate-rm-configs',
             'generate-lookups',
             'test-lookups',
             'write-v4-json',
@@ -82,6 +83,9 @@ class Command(BaseCommand):
 
         if op == 'start-migration':
             self.prepare_package(dir_path,overwrite=ow)
+
+        if op == 'generate-rm-configs':
+            self.generate_rm_configs(dir_path)
 
         if op == 'generate-lookups':
             self.generate_lookups(dir_path,overwrite=ow)
@@ -153,7 +157,11 @@ class Command(BaseCommand):
         os.mkdir(os.path.join(v3_dir,'reference_data'))
         os.mkdir(os.path.join(v3_dir,'graph_data'))
 
-        rm_dir = os.path.join(full_path,"graphs","resource_models")
+
+    def generate_rm_configs(self,pkg_path):
+        """generate the template for the rm_configs.json file."""
+
+        rm_dir = os.path.join(pkg_path,"graphs","resource_models")
         graph_files = glob(os.path.join(rm_dir,"*.json"))
         graph_names = [os.path.splitext(os.path.basename(i))[0] for i in graph_files]
         configs = {}
