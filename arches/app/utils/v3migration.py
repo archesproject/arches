@@ -585,6 +585,7 @@ class v3SkosConverter:
             skos = skos.replace("http://www.archesproject.org/", name_space)
             
         self.v3_skos = skos
+        self.uuid_lookup = {}
 
     def prepare_export(self, namespaces, nodes):
         """
@@ -702,9 +703,12 @@ class v3SkosConverter:
         # export files
         self.export(os.path.join(directory,'concepts','thesaurus.xml'), thesaurus_skos)
         self.export(os.path.join(directory,'collections','collections.xml'), collections_skos)
-        if uuid_collection_file:
+        
+        # update this class' uuid_lookup
+        self.uuid_lookup = uuid_lookup
 
-            # write UUID's
-            with open(uuid_collection_file, 'wb') as uuid_store:
-                uuid_store.write(json.dumps(uuid_lookup, indent=4, sort_keys=True))
-                uuid_store.close()
+    def write_uuid_lookup(self, filepath):
+        
+        with open(filepath, 'wb') as uuid_store:
+            uuid_store.write(json.dumps(self.uuid_lookup, indent=4, sort_keys=True))
+            uuid_store.close()
