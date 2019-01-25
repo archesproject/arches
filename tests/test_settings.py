@@ -48,7 +48,7 @@ BUSISNESS_DATA_FILES = (
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 # could add Chrome, PhantomJS etc... here
-LOCAL_BROWSERS = [] #['Firefox']
+LOCAL_BROWSERS = []  # ['Firefox']
 
 # these are set in Travis CI
 SAUCE_USERNAME = os.environ.get('SAUCE_USERNAME')
