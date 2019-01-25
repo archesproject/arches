@@ -82,6 +82,7 @@ class Command(BaseCommand):
 
         if op == 'start-migration':
             self.create_v3_directory(dir_path,overwrite=ow)
+            self.prepare_package(dir_path,overwrite=ow)
 
         if op == 'generate-lookups':
             self.generate_lookups(dir_path,overwrite=ow)
@@ -123,6 +124,7 @@ class Command(BaseCommand):
             self.register_uploaded_files()
 
     def create_v3_directory(self, full_path, overwrite=False):
+    def prepare_package(self, full_path, overwrite=False):
         """
         Creates a directory structure that will be used throughout the v3 data
         import process. Populates with some content based on existing installation.
