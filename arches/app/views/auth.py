@@ -215,6 +215,29 @@ class ChangePasswordView(View):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
+class UserProfileView(View):
+
+    def post(self, request):
+        username = request.POST.get('username', None)
+        password = request.POST.get('password', None)
+        user = authenticate(username=username, password=password)
+        if user:
+            if hasattr(user, 'userprofile') is not True:
+                models.UserProfile.objects.create(user=user)
+            userDict = JSONSerializer().serializeToPython(user)
+            userDict['password'] = None
+            userDict['is_reviewer'] = user.userprofile.is_reviewer()
+            userDict['viewable_cards'] = user.userprofile.viewable_cards
+            userDict['editable_cards'] = user.userprofile.editable_cards
+            userDict['deletable_cards'] = user.userprofile.deletable_cards
+            response = JSONResponse(userDict)
+        else:
+            response = Http401Response()
+
+        return response
+
+
+@method_decorator(csrf_exempt, name='dispatch')
 class GetTokenView(View):
 
     def post(self, request):
@@ -255,3 +278,5 @@ class GetClientIdView(View):
                 response = Http401Response()
 
         return response
+
+

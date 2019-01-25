@@ -138,7 +138,9 @@ class Surveys(APIBase):
     def get(self, request):
         if hasattr(request.user, 'userprofile') is not True:
             models.UserProfile.objects.create(user=request.user)
-        permitted_cards = request.user.userprofile.permitted_cards
+        viewable_cards = request.user.userprofile.viewable_cards
+        editable_cards = request.user.userprofile.editable_cards
+        permitted_cards = viewable_cards.union(editable_cards)
         group_ids = list(request.user.groups.values_list('id', flat=True))
         projects = MobileSurvey.objects.filter(Q(users__in=[request.user]) | Q(groups__in=group_ids), active=True).distinct()
         projects_for_couch = [project.serialize_for_mobile() for project in projects]
