@@ -8,6 +8,7 @@ from django.core import management
 from django.core.management.base import BaseCommand, CommandError
 from arches.app.models.graph import Graph
 from arches.app.models.models import TileModel, Node
+from arches.app.utils.skos import SKOSReader
 from arches.app.utils import v3utils
 from arches.app.utils.v3migration import v3Importer, v3SkosConverter
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -116,6 +117,8 @@ class Command(BaseCommand):
         if op == 'convert-v3-skos':
             self.convert_v3_skos(dir_path)
             
+            self.convert_v3_skos(dir_path,direct_import=options['import'])
+
         if op == 'register-files':
             self.register_uploaded_files()
 
@@ -308,6 +311,7 @@ class Command(BaseCommand):
                 '"{}"'.format(v4_relations)
 
     def convert_v3_skos(self, package_dir):
+    def convert_v3_skos(self, package_dir, direct_import=False):
 
         v3_ref_dir = os.path.join(package_dir,'v3data','reference_data')
         v4_ref_dir = os.path.join(package_dir,'reference_data')
@@ -332,3 +336,11 @@ class Command(BaseCommand):
         skos_importer = v3SkosConverter(skos_file,
             name_space=settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
         skos_importer.write_skos(v4_ref_dir,uuid_collection_file=uuid_collection_file)
+        if direct_import:
+
+            theaurus_file = os.path.join(v4_ref_dir,"concepts","thesaurus.xml")
+            collection_file = os.path.join(v4_ref_dir,"collections","collections.xml")
+            for skosfile in [theaurus_file, collection_file]:
+                skos = SKOSReader()
+                rdf = skos.read_file(skosfile)
+                ret = skos.save_concepts_from_skos(rdf, 'overwrite', 'keep')
