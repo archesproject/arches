@@ -16,55 +16,56 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.models.system_settings import settings
 settings.update_from_db()
 
-def fix_v3_value(value,datatype):
+
+def fix_v3_value(value, datatype):
     """in some cases, the v3 data must be modified before it can be saved
     into a v4 tile. this conversion is based on the v4 node datatype."""
 
-    ## convert the WKT geometry representation from v3 to a geojson feature
-    ## collection which is what is needed in v4
+    # convert the WKT geometry representation from v3 to a geojson feature
+    # collection which is what is needed in v4
     if datatype == "geojson-feature-collection":
 
-        ## assume that if a dictionary is passed in, it is already geojson
+        # assume that if a dictionary is passed in, it is already geojson
         if not isinstance(value, dict):
             geom = json.loads(GEOSGeometry(value).geojson)
             value = {
-               "type": "FeatureCollection",
-               "features": [
-                   {
-                       "type": "Feature",
-                       "id": str(uuid.uuid4()),
-                       "geometry": geom,
-                       "properties": {}
-                   }
-               ]
+                "type": "FeatureCollection",
+                "features": [
+                    {
+                        "type": "Feature",
+                        "id": str(uuid.uuid4()),
+                        "geometry": geom,
+                        "properties": {}
+                    }
+                ]
             }
 
-    ## sanitize number input
+    # sanitize number input
     elif datatype == "number":
-        value = value.replace(",","")
+        value = value.replace(",", "")
         try:
             value = int(value)
         except ValueError:
             value = float(value)
 
     elif datatype == "date":
-        ## kinda hacky but need to remove the T00:00:00 from the end of the
-        ## date string, and datetime doesn't handle dates before 1900 so just
-        ## use basic string slicing, as all v3 dates will end with T00:00:00.
+        # kinda hacky but need to remove the T00:00:00 from the end of the
+        # date string, and datetime doesn't handle dates before 1900 so just
+        # use basic string slicing, as all v3 dates will end with T00:00:00.
         value = value[:-9]
 
     elif datatype == "file-list":
 
         filename = os.path.basename(value)
-        fullpath = os.path.join(settings.MEDIA_ROOT,'uploadedfiles',filename)
+        fullpath = os.path.join(settings.MEDIA_ROOT, 'uploadedfiles', filename)
 
-        ## handle the fact that file names could be too long, > 100 characters.
-        ## a bit more complicated that you would expect, in order to accommodate
-        ## iterative development.
+        # handle the fact that file names could be too long, > 100 characters.
+        # a bit more complicated that you would expect, in order to accommodate
+        # iterative development.
         shortenedpath = ""
         if len(filename) > 100:
             shortname = os.path.splitext(filename)[0][:96]+os.path.splitext(filename)[1]
-            shortenedpath = fullpath.replace(filename,shortname)
+            shortenedpath = fullpath.replace(filename, shortname)
 
         if not os.path.isfile(fullpath) and not os.path.isfile(shortenedpath):
             print "expected file doesn't exist: {}".format(fullpath)
@@ -73,11 +74,11 @@ def fix_v3_value(value,datatype):
 
         if shortenedpath != "":
             if not os.path.isfile(shortenedpath):
-                os.rename(fullpath,shortenedpath)
+                os.rename(fullpath, shortenedpath)
             fullpath = shortenedpath
             filename = shortname
 
-        ## create ORM file object
+        # create ORM file object
         file_obj = File()
         file_obj.path = filename
 
@@ -88,13 +89,13 @@ def fix_v3_value(value,datatype):
             print e
             exit()
 
-        ## construct the full json needed to define a file-list node in a tile
+        # construct the full json needed to define a file-list node in a tile
         stats = os.stat(fullpath)
         type = MimeTypes().guess_type(fullpath)[0]
         value = [{
             "name": filename,
             "file_id": str(file_obj.pk),
-            "url": str(file_obj.path.url).replace("files/","files/uploadedfiles/"),
+            "url": str(file_obj.path.url).replace("files/", "files/uploadedfiles/"),
             "status": 'uploaded',
             "index": 0,
             "lastModified": stats.st_mtime,
@@ -108,30 +109,32 @@ def fix_v3_value(value,datatype):
 
     return value
 
+
 def get_empty_feature_collection():
     """ returns a dictionary representing an empty geojson feature collection. """
 
     collection = {
-       "type": "FeatureCollection",
-       "features": []
+        "type": "FeatureCollection",
+        "features": []
     }
 
     return collection
 
-def add_wkt_to_geojson_collection(wkt,collection):
+
+def add_wkt_to_geojson_collection(wkt, collection):
     """ takes an input WKT value, converts to geojson (with some built-in
     validation operations) and then adds it to the input collection. return
     the collection. """
 
-    ## connect to the database in order to use it for postgis functions
+    # connect to the database in order to use it for postgis functions
     db = settings.DATABASES['default']
     db_conn = "dbname = {} user = {} host = {} password = {} port = {}".format(
-        db['NAME'],db['USER'],db['HOST'],db['PASSWORD'],db['PORT'])
+        db['NAME'], db['USER'], db['HOST'], db['PASSWORD'], db['PORT'])
     conn = psycopg2.connect(db_conn)
     cur = conn.cursor()
 
-    ## create and execute SQL statement to force a valid direction on
-    ## coordinates in polygons
+    # create and execute SQL statement to force a valid direction on
+    # coordinates in polygons
     sql = '''
     SELECT ST_AsGeoJSON(ST_Reverse(ST_ForceRHR('{0}')));
     '''.format(wkt)
@@ -141,7 +144,7 @@ def add_wkt_to_geojson_collection(wkt,collection):
     try:
         geo_json = json.loads(rows[0][0])
 
-        ## iterate coords in polygons to remove duplicate coordinates
+        # iterate coords in polygons to remove duplicate coordinates
         if geo_json['type'] == "Polygon":
             lastcoord = None
             for index, coord in enumerate(geo_json['coordinates'][0]):
@@ -149,12 +152,12 @@ def add_wkt_to_geojson_collection(wkt,collection):
                     geo_json['coordinates'][0].pop(index)
                 lastcoord = coord
 
-        ## create feature json
+        # create feature json
         feature = {
-           "type": "Feature",
-           "id": str(uuid.uuid4()),
-           "geometry": geo_json,
-           "properties": {}
+            "type": "Feature",
+            "id": str(uuid.uuid4()),
+            "geometry": geo_json,
+            "properties": {}
         }
     except Exception as e:
         print "Error parsing this WKT: {}".format(wkt)
@@ -166,7 +169,8 @@ def add_wkt_to_geojson_collection(wkt,collection):
 
     return collection
 
-def flatten_geometries(resource_data,node_lookup):
+
+def flatten_geometries(resource_data, node_lookup):
     """ take the full input list of v3 nodes, find all geometries and combine
     them. this is necessary, as WKTs come separately from v3, but should be
     stored as a single geojson feature collection in v4. """
@@ -174,50 +178,51 @@ def flatten_geometries(resource_data,node_lookup):
     geom_found = False
     to_remove = []
 
-    ## create empty collection
+    # create empty collection
     collection = get_empty_feature_collection()
 
-    ## iterate nodes, create geometry from spatial nodes, add to collection,
-    ## and remove all spatial nodes besides the first one.
+    # iterate nodes, create geometry from spatial nodes, add to collection,
+    # and remove all spatial nodes besides the first one.
     for index, dp in enumerate(resource_data):
         dt = node_lookup[dp[0]]['v4_datatype']
 
         if dt == "geojson-feature-collection":
-            collection = add_wkt_to_geojson_collection(dp[1],collection)
+            collection = add_wkt_to_geojson_collection(dp[1], collection)
             if geom_found:
                 to_remove.append(dp)
             else:
                 geom = index
                 geom_found = True
 
-    ## if geometry has been found, insert the full collection at the position
-    ## of the first spatial node (which has not been removed)
+    # if geometry has been found, insert the full collection at the position
+    # of the first spatial node (which has not been removed)
     if geom_found:
-        resource_data[geom] = (resource_data[geom][0],collection)
-    resource_data = [i for i in resource_data if not i in to_remove]
+        resource_data[geom] = (resource_data[geom][0], collection)
+    resource_data = [i for i in resource_data if i not in to_remove]
 
     return resource_data
 
-def get_nodegroup_tilegroup(v4_node_name,nodes,resource_id,verbose=False):
 
-    ## get the corresponding v4 node and then get the tile for its nodegroup
+def get_nodegroup_tilegroup(v4_node_name, nodes, resource_id, verbose=False):
+
+    # get the corresponding v4 node and then get the tile for its nodegroup
     v4_node = nodes.get(name=v4_node_name)
-    ng_tile = Tile().get_blank_tile(v4_node.nodegroup_id,resourceid=resource_id)
+    ng_tile = Tile().get_blank_tile(v4_node.nodegroup_id, resourceid=resource_id)
 
     if verbose:
-        print "  ",ng_tile.data
-        print "  ",ng_tile.tiles
+        print "  ", ng_tile.data
+        print "  ", ng_tile.tiles
 
-    ## if there are child tiles, then the ng_tile.tileid needs to be set
-    ## (not sure why this is the case, but it is)
+    # if there are child tiles, then the ng_tile.tileid needs to be set
+    # (not sure why this is the case, but it is)
     if ng_tile.tileid is None:
         ng_tile.tileid = uuid.uuid4()
 
-    ## create a raw json representation of the node group tile and its children
-    ## and put these into a flat list of tiles that is returned
+    # create a raw json representation of the node group tile and its children
+    # and put these into a flat list of tiles that is returned
     tile_json = {
         "resourceinstance_id": resource_id,
-        "provisionaledits":None,
+        "provisionaledits": None,
         "parenttile_id": ng_tile.parenttile_id,
         "nodegroup_id": ng_tile.nodegroup_id,
         "sortorder": 0,
@@ -231,7 +236,7 @@ def get_nodegroup_tilegroup(v4_node_name,nodes,resource_id,verbose=False):
             "resourceinstance_id": resource_id,
             "nodegroup_id": tile.nodegroup_id,
             "sortorder": 0,
-            "provisionaledits":None,
+            "provisionaledits": None,
             "parenttile_id": ng_tile.tileid,
             "data": tile.data,
         }
@@ -239,11 +244,12 @@ def get_nodegroup_tilegroup(v4_node_name,nodes,resource_id,verbose=False):
 
     return output_tiles
 
+
 class v3PreparedResource:
     """ Used to convert data for a single v3 resource into corresponding set
     of v4 json. """
 
-    def __init__(self,resource_id,graph_id,data):
+    def __init__(self, resource_id, graph_id, data):
 
         self.resourceid = str(resource_id)
         self.graphid = str(graph_id)
@@ -253,33 +259,33 @@ class v3PreparedResource:
             """ recursively process the nested contents of v3 json and convert
             to a flat list of tuples: [(v3 node name, v3 node value)]"""
 
-            ## iterate all children of this entity
+            # iterate all children of this entity
             for child in children:
 
-                ## get the nested child entities
+                # get the nested child entities
                 grandchildren = child['child_entities']
 
-                ## if there are nested chilren, process each one
+                # if there are nested chilren, process each one
                 if len(grandchildren) > 0:
-                    process_children(grandchildren,processed)
+                    process_children(grandchildren, processed)
 
-                ## don't attempt to migrate semantic nodes
+                # don't attempt to migrate semantic nodes
                 if child['businesstablename'] == "":
                     continue
 
-                ## don't attempt to migrate empty nodes
+                # don't attempt to migrate empty nodes
                 if child['value'].rstrip() == "":
                     continue
 
-                ## append this entityid and value to the output
+                # append this entityid and value to the output
                 processed.append((child['entitytypeid'], child['value']))
 
             return processed
 
         self.node_list = process_children(self.v3_json['child_entities'])
 
-        ## this attribute is populated during self.process(), but is
-        ## left empty upon object instantiation
+        # this attribute is populated during self.process(), but is
+        # left empty upon object instantiation
         self.tiles = []
 
     def get_empty_resource(self):
@@ -291,7 +297,7 @@ class v3PreparedResource:
                 "resourceinstanceid": self.resourceid,
                 "legacyid": self.resourceid
             },
-            "tiles":[]
+            "tiles": []
         }
 
         return res
@@ -301,7 +307,7 @@ class v3PreparedResource:
         not have a value """
 
         for tile in self.tiles:
-            data = dict([(k,v) for k,v in tile['data'].items() if not v is None])
+            data = dict([(k, v) for k, v in tile['data'].items() if v is not None])
             tile['data'] = data
 
     def put_primary_name_last(self):
@@ -312,8 +318,8 @@ class v3PreparedResource:
         p_name_index = None
         for index, tile in enumerate(self.tiles):
             try:
-                ## currently, these hard-coded uuids work for hku models, but
-                ## should be refactored way back to the rm_configs.json file
+                # currently, these hard-coded uuids work for hku models, but
+                # should be refactored way back to the rm_configs.json file
                 name_type = tile['data']["185b9091-943d-11e8-8c9e-94659cf754d0"]
                 if name_type == "a4c88313-52c5-4b6a-9579-3fc5aad17335":
                     p_name_index = index
@@ -321,7 +327,7 @@ class v3PreparedResource:
             except KeyError:
                 continue
 
-        if not p_name_index == None:
+        if p_name_index is not None:
             self.tiles += [self.tiles.pop(index)]
 
     def process(self, v4_nodes, node_lookup, verbose=False):
@@ -331,73 +337,73 @@ class v3PreparedResource:
         instance of), as well as the node lookup that links v3 node names with
         v4 node names. """
 
-        ## duplicate what is stored in self.node_list. when trying to copy
-        ## self.node_list to a new variable with resource_data = list(self.node_list)
-        ## nodes were carried over from one resource to the next :(
+        # duplicate what is stored in self.node_list. when trying to copy
+        # self.node_list to a new variable with resource_data = list(self.node_list)
+        # nodes were carried over from one resource to the next :(
         resource_data = list(self.node_list)
         ct_total = len(resource_data)
 
-        ## first pull out all of the geometries into a single value
-        resource_data = flatten_geometries(resource_data,node_lookup)
+        # first pull out all of the geometries into a single value
+        resource_data = flatten_geometries(resource_data, node_lookup)
         ct_geom = len(resource_data)
 
         if verbose:
             if not ct_total == ct_geom:
                 print "{} {} - (total) (geom flattened) - {}".format(ct_total,
-                    ct_geom, self.resourceid)
+                                                                     ct_geom, self.resourceid)
             for i in resource_data:
                 print i
-            print "resource_data full length",len(resource_data)
+            print "resource_data full length", len(resource_data)
 
-        ## begin looping though the v3 resource data list
+        # begin looping though the v3 resource data list
         while len(resource_data):
             if verbose:
                 print "\nSTARTING WHILE LOOP ---"
-                print "resource_data current length",len(resource_data)
-                print "first in line:",resource_data[0][0],node_lookup[resource_data[0][0]]['v4_uuid']
-            
-            ## get the v4 name of the first node in the resource list
+                print "resource_data current length", len(resource_data)
+                print "first in line:", resource_data[0][0], node_lookup[resource_data[0][0]]['v4_uuid']
+
+            # get the v4 name of the first node in the resource list
             v4_name = node_lookup[resource_data[0][0]]['v4_name']
 
-            ## obtain a blank tile for the nodegroup that contains the corresponding
-            tilegroup_json = get_nodegroup_tilegroup(v4_name,v4_nodes,self.resourceid,
-                verbose=verbose)
+            # obtain a blank tile for the nodegroup that contains the corresponding
+            tilegroup_json = get_nodegroup_tilegroup(v4_name, v4_nodes, self.resourceid,
+                                                     verbose=verbose)
 
-            ## get a list of all the node UUIDs in this tile and its children
+            # get a list of all the node UUIDs in this tile and its children
             all_node_options = []
             for t in tilegroup_json:
                 all_node_options += t['data'].keys()
 
-            ## begin iterating resource_data, and trying to fill tile['data'] values
-            ## in the current tile group. if a node in the iteration doesn't fit
-            ## in any of the tiles, assume this is a new branch, break the for loop,
-            ## and restart the while loop to get the next tile group. remove any
-            ## nodes from resource_data whose value has been placed in a tile.
+            # begin iterating resource_data, and trying to fill tile['data'] values
+            # in the current tile group. if a node in the iteration doesn't fit
+            # in any of the tiles, assume this is a new branch, break the for loop,
+            # and restart the while loop to get the next tile group. remove any
+            # nodes from resource_data whose value has been placed in a tile.
             if verbose:
-                print "number of tiles in tilegroup:",len(tilegroup_json)
+                print "number of tiles in tilegroup:", len(tilegroup_json)
                 print "\nSTARTING FOR LOOP ---"
             used = []
-            for index,dp in enumerate(resource_data):
+            for index, dp in enumerate(resource_data):
 
                 if verbose:
                     print dp[0]
                 dt = node_lookup[dp[0]]['v4_datatype']
 
-                ## first fix the data value
-                value = fix_v3_value(dp[1],dt)
+                # first fix the data value
+                value = fix_v3_value(dp[1], dt)
 
-                ## now get the UUID of the v4 target node
+                # now get the UUID of the v4 target node
                 v4_uuid = node_lookup[dp[0]]['v4_uuid']
 
-                ## break the for loop (and subsequently, restart the while loop)
-                ## if this node is not in the current tile group
-                if not v4_uuid in all_node_options:
+                # break the for loop (and subsequently, restart the while loop)
+                # if this node is not in the current tile group
+                if v4_uuid not in all_node_options:
                     if verbose:
                         print "<< breaking the loop because this node is not in the current tilegroup >>"
                     break
 
-                ## first check if the node for this data has already been
-                ## populated, in which case a new ng tilegroup is needed
+                # first check if the node for this data has already been
+                # populated, in which case a new ng tilegroup is needed
                 if verbose:
                     print "    is this node already filled? >",
                 skip = False
@@ -416,19 +422,19 @@ class v3PreparedResource:
                     if verbose:
                         print "no"
 
-                ## find the tile that will hold the value
+                # find the tile that will hold the value
                 for tile in tilegroup_json:
 
-                    ## skip if the node is not in this tile
-                    if not v4_uuid in tile['data'].keys():
+                    # skip if the node is not in this tile
+                    if v4_uuid not in tile['data'].keys():
                         continue
 
-                    ## set value
-                    ## if this is a concept-list node, assume the value should
-                    ## be appended to the existing concept-list value, if extant
+                    # set value
+                    # if this is a concept-list node, assume the value should
+                    # be appended to the existing concept-list value, if extant
                     if dt == "concept-list":
                         if verbose:
-                            print tile['data'][v4_uuid],"="*60
+                            print tile['data'][v4_uuid], "="*60
                         if isinstance(tile['data'][v4_uuid], list):
                             tile['data'][v4_uuid].append(value)
                         else:
@@ -437,20 +443,20 @@ class v3PreparedResource:
                         tile['data'][v4_uuid] = value
                     used.append(index)
                     if verbose:
-                        print "    placing value into:",v4_uuid,node_lookup[dp[0]]['v4_name']
+                        print "    placing value into:", v4_uuid, node_lookup[dp[0]]['v4_name']
                     break
 
             if verbose:
-                print "removing used nodes:",used
-                print "resource_data len before:",len(resource_data)
-            resource_data = [v for i,v in enumerate(resource_data) if not i in used]
+                print "removing used nodes:", used
+                print "resource_data len before:", len(resource_data)
+            resource_data = [v for i, v in enumerate(resource_data) if i not in used]
             if verbose:
-                print "resource_data len after:",len(resource_data)
+                print "resource_data len after:", len(resource_data)
 
-            ## append the tile group to self.tiles
+            # append the tile group to self.tiles
             self.tiles += tilegroup_json
 
-        ## final processing, now that self.tiles is fully populated
+        # final processing, now that self.tiles is fully populated
         self.strip_empty_tile_values()
         self.put_primary_name_last()
 
@@ -464,9 +470,10 @@ class v3PreparedResource:
 
         return v4_json
 
+
 class v3Importer:
     """ This class is used at the Resource Model-level to support v3 migration.
-    
+
     It must be instantiated with the v3_data_dir (a structured subdirectory in
     a standard v4 package), the name of the resource model this class will
     represent, and the v3 json export file (though in the future this could be
@@ -474,7 +481,7 @@ class v3Importer:
     with the rm_configs content itself). An optional truncate argument can be
     used to limit the number of resources that are loaded from the v3 json. """
 
-    def __init__(self,v3_data_dir,v4_graph_name,v3_json_file,truncate=None,exclude=[]):
+    def __init__(self, v3_data_dir, v4_graph_name, v3_json_file, truncate=None, exclude=[]):
 
         if not os.path.isfile(v3_json_file):
             raise Exception("v3 business data file {} does not exist".format(
@@ -486,19 +493,19 @@ class v3Importer:
         self.v4_graph_name = v4_graph_name
         self.v4_nodes = Node.objects.filter(graph=self.v4_graph)
 
-        ## use this method to acquire the v3 configs, and full lookup paths
-        v3_config = v3utils.get_v3_config_info(v3_data_dir,v4_graph_name=v4_graph_name)
+        # use this method to acquire the v3 configs, and full lookup paths
+        v3_config = v3utils.get_v3_config_info(v3_data_dir, v4_graph_name=v4_graph_name)
 
-        ## load the info stored in the rm_configs file
+        # load the info stored in the rm_configs file
         self.v3_graph_name = v3_config["v3_entitytypeid"]
         self.v3_nodes_csv = v3_config["v3_nodes_csv"]
         self.v3_v4_node_lookup = v3_config["v3_v4_node_lookup"]
 
-        ## create better node_lookup that holds more information
+        # create better node_lookup that holds more information
         self.node_lookup = self.augment_node_lookup()
 
-        ## finally, do the actual loading of the v3 data into this class
-        self.v3_resources = self.load_v3_data(truncate=truncate,exclude=exclude)
+        # finally, do the actual loading of the v3 data into this class
+        self.v3_resources = self.load_v3_data(truncate=truncate, exclude=exclude)
 
     def augment_node_lookup(self):
         """takes the node lookup csv and converts to a dictionary
@@ -506,16 +513,16 @@ class v3Importer:
 
         lookup_path = self.v3_v4_node_lookup
         new_and_improved = {}
-        with open(lookup_path,'rb') as openfile:
+        with open(lookup_path, 'rb') as openfile:
             reader = csv.DictReader(openfile)
 
             for row in reader:
                 try:
                     n = self.v4_nodes.get(name=row['v4_node'])
                 except Node.DoesNotExist:
-                    raise Exception("{} in {} lookup csv is not matched "\
-                        "with a valid v4 node.".format(row['v3_node'],
-                        lookup_path))
+                    raise Exception("{} in {} lookup csv is not matched "
+                                    "with a valid v4 node.".format(row['v3_node'],
+                                                                   lookup_path))
                 new_and_improved[row['v3_node']] = {
                     'v4_name': row['v4_node'],
                     'v4_uuid': str(n.nodeid),
@@ -524,53 +531,54 @@ class v3Importer:
 
         return new_and_improved
 
-    def load_v3_data(self,truncate=None,exclude=[]):
+    def load_v3_data(self, truncate=None, exclude=[]):
         """ loads the data that is in the v3 export file. limits to the number
         in truncate, if truncate is not none."""
 
-        with open(self.source_file,'rb') as openfile:
+        with open(self.source_file, 'rb') as openfile:
             v3_json = json.loads(openfile.read())
 
-        self.v3_resources = [r for r in v3_json['resources'] if\
-            r['entitytypeid'] == self.v3_graph_name\
-            and len(r['child_entities']) != 0\
-            and not r['entityid'] in exclude
-        ]
+        self.v3_resources = [r for r in v3_json['resources'] if
+                             r['entitytypeid'] == self.v3_graph_name
+                             and len(r['child_entities']) != 0
+                             and not r['entityid'] in exclude
+                             ]
 
         if truncate:
             self.v3_resources = self.v3_resources[:truncate]
 
         return self.v3_resources
 
-    def convert_v3_data(self,verbose=False):
+    def convert_v3_data(self, verbose=False):
         """ creates v4 resources from all the loaded v3 resources in
         self.v3_resources. returns these resources. """
 
         resources = []
         for res in self.v3_resources:
 
-            v3_resource = v3PreparedResource(res['entityid'],self.v4_graph.graphid,res)
-            v3_resource.process(self.v4_nodes,self.node_lookup,verbose=verbose)
+            v3_resource = v3PreparedResource(res['entityid'], self.v4_graph.graphid, res)
+            v3_resource.process(self.v4_nodes, self.node_lookup, verbose=verbose)
             v4_json = v3_resource.get_json()
 
             resources.append(v4_json)
 
         return resources
 
-    def get_v4_json(self,verbose=False):
+    def get_v4_json(self, verbose=False):
 
         resources = self.convert_v3_data(verbose=verbose)
-        v4_json = {'business_data':{'resources':resources}}
+        v4_json = {'business_data': {'resources': resources}}
 
         return v4_json
 
-    def write_v4_json(self,dest_path,verbose=False):
+    def write_v4_json(self, dest_path, verbose=False):
 
         out_json = self.get_v4_json(verbose=verbose)
-        with open(dest_path,'wb') as openfile:
+        with open(dest_path, 'wb') as openfile:
             openfile.write(JSONSerializer().serialize(out_json, indent=4))
 
         return dest_path
+
 
 class v3SkosConverter:
     """
@@ -578,12 +586,12 @@ class v3SkosConverter:
     an Arches 4 thesaurus file and collections file for import
     """
 
-    def __init__(self, skos_file,name_space="http://localhost:8000/"):
+    def __init__(self, skos_file, name_space="http://localhost:8000/"):
 
-        with open(skos_file,"rb") as incoming_skos:
+        with open(skos_file, "rb") as incoming_skos:
             skos = incoming_skos.read()
             skos = skos.replace("http://www.archesproject.org/", name_space)
-            
+
         self.v3_skos = skos
         self.uuid_lookup = {}
 
@@ -609,9 +617,9 @@ class v3SkosConverter:
             fh.write(content)
             fh.close
 
-    def write_skos(self,directory,uuid_collection_file=None):
+    def write_skos(self, directory, uuid_collection_file=None):
 
-        def new_or_existing_uuid(preflabel,uuid_lookup={}):
+        def new_or_existing_uuid(preflabel, uuid_lookup={}):
             """
             take a topConcept's prefLabel node, parse the JSON within, and
             return a new or existing UUID for the collection based on
@@ -638,7 +646,7 @@ class v3SkosConverter:
             preflabel.text = json.dumps(working)
 
         if uuid_collection_file:
-            with open(uuid_collection_file,"rb") as openfile:
+            with open(uuid_collection_file, "rb") as openfile:
                 uuid_lookup = json.loads(openfile.read())
         else:
             uuid_lookup = {}
@@ -696,19 +704,19 @@ class v3SkosConverter:
 
         # prepare raw XML
         thesaurus_skos = self.prepare_export(namespaces,
-                                        concepts).serialize(format='pretty-xml')
+                                             concepts).serialize(format='pretty-xml')
         collections_skos = self.prepare_export(namespaces,
-                                          collections).serialize(format='pretty-xml')
+                                               collections).serialize(format='pretty-xml')
 
         # export files
-        self.export(os.path.join(directory,'concepts','thesaurus.xml'), thesaurus_skos)
-        self.export(os.path.join(directory,'collections','collections.xml'), collections_skos)
-        
+        self.export(os.path.join(directory, 'concepts', 'thesaurus.xml'), thesaurus_skos)
+        self.export(os.path.join(directory, 'collections', 'collections.xml'), collections_skos)
+
         # update this class' uuid_lookup
         self.uuid_lookup = uuid_lookup
 
     def write_uuid_lookup(self, filepath):
-        
+
         with open(filepath, 'wb') as uuid_store:
             uuid_store.write(json.dumps(self.uuid_lookup, indent=4, sort_keys=True))
             uuid_store.close()
