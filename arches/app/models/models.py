@@ -208,6 +208,23 @@ class EditLog(models.Model):
         db_table = 'edit_log'
 
 
+class MobileSyncLog(models.Model):
+    logid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    survey = models.ForeignKey('MobileSurveyModel', related_name='surveyid')
+    user = models.ForeignKey(User, related_name='syncedby')
+    started = models.DateTimeField(blank=True, null=True)
+    finished = models.DateTimeField(blank=True, null=True)
+    tilescreated = models.IntegerField(default=0, null=True)
+    tilesupdated = models.IntegerField(default=0, null=True)
+    tilesdeleted = models.IntegerField(default=0, null=True)
+    resourcescreated = models.IntegerField(default=0, null=True)
+    note = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'mobile_sync_log'
+
+
 class File(models.Model):
     fileid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     path = models.FileField(upload_to='uploadedfiles')
