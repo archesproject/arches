@@ -88,8 +88,8 @@ class Command(BaseCommand):
             self.generate_rm_configs(dir_path)
 
         if op == 'generate-lookups':
-            self.generate_lookups(dir_path,overwrite=ow)
-            
+            self.generate_lookups(dir_path)
+
         if op == 'test-lookups':
             self.test_lookups(dir_path)
 
@@ -175,7 +175,7 @@ class Command(BaseCommand):
         with open(os.path.join(v3_dir,"rm_configs.json"),"wb") as openfile:
             json.dump(configs,openfile,indent=4,sort_keys=True)
 
-    def generate_lookups(self,path,overwrite=False):
+    def generate_lookups(self,path):
 
         ## load configs in order to alter them
         config_file = os.path.join(path,"v3data","rm_configs.json")
