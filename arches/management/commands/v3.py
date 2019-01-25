@@ -81,7 +81,6 @@ class Command(BaseCommand):
         vb = options['verbose']
 
         if op == 'start-migration':
-            self.create_v3_directory(dir_path,overwrite=ow)
             self.prepare_package(dir_path,overwrite=ow)
 
         if op == 'generate-lookups':
@@ -116,14 +115,11 @@ class Command(BaseCommand):
             self.write_v4_relations(dir_path,direct_import=options['import'])
 
         if op == 'convert-v3-skos':
-            self.convert_v3_skos(dir_path)
-            
             self.convert_v3_skos(dir_path,direct_import=options['import'])
 
         if op == 'register-files':
             self.register_uploaded_files()
 
-    def create_v3_directory(self, full_path, overwrite=False):
     def prepare_package(self, full_path, overwrite=False):
         """
         Creates a directory structure that will be used throughout the v3 data
@@ -312,7 +308,6 @@ class Command(BaseCommand):
                 '\n  python manage.py packages -o import_business_data_relations -s '\
                 '"{}"'.format(v4_relations)
 
-    def convert_v3_skos(self, package_dir):
     def convert_v3_skos(self, package_dir, direct_import=False):
 
         v3_ref_dir = os.path.join(package_dir,'v3data','reference_data')
