@@ -227,9 +227,10 @@ define([
             })),
             hasprovisionaledits: ko.computed(function() {
                 return _.filter(params.tiles, function(tile) {
-                    return (
-                        params.tile ? (tile.parenttile_id === params.tile.tileid) : true
-                    ) && ko.unwrap(tile.nodegroup_id) === ko.unwrap(params.card.nodegroup_id) && ko.unwrap(tile.provisionaledits);
+                    return (params.tile ? (tile.parenttile_id === params.tile.tileid) : true)
+                        && ko.unwrap(tile.nodegroup_id) === ko.unwrap(params.card.nodegroup_id)
+                        && ko.unwrap(tile.provisionaledits)
+                        && _.keys(ko.unwrap(tile.provisionaledits)).length !== 0;
                 }).length;
             }),
             selected: ko.pureComputed({
