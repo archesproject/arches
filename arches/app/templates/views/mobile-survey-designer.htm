@@ -172,8 +172,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <div class="msm-stats-panel">
                                             <div class="col-xs-16 col-sm-4">
                                                 <div class="msm-stat">
-                                                    <span class="msm-stat-time">15:32:47</span>
-                                                    <span class="msm-stat-date">January 12, 2019</span>
+                                                    <!--ko if: history.lastsync.isValid() -->
+                                                    <span class="msm-stat-time" data-bind="text: history.lastsync.format('H:mm:ss');"></span>
+                                                    <span class="msm-stat-date" data-bind="text: history.lastsync.format('MMMM Do YYYY');"></span>
+                                                    <!--/ko-->
+                                                    <!--ko ifnot: history.lastsync.isValid() -->
+                                                    <span class="msm-stat-time">{% trans 'Not synched' %}</span>
+                                                    <!--/ko-->
                                                 </div>
                                                 <div class="msm-stat-label">
                                                     {% trans 'Last Synch' %}
@@ -181,18 +186,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             </div>
 
                                             <div class="col-xs-12 col-sm-3">
-                                                <div class="msm-stat">
-                                                    143
-                                                </div>
+                                                <div class="msm-stat" data-bind="text: history.edits"></div>
                                                 <div class="msm-stat-label">
                                                     {% trans 'Edits Made' %}
                                                 </div>
                                             </div>
 
                                             <div class="col-xs-12 col-sm-3">
-                                                <div class="msm-stat">
-                                                    7
-                                                </div>
+                                                <div class="msm-stat" data-bind="text: _.keys(history.editors).length"></div>
                                                 <div class="msm-stat-label">
                                                     {% trans 'Editors' %}
                                                 </div>
@@ -669,20 +670,22 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                                 <!--/ko-->
 
-
-
-
-                                            <!-- Last Synch -->
-                                             <div class="msm-stat-user-panel">
-                                                <div class="msm-stat">
-                                                    <span class="msm-stat-time">15:32:47</span>
-                                                    <span class="msm-stat-date">January 12, 2019</span>
+                                                <!-- Last Synch -->
+                                                 <div class="msm-stat-user-panel">
+                                                    <div class="msm-stat">
+                                                        <!--ko if: _.contains(_.keys(history.editors), String(mobilesurvey.selectedUser().id)) -->
+                                                        <span class="msm-stat-time" data-bind="text: history.editors[mobilesurvey.selectedUser().id].lastsync.format('H:mm:ss')"></span>
+                                                        <span class="msm-stat-date" data-bind="text: history.editors[mobilesurvey.selectedUser().id].lastsync.format('MMMM Do YYYY');"></span>
+                                                        <!--/ko-->
+                                                        <!--ko ifnot: _.contains(_.keys(history.editors), String(mobilesurvey.selectedUser().id)) -->
+                                                        <span class="msm-stat-user">{% trans 'Not yet synched' %}</span>
+                                                        <!--/ko-->
+                                                    </div>
+                                                    <div class="msm-stat-label">
+                                                        {% trans 'Last Synch' %}
+                                                    </div>
                                                 </div>
-                                                <div class="msm-stat-label">
-                                                    {% trans 'Last Synch' %}
-                                                </div>
-                                            </div>
-                                            <!--/ko-->
+                                                <!--/ko-->
 
                                         </div>
                                     </div>
@@ -712,6 +715,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 mobilesurvey: {{mobile_survey}},
                 resources: {{resources}},
                 identities: {{identities}},
+                history: {{history}},
                 transstrings: {
                     identity: {name: {% trans "'Name'" %}, namelong: {% trans "'Name'" %}, description: {% trans "'Manage users that participate in this survey'" %}},
                     resourcemodel: {name: {% trans "'Model Details'" %}, namelong: {% trans "'Model Details'" %}, description: {% trans "'Summary of how this model participates in the survey'" %}},

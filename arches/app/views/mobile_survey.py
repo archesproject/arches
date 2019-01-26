@@ -159,6 +159,24 @@ class MobileSurveyDesignerView(MapBaseManagerView):
                 print e
             return result
 
+        def get_history(survey, history):
+            sync_log_records = models.MobileSyncLog.objects.order_by('-finished').values().filter(survey=survey)
+            if len(sync_log_records) > 0:
+                lastsync = datetime.strftime(sync_log_records[0]['finished'], '%Y-%m-%d %H:%M:%S')
+                history['lastsync'] = lastsync
+            for entry in sync_log_records:
+                history['edits'] += entry['tilesupdated']
+                if entry['user_id'] not in history['editors']:
+                    history['editors'][entry['user_id']] = {'edits': entry['tilesupdated'], 'lastsync': entry['finished']}
+                else:
+                    history['editors'][entry['user_id']]['edits'] += entry['tilesupdated']
+                    if entry['finished'] > history['editors'][entry['user_id']]['lastsync']:
+                        history['editors'][entry['user_id']]['lastsync'] = entry['finished']
+            for id, editor in iter(history['editors'].items()):
+                editor['lastsync'] = datetime.strftime(editor['lastsync'], '%Y-%m-%d %H:%M:%S')
+            print(history)
+            return history
+
         identities = []
         for group in Group.objects.all():
             users = group.user_set.all()
@@ -175,6 +193,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
                 default_perms = default_perms + list(group.permissions.all())
             identities.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions': set(default_perms), 'is_superuser': user.is_superuser, 'group_ids': group_ids, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email})
 
+        history = {'lastsync': '', 'edits': 0, 'editors': {}}
         map_layers = models.MapLayer.objects.all()
         map_markers = models.MapMarker.objects.all()
         map_sources = models.MapSource.objects.all()
@@ -185,6 +204,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
         if survey_exists is True:
             survey = MobileSurvey.objects.get(pk=surveyid)
             mobile_survey = survey.serialize()
+            history = get_history(survey, history)
             resources = get_survey_resources(mobile_survey)
         else:
             survey = MobileSurvey(
@@ -216,6 +236,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
             map_layers=map_layers,
             map_markers=map_markers,
             map_sources=map_sources,
+            history=serializer.serialize(history),
             geocoding_providers=geocoding_providers,
             mobile_survey=serializer.serialize(mobile_survey, sort_keys=False),
             identities=serializer.serialize(identities, sort_keys=False),

@@ -79,8 +79,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <div class="mpm-subtitle" data-bind="text: description"></div>
                                         <!--/ko -->
                                         <!--ko if: enddate && startdate -->
-                                        <div>
-                                            <div class="mpm-subtitle" data-bind="text: starts + '{% trans " to " %}' + ends"></div>
+                                        <div class="mpm-subtitle">
+                                            <span data-bind="text: starts + '{% trans " to " %}' + ends"> </span>
                                             <!--ko if: expired -->
                                             <span style="color: red; font-weight: 300">{% trans '(expired)' %}</span>
                                             <!--/ko -->
