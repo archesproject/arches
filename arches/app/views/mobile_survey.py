@@ -159,6 +159,25 @@ class MobileSurveyDesignerView(MapBaseManagerView):
                 print e
             return result
 
+        def get_history(survey):
+            sync_log_records = models.MobileSyncLog.objects.order_by('-finished').values().filter(survey=survey)
+            history = {'lastsync': None, 'edits': 0, 'editors': {}}
+            if len(sync_log_records) > 0:
+                lastsync = datetime.strftime(sync_log_records[0]['finished'], '%Y-%m-%d %H:%M:%S')
+                history['lastsync'] = lastsync
+            for entry in sync_log_records:
+                history['edits'] += entry['tilesupdated']
+                if entry['user_id'] not in history['editors']:
+                    history['editors'][entry['user_id']] = {'edits': entry['tilesupdated'], 'lastsync': entry['finished']}
+                else:
+                    history['editors'][entry['user_id']]['edits'] += entry['tilesupdated']
+                    if entry['finished'] > history['editors'][entry['user_id']]['lastsync']:
+                        history['editors'][entry['user_id']]['lastsync'] = entry['finished']
+            for id, editor in iter(history['editors'].items()):
+                editor['lastsync'] = datetime.strftime(editor['lastsync'], '%Y-%m-%d %H:%M:%S')
+            print(history)
+            return history
+
         identities = []
         for group in Group.objects.all():
             users = group.user_set.all()
@@ -185,6 +204,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
         if survey_exists is True:
             survey = MobileSurvey.objects.get(pk=surveyid)
             mobile_survey = survey.serialize()
+            mobile_survey['history'] = get_history(survey)
             resources = get_survey_resources(mobile_survey)
         else:
             survey = MobileSurvey(

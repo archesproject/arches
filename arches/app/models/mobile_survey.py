@@ -241,6 +241,12 @@ class MobileSurvey(models.MobileSurveyModel):
         user_lookup = {}
         is_reviewer = False
         ret = []
+        report = {
+            'newtiles': 0,
+            'updatedtiles': 0,
+            'deletedtiles': 0,
+            'newresources': 0
+            }
         with transaction.atomic():
             couch_docs = self.couch.all_docs(db)
             for row in couch_docs:
@@ -253,6 +259,8 @@ class MobileSurvey(models.MobileSurveyModel):
                                 'graph_id': uuid.UUID(str(row.doc['graph_id']))
                             }
                         )
+                        if created is True:
+                            report['newresources'] += 1
                         print('Resource {0} Saved'.format(row.doc['resourceinstanceid']))
 
             for row in couch_docs:
@@ -261,6 +269,7 @@ class MobileSurvey(models.MobileSurveyModel):
                     if 'provisionaledits' in row.doc and row.doc['provisionaledits'] is not None:
                         try:
                             tile = Tile.objects.get(tileid=row.doc['tileid'])
+                            report['updatedtiles'] += 1
                             if row.doc['provisionaledits'] != '':
                                 for user_edits in row.doc['provisionaledits'].items():
                                     # user_edits is a tuple with the user number in
@@ -293,6 +302,7 @@ class MobileSurvey(models.MobileSurveyModel):
                         # TODO: If user is provisional user, apply as provisional edit
                         except Tile.DoesNotExist:
                             tile = Tile(row.doc)
+                            report['newtiles'] += 1
                             if row.doc['provisionaledits'] != '':
                                 for user_edits in row.doc['provisionaledits'].items():
                                     for nodeid, value in iter(user_edits[1]['value'].items()):
@@ -325,7 +335,7 @@ class MobileSurvey(models.MobileSurveyModel):
                         self.couch.update_doc(db, tile_serialized, tile_serialized['tileid'])
                         print('Tile {0} Saved'.format(row.doc['tileid']))
                         db.compact()
-        return ret
+        return report
 
     def collect_resource_instances_for_couch(self):
         """

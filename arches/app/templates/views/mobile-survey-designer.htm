@@ -172,8 +172,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <div class="msm-stats-panel">
                                             <div class="col-xs-16 col-sm-4">
                                                 <div class="msm-stat">
-                                                    <span class="msm-stat-time">15:32:47</span>
-                                                    <span class="msm-stat-date">January 12, 2019</span>
+                                                    <!--ko if: history.lastsync.isValid() -->
+                                                    <span class="msm-stat-time" data-bind="text: history.lastsync.format('H:mm:ss');"></span>
+                                                    <span class="msm-stat-date" data-bind="text: history.lastsync.format('MMMM Do YYYY');"></span>
+                                                    <!--/ko-->
+                                                    <!--ko ifnot: history.lastsync.isValid() -->
+                                                    <span class="msm-stat-time">{% trans 'Not synched' %}</span>
+                                                    <!--/ko-->
                                                 </div>
                                                 <div class="msm-stat-label">
                                                     {% trans 'Last Synch' %}
