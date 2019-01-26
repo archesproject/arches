@@ -138,8 +138,6 @@ class Surveys(APIBase):
     def get(self, request):
         if hasattr(request.user, 'userprofile') is not True:
             models.UserProfile.objects.create(user=request.user)
-        import ipdb
-        ipdb.set_trace()
         viewable_nodegroups = request.user.userprofile.viewable_nodegroups
         editable_nodegroups = request.user.userprofile.editable_nodegroups
         permitted_nodegroups = viewable_nodegroups.union(editable_nodegroups)
