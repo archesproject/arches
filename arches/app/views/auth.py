@@ -227,9 +227,9 @@ class UserProfileView(View):
             userDict = JSONSerializer().serializeToPython(user)
             userDict['password'] = None
             userDict['is_reviewer'] = user.userprofile.is_reviewer()
-            userDict['viewable_cards'] = user.userprofile.viewable_cards
-            userDict['editable_cards'] = user.userprofile.editable_cards
-            userDict['deletable_cards'] = user.userprofile.deletable_cards
+            userDict['viewable_nodegroups'] = user.userprofile.viewable_nodegroups
+            userDict['editable_nodegroups'] = user.userprofile.editable_nodegroups
+            userDict['deletable_nodegroups'] = user.userprofile.deletable_nodegroups
             response = JSONResponse(userDict)
         else:
             response = Http401Response()

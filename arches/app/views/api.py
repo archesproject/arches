@@ -138,14 +138,20 @@ class Surveys(APIBase):
     def get(self, request):
         if hasattr(request.user, 'userprofile') is not True:
             models.UserProfile.objects.create(user=request.user)
-        viewable_cards = request.user.userprofile.viewable_cards
-        editable_cards = request.user.userprofile.editable_cards
-        permitted_cards = viewable_cards.union(editable_cards)
+        import ipdb
+        ipdb.set_trace()
+        viewable_nodegroups = request.user.userprofile.viewable_nodegroups
+        editable_nodegroups = request.user.userprofile.editable_nodegroups
+        permitted_nodegroups = viewable_nodegroups.union(editable_nodegroups)
         group_ids = list(request.user.groups.values_list('id', flat=True))
         projects = MobileSurvey.objects.filter(Q(users__in=[request.user]) | Q(groups__in=group_ids), active=True).distinct()
         projects_for_couch = [project.serialize_for_mobile() for project in projects]
         for project in projects_for_couch:
-            project['cards'] = list(permitted_cards.intersection(set(project['cards'])))
+            permitted_cards = set()
+            for card in models.CardModel.objects.filter(cardid__in=project['cards']):
+                if str(card.nodegroup_id) in permitted_nodegroups:
+                    permitted_cards.add(str(card.cardid))
+            project['cards'] = list(permitted_cards)
             for graph in project['graphs']:
                 cards = []
                 for card in graph['cards']:
