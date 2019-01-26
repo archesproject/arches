@@ -37,8 +37,11 @@ define([
                     window.dispatchEvent(new window.Event('resize'));
                 }, 200);
         };
-        this.history = params.mobilesurvey.history;
+        this.history = params.history;
         this.history.lastsync = moment(this.history.lastsync);
+        _.each(this.history.editors, function(editor) {
+            editor.lastsync = moment(editor.lastsync);
+        });
         this.defaultCenterX = arches.mapDefaultX;
         this.defaultCenterY = arches.mapDefaultY;
         this.geocoderDefault = arches.geocoderDefault;
