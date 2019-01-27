@@ -15,6 +15,7 @@
 @import url(../packages/codemirror/theme/monokai.css);
 @import url(../packages/datatables.net-bs/css/dataTables.bootstrap.css);
 @import url(../packages/datatables.net-responsive-bs/css/responsive.bootstrap.css);
+@import url(../packages/datatables.net-buttons-bs/css/buttons.bootstrap.min.css);
 @import url(../packages/nvd3/build/nv.d3.min.css);
 @import url(../packages/leaflet/dist/leaflet.css);
 @import url(../packages/leaflet-draw/dist/leaflet.draw.css);
@@ -2800,6 +2801,19 @@ div.dropdown-menu.open {
     z-index: 100000001;
 }
 
+
+.loading-mask-string {
+    font-size: 35px;
+    font-weight: 600;
+    width: 100%;
+    text-align: center;
+    top: 25%;
+    position: absolute;
+    color: #222;
+    background-color: #999;
+    z-index: 8000;
+}
+
 .graph-designer-loading-mask {
     position: relative;
     opacity: .5;
@@ -5110,7 +5124,7 @@ ul.jqtree_common li.jqtree-folder {
 .account-tips {
     margin-top: 10px;
     font-size: 13px;
-    color: #777;
+    color: #999;
 }
 
 .account-input {
@@ -6231,6 +6245,107 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     border-right: solid 1px #dddddd;
     overflow-y: auto;
 }
+
+
+/*  Start card/widget manager Classes
+    used to manage placement and display of elements inside of the Card
+    and Widget Management forms
+*/
+.panel-config {
+    flex-direction: row-reverse;
+}
+
+.panel-config .middle-column-container {
+    border-right: transparent;
+    border-left: 1px solid #ddd;
+    background: #f4f4f4; /*#2d3c4b*/
+    color: #2d3c4b; /*#f1f1f1*/
+}
+
+.panel-config .toggle-container {
+    padding-bottom: 5px;
+}
+
+.panel-config .form-divider {
+    border-top: 1px solid #ccc;
+}
+
+.panel-config .widget-config-container {
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.panel-config .widget-config-container .control-label {
+    padding-top: 5px;
+    padding-left: 5px;
+}
+
+/* panel styling in widget manager for radio groups */
+.panel-config .widget-config-container .radio-panel {
+    background: #fff;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-top: 0px;
+    margin-left: -10px;
+    margin-right: -10px;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+}
+
+/* panel styling in widget manager for checkbox groups */
+.panel-config .widget-config-container .checkbox-panel {
+    background: #fff;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-top: 0px;
+    margin-left: -10px;
+    margin-right: -10px;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+}
+
+    /* Color changes if you want to use a dark (#2d3c4b) background panel color
+    for the .panel-config .middle-column-container classes
+
+    .panel-config .panel-section-title {
+        color: #f1f1f1;
+    }
+
+    .panel-config .form-radio.form-normal:hover:after {
+        background: #fff;
+    }
+
+    .panel-config .form-radio.form-normal.active:after {
+        background: #fff;
+    }
+
+    .panel-config .tertiary-panel-content .control-label {
+        color: #2d3c4b;
+    }
+
+    .panel-config .accordion-body .control-label {
+        color: #2d3c4b;
+    }
+
+    .panel-config .accordion .panel-title a:focus {
+        color: #2d3c4b;
+    }
+
+    .panel-config .accordion .panel-title a:hover {
+        color: #2d3c4b;
+    }
+
+    .panel-config .input-group-addon {
+        color: #f1f1f1;
+    }
+
+    .panel-config .bootstrap-datetimepicker-widget {
+        color: #2d3c4b;
+    }
+
+    End color changes if you want to use a dark (#2d3c4b) background panel color */
+
+/*End card/widget manager Classes*/
 
 .card-form-preview-container {
     -ms-flex: 1;
@@ -9155,6 +9270,39 @@ a.clear-geojson-button:hover {
     top: 6px
 }
 
+.msm-designer-panel {
+    width: 100%;
+    background-color: #fff;
+    overflow-y: auto;
+}
+
+.msm-list-filter {
+    display: flex;
+    padding: 12px 10px 13px 65px;
+}
+
+.msm-list-filter-input {
+    padding-left: 15px;
+    width: 350px;
+    height: 35px;
+    position: relative;
+}
+
+.msm-list-filter-input .clear-node-search {
+    top: 8px;
+    right: 10px;
+}
+
+.msm-summary-panel {
+    height: 100vh;
+    background: #fff;
+}
+
+.msm-summary-panel #cards {
+    background: #fafafa;
+}
+
+
 /* End Function Manager Page */
 
 .category-header {
@@ -10583,10 +10731,6 @@ a.search-facet-item.disabled {
     background: #fafafa;
 }
 
-.mobile-project-manager-editor .clear-node-search {
-    top: 50px;
-}
-
 .mobile-project-manager-editor .card-nav-container {
     margin-bottom: 0;
 }
@@ -10631,10 +10775,221 @@ a.search-facet-item.disabled {
 
 .mpm-card {
     min-height: 550px;
+    background: #fff;
 }
 
 .mpm-card-content {
+    margin: 0px;
+    border-bottom: 1px solid #ddd;
+    padding: 40px 25px 50px 25px;
+    background: #f9f9f9;
+}
+
+.mpm-card-content.mpm-crud-section {
+    background: #fff;
+    padding-left: 40px;
+}
+
+.mpm-card-content.selection-page {
+    border-bottom: transparent;
+}
+
+.mpm-card-content.active-survey {
+    background: #f3f3f3;
+}
+
+.msm-summary-panel .selection-page {
+    height: 100vh;
+}
+
+.mpm-group-panel-header {
+    padding: 10px 20px;
+    background: #fcfcfc;
+}
+
+.msm-group-label {
+    font-size: 15px;
+    color: #454545;
+    font-weight: 600;
+}
+
+.mpm-group-panel-header h4 {
+    margin-bottom: 5px;
+    margin-top: 0px;
+}
+
+.msm-filter-panel {
+    padding: 5px 0px;
+    width: 100%;
+    position: relative;
+}
+
+.mpm-group-panel-content {
+    padding: 0px 25px 20px 25px;
+}
+
+.mpm-user-panel-content {
+    padding: 0px 25px 20px 20px;
+    margin-top: -5px;
+}
+
+.mpm-group-panel-content .account-label {
+    font-weight: 600;
+}
+
+.mpm-group-panel-content.list {
+    border-top: solid 0px #ccc;
+    padding: 0px;
+}
+
+.msm-user-edit-stats-panel {
+    margin-top: 25px;
+}
+
+.mpm-card-content .userrow {
+    display: flex;
+    padding: 5px;
+    border-bottom: solid 1px #ccc;
+}
+
+.mpm-card-content .userrow:hover {
+    font-weight: 600;
+}
+
+.mpm-card-content .userrow.selected {
+    font-weight: 400;
+}
+
+.msm-user-account-item {
+    background: #fff;
+    height: 40px;
+    padding: 8px 15px;
+    border: transparent;
+    border-bottom: 1px solid #ddd;
+}
+
+.msm-user-account-item:nth-child(even) {
+    background: #fafafa;
+}
+
+.msm-user-account-item:hover {
+    cursor: pointer;
+    background: #F5FAFE;
+    border-bottom: 1px solid steelblue;
+}
+
+.msm-user-account-item.selected {
+    background: #F6F6FF;
+    border-bottom: 1px solid steelblue;
+}
+
+.msm-filter-tools-panel {
+    margin-top: 10px;
+}
+
+.mpm-card-content.group-page {
+    padding: 0;
+}
+
+.mpm-card-content .title {
+    font-size: 22px;
+    font-weight: 525;
+    text-align: center;
     padding: 10px;
+}
+
+.mpm-card-content .sub-title {
+    font-size: 18px;
+    font-weight: 500;
+    text-align: center;
+}
+
+.msm-identity-filter {
+    width: 100%;
+    flex: 1;
+}
+
+.msm-user-account-panel {
+    border-top: 1px solid #ddd;
+    height: 600px;
+    background: #fafafa;
+}
+
+.msm-account-listing-panel {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    background: #fff;
+}
+
+.msm-account-summary-panel {
+    display: flex;
+    flex-direction: column;
+    background: #fcfcfc;
+    flex: 1;
+    border-left: solid 1px #ccc;
+}
+
+.msm-user-summary-item-panel {
+    margin-bottom: 3px;
+}
+
+.msm-user-summary-label {
+    font-size: 13px;
+    color: #565656;
+}
+
+.msm-icon-wrap {
+    height: 60px;
+    width: 60px;
+    border-radius: 50%;
+    border: 1px solid #C68000;
+    background: #FFDA39;
+    font-size: 28px;
+    padding-top: 12px;
+    padding-left: 6px;
+}
+
+.model-selection .msm-icon-wrap {
+    background: #fff;
+    color:#2d3c4b;
+    padding-top: 15px;
+    border: 1px solid #2d3c4b;
+}
+
+a.filter-tools {
+    margin-left: 0px;
+    padding: 3px 6px;
+    color: #888;
+    font-size: 12px;
+}
+
+a.filter-tools:hover {
+    cursor: pointer;
+    background: #ddd;
+    color: #454545;
+}
+
+.mpm-card-content .description {
+    font-size: 14px;
+    text-align: center;
+    margin: 15px 100px 15px 100px;
+}
+
+.mpm-card-content .oddrow {
+    background: #fff;
+    border-left: solid 1px #ccc;
+}
+
+.mpm-resource-selection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+}
+
+.mpm-resource-selection .resource-dropdown {
+    width: 80%;
 }
 
 .account-wrapper {
@@ -10684,11 +11039,93 @@ a.search-facet-item.disabled {
     border-right: 1px solid #ddd;
 }
 
+
 .msm-data-selection .form-text.form-checkbox:not(.btn), .form-text.form-radio:not(.btn) {
     margin-top: 1px;
 }
 
+.resource-grid-main.mpm-manager {
+    height: 100%;
+    padding-top: 20px;
+    padding-left: 20px;
+}
 
+.resource-grid-tools-container.mpm-manager {
+    display: flex;
+    flex-direction: column;
+}
+
+
+.resource-grid-main-container.mpm {
+    background: none;
+}
+
+.grid.mpm {
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+    max-width: none;
+}
+
+.list-filter.mpm {
+    background-color: #f4f4f4;
+    margin-bottom: 0;
+}
+
+.mpm-subtitle {
+    position: relative;
+    left: 55px;
+    top: -45px;
+    color: #999;
+    font-size: 12px;
+    width: 500px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mpm-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.mpm-summary-panel {
+    background: #fff;
+    padding: 0px 40px;
+    margin-top: -60px;
+    margin-left: 0px;
+    border-top: 1px solid #ddd;
+    margin-right: 0px;
+}
+
+.map-search-container div .map-widget-panel {
+    height: calc(100vh - 110px);
+}
+
+.resource-grid-item.mpm-manager:hover {
+    /*background-color: #f5f5f5;*/
+    border-radius: 3px;
+    color: #000;
+}
+
+.resource-grid-main.mpm-manager .mpm-title {
+    font-weight: 400;
+    color: #454545;
+    font-size: 1.416em;
+    position: relative;
+    left: 55px;
+    top: -45px;
+}
+
+.mpm-manager .resource-grid-icon {
+    margin-top: -2px;
+    font-size: 19px;
+}
+
+.report-image-grid.mpm {
+    overflow-y: auto;
+}
 
 .nav-tabs li a.graph-designer-tab {
     padding: 15px 10px 15px 10px;
@@ -10710,7 +11147,7 @@ a.search-facet-item.disabled {
 }
 
 .graph-designer-tab-container .nav-tabs>li.active>a {
-    background: #f4f4f4;
+    background: #ecf0f5;
     border: 1px solid #f4f4f4;
 }
 
@@ -10721,6 +11158,7 @@ a.search-facet-item.disabled {
 .graph-designer-tab-container .nav-tabs>li:not(.active)>a:hover {
     cursor: pointer;
     color: #666;
+    background: #ecf0f5;
 }
 
 .viewstate-btn {
@@ -10809,6 +11247,30 @@ a.search-facet-item.disabled {
     padding:1px;
 }
 
+.mobile-designer-title {
+    font-size: 1.6em;
+    padding-left: 15px;
+    padding-top: 12px;
+}
+
+.msm-edit-buttons.mobile-project-category-header {
+    left: 0;
+    top: 15px;
+    font-size: 17px;
+    margin-left: 0px;
+    padding-left: 15px;
+}
+
+
+
+.msm-tree {
+    height: 100%;
+}
+
+.left-panel-overflow.mobile-designer-tree {
+    height: inherit;
+}
+
 .identities-list .mpm-left-panel .user .project-status {
     top: 33px;
 }
@@ -10840,8 +11302,18 @@ a.search-facet-item.disabled {
 }
 
 .msm-basemap-location {
-    z-index: 100;
-    background-color: #fff;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.msm-basemap-location:last-child {
+    border-bottom: transparent;
+}
+
+.msm-basemap-subtitle {
+    font-size: 13px;
+    color: #999;
+    padding-bottom: 10px;
 }
 
 .msm-location-card .row.widget-wrapper {
@@ -10850,8 +11322,13 @@ a.search-facet-item.disabled {
 }
 
 .msm-download-panel {
-    padding-top: 15px;
-    padding-bottom: 15px;
+    padding-top: 5px;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+#custom-download-panel {
+    padding-top: 20px;
     padding-left: 15px;
 }
 
@@ -11266,17 +11743,6 @@ a.search-facet-item.disabled {
     color: #999;
 }
 
-.mpm-project-delete {
-    position: absolute;
-    top: 31px;
-    right: 12px;
-    font-size: 12px;
-}
-
-.mpm-project-delete.disabled {
-    color: #ccc;
-}
-
 .mpm-user-status {
     color: #ccc;
     padding: 4px 10px;
@@ -11292,6 +11758,10 @@ a.search-facet-item.disabled {
     text-align: left;
 }
 
+
+.mpm-manager .btn-rr {
+    margin: 0;
+}
 
 .mpm-instructions {
     display: table-cell;
@@ -11320,11 +11790,61 @@ a.search-facet-item.disabled {
 }
 
 .mpm-item-listing-header {
+    font-size: 15px;
     padding-left: 10px;
     margin-top: 0px;
     color: #454545;
-    font-size: 15px;
     font-weight: 500;
+}
+
+.mpm-survey-status-header {
+    padding-left: 10px;
+    margin-top: 0px;
+    color: #454545;
+    font-size: 24px;
+    font-weight: 500;
+    text-align: center;
+}
+
+.msm-survey-status-text {
+    margin-top: 20px;
+}
+
+.msm-survey-status-instructions {
+    padding: 20px 10px 5px 10px;
+    font-size: 19px;
+    text-align: center;
+}
+
+.msm-survey-issues {
+    font-size: 15px;
+    color: #888;
+    list-style-type: none;
+}
+
+.msm-splash-instruction {
+    padding: 0px 60px;
+}
+
+.msm-report-section {
+    padding: 40px 30px;
+    background: #fefefe;
+    border-bottom: 1px solid #ddd;
+}
+
+.msm-crud-section {
+    padding: 40px 40px;
+    min-height: 150px;
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+}
+
+.msm-crud-section:last-child {
+    border-bottom: transparent;
+}
+
+.msm-report-section.active {
+    background: #fff;
 }
 
 .mpm-item-listing-header.data-panel {
@@ -11338,6 +11858,14 @@ a.search-facet-item.disabled {
 .mpm-account-switch-text {
     padding-left: 40px;
     margin-top: -17px;
+}
+
+.msm-download-header {
+    font-size: 15px;
+    padding-left: 0px;
+    margin-top: 30px;
+    color: #454545;
+    font-weight: 500;
 }
 
 .project-search-widget.mpm-item-listing {
@@ -11370,28 +11898,66 @@ a.search-facet-item.disabled {
 }
 
 .mpm-activation-panel {
-    margin-top: -30px;
-    padding: 20px 40px;
-}
-
-.mpm-summary-panel {
-    margin-top: 10px;
-    margin-left: -10px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    border-top: 1px solid #eee;
-    height: 135px;
+    padding: 0px;
 }
 
 .msm-settings-summary {
-    min-height: 500px;
-    overflow-y: scroll;
+    height:100%;
 }
 
 .msm-map-container {
-    padding: 20px;
+    padding: 0px;
+    height: 100vh;
+    margin-left: -10px;
+    margin-right: -20px;
+    margin-top: -30px;
 }
 
+.msm-map-container .widget-wrapper .mapboxgl-map {
+    height: 100vh;
+}
+
+.msm-map-container .geometry-tools-container {
+    top: 60px;
+    left: 10px;
+}
+
+.msm-stats-panel {
+    padding: 10px 5px;
+    min-height: 80px;
+    margin-top: -15px;
+}
+
+.msm-stat {
+    color: #2d3c4b;
+    font-size: 36px;
+    margin-top: 2px;
+}
+
+.msm-stat-label {
+    color: #999;
+    font-size: 13px;
+    margin-top: -5px;
+}
+
+.msm-stat-user {
+    color: #2d3c4b;
+    font-size: 24px;
+    margin-top: 2px;
+}
+
+.msm-stat-user-panel {
+    margin-top: 10px;
+}
+
+.msm-stat-time {
+
+}
+
+.msm-stat-date {
+    font-size: 17px;
+    white-space: nowrap;
+}
 
 .profile-mpm-panel {
     margin-left: 20px;
@@ -11653,7 +12219,7 @@ ul.select2-choices:after {
     border-right: solid 1px gainsboro;
     height:100%;
     z-index: 3;
-    font-size: 11px;
+    font-size: 10px;
 }
 
 .sidepanel-draggable div {
@@ -11678,7 +12244,7 @@ ul.select2-choices:after {
 .left-panel-overflow {
     height: calc(100vh - 225px);
     overflow-y: auto;
-    background: #f4f4f4;
+    background: #ecf0f5;
 }
 
 .main-panel{
@@ -11784,7 +12350,7 @@ ul.select2-choices:after {
 .resource-editor-tree {
     overflow-y: auto;
     height: 100%;
-    background: #f4f4f4;
+    background: #ecf0f5;
 }
 
 a.jstree-anchor strong {
@@ -11943,6 +12509,12 @@ a.jstree-anchor.permissions-widget {
     cursor: pointer;
 }
 
+.report-expander {
+    cursor: pointer;
+    padding-left: 6px;
+    font-weight:bold;
+    font-size: 18px;
+}
 
 @keyframes loader {
     0% {
@@ -12196,5 +12768,9 @@ a.jstree-anchor.permissions-widget {
         display: block;
         width: 100%;
         height: 100%;
+    }
+    .print-hide {
+        display: none;
+        height: 0;
     }
 }

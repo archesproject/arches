@@ -26,6 +26,14 @@ from django.db import connection, transaction
 from elasticsearch import Elasticsearch
 from edtf import parse_edtf
 
+# One benefit of shifting to python3.x would be to use
+# importlib.util.LazyLoader to load rdflib (and other lesser
+# used but memory soaking libs)
+from rdflib import Namespace, URIRef, Literal, Graph, BNode
+from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS
+archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
+cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
+
 EARTHCIRCUM = 40075016.6856
 PIXELSPERTILE = 256
 
@@ -111,6 +119,19 @@ class StringDataType(BaseDataType):
         except KeyError, e:
             pass
 
+    def to_rdf(self, edge_info, edge):
+        # returns an in-memory graph object, containing the domain resource, its
+        # type and the string as a string literal
+        g = Graph()
+        g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
+        g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), Literal(str(edge_info['range_tile_data']))))
+        return g
+
+    def from_rdf(self, json_ld_node):
+        # returns an in-memory graph object, containing the domain resource, its
+        # type and the number as a numeric literal (as this is how it is in the JSON)
+        return json_ld_node.get("@value")
+
 
 class NumberDataType(BaseDataType):
 
@@ -149,6 +170,20 @@ class NumberDataType(BaseDataType):
         except KeyError, e:
             pass
 
+    def to_rdf(self, edge_info, edge):
+        # returns an in-memory graph object, containing the domain resource, its
+        # type and the number as a numeric literal (as this is how it is in the JSON)
+        g = Graph()
+        rtd = int(edge_info['range_tile_data']) if type(edge_info['range_tile_data']) == float and edge_info['range_tile_data'].is_integer() else edge_info['range_tile_data']
+        g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
+        g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), Literal(rtd)))
+        return g
+
+    def from_rdf(self, json_ld_node):
+        # expects a node taken from an expanded json-ld graph
+        # returns the value, or None if no "@value" key is found
+        return json_ld_node.get("@value")
+
 
 class BooleanDataType(BaseDataType):
 
@@ -176,6 +211,18 @@ class BooleanDataType(BaseDataType):
         except KeyError, e:
             pass
 
+    def to_rdf(self, edge_info, edge):
+        # returns an in-memory graph object, containing the domain resource, its
+        # type and the number as a numeric literal (as this is how it is in the JSON)
+        g = Graph()
+        g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
+        g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), Literal(Boolean(edge_info['range_tile_data']))))
+        return g
+
+    def from_rdf(self, json_ld_node):
+        # expects a node taken from an expanded json-ld graph
+        # returns the value, or None if no "@value" key is found
+        return json_ld_node.get("@value")
 
 class DateDataType(BaseDataType):
 
@@ -244,6 +291,21 @@ class DateDataType(BaseDataType):
         config = cache.get('time_wheel_config_anonymous')
         if config is not None:
             cache.delete('time_wheel_config_anonymous')
+
+    def to_rdf(self, edge_info, edge):
+        # returns an in-memory graph object, containing the domain resource, its
+        # type and the number as a numeric literal (as this is how it is in the JSON)
+        g = Graph()
+        g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
+        g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty),
+               Literal(str(edge_info['range_tile_data']), datatype=XSD.dateTime)))
+        return g
+
+    def from_rdf(self, json_ld_node):
+        # expects a node taken from an expanded json-ld graph
+        # returns the value, or None if no "@value" key is found
+        return json_ld_node.get("@value")
+
 
 class EDTFDataType(BaseDataType):
 
@@ -401,8 +463,13 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             })
 
     def get_bounds(self, tile, node):
-        node_data = tile.data[str(node.pk)]
-        return self.get_bounds_from_value(node_data)
+        bounds = None
+        try:
+            node_data = tile.data[str(node.pk)]
+            bounds = self.get_bounds_from_value(node_data)
+        except KeyError as e:
+            print e
+        return bounds
 
     def get_bounds_from_value(self, node_data):
         bounds = None
@@ -929,20 +996,14 @@ class FileListDataType(BaseDataType):
             previously_saved_data = previously_saved_tile.data
         return previously_saved_data
 
-    def get_current_data(self, user_is_reviewer, user_id, current_tile):
-        if user_is_reviewer is True:
-            current_tile_data = current_tile.data
-        else:
-            current_tile_data = current_tile.provisionaledits[user_id]['value']
-        return current_tile_data
-
     def handle_request(self, current_tile, request, node):
+
         previously_saved_tile = models.TileModel.objects.filter(pk=current_tile.tileid)
         user = request.user
         if hasattr(request.user, 'userprofile') is not True:
             models.UserProfile.objects.create(user=request.user)
         user_is_reviewer = request.user.userprofile.is_reviewer()
-        current_tile_data = self.get_current_data(user_is_reviewer, str(user.id), current_tile)
+        current_tile_data = current_tile.data
         if previously_saved_tile.count() == 1:
             previously_saved_tile_data = self.get_previously_saved_data(user_is_reviewer, str(user.id), previously_saved_tile[0])
             if previously_saved_tile_data[str(node.pk)] is not None:
@@ -959,6 +1020,7 @@ class FileListDataType(BaseDataType):
                             print 'file does not exist'
 
         files = request.FILES.getlist('file-list_' + str(node.pk), [])
+
         for file_data in files:
             file_model = models.File()
             file_model.path = file_data
@@ -1024,6 +1086,80 @@ class FileListDataType(BaseDataType):
         result = json.loads(json.dumps(tile_data))
         return result
 
+    def to_rdf(self, edge_info, edge):
+        # outputs a graph holding an RDF representation of the file stored in the Arches instance
+
+        g = Graph()
+
+        unit_nt = """
+        <http://vocab.getty.edu/aat/300055644> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.cidoc-crm.org/cidoc-crm/E55_Type> .
+        <http://vocab.getty.edu/aat/300055644> <http://www.w3.org/2000/01/rdf-schema#label> "height" .
+        <http://vocab.getty.edu/aat/300055647> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.cidoc-crm.org/cidoc-crm/E55_Type> .
+        <http://vocab.getty.edu/aat/300055647> <http://www.w3.org/2000/01/rdf-schema#label> "width" .
+        <http://vocab.getty.edu/aat/300265863> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.cidoc-crm.org/cidoc-crm/E55_Type> .
+        <http://vocab.getty.edu/aat/300265863> <http://www.w3.org/2000/01/rdf-schema#label> "file size" .
+        <http://vocab.getty.edu/aat/300265869> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.cidoc-crm.org/cidoc-crm/E58_Measurement_Unit> .
+        <http://vocab.getty.edu/aat/300265869> <http://www.w3.org/2000/01/rdf-schema#label> "bytes" .
+        <http://vocab.getty.edu/aat/300266190> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.cidoc-crm.org/cidoc-crm/E58_Measurement_Unit> .
+        <http://vocab.getty.edu/aat/300266190> <http://www.w3.org/2000/01/rdf-schema#label> "pixels" .
+        """
+
+        g.parse(data=unit_nt, format="nt")
+
+        aatrefs = {'pixels': URIRef("http://vocab.getty.edu/aat/300266190"),
+                   'bytes': URIRef("http://vocab.getty.edu/aat/300265869"),
+                   'height': URIRef("http://vocab.getty.edu/aat/300055644"),
+                   'width': URIRef("http://vocab.getty.edu/aat/300055647"),
+                   'file size': URIRef("http://vocab.getty.edu/aat/300265863"), }
+
+        def add_dimension(graphobj, domain_uri, unittype, unit, value):
+            dim_node = BNode()
+            graphobj.add((domain_uri, cidoc["P43_has_dimension"], dim_node))
+            graphobj.add((dim_node, RDF.type, cidoc["E54_Dimension"]))
+            graphobj.add((dim_node, cidoc["P2_has_type"], aatrefs[unittype]))
+            graphobj.add((dim_node, cidoc["P91_has_unit"], aatrefs[unit]))
+            graphobj.add((dim_node, RDF.value, Literal(value)))
+
+        for f_data in edge_info['range_tile_data']:
+            # f_data will be something like:
+            # "{\"accepted\": true, \"content\": \"blob:http://localhost/cccadfd0-64fc-104a-8157-3c96aca0b9bd\",
+            # \"file_id\": \"f4cd6596-cd75-11e8-85e0-0242ac1b0003\", \"height\": 307, \"index\": 0,
+            # \"lastModified\": 1535067185606, \"name\": \"FUjJqP6.jpg\", \"size\": 19350,
+            # \"status\": \"uploaded\", \"type\": \"image/jpeg\", \"url\": \"/files/uploadedfiles/FUjJqP6.jpg\",
+            # \"width\": 503}"
+
+            # range URI should be the file URL/URI, and the rest of the details should hang off that
+            # FIXME - (Poor) assumption that file is on same host as Arches instance host config.
+            if f_data['url'].startswith("/"):
+                f_uri = URIRef(archesproject[f_data['url'][1:]])
+            else:
+                f_uri = URIRef(archesproject[f_data['url']])
+            g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), f_uri))
+            g.add((f_uri, RDF.type, URIRef(edge.rangenode.ontologyclass)))
+            g.add((f_uri, DC['format'], Literal(f_data['type'])))
+            g.add((f_uri, RDFS.label, Literal(f_data['name'])))
+
+            # FIXME - improve this ms in timestamp handling code in case of odd OS environments
+            # FIXME - Use the timezone settings for export?
+            if f_data['lastModified']:
+                lm = f_data['lastModified']
+                if lm > 9999999999:   # not a straight timestamp, but includes milliseconds
+                    lm = f_data['lastModified'] / 1000
+                graph.add((f_uri, DCTERMS.modified, Literal(datetime.utcfromtimestamp(lm).isoformat())))
+
+            if 'size' in f_data:
+                add_dimension(graph, f_uri, "file size", "bytes", f_data['size'])
+            if 'height' in f_data:
+                add_dimension(graph, f_uri, "height", "pixels", f_data['height'])
+            if 'width' in f_data:
+                add_dimension(graph, f_uri, "width", "pixels", f_data['width'])
+
+        return g
+
+    def from_rdf(self, json_ld_node):
+        # Currently up in the air about how best to do file imports via JSON-LD
+        pass
+
     def process_mobile_data(self, tile, node, db, couch_doc, node_value):
         '''
         Takes a tile, couch db instance, couch record, and the node value from
@@ -1034,12 +1170,13 @@ class FileListDataType(BaseDataType):
 
         try:
             for file in node_value:
-                attachment = db.get_attachment(couch_doc['_id'], file['name'])
+                attachment = db.get_attachment(couch_doc['_id'], file['file_id'])
                 if attachment is not None:
                     attachment_file = attachment.read()
                     file_data = ContentFile(attachment_file, name=file['name'])
                     file_model = models.File()
                     file_model.path = file_data
+                    file_model.pk = file['file_id']
                     file_model.save()
                     if file["name"] == file_data.name and 'url' not in file.keys():
                         file["file_id"] = str(file_model.pk)
@@ -1047,7 +1184,7 @@ class FileListDataType(BaseDataType):
                         file["status"] = 'uploaded'
                         file["accepted"] = True
                         file["size"] = file_data.size
-                    db.delete_attachment(couch_doc, file['name'])
+                    # db.delete_attachment(couch_doc, file['name'])
 
         except KeyError as e:
             pass
@@ -1324,6 +1461,43 @@ class ResourceInstanceDataType(BaseDataType):
                     query.must(search_query)
         except KeyError, e:
             pass
+
+    def to_rdf(self, edge_info, edge):
+        g = Graph()
+
+        def _add_resource(d, p, r, r_type):
+            g.add((r, RDF.type, URIRef(r_type)))
+            g.add((d, URIRef(p), r))
+
+        if edge_info['range_tile_data'] is not None:
+            res_insts = edge_info['range_tile_data']
+            if not isinstance(res_insts, list):
+                res_insts = [res_insts]
+
+            for res_inst in res_insts:
+                rangenode = URIRef(archesproject['resources/%s' % res_inst])
+                # FIXME: should be the class of the Resource Instance, rather than the expected class
+                # from the edge.
+                _add_resource(edge_info['d_uri'], edge.ontologyproperty,
+                              rangenode, edge.rangenode.ontologyclass)
+        return g
+
+    def from_rdf(self, json_ld_node):
+        res_inst_uri = json_ld_node['id']
+        # should be in the form http(s)://archeshost/resources/{UUID}
+        # FIXME: should any URI in this form be accepted, regardless to a specific Arches host?
+
+        # NOTE: This returns a dict including the host and the resource instance UUID as
+        # {"host":..., "res_inst":...}
+        # It may be important in future for resource instance datatypes to deal with externally held ones
+        # rather than require a local copy.
+
+        import re
+        p = re.compile(r"(http|https)://(?P<host>[^/]*)/resources/(?P<res_inst>[A-Fa-f0-9\-]*)/?$")
+        m = p.match(res_inst_uri)
+        if m is not None:
+            return m.groupdict()
+            # return m.groupdict()['re_inst']  # to return only the UUID
 
 
 class NodeValueDataType(BaseDataType):

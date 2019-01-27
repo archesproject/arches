@@ -93,7 +93,8 @@ define([
             }),
             expanded: ko.observable(false),
             hasprovisionaledits: ko.pureComputed(function() {
-                return !!ko.unwrap(self.provisionaledits);
+                var edits = ko.unwrap(self.provisionaledits);
+                return !!edits && _.keys(edits).length > 0;
             }, this),
             isfullyprovisional: ko.pureComputed(function() {
                 return !!ko.unwrap(self.provisionaledits()) && _.keys(koMapping.toJS(this.data)).length === 0;
@@ -233,6 +234,12 @@ define([
                 });
             }
         });
+        this.selected.subscribe(function(selected) {
+            if (selected) this.expanded(true);
+        }, this);
+        this.expanded.subscribe(function(expanded) {
+            if (expanded && this.parent) this.parent.expanded(true);
+        }, this);
         this.isChildSelected = ko.pureComputed(function() {
             return isChildSelected(this);
         }, this);

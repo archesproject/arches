@@ -100,6 +100,10 @@ ONTOLOGY_NAMESPACES = {
     'http://www.ics.forth.gr/isl/CRMsci/': '',
 }
 
+# Used in the JSON-LD export for determining which external concept scheme URI
+# to use in preference for the URI of a concept. If there is no match, the default
+# Arches host URI will be used (eg http://localhost/concepts/123f323f-...)
+PREFERRED_CONCEPT_SCHEME = "http://vocab.getty.edu/aat/"
 
 # This is the namespace to use for export of data (for RDF/XML for example)
 # Ideally this should point to the url where you host your site
@@ -125,6 +129,7 @@ RESOURCE_EDITOR_GROUPS = (
     'Resource Editor',
     'Crowdsource Editor'
 )
+
 
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  #<-- Only need to uncomment this for testing without an actual email server
 # EMAIL_USE_TLS = True
@@ -229,7 +234,7 @@ OAUTH2_PROVIDER = {
 # This is the client id you get when you register a new application
 # see https://arches.readthedocs.io/en/stable/api/#authentication
 MOBILE_OAUTH_CLIENT_ID = ''  #'9JCibwrWQ4hwuGn5fu2u1oRZSs9V6gK8Vu8hpRC4'
-
+MOBILE_DEFAULT_ONLINE_BASEMAP = {'default': 'mapbox://styles/mapbox/streets-v9'}
 
 TEMPLATES = [
     {
@@ -409,6 +414,10 @@ API_MAX_PAGE_SIZE = 500
 
 UUID_REGEX = '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
 
+OAUTH2_PROVIDER = {
+    'ACCESS_TOKEN_EXPIRE_SECONDS': 604800  # one week
+}
+
 #######################################
 ###       END STATIC SETTINGS       ###
 #######################################
@@ -422,7 +431,6 @@ UUID_REGEX = '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-
 PHONE_REGEX = r'^\+\d{8,15}$'
 SEARCH_ITEMS_PER_PAGE = 5
 SEARCH_EXPORT_ITEMS_PER_PAGE = 100000
-MOBILE_DOWNLOAD_RESOURCE_LIMIT = 50
 RELATED_RESOURCES_PER_PAGE = 15
 RELATED_RESOURCES_EXPORT_LIMIT = 10000
 SEARCH_DROPDOWN_LENGTH = 100

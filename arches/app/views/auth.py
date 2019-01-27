@@ -37,6 +37,7 @@ from django.shortcuts import render, redirect
 import django.contrib.auth.password_validation as validation
 from arches.app.utils.response import JSONResponse, Http401Response
 from arches.app.utils.forms import ArchesUserCreationForm
+from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils.arches_crypto import AESCipher
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -214,6 +215,29 @@ class ChangePasswordView(View):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
+class UserProfileView(View):
+
+    def post(self, request):
+        username = request.POST.get('username', None)
+        password = request.POST.get('password', None)
+        user = authenticate(username=username, password=password)
+        if user:
+            if hasattr(user, 'userprofile') is not True:
+                models.UserProfile.objects.create(user=user)
+            userDict = JSONSerializer().serializeToPython(user)
+            userDict['password'] = None
+            userDict['is_reviewer'] = user.userprofile.is_reviewer()
+            userDict['viewable_nodegroups'] = user.userprofile.viewable_nodegroups
+            userDict['editable_nodegroups'] = user.userprofile.editable_nodegroups
+            userDict['deletable_nodegroups'] = user.userprofile.deletable_nodegroups
+            response = JSONResponse(userDict)
+        else:
+            response = Http401Response()
+
+        return response
+
+
+@method_decorator(csrf_exempt, name='dispatch')
 class GetTokenView(View):
 
     def post(self, request):
@@ -243,10 +267,16 @@ class GetClientIdView(View):
             response = HttpResponse('Make sure to set your MOBILE_OAUTH_CLIENT_ID in settings.py', status=500)
         else:
             if user:
+                if hasattr(user, 'userprofile') is not True:
+                    models.UserProfile.objects.create(user=user)
+                is_reviewer = user.userprofile.is_reviewer()
                 user = JSONSerializer().serializeToPython(user)
                 user['password'] = None
+                user['is_reviewer'] = is_reviewer
                 response = JSONResponse({'user': user, 'clientid': settings.MOBILE_OAUTH_CLIENT_ID})
             else:
                 response = Http401Response()
 
         return response
+
+

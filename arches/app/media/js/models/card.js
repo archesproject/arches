@@ -244,7 +244,6 @@ define([
                         this._card(JSON.stringify(this.toJSON()));
                     }, this);
                     this.disposables.push(nodeDatatypeSubscription);
-                    node.config = koMapping.fromJS(node.config);
 
                     if (datatype.defaultwidget_id) {
                         var cardWidgetData = _.find(attributes.data.widgets, function(widget) {

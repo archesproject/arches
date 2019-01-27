@@ -6,7 +6,7 @@ define([
     'arches'
 ], function(_, ko, koMapping, AbstractModel, arches) {
     return AbstractModel.extend({
-        url: arches.urls.mobile_survey,
+        url: arches.urls.mobile_survey_designer,
 
         initialize: function(options) {
             var self = this;
@@ -17,6 +17,7 @@ define([
             self.startdate = ko.observable(null);
             self.enddate = ko.observable(null);
             self.active = ko.observable(false);
+            self.activatedOnServer = ko.observable(options.source.active);
             self.createdby = ko.observable(null);
             self.lasteditedby = ko.observable(null);
             self.users = ko.observableArray([]);
@@ -25,10 +26,11 @@ define([
             self.cards = ko.observableArray([]);
             self.datadownloadconfig = koMapping.fromJS(options.source.datadownloadconfig) || ko.observable();
             self.tilecache = ko.observable('');
-            self.onlinebasemap = ko.observable('');
+            self.onlinebasemap = ko.observable(options.source.onlinebasemaps || ko.observable());
             self.bounds = ko.observable(self.getDefaultBounds(null));
             self.collectedResources = ko.observable(false);
             self.showCustomDataDownload = ko.observable(false);
+            self.datadownloadconfig.resources.extend({ rateLimit: 50 });
 
             var getUserName = function(id) {
                 var user = _.find(self.identities, function(i) {
@@ -49,11 +51,17 @@ define([
                 });
             };
 
+            self.selectedUser = ko.observable();
+
             _.each(this.identities, function(item) {
+                item.filtered(false);
                 if (item.type === 'group') {
-                    _.each(item.users, function(user){
-                        if (!user.expanded) {
-                            user.expanded = ko.observable(false);
+                    item.fullusers = _.filter(self.identities, function(id) {
+                        return (id.type === 'user' && _.contains(id.group_ids, item.id));
+                    });
+                    item.selected.subscribe(function(val){
+                        if(val) {
+                            self.selectedUser(item.fullusers[0]);
                         }
                     });
                 }
@@ -73,42 +81,17 @@ define([
             });
 
             self.userFilter = ko.observable('');
-            self.selectedUser = ko.observable();
 
-            self.filteredUsers = ko.computed(function() {
-                var filter = self.userFilter();
-                this.selected = _.filter(self.identities, function(identity) {
-                    return ko.unwrap(identity.selected);
-                });
-                var list = [];
-
-                if (this.selected.length === 1) {
-                    list = this.selected[0].users;
-                    if (filter.length === 0) {
-                        return list;
-                    }
-                }
-
-                return _.filter(list, function(user) {
-                    if (user.username.startsWith(filter)) {
-                        return user;
+            self.userFilter.subscribe(function(filter){
+                _.each(self.identities, function(id) {
+                    var regex = new RegExp(filter);
+                    if (id.type && id.type === 'user' && regex.test(id.name)) {
+                        id.filtered(false);
+                    } else {
+                        id.filtered(true);
                     }
                 });
-
             });
-
-            self.selectedIdentity = ko.computed(function() {
-                var selected = _.filter(self.identities, function(identity) {
-                    return ko.unwrap(identity.selected);
-                });
-                if (selected.length === 1 && selected[0].users) {
-                    self.selectedUser(selected[0].users.length > 0 ? selected[0].users[0] : undefined);
-                }
-                return selected.length > 0 ? selected[0] : undefined;
-            });
-
-
-
 
             self.approvedUserNames = ko.computed(function() {
                 var names = [];
@@ -130,27 +113,22 @@ define([
                 return names;
             });
 
-            self.hasIdentity = function() {
+            self.hasIdentity = function(identity) {
                 var approved = false;
-                var identity = self.selectedIdentity();
                 if (identity) {
                     approved = identity.approved();
                 }
                 return approved;
             };
 
-            self.toggleIdentity = function() {
-                var identity = self.selectedIdentity();
+            self.toggleIdentity = function(identity) {
                 if (identity) {
                     var currentIdentities = identity.type === 'user' ? self.users : self.groups;
-                    if (self.hasIdentity()) {
+                    if (self.hasIdentity(identity) === false) {
                         currentIdentities.remove(identity.id);
-                        if (identity.type === 'user') {
-                            identity.approved(false);
-                        } else {
-                            identity.approved(false);
+                        if (identity.type === 'group') {
                             _.chain(self.identities).filter(function(id) {
-                                return id.type === 'user' && _.contains(_.pluck(this.selectedIdentity().users, 'id'), id.id);
+                                return id.type === 'user' && _.contains(_.pluck(identity.users, 'id'), id.id);
                             }, this).each(function(user) {
                                 if (_.intersection(user.group_ids, self.groups()).length === 0) { // user does not belong to any accepted groups
                                     user.approved(false);
@@ -163,13 +141,10 @@ define([
                             currentIdentities.push(identity.id);
                         }
                         identity.approved(true);
-                        if (identity.type === 'user') {
-                            self.users.push(identity.id);
-                        } else {
+                        if (identity.type === 'group') {
                             _.chain(self.identities).filter(function(id) {
-                                var identity = identity;
-                                return id.type === 'user';
-                            }).each(function(user) {
+                                return id.type === 'user' && _.contains(_.pluck(identity.users, 'id'), id.id);
+                            }, this).each(function(user) {
                                 if (_.intersection(user.group_ids, self.groups()).length > 0) {
                                     user.approved(true);
                                     if (!_.contains(self.users(), user.id)) {
@@ -179,6 +154,7 @@ define([
                             });
                         }
                     }
+                    currentIdentities.sort();
                 }
             };
 
@@ -202,16 +178,6 @@ define([
                 self.cards(_.union(diff, approvedCards));
             };
 
-            self.updateApproved = function(val){
-                val.item.approved(true);
-                self.updateCards(val.targetParent());
-            };
-
-            self.updateUnapproved = function(val){
-                val.item.approved(false);
-                self.cards.remove(val.item.cardid);
-            };
-
             self.addAllCardsByResource = function(val) {
                 var resource = val.resourceList.selected();
                 _.each(resource.cards(), function(card){
@@ -229,13 +195,13 @@ define([
             };
 
             self.toggleShowDetails = function() {
+                //used in the profile manager
                 self.setIdentityApproval();
                 self.showDetails(!self.showDetails());
             };
 
             self.parse(options.source);
             self.setIdentityApproval();
-
             self.json = ko.computed(function() {
                 var jsObj = ko.toJS({
                     name: self.name,
@@ -297,14 +263,15 @@ define([
             self.startdate(source.startdate);
             self.enddate(source.enddate);
             self.active(source.active);
+            self.activatedOnServer(source.active);
             self.createdby(source.createdby_id);
             self.lasteditedby(source.lasteditedby_id);
             self.groups(source.groups);
             self.users(source.users);
             self.cards(source.cards);
             self.tilecache(source.tilecache);
-            self.onlinebasemap(source.onlinebasemaps ? source.onlinebasemaps['default'] : source.onlinebasemaps);
             self.bounds(self.getDefaultBounds(source.bounds));
+            self.onlinebasemap(source.onlinebasemaps ? source.onlinebasemaps['default'] : source.onlinebasemaps);
             self.set('id', source.id);
         },
 
@@ -313,9 +280,8 @@ define([
         },
 
         _getURL: function(method) {
-            return this.url;
+            return this.url(this.id);
         },
-
 
         save: function(userCallback, scope) {
             var self = this;
@@ -337,6 +303,7 @@ define([
                     self.datadownloadconfig.count(request.responseJSON.mobile_survey.datadownloadconfig.count);
                     self.datadownloadconfig.resources(request.responseJSON.mobile_survey.datadownloadconfig.resources);
                     self.datadownloadconfig.custom(request.responseJSON.mobile_survey.datadownloadconfig.custom);
+                    self.activatedOnServer(request.responseJSON.mobile_survey.active);
                     this._mobilesurvey(this.json());
                 }
             };

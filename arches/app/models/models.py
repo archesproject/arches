@@ -208,6 +208,23 @@ class EditLog(models.Model):
         db_table = 'edit_log'
 
 
+class MobileSyncLog(models.Model):
+    logid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    survey = models.ForeignKey('MobileSurveyModel', related_name='surveyid')
+    user = models.ForeignKey(User, related_name='syncedby')
+    started = models.DateTimeField(auto_now_add=True, null=True)
+    finished = models.DateTimeField(auto_now=True, null=True)
+    tilescreated = models.IntegerField(default=0, null=True)
+    tilesupdated = models.IntegerField(default=0, null=True)
+    tilesdeleted = models.IntegerField(default=0, null=True)
+    resourcescreated = models.IntegerField(default=0, null=True)
+    note = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'mobile_sync_log'
+
+
 class File(models.Model):
     fileid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     path = models.FileField(upload_to='uploadedfiles')
@@ -860,6 +877,21 @@ class UserProfile(models.Model):
     def is_reviewer(self):
         return self.user.groups.filter(name='Resource Reviewer').exists()
 
+    @property
+    def viewable_nodegroups(self):
+        from arches.app.utils.permission_backend import get_nodegroups_by_perm
+        return set(str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(self.user, ['models.read_nodegroup'], any_perm=True))
+
+    @property
+    def editable_nodegroups(self):
+        from arches.app.utils.permission_backend import get_nodegroups_by_perm
+        return set(str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(self.user, ['models.write_nodegroup'], any_perm=True))
+
+    @property
+    def deletable_nodegroups(self):
+        from arches.app.utils.permission_backend import get_nodegroups_by_perm
+        return set(str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(self.user, ['models.delete_nodegroup'], any_perm=True))
+
     class Meta:
         managed = True
         db_table = 'user_profile'
@@ -880,7 +912,7 @@ class MobileSurveyModel(models.Model):
     bounds = models.MultiPolygonField(null=True)
     tilecache = models.TextField(null=True)
     onlinebasemaps = JSONField(blank=True, null=True, db_column='onlinebasemaps')
-    datadownloadconfig = JSONField(blank=True, null=True, default='{"download":false, "count":1000, "resources":[], "custom":null}')
+    datadownloadconfig = JSONField(blank=True, null=True, default='{"download":false, "count":100, "resources":[], "custom":null}')
 
     def __unicode__(self):
         return self.name
