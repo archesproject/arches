@@ -171,12 +171,15 @@ class GraphDesignerView(GraphBaseView):
             'sortorder').all() for card in cards] for widget in widgets]
         widgets = models.Widget.objects.all()
         nodegroups = cards.values_list('nodegroup_id', flat=True)
-        
+
         if settings.OVERRIDE_RESOURCE_MODEL_LOCK:
             restricted_nodegroups = []
         else:
-            restricted_nodegroups = models.TileModel.objects.filter(nodegroup__in=nodegroups).values_list('nodegroup_id', flat=True).distinct()
-        
+            restricted_nodegroups = models.TileModel.objects \
+                .filter(nodegroup__in=nodegroups) \
+                .values_list('nodegroup_id', flat=True) \
+                .distinct()
+
         card_components = models.CardComponent.objects.all()
         map_layers = models.MapLayer.objects.all()
         map_markers = models.MapMarker.objects.all()
