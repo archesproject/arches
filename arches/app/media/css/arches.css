@@ -10781,7 +10781,7 @@ a.search-facet-item.disabled {
 .mpm-card-content {
     margin: 0px;
     border-bottom: 1px solid #ddd;
-    padding: 40px 25px 50px 25px;
+    padding: 50px 25px 50px 25px;
     background: #f9f9f9;
 }
 
@@ -10795,7 +10795,13 @@ a.search-facet-item.disabled {
 }
 
 .mpm-card-content.active-survey {
-    background: #f3f3f3;
+    background: #C1F8E9;
+    border-top: 1px solid #65D6B7;
+    border-bottom: 1px solid #65D6B7;
+}
+
+.active-survey .msm-survey-message {
+    color: #009E72;
 }
 
 .msm-summary-panel .selection-page {
@@ -11806,14 +11812,26 @@ a.filter-tools:hover {
     text-align: center;
 }
 
-.msm-survey-status-text {
+.msm-survey-requirements-text {
     margin-top: 20px;
+}
+
+.msm-survey-status-text {
+    margin-top: 0px;
+}
+
+.msm-survey-message {
+    margin-top: 20px;
+    font-size: 16px;
+    color: #888;
 }
 
 .msm-survey-status-instructions {
     padding: 20px 10px 5px 10px;
-    font-size: 19px;
+    font-size: 16px;
     text-align: center;
+    border: 1px solid #ddd;
+    background: orange;
 }
 
 .msm-survey-issues {
