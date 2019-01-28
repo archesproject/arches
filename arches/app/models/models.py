@@ -348,6 +348,9 @@ class GraphModel(models.Model):
                 result = True
         return result
 
+    def __unicode__(self):
+        return self.name
+
     class Meta:
         managed = True
         db_table = 'graphs'
