@@ -567,7 +567,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <input style="width:30%; display:inline-block;"
                                         data-bind="select2Query: {
                                             select2Config: getSelect2GroupsConfig()
-                                        }">
+                                        }, attr: {disabled: locked}">
                                     </div>
                                 </div>
 
@@ -615,10 +615,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <div class="msm-user-account-panel">
                                                 <!--ko foreach: {data: selectedNode().fullusers, as: 'user'} -->
                                                 <div class="msm-user-account-item checkbox" data-bind="click: function(){$parent.mobilesurvey.selectedUser(user); return true;};, css: {selected: user.id === $parent.mobilesurvey.selectedUser().id}, visible: user.filtered() === false" class="userrow">
-                                                    <label class="form-checkbox form-normal form-primary" data-bind="css: {'active': user.approved}" style="padding-left: 25px; padding-top: 3px;">
-                                                        <input type="checkbox" data-bind="checked: user.approved, event: {'change': $parent.mobilesurvey.toggleIdentity}"/>
-                                                        <span data-bind="text: user.name"></span>
+                                                    <label class="form-checkbox form-normal form-primary" data-bind="css: {'active': user.approved, 'disabled': $parent.locked}" style="padding-left: 25px; padding-top: 3px;">
+                                                        <input type="checkbox" data-bind="checked: user.approved, event: {'change': $parent.mobilesurvey.toggleIdentity}, attr: {disabled: $parent.locked}"/>
                                                     </label>
+                                                    <span style="vertical-align: top" data-bind="text: user.name"></span>
                                                 </div>
                                                 <!--/ko-->
                                             </div>
