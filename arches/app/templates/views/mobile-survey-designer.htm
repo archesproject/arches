@@ -422,6 +422,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!--/ko-->
 
                         <!--ko if: activePage() === 'resourcemodel'-->
+                        <div class='msm-locked-warning' data-bind="visible: locked">{% trans 'These options cannot be modified because users have already synched with this survey.' %}</div>
                         <div class="mpm-card-content mpm-crud-section">
 
                             <div class="account-label">{% trans 'Data entry cards selected for this survey:' %}</div>
@@ -442,6 +443,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <!-- Models Card -->
                         <!--ko if: activePage() === 'models'-->
+                        <div class='msm-locked-warning' data-bind="visible: locked">{% trans 'These options cannot be modified because users have already synched with this survey.' %}</div>
                         <div class="mpm-card-content selection-page model-selection">
 
                             <!-- Icon and Title -->
@@ -473,6 +475,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <!-- Data Card -->
                         <!--ko if: activePage() === 'data'-->
+                        <div class='msm-locked-warning' data-bind="visible: locked">{% trans 'These options cannot be modified because users have already synched with this survey.' %}</div>
                         <div class="msm-crud-section" style="height: 200px; border-bottom: transparent;">
                             <!-- Allow Data Downloads Switch -->
                             <div class="mpm-item-listing-header data-panel">
@@ -558,6 +561,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!--/ko-->
 
                         <!--ko if: activePage() === 'people'-->
+                        <div class='msm-locked-warning' data-bind="visible: locked">{% trans 'These options cannot be modified because users have already synched with this survey.' %}</div>
                         <div id="models-card">
                             <div class="mpm-card-content selection-page model-selection">
 
@@ -590,6 +594,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <!--ko if: activePage() === 'identity'-->
                         <!-- Account Page -->
+                        <div class='msm-locked-warning' data-bind="visible: locked">{% trans 'These options cannot be modified because users have already synched with this survey.' %}</div>
                         <div id="models-card">
                             <div class="mpm-card-content group-page">
                                 <div style="display: flex">
