@@ -83,12 +83,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <!-- Icon and Status warning -->
                                 <div class="mpm-survey-status-header">
                                     <i class="msm-icon-wrap fa fa-check" style="color:#333; background: #eee; border: 1px solid #333; padding-right:5px;"></i>
-                                    <div class="msm-survey-status-text">{% trans 'Survey Requirements: Complete' %}</div>
+                                    <div class="msm-survey-requirements-text">
+                                        {% trans 'Survey Requirements: Complete' %}
+                                    </div>
                                     <div class="msm-survey-status-text" data-bind="text: mobilesurvey.activatedOnServer() === true ? '{% trans "Survey Status: Active" %}' : '{% trans " Survey Status: Inactive" %}'"></div>
+
+                                    <div class="msm-survey-message">
+                                        This survey is now active!  <br> Mobile app users can download this survey and begin <br> collecting and editing data using their mobile device.
+                                    </div>
                                 </div>
 
                                 <!--ko if: mobilesurvey.activatedOnServer() === false && mobilesurvey.active() === true -->
-                                <div class="msm-survey-status-instructions">{% trans 'You are activating this survey. Users will be able to download this survey and begin collecting data.' %}</div>
+                                <div class="msm-survey-status-instructions">{% trans "You are activating this survey. Confirm your settings before you save: you won't be able <br> to change the models, cards, or groups after you save your survey" %}</div>
                                 <!--/ko-->
 
                                 <!--ko if: mobilesurvey.activatedOnServer() === true && mobilesurvey.active() === false -->
@@ -109,7 +115,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <!-- Icon and Status warning -->
                                 <div class="mpm-survey-status-header">
                                     <i class="msm-icon-wrap fa fa-exclamation-triangle" style="color:orange; padding-right:5px;"></i>
-                                    <div class="msm-survey-status-text">{% trans 'Survey Requirements: Incomplete' %}</div>
+                                    <div class="msm-survey-requirements-text">{% trans 'Survey Requirements: Incomplete' %}</div>
                                     <div class="msm-survey-status-text" data-bind="text: mobilesurvey.activatedOnServer() === true ? '{% trans "Survey Status: Active" %}' : '{% trans " Survey Status: Inactive" %}'"></div>
                                 </div>
 
