@@ -154,7 +154,6 @@ define([
                             });
                         }
                     }
-                    currentIdentities.sort();
                 }
             };
 
