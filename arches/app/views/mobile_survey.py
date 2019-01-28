@@ -150,15 +150,6 @@ class MobileSurveyDesignerView(MapBaseManagerView):
 
     def get(self, request, surveyid):
 
-        def get_last_login(date):
-            result = _("Not yet logged in")
-            try:
-                if date is not None:
-                    result = datetime.strftime(date, '%Y-%m-%d %H:%M')
-            except TypeError as e:
-                print e
-            return result
-
         def get_history(survey, history):
             sync_log_records = models.MobileSyncLog.objects.order_by('-finished').values().filter(survey=survey)
             if len(sync_log_records) > 0:
@@ -181,7 +172,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
         for group in Group.objects.all():
             users = group.user_set.all()
             if len(users) > 0:
-                groupUsers = [{'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email, 'last_login': get_last_login(user.last_login), 'username': user.username, 'groups': [g.id for g in user.groups.all()], 'group_names': ', '.join([g.name for g in user.groups.all()])} for user in users]
+                groupUsers = [{'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email, 'username': user.username, 'groups': [g.id for g in user.groups.all()], 'group_names': ', '.join([g.name for g in user.groups.all()])} for user in users]
             identities.append({'name': group.name, 'type': 'group', 'id': group.pk, 'users': groupUsers, 'default_permissions': group.permissions.all()})
         for user in User.objects.filter():
             groups = []
