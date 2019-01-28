@@ -9276,6 +9276,15 @@ a.clear-geojson-button:hover {
     overflow-y: auto;
 }
 
+.msm-locked-warning {
+    height: 40px;
+    background: #999;
+    color: #fff;
+    padding-left: 10px;
+    position: relative;
+    padding-top: 10px;
+}
+
 .msm-list-filter {
     display: flex;
     padding: 12px 10px 13px 65px;
