@@ -355,13 +355,11 @@ class v3PreparedResource:
         instance of), as well as the node lookup that links v3 node names with
         v4 node names. """
 
-        # duplicate what is stored in self.node_list. when trying to copy
-        # self.node_list to a new variable with resource_data = list(self.node_list)
-        # nodes were carried over from one resource to the next :(
+        # duplicate what is stored in self.node_list.
         resource_data = list(self.node_list)
         ct_total = len(resource_data)
 
-        # first pull out all of the geometries into a single value
+        # first combine all of the geometries into a single value
         resource_data = flatten_geometries(resource_data, node_lookup)
         ct_geom = len(resource_data)
 
