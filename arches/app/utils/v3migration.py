@@ -9,7 +9,7 @@ from rdflib import Graph as RDFGraph
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.db.models.functions import MakeValid
 from arches.app.models.graph import Graph
-from arches.app.models.models import Node, File
+from arches.app.models.models import Node, File, NodeGroup
 from arches.app.models.tile import Tile
 from arches.app.utils import v3utils
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -200,6 +200,25 @@ def flatten_geometries(resource_data, node_lookup):
     resource_data = [i for i in resource_data if i not in to_remove]
 
     return resource_data
+
+
+def duplicate_tile_json(tilejson):
+    """returns a duplicate of the tilejson that is passed in, but
+    with all data values set to None."""
+
+    newtile = {
+        "resourceinstance_id": tilejson['resourceinstance_id'],
+        "provisionaledits": tilejson['provisionaledits'],
+        "parenttile_id": tilejson['parenttile_id'],
+        "nodegroup_id": tilejson['nodegroup_id'],
+        "sortorder": tilejson['sortorder'],
+        "data": {},
+        "tileid": uuid.uuid4(),
+    }
+    for k in tilejson['data'].keys():
+        newtile['data'][k] = None
+
+    return newtile
 
 
 def get_nodegroup_tilegroup(v4_node_name, nodes, resource_id, verbose=False):
@@ -410,7 +429,9 @@ class v3PreparedResource:
                     for tile in tilegroup_json:
                         if v4_uuid in tile['data'].keys():
                             if not tile['data'][v4_uuid] is None and not dt == "concept-list":
-                                skip = True
+                                ng = NodeGroup.objects.get(nodegroupid=tile['nodegroup_id'])
+                                if ng.parentnodegroup_id is None and ng.cardinality != "n":
+                                    skip = True
 
                 if skip:
                     if verbose:
@@ -428,21 +449,39 @@ class v3PreparedResource:
                     if v4_uuid not in tile['data'].keys():
                         continue
 
-                    # set value
                     # if this is a concept-list node, assume the value should
                     # be appended to the existing concept-list value, if extant
                     if dt == "concept-list":
                         if verbose:
                             print tile['data'][v4_uuid], "="*60
+                        # set value
                         if isinstance(tile['data'][v4_uuid], list):
                             tile['data'][v4_uuid].append(value)
                         else:
                             tile['data'][v4_uuid] = [value]
+                        tileid_used = tile['tileid']
                     else:
-                        tile['data'][v4_uuid] = value
+                        # this implicitly catches the situation where earlier logic
+                        # has determined that the cardinality will allow multiple
+                        # of this tile. therefore a new tile is made, the value is
+                        # set in the new tile (ignoring the currently iterated tile)
+                        # and then the new tile is placed at the beginning of the
+                        # current tilegroup_json list.
+                        if tile['data'][v4_uuid] is not None:
+                            newtile = duplicate_tile_json(tile)
+                            newtile['data'][v4_uuid] = value
+                            tilegroup_json.insert(0, newtile)
+                            tileid_used = newtile['tileid']
+
+                        # otherwise, this is the place where the majority of values
+                        # are set.
+                        else:
+                            tile['data'][v4_uuid] = value
+                            tileid_used = tile['tileid']
                     used.append(index)
                     if verbose:
-                        print "    placing value into:", v4_uuid, node_lookup[dp[0]]['v4_name']
+                        print "    placing value into tile:", tileid_used, 'nodeid -->',
+                        print v4_uuid, node_lookup[dp[0]]['v4_name']
                     break
 
             if verbose:
