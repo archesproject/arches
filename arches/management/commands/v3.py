@@ -13,7 +13,6 @@ from arches.app.utils import v3utils
 from arches.app.utils.v3migration import v3Importer, v3SkosConverter
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.models.system_settings import settings
-settings.update_from_db()
 
 
 class Command(BaseCommand):

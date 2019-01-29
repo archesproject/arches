@@ -14,7 +14,6 @@ from arches.app.models.tile import Tile
 from arches.app.utils import v3utils
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.models.system_settings import settings
-settings.update_from_db()
 
 
 def fix_v3_value(value, datatype):
