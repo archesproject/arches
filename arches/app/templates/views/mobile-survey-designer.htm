@@ -89,7 +89,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <div class="msm-survey-status-text" data-bind="text: mobilesurvey.activatedOnServer() === true ? '{% trans "Survey Status: Active" %}' : '{% trans " Survey Status: Inactive" %}'"></div>
 
                                     <div class="msm-survey-message" data-bind="visible: mobilesurvey.activatedOnServer() === false">
-                                        {% trans "This survey is ready to use.  <br> You will need to activate and save this survey first. <br> Please note: once you've activated the survey you won't be able to change the models or groups." %}
+                                        {% trans "This survey is ready, and only requires <br> you to activate it to allow your field team to collect data." %}
                                     </div>
 
                                     <div class="msm-survey-message" data-bind="visible: mobilesurvey.activatedOnServer() === true">

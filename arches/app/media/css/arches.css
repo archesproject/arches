@@ -2774,7 +2774,7 @@ div.dropdown-menu.open {
 .loading-mask {
     position: fixed;
     opacity: .75;
-    background-color: gray;
+    background-color: grey;
     top: 0;
     bottom: 0;
     left: 0;
@@ -11837,10 +11837,8 @@ a.filter-tools:hover {
 
 .msm-survey-status-instructions {
     padding: 20px 10px 5px 10px;
-    font-size: 16px;
+    font-size: 19px;
     text-align: center;
-    border: 1px solid #ddd;
-    background: orange;
 }
 
 .msm-survey-issues {
