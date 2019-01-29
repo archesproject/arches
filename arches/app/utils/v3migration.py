@@ -538,12 +538,16 @@ class v3Importer:
         with open(self.source_file, 'rb') as openfile:
             v3_json = json.loads(openfile.read())
 
-        self.v3_resources = [r for r in v3_json['resources'] if
-                             r['entitytypeid'] == self.v3_graph_name
-                             and len(r['child_entities']) != 0
-                             and not r['entityid'] in exclude
-                             ]
+        # get all the resources matching this resource graph name
+        v3_resources = [r for r in v3_json['resources'] if r['entitytypeid'] == self.v3_graph_name]
 
+        # filter out any empty resources
+        v3_resources = [r for r in v3_resources if len(r['child_entities']) != 0]
+
+        # filter out any that are explicitly excluded
+        self.v3_resources = [r for r in v3_resources if r['entityid'] not in exclude]
+
+        # if the list should be truncated, only take that many resources from the front of the list
         if truncate:
             self.v3_resources = self.v3_resources[:truncate]
 
