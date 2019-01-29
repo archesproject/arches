@@ -480,7 +480,7 @@ class v3Importer:
     with the rm_configs content itself). An optional truncate argument can be
     used to limit the number of resources that are loaded from the v3 json. """
 
-    def __init__(self, v3_data_dir, v4_graph_name, v3_json_file, truncate=None, exclude=[]):
+    def __init__(self, v3_data_dir, v4_graph_name, v3_json_file, truncate=None, exclude=[], only=[]):
 
         if not os.path.isfile(v3_json_file):
             raise Exception("v3 business data file {} does not exist".format(
@@ -504,7 +504,7 @@ class v3Importer:
         self.node_lookup = self.augment_node_lookup()
 
         # finally, do the actual loading of the v3 data into this class
-        self.v3_resources = self.load_v3_data(truncate=truncate, exclude=exclude)
+        self.v3_resources = self.load_v3_data(truncate=truncate, exclude=exclude, only=only)
 
     def augment_node_lookup(self):
         """takes the node lookup csv and converts to a dictionary
@@ -530,7 +530,7 @@ class v3Importer:
 
         return new_and_improved
 
-    def load_v3_data(self, truncate=None, exclude=[]):
+    def load_v3_data(self, truncate=None, exclude=[], only=[]):
         """ loads the data that is in the v3 export file. limits to the number
         in truncate, if truncate is not none."""
 
@@ -545,6 +545,10 @@ class v3Importer:
 
         # filter out any that are explicitly excluded
         self.v3_resources = [r for r in v3_resources if r['entityid'] not in exclude]
+
+        # filter out all but the ones specified in the only argument
+        if len(only) > 0:
+            self.v3_resources = [r for r in self.v3_resources if r['entityid'] in only]
 
         # if the list should be truncated, only take that many resources from the front of the list
         if truncate:

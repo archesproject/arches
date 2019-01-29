@@ -56,6 +56,9 @@ class Command(BaseCommand):
         parser.add_argument('--exclude', nargs="+", action='store', default=[],
                             help='List of resource ids (uuids) to exclude from the write process.')
 
+        parser.add_argument('--only', nargs="+", action='store', default=[],
+                            help='List of specific resource ids (uuids) to use.')
+
     def handle(self, *args, **options):
 
         if not options['target']:
@@ -113,7 +116,8 @@ class Command(BaseCommand):
                                direct_import=options['import'],
                                truncate=options['number'],
                                verbose=vb,
-                               exclude=options['exclude']
+                               exclude=options['exclude'],
+                               only=options['only']
                                )
 
         if op == 'write-v4-relations':
@@ -241,7 +245,7 @@ class Command(BaseCommand):
         print "PASS"
 
     def write_v4_json(self, package_dir, resource_models,
-                      direct_import=False, truncate=None, verbose=False, exclude=[]):
+                      direct_import=False, truncate=None, verbose=False, exclude=[], only=[]):
 
         v3_data_dir = os.path.join(package_dir, "v3data")
         endmsg = "\n  -- You can load these resources later with:\n"
@@ -263,7 +267,7 @@ class Command(BaseCommand):
             print rm
             output_file = os.path.join(package_dir, 'business_data', rm+".json")
             importer = v3Importer(v3_data_dir, rm, business_data,
-                                  truncate=truncate, exclude=exclude)
+                                  truncate=truncate, exclude=exclude, only=only)
             output = importer.write_v4_json(output_file, verbose=verbose)
             sources.append(output_file)
             endmsg += '\n  python manage.py packages -o import_business_data -s '\
