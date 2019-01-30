@@ -152,7 +152,9 @@ class Surveys(APIBase):
         projects_for_couch = [project.serialize_for_mobile() for project in projects]
         for project in projects_for_couch:
             permitted_cards = set()
-            for card in models.CardModel.objects.filter(cardid__in=project['cards']):
+            ordered_project_cards = project['cards']
+            for rootcardid in project['cards']:
+                card = models.CardModel.objects.get(cardid=rootcardid)
                 if str(card.nodegroup_id) in permitted_nodegroups:
                     permitted_cards.add(str(card.cardid))
                     get_child_cardids(card, permitted_cards)
@@ -160,9 +162,11 @@ class Surveys(APIBase):
             for graph in project['graphs']:
                 cards = []
                 for card in graph['cards']:
-                    if card['cardid'] in permitted_cards:
+                    if card['cardid'] in project['cards']:
+                        card['relative_position'] = ordered_project_cards.index(
+                            card['cardid']) if card['cardid'] in ordered_project_cards else None
                         cards.append(card)
-                graph['cards'] = cards
+                graph['cards'] = sorted(cards, key=lambda x: x['relative_position'])
         response = JSONResponse(projects_for_couch, indent=4)
         return response
 

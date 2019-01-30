@@ -278,6 +278,10 @@ define([
             this.parse(JSON.parse(this._mobilesurvey()), self);
         },
 
+        getInitialSurvey: function() {
+            return JSON.parse(this._mobilesurvey());
+        },
+
         _getURL: function(method) {
             return this.url(this.id);
         },
