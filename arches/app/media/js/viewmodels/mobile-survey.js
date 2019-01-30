@@ -175,14 +175,14 @@ define([
                         cards.push(m.cardid);
                     });
             });
-            return cards
+            return cards;
         });
 
-        this.mobilesurvey.cards(this.resourceOrderedCards())
+        this.mobilesurvey.cards(this.resourceOrderedCards());
 
         this.resourceOrderedCards.subscribe(function(val){
             self.mobilesurvey.cards(val);
-        })
+        });
 
         this.selectedResourceIds = ko.pureComputed({
             read: function() {

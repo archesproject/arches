@@ -55,8 +55,10 @@ def get_survey_resources(mobile_survey):
     for i, graph in enumerate(graphs):
         cards = []
         if i == 0 or unicode(graph.graphid) in active_graphs:
-            cards = [Card.objects.get(pk=card.cardid) for card in models.CardModel.objects.filter(graph=graph).order_by('sortorder')]
-        resources.append({'name': graph.name, 'id': graph.graphid, 'subtitle': graph.subtitle, 'iconclass': graph.iconclass, 'cards': cards})
+            cards = [Card.objects.get(pk=card.cardid) for card in models.CardModel.objects.filter(
+                graph=graph).order_by('sortorder')]
+        resources.append({'name': graph.name, 'id': graph.graphid,
+                          'subtitle': graph.subtitle, 'iconclass': graph.iconclass, 'cards': cards})
 
     return resources
 
