@@ -138,13 +138,17 @@ define([
 
         this.displayUser = ko.observable();
 
-        this.resetCards = function(cards){
+        this.resetCards = function(){
+            var initialsurvey = this.mobilesurvey.getInitialSurvey();
+            var initialcards = initialsurvey.cards;
+            var initialresources = initialsurvey.datadownloadconfig.resources;
             _.each(self.allResources, function(r){
                 _.each(r.cards(), function(c){
-                    c.approved(_.contains(cards(), c.cardid));
+                    c.approved(_.contains(initialcards, c.cardid));
                 });
                 r.hasApprovedCards() ? r.added(true) : r.added(false);
             });
+            self.mobilesurvey.datadownloadconfig.resources(initialresources);
         };
 
         this.resetIdentities = function(mobilesurvey){
@@ -161,6 +165,24 @@ define([
 
         _.each(this.allResources, this.initializeResource);
         _.each(this.allIdentities, this.initializeIdentities);
+
+        this.resourceOrderedCards = ko.pureComputed(function(){
+            var cards = [];
+            self.allResources.forEach(function(r){
+                r.cards()
+                    .filter(function(f){if (f.approved()){return f;}})
+                    .forEach(function(m){
+                        cards.push(m.cardid);
+                    });
+            });
+            return cards
+        });
+
+        this.mobilesurvey.cards(this.resourceOrderedCards())
+
+        this.resourceOrderedCards.subscribe(function(val){
+            self.mobilesurvey.cards(val);
+        })
 
         this.selectedResourceIds = ko.pureComputed({
             read: function() {

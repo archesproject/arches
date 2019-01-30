@@ -47,7 +47,6 @@ from arches.app.views.base import BaseManagerView
 from arches.app.views.base import MapBaseManagerView
 import arches.app.views.search as search
 
-
 def get_survey_resources(mobile_survey):
     graphs = models.GraphModel.objects.filter(isresource=True).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
     resources = []
@@ -56,7 +55,7 @@ def get_survey_resources(mobile_survey):
     for i, graph in enumerate(graphs):
         cards = []
         if i == 0 or unicode(graph.graphid) in active_graphs:
-            cards = [Card.objects.get(pk=card.cardid) for card in models.CardModel.objects.filter(graph=graph)]
+            cards = [Card.objects.get(pk=card.cardid) for card in models.CardModel.objects.filter(graph=graph).order_by('sortorder')]
         resources.append({'name': graph.name, 'id': graph.graphid, 'subtitle': graph.subtitle, 'iconclass': graph.iconclass, 'cards': cards})
 
     return resources
@@ -165,7 +164,6 @@ class MobileSurveyDesignerView(MapBaseManagerView):
                         history['editors'][entry['user_id']]['lastsync'] = entry['finished']
             for id, editor in iter(history['editors'].items()):
                 editor['lastsync'] = datetime.strftime(editor['lastsync'], '%Y-%m-%d %H:%M:%S')
-            print(history)
             return history
 
         identities = []
@@ -322,7 +320,6 @@ class MobileSurveyDesignerView(MapBaseManagerView):
             #     self.notify_mobile_survey_start(request, mobile_survey)
             # else:
             #     self.notify_mobile_survey_end(request, mobile_survey)
-
         mobile_survey.name = data['name']
         mobile_survey.description = data['description']
         mobile_survey.onlinebasemaps = data['onlinebasemaps']
