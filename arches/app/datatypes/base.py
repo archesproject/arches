@@ -14,7 +14,7 @@ class BaseDataType(object):
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         """
         Assigns a given node value to the corresponding key in a document in
-        in preparation to index the document
+        in preparation to index the document.
         """
         pass
 
