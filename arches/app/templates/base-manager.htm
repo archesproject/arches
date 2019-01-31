@@ -245,26 +245,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </li>
                                         {% endif %}
 
-                                        
-                                        <li>
-                                            <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
-                                                <div class="" data-placement="bottom" data-toggle="" data-original-title='{% trans "Search" %}'>
-                                                    <i class="ion-search"></i>
-                                                    <span class="menu-title">
-                                                            <strong>{% trans "Search" %}</strong>
-                                                        </span>
-                                                </div>
+                                        <li{% if "views/search" in main_script %} class="active-sub"{% endif %}>
+                                            <a href="{% url 'search_home' %}" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
+                                                <i class="fa fa-search"></i>
+                                                <span class="menu-title">
+                                                    <strong>{% trans "Search" %}</strong>
+                                                </span>
                                             </a>
-
-                                            <ul class="collapse in pop-in arches" data-bind="css:{'expanded-nav': navExpanded()}">
-                                                    <li class="link-submenu-item">
-                                                        <a class="link-submenu"  href="{% url 'search_home' %}" data-bind="click: navigate.bind(this, '{% url 'search_home' %}')">{% trans "Search" %}</a>
-                                                    </li>
-                                                </ul>
                                         </li>
                                         
-
-
                                         <!--Menu list item-->
                                         {% if request.user|can_edit_resource_instance %}
                                         <li{% if "views/resource" in main_script and is_system_settings is False %} class="active-sub"{% endif %}>
