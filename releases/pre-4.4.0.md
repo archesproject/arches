@@ -217,7 +217,7 @@ Assigned to: Namjun
 
 ## Resource Instance Management
 
-Assigned to: Namjun
+Assigned to: Namjun 
 
 #### Data Types
 
