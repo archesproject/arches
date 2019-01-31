@@ -203,7 +203,7 @@ Assigned to: Rob
 
 ## Import/Export
 
-Assigned to: Ryan
+Assigned to: Namjun
 
 | Test Subject               | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
@@ -217,7 +217,7 @@ Assigned to: Ryan
 
 ## Resource Instance Management
 
-Assigned to: Adam
+Assigned to: Namjun
 
 #### Data Types
 
@@ -265,7 +265,7 @@ Assigned to: Cyrus
 
 ## Related Resources
 
-Assigned to: Jeff
+Assigned to: Galen
 
 #### Resource Editor
 
@@ -292,7 +292,7 @@ Assigned to: Jeff
 
 ## Search
 
-Assigned to: Jeff
+Assigned to: Galen
 
 | Test Subject                                                                                                                                                                         | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
@@ -392,7 +392,7 @@ Assigned to: Adam
 
 ## RDM
 
-Assigned to: Ryan
+Assigned to: Namjun
 
 #### Thesauri
 
