@@ -126,7 +126,7 @@ class Entity(object):
 
         uniqueid_node = settings.RESOURCE_TYPE_CONFIGS()[self.entitytypeid]['primary_name_lookup']['entity_type']
         if entitytype in settings.EAMENA_RESOURCES:
-          type = 'EAMENA'
+          type = settings.EAMENA_RESOURCES[entitytype]
         else:
           type = re.split("\W+|_", entitytype)[0]
             
