@@ -91,7 +91,7 @@ class MobileSurvey(models.MobileSurveyModel):
                         found = True
                         try:
                             collection_id = node['config']['rdmCollection']
-                            concept_collection = Concept().get_child_collections_hierarchically(collection_id)
+                            concept_collection = Concept().get_child_collections_hierarchically(collection_id, offset=None)
                             widget.config['options'] = concept_collection
                         except Exception as e:
                             pass
@@ -109,7 +109,7 @@ class MobileSurvey(models.MobileSurveyModel):
                                 try:
                                     collection_id = node['config']['rdmCollection']
                                     if collection_id:
-                                        concept_collection = Concept().get_child_collections_hierarchically(collection_id)
+                                        concept_collection = Concept().get_child_collections_hierarchically(collection_id, offset=None)
                                         widget_model.config['options'] = concept_collection
                                 except Exception as e:
                                     pass
