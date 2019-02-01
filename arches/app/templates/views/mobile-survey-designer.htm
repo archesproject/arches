@@ -82,14 +82,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                 <!-- Icon and Status warning -->
                                 <div class="mpm-survey-status-header">
-                                    <i class="msm-icon-wrap fa fa-check" style="color:#333; background: #eee; border: 1px solid #333; padding-right:5px;"></i>
+                                    <i class="msm-icon-wrap fa fa-check"></i>
                                     <div class="msm-survey-requirements-text">
                                         {% trans 'Survey Requirements: Complete' %}
                                     </div>
                                     <div class="msm-survey-status-text" data-bind="text: mobilesurvey.activatedOnServer() === true ? '{% trans "Survey Status: Active" %}' : '{% trans " Survey Status: Inactive" %}'"></div>
 
+                                    <div class="msm-survey-message" data-bind="visible: mobilesurvey.activatedOnServer() === false">
+                                        {% trans "This survey is ready, and only requires <br> you to activate it to allow your field team to collect data." %}
+                                    </div>
+
                                     <div class="msm-survey-message" data-bind="visible: mobilesurvey.activatedOnServer() === true">
-                                        This survey is now active!  <br> Mobile app users can download this survey and begin <br> collecting and editing data using their mobile device.
+                                        {% trans "This survey is now active!  <br> Mobile app users can download this survey and begin <br> collecting and editing data using their mobile device." %}
                                     </div>
                                 </div>
 
@@ -102,7 +106,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <!--/ko-->
 
                                 <!--ko if: mobilesurvey.dirty() === true -->
-                                <div class="msm-survey-status-instructions">{% trans 'Save to commit your changes' %}</div>
+                                <div class="msm-save-message">{% trans 'Save to commit your changes' %}</div>
                                 <!--/ko-->
 
                             </div>
