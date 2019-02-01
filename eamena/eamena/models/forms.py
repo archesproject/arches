@@ -89,7 +89,18 @@ def exclude_empty_branches(branch_list, required_node):
             if node.entitytypeid == required_node:
                 branch_list_filled.append(branch)
     return branch_list_filled
-    
+
+
+def exclude_a_branch(branch_list, ignore_node):
+    branch_list_filled = []
+    for branch in branch_list:
+        keep = True
+        for node in branch['nodes']:
+            if node.entitytypeid == ignore_node:
+                keep = False
+        if keep:
+            branch_list_filled.append(branch)
+    return branch_list_filled
 
 
 # --- Resource Summary -> SummaryForm ------------------------------------------
@@ -235,6 +246,43 @@ class ModificationForm(ResourceForm):
                 'domains': {
                     'CONSTRUCTION_TECHNIQUE_TYPE.E55' : Concept().get_e55_domain('CONSTRUCTION_TECHNIQUE_TYPE.E55'),
                     'CONSTRUCTION_MATERIAL.E57' : Concept().get_e55_domain('CONSTRUCTION_MATERIAL.E57')
+                }
+            }
+
+class ComponentModificationForm(ResourceForm):
+    @staticmethod
+    def get_info():
+        return {
+            'id': 'component-modification',
+            'icon': 'fa-plus',
+            'name': _('Modification and Construction'),
+            'class': ComponentModificationForm
+        }
+
+    def update(self, data, files):
+        self.update_nodes('MODIFICATION_TYPE.E55', data)
+        self.update_nodes('MODIFICATION_REMARK.E62', data)
+        self.update_nodes('MODIFICATION_TECHNIQUE_TYPE.E55', data)
+
+    def load(self, lang):
+        if self.resource:
+            self.data['MODIFICATION_TYPE.E55'] = {
+                'branch_lists': datetime_nodes_to_dates(exclude_empty_branches(self.get_nodes('MODIFICATION.E11'), 'MODIFICATION_TYPE.E55')),
+                'domains': {
+                    'MODIFICATION_TYPE.E55': Concept().get_e55_domain('MODIFICATION_TYPE.E55'),
+                }
+            }
+
+            self.data['MODIFICATION_REMARK.E62'] = {
+                'branch_lists': exclude_empty_branches(self.get_nodes('MODIFICATION.E11'), 'MODIFICATION_REMARK.E62'),
+                'domains': {}
+            }
+
+            self.data['MODIFICATION_TECHNIQUE_TYPE.E55'] = {
+                'branch_lists': exclude_empty_branches(self.get_nodes('MODIFICATION.E11'), 'MODIFICATION_TECHNIQUE_TYPE.E55'),
+                'domains': {
+                    'MODIFICATION_TECHNIQUE_TYPE.E55' : Concept().get_e55_domain('MODIFICATION_TECHNIQUE_TYPE.E55'),
+                    'CONSTRUCTION_MATERIAL.E57': Concept().get_e55_domain('CONSTRUCTION_MATERIAL.E57')
                 }
             }
 
@@ -966,6 +1014,104 @@ class FeatureConditionAssessmentForm(ResourceForm):
                     'OVERALL_CONDITION_REMARKS_TYPE.E55' : Concept().get_e55_domain('OVERALL_CONDITION_REMARKS_TYPE.E55')
                 }
             }
+
+
+class ComponentConditionAssessmentForm(ResourceForm):
+
+    @staticmethod
+    def get_info():
+        return {
+            'id': 'component-condition-assessment',
+            'icon': 'fa-adjust',
+            'name': _('Condition Assessment'),
+            'class': ComponentConditionAssessmentForm
+        }
+
+    def update(self, data, files):
+        data = add_actor('DAMAGE_STATE.E3', 'DISTURBANCE_CAUSE_ASSIGNMENT_ASSESSOR_NAME.E41', data, self.user)
+        data = add_actor('THREAT_INFERENCE_MAKING.I5', 'THREAT_INFERENCE_MAKING_ASSESSOR_NAME.E41', data, self.user)
+        # step 1
+        self.update_nodes('DAMAGE_STATE.E3', data)
+
+        # step 2
+        # Can't run update_nodes on CONDITION_ASSESSMENT_IMAGE.E38 or it will delete the entityid of the image file.
+        self.update_nodes('CONDITION_ASSESSMENT_IMAGE_CREATION.E65', data)
+        self.update_nodes('CONDITION_ASSESSMENT_IMAGE_TITLE.E41', data)
+        self.update_nodes('CONDITION_ASSESSMENT_IMAGE_DESCRIPTION.E62', data)
+
+        # step 3
+        self.update_nodes('THREAT_INFERENCE_MAKING.I5', data)
+
+        # step 4
+        self.update_nodes('ACTIVITY_PLAN.E100', data)
+        self.update_nodes('ACTIVITY_PLAN_PRIORITY_ASSIGNMENT.E13', data)
+
+        if files:
+            self.resource.prune(entitytypes=['CONDITION_ASSESSMENT_IMAGE_FILE_PATH.E62'])
+            self.resource.trim()
+
+            for key, value in files.items():
+                self.resource.set_entity_value('CONDITION_ASSESSMENT_IMAGE_FILE_PATH.E62', value)
+
+
+    def load(self, lang):
+        if self.resource:
+            self.data['DAMAGE_STATE.E3'] = {
+                'branch_lists': datetime_nodes_to_dates(exclude_a_branch(
+                    self.get_nodes('DAMAGE_STATE.E3'), 'ACTIVITY_PLAN.E100')),
+                'domains': {
+                    'DISTURBANCE_CAUSE_CATEGORY_TYPE.E55': Concept().get_e55_domain(
+                        'DISTURBANCE_CAUSE_CATEGORY_TYPE.E55'),
+                    'DISTURBANCE_CAUSE_TYPE.I4': Concept().get_e55_domain('DISTURBANCE_CAUSE_TYPE.I4'),
+                    'DISTURBANCE_CAUSE_CERTAINTY.I6': Concept().get_e55_domain('DISTURBANCE_CAUSE_CERTAINTY.I6'),
+                    'EFFECT_TYPE.S9': Concept().get_e55_domain('EFFECT_TYPE.S9'),
+                    'DAMAGE_TREND_TYPE.E55': Concept().get_e55_domain('DAMAGE_TREND_TYPE.E55'),
+                    'DAMAGE_SEVERITY_TYPE.E55': Concept().get_e55_domain('DAMAGE_SEVERITY_TYPE.E55'),
+                    'DAMAGE_EXTENT_TYPE.E55': Concept().get_e55_domain('DAMAGE_EXTENT_TYPE.E55'),
+                }
+            }
+            self.data['current-files'] = {
+                'branch_lists': self.get_nodes('CONDITION_ASSESSMENT_IMAGE_FILE_PATH.E62'),
+                'domains': {}
+            }
+            self.data['CONDITION_ASSESSMENT_IMAGE_CREATION.E65'] = {
+                'branch_lists': datetime_nodes_to_dates(self.get_nodes('CONDITION_ASSESSMENT_IMAGE_CREATION.E65')),
+                'domains': {
+                    'CONDITION_ASSESSMENT_IMAGE_RIGHT_TYPE.E55':
+                        Concept().get_e55_domain('CONDITION_ASSESSMENT_IMAGE_RIGHT_TYPE.E55'),
+                }
+            }
+            self.data['CONDITION_ASSESSMENT_IMAGE_TITLE.E41'] = {
+                'branch_lists': self.get_nodes('CONDITION_ASSESSMENT_IMAGE_TITLE.E41'),
+                'domains': {}
+            }
+            self.data['CONDITION_ASSESSMENT_IMAGE_DESCRIPTION.E62'] = {
+                'branch_lists': self.get_nodes('CONDITION_ASSESSMENT_IMAGE_DESCRIPTION.E62'),
+                'domains': {}
+            }
+            self.data['THREAT_INFERENCE_MAKING.I5'] = {
+                'branch_lists': self.get_nodes('THREAT_INFERENCE_MAKING.I5'),
+                'domains': {
+                    'THREAT_CATEGORY.I4': Concept().get_e55_domain('THREAT_CATEGORY.I4'),
+                    'THREAT_TYPE.I4': Concept().get_e55_domain('THREAT_TYPE.I4'),
+                    'THREAT_PROBABILITY.I6': Concept().get_e55_domain('THREAT_PROBABILITY.I6'),
+                }
+            }
+            self.data['ACTIVITY_PLAN.E100'] = {
+                'branch_lists': exclude_a_branch(self.get_nodes('ACTIVITY_PLAN.E100'),
+                                                 'ACTIVITY_PLAN_PRIORITY_ASSIGNMENT.E13'),
+                'domains': {
+                    'ACTIVITY_RECOMMENDATION_TYPE.E55': Concept().get_e55_domain('ACTIVITY_RECOMMENDATION_TYPE.E55'),
+                    'INTERVENTION_MITIGATION_TYPE.E55': Concept().get_e55_domain('INTERVENTION_MITIGATION_TYPE.E55')
+                }
+            }
+            self.data['ACTIVITY_PLAN_PRIORITY_ASSIGNMENT.E13'] = {
+                'branch_lists': self.get_nodes('ACTIVITY_PLAN_PRIORITY_ASSIGNMENT.E13'),
+                'domains': {
+                    'PRIORITY_TYPE.E55': Concept().get_e55_domain('PRIORITY_TYPE.E55')
+                }
+            }
+
                
 class ExternalReferenceForm(ResourceForm):
     @staticmethod

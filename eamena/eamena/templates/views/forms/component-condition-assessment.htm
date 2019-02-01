@@ -1,0 +1,568 @@
+{% extends "views/forms/wizard-base.htm" %}
+{% load i18n %}
+
+{% block form_content %}
+
+
+<div>
+    <div class="col-xs12">
+        <div class="alert alert-danger wizard-invalid-alert" role="alert" style="display:none;">{% trans "A type and date must be specified." %}</div>
+    </div>
+    <!-- Condition Assessement Wizard Container --> 
+    <div style="display: none;" id="workflow-container">     
+        <div class="padding-10" id="crud">
+            <div>
+                
+                <!-- Arches form container -->
+                <dl>
+                    <dd class="arches-RDM-labels">
+                        <div class="row">
+                            <div class="col-xs-12 padding-left-0">
+            
+                                <!-- Start Wizard -->
+                                <form class="margin-top-20" id="wizard-1" novalidate="novalidate">
+                                    <div id="bootstrap-wizard-1" class="col-sm-12">
+                                        <div class="form-bootstrapWizard">
+                                            <ul class="bootstrapWizard form-wizard">
+                                                <li class="active" data-target="#step1" style="width: 25%">
+                                                    <a href="#tab1" data-toggle="tab"> <span class="step">1</span> <span class="title">{% trans "Part 1: Damage" %}</span> </a>
+                                                </li>
+                                                <li data-target="#step2" style="width: 25%">
+                                                    <a href="#tab2" data-toggle="tab"> <span class="step">2</span> <span class="title">{% trans "Part 2: Image" %}</span> </a>
+                                                </li>
+                                                <li data-target="#step3" style="width: 25%">
+                                                    <a href="#tab3" data-toggle="tab"> <span class="step">3</span> <span class="title">{% trans "Part 3: Threat" %}</span> </a>
+                                                </li>
+                                                <li data-target="#step4" style="width: 25%">
+                                                    <a href="#tab4" data-toggle="tab"> <span class="step">4</span> <span class="title">{% trans "Part 4: Recommendation and Priority" %}</span> </a>
+                                                </li>
+                                            </ul>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                        
+                                        <!-- Wizard Tabs -->
+                                        <div class="tab-content" style="margin-top: 20px;">
+
+                                            <!-- Tab 1: Summary -->
+                                            <div class="tab-pane active" id="tab1" style="min-height: 330px;">
+                                                <br>
+                                                <h3 class="margin-bottom-5"><strong>{% trans "Step 1" %}</strong> {% trans "Damage" %}</h3>
+
+                                                <div class="alert alert-info fade in">
+                                                    <i class="fa-fw fa fa-info"></i>
+                                                    {% trans "Record observed damage to the component." %}
+                                                </div>
+                                                <div class="row margin-bottom-20">
+                                                    <dl id="disturbances-section">
+                                                        <dt>
+                                                            <div class="col-xs-12">
+                                                                <h5 id="arches-names-form" class="section-headline">{% trans "Disturbances" %}</h5>
+                                                            </div>
+                                                        </dt>
+                                                        <dd>
+                                                            <div class="col-xs-12 col-sm-9">
+                                                                <div class="col-xs-6 form-section-input add-padding-right">
+                                                                    <div class="form-group">
+                                                                        <input class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('DISTURBANCE_CAUSE_CATEGORY_TYPE.E55', 'value'), placeholder: '{% trans 'Cause Category' %}', dataKey: 'DISTURBANCE_CAUSE_CATEGORY_TYPE.E55'}"></input>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-6 form-section-input">
+                                                                    <div class="form-group">
+                                                                        <input class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('DISTURBANCE_CAUSE_TYPE.I4', 'value'), placeholder: '{% trans 'Cause' %}', dataKey: 'DISTURBANCE_CAUSE_TYPE.I4'}"></input>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-6 form-section-input margin-top-5 add-padding-right">
+                                                                    <div class="form-group">
+                                                                        <input class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('DISTURBANCE_CAUSE_CERTAINTY.I6', 'value'), placeholder: '{% trans 'Cause Certainty' %}', dataKey: 'DISTURBANCE_CAUSE_CERTAINTY.I6'}"></input>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-6 form-section-input margin-top-5">
+                                                                    <div class="form-group">
+                                                                        <input class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('EFFECT_TYPE.S9', 'value'), placeholder: '{% trans 'Effect' %}', dataKey: 'EFFECT_TYPE.S9'}"></input>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-4 form-section-input margin-top-5 add-padding-right">
+                                                                    <span class="dropdown pull-left disturbance-date" style="width:100%">
+                                                                        <button class="btn btn-default dropdown-toggle select-disturbance-date" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" style="text-align:left; min-width:100%">
+                                                                            <span class="disturbance-date-value">{% trans ' Date Type ' %}</span><i class="fa fa-chevron-down pull-right"></i>
+                                                                        </button>
+                                                                        <ul class="dropdown-menu dropdown-disturbance-date" aria-labelledby="dropdown-grouped">
+                                                                            <li><a href="#" class="disturbance-date-item disturbance-date-from-to" data-value='From-To'>{% trans 'Between' %}</a></li>
+                                                                            <li><a href="#" class="disturbance-date-item disturbance-date-on" data-value='or'>{% trans 'On' %}</a></li>
+                                                                            <li><a href="#" class="disturbance-date-item disturbance-date-before" data-value='or'>{% trans 'Before' %}</a></li>
+                                                                        </ul>
+                                                                    </span>
+                                                                </div>
+                                                                <div class="col-xs-4 form-section-input div-date div-date-from-to margin-top-5 add-padding-right">
+                                                                    <!-- From Date -->
+                                                                    <div class="form-group datetimepicker">
+                                                                        <div class="input-group">
+                                                                            <input type="text" name="mydate" id="date-from" placeholder='{% trans "from (yyyy-mm-dd)" %}' class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('DISTURBANCE_CAUSE_DATE_FROM.E61', 'value')} ">
+                                                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-4 form-section-input div-date div-date-from-to margin-top-5">
+                                                                    <!-- To date -->
+                                                                    <div class="form-group datetimepicker">
+                                                                        <div class="input-group">
+                                                                            <input type="text" name="mydate" id="date-to" placeholder='{% trans "to (yyyy-mm-dd)" %}' class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('DISTURBANCE_CAUSE_DATE_TO.E61', 'value')} ">
+                                                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-4 form-section-input div-date div-date-before hidden margin-top-5">
+                                                                    <!-- Before date -->
+                                                                    <div class="form-group datetimepicker">
+                                                                        <div class="input-group">
+                                                                            <input type="text" name="mydate" id="date-before" placeholder='{% trans "before (yyyy-mm-dd)" %}' class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('DISTURBANCE_CAUSE_DATE_OCCURRED_BEFORE.E61', 'value')} ">
+                                                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-4 form-section-input div-date div-date-on hidden margin-top-5">
+                                                                    <!-- On date -->
+                                                                    <div class="form-group datetimepicker">
+                                                                        <div class="input-group">
+                                                                            <input type="text" name="mydate" id="date-on" placeholder='{% trans "on (yyyy-mm-dd)" %}' class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('DISTURBANCE_CAUSE_DATE_OCCURRED_ON.E61', 'value')} ">
+                                                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-4 form-section-input margin-top-5 add-padding-right">
+                                                                    <div class="form-group">
+                                                                        <input class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('DAMAGE_TREND_TYPE.E55', 'value'), placeholder: '{% trans 'Damage Trend' %}', dataKey: 'DAMAGE_TREND_TYPE.E55'}">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-4 form-section-input margin-top-5 add-padding-right">
+                                                                    <div class="form-group">
+                                                                        <input class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('DAMAGE_SEVERITY_TYPE.E55', 'value'), placeholder: '{% trans 'Damage Severity' %}', dataKey: 'DAMAGE_SEVERITY_TYPE.E55'}">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-4 form-section-input margin-top-5">
+                                                                    <div class="form-group">
+                                                                        <input class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('DAMAGE_EXTENT_TYPE.E55', 'value'), placeholder: '{% trans 'Damage Extent' %}', dataKey: 'DAMAGE_EXTENT_TYPE.E55'}">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-12 form-section-subheader">
+                                                                    <div id="arches-names-form" style="height:.5em;">
+                                                                        <span>{% trans "Identified by" %}
+                                                                        <i class="fa fa-pencil edit-actor show-box inference" data-actor="inference" aria-hidden="true"></i>
+                                                                        <i class="fa fa-pencil-square edit-actor hide-box inference hidden" data-actor="inference" aria-hidden="true"></i>
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="edit-actors-row inference hidden">
+                                                                    <input class="form-control arches-form-input" id="actor-name" style="" placeholder='{% trans "Name" %}' data-bind='value: getEditedNode("DISTURBANCE_CAUSE_ASSIGNMENT_ASSESSOR_NAME.E41", "value")'>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-xs-12 col-sm-3 add-button-column add-margin-top">
+                                                                {% include 'views/components/add-item-button.htm' %}
+                                                            </div>
+                                                            <div class="col-xs-12 col-sm-9">
+                                                                <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "Cause Category must be populated, and dates must be properly formatted (yyyy-mm-dd)." %}</div>
+                                                            </div>
+                                                            <div class="col-xs-12">
+                                                                    <div class="margin-left-10 margin-top-5" style="display: none;" data-bind="visible: true">
+                                                                        <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "None" %}</div>   
+                                                                        <div data-bind="foreach: getBranchLists()">
+                                                                            <div class="arches-crud-record">
+                                                                                <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans 'Delete this value' %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                                                                <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans 'Edit this disturbance' %}">
+                                                                                <span data-bind='text: nodes.get("DISTURBANCE_CAUSE_CATEGORY_TYPE.E55", "label")'></span><span class="text-muted" data-bind="visible: nodes.get('DISTURBANCE_CAUSE_CATEGORY_TYPE.E55', 'value').length > 0"> ( {% trans 'Cause Category' %} )</span>
+                                                                                <span data-bind='text: nodes.get("DISTURBANCE_CAUSE_TYPE.I4", "label")'></span><span class="text-muted" data-bind="visible: nodes.get('DISTURBANCE_CAUSE_TYPE.I4', 'value').length > 0"> ( {% trans 'Cause' %} )</span>
+                                                                                <span data-bind='text: nodes.get("DISTURBANCE_CAUSE_CERTAINTY.I6", "label")'></span><span class="text-muted" data-bind="visible: nodes.get('DISTURBANCE_CAUSE_CERTAINTY.I6', 'value').length > 0"> ( {% trans 'Cause Certainty' %} )</span>
+                                                                                <span data-bind='text: nodes.get("EFFECT_TYPE.S9", "label")'></span><span class="text-muted" data-bind="visible: nodes.get('EFFECT_TYPE.S9', 'value').length > 0"> ( {% trans 'Effect' %} )</span>
+                                                                                <span data-bind='text: nodes.get("DAMAGE_TREND_TYPE.E55", "label")'></span><span class="text-muted" data-bind="visible: nodes.get('DAMAGE_TREND_TYPE.E55', 'value').length > 0"> ( {% trans 'Damage Trend' %} )</span>
+                                                                                <span data-bind='text: nodes.get("DAMAGE_SEVERITY_TYPE.E55", "label")'></span><span class="text-muted" data-bind="visible: nodes.get('DAMAGE_SEVERITY_TYPE.E55', 'value').length > 0"> ( {% trans 'Damage Severity' %} )</span>
+                                                                                <span data-bind='text: nodes.get("DAMAGE_EXTENT_TYPE.E55", "label")'></span><span class="text-muted" data-bind="visible: nodes.get('DAMAGE_EXTENT_TYPE.E55', 'value').length > 0"> ( {% trans 'Damage Extent' %} )</span>
+                                                                                <span class="text-muted" data-bind="visible: nodes.get('DISTURBANCE_CAUSE_ASSIGNMENT_ASSESSOR_NAME.E41', 'value').length > 0">{% trans 'by: ' %}</span>
+                                                                                <span data-bind='text: nodes.get("DISTURBANCE_CAUSE_ASSIGNMENT_ASSESSOR_NAME.E41", "value")'></span>
+                                                                                <span class="text-muted" data-bind="visible: nodes.get('DISTURBANCE_CAUSE_DATE_FROM.E61', 'value').length > 0">{% trans 'From: ' %}</span><span data-bind="{text: nodes.get('DISTURBANCE_CAUSE_DATE_FROM.E61', 'value')}" style="padding-right:2px"></span>
+                                                                                <span class="text-muted" data-bind="visible: nodes.get('DISTURBANCE_CAUSE_DATE_TO.E61', 'value').length > 0">{% trans 'To: ' %}</span><span data-bind="{text: nodes.get('DISTURBANCE_CAUSE_DATE_TO.E61', 'value')}"></span>
+                                                                                <span class="text-muted" data-bind="visible: nodes.get('DISTURBANCE_CAUSE_DATE_OCCURRED_ON.E61', 'value').length > 0">{% trans 'On: ' %}</span><span data-bind="{text: nodes.get('DISTURBANCE_CAUSE_DATE_OCCURRED_ON.E61', 'value')}"></span>
+                                                                                <span class="text-muted" data-bind="visible: nodes.get('DISTURBANCE_CAUSE_DATE_OCCURRED_BEFORE.E61', 'value').length > 0">{% trans 'Before: ' %}</span><span data-bind="{text: nodes.get('DISTURBANCE_CAUSE_DATE_OCCURRED_BEFORE.E61', 'value')}"></span>
+
+                                                                                </a>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                            </div>
+                                                        </dd>
+                                                    </dl>
+                                                </div>
+                                            </div>
+
+                                            <!-- Tab 2: Image -->
+                                            <div class="tab-pane" id="tab2" style="min-height: 330px;">
+                                                 <br>
+                                                <h3 class="margin-bottom-5"><strong>{% trans "Step 2" %}</strong> {% trans "Image" %}</h3>
+
+                                                <div class="alert alert-info fade in">
+                                                    <i class="fa-fw fa fa-info"></i>
+                                                    {% trans "Upload image of component condition." %}
+                                                </div>
+
+                                                <div class="row margin-bottom-20">
+                                                    <dl id="image-file-section">
+                                                        <dt>
+                                                            <div class="col-xs-12">
+                                                                <h5 id="arches-names-form" class="section-headline">{% trans "File Upload" %}</h5>
+                                                            </div>
+                                                        </dt>
+                                                        <dd>
+                                                            <div class="col-xs-12 col-sm-9">
+                                                                <div data-bind="visible: getBranchLists().length == 0">
+                                                                    <div class="dropzone" id="dropzone"></div>
+                                                                </div>
+                                                                <div class="col-xs-6">
+                                                                    <div data-bind="foreach: getBranchLists()">
+                                                                        <div data-bind="if: nodes.get('CONDITION_ASSESSMENT_IMAGE_FILE_PATH.E62', 'value') !== ''" style="position: relative; display: inline-block; margin:1px;">
+                                                                            <a style="position:absolute; padding-left: 4px; width: 20px;" data-bind="click: $parent.deleteItem.bind($parent)"><i class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                                                            <a title="" data-gallery="links2" data-bind="attr: { href: nodes.get('CONDITION_ASSESSMENT_IMAGE_FILE_PATH.E62', 'value'), title: 'Uploaded image'}" target="_blank">
+                                                                                <img alt="" data-bind="attr: { src: nodes.get('CONDITION_ASSESSMENT_IMAGE_FILE_PATH.E62', 'value')}" style="width:100%;max-height: 100%;object-fit: cover;">
+                                                                            </a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </dd>
+                                                    </dl>
+                                                </div>
+                                                <div class="row margin-bottom-20">
+                                                    <dl id="image-title-section">
+                                                        <dt>
+                                                            <div class="col-xs-12">
+                                                                <h5 id="arches-names-form" class="section-headline">{% trans "Title" %}</h5>
+                                                            </div>
+                                                        </dt>
+                                                        <dd>
+                                                            <div class="col-xs-12 col-sm-9">
+                                                                <div class="col-xs-12 form-section-input">
+                                                                    <div class="form-group">
+                                                                        <input class="form-control arches-form-input" style="width:100%" placeholder='{% trans "Image Title" %}' data-bind='value: getEditedNode("CONDITION_ASSESSMENT_IMAGE_TITLE.E41", "value")'>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-xs-12 col-sm-3 add-button-column add-margin-top">
+                                                                {% include 'views/components/add-item-button.htm' %}
+                                                            </div>
+                                                            <div class="col-xs-12 col-sm-9">
+                                                                <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "You must enter a value." %}</div>
+                                                            </div>
+                                                            <div class="col-xs-12">
+                                                                <div class="margin-left-10 margin-top-5" style="display: none;" data-bind="visible: true">
+                                                                    <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "None" %}</div>
+                                                                    <div data-bind="foreach: getBranchLists()">
+                                                                        <div class="arches-crud-record">
+                                                                            <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans 'Delete this value' %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                                                            <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans 'Edit' %}"><span data-bind='text: nodes.get("CONDITION_ASSESSMENT_IMAGE_TITLE.E41", "value")'></span></a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </dd>
+                                                    </dl>
+                                                    <div id="new-image-section"></div>
+                                                </div>
+                                                <div class="row margin-bottom-20">
+                                                    <dl id="image-caption-section">
+                                                        <dt>
+                                                            <div class="col-xs-12">
+                                                                <h5 id="arches-names-form" class="section-headline">{% trans "Caption" %}</h5>
+                                                            </div>
+                                                        </dt>
+                                                        <dd>
+                                                            <div class="col-xs-12 col-sm-9">
+                                                                <div class="col-xs-12 form-section-input">
+                                                                    <div class="form-group">
+                                                                        <div class="arches-html-editor margin-top-5" style="width: 100%;">
+                                                                            <div class="summernote" data-bind="summernote: {value: getEditedNode('CONDITION_ASSESSMENT_IMAGE_DESCRIPTION.E62', 'value'), options:{}}"></div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-xs-12 col-sm-3 add-button-column add-margin-top">
+                                                                {% include 'views/components/add-item-button.htm' %}
+                                                            </div>
+                                                            <div class="col-xs-12 col-sm-9">
+                                                                <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "You must enter a value." %}</div>
+                                                            </div>
+                                                            <div class="col-xs-12">
+                                                                <div class="margin-left-10 margin-top-5" style="display: none;" data-bind="visible: true">
+                                                                    <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "None" %}</div>
+                                                                    <div data-bind="foreach: getBranchLists()">
+                                                                        <div class="arches-crud-record">
+                                                                            <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans 'Delete this value' %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                                                            <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans 'Edit' %}"><span data-bind='html: nodes.get("CONDITION_ASSESSMENT_IMAGE_DESCRIPTION.E62", "value")'></span></a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </dd>
+                                                    </dl>
+                                                </div>
+                                                <div class="row margin-bottom-20">
+                                                    <dl id="image-information-section">
+                                                        <dt>
+                                                            <div class="col-xs-12">
+                                                                <h5 id="arches-names-form" class="section-headline">{% trans "Other Information" %}</h5>
+                                                            </div>
+                                                        </dt>
+                                                        <dd>
+                                                            <div class="col-xs-12 col-sm-9">
+                                                                <div class="col-xs-6 form-section-input add-padding-right">
+                                                                    <div class="form-group datetimepicker">
+                                                                        <div class="input-group">
+                                                                            <input type="text" name="imagedate" placeholder='{% trans "Date (yyyy-mm-dd)" %}' class="form-control datepicker" data-date-format="YYYY-MM-DD" data-bind="{value: getEditedNode('CONDITION_ASSESSMENT_IMAGE_IMAGE_DATE.E49', 'value')} ">
+                                                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-6 form-section-input">
+                                                                    <div class="form-group">
+                                                                        <input class="form-control arches-form-input" style="width:100%" placeholder='{% trans "Creator" %}' data-bind='value: getEditedNode("CONDITION_ASSESSMENT_IMAGE_CREATOR_NAME.E41", "value")'>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-12 form-section-input margin-top-5">
+                                                                    <div class="form-group">
+                                                                        <input class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('CONDITION_ASSESSMENT_IMAGE_RIGHT_TYPE.E55', 'value'), placeholder: '{% trans 'Copyright' %}', dataKey: 'CONDITION_ASSESSMENT_IMAGE_RIGHT_TYPE.E55'}">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-xs-12 col-sm-3 add-button-column add-margin-top">
+                                                                {% include 'views/components/add-item-button.htm' %}
+                                                            </div>
+                                                            <div class="col-xs-12 col-sm-9">
+                                                                <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "You must enter a value." %}</div>
+                                                            </div>
+                                                            <div class="col-xs-12">
+                                                                <div class="margin-left-10 margin-top-5" style="display: none;" data-bind="visible: true">
+                                                                    <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "None" %}</div>
+                                                                    <div data-bind="foreach: getBranchLists()">
+                                                                        <div class="arches-crud-record">
+                                                                            <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans 'Delete this value' %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                                                            <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans 'Edit' %}">
+                                                                                <span data-bind='text: nodes.get("CONDITION_ASSESSMENT_IMAGE_CREATOR_NAME.E41", "value")'></span><span class="text-muted" data-bind="visible: nodes.get('CONDITION_ASSESSMENT_IMAGE_CREATOR_NAME.E41', 'value').length > 0"> ( {% trans 'Creator' %} )</span>
+                                                                                <span data-bind='text: nodes.get("CONDITION_ASSESSMENT_IMAGE_RIGHT_TYPE.E55", "label")'></span><span class="text-muted" data-bind="visible: nodes.get('CONDITION_ASSESSMENT_IMAGE_RIGHT_TYPE.E55', 'value').length > 0"> ( {% trans 'Copyright' %} )</span>
+                                                                                <span class="text-muted" data-bind="visible: nodes.get('CONDITION_ASSESSMENT_IMAGE_IMAGE_DATE.E49', 'value').length > 0">{% trans 'On: ' %}</span><span data-bind="{text: nodes.get('CONDITION_ASSESSMENT_IMAGE_IMAGE_DATE.E49', 'value')}"></span>
+                                                                            </a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </dd>
+                                                    </dl>
+                                                </div>
+                                            </div>
+
+                                            <!-- Tab 3: Threat -->
+                                            <div class="tab-pane" id="tab3" style="min-height: 330px;">
+                                                 <br>
+                                                <h3 class="margin-bottom-5"><strong>{% trans "Step 3" %}</strong> {% trans "Threat" %}</h3>
+
+                                                <div class="alert alert-info fade in">
+                                                    <i class="fa-fw fa fa-info"></i>
+                                                    {% trans "Record perceived risks to the component." %}
+                                                </div>
+                                                <div class="row margin-bottom-20">
+                                                    <dl id="threat-and-risk-section">
+                                                        <dt>
+                                                            <div class="col-xs-12">
+                                                                <h5 id="arches-names-form" class="section-headline">{% trans "Threat" %}</h5>
+                                                            </div>
+                                                        </dt>
+                                                    </dl>
+                                                    <dl id="potential-section">
+                                                        <dd>
+                                                            <div class="col-xs-12 col-sm-9">
+                                                                <div class="col-xs-4 form-section-input add-padding-right">
+                                                                    <div class="form-group">
+                                                                        <input class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('THREAT_CATEGORY.I4', 'value'), placeholder: '{% trans 'Category' %}', dataKey: 'THREAT_CATEGORY.I4'}">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-4 form-section-input add-padding-right">
+                                                                    <div class="form-group">
+                                                                        <input class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('THREAT_TYPE.I4', 'value'), placeholder: '{% trans 'Type' %}', dataKey: 'THREAT_TYPE.I4'}">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-4 form-section-input">
+                                                                    <div class="form-group">
+                                                                        <input class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('THREAT_PROBABILITY.I6', 'value'), placeholder: '{% trans 'Probability Type' %}', dataKey: 'THREAT_PROBABILITY.I6'}">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-12 form-section-subheader">
+                                                                    <div id="arches-names-form" style="height:.5em;">
+                                                                        <span>{% trans "Identified by" %}
+                                                                        <i class="fa fa-pencil edit-actor show-box inference" data-actor="inference" aria-hidden="true"></i>
+                                                                        <i class="fa fa-pencil-square edit-actor hide-box inference hidden" data-actor="inference" aria-hidden="true"></i>
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="edit-actors-row inference hidden">
+                                                                    <input class="form-control arches-form-input" id="actor-name" style="" placeholder='{% trans "Name" %}' data-bind='value: getEditedNode("THREAT_INFERENCE_MAKING_ASSESSOR_NAME.E41", "value")'>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-xs-12 col-sm-3 add-button-column add-margin-top">
+                                                                {% include 'views/components/add-item-button.htm' %}
+                                                            </div>
+                                                            <div class="col-xs-12 col-sm-9">
+                                                                <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "At least one value must be populated." %}</div>
+                                                            </div>
+                                                            <div class="col-xs-12">
+                                                                <div class="margin-left-10 margin-top-5" style="display: none;" data-bind="visible: true">
+                                                                    <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "None" %}</div>
+                                                                    <div data-bind="foreach: getBranchLists()">
+                                                                        <div class="arches-crud-record">
+                                                                            <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans 'Delete this value' %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                                                            <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans 'Edit this threat' %}">
+                                                                            <span data-bind='{text: nodes.get("THREAT_CATEGORY.I4", "label")}'></span><span class="text-muted" data-bind="visible: nodes.get('THREAT_CATEGORY.I4', 'value').length > 0"> ({% trans 'Category' %} )</span>
+                                                                            <span data-bind='{text: nodes.get("THREAT_TYPE.I4", "label")}'></span><span class="text-muted" data-bind="visible: nodes.get('THREAT_TYPE.I4', 'value').length > 0"> ({% trans 'Type' %} )</span>
+                                                                            <span data-bind='{text: nodes.get("THREAT_PROBABILITY.I6", "label")}'></span><span class="text-muted" data-bind="visible: nodes.get('THREAT_PROBABILITY.I6', 'value').length > 0"> ({% trans 'Probability' %} )</span>
+                                                                            <span class="text-muted" data-bind="visible: nodes.get('THREAT_INFERENCE_MAKING_ASSESSOR_NAME.E41', 'value').length > 0">{% trans 'by: ' %}</span>
+                                                                            <span data-bind='text: nodes.get("THREAT_INFERENCE_MAKING_ASSESSOR_NAME.E41", "value")'></span>
+
+                                                                            </a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </dd>
+                                                    </dl>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Tab 4: Recommendation and Priority -->
+                                            <div class="tab-pane" id="tab4" style="min-height: 330px;">
+                                                <br>
+                                                <h3 class="margin-bottom-5"><strong>{% trans "Step 4" %}</strong> {% trans "Recommendation and Priority" %}</h3>
+
+                                                <div class="alert alert-info fade in">
+                                                    <i class="fa-fw fa fa-info"></i>
+                                                    {% trans "Recommend and prioritise intervention activity." %}
+                                                </div>
+                                                <div class="row margin-bottom-20">
+                                                    <dl id="recommendation-section">
+                                                        <dt>
+                                                            <div class="col-xs-12">
+                                                                <h5 id="arches-names-form" class="section-headline">{% trans "Recommendation" %}</h5>
+                                                            </div>
+                                                        </dt>
+                                                        <dd>
+
+                                                            <div class="col-xs-12 col-sm-9">
+                                                                <div class="col-xs-6 form-section-input add-padding-right">
+                                                                    <div class="form-group">
+                                                                        <input class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('ACTIVITY_RECOMMENDATION_TYPE.E55', 'value'), placeholder: '{% trans 'Recommendation' %}', dataKey: 'ACTIVITY_RECOMMENDATION_TYPE.E55'}">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-6 form-section-input">
+                                                                    <div class="form-group">
+                                                                        <input class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('INTERVENTION_MITIGATION_TYPE.E55', 'value'), placeholder: '{% trans 'Intervention' %}', dataKey: 'INTERVENTION_MITIGATION_TYPE.E55'}">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-xs-12 col-sm-3 add-button-column add-margin-top">
+                                                                {% include 'views/components/add-item-button.htm' %}
+                                                            </div>
+                                                            <div class="col-xs-12 col-sm-9">
+                                                                <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "At least one value must be populated." %}</div>
+                                                            </div>
+                                                            <div class="col-xs-12">
+                                                                <div class="margin-left-10 margin-top-5" style="display: none;" data-bind="visible: true">
+                                                                    <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "None" %}</div>   
+                                                                    <div data-bind="foreach: getBranchLists()">
+                                                                        <div class="arches-crud-record">
+                                                                            <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans 'Delete this value' %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                                                            <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans 'Edit' %}"></a>
+                                                                            <span data-bind='{text: nodes.get("ACTIVITY_RECOMMENDATION_TYPE.E55", "label")}'></span><span class="text-muted" data-bind="visible: nodes.get('ACTIVITY_RECOMMENDATION_TYPE.E55', 'value').length > 0"> ({% trans 'Recommendation' %} )</span>
+                                                                            <span data-bind='{text: nodes.get("INTERVENTION_MITIGATION_TYPE.E55", "label")}'></span><span class="text-muted" data-bind="visible: nodes.get('INTERVENTION_MITIGATION_TYPE.E55', 'value').length > 0"> ({% trans 'Intervention' %} )</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </dd>
+                                                    </dl>
+                                                </div>
+                                                <div class="row margin-bottom-20">
+                                                    <dl id="priority-section">
+                                                        <dt>
+                                                            <div class="col-xs-12">
+                                                                <h5 id="arches-names-form" class="section-headline">{% trans "Priority" %}</h5>
+                                                            </div>
+                                                        </dt>
+                                                        <dd>
+                                                            <div class="col-xs-12 col-sm-9">
+                                                                <div class="col-xs-12 form-section-input">
+                                                                    <div class="form-group">
+                                                                        <input class="select2 arches-select2-crud-form" data-bind="select2: {value: getEditedNode('PRIORITY_TYPE.E55', 'value'), placeholder: '{% trans 'Priority' %}', dataKey: 'PRIORITY_TYPE.E55'}">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-xs-12 col-sm-3 add-button-column add-margin-top">
+                                                                {% include 'views/components/add-item-button.htm' %}
+                                                            </div>
+                                                            <div class="col-xs-12 col-sm-9">
+                                                                <div class="alert alert-danger branch-invalid-alert" role="alert" style="display:none;">{% trans "You must make a selection." %}</div>
+                                                            </div>
+                                                            <div class="col-xs-12">
+                                                                <div class="margin-left-10 margin-top-5" style="display: none;" data-bind="visible: true">
+                                                                    <div data-bind="visible: getBranchLists().length == 0" class="txt-color-blue">{% trans "None" %}</div>   
+                                                                    <div data-bind="foreach: getBranchLists()">
+                                                                        <div class="arches-crud-record">
+                                                                            <a href="javascript:void(0)" class="arches-CRUD-child" title="{% trans 'Delete this value' %}"><i data-bind="click: $parent.deleteItem.bind($parent)" class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                                                            <a href="javascript:void(0)" class="arches-CRUD-child arches-CRUD-edit" data-bind="click: $parent.editItem.bind($parent)" title="{% trans 'Edit' %}"><span data-bind='text: nodes.get("PRIORITY_TYPE.E55", "label")'></span></a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </dd>
+                                                    </dl>
+                                                </div>
+
+                                            </div>
+                                            
+
+                                        </div>
+                                        <!-- End Wizard Tabs -->
+
+                                    </div>
+                                </form>
+                                <!-- End Wizard -->
+
+                            </div>
+                        </div>
+
+                    </dd>
+                </dl>
+                <!-- End Arches form container -->
+
+            </div>
+        </div>
+    </div>
+    <!-- End Condition Assessement Wizard Container --> 
+
+    <div action="" class="modal fade confirm-delete-modal" tabindex="-1" role="dialog" aria-labelledby="alertmodal" aria-hidden="true">
+        <div class="modal-dialog confirm-delete">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">{% trans "Are you ready to delete this assessment?" %}</h4>
+                </div>
+                <div class="modal-body">
+                    <h5 name="warning-text">{% trans "Classification" %}
+                    </h5>
+                    <div name="additional-info" style="max-height: 300px; overflow-y: scroll;">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-u btn-u-default" data-dismiss="modal">{% trans "No" %}</button>
+                    <button class="btn-u btn-u-red confirm-delete-yes" href="javascript:void(0);" data-id="" data-action="delete">{% trans "Yes" %}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock form_content %}
