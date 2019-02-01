@@ -2803,14 +2803,17 @@ div.dropdown-menu.open {
 
 
 .loading-mask-string {
-    font-size: 35px;
+    font-size: 22px;
+    padding-top: 5%;
     font-weight: 600;
-    width: 100%;
+    width: 50%;
     text-align: center;
     top: 25%;
+    left: 25%;
+    height: 50%;
     position: absolute;
-    color: #222;
-    background-color: #999;
+    color: #fff;
+    background-color: #000;
     z-index: 8000;
 }
 
@@ -2827,14 +2830,14 @@ div.dropdown-menu.open {
 
 .graph-designer-loading-mask:after {
     position: fixed;
-    opacity: .5;
-    color: #000;
+    opacity: .8;
+    color: #fff;
     content: '\f110';
     -webkit-animation: fa-spin 2s infinite linear;
     animation: fa-spin 2s infinite linear;
     display: inline-block;
     font: normal normal normal 14px/1 FontAwesome;
-    font-size: 14vw;
+    font-size: 10vw;
     margin-top: 42vh;
     margin-left: 32vw;
     text-rendering: auto;
