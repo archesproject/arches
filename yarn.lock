@@ -1138,10 +1138,10 @@ chosen-js@1.8.2:
   resolved "https://registry.yarnpkg.com/chosen-js/-/chosen-js-1.8.2.tgz#bfd8ed1266ef667fbbc453c7e5b88d4c470e897e"
   integrity sha512-eC5+gRZLU20osMWuChokjL2WPeVlCWzd2YbF5ucaGkmuyD6eThxotJ9+t203sYvKx06bDUVeZ9MhGkm57Oei9g==
 
-ckeditor@~4.6.2:
-  version "4.6.2"
-  resolved "https://registry.yarnpkg.com/ckeditor/-/ckeditor-4.6.2.tgz#b1552b7a2f9537e165d7afd2d29d3d4959ff6bad"
-  integrity sha1-sVUrei+VN+Fl16/S0p09SVn/a60=
+ckeditor@~4.11.2:
+  version "4.11.2"
+  resolved "https://registry.yarnpkg.com/ckeditor/-/ckeditor-4.11.2.tgz#90c1439de18afa0b7ee1993a3a463a2e84aa481e"
+  integrity sha512-/qNERAeYsUAnfzEJZAOOI0sVpHk++W6BchCDmJ8+MbDPHq1Tr3jI/1PA9Qw3qSRXazud2T1yHXURfRUI+GT0FA==
 
 code-point-at@^1.0.0:
   version "1.1.0"
