@@ -11140,6 +11140,7 @@ a.filter-tools:hover {
 
 .report-image-grid.mpm {
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .nav-tabs li a.graph-designer-tab {
@@ -11836,8 +11837,11 @@ a.filter-tools:hover {
 }
 
 .msm-survey-status-instructions {
-    padding: 20px 10px 5px 10px;
-    font-size: 19px;
+    margin: 10px 20% 10px 20%;
+    padding: 20px 10px 20px 10px;
+    font-size: 17px;
+    background: #ffb80f;
+    border: 1px solid #ffb300;
     text-align: center;
 }
 

@@ -75,9 +75,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
                                         <div class="mpm-title"><span data-bind="text: name() === '' ? '{% trans "Unnamed Survey" %}' : name()"></span></div>
-                                        <!--ko if: description -->
-                                        <div class="mpm-subtitle" data-bind="text: description"></div>
-                                        <!--/ko -->
+                                        
                                         <!--ko if: enddate && startdate -->
                                         <div class="mpm-subtitle">
                                             <span data-bind="text: starts + '{% trans " to " %}' + ends"> </span>
