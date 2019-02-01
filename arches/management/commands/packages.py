@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """This module contains commands for building Arches."""
 
 from optparse import make_option
+from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 from django.utils.importlib import import_module
@@ -79,7 +80,9 @@ class Command(BaseCommand):
         make_option('-c', '--concepts', action='store_true', dest='only_concepts',
             help='Select this option to remove only concepts when pruning'),
          make_option('-r', '--resource', action='store', dest='resource_type',
-            help='Select this option to remove a whole resource graph from the ontology'),       
+            help='Select this option to remove a whole resource graph from the ontology'),
+        make_option('--eamena', action='store_true',
+            help='run the eamena alternate version of this command'),
     )
 
     def handle(self, *args, **options):
@@ -91,7 +94,7 @@ class Command(BaseCommand):
             self.setup(package_name)
 
         if options['operation'] == 'install':
-            self.install(package_name)
+            self.install(package_name, load_skos=options['eamena'])
 
         if options['operation'] == 'setup_db':
             self.setup_db(package_name)
@@ -176,7 +179,7 @@ class Command(BaseCommand):
         self.setup_db(package_name)
         self.generate_procfile(package_name)
 
-    def install(self, package_name):
+    def install(self, package_name, load_skos=False):
         """
         Runs the setup.py file found in the package root
 
@@ -184,7 +187,10 @@ class Command(BaseCommand):
 
         module = import_module('%s.setup' % package_name)
         install = getattr(module, 'install')
-        install() 
+        install()
+        
+        if load_skos:
+            call_command("load_skos")
 
     def setup_elasticsearch(self, package_name, port=9200):
         """
