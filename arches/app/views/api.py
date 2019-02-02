@@ -141,21 +141,32 @@ class Surveys(APIBase):
         viewable_nodegroups = request.user.userprofile.viewable_nodegroups
         editable_nodegroups = request.user.userprofile.editable_nodegroups
         permitted_nodegroups = viewable_nodegroups.union(editable_nodegroups)
+
+        def get_child_cardids(card, cardset):
+            for child_card in models.CardModel.objects.filter(nodegroup__parentnodegroup_id=card.nodegroup_id):
+                cardset.add(str(child_card.cardid))
+                get_child_cardids(child_card, cardset)
+
         group_ids = list(request.user.groups.values_list('id', flat=True))
         projects = MobileSurvey.objects.filter(Q(users__in=[request.user]) | Q(groups__in=group_ids), active=True).distinct()
         projects_for_couch = [project.serialize_for_mobile() for project in projects]
         for project in projects_for_couch:
             permitted_cards = set()
-            for card in models.CardModel.objects.filter(cardid__in=project['cards']):
+            ordered_project_cards = project['cards']
+            for rootcardid in project['cards']:
+                card = models.CardModel.objects.get(cardid=rootcardid)
                 if str(card.nodegroup_id) in permitted_nodegroups:
                     permitted_cards.add(str(card.cardid))
+                    get_child_cardids(card, permitted_cards)
             project['cards'] = list(permitted_cards)
             for graph in project['graphs']:
                 cards = []
                 for card in graph['cards']:
-                    if card['cardid'] in permitted_cards:
+                    if card['cardid'] in project['cards']:
+                        card['relative_position'] = ordered_project_cards.index(
+                            card['cardid']) if card['cardid'] in ordered_project_cards else None
                         cards.append(card)
-                graph['cards'] = cards
+                graph['cards'] = sorted(cards, key=lambda x: x['relative_position'])
         response = JSONResponse(projects_for_couch, indent=4)
         return response
 

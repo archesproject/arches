@@ -154,7 +154,6 @@ define([
                             });
                         }
                     }
-                    currentIdentities.sort();
                 }
             };
 
@@ -277,6 +276,10 @@ define([
 
         reset: function() {
             this.parse(JSON.parse(this._mobilesurvey()), self);
+        },
+
+        getInitialSurvey: function() {
+            return JSON.parse(this._mobilesurvey());
         },
 
         _getURL: function(method) {

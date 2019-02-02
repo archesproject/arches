@@ -2774,7 +2774,7 @@ div.dropdown-menu.open {
 .loading-mask {
     position: fixed;
     opacity: .75;
-    background-color: gray;
+    background-color: grey;
     top: 0;
     bottom: 0;
     left: 0;
@@ -2803,14 +2803,17 @@ div.dropdown-menu.open {
 
 
 .loading-mask-string {
-    font-size: 35px;
+    font-size: 22px;
+    padding-top: 5%;
     font-weight: 600;
-    width: 100%;
+    width: 50%;
     text-align: center;
     top: 25%;
+    left: 25%;
+    height: 50%;
     position: absolute;
-    color: #222;
-    background-color: #999;
+    color: #fff;
+    background-color: #000;
     z-index: 8000;
 }
 
@@ -2827,14 +2830,14 @@ div.dropdown-menu.open {
 
 .graph-designer-loading-mask:after {
     position: fixed;
-    opacity: .5;
-    color: #000;
+    opacity: .8;
+    color: #fff;
     content: '\f110';
     -webkit-animation: fa-spin 2s infinite linear;
     animation: fa-spin 2s infinite linear;
     display: inline-block;
     font: normal normal normal 14px/1 FontAwesome;
-    font-size: 14vw;
+    font-size: 10vw;
     margin-top: 42vh;
     margin-left: 32vw;
     text-rendering: auto;
@@ -9276,6 +9279,15 @@ a.clear-geojson-button:hover {
     overflow-y: auto;
 }
 
+.msm-locked-warning {
+    height: 40px;
+    background: #999;
+    color: #fff;
+    padding-left: 10px;
+    position: relative;
+    padding-top: 10px;
+}
+
 .msm-list-filter {
     display: flex;
     padding: 12px 10px 13px 65px;
@@ -10781,7 +10793,7 @@ a.search-facet-item.disabled {
 .mpm-card-content {
     margin: 0px;
     border-bottom: 1px solid #ddd;
-    padding: 40px 25px 50px 25px;
+    padding: 50px 25px 50px 25px;
     background: #f9f9f9;
 }
 
@@ -10795,7 +10807,11 @@ a.search-facet-item.disabled {
 }
 
 .mpm-card-content.active-survey {
-    background: #f3f3f3;
+    background: #fafafa;
+}
+
+.active-survey .msm-survey-message {
+    color: #999;
 }
 
 .msm-summary-panel .selection-page {
@@ -10943,11 +10959,12 @@ a.search-facet-item.disabled {
     height: 60px;
     width: 60px;
     border-radius: 50%;
-    border: 1px solid #C68000;
-    background: #FFDA39;
+    border: 1px solid #aaa;
+    color: #777;
+    background: #ddd;
     font-size: 28px;
-    padding-top: 12px;
-    padding-left: 6px;
+    padding-top: 14px;
+    padding-left: 2px;
 }
 
 .model-selection .msm-icon-wrap {
@@ -10955,6 +10972,14 @@ a.search-facet-item.disabled {
     color:#2d3c4b;
     padding-top: 15px;
     border: 1px solid #2d3c4b;
+}
+
+.active-survey .msm-icon-wrap {
+    background: #77DAD3;
+    color:#29b2a6;
+    padding-top: 15px;
+    padding-left: 2px;
+    border: 1px solid #26a69a;
 }
 
 a.filter-tools {
@@ -11125,6 +11150,7 @@ a.filter-tools:hover {
 
 .report-image-grid.mpm {
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .nav-tabs li a.graph-designer-tab {
@@ -11806,13 +11832,34 @@ a.filter-tools:hover {
     text-align: center;
 }
 
-.msm-survey-status-text {
+.msm-survey-requirements-text {
     margin-top: 20px;
 }
 
+.msm-survey-status-text {
+    margin-top: 0px;
+}
+
+.msm-survey-message {
+    margin-top: 20px;
+    font-size: 16px;
+    color: #888;
+}
+
 .msm-survey-status-instructions {
-    padding: 20px 10px 5px 10px;
-    font-size: 19px;
+    margin: 10px 20% 20px 20%;
+    padding: 20px 10px 20px 10px;
+    font-size: 17px;
+    background: #ddd;
+    border: 1px solid #aaa;
+    color: #2A096E;
+    text-align: center;
+    border-radius: 2px;
+}
+
+.msm-save-message {
+    font-size: 17px;
+    color: #2A096E;
     text-align: center;
 }
 
