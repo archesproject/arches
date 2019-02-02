@@ -21,6 +21,7 @@ define([
                     .append(handle)
                     .on('dragstart', function(e) {
                         start = $el.width() - e.pageX;
+                        e.originalEvent.dataTransfer.setData('Text', this.id);
                     })
                     .on('dragend', function(e) {
                         start = null;
