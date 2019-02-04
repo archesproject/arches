@@ -7698,6 +7698,7 @@ a.mega-dropdown-toggle.disabled {
     padding-top: 0px;
     position: relative;
     padding-left: 15px;
+    border: 2px solid black;
 }
 
 @media (min-width: 992px){
