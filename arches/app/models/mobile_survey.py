@@ -343,9 +343,12 @@ class MobileSurvey(models.MobileSurveyModel):
         resource instances relevant to a mobile survey. Takes a user object which
         is required for search.
         """
-        query = self.datadownloadconfig['custom']
+        query = self.datadownloadconfig['custom'] 
         resource_types = self.datadownloadconfig['resources']
-        instances = {}
+        from pprint import pprint as pp
+        
+        all_instances = {}
+
         if query in ('', None) and len(resource_types) == 0:
             print "No resources or data query defined"
         else:
@@ -369,19 +372,29 @@ class MobileSurvey(models.MobileSurveyModel):
             search_res_json = search.search_results(request)
             search_res = JSONDeserializer().deserialize(search_res_json.content)
             try:
-                instances = {hit['_source']['resourceinstanceid']: hit['_source'] for hit in search_res['results']['hits']['hits']}
-                # if we didn't get our limit of resource instances using a spatial filter
-                # let's try to get resource instances that don't have spatial data
-                if len(instances.keys()) < int(self.datadownloadconfig['count']):
-                    request.GET['mapFilter'] = '{}'
-                    request.GET['resourcecount'] = int(self.datadownloadconfig['count']) - len(instances.keys())
+                for res_type in resource_types:
+                    instances = {}
+                    request.GET['resourcecount'] = self.datadownloadconfig['count']
                     search_res_json = search.search_results(request)
                     search_res = JSONDeserializer().deserialize(search_res_json.content)
                     for hit in search_res['results']['hits']['hits']:
-                        instances[hit['_source']['resourceinstanceid']] = hit['_source']
+                        if hit['_type'] == res_type:
+                            if len(instances.keys()) < int(self.datadownloadconfig['count']):
+                                instances[hit['_source']['resourceinstanceid']] = hit['_source']
+                    if len(instances.keys()) < int(self.datadownloadconfig['count']): #if...then drop map filter
+                        request.GET['mapFilter'] = '{}'
+                        request.GET['resourcecount'] = int(self.datadownloadconfig['count']) - len(instances.keys()) #adjust count to difference
+                        search_res_json = search.search_results(request)
+                        search_res = JSONDeserializer().deserialize(search_res_json.content)
+                        for hit in search_res['results']['hits']['hits']:
+                            if hit['_type'] == res_type and len(instances.keys()) < int(self.datadownloadconfig['count']):
+                                instances[hit['_source']['resourceinstanceid']] = hit['_source']
+                    for key, value in instances.iteritems():
+                        all_instances[key] = value
             except KeyError:
                 print 'no instances found in', search_res
-        return instances
+        
+        return all_instances
 
     def load_tiles_into_couch(self, instances):
         """
