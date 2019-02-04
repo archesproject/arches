@@ -345,10 +345,7 @@ class MobileSurvey(models.MobileSurveyModel):
         """
         query = self.datadownloadconfig['custom'] 
         resource_types = self.datadownloadconfig['resources']
-        from pprint import pprint as pp
-        
         all_instances = {}
-
         if query in ('', None) and len(resource_types) == 0:
             print "No resources or data query defined"
         else:
@@ -381,9 +378,9 @@ class MobileSurvey(models.MobileSurveyModel):
                         if hit['_type'] == res_type:
                             if len(instances.keys()) < int(self.datadownloadconfig['count']):
                                 instances[hit['_source']['resourceinstanceid']] = hit['_source']
-                    if len(instances.keys()) < int(self.datadownloadconfig['count']): #if...then drop map filter
+                    if len(instances.keys()) < int(self.datadownloadconfig['count']):
                         request.GET['mapFilter'] = '{}'
-                        request.GET['resourcecount'] = int(self.datadownloadconfig['count']) - len(instances.keys()) #adjust count to difference
+                        request.GET['resourcecount'] = int(self.datadownloadconfig['count']) - len(instances.keys())
                         search_res_json = search.search_results(request)
                         search_res = JSONDeserializer().deserialize(search_res_json.content)
                         for hit in search_res['results']['hits']['hits']:
