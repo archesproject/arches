@@ -118,7 +118,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                 <!-- Icon and Status warning -->
                                 <div class="mpm-survey-status-header">
-                                    <i class="msm-icon-wrap fa fa-exclamation-triangle" style="color:orange; padding-right:5px;"></i>
+                                    <i class="msm-icon-wrap fa fa-exclamation-triangle" style="color:orange;"></i>
                                     <div class="msm-survey-requirements-text">{% trans 'Survey Requirements: Incomplete' %}</div>
                                     <div class="msm-survey-status-text" data-bind="text: mobilesurvey.activatedOnServer() === true ? '{% trans "Survey Status: Active" %}' : '{% trans " Survey Status: Inactive" %}'"></div>
                                 </div>
@@ -643,7 +643,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                     <!-- Account Summary Panel -->
                                     <div class="msm-account-summary-panel">
-                                        <div class="mpm-group-panel-header" style="border-left: 1px solid #ccc;">
+                                        <div class="mpm-group-panel-header">
                                             <h4 class="msm-group-label">{% trans "Account Summary" %}</h4>
                                             <div class="msm-basemap-subtitle">
                                                 {% trans "User identification and data editing statistics" %}
@@ -682,7 +682,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </div>
 
                                                 <div class="msm-stat-user-panel">
-                                                    <span class="msm-stat-user" style="font-size:18px" data-bind="text:mobilesurvey.selectedUser().groups"></span>
+                                                    <span class="msm-stat-user" data-bind="text:mobilesurvey.selectedUser().groups"></span>
                                                 </div>
                                                 <div class="msm-stat-label">
                                                     {% trans 'Assigned Groups' %}
