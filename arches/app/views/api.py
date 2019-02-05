@@ -73,7 +73,8 @@ class CouchdbProxy(ProxyView):
                 print e
                 surveyid = path.split('_')[1].strip('/')
                 if MobileSurvey.objects.filter(pk=surveyid).exists() is False:
-                    return JSONResponse({'notification': 'The survey you are attempting to sync is no longer available on the server'}, status=500)
+                    message = 'The survey you are attempting to sync is no longer available on the server'
+                    return JSONResponse({'notification': message}, status=500)
                 return JSONResponse('Sync failed', status=500)
 
 
