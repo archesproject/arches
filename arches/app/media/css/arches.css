@@ -2785,7 +2785,7 @@ div.dropdown-menu.open {
 .loading-mask:after {
     position: fixed;
     opacity: .5;
-    color: #fff;
+    color: #454545;
     content: '\f110';
     -webkit-animation: fa-spin 2s infinite linear;
     animation: fa-spin 2s infinite linear;
