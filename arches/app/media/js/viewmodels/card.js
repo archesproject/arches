@@ -57,7 +57,6 @@ define([
         );
     };
 
-
     var CardViewModel = function(params) {
         var TileViewModel = require('viewmodels/tile');
         var self = this;
@@ -331,6 +330,10 @@ define([
                 });
             }
         });
+
+        this.childless = ko.pureComputed(function() {
+            return this.cards().length === 0;
+        }, this);
 
         this.selected.subscribe(function(selected) {
             if (selected) this.expanded(true);
