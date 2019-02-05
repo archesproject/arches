@@ -47,7 +47,6 @@ from arches.app.views.base import BaseManagerView
 from arches.app.views.base import MapBaseManagerView
 import arches.app.views.search as search
 
-
 def get_survey_resources(mobile_survey):
     graphs = models.GraphModel.objects.filter(isresource=True).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
     resources = []
@@ -56,8 +55,10 @@ def get_survey_resources(mobile_survey):
     for i, graph in enumerate(graphs):
         cards = []
         if i == 0 or unicode(graph.graphid) in active_graphs:
-            cards = [Card.objects.get(pk=card.cardid) for card in models.CardModel.objects.filter(graph=graph)]
-        resources.append({'name': graph.name, 'id': graph.graphid, 'subtitle': graph.subtitle, 'iconclass': graph.iconclass, 'cards': cards})
+            cards = [Card.objects.get(pk=card.cardid) for card in models.CardModel.objects.filter(
+                graph=graph).order_by('sortorder')]
+        resources.append({'name': graph.name, 'id': graph.graphid,
+                          'subtitle': graph.subtitle, 'iconclass': graph.iconclass, 'cards': cards})
 
     return resources
 
@@ -150,20 +151,28 @@ class MobileSurveyDesignerView(MapBaseManagerView):
 
     def get(self, request, surveyid):
 
-        def get_last_login(date):
-            result = _("Not yet logged in")
-            try:
-                if date is not None:
-                    result = datetime.strftime(date, '%Y-%m-%d %H:%M')
-            except TypeError as e:
-                print e
-            return result
+        def get_history(survey, history):
+            sync_log_records = models.MobileSyncLog.objects.order_by('-finished').values().filter(survey=survey)
+            if len(sync_log_records) > 0:
+                lastsync = datetime.strftime(sync_log_records[0]['finished'], '%Y-%m-%d %H:%M:%S')
+                history['lastsync'] = lastsync
+            for entry in sync_log_records:
+                history['edits'] += entry['tilesupdated']
+                if entry['user_id'] not in history['editors']:
+                    history['editors'][entry['user_id']] = {'edits': entry['tilesupdated'], 'lastsync': entry['finished']}
+                else:
+                    history['editors'][entry['user_id']]['edits'] += entry['tilesupdated']
+                    if entry['finished'] > history['editors'][entry['user_id']]['lastsync']:
+                        history['editors'][entry['user_id']]['lastsync'] = entry['finished']
+            for id, editor in iter(history['editors'].items()):
+                editor['lastsync'] = datetime.strftime(editor['lastsync'], '%Y-%m-%d %H:%M:%S')
+            return history
 
         identities = []
         for group in Group.objects.all():
             users = group.user_set.all()
             if len(users) > 0:
-                groupUsers = [{'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email, 'last_login': get_last_login(user.last_login), 'username': user.username, 'groups': [g.id for g in user.groups.all()], 'group_names': ', '.join([g.name for g in user.groups.all()])} for user in users]
+                groupUsers = [{'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email, 'username': user.username, 'groups': [g.id for g in user.groups.all()], 'group_names': ', '.join([g.name for g in user.groups.all()])} for user in users]
             identities.append({'name': group.name, 'type': 'group', 'id': group.pk, 'users': groupUsers, 'default_permissions': group.permissions.all()})
         for user in User.objects.filter():
             groups = []
@@ -175,6 +184,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
                 default_perms = default_perms + list(group.permissions.all())
             identities.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions': set(default_perms), 'is_superuser': user.is_superuser, 'group_ids': group_ids, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email})
 
+        history = {'lastsync': '', 'edits': 0, 'editors': {}}
         map_layers = models.MapLayer.objects.all()
         map_markers = models.MapMarker.objects.all()
         map_sources = models.MapSource.objects.all()
@@ -185,6 +195,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
         if survey_exists is True:
             survey = MobileSurvey.objects.get(pk=surveyid)
             mobile_survey = survey.serialize()
+            history = get_history(survey, history)
             resources = get_survey_resources(mobile_survey)
         else:
             survey = MobileSurvey(
@@ -216,6 +227,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
             map_layers=map_layers,
             map_markers=map_markers,
             map_sources=map_sources,
+            history=serializer.serialize(history),
             geocoding_providers=geocoding_providers,
             mobile_survey=serializer.serialize(mobile_survey, sort_keys=False),
             identities=serializer.serialize(identities, sort_keys=False),
@@ -303,12 +315,13 @@ class MobileSurveyDesignerView(MapBaseManagerView):
         for card_id in cards_to_remove:
             models.MobileSurveyXCard.objects.filter(card=models.CardModel.objects.get(cardid=card_id), mobile_survey=mobile_survey).delete()
 
-        if mobile_survey.active != data['active']:
+        # TODO Disabling the following section until we make emailing users optional
+        # if mobile_survey.active != data['active']:
             # notify users in the mobile_survey that the state of the mobile_survey has changed
-            if data['active']:
-                self.notify_mobile_survey_start(request, mobile_survey)
-            else:
-                self.notify_mobile_survey_end(request, mobile_survey)
+            # if data['active']:
+            #     self.notify_mobile_survey_start(request, mobile_survey)
+            # else:
+            #     self.notify_mobile_survey_end(request, mobile_survey)
         mobile_survey.name = data['name']
         mobile_survey.description = data['description']
         mobile_survey.onlinebasemaps = data['onlinebasemaps']

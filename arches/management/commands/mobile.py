@@ -22,6 +22,7 @@ import json
 from urlparse import urlparse, urljoin
 from arches.management.commands import utils
 from arches.app.models.mobile_survey import MobileSurvey
+from arches.app.models.models import MobileSyncLog
 from arches.app.models.system_settings import settings
 from django.core.management.base import BaseCommand, CommandError
 from arches.app.utils.couch import Couch
@@ -62,15 +63,25 @@ class Command(BaseCommand):
 
         if options['operation'] == 'sync_survey':
             if options['id'] is not None:
-                self.sync_survey(options['id'])
+                self.sync_survey(options['id'], options['user'])
             else:
                 for mobile_survey in MobileSurvey.objects.all():
                     self.sync_survey(mobile_survey.id)
 
-    def sync_survey(self, uuid):
+    def sync_survey(self, uuid, user=None):
         mobile_survey = MobileSurvey.objects.get(id=uuid)
+        synclog = MobileSyncLog(
+            user=user,
+            survey=mobile_survey
+            )
+        synclog.save()
         print("Syncing {0} from CouchDB to PostgreSQL").format(mobile_survey)
-        mobile_survey.push_edits_to_db()
+        report = mobile_survey.push_edits_to_db()
+        synclog.tilescreated = report['newtiles']
+        synclog.tilesupdated = report['updatedtiles']
+        synclog.tilesdeleted = report['deletedtiles']
+        synclog.resourcescreated = report['newresources']
+        synclog.save()
 
     def delete_associated_surveys(self):
         couch = Couch()

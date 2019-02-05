@@ -1,8 +1,10 @@
 import os
+import sys
 import json
 import uuid
 import re
 import logging
+import traceback
 from django.shortcuts import render
 from django.views.generic import View
 from django.views.decorators.csrf import csrf_exempt
@@ -58,7 +60,7 @@ def userCanAccessMobileSurvey(request, surveyid=None):
     return allowed
 
 
-class CouchdbProxy(ProtectedResourceView, ProxyView):
+class CouchdbProxy(ProxyView):
     upstream = settings.COUCHDB_URL
 
     def dispatch(self, request, path):
@@ -66,12 +68,33 @@ class CouchdbProxy(ProtectedResourceView, ProxyView):
             return super(CouchdbProxy, self).dispatch(request, path)
         else:
             try:
-                if userCanAccessMobileSurvey(request, path.replace('project_', '')[:36]):
+                if True: # userCanAccessMobileSurvey(request, path.replace('project_', '')[:36]):
                     return super(CouchdbProxy, self).dispatch(request, path)
                 else:
                     return JSONResponse('Sync Failed', status=403)
-            except:
+            except Exception as e:
+                print e
+                surveyid = path.split('_')[1].strip('/')
+                if MobileSurvey.objects.filter(pk=surveyid).exists() is False:
+                    message = 'The survey you are attempting to sync is no longer available on the server'
+                    return JSONResponse({'notification': message}, status=500)
                 return JSONResponse('Sync failed', status=500)
+
+
+# class CouchdbProxy(ProtectedResourceView, ProxyView):
+#     upstream = settings.COUCHDB_URL
+
+#     def dispatch(self, request, path):
+#         if path is None or path == '':
+#             return super(CouchdbProxy, self).dispatch(request, path)
+#         else:
+#             try:
+#                 if True: # userCanAccessMobileSurvey(request, path.replace('project_', '')[:36]):
+#                     return super(CouchdbProxy, self).dispatch(request, path)
+#                 else:
+#                     return JSONResponse('Sync Failed', status=403)
+#             except:
+#                 return JSONResponse('Sync failed', status=500)
 
 
 class APIBase(View):
@@ -96,19 +119,24 @@ class APIBase(View):
         return super(APIBase, self).dispatch(request, *args, **kwargs)
 
 
-class Sync(ProtectedResourceView, APIBase):
+class Sync(APIBase):
 
     def get(self, request, surveyid=None):
         ret = 'Sync was successful'
         try:
             can_sync = userCanAccessMobileSurvey(request, surveyid)
             if can_sync:
-                management.call_command('mobile', operation='sync_survey', id=surveyid)
+                management.call_command('mobile', operation='sync_survey', id=surveyid, user=request.user)
                 return JSONResponse(ret)
             else:
                 return JSONResponse('Sync Failed', status=403)
-        except:
-            ret = 'Sync failed'
+        except Exception as e:
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            formatted = traceback.format_exception(exc_type, exc_value, exc_traceback)
+            if len(formatted):
+                for message in formatted:
+                    print message
+            ret = {'Syncfailed': {'stacktrace': formatted}}
 
         return JSONResponse(ret, status=500)
 
@@ -116,18 +144,37 @@ class Sync(ProtectedResourceView, APIBase):
 class Surveys(APIBase):
 
     def get(self, request):
-        permitted_cards = request.user.userprofile.permitted_cards
+        if hasattr(request.user, 'userprofile') is not True:
+            models.UserProfile.objects.create(user=request.user)
+        viewable_nodegroups = request.user.userprofile.viewable_nodegroups
+        editable_nodegroups = request.user.userprofile.editable_nodegroups
+        permitted_nodegroups = viewable_nodegroups.union(editable_nodegroups)
+
+        def get_child_cardids(card, cardset):
+            for child_card in models.CardModel.objects.filter(nodegroup__parentnodegroup_id=card.nodegroup_id):
+                cardset.add(str(child_card.cardid))
+                get_child_cardids(child_card, cardset)
+
         group_ids = list(request.user.groups.values_list('id', flat=True))
         projects = MobileSurvey.objects.filter(Q(users__in=[request.user]) | Q(groups__in=group_ids), active=True).distinct()
         projects_for_couch = [project.serialize_for_mobile() for project in projects]
         for project in projects_for_couch:
-            project['cards'] = list(permitted_cards.intersection(set(project['cards'])))
+            permitted_cards = set()
+            ordered_project_cards = project['cards']
+            for rootcardid in project['cards']:
+                card = models.CardModel.objects.get(cardid=rootcardid)
+                if str(card.nodegroup_id) in permitted_nodegroups:
+                    permitted_cards.add(str(card.cardid))
+                    get_child_cardids(card, permitted_cards)
+            project['cards'] = list(permitted_cards)
             for graph in project['graphs']:
                 cards = []
                 for card in graph['cards']:
-                    if card['cardid'] in permitted_cards:
+                    if card['cardid'] in project['cards']:
+                        card['relative_position'] = ordered_project_cards.index(
+                            card['cardid']) if card['cardid'] in ordered_project_cards else None
                         cards.append(card)
-                graph['cards'] = cards
+                graph['cards'] = sorted(cards, key=lambda x: x['relative_position'])
         response = JSONResponse(projects_for_couch, indent=4)
         return response
 

@@ -2774,7 +2774,7 @@ div.dropdown-menu.open {
 .loading-mask {
     position: fixed;
     opacity: .75;
-    background-color: gray;
+    background-color: grey;
     top: 0;
     bottom: 0;
     left: 0;
@@ -2785,20 +2785,36 @@ div.dropdown-menu.open {
 .loading-mask:after {
     position: fixed;
     opacity: .5;
-    color: #000;
+    color: #454545;
     content: '\f110';
     -webkit-animation: fa-spin 2s infinite linear;
     animation: fa-spin 2s infinite linear;
     display: inline-block;
     font: normal normal normal 14px/1 FontAwesome;
-    font-size: 16vw;
+    font-size: 10vw;
     margin-top: 42vh;
-    margin-left: 42vw;
+    margin-left: 45vw;
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     transform: translate(0, 0);
     z-index: 100000001;
+}
+
+
+.loading-mask-string {
+    font-size: 22px;
+    padding-top: 5%;
+    font-weight: 600;
+    width: 50%;
+    text-align: center;
+    top: 25%;
+    left: 25%;
+    height: 50%;
+    position: absolute;
+    color: #fff;
+    background-color: #000;
+    z-index: 8000;
 }
 
 .graph-designer-loading-mask {
@@ -2814,14 +2830,14 @@ div.dropdown-menu.open {
 
 .graph-designer-loading-mask:after {
     position: fixed;
-    opacity: .5;
-    color: #000;
+    opacity: .8;
+    color: #fff;
     content: '\f110';
     -webkit-animation: fa-spin 2s infinite linear;
     animation: fa-spin 2s infinite linear;
     display: inline-block;
     font: normal normal normal 14px/1 FontAwesome;
-    font-size: 14vw;
+    font-size: 10vw;
     margin-top: 42vh;
     margin-left: 32vw;
     text-rendering: auto;
@@ -3503,7 +3519,7 @@ ul .collapse li:last-of-type {
 }
 
 .edit-menu-item.disabled {
-    left: 0.5px;
+    margin-left: 0.5px;
 }
 
 .edit-menu-item:hover {
@@ -6235,7 +6251,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 
 /*  Start card/widget manager Classes
-    used to manage placement and display of elements inside of the Card 
+    used to manage placement and display of elements inside of the Card
     and Widget Management forms
 */
 .panel-config {
@@ -9263,6 +9279,15 @@ a.clear-geojson-button:hover {
     overflow-y: auto;
 }
 
+.msm-locked-warning {
+    height: 40px;
+    background: #999;
+    color: #fff;
+    padding-left: 10px;
+    position: relative;
+    padding-top: 10px;
+}
+
 .msm-list-filter {
     display: flex;
     padding: 12px 10px 13px 65px;
@@ -10768,7 +10793,7 @@ a.search-facet-item.disabled {
 .mpm-card-content {
     margin: 0px;
     border-bottom: 1px solid #ddd;
-    padding: 40px 25px 50px 25px;
+    padding: 50px 25px 50px 25px;
     background: #f9f9f9;
 }
 
@@ -10779,6 +10804,14 @@ a.search-facet-item.disabled {
 
 .mpm-card-content.selection-page {
     border-bottom: transparent;
+}
+
+.mpm-card-content.active-survey {
+    background: #fafafa;
+}
+
+.active-survey .msm-survey-message {
+    color: #999;
 }
 
 .msm-summary-panel .selection-page {
@@ -10846,24 +10879,32 @@ a.search-facet-item.disabled {
 .msm-user-account-item {
     background: #fff;
     height: 40px;
-    padding: 8px 15px;
+    padding: 10px 15px;
     border: transparent;
     border-bottom: 1px solid #ddd;
+    border-left: 3px solid #fff;
 }
 
 .msm-user-account-item:nth-child(even) {
     background: #fafafa;
+    border-left: 3px solid #fafafa;
 }
 
 .msm-user-account-item:hover {
     cursor: pointer;
-    background: #F5FAFE;
-    border-bottom: 1px solid steelblue;
+    /*background: #F5FAFE;*/
+    border-left: 3px solid steelblue;
 }
+
 
 .msm-user-account-item.selected {
     background: #F6F6FF;
-    border-bottom: 1px solid steelblue;
+    border-left: 3px solid steelblue;
+    cursor: default;
+}
+
+.msm-user-account-item.checkbox {
+    margin: 0px;
 }
 
 .msm-filter-tools-panel {
@@ -10899,17 +10940,17 @@ a.search-facet-item.disabled {
 }
 
 .msm-account-listing-panel {
-    display: flex; 
-    flex-direction: column; 
+    display: flex;
+    flex-direction: column;
     flex: 1;
     background: #fff;
 }
 
 .msm-account-summary-panel {
-    display: flex; 
-    flex-direction: column; 
+    display: flex;
+    flex-direction: column;
     background: #fcfcfc;
-    flex: 1; 
+    flex: 1;
     border-left: solid 1px #ccc;
 }
 
@@ -10926,18 +10967,27 @@ a.search-facet-item.disabled {
     height: 60px;
     width: 60px;
     border-radius: 50%;
-    border: 1px solid #C68000;
-    background: #FFDA39;
+    border: 1px solid #aaa;
+    color: #777;
+    background: #ddd;
     font-size: 28px;
-    padding-top: 12px;
-    padding-left: 6px;
+    padding-top: 14px;
+    padding-left: 2px;
 }
 
 .model-selection .msm-icon-wrap {
-    background: #fff; 
-    color:#2d3c4b; 
-    padding-top: 15px; 
+    background: #fff;
+    color:#2d3c4b;
+    padding-top: 15px;
     border: 1px solid #2d3c4b;
+}
+
+.active-survey .msm-icon-wrap {
+    background: #77DAD3;
+    color:#29b2a6;
+    padding-top: 15px;
+    padding-left: 2px;
+    border: 1px solid #26a69a;
 }
 
 a.filter-tools {
@@ -11108,6 +11158,7 @@ a.filter-tools:hover {
 
 .report-image-grid.mpm {
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .nav-tabs li a.graph-designer-tab {
@@ -11789,13 +11840,34 @@ a.filter-tools:hover {
     text-align: center;
 }
 
-.msm-survey-status-text {
+.msm-survey-requirements-text {
     margin-top: 20px;
 }
 
+.msm-survey-status-text {
+    margin-top: 0px;
+}
+
+.msm-survey-message {
+    margin-top: 20px;
+    font-size: 16px;
+    color: #888;
+}
+
 .msm-survey-status-instructions {
-    padding: 20px 10px 5px 10px; 
-    font-size: 19px;
+    margin: 10px 20% 20px 20%;
+    padding: 20px 10px 20px 10px;
+    font-size: 17px;
+    background: #ddd;
+    border: 1px solid #aaa;
+    color: #2A096E;
+    text-align: center;
+    border-radius: 2px;
+}
+
+.msm-save-message {
+    font-size: 17px;
+    color: #2A096E;
     text-align: center;
 }
 
@@ -11925,7 +11997,7 @@ a.filter-tools:hover {
 
 .msm-stat-user {
     color: #2d3c4b;
-    font-size: 24px;
+    font-size: 18px;
     margin-top: 2px;
 }
 
@@ -11939,6 +12011,7 @@ a.filter-tools:hover {
 
 .msm-stat-date {
     font-size: 17px;
+    white-space: nowrap;
 }
 
 .profile-mpm-panel {
@@ -12467,6 +12540,11 @@ a.jstree-anchor.permissions-widget {
 
 .rr-splash-icon {
     font-size: 48px;
+}
+
+.surveys {
+    height: 72px;
+    width: 72px;
 }
 
 .rr-splash-description {

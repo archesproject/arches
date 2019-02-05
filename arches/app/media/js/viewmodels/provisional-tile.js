@@ -66,10 +66,12 @@ define([
                 }
                 if ((data && _.keys(data).length === 0 && tile.provisionaledits()) ||  isfullyprovisional) {
                     self.selectedProvisionalEdit(undefined);
-                    this.provisionaledits()[0].isfullyprovisional(true);
-                    koMapping.fromJS(this.provisionaledits()[0]['value'], tile.data);
-                    this.selectedProvisionalEdit(this.provisionaledits()[0]);
-                    tile._tileData.valueHasMutated();
+                    if (this.provisionaledits().length > 0) {
+                        this.provisionaledits()[0].isfullyprovisional(true);
+                        koMapping.fromJS(this.provisionaledits()[0]['value'], tile.data);
+                        this.selectedProvisionalEdit(this.provisionaledits()[0]);
+                        tile._tileData.valueHasMutated();
+                    } 
                 } else if (self.selectedProvisionalEdit()) {
                     self.selectedProvisionalEdit(undefined);
                     self.selectedTile().reset();

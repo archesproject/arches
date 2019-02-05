@@ -5,7 +5,12 @@
 {% block editor_tree %}
 <li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.tiles().length > 0 && card.expanded()), 'jstree-closed' : (card.tiles().length > 0 && !card.expanded()), 'jstree-leaf': card.tiles().length === 0}, scrollTo: card.scrollTo, container: '.resource-editor-tree'">
     <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
-    <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected()}, click: function () { card.canAdd() ? card.selected(true) : card.tiles()[0].selected(true) },">
+    <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected()}, event: {
+        mousedown: function(d, e) {
+            e.stopPropagation();
+            card.canAdd() ? card.selected(true) : card.tiles()[0].selected(true);
+        }
+    }">
         <i class="fa fa-file-o" role="presentation" data-bind="css:{'filtered': card.highlight(), 'has-provisional-edits fa-file': card.doesChildHaveProvisionalEdits()}"></i>
         <span style="padding-right: 5px;" data-bind="text: card.model.name"></span>
         <!-- ko if: card.canAdd() -->
@@ -15,14 +20,18 @@
     <ul class="jstree-children" aria-expanded="true">
         <div data-bind="sortable: {
             data: card.tiles,
+            options: {
+                start: self.startDrag
+            },
             beforeMove: self.beforeMove,
             afterMove: card.reorderTiles
         }">
-            <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (cards.length > 0 && expanded), 'jstree-closed' : (cards.length > 0 && !expanded()), 'jstree-leaf': cards.length === 0}">
+            <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (cards.length > 0 && expanded), 'jstree-closed' : (cards.length > 0 && !expanded()), 'jstree-leaf': cards.length === 0}, event: {'dragstart': function () { console.log('dragging...') }}">
                 <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){expanded(!expanded())}"></i>
                 <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { self.form.selection($data) }, css:{'jstree-clicked': selected, 'child-selected': isChildSelected(), 'filtered-leaf': card.highlight()}">
                     <i class="fa fa-file" role="presentation" data-bind="css:{'has-provisional-edits': doesChildHaveProvisionalEdits() || $data.hasprovisionaledits()}"></i>
                     <strong style="margin-right: 10px;">
+                        {% block editor_tree_node_content %}
                         <!-- ko if: card.widgets().length > 0 && card.widgets()[0].visible -->
                         <span data-bind="text: card.widgets()[0].label || card.model.name"></span>:
                         <div style="display: inline;" data-bind="component: {
@@ -41,6 +50,7 @@
                         <!-- ko if: card.widgets().length === 0 || !card.widgets()[0].visible -->
                         <span data-bind="text: card.model.name"></span>
                         <!-- /ko -->
+                        {% endblock editor_tree_node_content %}
                     </strong>
                 </a>
                 <!-- ko if: cards.length > 0 -->
@@ -282,8 +292,8 @@
             </form>
             {% endblock form_widgets %}
             <!-- /ko -->
+            <!-- ko if: showChildCards -->
             {% block form_cards %}
-            <!-- ko if: card.widgets().length === 0 -->
             <ul class="card-summary-section" data-bind="css: {disabled: !tile.tileid}">
                 <!-- ko foreach: { data: tile.cards, as: 'card' } -->
                 <li class="card-summary">
@@ -329,8 +339,8 @@
                 </li>
                 <!-- /ko -->
             </ul>
-            <!-- /ko -->
             {% endblock form_cards %}
+            <!-- /ko -->
             {% block form_buttons %}
             <div class="install-buttons">
                 <!-- ko if: tile.tileid -->
@@ -382,6 +392,7 @@
             <!-- ko if: reportExpanded() -->
             <!-- ko foreach: { data: self.preview ? [card.newTile] : card.tiles, as: 'tile' } -->
                 <div class="rp-card-section" data-bind="css: {'provisional': tile.provisionaledits() !== null && tile.userisreviewer === false, 'fullyprovisional': tile.isfullyprovisional()}">
+                    {% block report_widgets %}
                     <!-- ko if: card.model.get('widgets')().length > 0 -->
                         <div class="rp-report-tile" data-bind="attr: { id: tile.tileid }">
                             <!-- ko if: tile.provisionaledits() !== null && tile.userisreviewer === false -->
@@ -404,8 +415,10 @@
                                 <!-- /ko -->
                             </dl>
                         </div>
-                        <!-- /ko -->
+                    <!-- /ko -->
+                    {% endblock report_widgets %}
 
+                    {% block report_cards %}
                     <div class="rp-report-container-tile" data-bind="visible: card.cards().length > 0">
                         <!-- ko foreach: { data: self.preview ? card.cards : tile.cards, as: 'card' } -->
                                 <!-- ko component: {
@@ -418,6 +431,7 @@
                                 } --> <!-- /ko -->
                         <!-- /ko -->
                     </div>
+                    {% endblock report_cards %}
                 </div>
             <!-- /ko -->
             <!-- /ko -->
