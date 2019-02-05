@@ -25,11 +25,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     <!--ko if: mobilesurveys().length === 0 -->
         <div id="rr-splash" class="rr-splash">
+
+            <!-- Image -->
+            <div class="img-circle rr-splash-img-container surveys">
+                <img class="rr-splash-img" src="../media/img/multiple_inputs.png" alt="Resource Editor">
+            </div>
+
             <!-- Splash Title -->
             <div class="rr-splash-title">{% trans "Mobile Data Collection" %}</div>
-            <div class="rr-splash-title">{% trans "Arches allows you to define data collection surveys to collect data in the field" %}</div>
-
-
+            
+            <!-- Splash Button -->
             <button class="btn btn-shim btn-rr btn-labeled btn-lg fa fa-globe" data-bind="click: newMobileSurvey">{% trans 'Create a Survey' %}</button>
 
             <!-- Splash Instructions -->
@@ -37,9 +42,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="rr-splash-description">{% trans "Android and iOS phones or tablets. Surveys are a way to define the time, location, content, and" %}</div>
             <div class="rr-splash-description">{% trans "participants of a field data collection effort" %}</div>
 
-
-            <!-- Help Hyperlink -->
-            <div class="rr-splash-help-link">{% trans "Show Me How" %}</div>
+            <!-- Help Hyperlink; Add here -->
+            
         </div>
     <!--/ko-->
 
