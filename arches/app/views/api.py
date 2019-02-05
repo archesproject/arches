@@ -57,41 +57,26 @@ def userCanAccessMobileSurvey(request, surveyid=None):
     return allowed
 
 
-class CouchdbProxy(ProxyView):
+class CouchdbProxy(ProtectedResourceView, ProxyView):
     upstream = settings.COUCHDB_URL
 
     def dispatch(self, request, path):
         if path is None or path == '':
             return super(CouchdbProxy, self).dispatch(request, path)
         else:
-            try:
-                if True: # userCanAccessMobileSurvey(request, path.replace('project_', '')[:36]):
-                    return super(CouchdbProxy, self).dispatch(request, path)
-                else:
-                    return JSONResponse('Sync Failed', status=403)
-            except Exception as e:
-                print e
-                surveyid = path.split('_')[1].strip('/')
-                if MobileSurvey.objects.filter(pk=surveyid).exists() is False:
-                    message = 'The survey you are attempting to sync is no longer available on the server'
-                    return JSONResponse({'notification': message}, status=500)
-                return JSONResponse('Sync failed', status=500)
-
-
-# class CouchdbProxy(ProtectedResourceView, ProxyView):
-#     upstream = settings.COUCHDB_URL
-
-#     def dispatch(self, request, path):
-#         if path is None or path == '':
-#             return super(CouchdbProxy, self).dispatch(request, path)
-#         else:
-#             try:
-#                 if True: # userCanAccessMobileSurvey(request, path.replace('project_', '')[:36]):
-#                     return super(CouchdbProxy, self).dispatch(request, path)
-#                 else:
-#                     return JSONResponse('Sync Failed', status=403)
-#             except:
-#                 return JSONResponse('Sync failed', status=500)
+            surveyid = path.split('_')[1].strip('/')
+            if MobileSurvey.objects.filter(pk=surveyid).exists() is False:
+                message = 'The survey you are attempting to sync is no longer available on the server'
+                return JSONResponse({'notification': message}, status=500)
+            else:
+                try:
+                    if userCanAccessMobileSurvey(request, surveyid):
+                        return super(CouchdbProxy, self).dispatch(request, path)
+                    else:
+                        return JSONResponse('Sync Failed', status=403)
+                except Exception as e:
+                    print e
+                    return JSONResponse('Sync failed', status=500)
 
 
 class APIBase(View):
