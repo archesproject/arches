@@ -70,8 +70,16 @@ class MobileSurvey(models.MobileSurveyModel):
 
     def save(self):
         super(MobileSurvey, self).save()
+        if self.datadownloadconfig['download'] and self.active:
+            self.load_data_into_couch()
+        else:
+            # remove all docs by first deleting and then recreating the database
+            try:
+                self.couch.delete_db('project_' + str(self.id))
+            except:
+                pass
+
         db = self.couch.create_db('project_' + str(self.id))
-        self.load_data_into_couch()
         return db
 
     def delete(self):
