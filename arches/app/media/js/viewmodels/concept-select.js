@@ -75,6 +75,7 @@ define([
             value: this.value,
             clickBubble: true,
             multiple: this.multiple,
+            closeOnSlect: false,
             placeholder: this.placeholder,
             allowClear: true,
             ajax: {
