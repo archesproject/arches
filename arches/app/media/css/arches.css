@@ -7703,6 +7703,11 @@ a.mega-dropdown-toggle.disabled {
     padding-left: 15px;
 }
 
+.childlessborder {
+    border: 1px solid rgb(188, 188, 188);
+    padding-bottom: 2%
+}
+
 @media (min-width: 992px){
     .rp-card-section {
         padding-left: 20px;

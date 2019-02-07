@@ -332,6 +332,9 @@ define([
             }
         });
 
+        this.childless = ko.pureComputed(function() {
+            return this.cards().length === 0;
+        }, this);
         this.selected.subscribe(function(selected) {
             if (selected) this.expanded(true);
         }, this);
