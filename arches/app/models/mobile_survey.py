@@ -294,10 +294,11 @@ class MobileSurvey(models.MobileSurveyModel):
                         print('{0}: already saved'.format(row.doc['_rev']))
 
             for row in couch_docs:
-                if row.doc['type'] == 'tile' and ResourceInstance.objects.filter(pk=row.doc['resourceinstance_id']).exists():
+                if row.doc['type'] == 'tile' and \
+                        ResourceInstance.objects.filter(pk=row.doc['resourceinstance_id']).exists():
                     if self.check_if_revision_exists(row.doc) is False:
                         if 'provisionaledits' in row.doc and row.doc['provisionaledits'] is not None:
-                            action='update'
+                            action = 'update'
                             try:
                                 tile = Tile.objects.get(tileid=row.doc['tileid'])
                                 if row.doc['provisionaledits'] != '':

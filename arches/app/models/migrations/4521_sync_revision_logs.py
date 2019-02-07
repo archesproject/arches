@@ -22,7 +22,8 @@ class Migration(migrations.Migration):
                 ('revisionid', models.TextField()),
                 ('synctimestamp', models.DateTimeField(auto_now_add=True)),
                 ('action', models.TextField(blank=True, null=True)),
-                ('survey', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='mobile_survey_id', to='models.MobileSurveyModel')),
+                ('survey', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                                             related_name='mobile_survey_id', to='models.MobileSurveyModel')),
             ],
             options={
                 'db_table': 'resource_revision_log',
@@ -38,7 +39,8 @@ class Migration(migrations.Migration):
                 ('revisionid', models.TextField()),
                 ('synctimestamp', models.DateTimeField(auto_now_add=True)),
                 ('action', models.TextField(blank=True, null=True)),
-                ('survey', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='survey_id', to='models.MobileSurveyModel')),
+                ('survey', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                                             related_name='survey_id', to='models.MobileSurveyModel')),
             ],
             options={
                 'db_table': 'tile_revision_log',
@@ -48,7 +50,8 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='mobilesynclog',
             name='survey',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='surveyid', to='models.MobileSurveyModel'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                                    related_name='surveyid', to='models.MobileSurveyModel'),
         ),
         migrations.AlterField(
             model_name='mobilesynclog',
@@ -58,11 +61,13 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='tilerevisionlog',
             name='synclog',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='mobile_sync_log', to='models.MobileSyncLog'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                                    related_name='mobile_sync_log', to='models.MobileSyncLog'),
         ),
         migrations.AddField(
             model_name='resourcerevisionlog',
             name='synclog',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='sync_log', to='models.MobileSyncLog'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                                    related_name='sync_log', to='models.MobileSyncLog'),
         ),
     ]
