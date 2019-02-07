@@ -76,11 +76,7 @@ class Command(BaseCommand):
             )
         synclog.save()
         print("Syncing {0} from CouchDB to PostgreSQL").format(mobile_survey)
-        report = mobile_survey.push_edits_to_db()
-        synclog.tilescreated = report['newtiles']
-        synclog.tilesupdated = report['updatedtiles']
-        synclog.tilesdeleted = report['deletedtiles']
-        synclog.resourcescreated = report['newresources']
+        mobile_survey.push_edits_to_db(synclog)
         synclog.save()
 
     def delete_associated_surveys(self):
