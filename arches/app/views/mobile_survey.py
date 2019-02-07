@@ -202,7 +202,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
         else:
             survey = MobileSurvey(
                     id=surveyid,
-                    name=_('Unnamed'),
+                    name=_(''),
                     datadownloadconfig={"download": False, "count": 100, "resources": [], "custom": None},
                     onlinebasemaps=settings.MOBILE_DEFAULT_ONLINE_BASEMAP,
                 )
