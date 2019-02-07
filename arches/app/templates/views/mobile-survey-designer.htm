@@ -93,7 +93,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     </div>
 
                                     <div class="msm-survey-message" data-bind="visible: mobilesurvey.activatedOnServer() === true">
-                                        {% trans "This survey is now active!  <br> Mobile app users can download this survey and begin <br> collecting and editing data using their mobile device." %}
+                                        {% trans "This survey is now active! Mobile app users can download this survey and begin <br> collecting and editing data using their mobile device." %}
                                     </div>
                                 </div>
 
@@ -118,7 +118,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                 <!-- Icon and Status warning -->
                                 <div class="mpm-survey-status-header">
-                                    <i class="msm-icon-wrap fa fa-exclamation-triangle" style="color:orange;"></i>
+                                    <i class="msm-icon-wrap fa fa-exclamation-triangle"></i>
                                     <div class="msm-survey-requirements-text">{% trans 'Survey Requirements: Incomplete' %}</div>
                                     <div class="msm-survey-status-text" data-bind="text: mobilesurvey.activatedOnServer() === true ? '{% trans "Survey Status: Active" %}' : '{% trans " Survey Status: Inactive" %}'"></div>
                                 </div>
@@ -748,7 +748,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     people: {name: {% trans "'People'" %}, namelong: {% trans "'People'" %}, description: {% trans "'Summary of people invited to participate in this survey'" %}},
                     groupplaceholder: {% trans "'Select one or more groups...'" %},
                     modelplaceholder: {% trans "'Select one or more resource models...'" %},
-                    loadingmessage: {% trans "'Saving survey - this may take a few minutes'" %}
+                    loadingmessage: {% trans "'Preparing survey - this may take a few minutes'" %}
                 }
             };
         });{% endautoescape %}
