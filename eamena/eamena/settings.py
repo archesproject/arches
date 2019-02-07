@@ -173,6 +173,8 @@ ADDITIONAL_RESOURCE_GRAPH_LOCATIONS = (
      os.path.join(PACKAGE_ROOT, 'additional_resource_graphs'),
 )
 
+SKOS_FILE_LOCATION =  None
+
 CONCEPT_SCHEME_LOCATIONS = (
     # Put strings here, like "/home/data/authority_files" or "C:/data/authority_files".
     # Always use forward slashes, even on Windows.
