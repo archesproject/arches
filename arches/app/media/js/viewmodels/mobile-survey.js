@@ -225,6 +225,7 @@ define([
                 data: {results: this.allResources.map(function(r){return {text: r.name, id: r.id};})},
                 value: this.selectedResourceIds,
                 multiple: true,
+                closeOnSelect: false,
                 placeholder: this.transStrings.modelplaceholder,
                 allowClear: true
             };
@@ -293,6 +294,7 @@ define([
                 data: {results: this.allIdentities.filter(function(id){return id.type==='group';}).map(function(g){return {text: g.name, id: g.id};})},
                 value: this.selectedGroupsIds,
                 multiple: true,
+                closeOnSelect: false,
                 placeholder: this.transStrings.groupplaceholder,
                 allowClear: true
             };

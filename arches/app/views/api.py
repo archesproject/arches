@@ -108,7 +108,7 @@ class Sync(APIBase):
         try:
             can_sync = userCanAccessMobileSurvey(request, surveyid)
             if can_sync:
-                management.call_command('mobile', operation='sync_survey', id=surveyid, user=request.user)
+                management.call_command('mobile', operation='sync_survey', id=surveyid, user=request.user.id)
                 return JSONResponse(ret)
             else:
                 return JSONResponse('Sync Failed', status=403)

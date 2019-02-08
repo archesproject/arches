@@ -23,6 +23,7 @@ from datetime import datetime
 from datetime import timedelta
 from django.db import transaction
 from django.shortcuts import render
+from django.db.models import Count
 from django.contrib.auth.models import User, Group
 from django.contrib.gis.geos import MultiPolygon
 from django.contrib.gis.geos import Polygon
@@ -153,17 +154,18 @@ class MobileSurveyDesignerView(MapBaseManagerView):
 
         def get_history(survey, history):
             sync_log_records = models.MobileSyncLog.objects.order_by('-finished').values().filter(survey=survey)
+            resourceedits = models.TileRevisionLog.objects.filter(survey=survey).values('resourceid').annotate(Count('tileid', distinct=True))
             if len(sync_log_records) > 0:
                 lastsync = datetime.strftime(sync_log_records[0]['finished'], '%Y-%m-%d %H:%M:%S')
                 history['lastsync'] = lastsync
             for entry in sync_log_records:
-                history['edits'] += entry['tilesupdated']
-                if entry['user_id'] not in history['editors']:
-                    history['editors'][entry['user_id']] = {'edits': entry['tilesupdated'], 'lastsync': entry['finished']}
+                history['edits'] = len(resourceedits)
+                if entry['user'] not in history['editors']:
+                    history['editors'][entry['user']] = {'edits': entry['tilesupdated'], 'lastsync': entry['finished']}
                 else:
-                    history['editors'][entry['user_id']]['edits'] += entry['tilesupdated']
-                    if entry['finished'] > history['editors'][entry['user_id']]['lastsync']:
-                        history['editors'][entry['user_id']]['lastsync'] = entry['finished']
+                    history['editors'][entry['user']]['edits'] += entry['tilesupdated']
+                    if entry['finished'] > history['editors'][entry['user']]['lastsync']:
+                        history['editors'][entry['user']]['lastsync'] = entry['finished']
             for id, editor in iter(history['editors'].items()):
                 editor['lastsync'] = datetime.strftime(editor['lastsync'], '%Y-%m-%d %H:%M:%S')
             return history
@@ -200,7 +202,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
         else:
             survey = MobileSurvey(
                     id=surveyid,
-                    name=_('Unnamed'),
+                    name=_(''),
                     datadownloadconfig={"download": False, "count": 100, "resources": [], "custom": None},
                     onlinebasemaps=settings.MOBILE_DEFAULT_ONLINE_BASEMAP,
                 )

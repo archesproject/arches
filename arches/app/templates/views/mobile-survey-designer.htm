@@ -93,7 +93,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     </div>
 
                                     <div class="msm-survey-message" data-bind="visible: mobilesurvey.activatedOnServer() === true">
-                                        {% trans "This survey is now active!  <br> Mobile app users can download this survey and begin <br> collecting and editing data using their mobile device." %}
+                                        {% trans "This survey is now active! Mobile app users can download this survey and begin <br> collecting and editing data using their mobile device." %}
                                     </div>
                                 </div>
 
@@ -118,7 +118,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                 <!-- Icon and Status warning -->
                                 <div class="mpm-survey-status-header">
-                                    <i class="msm-icon-wrap fa fa-exclamation-triangle" style="color:orange;"></i>
+                                    <i class="msm-icon-wrap fa fa-exclamation-triangle"></i>
                                     <div class="msm-survey-requirements-text">{% trans 'Survey Requirements: Incomplete' %}</div>
                                     <div class="msm-survey-status-text" data-bind="text: mobilesurvey.activatedOnServer() === true ? '{% trans "Survey Status: Active" %}' : '{% trans " Survey Status: Inactive" %}'"></div>
                                 </div>
@@ -198,7 +198,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <div class="col-xs-12 col-sm-3">
                                                 <div class="msm-stat" data-bind="text: history.edits"></div>
                                                 <div class="msm-stat-label">
-                                                    {% trans 'Edits Made' %}
+                                                    {% trans 'Resources Edited' %}
                                                 </div>
                                             </div>
 
@@ -312,7 +312,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 <div class="col-sm-5">
                                                     <div class="form-group">
                                                         <label class="control-label account-label">{% trans 'Survey name' %}</label>
-                                                        <input type="text" class="form-control input-lg account-input" data-bind="value: mobilesurvey.name, valueUpdate: 'keyup'">
+                                                        <input type="text" class="form-control input-lg account-input" placeholder="{% trans 'Survey name' %}" data-bind="value: mobilesurvey.name, valueUpdate: 'keyup'">
                                                     </div>
                                                 </div>
 
@@ -467,8 +467,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </div>
 
                             <!-- Model Selection Instructions -->
-                            <div class="msm-survey-status-instructions">{% trans 'Select the Resource Models for your project' %}</div>
-                            <div class="text-center">
+                            <div class="msm-survey-status-instructions" data-bind="visible: !locked">{% trans 'Select the Resource Models for your project' %}</div>
+                            <div class="text-center" data-bind="visible: !locked">
                                 <ul class="msm-survey-issues msm-splash-instruction">
                                     <li>{% trans "Arches allows you to create and edit data in the field using mobile devices. Select those resources that should participate in the survey.  Once you have selected the models, click on a model in the tree to select which data entry forms to include in your project." %}</li>
                                 </ul>
@@ -586,8 +586,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 </div>
 
                                 <!-- Group Selection Instructions -->
-                                <div class="msm-survey-status-instructions">{% trans 'Select the User Groups for your project' %}</div>
-                                <div class="text-center">
+                                <div class="msm-survey-status-instructions" data-bind="visible: !locked" >{% trans 'Select the User Groups for your project' %}</div>
+                                <div class="text-center" data-bind="visible: !locked">
                                     <ul class="msm-survey-issues msm-splash-instruction">
                                         <li>{% trans "Arches allows you to select the user groups you want to include in a field data collection effort.  Select the groups that should participate in the survey.  Once you have selected the groups, click on a group in the tree to select specific users who should join your survery." %}</li>
                                     </ul>
@@ -748,7 +748,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     people: {name: {% trans "'People'" %}, namelong: {% trans "'People'" %}, description: {% trans "'Summary of people invited to participate in this survey'" %}},
                     groupplaceholder: {% trans "'Select one or more groups...'" %},
                     modelplaceholder: {% trans "'Select one or more resource models...'" %},
-                    loadingmessage: {% trans "'Saving survey - this may take a few minutes'" %}
+                    loadingmessage: {% trans "'Preparing survey - this may take a few minutes'" %}
                 }
             };
         });{% endautoescape %}
