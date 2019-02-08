@@ -242,108 +242,127 @@ class MobileSurvey(models.MobileSurveyModel):
             tile.provisionaledits[userid] = edit
         self.handle_reviewer_edits(userid, tile)
 
-    def push_edits_to_db(self):
+    def check_if_revision_exists(self, doc):
+        res = False
+        if doc['type'] == 'resource':
+            res = models.ResourceRevisionLog.objects.filter(revisionid=doc['_rev']).exists()
+        elif doc['type'] == 'tile':
+            res = models.TileRevisionLog.objects.filter(revisionid=doc['_rev']).exists()
+        return res
+
+    def save_revision_log(self, doc, synclog, action):
+        if doc['type'] == 'resource':
+            revisionlog = models.ResourceRevisionLog(
+                    resourceid=doc['resourceinstanceid'],
+                )
+        elif doc['type'] == 'tile':
+            revisionlog = models.TileRevisionLog(
+                    tileid=doc['tileid'],
+                    resourceid=doc['resourceinstance_id']
+                )
+        revisionlog.survey = self
+        revisionlog.revisionid = doc['_rev']
+        revisionlog.synclog = synclog
+        revisionlog.action = action
+        revisionlog.save()
+
+    def push_edits_to_db(self, synclog=None):
         # read all docs that have changes
         # save back to postgres db
         db = self.couch.create_db('project_' + str(self.id))
         user_lookup = {}
         is_reviewer = False
-        ret = []
-        report = {
-            'newtiles': 0,
-            'updatedtiles': 0,
-            'deletedtiles': 0,
-            'newresources': 0
-            }
         with transaction.atomic():
             couch_docs = self.couch.all_docs(db)
             for row in couch_docs:
-                ret.append(row)
                 if row.doc['type'] == 'resource':
-                    if 'provisional_resource' in row.doc and row.doc['provisional_resource'] == 'true':
-                        resourceinstance, created = ResourceInstance.objects.update_or_create(
-                            resourceinstanceid=uuid.UUID(str(row.doc['resourceinstanceid'])),
-                            defaults={
-                                'graph_id': uuid.UUID(str(row.doc['graph_id']))
-                            }
-                        )
-                        if created is True:
-                            report['newresources'] += 1
-                        print('Resource {0} Saved'.format(row.doc['resourceinstanceid']))
+                    if self.check_if_revision_exists(row.doc) is False:
+                        if 'provisional_resource' in row.doc and row.doc['provisional_resource'] == 'true':
+                            resourceinstance, created = ResourceInstance.objects.update_or_create(
+                                resourceinstanceid=uuid.UUID(str(row.doc['resourceinstanceid'])),
+                                defaults={
+                                    'graph_id': uuid.UUID(str(row.doc['graph_id']))
+                                }
+                            )
+                            if created is True:
+                                self.save_revision_log(row.doc, synclog, 'create')
+                            else:
+                                self.save_revision_log(row.doc, synclog, 'update')
+
+                            print('Resource {0} Saved'.format(row.doc['resourceinstanceid']))
+                    else:
+                        print('{0}: already saved'.format(row.doc['_rev']))
 
             for row in couch_docs:
-                ret.append(row)
-                if row.doc['type'] == 'tile' and ResourceInstance.objects.filter(pk=row.doc['resourceinstance_id']).exists():
-                    if 'provisionaledits' in row.doc and row.doc['provisionaledits'] is not None:
-                        try:
-                            tile = Tile.objects.get(tileid=row.doc['tileid'])
-                            report['updatedtiles'] += 1
-                            if row.doc['provisionaledits'] != '':
-                                for user_edits in row.doc['provisionaledits'].items():
-                                    # user_edits is a tuple with the user number in
-                                    # position 0, prov. edit data in position 1
-                                    for nodeid, value in iter(user_edits[1]['value'].items()):
-                                        datatype_factory = DataTypeFactory()
-                                        node = models.Node.objects.get(nodeid=nodeid)
-                                        datatype = datatype_factory.get_instance(node.datatype)
-                                        newvalue = datatype.process_mobile_data(tile, node, db, row.doc, value)
-                                        if newvalue is not None:
-                                            user_edits[1]['value'][nodeid] = newvalue
+                if row.doc['type'] == 'tile' and \
+                        ResourceInstance.objects.filter(pk=row.doc['resourceinstance_id']).exists():
+                    if self.check_if_revision_exists(row.doc) is False:
+                        if 'provisionaledits' in row.doc and row.doc['provisionaledits'] is not None:
+                            action = 'update'
+                            try:
+                                tile = Tile.objects.get(tileid=row.doc['tileid'])
+                                if row.doc['provisionaledits'] != '':
+                                    for user_edits in row.doc['provisionaledits'].items():
+                                        # user_edits is a tuple with the user number in
+                                        # position 0, prov. edit data in position 1
+                                        for nodeid, value in iter(user_edits[1]['value'].items()):
+                                            datatype_factory = DataTypeFactory()
+                                            node = models.Node.objects.get(nodeid=nodeid)
+                                            datatype = datatype_factory.get_instance(node.datatype)
+                                            newvalue = datatype.process_mobile_data(tile, node, db, row.doc, value)
+                                            if newvalue is not None:
+                                                user_edits[1]['value'][nodeid] = newvalue
 
-                                    if tile.provisionaledits is None:
-                                        tile.provisionaledits = {}
+                                        if tile.provisionaledits is None:
+                                            tile.provisionaledits = {}
+                                            tile.provisionaledits[user_edits[0]] = user_edits[1]
+                                            self.handle_reviewer_edits(user_edits[0], tile)
+                                        else:
+                                            self.assign_provisional_edit(user_edits[0], user_edits[1], tile)
+
+                                # If there are conflicting documents, lets clear those out
+                                if '_conflicts' in row.doc:
+                                    for conflict_rev in row.doc['_conflicts']:
+                                        conflict_data = db.get(row.id, rev=conflict_rev)
+                                        if conflict_data['provisionaledits'] != '':
+                                            for user_edits in conflict_data['provisionaledits'].items():
+                                                self.assign_provisional_edit(user_edits[0], user_edits[1], tile)
+                                        # Remove conflicted revision from couch
+                                        db.delete(conflict_data)
+
+                            except Tile.DoesNotExist:
+                                action = 'create'
+                                tile = Tile(row.doc)
+                                if row.doc['provisionaledits'] != '':
+                                    for user_edits in row.doc['provisionaledits'].items():
+                                        for nodeid, value in iter(user_edits[1]['value'].items()):
+                                            datatype_factory = DataTypeFactory()
+                                            node = models.Node.objects.get(nodeid=nodeid)
+                                            datatype = datatype_factory.get_instance(node.datatype)
+                                            newvalue = datatype.process_mobile_data(tile, node, db, row.doc, value)
+                                            if newvalue is not None:
+                                                user_edits[1]['value'][nodeid] = newvalue
                                         tile.provisionaledits[user_edits[0]] = user_edits[1]
                                         self.handle_reviewer_edits(user_edits[0], tile)
-                                    else:
-                                        self.assign_provisional_edit(user_edits[0], user_edits[1], tile)
 
-                            # If there are conflicting documents, lets clear those out
-                            if '_conflicts' in row.doc:
-                                for conflict_rev in row.doc['_conflicts']:
-                                    conflict_data = db.get(row.id, rev=conflict_rev)
-                                    if conflict_data['provisionaledits'] != '':
-                                        for user_edits in conflict_data['provisionaledits'].items():
-                                            self.assign_provisional_edit(user_edits[0], user_edits[1], tile)
-                                    # Remove conflicted revision from couch
-                                    db.delete(conflict_data)
+                            # If user is reviewer, apply as authoritative edit
+                            if tile.provisionaledits != '':
+                                for user_edits in tile.provisionaledits.items():
+                                    if user_edits[0] not in user_lookup:
+                                        user = User.objects.get(pk=user_edits[0])
+                                        user_lookup[user_edits[0]] = user.groups.filter(name='Resource Reviewer').exists()
 
-                        # TODO: If user is provisional user, apply as provisional edit
-                        except Tile.DoesNotExist:
-                            tile = Tile(row.doc)
-                            report['newtiles'] += 1
-                            if row.doc['provisionaledits'] != '':
-                                for user_edits in row.doc['provisionaledits'].items():
-                                    for nodeid, value in iter(user_edits[1]['value'].items()):
-                                        datatype_factory = DataTypeFactory()
-                                        node = models.Node.objects.get(nodeid=nodeid)
-                                        datatype = datatype_factory.get_instance(node.datatype)
-                                        newvalue = datatype.process_mobile_data(tile, node, db, row.doc, value)
-                                        if newvalue is not None:
-                                            user_edits[1]['value'][nodeid] = newvalue
-                                    tile.provisionaledits[user_edits[0]] = user_edits[1]
-                                    self.handle_reviewer_edits(user_edits[0], tile)
+                                for user_id, is_reviewer in user_lookup.items():
+                                    if is_reviewer:
+                                        try:
+                                            tile.data = tile.provisionaledits.pop(user_id)['value']
+                                        except KeyError:
+                                            pass
 
-                        # If user is reviewer, apply as authoritative edit
-                        if tile.provisionaledits != '':
-                            for user_edits in tile.provisionaledits.items():
-                                if user_edits[0] not in user_lookup:
-                                    user = User.objects.get(pk=user_edits[0])
-                                    user_lookup[user_edits[0]] = user.groups.filter(name='Resource Reviewer').exists()
-
-                            for user_id, is_reviewer in user_lookup.items():
-                                if is_reviewer:
-                                    try:
-                                        tile.data = tile.provisionaledits.pop(user_id)['value']
-                                    except KeyError:
-                                        pass
-
-                        tile.save()
-                        tile_serialized = json.loads(JSONSerializer().serialize(tile))
-                        tile_serialized['type'] = 'tile'
-                        self.couch.update_doc(db, tile_serialized, tile_serialized['tileid'])
-                        print('Tile {0} Saved'.format(row.doc['tileid']))
-                        db.compact()
-        return report
+                            tile.save()
+                            self.save_revision_log(row.doc, synclog, action)
+                            print('Tile {0} Saved'.format(row.doc['tileid']))
+                            db.compact()
 
     def collect_resource_instances_for_couch(self):
         """

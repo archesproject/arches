@@ -210,8 +210,8 @@ class EditLog(models.Model):
 
 class MobileSyncLog(models.Model):
     logid = models.UUIDField(primary_key=True, default=uuid.uuid1)
-    survey = models.ForeignKey('MobileSurveyModel', related_name='surveyid')
-    user = models.ForeignKey(User, related_name='syncedby')
+    survey = models.ForeignKey('MobileSurveyModel', on_delete=models.CASCADE, related_name='surveyid')
+    user = models.IntegerField(null=True)  # not a ForeignKey so we can track deletions
     started = models.DateTimeField(auto_now_add=True, null=True)
     finished = models.DateTimeField(auto_now=True, null=True)
     tilescreated = models.IntegerField(default=0, null=True)
@@ -223,6 +223,35 @@ class MobileSyncLog(models.Model):
     class Meta:
         managed = True
         db_table = 'mobile_sync_log'
+
+
+class ResourceRevisionLog(models.Model):
+    logid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    resourceid = models.UUIDField(default=uuid.uuid1)
+    revisionid = models.TextField(null=False)  # not a ForeignKey so we can track deletions
+    survey = models.ForeignKey('MobileSurveyModel', on_delete=models.CASCADE, related_name='mobile_survey_id')
+    synclog = models.ForeignKey('MobileSyncLog', on_delete=models.CASCADE, related_name='sync_log')
+    synctimestamp = models.DateTimeField(auto_now_add=True, null=False)
+    action = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'resource_revision_log'
+
+
+class TileRevisionLog(models.Model):
+    logid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    tileid = models.UUIDField(default=uuid.uuid1)  # not a ForeignKey so we can track deletions
+    resourceid = models.UUIDField(default=uuid.uuid1)
+    revisionid = models.TextField(null=False)  # not a ForeignKey so we can track deletions
+    survey = models.ForeignKey('MobileSurveyModel', on_delete=models.CASCADE, related_name='survey_id')
+    synclog = models.ForeignKey('MobileSyncLog',  on_delete=models.CASCADE, related_name='mobile_sync_log')
+    synctimestamp = models.DateTimeField(auto_now_add=True, null=False)
+    action = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'tile_revision_log'
 
 
 class File(models.Model):
