@@ -345,11 +345,11 @@ class MobileSurvey(models.MobileSurveyModel):
                         db.compact()
         return report
 
-    def append_to_instances(request, instances):
+    def append_to_instances(self, request, instances, resource_type_id):
         search_res_json = search.search_results(request)
         search_res = JSONDeserializer().deserialize(search_res_json.content)
         for hit in search_res['results']['hits']['hits']:
-            if hit['_type'] == res_type and len(instances.keys()) < int(self.datadownloadconfig['count']):
+            if hit['_type'] == resource_type_id and len(instances.keys()) < int(self.datadownloadconfig['count']):
                 instances[hit['_source']['resourceinstanceid']] = hit['_source']
 
     def collect_resource_instances_for_couch(self):
@@ -358,7 +358,7 @@ class MobileSurvey(models.MobileSurveyModel):
         resource instances relevant to a mobile survey. Takes a user object which
         is required for search.
         """
-        query = self.datadownloadconfig['custom'] 
+        query = self.datadownloadconfig['custom']
         resource_types = self.datadownloadconfig['resources']
         all_instances = {}
         if query in ('', None) and len(resource_types) == 0:
@@ -381,11 +381,11 @@ class MobileSurvey(models.MobileSurveyModel):
                         request.GET['typeFilter'] = json.dumps([{'graphid': res_type, 'inverted': False}])
                         request.GET['mapFilter'] = map_filter
                         request.GET['resourcecount'] = self.datadownloadconfig['count']
-                        append_to_instances(request, instances)
+                        self.append_to_instances(request, instances, res_type)
                         if len(instances.keys()) < int(self.datadownloadconfig['count']):
                             request.GET['mapFilter'] = '{}'
                             request.GET['resourcecount'] = int(self.datadownloadconfig['count']) - len(instances.keys())
-                            append_to_instances(request, instances)
+                            self.append_to_instances(request, instances, res_type)
                         for key, value in instances.iteritems():
                             all_instances[key] = value
                 except KeyError:
