@@ -32,7 +32,7 @@ class Command(BaseCommand):
             filepath = options['source']
 
         schemeid = self.load_skos(filepath)
-        self.link_dropdowns(schemeid)
+        self.link_dropdowns(schemeid,filepath)
 
     def load_skos(self,skosfile):
 
@@ -46,11 +46,11 @@ class Command(BaseCommand):
 
         return schemeid
 
-    def link_dropdowns(self,schemeid):
+    def link_dropdowns(self,schemeid,skosfilepath):
 
         print "linking topconcepts with dropdown lists"
         lookups = {}
-        lfile = r"C:\arches\eamena\RESOURCE_GRAPHS\concept_dropdown_lookup.csv"
+        lfile = skosfilepath.replace(".xml","_lookups.csv")
 
         with open(lfile, "rb") as openfile:
             reader = csv.reader(openfile)
