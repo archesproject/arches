@@ -364,6 +364,13 @@ class MobileSurvey(models.MobileSurveyModel):
                             print('Tile {0} Saved'.format(row.doc['tileid']))
                             db.compact()
 
+    def append_to_instances(self, request, instances, resource_type_id):
+        search_res_json = search.search_results(request)
+        search_res = JSONDeserializer().deserialize(search_res_json.content)
+        for hit in search_res['results']['hits']['hits']:
+            if hit['_type'] == resource_type_id and len(instances.keys()) < int(self.datadownloadconfig['count']):
+                instances[hit['_source']['resourceinstanceid']] = hit['_source']
+
     def collect_resource_instances_for_couch(self):
         """
         Uses the data definition configs of a mobile survey object to search for
@@ -372,7 +379,7 @@ class MobileSurvey(models.MobileSurveyModel):
         """
         query = self.datadownloadconfig['custom']
         resource_types = self.datadownloadconfig['resources']
-        instances = {}
+        all_instances = {}
         if query in ('', None) and len(resource_types) == 0:
             print "No resources or data query defined"
         else:
@@ -384,31 +391,42 @@ class MobileSurvey(models.MobileSurveyModel):
                 if len(self.bounds.coords) == 0:
                     default_bounds = settings.DEFAULT_BOUNDS
                     default_bounds['features'][0]['properties']['inverted'] = False
-                    request.GET['mapFilter'] = json.dumps(default_bounds)
+                    map_filter = json.dumps(default_bounds)
                 else:
-                    request.GET['mapFilter'] = json.dumps({u'type': u'FeatureCollection', 'features': [{'geometry': json.loads(self.bounds.json)}]})
-                request.GET['typeFilter'] = json.dumps([{'graphid': resourceid, 'inverted': False} for resourceid in self.datadownloadconfig['resources']])
+                    map_filter = json.dumps({u'type': u'FeatureCollection', 'features': [
+                                            {'geometry': json.loads(self.bounds.json)}]})
+                try:
+                    for res_type in resource_types:
+                        instances = {}
+                        request.GET['typeFilter'] = json.dumps([{'graphid': res_type, 'inverted': False}])
+                        request.GET['mapFilter'] = map_filter
+                        request.GET['resourcecount'] = self.datadownloadconfig['count']
+                        self.append_to_instances(request, instances, res_type)
+                        if len(instances.keys()) < int(self.datadownloadconfig['count']):
+                            request.GET['mapFilter'] = '{}'
+                            request.GET['resourcecount'] = int(
+                                self.datadownloadconfig['count']) - len(instances.keys())
+                            self.append_to_instances(request, instances, res_type)
+                        for key, value in instances.iteritems():
+                            all_instances[key] = value
+                except KeyError:
+                    print 'no instances found in', search_res
             else:
-                parsed = urlparse.urlparse(query)
-                urlparams = urlparse.parse_qs(parsed.query)
-                for k, v in urlparams.iteritems():
-                    request.GET[k] = v[0]
-            search_res_json = search.search_results(request)
-            search_res = JSONDeserializer().deserialize(search_res_json.content)
-            try:
-                instances = {hit['_source']['resourceinstanceid']: hit['_source'] for hit in search_res['results']['hits']['hits']}
-                # if we didn't get our limit of resource instances using a spatial filter
-                # let's try to get resource instances that don't have spatial data
-                if len(instances.keys()) < int(self.datadownloadconfig['count']):
-                    request.GET['mapFilter'] = '{}'
-                    request.GET['resourcecount'] = int(self.datadownloadconfig['count']) - len(instances.keys())
+                try:
+                    instances = {}
+                    parsed = urlparse.urlparse(query)
+                    urlparams = urlparse.parse_qs(parsed.query)
+                    for k, v in urlparams.iteritems():
+                        request.GET[k] = v[0]
                     search_res_json = search.search_results(request)
                     search_res = JSONDeserializer().deserialize(search_res_json.content)
                     for hit in search_res['results']['hits']['hits']:
                         instances[hit['_source']['resourceinstanceid']] = hit['_source']
-            except KeyError:
-                print 'no instances found in', search_res
-        return instances
+                    for key, value in instances.iteritems():
+                        all_instances[key] = value
+                except KeyError:
+                    print 'no instances found in', search_res
+        return all_instances
 
     def load_tiles_into_couch(self, instances):
         """
