@@ -467,8 +467,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </div>
 
                             <!-- Model Selection Instructions -->
-                            <div class="msm-survey-status-instructions">{% trans 'Select the Resource Models for your project' %}</div>
-                            <div class="text-center">
+                            <div class="msm-survey-status-instructions" data-bind="visible: !locked">{% trans 'Select the Resource Models for your project' %}</div>
+                            <div class="text-center" data-bind="visible: !locked">
                                 <ul class="msm-survey-issues msm-splash-instruction">
                                     <li>{% trans "Arches allows you to create and edit data in the field using mobile devices. Select those resources that should participate in the survey.  Once you have selected the models, click on a model in the tree to select which data entry forms to include in your project." %}</li>
                                 </ul>
@@ -586,8 +586,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 </div>
 
                                 <!-- Group Selection Instructions -->
-                                <div class="msm-survey-status-instructions">{% trans 'Select the User Groups for your project' %}</div>
-                                <div class="text-center">
+                                <div class="msm-survey-status-instructions" data-bind="visible: !locked" >{% trans 'Select the User Groups for your project' %}</div>
+                                <div class="text-center" data-bind="visible: !locked">
                                     <ul class="msm-survey-issues msm-splash-instruction">
                                         <li>{% trans "Arches allows you to select the user groups you want to include in a field data collection effort.  Select the groups that should participate in the survey.  Once you have selected the groups, click on a group in the tree to select specific users who should join your survery." %}</li>
                                     </ul>
