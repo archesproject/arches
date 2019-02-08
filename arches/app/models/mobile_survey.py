@@ -374,7 +374,8 @@ class MobileSurvey(models.MobileSurveyModel):
                     default_bounds['features'][0]['properties']['inverted'] = False
                     map_filter = json.dumps(default_bounds)
                 else:
-                    map_filter = json.dumps({u'type': u'FeatureCollection', 'features': [{'geometry': json.loads(self.bounds.json)}]})
+                    map_filter = json.dumps({u'type': u'FeatureCollection', 'features': [
+                                            {'geometry': json.loads(self.bounds.json)}]})
                 try:
                     for res_type in resource_types:
                         instances = {}
@@ -384,7 +385,8 @@ class MobileSurvey(models.MobileSurveyModel):
                         self.append_to_instances(request, instances, res_type)
                         if len(instances.keys()) < int(self.datadownloadconfig['count']):
                             request.GET['mapFilter'] = '{}'
-                            request.GET['resourcecount'] = int(self.datadownloadconfig['count']) - len(instances.keys())
+                            request.GET['resourcecount'] = int(
+                                self.datadownloadconfig['count']) - len(instances.keys())
                             self.append_to_instances(request, instances, res_type)
                         for key, value in instances.iteritems():
                             all_instances[key] = value
