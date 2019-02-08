@@ -22,7 +22,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block graph_title %}
 <div class="ep-tools-title">
     <h1 class="page-header text-overflow mobile-designer-title">
-        <span data-bind="text: mobilesurvey.name()"></span>
+        <span data-bind="text: mobilesurvey.name() || 'Unnamed'"></span>
     </h1>
 </div>
 {% endblock graph_title %}
