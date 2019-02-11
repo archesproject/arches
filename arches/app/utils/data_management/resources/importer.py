@@ -123,7 +123,7 @@ class ResourceLoader(object):
                 try:
                     new_resource.index()
                 except Exception as e:
-                    print 'Could not index resource {}.\nERROR: {}'.format(entityid,e)
+                    print 'Could not index resource {}.\nERROR: {}'.format(resource.entityid,e)
                 legacyid_to_entityid[resource.resource_id] = master_graph.entityid
             else:
                 new_resource = Resource(resource)
