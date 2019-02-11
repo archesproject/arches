@@ -122,8 +122,8 @@ class ResourceLoader(object):
                 new_resource = Resource().get(resource.entityid)
                 try:
                     new_resource.index()
-                except:
-                    print 'Could not index resource. This may be because the valueid of a concept is not in the database.'                
+                except Exception as e:
+                    print 'Could not index resource {}.\nERROR: {}'.format(entityid,e)
                 legacyid_to_entityid[resource.resource_id] = master_graph.entityid
             else:
                 new_resource = Resource(resource)
