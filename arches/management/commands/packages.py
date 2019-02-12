@@ -65,7 +65,7 @@ class Command(BaseCommand):
             help='Directory containing a .arches or .shp file containing resource records'),
         make_option('-f', '--format', action='store', dest='format', default='arches',
             help='Format: shp or arches'),
-        make_option('-l', '--load_id', action='store', dest='load_id',
+        make_option('-l', '--load_id', action='store', dest='load_id', default=None,
             help='Text string identifying the resources in the data load you want to delete.'),
         make_option('-d', '--dest_dir', action='store', dest='dest_dir',
             help='Directory where you want to save exported files.'),
@@ -83,6 +83,10 @@ class Command(BaseCommand):
             help='Select this option to remove a whole resource graph from the ontology'),
         make_option('--eamena', action='store_true',
             help='run the eamena alternate version of this command'),
+        make_option('--user_id', action='store', type=int, default=None,
+            help='specify a userid for the remove resources command, this is an integer.'),
+        make_option('--force', action='store_true', default=None,
+            help='runs the given command with no user confirmation prompt')
     )
 
     def handle(self, *args, **options):
@@ -114,8 +118,14 @@ class Command(BaseCommand):
         if options['operation'] == 'load_resources':
             self.load_resources(package_name, options['source'], options['appending'], options['run_internal'])
             
-        if options['operation'] == 'remove_resources':     
-            self.remove_resources(options['load_id'])
+        if options['operation'] == 'remove_resources':
+            force = options['force']
+            if options['load_id'] is not None:
+                self.remove_resources(load_id=options['load_id'], force=force)
+            elif options['user_id'] is not None:
+                self.remove_resources(load_id=options['user_id'], force=force)
+            else:
+                self.remove_resources(force=force)
         
         if options['operation'] == 'remove_resources_from_csv':     
             self.remove_resources_from_csv(options['source'])
@@ -375,19 +385,41 @@ class Command(BaseCommand):
         if run_internal:
             self.stdout.write(json.dumps(results))
 
-    def remove_resources(self, load_id = None):
+    def remove_resources(self, load_id=None, user_id=None, csvpath=None,
+            force=False):
         """
         Runs the resource_remover command found in package_utils
 
         """
-        if load_id == None:
+        if load_id is None and user_id is None and csvpath is None:
+            if not force:
+                remove = raw_input("You are about to remove ALL resources from your database."\
+                        " Do you want to continue? y/N  > ")
+                if remove.lower() != "y":
+                    exit()
+            print "removing all resources from database..."
             resource_remover.truncate_resources()
-        else: 
-            resource_remover.delete_resources(load_id)
+            print "    done."
+
+        if load_id is not None:
+            resources = resource_remover.get_resourceids_from_edit_log(load_id=load_id)
+        elif user_id is not None:
+            resources = resource_remover.get_resourceids_from_edit_log(user_id=user_id)
+        elif csvpath:
+            resources = resource_remover.get_resourceids_from_csv(data_source)
+
+        if not force:
+            remove = raw_input("You are about to remove {} resources from your database."\
+                    " Do you want to continue? y/N  > ".format(len(resources)))
+            if remove.lower() != "y":
+                exit()
+        print "removing {} resources from database...".format(len(resources))
+        resource_remover.delete_resource_list(resources)
+        print "    done."
           
     def remove_resources_from_csv(self, data_source):
       
-        resource_remover.delete_resources_from_csv(data_source)
+        self.remove_resources(csvpath=data_source)
 
     def load_concept_scheme(self, package_name, data_source=None):
         """

@@ -11,50 +11,51 @@ import arches.app.utils.index_database as index_database
 import csv
 import uuid
 
-def delete_resources(load_id):
-    """Takes the load id stored in the note column of the edit log and deletes each resource with that id"""
-    resources_for_removal = archesmodels.EditLog.objects.filter( Q(note=load_id) )
-    resourceids = set([editlog.resourceid for editlog in resources_for_removal])
-    for r_id in resourceids:
+def delete_resource_list(resourcelist=[]):
+
+    for resid in resourcelist:
         try:
-            resource = Resource(r_id)
+            resource = Resource(resid)
             resource.delete_index()
-            note = '{0} Deleted'.format(load_id)
+            note = '{0} Deleted'.format(resid)
             resource.delete_all_resource_relationships()
             resource.delete(note=note)
         except ObjectDoesNotExist:
-            print 'Entity does not exist. Nothing to delete'
+            print 'Entity',resid,'does not exist. Nothing to delete'          
 
+def get_resourceids_from_edit_log(load_id=None,user_id=None):
+    """collect all resources that match a load id or match a user id (not username)"""
 
-def delete_resources_from_csv(data_source):
+    if load_id is not None:
+        resources_for_removal = archesmodels.EditLog.objects.filter( Q(note=load_id) )
+    elif user_id is not None:
+        resources_for_removal = archesmodels.EditLog.objects.filter( Q(userid=user_id) )
+
+    resourceids = set([editlog.resourceid for editlog in resources_for_removal])
+
+    return resourceids
+
+def get_resourceids_from_csv(data_source):
     """Reads a list of Resource IDs from a csv file and deletes them"""
-    
+
+    resource_list = list()
     with open(data_source, 'rb') as csvfile:
-      try:
-        dialect = csv.Sniffer().sniff(csvfile.read(1024))
-        csvfile.seek(0)
-      except csv.Error:
-        print "The source data is not a CSV file"
-      
-      resource_list = csv.reader(csvfile, delimiter = ',')
-      print "There are",sum(1 for line in open(data_source))," resources that will be deleted"
-      
-      for r_id in resource_list:
         try:
-          uuid.UUID(r_id[0])
-          try:
-              resource = Resource(r_id[0])
-              resource.delete_index()
-              note = '{0} Deleted'.format(r_id[0])
-              resource.delete_all_resource_relationships()
-              resource.delete(note=note)
-          except ObjectDoesNotExist:
-              print 'Entity ',r_id[0],' does not exist. Nothing to delete'          
-        except(ValueError):
-          print r_id[0], "is not a valid UUID"
-          break
-          
-        
+            dialect = csv.Sniffer().sniff(csvfile.read(1024))
+            csvfile.seek(0)
+        except csv.Error:
+            print "The source data is not a CSV file"
+
+        reader = csv.reader(csvfile)
+        for row in reader:
+            try:
+                uuid = uuid.UUID(reader[0])
+                resource_list.append(uuid)
+            except ValueError:
+                print "{} is not a valid UUID (skipping).".format(row[0])
+
+    return resource_list
+
 def truncate_resources():
     """Deletes ALL resources in your database. Use with caution!"""
     cursor = connection.cursor()
