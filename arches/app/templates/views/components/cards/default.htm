@@ -1,7 +1,7 @@
 {% load i18n %}
 <!-- ko foreach: { data: [$data], as: 'self' } -->
 
-<!-- ko if: state === 'editor-tree' && card.isWritable && card.model.visible() -->
+<!-- ko if: state === 'editor-tree' && card.model.visible() -->
 {% block editor_tree %}
 <li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.tiles().length > 0 && card.expanded()), 'jstree-closed' : (card.tiles().length > 0 && !card.expanded()), 'jstree-leaf': card.tiles().length === 0}, scrollTo: card.scrollTo, container: '.resource-editor-tree'">
     <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
@@ -28,7 +28,7 @@
         }">
             <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (cards.length > 0 && expanded), 'jstree-closed' : (cards.length > 0 && !expanded()), 'jstree-leaf': cards.length === 0}, event: {'dragstart': function () { console.log('dragging...') }}">
                 <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){expanded(!expanded())}"></i>
-                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { self.form.selection($data) }, css:{'jstree-clicked': selected, 'child-selected': isChildSelected(), 'filtered-leaf': card.highlight()}">
+                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { if(card.isWritable()) { self.form.selection($data)} }, css:{'jstree-clicked': selected, 'child-selected': isChildSelected(), 'filtered-leaf': card.highlight()}">
                     <i class="fa fa-file" role="presentation" data-bind="css:{'has-provisional-edits': doesChildHaveProvisionalEdits() || $data.hasprovisionaledits()}"></i>
                     <strong style="margin-right: 10px;">
                         {% block editor_tree_node_content %}
@@ -342,7 +342,7 @@
             {% endblock form_cards %}
             <!-- /ko -->
             {% block form_buttons %}
-            <div class="install-buttons">
+            <div class="install-buttons" data-bind="css: {disabled: !reviewer">
                 <!-- ko if: tile.tileid -->
                 <button class="btn btn-shim btn-warning btn-labeled btn-lg fa fa-trash" data-bind="click: function () { self.form.deleteTile(tile); }">{% trans 'Delete this record' %}</button>
                 <!-- /ko -->
