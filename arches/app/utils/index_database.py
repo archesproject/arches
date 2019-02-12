@@ -13,7 +13,7 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Terms
 from django.core.management.base import BaseCommand, CommandError
 import collections
-from .. import utils
+from arches.management.commands import utils
 from datetime import datetime
 
 
@@ -69,25 +69,31 @@ def index_resources_by_type(resource_types, result_summary):
 
     """
 
+    errors = []
     for resource_type in resource_types:
         resources = archesmodels.Entities.objects.filter(entitytypeid = resource_type)
         print "Indexing {0} {1} resources".format(len(resources), resource_type[0])
         result_summary[resource_type[0]] = {'database':len(resources), 'indexed':0}
-        errors = []
+
         for resource in resources:
             try:
                 resource = Resource().get(resource.entityid)
                 resource.index()
             except Exception as e:
-                if e not in errors:
-                    errors.append(e)
-        if len(errors) > 0:
-            print errors[0], ':', len(errors)
+                msg = 'Could not index resource {}.\nERROR: {}'.format(resource.entityid,e)
+                print msg
+                errors.append(e)
 
         se = SearchEngineFactory().create()
         related_resource_records = archesmodels.RelatedResource.objects.all()
         for related_resource_record in related_resource_records:
             se.index_data(index='resource_relations', doc_type='all', body=model_to_dict(related_resource_record), idfield='resourcexid')
+
+    if len(errors) > 0:
+        print "Number of errors:", len(errors)
+        log_file = os.path.join(settings.PACKAGE_ROOT, 'logs', 'indexing_errors.txt')
+        utils.write_to_file(log_file, '\n'.join(errors), mode="wb")
+        print "  -- errors written to:", log_file
 
     return result_summary
 
