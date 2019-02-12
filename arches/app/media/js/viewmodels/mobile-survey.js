@@ -37,7 +37,12 @@ define([
                     window.dispatchEvent(new window.Event('resize'));
                 }, 200);
         };
-
+        this.history = params.history;
+        this.locked = _.keys(this.history.editors) > 0 || false;
+        this.history.lastsync = moment(this.history.lastsync);
+        _.each(this.history.editors, function(editor) {
+            editor.lastsync = moment(editor.lastsync);
+        });
         this.defaultCenterX = arches.mapDefaultX;
         this.defaultCenterY = arches.mapDefaultY;
         this.geocoderDefault = arches.geocoderDefault;
@@ -105,6 +110,8 @@ define([
                 var result = r.cards().filter(function(c){return ko.unwrap(c.approved) === true;}).length > 0;
                 if (result === false) {
                     self.mobilesurvey.datadownloadconfig.resources.remove(r.id);
+                } else if (_.contains(self.mobilesurvey.datadownloadconfig.resources(), r.id) === false) {
+                    self.mobilesurvey.datadownloadconfig.resources.push(r.id);
                 }
                 return result;
             });
@@ -131,13 +138,17 @@ define([
 
         this.displayUser = ko.observable();
 
-        this.resetCards = function(cards){
+        this.resetCards = function(){
+            var initialsurvey = this.mobilesurvey.getInitialSurvey();
+            var initialcards = initialsurvey.cards;
+            var initialresources = initialsurvey.datadownloadconfig.resources;
             _.each(self.allResources, function(r){
                 _.each(r.cards(), function(c){
-                    c.approved(_.contains(cards(), c.cardid));
+                    c.approved(_.contains(initialcards, c.cardid));
                 });
                 r.hasApprovedCards() ? r.added(true) : r.added(false);
             });
+            self.mobilesurvey.datadownloadconfig.resources(initialresources);
         };
 
         this.resetIdentities = function(mobilesurvey){
@@ -154,6 +165,24 @@ define([
 
         _.each(this.allResources, this.initializeResource);
         _.each(this.allIdentities, this.initializeIdentities);
+
+        this.resourceOrderedCards = ko.pureComputed(function(){
+            var cards = [];
+            self.allResources.forEach(function(r){
+                r.cards()
+                    .filter(function(f){if (f.approved()){return f;}})
+                    .forEach(function(m){
+                        cards.push(m.cardid);
+                    });
+            });
+            return cards;
+        });
+
+        this.mobilesurvey.cards(this.resourceOrderedCards());
+
+        this.resourceOrderedCards.subscribe(function(val){
+            self.mobilesurvey.cards(val);
+        });
 
         this.selectedResourceIds = ko.pureComputed({
             read: function() {
@@ -196,6 +225,7 @@ define([
                 data: {results: this.allResources.map(function(r){return {text: r.name, id: r.id};})},
                 value: this.selectedResourceIds,
                 multiple: true,
+                closeOnSelect: false,
                 placeholder: this.transStrings.modelplaceholder,
                 allowClear: true
             };
@@ -264,6 +294,7 @@ define([
                 data: {results: this.allIdentities.filter(function(id){return id.type==='group';}).map(function(g){return {text: g.name, id: g.id};})},
                 value: this.selectedGroupsIds,
                 multiple: true,
+                closeOnSelect: false,
                 placeholder: this.transStrings.groupplaceholder,
                 allowClear: true
             };
@@ -289,10 +320,18 @@ define([
                 status.unexpired
             ].includes(false);
 
-            if (status.incomplete) {
+            return status;
+        }, this);
+
+        this.surveyReady.subscribe(function(val){
+            if (val.incomplete) {
                 this.mobilesurvey.active(false);
             }
-            return status;
+            //TODO: Switch the active status back to true if activatedOnServer is True
+            // Currently this does not work properly because activatedOnServer() is not updating in time.
+            //else if (!status.incomplete && this.mobilesurvey.activatedOnServer() === true) {
+            //     this.mobilesurvey.active(true);
+            // }
         }, this);
 
         this.treenodes = [{

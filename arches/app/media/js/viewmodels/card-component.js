@@ -5,6 +5,16 @@ define([
 ], function(ko, _) {
     return function(params) {
         var self = this;
+        var getTiles = function(tile, tiles) {
+            tiles = tiles || [tile];
+            tile.cards.forEach(function(card) {
+                card.tiles().forEach(function(tile) {
+                    tiles.push(tile);
+                    getTiles(tile, tiles);
+                });
+            });
+            return tiles;
+        };
         this.configKeys = params.configKeys || [];
         this.state = params.state || 'form';
         this.preview = params.preview;
@@ -25,10 +35,16 @@ define([
         this.beforeMove = function(e) {
             e.cancelDrop = (e.sourceParent!==e.targetParent);
         };
+        this.startDrag = function(e, ui) {
+            ko.utils.domData.get(ui.item[0], 'ko_sortItem').selected(true);
+        };
         this.config = this.card.model ? this.card.model.get('config') : {};
         _.each(this.configKeys, function(key) {
             self[key] = self.config[key];
         });
+        this.showChildCards = ko.computed(function() {
+            return this.card.widgets().length === 0;
+        }, this);
         this.getValuesByDatatype = function(type) {
             var values = {};
             if (self.tile && self.form) {
@@ -45,5 +61,16 @@ define([
             }
             return values;
         };
+        this.tiles = ko.computed(function() {
+            var tiles = [];
+            if (self.tile) {
+                return getTiles(self.tile);
+            } else {
+                self.card.tiles().forEach(function(tile) {
+                    getTiles(tile, tiles);
+                });
+            }
+            return tiles;
+        }, this);
     };
 });

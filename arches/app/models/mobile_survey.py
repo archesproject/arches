@@ -70,8 +70,16 @@ class MobileSurvey(models.MobileSurveyModel):
 
     def save(self):
         super(MobileSurvey, self).save()
+        if self.datadownloadconfig['download'] and self.active:
+            self.load_data_into_couch()
+        else:
+            # remove all docs by first deleting and then recreating the database
+            try:
+                self.couch.delete_db('project_' + str(self.id))
+            except:
+                pass
+
         db = self.couch.create_db('project_' + str(self.id))
-        self.load_data_into_couch()
         return db
 
     def delete(self):
@@ -91,7 +99,7 @@ class MobileSurvey(models.MobileSurveyModel):
                         found = True
                         try:
                             collection_id = node['config']['rdmCollection']
-                            concept_collection = Concept().get_child_collections_hierarchically(collection_id)
+                            concept_collection = Concept().get_child_collections_hierarchically(collection_id, offset=None)
                             widget.config['options'] = concept_collection
                         except Exception as e:
                             pass
@@ -109,7 +117,7 @@ class MobileSurvey(models.MobileSurveyModel):
                                 try:
                                     collection_id = node['config']['rdmCollection']
                                     if collection_id:
-                                        concept_collection = Concept().get_child_collections_hierarchically(collection_id)
+                                        concept_collection = Concept().get_child_collections_hierarchically(collection_id, offset=None)
                                         widget_model.config['options'] = concept_collection
                                 except Exception as e:
                                     pass
@@ -234,95 +242,134 @@ class MobileSurvey(models.MobileSurveyModel):
             tile.provisionaledits[userid] = edit
         self.handle_reviewer_edits(userid, tile)
 
-    def push_edits_to_db(self):
+    def check_if_revision_exists(self, doc):
+        res = False
+        if doc['type'] == 'resource':
+            res = models.ResourceRevisionLog.objects.filter(revisionid=doc['_rev']).exists()
+        elif doc['type'] == 'tile':
+            res = models.TileRevisionLog.objects.filter(revisionid=doc['_rev']).exists()
+        return res
+
+    def save_revision_log(self, doc, synclog, action):
+        if doc['type'] == 'resource':
+            revisionlog = models.ResourceRevisionLog(
+                    resourceid=doc['resourceinstanceid'],
+                )
+        elif doc['type'] == 'tile':
+            revisionlog = models.TileRevisionLog(
+                    tileid=doc['tileid'],
+                    resourceid=doc['resourceinstance_id']
+                )
+        revisionlog.survey = self
+        revisionlog.revisionid = doc['_rev']
+        revisionlog.synclog = synclog
+        revisionlog.action = action
+        revisionlog.save()
+
+    def push_edits_to_db(self, synclog=None):
         # read all docs that have changes
         # save back to postgres db
         db = self.couch.create_db('project_' + str(self.id))
         user_lookup = {}
         is_reviewer = False
-        ret = []
         with transaction.atomic():
             couch_docs = self.couch.all_docs(db)
             for row in couch_docs:
-                ret.append(row)
                 if row.doc['type'] == 'resource':
-                    if 'provisional_resource' in row.doc and row.doc['provisional_resource'] == 'true':
-                        resourceinstance, created = ResourceInstance.objects.update_or_create(
-                            resourceinstanceid=uuid.UUID(str(row.doc['resourceinstanceid'])),
-                            defaults={
-                                'graph_id': uuid.UUID(str(row.doc['graph_id']))
-                            }
-                        )
-                        print('Resource {0} Saved'.format(row.doc['resourceinstanceid']))
+                    if self.check_if_revision_exists(row.doc) is False:
+                        if 'provisional_resource' in row.doc and row.doc['provisional_resource'] == 'true':
+                            resourceinstance, created = ResourceInstance.objects.update_or_create(
+                                resourceinstanceid=uuid.UUID(str(row.doc['resourceinstanceid'])),
+                                defaults={
+                                    'graph_id': uuid.UUID(str(row.doc['graph_id']))
+                                }
+                            )
+                            if created is True:
+                                self.save_revision_log(row.doc, synclog, 'create')
+                            else:
+                                self.save_revision_log(row.doc, synclog, 'update')
+
+                            print('Resource {0} Saved'.format(row.doc['resourceinstanceid']))
+                    else:
+                        print('{0}: already saved'.format(row.doc['_rev']))
 
             for row in couch_docs:
-                ret.append(row)
-                if row.doc['type'] == 'tile':
-                    if 'provisionaledits' in row.doc and row.doc['provisionaledits'] is not None:
-                        try:
-                            tile = Tile.objects.get(tileid=row.doc['tileid'])
-                            for user_edits in row.doc['provisionaledits'].items():
-                                # user_edits is a tuple with the user number in
-                                # position 0, prov. edit data in position 1
-                                for nodeid, value in iter(user_edits[1]['value'].items()):
-                                    datatype_factory = DataTypeFactory()
-                                    node = models.Node.objects.get(nodeid=nodeid)
-                                    datatype = datatype_factory.get_instance(node.datatype)
-                                    newvalue = datatype.process_mobile_data(tile, node, db, row.doc, value)
-                                    if newvalue is not None:
-                                        user_edits[1]['value'][nodeid] = newvalue
+                if row.doc['type'] == 'tile' and \
+                        ResourceInstance.objects.filter(pk=row.doc['resourceinstance_id']).exists():
+                    if self.check_if_revision_exists(row.doc) is False:
+                        if 'provisionaledits' in row.doc and row.doc['provisionaledits'] is not None:
+                            action = 'update'
+                            try:
+                                tile = Tile.objects.get(tileid=row.doc['tileid'])
+                                if row.doc['provisionaledits'] != '':
+                                    for user_edits in row.doc['provisionaledits'].items():
+                                        # user_edits is a tuple with the user number in
+                                        # position 0, prov. edit data in position 1
+                                        for nodeid, value in iter(user_edits[1]['value'].items()):
+                                            datatype_factory = DataTypeFactory()
+                                            node = models.Node.objects.get(nodeid=nodeid)
+                                            datatype = datatype_factory.get_instance(node.datatype)
+                                            newvalue = datatype.process_mobile_data(tile, node, db, row.doc, value)
+                                            if newvalue is not None:
+                                                user_edits[1]['value'][nodeid] = newvalue
 
-                                if tile.provisionaledits is None:
-                                    tile.provisionaledits = {}
-                                    tile.provisionaledits[user_edits[0]] = user_edits[1]
-                                    self.handle_reviewer_edits(user_edits[0], tile)
-                                else:
-                                    self.assign_provisional_edit(user_edits[0], user_edits[1], tile)
+                                        if tile.provisionaledits is None:
+                                            tile.provisionaledits = {}
+                                            tile.provisionaledits[user_edits[0]] = user_edits[1]
+                                            self.handle_reviewer_edits(user_edits[0], tile)
+                                        else:
+                                            self.assign_provisional_edit(user_edits[0], user_edits[1], tile)
 
-                            # If there are conflicting documents, lets clear those out
-                            if '_conflicts' in row.doc:
-                                for conflict_rev in row.doc['_conflicts']:
-                                    conflict_data = db.get(row.id, rev=conflict_rev)
-                                    for user_edits in conflict_data['provisionaledits'].items():
-                                        self.assign_provisional_edit(user_edits[0], user_edits[1], tile)
-                                    # Remove conflicted revision from couch
-                                    db.delete(conflict_data)
+                                # If there are conflicting documents, lets clear those out
+                                if '_conflicts' in row.doc:
+                                    for conflict_rev in row.doc['_conflicts']:
+                                        conflict_data = db.get(row.id, rev=conflict_rev)
+                                        if conflict_data['provisionaledits'] != '':
+                                            for user_edits in conflict_data['provisionaledits'].items():
+                                                self.assign_provisional_edit(user_edits[0], user_edits[1], tile)
+                                        # Remove conflicted revision from couch
+                                        db.delete(conflict_data)
 
-                        # TODO: If user is provisional user, apply as provisional edit
-                        except Tile.DoesNotExist:
-                            tile = Tile(row.doc)
-                            for user_edits in row.doc['provisionaledits'].items():
-                                for nodeid, value in iter(user_edits[1]['value'].items()):
-                                    datatype_factory = DataTypeFactory()
-                                    node = models.Node.objects.get(nodeid=nodeid)
-                                    datatype = datatype_factory.get_instance(node.datatype)
-                                    newvalue = datatype.process_mobile_data(tile, node, db, row.doc, value)
-                                    if newvalue is not None:
-                                        user_edits[1]['value'][nodeid] = newvalue
-                                tile.provisionaledits[user_edits[0]] = user_edits[1]
-                                self.handle_reviewer_edits(user_edits[0], tile)
+                            except Tile.DoesNotExist:
+                                action = 'create'
+                                tile = Tile(row.doc)
+                                if row.doc['provisionaledits'] != '':
+                                    for user_edits in row.doc['provisionaledits'].items():
+                                        for nodeid, value in iter(user_edits[1]['value'].items()):
+                                            datatype_factory = DataTypeFactory()
+                                            node = models.Node.objects.get(nodeid=nodeid)
+                                            datatype = datatype_factory.get_instance(node.datatype)
+                                            newvalue = datatype.process_mobile_data(tile, node, db, row.doc, value)
+                                            if newvalue is not None:
+                                                user_edits[1]['value'][nodeid] = newvalue
+                                        tile.provisionaledits[user_edits[0]] = user_edits[1]
+                                        self.handle_reviewer_edits(user_edits[0], tile)
 
-                        # If user is reviewer, apply as authoritative edit
-                        for user_edits in tile.provisionaledits.items():
-                            if user_edits[0] not in user_lookup:
-                                user = User.objects.get(pk=user_edits[0])
-                                user_lookup[user_edits[0]] = user.groups.filter(name='Resource Reviewer').exists()
+                            # If user is reviewer, apply as authoritative edit
+                            if tile.provisionaledits != '':
+                                for user_edits in tile.provisionaledits.items():
+                                    if user_edits[0] not in user_lookup:
+                                        user = User.objects.get(pk=user_edits[0])
+                                        user_lookup[user_edits[0]] = user.groups.filter(name='Resource Reviewer').exists()
 
-                        for user_id, is_reviewer in user_lookup.items():
-                            if is_reviewer:
-                                try:
-                                    tile.data = tile.provisionaledits.pop(user_id)['value']
-                                except KeyError:
-                                    pass
+                                for user_id, is_reviewer in user_lookup.items():
+                                    if is_reviewer:
+                                        try:
+                                            tile.data = tile.provisionaledits.pop(user_id)['value']
+                                        except KeyError:
+                                            pass
 
-                        tile.save()
-                        tile_serialized = json.loads(JSONSerializer().serialize(tile))
-                        tile_serialized['type'] = 'tile'
-                        self.couch.update_doc(db, tile_serialized, tile_serialized['tileid'])
-                        print('Tile {0} Saved'.format(row.doc['tileid']))
-                        db.compact()
+                            tile.save()
+                            self.save_revision_log(row.doc, synclog, action)
+                            print('Tile {0} Saved'.format(row.doc['tileid']))
+                            db.compact()
 
-        return ret
+    def append_to_instances(self, request, instances, resource_type_id):
+        search_res_json = search.search_results(request)
+        search_res = JSONDeserializer().deserialize(search_res_json.content)
+        for hit in search_res['results']['hits']['hits']:
+            if hit['_type'] == resource_type_id and len(instances.keys()) < int(self.datadownloadconfig['count']):
+                instances[hit['_source']['resourceinstanceid']] = hit['_source']
 
     def collect_resource_instances_for_couch(self):
         """
@@ -332,7 +379,7 @@ class MobileSurvey(models.MobileSurveyModel):
         """
         query = self.datadownloadconfig['custom']
         resource_types = self.datadownloadconfig['resources']
-        instances = {}
+        all_instances = {}
         if query in ('', None) and len(resource_types) == 0:
             print "No resources or data query defined"
         else:
@@ -344,31 +391,42 @@ class MobileSurvey(models.MobileSurveyModel):
                 if len(self.bounds.coords) == 0:
                     default_bounds = settings.DEFAULT_BOUNDS
                     default_bounds['features'][0]['properties']['inverted'] = False
-                    request.GET['mapFilter'] = json.dumps(default_bounds)
+                    map_filter = json.dumps(default_bounds)
                 else:
-                    request.GET['mapFilter'] = json.dumps({u'type': u'FeatureCollection', 'features': [{'geometry': json.loads(self.bounds.json)}]})
-                request.GET['typeFilter'] = json.dumps([{'graphid': resourceid, 'inverted': False} for resourceid in self.datadownloadconfig['resources']])
+                    map_filter = json.dumps({u'type': u'FeatureCollection', 'features': [
+                                            {'geometry': json.loads(self.bounds.json)}]})
+                try:
+                    for res_type in resource_types:
+                        instances = {}
+                        request.GET['typeFilter'] = json.dumps([{'graphid': res_type, 'inverted': False}])
+                        request.GET['mapFilter'] = map_filter
+                        request.GET['resourcecount'] = self.datadownloadconfig['count']
+                        self.append_to_instances(request, instances, res_type)
+                        if len(instances.keys()) < int(self.datadownloadconfig['count']):
+                            request.GET['mapFilter'] = '{}'
+                            request.GET['resourcecount'] = int(
+                                self.datadownloadconfig['count']) - len(instances.keys())
+                            self.append_to_instances(request, instances, res_type)
+                        for key, value in instances.iteritems():
+                            all_instances[key] = value
+                except KeyError:
+                    print 'no instances found in', search_res
             else:
-                parsed = urlparse.urlparse(query)
-                urlparams = urlparse.parse_qs(parsed.query)
-                for k, v in urlparams.iteritems():
-                    request.GET[k] = v[0]
-            search_res_json = search.search_results(request)
-            search_res = JSONDeserializer().deserialize(search_res_json.content)
-            try:
-                instances = {hit['_source']['resourceinstanceid']: hit['_source'] for hit in search_res['results']['hits']['hits']}
-                # if we didn't get our limit of resource instances using a spatial filter
-                # let's try to get resource instances that don't have spatial data
-                if len(instances.keys()) < int(self.datadownloadconfig['count']):
-                    request.GET['mapFilter'] = '{}'
-                    request.GET['resourcecount'] = int(self.datadownloadconfig['count']) - len(instances.keys())
+                try:
+                    instances = {}
+                    parsed = urlparse.urlparse(query)
+                    urlparams = urlparse.parse_qs(parsed.query)
+                    for k, v in urlparams.iteritems():
+                        request.GET[k] = v[0]
                     search_res_json = search.search_results(request)
                     search_res = JSONDeserializer().deserialize(search_res_json.content)
                     for hit in search_res['results']['hits']['hits']:
                         instances[hit['_source']['resourceinstanceid']] = hit['_source']
-            except KeyError:
-                print 'no instances found in', search_res
-        return instances
+                    for key, value in instances.iteritems():
+                        all_instances[key] = value
+                except KeyError:
+                    print 'no instances found in', search_res
+        return all_instances
 
     def load_tiles_into_couch(self, instances):
         """

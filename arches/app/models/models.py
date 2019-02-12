@@ -208,6 +208,52 @@ class EditLog(models.Model):
         db_table = 'edit_log'
 
 
+class MobileSyncLog(models.Model):
+    logid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    survey = models.ForeignKey('MobileSurveyModel', on_delete=models.CASCADE, related_name='surveyid')
+    user = models.IntegerField(null=True)  # not a ForeignKey so we can track deletions
+    started = models.DateTimeField(auto_now_add=True, null=True)
+    finished = models.DateTimeField(auto_now=True, null=True)
+    tilescreated = models.IntegerField(default=0, null=True)
+    tilesupdated = models.IntegerField(default=0, null=True)
+    tilesdeleted = models.IntegerField(default=0, null=True)
+    resourcescreated = models.IntegerField(default=0, null=True)
+    note = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'mobile_sync_log'
+
+
+class ResourceRevisionLog(models.Model):
+    logid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    resourceid = models.UUIDField(default=uuid.uuid1)
+    revisionid = models.TextField(null=False)  # not a ForeignKey so we can track deletions
+    survey = models.ForeignKey('MobileSurveyModel', on_delete=models.CASCADE, related_name='mobile_survey_id')
+    synclog = models.ForeignKey('MobileSyncLog', on_delete=models.CASCADE, related_name='sync_log')
+    synctimestamp = models.DateTimeField(auto_now_add=True, null=False)
+    action = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'resource_revision_log'
+
+
+class TileRevisionLog(models.Model):
+    logid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    tileid = models.UUIDField(default=uuid.uuid1)  # not a ForeignKey so we can track deletions
+    resourceid = models.UUIDField(default=uuid.uuid1)
+    revisionid = models.TextField(null=False)  # not a ForeignKey so we can track deletions
+    survey = models.ForeignKey('MobileSurveyModel', on_delete=models.CASCADE, related_name='survey_id')
+    synclog = models.ForeignKey('MobileSyncLog',  on_delete=models.CASCADE, related_name='mobile_sync_log')
+    synctimestamp = models.DateTimeField(auto_now_add=True, null=False)
+    action = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'tile_revision_log'
+
+
 class File(models.Model):
     fileid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     path = models.FileField(upload_to='uploadedfiles')
@@ -865,11 +911,19 @@ class UserProfile(models.Model):
         return self.user.groups.filter(name='Resource Reviewer').exists()
 
     @property
-    def permitted_cards(self):
+    def viewable_nodegroups(self):
         from arches.app.utils.permission_backend import get_nodegroups_by_perm
-        permitted_nodegroups = [str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(self.user, ['models.read_nodegroup', 'models.write_nodegroup'], any_perm=False)]
-        ret = set([str(cardid) for cardid in CardModel.objects.filter(nodegroup_id__in=permitted_nodegroups).values_list('cardid', flat=True)])
-        return ret
+        return set(str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(self.user, ['models.read_nodegroup'], any_perm=True))
+
+    @property
+    def editable_nodegroups(self):
+        from arches.app.utils.permission_backend import get_nodegroups_by_perm
+        return set(str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(self.user, ['models.write_nodegroup'], any_perm=True))
+
+    @property
+    def deletable_nodegroups(self):
+        from arches.app.utils.permission_backend import get_nodegroups_by_perm
+        return set(str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(self.user, ['models.delete_nodegroup'], any_perm=True))
 
     class Meta:
         managed = True

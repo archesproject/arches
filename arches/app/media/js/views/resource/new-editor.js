@@ -250,6 +250,10 @@ define([
         }
     };
 
+    vm.selectedTile.subscribe(function() {
+        $('.main-panel')[0].scrollTop = 0;
+    });
+
     vm.report = null;
     vm.report = new ReportModel(_.extend(data, {graphModel: graphModel, cards: vm.topCards}));
 
