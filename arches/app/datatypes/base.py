@@ -274,6 +274,17 @@ class BaseDataType(object):
         """
         pass
 
+    def is_a_literal_in_rdf(self):
+        """
+        Convenience method to determine whether or not this datatype's `to_rdf` method will express
+        its data as an RDF Literal value or as a more complex graph of nodes.
+        :return:
+
+        True: `to_rdf()` turns the range node tile data into a suitable Literal value
+        False:  `to_rdf()` uses the data to construct something more complex.
+        """
+        return False
+
     def to_rdf(self, edge_info, edge):
         """
         Outputs an in-memory graph, converting the range tile data JSON into
