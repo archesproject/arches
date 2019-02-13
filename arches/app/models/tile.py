@@ -220,6 +220,9 @@ class Tile(models.TileModel):
             node = models.Node.objects.get(nodeid=nodeid)
             datatype = datatype_factory.get_instance(node.datatype)
             error = datatype.validate(value)
+            for error_instance in error:
+                if error_instance['type']=='ERROR':
+                    raise TileValidationError(_("Your tile: {0} ".format(error_instance["message"])))
             if errors != None:
                 errors += error
         return errors
@@ -269,6 +272,7 @@ class Tile(models.TileModel):
                     if provisional_edit_log_details == None:
                         provisional_edit_log_details={"user": user, "action": "create tile",  "provisional_editor": user}
 
+        self.validate([])
         super(Tile, self).save(*args, **kwargs)
         #We have to save the edit log record after calling save so that the
         #resource's displayname changes are avaliable
@@ -446,3 +450,12 @@ class Tile(models.TileModel):
         ret['tiles'] = self.tiles
 
         return ret
+
+class TileValidationError(Exception):
+    def __init__(self, message, code=None):
+        self.title = _("Tile Validation Error")
+        self.message = message
+        self.code = code
+
+    def __str__(self):
+        return repr(self.message)
