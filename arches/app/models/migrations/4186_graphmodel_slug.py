@@ -10,7 +10,7 @@ import re
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4273_provisional_edit_timestamps'),
+        ('models', '4521_sync_revision_logs'),
     ]
 
     operations = [
