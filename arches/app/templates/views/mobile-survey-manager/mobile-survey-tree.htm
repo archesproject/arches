@@ -27,7 +27,7 @@
                 <i data-bind="css: node.iconclass" role="presentation"></i>
                 <!--/ko-->
 
-                <div data-bind="text: node.name" style="padding-left:5px"></div>
+                <div data-bind="text: ko.unwrap(node.name) || 'Unnamed'" style="padding-left:5px"></div>
             <!-- ko if: node.istopnode -->
             <!-- <i class="jstree-node-action-icon fa fa-trash" role="presentation" data-bind="" data-toggle="tooltip" data-original-title="{% trans "Delete Survey" %}"></i> -->
             <!-- /ko -->

@@ -59,24 +59,30 @@ def userCanAccessMobileSurvey(request, surveyid=None):
 
 class CouchdbProxy(ProtectedResourceView, ProxyView):
     upstream = settings.COUCHDB_URL
+    p = re.compile(r"project_(?P<surveyid>[\w-]{36})")
 
     def dispatch(self, request, path):
         if path is None or path == '':
             return super(CouchdbProxy, self).dispatch(request, path)
         else:
-            surveyid = path.split('_')[1].strip('/')
-            if MobileSurvey.objects.filter(pk=surveyid).exists() is False:
-                message = 'The survey you are attempting to sync is no longer available on the server'
-                return JSONResponse({'notification': message}, status=500)
-            else:
-                try:
-                    if userCanAccessMobileSurvey(request, surveyid):
-                        return super(CouchdbProxy, self).dispatch(request, path)
-                    else:
-                        return JSONResponse('Sync Failed', status=403)
-                except Exception as e:
-                    print e
-                    return JSONResponse('Sync failed', status=500)
+            m = self.p.match(path)
+            surveyid = ''
+            if m is not None:
+                surveyid = m.groupdict().get("surveyid")
+                if MobileSurvey.objects.filter(pk=surveyid).exists() is False:
+                    message = 'The survey you are attempting to sync is no longer available on the server'
+                    return JSONResponse({'notification': message}, status=500)
+                else:
+                    try:
+                        if userCanAccessMobileSurvey(request, surveyid):
+                            return super(CouchdbProxy, self).dispatch(request, path)
+                        else:
+                            return JSONResponse('Sync Failed', status=403)
+                    except Exception as e:
+                        print e
+                        pass
+
+        return JSONResponse('Sync failed', status=500)
 
 
 class APIBase(View):
@@ -141,6 +147,7 @@ class Surveys(APIBase):
         projects = MobileSurvey.objects.filter(Q(users__in=[request.user]) | Q(groups__in=group_ids), active=True).distinct()
         projects_for_couch = [project.serialize_for_mobile() for project in projects]
         for project in projects_for_couch:
+            project['mapboxkey'] = settings.MAPBOX_API_KEY
             permitted_cards = set()
             ordered_project_cards = project['cards']
             for rootcardid in project['cards']:
