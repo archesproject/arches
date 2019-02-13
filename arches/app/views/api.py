@@ -3,7 +3,6 @@ import sys
 import json
 import uuid
 import re
-import logging
 import traceback
 from django.shortcuts import render
 from django.views.generic import View
