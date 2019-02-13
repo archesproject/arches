@@ -385,7 +385,7 @@ class JsonLdReader(Reader):
                         invalid_nodes.add((node['node'].name, node['node'].pk))
                         pass
                 if '@value' in jsonld_graph:
-                    if node['parent_edge'].ontologyproperty == ontology_property and node['node'].ontologyclass == str(RDFS.Literal):
+                    if node['parent_edge'].ontologyproperty == ontology_property:
                         # print node['parent_edge'].ontologyproperty == ontology_property and node['node'].ontologyclass == str(RDFS.Literal)
                         # print node['node'].name
                         # print node['node'].ontologyclass
