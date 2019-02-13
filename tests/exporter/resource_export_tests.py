@@ -160,6 +160,12 @@ class RDFExportTests(ArchesTestCase):
         obj = Literal(edge_info['range_tile_data'])
         self.assertTrue((edge_info['d_uri'], edge.ontologyproperty, obj) in graph)
 
+    def test_rdf_None_string(self):
+        dt = self.DT.get_instance("string")
+        edge_info, edge = mock_edge(1, CIDOC_NS['name'], None, '', None)
+        graph = dt.to_rdf(edge_info, edge)
+        self.assertTrue(len(graph) == 0)  # the graph should be empty
+
     def test_rdf_number(self):
         dt = self.DT.get_instance("number")
         edge_info, edge = mock_edge(1, CIDOC_NS['some_value'], None, '', 42)
