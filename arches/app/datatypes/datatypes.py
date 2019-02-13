@@ -119,6 +119,9 @@ class StringDataType(BaseDataType):
         except KeyError, e:
             pass
 
+    def is_a_literal_in_rdf(self):
+        return True
+
     def to_rdf(self, edge_info, edge):
         # returns an in-memory graph object, containing the domain resource, its
         # type and the string as a string literal
@@ -174,6 +177,9 @@ class NumberDataType(BaseDataType):
         except KeyError, e:
             pass
 
+    def is_a_literal_in_rdf(self):
+        return True
+
     def to_rdf(self, edge_info, edge):
         # returns an in-memory graph object, containing the domain resource, its
         # type and the number as a numeric literal (as this is how it is in the JSON)
@@ -227,6 +233,9 @@ class BooleanDataType(BaseDataType):
         g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty),
                Literal(edge_info['range_tile_data'])))
         return g
+
+    def is_a_literal_in_rdf(self):
+        return True
 
     def from_rdf(self, json_ld_node):
         # expects a node taken from an expanded json-ld graph
@@ -304,6 +313,9 @@ class DateDataType(BaseDataType):
         config = cache.get('time_wheel_config_anonymous')
         if config is not None:
             cache.delete('time_wheel_config_anonymous')
+
+    def is_a_literal_in_rdf(self):
+        return True
 
     def to_rdf(self, edge_info, edge):
         # returns an in-memory graph object, containing the domain resource, its

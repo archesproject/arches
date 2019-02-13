@@ -109,14 +109,17 @@ class RdfWriter(Writer):
                 pkg['domain_tile_data'] = tile.data[str(edge.domainnode_id)]
 
             # Don't add the type if the domain datatype is a literal
-            if pkg['d_datatype'] not in ['string', 'date', 'boolean', 'number']:
-                graph.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
-            else:
+            dom_dt = dt_factory.get_instance(pkg['d_datatype'])
+            if dom_dt.is_a_literal_in_rdf():
                 # Return to not process any range data of an edge where
                 # the domain will be a Literal in the RDF
                 return
 
-            # Don't output triples when the domain node is a simple literal?
+            # Domain node is not a literal value in the RDF representation, so will have a type:
+            graph.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
+
+            # Use the range node's datatype.to_rdf() method to generate an RDF representation of it
+            # and add its triples to the core graph
             dt = dt_factory.get_instance(pkg['r_datatype'])
             graph += dt.to_rdf(pkg, edge)
 
