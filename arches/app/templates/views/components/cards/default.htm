@@ -28,7 +28,7 @@
         }">
             <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (cards.length > 0 && expanded), 'jstree-closed' : (cards.length > 0 && !expanded()), 'jstree-leaf': cards.length === 0}, event: {'dragstart': function () { console.log('dragging...') }}">
                 <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){expanded(!expanded())}"></i>
-                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { if(card.isWritable()) { self.form.selection($data)} }, css:{'jstree-clicked': selected, 'child-selected': isChildSelected(), 'filtered-leaf': card.highlight()}">
+                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { if(card.isWritable === true) { self.form.selection($data)} }, css:{'jstree-clicked': selected, 'child-selected': isChildSelected(), 'filtered-leaf': card.highlight()}">
                     <i class="fa fa-file" role="presentation" data-bind="css:{'has-provisional-edits': doesChildHaveProvisionalEdits() || $data.hasprovisionaledits()}"></i>
                     <strong style="margin-right: 10px;">
                         {% block editor_tree_node_content %}
@@ -43,7 +43,8 @@
                                 label: self.form.widgetLookup[card.widgets()[0].widget_id()].label,
                                 value: $data.data[card.widgets()[0].node_id()],
                                 type: 'resource-editor',
-                                state: 'display_value'
+                                state: 'display_value',
+                                disabled: !card.isWritable
                             }
                         }"></div>
                         <!-- /ko -->
@@ -283,7 +284,8 @@
                             node: self.form.nodeLookup[widget.node_id()],
                             expanded: self.expanded,
                             graph: self.form.graph,
-                            type: "resource-editor"
+                            type: "resource-editor",
+                            disabled: !self.card.isWritable
                         }
                     }, css:{ "active": widget.selected, "hover": widget.hovered, "widget-preview": self.preview
                 }, click: function(data, e) { if (!widget.selected() && self.preview) {widget.selected(true);}
