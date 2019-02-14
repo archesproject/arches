@@ -136,7 +136,7 @@ class ConceptDataType(BaseConceptDataType):
                     rangenode = URIRef(id_uri)
             return rangenode
 
-        if edge_info['range_tile_data'] is not None: 
+        if edge_info['range_tile_data'] is not None:
             c = ConceptValue(str(edge_info['range_tile_data']))
 
             # create a default node
@@ -174,12 +174,9 @@ class ConceptDataType(BaseConceptDataType):
         except KeyError as e:
             pass
 
-        try:
-            concept_uri = json_ld_node.get('@id')
-        except:
-            print "FAILED TO GET ID: %s" % json_ld_node
-
+        concept_uri = json_ld_node.get('@id')
         label_node = json_ld_node.get(str(RDFS.label))
+
         # Consume the labels, such that we don't recurse into them
         del json_ld_node[str(RDFS.label)]
 
