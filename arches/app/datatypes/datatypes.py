@@ -233,7 +233,7 @@ class BooleanDataType(BaseDataType):
         if edge_info['range_tile_data'] is not None:
             g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
             g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty),
-                       Literal(edge_info['range_tile_data'])))
+                   Literal(edge_info['range_tile_data'])))
         return g
 
     def is_a_literal_in_rdf(self):
