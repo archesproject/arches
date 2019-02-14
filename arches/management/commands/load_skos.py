@@ -1,5 +1,5 @@
 import os
-import csv
+import unicodecsv
 import uuid
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
@@ -31,8 +31,9 @@ class Command(BaseCommand):
                 exit()
             filepath = options['source']
 
+        lookups = self.test_linking_file(filepath)
         schemeid = self.load_skos(filepath)
-        self.link_dropdowns(schemeid,filepath)
+        self.link_dropdowns(schemeid,lookups)
 
     def load_skos(self,skosfile):
 
@@ -45,19 +46,52 @@ class Command(BaseCommand):
         print "DONE"
 
         return schemeid
+    
+    def test_linking_file(self,skosfilepath):
+        
+        print "loading and testing the lookups file"
+        # these are the relations from the dropdown scheme to actual collections
+        dropdown_relations = ConceptRelations.objects.filter(
+            conceptidfrom_id="00000000-0000-0000-0000-000000000003"
+        )
 
-    def link_dropdowns(self,schemeid,skosfilepath):
+        # these are the ids of all the collections themselves
+        collection_ids = [i.conceptidto_id for i in dropdown_relations]
+        
+        all_node_names = [Concept().get(id=cid).legacyoid for cid in collection_ids]
 
-        print "linking topconcepts with dropdown lists"
         lookups = {}
         lfile = skosfilepath.replace(".xml","_lookups.csv")
 
         with open(lfile, "rb") as openfile:
-            reader = csv.reader(openfile)
+            reader = unicodecsv.reader(openfile)
             headers = reader.next()
             for row in reader:
-                if row[1] != "":
-                    lookups[row[0]] = row[1]
+                lookups[row[0]] = row[1]
+
+        invalid_nodes_in_lookup = [i for i in lookups.keys() if not i in all_node_names]
+        
+        if len(invalid_nodes_in_lookup) > 0:
+            print len(invalid_nodes_in_lookup), "nodes in your lookup file are"\
+                "not valid node names. (Disregard this message if your resource)"\
+                "graphs have not been loaded yet.)"
+    
+        nodes_not_in_lookup = [i for i in all_node_names if not i in lookups]
+        if nodes_not_in_lookup:
+            for nodename in nodes_not_in_lookup:
+                lookups[nodename] = ""
+            with open(lfile, "wb") as openfile:
+                writer = unicodecsv.writer(openfile)
+                writer.writerow(headers)
+                for name in sorted(lookups):
+                    writer.writerow([name,lookups[name]])
+
+        print len(nodes_not_in_lookup), "new node names added to your lookup"
+        return lookups
+
+    def link_dropdowns(self,schemeid,lookups):
+
+        print "linking topconcepts with dropdown lists"
 
         # make the graph of the full scheme
         full_graph = Concept().get(
@@ -83,6 +117,8 @@ class Command(BaseCommand):
 
         # these are the ids of all the collections themselves
         collection_ids = [i.conceptidto_id for i in dropdown_relations]
+        
+        all_node_names = [Concept().get(id=cid).legacyoid for cid in collection_ids]
 
         # iterate the collection ids. For each get the actual concept,
         # then its name, and then, if it's been linked with a topconcept,
@@ -95,8 +131,12 @@ class Command(BaseCommand):
             name = cconcept.legacyoid
 
             if name in lookups:
-
-                tc = topconcepts[lookups[name]]
+                
+                try:
+                    tc = topconcepts[lookups[name]]
+                except Exception as e:
+                    print e
+                    continue
                 for sc in tc.subconcepts:
                     newrelation = ConceptRelations(
                         relationid = uuid.uuid4(),
