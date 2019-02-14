@@ -36,6 +36,7 @@ from mock import Mock
 ARCHES_NS = Namespace(test_settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 CIDOC_NS = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
 
+
 class RDFExportUnitTests(ArchesTestCase):
     """
     Unit tests for the `to_rdf` method on Datatype classes.
@@ -188,6 +189,7 @@ class RDFExportUnitTests(ArchesTestCase):
             (ARCHES_NS["concepts/037daf4d-054a-44d2-9c0a-108b59e39109"], RDFS.label,
                 Literal("example document type", lang="en-us")) in graph
         )
+
 
 def append_domain_config_to_node(node):
     node.config = {
