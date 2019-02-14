@@ -372,8 +372,8 @@ class JsonLdReader(Reader):
             # try to find a node in the graph among a bunch of sibling nodes that has the same incoming edge (propertyclass) as
             # the edge/node combination we're searching for from the json-ld graph
 
-            print "Trying to match jsonld_graph:"
-            print jsonld_graph
+            # print "Trying to match jsonld_graph:"
+            # print jsonld_graph
             for node in nodes:
                 # print "node['node'].ontologyclass == jsonld_graph['@type']"
                 # print node['node'].ontologyclass == jsonld_graph['@type']
@@ -409,8 +409,8 @@ class JsonLdReader(Reader):
             def json_data_is_valid(node, json_ld_node):
                 datatype = self.datatype_factory.get_instance(node.datatype)
                 value = datatype.from_rdf(json_ld_node)
-                print 'in json_data_is_valid'
-                print datatype.validate(value)
+                # print 'in json_data_is_valid'
+                # print datatype.validate(value)
                 return len(datatype.validate(value)) == 0
 
             if len(found) > 1:
@@ -481,10 +481,9 @@ class JsonLdReader(Reader):
         # print "-------------------"
         if not isinstance(jsonld, list):
             jsonld = [jsonld]
-        # print len(jsonld)
 
-        print "-------"
-        print "INCOMING TO resolve_node_ids: %r" % jsonld
+        # print "-------"
+        # print "INCOMING TO resolve_node_ids: %r" % jsonld
         parent_tileid = tileid
         for jsonld_node in jsonld:
             if parent_node is not None:
@@ -542,17 +541,17 @@ class JsonLdReader(Reader):
                         #     import ipdb
                         #     ipdb.set_trace()
                         datatype = self.datatype_factory.get_instance(branch['node'].datatype)
-                        print 'finding value'
-                        print jsonld_node
-                        print branch['node'].datatype
+                        # print 'finding value'
+                        # print jsonld_node
+                        # print branch['node'].datatype
                         value = datatype.from_rdf(jsonld_node)
-                        print ('value found! : ', value)
+                        # print ('value found! : ', value)
                         self.tiles[tileid].data[str(branch['node'].nodeid)] = value
                         ontology_properties = self.findOntologyProperties(jsonld_node)
 
                 if len(ontology_properties) > 0:
                     for ontology_property in ontology_properties:
-                        print "Recursing on %s" % ontology_property
+                        # print "Recursing on %s" % ontology_property
                         # print jsonld_node['@type']
                         # print ontology_property
                         self.resolve_node_ids(jsonld_node[ontology_property], ontology_prop=ontology_property,

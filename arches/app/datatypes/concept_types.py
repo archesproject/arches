@@ -136,8 +136,7 @@ class ConceptDataType(BaseConceptDataType):
                     rangenode = URIRef(id_uri)
             return rangenode
 
-        if edge_info['range_tile_data'] is not None:
-            print "Concept tile_data: %r" % edge_info['range_tile_data'] 
+        if edge_info['range_tile_data'] is not None: 
             c = ConceptValue(str(edge_info['range_tile_data']))
 
             # create a default node
@@ -169,9 +168,6 @@ class ConceptDataType(BaseConceptDataType):
         # or by looking for say an external identifier attached to the concept and
         # building upon that.
 
-        print "--- in Concept from_rdf() ---"
-        print repr(json_ld_node)
-
         try:
             # assume a list, and as this is a ConceptDataType, assume a single entry
             json_ld_node = json_ld_node[0]
@@ -181,8 +177,8 @@ class ConceptDataType(BaseConceptDataType):
         try:
             concept_uri = json_ld_node.get('@id')
         except:
-            print "FAILED TO GET ID"
-            print json_ld_node
+            print "FAILED TO GET ID: %s" % json_ld_node
+
         label_node = json_ld_node.get(str(RDFS.label))
         # Consume the labels, such that we don't recurse into them
         del json_ld_node[str(RDFS.label)]
@@ -218,7 +214,7 @@ class ConceptDataType(BaseConceptDataType):
             values = get_valueids_from_concept_label(label, concept_id, lang)
 
             if values:
-                return [values[0]["id"]]
+                return values[0]["id"]
             else:
                 if concept_id:
                     print("FAILED TO FIND MATCHING LABEL '{0}'@{2} FOR CONCEPT '{1}' in ES").format(
@@ -226,8 +222,8 @@ class ConceptDataType(BaseConceptDataType):
                     print("Attempting a match from label via the DB:")
                     hits = [ident for ident in models.Value.objects.all().filter(value__exact=label)]
                     if hits and len(hits) == 1:
-                        print "FOUND: %s" % hits[0].pk
-                        return [str(hits[0].pk)]
+                        # print "FOUND: %s" % hits[0].pk
+                        return str(hits[0].pk)
                     label = None
                 else:
                     print("No Concept ID URI supplied for rdf")
@@ -236,7 +232,7 @@ class ConceptDataType(BaseConceptDataType):
             # got a concept URI but the label is nonexistant
             # or cannot be resolved in Arches
             value = get_preflabel_from_conceptid(concept_id, lang=lang)
-            return [value['id']]
+            return value['id']
 
         if concept_id is None and (label is None or label == ""):
             print("Concept lookup in from_rdf FAILED: No concept id found and no label either")
@@ -309,4 +305,4 @@ class ConceptListDataType(BaseConceptDataType):
         if isinstance(json_ld_node, list):
             return [ctype.from_rdf(item) for item in json_ld_node]
         else:
-            return ctype.from_rdf(json_ld_node)
+            return [ctype.from_rdf(json_ld_node)]

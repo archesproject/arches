@@ -220,6 +220,11 @@ class Resources(APIBase):
                     except models.ResourceInstance.DoesNotExist:
                         return JSONResponse(status=404)
                     except Exception as e:
+                        exc_type, exc_value, exc_traceback = sys.exc_info()
+                        formatted = traceback.format_exception(exc_type, exc_value, exc_traceback)
+                        if len(formatted):
+                            for message in formatted:
+                                print message
                         return JSONResponse(status=500, reason=e)
                 elif format == 'json':
                     out = Resource.objects.get(pk=resourceid)
