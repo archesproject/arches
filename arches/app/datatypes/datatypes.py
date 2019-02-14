@@ -230,9 +230,10 @@ class BooleanDataType(BaseDataType):
         # returns an in-memory graph object, containing the domain resource, its
         # type and the number as a numeric literal (as this is how it is in the JSON)
         g = Graph()
-        g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
-        g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty),
-               Literal(edge_info['range_tile_data'])))
+        if edge_info['range_tile_data'] is not None:
+            g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
+            g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty),
+                   Literal(edge_info['range_tile_data'])))
         return g
 
     def is_a_literal_in_rdf(self):
@@ -322,9 +323,10 @@ class DateDataType(BaseDataType):
         # returns an in-memory graph object, containing the domain resource, its
         # type and the number as a numeric literal (as this is how it is in the JSON)
         g = Graph()
-        g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
-        g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty),
-               Literal(str(edge_info['range_tile_data']), datatype=XSD.dateTime)))
+        if edge_info['range_tile_data'] is not None:
+            g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
+            g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty),
+                   Literal(str(edge_info['range_tile_data']), datatype=XSD.dateTime)))
         return g
 
     def from_rdf(self, json_ld_node):
@@ -1353,9 +1355,10 @@ class DomainDataType(BaseDomainDataType):
         # returns an in-memory graph object, containing the domain resource, its
         # type and the number as a numeric literal (as this is how it is in the JSON)
         g = Graph()
-        g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
-        g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty),
-               Literal(str(self.get_option_text(edge.rangenode, edge_info['range_tile_data'])))))
+        if edge_info['range_tile_data'] is not None:
+            g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
+            g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty),
+                   Literal(str(self.get_option_text(edge.rangenode, edge_info['range_tile_data'])))))
         return g
 
     def from_rdf(self, json_ld_node):
