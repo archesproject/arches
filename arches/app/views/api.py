@@ -131,7 +131,7 @@ class Sync(APIBase):
 
 class Surveys(APIBase):
 
-    def get(self, request):
+    def get(self, request, surveyid=None):
         if hasattr(request.user, 'userprofile') is not True:
             models.UserProfile.objects.create(user=request.user)
 
@@ -153,6 +153,8 @@ class Surveys(APIBase):
             editable_nodegroups = request.user.userprofile.editable_nodegroups
             permitted_nodegroups = viewable_nodegroups.union(editable_nodegroups)
             projects = MobileSurvey.objects.filter(Q(users__in=[request.user]) | Q(groups__in=group_ids), active=True).distinct()
+            if surveyid:
+                projects = projects.filter(pk=surveyid)
             projects_for_couch = [project.serialize_for_mobile() for project in projects]
             for project in projects_for_couch:
                 project['mapboxkey'] = settings.MAPBOX_API_KEY
