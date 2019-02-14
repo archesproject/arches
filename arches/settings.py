@@ -39,6 +39,9 @@ DATABASES = {
         'PORT': '5432',                      # Set to empty string for default. Not used with sqlite3.
         'SCHEMAS': 'public,data,ontology,concepts', # syncdb will put the admin tables in the first listed schema,
         'POSTGIS_TEMPLATE': 'template_postgis_20',
+        'OPTIONS': {
+            'options': '-c search_path=concepts,data,ontology,public'
+        }
     }
 }
 
