@@ -219,7 +219,7 @@ class ConceptDataType(BaseConceptDataType):
                     print("Attempting a match from label via the DB:")
                     hits = [ident for ident in models.Value.objects.all().filter(value__exact=label)]
                     if hits and len(hits) == 1:
-                        # print "FOUND: %s" % hits[0].pk
+                        print "FOUND: %s" % hits[0].pk
                         return str(hits[0].pk)
                     label = None
                 else:
