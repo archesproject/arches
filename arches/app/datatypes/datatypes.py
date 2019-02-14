@@ -126,8 +126,9 @@ class StringDataType(BaseDataType):
         # returns an in-memory graph object, containing the domain resource, its
         # type and the string as a string literal
         g = Graph()
-        g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
-        g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), Literal(str(edge_info['range_tile_data']))))
+        if edge_info['range_tile_data'] != None:
+            g.add((edge_info['d_uri'], RDF.type, URIRef(edge.domainnode.ontologyclass)))
+            g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), Literal(str(edge_info['range_tile_data']))))
         return g
 
     def from_rdf(self, json_ld_node):

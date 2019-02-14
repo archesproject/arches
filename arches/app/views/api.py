@@ -360,7 +360,6 @@ class Resources(APIBase):
                 except models.ResourceInstance.DoesNotExist:
                     return JSONResponse(status=404)
                 except Exception as e:
-                    logger.exception("error in resource PUT API")
                     return JSONResponse({"error": "resource data could not be saved"}, status=500, reason=e)
 
 
@@ -394,8 +393,12 @@ class Resources(APIBase):
             else:
                 return JSONResponse(status=403)
         except Exception as e:
-            logger.exception("error in resource POST API")
-            return JSONResponse({"error": "resource data could not be saved"}, status=500, reason=e)
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            formatted = traceback.format_exception(exc_type, exc_value, exc_traceback)
+            if len(formatted):
+                for message in formatted:
+                    print message
+            return JSONResponse({"error": "resource data could not be saved: %s" % e}, status=500, reason=e)
 
     def delete(self, request, resourceid, slug=None, graphid=None):
         if user_can_edit_resources(user=request.user):
