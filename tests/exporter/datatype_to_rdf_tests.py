@@ -187,7 +187,7 @@ class RDFExportUnitTests(ArchesTestCase):
         )
         self.assertTrue(
             (ARCHES_NS["concepts/037daf4d-054a-44d2-9c0a-108b59e39109"], RDFS.label,
-                Literal("example document type", lang="en-us")) in graph
+                Literal("example document type")) in graph
         )
 
 
