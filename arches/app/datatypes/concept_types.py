@@ -183,6 +183,8 @@ class ConceptDataType(BaseConceptDataType):
             print "FAILED TO GET ID"
             print json_ld_node
         label_node = json_ld_node.get(str(RDFS.label))
+        # Consume the labels, such that we don't recurse into them
+        del json_ld_node[str(RDFS.label)]
 
         concept_id = lang = None
         import re
