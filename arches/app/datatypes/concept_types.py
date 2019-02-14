@@ -137,6 +137,7 @@ class ConceptDataType(BaseConceptDataType):
             return rangenode
 
         if edge_info['range_tile_data'] is not None:
+            print "Concept tile_data: %r" % edge_info['range_tile_data'] 
             c = ConceptValue(str(edge_info['range_tile_data']))
 
             # create a default node
@@ -217,7 +218,7 @@ class ConceptDataType(BaseConceptDataType):
             values = get_valueids_from_concept_label(label, concept_id, lang)
 
             if values:
-                return values[0]["id"]
+                return [values[0]["id"]]
             else:
                 if concept_id:
                     print("FAILED TO FIND MATCHING LABEL '{0}'@{2} FOR CONCEPT '{1}' in ES").format(
@@ -226,7 +227,7 @@ class ConceptDataType(BaseConceptDataType):
                     hits = [ident for ident in models.Value.objects.all().filter(value__exact=label)]
                     if hits and len(hits) == 1:
                         print "FOUND: %s" % hits[0].pk
-                        return str(hits[0].pk)
+                        return [str(hits[0].pk)]
                     label = None
                 else:
                     print("No Concept ID URI supplied for rdf")
@@ -235,7 +236,7 @@ class ConceptDataType(BaseConceptDataType):
             # got a concept URI but the label is nonexistant
             # or cannot be resolved in Arches
             value = get_preflabel_from_conceptid(concept_id, lang=lang)
-            return value['id']
+            return [value['id']]
 
         if concept_id is None and (label is None or label == ""):
             print("Concept lookup in from_rdf FAILED: No concept id found and no label either")
