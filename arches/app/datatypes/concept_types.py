@@ -155,7 +155,7 @@ class ConceptDataType(BaseConceptDataType):
             g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), rangenode))
 
             assert c.value is not None, "Null or blank concept value"
-            g.add((rangenode, URIRef(RDFS.label), Literal(c.value, lang=c.language or '')))
+            g.add((rangenode, URIRef(RDFS.label), Literal(c.value)))
 
         return g
 
@@ -176,6 +176,9 @@ class ConceptDataType(BaseConceptDataType):
 
         concept_uri = json_ld_node.get('@id')
         label_node = json_ld_node.get(str(RDFS.label))
+
+        # Consume the labels, such that we don't recurse into them
+        del json_ld_node[str(RDFS.label)]
 
         concept_id = lang = None
         import re
@@ -216,6 +219,7 @@ class ConceptDataType(BaseConceptDataType):
                     print("Attempting a match from label via the DB:")
                     hits = [ident for ident in models.Value.objects.all().filter(value__exact=label)]
                     if hits and len(hits) == 1:
+                        print "FOUND: %s" % hits[0].pk
                         return str(hits[0].pk)
                     label = None
                 else:
@@ -295,5 +299,7 @@ class ConceptListDataType(BaseConceptDataType):
     def from_rdf(self, json_ld_node):
                 # returns a list of concept ids
         ctype = ConceptDataType()
-
-        return [ctype.from_rdf(item) for item in json_ld_node]
+        if isinstance(json_ld_node, list):
+            return [ctype.from_rdf(item) for item in json_ld_node]
+        else:
+            return [ctype.from_rdf(json_ld_node)]

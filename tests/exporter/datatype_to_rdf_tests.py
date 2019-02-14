@@ -163,7 +163,7 @@ class RDFExportUnitTests(ArchesTestCase):
             (edge_info['d_uri'], edge.ontologyproperty, URIRef("http://vocab.getty.edu/aat/300047196")) in graph
         )
         self.assertTrue(
-            (URIRef("http://vocab.getty.edu/aat/300047196"), RDFS.label, Literal("junk sculpture", lang="en")) in graph
+            (URIRef("http://vocab.getty.edu/aat/300047196"), RDFS.label, Literal("junk sculpture")) in graph
         )
 
     def test_rdf_concept_list(self):
@@ -179,7 +179,7 @@ class RDFExportUnitTests(ArchesTestCase):
             (edge_info['d_uri'], edge.ontologyproperty, URIRef("http://vocab.getty.edu/aat/300047196")) in graph
         )
         self.assertTrue(
-            (URIRef("http://vocab.getty.edu/aat/300047196"), RDFS.label, Literal("junk sculpture", lang="en")) in graph
+            (URIRef("http://vocab.getty.edu/aat/300047196"), RDFS.label, Literal("junk sculpture")) in graph
         )
         self.assertTrue(
             (edge_info['d_uri'], edge.ontologyproperty,
@@ -187,7 +187,7 @@ class RDFExportUnitTests(ArchesTestCase):
         )
         self.assertTrue(
             (ARCHES_NS["concepts/037daf4d-054a-44d2-9c0a-108b59e39109"], RDFS.label,
-                Literal("example document type", lang="en-us")) in graph
+                Literal("example document type")) in graph
         )
 
 
