@@ -144,7 +144,7 @@ class Surveys(APIBase):
 
         if request.GET.get('status', None) is not None:
             ret = {}
-            surveys = MobileSurvey.objects.filter(Q(users__in=[request.user]) | Q(groups__in=group_ids)).distinct()
+            surveys = MobileSurvey.objects.filter(users__in=[request.user]).distinct()
             for survey in surveys:
                 survey.deactivate_expired_survey()
                 ret[survey.id] = {'active': survey.active}
@@ -153,7 +153,7 @@ class Surveys(APIBase):
             viewable_nodegroups = request.user.userprofile.viewable_nodegroups
             editable_nodegroups = request.user.userprofile.editable_nodegroups
             permitted_nodegroups = viewable_nodegroups.union(editable_nodegroups)
-            projects = MobileSurvey.objects.filter(Q(users__in=[request.user]) | Q(groups__in=group_ids), active=True).distinct()
+            projects = MobileSurvey.objects.filter(users__in=[request.user], active=True).distinct()
             if surveyid:
                 projects = projects.filter(pk=surveyid)
             projects_for_couch = [project.serialize_for_mobile() for project in projects]
