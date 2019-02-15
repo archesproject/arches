@@ -230,6 +230,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
             </div>
 
+            <!-- ko if: !selectedCard().isWritable -->
+            <div class='msm-locked-warning'>{% trans 'You do not have permission to edit this card.' %}</div>
+            <!-- /ko -->
+
             <div data-bind="component: {
                 name: cardComponentLookup[selectedCard().model.component_id()].componentname,
                 params: {
