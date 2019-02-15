@@ -144,7 +144,7 @@ class Surveys(APIBase):
 
         if request.GET.get('status', None) is not None:
             ret = {}
-            surveys = MobileSurvey.objects.filter(Q(users__in=[request.user]) | Q(groups__in=group_ids)).distinct()
+            surveys = MobileSurvey.objects.filter(users__in=[request.user]).distinct()
             for survey in surveys:
                 survey.deactivate_expired_survey()
                 ret[survey.id] = {'active': survey.active}
