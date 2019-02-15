@@ -9280,12 +9280,13 @@ a.clear-geojson-button:hover {
 }
 
 .msm-locked-warning {
-    height: 40px;
+    height: 60px;
     background: #999;
+    font-size: 14px;
     color: #fff;
     padding-left: 10px;
     position: relative;
-    padding-top: 10px;
+    padding-top: 20px;
 }
 
 .msm-list-filter {
@@ -11855,6 +11856,11 @@ a.filter-tools:hover {
 
 .msm-survey-status-text {
     margin-top: 0px;
+    padding: 20px 0px 10px 0px;
+}
+
+.msm-survey-requirements-text + .msm-survey-status-text {
+    padding-top: 0px;
 }
 
 .msm-survey-message {
@@ -11864,9 +11870,9 @@ a.filter-tools:hover {
 }
 
 .msm-survey-status-instructions {
-    margin: 10px 20% 20px 20%;
+    margin: 15px 20% 25px 20%;
     padding: 20px 10px 20px 10px;
-    font-size: 17px;
+    font-size: 15px;
     background: #ddd;
     border: 1px solid #aaa;
     color: #2A096E;
@@ -11876,7 +11882,7 @@ a.filter-tools:hover {
 
 .msm-save-message {
     padding-top: 20px;
-    font-size: 17px;
+    font-size: 16px;
     color: #2A096E;
     text-align: center;
 }
