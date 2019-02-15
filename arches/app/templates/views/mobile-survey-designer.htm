@@ -410,7 +410,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <input type="text" class="form-control input-lg" data-bind="value: mobilesurvey.tilecache, valueUpdate: 'keyup'" placeholder="e.g.: http://arches_domain_name/media/lincoln.mbtiles">
                                 </div>
                                 <div class="msm-basemap-subtitle">
-                                    {% trans 'Arches uses the mbtiles that you specific to ensure that your field crew has a basemap, even when they do not have access to a cell network or WiFi connection.  You can create an mbtile file using your own geospatial data and GIS tools.  Or you can obtain high quality and inexpensive mbtiles from www.XXXX.org.  Note that large files will require longer downloads and more storage space on mobile devices.' %}
+                                    {% trans 'Arches uses the mbtiles that you specific to ensure that your field crew has a basemap, even when they do not have access to a cell network or WiFi connection.  You can create an mbtile file using your own geospatial data and GIS tools.  Or you can obtain high quality and inexpensive mbtiles from sites such as https://openmaptiles.com.  Note that large files will require longer downloads and more storage space on mobile devices.' %}
                                 </div>
                             </div>
                             <div class="msm-crud-section">
@@ -419,7 +419,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <input type="text" class="form-control input-lg" data-bind="value: mobilesurvey.onlinebasemap, valueUpdate: 'keyup'" placeholder="e.g.: mapbox://styles/mapbox/light-v9">
                                 </div>
                                 <div class="msm-basemap-subtitle">
-                                    {% trans 'Arches uses the Online Basemap URL that you specify as the default basemap for your field team when a cell network or WiFi connection is available. You may use you own map service, or any online basemap service compatible with MapBox (see www.XXXXX.com for a summary of basemap service requirements)' %}
+                                    {% trans 'Arches uses the Online Basemap URL that you specify as the default basemap for your field team when a cell network or WiFi connection is available. You may use your own map service, or any online basemap service (such as those created with ESRI, GeoServer, or other mapping servers).  You'll need to reference or create and host a MapBox style json file (see https://docs.mapbox.com/mapbox-gl-js/style-spec/)' %}
                                 </div>
                             </div>
                         </div>
