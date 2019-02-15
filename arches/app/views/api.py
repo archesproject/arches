@@ -141,12 +141,13 @@ class Surveys(APIBase):
                 get_child_cardids(child_card, cardset)
 
         group_ids = list(request.user.groups.values_list('id', flat=True))
-        
+
         if request.GET.get('status', None) is not None:
             ret = {}
-            projects = MobileSurvey.objects.filter(Q(users__in=[request.user]) | Q(groups__in=group_ids)).distinct()
-            for project in projects:
-                ret[project.id] = {'active': project.active, 'expired': project.expired}
+            surveys = MobileSurvey.objects.filter(Q(users__in=[request.user]) | Q(groups__in=group_ids)).distinct()
+            for survey in surveys:
+                survey.deactivate_expired_survey()
+                ret[survey.id] = {'active': survey.active}
             response = JSONResponse(ret, indent=4)
         else:
             viewable_nodegroups = request.user.userprofile.viewable_nodegroups
