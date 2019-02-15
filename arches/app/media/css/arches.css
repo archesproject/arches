@@ -11873,12 +11873,13 @@ a.filter-tools:hover {
     margin: 15px 20% 25px 20%;
     padding: 20px 10px 20px 10px;
     font-size: 15px;
-    background: #ddd;
-    border: 1px solid #aaa;
-    color: #2A096E;
+    background: #ffb80f;
+    border: 1px solid #ffb300;
+    color: #fff;
     text-align: center;
     border-radius: 2px;
 }
+
 
 .msm-save-message {
     padding-top: 20px;
@@ -11887,11 +11888,20 @@ a.filter-tools:hover {
     text-align: center;
 }
 
+.msm-survey-status-instructions + .msm-save-message {
+    padding-top: 0px;
+}
+
+
 .msm-survey-issues {
     padding-top: 20px;
     font-size: 15px;
     color: #888;
     list-style-type: none;
+}
+
+.msm-survey-status-instructions + .text-center .msm-survey-issues {
+    padding-top: 0px;
 }
 
 .msm-splash-instruction {
