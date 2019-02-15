@@ -1562,21 +1562,16 @@ class ResourceInstanceDataType(BaseDataType):
         return g
 
     def from_rdf(self, json_ld_node):
-        res_inst_uri = json_ld_node['id']
-        # should be in the form http(s)://archeshost/resources/{UUID}
-        # FIXME: should any URI in this form be accepted, regardless to a specific Arches host?
-
-        # NOTE: This returns a dict including the host and the resource instance UUID as
-        # {"host":..., "res_inst":...}
-        # It may be important in future for resource instance datatypes to deal with externally held ones
-        # rather than require a local copy.
+        res_inst_uri = json_ld_node['@id']
+        # `id` should be in the form schema:{...}/{UUID}
+        # eg `urn:uuid:{UUID}`
+        #    `http://arches_instance.getty.edu/resources/{UUID}`
 
         import re
-        p = re.compile(r"(http|https)://(?P<host>[^/]*)/resources/(?P<res_inst>[A-Fa-f0-9\-]*)/?$")
-        m = p.match(res_inst_uri)
+        p = re.compile(r"(?P<r>[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12})/?$")
+        m = p.search(res_inst_uri)
         if m is not None:
-            return m.groupdict()
-            # return m.groupdict()['re_inst']  # to return only the UUID
+            return m.groupdict()['r']
 
 
 class NodeValueDataType(BaseDataType):

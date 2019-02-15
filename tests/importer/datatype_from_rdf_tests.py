@@ -105,6 +105,33 @@ class RDFImportUnitTests(ArchesTestCase):
         resp = dt.from_rdf(jf)
         self.assertTrue(resp == "2018-12-18")
 
+    def test_jsonld_resource_http_port(self):
+        dt = self.DT.get_instance("resource-instance")
+        jf = {
+                "@id": "http://localhost:8000/resources/037daf4d-054a-44d2-9c0a-108b59e39109",
+                "@type": "http://www.cidoc-crm.org/cidoc-crm/E21_Person"
+              }
+        resp = dt.from_rdf(jf)
+        self.assertTrue(resp == "037daf4d-054a-44d2-9c0a-108b59e39109")
+
+    def test_jsonld_resource_urn_uuid(self):
+        dt = self.DT.get_instance("resource-instance")
+        jf = {
+                "@id": "urn:uuid:eccaa586-284b-4f98-b4db-bdf8bdc9efcb",
+                "@type": "http://www.cidoc-crm.org/cidoc-crm/E21_Person"
+              }
+        resp = dt.from_rdf(jf)
+        self.assertTrue(resp == "eccaa586-284b-4f98-b4db-bdf8bdc9efcb")
+
+    def test_jsonld_resource_not_a_uuid(self):
+        dt = self.DT.get_instance("resource-instance")
+        jf = {
+                "@id": "https://en.wikipedia.org/wiki/Alan_Smithee",
+                "@type": "http://www.cidoc-crm.org/cidoc-crm/E21_Person"
+              }
+        resp = dt.from_rdf(jf)
+        self.assertTrue(resp is None)
+
     def test_jsonld_concept_internal(self):
         dt = self.DT.get_instance("concept")
         # from the thesaurus that should be loaded into Arches,
