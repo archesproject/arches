@@ -10968,9 +10968,9 @@ a.search-facet-item.disabled {
     height: 60px;
     width: 60px;
     border-radius: 50%;
-    border: 1px solid #bbb;
+    border: 1px solid #7080CB;
     color: #7080CB;
-    background: #eee;
+    background: #E1EAFC;
     font-size: 28px;
     padding-top: 14px;
     padding-left: 2px;
@@ -10978,9 +10978,9 @@ a.search-facet-item.disabled {
 
 .model-selection .msm-icon-wrap {
     background: #fff;
-    color:#2d3c4b;
+    color:steelblue;
     padding-top: 15px;
-    border: 1px solid #2d3c4b;
+    border: 1px solid steelblue;
 }
 
 .active-survey .msm-icon-wrap {
@@ -10989,6 +10989,14 @@ a.search-facet-item.disabled {
     padding-top: 15px;
     padding-left: 2px;
     border: 1px solid #26a69a;
+}
+
+.incomplete .msm-icon-wrap {
+    background: #FFD264;
+    color:#B88406;
+    padding-top: 13px;
+    padding-left: 2px;
+    border: 1px solid #B88406;
 }
 
 .incomplete.active-survey .msm-icon-wrap {
@@ -11873,7 +11881,7 @@ a.filter-tools:hover {
     margin: 15px 20% 25px 20%;
     padding: 20px 10px 20px 10px;
     font-size: 15px;
-    background: #ffb80f;
+    background: #FFC741;
     border: 1px solid #ffb300;
     color: #fff;
     text-align: center;
@@ -11903,6 +11911,7 @@ a.filter-tools:hover {
 .msm-survey-status-instructions + .text-center .msm-survey-issues {
     padding-top: 0px;
 }
+
 
 .msm-splash-instruction {
     padding: 0px 60px;

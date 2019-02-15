@@ -410,7 +410,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <input type="text" class="form-control input-lg" data-bind="value: mobilesurvey.tilecache, valueUpdate: 'keyup'" placeholder="e.g.: http://arches_domain_name/media/lincoln.mbtiles">
                                 </div>
                                 <div class="msm-basemap-subtitle">
-                                    {% trans 'Arches uses the mbtiles that you specific to ensure that your field crew has a basemap, even when they do not have access to a cell network or WiFi connection.  You can create an mbtile file using your own geospatial data and GIS tools.  Or you can obtain high quality and inexpensive mbtiles from sites such as https://openmaptiles.com.  Note that large files will require longer downloads and more storage space on mobile devices.' %}
+                                    {% trans 'Arches uses the mbtiles that you specific to ensure that your field crew has a basemap, even when they do not have access to a cell network or WiFi connection.  You can create an mbtile file using your own geospatial data and GIS tools.  Or you can obtain high quality and inexpensive mbtiles from sites such as <strong>https://openmaptiles.com</strong>.  Note that large files will require longer downloads and more storage space on mobile devices.' %}
                                 </div>
                             </div>
                             <div class="msm-crud-section">
@@ -419,7 +419,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <input type="text" class="form-control input-lg" data-bind="value: mobilesurvey.onlinebasemap, valueUpdate: 'keyup'" placeholder="e.g.: mapbox://styles/mapbox/light-v9">
                                 </div>
                                 <div class="msm-basemap-subtitle">
-                                    {% trans 'Arches uses the Online Basemap URL that you specify as the default basemap for your field team when a cell network or WiFi connection is available. You may use your own map service, or any online basemap service (such as those created with ESRI, GeoServer, or other mapping servers).  You'll need to reference or create and host a MapBox style json file (see https://docs.mapbox.com/mapbox-gl-js/style-spec/)' %}
+                                    {% trans "Arches uses the Online Basemap URL that you specify as the default basemap for your field team when a cell network or WiFi connection is available. You may use your own map service, or any online basemap service (such as those created with ESRI, GeoServer, or other mapping servers).  You'll need to reference or create and host a MapBox style json file (see <strong>https://docs.mapbox.com/mapbox-gl-js/style-spec</strong>)" %}
                                 </div>
                             </div>
                         </div>
@@ -467,9 +467,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </div>
 
                             <!-- Model Selection Instructions -->
-                            <div class="msm-survey-status-instructions" data-bind="visible: !locked">{% trans 'Select the Resource Models for your project' %}</div>
-                            <div class="text-center" data-bind="visible: !locked">
-                                <ul class="msm-survey-issues msm-splash-instruction">
+                            <div class="text-center">
+                                <ul class="msm-survey-issues">
                                     <li>{% trans "Arches allows you to create and edit data in the field using mobile devices. Select those resources that should participate in the survey.  Once you have selected the models, click on a model in the tree to select which data entry forms to include in your project." %}</li>
                                 </ul>
                             </div>
@@ -571,7 +570,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                 <!-- Icon and Title -->
                                 <div class="mpm-survey-status-header">
-                                    <i class="msm-icon-wrap fa fa-group" style="padding-left: 3px;"></i>
+                                    <i class="msm-icon-wrap fa fa-group" style="padding-left: 2px;"></i>
                                     <div class="msm-survey-status-text">{% trans 'Survey Participants' %}</div>
                                 </div>
 
@@ -586,9 +585,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 </div>
 
                                 <!-- Group Selection Instructions -->
-                                <div class="msm-survey-status-instructions" data-bind="visible: !locked" >{% trans 'Select the User Groups for your project' %}</div>
-                                <div class="text-center" data-bind="visible: !locked">
-                                    <ul class="msm-survey-issues msm-splash-instruction">
+                                <div class="text-center">
+                                    <ul class="msm-survey-issues">
                                         <li>{% trans "Arches allows you to select the user groups you want to include in a field data collection effort.  Select the groups that should participate in the survey.  Once you have selected the groups, click on a group in the tree to select specific users who should join your survery." %}</li>
                                     </ul>
                                 </div>
