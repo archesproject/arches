@@ -144,7 +144,7 @@ class Surveys(APIBase):
                 get_child_cardids(child_card, cardset)
 
         group_ids = list(request.user.groups.values_list('id', flat=True))
-        projects = MobileSurvey.objects.filter(Q(users__in=[request.user]) | Q(groups__in=group_ids), active=True).distinct()
+        projects = MobileSurvey.objects.filter(users__in=[request.user], active=True).distinct()
         projects_for_couch = [project.serialize_for_mobile() for project in projects]
         for project in projects_for_couch:
             project['mapboxkey'] = settings.MAPBOX_API_KEY
