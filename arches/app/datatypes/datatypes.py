@@ -1568,10 +1568,10 @@ class ResourceInstanceDataType(BaseDataType):
         #    `http://arches_instance.getty.edu/resources/{UUID}`
 
         import re
-        p = re.compile(r"(?P<res_inst>[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12})/?$")
+        p = re.compile(r"(?P<r>[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12})/?$")
         m = p.search(res_inst_uri)
         if m is not None:
-            return m.groupdict()['res_inst']
+            return m.groupdict()['r']
 
 
 class NodeValueDataType(BaseDataType):

@@ -130,7 +130,7 @@ class RDFImportUnitTests(ArchesTestCase):
                 "@type": "http://www.cidoc-crm.org/cidoc-crm/E21_Person"
               }
         resp = dt.from_rdf(jf)
-        self.assertTrue(resp == None)
+        self.assertTrue(resp is None)
 
     def test_jsonld_concept_internal(self):
         dt = self.DT.get_instance("concept")
