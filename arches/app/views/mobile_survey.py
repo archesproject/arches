@@ -64,21 +64,6 @@ def get_survey_resources(mobile_survey):
     return resources
 
 
-def deactivate_expired_survey(mobile_survey):
-    result = False
-    if mobile_survey.enddate is not None:
-        enddate = datetime.strftime(mobile_survey.enddate, '%Y-%m-%d')
-        expired = (datetime.strptime(enddate, '%Y-%m-%d') - datetime.now() + timedelta(hours=24)).days < 0
-        if expired:
-            mobile_survey.active = False
-            try:
-                super(MobileSurvey, mobile_survey).save()
-            except TypeError as e:
-                mobile_survey.save()
-            result = True
-    return result
-
-
 @method_decorator(group_required('Application Administrator'), name='dispatch')
 class MobileSurveyManagerView(BaseManagerView):
 
@@ -87,11 +72,8 @@ class MobileSurveyManagerView(BaseManagerView):
         mobile_surveys = []
         serializer = JSONSerializer()
         for survey in mobile_survey_models:
-            expired = deactivate_expired_survey(survey)
+            survey.deactivate_expired_survey()
             serialized_survey = serializer.serializeToPython(survey)
-            serialized_survey['expired'] = expired
-            if expired is True:
-                serialized_survey['active'] = False
             serialized_survey['edited_by'] = {
                 'username': survey.lasteditedby.username,
                 'first': survey.lasteditedby.first_name,
