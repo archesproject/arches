@@ -178,7 +178,8 @@ class ConceptDataType(BaseConceptDataType):
         label_node = json_ld_node.get(str(RDFS.label))
 
         # Consume the labels, such that we don't recurse into them
-        del json_ld_node[str(RDFS.label)]
+        if label_node:
+            del json_ld_node[str(RDFS.label)]
 
         concept_id = lang = None
         import re
@@ -200,7 +201,10 @@ class ConceptDataType(BaseConceptDataType):
                     print("ConceptValue {0}, Concept {1} - '{2}'".format(hit.valueid, hit.conceptid, hit.value))
 
         print("Trying to get a label from the concept node.")
-        label, lang = get_value_from_jsonld(label_node)
+        if label_node:
+            label, lang = get_value_from_jsonld(label_node)
+        else:
+            label = None
 
         if label:
             # Could be:
