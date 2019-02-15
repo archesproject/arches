@@ -203,31 +203,28 @@ class ConceptDataType(BaseConceptDataType):
         print("Trying to get a label from the concept node.")
         if label_node:
             label, lang = get_value_from_jsonld(label_node)
-        else:
-            label = None
+            if label:
+                # Could be:
+                #  - Blank node E55_Type with a label - a Keyword
+                #  - Concept ID URI, with a label - a conventional Concept
+                #  - Concept ID via an external URI, hosted in Arches
+                # find a matching Concept Value to the label
+                values = get_valueids_from_concept_label(label, concept_id, lang)
 
-        if label:
-            # Could be:
-            #  - Blank node E55_Type with a label - a Keyword
-            #  - Concept ID URI, with a label - a conventional Concept
-            #  - Concept ID via an external URI, hosted in Arches
-            # find a matching Concept Value to the label
-            values = get_valueids_from_concept_label(label, concept_id, lang)
-
-            if values:
-                return values[0]["id"]
-            else:
-                if concept_id:
-                    print("FAILED TO FIND MATCHING LABEL '{0}'@{2} FOR CONCEPT '{1}' in ES").format(
-                        label, concept_id, lang)
-                    print("Attempting a match from label via the DB:")
-                    hits = [ident for ident in models.Value.objects.all().filter(value__exact=label)]
-                    if hits and len(hits) == 1:
-                        print "FOUND: %s" % hits[0].pk
-                        return str(hits[0].pk)
-                    label = None
+                if values:
+                    return values[0]["id"]
                 else:
-                    print("No Concept ID URI supplied for rdf")
+                    if concept_id:
+                        print("FAILED TO FIND MATCHING LABEL '{0}'@{2} FOR CONCEPT '{1}' in ES").format(
+                            label, concept_id, lang)
+                        print("Attempting a match from label via the DB:")
+                        hits = [ident for ident in models.Value.objects.all().filter(value__exact=label)]
+                        if hits and len(hits) == 1:
+                            print "FOUND: %s" % hits[0].pk
+                            return str(hits[0].pk)
+                        label = None
+                    else:
+                        print("No Concept ID URI supplied for rdf")
 
         if concept_id and label is None:
             # got a concept URI but the label is nonexistant
