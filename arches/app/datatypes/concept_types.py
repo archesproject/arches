@@ -215,12 +215,12 @@ class ConceptDataType(BaseConceptDataType):
                     return values[0]["id"]
                 else:
                     if concept_id:
-                        #print("FAILED TO FIND MATCHING LABEL '{0}'@{2} FOR CONCEPT '{1}' in ES").format(
-                        #    label, concept_id, lang)
-                        #print("Attempting a match from label via the DB:")
+                        # print("FAILED TO FIND MATCHING LABEL '{0}'@{2} FOR CONCEPT '{1}' in ES").format(
+                        #     label, concept_id, lang)
+                        # print("Attempting a match from label via the DB:")
                         hits = [ident for ident in models.Value.objects.all().filter(value__exact=label)]
                         if hits and len(hits) == 1:
-                            #print "FOUND: %s" % hits[0].pk
+                            # print "FOUND: %s" % hits[0].pk
                             return str(hits[0].pk)
                         label = None
                     else:
