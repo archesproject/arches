@@ -191,7 +191,7 @@ class ConceptDataType(BaseConceptDataType):
             # could be an external id, rather than an Arches only URI
             hits = [ident for ident in models.Value.objects.all().filter(value__exact=str(concept_uri),
                                                                          valuetype__category="identifiers")]
-            print("Could be external URI - hits from RDM: {0}".format(len(hits)))
+            # print("Could be external URI - hits from RDM: {0}".format(len(hits)))
             if len(hits) == 1:
                 concept_id = hits[0].concept_id
                 # Still need to find the label or prefLabel for this concept
@@ -200,7 +200,7 @@ class ConceptDataType(BaseConceptDataType):
                 for hit in hits:
                     print("ConceptValue {0}, Concept {1} - '{2}'".format(hit.valueid, hit.conceptid, hit.value))
 
-        print("Trying to get a label from the concept node.")
+        # print("Trying to get a label from the concept node.")
         if label_node:
             label, lang = get_value_from_jsonld(label_node)
             if label:
@@ -215,16 +215,18 @@ class ConceptDataType(BaseConceptDataType):
                     return values[0]["id"]
                 else:
                     if concept_id:
-                        print("FAILED TO FIND MATCHING LABEL '{0}'@{2} FOR CONCEPT '{1}' in ES").format(
-                            label, concept_id, lang)
-                        print("Attempting a match from label via the DB:")
+                        #print("FAILED TO FIND MATCHING LABEL '{0}'@{2} FOR CONCEPT '{1}' in ES").format(
+                        #    label, concept_id, lang)
+                        #print("Attempting a match from label via the DB:")
                         hits = [ident for ident in models.Value.objects.all().filter(value__exact=label)]
                         if hits and len(hits) == 1:
-                            print "FOUND: %s" % hits[0].pk
+                            #print "FOUND: %s" % hits[0].pk
                             return str(hits[0].pk)
                         label = None
                     else:
                         print("No Concept ID URI supplied for rdf")
+        else:
+            label = None
 
         if concept_id and label is None:
             # got a concept URI but the label is nonexistant
