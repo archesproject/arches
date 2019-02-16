@@ -90,6 +90,9 @@ define([
             })
                 .done(function(data){
                     var rootCards = self.getRootCards(data.cards);
+                    rootCards.sort(function(a, b) {
+                        return a.sortorder - b.sortorder;
+                    })();
                     resource.cards(ko.unwrap(rootCards));
                 });
         };
