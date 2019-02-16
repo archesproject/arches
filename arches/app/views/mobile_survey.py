@@ -409,7 +409,6 @@ class MobileSurveyResources(View):
         graphs = models.GraphModel.objects.filter(isresource=True).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         resources = []
         all_ordered_card_ids = []
-
         proj = MobileSurvey.objects.get(id=surveyid)
         all_ordered_card_ids = proj.get_ordered_cards()
         active_graphs = set([unicode(card.graph_id) for card in models.CardModel.objects.filter(cardid__in=all_ordered_card_ids)])
