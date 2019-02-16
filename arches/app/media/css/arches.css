@@ -7705,7 +7705,8 @@ a.mega-dropdown-toggle.disabled {
 
 .childlessborder {
     border: 1px solid rgb(188, 188, 188);
-    padding-bottom: 2%
+    padding-bottom: 2%;
+    background: rgb(230, 235, 255);
 }
 
 @media (min-width: 992px){
