@@ -133,31 +133,30 @@ class NewResourceEditorView(MapBaseManagerView):
                 displayname = _("System Settings")
 
             tiles = resource_instance.tilemodel_set.order_by('sortorder').filter(nodegroup__in=nodegroups)
-
             provisionaltiles = []
             for tile in tiles:
                 append_tile = True
                 isfullyprovisional = False
                 if tile.provisionaledits is not None:
-                    if len(tile.data) == 0:
-                        isfullyprovisional = True
-                    if user_is_reviewer == False:
-                        if str(request.user.id) in tile.provisionaledits:
-                            tile.provisionaledits = {str(request.user.id): tile.provisionaledits[str(request.user.id)]}
-                            tile.data = tile.provisionaledits[str(request.user.id)]['value']
-                        else:
-                            if isfullyprovisional == True:
-                                # if the tile IS fully provisional and the current user is not the owner,
-                                # we don't send that tile back to the client.
-                                append_tile = False
+                    if len(tile.provisionaledits.keys()) > 0:
+                        if len(tile.data) == 0:
+                            isfullyprovisional = True
+                        if user_is_reviewer == False:
+                            if str(request.user.id) in tile.provisionaledits:
+                                tile.provisionaledits = {str(request.user.id): tile.provisionaledits[str(request.user.id)]}
+                                tile.data = tile.provisionaledits[str(request.user.id)]['value']
                             else:
-                                # if the tile has authoritaive data and the current user is not the owner,
-                                # we don't send the provisional data of other users back to the client.
-                                tile.provisionaledits = None
+                                if isfullyprovisional == True:
+                                    # if the tile IS fully provisional and the current user is not the owner,
+                                    # we don't send that tile back to the client.
+                                    append_tile = False
+                                else:
+                                    # if the tile has authoritaive data and the current user is not the owner,
+                                    # we don't send the provisional data of other users back to the client.
+                                    tile.provisionaledits = None
                 if append_tile == True:
                     provisionaltiles.append(tile)
             tiles = provisionaltiles
-
         map_layers = models.MapLayer.objects.all()
         map_markers = models.MapMarker.objects.all()
         map_sources = models.MapSource.objects.all()
