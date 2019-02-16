@@ -265,6 +265,7 @@ class JsonLdReader(Reader):
 
         for jsonld in data:
             self.errors = {}
+            # FIXME: This should use a cache of the context
             jsonld = expand(jsonld)[0]
             if graphid is None:
                 graphid = self.get_graph_id(jsonld["@type"][0])
@@ -475,7 +476,7 @@ class JsonLdReader(Reader):
             elif len(valid_nodes) > 1:
                 raise self.AmbiguousGraphException()
             else:
-                raise self.DataDoesNotMatchGraphException(jsonld_graph)
+                raise self.DataDoesNotMatchGraphException()
 
     def resolve_node_ids(self, jsonld, ontology_prop=None, graph=None, parent_node=None, tileid=None, parent_tileid=None, resource=None):
         # print "-------------------"
