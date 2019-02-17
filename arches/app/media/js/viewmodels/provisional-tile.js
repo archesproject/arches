@@ -90,7 +90,13 @@ define([
                 self.selectedProvisionalEdit(val);
                 koMapping.fromJS(val['value'], self.selectedTile().data);
                 self.selectedTile()._tileData.valueHasMutated();
-                self.selectedTile().parent.widgets()[0].label.valueHasMutated();
+                self.selectedTile().parent.widgets().forEach(
+                    function(w){
+                        var defaultconfig = w.widgetLookup[w.widget_id()].defaultconfig;
+                        if (JSON.parse(defaultconfig).rerender === true) {
+                            self.selectedTile().parent.widgets()[0].label.valueHasMutated();
+                        }
+                    });
             }
         };
 

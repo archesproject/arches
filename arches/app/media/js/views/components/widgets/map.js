@@ -77,7 +77,8 @@ define([
             'overlayOpacity',
             'mapControlsHidden',
             'defaultValueType',
-            'defaultValue'
+            'defaultValue',
+            'rerender'
         ];
 
         WidgetViewModel.apply(this, [params]);
@@ -90,6 +91,7 @@ define([
                 expanded: this.expanded()
             };
         }, this);
+        this.rerender(true);
         this.resizeDuration = params.resizeDuration || 500;
         this.context = params.type;
         this.getContextCss = ko.pureComputed(function() {
