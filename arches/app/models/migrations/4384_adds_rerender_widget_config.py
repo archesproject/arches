@@ -10,15 +10,16 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4521_revision_sync_logs'),
+        ('models', '4521_sync_revision_logs'),
     ]
 
-    migrations.RunSQL("""
-        update widgets as w
-        set defaultconfig = jsonb_set(defaultconfig, '{rerender}', to_jsonb(true), true) where w.name in ('map-widget', 'file-widget');
-        """,
-        """
-        update widgets as w
-        set defaultconfig = defaultconfig - 'rerender}' where w.name in ('map-widget', 'file-widget');
-        """)
-    ]
+    operations = [
+        migrations.RunSQL("""
+            update widgets as w
+            set defaultconfig = jsonb_set(defaultconfig, '{rerender}', to_jsonb(true), true) where w.name in ('map-widget', 'file-widget');
+            """,
+            """
+            update widgets as w
+            set defaultconfig = defaultconfig - 'rerender' where w.name in ('map-widget', 'file-widget');
+            """)
+        ]
