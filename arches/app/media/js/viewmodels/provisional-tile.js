@@ -71,7 +71,7 @@ define([
                         koMapping.fromJS(this.provisionaledits()[0]['value'], tile.data);
                         this.selectedProvisionalEdit(this.provisionaledits()[0]);
                         tile._tileData.valueHasMutated();
-                    } 
+                    }
                 } else if (self.selectedProvisionalEdit()) {
                     self.selectedProvisionalEdit(undefined);
                     self.selectedTile().reset();
@@ -90,6 +90,7 @@ define([
                 self.selectedProvisionalEdit(val);
                 koMapping.fromJS(val['value'], self.selectedTile().data);
                 self.selectedTile()._tileData.valueHasMutated();
+                self.selectedTile().parent.widgets()[0].label.valueHasMutated();
             }
         };
 
