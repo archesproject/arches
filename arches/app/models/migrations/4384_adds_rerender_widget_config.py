@@ -16,10 +16,12 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunSQL("""
             update widgets as w
-            set defaultconfig = jsonb_set(defaultconfig, '{rerender}', to_jsonb(true), true) where w.name in ('map-widget', 'file-widget');
+            set defaultconfig = jsonb_set(defaultconfig, '{rerender}', to_jsonb(true), true)
+            where w.name in ('map-widget', 'file-widget', 'iiif-widget');
             """,
             """
             update widgets as w
-            set defaultconfig = defaultconfig - 'rerender' where w.name in ('map-widget', 'file-widget');
+            set defaultconfig = defaultconfig - 'rerender'
+            where w.name in ('map-widget', 'file-widget', 'iiif-widget');
             """)
         ]
