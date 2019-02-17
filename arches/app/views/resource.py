@@ -141,12 +141,13 @@ class NewResourceEditorView(MapBaseManagerView):
                     if len(tile.provisionaledits.keys()) > 0:
                         if len(tile.data) == 0:
                             isfullyprovisional = True
-                        if user_is_reviewer == False:
+                        if user_is_reviewer is False:
                             if str(request.user.id) in tile.provisionaledits:
-                                tile.provisionaledits = {str(request.user.id): tile.provisionaledits[str(request.user.id)]}
+                                tile.provisionaledits = {
+                                    str(request.user.id): tile.provisionaledits[str(request.user.id)]}
                                 tile.data = tile.provisionaledits[str(request.user.id)]['value']
                             else:
-                                if isfullyprovisional == True:
+                                if isfullyprovisional is True:
                                     # if the tile IS fully provisional and the current user is not the owner,
                                     # we don't send that tile back to the client.
                                     append_tile = False

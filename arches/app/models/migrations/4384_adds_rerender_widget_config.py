@@ -14,7 +14,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunSQL("""
+        migrations.RunSQL(
+            """
             update widgets as w
             set defaultconfig = jsonb_set(defaultconfig, '{rerender}', to_jsonb(true), true)
             where w.name in ('map-widget', 'file-widget', 'iiif-widget');
