@@ -5673,7 +5673,7 @@ ul.jqtree_common li.jqtree-folder {
 }
 
 .ep-help-body {
-    height: 100%;
+    height: calc(100vh - 50px);
     width: 100%;
     overflow-y: auto;
     display: table-row;
