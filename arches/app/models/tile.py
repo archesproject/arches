@@ -273,15 +273,12 @@ class Tile(models.TileModel):
                     if provisional_edit_log_details == None:
                         provisional_edit_log_details={"user": user, "action": "create tile",  "provisional_editor": user}
 
-        # self.validate([])
         super(Tile, self).save(*args, **kwargs)
         #We have to save the edit log record after calling save so that the
         #resource's displayname changes are avaliable
         if log == True:
-            user = {} if user == None else user
-            # print("user="+ str(user))
-            # print("len="+str(len(user.keys())))
-            if (len(user.keys()) == 0):
+            if (user == None):
+                user = {}
                 if creating_new_tile == True:
                     self.save_edit(user=user, edit_type=edit_type, old_value={}, new_value=self.data, newprovisionalvalue=newprovisionalvalue, provisional_edit_log_details=provisional_edit_log_details)
                 else:
@@ -302,7 +299,7 @@ class Tile(models.TileModel):
                     tile.resourceinstance = self.resourceinstance
                     tile.parenttile = self
                     tile.save(*args, request=request, index=index, **kwargs)
-            elif (len(user.keys()) > 0):
+            else:
                 try:
                     self.validate([])
                     if creating_new_tile == True:
