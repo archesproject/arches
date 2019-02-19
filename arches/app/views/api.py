@@ -408,11 +408,12 @@ class Resources(APIBase):
             else:
                 return JSONResponse(status=403)
         except Exception as e:
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            formatted = traceback.format_exception(exc_type, exc_value, exc_traceback)
-            if len(formatted):
-                for message in formatted:
-                    print message
+            if settings.DEBUG is True:
+                exc_type, exc_value, exc_traceback = sys.exc_info()
+                formatted = traceback.format_exception(exc_type, exc_value, exc_traceback)
+                if len(formatted):
+                    for message in formatted:
+                        print(message)
             return JSONResponse({"error": "resource data could not be saved: %s" % e}, status=500, reason=e)
 
     def delete(self, request, resourceid, slug=None, graphid=None):
