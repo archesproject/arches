@@ -26,12 +26,7 @@ define(['jquery', 'backbone', 'd3'], function($, Backbone) {
                     .attr("width", width)
                     .attr("height", height)
                     .call(d3.behavior.zoom().on("zoom", function() {
-                        try {
-                            svg.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")");
-                        } 
-                        catch(err) {
-                            console.log(err.message);
-                        } 
+                        svg.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")");
                     }))
                     .append('svg:g'),
 
