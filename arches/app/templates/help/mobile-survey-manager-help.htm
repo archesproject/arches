@@ -2,13 +2,114 @@
 {% load i18n %}
 <div class="ep-help-content">
     <div>
-        <div class="">
-            <p>{% blocktrans %}When modifying group and user mobile survey approvals, bear in mind the following: {% endblocktrans %}</p>
-            <ul style="">
-                <li>{% blocktrans %} By approving a group, all members will be approved {% endblocktrans %}</li>
-                <li>{% blocktrans %} By disapproving a group, all members will be disapproved unless they are approved as a member of a different group {% endblocktrans %}</li>
-                <li>{% blocktrans %} You may approve or disapprove a user regardless of the approval status of any group to which that user belongs {% endblocktrans %}</li>
-            </ul>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle">
+            <h4>{% trans "Overview" %}</h4>
+            &nbsp;<i class="ep-help-topic-toggle-icon fa fa-chevron-right"></i>
+        </a>
+        <div class="ep-help-topic-content">
+            <p>{% blocktrans %}As a database administrator, you will use the Arches Collector Manager to create and manage the surveys that data collection users will access through the <a href="https://arches.readthedocs.io/en/stable/using-arches-mobile.html" target="_blank">Arches Collector</a> mobile app.{% endblocktrans %}</p>
+            <p>{% blocktrans %}When you begin creating a new survey, you'll be brought to the survey summary.{% endblocktrans %}</p>
+            <p><img class="reloadable-img" src="{{ STATIC_URL }}img/help/start-new-mobile-survey.png"></img></p>
+            <p>{% blocktrans %}Once you have finished setting all of the parameters for your survey, you will return to the summary page to activate it for the first time.{% endblocktrans %}</p>
+            <p>
+                <span class="ep-help-img-link">
+                    <a href="{{ STATIC_URL }}img/help/activate-mobile-survey.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+                    </a>
+                </span>
+                <img class="reloadable-img" src="{{ STATIC_URL }}img/help/activate-mobile-survey.gif"></img>
+            </p>
+            <p>{% blocktrans %}This initial activation saves the contents of your survey to a staging database, from which Arches Collector users will download it and begin collecting data.{% endblocktrans %}</p>
+            <p><strong>{% blocktrans %}IMPORTANT: In order for Arches Collector users to connect to this Arches instance a system admin must first <a href="https://arches.readthedocs.io/en/stable/api/#registering-an-application-with-arches" target="_blank">register an application</a>.{% endblocktrans %}</strong></p>
+        </div>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle">
+            <h4>{% trans "Survey Parameters" %}</h4>
+            &nbsp;<i class="ep-help-topic-toggle-icon fa fa-chevron-right"></i>
+        </a>
+        <div class="ep-help-topic-content">
+            <div>
+                <a href="javascript:void(0)" class="ep-help-topic-toggle">
+                    <h5>{% trans "Settings" %}</h5>
+                </a>
+                <div class="ep-help-topic-content">
+                    <table class="ep-help-table">
+                        <tr>
+                            <td>{% trans "Name" %}</td>
+                            <td>{% trans "This name will be used in Arches Collector when users connect to this Arches instance." %}</td>
+                        </tr>
+                        <tr>
+                            <td>{% trans "Start Date/End Date" %}</td>
+                            <td>{% blocktrans %}The survey start and end dates are used to limit when people can add or edit data to your project. Use these dates to enforce the beginning and end of your field data collection effort.{% endblocktrans %}</td>
+                        </tr>
+                        <tr>
+                            <td>{% trans "Description" %}</td>
+                            <td>{% blocktrans %}Optionally add a description for your survey. This description will be included when users download the survey using Arches Collector.{% endblocktrans %}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div>
+                <a href="javascript:void(0)" class="ep-help-topic-toggle">
+                    <h5>{% trans "Map Extent" %}</h5>
+                </a>
+                <div class="ep-help-topic-content">
+                    <p>{% blocktrans %}The map extent for this survey will default to your project extent (set in System Settings), but can be changed however you like. If you allow users to download data in this survey, only resources within this boundary will be used.{% endblocktrans %}</p>
+                </div>
+            </div>
+            <div>
+                <a href="javascript:void(0)" class="ep-help-topic-toggle">
+                    <h5>{% trans "Map Sources" %}</h5>
+                </a>
+                <div class="ep-help-topic-content">
+                     <p>{% blocktrans %}Define the basemap layer(s) that will be available to users while they collect data with Arches Collector. If you expect data collection to happen in areas that do not have reliable cellular/wifi data connections, you are advised to add a path to an MBTiles file that users will download when they download this survey.{% endblocktrans %}</p>
+                    <p>{% blocktrans %}This file must be prepared ahead of time to contain the basemap for the area of your survey.{% endblocktrans %}</p>
+                </div>
+            </div>
+            <div>
+                <a href="javascript:void(0)" class="ep-help-topic-toggle">
+                    <h5>{% trans "Models" %}</h5>
+                </a>
+                <div class="ep-help-topic-content">
+                    <p>{% blocktrans %}You must select one or more resources models to include in the survey. When a user downloads the survey and begins editing data, only these resource models will be available to them.{% endblocktrans %}</p>
+                    <p>{% blocktrans %}Once you have selected a model, you must further decide which cards from that model to include.{% endblocktrans %}</p>
+                    <p><img class="reloadable-img" src="{{ STATIC_URL }}img/help/survey-pick-cards.png"></img></p>
+                    </p>{% blocktrans %}By only including certain cards, you can keep the Arches Collector users focused on the specific information you want them to gather.{% endblocktrans %}</p>
+                    <p>{% blocktrans %}All card-level permissions that are defined in a resource model will be honored during data collection.{% endblocktrans %}</p>
+                </div>
+            </div>
+            <div>
+                <a href="javascript:void(0)" class="ep-help-topic-toggle">
+                    <h5>{% trans "Data" %}</h5>
+                </a>
+                <div class="ep-help-topic-content">
+                    <p>{% blocktrans %}If you want users to edit existing resources in your database, you must include these resources in the Data Download section. You can limit the number of resources that get downloaded, with the default maximum limit being 2000. If the resource model you want to download includes geometry, only resources from within your Map Extent will be downloaded.{% endblocktrans %}</p>
+                    <p>{% blocktrans %}You can also choose a custom download of resources. Simply go to the search page, construct a search query, and copy and paste the URL in the Custom Download URL box. All of the resources that appeared in the search results in the search page will be included when users download this survey.{% endblocktrans %}</p>
+                </div>
+            </div>
+            <div>
+                <a href="javascript:void(0)" class="ep-help-topic-toggle">
+                    <h5>{% trans "People" %}</h5>
+                </a>
+                <div class="ep-help-topic-content">
+                    <p>{% blocktrans %}When someone connects to this Arches instance from their mobile device using Arches Collector, they will only be able to access this survey if they have been approved to do so.{% endblocktrans %}</p>
+                    <p>{% blocktrans %}When modifying group and user mobile survey approvals, bear in mind the following: {% endblocktrans %}</p>
+                    <ul style="">
+                        <li>{% blocktrans %} By approving a group, all members will be approved {% endblocktrans %}</li>
+                        <li>{% blocktrans %} By disapproving a group, all members will be disapproved unless they are approved as a member of a different group {% endblocktrans %}</li>
+                        <li>{% blocktrans %} You may approve or disapprove a user regardless of the approval status of any group to which that user belongs {% endblocktrans %}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle">
+            <h4>{% trans "About Syncing Surveys" %}</h4>
+            &nbsp;<i class="ep-help-topic-toggle-icon fa fa-chevron-right"></i>
+        </a>
+        <div class="ep-help-topic-content">
+            <p>After you have activated a survey, and users have begun downloading it and entering data, they are able to sync their changes back to this database at any time. New resources will appear on the map immediately. However, <strong>syncing data is a one-way street</strong> and any changes that you have made on the web database will not be pushed back down to the Arches Collector users. <em>Their initial download of the survey is the only time they receive data from the web database.</em></p>
         </div>
     </div>
 </div>
