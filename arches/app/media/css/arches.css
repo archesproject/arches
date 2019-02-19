@@ -730,6 +730,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 
 .select2-container {
     width: 100%!important;
+    height: 32px;
 }
 
 .select2-choice {
@@ -9280,12 +9281,13 @@ a.clear-geojson-button:hover {
 }
 
 .msm-locked-warning {
-    height: 40px;
+    height: 60px;
     background: #999;
+    font-size: 14px;
     color: #fff;
     padding-left: 10px;
     position: relative;
-    padding-top: 10px;
+    padding-top: 20px;
 }
 
 .msm-list-filter {
@@ -10967,9 +10969,9 @@ a.search-facet-item.disabled {
     height: 60px;
     width: 60px;
     border-radius: 50%;
-    border: 1px solid #bbb;
+    border: 1px solid #7080CB;
     color: #7080CB;
-    background: #eee;
+    background: #E1EAFC;
     font-size: 28px;
     padding-top: 14px;
     padding-left: 2px;
@@ -10977,9 +10979,9 @@ a.search-facet-item.disabled {
 
 .model-selection .msm-icon-wrap {
     background: #fff;
-    color:#2d3c4b;
+    color:steelblue;
     padding-top: 15px;
-    border: 1px solid #2d3c4b;
+    border: 1px solid steelblue;
 }
 
 .active-survey .msm-icon-wrap {
@@ -10988,6 +10990,14 @@ a.search-facet-item.disabled {
     padding-top: 15px;
     padding-left: 2px;
     border: 1px solid #26a69a;
+}
+
+.incomplete .msm-icon-wrap {
+    background: #FFD264;
+    color:#B88406;
+    padding-top: 13px;
+    padding-left: 2px;
+    border: 1px solid #B88406;
 }
 
 .incomplete.active-survey .msm-icon-wrap {
@@ -11855,6 +11865,11 @@ a.filter-tools:hover {
 
 .msm-survey-status-text {
     margin-top: 0px;
+    padding: 20px 0px 10px 0px;
+}
+
+.msm-survey-requirements-text + .msm-survey-status-text {
+    padding-top: 0px;
 }
 
 .msm-survey-message {
@@ -11864,22 +11879,28 @@ a.filter-tools:hover {
 }
 
 .msm-survey-status-instructions {
-    margin: 10px 20% 20px 20%;
+    margin: 15px 20% 25px 20%;
     padding: 20px 10px 20px 10px;
-    font-size: 17px;
-    background: #ddd;
-    border: 1px solid #aaa;
-    color: #2A096E;
+    font-size: 15px;
+    background: #FFC741;
+    border: 1px solid #ffb300;
+    color: #fff;
     text-align: center;
     border-radius: 2px;
 }
 
+
 .msm-save-message {
     padding-top: 20px;
-    font-size: 17px;
+    font-size: 16px;
     color: #2A096E;
     text-align: center;
 }
+
+.msm-survey-status-instructions + .msm-save-message {
+    padding-top: 0px;
+}
+
 
 .msm-survey-issues {
     padding-top: 20px;
@@ -11887,6 +11908,11 @@ a.filter-tools:hover {
     color: #888;
     list-style-type: none;
 }
+
+.msm-survey-status-instructions + .text-center .msm-survey-issues {
+    padding-top: 0px;
+}
+
 
 .msm-splash-instruction {
     padding: 0px 60px;

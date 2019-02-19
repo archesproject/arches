@@ -131,12 +131,9 @@ class Sync(APIBase):
 
 class Surveys(APIBase):
 
-    def get(self, request):
+    def get(self, request, surveyid=None):
         if hasattr(request.user, 'userprofile') is not True:
             models.UserProfile.objects.create(user=request.user)
-        viewable_nodegroups = request.user.userprofile.viewable_nodegroups
-        editable_nodegroups = request.user.userprofile.editable_nodegroups
-        permitted_nodegroups = viewable_nodegroups.union(editable_nodegroups)
 
         def get_child_cardids(card, cardset):
             for child_card in models.CardModel.objects.filter(nodegroup__parentnodegroup_id=card.nodegroup_id):
@@ -144,26 +141,41 @@ class Surveys(APIBase):
                 get_child_cardids(child_card, cardset)
 
         group_ids = list(request.user.groups.values_list('id', flat=True))
-        projects = MobileSurvey.objects.filter(Q(users__in=[request.user]) | Q(groups__in=group_ids), active=True).distinct()
-        projects_for_couch = [project.serialize_for_mobile() for project in projects]
-        for project in projects_for_couch:
-            permitted_cards = set()
-            ordered_project_cards = project['cards']
-            for rootcardid in project['cards']:
-                card = models.CardModel.objects.get(cardid=rootcardid)
-                if str(card.nodegroup_id) in permitted_nodegroups:
-                    permitted_cards.add(str(card.cardid))
-                    get_child_cardids(card, permitted_cards)
-            project['cards'] = list(permitted_cards)
-            for graph in project['graphs']:
-                cards = []
-                for card in graph['cards']:
-                    if card['cardid'] in project['cards']:
-                        card['relative_position'] = ordered_project_cards.index(
-                            card['cardid']) if card['cardid'] in ordered_project_cards else None
-                        cards.append(card)
-                graph['cards'] = sorted(cards, key=lambda x: x['relative_position'])
-        response = JSONResponse(projects_for_couch, indent=4)
+
+        if request.GET.get('status', None) is not None:
+            ret = {}
+            surveys = MobileSurvey.objects.filter(users__in=[request.user]).distinct()
+            for survey in surveys:
+                survey.deactivate_expired_survey()
+                ret[survey.id] = {'active': survey.active}
+            response = JSONResponse(ret, indent=4)
+        else:
+            viewable_nodegroups = request.user.userprofile.viewable_nodegroups
+            editable_nodegroups = request.user.userprofile.editable_nodegroups
+            permitted_nodegroups = viewable_nodegroups.union(editable_nodegroups)
+            projects = MobileSurvey.objects.filter(users__in=[request.user], active=True).distinct()
+            if surveyid:
+                projects = projects.filter(pk=surveyid)
+            projects_for_couch = [project.serialize_for_mobile() for project in projects]
+            for project in projects_for_couch:
+                project['mapboxkey'] = settings.MAPBOX_API_KEY
+                permitted_cards = set()
+                ordered_project_cards = project['cards']
+                for rootcardid in project['cards']:
+                    card = models.CardModel.objects.get(cardid=rootcardid)
+                    if str(card.nodegroup_id) in permitted_nodegroups:
+                        permitted_cards.add(str(card.cardid))
+                        get_child_cardids(card, permitted_cards)
+                project['cards'] = list(permitted_cards)
+                for graph in project['graphs']:
+                    cards = []
+                    for card in graph['cards']:
+                        if card['cardid'] in project['cards']:
+                            card['relative_position'] = ordered_project_cards.index(
+                                card['cardid']) if card['cardid'] in ordered_project_cards else None
+                            cards.append(card)
+                    graph['cards'] = sorted(cards, key=lambda x: x['relative_position'])
+            response = JSONResponse(projects_for_couch, indent=4)
         return response
 
 

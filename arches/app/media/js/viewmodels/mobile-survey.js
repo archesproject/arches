@@ -38,7 +38,7 @@ define([
                 }, 200);
         };
         this.history = params.history;
-        this.locked = _.keys(this.history.editors) > 0 || false;
+        this.locked = _.keys(this.history.editors).length > 0 || false;
         this.history.lastsync = moment(this.history.lastsync);
         _.each(this.history.editors, function(editor) {
             editor.lastsync = moment(editor.lastsync);
@@ -90,6 +90,9 @@ define([
             })
                 .done(function(data){
                     var rootCards = self.getRootCards(data.cards);
+                    rootCards.sort(function(a, b) {
+                        return a.sortorder - b.sortorder;
+                    })();
                     resource.cards(ko.unwrap(rootCards));
                 });
         };

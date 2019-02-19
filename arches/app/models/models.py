@@ -15,6 +15,7 @@ import json
 import uuid
 import importlib
 import datetime
+from datetime import timedelta
 from django.forms.models import model_to_dict
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
@@ -953,6 +954,19 @@ class MobileSurveyModel(models.Model):
     class Meta:
         managed = True
         db_table = 'mobile_surveys'
+
+    @property
+    def expired(self):
+        result = False
+        if self.enddate is not None:
+            enddate = datetime.datetime.strftime(self.enddate, '%Y-%m-%d')
+            result = (datetime.datetime.strptime(enddate, '%Y-%m-%d') - datetime.datetime.now() + timedelta(hours=24)).days < 0
+        return result
+
+    def deactivate_expired_survey(self):
+        if self.expired:
+            self.active = False
+            self.save()
 
 
 class MobileSurveyXUser(models.Model):

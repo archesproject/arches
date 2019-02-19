@@ -428,31 +428,25 @@ class MobileSurvey(models.MobileSurveyModel):
                     print 'no instances found in', search_res
         return all_instances
 
-    def load_tiles_into_couch(self, instances):
+    def load_tiles_into_couch(self, instances, nodegroup):
         """
         Takes a mobile survey object, a couch database instance, and a dictionary
         of resource instances to identify eligible tiles and load them into the
         database instance
         """
         db = self.couch.create_db('project_' + str(self.id))
-        cards = self.cards.all()
-        for card in cards:
-            tiles = models.TileModel.objects.filter(nodegroup=card.nodegroup_id)
-            tiles_serialized = json.loads(JSONSerializer().serialize(tiles))
-            for tile in tiles_serialized:
-                if str(tile['resourceinstance_id']) in instances:
-                    try:
-                        tile['type'] = 'tile'
-                        self.couch.update_doc(db, tile, tile['tileid'])
-                        # couch_record = db.get(tile['tileid'])
-                        # if couch_record == None:
-                        #     db[tile['tileid']] = tile
-                        # else:
-                        #     if couch_record['data'] != tile['data']:
-                        #         couch_record['data'] = tile['data']
-                        #         db[tile['tileid']] = couch_record
-                    except Exception as e:
-                        print e, tile
+        tiles = models.TileModel.objects.filter(nodegroup=nodegroup)
+        tiles_serialized = json.loads(JSONSerializer().serialize(tiles))
+        for tile in tiles_serialized:
+            if str(tile['resourceinstance_id']) in instances:
+                try:
+                    tile['type'] = 'tile'
+                    self.couch.update_doc(db, tile, tile['tileid'])
+                except Exception as e:
+                    print e, tile
+        nodegroups = models.NodeGroup.objects.filter(parentnodegroup=nodegroup)
+        for nodegroup in nodegroups:
+            self.load_tiles_into_couch(instances, nodegroup)
 
     def load_instances_into_couch(self, instances):
         """
@@ -473,5 +467,7 @@ class MobileSurvey(models.MobileSurveyModel):
         tile and resource instance data into the couch instance.
         """
         instances = self.collect_resource_instances_for_couch()
-        self.load_tiles_into_couch(instances)
+        cards = self.cards.all()
+        for card in cards:
+            self.load_tiles_into_couch(instances, card.nodegroup)
         self.load_instances_into_couch(instances)
