@@ -142,7 +142,7 @@ class RdfWriter(Writer):
 
                 # add the edge from the parent node to this tile's root node
                 # where the tile has no parent tile, which means the domain node has no tile_id
-                if graph_info['subgraphs'][tile.nodegroup]['parentnode_nodegroup'] == None:
+                if graph_info['subgraphs'][tile.nodegroup]['parentnode_nodegroup'] is None:
                     edge = graph_info['subgraphs'][tile.nodegroup]['inedge']
                     if edge.domainnode.istopnode:
                         domainnode = archesproject[reverse('resources', args=[resourceinstanceid]).lstrip('/')]
@@ -153,7 +153,7 @@ class RdfWriter(Writer):
 
                 # add the edge from the parent node to this tile's root node
                 # where the tile has a parent tile
-                if graph_info['subgraphs'][tile.nodegroup]['parentnode_nodegroup'] != None:
+                if graph_info['subgraphs'][tile.nodegroup]['parentnode_nodegroup'] is not None:
                     edge = graph_info['subgraphs'][tile.nodegroup]['inedge']
                     domainnode = archesproject["tile/%s/node/%s" % (str(tile.parenttile.pk), str(edge.domainnode.pk))]
                     rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]

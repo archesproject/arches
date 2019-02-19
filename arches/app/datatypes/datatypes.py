@@ -1601,7 +1601,6 @@ class NodeValueDataType(BaseDataType):
         pass
 
 
-
 def get_value_from_jsonld(json_ld_node):
     try:
         return (json_ld_node[0].get("@value"), json_ld_node[0].get("@language"))
@@ -1612,4 +1611,3 @@ def get_value_from_jsonld(json_ld_node):
             return
     except IndexError as e:
         return
-

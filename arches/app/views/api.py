@@ -379,8 +379,6 @@ class Resources(APIBase):
                 except Exception as e:
                     return JSONResponse({"error": "resource data could not be saved"}, status=500, reason=e)
 
-
-
     def post(self, request, resourceid=None, slug=None, graphid=None):
         try:
             indent = int(request.POST.get('indent', None))
