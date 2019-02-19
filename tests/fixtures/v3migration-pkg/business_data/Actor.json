@@ -1,0 +1,969 @@
+{
+    "business_data": {
+        "resources": [
+            {
+                "resourceinstance": {
+                    "graph_id": "ccbd1537-ac5e-11e6-84a5-026d961c88e6", 
+                    "legacyid": "7a25592a-d413-47f0-b041-16d83b9a206b", 
+                    "resourceinstanceid": "7a25592a-d413-47f0-b041-16d83b9a206b"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "1b6d7661-943b-11e8-b811-94659cf754d0": "Adams, Little and Wood", 
+                            "1b6d7664-943b-11e8-a3b3-94659cf754d0": "a4c88313-52c5-4b6a-9579-3fc5aad17335"
+                        }, 
+                        "nodegroup_id": "1b6d7661-943b-11e8-b811-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "7a25592a-d413-47f0-b041-16d83b9a206b", 
+                        "sortorder": 0, 
+                        "tileid": "545f6b80-1f38-11e9-bfc2-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "fb611dde-943a-11e8-a82c-94659cf754d0": "c763b6ec-94f1-42a2-a061-84257af9afa8"
+                        }, 
+                        "nodegroup_id": "fb60f6d0-943a-11e8-835a-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "7a25592a-d413-47f0-b041-16d83b9a206b", 
+                        "sortorder": 0, 
+                        "tileid": "546007c0-1f38-11e9-9805-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "cd95ca06-943a-11e8-90a5-94659cf754d0": "1941-01-01", 
+                            "cd95ca08-943a-11e8-ad5d-94659cf754d0": "5a6ebe20-b979-40c6-81a4-c051c23a73f7", 
+                            "cd95ca0b-943a-11e8-8e28-94659cf754d0": "1916-01-01"
+                        }, 
+                        "nodegroup_id": "cd95ca01-943a-11e8-84dc-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "7a25592a-d413-47f0-b041-16d83b9a206b", 
+                        "sortorder": 0, 
+                        "tileid": "5460cb0f-1f38-11e9-a206-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "0eb367e6-943b-11e8-97ad-94659cf754d0": "0953a03d-b34d-4181-b909-0444b30889ea"
+                        }, 
+                        "nodegroup_id": "0eb367e2-943b-11e8-8b46-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "7a25592a-d413-47f0-b041-16d83b9a206b", 
+                        "sortorder": 0, 
+                        "tileid": "54618e61-1f38-11e9-b403-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "de257195-943a-11e8-a070-94659cf754d0": "6e67fa52-0189-4093-b908-c74fb0da3eeb", 
+                            "de2598a1-943a-11e8-9060-94659cf754d0": "<p>Adams, Little and Wood</p><ul><li>&nbsp;Kam Tong Hall, 1914</li><li>&nbsp;Old Tsan Yuk Hospital, 1922</li><li>&nbsp;La Salle College, 1932</li><li>&nbsp;Nethersole Hospital, 1937<br></li></ul>"
+                        }, 
+                        "nodegroup_id": "de257192-943a-11e8-87c6-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "7a25592a-d413-47f0-b041-16d83b9a206b", 
+                        "sortorder": 0, 
+                        "tileid": "54622a9e-1f38-11e9-ac16-94659cf754d0"
+                    }
+                ]
+            }, 
+            {
+                "resourceinstance": {
+                    "graph_id": "ccbd1537-ac5e-11e6-84a5-026d961c88e6", 
+                    "legacyid": "102f9893-a81b-4195-8c76-be3d4e733a39", 
+                    "resourceinstanceid": "102f9893-a81b-4195-8c76-be3d4e733a39"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "1b6d7661-943b-11e8-b811-94659cf754d0": " Francis Robert John ADAMS", 
+                            "1b6d7664-943b-11e8-a3b3-94659cf754d0": "a4c88313-52c5-4b6a-9579-3fc5aad17335"
+                        }, 
+                        "nodegroup_id": "1b6d7661-943b-11e8-b811-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "102f9893-a81b-4195-8c76-be3d4e733a39", 
+                        "sortorder": 0, 
+                        "tileid": "5462edf0-1f38-11e9-b0b1-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "fb611dde-943a-11e8-a82c-94659cf754d0": "778f66b7-eeb1-4cc1-b37d-c5cde0e7dfdd"
+                        }, 
+                        "nodegroup_id": "fb60f6d0-943a-11e8-835a-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "102f9893-a81b-4195-8c76-be3d4e733a39", 
+                        "sortorder": 0, 
+                        "tileid": "54636321-1f38-11e9-9acf-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "ee4e3072-cc0f-11e8-9b34-027f111c8e34": "C.E."
+                        }, 
+                        "nodegroup_id": "ee4e3072-cc0f-11e8-9b34-027f111c8e34", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "102f9893-a81b-4195-8c76-be3d4e733a39", 
+                        "sortorder": 0, 
+                        "tileid": "54642670-1f38-11e9-b2b6-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "ee4e3072-cc0f-11e8-9b34-027f111c8e34": "Authorized Architect 1912-27"
+                        }, 
+                        "nodegroup_id": "ee4e3072-cc0f-11e8-9b34-027f111c8e34", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "102f9893-a81b-4195-8c76-be3d4e733a39", 
+                        "sortorder": 0, 
+                        "tileid": "5464c2ae-1f38-11e9-a109-94659cf754d0"
+                    }
+                ]
+            }, 
+            {
+                "resourceinstance": {
+                    "graph_id": "ccbd1537-ac5e-11e6-84a5-026d961c88e6", 
+                    "legacyid": "e0f04b24-11f6-4b89-9c33-81b5767fe3c9", 
+                    "resourceinstanceid": "e0f04b24-11f6-4b89-9c33-81b5767fe3c9"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "1b6d7661-943b-11e8-b811-94659cf754d0": "George Albert Victor HALL", 
+                            "1b6d7664-943b-11e8-a3b3-94659cf754d0": "a4c88313-52c5-4b6a-9579-3fc5aad17335"
+                        }, 
+                        "nodegroup_id": "1b6d7661-943b-11e8-b811-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "e0f04b24-11f6-4b89-9c33-81b5767fe3c9", 
+                        "sortorder": 0, 
+                        "tileid": "54658600-1f38-11e9-847d-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "cd95ca06-943a-11e8-90a5-94659cf754d0": "1956-01-01", 
+                            "cd95ca08-943a-11e8-ad5d-94659cf754d0": "75e3ee0b-340e-4c81-acad-1bc97a255bfc", 
+                            "cd95ca0b-943a-11e8-8e28-94659cf754d0": "1897-01-01"
+                        }, 
+                        "nodegroup_id": "cd95ca01-943a-11e8-84dc-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "e0f04b24-11f6-4b89-9c33-81b5767fe3c9", 
+                        "sortorder": 0, 
+                        "tileid": "5466be80-1f38-11e9-8dc7-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "0eb367e6-943b-11e8-97ad-94659cf754d0": "fc67f54c-4adc-403a-bc04-347e495ddc7b"
+                        }, 
+                        "nodegroup_id": "0eb367e2-943b-11e8-8b46-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "e0f04b24-11f6-4b89-9c33-81b5767fe3c9", 
+                        "sortorder": 0, 
+                        "tileid": "546781cf-1f38-11e9-8d9e-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "fb611dde-943a-11e8-a82c-94659cf754d0": "778f66b7-eeb1-4cc1-b37d-c5cde0e7dfdd", 
+                            "fb611ddf-943a-11e8-8891-94659cf754d0": "1927-01-01", 
+                            "fb611de2-943a-11e8-afcc-94659cf754d0": "1941-01-01"
+                        }, 
+                        "nodegroup_id": "fb60f6d0-943a-11e8-835a-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "e0f04b24-11f6-4b89-9c33-81b5767fe3c9", 
+                        "sortorder": 0, 
+                        "tileid": "5468ba4f-1f38-11e9-86f2-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "ee4e3072-cc0f-11e8-9b34-027f111c8e34": "RIBA"
+                        }, 
+                        "nodegroup_id": "ee4e3072-cc0f-11e8-9b34-027f111c8e34", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "e0f04b24-11f6-4b89-9c33-81b5767fe3c9", 
+                        "sortorder": 0, 
+                        "tileid": "54697da1-1f38-11e9-a990-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "ee4e3072-cc0f-11e8-9b34-027f111c8e34": "Authorized Architect 1927-41"
+                        }, 
+                        "nodegroup_id": "ee4e3072-cc0f-11e8-9b34-027f111c8e34", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "e0f04b24-11f6-4b89-9c33-81b5767fe3c9", 
+                        "sortorder": 0, 
+                        "tileid": "546ab61e-1f38-11e9-bf14-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "ebe0c371-943a-11e8-8919-94659cf754d0": [
+                                "aeb5401e-2335-43c9-8a48-9a4440ea0d1a", 
+                                "559e6d91-5a77-45bc-9296-f2ea09ceeea1"
+                            ]
+                        }, 
+                        "nodegroup_id": "ebe0c371-943a-11e8-8919-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "e0f04b24-11f6-4b89-9c33-81b5767fe3c9", 
+                        "sortorder": 0, 
+                        "tileid": "546bc78f-1f38-11e9-8644-94659cf754d0"
+                    }
+                ]
+            }, 
+            {
+                "resourceinstance": {
+                    "graph_id": "ccbd1537-ac5e-11e6-84a5-026d961c88e6", 
+                    "legacyid": "8cb382f1-2262-410c-9037-0139e6740f22", 
+                    "resourceinstanceid": "8cb382f1-2262-410c-9037-0139e6740f22"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "1b6d7661-943b-11e8-b811-94659cf754d0": "Douglas LAPRAIK", 
+                            "1b6d7664-943b-11e8-a3b3-94659cf754d0": "a4c88313-52c5-4b6a-9579-3fc5aad17335"
+                        }, 
+                        "nodegroup_id": "1b6d7661-943b-11e8-b811-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "8cb382f1-2262-410c-9037-0139e6740f22", 
+                        "sortorder": 0, 
+                        "tileid": "546c63d1-1f38-11e9-99cf-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "be9d6e24-e742-11e6-84a6-026d961c88e6", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "8cb382f1-2262-410c-9037-0139e6740f22", 
+                        "sortorder": 0, 
+                        "tileid": "4b25aa27-5ef7-4ea0-8c76-07c0c06727d4"
+                    }, 
+                    {
+                        "data": {
+                            "be9d6e15-e742-11e6-84a6-026d961c88e6": "Scotland", 
+                            "be9d6e27-e742-11e6-84a6-026d961c88e6": "0c86c632-1a02-4f9e-a791-35e9e2fa3c0f"
+                        }, 
+                        "nodegroup_id": "be9d6e15-e742-11e6-84a6-026d961c88e6", 
+                        "parenttile_id": "4b25aa27-5ef7-4ea0-8c76-07c0c06727d4", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "8cb382f1-2262-410c-9037-0139e6740f22", 
+                        "sortorder": 0, 
+                        "tileid": "546d9c4f-1f38-11e9-b1fd-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "be9d6e18-e742-11e6-84a6-026d961c88e6", 
+                        "parenttile_id": "4b25aa27-5ef7-4ea0-8c76-07c0c06727d4", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "8cb382f1-2262-410c-9037-0139e6740f22", 
+                        "sortorder": 0, 
+                        "tileid": "546dea70-1f38-11e9-9361-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "be9d6e1b-e742-11e6-84a6-026d961c88e6", 
+                        "parenttile_id": "4b25aa27-5ef7-4ea0-8c76-07c0c06727d4", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "8cb382f1-2262-410c-9037-0139e6740f22", 
+                        "sortorder": 0, 
+                        "tileid": "546e388f-1f38-11e9-8e25-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "be9d6e1e-e742-11e6-84a6-026d961c88e6", 
+                        "parenttile_id": "4b25aa27-5ef7-4ea0-8c76-07c0c06727d4", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "8cb382f1-2262-410c-9037-0139e6740f22", 
+                        "sortorder": 0, 
+                        "tileid": "546e86b0-1f38-11e9-8795-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "be9d6e21-e742-11e6-84a6-026d961c88e6", 
+                        "parenttile_id": "4b25aa27-5ef7-4ea0-8c76-07c0c06727d4", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "8cb382f1-2262-410c-9037-0139e6740f22", 
+                        "sortorder": 0, 
+                        "tileid": "546ed4cf-1f38-11e9-82fd-94659cf754d0"
+                    }
+                ]
+            }, 
+            {
+                "resourceinstance": {
+                    "graph_id": "ccbd1537-ac5e-11e6-84a5-026d961c88e6", 
+                    "legacyid": "375b7ed5-7d58-4158-b30e-870fffd21981", 
+                    "resourceinstanceid": "375b7ed5-7d58-4158-b30e-870fffd21981"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "1b6d7661-943b-11e8-b811-94659cf754d0": "Shiu Tai", 
+                            "1b6d7664-943b-11e8-a3b3-94659cf754d0": "a4c88313-52c5-4b6a-9579-3fc5aad17335"
+                        }, 
+                        "nodegroup_id": "1b6d7661-943b-11e8-b811-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "375b7ed5-7d58-4158-b30e-870fffd21981", 
+                        "sortorder": 0, 
+                        "tileid": "546f9821-1f38-11e9-ac6a-94659cf754d0"
+                    }
+                ]
+            }, 
+            {
+                "resourceinstance": {
+                    "graph_id": "ccbd1537-ac5e-11e6-84a5-026d961c88e6", 
+                    "legacyid": "9917b2b4-41a9-4b90-9b0c-6fefe47bbf10", 
+                    "resourceinstanceid": "9917b2b4-41a9-4b90-9b0c-6fefe47bbf10"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "cd95ca06-943a-11e8-90a5-94659cf754d0": "2015-08-08", 
+                            "cd95ca08-943a-11e8-ad5d-94659cf754d0": "5fab9c77-8b86-4154-9d92-2dc7f0386ea1", 
+                            "cd95ca0b-943a-11e8-8e28-94659cf754d0": "1920-09-01"
+                        }, 
+                        "nodegroup_id": "cd95ca01-943a-11e8-84dc-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "9917b2b4-41a9-4b90-9b0c-6fefe47bbf10", 
+                        "sortorder": 0, 
+                        "tileid": "54705b6e-1f38-11e9-b494-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "0eb367e6-943b-11e8-97ad-94659cf754d0": "8b756e81-50bb-4138-bad6-e16e27574b27"
+                        }, 
+                        "nodegroup_id": "0eb367e2-943b-11e8-8b46-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "9917b2b4-41a9-4b90-9b0c-6fefe47bbf10", 
+                        "sortorder": 0, 
+                        "tileid": "5470f7b0-1f38-11e9-9f9d-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "fb611ddf-943a-11e8-8891-94659cf754d0": "1987-01-09", 
+                            "fb611de2-943a-11e8-afcc-94659cf754d0": "2015-04-08"
+                        }, 
+                        "nodegroup_id": "fb60f6d0-943a-11e8-835a-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "9917b2b4-41a9-4b90-9b0c-6fefe47bbf10", 
+                        "sortorder": 0, 
+                        "tileid": "5471bb00-1f38-11e9-9f02-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "de257195-943a-11e8-a070-94659cf754d0": "6e67fa52-0189-4093-b908-c74fb0da3eeb", 
+                            "de2598a1-943a-11e8-9060-94659cf754d0": "<p></p><p>1969-1972 served as Vice Chancellor of Nanyang University</p>1972-1986 served as Vice Chancellor of The University of Hong Kong<p></p><p></p><p>1987 assumed office as Hong Kong incumbent</p><p></p>"
+                        }, 
+                        "nodegroup_id": "de257192-943a-11e8-87c6-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "9917b2b4-41a9-4b90-9b0c-6fefe47bbf10", 
+                        "sortorder": 0, 
+                        "tileid": "54725740-1f38-11e9-864a-94659cf754d0"
+                    }
+                ]
+            }, 
+            {
+                "resourceinstance": {
+                    "graph_id": "ccbd1537-ac5e-11e6-84a5-026d961c88e6", 
+                    "legacyid": "0fd60848-8b2d-4bc5-ba68-276c46fca46c", 
+                    "resourceinstanceid": "0fd60848-8b2d-4bc5-ba68-276c46fca46c"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "1b6d7661-943b-11e8-b811-94659cf754d0": "Sir William Peel (\u8c9d\u7490)", 
+                            "1b6d7664-943b-11e8-a3b3-94659cf754d0": "a4c88313-52c5-4b6a-9579-3fc5aad17335"
+                        }, 
+                        "nodegroup_id": "1b6d7661-943b-11e8-b811-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "0fd60848-8b2d-4bc5-ba68-276c46fca46c", 
+                        "sortorder": 0, 
+                        "tileid": "5472f380-1f38-11e9-91ca-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "cd95ca06-943a-11e8-90a5-94659cf754d0": "1945-02-24", 
+                            "cd95ca08-943a-11e8-ad5d-94659cf754d0": "75e3ee0b-340e-4c81-acad-1bc97a255bfc", 
+                            "cd95ca0b-943a-11e8-8e28-94659cf754d0": "1875-02-27"
+                        }, 
+                        "nodegroup_id": "cd95ca01-943a-11e8-84dc-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "0fd60848-8b2d-4bc5-ba68-276c46fca46c", 
+                        "sortorder": 0, 
+                        "tileid": "54738fc0-1f38-11e9-86d8-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "0eb367e6-943b-11e8-97ad-94659cf754d0": "fc67f54c-4adc-403a-bc04-347e495ddc7b"
+                        }, 
+                        "nodegroup_id": "0eb367e2-943b-11e8-8b46-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "0fd60848-8b2d-4bc5-ba68-276c46fca46c", 
+                        "sortorder": 0, 
+                        "tileid": "5474530f-1f38-11e9-affd-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "de257195-943a-11e8-a070-94659cf754d0": "6e67fa52-0189-4093-b908-c74fb0da3eeb", 
+                            "de2598a1-943a-11e8-9060-94659cf754d0": "Sir William Peel was a British colonial administrator who became the 18th Governor of Hong Kong (1930-1935)<br>"
+                        }, 
+                        "nodegroup_id": "de257192-943a-11e8-87c6-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "0fd60848-8b2d-4bc5-ba68-276c46fca46c", 
+                        "sortorder": 0, 
+                        "tileid": "54751661-1f38-11e9-9036-94659cf754d0"
+                    }
+                ]
+            }, 
+            {
+                "resourceinstance": {
+                    "graph_id": "ccbd1537-ac5e-11e6-84a5-026d961c88e6", 
+                    "legacyid": "d6b98140-7bb3-44ed-a88a-7e85d35c9a19", 
+                    "resourceinstanceid": "d6b98140-7bb3-44ed-a88a-7e85d35c9a19"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "fb611ddf-943a-11e8-8891-94659cf754d0": "1930-01-01", 
+                            "fb611de2-943a-11e8-afcc-94659cf754d0": "1935-01-01"
+                        }, 
+                        "nodegroup_id": "fb60f6d0-943a-11e8-835a-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "d6b98140-7bb3-44ed-a88a-7e85d35c9a19", 
+                        "sortorder": 0, 
+                        "tileid": "5475b29e-1f38-11e9-adae-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "de257195-943a-11e8-a070-94659cf754d0": "6e67fa52-0189-4093-b908-c74fb0da3eeb", 
+                            "de2598a1-943a-11e8-9060-94659cf754d0": "<span style=\"font-weight: 700; color: rgb(37, 37, 37); font-family: sans-serif; font-size: 14px; line-height: 22.4px;\">Sir William Peel</span><span style=\"color: rgb(37, 37, 37); font-family: sans-serif; font-size: 14px; line-height: 22.4px;\">&nbsp;</span><span style=\"color: rgb(37, 37, 37); font-family: sans-serif; font-size: 14px; line-height: 22.4px;\">(Chinese name: \u8c9d\u7490, 27 February 1875 \u2013 24 February 1945) was a British C</span><span style=\"color: rgb(37, 37, 37); font-family: sans-serif; font-size: 14px; line-height: 22.4px;\">olonial administrator who was the 18th Governor of Hong Kong from May 9, 1930 until May 17, 1935. &nbsp;He also served as Chancellor of the University of Hong Kong from 1930 to 1935. &nbsp;(sample text info from Wikipedia and HKU lib)</span>"
+                        }, 
+                        "nodegroup_id": "de257192-943a-11e8-87c6-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "d6b98140-7bb3-44ed-a88a-7e85d35c9a19", 
+                        "sortorder": 0, 
+                        "tileid": "547675f0-1f38-11e9-98a8-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "cd95ca06-943a-11e8-90a5-94659cf754d0": "1945-02-24", 
+                            "cd95ca08-943a-11e8-ad5d-94659cf754d0": "5fab9c77-8b86-4154-9d92-2dc7f0386ea1", 
+                            "cd95ca0b-943a-11e8-8e28-94659cf754d0": "1875-02-27"
+                        }, 
+                        "nodegroup_id": "cd95ca01-943a-11e8-84dc-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "d6b98140-7bb3-44ed-a88a-7e85d35c9a19", 
+                        "sortorder": 0, 
+                        "tileid": "54771230-1f38-11e9-bd18-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "0eb367e6-943b-11e8-97ad-94659cf754d0": "8b756e81-50bb-4138-bad6-e16e27574b27"
+                        }, 
+                        "nodegroup_id": "0eb367e2-943b-11e8-8b46-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "d6b98140-7bb3-44ed-a88a-7e85d35c9a19", 
+                        "sortorder": 0, 
+                        "tileid": "5477fc91-1f38-11e9-9841-94659cf754d0"
+                    }
+                ]
+            }, 
+            {
+                "resourceinstance": {
+                    "graph_id": "ccbd1537-ac5e-11e6-84a5-026d961c88e6", 
+                    "legacyid": "9f0c60ef-474f-47f1-bee8-229d47bb5f98", 
+                    "resourceinstanceid": "9f0c60ef-474f-47f1-bee8-229d47bb5f98"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "1b6d7661-943b-11e8-b811-94659cf754d0": "Kenneth Fung Ping Fan", 
+                            "1b6d7664-943b-11e8-a3b3-94659cf754d0": "a4c88313-52c5-4b6a-9579-3fc5aad17335"
+                        }, 
+                        "nodegroup_id": "1b6d7661-943b-11e8-b811-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "9f0c60ef-474f-47f1-bee8-229d47bb5f98", 
+                        "sortorder": 0, 
+                        "tileid": "547898cf-1f38-11e9-929f-94659cf754d0"
+                    }
+                ]
+            }, 
+            {
+                "resourceinstance": {
+                    "graph_id": "ccbd1537-ac5e-11e6-84a5-026d961c88e6", 
+                    "legacyid": "b58cd342-7366-4504-a13c-25034b6b6ce5", 
+                    "resourceinstanceid": "b58cd342-7366-4504-a13c-25034b6b6ce5"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "1b6d7661-943b-11e8-b811-94659cf754d0": "Chung Yuen", 
+                            "1b6d7664-943b-11e8-a3b3-94659cf754d0": "a4c88313-52c5-4b6a-9579-3fc5aad17335"
+                        }, 
+                        "nodegroup_id": "1b6d7661-943b-11e8-b811-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "b58cd342-7366-4504-a13c-25034b6b6ce5", 
+                        "sortorder": 0, 
+                        "tileid": "5479350f-1f38-11e9-9d00-94659cf754d0"
+                    }
+                ]
+            }, 
+            {
+                "resourceinstance": {
+                    "graph_id": "ccbd1537-ac5e-11e6-84a5-026d961c88e6", 
+                    "legacyid": "501d3f3d-f59f-49c6-832a-8ca0c82322a7", 
+                    "resourceinstanceid": "501d3f3d-f59f-49c6-832a-8ca0c82322a7"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "1b6d7661-943b-11e8-b811-94659cf754d0": "Dodwell & Company Ltd", 
+                            "1b6d7664-943b-11e8-a3b3-94659cf754d0": "a4c88313-52c5-4b6a-9579-3fc5aad17335"
+                        }, 
+                        "nodegroup_id": "1b6d7661-943b-11e8-b811-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "501d3f3d-f59f-49c6-832a-8ca0c82322a7", 
+                        "sortorder": 0, 
+                        "tileid": "5479d14f-1f38-11e9-84f9-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "fb611dde-943a-11e8-a82c-94659cf754d0": "b0e4a242-3f6b-43ab-b306-29d8a59e6e1a"
+                        }, 
+                        "nodegroup_id": "fb60f6d0-943a-11e8-835a-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "501d3f3d-f59f-49c6-832a-8ca0c82322a7", 
+                        "sortorder": 0, 
+                        "tileid": "547a94a1-1f38-11e9-853e-94659cf754d0"
+                    }
+                ]
+            }, 
+            {
+                "resourceinstance": {
+                    "graph_id": "ccbd1537-ac5e-11e6-84a5-026d961c88e6", 
+                    "legacyid": "b0ffe2bf-95cc-4058-841f-7cb5308f73a8", 
+                    "resourceinstanceid": "b0ffe2bf-95cc-4058-841f-7cb5308f73a8"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "1b6d7661-943b-11e8-b811-94659cf754d0": "Way & Hall, Architects and Surveyors", 
+                            "1b6d7664-943b-11e8-a3b3-94659cf754d0": "a4c88313-52c5-4b6a-9579-3fc5aad17335"
+                        }, 
+                        "nodegroup_id": "1b6d7661-943b-11e8-b811-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "b0ffe2bf-95cc-4058-841f-7cb5308f73a8", 
+                        "sortorder": 0, 
+                        "tileid": "547b30e1-1f38-11e9-89be-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "de257195-943a-11e8-a070-94659cf754d0": "a27bc4f6-4584-43ef-b703-129bf6262934", 
+                            "de2598a1-943a-11e8-9060-94659cf754d0": "<span id=\"docs-internal-guid-d0391baa-cb1d-4a21-3c86-5739a40fd867\"><span style=\"font-size: 14.6667px; font-family: Calibri; color: rgb(0, 0, 0); vertical-align: baseline; white-space: pre-wrap; background-color: transparent;\">Mr. George Hall, of <span style=\"font-size: 14.6667px; line-height: 20.9524px;\">Way and Hall Architects and Surveyors, was the </span>architect in charge of the rehabilitation of the Great Hall (Main Building, HKU) after damage from WWII.</span></span>"
+                        }, 
+                        "nodegroup_id": "de257192-943a-11e8-87c6-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "b0ffe2bf-95cc-4058-841f-7cb5308f73a8", 
+                        "sortorder": 0, 
+                        "tileid": "547bcd1e-1f38-11e9-8ac9-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "cd95ca06-943a-11e8-90a5-94659cf754d0": "1956-01-01", 
+                            "cd95ca08-943a-11e8-ad5d-94659cf754d0": "5a6ebe20-b979-40c6-81a4-c051c23a73f7", 
+                            "cd95ca0b-943a-11e8-8e28-94659cf754d0": "1934-01-01"
+                        }, 
+                        "nodegroup_id": "cd95ca01-943a-11e8-84dc-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "b0ffe2bf-95cc-4058-841f-7cb5308f73a8", 
+                        "sortorder": 0, 
+                        "tileid": "547c9070-1f38-11e9-b173-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "0eb367e6-943b-11e8-97ad-94659cf754d0": "0953a03d-b34d-4181-b909-0444b30889ea"
+                        }, 
+                        "nodegroup_id": "0eb367e2-943b-11e8-8b46-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "b0ffe2bf-95cc-4058-841f-7cb5308f73a8", 
+                        "sortorder": 0, 
+                        "tileid": "547d2cb0-1f38-11e9-bae7-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "fb611dde-943a-11e8-a82c-94659cf754d0": "c763b6ec-94f1-42a2-a061-84257af9afa8", 
+                            "fb611ddf-943a-11e8-8891-94659cf754d0": "1934-01-01", 
+                            "fb611de2-943a-11e8-afcc-94659cf754d0": "1956-01-01"
+                        }, 
+                        "nodegroup_id": "fb60f6d0-943a-11e8-835a-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "b0ffe2bf-95cc-4058-841f-7cb5308f73a8", 
+                        "sortorder": 0, 
+                        "tileid": "547dc8f0-1f38-11e9-afab-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "1b6d7661-943b-11e8-b811-94659cf754d0": "Hall & Hall", 
+                            "1b6d7664-943b-11e8-a3b3-94659cf754d0": "0339d37d-bbbf-4c64-85e1-b92fc740f2fa"
+                        }, 
+                        "nodegroup_id": "1b6d7661-943b-11e8-b811-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "b0ffe2bf-95cc-4058-841f-7cb5308f73a8", 
+                        "sortorder": 0, 
+                        "tileid": "547e652e-1f38-11e9-b3f9-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "cd95ca06-943a-11e8-90a5-94659cf754d0": "1933-01-01", 
+                            "cd95ca08-943a-11e8-ad5d-94659cf754d0": "5a6ebe20-b979-40c6-81a4-c051c23a73f7", 
+                            "cd95ca0b-943a-11e8-8e28-94659cf754d0": "1928-01-01"
+                        }, 
+                        "nodegroup_id": "cd95ca01-943a-11e8-84dc-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "b0ffe2bf-95cc-4058-841f-7cb5308f73a8", 
+                        "sortorder": 0, 
+                        "tileid": "547f4f8f-1f38-11e9-8dcf-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "0eb367e6-943b-11e8-97ad-94659cf754d0": "0953a03d-b34d-4181-b909-0444b30889ea"
+                        }, 
+                        "nodegroup_id": "0eb367e2-943b-11e8-8b46-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "b0ffe2bf-95cc-4058-841f-7cb5308f73a8", 
+                        "sortorder": 0, 
+                        "tileid": "54806100-1f38-11e9-8775-94659cf754d0"
+                    }
+                ]
+            }, 
+            {
+                "resourceinstance": {
+                    "graph_id": "ccbd1537-ac5e-11e6-84a5-026d961c88e6", 
+                    "legacyid": "c73293bd-bf90-401b-beda-4ea6211fe292", 
+                    "resourceinstanceid": "c73293bd-bf90-401b-beda-4ea6211fe292"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "1b6d7661-943b-11e8-b811-94659cf754d0": "Hung Yue & Company", 
+                            "1b6d7664-943b-11e8-a3b3-94659cf754d0": "a4c88313-52c5-4b6a-9579-3fc5aad17335"
+                        }, 
+                        "nodegroup_id": "1b6d7661-943b-11e8-b811-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "c73293bd-bf90-401b-beda-4ea6211fe292", 
+                        "sortorder": 0, 
+                        "tileid": "54814b5e-1f38-11e9-a05b-94659cf754d0"
+                    }
+                ]
+            }, 
+            {
+                "resourceinstance": {
+                    "graph_id": "ccbd1537-ac5e-11e6-84a5-026d961c88e6", 
+                    "legacyid": "85a6de6b-a8f0-4e21-877e-11ad4c222877", 
+                    "resourceinstanceid": "85a6de6b-a8f0-4e21-877e-11ad4c222877"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "1b6d7661-943b-11e8-b811-94659cf754d0": "The Jardine Engineering Corporation", 
+                            "1b6d7664-943b-11e8-a3b3-94659cf754d0": "a4c88313-52c5-4b6a-9579-3fc5aad17335"
+                        }, 
+                        "nodegroup_id": "1b6d7661-943b-11e8-b811-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "85a6de6b-a8f0-4e21-877e-11ad4c222877", 
+                        "sortorder": 0, 
+                        "tileid": "548235c0-1f38-11e9-8501-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "de257195-943a-11e8-a070-94659cf754d0": "6e67fa52-0189-4093-b908-c74fb0da3eeb", 
+                            "de2598a1-943a-11e8-9060-94659cf754d0": "<a href=\"http://www.hk.jec.com/en/our-business.aspx\" style=\"color: rgb(51, 51, 51); font-family: Arial, Verdana, sans-serif; font-size: 12px; line-height: 18px;\">Jardine Engineering Corporation (JEC) is a trusted provider of engineering and building services and products across Asia, offering contracted installation and maintenance as well as specialist product sourcing.&nbsp;</a>&nbsp;(Description from JEC website)"
+                        }, 
+                        "nodegroup_id": "de257192-943a-11e8-87c6-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "85a6de6b-a8f0-4e21-877e-11ad4c222877", 
+                        "sortorder": 0, 
+                        "tileid": "54832021-1f38-11e9-b756-94659cf754d0"
+                    }
+                ]
+            }, 
+            {
+                "resourceinstance": {
+                    "graph_id": "ccbd1537-ac5e-11e6-84a5-026d961c88e6", 
+                    "legacyid": "f8677fe6-bab5-41a8-b65a-c2abb7f3094f", 
+                    "resourceinstanceid": "f8677fe6-bab5-41a8-b65a-c2abb7f3094f"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "1b6d7661-943b-11e8-b811-94659cf754d0": "Lam, Woo & Company", 
+                            "1b6d7664-943b-11e8-a3b3-94659cf754d0": "a4c88313-52c5-4b6a-9579-3fc5aad17335"
+                        }, 
+                        "nodegroup_id": "1b6d7661-943b-11e8-b811-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "f8677fe6-bab5-41a8-b65a-c2abb7f3094f", 
+                        "sortorder": 0, 
+                        "tileid": "5483e36e-1f38-11e9-a0d4-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "cd95ca08-943a-11e8-ad5d-94659cf754d0": "5a6ebe20-b979-40c6-81a4-c051c23a73f7", 
+                            "cd95ca0b-943a-11e8-8e28-94659cf754d0": "1895-01-01"
+                        }, 
+                        "nodegroup_id": "cd95ca01-943a-11e8-84dc-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "f8677fe6-bab5-41a8-b65a-c2abb7f3094f", 
+                        "sortorder": 0, 
+                        "tileid": "54847fb0-1f38-11e9-81e0-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "fb611dde-943a-11e8-a82c-94659cf754d0": "b0e4a242-3f6b-43ab-b306-29d8a59e6e1a"
+                        }, 
+                        "nodegroup_id": "fb60f6d0-943a-11e8-835a-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "f8677fe6-bab5-41a8-b65a-c2abb7f3094f", 
+                        "sortorder": 0, 
+                        "tileid": "54854300-1f38-11e9-8355-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "fb611dde-943a-11e8-a82c-94659cf754d0": "b64fbd91-e871-4c33-96e8-24ffa73b05c4"
+                        }, 
+                        "nodegroup_id": "fb60f6d0-943a-11e8-835a-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "f8677fe6-bab5-41a8-b65a-c2abb7f3094f", 
+                        "sortorder": 0, 
+                        "tileid": "5485df40-1f38-11e9-bbfc-94659cf754d0"
+                    }
+                ]
+            }, 
+            {
+                "resourceinstance": {
+                    "graph_id": "ccbd1537-ac5e-11e6-84a5-026d961c88e6", 
+                    "legacyid": "f54e2adb-6d20-4a59-ba10-1362f0a5707d", 
+                    "resourceinstanceid": "f54e2adb-6d20-4a59-ba10-1362f0a5707d"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "1b6d7661-943b-11e8-b811-94659cf754d0": "Hung Hing Ying \u5b54\u6176\u7192", 
+                            "1b6d7664-943b-11e8-a3b3-94659cf754d0": "a4c88313-52c5-4b6a-9579-3fc5aad17335"
+                        }, 
+                        "nodegroup_id": "1b6d7661-943b-11e8-b811-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "f54e2adb-6d20-4a59-ba10-1362f0a5707d", 
+                        "sortorder": 0, 
+                        "tileid": "5486c99e-1f38-11e9-8ca1-94659cf754d0"
+                    }
+                ]
+            }, 
+            {
+                "resourceinstance": {
+                    "graph_id": "ccbd1537-ac5e-11e6-84a5-026d961c88e6", 
+                    "legacyid": "1cf98d78-2125-488d-8641-bb9b444515a2", 
+                    "resourceinstanceid": "1cf98d78-2125-488d-8641-bb9b444515a2"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "1b6d7661-943b-11e8-b811-94659cf754d0": "Suggs and Co.", 
+                            "1b6d7664-943b-11e8-a3b3-94659cf754d0": "a4c88313-52c5-4b6a-9579-3fc5aad17335"
+                        }, 
+                        "nodegroup_id": "1b6d7661-943b-11e8-b811-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1cf98d78-2125-488d-8641-bb9b444515a2", 
+                        "sortorder": 0, 
+                        "tileid": "548765de-1f38-11e9-a76b-94659cf754d0"
+                    }
+                ]
+            }, 
+            {
+                "resourceinstance": {
+                    "graph_id": "ccbd1537-ac5e-11e6-84a5-026d961c88e6", 
+                    "legacyid": "4ea0fe13-ea1a-4230-a12b-be0a9406f313", 
+                    "resourceinstanceid": "4ea0fe13-ea1a-4230-a12b-be0a9406f313"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "1b6d7661-943b-11e8-b811-94659cf754d0": "Reginald Edward Stubbs \u53f8\u5f92\u62d4", 
+                            "1b6d7664-943b-11e8-a3b3-94659cf754d0": "a4c88313-52c5-4b6a-9579-3fc5aad17335"
+                        }, 
+                        "nodegroup_id": "1b6d7661-943b-11e8-b811-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "4ea0fe13-ea1a-4230-a12b-be0a9406f313", 
+                        "sortorder": 0, 
+                        "tileid": "54880221-1f38-11e9-bb67-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "cd95ca06-943a-11e8-90a5-94659cf754d0": "1947-12-07", 
+                            "cd95ca08-943a-11e8-ad5d-94659cf754d0": "75e3ee0b-340e-4c81-acad-1bc97a255bfc", 
+                            "cd95ca0b-943a-11e8-8e28-94659cf754d0": "1876-10-13"
+                        }, 
+                        "nodegroup_id": "cd95ca01-943a-11e8-84dc-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "4ea0fe13-ea1a-4230-a12b-be0a9406f313", 
+                        "sortorder": 0, 
+                        "tileid": "54889e61-1f38-11e9-9562-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "0eb367e6-943b-11e8-97ad-94659cf754d0": "fc67f54c-4adc-403a-bc04-347e495ddc7b"
+                        }, 
+                        "nodegroup_id": "0eb367e2-943b-11e8-8b46-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "4ea0fe13-ea1a-4230-a12b-be0a9406f313", 
+                        "sortorder": 0, 
+                        "tileid": "548961ae-1f38-11e9-94c0-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "ee4e3072-cc0f-11e8-9b34-027f111c8e34": "Sir"
+                        }, 
+                        "nodegroup_id": "ee4e3072-cc0f-11e8-9b34-027f111c8e34", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "4ea0fe13-ea1a-4230-a12b-be0a9406f313", 
+                        "sortorder": 0, 
+                        "tileid": "5489fdee-1f38-11e9-97da-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "ee4e3072-cc0f-11e8-9b34-027f111c8e34": "Governor of Hong Kong"
+                        }, 
+                        "nodegroup_id": "ee4e3072-cc0f-11e8-9b34-027f111c8e34", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "4ea0fe13-ea1a-4230-a12b-be0a9406f313", 
+                        "sortorder": 0, 
+                        "tileid": "548a9a30-1f38-11e9-90e4-94659cf754d0"
+                    }
+                ]
+            }, 
+            {
+                "resourceinstance": {
+                    "graph_id": "ccbd1537-ac5e-11e6-84a5-026d961c88e6", 
+                    "legacyid": "b5ab84ec-a38e-46dc-b07d-2c85a1e8888b", 
+                    "resourceinstanceid": "b5ab84ec-a38e-46dc-b07d-2c85a1e8888b"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "1b6d7661-943b-11e8-b811-94659cf754d0": "Marjory Stubbs", 
+                            "1b6d7664-943b-11e8-a3b3-94659cf754d0": "a4c88313-52c5-4b6a-9579-3fc5aad17335"
+                        }, 
+                        "nodegroup_id": "1b6d7661-943b-11e8-b811-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "b5ab84ec-a38e-46dc-b07d-2c85a1e8888b", 
+                        "sortorder": 0, 
+                        "tileid": "548b3670-1f38-11e9-b7a2-94659cf754d0"
+                    }
+                ]
+            }, 
+            {
+                "resourceinstance": {
+                    "graph_id": "ccbd1537-ac5e-11e6-84a5-026d961c88e6", 
+                    "legacyid": "7674f7ab-c25c-424e-b591-9f4951d54b19", 
+                    "resourceinstanceid": "7674f7ab-c25c-424e-b591-9f4951d54b19"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "1b6d7661-943b-11e8-b811-94659cf754d0": "Edward Dean SHANKS", 
+                            "1b6d7664-943b-11e8-a3b3-94659cf754d0": "a4c88313-52c5-4b6a-9579-3fc5aad17335"
+                        }, 
+                        "nodegroup_id": "1b6d7661-943b-11e8-b811-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "7674f7ab-c25c-424e-b591-9f4951d54b19", 
+                        "sortorder": 0, 
+                        "tileid": "548bf9c0-1f38-11e9-9e52-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "ee4e3072-cc0f-11e8-9b34-027f111c8e34": "Authorized Architect 1922-41"
+                        }, 
+                        "nodegroup_id": "ee4e3072-cc0f-11e8-9b34-027f111c8e34", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "7674f7ab-c25c-424e-b591-9f4951d54b19", 
+                        "sortorder": 0, 
+                        "tileid": "548c6eee-1f38-11e9-9b2e-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "ebe0c371-943a-11e8-8919-94659cf754d0": [
+                                "559e6d91-5a77-45bc-9296-f2ea09ceeea1"
+                            ]
+                        }, 
+                        "nodegroup_id": "ebe0c371-943a-11e8-8919-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "7674f7ab-c25c-424e-b591-9f4951d54b19", 
+                        "sortorder": 0, 
+                        "tileid": "548d3240-1f38-11e9-ac17-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "fb611dde-943a-11e8-a82c-94659cf754d0": "778f66b7-eeb1-4cc1-b37d-c5cde0e7dfdd", 
+                            "fb611ddf-943a-11e8-8891-94659cf754d0": "1922-01-01", 
+                            "fb611de2-943a-11e8-afcc-94659cf754d0": "1941-01-01"
+                        }, 
+                        "nodegroup_id": "fb60f6d0-943a-11e8-835a-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "7674f7ab-c25c-424e-b591-9f4951d54b19", 
+                        "sortorder": 0, 
+                        "tileid": "548df58f-1f38-11e9-a139-94659cf754d0"
+                    }
+                ]
+            }
+        ]
+    }
+}

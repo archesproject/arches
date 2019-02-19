@@ -1,0 +1,20 @@
+v3_node,v4_node
+ACTOR_APPELLATION.E82,Appellation
+ACTOR_TYPE.E55,Actor Type
+ADDRESS_TYPE.E55,Address Type
+BEGINNING_OF_EXISTENCE_TYPE.E55,Start Date Type
+CULTURAL_PERIOD.E55,Cultural Period
+DESCRIPTION.E62,Description
+DESCRIPTION_OF_LOCATION.E62,Place Description
+DESCRIPTION_TYPE.E55,Description Type
+END_DATE_OF_EXISTENCE.E49,End Date of Existence
+END_OF_EXISTENCE_TYPE.E55,External Identifier Type
+EPITHET.E82,Epithet
+EXTERNAL_XREF.E42,External XRef
+EXTERNAL_XREF_TYPE.E55,External Identifier Type
+FROM_DATE.E49,Actor Type From Date
+KEYWORD.E55,Keyword
+NAME_TYPE.E55,Appellation Type
+PLACE_ADDRESS.E45,Place Address
+START_DATE_OF_EXISTENCE.E49,Start Date of Existence
+TO_DATE.E49,Actor Type To Date

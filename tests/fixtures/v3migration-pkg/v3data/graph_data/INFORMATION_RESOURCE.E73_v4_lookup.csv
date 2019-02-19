@@ -1,0 +1,26 @@
+v3_node,v4_node
+CONTRIBUTOR_APPELLATION.E82,Contributor Name
+CREATOR_APPELLATION.E82,Creator Name
+DATE_OF_CREATION.E50,Date of Creation
+DATE_OF_PUBLICATION.E50,Date of Publication
+DATE_OF_UPDATE.E50,Date of Update
+DESCRIPTION.E62,Description
+DESCRIPTION_OF_LOCATION.E62,Place Description
+DESCRIPTION_TYPE.E55,Description Type
+EXTERNAL_XREF.E42,External XRef
+EXTERNAL_XREF_TYPE.E55,External Identifier Type
+FILE_PATH.E62,File Path
+GEOMETRY_QUALIFIER.E55,Geometry Qualifier
+IDENTIFIER_TYPE.E55,External Identifier Type
+INFORMATION_CARRIER_FORMAT_TYPE.E55,Information Carrier Format Type
+INFORMATION_RESOURCE_TYPE.E55,Information Resource Type
+KEYWORD.E55,Keyword
+LANGUAGE.E55,Language_Type
+PUBLISHER_APPELLATION.E82,Publisher Appellation
+RIGHT_DESCRIPTION.E30,Copyright Description
+RIGHT_TYPE.E55,Copyright Type
+SPATIAL_COORDINATES_GEOMETRY.E47,Spatial Coordinates Geometry
+TEMPORAL_COVERAGE_TIME-SPAN.E52,Temporal Coverage Timespan
+THUMBNAIL.E62,Thumbnail
+TITLE.E41,Title
+TITLE_TYPE.E55,Title Type
