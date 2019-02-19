@@ -124,7 +124,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
                             <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Search" %}'>
                               <i class="ion-search"></i>
-                              
+
                             </div>
                         </a>
                         {% endif %}
@@ -200,7 +200,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </div>
 
                         <!-- help content loaded from contextually referenced template -->
-                        <div class="ep-help-body" style="float:left; background-color:blue" data-bind="css: {'loading-mask': helploading()}">
+                        <div class="ep-help-body" data-bind="css: {'loading-mask': helploading()}">
                             <!-- content gets inserted into this div -->
                             <div class="ep-help-content"></div>
                             <hr>
@@ -223,7 +223,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <ul id="mainnav-menu" class="list-group">
 
                                         <!-- Tools -->
-                                        <li class="list-header">{% trans "Tools" %}</li> 
+                                        <li class="list-header">{% trans "Tools" %}</li>
 
                                         <!-- System Settings list item -->
                                         {% if request.user|has_group:"System Administrator" %}
@@ -253,7 +253,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </span>
                                             </a>
                                         </li>
-                                        
+
                                         <!--Menu list item-->
                                         {% if request.user|can_edit_resource_instance %}
                                         <li{% if "views/resource" in main_script and is_system_settings is False %} class="active-sub"{% endif %}>

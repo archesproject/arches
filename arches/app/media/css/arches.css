@@ -5673,12 +5673,12 @@ ul.jqtree_common li.jqtree-folder {
 }
 
 .ep-help-body {
-    height: 100%;
     width: 100%;
     overflow-y: auto;
-    display: table-row;
-    float: left;
     padding: 0px 15px;
+    position: absolute;
+    bottom: 0;
+    top: 50px;
 }
 
 .ep-help-body img {
