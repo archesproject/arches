@@ -10,7 +10,7 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4521_sync_revision_logs'),
+        ('models', '4186_graphmodel_slug'),
     ]
 
     operations = [
