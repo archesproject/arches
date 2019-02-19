@@ -282,7 +282,7 @@ class Tile(models.TileModel):
             # print("user="+ str(user))
             # print("len="+str(len(user.keys())))
             if (len(user.keys()) == 0):
-                if creating_new_tile == True:
+                if creating_new_tile is True:
                     self.save_edit(user=user, edit_type=edit_type, old_value={}, new_value=self.data, newprovisionalvalue=newprovisionalvalue, provisional_edit_log_details=provisional_edit_log_details)
                 else:
                     self.save_edit(
