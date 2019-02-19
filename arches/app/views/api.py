@@ -402,7 +402,6 @@ class Resources(APIBase):
                     for resource in reader.resources:
                         with transaction.atomic():
                             resource.save(request=request)
-                        print resource.resourceinstanceid
                         response.append(JSONDeserializer().deserialize(
                             self.get(request, resource.resourceinstanceid).content))
                     return JSONResponse(response, indent=indent, status=201)
