@@ -1310,6 +1310,7 @@ def get_valueids_from_concept_label(label, conceptid=None, lang=None):
     concept_label_results = se.search(index='strings', doc_type='concept',
                                       body=exact_val_match(label, conceptid))
     if concept_label_results is None:
+        print("Found no matches for label:'{0}' and concept_id: '{1}'".format(label, conceptid))
         return
     return [res['_source'] for res in concept_label_results['hits']['hits']
             if lang is None or res['_source']['language'].lower() == lang.lower()]

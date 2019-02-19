@@ -376,6 +376,7 @@ class GraphModel(models.Model):
         default='50000000-0000-0000-0000-000000000001'
     )
     config = JSONField(db_column='config', default={})
+    slug = models.TextField(validators=[validate_slug], unique=True, null=True)
 
     @property
     def disable_instance_creation(self):
@@ -393,6 +394,9 @@ class GraphModel(models.Model):
             if settings.OVERRIDE_RESOURCE_MODEL_LOCK == True:
                 result = True
         return result
+
+    def __unicode__(self):
+        return self.name
 
     class Meta:
         managed = True

@@ -4,7 +4,7 @@ from arches.app.models import models
 from arches.app.models import concept
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.base import BaseDataType
-from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.datatypes.datatypes import DataTypeFactory, get_value_from_jsonld
 from arches.app.models.concept import get_preflabel_from_valueid, get_preflabel_from_conceptid, get_valueids_from_concept_label
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Nested, Exists
 from arches.app.utils.date_utils import ExtendedDateFormat
@@ -133,7 +133,7 @@ class ConceptDataType(BaseConceptDataType):
 
             for id_uri in ext_ids:
                 if str(id_uri).startswith(settings.PREFERRED_CONCEPT_SCHEME):
-                    rangenode = id_uri
+                    rangenode = URIRef(id_uri)
             return rangenode
 
         if edge_info['range_tile_data'] is not None:
@@ -147,15 +147,15 @@ class ConceptDataType(BaseConceptDataType):
                 arches_uri = URIRef(archesproject['concepts/%s' % c.conceptid])
 
                 # get other identifiers:
-                ext_idents = [ident.value for ident in models.Value.objects.all().filter(concept_id=c.conceptid,
-                                                                                  valuetype__category="identifiers")]
+                ext_idents = [ident.value for ident in models.Value.objects.all().filter(
+                        concept_id__exact=c.conceptid, valuetype__category="identifiers")]
             rangenode = get_rangenode(arches_uri, ext_idents)
 
             g.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
             g.add((edge_info['d_uri'], URIRef(edge.ontologyproperty), rangenode))
 
             assert c.value is not None, "Null or blank concept value"
-            g.add((rangenode, URIRef(RDFS.label), Literal(c.value, lang=c.language)))
+            g.add((rangenode, URIRef(RDFS.label), Literal(c.value)))
 
         return g
 
@@ -167,45 +167,75 @@ class ConceptDataType(BaseConceptDataType):
         # Either by instantiating a keyword without a concept_id or by
         # or by looking for say an external identifier attached to the concept and
         # building upon that.
-        concept_uri = json_ld_node.get('id')
-        label = json_ld_node.get(str(RDFS.label))
 
-        concept_id = None
+        try:
+            # assume a list, and as this is a ConceptDataType, assume a single entry
+            json_ld_node = json_ld_node[0]
+        except KeyError as e:
+            pass
+
+        concept_uri = json_ld_node.get('@id')
+        label_node = json_ld_node.get(str(RDFS.label))
+
+        # Consume the labels, such that we don't recurse into them
+        if label_node:
+            del json_ld_node[str(RDFS.label)]
+
+        concept_id = lang = None
         import re
         p = re.compile(r"(http|https)://(?P<host>[^/]*)/concepts/(?P<concept_id>[A-Fa-f0-9\-]*)/?$")
         m = p.match(concept_uri)
         if m is not None:
             concept_id = m.groupdict().get("concept_id")
-
-        # FIXME: assert that the type of this node is a E55_Type?
-
-        # FIXME when pyld supports uppercase lang in strings, include
-        # language handling here.
-
-        if label:
-            # Could be:
-            #  - Blank node E55_Type with a label - a Keyword
-            #  - Concept ID URI, with a label - a conventional Concept
-            # find a matching Concept Value to the label
-            values = get_valueids_from_concept_label(label, concept_id)
-
-            if values:
-                return values[0]["id"]
+        else:
+            # could be an external id, rather than an Arches only URI
+            hits = [ident for ident in models.Value.objects.all().filter(value__exact=str(concept_uri),
+                                                                         valuetype__category="identifiers")]
+            # print("Could be external URI - hits from RDM: {0}".format(len(hits)))
+            if len(hits) == 1:
+                concept_id = hits[0].concept_id
+                # Still need to find the label or prefLabel for this concept
             else:
-                if concept_id:
-                    print("FAILED TO FIND MATCHING LABEL '{0}' FOR CONCEPT '{1}'").format(
-                        label, concept_id)
-                    label = None
+                print("ERROR: Multiple hits for {0} external identifier in RDM:".format(concept_uri))
+                for hit in hits:
+                    print("ConceptValue {0}, Concept {1} - '{2}'".format(hit.valueid, hit.conceptid, hit.value))
+
+        # print("Trying to get a label from the concept node.")
+        if label_node:
+            label, lang = get_value_from_jsonld(label_node)
+            if label:
+                # Could be:
+                #  - Blank node E55_Type with a label - a Keyword
+                #  - Concept ID URI, with a label - a conventional Concept
+                #  - Concept ID via an external URI, hosted in Arches
+                # find a matching Concept Value to the label
+                values = get_valueids_from_concept_label(label, concept_id, lang)
+
+                if values:
+                    return values[0]["id"]
                 else:
-                    print("No Concept ID URI supplied for rdf")
+                    if concept_id:
+                        # print("FAILED TO FIND MATCHING LABEL '{0}'@{2} FOR CONCEPT '{1}' in ES").format(
+                        #     label, concept_id, lang)
+                        # print("Attempting a match from label via the DB:")
+                        hits = [ident for ident in models.Value.objects.all().filter(value__exact=label)]
+                        if hits and len(hits) == 1:
+                            # print "FOUND: %s" % hits[0].pk
+                            return str(hits[0].pk)
+                        label = None
+                    else:
+                        print("No Concept ID URI supplied for rdf")
+        else:
+            label = None
 
         if concept_id and label is None:
             # got a concept URI but the label is nonexistant
             # or cannot be resolved in Arches
-            value = get_preflabel_from_conceptid(concept_id, lang=None)
+            value = get_preflabel_from_conceptid(concept_id, lang=lang)
             return value['id']
 
         if concept_id is None and (label is None or label == ""):
+            print("Concept lookup in from_rdf FAILED: No concept id found and no label either")
             # a keyword of some type. If the code execution gets here their either
             # was no RDFS:label literal value to note or the keyword cannot be found
             # amongst the current Arches ConceptValues
@@ -262,8 +292,17 @@ class ConceptListDataType(BaseConceptDataType):
     def to_rdf(self, edge_info, edge):
         g = Graph()
         c = ConceptDataType()
-        for r in edge_info['range_tile_data']:
-            concept_info = edge_info.copy()
-            concept_info['range_tile_data'] = r
-            g += c.to_rdf(concept_info, edge)
+        if edge_info['range_tile_data']:
+            for r in edge_info['range_tile_data']:
+                concept_info = edge_info.copy()
+                concept_info['range_tile_data'] = r
+                g += c.to_rdf(concept_info, edge)
         return g
+
+    def from_rdf(self, json_ld_node):
+                # returns a list of concept ids
+        ctype = ConceptDataType()
+        if isinstance(json_ld_node, list):
+            return [ctype.from_rdf(item) for item in json_ld_node]
+        else:
+            return [ctype.from_rdf(json_ld_node)]
