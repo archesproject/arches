@@ -475,6 +475,7 @@ class Tile(models.TileModel):
         ret['tiles'] = self.tiles
 
         return ret
+        
 
 class TileValidationError(Exception):
     def __init__(self, message, code=None):
