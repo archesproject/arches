@@ -4,6 +4,7 @@ import decimal
 import importlib
 import distutils
 import base64
+import re
 from datetime import datetime
 from mimetypes import MimeTypes
 from arches.app.datatypes.base import BaseDataType
@@ -1566,8 +1567,6 @@ class ResourceInstanceDataType(BaseDataType):
         # `id` should be in the form schema:{...}/{UUID}
         # eg `urn:uuid:{UUID}`
         #    `http://arches_instance.getty.edu/resources/{UUID}`
-
-        import re
         p = re.compile(r"(?P<r>[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12})/?$")
         m = p.search(res_inst_uri)
         if m is not None:
