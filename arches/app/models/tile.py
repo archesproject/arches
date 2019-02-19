@@ -221,7 +221,7 @@ class Tile(models.TileModel):
             datatype = datatype_factory.get_instance(node.datatype)
             error = datatype.validate(value)
             for error_instance in error:
-                if error_instance['type']=='ERROR':
+                if error_instance['type'] == 'ERROR':
                     print(str(error_instance)+" rejected tile with pk: "+ str(self.pk))
                     raise TileValidationError(_("Your tile: {0} ".format(error_instance["message"])))
             if errors != None:
