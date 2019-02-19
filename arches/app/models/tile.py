@@ -221,7 +221,7 @@ class Tile(models.TileModel):
             datatype = datatype_factory.get_instance(node.datatype)
             error = datatype.validate(value)
             for error_instance in error:
-                if error_instance['type']=='ERROR':
+                if error_instance['type'] == 'ERROR':
                     print(str(error_instance)+" rejected tile with pk: "+ str(self.pk))
                     raise TileValidationError(_("Your tile: {0} ".format(error_instance["message"])))
             if errors != None:
@@ -277,9 +277,17 @@ class Tile(models.TileModel):
         #We have to save the edit log record after calling save so that the
         #resource's displayname changes are avaliable
         if log == True:
+<<<<<<< HEAD
             if (user == None):
                 user = {}
                 if creating_new_tile == True:
+=======
+            user = {} if user == None else user
+            # print("user="+ str(user))
+            # print("len="+str(len(user.keys())))
+            if (len(user.keys()) == 0):
+                if creating_new_tile is True:
+>>>>>>> origin/4451_galen_validate_tiles_onsave
                     self.save_edit(user=user, edit_type=edit_type, old_value={}, new_value=self.data, newprovisionalvalue=newprovisionalvalue, provisional_edit_log_details=provisional_edit_log_details)
                 else:
                     self.save_edit(
