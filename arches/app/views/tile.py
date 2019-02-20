@@ -20,7 +20,7 @@ import uuid, importlib, json as jsonparser
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from arches.app.models.resource import Resource
-from arches.app.models.tile import Tile
+from arches.app.models.tile import Tile, TileValidationError
 from arches.app.models.system_settings import settings
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -87,6 +87,8 @@ class TileData(View):
                             if accepted_provisional == None:
                                 try:
                                     tile.save(request=request)
+                                except TileValidationError as e:
+                                    return JSONResponse({'status': 'false', 'message': [e.message, _('Unable to Save. Please verify your input is valid')]}, status=500)
                                 except Exception as e:
                                     message = "Unable to save. A {0} has occurred. Arguments: {1!r}".format(type(e).__name__, e.args)
                                     return JSONResponse({'status': 'false', 'message': [message, _('Please contact your system administrator')]}, status=500)

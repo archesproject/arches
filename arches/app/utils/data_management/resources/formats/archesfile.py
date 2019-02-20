@@ -27,7 +27,7 @@ from copy import deepcopy
 from os.path import isfile, join
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as resourceGraphImporter
-from arches.app.models.tile import Tile
+from arches.app.models.tile import Tile, TileValidationError
 from arches.app.models.models import ResourceInstance
 from arches.app.models.models import FunctionXGraph
 from arches.app.models.models import NodeGroup
@@ -188,9 +188,12 @@ class ArchesFileReader(Reader):
                                         'data': src_tile['data']
                                     }
                                 )
-                                if len(Tile.objects.filter(tileid=tile.tileid)) == 1:
-                                    errors = tile.validate(self.errors)
-                                    reporter.update_tiles_saved()
+                                try:
+                                    if len(Tile.objects.filter(tileid=tile.tileid)) == 1:
+                                        errors = tile.validate(self.errors)
+                                        reporter.update_tiles_saved()
+                                except TileValidationError as e:
+                                    print(e)
                                 for child in src_tile['tiles']:
                                     update_or_create_tile(child)
 

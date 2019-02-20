@@ -220,6 +220,10 @@ class Tile(models.TileModel):
             node = models.Node.objects.get(nodeid=nodeid)
             datatype = datatype_factory.get_instance(node.datatype)
             error = datatype.validate(value)
+            for error_instance in error:
+                if error_instance['type'] == 'ERROR':
+                    print(str(error_instance)+" rejected tile with pk: "+ str(self.pk))
+                    raise TileValidationError(_("Your tile: {0} ".format(error_instance["message"])))
             if errors != None:
                 errors += error
         return errors
@@ -273,28 +277,53 @@ class Tile(models.TileModel):
         #We have to save the edit log record after calling save so that the
         #resource's displayname changes are avaliable
         if log == True:
-            user = {} if user == None else user
-            if creating_new_tile == True:
-                self.save_edit(user=user, edit_type=edit_type, old_value={}, new_value=self.data, newprovisionalvalue=newprovisionalvalue, provisional_edit_log_details=provisional_edit_log_details)
+            if (user == None):
+                user = {}
+                if creating_new_tile == True:
+                    self.save_edit(user=user, edit_type=edit_type, old_value={}, new_value=self.data, newprovisionalvalue=newprovisionalvalue, provisional_edit_log_details=provisional_edit_log_details)
+                else:
+                    self.save_edit(
+                        user=user,
+                        edit_type=edit_type,
+                        old_value=existing_model.data,
+                        new_value=self.data,
+                        newprovisionalvalue=newprovisionalvalue,
+                        oldprovisionalvalue=oldprovisionalvalue,
+                        provisional_edit_log_details=provisional_edit_log_details
+                    )
+
+                if index:
+                    self.index()
+
+                for tile in self.tiles:
+                    tile.resourceinstance = self.resourceinstance
+                    tile.parenttile = self
+                    tile.save(*args, request=request, index=index, **kwargs)
             else:
-                self.save_edit(
-                    user=user,
-                    edit_type=edit_type,
-                    old_value=existing_model.data,
-                    new_value=self.data,
-                    newprovisionalvalue=newprovisionalvalue,
-                    oldprovisionalvalue=oldprovisionalvalue,
-                    provisional_edit_log_details=provisional_edit_log_details
-                )
+                try:
+                    self.validate([])
+                    if creating_new_tile == True:
+                            self.save_edit(user=user, edit_type=edit_type, old_value={}, new_value=self.data, newprovisionalvalue=newprovisionalvalue, provisional_edit_log_details=provisional_edit_log_details)
+                    else:
+                        self.save_edit(
+                            user=user,
+                            edit_type=edit_type,
+                            old_value=existing_model.data,
+                            new_value=self.data,
+                            newprovisionalvalue=newprovisionalvalue,
+                            oldprovisionalvalue=oldprovisionalvalue,
+                            provisional_edit_log_details=provisional_edit_log_details
+                        )
 
-        if index:
-            self.index()
+                    if index:
+                        self.index()
 
-        for tile in self.tiles:
-            tile.resourceinstance = self.resourceinstance
-            tile.parenttile = self
-            tile.save(*args, request=request, index=index, **kwargs)
-
+                    for tile in self.tiles:
+                        tile.resourceinstance = self.resourceinstance
+                        tile.parenttile = self
+                        tile.save(*args, request=request, index=index, **kwargs)
+                except TileValidationError:
+                    print(TileValidationError.message)
 
     def delete(self, *args, **kwargs):
         se = SearchEngineFactory().create()
@@ -446,3 +475,13 @@ class Tile(models.TileModel):
         ret['tiles'] = self.tiles
 
         return ret
+
+
+class TileValidationError(Exception):
+    def __init__(self, message, code=None):
+        self.title = _("Tile Validation Error")
+        self.message = message
+        self.code = code
+
+    def __str__(self):
+        return repr(self.message)
