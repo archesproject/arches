@@ -7704,11 +7704,12 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .childlessborder {
-    border-bottom: 1px solid rgba(188, 188, 188, 0.7);
-    /* border-left: 26px solid rgb(250, 250, 250, 1.0); */
+    border-bottom: 1px solid rgba(205, 205, 205, 0.7);
+    border-left: 26px solid rgb(250, 250, 250, 1.0);
+    margin-right: 8%;
     /* border-bottom-left-radius: 6px; */
-    padding-bottom: 2%;
-    margin-top: 2%;
+    padding-bottom: 1%;
+    margin-top: 1%;
 }
 
 @media (min-width: 992px){
