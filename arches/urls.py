@@ -141,7 +141,7 @@ urlpatterns = [
     url(r'^collector_designer/(?P<surveyid>%s)$' % uuid_regex, MobileSurveyDesignerView.as_view(), name='collector_designer'),
     url(r'^mobile_survey_resources/(?P<surveyid>%s)/resources$' % uuid_regex, MobileSurveyResources.as_view(), name='mobile_survey_resources'),
     url(r'^couchdb/(?P<path>.*)$', api.CouchdbProxy.as_view()),
-    url(r'^surveys/(?:(?P<surveyid>%s))?$' % uuid_regex, api.Surveys.as_view(), name='surveys'),
+    url(r'^mobileprojects/(?:(?P<surveyid>%s))?$' % uuid_regex, api.Surveys.as_view(), name='mobileprojects'),
     url(r'^sync/(?P<surveyid>%s|())$' % uuid_regex, api.Sync.as_view(), name='sync'),
     url(r'^resources/(?P<graphid>%s)/(?P<resourceid>%s|())$' % (uuid_regex, uuid_regex), api.Resources.as_view(), name='resources_graphid'),
     url(r'^resources/(?P<slug>[-\w]+)/(?P<resourceid>%s|())$' % uuid_regex, api.Resources.as_view(), name='resources_slug'),
