@@ -23,7 +23,7 @@ define([
                 mobilesurvey.starts = moment(mobilesurvey.startdate).format('D MMMM YYYY');
                 mobilesurvey.delete = function(successCallback, errorCallback) {
                     return $.ajax({
-                        url: arches.urls.mobile_survey_manager,
+                        url: arches.urls.collector_manager,
                         data: JSON.stringify(this),
                         method: 'DELETE'
                     }).done(successCallback).fail(errorCallback);
@@ -51,12 +51,12 @@ define([
     var viewModel = new MobileSurveysViewModel(data);
 
     viewModel.navigateToEditor = function(survey) {
-        window.location = arches.urls.mobile_survey_designer(survey.id);
+        window.location = arches.urls.collector_designer(survey.id);
     };
 
     viewModel.newMobileSurvey = function() {
         var surveyid = uuid.generate();
-        window.location = arches.urls.mobile_survey_designer(surveyid);
+        window.location = arches.urls.collector_designer(surveyid);
     };
 
     viewModel.deleteMobileSurvey = function(mobilesurvey){

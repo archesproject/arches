@@ -45,7 +45,8 @@ define([
                     return new MobileSurveyViewModel({
                         resources: data.resources,
                         mobilesurvey: mobilesurvey,
-                        identities: data.identities
+                        identities: data.identities,
+                        context: 'userprofile'
                     });
                 });
 

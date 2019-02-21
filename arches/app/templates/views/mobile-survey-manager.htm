@@ -33,17 +33,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             <!-- Splash Title -->
             <div class="rr-splash-title">{% trans "Mobile Data Collection" %}</div>
-            
+
             <!-- Splash Button -->
-            <button class="btn btn-shim btn-rr btn-labeled btn-lg fa fa-globe" data-bind="click: newMobileSurvey">{% trans 'Create a Survey' %}</button>
+            <button class="btn btn-shim btn-rr btn-labeled btn-lg fa fa-globe" data-bind="click: newMobileSurvey">{% trans 'Create a Project' %}</button>
 
             <!-- Splash Instructions -->
             <div class="rr-splash-description">{% trans "Arches allows you to create and edit data in the field using mobile devices such as" %}</div>
-            <div class="rr-splash-description">{% trans "Android and iOS phones or tablets. Surveys are a way to define the time, location, content, and" %}</div>
+            <div class="rr-splash-description">{% trans "Android and iOS phones or tablets. Projects are a way to define the time, location, content, and" %}</div>
             <div class="rr-splash-description">{% trans "participants of a field data collection effort" %}</div>
 
             <!-- Help Hyperlink; Add here -->
-            
+
         </div>
     <!--/ko-->
 
@@ -53,10 +53,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="list-filter mpm" data-bind="">
                     <div class="msm-list-filter">
                     <div>
-                        <button id="" class="btn btn-lg btn-mint btn-active-dark btn-labeled ion-plus-round" data-bind="click: newMobileSurvey">{% trans "New Survey" %}</button>
+                        <button id="" class="btn btn-lg btn-mint btn-active-dark btn-labeled ion-plus-round" data-bind="click: newMobileSurvey">{% trans "New Project" %}</button>
                     </div>
                     <div class="msm-list-filter-input">
-                    <input type="text" class="form-control" placeholder="{% trans 'Find a survey...' %}" data-bind="value: mobileSurveyFilter, valueUpdate: 'keyup'">
+                    <input type="text" class="form-control" placeholder="{% trans 'Find a project...' %}" data-bind="value: mobileSurveyFilter, valueUpdate: 'keyup'">
                     <!-- Clear Search -->
                     <span class="clear-node-search" data-bind="visible: mobileSurveyFilter().length > 0, click: function() { mobileSurveyFilter(''); }"><i class="fa fa-times-circle"></i></span>
                 </div>
@@ -78,8 +78,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <i class="icon-wrap resource-grid-icon fa fa-server"></i>
 
 
-                                        <div class="mpm-title"><span data-bind="text: name() === '' ? '{% trans "Unnamed Survey" %}' : name()"></span></div>
-                                        
+                                        <div class="mpm-title"><span data-bind="text: name() === '' ? '{% trans "Unnamed Project" %}' : name()"></span></div>
+
                                         <!--ko if: enddate && startdate -->
                                         <div class="mpm-subtitle">
                                             <span data-bind="text: starts + '{% trans " to " %}' + ends"> </span>

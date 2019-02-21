@@ -37,12 +37,17 @@ define([
                     window.dispatchEvent(new window.Event('resize'));
                 }, 200);
         };
-        this.history = params.history;
-        this.locked = _.keys(this.history.editors).length > 0 || false;
-        this.history.lastsync = moment(this.history.lastsync);
-        _.each(this.history.editors, function(editor) {
-            editor.lastsync = moment(editor.lastsync);
-        });
+
+        this.context = params.context;
+
+        if (this.context !== 'userprofile') {
+            this.history = params.history;
+            this.locked = _.keys(this.history.editors).length > 0 || false;
+            this.history.lastsync = moment(this.history.lastsync);
+            _.each(this.history.editors, function(editor) {
+                editor.lastsync = moment(editor.lastsync);
+            });
+        }
         this.defaultCenterX = arches.mapDefaultX;
         this.defaultCenterY = arches.mapDefaultY;
         this.geocoderDefault = arches.geocoderDefault;
@@ -98,7 +103,7 @@ define([
         };
 
         this.navigateToManager = function() {
-            window.location = arches.urls.mobile_survey;
+            window.location = arches.urls.collector_manager;
         };
 
         this.initializeResource = function(r) {
@@ -167,7 +172,10 @@ define([
         };
 
         _.each(this.allResources, this.initializeResource);
-        _.each(this.allIdentities, this.initializeIdentities);
+
+        if (this.context != 'userprofile') {
+            _.each(this.allIdentities, this.initializeIdentities);
+        }
 
         this.resourceOrderedCards = ko.pureComputed(function(){
             var cards = [];
@@ -337,92 +345,93 @@ define([
             // }
         }, this);
 
-        this.treenodes = [{
-            name: this.mobilesurvey.name,
-            namelong: this.transStrings.root.namelong,
-            description: this.transStrings.root.description,
-            id: 'root',
-            selected: ko.observable(true),
-            istopnode: true,
-            iconclass: 'fa fa-globe',
-            status: this.surveyReady,
-            pageactive: ko.observable(true),
-            expanded: ko.observable(true),
-            childNodes: ko.observableArray([{
-                name: this.transStrings.settings.name,
-                namelong: this.transStrings.settings.namelong,
-                description: this.transStrings.settings.description,
-                id: 'settings',
-                selected: ko.observable(false),
-                istopnode: false,
-                iconclass: 'fa fa-wrench',
-                pageactive: ko.observable(false),
-                childNodes: ko.observableArray([]),
-                expanded: ko.observable(false)
-            },
-            {
-                name: this.transStrings.mapextent.name,
-                namelong: this.transStrings.mapextent.namelong,
-                description: this.transStrings.mapextent.description,
-                id: 'mapextent',
-                selected: ko.observable(false),
-                istopnode: false,
-                iconclass: 'fa fa-map-marker',
-                pageactive: ko.observable(false),
-                childNodes: ko.observableArray([]),
-                expanded: ko.observable(false)
-            },
-            {
-                name: this.transStrings.mapsources.name,
-                namelong: this.transStrings.mapsources.namelong,
-                description: this.transStrings.mapsources.description,
-                id: 'mapsources',
-                selected: ko.observable(false),
-                istopnode: false,
-                iconclass: 'fa fa-th',
-                pageactive: ko.observable(false),
-                childNodes: ko.observableArray([]),
-                expanded: ko.observable(false)
-            },
-            {
-                name: this.transStrings.models.name,
-                namelong: this.transStrings.models.namelong,
-                description: this.transStrings.models.description,
-                id: 'models',
-                selected: ko.observable(false),
-                istopnode: false,
-                iconclass: 'fa fa-bookmark',
-                pageactive: ko.observable(false),
-                childNodes: this.selectedResources,
-                expanded: ko.observable(true)
-            },
-            {
-                name: this.transStrings.data.name,
-                namelong: this.transStrings.data.namelong,
-                description: this.transStrings.data.description,
-                id: 'data',
-                selected: ko.observable(false),
-                istopnode: false,
-                iconclass: 'fa fa-bar-chart-o',
-                pageactive: ko.observable(false),
-                childNodes: ko.observableArray([]),
-                expanded: ko.observable(false)
-            },
-            {
-                name: this.transStrings.people.name,
-                namelong: this.transStrings.people.namelong,
-                description: this.transStrings.people.description,
-                id: 'people',
-                selected: ko.observable(false),
-                istopnode: false,
-                iconclass: 'fa fa-user-plus',
-                pageactive: ko.observable(false),
-                childNodes: this.selectedGroups,
-                expanded: ko.observable(true)
-            }
-            ])
-        }];
-
+        if (this.context !== 'userprofile' ) {
+            this.treenodes = [{
+                name: this.mobilesurvey.name,
+                namelong: this.transStrings.root.namelong,
+                description: this.transStrings.root.description,
+                id: 'root',
+                selected: ko.observable(true),
+                istopnode: true,
+                iconclass: 'fa fa-globe',
+                status: this.surveyReady,
+                pageactive: ko.observable(true),
+                expanded: ko.observable(true),
+                childNodes: ko.observableArray([{
+                    name: this.transStrings.settings.name,
+                    namelong: this.transStrings.settings.namelong,
+                    description: this.transStrings.settings.description,
+                    id: 'settings',
+                    selected: ko.observable(false),
+                    istopnode: false,
+                    iconclass: 'fa fa-wrench',
+                    pageactive: ko.observable(false),
+                    childNodes: ko.observableArray([]),
+                    expanded: ko.observable(false)
+                },
+                {
+                    name: this.transStrings.mapextent.name,
+                    namelong: this.transStrings.mapextent.namelong,
+                    description: this.transStrings.mapextent.description,
+                    id: 'mapextent',
+                    selected: ko.observable(false),
+                    istopnode: false,
+                    iconclass: 'fa fa-map-marker',
+                    pageactive: ko.observable(false),
+                    childNodes: ko.observableArray([]),
+                    expanded: ko.observable(false)
+                },
+                {
+                    name: this.transStrings.mapsources.name,
+                    namelong: this.transStrings.mapsources.namelong,
+                    description: this.transStrings.mapsources.description,
+                    id: 'mapsources',
+                    selected: ko.observable(false),
+                    istopnode: false,
+                    iconclass: 'fa fa-th',
+                    pageactive: ko.observable(false),
+                    childNodes: ko.observableArray([]),
+                    expanded: ko.observable(false)
+                },
+                {
+                    name: this.transStrings.models.name,
+                    namelong: this.transStrings.models.namelong,
+                    description: this.transStrings.models.description,
+                    id: 'models',
+                    selected: ko.observable(false),
+                    istopnode: false,
+                    iconclass: 'fa fa-bookmark',
+                    pageactive: ko.observable(false),
+                    childNodes: this.selectedResources,
+                    expanded: ko.observable(true)
+                },
+                {
+                    name: this.transStrings.data.name,
+                    namelong: this.transStrings.data.namelong,
+                    description: this.transStrings.data.description,
+                    id: 'data',
+                    selected: ko.observable(false),
+                    istopnode: false,
+                    iconclass: 'fa fa-bar-chart-o',
+                    pageactive: ko.observable(false),
+                    childNodes: ko.observableArray([]),
+                    expanded: ko.observable(false)
+                },
+                {
+                    name: this.transStrings.people.name,
+                    namelong: this.transStrings.people.namelong,
+                    description: this.transStrings.people.description,
+                    id: 'people',
+                    selected: ko.observable(false),
+                    istopnode: false,
+                    iconclass: 'fa fa-user-plus',
+                    pageactive: ko.observable(false),
+                    childNodes: this.selectedGroups,
+                    expanded: ko.observable(true)
+                }
+                ])
+            }];
+        }
     };
     return MobileSurveyViewModel;
 });
