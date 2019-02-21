@@ -147,7 +147,10 @@ class Surveys(APIBase):
             surveys = MobileSurvey.objects.filter(users__in=[request.user]).distinct()
             for survey in surveys:
                 survey.deactivate_expired_survey()
-                ret[survey.id] = {'active': survey.active}
+                survey = survey.serialize_for_mobile()
+                ret[survey['id']] = {}
+                for key in ['active', 'name', 'description', 'startdate', 'enddate', 'onlinebasemaps', 'bounds', 'tilecache']:
+                    ret[survey['id']][key] = survey[key]
             response = JSONResponse(ret, indent=4)
         else:
             viewable_nodegroups = request.user.userprofile.viewable_nodegroups
@@ -156,7 +159,12 @@ class Surveys(APIBase):
             projects = MobileSurvey.objects.filter(users__in=[request.user], active=True).distinct()
             if surveyid:
                 projects = projects.filter(pk=surveyid)
-            projects_for_couch = [project.serialize_for_mobile() for project in projects]
+
+            projects_for_couch = []
+            for project in projects:
+                project.deactivate_expired_survey()
+                projects_for_couch.append(project.serialize_for_mobile())
+            
             for project in projects_for_couch:
                 project['mapboxkey'] = settings.MAPBOX_API_KEY
                 permitted_cards = set()
