@@ -205,7 +205,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </div>
                                         <div class="col-sm-5">
                                             <p class="account-tips">
-                                                {% trans 'Arches uses your e-maill to alert you to surveys and tasks assigned to you.' %}
+                                                {% trans 'Arches uses your e-maill to alert you to projects and tasks assigned to you.' %}
                                             </p>
                                         </div>
                                     </div>
@@ -292,12 +292,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- My Surveys -->
                 <div class="profile-list profile-projects">
                     <div class="profile-header">
-                        {% trans 'My Surveys' %}
+                        {% trans 'My Collector Projects' %}
                     </div>
 
                     <!--ko ifnot: mobilesurveys.length -->
                     <div id="default-mobile-projects" class="profile-default-message-panel">
-                        {% trans "Sorry, but you haven't been invited to a survey yet..." %}
+                        {% trans "Sorry, but you haven't been invited to a project yet..." %}
                     </div>
                     <!--/ko-->
 
@@ -309,7 +309,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <!-- Find a survey -->
                             <div class="col-sm-9 col-sm-offset-3 relative">
                                 <div class="project-search-widget">
-                                    <input type="text" class="form-control" placeholder="{% trans 'Find a survey...' %}" data-bind="value: mobileSurveyFilter, valueUpdate: 'keyup'">
+                                    <input type="text" class="form-control" placeholder="{% trans 'Find a project...' %}" data-bind="value: mobileSurveyFilter, valueUpdate: 'keyup'">
                                     <span class="clear-node-search" data-bind="visible: mobileSurveyFilter().length > 0, click: function() { mobileSurveyFilter(''); }"><i class="fa fa-times-circle"></i></span>
                                 </div>
                             </div>
@@ -345,7 +345,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <div class='profile-mpm-panel' data-bind="css: {'show-details': vm.mobilesurvey.showDetails}">
                                             <div class="">
                                                 <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-                                                    {% trans 'Survey Summary' %}
+                                                    {% trans 'Project Summary' %}
                                                 </p>
                                                 <ul class="mpm-node-detail-metadata">
                                                     <li class="">
