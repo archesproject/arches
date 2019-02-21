@@ -98,7 +98,7 @@ define([
         };
 
         this.navigateToManager = function() {
-            window.location = arches.urls.mobile_survey;
+            window.location = arches.urls.collector_manager;
         };
 
         this.initializeResource = function(r) {

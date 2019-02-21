@@ -30,7 +30,7 @@ from arches.app.utils.couch import Couch
 
 class Command(BaseCommand):
     """
-    Commands for managing Arches mobile surveys
+    Commands for managing Arches collector projects
 
     """
 

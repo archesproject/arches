@@ -93,7 +93,7 @@ class MobileSurveyManagerView(BaseManagerView):
             main_script='views/mobile-survey-manager',
         )
 
-        context['nav']['title'] = _('Mobile Survey Manager')
+        context['nav']['title'] = _('Arches Collector Manager')
         context['nav']['icon'] = 'fa-server'
         context['nav']['help'] = {
             'title': _('Arches Collector Manager'),
@@ -221,7 +221,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
         )
 
         context['nav']['menu'] = True
-        context['nav']['title'] = _('Mobile Survey Manager')
+        context['nav']['title'] = _('Arches Collector Manager')
         context['nav']['icon'] = 'fa-server'
         context['nav']['help'] = {
             'title': _('Arches Collector Manager'),

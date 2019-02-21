@@ -8,20 +8,20 @@
                 <li class="edit-menu-item" data-bind="">
                     <a href="" target="" class="" data-bind="click: navigateToManager">
                         <div class="media-body">
-                            <div class="menu-item-title"><i class="fa fa-copy"></i> {% trans "Exit Survey" %} </div>
-                            <span class="text-muted menu-item-subtitle">{% trans "Return to the list of available surveys" %}</span>
+                            <div class="menu-item-title"><i class="fa fa-copy"></i> {% trans "Exit Project" %} </div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Return to the list of available projects" %}</span>
                         </div>
                     </a>
                 </li>
                 <li class="edit-menu-item" data-bind="css: {'disabled': mobilesurvey.active()}">
                     <a href="" target="" class="" data-bind="click: deleteMobileSurvey">
                         <div class="media-body">
-                            <div class="menu-item-title"><i class="fa fa-copy"></i> {% trans "Delete Survey" %} </div>
+                            <div class="menu-item-title"><i class="fa fa-copy"></i> {% trans "Delete Project" %} </div>
                             <!--ko ifnot: mobilesurvey.active() -->
-                            <span class="text-muted menu-item-subtitle">{% trans "Delete the current survey" %}</span>
+                            <span class="text-muted menu-item-subtitle">{% trans "Delete the current project" %}</span>
                             <!--/ko-->
                             <!--ko if: mobilesurvey.active() -->
-                            <span class="text-muted menu-item-subtitle">{% trans "You cannot delete an active survey" %}</span>
+                            <span class="text-muted menu-item-subtitle">{% trans "You cannot delete an active project" %}</span>
                             <!--/ko-->
 
                         </div>
