@@ -28,13 +28,14 @@
             &nbsp;<i class="ep-help-topic-toggle-icon fa fa-chevron-right"></i>
         </a>
         <div class="ep-help-topic-content">
-            <p><strong>{% blocktrans %}Syncing{% endblocktrans %}</strong> - {% blocktrans %}After you have activated a project, and users have begun downloading it and entering data, they can sync their changes at any time. The following takes place during project sync:{% endblocktrans %}</p>
+            <p><strong>{% blocktrans %}Activation/Deactivation{% endblocktrans %}</strong> - {% blocktrans %}The first time you activate the project and click Save, all of the parameters are saved to an intermediate location, and cannot be updated. After this initial activation, you can deactivate/reactivate the project whenever you want. When a project is deactivated, users who have already downloaded it can still collect and sync their data, but new users cannot download it, even if they have the proper permissions.{% endblocktrans %}</p>
+            <p><strong>{% blocktrans %}Syncing{% endblocktrans %}</strong> - {% blocktrans %}After you have activated a project, and users have begun downloading it and entering data, they can sync their changes at any time. The following takes place when a user syncs a project:{% endblocktrans %}</p>
             <ul style="">
                 <li>{% blocktrans %}All changes from the user's mobile device will be pushed to this database.{% endblocktrans %}</li>
-                <li>{% blocktrans %}By disapproving a group, all members will be disapproved unless they are approved as a member of a different group.{% endblocktrans %}</li>
-                <li>{% blocktrans %}You may approve or disapprove a user regardless of the approval status of any group to which that user belongs.{% endblocktrans %}</li>
+                <li>{% blocktrans %}All changes from the user's mobile device will be made available to all other participants in the same project.{% endblocktrans %}</li>
+                <li>{% blocktrans %}If other project participants have synced their data, it will be downloaded to the user's mobile device.{% endblocktrans %}</li>
+                <li>{% blocktrans %}If resources have been changed in this database since the project was first activated, these changes are <strong>not</strong> downloaded to the user's mobile device.{% endblocktrans %}</li>
             </ul>
-            <p><strong>{% blocktrans %}Activation/Deactivation{% endblocktrans %}</strong> - {% blocktrans %}The first time you activate the project and click Save, all of the parameters are saved to an intermediate location, and cannot be updated. After this initial activation, you can deactivate/reactivate the project whenever you want. When a project is deactivated, users who have already downloaded it can still collect and sync their data, but new users cannot download it, even if they have the proper permissions.{% endblocktrans %}</p>
         </div>
     </div>
     <div>
@@ -55,7 +56,7 @@
                         </tr>
                         <tr>
                             <td>{% trans "Start Date/End Date" %}</td>
-                            <td>{% blocktrans %}The project's start and end dates are used to limit when people can add or edit data to your project. Use these dates to enforce the beginning and end of your field data collection effort. When a survey has expired, users will not be able to collect new data, but they can still sync.{% endblocktrans %}</td>
+                            <td>{% blocktrans %}The project's start and end dates are used to limit when people can add or edit data to your project. Use these dates to enforce the beginning and end of your field data collection effort. When a project has expired, users will not be able to collect new data, but they can still sync.{% endblocktrans %}</td>
                         </tr>
                         <tr>
                             <td>{% trans "Description" %}</td>
