@@ -18,7 +18,7 @@ define([
 
         var value = self.configForm ? self.defaultValue : self.value;
 
-        if (this.node.config.options) {
+        if (this.node && this.node.config.options) {
             this.options = this.node.config.options;
             ko.unwrap(this.options).forEach(function(option) {
                 if (!ko.isObservable(option.text)) {
