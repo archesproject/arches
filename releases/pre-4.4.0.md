@@ -73,9 +73,6 @@ As always the documentation can be found at <http://arches.readthedocs.io>
     	WSGIPassAuthorization on
 
 
-#### Changes
--   Upgrade of django from 1.11.14 to 1.11.15 [#4085](https://github.com/archesproject/arches/pull/4085)
-
 # Testing Script
 
 Before Version Release, go through this checklist to confirm that Arches is running as intended.
