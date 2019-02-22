@@ -4,8 +4,16 @@ The Arches team has been busy improving Arches and fixing several bugs as well.
 Below you'll find a listing of all the changes that are included in the latest release.
 
 Some of the highlights:
--   
 
+- Debut of the Arches Collection Manager for designing mobile projects for the Arches Collector App
+- Addition of Arches Plugin components
+- Default Ubuntu installation is now Ubuntu 18.04 LTS
+- Cards represented in reports are now collapsible
+- Users can now edit any card for which they have write permissions (edited)
+- Tile datatype validation is now always applied on save
+- Provisional edit review is now fully available for file, map, and iiif widgets
+- Usability enhancements in resource editor tree selection
+- Enhancements to card component viewmodel for easier customization
 
 #### Upgrading Arches
 
@@ -27,8 +35,43 @@ As always the documentation can be found at <http://arches.readthedocs.io>
 
 #### Upgrading an Arches project
 
-#### Changes
--   Upgrade of django from 1.11.14 to 1.11.15 [#4085](https://github.com/archesproject/arches/pull/4085)
+1.  Add the following to your package.json file:
+
+        "datatables.net-buttons": "^1.5.4",
+        "datatables.net-buttons-bs": "^1.5.4"
+
+        and run: `yarn install`
+
+2. If you intend to use the Arches Collector you will need to install and configure CouchDB:
+
+        sudo add-apt-repository "deb https://apache.bintray.com/couchdb-deb $(lsb_release -sc) main"
+        wget --quiet -O - https://couchdb.apache.org/repo/bintray-pubkey.asc | sudo apt-key add -
+        sudo apt-get update
+        sudo apt-get install couchdb
+
+    By default arches connects to couch using the following credentials:
+
+    	username: admin
+    	password: admin
+    	http://localhost:5984/
+
+    You'll also need to add the following settings to your project's settings.py file:
+
+        MOBILE_OAUTH_CLIENT_ID = ''
+        MOBILE_DEFAULT_ONLINE_BASEMAP = {'default': 'mapbox://styles/mapbox/streets-v9'}
+        COUCHDB_URL = 'http://admin:admin@localhost:5984'
+
+    You may want to update this setting to something more secure:
+
+    	COUCHDB_URL = 'http://admin:admin@localhost:5984'
+
+    Now you can create a new oauth client for the api:
+        https://arches.readthedocs.io/en/stable/api/?highlight=application#authentication
+
+    Finally, if you are running Apache, you will need to add the following directive to your site's `000-default.conf` file:
+
+    	WSGIPassAuthorization on
+
 
 # Testing Script
 
@@ -217,7 +260,7 @@ Assigned to: Namjun
 
 ## Resource Instance Management
 
-Assigned to: Namjun 
+Assigned to: Namjun
 
 #### Data Types
 
