@@ -37,17 +37,17 @@ As always the documentation can be found at <http://arches.readthedocs.io>
 
 1.  Add the following to your package.json file:
 
-    "datatables.net-buttons": "^1.5.4",
-    "datatables.net-buttons-bs": "^1.5.4"
+        "datatables.net-buttons": "^1.5.4",
+        "datatables.net-buttons-bs": "^1.5.4"
 
-    and run: `yarn install`
+        and run: `yarn install`
 
 2. If you intend to use the Arches Collector you will need to install and configure CouchDB:
 
-    sudo add-apt-repository "deb https://apache.bintray.com/couchdb-deb $(lsb_release -sc) main"
-    wget --quiet -O - https://couchdb.apache.org/repo/bintray-pubkey.asc | sudo apt-key add -
-    sudo apt-get update
-    sudo apt-get install couchdb
+        sudo add-apt-repository "deb https://apache.bintray.com/couchdb-deb $(lsb_release -sc) main"
+        wget --quiet -O - https://couchdb.apache.org/repo/bintray-pubkey.asc | sudo apt-key add -
+        sudo apt-get update
+        sudo apt-get install couchdb
 
     By default arches connects to couch using the following credentials:
 
@@ -55,12 +55,20 @@ As always the documentation can be found at <http://arches.readthedocs.io>
     	password: admin
     	http://localhost:5984/
 
-    However you should update this setting in your project's settings.py file to something more secure:
+    You'll also need to add the following settings to your project's settings.py file:
+
+        MOBILE_OAUTH_CLIENT_ID = ''
+        MOBILE_DEFAULT_ONLINE_BASEMAP = {'default': 'mapbox://styles/mapbox/streets-v9'}
+        COUCHDB_URL = 'http://admin:admin@localhost:5984'
+
+    You may want to update this setting to something more secure:
 
     	COUCHDB_URL = 'http://admin:admin@localhost:5984'
 
+    Now you can create a new oauth client for the api:
+        https://arches.readthedocs.io/en/stable/api/?highlight=application#authentication
 
-    If you are running Apache, you will need to add the following directive:
+    Finally, if you are running Apache, you will need to add the following directive to your site's `000-default.conf` file:
 
     	WSGIPassAuthorization on
 
