@@ -324,7 +324,7 @@ class MobileSurvey(models.MobileSurveyModel):
                                 if '_conflicts' in row.doc:
                                     for conflict_rev in row.doc['_conflicts']:
                                         conflict_data = db.get(row.id, rev=conflict_rev)
-                                        if conflict_data['provisionaledits'] != '':
+                                        if conflict_data['provisionaledits'] != '' and conflict_data['provisionaledits'] is not None:
                                             for user_edits in conflict_data['provisionaledits'].items():
                                                 self.assign_provisional_edit(user_edits[0], user_edits[1], tile)
                                         # Remove conflicted revision from couch
