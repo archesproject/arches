@@ -5128,7 +5128,7 @@ ul.jqtree_common li.jqtree-folder {
 .account-tips {
     margin-top: 10px;
     font-size: 13px;
-    color: #999;
+    color: #888;
 }
 
 .account-input {
@@ -11365,7 +11365,7 @@ a.filter-tools:hover {
 
 .msm-basemap-subtitle {
     font-size: 13px;
-    color: #999;
+    color: #888;
     padding-bottom: 10px;
 }
 
@@ -11874,7 +11874,7 @@ a.filter-tools:hover {
 
 .msm-survey-message {
     margin-top: 20px;
-    font-size: 16px;
+    font-size: 15px;
     color: #888;
 }
 
@@ -11883,8 +11883,9 @@ a.filter-tools:hover {
     padding: 20px 10px 20px 10px;
     font-size: 15px;
     background: #FFC741;
-    border: 1px solid #ffb300;
+    border: 1px solid #B88406;
     color: #fff;
+    font-weight: 600;
     text-align: center;
     border-radius: 2px;
 }
@@ -11892,7 +11893,7 @@ a.filter-tools:hover {
 
 .msm-save-message {
     padding-top: 20px;
-    font-size: 16px;
+    font-size: 15px;
     color: #2A096E;
     text-align: center;
 }

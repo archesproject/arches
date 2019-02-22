@@ -335,7 +335,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </div>
                                             </div>
 
-                                            <div class="row">
+                                            <div class="row" style="margin-top: 10px;">
                                                 <div class="col-sm-5">
                                                     <div class="form-group">
                                                         <label class="control-label account-label">{% trans 'Project end date' %}</label>
@@ -425,7 +425,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div class='msm-locked-warning' data-bind="visible: locked">{% trans 'These options cannot be modified because users have already synced with this project.' %}</div>
                         <div class="mpm-card-content mpm-crud-section">
 
-                            <div class="account-label">{% trans 'Data entry cards selected for this project:' %}</div>
+                            <div class="account-label" style="margin-top: -15px;">{% trans 'Data entry cards selected for this project:' %}</div>
 
                             <!--ko if: selectedNode().cards -->
                             <!--ko foreach: {data: selectedNode().cards, as: 'card'} -->
