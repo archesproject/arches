@@ -55,7 +55,7 @@ Assigned to: Cyrus
 
 | Test Subject                                                   | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Confirm that upgrading from the previous release is issue free |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Confirm that upgrading from the previous release is issue free |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -71,7 +71,7 @@ Assigned to: Cyrus
 
 ## Authentication
 
-Assigned to: Alexei
+Assigned to: Ryan
 
 Ensure that all browsers are compatible with Authentication process.
 
@@ -98,7 +98,7 @@ Assigned to: Cyrus
 
 #### Map Settings
 
-Assigned to: Cyrus
+Assigned to: Galen
 
 | Test Subject                                                                                                                                                                                    | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
@@ -112,7 +112,7 @@ Assigned to: Cyrus
 
 #### Search Settings
 
-Assigned to: Cyrus
+Assigned to: Galen
 
 Basic Search Settings
 
@@ -139,7 +139,7 @@ Saved Searches
 
 ## Map Widget
 
-Assigned to: Cyrus
+Assigned to: Namjun
 
 Test in the Card Configuration Manager.
 
@@ -153,11 +153,11 @@ Test in the Card Configuration Manager.
 
 ## Map Layer Manager
 
-Assigned to: Rob
+Assigned to: Cyrus
 
 #### Resource Layers
 
-Assigned to: Rob
+Assigned to: Cyrus
 
 | Test Subject                                                                                                                         | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
@@ -171,7 +171,7 @@ Assigned to: Rob
 
 #### Clustering (Resource Layers)
 
-Assigned to: Rob
+Assigned to: Cyrus
 
 | Test Subject                                                                               | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
@@ -182,7 +182,7 @@ Assigned to: Rob
 
 #### Basemaps
 
-Assigned to: Rob
+Assigned to: Cyrus
 
 | Test Subject                                                                                    | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ----------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
@@ -192,7 +192,7 @@ Assigned to: Rob
 
 #### Overlays
 
-Assigned to: Rob
+Assigned to: Cyrus
 
 | Test Subject                                                                                                        | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
@@ -254,7 +254,7 @@ Updating a resource descriptor should be reflected in the following subjects.
 
 #### Provisional Edit Management
 
-Assigned to: Cyrus
+Assigned to: Ryan
 
 | Test Subject                                           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
@@ -364,7 +364,7 @@ Assigned to: Ryan
 
 ## Reports
 
-Assigned to: Adam
+Assigned to: Cyrus
 
 #### Headers Rendering
 
