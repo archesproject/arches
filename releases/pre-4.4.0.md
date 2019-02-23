@@ -131,17 +131,17 @@ Assigned to: Cyrus
 
 #### Map Settings
 
-Assigned to: Galen
+Assigned to: Galen (extent verified by @chiatt)
 
 | Test Subject                                                                                                                                                                                    | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| API Key - Key saves and API calls are successful                                                                                                                                                |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Hex Grid Precision - Saves properly, but errors if precision is too high (\`Exception detail: TransportError(400, u'parsing_exception', u'[geohash_grid] failed to parse field [precision]')``) |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Hex Cell Size - Changes reflected in Search results                                                                                                                                             |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Default Zoom - Changes reflected in Card Config Manager                                                                                                                                         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Min Zoom - Changes reflected in Card Config Manager                                                                                                                                             |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Max Zoom - Changes reflected in Card Config Manager                                                                                                                                             |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Project Extent - Changes reflected in Card Config Manager                                                                                                                                       |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| API Key - Key saves and API calls are successful                                                                                                                                                |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Hex Grid Precision - Saves properly, but errors if precision is too high (\`Exception detail: TransportError(400, u'parsing_exception', u'[geohash_grid] failed to parse field [precision]')``) |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Hex Cell Size - Changes reflected in Search results                                                                                                                                             |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Default Zoom - Changes reflected in Card Config Manager                                                                                                                                         |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Min Zoom - Changes reflected in Card Config Manager                                                                                                                                             |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Max Zoom - Changes reflected in Card Config Manager                                                                                                                                             |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Project Extent - Changes reflected in Card Config Manager                                                                                                                                       |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 #### Search Settings
 
@@ -304,21 +304,21 @@ Assigned to: Galen
 
 | Test Subject                                           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| User can add a related resource                        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can delete a related resource                     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can change the properties of related resources    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can switch between table and force directed graph |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can page through related resources in table       |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| User can add a related resource                        |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| User can delete a related resource                     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| User can change the properties of related resources    |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| User can switch between table and force directed graph |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| User can page through related resources in table       |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 #### Resource Search
 
 | Test Subject                                                                                                                           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Hovering over a link in the force directed graph opens a panel with source and target node info and list each unique relationship type |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Hovering over a node highlights the adjacent links and the corresponding entry in the node list                                        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Hovering over a node list entry highlights the corresponding node and its adjacent links                                               |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can switch between table and force directed graph                                                                                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Entering text in the search field filters the list of list entries                                                                     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Hovering over a link in the force directed graph opens a panel with source and target node info and list each unique relationship type |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Hovering over a node highlights the adjacent links and the corresponding entry in the node list                                        |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Hovering over a node list entry highlights the corresponding node and its adjacent links                                               |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| User can switch between table and force directed graph                                                                                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Entering text in the search field filters the list of list entries                                                                     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 | Overlays support custom popups                                                                                                         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
@@ -329,17 +329,17 @@ Assigned to: Galen
 
 | Test Subject                                                                                                                                                                         | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| Free text search                                                                                                                                                                     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Concept search                                                                                                                                                                       |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Map search                                                                                                                                                                           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Time range based search                                                                                                                                                              |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Time wheel search                                                                                                                                                                    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Advanced search                                                                                                                                                                      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Related resource table search                                                                                                                                                        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Related resource graph search                                                                                                                                                        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Resource type search                                                                                                                                                                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Edit status search (provisional, authoritative, or both). Confirm that only resource reviewers are able to see provisional tile data                                                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Map should not zoom to points that a user is not permitted to read, nor should the search aggregation layer (e.g. hexbin or heatmap) indicate that a restricted resource is present. |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Free text search                                                                                                                                                                     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Concept search                                                                                                                                                                       |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Map search                                                                                                                                                                           |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Time range based search                                                                                                                                                              |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Time wheel search                                                                                                                                                                    |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Advanced search                                                                                                                                                                      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Related resource table search                                                                                                                                                        |:construction:|    ?   |    ?    |   ?  | ?   |Table filter is not available|
+| Related resource graph search                                                                                                                                                        |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Resource type search                                                                                                                                                                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Edit status search (provisional, authoritative, or both). Confirm that only resource reviewers are able to see provisional tile data                                                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Map should not zoom to points that a user is not permitted to read, nor should the search aggregation layer (e.g. hexbin or heatmap) indicate that a restricted resource is present. |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -439,18 +439,18 @@ Assigned to: Namjun
 | Import from SPARQL |:construction:|    ?   |    ?    |   ?  | ?   |The list is not refreshed on import|
 | Manage parents     |:construction:|    ?   |    ?    |   ?  | ?   |When polyhierachy is set, the selection not deactivated |
 | Make collection    |:construction:|    ?   |    ?    |   ?  | ?   |If a user creates two collections with the same name they will not be able to delete either of them|
-| Add label          |:white_check_mark|    ?   |    ?    |   ?  | ?   | -     |
-| Add Note           |:white_check_mark|    ?   |    ?    |   ?  | ?   | -     |
-| Add image          |:white_check_mark|    ?   |    ?    |   ?  | ?   | -     |
+| Add label          |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Add Note           |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Add image          |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 #### Collections
 
 | Test Subject                           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Add collection                         |white_check_mark|    ?   |    ?    |   ?  | ?   | -     |
-| Delete collection                      |white_check_mark|    ?   |    ?    |   ?  | ?   | -     |
-| Export all collections                 |white_check_mark|    ?   |    ?    |   ?  | ?   | -     |
-| Add dropdown entry                     |white_check_mark|    ?   |    ?    |   ?  | ?   | -     |
+| Add collection                         |white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Delete collection                      |white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Export all collections                 |white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Add dropdown entry                     |white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 | Add sort order and confirm in dropdown |:construction:|    ?   |    ?    |   ?  | ?   |In some cases custom sorting reverts to alphabetical order|
 
 * * *
