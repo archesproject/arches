@@ -102,16 +102,6 @@ Assigned to: Cyrus
 
 * * *
 
-## Future Release Features
-
-Assigned to: Cyrus
-
-| Test Subject                                                                              | Chrome | Safari | Firefox | IE11 | UI | Notes |
-| ----------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | :-: | ----- |
-| Test that users can't access the Mobile Survey Manager page |    ?   |    ?   |    ?    |   ?  | ?  | -     |
-
-* * *
-
 ## Authentication
 
 Assigned to: Ryan
@@ -136,8 +126,8 @@ Assigned to: Cyrus
 
 | Test Subject                                                                                                                 | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Project Name - Updating name updates in index.htm and the page tab                                                           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Web Analytics - String value inserts in base.htm at the location of this template variable:{{GOOGLE_ANALYTICS_TRACKING_ID}} |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Project Name - Updating name updates in index.htm and the page tab                                                           |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Web Analytics - String value inserts in base.htm at the location of this template variable:{{GOOGLE_ANALYTICS_TRACKING_ID}} |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 #### Map Settings
 
@@ -188,9 +178,9 @@ Test in the Card Configuration Manager.
 
 | Test Subject                                                                                                                                            | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Point line and poly geoms can be created, edited, and deleted                                                                                           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| XY widget is working properly                                                                                                                           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Valid geojson entered in the geojson input adds features to the map and pans to those features. If geojson is invalid user has a chance to update data. |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Point line and poly geoms can be created, edited, and deleted                                                                                           |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| XY widget is working properly                                                                                                                           |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Valid geojson entered in the geojson input adds features to the map and pans to those features. If geojson is invalid user has a chance to update data. |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -204,13 +194,13 @@ Assigned to: Cyrus
 
 | Test Subject                                                                                                                         | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| Settings - changes to the name and icon of a layer are reflected in the map widget overlay list and overlay library                  |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Deactivating/Activating a resource layer hides/shows the layer in the map widget overlay list and overlay library                    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Style Settings - changes to the layer style are displayed in the layer                                                               |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Style Settings Advanced - changes to the layer style are displayed in the layer                                                      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Activating caching adds a cache folder for a resource in your projects tileserver directory                                          |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Activating clean cache on edit updates the cache when a geometry is edited                                                           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Setting permissions for a user or group as No Access removes the user and group from the permissions list under the permissions tab. |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Settings - changes to the name and icon of a layer are reflected in the map widget overlay list and overlay library                  |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Deactivating/Activating a resource layer hides/shows the layer in the map widget overlay list and overlay library                    |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Style Settings - changes to the layer style are displayed in the layer                                                               |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Style Settings Advanced - changes to the layer style are displayed in the layer                                                      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Activating caching adds a cache folder for a resource in your projects tile server directory                                          |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Activating clean cache on edit updates the cache when a geometry is edited                                                           |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Setting permissions for a user or group as No Access removes the user and group from the permissions list under the permissions tab. |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 #### Clustering (Resource Layers)
 
@@ -250,11 +240,11 @@ Assigned to: Namjun
 
 | Test Subject               | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Create_mapping_file        |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Import business data (cli) |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Export business data (cli) |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Load package (cli)         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Create package (cli)       |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Create_mapping_file        |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Import business data (cli) |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Export business data (cli) |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Load package (cli)         |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Create package (cli)       |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -269,15 +259,15 @@ Note (GeoJson is covered by map widget testing in a different section)
 
 | Test Subject           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| String                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Concepts               |    ?   |    ?   |    ?    |   ?  | ?   | Make sure collector nodes are not clickable     |
-| Domains                |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Images                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Dates                  |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Number                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Boolean                |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Resource instance type |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Node data type         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| String                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Concepts               |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Domains                |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Images                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Dates                  |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Number                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Boolean                |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Resource instance type |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Node data type         |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 #### Resource Descriptors
 
@@ -441,26 +431,26 @@ Assigned to: Namjun
 
 | Test Subject       | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| Add scheme         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Delete scheme      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Import scheme      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Export scheme      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add top concept    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Import from SPARQL |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Manage parents     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Make collection    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add label          |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add Note           |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add image          |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Add scheme         |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Delete scheme      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Import scheme      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Export scheme      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Add top concept    |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Import from SPARQL |:construction:|    ?   |    ?    |   ?  | ?   |The list is not refreshed on import|
+| Manage parents     |:construction:|    ?   |    ?    |   ?  | ?   |When polyhierachy is set, the selection not deactivated |
+| Make collection    |:construction:|    ?   |    ?    |   ?  | ?   |If a user creates two collections with the same name they will not be able to delete either of them|
+| Add label          |:white_check_mark|    ?   |    ?    |   ?  | ?   | -     |
+| Add Note           |:white_check_mark|    ?   |    ?    |   ?  | ?   | -     |
+| Add image          |:white_check_mark|    ?   |    ?    |   ?  | ?   | -     |
 
 #### Collections
 
 | Test Subject                           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Add collection                         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Delete collection                      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Export all collections                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add dropdown entry                     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add sort order and confirm in dropdown |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Add collection                         |white_check_mark|    ?   |    ?    |   ?  | ?   | -     |
+| Delete collection                      |white_check_mark|    ?   |    ?    |   ?  | ?   | -     |
+| Export all collections                 |white_check_mark|    ?   |    ?    |   ?  | ?   | -     |
+| Add dropdown entry                     |white_check_mark|    ?   |    ?    |   ?  | ?   | -     |
+| Add sort order and confirm in dropdown |:construction:|    ?   |    ?    |   ?  | ?   |In some cases custom sorting reverts to alphabetical order|
 
 * * *
