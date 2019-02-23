@@ -208,10 +208,10 @@ Assigned to: Cyrus
 
 | Test Subject                                                                               | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| Increasing cluster distance causes features to cluster at increased distances between them |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Increasing cluster max zoom causes clusters to be formed at higher zoom levels             |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Decreasing min points to 2 points causes clusters to form with only 2 points               |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Increasing vector simplification to 0.0 prevents simplification a low zoom levels          |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Increasing cluster distance causes features to cluster at increased distances between them |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Increasing cluster max zoom causes clusters to be formed at higher zoom levels             |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Decreasing min points to 2 points causes clusters to form with only 2 points               |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Increasing vector simplification to 0.0 prevents simplification a low zoom levels          |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 #### Basemaps
 
@@ -219,9 +219,9 @@ Assigned to: Cyrus
 
 | Test Subject                                                                                    | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ----------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Changing the default search basemap in the basemap settings is reflected on the search page     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Settings - changes to the name and icon of a layer are reflected in the map widget basemap list |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can delete a basemap and it no longer appears in the map widget's list of basemaps         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Changing the default search basemap in the basemap settings is reflected on the search page     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Settings - changes to the name and icon of a layer are reflected in the map widget basemap list |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| User can delete a basemap and it no longer appears in the map widget's list of basemaps         |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 #### Overlays
 
@@ -229,8 +229,8 @@ Assigned to: Cyrus
 
 | Test Subject                                                                                                        | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Settings - changes to the name and icon of a layer are reflected in the map widget overlay list and overlay library |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| User can delete an overlay and it no longer appears in the map widget overlay library                               |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Settings - changes to the name and icon of a layer are reflected in the map widget overlay list and overlay library |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| User can delete an overlay and it no longer appears in the map widget overlay library                               |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -277,11 +277,11 @@ Updating a resource descriptor should be reflected in the following subjects.
 
 | Test Subject                                                                                        | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | --------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Search results                                                                                      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Form headings                                                                                       |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Report headings                                                                                     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Map popups                                                                                          |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Related resource d3 graph and listings                                                              |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Search results                                                                                      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Form headings                                                                                       |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Report headings                                                                                     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Map popups                                                                                          |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Related resource d3 graph and listings                                                              |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -345,19 +345,19 @@ Assigned to: Galen
 
 ## Graph Design
 
-Assigned to: Alexei
+Assigned to: Namjun
 
 ### Arches Designer
 
 | Test Subject     | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Import graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Export graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Clone graph      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Delete graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Create branch    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Create graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Delete Instances |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Import graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Export graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Clone graph      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Delete graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Create branch    |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Create graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Delete Instances |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 ### Graph Designer
 
@@ -447,10 +447,10 @@ Assigned to: Namjun
 
 | Test Subject                           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Add collection                         |white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
-| Delete collection                      |white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
-| Export all collections                 |white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
-| Add dropdown entry                     |white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Add collection                         |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Delete collection                      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Export all collections                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Add dropdown entry                     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 | Add sort order and confirm in dropdown |:construction:|    ?   |    ?    |   ?  | ?   |In some cases custom sorting reverts to alphabetical order|
 
 * * *
