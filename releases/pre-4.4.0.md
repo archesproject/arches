@@ -151,8 +151,8 @@ Basic Search Settings
 
 | Test Subject                                                   | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Searches per page updates properly in Search                   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Number of search suggestions is reflected in search term input |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Searches per page updates properly in Search                   |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Number of search suggestions is reflected in search term input |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 Temporal Search Settings (not in use)
 
@@ -165,8 +165,8 @@ Saved Searches
 
 | Test Subject                                                                                                       | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| A new search saves with a name, search url, description, and image and displays properly in the saved search page. |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Users can delete a saved search                                                                                    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| A new search saves with a name, search url, description, and image and displays properly in the saved search page. |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Users can delete a saved search                                                                                    |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -291,8 +291,8 @@ Assigned to: Ryan
 
 | Test Subject                                           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| Provisional users see indication in a widget that their tile edits were submitted                   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Resource reviewers are able to identify provisional tiles and can approve/discard provisional edits |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Provisional users see indication in a widget that their tile edits were submitted                   |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Resource reviewers are able to identify provisional tiles and can approve/discard provisional edits |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -368,12 +368,10 @@ Assigned to: Namjun
 | Clone graph      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Delete graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 | Create branch    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Create graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Delete Instances |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add/Edit cards   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Reorder widgets  in card |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add/Edit menus   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Add/Edit reports |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Create graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Delete Instances |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Add/Edit cards   |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Reorder widgets  in card |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -403,23 +401,23 @@ Assigned to: Cyrus
 
 | Test Subject                                                            | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ----------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Confirm that report templates with map header gets rendered correctly   |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Confirm that report templates with image header gets rendered correctly |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Confirm that report templates with no header gets rendered correctly    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| Confirm that report templates with map header gets rendered correctly   |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Confirm that report templates with image header gets rendered correctly |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Confirm that report templates with no header gets rendered correctly    |:construction:|    ?   |    ?    |   ?  | ?   |#4613|
 
 #### Data Rendering
 
 | Test Subject           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| String                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Concepts               |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Domains                |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Images                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Dates                  |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Number                 |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Boolean                |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Resource instance type |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Node data type         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
+| String                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Concepts               |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Domains                |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Images                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Dates                  |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Number                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Boolean                |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Resource instance type |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Node data type         |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
