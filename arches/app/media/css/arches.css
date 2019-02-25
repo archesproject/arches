@@ -730,6 +730,10 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 
 .select2-container {
     width: 100%!important;
+}
+
+
+.mpm-resource-selection .select2-container {
     height: 32px;
 }
 
