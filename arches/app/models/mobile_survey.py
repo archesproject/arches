@@ -359,7 +359,7 @@ class MobileSurvey(models.MobileSurveyModel):
                                         except KeyError:
                                             pass
 
-                            tile.save()
+                            tile.save(user=user)
                             self.save_revision_log(row.doc, synclog, action)
                             print('Tile {0} Saved'.format(row.doc['tileid']))
                             db.compact()
