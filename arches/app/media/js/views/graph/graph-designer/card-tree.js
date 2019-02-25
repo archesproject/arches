@@ -325,6 +325,10 @@ define([
                     }
                 });
 
+                if (_.contains(_.keys(this.nodeLookup), node.nodeid) === false) {
+                    this.nodeLookup[node.nodeid] = node;
+                }
+
                 self.cachedFlatTree = self.flattenTree(self.topCards(), []);
                 return newCardViewModel;
             },
