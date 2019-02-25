@@ -231,6 +231,7 @@ class Tile(models.TileModel):
     def save(self, *args, **kwargs):
         request = kwargs.pop('request', None)
         index = kwargs.pop('index', True)
+        user = kwargs.pop('user', None)
         log = kwargs.pop('log', True)
         provisional_edit_log_details = kwargs.pop('provisional_edit_log_details', None)
         self.__preSave(request)
@@ -242,8 +243,9 @@ class Tile(models.TileModel):
         self.check_for_missing_nodes(request)
 
         try:
-            user = request.user
-            user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
+            if user is None and request is not None:
+                user = request.user
+            user_is_reviewer = user.groups.filter(name='Resource Reviewer').exists()
         except AttributeError: #no user - probably importing data
             user = None
 
