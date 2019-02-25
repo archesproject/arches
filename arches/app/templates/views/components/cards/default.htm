@@ -397,10 +397,10 @@
                     {% block report_widgets %}
                     <!-- ko if: card.model.get('widgets')().length > 0 -->
                         <div class="rp-report-tile" data-bind="attr: { id: tile.tileid }">
-                            <!-- ko if: tile.provisionaledits() !== null && tile.userisreviewer === false -->
+                            <!-- ko if: ko.unwrap(tile.provisionaledits) !== null && tile.userisreviewer === false -->
                             <div class="report-card-provisional-flag">{% trans 'These data are provisional and pending review' %}</div>
                             <!--/ko-->
-                            <dl class="dl-horizontal" data-bind="css: {'provisional': tile.provisionaledits() !== null && tile.userisreviewer === false}">
+                            <dl class="dl-horizontal" data-bind="css: {'provisional': ko.unwrap(tile.provisionaledits) !== null && tile.userisreviewer === false}">
                                 <!-- ko foreach: { data: card.model.get('widgets'), as: 'widget' } -->
                                     <!-- ko if: widget.visible -->
                                     <!-- ko component: {
