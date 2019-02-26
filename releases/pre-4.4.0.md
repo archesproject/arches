@@ -229,8 +229,8 @@ Assigned to: Rob
 
 | Test Subject                                                                                                        | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Settings - changes to the name and icon of a layer are reflected in the map widget overlay list and overlay library ||    ?   |    ?    |   ?  | ?   | -     |
-| User can delete an overlay and it no longer appears in the map widget overlay library                               ||    ?   |    ?    |   ?  | ?   | -     |
+| Settings - changes to the name and icon of a layer are reflected in the map widget overlay list and overlay library |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| User can delete an overlay and it no longer appears in the map widget overlay library                               |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
