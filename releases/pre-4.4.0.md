@@ -126,8 +126,8 @@ Assigned to: Cyrus
 
 | Test Subject                                                                                                                 | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Project Name - Updating name updates in index.htm and the page tab                                                           ||    ?   |    ?    |   ?  | ?   | -     |
-| Web Analytics - String value inserts in base.htm at the location of this template variable:{{GOOGLE_ANALYTICS_TRACKING_ID}} ||    ?   |    ?    |   ?  | ?   | -     |
+| Project Name - Updating name updates in index.htm and the page tab                                                           |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Web Analytics - String value inserts in base.htm at the location of this template variable:{{GOOGLE_ANALYTICS_TRACKING_ID}} |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 #### Map Settings
 
@@ -240,11 +240,11 @@ Assigned to: Cyrus
 
 | Test Subject               | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Create_mapping_file        ||    ?   |    ?    |   ?  | ?   | -     |
-| Import business data (cli) ||    ?   |    ?    |   ?  | ?   | -     |
-| Export business data (cli) ||    ?   |    ?    |   ?  | ?   | -     |
-| Load package (cli)         ||    ?   |    ?    |   ?  | ?   | -     |
-| Create package (cli)       ||    ?   |    ?    |   ?  | ?   | -     |
+| Create_mapping_file        |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Import business data (cli) |:construction:|    ?   |    ?    |   ?  | ?   | #4625 |
+| Export business data (cli) |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Load package (cli)         |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Create package (cli)       |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -401,23 +401,23 @@ Assigned to: Cyrus
 
 | Test Subject                                                            | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ----------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Confirm that report templates with map header gets rendered correctly   ||    ?   |    ?    |   ?  | ?   | -     |
-| Confirm that report templates with image header gets rendered correctly ||    ?   |    ?    |   ?  | ?   | -     |
-| Confirm that report templates with no header gets rendered correctly    ||    ?   |    ?    |   ?  | ?   |#4613|
+| Confirm that report templates with map header gets rendered correctly   |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Confirm that report templates with image header gets rendered correctly |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Confirm that report templates with no header gets rendered correctly    |:white_check_mark:|    ?   |    ?    |   ?  | ?   | #4613 |
 
 #### Data Rendering
 
 | Test Subject           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| String                 ||    ?   |    ?    |   ?  | ?   | -     |
-| Concepts               ||    ?   |    ?    |   ?  | ?   | -     |
-| Domains                ||    ?   |    ?    |   ?  | ?   | -     |
-| Images                 ||    ?   |    ?    |   ?  | ?   | -     |
-| Dates                  ||    ?   |    ?    |   ?  | ?   | -     |
-| Number                 ||    ?   |    ?    |   ?  | ?   | -     |
-| Boolean                ||    ?   |    ?    |   ?  | ?   | -     |
-| Resource instance type ||    ?   |    ?    |   ?  | ?   | -     |
-| Node data type         ||    ?   |    ?    |   ?  | ?   | -     |
+| String                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Concepts               |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Domains                |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Images                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Dates                  |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Number                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Boolean                |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Resource instance type |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Node data type         |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
