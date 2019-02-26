@@ -94,7 +94,7 @@ When doing a test pass, consider using these status indicators:
 
 ## Install
 
-Assigned to: Cyrus
+Assigned to: Alexei
 
 | Test Subject                                                   | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
@@ -186,11 +186,11 @@ Test in the Card Configuration Manager.
 
 ## Map Layer Manager
 
-Assigned to: Cyrus
+Assigned to: Rob
 
 #### Resource Layers
 
-Assigned to: Cyrus
+Assigned to: Rob
 
 | Test Subject                                                                                                                         | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
@@ -204,7 +204,7 @@ Assigned to: Cyrus
 
 #### Clustering (Resource Layers)
 
-Assigned to: Cyrus
+Assigned to: Rob
 
 | Test Subject                                                                               | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
@@ -215,7 +215,7 @@ Assigned to: Cyrus
 
 #### Basemaps
 
-Assigned to: Cyrus
+Assigned to: Rob
 
 | Test Subject                                                                                    | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ----------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
@@ -225,7 +225,7 @@ Assigned to: Cyrus
 
 #### Overlays
 
-Assigned to: Cyrus
+Assigned to: Rob
 
 | Test Subject                                                                                                        | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
@@ -236,7 +236,7 @@ Assigned to: Cyrus
 
 ## Import/Export
 
-Assigned to: Namjun
+Assigned to: Cyrus
 
 | Test Subject               | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
@@ -271,7 +271,7 @@ Note (GeoJson is covered by map widget testing in a different section)
 
 #### Resource Descriptors
 
-Assigned to: Adam
+Assigned to: Alexei
 
 Updating a resource descriptor should be reflected in the following subjects.
 
@@ -325,7 +325,7 @@ Assigned to: Galen
 
 ## Search
 
-Assigned to: Galen
+Assigned to: Alexei
 
 | Test Subject                                                                                                                                                                         | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
