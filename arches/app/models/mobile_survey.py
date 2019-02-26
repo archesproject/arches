@@ -226,21 +226,28 @@ class MobileSurvey(models.MobileSurveyModel):
         ordered_card_ids = [unicode(mpc.card_id) for mpc in ordered_cards]
         return ordered_card_ids
 
-    def handle_reviewer_edits(self, userid, tile):
-        user = User.objects.get(pk=userid)
+    def handle_reviewer_edits(self, user, tile):
         if hasattr(user, 'userprofile') is not True:
             models.UserProfile.objects.create(user=user)
         if user.userprofile.is_reviewer():
-            tile.make_provisional_authoritative(user)
+            user_id = str(user.id)
+            if user_id in tile.provisionaledits:
+                tile.provisionaledits.pop(user_id, None)
 
-    def assign_provisional_edit(self, userid, edit, tile):
-        if userid in tile.provisionaledits:
-            if edit['timestamp'] >= tile.provisionaledits[userid]['timestamp']:
-                # If the mobile user edits are newer by UTC timestamp, overwrite the tile data
-                tile.provisionaledits[userid] = edit
+    def get_provisional_edit(self, doc, tile, sync_user_id, db):
+        if doc['provisionaledits'] != '':
+            if sync_user_id in doc['provisionaledits']:
+                user_edit = doc['provisionaledits'][sync_user_id]
+                for nodeid, value in iter(user_edit['value'].items()):
+                    datatype_factory = DataTypeFactory()
+                    node = models.Node.objects.get(nodeid=nodeid)
+                    datatype = datatype_factory.get_instance(node.datatype)
+                    newvalue = datatype.process_mobile_data(tile, node, db, doc, value)
+                    if newvalue is not None:
+                        user_edit['value'][nodeid] = newvalue
+                return user_edit['value']
         else:
-            tile.provisionaledits[userid] = edit
-        self.handle_reviewer_edits(userid, tile)
+            return None
 
     def check_if_revision_exists(self, doc):
         res = False
@@ -266,12 +273,18 @@ class MobileSurvey(models.MobileSurveyModel):
         revisionlog.action = action
         revisionlog.save()
 
-    def push_edits_to_db(self, synclog=None):
+    def push_edits_to_db(self, synclog=None, userid=None):
         # read all docs that have changes
         # save back to postgres db
         db = self.couch.create_db('project_' + str(self.id))
         user_lookup = {}
         is_reviewer = False
+        sync_user = None
+        sync_user_id = None
+        if userid is not None:
+            sync_user = User.objects.get(pk=userid)
+            sync_user_id = str(sync_user.id)
+
         with transaction.atomic():
             couch_docs = self.couch.all_docs(db)
             for row in couch_docs:
@@ -301,65 +314,30 @@ class MobileSurvey(models.MobileSurveyModel):
                             action = 'update'
                             try:
                                 tile = Tile.objects.get(tileid=row.doc['tileid'])
-                                if row.doc['provisionaledits'] != '':
-                                    for user_edits in row.doc['provisionaledits'].items():
-                                        # user_edits is a tuple with the user number in
-                                        # position 0, prov. edit data in position 1
-                                        for nodeid, value in iter(user_edits[1]['value'].items()):
-                                            datatype_factory = DataTypeFactory()
-                                            node = models.Node.objects.get(nodeid=nodeid)
-                                            datatype = datatype_factory.get_instance(node.datatype)
-                                            newvalue = datatype.process_mobile_data(tile, node, db, row.doc, value)
-                                            if newvalue is not None:
-                                                user_edits[1]['value'][nodeid] = newvalue
-
-                                        if tile.provisionaledits is None:
-                                            tile.provisionaledits = {}
-                                            tile.provisionaledits[user_edits[0]] = user_edits[1]
-                                            self.handle_reviewer_edits(user_edits[0], tile)
-                                        else:
-                                            self.assign_provisional_edit(user_edits[0], user_edits[1], tile)
+                                prov_edit = self.get_provisional_edit(row.doc, tile, sync_user_id, db)
+                                if prov_edit is not None:
+                                    tile.data = prov_edit
 
                                 # If there are conflicting documents, lets clear those out
                                 if '_conflicts' in row.doc:
                                     for conflict_rev in row.doc['_conflicts']:
                                         conflict_data = db.get(row.id, rev=conflict_rev)
-                                        if conflict_data['provisionaledits'] != '' and conflict_data['provisionaledits'] is not None:
-                                            for user_edits in conflict_data['provisionaledits'].items():
-                                                self.assign_provisional_edit(user_edits[0], user_edits[1], tile)
+                                        if conflict_data['provisionaledits'] != '' and \
+                                                conflict_data['provisionaledits'] is not None:
+                                            if sync_user_id in conflict_data['provisionaledits']:
+                                                tile.data = conflict_data['provisionaledits'][sync_user_id]['value']
                                         # Remove conflicted revision from couch
                                         db.delete(conflict_data)
 
                             except Tile.DoesNotExist:
                                 action = 'create'
                                 tile = Tile(row.doc)
-                                if row.doc['provisionaledits'] != '':
-                                    for user_edits in row.doc['provisionaledits'].items():
-                                        for nodeid, value in iter(user_edits[1]['value'].items()):
-                                            datatype_factory = DataTypeFactory()
-                                            node = models.Node.objects.get(nodeid=nodeid)
-                                            datatype = datatype_factory.get_instance(node.datatype)
-                                            newvalue = datatype.process_mobile_data(tile, node, db, row.doc, value)
-                                            if newvalue is not None:
-                                                user_edits[1]['value'][nodeid] = newvalue
-                                        tile.provisionaledits[user_edits[0]] = user_edits[1]
-                                        self.handle_reviewer_edits(user_edits[0], tile)
+                                prov_edit = self.get_provisional_edit(row.doc, tile, sync_user_id, db)
+                                if prov_edit is not None:
+                                    tile.data = prov_edit
 
-                            # If user is reviewer, apply as authoritative edit
-                            if tile.provisionaledits != '':
-                                for user_edits in tile.provisionaledits.items():
-                                    if user_edits[0] not in user_lookup:
-                                        user = User.objects.get(pk=user_edits[0])
-                                        user_lookup[user_edits[0]] = user.groups.filter(name='Resource Reviewer').exists()
-
-                                for user_id, is_reviewer in user_lookup.items():
-                                    if is_reviewer:
-                                        try:
-                                            tile.data = tile.provisionaledits.pop(user_id)['value']
-                                        except KeyError:
-                                            pass
-
-                            tile.save(user=user)
+                            self.handle_reviewer_edits(sync_user, tile)
+                            tile.save(user=sync_user)
                             self.save_revision_log(row.doc, synclog, action)
                             print('Tile {0} Saved'.format(row.doc['tileid']))
                             db.compact()
