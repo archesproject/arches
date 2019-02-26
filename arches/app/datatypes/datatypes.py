@@ -1581,7 +1581,7 @@ class NodeValueDataType(BaseDataType):
             try:
                 models.TileModel.objects.get(tileid=value)
             except:
-                errors.append({'type': 'ERROR', 'message': '{0} {1} is not a valid tile id. This data was not imported.'.format(v, row_number)})
+                errors.append({'type': 'ERROR', 'message': '{0} {1} is not a valid tile id. This data was not imported.'.format(value, row_number)})
         return errors
 
     def get_display_value(self, tile, node):
