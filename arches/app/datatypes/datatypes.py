@@ -73,7 +73,8 @@ class StringDataType(BaseDataType):
     def validate(self, value, row_number=None, source=None):
         errors = []
         try:
-            value.upper()
+            if value is not None:
+                value.upper()
         except:
             errors.append({
                 'type': 'ERROR',
