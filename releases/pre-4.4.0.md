@@ -110,11 +110,11 @@ Ensure that all browsers are compatible with Authentication process.
 
 | Test Subject                                                             | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| User can sign themselves up for a new Arches account                     |       |    ?   |    ?    |   ?  | ?   | -     |
-| User is added to default group (Crowdsource Editor)                      |       |    ?   |    ?    |   ?  | ?   | -     |
-| User can log in with their email address                                 |       |    ?   |    ?    |   ?  | ?   | -     |
-| User can reset their password                                            |       |    ?   |    ?    |   ?  | ?   | -     |
-| User can edit their profile (First and Last name, email address, etc...) |       |    ?   |    ?    |   ?  | ?   | -     |
+| User can sign themselves up for a new Arches account                     |:white_check_mark:     |    ?   |    ?    |   ?  | ?   | -     |
+| User is added to default group (Crowdsource Editor)                      |:white_check_mark:       |    ?   |    ?    |   ?  | ?   | -     |
+| User can log in with their email address                                 |:white_check_mark:       |    ?   |    ?    |   ?  | ?   | -     |
+| User can reset their password                                            |:white_check_mark:       |    ?   |    ?    |   ?  | ?   | -     |
+| User can edit their profile (First and Last name, email address, etc...) |:white_check_mark:       |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -178,9 +178,9 @@ Test in the Card Configuration Manager.
 
 | Test Subject                                                                                                                                            | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Point line and poly geoms can be created, edited, and deleted                                                                                           ||    ?   |    ?    |   ?  | ?   | -     |
-| XY widget is working properly                                                                                                                           ||    ?   |    ?    |   ?  | ?   | -     |
-| Valid geojson entered in the geojson input adds features to the map and pans to those features. If geojson is invalid user has a chance to update data. ||    ?   |    ?    |   ?  | ?   | -     |
+| Point line and poly geoms can be created, edited, and deleted                                                                                           |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| XY widget is working properly                                                                                                                           |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Valid geojson entered in the geojson input adds features to the map and pans to those features. If geojson is invalid user has a chance to update data. |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -259,15 +259,15 @@ Note (GeoJson is covered by map widget testing in a different section)
 
 | Test Subject           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| String                 ||    ?   |    ?    |   ?  | ?   | -     |
-| Concepts               ||    ?   |    ?    |   ?  | ?   | -     |
-| Domains                ||    ?   |    ?    |   ?  | ?   | -     |
-| Images                 ||    ?   |    ?    |   ?  | ?   | -     |
-| Dates                  ||    ?   |    ?    |   ?  | ?   | -     |
-| Number                 ||    ?   |    ?    |   ?  | ?   | -     |
-| Boolean                ||    ?   |    ?    |   ?  | ?   | -     |
-| Resource instance type ||    ?   |    ?    |   ?  | ?   | -     |
-| Node data type         ||    ?   |    ?    |   ?  | ?   | -     |
+| String                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Concepts               |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Domains                |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Images                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Dates                  |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Number                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Boolean                |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Resource instance type |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Node data type         |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 #### Resource Descriptors
 
@@ -277,11 +277,11 @@ Updating a resource descriptor should be reflected in the following subjects.
 
 | Test Subject                                                                                        | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | --------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Search results                                                                                      ||    ?   |    ?    |   ?  | ?   | -     |
-| Form headings                                                                                       ||    ?   |    ?    |   ?  | ?   | -     |
-| Report headings                                                                                     ||    ?   |    ?    |   ?  | ?   | -     |
-| Map popups                                                                                          ||    ?   |    ?    |   ?  | ?   | -     |
-| Related resource d3 graph and listings                                                              ||    ?   |    ?    |   ?  | ?   | -     |
+| Search results                                                                                      |:white_check_mark:| :white_check_mark: | :white_check_mark:  |   ?   | ?   | -     |
+| Form headings                                                                                       |:white_check_mark:| :white_check_mark: | :white_check_mark:  |   ?   | ?   | -     |
+| Report headings                                                                                     |:white_check_mark:| :white_check_mark: | :white_check_mark:  |   ?   | ?   | -     |
+| Map popups                                                                                          |:white_check_mark:| :white_check_mark: | :white_check_mark:  |   ?   | ?   | -     |
+| Related resource d3 graph and listings                                                              |:white_check_mark:| :white_check_mark: | :white_check_mark:  |   ?   | ?   | -     |
 
 * * *
 
@@ -291,8 +291,8 @@ Assigned to: Ryan
 
 | Test Subject                                           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| Provisional users see indication in a widget that their tile edits were submitted                   ||    ?   |    ?    |   ?  | ?   | -     |
-| Resource reviewers are able to identify provisional tiles and can approve/discard provisional edits ||    ?   |    ?    |   ?  | ?   | -     |
+| Provisional users see indication in a widget that their tile edits were submitted                   |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Resource reviewers are able to identify provisional tiles and can approve/discard provisional edits |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -329,17 +329,17 @@ Assigned to: Alexei
 
 | Test Subject                                                                                                                                                                         | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| Free text search                                                                                                                                                                     ||    ?   |    ?    |   ?  | ?   | -     |
-| Concept search                                                                                                                                                                       ||    ?   |    ?    |   ?  | ?   | -     |
-| Map search                                                                                                                                                                           ||    ?   |    ?    |   ?  | ?   | -     |
-| Time range based search                                                                                                                                                              ||    ?   |    ?    |   ?  | ?   | -     |
-| Time wheel search                                                                                                                                                                    ||    ?   |    ?    |   ?  | ?   | -     |
-| Advanced search                                                                                                                                                                      ||    ?   |    ?    |   ?  | ?   | -     |
+| Free text search                                                                                                                                                                     |:white_check_mark:| :white_check_mark: | :white_check_mark:  |   ?  |   ?   | -     |
+| Concept search                                                                                                                                                                       |:white_check_mark:| :white_check_mark: | :white_check_mark:  |   ?  |   ?   | -     |
+| Map search                                                                                                                                                                           |:white_check_mark:| :white_check_mark: | :white_check_mark:  |   ?  |   ?   | -     |
+| Time range based search                                                                                                                                                              |:white_check_mark:| :white_check_mark: | :white_check_mark:  |   ?  |   ?   | -     |
+| Time wheel search                                                                                                                                                                    |:white_check_mark:| :white_check_mark: | :white_check_mark:  |   ?  |   ?   | -     |
+| Advanced search                                                                                                                                                                      |:white_check_mark:| :white_check_mark: | :white_check_mark:  |   ?  |   ?   | -     |
 | Related resource table search                                                                                                                                                        |:construction:|    ?   |    ?    |   ?  | ?   |Table filter is not available|
-| Related resource graph search                                                                                                                                                        ||    ?   |    ?    |   ?  | ?   | -     |
-| Resource type search                                                                                                                                                                 ||    ?   |    ?    |   ?  | ?   | -     |
-| Edit status search (provisional, authoritative, or both). Confirm that only resource reviewers are able to see provisional tile data                                                 ||    ?   |    ?    |   ?  | ?   | -     |
-| Map should not zoom to points that a user is not permitted to read, nor should the search aggregation layer (e.g. hexbin or heatmap) indicate that a restricted resource is present. ||    ?   |    ?    |   ?  | ?   | -     |
+| Related resource graph search                                                                                                                                                        |:white_check_mark:|:white_check_mark: | :white_check_mark:  |   ?   |   ?   | -     |
+| Resource type search                                                                                                                                                                 |:white_check_mark:| :white_check_mark: | :white_check_mark:  |  ?   | ?   | -     |
+| Edit status search (provisional, authoritative, or both). Confirm that only resource reviewers are able to see provisional tile data                                                 |:white_check_mark:| :white_check_mark: | :white_check_mark:  |   ?   | ?   | -     |
+| Map should not zoom to points that a user is not permitted to read, nor should the search aggregation layer (e.g. hexbin or heatmap) indicate that a restricted resource is present. |:white_check_mark:| :white_check_mark: | :white_check_mark:  |   ?   |  ?   | -     |
 
 * * *
 
@@ -351,27 +351,27 @@ Assigned to: Namjun
 
 | Test Subject     | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Import graph     ||    ?   |    ?    |   ?  | ?   | -     |
-| Export graph     ||    ?   |    ?    |   ?  | ?   | -     |
-| Clone graph      ||    ?   |    ?    |   ?  | ?   | -     |
-| Delete graph     ||    ?   |    ?    |   ?  | ?   | -     |
-| Create branch    ||    ?   |    ?    |   ?  | ?   | -     |
-| Create graph     ||    ?   |    ?    |   ?  | ?   | -     |
-| Delete Instances ||    ?   |    ?    |   ?  | ?   | -     |
+| Import graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   ||
+| Export graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Clone graph      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Delete graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Create branch    |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Create graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Delete Instances |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 ### Graph Designer
 
 | Test Subject     | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Import graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Export graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Clone graph      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Delete graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Create branch    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Create graph     ||    ?   |    ?    |   ?  | ?   | -     |
-| Delete Instances ||    ?   |    ?    |   ?  | ?   | -     |
-| Add/Edit cards   ||    ?   |    ?    |   ?  | ?   | -     |
-| Reorder widgets  in card ||    ?   |    ?    |   ?  | ?   | -     |
+| Import graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   |Popup blocker will block the new windows for some of these functions.|
+| Export graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Clone graph      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Delete graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Create branch    |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Create graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Delete Instances |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Add/Edit cards   |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Reorder widgets  in card |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
