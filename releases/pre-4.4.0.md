@@ -277,11 +277,11 @@ Updating a resource descriptor should be reflected in the following subjects.
 
 | Test Subject                                                                                        | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | --------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Search results                                                                                      || :white_check_mark: | :white_check_mark:  |:white_check_mark:| ?   | -     |
-| Form headings                                                                                       || :white_check_mark: | :white_check_mark:  |:white_check_mark:| ?   | -     |
-| Report headings                                                                                     || :white_check_mark: | :white_check_mark:  |:white_check_mark:| ?   | -     |
-| Map popups                                                                                          || :white_check_mark: | :white_check_mark:  |:white_check_mark:| ?   | -     |
-| Related resource d3 graph and listings                                                              || :white_check_mark: | :white_check_mark:  |:white_check_mark:| ?   | -     |
+| Search results                                                                                      |:white_check_mark:| :white_check_mark: | :white_check_mark:  |   ?   | ?   | -     |
+| Form headings                                                                                       |:white_check_mark:| :white_check_mark: | :white_check_mark:  |   ?   | ?   | -     |
+| Report headings                                                                                     |:white_check_mark:| :white_check_mark: | :white_check_mark:  |   ?   | ?   | -     |
+| Map popups                                                                                          |:white_check_mark:| :white_check_mark: | :white_check_mark:  |   ?   | ?   | -     |
+| Related resource d3 graph and listings                                                              |:white_check_mark:| :white_check_mark: | :white_check_mark:  |   ?   | ?   | -     |
 
 * * *
 
@@ -329,17 +329,17 @@ Assigned to: Alexei
 
 | Test Subject                                                                                                                                                                         | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| Free text search                                                                                                                                                                     || :white_check_mark: | :white_check_mark:  |:white_check_mark:| ?   | -     |
-| Concept search                                                                                                                                                                       || :white_check_mark: | :white_check_mark:  |:white_check_mark:| ?   | -     |
-| Map search                                                                                                                                                                           || :white_check_mark: | :white_check_mark:  |:white_check_mark:| ?   | -     |
-| Time range based search                                                                                                                                                              || :white_check_mark: | :white_check_mark:  |:white_check_mark:| ?   | -     |
-| Time wheel search                                                                                                                                                                    || :white_check_mark: | :white_check_mark:  |:white_check_mark:| ?   | -     |
-| Advanced search                                                                                                                                                                      || :white_check_mark: | :white_check_mark:  |:white_check_mark:| ?   | -     |
+| Free text search                                                                                                                                                                     |:white_check_mark:| :white_check_mark: | :white_check_mark:  |   ?  |   ?   | -     |
+| Concept search                                                                                                                                                                       |:white_check_mark:| :white_check_mark: | :white_check_mark:  |   ?  |   ?   | -     |
+| Map search                                                                                                                                                                           |:white_check_mark:| :white_check_mark: | :white_check_mark:  |   ?  |   ?   | -     |
+| Time range based search                                                                                                                                                              |:white_check_mark:| :white_check_mark: | :white_check_mark:  |   ?  |   ?   | -     |
+| Time wheel search                                                                                                                                                                    |:white_check_mark:| :white_check_mark: | :white_check_mark:  |   ?  |   ?   | -     |
+| Advanced search                                                                                                                                                                      |:white_check_mark:| :white_check_mark: | :white_check_mark:  |   ?  |   ?   | -     |
 | Related resource table search                                                                                                                                                        |:construction:|    ?   |    ?    |   ?  | ?   |Table filter is not available|
-| Related resource graph search                                                                                                                                                        || :white_check_mark: | :white_check_mark:  |:white_check_mark:| ?   | -     |
-| Resource type search                                                                                                                                                                 || :white_check_mark: | :white_check_mark:  |:white_check_mark:| ?   | -     |
-| Edit status search (provisional, authoritative, or both). Confirm that only resource reviewers are able to see provisional tile data                                                 || :white_check_mark: | :white_check_mark:  |:white_check_mark:| ?   | -     |
-| Map should not zoom to points that a user is not permitted to read, nor should the search aggregation layer (e.g. hexbin or heatmap) indicate that a restricted resource is present. || :white_check_mark: | :white_check_mark:  |:white_check_mark:| ?   | -     |
+| Related resource graph search                                                                                                                                                        |:white_check_mark:|:white_check_mark: | :white_check_mark:  |   ?   |   ?   | -     |
+| Resource type search                                                                                                                                                                 |:white_check_mark:| :white_check_mark: | :white_check_mark:  |  ?   | ?   | -     |
+| Edit status search (provisional, authoritative, or both). Confirm that only resource reviewers are able to see provisional tile data                                                 |:white_check_mark:| :white_check_mark: | :white_check_mark:  |   ?   | ?   | -     |
+| Map should not zoom to points that a user is not permitted to read, nor should the search aggregation layer (e.g. hexbin or heatmap) indicate that a restricted resource is present. |:white_check_mark:| :white_check_mark: | :white_check_mark:  |   ?   |  ?   | -     |
 
 * * *
 
