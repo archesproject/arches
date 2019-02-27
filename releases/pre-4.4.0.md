@@ -178,9 +178,9 @@ Test in the Card Configuration Manager.
 
 | Test Subject                                                                                                                                            | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Point line and poly geoms can be created, edited, and deleted                                                                                           ||    ?   |    ?    |   ?  | ?   | -     |
-| XY widget is working properly                                                                                                                           ||    ?   |    ?    |   ?  | ?   | -     |
-| Valid geojson entered in the geojson input adds features to the map and pans to those features. If geojson is invalid user has a chance to update data. ||    ?   |    ?    |   ?  | ?   | -     |
+| Point line and poly geoms can be created, edited, and deleted                                                                                           |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| XY widget is working properly                                                                                                                           |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Valid geojson entered in the geojson input adds features to the map and pans to those features. If geojson is invalid user has a chance to update data. |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -259,15 +259,15 @@ Note (GeoJson is covered by map widget testing in a different section)
 
 | Test Subject           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| String                 ||    ?   |    ?    |   ?  | ?   | -     |
-| Concepts               ||    ?   |    ?    |   ?  | ?   | -     |
-| Domains                ||    ?   |    ?    |   ?  | ?   | -     |
-| Images                 ||    ?   |    ?    |   ?  | ?   | -     |
-| Dates                  ||    ?   |    ?    |   ?  | ?   | -     |
-| Number                 ||    ?   |    ?    |   ?  | ?   | -     |
-| Boolean                ||    ?   |    ?    |   ?  | ?   | -     |
-| Resource instance type ||    ?   |    ?    |   ?  | ?   | -     |
-| Node data type         ||    ?   |    ?    |   ?  | ?   | -     |
+| String                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Concepts               |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Domains                |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Images                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Dates                  |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Number                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Boolean                |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Resource instance type |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Node data type         |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 #### Resource Descriptors
 
@@ -351,27 +351,27 @@ Assigned to: Namjun
 
 | Test Subject     | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Import graph     ||    ?   |    ?    |   ?  | ?   | -     |
-| Export graph     ||    ?   |    ?    |   ?  | ?   | -     |
-| Clone graph      ||    ?   |    ?    |   ?  | ?   | -     |
-| Delete graph     ||    ?   |    ?    |   ?  | ?   | -     |
-| Create branch    ||    ?   |    ?    |   ?  | ?   | -     |
-| Create graph     ||    ?   |    ?    |   ?  | ?   | -     |
-| Delete Instances ||    ?   |    ?    |   ?  | ?   | -     |
+| Import graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   ||
+| Export graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Clone graph      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Delete graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Create branch    |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Create graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Delete Instances |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 ### Graph Designer
 
 | Test Subject     | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Import graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Export graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Clone graph      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Delete graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Create branch    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Create graph     ||    ?   |    ?    |   ?  | ?   | -     |
-| Delete Instances ||    ?   |    ?    |   ?  | ?   | -     |
-| Add/Edit cards   ||    ?   |    ?    |   ?  | ?   | -     |
-| Reorder widgets  in card ||    ?   |    ?    |   ?  | ?   | -     |
+| Import graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   |Popup blocker will block the new windows for some of these functions.|
+| Export graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Clone graph      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Delete graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Create branch    |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Create graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Delete Instances |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Add/Edit cards   |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Reorder widgets  in card |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
