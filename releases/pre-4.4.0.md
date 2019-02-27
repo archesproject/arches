@@ -178,9 +178,9 @@ Test in the Card Configuration Manager.
 
 | Test Subject                                                                                                                                            | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Point line and poly geoms can be created, edited, and deleted                                                                                           ||    ?   |    ?    |   ?  | ?   | -     |
-| XY widget is working properly                                                                                                                           ||    ?   |    ?    |   ?  | ?   | -     |
-| Valid geojson entered in the geojson input adds features to the map and pans to those features. If geojson is invalid user has a chance to update data. ||    ?   |    ?    |   ?  | ?   | -     |
+| Point line and poly geoms can be created, edited, and deleted                                                                                           |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| XY widget is working properly                                                                                                                           |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Valid geojson entered in the geojson input adds features to the map and pans to those features. If geojson is invalid user has a chance to update data. |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -259,15 +259,15 @@ Note (GeoJson is covered by map widget testing in a different section)
 
 | Test Subject           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| String                 ||    ?   |    ?    |   ?  | ?   | -     |
-| Concepts               ||    ?   |    ?    |   ?  | ?   | -     |
-| Domains                ||    ?   |    ?    |   ?  | ?   | -     |
-| Images                 ||    ?   |    ?    |   ?  | ?   | -     |
-| Dates                  ||    ?   |    ?    |   ?  | ?   | -     |
-| Number                 ||    ?   |    ?    |   ?  | ?   | -     |
-| Boolean                ||    ?   |    ?    |   ?  | ?   | -     |
-| Resource instance type ||    ?   |    ?    |   ?  | ?   | -     |
-| Node data type         ||    ?   |    ?    |   ?  | ?   | -     |
+| String                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Concepts               |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Domains                |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Images                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Dates                  |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Number                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Boolean                |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Resource instance type |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Node data type         |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 #### Resource Descriptors
 
@@ -351,27 +351,27 @@ Assigned to: Namjun
 
 | Test Subject     | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Import graph     ||    ?   |    ?    |   ?  | ?   | -     |
-| Export graph     ||    ?   |    ?    |   ?  | ?   | -     |
-| Clone graph      ||    ?   |    ?    |   ?  | ?   | -     |
-| Delete graph     ||    ?   |    ?    |   ?  | ?   | -     |
-| Create branch    ||    ?   |    ?    |   ?  | ?   | -     |
-| Create graph     ||    ?   |    ?    |   ?  | ?   | -     |
-| Delete Instances ||    ?   |    ?    |   ?  | ?   | -     |
+| Import graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   ||
+| Export graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Clone graph      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Delete graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Create branch    |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Create graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Delete Instances |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 ### Graph Designer
 
 | Test Subject     | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ---------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Import graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Export graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Clone graph      |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Delete graph     |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Create branch    |    ?   |    ?   |    ?    |   ?  | ?   | -     |
-| Create graph     ||    ?   |    ?    |   ?  | ?   | -     |
-| Delete Instances ||    ?   |    ?    |   ?  | ?   | -     |
-| Add/Edit cards   ||    ?   |    ?    |   ?  | ?   | -     |
-| Reorder widgets  in card ||    ?   |    ?    |   ?  | ?   | -     |
+| Import graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   |Popup blocker will block the new windows for some of these functions.|
+| Export graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Clone graph      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Delete graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Create branch    |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Create graph     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Delete Instances |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Add/Edit cards   |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Reorder widgets  in card |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -429,26 +429,26 @@ Assigned to: Namjun
 
 | Test Subject       | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| Add scheme         ||    ?   |    ?    |   ?  | ?   | -     |
-| Delete scheme      ||    ?   |    ?    |   ?  | ?   | -     |
-| Import scheme      ||    ?   |    ?    |   ?  | ?   | -     |
-| Export scheme      ||    ?   |    ?    |   ?  | ?   | -     |
-| Add top concept    ||    ?   |    ?    |   ?  | ?   | -     |
-| Import from SPARQL ||    ?   |    ?    |   ?  | ?   |The list is not refreshed on import|
-| Manage parents     ||    ?   |    ?    |   ?  | ?   |When polyhierachy is set, the selection not deactivated |
-| Make collection    ||    ?   |    ?    |   ?  | ?   |If a user creates two collections with the same name they will not be able to delete either of them|
-| Add label          ||    ?   |    ?    |   ?  | ?   | -     |
-| Add Note           ||    ?   |    ?    |   ?  | ?   | -     |
-| Add image          ||    ?   |    ?    |   ?  | ?   | -     |
+| Add scheme         |:white_check_mark:|    ?   |    ?    |   ?  | ?   |Dialogue contents do not update right away|
+| Delete scheme      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Import scheme      |:white_check_mark:|    ?   |    ?    |   ?  | ?   |Does not import images|
+| Export scheme      |:white_check_mark:|    ?   |    ?    |   ?  | ?   |Does not import images|
+| Add top concept    |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Import from SPARQL |:white_check_mark:|    ?   |    ?    |   ?  | ?   |The list is not refreshed on import|
+| Manage parents     |:white_check_mark:|    ?   |    ?    |   ?  | ?   |When polyhierachy is set, the selection not deactivated |
+| Make collection    |:white_check_mark:|    ?   |    ?    |   ?  | ?   |If a user creates two collections with the same name they will not be able to delete either of them|
+| Add label          |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Add Note           |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Add image          |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 #### Collections
 
 | Test Subject                           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Add collection                         ||    ?   |    ?    |   ?  | ?   | -     |
-| Delete collection                      ||    ?   |    ?    |   ?  | ?   | -     |
-| Export all collections                 ||    ?   |    ?    |   ?  | ?   | -     |
-| Add dropdown entry                     ||    ?   |    ?    |   ?  | ?   | -     |
-| Add sort order and confirm in dropdown ||    ?   |    ?    |   ?  | ?   |In some cases custom sorting reverts to alphabetical order|
+| Add collection                         |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Delete collection                      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Export all collections                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Add dropdown entry                     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Add sort order and confirm in dropdown |:white_check_mark:|    ?   |    ?    |   ?  | ?   |In some cases custom sorting reverts to alphabetical order|
 
 * * *
