@@ -110,11 +110,11 @@ Ensure that all browsers are compatible with Authentication process.
 
 | Test Subject                                                             | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| User can sign themselves up for a new Arches account                     |       |    ?   |    ?    |   ?  | ?   | -     |
-| User is added to default group (Crowdsource Editor)                      |       |    ?   |    ?    |   ?  | ?   | -     |
-| User can log in with their email address                                 |       |    ?   |    ?    |   ?  | ?   | -     |
-| User can reset their password                                            |       |    ?   |    ?    |   ?  | ?   | -     |
-| User can edit their profile (First and Last name, email address, etc...) |       |    ?   |    ?    |   ?  | ?   | -     |
+| User can sign themselves up for a new Arches account                     |:white_check_mark:     |    ?   |    ?    |   ?  | ?   | -     |
+| User is added to default group (Crowdsource Editor)                      |:white_check_mark:       |    ?   |    ?    |   ?  | ?   | -     |
+| User can log in with their email address                                 |:white_check_mark:       |    ?   |    ?    |   ?  | ?   | -     |
+| User can reset their password                                            |:white_check_mark:       |    ?   |    ?    |   ?  | ?   | -     |
+| User can edit their profile (First and Last name, email address, etc...) |:white_check_mark:       |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -291,8 +291,8 @@ Assigned to: Ryan
 
 | Test Subject                                           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| Provisional users see indication in a widget that their tile edits were submitted                   ||    ?   |    ?    |   ?  | ?   | -     |
-| Resource reviewers are able to identify provisional tiles and can approve/discard provisional edits ||    ?   |    ?    |   ?  | ?   | -     |
+| Provisional users see indication in a widget that their tile edits were submitted                   |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Resource reviewers are able to identify provisional tiles and can approve/discard provisional edits |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
