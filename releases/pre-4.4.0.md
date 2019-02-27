@@ -429,26 +429,26 @@ Assigned to: Namjun
 
 | Test Subject       | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| Add scheme         ||    ?   |    ?    |   ?  | ?   | -     |
-| Delete scheme      ||    ?   |    ?    |   ?  | ?   | -     |
-| Import scheme      ||    ?   |    ?    |   ?  | ?   | -     |
-| Export scheme      ||    ?   |    ?    |   ?  | ?   | -     |
-| Add top concept    ||    ?   |    ?    |   ?  | ?   | -     |
-| Import from SPARQL ||    ?   |    ?    |   ?  | ?   |The list is not refreshed on import|
-| Manage parents     ||    ?   |    ?    |   ?  | ?   |When polyhierachy is set, the selection not deactivated |
-| Make collection    ||    ?   |    ?    |   ?  | ?   |If a user creates two collections with the same name they will not be able to delete either of them|
-| Add label          ||    ?   |    ?    |   ?  | ?   | -     |
-| Add Note           ||    ?   |    ?    |   ?  | ?   | -     |
-| Add image          ||    ?   |    ?    |   ?  | ?   | -     |
+| Add scheme         |:white_check_mark:|    ?   |    ?    |   ?  | ?   |Dialogue contents do not update right away|
+| Delete scheme      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Import scheme      |:white_check_mark:|    ?   |    ?    |   ?  | ?   |Does not import images|
+| Export scheme      |:white_check_mark:|    ?   |    ?    |   ?  | ?   |Does not import images|
+| Add top concept    |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Import from SPARQL |:white_check_mark:|    ?   |    ?    |   ?  | ?   |The list is not refreshed on import|
+| Manage parents     |:white_check_mark:|    ?   |    ?    |   ?  | ?   |When polyhierachy is set, the selection not deactivated |
+| Make collection    |:white_check_mark:|    ?   |    ?    |   ?  | ?   |If a user creates two collections with the same name they will not be able to delete either of them|
+| Add label          |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Add Note           |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Add image          |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 
 #### Collections
 
 | Test Subject                           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Add collection                         ||    ?   |    ?    |   ?  | ?   | -     |
-| Delete collection                      ||    ?   |    ?    |   ?  | ?   | -     |
-| Export all collections                 ||    ?   |    ?    |   ?  | ?   | -     |
-| Add dropdown entry                     ||    ?   |    ?    |   ?  | ?   | -     |
-| Add sort order and confirm in dropdown ||    ?   |    ?    |   ?  | ?   |In some cases custom sorting reverts to alphabetical order|
+| Add collection                         |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Delete collection                      |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Export all collections                 |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Add dropdown entry                     |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
+| Add sort order and confirm in dropdown |:white_check_mark:|    ?   |    ?    |   ?  | ?   |In some cases custom sorting reverts to alphabetical order|
 
 * * *
