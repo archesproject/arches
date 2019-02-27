@@ -135,13 +135,13 @@ Assigned to: Galen (extent verified by @chiatt)
 
 | Test Subject                                                                                                                                                                                    | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| API Key - Key saves and API calls are successful                                                                                                                                                ||    ?   |    ?    |   ?  | ?   | -     |
-| Hex Grid Precision - Saves properly, but errors if precision is too high (\`Exception detail: TransportError(400, u'parsing_exception', u'[geohash_grid] failed to parse field [precision]')``) ||    ?   |    ?    |   ?  | ?   | -     |
-| Hex Cell Size - Changes reflected in Search results                                                                                                                                             ||    ?   |    ?    |   ?  | ?   | -     |
-| Default Zoom - Changes reflected in Card Config Manager                                                                                                                                         ||    ?   |    ?    |   ?  | ?   | -     |
-| Min Zoom - Changes reflected in Card Config Manager                                                                                                                                             ||    ?   |    ?    |   ?  | ?   | -     |
-| Max Zoom - Changes reflected in Card Config Manager                                                                                                                                             ||    ?   |    ?    |   ?  | ?   | -     |
-| Project Extent - Changes reflected in Card Config Manager                                                                                                                                       ||    ?   |    ?    |   ?  | ?   | -     |
+| API Key - Key saves and API calls are successful                                                                                                                                                ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
+| Hex Grid Precision - Saves properly, but errors if precision is too high (\`Exception detail: TransportError(400, u'parsing_exception', u'[geohash_grid] failed to parse field [precision]')``) ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
+| Hex Cell Size - Changes reflected in Search results                                                                                                                                             ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
+| Default Zoom - Changes reflected in Card Config Manager                                                                                                                                         ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
+| Min Zoom - Changes reflected in Card Config Manager                                                                                                                                             ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
+| Max Zoom - Changes reflected in Card Config Manager                                                                                                                                             ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
+| Project Extent - Changes reflected in Card Config Manager                                                                                                                                       ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
 
 #### Search Settings
 
@@ -151,8 +151,8 @@ Basic Search Settings
 
 | Test Subject                                                   | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Searches per page updates properly in Search                   ||    ?   |    ?    |   ?  | ?   | -     |
-| Number of search suggestions is reflected in search term input ||    ?   |    ?    |   ?  | ?   | -     |
+| Searches per page updates properly in Search                   ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
+| Number of search suggestions is reflected in search term input ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
 
 Temporal Search Settings (not in use)
 
@@ -165,8 +165,8 @@ Saved Searches
 
 | Test Subject                                                                                                       | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| A new search saves with a name, search url, description, and image and displays properly in the saved search page. ||    ?   |    ?    |   ?  | ?   | -     |
-| Users can delete a saved search                                                                                    ||    ?   |    ?    |   ?  | ?   | -     |
+| A new search saves with a name, search url, description, and image and displays properly in the saved search page. ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
+| Users can delete a saved search                                                                                    ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -304,21 +304,21 @@ Assigned to: Galen
 
 | Test Subject                                           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| User can add a related resource                        ||    ?   |    ?    |   ?  | ?   | -     |
-| User can delete a related resource                     ||    ?   |    ?    |   ?  | ?   | -     |
-| User can change the properties of related resources    ||    ?   |    ?    |   ?  | ?   | -     |
-| User can switch between table and force directed graph ||    ?   |    ?    |   ?  | ?   | -     |
-| User can page through related resources in table       ||    ?   |    ?    |   ?  | ?   | -     |
+| User can add a related resource                        ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
+| User can delete a related resource                     ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
+| User can change the properties of related resources    ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
+| User can switch between table and force directed graph ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
+| User can page through related resources in table       ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
 
 #### Resource Search
 
 | Test Subject                                                                                                                           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Hovering over a link in the force directed graph opens a panel with source and target node info and list each unique relationship type ||    ?   |    ?    |   ?  | ?   | -     |
-| Hovering over a node highlights the adjacent links and the corresponding entry in the node list                                        ||    ?   |    ?    |   ?  | ?   | -     |
-| Hovering over a node list entry highlights the corresponding node and its adjacent links                                               ||    ?   |    ?    |   ?  | ?   | -     |
-| User can switch between table and force directed graph                                                                                 ||    ?   |    ?    |   ?  | ?   | -     |
-| Entering text in the search field filters the list of list entries                                                                     ||    ?   |    ?    |   ?  | ?   | -     |
+| Hovering over a link in the force directed graph opens a panel with source and target node info and list each unique relationship type ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
+| Hovering over a node highlights the adjacent links and the corresponding entry in the node list                                        ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
+| Hovering over a node list entry highlights the corresponding node and its adjacent links                                               ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
+| User can switch between table and force directed graph                                                                                 ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
+| Entering text in the search field filters the list of list entries                                                                     ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
 | Overlays support custom popups                                                                                                         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
