@@ -1,19 +1,22 @@
 ### Arches 4.4.0 release notes
 
 The Arches team has been busy improving Arches and fixing several bugs as well.
-Below you'll find a listing of all the changes that are included in the latest release.
+Below you'll find a listing of more changes included in the latest release.
 
 Some of the highlights:
 
-- Debut of the Arches Collection Manager for designing mobile projects for the Arches Collector App
-- Addition of Arches Plugin components
-- Default Ubuntu installation is now Ubuntu 18.04 LTS
+- Adds the Arches Collection Manager for designing mobile projects for the Arches Collector App
+- Allows developers to create Arches Plugin components
+- Adds a data migration workflow from v3 to v4
+- Updates the target Ubuntu version to Ubuntu 18.04 LTS (install script still supports 16.04 as well as 18.04)
+- Fixes file-list datatype import
 - Cards represented in reports are now collapsible
 - Users can now edit any card for which they have write permissions (edited)
 - Tile datatype validation is now always applied on save
 - Provisional edit review is now fully available for file, map, and iiif widgets
 - Usability enhancements in resource editor tree selection
 - Enhancements to card component viewmodel for easier customization
+- JSON-LD Import/Export: added the ability for JSON-LD representations of Arches resources to be retrieved, updated, and replaced through the Arches API. The JSON-LD representations are interpretable by clients without explicit knowledge of Arches data architecture (cards/tiles/nodegroups)
 
 #### Upgrading Arches
 
@@ -33,6 +36,23 @@ If you have Arches running on a web server such as Apache, be sure to update you
 
 As always the documentation can be found at <http://arches.readthedocs.io>
 
+
+#### New Python dependencies (in requirements.txt):
+
+lxml==4.2.5
+urllib3==1.21.1
+requests[security]>=2.18.1
+
+#### Python dependency upgrades (in requirements.txt):
+
+PyLD[requests]==1.0.3 -> 1.0.4
+Django==1.11.14 -> Django==1.11.15
+TileStache==1.51.8 -> TileStache==1.51.13
+
+#### New dev requirements (in requirements_dev.txt)
+
+mock==2.0.0
+
 #### Upgrading an Arches project
 
 1.  Add the following to your package.json file:
@@ -42,7 +62,7 @@ As always the documentation can be found at <http://arches.readthedocs.io>
 
         and run: `yarn install`
 
-2. If you intend to use the Arches Collector you will need to install and configure CouchDB:
+2. If you intend to use the Arches Collector you will need to install and configure CouchDB. The install process for Ubuntu:
 
         sudo add-apt-repository "deb https://apache.bintray.com/couchdb-deb $(lsb_release -sc) main"
         wget --quiet -O - https://couchdb.apache.org/repo/bintray-pubkey.asc | sudo apt-key add -
@@ -71,6 +91,130 @@ As always the documentation can be found at <http://arches.readthedocs.io>
     Finally, if you are running Apache, you will need to add the following directive to your site's `000-default.conf` file:
 
     	WSGIPassAuthorization on
+
+
+### Additional Changes
+
+- eb8ebc3 #4099 Remove OWNER directive from create database script. Format document & remove unused imports
+- 59f9316 #4099 Add explicit database name 'postgres' to wait_for_db() and db_exists() functions (needed to support @hostname in database usernames as dictated by Azure Postgresql).
+- 862f660 enhances widget viewmodel and select2-query binding
+- b2801f8 enhancements for widget development
+- 96ebe4c enhances card components to support extension
+- 49a33ed adds css files to be overridden, re: #4101
+- 49274de copies package css during load, re: #4101
+- 7d40489 #3601 remove all obsolete in-app help html
+- 5e251a6 #3601 update function help content, improve some trans tags
+- 58dac81 enhances mapboxgl binding handler
+- 8bc9355 enhances card component viewmodel for extension
+- c96ce89 adds onClear to select2-query binding
+- 3df68da Bump tilestache from 1.51.8 to 1.51.13 in /arches/install
+- 76fc4a6 #4141 Add PYTHONUNBUFFERED=0 to docker-compose file in order to show all `print` logging when running Arches with docker-compose
+- ed3778d Updates cards and widgets when a user modifies a node. re #3993, #4149
+- 817faf6 Adds update method to datatype management command.
+- 04a1b75 #4177 Add initial gunicorn config file (official example). Add get_env_variable() functions
+- 7d16eaf #4177 Fix gunicorn binding: always bind to 0.0.0.0. Export DJANGO_PORT env variable in order to use it in gunicorn_config.py
+- 59f3aaa Added: resource-instance/-list, concept/-list additions by Rob Sanderson
+- 60cc6de Fixed Concept ID issues, and added in extra information to concept nodes
+- 2e8329a Removed the toplevel -> Type -> Graph URI and fixed some other concept issues
+- 80458ff Adjusted the JSON-LD framing to focus on the resource instance URI + minor fixes. Commented out language tag from the Concept value as pyld has a bug that stops it being parsed correctly.
+- a3b72f6 Refactor the Resource Instance as range handling part of the JSONLD export
+- 6443386 fix duplication of card_x_node_x_widget entries, re #3892
+- 0edff1b #4190 Add flag to disable/enable installing yarn components on Docker startup. Explain in Readme. Some Readme formatting
+- a8223fa Sorts widgets after they are added to the card model. re #4169
+- 07ef61a makes collectors unselectable, re: #4124
+- 13803d4 syncs card tree w/ graph changes, re: #4166
+- d132060 Fixes urllib3 at v1.21.1
+- 806e4d4 adds plugin model
+- 9851d82 adds plugin page (and demo map plugin), re: #4204
+- 82baf92 #4212 Add exception handling and logging to tile.post()
+- 83cee92 adds plugins to admin interface, re: #4202
+- 1568756 adds commands to load plugins, re: #4202
+- fc5cd08 Fixes sort order bug, re #4169
+- bdf84bc Prevents provisional users from deleting resources with authoritative data re #4231
+- 88ebe20 Prevents error if a user switches from the card tab to the graph tab when no cards are in the card tree.
+- c544f0a rate-limit node dirty state for performance
+- 8ddb38f Adds missing urlparse import statement, re #4264
+- 62075b2 Saves timestamp for provisional edits as a UTC isostring. re #4273
+- e54af62 Added default implmentation of .to_rdf() to the BaseDataType
+- d886e41 Wrap all CouchDB Sync activities in an atomic transaction #4161
+- 98ccd39 fix None resource-instance tile data
+- ec23dda Adding null and None handling to the Concept RDF export method
+- 052864c [4044] add test for csv import of node with file-list datatype
+- af36edf Refactor: switched rdf export to use datatypes.py .to_rdf methods, instead of the utility methods in DatatypeToRDF
+- fa9b354 need to expand json-ld to be able to match existing ontology properties and classes
+- d4b8848 expand method returns arrays
+- 374402e rdfs:literal nodes don't have the @type property
+- 7fe6748 use RDFS:Literals to find nodes
+- 636964f stub out datatype specific tests for JSON-LD import
+- 925b6d4 populate the tile from the as yet un-implemented "from_rdf" method
+- e62e617 Adding from_rdf methods for Literal datatypes
+- fe11930 Added get_valueids_from_concept_label search method in models/concept.py
+- b9ff9e6 Adding from_rdf logic for Concepts
+- 5c83395 Adding list or single resource instance handling to to_rdfmethod
+- b38eab2 #4293 update nodejs version in xenial dependency install script
+- 64d297f fix is_integer() bug, re #4186
+- e928a7a update PUT request to perform DELETE then POST, re #4186
+- 7d70b14 get basic import working again with Ben's PR, re #4186
+- 281d085 Updated and simplified login page
+- a1b450c Update and simplify New Account signup page UI
+- 87c035c Update password recovery page
+- 93d0dad Small tweaks (lowercase lang matching,etc) for Concept to_rdf/value search
+- 404c2c8 Fixed a JSONLD framing error when no context URI is set in the Resource Model
+- a8b43ec Add Method to Resource Class that will return a node's value
+- 129f547 Improved the Concept value matching Query DSL
+- ecddd9d Adding Resource Instance URI handling. Resource datatype will return the UUID and Arches host of a valid URI in the JSON-LD node fragment
+- 06d906e Use a simple http sync method to sync between couch and postgres, re #4161
+- ff30596 allows all cards in descriptor function, re: #4300
+- 71fe48c #4326 Source custom entrypoint script
+- 8922fc4 fixes business data import programming error
+- e9da7f9 Check for provisional resource key. re #4311
+- 63393d1 Adding 'mock' library to dev requirements
+- 0a6c085 Adding some test fixture files for RDF/JSONLD export testing
+- 57651a9 fixes issue with graph import re: card components
+- 863abb2 Deletes attachments from couch after they are converted to files, re #4311
+- 2d99878 adds block for form widgets
+- dc4ddfa Displays error message to user when a tile fails to save. re #4311
+- acfd855 Fixed a bug in the existing get_preflabel_from_conceptid method that crashed if the lang was 'None'
+- 6f19679 PyLD required version shifted from 1.0.3 to 1.0.4 - includes language tag fix
+- 4e6dbe8 Updating JSON-LD export test fixtures to use remote linked-art.json context
+- e54aff7 Adding new setting: PREFERRED_CONCEPT_SCHEME to indicate which concept scheme is preferred for the JSON-LD import/export of Concepts
+- ec6653c Refactoring the Concept to_rdf to include external identifiers and also language tags, due to pyld update to 1.0.4
+- 694013d Reference file attachments by file id. re #4331
+- e149b63 change "id" property to "@id", re #4186
+- 8405d7f adds blocks to default card
+- 6065a5e add lxml used to parse skos xml
+- 79f0908 allow exclusion of specific resources during v3 migration
+- 9f86c1a Prevents icons in the card tree from getting highlighted as provisional if the provisional object is an empty literal (which is the case if all prov edits get deleted). re #4337
+- c60aeeb Fixes issue with not assigning provisional value if the user does not already have provisional edits. re #4337
+- 72b4c47 Updating tests to cover to_rdf methods for basic datatypes
+- dc1b87f adds expander to report cards, re: #4350
+- f658ec1 Create a new ubuntu setup script for both xenial and bionic. Upgrade elasticsearch to 5.3.3
+- 3e61e0f use Oauth for CouchDb and Sync endpoints, re #4161
+- 0ef9035 add traceback handler to API, remove always embedded p2_has_type
+- bcddd22 specifies requests[security] for ssl, re: #3852
+- 3c61ed9 adds blocks for report to card component
+- 953eb53 enhancements to card components
+- 340e847 switch configs to use just file names, not paths
+- 4c26d08 add cli operation for testing configs (re v3 migration)
+- cc4f239 improves performance with nested graphs
+- 1654929 add tests for new v3 migration code
+- 1727c32 adding a specific userprofile endpoint to support mobile, re #archesproject/arches-mobile/336
+- baa7f36 Adds sync log model, re #4467
+- 40a3164 adds graph model to admin interface
+- dea420c improve handling of cardinality = n nodegroups
+- 7515ee6 new search icon left nav-bar
+- bdc3b29 #3620 Fix side panel not draggable in Firefox
+- 1a181ed Replaces 'CRM Class' with 'Ontology Class'
+- 79d5282 adds validation on import from UI in the tile model via custom exception: TileValidationError
+- 71a4c33 resource-instance datatype from_rdf() treats any Resource URIs that end in a UUID as potentially valid
+- 0bdeaea Triggers update of the map and file widget when a provisional edit is selected. re #4384
+- b666b4c Adds a rerender property to the map and file widget's default configs. re #4384
+- 96aa9a1 add new images for help panels
+- 21a727e fixes css for help overflow firefox, re: #4031
+- 9ccbd90 add a bit more content to in-app help for profile manager re: #4586
+- a6ea037 comment out un-implemented device listing and app download links in profile manager
+- 1b1c08f Fixes node datatype validation bug. re #4625
+
 
 
 # Testing Script
@@ -135,13 +279,13 @@ Assigned to: Galen (extent verified by @chiatt)
 
 | Test Subject                                                                                                                                                                                    | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| API Key - Key saves and API calls are successful                                                                                                                                                ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
-| Hex Grid Precision - Saves properly, but errors if precision is too high (\`Exception detail: TransportError(400, u'parsing_exception', u'[geohash_grid] failed to parse field [precision]')``) ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
-| Hex Cell Size - Changes reflected in Search results                                                                                                                                             ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
-| Default Zoom - Changes reflected in Card Config Manager                                                                                                                                         ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
-| Min Zoom - Changes reflected in Card Config Manager                                                                                                                                             ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
-| Max Zoom - Changes reflected in Card Config Manager                                                                                                                                             ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
-| Project Extent - Changes reflected in Card Config Manager                                                                                                                                       ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
+| API Key - Key saves and API calls are successful                                                                                                                                                |:white_check_mark:|   ?   |    ?    |   ?  | ?   | -     |
+| Hex Grid Precision - Saves properly, but errors if precision is too high (\`Exception detail: TransportError(400, u'parsing_exception', u'[geohash_grid] failed to parse field [precision]')``) |:white_check_mark:|   ?   |    ?    |   ?  | ?   | -     |
+| Hex Cell Size - Changes reflected in Search results                                                                                                                                             |:white_check_mark:|   ?   |    ?    |   ?  | ?   | -     |
+| Default Zoom - Changes reflected in Card Config Manager                                                                                                                                         |:white_check_mark:|   ?   |    ?    |   ?  | ?   | -     |
+| Min Zoom - Changes reflected in Card Config Manager                                                                                                                                             |:white_check_mark:|   ?   |    ?    |   ?  | ?   | -     |
+| Max Zoom - Changes reflected in Card Config Manager                                                                                                                                             |:white_check_mark:|   ?   |    ?    |   ?  | ?   | -     |
+| Project Extent - Changes reflected in Card Config Manager                                                                                                                                       |:white_check_mark:|   ?   |    ?    |   ?  | ?   | -     |
 
 #### Search Settings
 
@@ -151,8 +295,8 @@ Basic Search Settings
 
 | Test Subject                                                   | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Searches per page updates properly in Search                   ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
-| Number of search suggestions is reflected in search term input ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
+| Searches per page updates properly in Search                   |:white_check_mark:|   ?   |    ?    |   ?  | ?   | -     |
+| Number of search suggestions is reflected in search term input |:white_check_mark:|   ?   |    ?    |   ?  | ?   | -     |
 
 Temporal Search Settings (not in use)
 
@@ -165,8 +309,8 @@ Saved Searches
 
 | Test Subject                                                                                                       | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------------------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| A new search saves with a name, search url, description, and image and displays properly in the saved search page. ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
-| Users can delete a saved search                                                                                    ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
+| A new search saves with a name, search url, description, and image and displays properly in the saved search page. |:white_check_mark:|   ?   |    ?    |   ?  | ?   | -     |
+| Users can delete a saved search                                                                                    |:white_check_mark:|   ?   |    ?    |   ?  | ?   | -     |
 
 * * *
 
@@ -241,7 +385,7 @@ Assigned to: Cyrus
 | Test Subject               | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
 | Create_mapping_file        |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
-| Import business data (cli) |:construction:|    ?   |    ?    |   ?  | ?   | #4625 |
+| Import business data (cli) |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -    |
 | Export business data (cli) |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 | Load package (cli)         |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
 | Create package (cli)       |:white_check_mark:|    ?   |    ?    |   ?  | ?   | -     |
@@ -304,21 +448,21 @@ Assigned to: Galen
 
 | Test Subject                                           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | ------------------------------------------------------ | :----: | :----: | :-----: | :--: | --- | ----- |
-| User can add a related resource                        ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
-| User can delete a related resource                     ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
-| User can change the properties of related resources    ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
-| User can switch between table and force directed graph ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
-| User can page through related resources in table       ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
+| User can add a related resource                        |:white_check_mark:|   ?   |    ?    |   ?  | ?   | -     |
+| User can delete a related resource                     |:white_check_mark:|   ?   |    ?    |   ?  | ?   | -     |
+| User can change the properties of related resources    |:white_check_mark:|   ?   |    ?    |   ?  | ?   | -     |
+| User can switch between table and force directed graph |:white_check_mark:|   ?   |    ?    |   ?  | ?   | -     |
+| User can page through related resources in table       |:white_check_mark:|   ?   |    ?    |   ?  | ?   | -     |
 
 #### Resource Search
 
 | Test Subject                                                                                                                           | Chrome | Safari | Firefox | IE11 | UI  | Notes |
 | -------------------------------------------------------------------------------------------------------------------------------------- | :----: | :----: | :-----: | :--: | --- | ----- |
-| Hovering over a link in the force directed graph opens a panel with source and target node info and list each unique relationship type ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
-| Hovering over a node highlights the adjacent links and the corresponding entry in the node list                                        ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
-| Hovering over a node list entry highlights the corresponding node and its adjacent links                                               ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
-| User can switch between table and force directed graph                                                                                 ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
-| Entering text in the search field filters the list of list entries                                                                     ||    :white_check_mark:   |    ?    |   ?  | ?   | -     |
+| Hovering over a link in the force directed graph opens a panel with source and target node info and list each unique relationship type |:white_check_mark:|   ?   |    ?    |   ?  | ?   | -     |
+| Hovering over a node highlights the adjacent links and the corresponding entry in the node list                                        |:white_check_mark:|   ?   |    ?    |   ?  | ?   | -     |
+| Hovering over a node list entry highlights the corresponding node and its adjacent links                                               |:white_check_mark:|   ?   |    ?    |   ?  | ?   | -     |
+| User can switch between table and force directed graph                                                                                 |:white_check_mark:|   ?   |    ?    |   ?  | ?   | -     |
+| Entering text in the search field filters the list of list entries                                                                     |:white_check_mark:|   ?   |    ?    |   ?  | ?   | -     |
 | Overlays support custom popups                                                                                                         |    ?   |    ?   |    ?    |   ?  | ?   | -     |
 
 * * *
