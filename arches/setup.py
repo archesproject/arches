@@ -47,16 +47,6 @@ def confirm_system_requirements():
     except OSError:
         print('ERROR: Arches requires psql. Please install and then rerun this file again.')
         sys.exit(101)
-    if postgres_version.find("9.") == -1:
-        print('ERROR: Arches requires Postgres 9.0 or greater')
-        print('Version detected: %s\n' % (postgres_version))
-        postgres_override = raw_input('Would like to continue anyway?\nPress Y for Yes or N for No:')
-        if(postgres_override == 'Y' or postgres_override == 'y'):
-            pass
-        else:
-            sys.exit(101)
-    else:
-        pass
 
     return True
 
