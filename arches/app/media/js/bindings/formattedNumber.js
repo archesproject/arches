@@ -15,9 +15,14 @@ define([
                     value(numeral(newValue).value());
                 }
             }).extend({notify: 'always'});
-            ko.applyBindingsToNode(element, {
-                value: formattedNumber
-            });
+            if(element.tagName.toLowerCase() == 'input' )
+                ko.applyBindingsToNode(element, {
+                    value: formattedNumber
+                });
+            else
+                ko.applyBindingsToNode(element, {
+                    text: formattedNumber
+                });
         }
     };
     return ko.bindingHandlers.formattedNumber;

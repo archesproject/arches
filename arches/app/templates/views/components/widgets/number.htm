@@ -32,7 +32,12 @@
 <dt data-bind="text: label"></dt>
 <dd class='number-widget-report'>
     <div data-bind="text: prefix(), css: {'number-prefix': prefix()}"></div>
+    <!-- ko if: format -->
+    <div data-bind="formattedNumber: value(), format: format"></div>
+    <!-- /ko -->
+    <!-- ko ifnot: format -->
     <div data-bind="text: value()"></div>
+    <!-- /ko -->
     <div data-bind="text: suffix(), css: {'number-suffix': suffix()}"></div>
 </dd>
 {% endblock report %}
