@@ -1072,10 +1072,10 @@ bootstrap-colorpicker@^2.3.6:
   dependencies:
     jquery ">=1.10"
 
-bootstrap@3.3.2, bootstrap@^3.3:
-  version "3.3.2"
-  resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-3.3.2.tgz#43b0283dfb2ac83b12cd3dc1f4238f5042ed02cc"
-  integrity sha1-Q7AoPfsqyDsSzT3B9COPUELtAsw=
+bootstrap@3.4.1, bootstrap@^3.3:
+  version "3.4.1"
+  resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-3.4.1.tgz#c3a347d419e289ad11f4033e3c4132b87c081d72"
+  integrity sha512-yN5oZVmRCwe5aKwzRj6736nSmKDX7pLYwsXiCj/EYmo16hODaBiT4En5btW/jhBF/seV+XMx3aYwukYC3A49DA==
 
 bops@0.0.6:
   version "0.0.6"
