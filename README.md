@@ -12,18 +12,18 @@ Issue reports are encouraged! [Please read this article](http://polite.technolog
 *   [Report a Bug](https://github.com/archesproject/arches/issues/new?template=bug.md)
 *   [File a Feature Ticket](https://github.com/archesproject/arches/issues/new?template=feature.md)
 
-[Version 4.3.1 release notes](https://github.com/archesproject/arches/blob/stable/4.3.x/releases/4.3.1.md)
+[Version 4.4.1 release notes](https://github.com/archesproject/arches/blob/stable/4.4.x/releases/4.4.1.md)
 
 #### Quick Install
 
 Installation is fully documented in the official documentation, [arches.readthedocs.io/en/stable](https://arches.readthedocs.io/en/stable), but assuming you have all of the dependencies installed you should make a virtual environment, activate it, and then run
 
     pip install arches --no-binary :all:
-    
+
 then
 
     arches-project create myproject
-    
+
 enter the new `myproject` directory
 
     cd myproject
@@ -32,7 +32,7 @@ and run
 
     python manage.py packages -o setup_db
     python manage.py runserver
-    
+
 and visit `localhost:8000` in a browser (only Chrome is fully supported at this time).
 
 If you run into problems, please review our the full [installation documentation](http://arches.readthedocs.io/en/stable/installation/)
