@@ -13,7 +13,12 @@
             <!-- ko if: prefix -->
             <span class="input-group-addon" data-bind="text: prefix"></span>
             <!-- /ko -->
+            <!-- ko if: format -->
+            <input type="text" data-bind="formattedNumber: value, format: format, attr: {placeholder: placeholder, max: max, min: min, step: step, disabled: disabled}, style: {width: width}, valueUpdate: 'keyup'" class="form-control input-lg widget-input">
+            <!-- /ko -->
+            <!-- ko ifnot: format -->
             <input type="number" data-bind="value: value, attr: {placeholder: placeholder, max: max, min: min, step: step, disabled: disabled}, style: {width: width}, valueUpdate: 'keyup'" class="form-control input-lg widget-input">
+            <!-- /ko -->
             <!-- ko if: suffix -->
             <span class="input-group-addon" data-bind="text: suffix"></span>
             <!-- /ko -->
@@ -27,7 +32,12 @@
 <dt data-bind="text: label"></dt>
 <dd class='number-widget-report'>
     <div data-bind="text: prefix(), css: {'number-prefix': prefix()}"></div>
+    <!-- ko if: format -->
+    <div data-bind="formattedNumber: value(), format: format"></div>
+    <!-- /ko -->
+    <!-- ko ifnot: format -->
     <div data-bind="text: value()"></div>
+    <!-- /ko -->
     <div data-bind="text: suffix(), css: {'number-suffix': suffix()}"></div>
 </dd>
 {% endblock report %}
@@ -54,8 +64,8 @@
 <div class="control-label">
     {% trans "Increment" %}
 </div>
-<div class="col-xs-12 pad-no crud-widget-container">
-    <input type="number" placeholder="{% trans "Increment size" %}" id="" class="form-control input-md widget-input" data-bind="value: step, valueUpdate: 'keyup'">
+<div class="col-xs-12 pad-no crud-widget-container" >
+    <input type="number" placeholder="{% trans "Increment size" %}" id="" class="form-control input-md widget-input" data-bind="value: step, valueUpdate: 'keyup', disable: format">
 </div>
 <div class="control-label">
     {% trans "Decimal Places" %}
@@ -80,5 +90,11 @@
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input type="number" placeholder="{% trans "Default Value" %}" id="" class="form-control input-md widget-input" data-bind="value: defaultValue, valueUpdate: 'keyup'">
+</div>
+<div class="control-label">
+  {% trans "Format" %} <a href="http://numeraljs.com/#format" target="_blank">(view valid formats)</a>
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+  <input type="" placeholder="{% trans "Format" %}" id="" class="form-control input-md widget-input" data-bind="value: format, valueUpdate: 'keyup'">
 </div>
 {% endblock config_form %}
