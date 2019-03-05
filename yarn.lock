@@ -2381,10 +2381,10 @@ util-deprecate@~1.0.1:
   resolved "https://registry.yarnpkg.com/util-deprecate/-/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
   integrity sha1-RQ1Nyfpw3nMnYvvS1KKJgUGaDM8=
 
-uuidjs@^3.3.0:
-  version "3.6.2"
-  resolved "https://registry.yarnpkg.com/uuidjs/-/uuidjs-3.6.2.tgz#d46cc53ab911b71915fe363ff27a2fa0f1a704a0"
-  integrity sha512-F0uFcS9jQg+hY87SRBNtPTVTVaCkDUxXtvbOruZJJXIX+NLVD4Z+zlU3XuOlj4WMSByuJHqXEvtVDaK+BmfTPQ==
+uuidjs@^4.2.1:
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/uuidjs/-/uuidjs-4.2.1.tgz#078e259320cc96a1c6bcd5fa9053f1656ef3c6e5"
+  integrity sha512-LNl5tqW081cMcn3+e1BqPDZIDNOooxrPHs7JN1j8pK7wFx0H/ziVUGVlALn+pNJ2jwT9RBHHQsKEnvgkOuYSDw==
 
 vfile-reporter@3.0.0:
   version "3.0.0"
