@@ -87,7 +87,7 @@ class TestSearchEngine(SearchEngine):
     def delete(self, **kwargs):
         """
         Deletes a document from the index
-        Pass an index, doc_type, and id to delete a specific document
+        Pass an index and id to delete a specific document
         Pass a body with a query dsl to delete by query
 
         """
@@ -107,7 +107,7 @@ class TestSearchEngine(SearchEngine):
     def search(self, **kwargs):
         """
         Search for an item in the index.
-        Pass an index, doc_type, and id to get a specific document
+        Pass an index and id to get a specific document
         Pass a body with a query dsl to perform a search
 
         """
@@ -115,20 +115,20 @@ class TestSearchEngine(SearchEngine):
         #kwargs = self.reset_index(**kwargs)
         return super(TestSearchEngine, self).search(**kwargs)
 
-    def create_mapping(self, index, doc_type, fieldname='', fieldtype='string', fieldindex=None, body=None):
+    def create_mapping(self, index, fieldname='', fieldtype='string', fieldindex=None, body=None):
         """
         Creates an Elasticsearch body for a single field given an index name and type name
 
         """
 
         #index = '%s%s' % (self.index_prefix, index)
-        return super(TestSearchEngine, self).create_mapping(index=index, doc_type=doc_type, fieldname=fieldname, fieldtype=fieldtype, fieldindex=fieldindex, body=body)
+        return super(TestSearchEngine, self).create_mapping(index=index, fieldname=fieldname, fieldtype=fieldtype, fieldindex=fieldindex, body=body)
 
     def create_index(self, **kwargs):
         #kwargs = self.reset_index(**kwargs)
         return super(TestSearchEngine, self).create_index(**kwargs)
 
-    def index_data(self, index=None, doc_type=None, body=None, idfield=None, id=None, **kwargs):
+    def index_data(self, index=None, body=None, idfield=None, id=None, **kwargs):
         """
         Indexes a document or list of documents into Elasticsearch
 
@@ -140,7 +140,6 @@ class TestSearchEngine(SearchEngine):
         """
 
         kwargs['index'] = index
-        kwargs['doc_type'] = doc_type
         kwargs['body'] = body
         kwargs['idfield'] = idfield
         kwargs['id'] = id

@@ -345,7 +345,7 @@ def search(request):
     query = Query(se, start=0, limit=100)
     phrase = Match(field='value', query=searchString.lower(), type='phrase_prefix')
     query.add_query(phrase)
-    results = query.search(index='concepts', doc_type='_doc')
+    results = query.search(index='concepts')
 
     ids = []
     if removechildren != None:
@@ -365,7 +365,7 @@ def search(request):
                 query = Query(se, start=0, limit=100)
                 phrase = Match(field='conceptid', query=top_concept, type='phrase')
                 query.add_query(phrase)
-                scheme = query.search(index='concepts', doc_type='_doc')
+                scheme = query.search(index='concepts')
                 for label in scheme['hits']['hits']:
                     if label['_source']['type'] == 'prefLabel':
                         cached_scheme_names[top_concept] = label['_source']['value']
@@ -458,7 +458,7 @@ def concept_tree(request, mode):
 
 def get_concept_label_from_valueid(valueid):
     se = SearchEngineFactory().create()
-    concept_label = se.search(index='concepts', doc_type='_doc', id=valueid)
+    concept_label = se.search(index='concepts', id=valueid)
     if concept_label['found']:
         return concept_label['_source']
 
@@ -478,7 +478,7 @@ def get_preflabel_from_conceptid(conceptid, lang):
     bool_query.must(Match(field='type', query='prefLabel', type='phrase'))
     bool_query.filter(Terms(field='conceptid', terms=[conceptid]))
     query.add_query(bool_query)
-    preflabels = query.search(index='concepts', doc_type='_doc')['hits']['hits']
+    preflabels = query.search(index='concepts')['hits']['hits']
     for preflabel in preflabels:
         default = preflabel['_source']
         # get the label in the preferred language, otherwise get the label in the default language

@@ -1486,7 +1486,7 @@ class ResourceInstanceDataType(BaseDataType):
             id_list = self.get_id_list(nodevalue)
             for resourceid in id_list:
                 try:
-                    resource_document = se.search(index='resource', doc_type='_all', id=resourceid)
+                    resource_document = se.search(index='resource', id=resourceid)
                     resource_names.add(resource_document['_source']['displayname'])
                 except:
                     print 'resource not available'

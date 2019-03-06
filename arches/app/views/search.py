@@ -227,7 +227,7 @@ def search_results(request):
     if request.GET.get('tiles', None) is not None:
         dsl.include('tiles')
 
-    results = dsl.search(index='resource', doc_type=get_doc_type(request))
+    results = dsl.search(index='resource')
 
     if results is not None:
         user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
@@ -272,23 +272,6 @@ def search_results(request):
     else:
         return HttpResponseNotFound(_("There was an error retrieving the search results"))
 
-def get_doc_type(request):
-    doc_type = set()
-    type_filter = request.GET.get('typeFilter', '')
-    if type_filter != '':
-        resource_model_ids = set(str(graphid) for graphid in models.GraphModel.objects.filter(isresource=True).values_list('graphid', flat=True))
-        for resouceTypeFilter in JSONDeserializer().deserialize(type_filter):
-            if resouceTypeFilter['inverted'] == True:
-                inverted_resource_model_ids = resource_model_ids - set([str(resouceTypeFilter['graphid'])])
-                if len(doc_type) > 0:
-                    doc_type = doc_type.intersection(inverted_resource_model_ids)
-                else:
-                    doc_type = inverted_resource_model_ids
-            else:
-                doc_type.add(str(resouceTypeFilter['graphid']))
-
-    return list(doc_type)
-
 def get_provisional_type(request):
     """
     Parses the provisional filter data to determine if a search results will
@@ -321,6 +304,7 @@ def build_search_results_dsl(request):
     term_filter = request.GET.get('termFilter', '')
     spatial_filter = JSONDeserializer().deserialize(request.GET.get('mapFilter', '{}'))
     include_provisional = get_provisional_type(request)
+    type_filter = request.GET.get('typeFilter', '')
 
     export = request.GET.get('export', None)
     mobile_download = request.GET.get('mobiledownload', None)
@@ -412,8 +396,15 @@ def build_search_results_dsl(request):
                 else:
                     search_query.filter(nested_conceptid_filter)
 
-    if 'features' in spatial_filter:
+    if type_filter != '':
+        for resouceTypeFilter in JSONDeserializer().deserialize(type_filter):
+            term = Term(field='graphid', term=str(resouceTypeFilter['graphid']))
+            if resouceTypeFilter['inverted'] == True:
+                search_query.must_not(term)
+            else:
+                search_query.must(term)
 
+    if 'features' in spatial_filter:
         if len(spatial_filter['features']) > 0:
             feature_geom = spatial_filter['features'][0]['geometry']
             feature_properties = {}

@@ -89,13 +89,13 @@ class Query(Dsl):
     def min_score(self, min_score):
         self.dsl['min_score'] = min_score
 
-    def search(self, index='', doc_type='', **kwargs):
+    def search(self, index='', **kwargs):
         self.start = kwargs.pop('start', self.start)
         self.limit = kwargs.pop('limit', self.limit)
 
         self.prepare()
         #print self
-        return self.se.search(index=index, doc_type=doc_type, body=self.dsl)
+        return self.se.search(index=index, body=self.dsl)
 
     def delete(self, index='', **kwargs):
         return self.se.delete(index=index, body=self.dsl, **kwargs)

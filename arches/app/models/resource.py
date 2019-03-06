@@ -168,10 +168,10 @@ class Resource(models.ResourceInstance):
                 fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes)
             document['root_ontology_class'] = resource.get_root_ontology()
             documents.append(se.create_bulk_item(
-                index='resource', doc_type=document['graph_id'], id=document['resourceinstanceid'], data=document))
+                index='resource', id=document['resourceinstanceid'], data=document))
             for term in terms:
                 term_list.append(se.create_bulk_item(
-                    index='terms', doc_type='_doc', id=term['_id'], data=term['_source']))
+                    index='terms', id=term['_id'], data=term['_source']))
 
         for tile in tiles:
             tile.save_edit(edit_type='tile create', new_value=tile.data)
@@ -284,19 +284,15 @@ class Resource(models.ResourceInstance):
             related_resources = self.get_related_resources(
                 lang="en-US", start=0, limit=1000, page=0)
             for rr in related_resources['resource_relationships']:
-                models.ResourceXResource.objects.get(
-                    pk=rr['resourcexid']).delete()
+                models.ResourceXResource.objects.get(pk=rr['resourcexid']).delete()
             query = Query(se)
             bool_query = Bool()
-            bool_query.filter(Terms(field='resourceinstanceid',
-                                    terms=[self.resourceinstanceid]))
+            bool_query.filter(Terms(field='resourceinstanceid',terms=[self.resourceinstanceid]))
             query.add_query(bool_query)
-            results = query.search(index='terms', doc_type='_doc')[
-                'hits']['hits']
+            results = query.search(index='terms')['hits']['hits']
             for result in results:
-                se.delete(index='terms', doc_type='_doc', id=result['_id'])
-            se.delete(index='resource', doc_type=str(
-                self.graph_id), id=self.resourceinstanceid)
+                se.delete(index='terms', id=result['_id'])
+            se.delete(index='resource', id=self.resourceinstanceid)
 
             self.save_edit(edit_type='delete', user=user,
                            note=self.displayname)
@@ -333,7 +329,7 @@ class Resource(models.ResourceInstance):
             bool_filter.should(
                 Terms(field='resourceinstanceidto', terms=resourceinstanceid))
             query.add_query(bool_filter)
-            return query.search(index='resource_relations', doc_type='all')
+            return query.search(index='resource_relations')
 
         resource_relations = get_relations(
             self.resourceinstanceid, start, limit)
@@ -355,8 +351,7 @@ class Resource(models.ResourceInstance):
             instanceids.remove(str(self.resourceinstanceid))
 
         if len(instanceids) > 0:
-            related_resources = se.search(
-                index='resource', doc_type='_all', id=list(instanceids))
+            related_resources = se.search(index='resource', id=list(instanceids))
             if related_resources:
                 for resource in related_resources['docs']:
                     relations = get_relations(resource['_id'], 0, 0)

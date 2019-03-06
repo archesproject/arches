@@ -77,7 +77,7 @@ def reverse_func(apps, schema_editor):
     se = SearchEngineFactory().create()
     query = Query(se, start=0, limit=10000)
     query.add_query(Term(field='conceptid', term='00000000-0000-0000-0000-000000000001'))
-    query.delete(index='concepts', doc_type='_doc')
+    query.delete(index='concepts')
 
     try:
         DValueType = apps.get_model("models", "DValueType")

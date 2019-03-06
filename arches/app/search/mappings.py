@@ -117,11 +117,11 @@ def prepare_concepts_index(create=False):
 
 def delete_terms_index():
     se = SearchEngineFactory().create()
-    se.delete_index(index='terms', doc_type='_doc')
+    se.delete_index(index='terms')
 
 def delete_concepts_index():
     se = SearchEngineFactory().create()
-    se.delete_index(index='concepts', doc_type='_doc')
+    se.delete_index(index='concepts')
 
 def prepare_search_index(create=False):
     """
@@ -258,7 +258,7 @@ def prepare_search_index(create=False):
             se.create_index(index='resource', body=index_settings)
         except:
             index_settings = index_settings['mappings']
-            se.create_mapping(index='resource', doc_type='_doc', body=index_settings)
+            se.create_mapping(index='resource', body=index_settings)
 
     return index_settings
 
