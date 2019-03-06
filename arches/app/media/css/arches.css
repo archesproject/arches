@@ -7708,6 +7708,11 @@ a.mega-dropdown-toggle.disabled {
     padding-left: 15px;
 }
 
+.rp-tile-separator {
+    border: 1px solid rgb(179, 179, 179);
+    margin-right: 15%;
+}
+
 @media (min-width: 992px){
     .rp-card-section {
         padding-left: 20px;
