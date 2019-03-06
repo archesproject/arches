@@ -35,7 +35,7 @@ def setUpModule():
 
 def tearDownModule():
     se = SearchEngineFactory().create()
-    se.delete_index(index='strings')
+    se.delete_index(index='terms,concepts')
     se.delete_index(index='resource')
 
 
@@ -74,14 +74,15 @@ class ArchesTestCase(TestCase):
 class TestSearchEngine(SearchEngine):
 
     def __init__(self):
-        super(TestSearchEngine, self).__init__()
-        self.index_prefix = 'test_'
+        super(TestSearchEngine, self).__init__(prefix='test')
+        #self.index_prefix = 'test_'
 
-    def reset_index(self, **kwargs):
-        index = kwargs.get('index', None)
-        if index:
-            kwargs['index'] ='%s%s' % (self.index_prefix, index)
-        return kwargs
+    # def reset_index(self, **kwargs):
+    #     index = kwargs.get('index', None)
+    #     kwargs = self._add_prefix(**kwargs)
+    #     if index:
+    #         kwargs['index'] ='%s%s' % (self.index_prefix, index)
+    #     return kwargs
 
     def delete(self, **kwargs):
         """
@@ -91,7 +92,7 @@ class TestSearchEngine(SearchEngine):
 
         """
 
-        kwargs = self.reset_index(**kwargs)
+        #kwargs = self.reset_index(**kwargs)
         return super(TestSearchEngine, self).delete(**kwargs)
 
     def delete_index(self, **kwargs):
@@ -100,7 +101,7 @@ class TestSearchEngine(SearchEngine):
 
         """
 
-        kwargs = self.reset_index(**kwargs)
+        #kwargs = self.reset_index(**kwargs)
         return super(TestSearchEngine, self).delete_index(**kwargs)
 
     def search(self, **kwargs):
@@ -111,7 +112,7 @@ class TestSearchEngine(SearchEngine):
 
         """
 
-        kwargs = self.reset_index(**kwargs)
+        #kwargs = self.reset_index(**kwargs)
         return super(TestSearchEngine, self).search(**kwargs)
 
     def create_mapping(self, index, doc_type, fieldname='', fieldtype='string', fieldindex=None, body=None):
@@ -120,11 +121,11 @@ class TestSearchEngine(SearchEngine):
 
         """
 
-        index = '%s%s' % (self.index_prefix, index)
-        return super(TestSearchEngine, self).create_mapping(index, doc_type, fieldname=fieldname, fieldtype=fieldtype, fieldindex=fieldindex, body=body)
+        #index = '%s%s' % (self.index_prefix, index)
+        return super(TestSearchEngine, self).create_mapping(index=index, doc_type=doc_type, fieldname=fieldname, fieldtype=fieldtype, fieldindex=fieldindex, body=body)
 
     def create_index(self, **kwargs):
-        kwargs = self.reset_index(**kwargs)
+        #kwargs = self.reset_index(**kwargs)
         return super(TestSearchEngine, self).create_index(**kwargs)
 
     def index_data(self, index=None, doc_type=None, body=None, idfield=None, id=None, **kwargs):
@@ -143,18 +144,18 @@ class TestSearchEngine(SearchEngine):
         kwargs['body'] = body
         kwargs['idfield'] = idfield
         kwargs['id'] = id
-        kwargs = self.reset_index(**kwargs)
+        #kwargs = self.reset_index(**kwargs)
         return super(TestSearchEngine, self).index_data(**kwargs)
 
     def bulk_index(self, data, **kwargs):
         kwargs['data'] = data
-        kwargs = self.reset_index(**kwargs)
+        #kwargs = self.reset_index(**kwargs)
         return super(TestSearchEngine, self).bulk_index(**kwargs)
 
     def create_bulk_item(self, **kwargs):
-        kwargs = self.reset_index(**kwargs)
+        #kwargs = self.reset_index(**kwargs)
         return super(TestSearchEngine, self).create_bulk_item(**kwargs)
 
     def count(self, **kwargs):
-        kwargs = self.reset_index(**kwargs)
+        #kwargs = self.reset_index(**kwargs)
         return super(TestSearchEngine, self).count(**kwargs)

@@ -46,7 +46,11 @@ class SearchEngine(object):
             raise NotImplementedError("Elasticsearch index not specified.")
 
         prefix = '%s_' % self.prefix.strip() if self.prefix and self.prefix.strip() != '' else ''
-        index = '%s%s' % (prefix, index)
+        ret = []
+        for idx in index.split(','):
+            ret.append('%s%s' % (prefix, idx))
+
+        index = ','.join(ret)
         if args:
             return index
         else:
@@ -158,7 +162,7 @@ class SearchEngine(object):
 
     def create_index(self, **kwargs):
         kwargs = self._add_prefix(**kwargs)
-        self.es.indices.create(**kwargs)
+        self.es.indices.create(ignore=400, **kwargs)
         print 'creating index : %s' % kwargs.get('index', '')
 
     def index_data(self, index=None, doc_type=None, body=None, idfield=None, id=None, **kwargs):

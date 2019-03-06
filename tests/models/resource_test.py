@@ -43,7 +43,7 @@ class ResourceTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
         se = SearchEngineFactory().create()
-        se.delete_index(index='strings')
+        se.delete_index(index='terms,concepts')
         se.delete_index(index='resource')
 
         cls.client = Client()

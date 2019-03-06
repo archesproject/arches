@@ -46,7 +46,7 @@ from arches.app.utils.skos import SKOSReader
 from arches.app.views.tileserver import seed_resource_cache
 from arches.management.commands import utils
 from arches.setup import get_elasticsearch_download_url, download_elasticsearch, unzip_file
-from arches.app.search.mappings import prepare_term_index, prepare_resource_relations_index
+from arches.app.search.mappings import prepare_terms_index, prepare_concepts_index, prepare_resource_relations_index
 
 class Command(BaseCommand):
     """
@@ -793,7 +793,8 @@ class Command(BaseCommand):
         os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d postgres -f "%(truncate_path)s"' % db_settings)
 
         self.delete_indexes()
-        prepare_term_index(create=True)
+        prepare_terms_index(create=True)
+        prepare_concepts_index(create=True)
         prepare_resource_relations_index(create=True)
         management.call_command('migrate')
 

@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 
-def prepare_term_index(create=False):
+def prepare_terms_index(create=False):
     """
     Creates the settings and mappings in Elasticsearch to support term search
 
@@ -37,7 +37,7 @@ def prepare_term_index(create=False):
             }
         },
         'mappings': {
-            'term': {
+            '_doc': {
                 'properties': {
                     'nodegroupid': {'type': 'keyword'},
                     'tileid': {'type': 'keyword'},
@@ -56,8 +56,35 @@ def prepare_term_index(create=False):
                         }
                     }
                 }
-            },
-            'concept': {
+            }
+        }
+    }
+
+    if create:
+        se = SearchEngineFactory().create()
+        se.create_index(index='terms', body=index_settings)
+
+    return index_settings
+
+def prepare_concepts_index(create=False):
+    """
+    Creates the settings and mappings in Elasticsearch to support term search
+
+    """
+
+    index_settings = {
+        'settings': {
+            'analysis': {
+                'analyzer': {
+                    'folding': {
+                        'tokenizer': 'standard',
+                        'filter': [ 'lowercase', 'asciifolding' ]
+                    }
+                }
+            }
+        },
+        'mappings': {
+            '_doc': {
                 'properties': {
                     'top_concept': {'type': 'keyword'},
                     'conceptid': {'type': 'keyword'},
@@ -84,15 +111,19 @@ def prepare_term_index(create=False):
 
     if create:
         se = SearchEngineFactory().create()
-        se.create_index(index='strings', body=index_settings)
+        se.create_index(index='concepts', body=index_settings)
 
     return index_settings
 
-def delete_term_index():
+def delete_terms_index():
     se = SearchEngineFactory().create()
-    se.delete_index(index='strings')
+    se.delete_index(index='terms', doc_type='_doc')
 
-def prepare_search_index(resource_model_id, create=False):
+def delete_concepts_index():
+    se = SearchEngineFactory().create()
+    se.delete_index(index='concepts', doc_type='_doc')
+
+def prepare_search_index(create=False):
     """
     Creates the settings and mappings in Elasticsearch to support resource search
 
@@ -110,7 +141,7 @@ def prepare_search_index(resource_model_id, create=False):
             }
         },
         'mappings': {
-            resource_model_id : {
+            '_doc' : {
                 'properties' : {
                     'graphid': {'type': 'keyword'},
                     'resourceinstanceid': {'type': 'keyword'},
@@ -227,7 +258,7 @@ def prepare_search_index(resource_model_id, create=False):
             se.create_index(index='resource', body=index_settings)
         except:
             index_settings = index_settings['mappings']
-            se.create_mapping(index='resource', doc_type=resource_model_id, body=index_settings)
+            se.create_mapping(index='resource', doc_type='_doc', body=index_settings)
 
     return index_settings
 

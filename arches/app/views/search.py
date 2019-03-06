@@ -151,7 +151,7 @@ def search_terms(request):
     base_agg.add_aggregation(top_concept_agg)
     base_agg.add_aggregation(nodegroupid_agg)
     query.add_aggregation(base_agg)
-    results = query.search(index='strings') or {'hits': {'hits':[]}}
+    results = query.search(index='terms,concepts') or {'hits': {'hits':[]}}
 
     i = 0;
     ret = []

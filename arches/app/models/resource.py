@@ -171,7 +171,7 @@ class Resource(models.ResourceInstance):
                 index='resource', doc_type=document['graph_id'], id=document['resourceinstanceid'], data=document))
             for term in terms:
                 term_list.append(se.create_bulk_item(
-                    index='strings', doc_type='term', id=term['_id'], data=term['_source']))
+                    index='terms', doc_type='_doc', id=term['_id'], data=term['_source']))
 
         for tile in tiles:
             tile.save_edit(edit_type='tile create', new_value=tile.data)
@@ -195,8 +195,7 @@ class Resource(models.ResourceInstance):
             se.index_data('resource', self.graph_id, JSONSerializer(
             ).serializeToPython(document), id=self.pk)
             for term in terms:
-                se.index_data('strings', 'term',
-                              term['_source'], id=term['_id'])
+                se.index_data('terms', body=term['_source'], id=term['_id'])
 
     def get_documents_to_index(self, fetchTiles=True, datatype_factory=None, node_datatypes=None):
         """
@@ -292,10 +291,10 @@ class Resource(models.ResourceInstance):
             bool_query.filter(Terms(field='resourceinstanceid',
                                     terms=[self.resourceinstanceid]))
             query.add_query(bool_query)
-            results = query.search(index='strings', doc_type='term')[
+            results = query.search(index='terms', doc_type='_doc')[
                 'hits']['hits']
             for result in results:
-                se.delete(index='strings', doc_type='term', id=result['_id'])
+                se.delete(index='terms', doc_type='_doc', id=result['_id'])
             se.delete(index='resource', doc_type=str(
                 self.graph_id), id=self.resourceinstanceid)
 
