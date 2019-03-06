@@ -14,10 +14,10 @@ class Migration(migrations.Migration):
     operations = [
             migrations.RunSQL("""
                     update widgets
-                    	set defaultconfig = jsonb_set(defaultconfig, '{format}', '')
+                    	set defaultconfig = jsonb_set(defaultconfig, '{format}', '""')
                     	where datatype = 'number';
                     update cards_x_nodes_x_widgets
-                    	set config = jsonb_set(config, '{format}', '')
+                    	set config = jsonb_set(config, '{format}', '""')
                     	WHERE nodeid IN (SELECT nodeid FROM nodes WHERE datatype = 'number');
                 """,
                 """
