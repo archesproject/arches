@@ -8,7 +8,7 @@ define([
     var nameLookup = {};
     var NodeValueSelectViewModel = function(params) {
         var self = this;
-        params.configKeys = ['placeholder'];
+        params.configKeys = ['placeholder','displayOnlySelectedNode'];
         this.multiple = params.multiple || false;
 
         WidgetViewModel.apply(this, [params]);
@@ -120,12 +120,12 @@ define([
                     '<div class="selected-node-value">' +
                     getDisplayValueMarkup(nodeDisplayValue) +
                     '</div>';
-
-                tile.display_values.forEach(function(displayValue) {
-                    if (nodeid !== displayValue.nodeid) {
-                        markup += getDisplayValueMarkup(displayValue);
-                    }
-                });
+                if (!params.config().displayOnlySelectedNode) {
+                    tile.display_values.forEach(function(displayValue) {
+                        if (nodeid !== displayValue.nodeid) {
+                            markup += getDisplayValueMarkup(displayValue);
+                        }
+                })};
                 markup += '</div>';
                 return markup;
             },
