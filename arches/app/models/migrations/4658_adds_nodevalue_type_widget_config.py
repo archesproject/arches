@@ -10,7 +10,7 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4384_adds_rerender_widget_config'),
+        ('models', '4352_format_config_number_widget'),
     ]
 
     operations = [
