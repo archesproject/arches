@@ -5,7 +5,7 @@ define([
     'viewmodels/widget',
     'arches',
 ], function(_, ko, $, WidgetViewModel, arches) {
-    var nameLookup = {};
+
     var NodeValueSelectViewModel = function(params) {
         var self = this;
         params.configKeys = ['placeholder','displayOnlySelectedNode'];
@@ -20,8 +20,8 @@ define([
             var resourceId = ko.unwrap(self.resourceinstanceid);
             if (resourceId === '') {
                 resourceId = window.location.pathname.split('/');
-                resourceId = resourceId[resourceId.length-1]
-            };
+                resourceId = resourceId[resourceId.length-1];
+            }
             var url = arches.urls.resource_tiles.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', resourceId);
             if (nodeid && resourceId) {
                 $.ajax({
@@ -48,12 +48,12 @@ define([
 
         this.toggleDisplayOnlySelected = function(){
             this.displayOnlySelectedNode(!this.displayOnlySelectedNode());
-        }
+        };
 
         this.getSelectedDisplayValue = function() {
             var value = self.value();
             var nodeid = params.node.config.nodeid();
-            var tile = _.find(self.tiles(), function (tile) {
+            var tile = _.find(self.tiles(), function(tile) {
                 return tile.tileid === value;
             });
 
@@ -62,7 +62,7 @@ define([
                     return nodeid === dv.nodeid;
                 });
             }
-        }
+        };
         this.displayValue = ko.computed(function() {
             var displayValue = this.getSelectedDisplayValue();
             return displayValue ? displayValue.value : '';
@@ -81,9 +81,9 @@ define([
             multiple: this.multiple,
             placeholder: this.placeholder,
             allowClear: true,
-            query: function (query) {
+            query: function(query) {
                 var tiles = self.tiles();
-                var data = {results: []}
+                var data = {results: []};
                 tiles.forEach(function(tile) {
                     data.results.push(tile);
                 });
@@ -93,8 +93,8 @@ define([
                 var id = $(element).val();
                 var tiles = self.tiles();
                 if (id !== "") {
-                    var setSelection = function (tiles, callback)   {
-                        var selection =  _.find(tiles, function (tile) {
+                    var setSelection = function(tiles, callback)   {
+                        var selection =  _.find(tiles, function(tile) {
                             return tile.tileid === id;
                         });
                         if (selection) {
@@ -102,7 +102,7 @@ define([
                         }
                     };
                     if (tiles.length === 0)   {
-                        var subscription = self.tiles.subscribe(function (tiles) {
+                        var subscription = self.tiles.subscribe(function(tiles) {
                             setSelection(tiles, callback);
                             subscription.dispose();
                         });
@@ -111,7 +111,7 @@ define([
                     }
                 }
             },
-            escapeMarkup: function (m) { return m; },
+            escapeMarkup: function(m) { return m; },
             id: function(tile) {
                 return tile.tileid;
             },
@@ -129,7 +129,7 @@ define([
                         if (nodeid !== displayValue.nodeid) {
                             markup += getDisplayValueMarkup(displayValue);
                         }
-                })};
+                    });}
                 markup += '</div>';
                 return markup;
             },
