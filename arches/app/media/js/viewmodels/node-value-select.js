@@ -46,6 +46,10 @@ define([
             this.form.on('after-update', updateTiles);
         }
 
+        this.toggleDisplayOnlySelected = function(){
+            this.displayOnlySelectedNode(!this.displayOnlySelectedNode());
+        }
+
         this.getSelectedDisplayValue = function() {
             var value = self.value();
             var nodeid = params.node.config.nodeid();
