@@ -3,7 +3,8 @@ define([
     'knockout',
     'datatables.net-buttons-bs',
     'datatables.net-responsive-bs',
-    'datatables.net-buttons-print'
+    'datatables.net-buttons-print',
+    'datatables.net-buttons-html5'
 ], function($, ko, DataTable) {
     ko.bindingHandlers.datatable = {
         init: function(element, valueAccessor) {
