@@ -36,7 +36,7 @@ def setUpModule():
 def tearDownModule():
     se = SearchEngineFactory().create()
     se.delete_index(index='terms,concepts')
-    se.delete_index(index='resource')
+    se.delete_index(index='resources')
 
 
 class ArchesTestCase(TestCase):

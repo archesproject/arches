@@ -71,17 +71,17 @@ def index_resources_by_type(resource_types, clear_index=True, batch_size=setting
         term = Term(field='graphid', term=str(resource_type))
         q.add_query(term)
         if clear_index:
-            q.delete(index='resource')
+            q.delete(index='resources')
 
         with se.BulkIndexer(batch_size=batch_size, refresh=True) as doc_indexer:
             with se.BulkIndexer(batch_size=batch_size, refresh=True) as term_indexer:
                 for resource in resources:
                     document, terms = resource.get_documents_to_index(fetchTiles=True, datatype_factory=datatype_factory, node_datatypes=node_datatypes)
-                    doc_indexer.add(index='resource', id=document['resourceinstanceid'], data=document)
+                    doc_indexer.add(index='resources', id=document['resourceinstanceid'], data=document)
                     for term in terms:
                         term_indexer.add(index='terms', id=term['_id'], data=term['_source'])
 
-        result_summary['indexed'] = se.count(index='resource', body=q.dsl)
+        result_summary['indexed'] = se.count(index='resources', body=q.dsl)
 
         status = 'Passed' if result_summary['database'] == result_summary['indexed'] else 'Failed'
         print "Status: {0}, Resource Type: {1}, In Database: {2}, Indexed: {3}, Took: {4} seconds".format(status, graph_name, result_summary['database'], result_summary['indexed'], (datetime.now()-start).seconds)

@@ -227,7 +227,7 @@ def search_results(request):
     if request.GET.get('tiles', None) is not None:
         dsl.include('tiles')
 
-    results = dsl.search(index='resource')
+    results = dsl.search(index='resources')
 
     if results is not None:
         user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
@@ -398,7 +398,7 @@ def build_search_results_dsl(request):
 
     if type_filter != '':
         for resouceTypeFilter in JSONDeserializer().deserialize(type_filter):
-            term = Term(field='graphid', term=str(resouceTypeFilter['graphid']))
+            term = Term(field='graph_id', term=str(resouceTypeFilter['graphid']))
             if resouceTypeFilter['inverted'] == True:
                 search_query.must_not(term)
             else:

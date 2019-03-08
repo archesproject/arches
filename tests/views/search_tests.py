@@ -49,7 +49,7 @@ class SearchTests(ArchesTestCase):
     def setUpClass(cls):
         se = SearchEngineFactory().create()
         se.delete_index(index='terms,concepts')
-        se.delete_index(index='resource')
+        se.delete_index(index='resources')
 
 
         cls.client = Client()

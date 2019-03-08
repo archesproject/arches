@@ -168,7 +168,7 @@ class Resource(models.ResourceInstance):
                 fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes)
             document['root_ontology_class'] = resource.get_root_ontology()
             documents.append(se.create_bulk_item(
-                index='resource', id=document['resourceinstanceid'], data=document))
+                index='resources', id=document['resourceinstanceid'], data=document))
             for term in terms:
                 term_list.append(se.create_bulk_item(
                     index='terms', id=term['_id'], data=term['_source']))
@@ -192,8 +192,8 @@ class Resource(models.ResourceInstance):
             document, terms = self.get_documents_to_index(
                 datatype_factory=datatype_factory, node_datatypes=node_datatypes)
             document['root_ontology_class'] = self.get_root_ontology()
-            se.index_data('resource', self.graph_id, JSONSerializer(
-            ).serializeToPython(document), id=self.pk)
+            doc = JSONSerializer().serializeToPython(document)
+            se.index_data(index='resources', body=doc, id=self.pk)
             for term in terms:
                 se.index_data('terms', body=term['_source'], id=term['_id'])
 
@@ -292,7 +292,7 @@ class Resource(models.ResourceInstance):
             results = query.search(index='terms')['hits']['hits']
             for result in results:
                 se.delete(index='terms', id=result['_id'])
-            se.delete(index='resource', id=self.resourceinstanceid)
+            se.delete(index='resources', id=self.resourceinstanceid)
 
             self.save_edit(edit_type='delete', user=user,
                            note=self.displayname)
@@ -351,7 +351,7 @@ class Resource(models.ResourceInstance):
             instanceids.remove(str(self.resourceinstanceid))
 
         if len(instanceids) > 0:
-            related_resources = se.search(index='resource', id=list(instanceids))
+            related_resources = se.search(index='resources', id=list(instanceids))
             if related_resources:
                 for resource in related_resources['docs']:
                     relations = get_relations(resource['_id'], 0, 0)
