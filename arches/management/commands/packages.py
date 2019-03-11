@@ -285,6 +285,7 @@ class Command(BaseCommand):
     def export_widgets(self, dest_dir, force=False):
         overwrite = True
         widget_path = os.path.join(settings.APP_ROOT, 'media', 'js', 'views', 'components', 'widgets')
+        widget_template_path = os.path.join(settings.APP_ROOT, 'templates', 'views', 'components', 'widgets')
         widget_config_path = os.path.join(settings.APP_ROOT, 'widgets')
         if os.path.exists(widget_path):
             widgets = glob.glob(os.path.join(widget_path, '*.js'))
@@ -292,9 +293,12 @@ class Command(BaseCommand):
                 widget_basename = os.path.splitext(os.path.basename(widget))[0]
                 widget_dir = os.path.join(dest_dir, widget_basename)
                 widget_config_file = os.path.join(widget_config_path, widget_basename + '.json')
+                widget_template_file = os.path.join(widget_template_path, widget_basename + '.htm')
                 if os.path.exists(widget_dir) is False:
                     os.makedirs(widget_dir)
                 shutil.copy(widget, widget_dir)
+                if os.path.exists(widget_template_file):
+                    shutil.copy(widget_template_file, widget_dir)
                 if os.path.exists(widget_config_file):
                     with open(widget_config_file) as f:
                         details = json.load(f)
