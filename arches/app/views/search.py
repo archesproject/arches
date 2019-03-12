@@ -132,8 +132,8 @@ def search_terms(request):
     user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
 
     boolquery = Bool()
-    boolquery.should(Match(field='value', query=searchString.lower(), type='phrase_prefix', fuzziness='AUTO'))
-    boolquery.should(Match(field='value.folded', query=searchString.lower(), type='phrase_prefix', fuzziness='AUTO'))
+    boolquery.should(Match(field='value', query=searchString.lower(), type='phrase_prefix'))
+    boolquery.should(Match(field='value.folded', query=searchString.lower(), type='phrase_prefix'))
     boolquery.should(Match(field='value.folded', query=searchString.lower(), fuzziness='AUTO'))
 
     if user_is_reviewer is False:
@@ -153,7 +153,7 @@ def search_terms(request):
     query.add_aggregation(base_agg)
     results = query.search(index='terms,concepts') or {'hits': {'hits':[]}}
 
-    i = 0;
+    i = 0
     ret = []
     for result in results['aggregations']['value_agg']['buckets']:
         if len(result['top_concept']['buckets']) > 0:
