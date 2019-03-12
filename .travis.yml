@@ -34,7 +34,7 @@ before_install:
   - psql -d postgres -c "SET standard_conforming_strings = off;"
   - psql -d postgres -c "CREATE EXTENSION postgis;"
   - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.6.2.deb && sudo dpkg -i --force-confnew elasticsearch-6.6.2.deb && sudo service elasticsearch restart
-
+  - curl -v http://localhost:9200/
 
 before_script: ./arches/install/ci_install/setup_couch.sh
 
