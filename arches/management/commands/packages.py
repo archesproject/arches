@@ -793,9 +793,8 @@ class Command(BaseCommand):
         os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d postgres -f "%(truncate_path)s"' % db_settings)
 
         self.delete_indexes()
-        prepare_terms_index(create=True)
-        prepare_concepts_index(create=True)
-        prepare_resource_relations_index(create=True)
+        self.setup_indexes()
+
         management.call_command('migrate')
 
         self.import_graphs(os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Model.json'), overwrite_graphs=True)
@@ -805,7 +804,6 @@ class Command(BaseCommand):
 
         if local_settings_available == True:
             self.import_business_data(settings.SYSTEM_SETTINGS_LOCAL_PATH, overwrite=True)
-
 
     def setup_indexes(self):
         management.call_command('es', operation='setup_indexes')

@@ -18,43 +18,45 @@ class Migration(migrations.Migration):
         se = SearchEngineFactory().create()
         prefix = settings.ELASTICSEARCH_PREFIX
 
-        prepare_terms_index(create=True)
-        doc = {
-            "source": {
-                "index": "%s_strings" % prefix,
-                "type": "term"
-            },
-            "dest": {
-                "index": "%s_terms" % prefix,
-                "type": "_doc"
+        if(se.es.indices.exists(index="%s_strings" % prefix)):
+            prepare_terms_index(create=True)
+            doc = {
+                "source": {
+                    "index": "%s_strings" % prefix,
+                    "type": "term"
+                },
+                "dest": {
+                    "index": "%s_terms" % prefix,
+                    "type": "_doc"
+                }
             }
-        }
-        se.es.reindex(body=doc)
+            se.es.reindex(body=doc)
 
-        prepare_concepts_index(create=True)
-        doc = {
-            "source": {
-                "index": "%s_strings" % prefix,
-                "type": "concept"
-            },
-            "dest": {
-                "index": "%s_concepts" % prefix,
-                "type": "_doc"
+            prepare_concepts_index(create=True)
+            doc = {
+                "source": {
+                    "index": "%s_strings" % prefix,
+                    "type": "concept"
+                },
+                "dest": {
+                    "index": "%s_concepts" % prefix,
+                    "type": "_doc"
+                }
             }
-        }
-        se.es.reindex(body=doc)
+            se.es.reindex(body=doc)
 
-        prepare_search_index(create=True)
-        doc = {
-            "source": {
-                "index": "%s_resource" % prefix
-            },
-            "dest": {
-                "index": "%s_resources" % prefix,
-                "type": "_doc"
+        if(se.es.indices.exists(index="%s_resource" % prefix)):
+            prepare_search_index(create=True)
+            doc = {
+                "source": {
+                    "index": "%s_resource" % prefix
+                },
+                "dest": {
+                    "index": "%s_resources" % prefix,
+                    "type": "_doc"
+                }
             }
-        }
-        se.es.reindex(body=doc)
+            se.es.reindex(body=doc)
 
     def reverse_func(apps, schema_editor):
         delete_terms_index()

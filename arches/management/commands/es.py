@@ -148,7 +148,6 @@ class Command(BaseCommand):
         prepare_concepts_index(create=True)
         prepare_resource_relations_index(create=True)
         prepare_search_index(create=True)
-        #for graphid in models.GraphModel.objects.filter(isresource=True).values_list('graphid', flat=True):
 
     def delete_indexes(self):
         delete_terms_index()
