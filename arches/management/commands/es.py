@@ -113,9 +113,8 @@ class Command(BaseCommand):
         with open(os.path.join(es_config_directory, 'elasticsearch.yml'), 'w') as f:
             f.write('# ----------------- FOR TESTING ONLY -----------------')
             f.write('\n# - THESE SETTINGS SHOULD BE REVIEWED FOR PRODUCTION -')
-            f.write('\n# -https://www.elastic.co/guide/en/elasticsearch/reference/5.0/system-config.html - ')
+            f.write('\n# -https://www.elastic.co/guide/en/elasticsearch/reference/6.6/important-settings.html - ')
             f.write('\nhttp.port: %s' % port)
-            f.write('\nscript.inline: true')
             f.write('\n\n# for the elasticsearch-head plugin')
             f.write('\nhttp.cors.enabled: true')
             f.write('\nhttp.cors.allow-origin: "*"')
