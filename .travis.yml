@@ -5,7 +5,7 @@ filter_secrets: false
 python:
   - 2.7
 
-sudo: false
+sudo: true
 
 cache:
   - apt
@@ -26,7 +26,6 @@ addons:
 
 services:
   - postgresql
-  - elasticsearch
   - couchdb
 
 before_install:
