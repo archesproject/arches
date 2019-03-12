@@ -14,8 +14,8 @@ cache:
 addons:
   postgresql: 9.6
   apt:
-    sources:
-      - elasticsearch-6.x
+    # sources:
+    #   - elasticsearch-6.x
     packages:
       - elasticsearch
       - libxml2-dev
@@ -34,6 +34,7 @@ before_install:
   - echo "*:*:*:postgres:postgis" >> ~/.pgpass
   - psql -d postgres -c "SET standard_conforming_strings = off;"
   - psql -d postgres -c "CREATE EXTENSION postgis;"
+  - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.6.2.deb && sudo dpkg -i --force-confnew elasticsearch-6.6.2.deb && sudo service elasticsearch restart
 
 
 before_script: ./arches/install/ci_install/setup_couch.sh
