@@ -303,7 +303,7 @@ def prepare_resource_relations_index(create=False):
 
     if create:
         se = SearchEngineFactory().create()
-        se.create_index(index='resource_relations', body=index_settings, ignore=400)
+        se.create_index(index='resource_relations', body=index_settings)
 
     return index_settings
 
