@@ -11,6 +11,9 @@ cache:
   - apt
   - pip
 
+env:
+  - ES_VERSION=6.6.2 ES_DOWNLOAD_URL=https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.tar.gz
+
 addons:
   postgresql: 9.6
   apt:
@@ -33,12 +36,15 @@ before_install:
   - echo "*:*:*:postgres:postgis" >> ~/.pgpass
   - psql -d postgres -c "SET standard_conforming_strings = off;"
   - psql -d postgres -c "CREATE EXTENSION postgis;"
-  - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.6.2.deb && sudo dpkg -i --force-confnew elasticsearch-6.6.2.deb && sudo service elasticsearch restart
-  - curl -v http://localhost:9200/
+  # - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.6.2.deb && sudo dpkg -i --force-confnew elasticsearch-6.6.2.deb && sudo service elasticsearch restart
+  # - curl -v http://localhost:9200/
 
 before_script: ./arches/install/ci_install/setup_couch.sh
 
 install:
+  - wget ${ES_DOWNLOAD_URL}
+  - tar -xzf elasticsearch-${ES_VERSION}.tar.gz
+  - ./elasticsearch-${ES_VERSION}/bin/elasticsearch &
   - python setup.py install
   - pip install -r arches/install/requirements_dev.txt
   - pip install coveralls
@@ -46,6 +52,7 @@ install:
   # - yarn install
 
 script:
+  - wget -q --waitretry=1 --retry-connrefused -T 10 -O - http://127.0.0.1:9200
   - python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
 
 after_success:
