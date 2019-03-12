@@ -282,8 +282,38 @@ class Command(BaseCommand):
             if overwrite == True:
                 shutil.copy(projects_package_settings_file, dest_dir)
 
+    def export_widgets(self, dest_dir, force=False):
+        overwrite = True
+        widget_path = os.path.join(settings.APP_ROOT, 'media', 'js', 'views', 'components', 'widgets')
+        widget_template_path = os.path.join(settings.APP_ROOT, 'templates', 'views', 'components', 'widgets')
+        widget_config_path = os.path.join(settings.APP_ROOT, 'widgets')
+        if os.path.exists(widget_path):
+            widgets = glob.glob(os.path.join(widget_path, '*.js'))
+            for widget in widgets:
+                widget_basename = os.path.splitext(os.path.basename(widget))[0]
+                widget_dir = os.path.join(dest_dir, widget_basename)
+                widget_config_file = os.path.join(widget_config_path, widget_basename + '.json')
+                widget_template_file = os.path.join(widget_template_path, widget_basename + '.htm')
+                if os.path.exists(widget_dir) is False:
+                    os.makedirs(widget_dir)
+                shutil.copy(widget, widget_dir)
+                if os.path.exists(widget_template_file):
+                    shutil.copy(widget_template_file, widget_dir)
+                if os.path.exists(widget_config_file):
+                    with open(widget_config_file) as f:
+                        details = json.load(f)
+                        if 'widgetid' not in details:
+                            widget_instance = models.Widget.objects.get(name=details['name'])
+                            details['widgetid'] = unicode(widget_instance.widgetid)
+                            f.close()
+                            with open(widget_config_file, 'w') as of:
+                                json.dump(details, of, sort_keys=True, indent=4)
+                    shutil.copy(widget_config_file, widget_dir)
+
     def update_package(self, dest_dir, yes):
         if os.path.exists(os.path.join(dest_dir, 'package_config.json')):
+            print 'Updating Widgets'
+            self.export_widgets(os.path.join(dest_dir, 'extensions', 'widgets'))
             print 'Updating Resource Models'
             self.export_resource_graphs(os.path.join(dest_dir, 'graphs', 'resource_models'), yes)
         else:
@@ -326,6 +356,7 @@ class Command(BaseCommand):
 
             self.export_package_configs(dest_dir)
             self.export_resource_graphs(os.path.join(dest_dir, 'graphs', 'resource_models'), 'true')
+            self.export_widgets(os.path.join(dest_dir, 'extensions', 'widgets'))
 
             try:
                 self.save_system_settings(data_dest=os.path.join(dest_dir, 'system_settings'))

@@ -1,4 +1,4 @@
-define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetViewModel) {
+define(['knockout', 'underscore', 'viewmodels/widget', 'bindings/formattedNumber'], function (ko, _, WidgetViewModel) {
     /**
     * registers a text-widget component for use in forms
     * @function external:"ko.components".text-widget
@@ -11,7 +11,7 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
 
 
     var NumberWidget = function(params) {
-        params.configKeys = ['placeholder', 'width', 'min', 'max', 'step', 'precision', 'prefix', 'suffix', 'defaultValue'];
+        params.configKeys = ['placeholder', 'width', 'min', 'max', 'step', 'precision', 'prefix', 'suffix', 'defaultValue', 'format'];
 
         WidgetViewModel.apply(this, [params]);
 
@@ -20,6 +20,14 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
         var updateVal = ko.computed(function(){
             if (self.value()){
                 var val = self.value();
+                if (self.min() != "") {
+                    val = Number(val) < Number(self.min()) ? Number(self.min()) : Number(val);
+                }
+
+                if (self.max() != "") {
+                    val = Number(val) > Number(self.max()) ? Number(self.max()) : Number(val);
+                }
+
                 if (self.precision()) {
                     val = Number(val).toFixed(self.precision());
                 }
