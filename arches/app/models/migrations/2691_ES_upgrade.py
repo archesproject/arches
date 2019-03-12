@@ -11,7 +11,7 @@ from arches.app.search.mappings import prepare_terms_index, delete_terms_index, 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4384_adds_rerender_widget_config'),
+        ('models', '4658_adds_nodevalue_type_widget_config'),
     ]
 
     def forwards_func(apps, schema_editor):
