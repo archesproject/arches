@@ -584,26 +584,6 @@ def _get_child_concepts(conceptid):
         ret.add(row[0])
     return list(ret)
 
-def export_results(request):
-    search_results_dsl = build_search_results_dsl(request)
-    dsl = search_results_dsl['query']
-    search_results = dsl.search(index='entity', doc_type='')
-    response = None
-    format = request.GET.get('export', 'csv')
-    exporter = ResourceExporter(format)
-    results = exporter.export(search_results['hits']['hits'])
-
-    related_resources = [{'id1':rr.entityid1, 'id2':rr.entityid2, 'type':rr.relationshiptype} for rr in models.RelatedResource.objects.all()]
-    csv_name = 'resource_relationships.csv'
-    dest = StringIO()
-    csvwriter = csv.DictWriter(dest, delimiter=',', fieldnames=['id1','id2','type'])
-    csvwriter.writeheader()
-    for csv_record in related_resources:
-        csvwriter.writerow({k:v.encode('utf8') for k,v in csv_record.items()})
-    results.append({'name':csv_name, 'outputfile': dest})
-    zipped_results = exporter.zip_response(results, '{0}_{1}_export.zip'.format(settings.PACKAGE_NAME, format))
-    return zipped_results
-
 def time_wheel_config(request):
     time_wheel = TimeWheel()
     key = 'time_wheel_config_{0}'.format(request.user.username)
