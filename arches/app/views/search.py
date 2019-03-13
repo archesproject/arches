@@ -132,8 +132,8 @@ def search_terms(request):
     user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
 
     boolquery = Bool()
-    boolquery.should(Match(field='value', query=searchString.lower(), type='phrase_prefix', fuzziness='AUTO'))
-    boolquery.should(Match(field='value.folded', query=searchString.lower(), type='phrase_prefix', fuzziness='AUTO'))
+    boolquery.should(Match(field='value', query=searchString.lower(), type='phrase_prefix'))
+    boolquery.should(Match(field='value.folded', query=searchString.lower(), type='phrase_prefix'))
     boolquery.should(Match(field='value.folded', query=searchString.lower(), fuzziness='AUTO'))
 
     if user_is_reviewer is False:
@@ -151,9 +151,9 @@ def search_terms(request):
     base_agg.add_aggregation(top_concept_agg)
     base_agg.add_aggregation(nodegroupid_agg)
     query.add_aggregation(base_agg)
-    results = query.search(index='strings') or {'hits': {'hits':[]}}
+    results = query.search(index='terms,concepts') or {'hits': {'hits':[]}}
 
-    i = 0;
+    i = 0
     ret = []
     for result in results['aggregations']['value_agg']['buckets']:
         if len(result['top_concept']['buckets']) > 0:
@@ -227,7 +227,7 @@ def search_results(request):
     if request.GET.get('tiles', None) is not None:
         dsl.include('tiles')
 
-    results = dsl.search(index='resource', doc_type=get_doc_type(request))
+    results = dsl.search(index='resources')
 
     if results is not None:
         user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
@@ -272,23 +272,6 @@ def search_results(request):
     else:
         return HttpResponseNotFound(_("There was an error retrieving the search results"))
 
-def get_doc_type(request):
-    doc_type = set()
-    type_filter = request.GET.get('typeFilter', '')
-    if type_filter != '':
-        resource_model_ids = set(str(graphid) for graphid in models.GraphModel.objects.filter(isresource=True).values_list('graphid', flat=True))
-        for resouceTypeFilter in JSONDeserializer().deserialize(type_filter):
-            if resouceTypeFilter['inverted'] == True:
-                inverted_resource_model_ids = resource_model_ids - set([str(resouceTypeFilter['graphid'])])
-                if len(doc_type) > 0:
-                    doc_type = doc_type.intersection(inverted_resource_model_ids)
-                else:
-                    doc_type = inverted_resource_model_ids
-            else:
-                doc_type.add(str(resouceTypeFilter['graphid']))
-
-    return list(doc_type)
-
 def get_provisional_type(request):
     """
     Parses the provisional filter data to determine if a search results will
@@ -321,6 +304,7 @@ def build_search_results_dsl(request):
     term_filter = request.GET.get('termFilter', '')
     spatial_filter = JSONDeserializer().deserialize(request.GET.get('mapFilter', '{}'))
     include_provisional = get_provisional_type(request)
+    type_filter = request.GET.get('typeFilter', '')
 
     export = request.GET.get('export', None)
     mobile_download = request.GET.get('mobiledownload', None)
@@ -412,8 +396,15 @@ def build_search_results_dsl(request):
                 else:
                     search_query.filter(nested_conceptid_filter)
 
-    if 'features' in spatial_filter:
+    if type_filter != '':
+        for resouceTypeFilter in JSONDeserializer().deserialize(type_filter):
+            term = Term(field='graph_id', term=str(resouceTypeFilter['graphid']))
+            if resouceTypeFilter['inverted'] == True:
+                search_query.must_not(term)
+            else:
+                search_query.must(term)
 
+    if 'features' in spatial_filter:
         if len(spatial_filter['features']) > 0:
             feature_geom = spatial_filter['features'][0]['geometry']
             feature_properties = {}
@@ -592,26 +583,6 @@ def _get_child_concepts(conceptid):
     for row in Concept().get_child_concepts(conceptid, ['prefLabel']):
         ret.add(row[0])
     return list(ret)
-
-def export_results(request):
-    search_results_dsl = build_search_results_dsl(request)
-    dsl = search_results_dsl['query']
-    search_results = dsl.search(index='entity', doc_type='')
-    response = None
-    format = request.GET.get('export', 'csv')
-    exporter = ResourceExporter(format)
-    results = exporter.export(search_results['hits']['hits'])
-
-    related_resources = [{'id1':rr.entityid1, 'id2':rr.entityid2, 'type':rr.relationshiptype} for rr in models.RelatedResource.objects.all()]
-    csv_name = 'resource_relationships.csv'
-    dest = StringIO()
-    csvwriter = csv.DictWriter(dest, delimiter=',', fieldnames=['id1','id2','type'])
-    csvwriter.writeheader()
-    for csv_record in related_resources:
-        csvwriter.writerow({k:v.encode('utf8') for k,v in csv_record.items()})
-    results.append({'name':csv_name, 'outputfile': dest})
-    zipped_results = exporter.zip_response(results, '{0}_{1}_export.zip'.format(settings.PACKAGE_NAME, format))
-    return zipped_results
 
 def time_wheel_config(request):
     time_wheel = TimeWheel()

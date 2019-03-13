@@ -111,7 +111,7 @@ class ConceptDataType(BaseConceptDataType):
     def append_search_filters(self, value, node, query, request):
         try:
             if value['val'] != '':
-                match_query = Match(field='tiles.data.%s' % (str(node.pk)), type="phrase", query=value['val'], fuzziness=0)
+                match_query = Match(field='tiles.data.%s' % (str(node.pk)), type="phrase", query=value['val'])
                 if '!' in value['op']:
                     query.must_not(match_query)
                     query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
@@ -279,7 +279,7 @@ class ConceptListDataType(BaseConceptDataType):
     def append_search_filters(self, value, node, query, request):
         try:
             if value['val'] != '':
-                match_query = Match(field='tiles.data.%s' % (str(node.pk)), type="phrase", query=value['val'], fuzziness=0)
+                match_query = Match(field='tiles.data.%s' % (str(node.pk)), type="phrase", query=value['val'])
                 if '!' in value['op']:
                     query.must_not(match_query)
                     query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))

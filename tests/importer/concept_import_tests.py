@@ -31,27 +31,27 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 
 
 class conceptImportTests(ArchesTestCase):
-	@classmethod
-	def setUpClass(cls):
-		se = SearchEngineFactory().create()
-		se.delete_index(index='strings')
-		se.create_index(index='strings')
-		# management.call_command('packages', operation='import_graphs', source='tests/fixtures/resource_graphs/archesv4_resource.json')
+    @classmethod
+    def setUpClass(cls):
+        se = SearchEngineFactory().create()
+        se.delete_index(index='terms,concepts')
+        se.create_index(index='terms,concepts')
+        # management.call_command('packages', operation='import_graphs', source='tests/fixtures/resource_graphs/archesv4_resource.json')
 
-	@classmethod
-	def tearDownClass(cls):
-		se = SearchEngineFactory().create()
-		se.delete_index(index='strings')
-		se.create_index(index='strings')
+    @classmethod
+    def tearDownClass(cls):
+        se = SearchEngineFactory().create()
+        se.delete_index(index='terms,concepts')
+        se.create_index(index='terms,concepts')
 
 
-	# def test_hierarchical_relationships(self):
-	# 	result = JSONDeserializer().deserialize(JSONSerializer().serialize(Concept().get(id='09bf4b42-51a8-4ff2-9210-c4e4ae0e6755', include_subconcepts=True, depth_limit=1)))
-	# 	children = len(result['subconcepts'])
-	# 	self.assertEqual(children, 3)
-	#
-	#
-	# def test_value_import(self):
-	# 	result = JSONDeserializer().deserialize(JSONSerializer().serialize(Concept().get(id='f2bb7a67-d3b3-488f-af39-e0773585c23a', include_subconcepts=True, depth_limit=1)))
-	# 	values = len(result['values'])
-	# 	self.assertEqual(values, 5)
+    # def test_hierarchical_relationships(self):
+    #   result = JSONDeserializer().deserialize(JSONSerializer().serialize(Concept().get(id='09bf4b42-51a8-4ff2-9210-c4e4ae0e6755', include_subconcepts=True, depth_limit=1)))
+    #   children = len(result['subconcepts'])
+    #   self.assertEqual(children, 3)
+    #
+    #
+    # def test_value_import(self):
+    #   result = JSONDeserializer().deserialize(JSONSerializer().serialize(Concept().get(id='f2bb7a67-d3b3-488f-af39-e0773585c23a', include_subconcepts=True, depth_limit=1)))
+    #   values = len(result['values'])
+    #   self.assertEqual(values, 5)

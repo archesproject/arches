@@ -505,7 +505,7 @@ class ResourceDescriptors(View):
     def get(self, request, resourceid=None):
         if resourceid is not None:
             se = SearchEngineFactory().create()
-            document = se.search(index='resource', doc_type='_all', id=resourceid)
+            document = se.search(index='resources', id=resourceid)
             resource = Resource.objects.get(pk=resourceid)
             return JSONResponse({
                 'graphid': document['_source']['graph_id'],

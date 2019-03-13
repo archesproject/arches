@@ -29,7 +29,7 @@ from arches.app.utils.decorators import group_required
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.permission_backend import get_users_for_object, get_groups_for_object
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Query, Bool, GeoBoundsAgg
+from arches.app.search.elasticsearch_dsl_builder import Query, Bool, GeoBoundsAgg, Term
 
 @method_decorator(group_required('Application Administrator'), name='dispatch')
 class MapLayerManagerView(MapBaseManagerView):
@@ -58,7 +58,8 @@ class MapLayerManagerView(MapBaseManagerView):
             search_query = Bool()
             query.add_query(search_query)
             query.add_aggregation(GeoBoundsAgg(field='points.point', name='bounds'))
-            results = query.search(index='resource', doc_type=[str(node.graph_id)])
+            query.add_query(Term(field='graphid', term=str(resource_type)))
+            results = query.search(index='resources')
             bounds = results['aggregations']['bounds']['bounds'] if 'bounds' in results['aggregations']['bounds'] else None
             return bounds
 

@@ -9,20 +9,6 @@ import django.contrib.postgres.fields.jsonb
 from django.db import migrations, models
 from django.core import management
 from arches.app.models.system_settings import settings
-from arches.app.search.mappings import prepare_search_index, delete_search_index
-
-def forwards_func(apps, schema_editor):
-    # We get the model from the versioned app registry;
-    # if we directly import it, it'll be the wrong version
-
-    GraphModel = apps.get_model("models", "GraphModel")
-    delete_search_index()
-    for graphid in GraphModel.objects.filter(isresource=True).values_list('graphid', flat=True):
-        prepare_search_index(str(graphid), create=True)
-
-def reverse_func(apps, schema_editor):
-    GraphModel = apps.get_model("models", "GraphModel")
-    GraphModel.objects.get(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).delete()
 
 def add_permissions(apps, schema_editor, with_create_permissions=True):
     db_alias = schema_editor.connection.alias
@@ -315,6 +301,5 @@ class Migration(migrations.Migration):
 
 
         ## the following command has to be run after the previous RunSQL commands that update the domain datatype values
-        migrations.RunPython(forwards_func, reverse_func),
         migrations.RunPython(add_permissions,reverse_code=lambda *args,**kwargs: True),
     ]

@@ -24,7 +24,6 @@ from django.db import transaction
 from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
-from arches.app.search.mappings import prepare_search_index, delete_search_index
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.utils.translation import ugettext as _
 from pyld.jsonld import compact, JsonLdError
@@ -353,9 +352,6 @@ class Graph(models.GraphModel):
                 nodegroup.delete()
             self._nodegroups_to_delete = []
 
-            if self.isresource:
-                prepare_search_index(self.graphid, create=True)
-
         return self
 
     def delete(self):
@@ -375,9 +371,6 @@ class Graph(models.GraphModel):
 
                 for widget in self.widgets.itervalues():
                     widget.delete()
-
-                # if self.isresource:
-                #     delete_search_index(self.graphid)
 
                 super(Graph, self).delete()
         else:

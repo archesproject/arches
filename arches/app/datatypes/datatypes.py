@@ -175,7 +175,7 @@ class NumberDataType(BaseDataType):
                     operators[value['op']] = value['val']
                     search_query = Range(field='tiles.data.%s' % (str(node.pk)), **operators)
                 else:
-                    search_query = Match(field='tiles.data.%s' % (str(node.pk)), query=value['val'], type='phrase_prefix', fuzziness=0)
+                    search_query = Match(field='tiles.data.%s' % (str(node.pk)), query=value['val'], type='phrase_prefix')
                 query.must(search_query)
         except KeyError, e:
             pass
@@ -308,7 +308,7 @@ class DateDataType(BaseDataType):
                     operators[value['op']] = date_value
                     search_query = Range(field='tiles.data.%s' % (str(node.pk)), **operators)
                 else:
-                    search_query = Match(field='tiles.data.%s' % (str(node.pk)), query=date_value, type='phrase_prefix', fuzziness=0)
+                    search_query = Match(field='tiles.data.%s' % (str(node.pk)), query=date_value, type='phrase_prefix')
                 query.must(search_query)
         except KeyError, e:
             pass
@@ -387,7 +387,7 @@ class EDTFDataType(BaseDataType):
             if value['op'] == 'eq':
                 if edtf.lower != edtf.upper:
                     raise Exception(_('Only dates that specify an exact year, month, and day can be used with the "=" operator'))
-                query.should(Match(field='tiles.data.%s.dates.date' % (str(node.pk)), query=edtf.lower, type='phrase_prefix', fuzziness=0))
+                query.should(Match(field='tiles.data.%s.dates.date' % (str(node.pk)), query=edtf.lower, type='phrase_prefix'))
             else:
                 if value['op'] == 'overlaps':
                     operators = {'gte': edtf.lower, 'lte': edtf.upper}
@@ -1342,7 +1342,7 @@ class DomainDataType(BaseDomainDataType):
     def append_search_filters(self, value, node, query, request):
         try:
             if value['val'] != '':
-                search_query = Match(field='tiles.data.%s' % (str(node.pk)), type="phrase", query=value['val'], fuzziness=0)
+                search_query = Match(field='tiles.data.%s' % (str(node.pk)), type="phrase", query=value['val'])
                 # search_query = Term(field='tiles.data.%s' % (str(node.pk)), term=str(value['val']))
                 if '!' in value['op']:
                     query.must_not(search_query)
@@ -1443,7 +1443,7 @@ class DomainListDataType(BaseDomainDataType):
     def append_search_filters(self, value, node, query, request):
         try:
             if value['val'] != '':
-                search_query = Match(field='tiles.data.%s' % (str(node.pk)), type="phrase", query=value['val'], fuzziness=0)
+                search_query = Match(field='tiles.data.%s' % (str(node.pk)), type="phrase", query=value['val'])
                 # search_query = Term(field='tiles.data.%s' % (str(node.pk)), term=str(value['val']))
                 if '!' in value['op']:
                     query.must_not(search_query)
@@ -1486,7 +1486,7 @@ class ResourceInstanceDataType(BaseDataType):
             id_list = self.get_id_list(nodevalue)
             for resourceid in id_list:
                 try:
-                    resource_document = se.search(index='resource', doc_type='_all', id=resourceid)
+                    resource_document = se.search(index='resources', id=resourceid)
                     resource_names.add(resource_document['_source']['displayname'])
                 except:
                     print 'resource not available'
@@ -1532,7 +1532,7 @@ class ResourceInstanceDataType(BaseDataType):
     def append_search_filters(self, value, node, query, request):
         try:
             if value['val'] != '':
-                search_query = Match(field='tiles.data.%s' % (str(node.pk)), type="phrase", query=value['val'], fuzziness=0)
+                search_query = Match(field='tiles.data.%s' % (str(node.pk)), type="phrase", query=value['val'])
                 # search_query = Term(field='tiles.data.%s' % (str(node.pk)), term=str(value['val']))
                 if '!' in value['op']:
                     query.must_not(search_query)

@@ -607,7 +607,7 @@ class ResourceXResource(models.Model):
     def delete(self):
         from arches.app.search.search_engine_factory import SearchEngineFactory
         se = SearchEngineFactory().create()
-        se.delete(index='resource_relations', doc_type='all', id=self.resourcexid)
+        se.delete(index='resource_relations', id=self.resourcexid)
         super(ResourceXResource, self).delete()
 
     def save(self):
@@ -617,7 +617,7 @@ class ResourceXResource(models.Model):
             self.created = datetime.datetime.now()
         self.modified = datetime.datetime.now()
         document = model_to_dict(self)
-        se.index_data(index='resource_relations', doc_type='all', body=document, idfield='resourcexid')
+        se.index_data(index='resource_relations', body=document, idfield='resourcexid')
         super(ResourceXResource, self).save()
 
     class Meta:

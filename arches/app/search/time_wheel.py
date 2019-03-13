@@ -15,7 +15,7 @@ class TimeWheel(object):
         nested_agg.add_aggregation(MinAgg(field='dates.date'))
         nested_agg.add_aggregation(MaxAgg(field='dates.date'))
         query.add_aggregation(nested_agg)
-        results = query.search(index='resource')
+        results = query.search(index='resources')
 
         if results is not None and results['aggregations']['min_max_agg']['min_dates.date']['value'] is not None and results['aggregations']['min_max_agg']['max_dates.date']['value'] is not None:
             min_date = int(results['aggregations']['min_max_agg']['min_dates.date']['value'])/10000
@@ -89,7 +89,7 @@ class TimeWheel(object):
             add_date_tier(date_tiers, min_date, max_date)
 
             root = d3Item(name='root')
-            results = {'buckets':[query.search(index='resource')['aggregations']]}
+            results = {'buckets':[query.search(index='resources')['aggregations']]}
             results_with_ranges = self.appendDateRanges(results, range_lookup)
             self.transformESAggToD3Hierarchy(results_with_ranges, root)
             if user.username in settings.CACHE_BY_USER:
