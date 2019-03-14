@@ -333,6 +333,8 @@ class Command(BaseCommand):
                 'extensions/datatypes',
                 'extensions/functions',
                 'extensions/widgets',
+                'extensions/css',
+                'extensions/bindings',
                 'extensions/card_components',
                 'extensions/plugins',
                 'graphs/branches',
