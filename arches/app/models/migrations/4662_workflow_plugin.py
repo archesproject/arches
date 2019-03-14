@@ -10,7 +10,7 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4658_adds_nodevalue_type_widget_config'),
+        ('models', '2691_ES_upgrade'),
     ]
 
     operations = [
