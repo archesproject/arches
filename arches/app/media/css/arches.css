@@ -420,13 +420,95 @@ input[type="checkbox"] {
 }
 
 
-.workflowsteps {
+.workflowstep-nav {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     width: 100%;
     border-bottom: solid 1px #ccc;
     border-top: solid 1px #ccc;
+    height: fit-content;
+    padding: 15px;
+    background-color: white;
+}
+
+.workflow-step-icon {
+    border-radius: 50%;
+    box-shadow: 0 0 0 7px #ebeef0;
+    display: block;
+    margin: 0 auto;
+    height: 56px;
+    line-height: 56px;
+    text-align: center;
+    width: 56px;
+    background-color: #598ec7;
+    color: #fff;
+}
+
+.workflow-step-description-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.workflow-step-description {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: #fff;
+    padding: 10px;
+    height: 105px;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    width: 100%;
+    border-bottom: solid 1px #aaa;
+}
+
+.workflow-step-description .title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #2056a9;
+}
+
+.workflow-step-description .subtitle {
+    font-size: 12px;
+    font-weight: 400;
+    color: #2056a9;
+}
+.workflow-step-description .step {
+    font-size: 10px;
+    font-weight: 400;
+    color: #999;
+}
+
+.workflow-step-body {
+    padding: 10px;
+    background-color: #eee;
+    height: 100%;
+}
+
+.workflow-nav-controls {
+    width: 60px;
+    height: 105px;
+    display: flex;
+    background-color: #fff;
+    align-items: center;
+    font-size: 41px;
+    justify-content: center;
+    border-bottom: solid 1px #aaa;
+    color: #2056a9;
+}
+
+.workflow-nave-controls.left {
+    border-left: solid 1px #aaa;
+}
+
+.workflow-nave-controls.right {
+    border-right: solid 1px #aaa;
+}
+
+.workflow-plugin {
+    flex-grow: inherit;
 }
 
 .summary-panel {
