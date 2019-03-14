@@ -7112,7 +7112,6 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
     color: rgb(89, 56, 255);
     border: 1px solid #c4c4c4;
     border-radius: 2px;
-    /* vertical-align: middle; */
 }
 
 .file-select {
@@ -7124,6 +7123,7 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 .file-select-window {
     border: 1px solid #c4c4c4;
     border-radius: 2px;
+    margin-bottom: 12px;
 }
 
 .file-upload-card {
@@ -7134,7 +7134,20 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
     color: #01113c;
 }
 
-.file-upload-card-detail {
+.file-upload-options {
+    padding-bottom: 8px;
+}
+
+.btn-file-upload-reset {
+    color: #489EED;
+    font-size: 12px;
+    float: right;
+}
+
+.btn-file-upload-limit {
+    color: #489EED;
+    font-size: 12px;
+    float: left;
 }
 
 .file-upload-card-detail-right {
