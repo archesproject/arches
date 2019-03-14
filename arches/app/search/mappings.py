@@ -16,10 +16,10 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 
-def prepare_term_index(create=False):
+
+def prepare_terms_index(create=False):
     """
     Creates the settings and mappings in Elasticsearch to support term search
 
@@ -31,13 +31,13 @@ def prepare_term_index(create=False):
                 'analyzer': {
                     'folding': {
                         'tokenizer': 'standard',
-                        'filter': [ 'lowercase', 'asciifolding' ]
+                        'filter': ['lowercase', 'asciifolding']
                     }
                 }
             }
         },
         'mappings': {
-            'term': {
+            '_doc': {
                 'properties': {
                     'nodegroupid': {'type': 'keyword'},
                     'tileid': {'type': 'keyword'},
@@ -56,8 +56,36 @@ def prepare_term_index(create=False):
                         }
                     }
                 }
-            },
-            'concept': {
+            }
+        }
+    }
+
+    if create:
+        se = SearchEngineFactory().create()
+        se.create_index(index='terms', body=index_settings)
+
+    return index_settings
+
+
+def prepare_concepts_index(create=False):
+    """
+    Creates the settings and mappings in Elasticsearch to support term search
+
+    """
+
+    index_settings = {
+        'settings': {
+            'analysis': {
+                'analyzer': {
+                    'folding': {
+                        'tokenizer': 'standard',
+                        'filter': ['lowercase', 'asciifolding']
+                    }
+                }
+            }
+        },
+        'mappings': {
+            '_doc': {
                 'properties': {
                     'top_concept': {'type': 'keyword'},
                     'conceptid': {'type': 'keyword'},
@@ -84,15 +112,22 @@ def prepare_term_index(create=False):
 
     if create:
         se = SearchEngineFactory().create()
-        se.create_index(index='strings', body=index_settings)
+        se.create_index(index='concepts', body=index_settings)
 
     return index_settings
 
-def delete_term_index():
-    se = SearchEngineFactory().create()
-    se.delete_index(index='strings')
 
-def prepare_search_index(resource_model_id, create=False):
+def delete_terms_index():
+    se = SearchEngineFactory().create()
+    se.delete_index(index='terms')
+
+
+def delete_concepts_index():
+    se = SearchEngineFactory().create()
+    se.delete_index(index='concepts')
+
+
+def prepare_search_index(create=False):
     """
     Creates the settings and mappings in Elasticsearch to support resource search
 
@@ -104,65 +139,72 @@ def prepare_search_index(resource_model_id, create=False):
                 'analyzer': {
                     'folding': {
                         'tokenizer': 'standard',
-                        'filter':  [ 'lowercase', 'asciifolding' ]
+                        'filter':  ['lowercase', 'asciifolding']
                     }
                 }
             }
         },
         'mappings': {
-            resource_model_id : {
-                'properties' : {
-                    'graphid': {'type': 'keyword'},
+            '_doc': {
+                'properties': {
+                    'graph_id': {'type': 'keyword'},
+                    'legacyid': {
+                        'type': 'text',
+                        'fields': {
+                            'keyword': {
+                                'ignore_above': 256,
+                                'type': 'keyword'
+                            }
+                        }
+                    },
                     'resourceinstanceid': {'type': 'keyword'},
-                    'root_ontology_class': {'type':'keyword'},
+                    'root_ontology_class': {'type': 'keyword'},
                     'displayname': {'type': 'keyword'},
                     'displaydescription': {'type': 'keyword'},
                     'map_popup': {'type': 'keyword'},
                     'provisional_resource': {'type': 'keyword'},
-                    'tiles' : {
-                        'type' : 'nested',
-                        'properties' : {
+                    'tiles': {
+                        'type': 'nested',
+                        'properties': {
                             "tiles": {'enabled': False},
-                            'tileid' : {'type': 'keyword'},
-                            'nodegroup_id' : {'type': 'keyword'},
-                            'parenttile_id' : {'type': 'keyword'},
-                            'resourceinstanceid_id' : {'type': 'keyword'},
+                            'tileid': {'type': 'keyword'},
+                            'nodegroup_id': {'type': 'keyword'},
+                            'parenttile_id': {'type': 'keyword'},
+                            'resourceinstanceid_id': {'type': 'keyword'},
                             'provisionaledits': {'enabled': False}
                         }
                     },
-                    'strings' : {
-                        'type' : 'nested',
+                    'strings': {
+                        'type': 'nested',
                         'properties': {
                             'string': {
-                                'type' : 'text',
-                                'index' : 'analyzed',
-                                'fields' : {
-                                    'raw' : {'type': 'keyword'},
-                                    'folded': { 'type': 'text', 'analyzer': 'folding'}
+                                'type': 'text',
+                                'fields': {
+                                    'raw': {'type': 'keyword'},
+                                    'folded': {'type': 'text', 'analyzer': 'folding'}
                                 }
                             },
-                            'nodegroup_id' : {'type': 'keyword'},
+                            'nodegroup_id': {'type': 'keyword'},
                             'provisional': {'type': 'boolean'}
                         }
                     },
-                    'domains' : {
-                        'type' : 'nested',
-                        'properties' : {
-                            'value' : {
-                                'type' : 'text',
-                                'index' : 'analyzed',
-                                'fields' : {
-                                    'raw' : {'type': 'keyword'}
+                    'domains': {
+                        'type': 'nested',
+                        'properties': {
+                            'value': {
+                                'type': 'text',
+                                'fields': {
+                                    'raw': {'type': 'keyword'}
                                 }
                             },
-                            'conceptid' : {'type': 'keyword'},
-                            'valueid' : {'type': 'keyword'},
-                            'nodegroup_id' : {'type': 'keyword'},
+                            'conceptid': {'type': 'keyword'},
+                            'valueid': {'type': 'keyword'},
+                            'nodegroup_id': {'type': 'keyword'},
                             'provisional': {'type': 'boolean'}
                         }
                     },
-                    'geometries' : {
-                        'type' : 'nested',
+                    'geometries': {
+                        'type': 'nested',
                         'properties': {
                             'geom': {
                                 'properties': {
@@ -172,47 +214,47 @@ def prepare_search_index(resource_model_id, create=False):
                                             'id': {'type': 'keyword'},
                                             'type': {'type': 'keyword'},
                                             'properties': {
-                                                 'enabled': False
+                                                'enabled': False
                                             }
                                         }
                                     },
                                     'type': {'type': 'keyword'}
                                 }
                             },
-                            'nodegroup_id' : {'type': 'keyword'},
+                            'nodegroup_id': {'type': 'keyword'},
                             'provisional': {'type': 'boolean'}
                         }
                     },
                     'points': {
-                        'type' : 'nested',
-                        'properties' : {
-                            'point' : {'type': 'geo_point'},
-                            'nodegroup_id' : {'type': 'keyword'},
+                        'type': 'nested',
+                        'properties': {
+                            'point': {'type': 'geo_point'},
+                            'nodegroup_id': {'type': 'keyword'},
                             'provisional': {'type': 'boolean'}
                         }
                     },
-                    'dates' : {
-                        'type' : 'nested',
-                        'properties' : {
-                            'date' : {'type': 'float'},
-                            'nodegroup_id' : {'type': 'keyword'},
-                            'nodeid' : {'type': 'keyword'},
+                    'dates': {
+                        'type': 'nested',
+                        'properties': {
+                            'date': {'type': 'float'},
+                            'nodegroup_id': {'type': 'keyword'},
+                            'nodeid': {'type': 'keyword'},
                             'provisional': {'type': 'boolean'}
                         }
                     },
-                    'numbers' : {
-                        'type' : 'nested',
-                        'properties' : {
-                            'number' : {'type': 'double'},
-                            'nodegroup_id' : {'type': 'keyword'},
+                    'numbers': {
+                        'type': 'nested',
+                        'properties': {
+                            'number': {'type': 'double'},
+                            'nodegroup_id': {'type': 'keyword'},
                             'provisional': {'type': 'boolean'}
                         }
                     },
                     'date_ranges': {
-                        'type' : 'nested',
-                        'properties' : {
-                            'date_range' : {'type': 'float_range'},
-                            'nodegroup_id' : {'type': 'keyword'},
+                        'type': 'nested',
+                        'properties': {
+                            'date_range': {'type': 'float_range'},
+                            'nodegroup_id': {'type': 'keyword'},
                             'provisional': {'type': 'boolean'}
                         }
                     }
@@ -224,17 +266,17 @@ def prepare_search_index(resource_model_id, create=False):
     if create:
         se = SearchEngineFactory().create()
         try:
-            se.create_index(index='resource', body=index_settings)
+            se.create_index(index='resources', body=index_settings)
         except:
             index_settings = index_settings['mappings']
-            se.create_mapping(index='resource', doc_type=resource_model_id, body=index_settings)
+            se.create_mapping(index='resources', body=index_settings)
 
     return index_settings
 
 
 def delete_search_index():
     se = SearchEngineFactory().create()
-    se.delete_index(index='resource')
+    se.delete_index(index='resources')
 
 
 def prepare_resource_relations_index(create=False):
@@ -261,9 +303,10 @@ def prepare_resource_relations_index(create=False):
 
     if create:
         se = SearchEngineFactory().create()
-        se.create_index(index='resource_relations', body=index_settings, ignore=400)
+        se.create_index(index='resource_relations', body=index_settings)
 
     return index_settings
+
 
 def delete_resource_relations_index():
     se = SearchEngineFactory().create()

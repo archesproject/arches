@@ -764,11 +764,11 @@ class Concept(object):
                 concept = Concept().get(id=topConcept['conceptid'])
                 scheme = concept.get_context()
                 topConcept['top_concept'] = scheme.id
-                concept_docs.append(se.create_bulk_item(index='strings', doc_type='concept',
+                concept_docs.append(se.create_bulk_item(index='concepts',
                                                         id=topConcept['id'], data=topConcept))
                 for childConcept in concept.get_child_concepts_for_indexing(topConcept['conceptid']):
                     childConcept['top_concept'] = scheme.id
-                    concept_docs.append(se.create_bulk_item(index='strings', doc_type='concept',
+                    concept_docs.append(se.create_bulk_item(index='concepts',
                                                             id=childConcept['id'], data=childConcept))
 
         if self.nodetype == 'Concept':
@@ -777,7 +777,7 @@ class Concept(object):
             concept.index(scheme)
             for childConcept in concept.get_child_concepts_for_indexing(self.id):
                 childConcept['top_concept'] = scheme.id
-                concept_docs.append(se.create_bulk_item(index='strings', doc_type='concept',
+                concept_docs.append(se.create_bulk_item(index='concepts',
                                                         id=childConcept['id'], data=childConcept))
 
         se.bulk_index(concept_docs)
@@ -790,7 +790,7 @@ class Concept(object):
                 query = Query(se, start=0, limit=10000)
                 term = Term(field='conceptid', term=concept.id)
                 query.add_query(term)
-                query.delete(index='strings', doc_type='concept')
+                query.delete(index='concepts')
 
         if delete_self:
             concepts_to_delete = Concept.gather_concepts_to_delete(self)
@@ -1224,18 +1224,18 @@ class ConceptValue(object):
                 raise Exception('Index of label failed.  Index type (scheme id) could not be derived from the label.')
 
             data['top_concept'] = scheme.id
-            se.index_data('strings', 'concept', data, 'id')
+            se.index_data(index='concepts', body=data, idfield='id')
 
     def delete_index(self):
         se = SearchEngineFactory().create()
         query = Query(se, start=0, limit=10000)
         term = Term(field='id', term=self.id)
         query.add_query(term)
-        query.delete(index='strings', doc_type='concept')
+        query.delete(index='concepts')
 
     def get_scheme_id(self):
         se = SearchEngineFactory().create()
-        result = se.search(index='strings', doc_type='concept', id=self.id)
+        result = se.search(index='concepts', id=self.id)
         if result['found']:
             return Concept(result['top_concept'])
         else:
@@ -1258,7 +1258,7 @@ def get_preflabel_from_conceptid(conceptid, lang):
     bool_query.must(Match(field='type', query='prefLabel', type='phrase'))
     bool_query.filter(Terms(field='conceptid', terms=[conceptid]))
     query.add_query(bool_query)
-    preflabels = query.search(index='strings', doc_type='concept')['hits']['hits']
+    preflabels = query.search(index='concepts')['hits']['hits']
     for preflabel in preflabels:
         default = preflabel['_source']
         if preflabel['_source']['language'] is not None and lang is not None:
@@ -1307,8 +1307,7 @@ def get_valueids_from_concept_label(label, conceptid=None, lang=None):
                 }
             }
 
-    concept_label_results = se.search(index='strings', doc_type='concept',
-                                      body=exact_val_match(label, conceptid))
+    concept_label_results = se.search(index='concepts', body=exact_val_match(label, conceptid))
     if concept_label_results is None:
         print("Found no matches for label:'{0}' and concept_id: '{1}'".format(label, conceptid))
         return
@@ -1318,13 +1317,13 @@ def get_valueids_from_concept_label(label, conceptid=None, lang=None):
 
 def get_concept_label_from_valueid(valueid):
     se = SearchEngineFactory().create()
-    concept_label = se.search(index='strings', doc_type='concept', id=valueid)
+    concept_label = se.search(index='concepts', id=valueid)
     if concept_label['found']:
         return concept_label['_source']
 
 
 def get_preflabel_from_valueid(valueid, lang):
     se = SearchEngineFactory().create()
-    concept_label = se.search(index='strings', doc_type='concept', id=valueid)
+    concept_label = se.search(index='concepts', id=valueid)
     if concept_label['found']:
         return get_preflabel_from_conceptid(get_concept_label_from_valueid(valueid)['conceptid'], lang)

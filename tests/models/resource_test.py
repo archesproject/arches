@@ -36,15 +36,15 @@ from tests.base_test import ArchesTestCase
 
 
 # these tests can be run from the command line via
-# python manage.py test tests/views/search_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests/models/resource_test.py --pattern="*.py" --settings="tests.test_settings"
 
 
 class ResourceTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
         se = SearchEngineFactory().create()
-        se.delete_index(index='strings')
-        se.delete_index(index='resource')
+        se.delete_index(index='terms,concepts')
+        se.delete_index(index='resources')
 
         cls.client = Client()
         cls.client.login(username='admin', password='admin')

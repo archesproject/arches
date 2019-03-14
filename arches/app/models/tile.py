@@ -338,10 +338,10 @@ class Tile(models.TileModel):
             bool_query = Bool()
             bool_query.filter(Terms(field='tileid', terms=[self.tileid]))
             query.add_query(bool_query)
-            results = query.search(index='strings', doc_type='term')['hits']['hits']
+            results = query.search(index='terms')['hits']['hits']
 
             for result in results:
-                se.delete(index='strings', doc_type='term', id=result['_id'])
+                se.delete(index='terms', id=result['_id'])
 
             self.__preDelete(request)
             self.save_edit(

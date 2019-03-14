@@ -26,8 +26,8 @@ def clear_resources():
     """Removes all resource instances from your db and elasticsearch resource index"""
     se = SearchEngineFactory().create()
     match_all_query = Query(se)
-    match_all_query.delete(index='strings', doc_type='term')
-    match_all_query.delete(index='resource')
+    match_all_query.delete(index='terms')
+    match_all_query.delete(index='resources')
     match_all_query.delete(index='resource_relations')
 
     print 'deleting', Resource.objects.exclude(resourceinstanceid=settings.RESOURCE_INSTANCE_ID).count(), 'resources'

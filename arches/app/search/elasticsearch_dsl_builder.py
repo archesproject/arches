@@ -89,13 +89,13 @@ class Query(Dsl):
     def min_score(self, min_score):
         self.dsl['min_score'] = min_score
 
-    def search(self, index='', doc_type='', **kwargs):
+    def search(self, index='', **kwargs):
         self.start = kwargs.pop('start', self.start)
         self.limit = kwargs.pop('limit', self.limit)
 
         self.prepare()
         #print self
-        return self.se.search(index=index, doc_type=doc_type, body=self.dsl)
+        return self.se.search(index=index, body=self.dsl)
 
     def delete(self, index='', **kwargs):
         return self.se.delete(index=index, body=self.dsl, **kwargs)
@@ -169,26 +169,32 @@ class Match(Dsl):
     """
 
     def __init__(self, **kwargs):
-        self.type = kwargs.pop('type', 'boolean')
-        self.query = kwargs.pop('query', '')
+        self.type = kwargs.pop('type', 'match')
         self.field = kwargs.pop('field', '_all')
-        self.fuzziness = kwargs.pop('fuzziness', None)
-        self.operator = kwargs.pop('operator', 'or')
-        self.max_expansions = kwargs.pop('max_expansions', 10)
+        # self.query = kwargs.pop('query', '')
+        # self.fuzziness = kwargs.pop('fuzziness', None)
+        # self.fuzzy_transpositions = kwargs.pop('fuzzy_transpositions', True)
+        # self.fuzzy_rewrite = kwargs.pop('fuzzy_rewrite', 'constant_score')
+        # self.prefix_length = kwargs.pop('prefix_length', None)
+        # self.operator = kwargs.pop('operator', 'or')
+        # self.max_expansions = kwargs.pop('max_expansions', 10)
+        # self.zero_terms_query = kwargs.pop('zero_terms_query', None)
+        # self.cutoff_frequency = kwargs.pop('cutoff_frequency', 1)
+        # self.auto_generate_synonyms_phrase_query = kwargs.pop('auto_generate_synonyms_phrase_query', True)
+
+        if self.type != 'match':
+            self.type = 'match_%s' % self.type
+
+        parameters = {}
+        for key, value in kwargs.iteritems():
+            parameters[key] = value
 
         self.dsl = {
-            'match' : {
-                self.field : {
-                    'query' : self.query,
-                    'type' : self.type,
-                    'operator': self.operator,
-                    'max_expansions' : self.max_expansions
-                }
+            self.type: {
+                self.field: parameters
             }
         }
 
-        if self.fuzziness:
-            self.dsl['match'][self.field]['fuzziness'] = self.fuzziness
 
 class Nested(Dsl):
     """

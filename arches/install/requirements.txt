@@ -1,6 +1,6 @@
 Django==1.11.15
 psycopg2-binary==2.7.4
-elasticsearch>=5.0.0,<6.0.0
+elasticsearch>=6.0.0,<7.0.0
 rdflib==4.2.2
 unicodecsv==0.14.1
 PyYAML==3.12
@@ -26,4 +26,4 @@ requests[security]>=2.18.1
 
 # Leave the following line commented so that pip install will ignore this
 # The installer uses the following line to download the proper version of ES
-# https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.3.3.zip
+# https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.6.2.zip
