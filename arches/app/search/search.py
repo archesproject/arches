@@ -111,8 +111,9 @@ class SearchEngine(object):
         kwargs = self._add_prefix(**kwargs)
         body = kwargs.get('body', None)
         id = kwargs.get('id', None)
-        
+
         if id:
+            kwargs['doc_type'] = '_all'
             if isinstance(id, list):
                 kwargs.setdefault('body', {'ids': kwargs.pop('id')})
                 return self.es.mget(**kwargs)
