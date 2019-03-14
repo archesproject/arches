@@ -426,7 +426,6 @@ input[type="checkbox"] {
     justify-content: space-between;
     width: 100%;
     border-bottom: solid 1px #ccc;
-    border-top: solid 1px #ccc;
     height: fit-content;
     padding: 15px;
     background-color: white;
@@ -449,6 +448,8 @@ input[type="checkbox"] {
     width: 100%;
     display: flex;
     justify-content: space-between;
+    height: 120px;
+    border-bottom: solid 1px #ccc;
 }
 
 .workflow-step-description {
@@ -457,23 +458,21 @@ input[type="checkbox"] {
     justify-content: center;
     background-color: #fff;
     padding: 10px;
-    height: 105px;
     overflow-x: hidden;
     overflow-y: hidden;
     width: 100%;
-    border-bottom: solid 1px #aaa;
 }
 
 .workflow-step-description .title {
     font-size: 20px;
     font-weight: 600;
-    color: #2056a9;
+    color: #004577;
 }
 
 .workflow-step-description .subtitle {
     font-size: 12px;
     font-weight: 400;
-    color: #2056a9;
+    color: #004577;
 }
 .workflow-step-description .step {
     font-size: 10px;
@@ -489,21 +488,32 @@ input[type="checkbox"] {
 
 .workflow-nav-controls {
     width: 60px;
-    height: 105px;
     display: flex;
     background-color: #fff;
     align-items: center;
     font-size: 41px;
     justify-content: center;
-    border-bottom: solid 1px #aaa;
-    color: #2056a9;
+    color: #004577;
 }
 
-.workflow-nave-controls.left {
+.workflow-delete {
+    font-size: 30px;
+    color: red;
+}
+
+.workflow-delete:hover {
+    color: #DD6666;
+}
+
+.workflow-nav-controls:hover {
+    color: #007799;
+}
+
+.workflow-nav-controls.left {
     border-left: solid 1px #aaa;
 }
 
-.workflow-nave-controls.right {
+.workflow-nav-controls.right {
     border-right: solid 1px #aaa;
 }
 
