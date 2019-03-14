@@ -419,6 +419,16 @@ input[type="checkbox"] {
     right: 10px;
 }
 
+
+.workflowsteps {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    border-bottom: solid 1px #ccc;
+    border-top: solid 1px #ccc;
+}
+
 .summary-panel {
     background: #f9f9f9;
     margin-top: -30px;
