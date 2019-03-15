@@ -13,13 +13,11 @@ define([
         this.next = function(){
             if (self.activeStepIndex() < self.steps().length - 1) {
                 self.activeStepIndex(self.activeStepIndex() + 1);
-                console.log('going to the next step');
             }
         };
         this.back = function(){
             if (self.activeStepIndex() > 0) {
                 self.activeStepIndex(self.activeStepIndex() - 1);
-                console.log('going back a step');
             }
         };
     };
