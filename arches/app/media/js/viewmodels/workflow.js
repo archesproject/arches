@@ -6,12 +6,17 @@ define([
         this.steps = ko.observableArray(config.steps);
         this.activeStepIndex = ko.observable(0);
         this.activeStep = ko.computed(function() {
-            var index = self.activeStepIndex;
-            return self.steps()[index()];
-        });
+            this.steps().forEach(function(step){
+                step.active(false);
+            });
+            var activeStep = self.steps()[self.activeStepIndex()];
+            activeStep.active(true);
+            return activeStep;
+        }, this);
 
         this.next = function(){
             if (self.activeStepIndex() < self.steps().length - 1) {
+                this.activeStep().complete(true);
                 self.activeStepIndex(self.activeStepIndex() + 1);
             }
         };

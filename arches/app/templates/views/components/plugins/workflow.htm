@@ -1,7 +1,7 @@
 <div class="workflow-plugin">
     <div class="workflowstep-nav">
         <!--ko foreach: {data: workflow.steps, as: 'step'}-->
-        <div class="workflow-step-icon" data-bind="css: {'background-color': step.color}"><i class="fa fa-plus fa-lg fa-chevron-circle-right" data-bind="css: step.icon"></i></div>
+        <div data-bind=""><i class="fa fa-lg" data-bind="class: step.iconClass"></i></div>
         <!--/ko-->
         <div class="workflow-nav-controls"><i class="workflow-delete fa fa-times-circle"></i></div>
     </div>
