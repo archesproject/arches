@@ -7833,7 +7833,7 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .rp-report-section-root {
-    margin-top: 30px;
+    /* margin-top: 30px; */
 }
 
 .rp-report-header {
@@ -7842,7 +7842,7 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .rp-report-section {
-    padding: 0px 0px 35px 0px;
+    padding: 30px 0px 35px 0px;
     background: #fff;
     border-bottom: solid 1px lightgray;
 }
