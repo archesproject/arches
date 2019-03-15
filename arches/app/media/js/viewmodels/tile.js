@@ -154,7 +154,7 @@ define([
                     "tiles": children
                 });
             },
-            save: function(onFail) {
+            save: function(onFail, onSuccess) {
                 loading(true);
                 delete self.formData.data;
                 if (params.provisionalTileViewModel.selectedProvisionalEdit()) {
@@ -208,6 +208,9 @@ define([
                         handler(req, self);
                     });
                     updateDisplayName(params.resourceId, params.displayname);
+                    if (typeof onSuccess === 'function') {
+                        onSuccess(tileData);
+                    }
                 }).fail(function(response) {
                     if (typeof onFail === 'function') {
                         onFail(response);
