@@ -1,17 +1,17 @@
 <div class="workflow-plugin">
     <div class="workflowstep-nav">
-        <!--ko foreach: {data: workflowSteps, as: 'step'}-->
+        <!--ko foreach: {data: workflow.steps, as: 'step'}-->
         <div class="workflow-step-icon" data-bind="css: {'background-color': step.color}"><i class="fa fa-plus fa-lg fa-chevron-circle-right" data-bind="css: step.icon"></i></div>
         <!--/ko-->
     </div>
     <div class="workflow-step-description-container">
-         <div class="workflow-nav-controls left"><i class="fa fa-chevron-circle-left"></i></div>
-         <div class="workflow-step-description">
-             <div class="title">Recommendations </div>
-             <div class="subtitle">New Site Visit </div>
-             <div class="step">Step 5 of 6: Recommendated Actions </div>
+         <div class="workflow-nav-controls left"><i class="fa fa-chevron-circle-left" data-bind="click: workflow.back"></i></div>
+         <div class="workflow-step-description" >
+             <div class="title" data-bind="text:workflow.activeStep().title">Recommendations </div>
+             <div class="subtitle" data-bind="text:workflow.activeStep().subtitle">New Site Visit </div>
+             <div class="step">Step <span data-bind="text:workflow.activeStepIndex() + 1">1</span> of <span data-bind="text:workflow.steps().length">1</span>: Recommendated Actions </div>
         </div>
-        <div class="workflow-nav-controls right"><i class="fa fa-chevron-circle-right"></i></div>
+        <div class="workflow-nav-controls right"><i class="fa fa-chevron-circle-right" data-bind="click: workflow.next"></i></div>
     </div>
     <div class='workflow-step-body'>
     </div>
