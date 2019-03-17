@@ -73,7 +73,6 @@
                 <!-- /ko -->
             </li>
         </div>
-        <!-- /ko -->
     </ul>
 </li>
 {% endblock editor_tree %}
@@ -146,7 +145,7 @@
         <span style="padding-right: 5px;" data-bind="text: card.model.name">
         </span>
         <span class="node-permissions">
-            <!--ko if: card.perms -->
+            <!-- ko if: card.perms -->
             <!-- ko foreach: card.perms() -->
             <i class="node-permission-icon" data-bind="css: $data.icon"></i>
             <!-- /ko -->
@@ -208,36 +207,36 @@
 {% block form %}
 <div class="card-component" data-bind="css: card.model.cssclass">
 
-    <!--ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
+    <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
     <div class="edit-message-container">
         <span>{% trans 'Currently showing edits by' %}</span>
         <span class="edit-message-container-user" data-bind="text: provisionalTileViewModel.selectedProvisionalEdit().username() + '.'"></span>
-        <!--ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
+        <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
         <a class="reset-authoritative" href='' data-bind="click: function(){provisionalTileViewModel.resetAuthoritative();}">{% trans 'Return to approved edits' %}</a>
-        <!--/ko-->
-        <!--ko if: provisionalTileViewModel.selectedProvisionalEdit().isfullyprovisional -->
+        <!-- /ko-->
+        <!-- ko if: provisionalTileViewModel.selectedProvisionalEdit().isfullyprovisional -->
         <span>{% trans ' This is a new contribution by a provisional editor.' %}</span>
-        <!--/ko-->
+        <!-- /ko-->
     </div>
-    <!--/ko-->
+    <!-- /ko-->
 
-    <!--ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 && !provisionalTileViewModel.selectedProvisionalEdit()-->
+    <!-- ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 && !provisionalTileViewModel.selectedProvisionalEdit()-->
     <div class="edit-message-container approved">
         <div>{% trans 'Currently showing the most recent approved edits' %}</div>
     </div>
-    <!--/ko-->
+    <!-- /ko-->
 
 
 
     <div class="new-provisional-edit-card-container">
-        <!--ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 -->
-        <!--ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
+        <!-- ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 -->
+        <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
         <div class='new-provisional-edits-list'>
             <div class='new-provisional-edits-header'>
                 <div class='new-provisional-edits-title'>{% trans 'Provisional Edits' %}</div>
                 <div class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" style="padding: 3px;" data-bind="click: function(){provisionalTileViewModel.deleteAllProvisionalEdits()}">{% trans 'Delete all edits' %}</div>
             </div>
-            <!--ko foreach: { data: provisionalTileViewModel.provisionaledits(), as: 'pe' } -->
+            <!-- ko foreach: { data: provisionalTileViewModel.provisionaledits(), as: 'pe' } -->
             <div class='new-provisional-edit-entry' data-bind="css: {'selected': pe === $parent.provisionalTileViewModel.selectedProvisionalEdit()}, click: function(){$parent.provisionalTileViewModel.selectProvisionalEdit(pe)}">
                 <div class='title'>
                     <div class='field'>
@@ -252,8 +251,8 @@
             </div>
             <!-- /ko -->
         </div>
-        <!--/ko-->
-        <!--/ko-->
+        <!-- /ko-->
+        <!-- /ko-->
 
 
         <div class="card">
@@ -401,7 +400,7 @@
                         <div class="rp-report-tile" data-bind="attr: { id: tile.tileid }">
                             <!-- ko if: ko.unwrap(tile.provisionaledits) !== null && tile.userisreviewer === false -->
                             <div class="report-card-provisional-flag">{% trans 'These data are provisional and pending review' %}</div>
-                            <!--/ko-->
+                            <!-- /ko-->
                             <dl class="dl-horizontal" data-bind="css: {'provisional': ko.unwrap(tile.provisionaledits) !== null && tile.userisreviewer === false}">
                                 <!-- ko foreach: { data: card.model.get('widgets'), as: 'widget' } -->
                                     <!-- ko if: widget.visible -->

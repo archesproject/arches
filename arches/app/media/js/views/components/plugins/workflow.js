@@ -5,10 +5,10 @@ define([
         viewModel: function() {
             this.configJSON = {};
             var steps = [
-                new Step({title: 'Step 1'}),
-                new Step({title: 'Step 2'}),
+                new Step({title: 'Step 1', description: 'A description here'}),
+                new Step({title: 'Step 2', description: 'A very long and verboser description here that explains many different things about the workflow step'}),
                 new Step({title: 'Step 3'}),
-                new Step({title: 'Step 4'})
+                new Step({title: 'Step 4', description: 'Another description here'})
             ];
             this.workflow = new Workflow({
                 steps: steps
