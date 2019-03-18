@@ -10,6 +10,7 @@ from django.db import migrations, models
 from django.core import management
 from arches.app.models.system_settings import settings
 
+
 def add_permissions(apps, schema_editor, with_create_permissions=True):
     db_alias = schema_editor.connection.alias
     Group = apps.get_model("auth", "Group")
@@ -28,6 +29,7 @@ def add_permissions(apps, schema_editor, with_create_permissions=True):
     resource_editor_group.permissions.add(write_nodegroup)
     resource_editor_group.permissions.add(delete_nodegroup)
 
+
 def remove_permissions(apps, schema_editor, with_create_permissions=True):
     db_alias = schema_editor.connection.alias
     Group = apps.get_model("auth", "Group")
@@ -45,6 +47,7 @@ def remove_permissions(apps, schema_editor, with_create_permissions=True):
     resource_editor_group = Group.objects.using(db_alias).get(name='Crowdsource Editor')
     resource_editor_group.permissions.remove(write_nodegroup)
     resource_editor_group.permissions.remove(delete_nodegroup)
+
     
 class Migration(migrations.Migration):
 
