@@ -372,6 +372,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </li>
                                         {% endif %}
 
+                                        {% for p in plugins %}
                                         <li{% if main_script == "views/plugin" and plugin.pluginid == p.pluginid  %} class="active-sub"{% endif %}>
                                             {% if p.slug is not None %}
                                             <a href="{% url 'plugins' p.slug %}" data-bind="click: navigate.bind(this, '{% url 'plugins' p.slug %}') ">
