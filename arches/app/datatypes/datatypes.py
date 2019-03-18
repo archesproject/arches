@@ -1224,64 +1224,6 @@ class FileListDataType(BaseDataType):
             pass
         return node_value
 
-class CSVChartJsonDataType(FileListDataType):
-    def __init__(self, model=None):
-        super(CSVChartJsonDataType, self).__init__(model=model)
-
-    def handle_request(self, current_tile, request, node):
-        try:
-            previously_saved_tile = models.TileModel.objects.filter(pk=current_tile.tileid)
-            if previously_saved_tile.count() == 1:
-                for previously_saved_file in previously_saved_tile[0].data[str(node.pk)]['files']:
-                    previously_saved_file_has_been_removed = True
-                    for incoming_file in current_tile.data[str(node.pk)]['files']:
-                        if previously_saved_file['file_id'] == incoming_file['file_id']:
-                            previously_saved_file_has_been_removed = False
-                    if previously_saved_file_has_been_removed:
-                        deleted_file = models.File.objects.get(pk=previously_saved_file["file_id"])
-                        deleted_file.delete()
-
-            files = request.FILES.getlist('file-list_' + str(node.pk), [])
-            for file_data in files:
-                file_model = models.File()
-                file_model.path = file_data
-                file_model.save()
-                for file_json in current_tile.data[str(node.pk)]['files']:
-                    if file_json["name"] == file_data.name and file_json["url"] is None:
-                        file_json["file_id"] = str(file_model.pk)
-                        file_json["url"] = str(file_model.path.url)
-                        file_json["status"] = 'uploaded'
-        except Exception as e:
-            print e
-
-
-class IIIFDrawingDataType(BaseDataType):
-    def get_strings(self, nodevalue):
-        string_list = [nodevalue['manifestLabel']]
-        for feature in nodevalue['features']:
-            if feature['properties']['name'] != '':
-                string_list.append(feature['properties']['name'])
-        return string_list
-
-    def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        string_list = self.get_strings(nodevalue)
-        for string_item in string_list:
-            document['strings'].append({'string': string_item, 'nodegroup_id': tile.nodegroup_id})
-        for feature in nodevalue['features']:
-            if feature['properties']['type'] is not None:
-                valueid = feature['properties']['type']
-                value = models.Value.objects.get(pk=valueid)
-                document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': valueid, 'nodegroup_id': tile.nodegroup_id, 'provisional': provisional})
-
-    def get_search_terms(self, nodevalue, nodeid=None):
-        terms = []
-        string_list = self.get_strings(nodevalue)
-        for string_item in string_list:
-            if string_item is not None:
-                if settings.WORDS_PER_SEARCH_TERM == None or (len(string_item.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
-                    terms.append(string_item)
-        return terms
-
 
 class BaseDomainDataType(BaseDataType):
     def get_option_text(self, node, option_id):
