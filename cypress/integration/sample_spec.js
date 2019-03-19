@@ -5,7 +5,7 @@ describe('Home page', function() {
 })
 
 describe('Log in as admin', function() {
-  it('Goes to Login page from home page', function() {
+  it('Goes to login page, logs in with default creds, and should redirect to index', function() {
     cy.visit('/auth/?next=/index.htm')
 
     cy.get(':nth-child(3) > .input-group > .form-control').type("admin")
