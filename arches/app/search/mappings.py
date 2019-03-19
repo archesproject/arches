@@ -287,7 +287,7 @@ def prepare_resource_relations_index(create=False):
 
     index_settings = {
         'mappings': {
-            'all': {
+            '_doc': {
                 'properties': {
                     'resourcexid': {'type': 'keyword'},
                     'notes': {'type': 'text'},
