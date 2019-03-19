@@ -65,6 +65,7 @@ class SearchEngine(object):
         """
 
         kwargs = self._add_prefix(**kwargs)
+        kwargs['doc_type'] = kwargs.pop('doc_type', '_doc')
         body = kwargs.pop('body', None)
         if body != None:
             try:
@@ -109,11 +110,11 @@ class SearchEngine(object):
         """
 
         kwargs = self._add_prefix(**kwargs)
+        kwargs['doc_type'] = kwargs.pop('doc_type', '_doc')
         body = kwargs.get('body', None)
         id = kwargs.get('id', None)
 
         if id:
-            kwargs['doc_type'] = '_all'
             if isinstance(id, list):
                 kwargs.setdefault('body', {'ids': kwargs.pop('id')})
                 return self.es.mget(**kwargs)
@@ -209,6 +210,7 @@ class SearchEngine(object):
 
     def count(self, **kwargs):
         kwargs = self._add_prefix(**kwargs)
+        kwargs['doc_type'] = kwargs.pop('doc_type', '_doc')
         count = self.es.count(**kwargs)
         if count is not None:
             return count['count']
