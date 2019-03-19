@@ -11,7 +11,7 @@ from arches.app.search.mappings import prepare_resource_relations_index, delete_
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4662_workflow_plugin'),
+        ('models', '4679_resource_editor_permissions'),
     ]
 
     def forwards_func(apps, schema_editor):
