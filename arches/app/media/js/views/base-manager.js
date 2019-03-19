@@ -33,7 +33,7 @@ define([
             data.graphs.forEach(function(graph){
               graph.name = ko.observable(graph.name);
               graph.iconclass = ko.observable(graph.iconclass);
-            })
+            });
             options.viewModel.allGraphs = ko.observableArray(data.graphs);
             options.viewModel.graphs = ko.computed(function() {
                 return ko.utils.arrayFilter(options.viewModel.allGraphs(), function(graph) {
