@@ -65,7 +65,6 @@ class BaseManagerView(TemplateView):
         }
         context['user_is_reviewer'] = self.request.user.groups.filter(name='Resource Reviewer').exists()
         context['app_name'] = settings.APP_NAME
-        context['iiif_manifests'] = models.IIIFManifest.objects.all()
         return context
 
 

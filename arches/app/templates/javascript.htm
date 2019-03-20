@@ -312,11 +312,6 @@
                 'addtomap': {{ resource_map_layer.addtomap|lower }},
                 'is_resource_layer': true
             },{% endfor %}{% endautoescape %}],
-            iiifManifests: [{% autoescape off %}{% for manifest in iiif_manifests %}{
-                'id': '{{ manifest.id }}',
-                'url': '{{ manifest.url }}',
-                'icon': '{{ manifest.icon }}'
-            },{% endfor %}{% endautoescape %}],
             conceptCollections: [{% autoescape off %}{% for concept_collection in concept_collections %}{
                 'label': '{{ concept_collection.label | escapejs }}',
                 'id': '{{ concept_collection.id }}',

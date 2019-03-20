@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 """This module contains commands for building Arches."""
+
 import os, sys, subprocess, shutil, csv, json, unicodecsv
 import urllib, uuid, glob
 from datetime import datetime
@@ -381,23 +382,27 @@ class Command(BaseCommand):
                     else:
                         update_system_settings = False
 
-            if update_system_settings == True:
+            if update_system_settings is True:
                 if len(glob.glob(os.path.join(package_dir, 'system_settings', 'System_Settings.json'))) > 0:
-                    system_settings = glob.glob(os.path.join(package_dir, 'system_settings', 'System_Settings.json'))[0]
+                    system_settings = os.path.join(package_dir, 'system_settings', 'System_Settings.json')
                     shutil.copy(system_settings, settings.SYSTEM_SETTINGS_LOCAL_PATH)
                     self.import_business_data(settings.SYSTEM_SETTINGS_LOCAL_PATH, overwrite=True)
 
         def load_package_settings(package_dir):
-            if os.path.exists(os.path.join(package_dir, 'package_settings.py')):
+            if os.path.exists(os.path.join(package_dir, 'package_settings.py')) is True:
                 update_package_settings = True
                 if os.path.exists(os.path.join(settings.APP_ROOT, 'package_settings.py')):
-                    if yes == False:
+                    if yes is False:
                         response = raw_input('Overwrite current packages_settings.py? (Y/N): ')
                         if response.lower() not in ('t', 'true', 'y', 'yes'):
                             update_package_settings = False
-                    if update_package_settings == True:
-                        package_settings = glob.glob(os.path.join(package_dir, 'package_settings.py'))[0]
+                    if update_package_settings is True \
+                            and os.path.exists(os.path.join(package_dir, 'package_settings.py')):
+                        package_settings = os.path.join(package_dir, 'package_settings.py')
                         shutil.copy(package_settings, settings.APP_ROOT)
+                elif os.path.exists(os.path.join(package_dir, 'package_settings.py')):
+                    package_settings = os.path.join(package_dir, 'package_settings.py')
+                    shutil.copy(package_settings, settings.APP_ROOT)
 
         def load_resource_to_resource_constraints(package_dir):
             config_paths = glob.glob(os.path.join(package_dir, 'package_config.json'))
@@ -577,6 +582,14 @@ class Command(BaseCommand):
         def load_functions(package_dir):
             load_extensions(package_dir, 'functions', 'fn')
 
+        def load_apps(package_dir):
+            package_apps = glob.glob(os.path.join(package_dir, 'apps', '*'))
+            for app in package_apps:
+                try:
+                    app_name = os.path.basename(app)
+                    management.call_command('startapp', '--template', app, app_name)
+                except CommandError as e:
+                    print e
 
         def handle_source(source):
             if os.path.isdir(source):
@@ -654,6 +667,7 @@ class Command(BaseCommand):
             css_files = glob.glob(os.path.join(css_source, '*.css'))
             for css_file in css_files:
                 shutil.copy(css_file, css_dest)
+        load_apps(package_location)
 
 
     def update_project_templates(self):
@@ -669,105 +683,6 @@ class Command(BaseCommand):
             ]
         for f in files:
             shutil.copyfile(f['src'], f['dst'])
-
-        settings_whitelist = [
-            'APP_NAME',
-            'APP_TITLE',
-            'COPYRIGHT_TEXT',
-            'COPYRIGHT_YEAR',
-            'MODE',
-            'CACHES',
-            'DATABASES',
-            'DEBUG',
-            'RESOURCE_IMPORT_LOG',
-            'INTERNAL_IPS',
-            'ANONYMOUS_USER_NAME',
-            'ELASTICSEARCH_HTTP_PORT',
-            'SEARCH_BACKEND',
-            'ELASTICSEARCH_HOSTS',
-            'ELASTICSEARCH_CONNECTION_OPTIONS',
-            'ROOT_DIR',
-            'ONTOLOGY_PATH',
-            'ONTOLOGY_BASE',
-            'ONTOLOGY_BASE_VERSION',
-            'ONTOLOGY_BASE_NAME',
-            'ONTOLOGY_BASE_ID',
-            'ONTOLOGY_EXT',
-            'ADMINS',
-            'MANAGERS',
-            'POSTGIS_VERSION',
-            'USE_I18N',
-            'TIME_ZONE',
-            'USE_TZ',
-            'LANGUAGE_CODE',
-            'LOCALE_PATHS',
-            'USE_L10N',
-            'MEDIA_URL',
-            'MEDIA_ROOT',
-            'DATATYPE_LOCATIONS',
-            'STATIC_ROOT',
-            'STATIC_URL',
-            'TILE_CACHE_CONFIG',
-            'ADMIN_MEDIA_PREFIX',
-            'STATICFILES_DIRS',
-            'STATICFILES_FINDERS',
-            'TEMPLATES',
-            'AUTHENTICATION_BACKENDS',
-            'INSTALLED_APPS',
-            'MIDDLEWARE_CLASSES',
-            'ROOT_URLCONF',
-            'WSGI_APPLICATION',
-            'LOGGING',
-            'LOGIN_URL',
-            'SYSTEM_SETTINGS_LOCAL_PATH',
-            'AUTH_PASSWORD_VALIDATORS',
-            'EMAIL_BACKEND',
-            'EMAIL_USE_TLS',
-            'EMAIL_HOST',
-            'EMAIL_HOST_USER',
-            'EMAIL_HOST_PASSWORD',
-            'EMAIL_PORT',
-            'DATE_IMPORT_EXPORT_FORMAT',
-            'ANALYSIS_COORDINATE_SYSTEM_SRID',
-            'CACHE_BY_USER'
-            ]
-
-        with open('arches/install/arches-templates/project_name/settings_local.py-tpl', 'w') as f:
-            for setting_key in dir(settings):
-                if setting_key in settings_whitelist:
-                    setting_value = getattr(settings, setting_key)
-                    if type(setting_value) == dict or type(setting_value) == list:
-                        val = "\n{0} = {1}\n\n\n".format(setting_key, JSONSerializer().serialize(setting_value, indent=4))
-                        val = val.replace(' false', ' False').replace(' true', ' True').replace(' null', ' None')
-                    elif type(setting_value) == tuple:
-                        braces = ('(',')')
-                        val = "\n{0} = {1}\n".format(setting_key, braces[0])
-                        for value in setting_value:
-                            val = val + "    " + str(value) + ',\n'
-                        val = val + "{0}\n\n\n".format(braces[1])
-                    else:
-                        try:
-                            setting_value.upper()
-                            val = "{0} = '{1}'\n\n".format(setting_key, setting_value)
-                        except:
-                            val = "{0} = {1}\n\n".format(setting_key, setting_value)
-
-                    f.write(val)
-
-        lines = None
-        with open('arches/install/arches-templates/project_name/settings_local.py-tpl', 'r') as f:
-            lines = f.readlines()
-
-        with open('arches/install/arches-templates/project_name/settings_local.py-tpl', 'w') as f:
-            f.write('import os\n')
-            cwd = os.getcwd()
-
-            for line in lines:
-                line = line.replace(cwd, '')
-                if len(line) > 1:
-                    f.write('#' + line)
-                else:
-                    f.write(line)
 
 
     def setup(self, package_name, es_install_location=None):
