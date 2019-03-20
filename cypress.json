@@ -1,0 +1,5 @@
+{
+  "projectId": "arches",
+  "baseUrl": "http://localhost:8000/",
+  "video": false
+}
