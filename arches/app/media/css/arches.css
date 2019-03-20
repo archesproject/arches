@@ -7273,7 +7273,7 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
     background: #01113c;
     border-radius: 50%;
     border: none;
-    
+
 }
 
 .btn-file-select {
@@ -8065,76 +8065,9 @@ h4.report-toolbar-title {
     color: grey;
 }
 
-.csv-chart {
-    height: 300px;
-    margin-left: -10px;
-    padding-right: 30px;
-}
-
-.csv-chart-title {
-    font-size: 15px;
-    font-weight: 500;
-}
-
-.csv-chart-menubar {
-    padding-bottom: 15px;
-    margin-top: 5px;
-}
-
-.csv-chart-menubar-item {
-    padding: 5px 10px;
-    border: 1px solid #ddd;
-}
-
-a .csv-chart-menubar-item {
-    color: #777;
-    font-weight: 400;
-}
-
-.csv-chart-menubar-item.active {
-    color: #123;
-    border-radius: 1px;
-    background: #f2f2f2;
-}
-
-.csv-chart-widget-input {
-    width: 100%;
-    padding: 0px 0px 10px;
-}
-
-.csv-chart-selection-detail-container {
-    flex-direction: row;
-    display: flex;
-    justify-content: center;
-}
-
-.csv-chart-selection-detail {
-    flex-grow: 1;
-    flex-shrink: 1;
-}
-
 .file-selector {
     padding-right: 15px;
     padding-top: 15px;
-}
-
-.tab-content .csv-chart-panel {
-    padding-top: 0px;
-}
-
-.pad-ver .csv-chart-panel {
-    padding-top: 0px;
-}
-
-.csv-chart-container {
-    margin-top: -15px;
-    margin-left: -30px;
-    margin-right: -45px;
-}
-
-.csv-chart-file-selector {
-    margin-top: 10px;
-    padding-right: 15px;
 }
 
 .map-widget-container {
@@ -8572,19 +8505,6 @@ div.row.widget-wrapper.report-header:hover {
     right: 11px;
 }
 
-.iiif-wrapper .map-widget-panel {
-    background-color: rgba(143, 143, 143, 0.2);
-    border-left: solid rgba(143, 143, 143, 0.6) 1px;
-}
-
-.expanded-iiif .map-widget-panel {
-    position: fixed;
-    top: 160px;
-    width: 298px;
-    bottom: 0;
-    height: auto;
-}
-
 .map-search-container, .map-search-container div .map-widget-panel {
     height: calc(100vh - 110px);
 }
@@ -8652,25 +8572,6 @@ div.row.widget-wrapper.report-header:hover {
 
 .map-search-container.expanded-edit-map {
     top: 51px;
-}
-
-.iiif-wrapper {
-    height: 500px;
-}
-
-.iiif-wrapper.expanded-iiif {
-    position: fixed;
-    top: 106px;
-    right: 0px;
-    left: 50px;
-    bottom: 0;
-    transition-duration: .3s;
-    z-index: 100;
-    height: auto;
-}
-
-.leaflet-iiif {
-    height: 100%;
 }
 
 .expanded-resource-menu {
@@ -9345,28 +9246,6 @@ a.clear-geojson-button:hover {
     border-radius: 2px;
 }
 
-.iiif-expand-button {
-    position: absolute;
-}
-
-.iiif-toolbar {
-    border-left: 1px solid #999;
-    border-right: 1px solid #999;
-}
-
-.iiif-widget-panel {
-    height: 430px;
-    width: 298px;
-    right: 11px;
-    border-bottom: 1px solid #999;
-    border-right: 1px solid #999;
-}
-
-.iiif-widget-panel-title {
-    width: 297px;
-}
-
-
 /* Hide "Full Screen" button for map tools widget in card manager */
 
 .widget-preview div div div div span .toggle-map-size {
@@ -9679,15 +9558,6 @@ a.clear-geojson-button:hover {
 .related-node-details {
     display: flex;
     flex-direction: column;
-}
-
-.iiif-widget {
-    position: relative;
-}
-
-.iiif-widget .hover-feature-info {
-    margin-left: 25px;
-    height: 220px;
 }
 
 .hover-feature-title-bar {
