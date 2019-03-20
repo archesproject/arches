@@ -1,15 +1,6 @@
 dist: trusty
-language: python
 filter_secrets: false
-
-python:
-  - 2.7
-
 sudo: false
-
-cache:
-  - apt
-  - pip
 
 env:
   - ES_VERSION=6.6.2 ES_DOWNLOAD_URL=https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.tar.gz
@@ -17,10 +8,7 @@ env:
 addons:
   postgresql: 9.6
   apt:
-    # sources:
-    #   - elasticsearch-6.x
     packages:
-      #- elasticsearch
       - libxml2-dev
       - libpq-dev
       - openjdk-7-jdk
@@ -32,30 +20,59 @@ services:
   - couchdb
 
 before_install:
+  - echo 'ELASTICSEARCH_PREFIX="arches"' > arches/settings_local.py
   - psql -d postgres -c "ALTER USER postgres with encrypted password 'postgis';"
   - echo "*:*:*:postgres:postgis" >> ~/.pgpass
   - psql -d postgres -c "SET standard_conforming_strings = off;"
   - psql -d postgres -c "CREATE EXTENSION postgis;"
+  - "pip install -e . --no-binary :all:"
+  - pip install -r arches/install/requirements.txt
+  - pip install -r arches/install/requirements_dev.txt
+  - npm install -g wait-on
+  - pip install coveralls
   - wget ${ES_DOWNLOAD_URL}
   - tar -xzf elasticsearch-${ES_VERSION}.tar.gz
-  - ./elasticsearch-${ES_VERSION}/bin/elasticsearch &
+  - "./elasticsearch-${ES_VERSION}/bin/elasticsearch -v &"
 
-before_script: ./arches/install/ci_install/setup_couch.sh
-
-install:
-  - python setup.py install
-  - pip install -r arches/install/requirements_dev.txt
-  - pip install coveralls
-  # - npm install -g yarn
-  # - yarn install
-
-script:
-  - curl -v http://localhost:9200/
-  #- wget -q --waitretry=1 --retry-connrefused -T 10 -O - http://127.0.0.1:9200
-  - python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
+cache:
+  - apt
+  - pip
 
 after_success:
   - coveralls
+
+before_script:
+  - ./arches/install/ci_install/setup_couch.sh
+
+language: 
+  - python
+  - node_js
+python: 2.7.9
+node_js: 10.8
+
+matrix:
+  include:
+    - name: "Python - Nose/unittests"
+      script:
+        - wait-on http://localhost:9200/
+        - python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
+      install:
+    - name: "Javascript - Cypress.io tests"
+      install:
+        - yarn install
+        - npm install cypress --save-dev
+        - wait-on http://localhost:9200/
+        - python manage.py packages -o setup_db
+      cache:
+        npm: true
+        directories:
+          - ~/.cache
+      script:
+        - python manage.py runserver 0.0.0.0:8000 &
+        - $(npm bin)/cypress run
+        # after all tests finish running we need
+        # to kill all background jobs (like "npm start &")
+        - kill $(jobs -p) || true
 
 notifications:
   slack:
