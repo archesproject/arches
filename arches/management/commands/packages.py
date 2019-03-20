@@ -17,6 +17,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 """This module contains commands for building Arches."""
+
+from collections import OrderedDict
+from django.apps import apps
+
 import os, sys, subprocess, shutil, csv, json, unicodecsv
 import urllib, uuid, glob
 from datetime import datetime
@@ -388,16 +392,19 @@ class Command(BaseCommand):
                     self.import_business_data(settings.SYSTEM_SETTINGS_LOCAL_PATH, overwrite=True)
 
         def load_package_settings(package_dir):
-            if os.path.exists(os.path.join(package_dir, 'package_settings.py')):
+            if os.path.exists(os.path.join(package_dir, 'package_settings.py')) is True:
                 update_package_settings = True
                 if os.path.exists(os.path.join(settings.APP_ROOT, 'package_settings.py')):
                     if yes == False:
                         response = raw_input('Overwrite current packages_settings.py? (Y/N): ')
                         if response.lower() not in ('t', 'true', 'y', 'yes'):
                             update_package_settings = False
-                    if update_package_settings == True:
-                        package_settings = glob.glob(os.path.join(package_dir, 'package_settings.py'))[0]
+                    if update_package_settings == True and os.path.exists(os.path.join(package_dir, 'package_settings.py')):
+                        package_settings = os.path.join(package_dir, 'package_settings.py')
                         shutil.copy(package_settings, settings.APP_ROOT)
+                elif os.path.exists(os.path.join(package_dir, 'package_settings.py')):
+                    package_settings = os.path.join(package_dir, 'package_settings.py')
+                    shutil.copy(package_settings, settings.APP_ROOT)
 
         def load_resource_to_resource_constraints(package_dir):
             config_paths = glob.glob(os.path.join(package_dir, 'package_config.json'))
@@ -577,6 +584,25 @@ class Command(BaseCommand):
         def load_functions(package_dir):
             load_extensions(package_dir, 'functions', 'fn')
 
+        def load_apps(package_dir):
+            package_apps = glob.glob(os.path.join(package_dir, 'apps', '*'))
+            for app in package_apps:
+                try:
+                    print app
+                    app_name = os.path.basename(app)
+                    management.call_command('startapp', '--template', app, app_name)
+                    # settings.INSTALLED_APPS += (app_name,)
+                    # apps.app_configs = OrderedDict()
+                    # apps.ready = False
+                    # apps.populate(settings.INSTALLED_APPS)
+                    # from pprint import pprint as pp
+                    # pp(settings.INSTALLED_APPS)
+                    # print settings.INSTALLED_APPS
+                    # management.call_command('migrate', app)
+                    # print settings.INSTALLED_APPS
+                except CommandError as e:
+                    print e
+
 
         def handle_source(source):
             if os.path.isdir(source):
@@ -654,6 +680,7 @@ class Command(BaseCommand):
             css_files = glob.glob(os.path.join(css_source, '*.css'))
             for css_file in css_files:
                 shutil.copy(css_file, css_dest)
+        load_apps(package_location)
 
 
     def update_project_templates(self):
