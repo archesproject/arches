@@ -16,12 +16,26 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from app.models.models import DLanguage, MapLayer, MapSource, TileserverLayer, Geocoder, MapMarker, DDataType, Widget, Plugin, UserProfile, GraphModel
+from app.models import models
 from django.contrib import admin
 from guardian.admin import GuardedModelAdmin
+
 
 class PluginAdmin(GuardedModelAdmin):
     pass
 
-admin.site.register([DLanguage, MapLayer, MapSource, TileserverLayer, Geocoder, MapMarker, DDataType, Widget, UserProfile, GraphModel])
-admin.site.register(Plugin, PluginAdmin)
+
+admin.site.register([
+    models.DLanguage,
+    models.MapLayer,
+    models.MapSource,
+    models.TileserverLayer,
+    models.Geocoder,
+    models.MapMarker,
+    models.DDataType,
+    models.Widget,
+    models.UserProfile,
+    models.GraphModel
+    ])
+
+admin.site.register(models.Plugin, PluginAdmin)
