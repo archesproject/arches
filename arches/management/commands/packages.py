@@ -382,9 +382,9 @@ class Command(BaseCommand):
                     else:
                         update_system_settings = False
 
-            if update_system_settings == True:
+            if update_system_settings is True:
                 if len(glob.glob(os.path.join(package_dir, 'system_settings', 'System_Settings.json'))) > 0:
-                    system_settings = glob.glob(os.path.join(package_dir, 'system_settings', 'System_Settings.json'))[0]
+                    system_settings = os.path.join(package_dir, 'system_settings', 'System_Settings.json')
                     shutil.copy(system_settings, settings.SYSTEM_SETTINGS_LOCAL_PATH)
                     self.import_business_data(settings.SYSTEM_SETTINGS_LOCAL_PATH, overwrite=True)
 
@@ -392,11 +392,12 @@ class Command(BaseCommand):
             if os.path.exists(os.path.join(package_dir, 'package_settings.py')) is True:
                 update_package_settings = True
                 if os.path.exists(os.path.join(settings.APP_ROOT, 'package_settings.py')):
-                    if yes == False:
+                    if yes is False:
                         response = raw_input('Overwrite current packages_settings.py? (Y/N): ')
                         if response.lower() not in ('t', 'true', 'y', 'yes'):
                             update_package_settings = False
-                    if update_package_settings == True and os.path.exists(os.path.join(package_dir, 'package_settings.py')):
+                    if update_package_settings is True \
+                            and os.path.exists(os.path.join(package_dir, 'package_settings.py')):
                         package_settings = os.path.join(package_dir, 'package_settings.py')
                         shutil.copy(package_settings, settings.APP_ROOT)
                 elif os.path.exists(os.path.join(package_dir, 'package_settings.py')):
