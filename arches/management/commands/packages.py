@@ -18,9 +18,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 """This module contains commands for building Arches."""
 
-from collections import OrderedDict
-from django.apps import apps
-
 import os, sys, subprocess, shutil, csv, json, unicodecsv
 import urllib, uuid, glob
 from datetime import datetime
@@ -588,21 +585,10 @@ class Command(BaseCommand):
             package_apps = glob.glob(os.path.join(package_dir, 'apps', '*'))
             for app in package_apps:
                 try:
-                    print app
                     app_name = os.path.basename(app)
                     management.call_command('startapp', '--template', app, app_name)
-                    # settings.INSTALLED_APPS += (app_name,)
-                    # apps.app_configs = OrderedDict()
-                    # apps.ready = False
-                    # apps.populate(settings.INSTALLED_APPS)
-                    # from pprint import pprint as pp
-                    # pp(settings.INSTALLED_APPS)
-                    # print settings.INSTALLED_APPS
-                    # management.call_command('migrate', app)
-                    # print settings.INSTALLED_APPS
                 except CommandError as e:
                     print e
-
 
         def handle_source(source):
             if os.path.isdir(source):
