@@ -13,10 +13,16 @@ class CreateExtension(Operation):
         pass
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        schema_editor.execute("CREATE EXTENSION IF NOT EXISTS \"%s\"" % self.name)
+        try:
+            schema_editor.execute("CREATE EXTENSION IF NOT EXISTS \"%s\"" % self.name)
+        except:
+            print("INFO: SQL command to create extension \"%s\" failed. Must be executed by Postgres superuser account before running Arches." % self.name)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        schema_editor.execute("DROP EXTENSION IF EXISTS \"%s\"" % self.name)
+        try:
+            schema_editor.execute("DROP EXTENSION IF EXISTS \"%s\"" % self.name)
+        except:
+            print("INFO: SQL command to drop extension \"%s\" failed. Must be executed by Postgres superuser account." % self.name)
 
     def describe(self):
         return "Creates extension %s" % self.name
