@@ -1690,7 +1690,12 @@ knockout-mapping@~2.6.0:
   resolved "https://registry.yarnpkg.com/knockout-mapping/-/knockout-mapping-2.6.0.tgz#052759d01ecf30d4947e8ebe64ad2c82933f06ff"
   integrity sha1-BSdZ0B7PMNSUfo6+ZK0sgpM/Bv8=
 
-knockout@3.4.0, knockout@>=2.3.0:
+knockout@3.5.0:
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/knockout/-/knockout-3.5.0.tgz#6d3e19bf53b1dc4d8de81c97a5ba9672443dc292"
+  integrity sha512-vBUF/IsBDzaejHkNpiquKdc5uPrImXuQ4Mb9lEfNNJ5cyHGI8ThDupR+h3eMFZhfmPE/brfwcIAn/fm0yOvJUg==
+
+knockout@>=2.3.0:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/knockout/-/knockout-3.4.0.tgz#59d7261815a11eb7c1a3f3c7077ca898a44caadb"
   integrity sha1-WdcmGBWhHrfBo/PHB3yomKRMqts=
