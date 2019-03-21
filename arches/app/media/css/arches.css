@@ -7244,6 +7244,10 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
     color: #01113c;
 }
 
+.file-upload-filter {
+    margin-right: 5px;
+}
+
 .file-upload-options {
     padding-bottom: 8px;
 }
@@ -7263,6 +7267,7 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 .file-upload-card-detail-right {
     min-width: 85px;
     float: right;
+    margin-top: 6px;
 }
 
 .file-select-title {
