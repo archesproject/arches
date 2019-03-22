@@ -64,6 +64,27 @@ class CardModel(models.Model):
         managed = True
         db_table = 'cards'
 
+
+class ConstraintModel(models.Model):
+    constraintid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    card = models.ForeignKey('CardModel', db_column='cardid')
+    nodes = models.ManyToManyField(to='Node', through='ConstraintXNode')
+
+    class Meta:
+        managed = True
+        db_table = 'card_constraints'
+
+
+class ConstraintXNode(models.Model):
+    id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
+    constraint = models.ForeignKey('ConstraintModel', on_delete=models.CASCADE, db_column='constraintid')
+    node = models.ForeignKey('Node', on_delete=models.CASCADE, db_column='nodeid')
+
+    class Meta:
+        managed = True
+        db_table = 'constraints_x_nodes'
+
+
 class CardComponent(models.Model):
     componentid = models.UUIDField(primary_key=True, default=uuid.uuid1)
     name = models.TextField(blank=True, null=True)
