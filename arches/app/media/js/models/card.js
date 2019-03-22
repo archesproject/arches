@@ -70,6 +70,17 @@ define([
             this.set('component_id', this.component_id);
             this.set('config', {});
 
+            this.uniqueNodes = ko.observableArray([]);
+            this.uniqueToAllInstances = ko.observable(false);
+
+            this.toggleUniqueConstraint = function(node){
+                _.contains(this.uniqueNodes(), node) === false ? this.uniqueNodes.push(node) : this.uniqueNodes.remove(node);
+            };
+
+            this.uniqueToAllInstances.subscribe(function(val){
+                console.log(val);
+            });
+
             this.cardComponentLookup = cardComponentLookup;
             this.configKeys = ko.observableArray();
             this.disposables = [];
@@ -140,6 +151,27 @@ define([
             var nodesSubscription = nodes.subscribe(function(){
                 this.parseNodes(attributes);
             }, this);
+
+            this.widgets().forEach(function(widget){
+                widget.node.isUnique = ko.observable(false);
+            });
+
+            this.uniqueNodes = ko.pureComputed(function(){
+                var res = [];
+                self.widgets().forEach(function(widget) {
+                    if (widget.node.isUnique()) {
+                        res.push(widget.node.nodeid);
+                    }
+                });
+                return res;
+            });
+
+            var updateConfigsWithUniqueNodes = function(val) {
+                self.configJSON({uniqueNodes: val});
+                console.log(self.configJSON);
+            }
+
+            this.uniqueNodes.subscribe(updateConfigsWithUniqueNodes);
 
             this.disposables.push(componentIdSubscription);
             this.disposables.push(cardSubscription);

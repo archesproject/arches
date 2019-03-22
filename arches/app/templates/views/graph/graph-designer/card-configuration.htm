@@ -80,7 +80,7 @@
                 </div>
 
                 <!-- Enable help -->
-                <div data-bind="component: { name: 'views/components/simple-switch', params: {value: model.helpenabled, config:{label: '{% trans "Enable Card-level help" %}', subtitle: '{% trans "Provide specific user guidance for this card" %}'}}}"></div>
+                <div data-bind="component: { name: 'views/components/simple-switch', params: {value: model.helpenabled, config:{label: '{% trans "Enable Card-level help!" %}', subtitle: '{% trans "Provide specific user guidance for this card" %}'}}}"></div>
 
                 <!-- Tertiary Panel For Card Help Text-->
                 <div class="" style="display: none;" data-bind="visible: model.helpenabled">
@@ -108,6 +108,17 @@
 
                         </div>
                     </div>
+                </div>
+                <div class="panel-section-title dark-colored-text pad-top">
+                    {% trans "Unique Values" %}
+                </div>
+                <div class="form-divider">
+                <div data-bind="component: { name: 'views/components/simple-switch', params: {value: model.uniqueToAllInstances, config:{label: 'Unique to all resource instances?'}}}"></div>
+                <!-- ko if: widgets().length > 0 -->
+                <div data-bind="foreach: {data: widgets(), as: 'widget'}">
+                    <div data-bind="component: { name: 'views/components/simple-switch', params: {value: widget.node.isUnique, config:{label: widget.label()}}}"></div>
+                </div>
+                <!--/ko-->
                 </div>
             </div>
         </div>
