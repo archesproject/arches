@@ -374,7 +374,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         {% for p in plugins %}
                                         <li{% if main_script == "views/plugin" and plugin.pluginid == p.pluginid  %} class="active-sub"{% endif %}>
-                                            {% if p.slug is not None %}
+                                            {% if p.name == "Dashboard" %}
+                                            <a href="{% url 'plugins' p.pluginid %}" data-bind="css: {'nav-item-disabled': !inSearch() }" alt="Click Search to use Dashboard">
+                                            {% elif p.slug is not None %}
                                             <a href="{% url 'plugins' p.slug %}" data-bind="click: navigate.bind(this, '{% url 'plugins' p.slug %}') ">
                                             {% else %}
                                             <a href="{% url 'plugins' p.pluginid %}" data-bind="click: navigate.bind(this, '{% url 'plugins' p.pluginid %}') ">
