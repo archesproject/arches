@@ -61,6 +61,17 @@ dl.inline-flex dd {
     width: 50px;
 }
 
+.nav-item-disabled {
+    background-color: #9eacc1;
+    color: black;
+    pointer-events: none;
+    cursor: default;
+}
+
+.nav-item-disabled i {
+    color: black;
+}
+
 .navbar-header {
     height: 50px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.4);

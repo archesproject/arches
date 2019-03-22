@@ -58,6 +58,10 @@ define([
                 window.nifty.window.trigger('resize');
             });
 
+            options.viewModel.inSearch = ko.pureComputed(function() {
+                return window.location.pathname === "/search" || window.location.pathname === "/plugins/c8261a41-a409-4e45-b049-c925c28a57da";
+            });
+
             PageView.prototype.constructor.call(this, options);
             return this;
         }
