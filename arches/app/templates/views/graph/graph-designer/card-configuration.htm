@@ -109,17 +109,28 @@
                         </div>
                     </div>
                 </div>
+
+
+                <!--ko if: model.widgets().length > 0 -->
                 <div class="panel-section-title dark-colored-text pad-top">
                     {% trans "Unique Values" %}
                 </div>
+
                 <div class="form-divider">
-                <div data-bind="component: { name: 'views/components/simple-switch', params: {value: model.uniqueToAllInstances, config:{label: 'Unique to all resource instances?'}}}"></div>
-                <!-- ko if: widgets().length > 0 -->
-                <div data-bind="foreach: {data: widgets(), as: 'widget'}">
-                    <div data-bind="component: { name: 'views/components/simple-switch', params: {value: widget.node.isUnique, config:{label: widget.label()}}}"></div>
+                    <!--ko if: model.uniqueConstraints().length > 0 -->
+                    <div class="constraint-selection" data-bind="foreach: {data: model.uniqueConstraints(), as: 'constraint'}">
+                        <div class="dropdown">
+                            <input class="" style="display:inline-block;"
+                            data-bind="select2Query: {
+                                select2Config: getSelect2ConstraintConfig('{% trans "Select Nodes" %}')
+                            }">
+                        </div>
+                        <div data-bind="component: { name: 'views/components/simple-switch', params: {value: constraint.uniqueToAllInstances, config:{label: 'Unique to all resource instances?'}}}"></div>
+                    </div>
+                    <!--/ko-->
                 </div>
                 <!--/ko-->
-                </div>
+
             </div>
         </div>
     </div>

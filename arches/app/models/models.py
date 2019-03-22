@@ -67,6 +67,7 @@ class CardModel(models.Model):
 
 class ConstraintModel(models.Model):
     constraintid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    uniquetoallinstances = models.BooleanField(default=False)
     card = models.ForeignKey('CardModel', db_column='cardid')
     nodes = models.ManyToManyField(to='Node', through='ConstraintXNode')
 

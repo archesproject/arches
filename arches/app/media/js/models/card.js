@@ -7,8 +7,9 @@ define([
     'knockout',
     'knockout-mapping',
     'card-components',
+    'viewmodels/card-constraints',
     'utils/dispose'
-], function(_, arches, AbstractModel, NodeModel, CardWidgetModel, ko, koMapping, cardComponentLookup, dispose) {
+], function(_, arches, AbstractModel, NodeModel, CardWidgetModel, ko, koMapping, cardComponentLookup, CardConstraintsViewModel, dispose) {
     var CardModel = AbstractModel.extend({
         /**
         * A backbone model to manage card data
@@ -45,6 +46,12 @@ define([
             this.sortorder = ko.observable();
             this.disabled = ko.observable();
             this.component_id = ko.observable();
+            this.constraints = ko.observableArray([
+                {
+                    uniqueToAllInstances: false,
+                    nodeIds: []
+                }
+            ]);
 
             this.set('cards', this.cards);
             this.set('nodes', this.nodes);
@@ -69,17 +76,7 @@ define([
             this.set('disabled', this.disabled);
             this.set('component_id', this.component_id);
             this.set('config', {});
-
-            this.uniqueNodes = ko.observableArray([]);
-            this.uniqueToAllInstances = ko.observable(false);
-
-            this.toggleUniqueConstraint = function(node){
-                _.contains(this.uniqueNodes(), node) === false ? this.uniqueNodes.push(node) : this.uniqueNodes.remove(node);
-            };
-
-            this.uniqueToAllInstances.subscribe(function(val){
-                console.log(val);
-            });
+            this.set('constraints', this.constraints);
 
             this.cardComponentLookup = cardComponentLookup;
             this.configKeys = ko.observableArray();
@@ -152,26 +149,28 @@ define([
                 this.parseNodes(attributes);
             }, this);
 
-            this.widgets().forEach(function(widget){
-                widget.node.isUnique = ko.observable(false);
+            this.updateConstraints = function(){
+                var self = this;
+                return function(){
+                    console.log(self.constraints());
+                    var updatedConstraints = self.uniqueConstraints().map(function(c){
+                        return {
+                            nodeIds: ko.unwrap(c.nodeIds),
+                            uniqueToAllInstances: ko.unwrap(c.uniqueToAllInstances)
+                        };
+                    });
+                    self.constraints(updatedConstraints);
+                };
+            };
+
+            this.uniqueConstraints = ko.observableArray();
+            this.constraints().forEach(function(constraint){
+                constraint.widgets = self.widgets();
+                var constraintViewModel = new CardConstraintsViewModel(constraint);
+                constraintViewModel.nodeIds.subscribe(self.updateConstraints());
+                constraintViewModel.uniqueToAllInstances.subscribe(self.updateConstraints());
+                self.uniqueConstraints.push(constraintViewModel);
             });
-
-            this.uniqueNodes = ko.pureComputed(function(){
-                var res = [];
-                self.widgets().forEach(function(widget) {
-                    if (widget.node.isUnique()) {
-                        res.push(widget.node.nodeid);
-                    }
-                });
-                return res;
-            });
-
-            var updateConfigsWithUniqueNodes = function(val) {
-                self.configJSON({uniqueNodes: val});
-                console.log(self.configJSON);
-            }
-
-            this.uniqueNodes.subscribe(updateConfigsWithUniqueNodes);
 
             this.disposables.push(componentIdSubscription);
             this.disposables.push(cardSubscription);
@@ -315,7 +314,16 @@ define([
                     widget.label(originalWidgetData.label);
                     widget.widget_id(originalWidgetData.widget_id);
                 }
+                this._attributes.data.constraints.forEach(function(constraint){
+                    constraint.widgets = this.widgets();
+                    var constraintViewModel = new CardConstraintsViewModel(constraint);
+                    constraintViewModel.nodeIds.subscribe(this.updateConstraints());
+                    constraintViewModel.uniqueToAllInstances.subscribe(this.updateConstraints());
+                    this.uniqueConstraints.push(constraintViewModel);
+                });
             }, this);
+
+
             this.parse(this._attributes);
         },
 
