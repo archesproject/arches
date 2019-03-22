@@ -1,9 +1,14 @@
 define([
-    'knockout',
-], function(ko) {
+    'knockout', 'viewmodels/workflow-step', 'views/components/workflows/new-tile-step'
+], function(ko, Step, NewTileStep) {
     var Workflow = function(config) {
         var self = this;
-        this.steps = ko.observableArray(config.steps);
+        this.steps = ko.observableArray([
+            new Step({title: 'Step 1', description: 'A description here', component: 'new-tile-step'}),
+            new Step({title: 'Step 2', description: 'A very long and verboser description here that explains many different things about the workflow step'}),
+            new Step({title: 'Step 3'}),
+            new Step({title: 'Step 4', description: 'Another description here'})
+        ]);
         this.activeStepIndex = ko.observable(0);
         this.activeStep = ko.computed(function() {
             this.steps().forEach(function(step){
