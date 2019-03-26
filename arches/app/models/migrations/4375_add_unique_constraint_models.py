@@ -18,6 +18,7 @@ class Migration(migrations.Migration):
             name='ConstraintModel',
             fields=[
                 ('constraintid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                ('uniquetoallinstances', models.BooleanField(default=False)),
                 ('card', models.ForeignKey(db_column='cardid', on_delete=django.db.models.deletion.CASCADE, to='models.CardModel')),
             ],
             options={
