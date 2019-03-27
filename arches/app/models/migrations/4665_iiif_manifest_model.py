@@ -17,4 +17,38 @@ class Migration(migrations.Migration):
         migrations.DeleteModel(
             name='IIIFManifest',
         ),
-    ]
+        migrations.RunSQL(
+            """
+            DELETE FROM widgets WHERE datatype IN ('iiif-drawing', 'csv-chart-json');
+            """,
+            """
+            INSERT INTO widgets(
+                widgetid,
+                name,
+                component,
+                datatype,
+                defaultconfig)
+            VALUES(
+                '10000000-0000-0000-0000-000000000020',
+                'csv-chart-widget',
+                'views/components/widgets/csv-chart',
+                'csv-chart-json',
+                '{"acceptedFiles": "", "maxFilesize": "200"}'
+            );
+
+            INSERT INTO widgets(
+                widgetid,
+                name,
+                component,
+                datatype,
+                defaultconfig)
+            VALUES(
+                '10000000-0000-0000-0000-000000000022',
+                'iiif-widget',
+                'views/components/widgets/iiif',
+                'iiif-drawing',
+                '{ "placeholder": "", "options": [], "nameLabel": "Name", "typeLabel": "Type"}'
+            );
+            """
+            )
+      ]
