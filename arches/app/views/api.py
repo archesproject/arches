@@ -287,6 +287,15 @@ class Resources(APIBase):
                 except:
                     page = 1
 
+                try:
+                    graphid = request.GET.get('model', None)
+                    # is a UUID?
+                    _ = uuid.UUID(graphid)
+                    resource_list = Resource.objects.filter(graph=graphid)
+                except ValueError as e:
+                    graphid = None
+                    resource_list = Resource.objects
+
                 start = ((page - 1) * page_size)
                 end = start + page_size
 
@@ -301,6 +310,9 @@ class Resources(APIBase):
                     "ldp:contains": ["%s%s" % (base_url, resourceid) for resourceid in list(Resource.objects.values_list('pk', flat=True).
                         exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_ID).order_by('pk')[start:end])]
                 }
+
+                if graphid is not None:
+                    out["label"] = str(graphid)
 
             return JSONResponse(out, indent=indent)
         else:
