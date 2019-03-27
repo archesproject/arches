@@ -18,8 +18,10 @@ class Migration(migrations.Migration):
             name='ConstraintModel',
             fields=[
                 ('constraintid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ('uniquetoallinstances', models.BooleanField(default=False)),
-                ('card', models.ForeignKey(db_column='cardid', on_delete=django.db.models.deletion.CASCADE, to='models.CardModel')),
+                ('card', models.ForeignKey(
+                    db_column='cardid',
+                    on_delete=django.db.models.deletion.CASCADE,
+                    to='models.CardModel')),
             ],
             options={
                 'db_table': 'card_constraints',
@@ -30,8 +32,14 @@ class Migration(migrations.Migration):
             name='ConstraintXNode',
             fields=[
                 ('id', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ('constraint', models.ForeignKey(db_column='constraintid', on_delete=django.db.models.deletion.CASCADE, to='models.ConstraintModel')),
-                ('node', models.ForeignKey(db_column='nodeid', on_delete=django.db.models.deletion.CASCADE, to='models.Node')),
+                ('constraint', models.ForeignKey(
+                    db_column='constraintid',
+                    on_delete=django.db.models.deletion.CASCADE,
+                    to='models.ConstraintModel')),
+                ('node', models.ForeignKey(
+                    db_column='nodeid',
+                    on_delete=django.db.models.deletion.CASCADE,
+                    to='models.Node')),
             ],
             options={
                 'db_table': 'constraints_x_nodes',

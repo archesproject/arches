@@ -172,7 +172,7 @@ define([
                     constraintViewModel.uniqueToAllInstances.subscribe(self.updateConstraints());
                     self.uniqueConstraints.push(constraintViewModel);
                 });
-            }
+            };
 
             this.setConstraints(this.constraints());
 
