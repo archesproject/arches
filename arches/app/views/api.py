@@ -312,7 +312,12 @@ class Resources(APIBase):
                 base_url = "%s%s" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT,
                                      reverse('resources', args=['']).lstrip('/'))
                 out = {
-                    "@context": "https://www.w3.org/ns/ldp/",
+                    "@context": {
+                        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+                        "label": "rdfs:label",
+                        "seeAlso": { "@id": "rdfs:seeAlso", "@type": "@id" },
+                        "ldp": "https://www.w3.org/ns/ldp/"
+                    },
                     "@id": "",
                     "@type": "ldp:BasicContainer",
                     # Here we actually mean the name
