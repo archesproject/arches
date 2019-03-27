@@ -324,6 +324,12 @@ class Resources(APIBase):
                 if graph_id is not None:
                     out["label"] = "Graph ID: %s" % str(graph_id)
 
+                if len(out['ldp:contains']) == page_size:
+                    full_url = request.build_absolute_uri().split("?")[0]
+                    params = request.GET.copy()
+                    params['page'] = page + 1
+                    out['rdfs:seeAlso'] = "%s?%s" % (full_url, params.urlencode())
+
             return JSONResponse(out, indent=indent)
         else:
             return JSONResponse(status=403)
