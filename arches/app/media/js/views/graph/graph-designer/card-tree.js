@@ -26,7 +26,23 @@ define([
         var scrollTo = ko.observable();
         var cachedFlatTree;
         var cardList = data.cards;
-
+        data.cards.forEach(function(card){
+            var cardConstraints = [];
+            data.constraints.forEach(function(constraint){
+                if (card.cardid === constraint.card_id) {
+                    cardConstraints.push(constraint);
+                }
+            });
+            if (cardConstraints.length === 0) {
+                cardConstraints.push({
+                    uniquetoallinstances: false,
+                    nodeIds:[],
+                    cardid: undefined,
+                    constraintid: undefined
+                });
+            }
+            card.constraints = cardConstraints;
+        });
         this.flattenTree = function(parents, flatList) {
             _.each(ko.unwrap(parents), function(parent) {
                 flatList.push(parent);
