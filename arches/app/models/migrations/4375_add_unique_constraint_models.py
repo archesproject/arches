@@ -22,6 +22,7 @@ class Migration(migrations.Migration):
                     db_column='cardid',
                     on_delete=django.db.models.deletion.CASCADE,
                     to='models.CardModel')),
+                ('uniquetoallinstances', models.BooleanField(default=False)),
             ],
             options={
                 'db_table': 'card_constraints',
