@@ -6,9 +6,9 @@ define([
         this.classActive = 'workflow-step-icon active';
         this.classComplete = 'workflow-step-icon complete';
         this.icon = 'fa-chevron-circle-right';
-        this.title = 'Title';
-        this.subtitle = 'Subtitle';
-        this.description = 'description of step here';
+        this.title = config.title || 'Title';
+        this.subtitle = config.subtitle || 'Subtitle';
+        this.description = config.description || 'description of step here';
         this.complete = ko.observable(false);
         this.active = ko.observable(false);
 

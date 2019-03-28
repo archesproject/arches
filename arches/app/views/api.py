@@ -14,6 +14,7 @@ from django.http.request import QueryDict
 from django.core import management
 from django.core.urlresolvers import reverse
 from django.utils.decorators import method_decorator
+from django.utils.translation import ugettext as _
 from revproxy.views import ProxyView
 from oauth2_provider.views import ProtectedResourceView
 from arches.app.models import models
@@ -164,7 +165,7 @@ class Surveys(APIBase):
             for project in projects:
                 project.deactivate_expired_survey()
                 projects_for_couch.append(project.serialize_for_mobile())
-            
+
             for project in projects_for_couch:
                 project['mapboxkey'] = settings.MAPBOX_API_KEY
                 permitted_cards = set()
@@ -299,7 +300,7 @@ class Resources(APIBase):
                     # Here we actually mean the name
                     #"label": str(model.name),
                     "ldp:contains": ["%s%s" % (base_url, resourceid) for resourceid in list(Resource.objects.values_list('pk', flat=True).
-                        exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_ID).order_by('pk')[start:end])]
+                                                                                            exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_ID).order_by('pk')[start:end])]
                 }
 
             return JSONResponse(out, indent=indent)
@@ -496,3 +497,134 @@ class Concepts(APIBase):
                 return JSONResponse(status=500, reason=e)
 
         return JSONResponse(ret, indent=indent)
+
+
+def get_resource_relationship_types():
+    resource_relationship_types = Concept().get_child_collections('00000000-0000-0000-0000-000000000005')
+    default_relationshiptype_valueid = None
+    for relationship_type in resource_relationship_types:
+        if relationship_type[0] == '00000000-0000-0000-0000-000000000007':
+            default_relationshiptype_valueid = relationship_type[2]
+    relationship_type_values = {'values': [{'id': str(c[2]), 'text':str(
+        c[1])} for c in resource_relationship_types], 'default': str(default_relationshiptype_valueid)}
+    return relationship_type_values
+
+
+class Card(APIBase):
+
+    def get(self, request, nodegroupid):
+        resource_instance = None
+        card = models.CardModel.objects.get(nodegroup_id=nodegroupid)
+        graph = card.graph
+        resourceid = ''
+        nodes = graph.node_set.all()
+        resource_graphs = models.GraphModel.objects.exclude(
+            pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
+        ontologyclass = [node for node in nodes if node.istopnode is True][0].ontologyclass
+        relationship_type_values = get_resource_relationship_types()
+
+        nodegroups = []
+        editable_nodegroups = []
+        for node in nodes:
+            if node.is_collector:
+                added = False
+                if request.user.has_perm('write_nodegroup', node.nodegroup):
+                    editable_nodegroups.append(node.nodegroup)
+                    nodegroups.append(node.nodegroup)
+                    added = True
+                if not added and request.user.has_perm('read_nodegroup', node.nodegroup):
+                    nodegroups.append(node.nodegroup)
+
+        nodes = nodes.filter(nodegroup__in=nodegroups)
+        cards = graph.cardmodel_set.order_by('sortorder').filter(
+            nodegroup__in=nodegroups).prefetch_related('cardxnodexwidget_set')
+        cardwidgets = [widget for widgets in [card.cardxnodexwidget_set.order_by(
+            'sortorder').all() for card in cards] for widget in widgets]
+        widgets = models.Widget.objects.all()
+        card_components = models.CardComponent.objects.all()
+        datatypes = models.DDataType.objects.all()
+        user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
+        is_system_settings = False
+
+        if resource_instance is None:
+            tiles = []
+            displayname = _('New Resource')
+        else:
+            displayname = resource_instance.displayname
+            if displayname == 'undefined':
+                displayname = _('Unnamed Resource')
+            if str(resource_instance.graph_id) == settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
+                is_system_settings = True
+                displayname = _("System Settings")
+
+            tiles = resource_instance.tilemodel_set.order_by('sortorder').filter(nodegroup__in=nodegroups)
+            provisionaltiles = []
+            for tile in tiles:
+                append_tile = True
+                isfullyprovisional = False
+                if tile.provisionaledits is not None:
+                    if len(tile.provisionaledits.keys()) > 0:
+                        if len(tile.data) == 0:
+                            isfullyprovisional = True
+                        if user_is_reviewer is False:
+                            if str(request.user.id) in tile.provisionaledits:
+                                tile.provisionaledits = {
+                                    str(request.user.id): tile.provisionaledits[str(request.user.id)]}
+                                tile.data = tile.provisionaledits[str(request.user.id)]['value']
+                            else:
+                                if isfullyprovisional is True:
+                                    # if the tile IS fully provisional and the current user is not the owner,
+                                    # we don't send that tile back to the client.
+                                    append_tile = False
+                                else:
+                                    # if the tile has authoritaive data and the current user is not the owner,
+                                    # we don't send the provisional data of other users back to the client.
+                                    tile.provisionaledits = None
+                if append_tile == True:
+                    provisionaltiles.append(tile)
+            tiles = provisionaltiles
+        map_layers = models.MapLayer.objects.all()
+        map_markers = models.MapMarker.objects.all()
+        map_sources = models.MapSource.objects.all()
+        geocoding_providers = models.Geocoder.objects.all()
+        templates = models.ReportTemplate.objects.all()
+
+        cards = JSONSerializer().serializeToPython(cards)
+        editable_nodegroup_ids = [str(nodegroup.pk) for nodegroup in editable_nodegroups]
+        for card in cards:
+            card['is_writable'] = False
+            if str(card['nodegroup_id']) in editable_nodegroup_ids:
+                card['is_writable'] = True
+
+        context = {
+            # main_script: main_script,
+            'resourceid': resourceid,
+            'displayname': displayname,
+            'graphid': graph.graphid,
+            'graphiconclass': graph.iconclass,
+            'graphname': graph.name,
+            'ontologyclass': ontologyclass,
+            'resource_graphs': resource_graphs,
+            'relationship_types': relationship_type_values,
+            'widgets': widgets,
+            'widgets_json': JSONSerializer().serialize(widgets),
+            'card_components': card_components,
+            'card_components_json': JSONSerializer().serialize(card_components),
+            'tiles': JSONSerializer().serialize(tiles),
+            'cards': JSONSerializer().serialize(cards),
+            'nodegroups': JSONSerializer().serialize(nodegroups),
+            'nodes': JSONSerializer().serialize(nodes),
+            'cardwidgets': JSONSerializer().serialize(cardwidgets),
+            'datatypes_json': JSONSerializer().serialize(datatypes, exclude=['iconclass', 'modulename', 'classname']),
+            'map_layers': map_layers,
+            'map_markers': map_markers,
+            'map_sources': map_sources,
+            'geocoding_providers': geocoding_providers,
+            'user_is_reviewer': json.dumps(user_is_reviewer),
+            'report_templates': templates,
+            'templates_json': JSONSerializer().serialize(templates, sort_keys=False, exclude=['name', 'description']),
+            'graph_json': JSONSerializer().serialize(graph),
+            'is_system_settings': is_system_settings
+        }
+
+        return JSONResponse(context, indent=4)
