@@ -22,6 +22,7 @@ import json
 import pytz
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 from arches.app.models import models
@@ -190,6 +191,34 @@ class Tile(models.TileModel):
                 edit = edits[str(user.id)]
         return edit
 
+    def check_for_constraint_violation(self, request):
+        card = models.CardModel.objects.get(nodegroup=self.nodegroup)
+        constraints = models.ConstraintModel.objects.filter(card=card)
+        if constraints.count() > 0:
+            for constraint in constraints:
+                if constraint.uniquetoallinstances is True:
+                    tiles = models.TileModel.objects.filter(nodegroup=self.nodegroup)
+                else:
+                    tiles = models.TileModel.objects.filter(
+                        Q(resourceinstance_id=self.resourceinstance.resourceinstanceid) &
+                        Q(nodegroup=self.nodegroup))
+                nodes = [node for node in constraint.nodes.all()]
+                for tile in tiles:
+                    match = False
+                    duplicate_values = []
+                    for node in nodes:
+                        datatype_factory = DataTypeFactory()
+                        datatype = datatype_factory.get_instance(node.datatype)
+                        nodeid = str(node.nodeid)
+                        if datatype.values_match(tile.data[nodeid], self.data[nodeid]):
+                            match = True
+                            duplicate_values.append(datatype.get_display_value(tile, node))
+                        else:
+                            return False
+                    if match is True:
+                        message = _('This card violates a unique constraint. The following value is already saved: ')
+                        raise TileValidationError(message + (', ').join(duplicate_values))
+
     def check_for_missing_nodes(self, request):
         missing_nodes = []
         for nodeid, value in self.data.iteritems():
@@ -235,6 +264,7 @@ class Tile(models.TileModel):
         newprovisionalvalue = None
         oldprovisionalvalue = None
         self.check_for_missing_nodes(request)
+        self.check_for_constraint_violation(request)
 
         try:
             if user is None and request is not None:

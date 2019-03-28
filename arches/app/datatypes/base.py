@@ -24,6 +24,9 @@ class BaseDataType(object):
         """
         pass
 
+    def values_match(self, value1, value2):
+        return value1 == value2
+
     def transform_import_values(self, value, nodeid):
         """
         Transforms values from probably string/wkt representation to specified

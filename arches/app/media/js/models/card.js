@@ -7,8 +7,9 @@ define([
     'knockout',
     'knockout-mapping',
     'card-components',
+    'viewmodels/card-constraints',
     'utils/dispose'
-], function(_, arches, AbstractModel, NodeModel, CardWidgetModel, ko, koMapping, cardComponentLookup, dispose) {
+], function(_, arches, AbstractModel, NodeModel, CardWidgetModel, ko, koMapping, cardComponentLookup, CardConstraintsViewModel, dispose) {
     var CardModel = AbstractModel.extend({
         /**
         * A backbone model to manage card data
@@ -45,6 +46,8 @@ define([
             this.sortorder = ko.observable();
             this.disabled = ko.observable();
             this.component_id = ko.observable();
+            this.constraints = ko.observableArray();
+            this.uniqueConstraints = ko.observableArray();
 
             this.set('cards', this.cards);
             this.set('nodes', this.nodes);
@@ -69,6 +72,7 @@ define([
             this.set('disabled', this.disabled);
             this.set('component_id', this.component_id);
             this.set('config', {});
+            this.set('constraints', this.constraints);
 
             this.cardComponentLookup = cardComponentLookup;
             this.configKeys = ko.observableArray();
@@ -141,6 +145,37 @@ define([
                 this.parseNodes(attributes);
             }, this);
 
+            this.updateConstraints = function(){
+                var self = this;
+                return function(){
+                    var updatedConstraints = self.uniqueConstraints().map(function(c){
+                        return {
+                            nodeIds: ko.unwrap(c.nodeIds),
+                            uniquetoallinstances: ko.unwrap(c.uniqueToAllInstances),
+                            constraintid: c.constraintid,
+                            cardid: c.cardid
+                        };
+                    });
+                    self.constraints(updatedConstraints);
+                    self.set('constraints', updatedConstraints);
+                    self.constraints.valueHasMutated();
+                };
+            };
+
+            this.setConstraints = function(arr) {
+                var self = this;
+                self.uniqueConstraints.removeAll();
+                arr.forEach(function(constraint){
+                    constraint.widgets = self.widgets();
+                    var constraintViewModel = new CardConstraintsViewModel(constraint);
+                    constraintViewModel.nodeIds.subscribe(self.updateConstraints());
+                    constraintViewModel.uniqueToAllInstances.subscribe(self.updateConstraints());
+                    self.uniqueConstraints.push(constraintViewModel);
+                });
+            };
+
+            this.setConstraints(this.constraints());
+
             this.disposables.push(componentIdSubscription);
             this.disposables.push(cardSubscription);
             this.disposables.push(widgetSubscription);
@@ -202,6 +237,9 @@ define([
                     this.set('id', value);
                     this.get(key)(value);
                     break;
+                case 'constraints':
+                    this.setConstraints ? this.setConstraints(value) : this.get(key)(value);
+                    break;
                 case 'name':
                 case 'nodegroup_id':
                 case 'instructions':
@@ -225,7 +263,6 @@ define([
                     this.set(key, value);
                 }
             }, this);
-
             this._card(JSON.stringify(this.toJSON()));
         },
 
@@ -283,6 +320,7 @@ define([
                     widget.label(originalWidgetData.label);
                     widget.widget_id(originalWidgetData.widget_id);
                 }
+                // this.setConstraints(this._attributes.data.constraints);
             }, this);
             this.parse(this._attributes);
         },

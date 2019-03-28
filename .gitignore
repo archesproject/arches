@@ -34,3 +34,4 @@ dist
 jsdoc.json
 migrate_graphs.py
 djcp.sh
+.vscode
