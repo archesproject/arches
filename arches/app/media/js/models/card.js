@@ -238,8 +238,7 @@ define([
                     this.get(key)(value);
                     break;
                 case 'constraints':
-                    // this.set(key, koMapping.fromJS(value));
-                    this.get(key)(value);
+                    this.setConstraints ? this.setConstraints(value) : this.get(key)(value);
                     break;
                 case 'name':
                 case 'nodegroup_id':
