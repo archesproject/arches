@@ -14,6 +14,7 @@ from django.http.request import QueryDict
 from django.core import management
 from django.core.urlresolvers import reverse
 from django.utils.decorators import method_decorator
+from django.utils.translation import ugettext as _
 from revproxy.views import ProxyView
 from oauth2_provider.views import ProtectedResourceView
 from arches.app.models import models
@@ -164,7 +165,7 @@ class Surveys(APIBase):
             for project in projects:
                 project.deactivate_expired_survey()
                 projects_for_couch.append(project.serialize_for_mobile())
-            
+
             for project in projects_for_couch:
                 project['mapboxkey'] = settings.MAPBOX_API_KEY
                 permitted_cards = set()
@@ -299,7 +300,7 @@ class Resources(APIBase):
                     # Here we actually mean the name
                     #"label": str(model.name),
                     "ldp:contains": ["%s%s" % (base_url, resourceid) for resourceid in list(Resource.objects.values_list('pk', flat=True).
-                        exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_ID).order_by('pk')[start:end])]
+                                                                                            exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_ID).order_by('pk')[start:end])]
                 }
 
             return JSONResponse(out, indent=indent)
@@ -497,7 +498,6 @@ class Concepts(APIBase):
 
         return JSONResponse(ret, indent=indent)
 
-from django.utils.translation import ugettext as _
 
 def get_resource_relationship_types():
     resource_relationship_types = Concept().get_child_collections('00000000-0000-0000-0000-000000000005')
@@ -509,8 +509,8 @@ def get_resource_relationship_types():
         c[1])} for c in resource_relationship_types], 'default': str(default_relationshiptype_valueid)}
     return relationship_type_values
 
-class Card(APIBase):
 
+class Card(APIBase):
 
     def get(self, request, nodegroupid):
         resource_instance = None
@@ -596,9 +596,8 @@ class Card(APIBase):
             if str(card['nodegroup_id']) in editable_nodegroup_ids:
                 card['is_writable'] = True
 
-
         context = {
-            #main_script: main_script,
+            # main_script: main_script,
             'resourceid': resourceid,
             'displayname': displayname,
             'graphid': graph.graphid,
