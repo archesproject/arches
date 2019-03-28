@@ -1,43 +1,37 @@
 define([
-    'knockout', 'viewmodels/workflow-step', 'views/components/workflows/new-tile-step'
-], function(ko, Step, NewTileStep) {
+    'knockout',
+    'viewmodels/workflow-step'
+], function(ko, Step) {
     var Workflow = function(config) {
         var self = this;
 
-        fetch('/cards/042fdc54-fa30-11e6-9e3e-026d961c88e6', {
-            method: 'GET'
-        }).then(function(response){
-            if(response.status == 200){
-                return response.json();
-            }
-        }).then(function(response){
-            this.steps = ko.observableArray([
-                new Step({title: 'Step 1', description: 'A description here', component: 'new-tile-step'}),
-                new Step({title: 'Step 2', description: 'A very long and verboser description here that explains many different things about the workflow step'}),
-                new Step({title: 'Step 3'}),
-                new Step({title: 'Step 4', description: 'Another description here'})
-            ]);
-            this.activeStepIndex = ko.observable(0);
-            this.activeStep = ko.computed(function() {
-                this.steps().forEach(function(step){
-                    step.active(false);
-                });
-                var activeStep = self.steps()[self.activeStepIndex()];
-                activeStep.active(true);
-                return activeStep;
-            }, this);
-        })
+        this.steps = config.steps || [];
+        this.activeStep = ko.observable();
+        this.ready = ko.observable(false);
 
+        this.ready.subscribe(function() {
+            self.steps.forEach(function(step, i) {
+                if (!(self.steps[i] instanceof Step)) {
+                    self.steps[i] = new Step(step);
+                }
+                self.steps[i]._index = i;
+            });
+            if (self.steps.length > 0) {
+                self.activeStep(self.steps[0]);
+            }
+        });
 
         this.next = function(){
-            if (self.activeStepIndex() < self.steps().length - 1) {
-                this.activeStep().complete(true);
-                self.activeStepIndex(self.activeStepIndex() + 1);
+            var activeStep = self.activeStep();
+            if (activeStep && activeStep._index < self.steps.length - 1) {
+                activeStep.complete(true);
+                self.activeStep(self.steps[activeStep._index+1]);
             }
         };
         this.back = function(){
-            if (self.activeStepIndex() > 0) {
-                self.activeStepIndex(self.activeStepIndex() - 1);
+            var activeStep = self.activeStep();
+            if (activeStep && activeStep._index > 0) {
+                self.activeStep(self.steps[activeStep._index-1]);
             }
         };
     };
