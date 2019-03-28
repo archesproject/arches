@@ -9,7 +9,7 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4665_remove_disco_widgets'),
+        ('models', '4665_iiif_manifest_model'),
     ]
 
     operations = [
