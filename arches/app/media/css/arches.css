@@ -540,6 +540,46 @@ input[type="checkbox"] {
     flex-grow: inherit;
 }
 
+.workflow-select-plugin {
+    padding: 20px;
+}
+
+.workflow-select-card-container {
+    display: flex;
+    flex-grow: inherit;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.workflow-select-card {
+    width: 180px;
+    height: 180px;
+    padding: 10px;
+    color: white;
+    text-align: center;
+    border: 1px solid black;
+    border-radius: 1px;
+    margin: 10px;
+}
+
+.workflow-select-wf-circle {
+    width: 80px;
+    height: 80px;
+    display: inline-block;
+    text-align: center;
+    padding: 18px;
+    border-radius: 40px;
+}
+
+.workflow-select-wf-icon {
+    color: white;
+    font-size: 40px;
+}
+
+.workflow-select-desc {
+    font-size: 11px;
+}
+
 .summary-panel {
     background: #f9f9f9;
     margin-top: -30px;

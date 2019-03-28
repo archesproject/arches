@@ -1,5 +1,7 @@
 define([
-    'knockout', 'viewmodels/workflow-step', 'views/components/workflows/new-tile-step'
+    'knockout',
+    'viewmodels/workflow-step', 
+    // 'views/components/workflows/new-tile-step'
 ], function(ko, Step, NewTileStep) {
     var Workflow = function(config) {
         var self = this;
