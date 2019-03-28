@@ -63,6 +63,8 @@ class Graph(models.GraphModel):
         self.widgets = {}
         self._nodegroups_to_delete = []
         self._functions = []
+        self._card_constraints = []
+        self._constraints_x_nodes = []
 
         if args:
             if isinstance(args[0], dict):
@@ -236,6 +238,20 @@ class Graph(models.GraphModel):
         self.edges[edge.pk] = edge
         return edge
 
+    def add_card_contraint(self, constraint, card):
+        unique_to_all = constraint.get('uniquetoallinstances', False)
+        constraint_model = models.ConstraintModel()
+        constraint_model.constraintid = constraint.get('constraintid', None)
+        constraint_model.uniquetoallinstances = constraint.get('uniquetoallinstances', False)
+        constraint_model.card = card
+        self._card_constraints.append(constraint_model)
+        for nodeid in constraint.get('nodes', []):
+            constraint_x_node = {
+                'constraint': constraint_model,
+                'node': nodeid
+            }
+            self._constraints_x_nodes.append(constraint_x_node)
+
     def add_card(self, card):
         """
         Adds a card to this graph
@@ -260,6 +276,9 @@ class Graph(models.GraphModel):
             card.component_id = cardobj.get('component_id', uuid.UUID('f05e4d3a-53c1-11e8-b0ea-784f435179ea'))
             card.nodegroup_id = uuid.UUID(str(cardobj.get('nodegroup_id', '')))
             card.nodegroup = self.get_or_create_nodegroup(nodegroupid=card.nodegroup_id)
+            constraints = cardobj.get('constraints', '')
+            for constraint in constraints:
+                self.add_card_contraint(constraint, card)
 
         card.graph = self
 
@@ -339,6 +358,15 @@ class Graph(models.GraphModel):
 
             for card in self.cards.itervalues():
                 card.save()
+
+            for constraint in self._card_constraints:
+                constraint.save()
+
+            for constraint_x_node in self._constraints_x_nodes:
+                node_constraint = models.ConstraintXNode()
+                node_constraint.node = models.Node.objects.get(pk=constraint_x_node['node'])
+                node_constraint.constraint = constraint_x_node['constraint']
+                node_constraint.save()
 
             for widget in self.widgets.itervalues():
                 widget.save()
@@ -1162,6 +1190,8 @@ class Graph(models.GraphModel):
                         card.description = self.nodes[card.nodegroup_id].description
             card_dict = JSONSerializer().serializeToPython(card)
             card_dict['is_editable'] = is_editable
+            card_constraints = card.constraintmodel_set.all()
+            card_dict['constraints'] = JSONSerializer().serializeToPython(card_constraints)
             cards.append(card_dict)
 
         return cards

@@ -36,12 +36,12 @@ class Card(models.CardModel):
 
         def add_nodeconstraints(nodeids, constraint_model):
             for nodeid in nodeids:
-                print('adding nodes', nodeid)
                 node_constraint = models.ConstraintXNode()
                 node_constraint.node = models.Node.objects.get(pk=nodeid)
                 node_constraint.constraint = constraint_model
                 node_constraint.save()
 
+        constraint_models = []
         for constraint in constraints:
             constraintid = constraint.get('constraintid', None)
             unique_to_all = constraint.get('uniquetoallinstances', False)
@@ -69,7 +69,8 @@ class Card(models.CardModel):
                     constraint_model.save()
                 except ObjectDoesNotExist as e:
                     print e
-        self.constraints = constraint_model
+            constraint_models.append(constraint_model)
+        self.constraints = constraint_models
 
     def __init__(self, *args, **kwargs):
         """
