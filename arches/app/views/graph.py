@@ -167,7 +167,6 @@ class GraphDesignerView(GraphBaseView):
         datatypes_json = JSONSerializer().serialize(datatypes, exclude=['modulename', 'isgeometric'])
         branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True)
         cards = self.graph.cardmodel_set.order_by('sortorder').prefetch_related('cardxnodexwidget_set')
-        models.ConstraintModel.objects.filter(card=cards[0].cardid)
         constraints = []
         for card in cards:
             if models.ConstraintModel.objects.filter(card=card).count() > 0:
