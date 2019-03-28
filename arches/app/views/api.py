@@ -286,7 +286,7 @@ class Resources(APIBase):
                     page_size = int(request.GET.get('page_size', None))
                     if page_size > settings.API_MAX_PAGE_SIZE or page_size < 1:
                         page_size = settings.API_MAX_PAGE_SIZE
-                except:
+                except (TypeError, ValueError):
                     if hasattr(settings, "API_DEFAULT_PAGE_SIZE"):
                         page_size = settings.API_DEFAULT_PAGE_SIZE
                     else:
@@ -294,7 +294,7 @@ class Resources(APIBase):
 
                 try:
                     page = int(request.GET.get('page', None))
-                except:
+                except (TypeError, ValueError):
                     page = 1
 
                 try:
@@ -302,7 +302,7 @@ class Resources(APIBase):
                     # is a UUID?
                     _ = uuid.UUID(graph_id)
                     resource_list = Resource.objects.filter(graph=graph_id)
-                except (ValueError, TypeError) as e:
+                except (ValueError, TypeError):
                     graph_id = None
                     resource_list = Resource.objects
 
@@ -315,15 +315,18 @@ class Resources(APIBase):
                     "@context": {
                         "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
                         "label": "rdfs:label",
-                        "seeAlso": { "@id": "rdfs:seeAlso", "@type": "@id" },
+                        "seeAlso": {"@id": "rdfs:seeAlso", "@type": "@id"},
                         "ldp": "https://www.w3.org/ns/ldp/"
                     },
                     "@id": "",
                     "@type": "ldp:BasicContainer",
-                    # Here we actually mean the name
-                    #"label": str(model.name),
-                    "ldp:contains": ["%s%s" % (base_url, resourceid) for resourceid in list(resource_list.values_list('pk', flat=True).
-                        exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_ID).order_by('pk')[start:end])]
+                    "ldp:contains": [
+                        "%s%s" % (base_url, resourceid)
+                        for resourceid in list(
+                            resource_list.values_list('pk', flat=True).exclude(
+                                pk=settings.SYSTEM_SETTINGS_RESOURCE_ID).order_by('pk')[start:end]
+                            )
+                    ]
                 }
 
                 if graph_id is not None:
