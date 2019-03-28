@@ -66,7 +66,6 @@ class Card(models.CardModel):
                         Q(constraint=constraint_model) &
                         Q(node__in=nodes_to_remove)
                         ).delete()
-                    print(models.ConstraintXNode.objects.filter(Q(constraint=constraint_model)))
                     constraint_model.save()
                 except ObjectDoesNotExist as e:
                     print e
