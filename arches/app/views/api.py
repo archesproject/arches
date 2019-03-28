@@ -333,7 +333,7 @@ class Resources(APIBase):
                     full_url = request.build_absolute_uri().split("?")[0]
                     params = request.GET.copy()
                     params['page'] = page + 1
-                    out['rdfs:seeAlso'] = "%s?%s" % (full_url, params.urlencode())
+                    out['seeAlso'] = "%s?%s" % (full_url, params.urlencode())
 
             return JSONResponse(out, indent=indent)
         else:
