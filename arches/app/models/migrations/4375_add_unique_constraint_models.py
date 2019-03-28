@@ -21,8 +21,7 @@ class Migration(migrations.Migration):
                 ('card', models.ForeignKey(
                     db_column='cardid',
                     on_delete=django.db.models.deletion.CASCADE,
-                    to='models.CardModel')),
-                ('uniquetoallinstances', models.BooleanField(default=False)),
+                    to='models.CardModel'))
             ],
             options={
                 'db_table': 'card_constraints',
@@ -51,5 +50,10 @@ class Migration(migrations.Migration):
             model_name='constraintmodel',
             name='nodes',
             field=models.ManyToManyField(through='models.ConstraintXNode', to='models.Node'),
+        ),
+        migrations.AddField(
+            model_name='constraintmodel',
+            name='uniquetoallinstances',
+            field=models.BooleanField(default=False),
         ),
     ]
