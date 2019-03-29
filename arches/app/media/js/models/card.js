@@ -132,7 +132,6 @@ define([
                         widgets: self.widgets()
                     });
                     constraintViewModel.constraint.nodes.subscribe(function(val){
-                        console.log(val);
                         self.toJSON();
                     }, self)
                     self.constraints.push(constraintViewModel);
