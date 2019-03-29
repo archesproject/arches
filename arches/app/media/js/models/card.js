@@ -131,9 +131,9 @@ define([
                         constraint: koMapping.fromJS(constraint),
                         widgets: self.widgets()
                     });
-                    constraintViewModel.constraint.nodes.subscribe(function(val){
+                    constraintViewModel.constraint.nodes.subscribe(function(){
                         self.toJSON();
-                    }, self)
+                    }, self);
                     self.constraints.push(constraintViewModel);
                 });
             };
