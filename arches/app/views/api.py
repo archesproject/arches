@@ -314,9 +314,12 @@ class Resources(APIBase):
                 out = {
                     "@context": {
                         "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+                        "as": "http://www.w3.org/ns/activitystreams#",
                         "label": "rdfs:label",
                         "seeAlso": {"@id": "rdfs:seeAlso", "@type": "@id"},
-                        "ldp": "https://www.w3.org/ns/ldp/"
+                        "ldp": "https://www.w3.org/ns/ldp/",
+                        "next":
+                            {"@type": "@id", "@id": "as:next"},
                     },
                     "@id": "",
                     "@type": "ldp:BasicContainer",
@@ -336,7 +339,7 @@ class Resources(APIBase):
                     full_url = request.build_absolute_uri().split("?")[0]
                     params = request.GET.copy()
                     params['page'] = page + 1
-                    out['seeAlso'] = "%s?%s" % (full_url, params.urlencode())
+                    out['next'] = "%s?%s" % (full_url, params.urlencode())
 
             return JSONResponse(out, indent=indent)
         else:
