@@ -503,7 +503,6 @@ class CardView(GraphBaseView):
                         card = models.CardModel.objects.get(pk=card_data['id'])
                         card.sortorder = card_data['sortorder']
                         card.save()
-
                 return JSONResponse(data['cards'])
 
         return HttpResponseNotFound()
