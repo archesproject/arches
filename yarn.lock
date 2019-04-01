@@ -1877,10 +1877,10 @@ ms@2.0.0:
     chalk "~0.4.0"
     underscore "~1.6.0"
 
-nouislider@11.0.3:
-  version "11.0.3"
-  resolved "https://registry.yarnpkg.com/nouislider/-/nouislider-11.0.3.tgz#a45a31bb7846bbced498afa514a513da197d22b2"
-  integrity sha512-EmL3FHQ1vZ7wofzeLRqGZc7Lt4HpHezwfi2ODz8H2qcvltdIb4yqSo0trFN3Uk08YN7sPSQVETtH4Dg+k8xOBA==
+nouislider@13.1.4:
+  version "13.1.4"
+  resolved "https://registry.yarnpkg.com/nouislider/-/nouislider-13.1.4.tgz#1927e8787b3f8876d7b942999e9968b234e8bc8f"
+  integrity sha512-XcGdAkjDNjaciL4rBdf6/0Yfj7cVCPD9lUjFfOJnUdku4XaJUFa3Im3w8NnCuJFZ3NraRATREjpqDfbQIRRU0w==
 
 number-is-nan@^1.0.0:
   version "1.0.1"

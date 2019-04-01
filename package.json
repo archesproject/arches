@@ -48,7 +48,7 @@
         "mathjs": "^3.11.4",
         "metismenu": "^2.7.2",
         "moment": ">=2.10.5",
-        "nouislider": "11.0.3",
+        "nouislider": "13.1.4",
         "nvd3": "^1.8.5",
         "proj4": "^2.3.15",
         "requirejs": "~2.3.2",
