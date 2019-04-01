@@ -24,7 +24,6 @@ define([
     'views/components/simple-switch'
 ], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, GraphModel, ReportModel, GraphView, GraphTree, NodeFormView, BranchListView, CardTreeViewModel, PermissionDesigner, data, arches, GraphSettingsViewModel, CardViewModel, viewData, reportLookup) {
     var GraphDesignerView = BaseManagerView.extend({
-
         initialize: function(options) {
             var viewModel = options.viewModel;
             viewModel.graphid = ko.observable(data.graphid);

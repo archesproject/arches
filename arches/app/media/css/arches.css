@@ -1277,6 +1277,16 @@ a.select2-search-choice-close {
     flex-basis: 450px;
 }
 
+.constraint-selection {
+    padding-top: 10px;
+    border-bottom: solid 1px #eee;
+}
+
+.constraint-selection .dropdown {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
 .library-icon {
     width: 30px;
     position: absolute;

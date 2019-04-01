@@ -17,10 +17,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from django.db import transaction
+from django.db.models import Q
+from django.core.exceptions import ObjectDoesNotExist
+from django.forms import ModelForm
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer
-from django.forms import ModelForm
-
 
 class Card(models.CardModel):
     """
@@ -30,6 +31,46 @@ class Card(models.CardModel):
 
     class Meta:
         proxy = True
+
+    def update_constraints(self, constraints):
+
+        def add_nodeconstraints(nodeids, constraint_model):
+            for nodeid in nodeids:
+                node_constraint = models.ConstraintXNode()
+                node_constraint.node = models.Node.objects.get(pk=nodeid)
+                node_constraint.constraint = constraint_model
+                node_constraint.save()
+
+        constraint_models = []
+        for constraint in constraints:
+            constraintid = constraint.get('constraintid', None)
+            unique_to_all = constraint.get('uniquetoallinstances', False)
+            nodeids = constraint.get('nodes', [])
+            if constraintid is None:
+                constraint_model = models.ConstraintModel()
+                constraint_model.card = self
+                constraint_model.uniquetoallinstances = unique_to_all
+                constraint_model.save()
+                add_nodeconstraints(nodeids, constraint_model)
+                constraint_model.save()
+            else:
+                try:
+                    constraint_model = models.ConstraintModel.objects.get(pk=constraintid)
+                    constraint_model.uniquetoallinstances = unique_to_all
+                    current_nodeids = {str(i.nodeid) for i in constraint_model.nodes.all()}
+                    future_nodeids = set(nodeids)
+                    nodes_to_remove = current_nodeids - future_nodeids
+                    nodes_to_add = future_nodeids - current_nodeids
+                    add_nodeconstraints(nodes_to_add, constraint_model)
+                    models.ConstraintXNode.objects.filter(
+                        Q(constraint=constraint_model) &
+                        Q(node__in=nodes_to_remove)
+                        ).delete()
+                    constraint_model.save()
+                except ObjectDoesNotExist as e:
+                    print e
+            constraint_models.append(constraint_model)
+        self.constraints = constraint_models
 
     def __init__(self, *args, **kwargs):
         """
@@ -79,15 +120,20 @@ class Card(models.CardModel):
         self.widgets = []
         self.nodes = []
         self.ontologyproperty = None
+        self.constraints = []
+
         if args:
             if isinstance(args[0], dict):
                 for key, value in args[0].iteritems():
-                    if key not in ('cards', 'widgets', 'nodes', 'is_editable', 'nodegroup'):
+                    if key not in ('cards', 'widgets', 'nodes', 'is_editable', 'nodegroup', 'constraints'):
                         setattr(self, key, value)
 
                 if 'cards' in args[0]:
                     for card in args[0]["cards"]:
                         self.cards.append(Card(card))
+
+                if 'constraints':
+                    self.update_constraints(args[0]["constraints"])
 
                 if 'widgets' in args[0]:
                     for widget in args[0]["widgets"]:
@@ -208,7 +254,7 @@ class Card(models.CardModel):
         ret['ontologyproperty'] = self.ontologyproperty if 'ontologyproperty' not in exclude else ret.pop(
             'ontologyproperty', None)
         ret['disabled'] = self.disabled if 'disabled' not in exclude else ret.pop('disabled', None)
-
+        ret['constraints'] = self.constraints if 'constraints' not in exclude else ret.pop('constraints', None)
         if self.graph and self.graph.ontology and self.graph.isresource:
             edge = self.get_edge_to_parent()
             ret['ontologyproperty'] = edge.ontologyproperty
