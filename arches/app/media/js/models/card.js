@@ -47,7 +47,6 @@ define([
             this.disabled = ko.observable();
             this.component_id = ko.observable();
             this.constraints = ko.observableArray();
-            this.uniqueConstraints = ko.observableArray();
 
             this.set('cards', this.cards);
             this.set('nodes', this.nodes);
@@ -114,12 +113,30 @@ define([
             this._card = ko.observable('{}');
 
             this.dirty = ko.computed(function() {
-                return JSON.stringify(_.extend(JSON.parse(self._card()), self.toJSON())) !== self._card();
+                return JSON.stringify(
+                    _.extend(
+                        JSON.parse(self._card()),
+                        self.toJSON())
+                ) !== self._card();
             });
 
             this.isContainer = ko.computed(function() {
                 return !!self.get('cards')().length;
             });
+
+            this.setConstraints = function(arr) {
+                var self = this;
+                arr.forEach(function(constraint){
+                    var constraintViewModel = new CardConstraintsViewModel({
+                        constraint: koMapping.fromJS(constraint),
+                        widgets: self.widgets()
+                    });
+                    constraintViewModel.constraint.nodes.subscribe(function(){
+                        self.toJSON();
+                    }, self);
+                    self.constraints.push(constraintViewModel);
+                });
+            };
 
             this.sourceData = attributes;
             this.parse(attributes);
@@ -145,37 +162,6 @@ define([
                 this.parseNodes(attributes);
             }, this);
 
-            this.updateConstraints = function(){
-                var self = this;
-                return function(){
-                    var updatedConstraints = self.uniqueConstraints().map(function(c){
-                        return {
-                            nodeIds: ko.unwrap(c.nodeIds),
-                            uniquetoallinstances: ko.unwrap(c.uniqueToAllInstances),
-                            constraintid: c.constraintid,
-                            cardid: c.cardid
-                        };
-                    });
-                    self.constraints(updatedConstraints);
-                    self.set('constraints', updatedConstraints);
-                    self.constraints.valueHasMutated();
-                };
-            };
-
-            this.setConstraints = function(arr) {
-                var self = this;
-                self.uniqueConstraints.removeAll();
-                arr.forEach(function(constraint){
-                    constraint.widgets = self.widgets();
-                    var constraintViewModel = new CardConstraintsViewModel(constraint);
-                    constraintViewModel.nodeIds.subscribe(self.updateConstraints());
-                    constraintViewModel.uniqueToAllInstances.subscribe(self.updateConstraints());
-                    self.uniqueConstraints.push(constraintViewModel);
-                });
-            };
-
-            this.setConstraints(this.constraints());
-
             this.disposables.push(componentIdSubscription);
             this.disposables.push(cardSubscription);
             this.disposables.push(widgetSubscription);
@@ -198,6 +184,8 @@ define([
          */
         parse: function(attributes) {
             var self = this;
+            // console.log(attributes.data.constraints[0].nodes)
+            // console.log(attributes.data.constraints[0].nodes)
             this._attributes = attributes;
 
             _.each(attributes.data, function(value, key) {
@@ -238,7 +226,13 @@ define([
                     this.get(key)(value);
                     break;
                 case 'constraints':
-                    this.setConstraints ? this.setConstraints(value) : this.get(key)(value);
+                    if (this.constraints().length === 0) {
+                        this.setConstraints(value);
+                    } else {
+                        this.constraints().forEach(function(constraint, i){
+                            constraint.update(value[i]);
+                        });
+                    }
                     break;
                 case 'name':
                 case 'nodegroup_id':
@@ -320,7 +314,6 @@ define([
                     widget.label(originalWidgetData.label);
                     widget.widget_id(originalWidgetData.widget_id);
                 }
-                // this.setConstraints(this._attributes.data.constraints);
             }, this);
             this.parse(this._attributes);
         },
@@ -333,7 +326,12 @@ define([
                  key !== 'widgets' && key !== 'datatypes' && key !== 'data' && key !== 'helpactive' &&
                  key !== 'config') {
                     if (ko.isObservable(this.attributes[key])) {
-                        if (key === 'cards') {
+                        if (key === 'constraints') {
+                            ret[key] = [];
+                            this.attributes[key]().forEach(function(constraint) {
+                                ret[key].push(constraint.toJSON());
+                            }, this);
+                        } else if (key === 'cards') {
                             ret[key] = [];
                             this.attributes[key]().forEach(function(card) {
                                 ret[key].push(card.toJSON());

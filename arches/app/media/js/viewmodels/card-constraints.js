@@ -1,25 +1,30 @@
 define([
     'knockout',
-], function(ko) {
+    'knockout-mapping'
+], function(ko, koMapping) {
     var ConstraintViewModel = function(params) {
-
-        this.uniqueToAllInstances = ko.observable(params.uniquetoallinstances || false);
         this.widgets = params.widgets || [];
-        this.nodeIds = ko.observableArray(params.nodes);
-        this.cardid = params.card_id;
-        this.constraintid = params.constraintid;
+        this.constraint = params.constraint;
         this.getSelect2ConstraintConfig = function(placeholder){
             var nodeOptions = this.widgets.map(function(c){return {text: c.label(), id: c.node.nodeid};});
             return {
                 clickBubble: true,
                 disabled: false,
                 data: {results: nodeOptions},
-                value: this.nodeIds,
+                value: this.constraint.nodes,
                 multiple: params.multiple || true,
                 closeOnSelect: false,
                 placeholder: placeholder || "Select Widgets",
                 allowClear: true
             };
+        };
+        this.update = function(val){
+            this.constraint.nodes(val.nodes);
+            this.constraint.constraintid(val.constraintid);
+            this.constraint.uniquetoallinstances(val.uniquetoallinstances);
+        };
+        this.toJSON = function(){
+            return koMapping.toJS(this.constraint);
         };
 
     };

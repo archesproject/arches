@@ -588,6 +588,8 @@ class Command(BaseCommand):
                 try:
                     app_name = os.path.basename(app)
                     management.call_command('startapp', '--template', app, app_name)
+                    management.call_command('makemigrations', app_name, interactive=False)
+                    management.call_command('migrate', new_name, interactive=False)
                 except CommandError as e:
                     print e
 
@@ -627,37 +629,39 @@ class Command(BaseCommand):
             if setup_db.lower() in ('t', 'true', 'y', 'yes'):
                 self.setup_db(settings.PACKAGE_NAME)
 
-        print 'loading package_settings.py'
+        print('loading package_settings.py')
         load_package_settings(package_location)
-        print 'loading preliminary sql'
+        print('loading preliminary sql')
         load_preliminary_sql(package_location)
-        print 'loading system settings'
+        print('loading system settings')
         load_system_settings(package_location)
-        print 'loading widgets'
+        print('loading widgets')
         load_widgets(package_location)
-        print 'loading card components'
+        print('loading card components')
         load_card_components(package_location)
-        print 'loading plugins'
+        print('loading plugins')
         load_plugins(package_location)
-        print 'loading reports'
+        print('loading reports')
         load_reports(package_location)
-        print 'loading functions'
+        print('loading functions')
         load_functions(package_location)
-        print 'loading datatypes'
+        print('loading datatypes')
         load_datatypes(package_location)
-        print 'loading concepts'
+        print('loading concepts')
         load_concepts(package_location, overwrite_concepts, stage_concepts)
-        print 'loading resource models and branches'
+        print('loading resource models and branches')
         load_graphs(package_location)
-        print 'loading resource to resource constraints'
+        print('loading resource to resource constraints')
         load_resource_to_resource_constraints(package_location)
-        print 'loading map layers'
+        print('loading map layers')
         load_map_layers(package_location)
-        print 'loading business data - resource instances and relationships'
+        print('loading business data - resource instances and relationships')
         load_business_data(package_location)
-        print 'loading resource views'
+        print('loading resource views')
         load_resource_views(package_location)
-        print 'loading package css'
+        print('loading package css')
+        print('loading apps')
+        load_apps(package_location)
         root = settings.APP_ROOT if settings.APP_ROOT is not None else os.path.join(settings.ROOT_DIR, 'app')
         css_source = os.path.join(package_location, 'extensions', 'css')
         if os.path.exists(css_source):
@@ -667,8 +671,6 @@ class Command(BaseCommand):
             css_files = glob.glob(os.path.join(css_source, '*.css'))
             for css_file in css_files:
                 shutil.copy(css_file, css_dest)
-        load_apps(package_location)
-
 
     def update_project_templates(self):
         """

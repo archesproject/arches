@@ -45,7 +45,7 @@ class Card(models.CardModel):
         for constraint in constraints:
             constraintid = constraint.get('constraintid', None)
             unique_to_all = constraint.get('uniquetoallinstances', False)
-            nodeids = constraint.get('nodeIds', [])
+            nodeids = constraint.get('nodes', [])
             if constraintid is None:
                 constraint_model = models.ConstraintModel()
                 constraint_model.card = self

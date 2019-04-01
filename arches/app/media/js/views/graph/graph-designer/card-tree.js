@@ -36,7 +36,7 @@ define([
             if (cardConstraints.length === 0) {
                 cardConstraints.push({
                     uniquetoallinstances: false,
-                    nodeIds:[],
+                    nodes:[],
                     cardid: undefined,
                     constraintid: undefined
                 });
