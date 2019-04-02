@@ -72,6 +72,8 @@ matrix:
         # to kill all background jobs (like "npm start &")
         - kill $(jobs -p) || true
     - stage: deploy
+      install: echo "Deploying if 'master'"
+      script: echo ""
       after_success:
         - coveralls
       notifications:
