@@ -50,26 +50,27 @@ node_js: 10.8
 matrix:
   include:
     - stage: test
-    - name: "Python - Nose/unittests"
-      script:
-        - wait-on http://localhost:9200/
-        - python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
-    - name: "Javascript - Cypress.io tests"
-      install:
-        - yarn install
-        - npm install cypress --save-dev
-        - wait-on http://localhost:9200/
-        - python manage.py packages -o setup_db
-      cache:
-        npm: true
-        directories:
-          - ~/.cache
-      script:
-        - python manage.py runserver 0.0.0.0:8000 &
-        - $(npm bin)/cypress run
-        # after all tests finish running we need
-        # to kill all background jobs (like "npm start &")
-        - kill $(jobs -p) || true
+      - name: "Python - Nose/unittests"
+        install: echo "Python dependences installed"
+        script:
+          - wait-on http://localhost:9200/
+          - python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
+      - name: "Javascript - Cypress.io tests"
+        install:
+          - yarn install
+          - npm install cypress --save-dev
+          - wait-on http://localhost:9200/
+          - python manage.py packages -o setup_db
+        cache:
+          npm: true
+          directories:
+            - ~/.cache
+        script:
+          - python manage.py runserver 0.0.0.0:8000 &
+          - $(npm bin)/cypress run
+          # after all tests finish running we need
+          # to kill all background jobs (like "npm start &")
+          - kill $(jobs -p) || true
     - stage: deploy
       after_success:
         - coveralls
