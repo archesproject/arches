@@ -204,21 +204,22 @@ class Tile(models.TileModel):
                         Q(nodegroup=self.nodegroup))
                 nodes = [node for node in constraint.nodes.all()]
                 for tile in tiles:
-                    match = False
-                    duplicate_values = []
-                    for node in nodes:
-                        datatype_factory = DataTypeFactory()
-                        datatype = datatype_factory.get_instance(node.datatype)
-                        nodeid = str(node.nodeid)
-                        if datatype.values_match(tile.data[nodeid], self.data[nodeid]):
-                            match = True
-                            duplicate_values.append(datatype.get_display_value(tile, node))
-                        else:
-                            match = False
-                            break
-                    if match is True:
-                        message = _('This card violates a unique constraint. The following value is already saved: ')
-                        raise TileValidationError(message + (', ').join(duplicate_values))
+                    if str(self.tileid) != str(tile.tileid):
+                        match = False
+                        duplicate_values = []
+                        for node in nodes:
+                            datatype_factory = DataTypeFactory()
+                            datatype = datatype_factory.get_instance(node.datatype)
+                            nodeid = str(node.nodeid)
+                            if datatype.values_match(tile.data[nodeid], self.data[nodeid]):
+                                match = True
+                                duplicate_values.append(datatype.get_display_value(tile, node))
+                            else:
+                                match = False
+                                break
+                        if match is True:
+                            message = _('This card violates a unique constraint. The following value is already saved: ')
+                            raise TileValidationError(message + (', ').join(duplicate_values))
 
     def check_for_missing_nodes(self, request):
         missing_nodes = []
