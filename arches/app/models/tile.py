@@ -237,8 +237,9 @@ class Tile(models.TileModel):
                     else:
                         missing_nodes.append(node.name)
         if missing_nodes != []:
-            message = _('This card requires values for the following:')
-            raise ValidationError(message, (', ').join(missing_nodes))
+            message = _('This card requires values for the following: ')
+            message += (', ').join(missing_nodes)
+            raise TileValidationError(message)
 
     def validate(self, errors=None):
         for nodeid, value in self.data.iteritems():
