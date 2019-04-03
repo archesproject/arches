@@ -85,6 +85,35 @@ define([
         datatypes: data.datatypes
     });
 
+    var topCards = _.filter(data.cards, function(card) {
+        var nodegroup = _.find(data.nodegroups, function(group) {
+            return group.nodegroupid === card.nodegroup_id;
+        });
+        return !nodegroup || !nodegroup.parentnodegroup_id;
+    }).map(function(card) {
+        return new CardViewModel({
+            card: card,
+            graphModel: graphModel,
+            tile: null,
+            resourceId: resourceId,
+            displayname: displayname,
+            handlers: handlers,
+            cards: data.cards,
+            tiles: tiles,
+            selection: selection,
+            scrollTo: scrollTo,
+            loading: loading,
+            filter: filter,
+            provisionalTileViewModel: provisionalTileViewModel,
+            cardwidgets: data.cardwidgets,
+            userisreviewer: data.userisreviewer
+        });
+    });
+
+    topCards.forEach(function(topCard) {
+        topCard.topCards = topCards;
+    });
+
     var vm = {
         loading: loading,
         scrollTo: scrollTo,
@@ -130,30 +159,7 @@ define([
             toggleAll(false);
         },
         rootExpanded: ko.observable(true),
-        topCards: _.filter(data.cards, function(card) {
-            var nodegroup = _.find(data.nodegroups, function(group) {
-                return group.nodegroupid === card.nodegroup_id;
-            });
-            return !nodegroup || !nodegroup.parentnodegroup_id;
-        }).map(function(card) {
-            return new CardViewModel({
-                card: card,
-                graphModel: graphModel,
-                tile: null,
-                resourceId: resourceId,
-                displayname: displayname,
-                handlers: handlers,
-                cards: data.cards,
-                tiles: tiles,
-                selection: selection,
-                scrollTo: scrollTo,
-                loading: loading,
-                filter: filter,
-                provisionalTileViewModel: provisionalTileViewModel,
-                cardwidgets: data.cardwidgets,
-                userisreviewer: data.userisreviewer
-            });
-        }),
+        topCards: topCards,
         selection: selection,
         selectedTile: selectedTile,
         selectedCard: ko.computed(function() {

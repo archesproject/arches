@@ -1439,7 +1439,8 @@ define([
                         return layer.id === feature.layer.id;
                     });
                 });
-                return !overlay.invisible();
+                if (overlay) return !overlay.invisible();
+                else return true;
             };
 
             var highlightFeature = function(feature, layerIdSuffix, filterProperty, style) {
@@ -1476,7 +1477,7 @@ define([
                                 }
                             });
                         }
-                        if (sourceLayer.filter) {
+                        if (sourceLayer && sourceLayer.filter) {
                             var clickCacheFeatureId;
                             var clickCacheFilterProperty;
                             if (self.clickSourceLayerCache && self.clickData()) {
