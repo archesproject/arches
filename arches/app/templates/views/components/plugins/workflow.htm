@@ -12,7 +12,7 @@
         <div class="workflow-step-description">
              <div class="title" data-bind="text:activeStep().title"></div>
              <div class="subtitle" data-bind="text:activeStep().subtitle"></div>
-             <div class="step">Step <span data-bind="text:activeStep()._index"></span> of <span data-bind="text:steps.length"></span>: <span data-bind="text:activeStep().description"></span></div>
+             <div class="step">{% trans "Step" %} <span data-bind="text:activeStep()._index+1"></span> {% trans "of" %} <span data-bind="text:steps.length"></span>: <span data-bind="text:activeStep().description"></span></div>
         </div>
         <div class="workflow-nav-controls right"><i class="fa fa-chevron-circle-right" data-bind="click: next"></i></div>
     </div>

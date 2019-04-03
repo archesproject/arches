@@ -12,6 +12,7 @@ define([
         this.ready.subscribe(function() {
             self.steps.forEach(function(step, i) {
                 if (!(self.steps[i] instanceof Step)) {
+                    step.workflow = self;
                     self.steps[i] = new Step(step);
                 }
                 self.steps[i]._index = i;
@@ -23,8 +24,7 @@ define([
 
         this.next = function(){
             var activeStep = self.activeStep();
-            if (activeStep && activeStep._index < self.steps.length - 1) {
-                activeStep.complete(true);
+            if (activeStep && activeStep.complete() && activeStep._index < self.steps.length - 1) {
                 self.activeStep(self.steps[activeStep._index+1]);
             }
         };
