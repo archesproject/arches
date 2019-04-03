@@ -100,19 +100,6 @@ class TileData(View):
                                 if accepted_provisional is not None:
                                     provisional_editor = User.objects.get(pk=accepted_provisional_edit["user"])
                                 tile.save(provisional_edit_log_details={"user": request.user, "action": "accept edit", "edit": accepted_provisional_edit, "provisional_editor": provisional_editor})
-                            if tile_id == '4345f530-aa90-48cf-b4b3-92d1185ca439':
-                                import couchdb
-                                import json as json_json
-                                couch = couchdb.Server(settings.COUCHDB_URL)
-                                for project in models.MobileSurveyModel.objects.all():
-                                    db = couch['project_' + str(project.id)]
-                                    #tile = models.TileModel.objects.get(pk='4345f530-aa90-48cf-b4b3-92d1185ca439')
-                                    tile_json = json_json.loads(JSONSerializer().serialize(tile))
-                                    tile_json['_id'] = tile_json['tileid']
-                                    for row in db.view('_all_docs', include_docs=True):
-                                        if 'tileid' in row.doc and tile_json['_id'] == row.doc['_id']:
-                                            tile_json['_rev'] = row.doc['_rev']
-                                            db.save(tile_json)
 
                             if tile.provisionaledits is not None and str(request.user.id) in tile.provisionaledits:
                                 tile.data = tile.provisionaledits[str(request.user.id)]['value']
