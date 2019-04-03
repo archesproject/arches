@@ -1356,9 +1356,10 @@ class DomainListDataType(BaseDomainDataType):
 
     def get_display_value(self, tile, node):
         new_values = []
-        for val in tile.data[str(node.nodeid)]:
-            option = self.get_option_text(node, val)
-            new_values.append(option)
+        if tile.data[str(node.nodeid)] is not None:
+            for val in tile.data[str(node.nodeid)]:
+                option = self.get_option_text(node, val)
+                new_values.append(option)
         return ','.join(new_values)
 
     def transform_export_values(self, value, *args, **kwargs):
