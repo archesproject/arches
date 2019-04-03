@@ -92,6 +92,9 @@ class TileData(View):
                                 try:
                                     tile.save(request=request)
                                 except TileValidationError as e:
+                                    resource_tiles = models.TileModel.objects.filter(resourceinstance=tile.resourceinstance)
+                                    if resource_tiles.count() == 0:
+                                        Resource.objects.get(pk=tile.resourceinstance_id).delete(request.user, 'test')
                                     return JSONResponse({'status': 'false', 'message': [e.message, _('Unable to Save. Please verify your input is valid')]}, status=500)
                                 except Exception as e:
                                     message = "Unable to save. A {0} has occurred. Arguments: {1!r}".format(type(e).__name__, e.args)
