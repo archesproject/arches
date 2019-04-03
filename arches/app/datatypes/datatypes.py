@@ -267,24 +267,23 @@ class DateDataType(BaseDataType):
 
     def validate(self, value, row_number=None, source=''):
         errors = []
-
-        date_formats = ['-%Y','%Y','%Y-%m-%d','%B-%m-%d','%Y-%m-%d %H:%M:%S']
-        valid = False
-        for mat in date_formats:
+        if value is not None:
+            date_formats = ['-%Y','%Y','%Y-%m-%d','%B-%m-%d','%Y-%m-%d %H:%M:%S']
+            valid = False
+            for mat in date_formats:
+                if valid == False:
+                    try:
+                        if datetime.strptime(value, mat):
+                            valid = True
+                    except:
+                        valid = False
             if valid == False:
-                try:
-                    if datetime.strptime(value, mat):
-                        valid = True
-                except:
-                    valid = False
-        if valid == False:
-            if hasattr(settings, 'DATE_IMPORT_EXPORT_FORMAT'):
-                date_format = settings.DATE_IMPORT_EXPORT_FORMAT
-            else:
-                date_format = date_formats
+                if hasattr(settings, 'DATE_IMPORT_EXPORT_FORMAT'):
+                    date_format = settings.DATE_IMPORT_EXPORT_FORMAT
+                else:
+                    date_format = date_formats
 
-            errors.append({'type': 'ERROR', 'message': '{0} {1} is not in the correct format, make sure it is in this format: {2} or set the date format in settings.DATE_IMPORT_EXPORT_FORMAT. This data was not imported.'.format(value, row_number, date_format)})
-
+                errors.append({'type': 'ERROR', 'message': '{0} {1} is not in the correct format, make sure it is in this format: {2} or set the date format in settings.DATE_IMPORT_EXPORT_FORMAT. This data was not imported.'.format(value, row_number, date_format)})
 
         return errors
 
@@ -1403,10 +1402,10 @@ class DomainDataType(BaseDomainDataType):
 class DomainListDataType(BaseDomainDataType):
     def validate(self, value, row_number=None, source=''):
         errors = []
-
-        for v in value:
-            if len(models.Node.objects.filter(config__options__contains=[{"id": v}])) < 1:
-                errors.append({'type': 'ERROR', 'message': '{0} {1} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(v, row_number)})
+        if value is not None:
+            for v in value:
+                if len(models.Node.objects.filter(config__options__contains=[{"id": v}])) < 1:
+                    errors.append({'type': 'ERROR', 'message': '{0} {1} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(v, row_number)})
         return errors
 
     def transform_import_values(self, value, nodeid):
