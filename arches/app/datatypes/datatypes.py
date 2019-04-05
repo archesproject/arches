@@ -149,7 +149,8 @@ class NumberDataType(BaseDataType):
         errors = []
 
         try:
-            decimal.Decimal(value)
+            if value is not None:
+                decimal.Decimal(value)
         except:
             errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} {3}- {4}. {5}'.format(self.datatype_model.datatype, value, source, row_number, 'not a properly formatted number', 'This data was not imported.')})
         return errors
