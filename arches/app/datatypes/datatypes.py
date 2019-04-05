@@ -433,7 +433,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         errors = []
         coord_limit = 1500
         coordinate_count = 0
-
         def validate_geom(geom, coordinate_count=0):
             try:
                 coordinate_count += geom.num_coords
@@ -449,13 +448,14 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 message = 'Not a properly formatted geometry'
                 errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}.'.format(self.datatype_model.datatype, value, source, message, 'This data was not imported.')})
 
-        for feature in value['features']:
-            try:
-                geom = GEOSGeometry(JSONSerializer().serialize(feature['geometry']))
-                validate_geom(geom, coordinate_count)
-            except:
-                message = 'It was not possible to serialize some feaures in your geometry.'
-                errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, message, 'This data was not imported.')})
+        if value is not None:
+            for feature in value['features']:
+                try:
+                    geom = GEOSGeometry(JSONSerializer().serialize(feature['geometry']))
+                    validate_geom(geom, coordinate_count)
+                except:
+                    message = 'It was not possible to serialize some feaures in your geometry.'
+                    errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, message, 'This data was not imported.')})
 
         return errors
 
