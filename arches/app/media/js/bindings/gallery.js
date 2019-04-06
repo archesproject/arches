@@ -10,7 +10,6 @@ define([
             var value = valueAccessor();
             var bindings = allBindingsAccessor();
             var pan = value;
-            var scrolldistance = bindings.scrolldistance;
             var duration = bindings.duration;
             var gt = $(element).find('.gallery-thumbnails')[0];
             pan.subscribe(function(val){
