@@ -282,11 +282,30 @@ class Resources(APIBase):
                 # }
                 # out = compact(out, context, options={'skipExpansion':False, 'compactArrays': False})
 
-                page_size = settings.API_MAX_PAGE_SIZE
+                # Get a page_size for the pagination, or fall back to a default or max size.
+                try:
+                    page_size = int(request.GET.get('page_size', None))
+                    if page_size > settings.API_MAX_PAGE_SIZE or page_size < 1:
+                        page_size = settings.API_MAX_PAGE_SIZE
+                except (TypeError, ValueError):
+                    if hasattr(settings, "API_DEFAULT_PAGE_SIZE"):
+                        page_size = settings.API_DEFAULT_PAGE_SIZE
+                    else:
+                        page_size = settings.API_MAX_PAGE_SIZE
+
                 try:
                     page = int(request.GET.get('page', None))
-                except:
+                except (TypeError, ValueError):
                     page = 1
+
+                try:
+                    graph_id = request.GET.get('graph_id', None)
+                    # is a UUID?
+                    _ = uuid.UUID(graph_id)
+                    resource_list = Resource.objects.filter(graph=graph_id)
+                except (ValueError, TypeError):
+                    graph_id = None
+                    resource_list = Resource.objects
 
                 start = ((page - 1) * page_size)
                 end = start + page_size
@@ -294,14 +313,34 @@ class Resources(APIBase):
                 base_url = "%s%s" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT,
                                      reverse('resources', args=['']).lstrip('/'))
                 out = {
-                    "@context": "https://www.w3.org/ns/ldp/",
+                    "@context": {
+                        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+                        "as": "http://www.w3.org/ns/activitystreams#",
+                        "label": "rdfs:label",
+                        "seeAlso": {"@id": "rdfs:seeAlso", "@type": "@id"},
+                        "ldp": "https://www.w3.org/ns/ldp/",
+                        "next":
+                            {"@type": "@id", "@id": "as:next"},
+                    },
                     "@id": "",
                     "@type": "ldp:BasicContainer",
-                    # Here we actually mean the name
-                    #"label": str(model.name),
-                    "ldp:contains": ["%s%s" % (base_url, resourceid) for resourceid in list(Resource.objects.values_list('pk', flat=True).
-                                                                                            exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_ID).order_by('pk')[start:end])]
+                    "ldp:contains": [
+                        "%s%s" % (base_url, resourceid)
+                        for resourceid in list(
+                            resource_list.values_list('pk', flat=True).exclude(
+                                pk=settings.SYSTEM_SETTINGS_RESOURCE_ID).order_by('pk')[start:end]
+                            )
+                    ]
                 }
+
+                if graph_id is not None:
+                    out["label"] = "Graph ID: %s" % str(graph_id)
+
+                if len(out['ldp:contains']) == page_size:
+                    full_url = request.build_absolute_uri().split("?")[0]
+                    params = request.GET.copy()
+                    params['page'] = page + 1
+                    out['next'] = "%s?%s" % (full_url, params.urlencode())
 
             return JSONResponse(out, indent=indent)
         else:

@@ -411,6 +411,7 @@ CACHE_BY_USER = {'anonymous': 3600 * 24}
 DATE_IMPORT_EXPORT_FORMAT = '%Y-%m-%d'
 
 API_MAX_PAGE_SIZE = 500
+API_DEFAULT_PAGE_SIZE = 500
 
 UUID_REGEX = '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
 
