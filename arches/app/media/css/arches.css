@@ -243,11 +243,6 @@ dl.inline-flex dd {
     margin-bottom: 10px;
 }
 
-.btn-dt-column-toggle {
-    background-color: rgb(126, 126, 126);
-    color: #fff;
-}
-
 .library-tools-icon.card-container-trash-icon {
     float: right;
     margin-top: -50px;
