@@ -26,4 +26,4 @@ requests[security]>=2.18.1
 
 # Leave the following line commented so that pip install will ignore this
 # The installer uses the following line to download the proper version of ES
-# https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.6.2.zip
+# https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.7.1.zip
