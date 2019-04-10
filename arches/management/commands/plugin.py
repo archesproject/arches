@@ -76,7 +76,9 @@ class Command(BaseCommand):
             icon=details['icon'],
             component=details['component'],
             componentname=details['componentname'],
-            config=details['config']
+            config=details['config'],
+            slug=details['slug'],
+            sortorder=details['sortorder']
         )
 
         instance.save()
