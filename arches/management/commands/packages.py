@@ -115,6 +115,9 @@ class Command(BaseCommand):
         parser.add_argument('-db', '--setup_db', action='store', dest='setup_db', default=False,
             help='Rebuild database')
 
+        parser.add_argument('-ex', '--load_ext_from_prj', action='store', dest='load_project_extensions', default=False,
+            help='Load extensions from the project directory')
+
         parser.add_argument('-bulk', '--bulk_load', action='store_true', dest='bulk_load',
             help='Bulk load values into the database.  By setting this flag the system will bypass any PreSave functions attached to the resource.')
 
@@ -207,7 +210,7 @@ class Command(BaseCommand):
             self.update_project_templates()
 
         if options['operation'] in ['load', 'load_package']:
-            self.load_package(options['source'], options['setup_db'], options['overwrite'], options['stage'], options['yes'])
+            self.load_package(options['source'], options['setup_db'], options['overwrite'], options['stage'], options['yes'], options['load_project_extensions'])
 
         if options['operation'] in ['create', 'create_package']:
             self.create_package(options['dest_dir'])
@@ -369,7 +372,7 @@ class Command(BaseCommand):
             self.export_package_settings(dest_dir, 'true')
 
 
-    def load_package(self, source, setup_db=True, overwrite_concepts='ignore', stage_concepts='keep', yes=False):
+    def load_package(self, source, setup_db=True, overwrite_concepts='ignore', stage_concepts='keep', yes=False, load_project_extensions=False):
 
         def load_system_settings(package_dir):
             update_system_settings = True
@@ -629,6 +632,10 @@ class Command(BaseCommand):
             if setup_db.lower() in ('t', 'true', 'y', 'yes'):
                 self.setup_db(settings.PACKAGE_NAME)
 
+        if load_project_extensions != False:
+            if load_project_extensions.lower() in ('t', 'true', 'y', 'yes'):
+                load_project_extensions = True
+
         print('loading package_settings.py')
         load_package_settings(package_location)
         print('loading preliminary sql')
@@ -648,6 +655,8 @@ class Command(BaseCommand):
         print('loading datatypes')
         load_datatypes(package_location)
         print('loading concepts')
+        if load_project_extensions:
+            management.call_command('project', 'update')
         load_concepts(package_location, overwrite_concepts, stage_concepts)
         print('loading resource models and branches')
         load_graphs(package_location)
