@@ -75,6 +75,13 @@ define([
             self.card(topCards[0]);
             self.tile(self.card().getNewTile());
         });
+
+        self.saveTile = function(tile, callback) {
+            tile.save(function(response) {
+                // handle failure...
+                console.log(response);
+            }, callback);
+        };
     }
     ko.components.register('new-tile-step', {
         viewModel: viewModel,
