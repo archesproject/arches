@@ -12,6 +12,7 @@ define([
 
         this.card = ko.observable();
         this.tile = ko.observable();
+        this.loading = ko.observable();
 
         $.getJSON(url, function(data) {
             var handlers = {
@@ -27,7 +28,8 @@ define([
                 }, {});
             };
 
-            var provisionalTileViewModel = new ProvisionalTileViewModel({tile: self.tile, reviewer: data.userisreviewer});
+            self.reviewer = data.userisreviewer;
+            self.provisionalTileViewModel = new ProvisionalTileViewModel({tile: self.tile, reviewer: data.userisreviewer});
 
             var graphModel = new GraphModel({
                 data: {nodes: data.nodes, nodegroups: data.nodegroups, edges: []},
@@ -49,9 +51,10 @@ define([
                     handlers: handlers,
                     cards: data.cards,
                     tiles: data.tiles,
-                    provisionalTileViewModel: provisionalTileViewModel,
+                    provisionalTileViewModel: self.provisionalTileViewModel,
                     cardwidgets: data.cardwidgets,
-                    userisreviewer: data.userisreviewer
+                    userisreviewer: data.userisreviewer,
+                    loading: self.loading
                 });
             });
 
@@ -69,6 +72,8 @@ define([
             };
 
             // set self.tile and self.card....
+            self.card(topCards[0]);
+            self.tile(self.card().getNewTile());
         });
     }
     ko.components.register('new-tile-step', {
