@@ -29,10 +29,17 @@ define([
             };
 
             self.reviewer = data.userisreviewer;
-            self.provisionalTileViewModel = new ProvisionalTileViewModel({tile: self.tile, reviewer: data.userisreviewer});
+            self.provisionalTileViewModel = new ProvisionalTileViewModel({
+                tile: self.tile,
+                reviewer: data.userisreviewer
+            });
 
             var graphModel = new GraphModel({
-                data: {nodes: data.nodes, nodegroups: data.nodegroups, edges: []},
+                data: {
+                    nodes: data.nodes,
+                    nodegroups: data.nodegroups,
+                    edges: []
+                },
                 datatypes: data.datatypes
             });
 
@@ -62,9 +69,18 @@ define([
                 topCard.topCards = topCards;
             });
 
-            self.widgetLookup = createLookup(data.widgets, 'widgetid');
-            self.cardComponentLookup = createLookup(data['card_components'], 'componentid');
-            self.nodeLookup = createLookup(graphModel.get('nodes')(), 'nodeid');
+            self.widgetLookup = createLookup(
+                data.widgets,
+                'widgetid'
+            );
+            self.cardComponentLookup = createLookup(
+                data['card_components'],
+                'componentid'
+            );
+            self.nodeLookup = createLookup(
+                graphModel.get('nodes')(),
+                'nodeid'
+            );
             self.on = function(eventName, handler) {
                 if (handlers[eventName]) {
                     handlers[eventName].push(handler);
@@ -80,7 +96,12 @@ define([
             tile.save(function(response) {
                 // handle failure...
                 console.log(response);
-            }, callback);
+            }, function() {
+                params.complete(true);
+                if (typeof callback === 'function') {
+                    callback.apply(null, arguments);
+                }
+            });
         };
     }
     ko.components.register('new-tile-step', {
