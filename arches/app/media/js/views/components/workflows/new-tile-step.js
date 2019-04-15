@@ -1,11 +1,12 @@
 define([
+    'underscore',
     'jquery',
     'arches',
     'knockout',
     'models/graph',
     'viewmodels/card',
     'viewmodels/provisional-tile'
-], function($, arches, ko, GraphModel, CardViewModel, ProvisionalTileViewModel) {
+], function(_, $, arches, ko, GraphModel, CardViewModel, ProvisionalTileViewModel) {
     function viewModel(params) {
         var self = this;
         var url = arches.urls.api_card + params.graphid;
