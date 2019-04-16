@@ -7,9 +7,10 @@ define([
     'models/card-widget',
     'arches',
     'require',
+    'uuid',
     'utils/dispose',
     'viewmodels/tile'
-], function($, _, ko, koMapping, CardModel, CardWidgetModel, arches, require, dispose) {
+], function($, _, ko, koMapping, CardModel, CardWidgetModel, arches, require, uuid, dispose) {
     /**
     * A viewmodel used for generic cards
     *
@@ -71,6 +72,12 @@ define([
         var multiselect = params.multiselect || false;
         var isWritable = params.card.is_writable || false;
         var selection;
+        var emptyConstraint = [{
+            uniquetoallinstances: false,
+            nodes:[],
+            cardid: self.cardid,
+            constraintid:  uuid.generate()
+        }];
         if (params.multiselect) {
             selection = params.selection || ko.observableArray([]);
         } else {
@@ -83,7 +90,8 @@ define([
             data: _.extend(params.card, {
                 widgets: params.cardwidgets,
                 nodes: params.graphModel.get('nodes'),
-                nodegroup: nodegroup
+                nodegroup: nodegroup,
+                constraints: params.constraints
             }),
             datatypelookup: params.graphModel.get('datatypelookup'),
         });
@@ -134,6 +142,7 @@ define([
             parentCard: params.parentCard,
             expanded: ko.observable(false),
             perms: perms,
+            constraints: params.constraints || emptyConstraint,
             permsLiteral: permsLiteral,
             scrollTo: ko.pureComputed(function() {
                 return scrollTo() === this;

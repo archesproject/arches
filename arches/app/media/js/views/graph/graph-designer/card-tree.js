@@ -5,12 +5,13 @@ define([
     'viewmodels/card',
     'models/card-widget',
     'arches',
+    'uuid',
     'graph-designer-data',
     'bindings/sortable',
     'bindings/scrollTo',
     'widgets',
     'card-components'
-], function($, _, ko, CardViewModel, CardWidgetModel, arches, data) {
+], function($, _, ko, CardViewModel, CardWidgetModel, arches, uuid, data) {
     var CardTreeViewModel = function(params) {
         var self = this;
         var filter = ko.observable('');
@@ -26,23 +27,16 @@ define([
         var scrollTo = ko.observable();
         var cachedFlatTree;
         var cardList = data.cards;
-        data.cards.forEach(function(card){
-            var cardConstraints = [];
-            data.constraints.forEach(function(constraint){
-                if (card.cardid === constraint.card_id) {
-                    cardConstraints.push(constraint);
-                }
-            });
-            if (cardConstraints.length === 0) {
-                cardConstraints.push({
-                    uniquetoallinstances: false,
-                    nodes:[],
-                    cardid: undefined,
-                    constraintid: undefined
-                });
-            }
-            card.constraints = cardConstraints;
-        });
+
+        var getBlankConstraint = function(card){
+            return [{
+                uniquetoallinstances: false,
+                nodes: [],
+                cardid: card.cardid,
+                constraintid: uuid.generate()
+            }]
+        };
+
         this.flattenTree = function(parents, flatList) {
             _.each(ko.unwrap(parents), function(parent) {
                 flatList.push(parent);
@@ -170,6 +164,10 @@ define([
                 });
                 return !nodegroup || !ko.unwrap(nodegroup.parentnodegroup_id);
             }).map(function(card) {
+                var constraints =  data.constraints.filter(function(ct){return ct.card_id === card.cardid;});
+                if (constraints.length === 0) {
+                    constraints = getBlankConstraint(card);
+                }
                 return new CardViewModel({
                     card: card,
                     graphModel: params.graphModel,
@@ -178,6 +176,7 @@ define([
                     displayname: ko.observable(),
                     handlers: {},
                     cards: data.cards,
+                    constraints: constraints,
                     tiles: [],
                     selection: selection,
                     hover: hover,
@@ -317,7 +316,8 @@ define([
                     userisreviewer: true,
                     perms: ko.observableArray(),
                     permsLiteral: ko.observableArray(),
-                    parentCard: parent
+                    parentCard: parent,
+                    constraints: getBlankConstraint(data.card)
                 });
                 parentcards.push(newCardViewModel);
 
