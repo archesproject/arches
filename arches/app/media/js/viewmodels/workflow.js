@@ -14,6 +14,9 @@ define([
                 if (!(self.steps[i] instanceof Step)) {
                     step.workflow = self;
                     self.steps[i] = new Step(step);
+                    self.steps[i].complete.subscribe(function(complete) {
+                        if (complete) self.next();
+                    });
                 }
                 self.steps[i]._index = i;
             });

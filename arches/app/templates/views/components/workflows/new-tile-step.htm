@@ -1,12 +1,13 @@
-Card component here...
-<!-- <div data-bind="component: {
-    name: componentname,
+<!-- ko if: tile() && card() -->
+<div data-bind="component: {
+    name: cardComponentLookup[card().model.component_id()].componentname,
     params: {
-        card: selectedCard(),
-        tile: null,
+        card: card(),
+        tile: tile(),
         provisionalTileViewModel: provisionalTileViewModel,
         reviewer: reviewer,
         loading: loading,
         form: $data
     }
-}"></div> -->
+}"></div>
+<!-- /ko -->
