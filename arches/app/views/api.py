@@ -514,9 +514,9 @@ class Card(APIBase):
 
     def get(self, request, resourceid):
         try:
-            resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
+            resource_instance = Resource.objects.get(pk=resourceid)
             graph = resource_instance.graph
-        except models.ResourceInstance.DoesNotExist:
+        except Resource.DoesNotExist:
             graph = models.GraphModel.objects.get(pk=resourceid)
             resourceid = None
             resource_instance = None

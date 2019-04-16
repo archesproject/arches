@@ -9,24 +9,38 @@ define([
 ], function(_, $, arches, ko, GraphModel, CardViewModel, ProvisionalTileViewModel) {
     function viewModel(params) {
         var self = this;
-        var url = arches.urls.api_card + params.graphid;
+        var url = arches.urls.api_card + (params.resourceid || params.graphid);
 
         this.card = ko.observable();
         this.tile = ko.observable();
         this.loading = ko.observable();
+        this.resourceId = ko.observable(params.resourceid);
+        this.complete = params.complete || ko.observable();
+        this.complete(!!params.tileid);
 
+        // TODO: show/hide loading mask before/after request/response
         $.getJSON(url, function(data) {
             var handlers = {
                 'after-update': [],
                 'tile-reset': []
             };
             var displayname = ko.observable(data.displayname);
-            var resourceId = ko.observable(data.resourceid);
             var createLookup = function(list, idKey) {
                 return _.reduce(list, function(lookup, item) {
                     lookup[item[idKey]] = item;
                     return lookup;
                 }, {});
+            };
+            var flattenTree = function(parents, flatList) {
+                _.each(ko.unwrap(parents), function(parent) {
+                    flatList.push(parent);
+                    var childrenKey = parent.tiles ? 'tiles' : 'cards';
+                    flattenTree(
+                        ko.unwrap(parent[childrenKey]),
+                        flatList
+                    );
+                });
+                return flatList;
             };
 
             self.reviewer = data.userisreviewer;
@@ -54,7 +68,7 @@ define([
                     card: card,
                     graphModel: graphModel,
                     tile: null,
-                    resourceId: resourceId,
+                    resourceId: self.resourceId,
                     displayname: displayname,
                     handlers: handlers,
                     cards: data.cards,
@@ -88,17 +102,34 @@ define([
                 }
             };
 
-            // set self.tile and self.card....
-            self.card(topCards[0]);
-            self.tile(self.card().getNewTile());
+            flattenTree(topCards, []).forEach(function(item) {
+                if (item.constructor.name === 'CardViewModel' && item.nodegroupid === params.nodegroupid) {
+                    if (params.parenttileid && item.parent && params.parenttileid !== item.parent.tileid) {
+                        return;
+                    }
+                    self.card(item);
+                    if (params.tileid) {
+                        ko.unwrap(item.tiles).forEach(function(tile) {
+                            if (tile.tileid === params.tileid) {
+                                self.tile(tile);
+                            }
+                        });
+                    } else {
+                        self.tile(item.getNewTile());
+                    }
+                }
+            });
         });
 
         self.saveTile = function(tile, callback) {
             tile.save(function(response) {
-                // handle failure...
-                console.log(response);
-            }, function() {
-                params.complete(true);
+                // TODO handle failure with alert...
+                throw response;
+            }, function(tile) {
+                params.resourceid = tile.resourceinstance_id;
+                params.tileid = tile.tileid;
+                self.resourceId(tile.resourceinstance_id);
+                self.complete(true);
                 if (typeof callback === 'function') {
                     callback.apply(null, arguments);
                 }
