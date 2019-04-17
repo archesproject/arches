@@ -36,8 +36,8 @@ def map_info(request):
         hex_bin_bounds = geo_utils.get_bounds_from_geojson(settings.DEFAULT_BOUNDS)
         default_center = geo_utils.get_centroid(settings.DEFAULT_BOUNDS)
     else:
-        hex_bin_bounds = None
-        default_center = None
+        hex_bin_bounds = (0, 0, 1, 1)
+        default_center = {'coordinates': [6.602384, 0.245926]}  # an island off the coast of Africa
     return {
         'map_info': {
             'x': default_center['coordinates'][0],
