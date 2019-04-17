@@ -265,11 +265,7 @@ def prepare_search_index(create=False):
 
     if create:
         se = SearchEngineFactory().create()
-        try:
-            se.create_index(index='resources', body=index_settings)
-        except:
-            index_settings = index_settings['mappings']
-            se.create_mapping(index='resources', body=index_settings)
+        se.create_index(index='resources', body=index_settings)
 
     return index_settings
 

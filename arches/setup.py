@@ -5,6 +5,8 @@ import shutil
 import urllib2
 import zipfile
 import datetime
+import platform
+import tarfile
 from arches import settings
 
 here = os.path.dirname(os.path.abspath(__file__))
@@ -106,9 +108,15 @@ def download_file(url, file_name):
     f.close()
 
 def unzip_file(file_name, unzip_location):
-    with zipfile.ZipFile(file_name, 'r') as myzip:
-        print 'unzipping %s to: %s' % (file_name, unzip_location)
-        myzip.extractall(unzip_location)
+    try:
+        # first assume you have a .tar.gz file
+        tar = tarfile.open(file_name, "r:gz")
+        tar.extractall(path=unzip_location)
+        tar.close()
+    except:
+        # next assume you have a .zip file
+        with zipfile.ZipFile(file_name, 'r') as myzip:
+            myzip.extractall(unzip_location)
 
 def download_elasticsearch(install_dir):
     url = get_elasticsearch_download_url(install_dir)
@@ -117,9 +125,10 @@ def download_elasticsearch(install_dir):
         download_file(url, os.path.join(install_dir, file_name))
 
 def get_elasticsearch_download_url(install_dir):
+    os_name = platform.system().lower()
     with open(os.path.join(install_dir, "requirements.txt"), "r") as f:
         for line in f:
-            if line.startswith('# https://'):
+            if line.startswith('# https://') and os_name in line:
                 return line.replace('# ', '').strip()
     raise Exception("""\n
 ------------------------------------------------------------------------------------------------------

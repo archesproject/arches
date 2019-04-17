@@ -229,9 +229,11 @@ def search_results(request):
 
     results = dsl.search(index='resources')
 
+    print JSONSerializer().serialize(dsl.dsl)
+
     if results is not None:
         user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
-        total = results['hits']['total']
+        total = results['hits']['total']['value']
         page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
 
         paginator, pages = get_paginator(request, results, total, page, settings.SEARCH_ITEMS_PER_PAGE)

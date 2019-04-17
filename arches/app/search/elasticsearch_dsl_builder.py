@@ -135,6 +135,8 @@ class Bool(Dsl):
         return self._append('must', dsl)
 
     def should(self, dsl):
+        if dsl and 'minimum_should_match' not in self.dsl['bool']:
+            self.dsl['bool']['minimum_should_match'] = 1
         return self._append('should', dsl)
 
     def must_not(self, dsl):

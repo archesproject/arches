@@ -115,15 +115,6 @@ class TestSearchEngine(SearchEngine):
         #kwargs = self.reset_index(**kwargs)
         return super(TestSearchEngine, self).search(**kwargs)
 
-    def create_mapping(self, index, fieldname='', fieldtype='string', fieldindex=None, body=None):
-        """
-        Creates an Elasticsearch body for a single field given an index name and type name
-
-        """
-
-        #index = '%s%s' % (self.index_prefix, index)
-        return super(TestSearchEngine, self).create_mapping(index=index, fieldname=fieldname, fieldtype=fieldtype, fieldindex=fieldindex, body=body)
-
     def create_index(self, **kwargs):
         #kwargs = self.reset_index(**kwargs)
         return super(TestSearchEngine, self).create_index(**kwargs)
