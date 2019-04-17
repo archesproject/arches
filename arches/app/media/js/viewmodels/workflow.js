@@ -8,11 +8,15 @@ define([
         this.steps = config.steps || [];
         this.activeStep = ko.observable();
         this.ready = ko.observable(false);
+        this.loading = config.loading || ko.observable(false);
+        this.alert = config.alert || ko.observable(null);
 
         this.ready.subscribe(function() {
             self.steps.forEach(function(step, i) {
                 if (!(self.steps[i] instanceof Step)) {
                     step.workflow = self;
+                    step.loading = self.loading;
+                    step.alert = self.alert;
                     self.steps[i] = new Step(step);
                     self.steps[i].complete.subscribe(function(complete) {
                         if (complete) self.next();

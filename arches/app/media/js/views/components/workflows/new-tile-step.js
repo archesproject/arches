@@ -5,20 +5,21 @@ define([
     'knockout',
     'models/graph',
     'viewmodels/card',
-    'viewmodels/provisional-tile'
-], function(_, $, arches, ko, GraphModel, CardViewModel, ProvisionalTileViewModel) {
+    'viewmodels/provisional-tile',
+    'viewmodels/alert'
+], function(_, $, arches, ko, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel) {
     function viewModel(params) {
         var self = this;
         var url = arches.urls.api_card + (params.resourceid || params.graphid);
 
         this.card = ko.observable();
         this.tile = ko.observable();
-        this.loading = ko.observable();
+        this.loading = params.loading || ko.observable(false);
+        this.alert = params.alert || ko.observable(null);
         this.resourceId = ko.observable(params.resourceid);
         this.complete = params.complete || ko.observable();
-        this.complete(!!params.tileid);
 
-        // TODO: show/hide loading mask before/after request/response
+        this.loading(true);
         $.getJSON(url, function(data) {
             var handlers = {
                 'after-update': [],
@@ -119,12 +120,23 @@ define([
                     }
                 }
             });
+            self.loading(false);
+            self.complete(!!params.tileid);
         });
 
         self.saveTile = function(tile, callback) {
+            self.loading(true);
             tile.save(function(response) {
-                // TODO handle failure with alert...
-                throw response;
+                self.loading(false);
+                self.alert(
+                    new AlertViewModel(
+                        'ep-alert-red',
+                        response.responseJSON.message[0],
+                        response.responseJSON.message[1],
+                        null,
+                        function(){ return; }
+                    )
+                );
             }, function(tile) {
                 params.resourceid = tile.resourceinstance_id;
                 params.tileid = tile.tileid;
@@ -133,6 +145,7 @@ define([
                 if (typeof callback === 'function') {
                     callback.apply(null, arguments);
                 }
+                self.loading(false);
             });
         };
     }
