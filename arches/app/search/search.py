@@ -65,7 +65,6 @@ class SearchEngine(object):
         """
 
         kwargs = self._add_prefix(**kwargs)
-        # kwargs['doc_type'] = kwargs.pop('doc_type', '_doc')
         body = kwargs.pop('body', None)
         if body != None:
             try:
@@ -110,7 +109,6 @@ class SearchEngine(object):
         """
 
         kwargs = self._add_prefix(**kwargs)
-        #kwargs['doc_type'] = kwargs.pop('doc_type', '_doc')
         body = kwargs.get('body', None)
         id = kwargs.get('id', None)
 
