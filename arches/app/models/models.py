@@ -15,7 +15,6 @@ import json
 import uuid
 import importlib
 import datetime
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from datetime import timedelta
 from django.forms.models import model_to_dict
 from django.contrib.gis.db import models

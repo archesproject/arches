@@ -172,7 +172,6 @@ define([
                 if (viewModel.graphView) {
                     viewModel.graphView.redraw(true);
                 }
-                // console.log(viewModel.appliedFunctions());
                 viewModel.alert(null);
                 viewModel.loading(false);
                 if (response.status !== 200) {
