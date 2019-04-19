@@ -48,7 +48,6 @@ define([
             this.component_id = ko.observable();
             this.constraints = ko.observableArray();
             this.appliedFunctions = attributes.appliedFunctions;
-            // this.appliedFunctions = ko.observable();
 
             this.set('cards', this.cards);
             this.set('nodes', this.nodes);
