@@ -414,6 +414,10 @@
         {% autoescape off %}return {{geoms}};{% endautoescape %}
     });
 
+    define('search-components', ['views/components/search/term-filter'], function () {
+        return
+    });
+
     define('leaflet-draw-local', [
         'leaflet',
         'leaflet-draw'

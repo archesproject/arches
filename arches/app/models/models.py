@@ -658,6 +658,23 @@ class ResourceInstance(models.Model):
         db_table = 'resource_instances'
 
 
+class SearchComponent(models.Model):
+    searchcomponentid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
+    name = models.TextField(unique=True)
+    icon = models.TextField(default=None)
+    componentpath = models.TextField(unique=True)
+    componentname = models.TextField()
+    config = JSONField(blank=True, null=True)
+    sortorder = models.IntegerField(blank=True, null=True, default=None)
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        managed = True
+        db_table = 'search_compnent'
+
+
 class TileModel(models.Model): #Tile
     """
     the data JSONField has this schema:
