@@ -19,7 +19,7 @@ function(_, ko, moment, BaseFilter, arches) {
                     toDate: ko.observable(null),
                     dateNodeId: ko.observable(null),
                     inverted: ko.observable(false)
-                }
+                };
                 this.filter.fromDate.subscribe(function (fromDate) {
                     var toDate = self.filter.toDate();
                     if (fromDate && toDate && !this.isFromLessThanTo(fromDate, toDate)) {
