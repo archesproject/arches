@@ -147,6 +147,7 @@ define([
             graphiconclass: params.graph.iconclass,
             graph: params.graph,
             graphModel: params.graphModel,
+            appliedFunctions: params.appliedFunctions(),
             expandAll: function() {
                 toggleAll(true);
             },
@@ -172,6 +173,7 @@ define([
             }).map(function(card) {
                 return new CardViewModel({
                     card: card,
+                    appliedFunctions: params.appliedFunctions(),
                     graphModel: params.graphModel,
                     tile: null,
                     resourceId: ko.observable(),
@@ -370,7 +372,21 @@ define([
                 });
             },
             selection: selection,
-            filter: filter
+            filter: filter,
+            isFuncNode: function() {
+                var appFuncDesc, appFuncName, nodegroupId;
+                if(params.card) {
+                    nodegroupId = params.card.nodegroup_id;
+                    if(this.appliedFunctions().length > 0) {
+                        appFuncDesc = this.appliedFunctions()[0]['config']['description']['nodegroup_id'];
+                        appFuncName = this.appliedFunctions()[0]['config']['name']['nodegroup_id'];
+                        if(nodegroupId == appFuncDesc || nodegroupId == appFuncName) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
         });
         var topCard = self.topCards()[0];
         if (topCard != null) {

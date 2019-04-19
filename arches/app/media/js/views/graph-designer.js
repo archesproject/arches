@@ -35,6 +35,7 @@ define([
             viewModel.ontologies = ko.observable(data['ontologies']);
             viewModel.ontologyClasses = ko.observable(data['ontologyClasses']);
             viewModel.cardComponents = data.cardComponents;
+            viewModel.appliedFunctions = ko.observable(data['appliedFunctions']);
 
             var resources = ko.utils.arrayFilter(viewData.graphs, function(graph) {
                 return graph.isresource;
@@ -171,6 +172,7 @@ define([
                 if (viewModel.graphView) {
                     viewModel.graphView.redraw(true);
                 }
+                // console.log(viewModel.appliedFunctions());
                 viewModel.alert(null);
                 viewModel.loading(false);
                 if (response.status !== 200) {
@@ -215,12 +217,14 @@ define([
 
             viewModel.cardTree = new CardTreeViewModel({
                 graph: viewModel.graph,
+                appliedFunctions: viewModel.appliedFunctions,
                 graphModel: viewModel.graphModel
             });
 
             viewModel.permissionTree = new CardTreeViewModel({
                 graph: viewModel.graph,
                 graphModel: viewModel.graphModel,
+                appliedFunctions: viewModel.appliedFunctions,
                 multiselect: true
             });
 
@@ -253,6 +257,7 @@ define([
                 graphModel: viewModel.graphModel,
                 loading: viewModel.loading,
                 node: viewModel.selectedNode,
+                appliedFunctions: viewModel.appliedFunctions,
                 restrictedNodegroups: data.restrictedNodegroups
             });
 
@@ -314,6 +319,7 @@ define([
                 graphSettings: viewModel.graphSettingsViewModel,
                 cardTree: viewModel.cardTree,
                 permissionTree: viewModel.permissionTree,
+                appliedFunctions: viewModel.appliedFunctions,
                 restrictedNodegroups: data.restrictedNodegroups
             });
 

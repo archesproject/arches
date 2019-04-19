@@ -33,6 +33,29 @@ define([
                 return self.graphModel.get('isresource') && node && node.istopnode;
             });
             this.restrictedNodegroups = options.restrictedNodegroups;
+            this.appliedFunctions = options.appliedFunctions;
+
+            this.isFuncNode = function() {
+                var node = self.node();
+                var appFuncDesc = this.appliedFunctions()[0]['config']['description']['nodegroup_id'];
+                var appFuncName = this.appliedFunctions()[0]['config']['name']['nodegroup_id'];
+                if(node['id'] == appFuncDesc) {
+                    return "This node participates in the descriptor function";
+                } else if(node['id'] == appFuncName) {
+                    return "This node participates in the name function";
+                } else {
+                    if(node['children']) {
+                        node['children'].forEach( function(child) {
+                            if(child['id'] == appFuncDesc) {
+                                return "This node participates in the descriptor function";
+                            } else if(child['id'] == appFuncName) {
+                                return "This node participates in the name function";
+                            }
+                        }); 
+                    }
+                }
+                return false;
+            };
 
             /**
             * Checks if a node's card is editable and returns a boolean useful

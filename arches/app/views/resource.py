@@ -117,6 +117,7 @@ class NewResourceEditorView(MapBaseManagerView):
             'sortorder').all() for card in cards] for widget in widgets]
         widgets = models.Widget.objects.all()
         card_components = models.CardComponent.objects.all()
+        applied_functions = JSONSerializer().serialize(models.FunctionXGraph.objects.filter(graph=graph))
         datatypes = models.DDataType.objects.all()
         user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
         is_system_settings = False
@@ -187,6 +188,7 @@ class NewResourceEditorView(MapBaseManagerView):
             card_components_json=JSONSerializer().serialize(card_components),
             tiles=JSONSerializer().serialize(tiles),
             cards=JSONSerializer().serialize(cards),
+            applied_functions=applied_functions,
             nodegroups=JSONSerializer().serialize(nodegroups),
             nodes=JSONSerializer().serialize(nodes),
             cardwidgets=JSONSerializer().serialize(cardwidgets),

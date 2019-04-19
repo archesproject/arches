@@ -37,9 +37,6 @@ define([
             this.helptitle = ko.observable();
             this.helpactive = ko.observable(false);
             this.cardinality = ko.observable();
-            if (attributes.data.nodegroup) {
-                this.cardinality(attributes.data.nodegroup.cardinality);
-            }
             this.visible = ko.observable();
             this.active = ko.observable();
             this.ontologyproperty = ko.observable();
@@ -47,6 +44,8 @@ define([
             this.disabled = ko.observable();
             this.component_id = ko.observable();
             this.constraints = ko.observableArray();
+            this.appliedFunctions = attributes.appliedFunctions;
+            // this.appliedFunctions = ko.observable();
 
             this.set('cards', this.cards);
             this.set('nodes', this.nodes);
@@ -72,6 +71,7 @@ define([
             this.set('component_id', this.component_id);
             this.set('config', {});
             this.set('constraints', this.constraints);
+            this.set('appliedFunctions', this.appliedFunctions);
 
             this.cardComponentLookup = cardComponentLookup;
             this.configKeys = ko.observableArray();

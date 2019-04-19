@@ -61,6 +61,7 @@ define([
             this.graphModel = options.graphModel;
             this.graphSettings = options.graphSettings;
             this.cardTree = options.cardTree;
+            this.appliedFunctions = options.appliedFunctions;
             this.permissionTree = options.permissionTree;
             this.items = this.graphModel.get('nodes');
             this.branchListVisible = ko.observable(false);
@@ -83,6 +84,30 @@ define([
                 }
                 return name;
             }, this);
+        },
+
+        /**
+         * Returns a boolean to indicate whether this node participates in descriptor function
+         * @param {object} node - a node in the tree 
+         */
+        isFuncNode: function(node) {
+            var appFuncDesc, appFuncName;
+            if(this.appliedFunctions().length > 0) {
+                appFuncDesc = this.appliedFunctions()[0]['config']['description']['nodegroup_id'];
+                appFuncName = this.appliedFunctions()[0]['config']['name']['nodegroup_id'];
+                if(node['id'] == appFuncDesc || node['id'] == appFuncName) {
+                    return true;
+                } else {
+                    if(node['children']) {
+                        node['children'].forEach( function(child) {
+                            if(child['id'] == appFuncDesc || child['id'] == appFuncName) {
+                                return true;
+                            }
+                        }); 
+                    }
+                }
+            }
+            return false;
         },
 
         /**

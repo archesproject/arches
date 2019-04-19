@@ -71,6 +71,7 @@ define([
         var multiselect = params.multiselect || false;
         var isWritable = params.card.is_writable || false;
         var selection;
+        var appliedFunctions = params.appliedFunctions;
         if (params.multiselect) {
             selection = params.selection || ko.observableArray([]);
         } else {
@@ -128,6 +129,7 @@ define([
         _.extend(this, nodegroup, {
             isWritable: isWritable,
             model: cardModel,
+            appliedFunctions: appliedFunctions,
             multiselect: params.multiselect,
             widgets: cardModel.widgets,
             parent: params.tile,
@@ -328,6 +330,20 @@ define([
                     loading: loading,
                     cardwidgets: params.cardwidgets,
                 });
+            },
+            isFuncNode: function() {
+                var appFuncDesc, appFuncName, nodegroupId;
+                if(params.appliedFunctions && params.card) {
+                    appFuncDesc = self.appliedFunctions[0]['config']['description']['nodegroup_id'];
+                    appFuncName = self.appliedFunctions[0]['config']['name']['nodegroup_id'];
+                    nodegroupId = params.card.nodegroup_id;
+                    if(nodegroupId == appFuncDesc) {
+                        return "* This card data will show as the resource description.";
+                    } else if(nodegroupId == appFuncName) {
+                        return "* This card data will show as the resource name.";
+                    }
+                }
+                return false;
             }
         });
 
