@@ -1,6 +1,6 @@
 define([
     'knockout',
-    'views/search/base-filter',
+    'views/components/search/base-filter',
     'arches',
     'views/components/widgets/map',
 ],

@@ -1,6 +1,6 @@
 define([
     'knockout',
-    'views/search/base-filter'
+    'views/components/search/base-filter'
 ], function(ko, BaseFilter) {
     return BaseFilter.extend({
         initialize: function(options) {

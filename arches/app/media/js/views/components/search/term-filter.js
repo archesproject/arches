@@ -1,7 +1,7 @@
 define([
     'knockout',
     'underscore',
-    'views/search/base-filter',
+    'views/components/search/base-filter',
     'bindings/term-search'
 ], function(ko, _, BaseFilter, termSearchComponent) {
     return ko.components.register('term-filter', {
@@ -75,6 +75,6 @@ define([
                 return has_tag;
             }
         }),
-        template: { require: 'text!templates/views/search/term-filter.htm' }
+        template: { require: 'text!templates/views/components/search/term-filter.htm' }
     });
 });

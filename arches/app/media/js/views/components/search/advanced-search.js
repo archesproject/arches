@@ -2,7 +2,7 @@ define([
     'underscore',
     'knockout',
     'knockout-mapping',
-    'views/search/base-filter',
+    'views/components/search/base-filter',
     'arches',
     'datatype-config-components',
     'bindings/let'
