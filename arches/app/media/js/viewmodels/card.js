@@ -332,15 +332,21 @@ define([
                 });
             },
             isFuncNode: function() {
-                var appFuncDesc, appFuncName, nodegroupId;
+                var appFuncDesc = false, appFuncName = false, nodegroupId = null;
                 if(params.appliedFunctions && params.card) {
-                    appFuncDesc = self.appliedFunctions[0]['config']['description']['nodegroup_id'];
-                    appFuncName = self.appliedFunctions[0]['config']['name']['nodegroup_id'];
-                    nodegroupId = params.card.nodegroup_id;
-                    if(nodegroupId == appFuncDesc) {
-                        return "* This card data will show as the resource description.";
-                    } else if(nodegroupId == appFuncName) {
-                        return "* This card data will show as the resource name.";
+                    for(var i=0; i < self.appliedFunctions.length; i++) {
+                        if(self.appliedFunctions[i]['config']['description']['nodegroup_id']) {
+                            appFuncDesc = self.appliedFunctions[i]['config']['description']['nodegroup_id'];
+                        }
+                        if(self.appliedFunctions[i]['config']['name']['nodegroup_id']) {
+                            appFuncName = self.appliedFunctions[i]['config']['name']['nodegroup_id'];
+                        }
+                        nodegroupId = params.card.nodegroup_id;
+                        if(nodegroupId === appFuncDesc) {
+                            return "* This card data will show as the resource description.";
+                        } else if(nodegroupId === appFuncName) {
+                            return "* This card data will show as the resource name.";
+                        }
                     }
                 }
                 return false;

@@ -91,19 +91,26 @@ define([
          * @param {object} node - a node in the tree 
          */
         isFuncNode: function(node) {
-            var appFuncDesc, appFuncName;
-            if(this.appliedFunctions().length > 0) {
-                appFuncDesc = this.appliedFunctions()[0]['config']['description']['nodegroup_id'];
-                appFuncName = this.appliedFunctions()[0]['config']['name']['nodegroup_id'];
-                if(node['id'] == appFuncDesc || node['id'] == appFuncName) {
-                    return true;
-                } else {
-                    if(node['children']) {
-                        node['children'].forEach( function(child) {
-                            if(child['id'] == appFuncDesc || child['id'] == appFuncName) {
-                                return true;
-                            }
-                        }); 
+            var appFuncs = null, appFuncDesc = false, appFuncName = false;
+            if(this.appliedFunctions()) {
+                appFuncs = this.appliedFunctions();
+                for(var i = 0; i < appFuncs.length; i++) {
+                    if(appFuncs[i]['config']['description']['nodegroup_id']) {
+                        appFuncDesc = appFuncs[i]['config']['description']['nodegroup_id'];
+                    }
+                    if(appFuncs[i]['config']['name']['nodegroup_id']) {
+                        appFuncName[i]['config']['name']['nodegroup_id'];
+                    }
+                    if(node['id'] === appFuncDesc || node['id'] === appFuncName) {
+                        return true;
+                    } else {
+                        if(node['children']) {
+                            node['children'].forEach( function(child) {
+                                if(child['id'] === appFuncDesc || child['id'] === appFuncName) {
+                                    return true;
+                                }
+                            }); 
+                        }
                     }
                 }
             }

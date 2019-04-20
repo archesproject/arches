@@ -148,26 +148,6 @@ define([
         graphiconclass: data.graphiconclass,
         relationship_types: data.relationship_types,
         appliedFunctions: appliedFunctions(),
-        isFuncNode: function() {
-            var node = false;
-            var appFuncDesc, appFuncName;
-            if(this.appliedFunctions.length > 0) {
-                appFuncDesc = this.appliedFunctions[0]['config']['description']['nodegroup_id'];
-                appFuncName = this.appliedFunctions[0]['config']['name']['nodegroup_id'];
-                if(node['id'] == appFuncDesc || node['id'] == appFuncName) {
-                    return true;
-                } else {
-                    if(node['children']) {
-                        node['children'].forEach( function(child) {
-                            if(child['id'] == appFuncDesc || child['id'] == appFuncName) {
-                                return true;
-                            }
-                        }); 
-                    }
-                }
-            }
-            return false;
-        },
         graph: {
             graphid: data.graphid,
             name: data.graphname,

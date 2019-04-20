@@ -36,22 +36,33 @@ define([
             this.appliedFunctions = options.appliedFunctions;
 
             this.isFuncNode = function() {
+                console.log('viewmodels/node-form isFunc');
                 var node = self.node();
-                var appFuncDesc = this.appliedFunctions()[0]['config']['description']['nodegroup_id'];
-                var appFuncName = this.appliedFunctions()[0]['config']['name']['nodegroup_id'];
-                if(node['id'] == appFuncDesc) {
-                    return "This node participates in the descriptor function";
-                } else if(node['id'] == appFuncName) {
-                    return "This node participates in the name function";
-                } else {
-                    if(node['children']) {
-                        node['children'].forEach( function(child) {
-                            if(child['id'] == appFuncDesc) {
-                                return "This node participates in the descriptor function";
-                            } else if(child['id'] == appFuncName) {
-                                return "This node participates in the name function";
+                var appFuncs = null, appFuncDesc = false, appFuncName = false;
+                if(this.appliedFunctions()) {
+                    appFuncs = this.appliedFunctions();
+                    for(var i = 0; i < appFuncs.length; i++) {
+                        if(appFuncs[i]['config']['description']['nodegroup_id']) {
+                            appFuncDesc = appFuncs[i]['config']['description']['nodegroup_id'];
+                        }
+                        if(appFuncs[i]['config']['name']['nodegroup_id']) {
+                            appFuncName = appFuncs[i]['config']['name']['nodegroup_id'];
+                        }
+                        if(node['id'] == appFuncDesc) {
+                            return "This node participates in the descriptor function";
+                        } else if(node['id'] == appFuncName) {
+                            return "This node participates in the name function";
+                        } else {
+                            if(node['children']) {
+                                node['children'].forEach( function(child) {
+                                    if(child['id'] == appFuncDesc) {
+                                        return "This node participates in the descriptor function";
+                                    } else if(child['id'] == appFuncName) {
+                                        return "This node participates in the name function";
+                                    }
+                                }); 
                             }
-                        }); 
+                        }
                     }
                 }
                 return false;

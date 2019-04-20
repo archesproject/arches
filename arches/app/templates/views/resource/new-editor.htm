@@ -52,7 +52,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
                 <div class="resource-editor-tree">
                     <ul class="jstree-container-ul jstree-children" aria-expanded="true">
-                    <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': rootExpanded, 'jstree-closed' : !rootExpanded(), 'func-node': isFuncNode()}">
+                    <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': rootExpanded, 'jstree-closed' : !rootExpanded()}">
                         <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}"></i>
                         <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { selection('root'); }, css: {'jstree-clicked': selection() === 'root'}">
                             <strong>

@@ -374,13 +374,18 @@ define([
             selection: selection,
             filter: filter,
             isFuncNode: function() {
-                var appFuncDesc, appFuncName, nodegroupId;
-                if(params.card) {
+                var appFuncs = null, appFuncDesc = false, appFuncName = false, nodegroupId = null;
+                if(params.card && this.appliedFunctions()) {
+                    appFuncs = this.appliedFunctions();
                     nodegroupId = params.card.nodegroup_id;
-                    if(this.appliedFunctions().length > 0) {
-                        appFuncDesc = this.appliedFunctions()[0]['config']['description']['nodegroup_id'];
-                        appFuncName = this.appliedFunctions()[0]['config']['name']['nodegroup_id'];
-                        if(nodegroupId == appFuncDesc || nodegroupId == appFuncName) {
+                    for(var i = 0; i < appFuncs.length; i++) {
+                        if(appFuncs[i]['config']['description']['nodegroup_id']) {
+                            appFuncDesc = appFuncs[i]['config']['description']['nodegroup_id'];
+                        }
+                        if(appFuncs[i]['config']['name']['nodegroup_id']) {
+                            appFuncName = appFuncs[i]['config']['name']['nodegroup_id'];
+                        }
+                        if(nodegroupId === appFuncDesc || nodegroupId === appFuncName) {
                             return true;
                         }
                     }
