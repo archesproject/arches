@@ -147,7 +147,7 @@ define([
         reviewer: data.userisreviewer,
         graphiconclass: data.graphiconclass,
         relationship_types: data.relationship_types,
-        appliedFunctions: appliedFunctions(),
+        // appliedFunctions: appliedFunctions(),
         graph: {
             graphid: data.graphid,
             name: data.graphname,
