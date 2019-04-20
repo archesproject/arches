@@ -99,7 +99,7 @@ define([
                         appFuncDesc = appFuncs[i]['config']['description']['nodegroup_id'];
                     }
                     if(appFuncs[i]['config']['name']['nodegroup_id']) {
-                        appFuncName[i]['config']['name']['nodegroup_id'];
+                        appFuncName = appFuncs[i]['config']['name']['nodegroup_id'];
                     }
                     if(node['id'] === appFuncDesc || node['id'] === appFuncName) {
                         return true;

@@ -36,7 +36,6 @@ define([
             this.appliedFunctions = options.appliedFunctions;
 
             this.isFuncNode = function() {
-                console.log('viewmodels/node-form isFunc');
                 var node = self.node();
                 var appFuncs = null, appFuncDesc = false, appFuncName = false;
                 if(this.appliedFunctions()) {
@@ -48,16 +47,16 @@ define([
                         if(appFuncs[i]['config']['name']['nodegroup_id']) {
                             appFuncName = appFuncs[i]['config']['name']['nodegroup_id'];
                         }
-                        if(node['id'] == appFuncDesc) {
+                        if(node['id'] === appFuncDesc) {
                             return "This node participates in the descriptor function";
-                        } else if(node['id'] == appFuncName) {
+                        } else if(node['id'] === appFuncName) {
                             return "This node participates in the name function";
                         } else {
                             if(node['children']) {
                                 node['children'].forEach( function(child) {
-                                    if(child['id'] == appFuncDesc) {
+                                    if(child['id'] === appFuncDesc) {
                                         return "This node participates in the descriptor function";
-                                    } else if(child['id'] == appFuncName) {
+                                    } else if(child['id'] === appFuncName) {
                                         return "This node participates in the name function";
                                     }
                                 }); 
