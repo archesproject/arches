@@ -110,12 +110,6 @@ define([
                 desc: "Advice on the potential work related to a development area"
             }
         ]);
-        this.iconClass = ko.computed(function() {
-            return " flavortown ";
-        }, this);
-        this.classIcon = function(index) {
-            return self.workflows[index].icon;
-        };
     };
     return WorkflowSelect;
 });

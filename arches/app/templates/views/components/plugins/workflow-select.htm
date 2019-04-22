@@ -45,7 +45,7 @@
         <a data-bind="attr: {href: '#', title: workflow.name, target: '_blank'" href="#"><div data-bind="style: {'background-color': workflow.bgColor}" class="workflow-select-card">
             <h4 data-bind="text: workflow.name"></h4>
             <div data-bind="style: {'background-color': workflow.circleColor}" class="workflow-select-wf-circle">
-                <span><i data-bind="css: {'fa-building-o': workflow.name === 'Application Area', 'fa-comment': workflow.name === 'Communication', 'fa-file-text-o': workflow.name === 'Consultation'}" class="fa workflow-select-wf-icon"></i></span>
+                <span><i data-bind="attr:{class: ('fa '+workflow.icon +' workflow-select-wf-icon')}"></i></span>
             </div>
             <p data-bind="text: workflow.desc" class="workflow-select-desc"></p>   
         </div></a>
