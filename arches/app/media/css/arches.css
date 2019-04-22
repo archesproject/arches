@@ -544,11 +544,72 @@ input[type="checkbox"] {
     padding: 20px;
 }
 
+.workflow-panel-header a span {
+    font-size: 16px;
+    color: white;
+    margin-bottom: 12px;
+    margin-left: 20px;
+    padding-right: 50px;
+    width: 100%;
+}
+
+.workflow-panel-header {
+    padding-top: 20px;
+}
+
+.workflow-panel-header > hr {
+    border-color: #142638;
+    width: 100%;
+}
+
+.workflow-panel {
+    background: #26476a;
+    width: 12%;
+    color: white;
+}
+.workflow-panel ul {
+    /* text-decoration: none; */
+    list-style-type: none;
+    /* padding-left: 12px; */
+    margin-bottom: 20px;
+    min-height: 200px;
+    padding-left: 0;
+    /* border-bottom: #fff; */
+    border-width: 2px;
+}
+
+.workflow-panel i {
+    margin-right: 12px;
+}
+
+.workflow-panel li {
+    padding-top: 12px;
+    padding-left: 30px;
+    padding-bottom: 12px;
+}
+
+.workflow-panel li:hover {
+    background-color: #5f7892;
+}
+
+.workflow-panel > hr {
+    border-color: white;
+    margin-left: 30px;
+    margin-right: 30px;
+}
+
+.workflow-panel li a span {
+    color: white;
+    font-size: 16px;
+    margin-top: 15px;
+}
+
 .workflow-select-card-container {
     display: flex;
     flex-grow: inherit;
     flex-direction: row;
     flex-wrap: wrap;
+    padding: 20px;
 }
 
 .workflow-select-card {
