@@ -167,6 +167,11 @@ class GraphDesignerView(GraphBaseView):
         datatypes_json = JSONSerializer().serialize(datatypes, exclude=['modulename', 'isgeometric'])
         branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True)
         cards = self.graph.cardmodel_set.order_by('sortorder').prefetch_related('cardxnodexwidget_set')
+        constraints = []
+        for card in cards:
+            if models.ConstraintModel.objects.filter(card=card).count() > 0:
+                constraints += models.ConstraintModel.objects.filter(card=card)
+
         cardwidgets = [widget for widgets in [card.cardxnodexwidget_set.order_by(
             'sortorder').all() for card in cards] for widget in widgets]
         widgets = models.Widget.objects.all()
@@ -232,6 +237,7 @@ class GraphDesignerView(GraphBaseView):
             'title': help_title,
             'template': 'graph-tab-help',
         }
+        context['constraints'] = JSONSerializer().serialize(constraints)
 
         return render(request, 'views/graph-designer.htm', context)
 
@@ -497,7 +503,6 @@ class CardView(GraphBaseView):
                         card = models.CardModel.objects.get(pk=card_data['id'])
                         card.sortorder = card_data['sortorder']
                         card.save()
-
                 return JSONResponse(data['cards'])
 
         return HttpResponseNotFound()

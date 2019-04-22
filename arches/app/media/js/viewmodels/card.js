@@ -79,7 +79,6 @@ define([
         var nodegroup = _.find(ko.unwrap(nodegroups), function(group) {
             return ko.unwrap(group.nodegroupid) === ko.unwrap(params.card.nodegroup_id);
         });
-
         var cardModel = new CardModel({
             data: _.extend(params.card, {
                 widgets: params.cardwidgets,

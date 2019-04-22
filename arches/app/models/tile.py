@@ -22,6 +22,7 @@ import json
 import pytz
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 from arches.app.models import models
@@ -190,6 +191,37 @@ class Tile(models.TileModel):
                 edit = edits[str(user.id)]
         return edit
 
+    def check_for_constraint_violation(self, request):
+        card = models.CardModel.objects.get(nodegroup=self.nodegroup)
+        constraints = models.ConstraintModel.objects.filter(card=card)
+        if constraints.count() > 0:
+            for constraint in constraints:
+                if constraint.uniquetoallinstances is True:
+                    tiles = models.TileModel.objects.filter(nodegroup=self.nodegroup)
+                else:
+                    tiles = models.TileModel.objects.filter(
+                        Q(resourceinstance_id=self.resourceinstance.resourceinstanceid) &
+                        Q(nodegroup=self.nodegroup))
+                nodes = [node for node in constraint.nodes.all()]
+                for tile in tiles:
+                    if str(self.tileid) != str(tile.tileid):
+                        match = False
+                        duplicate_values = []
+                        for node in nodes:
+                            datatype_factory = DataTypeFactory()
+                            datatype = datatype_factory.get_instance(node.datatype)
+                            nodeid = str(node.nodeid)
+                            if datatype.values_match(tile.data[nodeid], self.data[nodeid]):
+                                match = True
+                                duplicate_values.append(datatype.get_display_value(tile, node))
+                            else:
+                                match = False
+                                break
+                        if match is True:
+                            message = _('This card violates a unique constraint. \
+                                The following value is already saved: ')
+                            raise TileValidationError(message + (', ').join(duplicate_values))
+
     def check_for_missing_nodes(self, request):
         missing_nodes = []
         for nodeid, value in self.data.iteritems():
@@ -205,8 +237,9 @@ class Tile(models.TileModel):
                     else:
                         missing_nodes.append(node.name)
         if missing_nodes != []:
-            message = _('This card requires values for the following:')
-            raise ValidationError(message, (', ').join(missing_nodes))
+            message = _('This card requires values for the following: ')
+            message += (', ').join(missing_nodes)
+            raise TileValidationError(message)
 
     def validate(self, errors=None):
         for nodeid, value in self.data.iteritems():
@@ -235,6 +268,7 @@ class Tile(models.TileModel):
         newprovisionalvalue = None
         oldprovisionalvalue = None
         self.check_for_missing_nodes(request)
+        self.check_for_constraint_violation(request)
 
         try:
             if user is None and request is not None:
@@ -447,7 +481,11 @@ class Tile(models.TileModel):
     def __getFunctionClassInstances(self):
         ret = []
         resource = models.ResourceInstance.objects.get(pk=self.resourceinstance_id)
-        functionXgraphs = models.FunctionXGraph.objects.filter(graph_id=resource.graph_id, config__triggering_nodegroups__contains=[str(self.nodegroup_id)])
+        functionXgraphs = models.FunctionXGraph.objects.filter(
+            Q(graph_id=resource.graph_id),
+            Q(config__triggering_nodegroups__contains=[str(self.nodegroup_id)]) | Q(config__triggering_nodegroups=[]),
+            ~Q(function__classname='PrimaryDescriptorsFunction')
+        )
         for functionXgraph in functionXgraphs:
             func = functionXgraph.function.get_class_module()(functionXgraph.config, self.nodegroup_id)
             ret.append(func)

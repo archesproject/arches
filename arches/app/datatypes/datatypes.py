@@ -149,7 +149,8 @@ class NumberDataType(BaseDataType):
         errors = []
 
         try:
-            decimal.Decimal(value)
+            if value is not None:
+                decimal.Decimal(value)
         except:
             errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} {3}- {4}. {5}'.format(self.datatype_model.datatype, value, source, row_number, 'not a properly formatted number', 'This data was not imported.')})
         return errors
@@ -254,24 +255,23 @@ class DateDataType(BaseDataType):
 
     def validate(self, value, row_number=None, source=''):
         errors = []
-
-        date_formats = ['-%Y','%Y','%Y-%m-%d','%B-%m-%d','%Y-%m-%d %H:%M:%S']
-        valid = False
-        for mat in date_formats:
+        if value is not None:
+            date_formats = ['-%Y','%Y','%Y-%m-%d','%B-%m-%d','%Y-%m-%d %H:%M:%S']
+            valid = False
+            for mat in date_formats:
+                if valid == False:
+                    try:
+                        if datetime.strptime(value, mat):
+                            valid = True
+                    except:
+                        valid = False
             if valid == False:
-                try:
-                    if datetime.strptime(value, mat):
-                        valid = True
-                except:
-                    valid = False
-        if valid == False:
-            if hasattr(settings, 'DATE_IMPORT_EXPORT_FORMAT'):
-                date_format = settings.DATE_IMPORT_EXPORT_FORMAT
-            else:
-                date_format = date_formats
+                if hasattr(settings, 'DATE_IMPORT_EXPORT_FORMAT'):
+                    date_format = settings.DATE_IMPORT_EXPORT_FORMAT
+                else:
+                    date_format = date_formats
 
-            errors.append({'type': 'ERROR', 'message': '{0} {1} is not in the correct format, make sure it is in this format: {2} or set the date format in settings.DATE_IMPORT_EXPORT_FORMAT. This data was not imported.'.format(value, row_number, date_format)})
-
+                errors.append({'type': 'ERROR', 'message': '{0} {1} is not in the correct format, make sure it is in this format: {2} or set the date format in settings.DATE_IMPORT_EXPORT_FORMAT. This data was not imported.'.format(value, row_number, date_format)})
 
         return errors
 
@@ -420,7 +420,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         errors = []
         coord_limit = 1500
         coordinate_count = 0
-
         def validate_geom(geom, coordinate_count=0):
             try:
                 coordinate_count += geom.num_coords
@@ -436,13 +435,14 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 message = 'Not a properly formatted geometry'
                 errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}.'.format(self.datatype_model.datatype, value, source, message, 'This data was not imported.')})
 
-        for feature in value['features']:
-            try:
-                geom = GEOSGeometry(JSONSerializer().serialize(feature['geometry']))
-                validate_geom(geom, coordinate_count)
-            except:
-                message = 'It was not possible to serialize some feaures in your geometry.'
-                errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, message, 'This data was not imported.')})
+        if value is not None:
+            for feature in value['features']:
+                try:
+                    geom = GEOSGeometry(JSONSerializer().serialize(feature['geometry']))
+                    validate_geom(geom, coordinate_count)
+                except:
+                    message = 'It was not possible to serialize some feaures in your geometry.'
+                    errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, message, 'This data was not imported.')})
 
         return errors
 
@@ -1320,10 +1320,10 @@ class DomainDataType(BaseDomainDataType):
 class DomainListDataType(BaseDomainDataType):
     def validate(self, value, row_number=None, source=''):
         errors = []
-
-        for v in value:
-            if len(models.Node.objects.filter(config__options__contains=[{"id": v}])) < 1:
-                errors.append({'type': 'ERROR', 'message': '{0} {1} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(v, row_number)})
+        if value is not None:
+            for v in value:
+                if len(models.Node.objects.filter(config__options__contains=[{"id": v}])) < 1:
+                    errors.append({'type': 'ERROR', 'message': '{0} {1} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(v, row_number)})
         return errors
 
     def transform_import_values(self, value, nodeid):
@@ -1356,9 +1356,10 @@ class DomainListDataType(BaseDomainDataType):
 
     def get_display_value(self, tile, node):
         new_values = []
-        for val in tile.data[str(node.nodeid)]:
-            option = self.get_option_text(node, val)
-            new_values.append(option)
+        if tile.data[str(node.nodeid)] is not None:
+            for val in tile.data[str(node.nodeid)]:
+                option = self.get_option_text(node, val)
+                new_values.append(option)
         return ','.join(new_values)
 
     def transform_export_values(self, value, *args, **kwargs):

@@ -14,6 +14,7 @@ from django.http.request import QueryDict
 from django.core import management
 from django.core.urlresolvers import reverse
 from django.utils.decorators import method_decorator
+from django.utils.translation import ugettext as _
 from revproxy.views import ProxyView
 from oauth2_provider.views import ProtectedResourceView
 from arches.app.models import models
@@ -164,7 +165,7 @@ class Surveys(APIBase):
             for project in projects:
                 project.deactivate_expired_survey()
                 projects_for_couch.append(project.serialize_for_mobile())
-            
+
             for project in projects_for_couch:
                 project['mapboxkey'] = settings.MAPBOX_API_KEY
                 permitted_cards = set()
@@ -299,7 +300,7 @@ class Resources(APIBase):
                     # Here we actually mean the name
                     #"label": str(model.name),
                     "ldp:contains": ["%s%s" % (base_url, resourceid) for resourceid in list(Resource.objects.values_list('pk', flat=True).
-                        exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_ID).order_by('pk')[start:end])]
+                                                                                            exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_ID).order_by('pk')[start:end])]
                 }
 
             return JSONResponse(out, indent=indent)
@@ -496,3 +497,110 @@ class Concepts(APIBase):
                 return JSONResponse(status=500, reason=e)
 
         return JSONResponse(ret, indent=indent)
+
+
+def get_resource_relationship_types():
+    resource_relationship_types = Concept().get_child_collections('00000000-0000-0000-0000-000000000005')
+    default_relationshiptype_valueid = None
+    for relationship_type in resource_relationship_types:
+        if relationship_type[0] == '00000000-0000-0000-0000-000000000007':
+            default_relationshiptype_valueid = relationship_type[2]
+    relationship_type_values = {'values': [{'id': str(c[2]), 'text':str(
+        c[1])} for c in resource_relationship_types], 'default': str(default_relationshiptype_valueid)}
+    return relationship_type_values
+
+
+class Card(APIBase):
+
+    def get(self, request, resourceid):
+        try:
+            resource_instance = Resource.objects.get(pk=resourceid)
+            graph = resource_instance.graph
+        except Resource.DoesNotExist:
+            graph = models.GraphModel.objects.get(pk=resourceid)
+            resourceid = None
+            resource_instance = None
+            pass
+        nodes = graph.node_set.all()
+
+        nodegroups = []
+        editable_nodegroups = []
+        for node in nodes:
+            if node.is_collector:
+                added = False
+                if request.user.has_perm('write_nodegroup', node.nodegroup):
+                    editable_nodegroups.append(node.nodegroup)
+                    nodegroups.append(node.nodegroup)
+                    added = True
+                if not added and request.user.has_perm('read_nodegroup', node.nodegroup):
+                    nodegroups.append(node.nodegroup)
+
+        nodes = nodes.filter(nodegroup__in=nodegroups)
+        cards = graph.cardmodel_set.order_by('sortorder').filter(
+            nodegroup__in=nodegroups).prefetch_related('cardxnodexwidget_set')
+        cardwidgets = [widget for widgets in [card.cardxnodexwidget_set.order_by(
+            'sortorder').all() for card in cards] for widget in widgets]
+        datatypes = models.DDataType.objects.all()
+        user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
+        widgets = models.Widget.objects.all()
+        card_components = models.CardComponent.objects.all()
+
+        if resource_instance is None:
+            tiles = []
+            displayname = _('New Resource')
+        else:
+            displayname = resource_instance.displayname
+            if displayname == 'undefined':
+                displayname = _('Unnamed Resource')
+            if str(resource_instance.graph_id) == settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
+                displayname = _("System Settings")
+
+            tiles = resource_instance.tilemodel_set.order_by('sortorder').filter(nodegroup__in=nodegroups)
+            provisionaltiles = []
+            for tile in tiles:
+                append_tile = True
+                isfullyprovisional = False
+                if tile.provisionaledits is not None:
+                    if len(tile.provisionaledits.keys()) > 0:
+                        if len(tile.data) == 0:
+                            isfullyprovisional = True
+                        if user_is_reviewer is False:
+                            if str(request.user.id) in tile.provisionaledits:
+                                tile.provisionaledits = {
+                                    str(request.user.id): tile.provisionaledits[str(request.user.id)]}
+                                tile.data = tile.provisionaledits[str(request.user.id)]['value']
+                            else:
+                                if isfullyprovisional is True:
+                                    # if the tile IS fully provisional and the current user is not the owner,
+                                    # we don't send that tile back to the client.
+                                    append_tile = False
+                                else:
+                                    # if the tile has authoritaive data and the current user is not the owner,
+                                    # we don't send the provisional data of other users back to the client.
+                                    tile.provisionaledits = None
+                if append_tile == True:
+                    provisionaltiles.append(tile)
+            tiles = provisionaltiles
+
+        cards = JSONSerializer().serializeToPython(cards)
+        editable_nodegroup_ids = [str(nodegroup.pk) for nodegroup in editable_nodegroups]
+        for card in cards:
+            card['is_writable'] = False
+            if str(card['nodegroup_id']) in editable_nodegroup_ids:
+                card['is_writable'] = True
+
+        context = {
+            'resourceid': resourceid,
+            'displayname': displayname,
+            'tiles': tiles,
+            'cards': cards,
+            'nodegroups': nodegroups,
+            'nodes': nodes,
+            'cardwidgets': cardwidgets,
+            'datatypes': datatypes,
+            'userisreviewer': user_is_reviewer,
+            'widgets': widgets,
+            'card_components': card_components,
+        }
+
+        return JSONResponse(context, indent=4)

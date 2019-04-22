@@ -1,3 +1,5 @@
+{% load i18n %}
+<!--ko if: ready() -->
 <div class="workflow-plugin">
     <div class="workflowstep-nav">
         <!--ko foreach: {data: steps, as: 'step'}-->
@@ -8,15 +10,19 @@
     <div class="workflow-step-description-container">
         <div class="workflow-nav-controls left"><i class="fa fa-chevron-circle-left" data-bind="click: back"></i></div>
         <div class="workflow-step-description">
-             <div class="title" data-bind="text:activeStep().title">Recommendations </div>
-             <div class="subtitle" data-bind="text:activeStep().subtitle">New Site Visit </div>
-             <div class="step">Step <span data-bind="text:activeStepIndex() + 1">1</span> of <span data-bind="text:steps().length">1</span>: <span data-bind="text:activeStep().description">Recommendated Actions</span></div>
+             <div class="title" data-bind="text:activeStep().title"></div>
+             <div class="subtitle" data-bind="text:activeStep().subtitle"></div>
+             <div class="step">{% trans "Step" %} <span data-bind="text:activeStep()._index+1"></span> {% trans "of" %} <span data-bind="text:steps.length"></span>: <span data-bind="text:activeStep().description"></span></div>
         </div>
         <div class="workflow-nav-controls right"><i class="fa fa-chevron-circle-right" data-bind="click: next"></i></div>
     </div>
     <div class='workflow-step-body'>
-        <div data-bind="component: {
-            name: activeStep().component
-        }"></div>
+        <!--ko if: activeStep().component-->
+            <!-- ko component: {
+                name: activeStep().component,
+                params: activeStep()
+            } --><!--/ko-->
+        <!--/ko-->
     </div>
 </div>
+<!--/ko-->

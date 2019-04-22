@@ -110,10 +110,20 @@ class Command(BaseCommand):
 
         os.chmod(os.path.join(install_location, file_name_wo_extention, 'bin', 'elasticsearch'), 0755)
 
+        def change_permissions_recursive(path, mode):
+            for root, dirs, files in os.walk(path, topdown=True):
+                for dir in [os.path.join(root,d) for d in dirs]:
+                    os.chmod(dir, mode)
+                for file in [os.path.join(root, f) for f in files]:
+                    if '/bin/' in file:
+                        os.chmod(file, mode)
+
+        change_permissions_recursive(os.path.join(install_location, file_name_wo_extention, 'modules', 'x-pack-ml', 'platform'), 0o755)
+
         with open(os.path.join(es_config_directory, 'elasticsearch.yml'), 'w') as f:
             f.write('# ----------------- FOR TESTING ONLY -----------------')
             f.write('\n# - THESE SETTINGS SHOULD BE REVIEWED FOR PRODUCTION -')
-            f.write('\n# -https://www.elastic.co/guide/en/elasticsearch/reference/6.6/important-settings.html - ')
+            f.write('\n# -https://www.elastic.co/guide/en/elasticsearch/reference/6.7/important-settings.html - ')
             f.write('\nhttp.port: %s' % port)
             f.write('\n\n# for the elasticsearch-head plugin')
             f.write('\nhttp.cors.enabled: true')

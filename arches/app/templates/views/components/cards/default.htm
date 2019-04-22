@@ -344,7 +344,7 @@
             <!-- /ko -->
             {% block form_buttons %}
             <div class="install-buttons">
-                <!-- ko if: tile.tileid -->
+                <!-- ko if: tile.tileid && self.form.deleteTile -->
                 <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: function () { self.form.deleteTile(tile); }, css: {disabled: (!card.isWritable && !self.preview), 'btn-warning': card.isWritable }">{% trans 'Delete this record' %}</button>
                 <!-- /ko -->
                 <!-- ko if: tile.dirty() -->

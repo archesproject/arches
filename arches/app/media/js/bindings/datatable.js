@@ -1,15 +1,24 @@
 define([
     'jquery',
     'knockout',
+    'underscore',
     'datatables.net-buttons-bs',
     'datatables.net-responsive-bs',
     'datatables.net-buttons-print',
     'datatables.net-buttons-html5'
-], function($, ko, DataTable) {
+], function($, ko, _, DataTable) {
     ko.bindingHandlers.datatable = {
         init: function(element, valueAccessor) {
             var config = ko.unwrap(valueAccessor());
-            $(element).DataTable(config);
+            var table = $(element).DataTable(config);
+            if(config.columnVis) {
+                _.each(config.columnVis, function(vis, i) {
+                    vis.subscribe(function(val) {
+                        var column = table.column(i);
+                        column.visible(val);
+                    });
+                });
+            }
         }
     };
 

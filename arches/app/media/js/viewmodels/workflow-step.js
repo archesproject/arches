@@ -1,16 +1,19 @@
 define([
-    'knockout', 'underscore'
+    'knockout',
+    'underscore'
 ], function(ko, _) {
     var WorkflowStep = function(config) {
         this.classUnvisited = 'workflow-step-icon';
         this.classActive = 'workflow-step-icon active';
         this.classComplete = 'workflow-step-icon complete';
         this.icon = 'fa-chevron-circle-right';
-        this.title = 'Title';
-        this.subtitle = 'Subtitle';
-        this.description = 'description of step here';
+        this.title = '';
+        this.subtitle = '';
+        this.description = '';
         this.complete = ko.observable(false);
-        this.active = ko.observable(false);
+        this.active = ko.computed(function() {
+            return config.workflow.activeStep() === this;
+        }, this);
 
         _.extend(this, config);
 
