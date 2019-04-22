@@ -111,11 +111,9 @@ define([
             }
         ]);
         this.iconClass = ko.computed(function() {
-            console.log(self.workflows()[0].icon);
             return " flavortown ";
         }, this);
         this.classIcon = function(index) {
-            console.log("here");
             return self.workflows[index].icon;
         };
     };
