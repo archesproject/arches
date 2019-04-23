@@ -42,7 +42,7 @@
     </div>
     <div class="workflow-select-card-container">
         <!-- ko foreach: {data: workflows, as: 'workflow'} -->
-        <a data-bind="attr: {href: '#', title: workflow.name, target: '_blank'" href="#"><div data-bind="style: {'background-color': workflow.bgColor}" class="workflow-select-card">
+        <a data-bind="attr: {href: '#', title: workflow.name, target: '_blank'}" href="#"><div data-bind="style: {'background-color': workflow.bgColor}" class="workflow-select-card">
             <h4 data-bind="text: workflow.name"></h4>
             <div data-bind="style: {'background-color': workflow.circleColor}" class="workflow-select-wf-circle">
                 <span><i data-bind="attr:{class: ('fa '+workflow.icon +' workflow-select-wf-icon')}"></i></span>

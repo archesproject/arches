@@ -2,8 +2,7 @@ define([
     'knockout'
 ], function(ko) {
     var WorkflowSelect = function() {
-        var self = this;
-        self.workflows = ko.observableArray([
+        this.workflows = ko.observableArray([
             {
                 name: "Application Area",
                 bgColor: "#87bceb",
