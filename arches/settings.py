@@ -304,13 +304,13 @@ if ARCHES_USE_LDAP:
     #   ldap.OPT_X_TLS_DEMAND: True,
     # }
 
-    # By default, all mapped user fields will be updated each time the user logs in. 
+    # By default, all mapped user fields will be updated each time the user logs in.
     # To disable this, set AUTH_LDAP_ALWAYS_UPDATE_USER to False
-    AUTH_LDAP_ALWAYS_UPDATE_USER=True   # Default
+    AUTH_LDAP_ALWAYS_UPDATE_USER = True   # Default
 
     AUTH_LDAP_BIND_DN = ''
     AUTH_LDAP_BIND_PASSWORD = ''
-    #AUTH_LDAP_USER_SEARCH = LDAPSearch(
+    # AUTH_LDAP_USER_SEARCH = LDAPSearch(
     #     'ou=users,dc=example,dc=org',
     #     ldap.SCOPE_SUBTREE,
     #     '(uid=%(user)s)',
@@ -330,8 +330,8 @@ if ARCHES_USE_LDAP:
     # }
 
     # Simple group restrictions
-    #AUTH_LDAP_REQUIRE_GROUP = 'cn=enabled,ou=django,ou=groups,dc=example,dc=com'
-    #AUTH_LDAP_DENY_GROUP = 'cn=disabled,ou=django,ou=groups,dc=example,dc=com'
+    # AUTH_LDAP_REQUIRE_GROUP = 'cn=enabled,ou=django,ou=groups,dc=example,dc=com'
+    # AUTH_LDAP_DENY_GROUP = 'cn=disabled,ou=django,ou=groups,dc=example,dc=com'
 
 # ==============LDAP CONFIG END==============
 
