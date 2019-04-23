@@ -280,7 +280,7 @@ AUTHENTICATION_BACKENDS = (
 # sudo apt-get install libsasl2-dev python-dev libldap2-dev libssl-dev
 # (ENV) $ pip install django-auth-ldap
 
-ARCHES_USE_LDAP=False
+ARCHES_USE_LDAP = False
 
 if ARCHES_USE_LDAP:
     import ldap
