@@ -168,6 +168,9 @@ class ResourceTests(ArchesTestCase):
     @classmethod
     def tearDownClass(cls):
         cls.user.delete()
+        delete_terms_index()
+        delete_concepts_index()
+        delete_search_index()
 
     @classmethod
     def addNodeWithoutValue(cls):
