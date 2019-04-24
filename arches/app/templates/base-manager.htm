@@ -377,7 +377,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             {% if p.slug is not None %}
                                             <a href="{% url 'plugins' p.slug %}" data-bind="click: navigate.bind(this, '{% url 'plugins' p.slug %}') ">
                                             {% else %}
-                                            <a href="{% url 'plugins' p.pluginid %}" data-bind="click: navigate.bind(this, '{% url 'plugins' p.slug %}') ">
+                                            <a href="{% url 'plugins' p.pluginid %}" data-bind="click: navigate.bind(this, '{% url 'plugins' p.pluginid %}') ">
                                             {% endif %}
                                                 <i class="{{p.icon}}"></i>
                                                 <span class="menu-title">
