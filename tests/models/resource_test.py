@@ -29,7 +29,8 @@ from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from arches.app.search.mappings import prepare_terms_index, delete_terms_index, \
-    prepare_concepts_index, delete_concepts_index, prepare_search_index, delete_search_index
+    prepare_concepts_index, delete_concepts_index, prepare_search_index, delete_search_index, \
+    prepare_resource_relations_index, delete_resource_relations_index
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as resource_graph_importer
 from arches.app.utils.exceptions import InvalidNodeNameException, MultipleNodesFoundException
@@ -51,6 +52,7 @@ class ResourceTests(ArchesTestCase):
         prepare_terms_index(create=True)
         prepare_concepts_index(create=True)
         prepare_search_index(create=True)
+        prepare_resource_relations_index(create=True)
 
         cls.client = Client()
         cls.client.login(username='admin', password='admin')
@@ -171,14 +173,7 @@ class ResourceTests(ArchesTestCase):
         delete_terms_index()
         delete_concepts_index()
         delete_search_index()
-
-    @classmethod
-    def addNodeWithoutValue(cls):
-        cls.test_resource_no_value = Resource(graph_id=cls.search_model_graphid)
-        tile = Tile(data={cls.search_model_cultural_period_nodeid: ''},
-                    nodegroup_id=cls.search_model_cultural_period_nodeid)
-        cls.test_resource_no_value.tiles.append(tile)
-        cls.test_resource_no_value.save()
+        delete_resource_relations_index()
 
     def test_get_node_value_string(self):
         """
@@ -208,11 +203,17 @@ class ResourceTests(ArchesTestCase):
         """
         Query a concept node without a value
         """
-        self.addNodeWithoutValue()
+
+        test_resource_no_value = Resource(graph_id=self.search_model_graphid)
+        tile = Tile(data={self.search_model_cultural_period_nodeid: ''},
+                    nodegroup_id=self.search_model_cultural_period_nodeid)
+        test_resource_no_value.tiles.append(tile)
+        test_resource_no_value.save()
 
         node_name = "Cultural Period Concept"
-        result = self.test_resource_no_value.get_node_values(node_name)
+        result = test_resource_no_value.get_node_values(node_name)
         self.assertEqual(None, result[0])
+        test_resource_no_value.delete()
 
     def test_get_value_from_not_existing_concept(self):
         """
