@@ -15,7 +15,7 @@ def get_env_variable(var_name):
         raise ImproperlyConfigured(error_msg)
 
 
-def opt_env(var_name, default_resp = None):
+def opt_env(var_name, default_resp=None):
     try:
         return os.environ[var_name]
     except KeyError:
@@ -80,7 +80,6 @@ if ARCHES_USE_LDAP:
     AUTHENTICATION_BACKENDS = ('django_auth_ldap.backend.LDAPBackend',) + AUTHENTICATION_BACKENDS
     AUTH_LDAP_SERVER_URI = get_env_variable("AUTH_LDAP_SERVER_URI")
 
-
     # Some ldap options for TLS (https://python-ldap.readthedocs.io/en/latest/reference/ldap.html#ldap-options)
     # AUTH_LDAP_CONNECTION_OPTIONS = {
     #   ldap.OPT_REFERRALS: 0,
@@ -102,7 +101,7 @@ if ARCHES_USE_LDAP:
         '(uid=%(user)s)',
     )
     # Or:
-    #AUTH_LDAP_USER_DN_TEMPLATE = 'uid=%(user)s,ou=users,dc=example,dc=org'
+    # AUTH_LDAP_USER_DN_TEMPLATE = 'uid=%(user)s,ou=users,dc=example,dc=org'
 
     AUTH_LDAP_USER_ATTR_MAP = {"first_name": "givenName",
                                "last_name": "sn",
