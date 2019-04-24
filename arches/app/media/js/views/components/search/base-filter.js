@@ -9,6 +9,7 @@ define([
             
             // the various filters managed by this widget
             this.filter = {};
+            this.loaded = ko.observable(false);
 
             // Call the original constructor
             Backbone.View.apply(this, arguments);
@@ -35,6 +36,10 @@ define([
         // the ui to a clean and unfiltered state
         clear: function() {
             return;
+        },
+
+        getFilter: function(filterName) {
+            return 
         }
     });
 });

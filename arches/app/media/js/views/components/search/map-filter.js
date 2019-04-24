@@ -55,7 +55,7 @@ function(ko, BaseFilter, arches) {
                     if (!val) {
                         this.clear(false);
                     }
-                }, this);
+                }, this)
             },
 
             restoreState: function(query) {

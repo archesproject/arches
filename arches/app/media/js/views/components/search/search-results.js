@@ -1,6 +1,6 @@
 define(['jquery',
     'underscore',
-    'backbone',
+    'views/components/search/base-filter',
     'bootstrap',
     'arches',
     'select2',
@@ -9,9 +9,9 @@ define(['jquery',
     'view-data',
     'bootstrap-datetimepicker',
     'plugins/knockout-select2'],
-function($, _, Backbone, bootstrap, arches, select2, ko, koMapping, viewdata) {
+function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) {
     return ko.components.register('search-results', {
-        viewModel: Backbone.View.extend({
+        viewModel: BaseFilter.extend({
 
             events: {
                 'click .related-resources-graph': 'showRelatedResouresGraph',
@@ -21,6 +21,7 @@ function($, _, Backbone, bootstrap, arches, select2, ko, koMapping, viewdata) {
             },
 
             initialize: function(options) {
+                BaseFilter.prototype.initialize.call(this, options);
                 var self = this;
                 _.extend(this, options);
 
@@ -39,6 +40,11 @@ function($, _, Backbone, bootstrap, arches, select2, ko, koMapping, viewdata) {
                 this.showRelationships.subscribe(function(res) {
                     self.selectedResourceId(res.resourceinstanceid);
                 });
+
+                //this.loaded(true);
+                options.filters['search-results'](this);
+
+                this.showRelatedResourceLink = ko.observable(false);
             },
 
             mouseoverInstance: function() {

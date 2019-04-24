@@ -7,7 +7,7 @@ define([
     'datatype-config-components',
     'bindings/let'
 ], function(_, ko, koMapping, BaseFilter, arches) {
-	return ko.components.register('advanced-search-filter', {
+	return ko.components.register('advanced-search', {
         viewModel: BaseFilter.extend({
 			initialize: function(options) {
 				var self = this;
@@ -122,6 +122,6 @@ define([
 				return;
 			}
 		}),
-        template: { require: 'text!templates/views/components/search/advanced-search-filter.htm' }
+        template: { require: 'text!templates/views/components/search/advanced-search.htm' }
 	});
 });

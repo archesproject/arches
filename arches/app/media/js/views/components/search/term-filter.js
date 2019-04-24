@@ -1,9 +1,10 @@
 define([
     'knockout',
+    'knockout-mapping',
     'underscore',
     'views/components/search/base-filter',
     'bindings/term-search'
-], function(ko, _, BaseFilter, termSearchComponent) {
+], function(ko, koMapping, _, BaseFilter, termSearchComponent) {
     return ko.components.register('term-filter', {
         viewModel: BaseFilter.extend({
             initialize: function(options) {
@@ -13,6 +14,13 @@ define([
 
                 this.filter.terms = ko.observableArray();
                 this.filter.tags = ko.observableArray();
+
+                this.filter.terms.subscribe(function(terms) {
+                    this.appendFilters(this.queryString);
+                }, this);
+
+                //this.loaded(true);
+                options.filters['term-filter'](this);
             },
 
             restoreState: function(query) {
@@ -41,7 +49,9 @@ define([
                 }, this);
 
                 if(terms.length > 0){
-                    filterParams.termFilter = ko.toJSON(terms);
+                    var queryObj = JSON.parse(filterParams());
+                    queryObj.termFilter = ko.toJS(terms);
+                    filterParams(JSON.stringify(queryObj));
                 }
 
                 return terms.length > 0;
