@@ -68,7 +68,7 @@ def index_resources_by_type(resource_types, clear_index=True, batch_size=setting
         result_summary = {'database':len(resources), 'indexed':0}
 
         q = Query(se=se)
-        term = Term(field='graphid', term=str(resource_type))
+        term = Term(field='graph_id', term=str(resource_type))
         q.add_query(term)
         if clear_index:
             q.delete(index='resources')
