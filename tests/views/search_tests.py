@@ -178,7 +178,9 @@ class SearchTests(ArchesTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        pass
+        delete_terms_index()
+        delete_concepts_index()
+        delete_search_index()
 
     def test_temporal_only_search_1(self):
         """
