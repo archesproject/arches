@@ -85,6 +85,7 @@ def index_resources_by_type(resource_types, clear_index=True, batch_size=setting
 
         status = 'Passed' if result_summary['database'] == result_summary['indexed'] else 'Failed'
         print "Status: {0}, Resource Type: {1}, In Database: {2}, Indexed: {3}, Took: {4} seconds".format(status, graph_name, result_summary['database'], result_summary['indexed'], (datetime.now()-start).seconds)
+    return status
 
 def index_resource_relations(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE):
     """

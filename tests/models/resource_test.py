@@ -28,10 +28,12 @@ from guardian.shortcuts import assign_perm
 from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
-from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.mappings import prepare_terms_index, delete_terms_index, \
+    prepare_concepts_index, delete_concepts_index, prepare_search_index, delete_search_index
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as resource_graph_importer
 from arches.app.utils.exceptions import InvalidNodeNameException, MultipleNodesFoundException
+from arches.app.utils.index_database import index_resources_by_type
 from tests.base_test import ArchesTestCase
 
 
@@ -42,9 +44,13 @@ from tests.base_test import ArchesTestCase
 class ResourceTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
-        se = SearchEngineFactory().create()
-        se.delete_index(index='terms,concepts')
-        se.delete_index(index='resources')
+        delete_terms_index()
+        delete_concepts_index()
+        delete_search_index()
+
+        prepare_terms_index(create=True)
+        prepare_concepts_index(create=True)
+        prepare_search_index(create=True)
 
         cls.client = Client()
         cls.client.login(username='admin', password='admin')
@@ -228,3 +234,11 @@ class ResourceTests(ArchesTestCase):
         node_name = "Geometry"
         result = self.test_resource.get_node_values(node_name)
         self.assertEqual(self.geom, result[0])
+
+    def test_reindex_by_resource_type(self):
+        """
+        Test re-index a resource by type
+        """
+
+        result = index_resources_by_type([self.search_model_graphid], clear_index=False, batch_size=4000)
+        self.assertEqual(result, 'Passed')
