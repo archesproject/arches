@@ -45,11 +45,11 @@ def remove_permissions(apps, schema_editor, with_create_permissions=True):
     resource_editor_group = Group.objects.using(db_alias).get(name='Crowdsource Editor')
     resource_editor_group.permissions.remove(write_nodegroup)
     resource_editor_group.permissions.remove(delete_nodegroup)
-    
+
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4662_workflow_plugin'),
+        ('models', '4384_adds_rerender_widget_config'),
     ]
 
     operations = [
