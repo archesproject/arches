@@ -240,5 +240,5 @@ class ResourceTests(ArchesTestCase):
         Test re-index a resource by type
         """
 
-        result = index_resources_by_type([self.search_model_graphid], clear_index=False, batch_size=4000)
+        result = index_resources_by_type([self.search_model_graphid], clear_index=True, batch_size=4000)
         self.assertEqual(result, 'Passed')
