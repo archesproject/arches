@@ -63,7 +63,7 @@ class SearchTests(ArchesTestCase):
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile['graph'])
 
-        cls.search_model_graphid = 'e503a445-fa5f-11e6-afa8-14109fd34195'
+        cls.search_model_graphid = 'd291a445-fa5f-11e6-afa8-14109fd34195'
         cls.search_model_cultural_period_nodeid = '7a182580-fa60-11e6-96d1-14109fd34195'
         cls.search_model_creation_date_nodeid = '1c1d05f5-fa60-11e6-887f-14109fd34195'
         cls.search_model_destruction_date_nodeid = 'e771b8a1-65fe-11e7-9163-14109fd34195'
@@ -178,7 +178,9 @@ class SearchTests(ArchesTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        pass
+        delete_terms_index()
+        delete_concepts_index()
+        delete_search_index()
 
     def test_temporal_only_search_1(self):
         """
