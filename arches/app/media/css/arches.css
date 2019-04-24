@@ -500,7 +500,6 @@ input[type="checkbox"] {
 }
 
 .workflow-step-body {
-    padding: 10px;
     background-color: #eee;
     height: 100%;
 }
@@ -543,6 +542,39 @@ input[type="checkbox"] {
 .summary-panel {
     background: #f9f9f9;
     margin-top: -30px;
+}
+
+.map-card-wrapper {
+    height: 100%;
+    position: relative;
+}
+
+.map-card-container {
+    height: 100%;
+    margin-right: 92px;
+}
+
+.map-card-sidebar {
+    position:absolute;
+    right: 0;
+    height: 100%;
+    width: 92px;
+    background-color: rgb(247, 247, 247);
+}
+
+.map-card-sidebar-tab {
+    color: rgb(33, 62, 95);
+    min-height: 86px;
+    padding: 16px;
+    text-align: center;
+    font-size: 1.1em;
+    border-bottom: 1px solid rgb(216, 216, 216);
+    border-left: 1px solid rgb(216, 216, 216);
+}
+.map-card-sidebar-tab i {
+    font-size: 1.7em;
+    display: block;
+    padding-bottom: 4px;
 }
 
 #map-settings {

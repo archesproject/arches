@@ -1,0 +1,25 @@
+{% extends "views/components/cards/default.htm" %}
+{% load i18n %}
+
+{% block form %}
+<div class="map-card-wrapper">
+    <div class="map-card-sidebar">
+        <div class="map-card-sidebar-tab">
+            <i class="fa fa-list-alt"></i>
+            Legend
+        </div>
+        <div class="map-card-sidebar-tab">
+            <i class="fa fa-globe"></i>
+            Basemap
+        </div>
+        <div class="map-card-sidebar-tab">
+            <i class="fa fa-list"></i>
+            Overlays
+        </div>
+    </div>
+    <div class="map-card-container" data-bind="mapboxgl: {
+            mapOptions: { style: mapStyle }
+        }">
+    </div>
+</div>
+{% endblock form %}
