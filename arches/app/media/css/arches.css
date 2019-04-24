@@ -7666,8 +7666,9 @@ a.mega-dropdown-toggle.disabled {
     background-color: white;
 }
 
-.rp-report-section-root {
-    margin-top: 30px;
+.rp-report-section.rp-report-section-root {
+    padding-top: 30px;
+    background-color: #fff;
 }
 
 .rp-report-header {
