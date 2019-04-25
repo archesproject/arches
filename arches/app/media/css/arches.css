@@ -560,6 +560,7 @@ input[type="checkbox"] {
     height: 100%;
     width: 92px;
     background-color: rgb(247, 247, 247);
+    border-left: 1px solid rgb(216, 216, 216);
 }
 
 .map-card-sidebar-tab {
@@ -569,12 +570,30 @@ input[type="checkbox"] {
     text-align: center;
     font-size: 1.1em;
     border-bottom: 1px solid rgb(216, 216, 216);
-    border-left: 1px solid rgb(216, 216, 216);
+    cursor: pointer;
 }
+
+.map-card-sidebar-tab.active {
+    background-color: white;
+    border-left: solid 1px white;
+    margin-left: -1px;
+}
+
 .map-card-sidebar-tab i {
     font-size: 1.7em;
     display: block;
-    padding-bottom: 4px;
+    padding-bottom: 6px;
+}
+
+.map-card-sidepanel {
+    position:absolute;
+    z-index: 10;
+    right: 92px;
+    height: 100%;
+    width: 400px;
+    background: white;
+    border-left: 1px solid rgb(216, 216, 216);
+    padding: 16px;
 }
 
 #map-settings {

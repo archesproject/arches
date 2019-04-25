@@ -4,19 +4,47 @@
 {% block form %}
 <div class="map-card-wrapper">
     <div class="map-card-sidebar">
-        <div class="map-card-sidebar-tab">
+        <div class="map-card-sidebar-tab" data-bind="click: function() {
+            if (activeTab() === 'legend') {
+                activeTab(null);
+            } else {
+                activeTab('legend');
+            }
+        }, css: {
+            'active': activeTab() === 'legend'
+        }">
             <i class="fa fa-list-alt"></i>
-            Legend
+            {% trans "Legend" %}
         </div>
-        <div class="map-card-sidebar-tab">
+        <div class="map-card-sidebar-tab" data-bind="click: function() {
+            if (activeTab() === 'basemap') {
+                activeTab(null);
+            } else {
+                activeTab('basemap');
+            }
+        }, css: {
+            'active': activeTab() === 'basemap'
+        }">
             <i class="fa fa-globe"></i>
-            Basemap
+            {% trans "Basemap" %}
         </div>
-        <div class="map-card-sidebar-tab">
+        <div class="map-card-sidebar-tab" data-bind="click: function() {
+            if (activeTab() === 'overlays') {
+                activeTab(null);
+            } else {
+                activeTab('overlays');
+            }
+        }, css: {
+            'active': activeTab() === 'overlays'
+        }">
             <i class="fa fa-list"></i>
-            Overlays
+            {% trans "Overlays" %}
         </div>
     </div>
+    <!--ko if: activeTab() -->
+        <div class="map-card-sidepanel" data-bind="text: activeTab">
+        </div>
+    <!--/ko -->
     <div class="map-card-container" data-bind="mapboxgl: {
             mapOptions: { style: mapStyle }
         }">

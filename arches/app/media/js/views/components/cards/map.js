@@ -18,6 +18,7 @@ define([
                 "glyphs": arches.mapboxGlyphs,
                 "layers": layers
             };
+            this.activeTab = ko.observable();
 
             CardComponentViewModel.apply(this, [params]);
         },
