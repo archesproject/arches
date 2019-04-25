@@ -41,10 +41,15 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                     self.selectedResourceId(res.resourceinstanceid);
                 });
 
-                //this.loaded(true);
                 options.filters['search-results'](this);
 
+                this.searchResults.timestamp.subscribe(function(timestamp) {
+                    this.updateResults(this.searchResults);
+                }, this);
+
                 this.showRelatedResourceLink = ko.observable(false);
+
+                this.restoreState();
             },
 
             mouseoverInstance: function() {
@@ -163,10 +168,8 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                 return data;
             },
 
-            restoreState: function(page){
-                if(typeof page !== 'undefined'){
-                    this.page(ko.utils.unwrapObservable(page));
-                }
+            restoreState: function(){
+                this.page(ko.utils.unwrapObservable(this.query.page));
             },
 
             viewReport: function(resourceinstance){

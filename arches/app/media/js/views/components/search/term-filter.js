@@ -8,23 +8,35 @@ define([
     return ko.components.register('term-filter', {
         viewModel: BaseFilter.extend({
             initialize: function(options) {
+                options.name = 'Term Filter';
                 BaseFilter.prototype.initialize.call(this, options);
-
-                this.name = 'Term Filter';
 
                 this.filter.terms = ko.observableArray();
                 this.filter.tags = ko.observableArray();
 
                 this.filter.terms.subscribe(function(terms) {
-                    this.appendFilters(this.queryString);
+                    this.updateQuery();
                 }, this);
 
-                //this.loaded(true);
                 options.filters['term-filter'](this);
+
+                this.restoreState();
             },
 
-            restoreState: function(query) {
-                var doQuery = false;
+            updateQuery: function() {
+                var terms = _.filter(this.filter.terms(), function(term){
+                    return term.type === 'string' || term.type === 'concept' || term.type === 'term';
+                }, this);
+
+                if(terms.length > 0){
+                    var queryObj = this.query();
+                    queryObj.termFilter = ko.toJSON(terms);
+                    this.query(queryObj);
+                }
+            },
+
+            restoreState: function() {
+                var query = this.query();
                 if ('termFilter' in query) {
                     query.termFilter = JSON.parse(query.termFilter);
                     if (query.termFilter.length > 0) {
@@ -33,28 +45,11 @@ define([
                         });
                         this.filter.terms(query.termFilter);
                     }
-
-                    doQuery = true;
                 }
-                return doQuery;
             },
 
             clear: function() {
                 this.filter.terms.removeAll();
-            },
-
-            appendFilters: function(filterParams) {
-                var terms = _.filter(this.filter.terms(), function(term){
-                    return term.type === 'string' || term.type === 'concept' || term.type === 'term';
-                }, this);
-
-                if(terms.length > 0){
-                    var queryObj = JSON.parse(filterParams());
-                    queryObj.termFilter = ko.toJS(terms);
-                    filterParams(JSON.stringify(queryObj));
-                }
-
-                return terms.length > 0;
             },
 
             addTag: function(term, type, inverted){

@@ -333,6 +333,7 @@ def search_results(request):
         ret['paginator']['end_index'] = page.end_index()
         ret['paginator']['pages'] = pages
         ret['reviewer'] = user_is_reviewer
+        ret['timestamp'] = datetime.now()
 
         return JSONResponse(ret)
     else:

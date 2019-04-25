@@ -71,7 +71,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 <div data-bind="component: {
                     name: 'search-results',
-                    params: mapFilterSharedObject
+                    params: sharedStateObject
                 }"></div>
 
                 <!-- Card Container -->
@@ -80,7 +80,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div class="tab-pane map-filter-panel" data-bind="css: {'active': sharedStateObject.selectedTab() === 'map-filter'}">
                             <div data-bind="component: {
                                 name: 'map-filter',
-                                params: mapFilterSharedObject
+                                params: sharedStateObject
                             }"></div>
                         </div>
                         <div class="tab-pane" data-bind="css: {'active': sharedStateObject.selectedTab() === 'time-filter'}">

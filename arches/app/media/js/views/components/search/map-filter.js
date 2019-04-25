@@ -8,10 +8,11 @@ function(ko, BaseFilter, arches) {
     return ko.components.register('map-filter', {
         viewModel: BaseFilter.extend({
             initialize: function(options) {
+                options.name = "Map Filter";
                 BaseFilter.prototype.initialize.call(this, options);
+                
                 this.aggregations = options.aggregations;
                 this.searchBuffer = options.searchBuffer;
-                this.name = "Map Filter";
                 this.resizeOnChange = ko.computed(function() {
                     return ko.unwrap(options.resizeOnChange);
                 });
@@ -55,25 +56,21 @@ function(ko, BaseFilter, arches) {
                     if (!val) {
                         this.clear(false);
                     }
-                }, this)
+                }, this);
             },
 
-            restoreState: function(query) {
-                var doQuery = false;
+            restoreState: function() {
                 var inverted;
+                var query = this.query();
                 if ('mapFilter' in query) {
                     query.mapFilter = JSON.parse(query.mapFilter);
-                    this.query = query.mapFilter;
+                    //this.query = query.mapFilter;
                     if (query.mapFilter.features.length > 0) {
                         this.filter.feature_collection(query.mapFilter);
-                        this.filter.inverted(this.query.features[0].properties.inverted);
+                        this.filter.inverted(query.features[0].properties.inverted);
                         this.termFilter.addTag('Map Filter Enabled', this.name, this.filter.inverted);
                     }
-                    doQuery = true;
-                } else {
-                    this.query = undefined;
                 }
-                return doQuery;
             },
 
             clear: function(reset_features) {
