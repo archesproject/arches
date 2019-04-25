@@ -31,6 +31,12 @@ services:
         - DJANGO_DEBUG=False
         # - DJANGO_REMOTE_DEBUG=False
         - DOMAIN_NAMES=localhost
+        - USE_LDAP=True
+        # LDAP environment variables
+        # - "AUTH_LDAP_SERVER_URI=ldaps://"
+        # - "AUTH_LDAP_BIND_DN=cn=django_agent,dc=example,dc=org"
+        # - "AUTH_LDAP_BIND_PASSWORD=foobar"
+        # - "AUTH_LDAP_BASE_DN_SEARCH=ou=Users,dc=example,dc=org"
         - PYTHONUNBUFFERED=0
         - TZ=PST
       ports:
