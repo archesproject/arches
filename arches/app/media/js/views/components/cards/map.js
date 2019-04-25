@@ -5,6 +5,7 @@ define([
 ], function(arches, ko, CardComponentViewModel) {
     return ko.components.register('map-card', {
         viewModel: function(params) {
+            var self = this;
             var layers = [];
             arches.mapLayers.forEach(function(layer) {
                 if (layer.addtomap) {
@@ -19,6 +20,13 @@ define([
                 "layers": layers
             };
             this.activeTab = ko.observable();
+            this.toggleTab = function(tabName) {
+                if (self.activeTab() === tabName) {
+                    self.activeTab(null);
+                } else {
+                    self.activeTab(tabName);
+                }
+            };
 
             CardComponentViewModel.apply(this, [params]);
         },
