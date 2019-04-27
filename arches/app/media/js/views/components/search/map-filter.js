@@ -11,8 +11,16 @@ function(ko, BaseFilter, arches) {
                 options.name = "Map Filter";
                 BaseFilter.prototype.initialize.call(this, options);
                 
-                this.aggregations = options.aggregations;
-                this.searchBuffer = options.searchBuffer;
+                this.aggregations = ko.observable();
+                this.searchBuffer = ko.observable();
+                this.searchResults.timestamp.subscribe(function(timestamp) {
+                    this.aggregations({
+                        results: this.searchResults.results.hits.hits,
+                        geo_aggs: this.searchResults.results.aggregations.geo_aggs.inner.buckets[0]
+                    });
+                    this.searchBuffer(this.searchResults.search_buffer);
+                }, this);
+
                 this.resizeOnChange = ko.computed(function() {
                     return ko.unwrap(options.resizeOnChange);
                 });
@@ -57,6 +65,8 @@ function(ko, BaseFilter, arches) {
                         this.clear(false);
                     }
                 }, this);
+
+                options.filters['map-filter'](this);
             },
 
             restoreState: function() {

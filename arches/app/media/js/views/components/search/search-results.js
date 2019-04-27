@@ -21,6 +21,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
             },
 
             initialize: function(options) {
+                options.name = 'Search Results';
                 BaseFilter.prototype.initialize.call(this, options);
                 var self = this;
                 _.extend(this, options);
@@ -112,13 +113,6 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                 this.total(response.results.hits.total);
                 this.results.removeAll();
                 this.userRequestedNewPage(false);
-                response.results.aggregations["geo_aggs"] = response.results.aggregations.geo_aggs.inner.buckets[0];
-                this.aggregations(
-                    _.extend(response.results.aggregations, {
-                        results: response.results.hits.hits
-                    })
-                );
-                this.searchBuffer(response.search_buffer);
                 this.selectedResourceId(null);
                 this.userIsReviewer = response.reviewer;
                 response.results.hits.hits.forEach(function(result){

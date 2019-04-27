@@ -39,29 +39,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </div>
 
             <div class="" style="margin-top: 0px;">
-                <div class="">
-                    <button class="btn search-type-btn relative" data-bind="css: {'active': sharedStateObject.selectedTab() === 'map-filter'}, click: function(){sharedStateObject.selectedTab('map-filter')}">
-                        <i class="fa fa-map-marker"></i>
-                        <p>{% trans 'Map' %}</p>
-                    </button>
-                    <button class="btn search-type-btn relative" data-bind="css: {'active': sharedStateObject.selectedTab() === 'time-filter'}, click: function(){sharedStateObject.selectedTab('time-filter')}">
-                        <i class="fa fa-calendar"></i>
-                        <p>{% trans 'Time' %}</p>
-                    </button>
-                    <button class="btn search-type-btn relative" data-bind="css: {'active': sharedStateObject.selectedTab() === 'saved-searches'}, click: function(){sharedStateObject.selectedTab('saved-searches')}">
-                        <i class="fa fa-bookmark"></i>
-                        <p>{% trans 'Saved' %}</p>
-                    </button>
-                    <button class="btn search-type-btn relative" data-bind="css: {'active': sharedStateObject.selectedTab() === 'advanced-filter'}, click: function(){sharedStateObject.selectedTab('advanced-filter')}">
-                        <i class="fa fa-check-circle-o"></i>
-                        <p>{% trans 'Advanced' %}</p>
-                    </button>
+                <div class="" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
+                    <!-- ko if: filter.type === 'filter' -->
                     {% if user|can_read_resource_instance %}
-                    <button class="btn search-type-btn relative" data-bind="css: {'active': sharedStateObject.selectedTab() === 'related-resource-manager'}, click: function(){sharedStateObject.selectedTab('related-resource-manager')}">
+                    <button class="btn search-type-btn relative" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.name}, click: function(){sharedStateObject.selectedTab('related-resource-manager')}">
                         <i class="fa fa-code-fork"></i>
-                        <p>{% trans 'Related' %}</p>
+                        <p data-bind="text: filter.name"></p>
                     </button>
                     {% endif %}
+                    <!-- /ko -->
                 </div>
             </div>
         </div>
@@ -76,36 +62,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 <!-- Card Container -->
                 <div class="card-form-preview-container">
-                    <div class="tab-content relative">
-                        <div class="tab-pane map-filter-panel" data-bind="css: {'active': sharedStateObject.selectedTab() === 'map-filter'}">
+                    <div class="tab-content relative" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
+                        <div class="tab-pane map-filter-panel" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.name}">
                             <div data-bind="component: {
-                                name: 'map-filter',
-                                params: sharedStateObject
+                                name: filter.name,
+                                params: $parent.sharedStateObject
                             }"></div>
                         </div>
-                        <div class="tab-pane" data-bind="css: {'active': sharedStateObject.selectedTab() === 'time-filter'}">
-                            <div data-bind="component: {
-                                name: 'time-filter',
-                                params: sharedStateObject
-                            }"></div>
-                        </div>
-                        <div class="tab-pane" data-bind="css: {'active': sharedStateObject.selectedTab() === 'saved-searches'}">
-                            <div data-bind="component: {
-                                name: 'saved-searches',
-                                params: sharedStateObject
-                            }"></div>
-                        </div>
-                        <div class="tab-pane" data-bind="css: {'active': sharedStateObject.selectedTab() === 'advanced-filter'}">
-                            <div data-bind="component: {
-                                name: 'advanced-search',
-                                params: sharedStateObject
-                            }"></div>
-                        </div>
-                        <!-- ko if: sharedStateObject.selectedTab() === 'related-resource-manager' -->
-                        <div class="tab-pane" data-bind="css: {'active': sharedStateObject.selectedTab() === 'related-resource-manager'}, with: relatedResourcesManager">
-                            {% include 'views/resource/related-resources/related-resources-manager.htm' %}
-                        </div>
-                        <!-- /ko -->
                     </div>
                 </div>
             </div>
@@ -120,7 +83,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <script>
         define('search-data', [], function() {
             return {{% autoescape off %}
-                search_components: ['term-filter', 'search-results'],
+                search_components: [{'name': 'term-filter', 'type': 'text-input'}, {'name': 'search-results', 'type': 'results-list'}, {'name': 'map-filter', 'type': 'filter'}, {'name': 'related-resources-filter', 'type': 'filter'}],
                 searchable_nodes: {{ searchable_nodes }},
                 resource_cards: {{ resource_cards }},
                 datatypes: {{ datatypes_json }},

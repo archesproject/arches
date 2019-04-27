@@ -13,7 +13,7 @@ define([
     'views/components/search/provisional-filter',
     'views/components/search/advanced-search',
     'views/components/search/resource-type-filter',
-    'views/resource/related-resources-manager',
+    'views/components/search/related-resources-filter',
     'views/components/search/search-results',
     'views/components/search/saved-searches',
     'views/base-manager',
@@ -68,16 +68,16 @@ define([
 
     var CommonSearchViewModel = function() {
         this.filters = {};
-        searchData.search_components.forEach(function(componentName){
-            this.filters[componentName] = ko.observable(null);
+        this.filtersList = [];
+        searchData.search_components.forEach(function(component) {
+            this.filters[component.name] = ko.observable(null);
+            this.filtersList.push(component);
         }, this);
         this.tags = ko.observableArray();
         this.selectedTab = ko.observable('map-filter');
         this.resultsExpanded = ko.observable(true);
         this.query = ko.observable(getQueryObject());
         this.page = ko.observable(1);
-        this.searchBuffer = ko.observable();
-        this.aggregations = ko.observable();
         // this.getFilter = function(filterName) {
         //     return this.filter
         // };
