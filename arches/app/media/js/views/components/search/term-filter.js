@@ -14,7 +14,10 @@ define([
                 this.filter.terms = ko.observableArray();
                 this.filter.tags = ko.observableArray();
 
-                this.filter.terms.subscribe(function(terms) {
+                var updated = ko.computed(function() {
+                    return ko.toJS(this.filter.terms);
+                }, this);
+                updated.subscribe(function() {
                     this.updateQuery();
                 }, this);
 
@@ -27,12 +30,10 @@ define([
                 var terms = _.filter(this.filter.terms(), function(term){
                     return term.type === 'string' || term.type === 'concept' || term.type === 'term';
                 }, this);
-
-                if(terms.length > 0){
-                    var queryObj = this.query();
-                    queryObj.termFilter = ko.toJSON(terms);
-                    this.query(queryObj);
-                }
+                
+                var queryObj = this.query();
+                queryObj.termFilter = ko.toJSON(terms);
+                this.query(queryObj);
             },
 
             restoreState: function() {
