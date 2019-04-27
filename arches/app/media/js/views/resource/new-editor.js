@@ -11,14 +11,13 @@ define([
     'viewmodels/provisional-tile',
     'arches',
     'resource-editor-data',
-    'views/search/search-results',
-    'views/resource/related-resources-manager',
     'report-templates',
     'bindings/resizable-sidepanel',
     'bindings/sortable',
     'widgets',
-    'card-components'
-], function($, _, ko, moment, BaseManagerView, AlertViewModel, GraphModel, ReportModel, CardViewModel, ProvisionalTileViewModel, arches, data, searchResults, RelatedResourcesManager, reportLookup) {
+    'card-components',
+    'views/resource/related-resources-manager'
+], function($, _, ko, moment, BaseManagerView, AlertViewModel, GraphModel, ReportModel, CardViewModel, ProvisionalTileViewModel, arches, data, reportLookup) {
     var handlers = {
         'after-update': [],
         'tile-reset': []
@@ -280,13 +279,13 @@ define([
                     data: {"ontology_class": vm.graph.ontologyclass}
                 }).done(function(data){
                     vm.graph.domain_connections = data;
-                    vm.relatedResourcesManager = new RelatedResourcesManager({
-                        searchResults: new searchResults(),
+                    vm.relatedResourcesManagerObj = {
+                        searchResultsVm: undefined,
                         resourceEditorContext: true,
                         editing_instance_id: vm.resourceId(),
                         relationship_types: vm.relationship_types,
                         graph: vm.graph
-                    });
+                    };
                     vm.selection('related-resources');
                 });
             });
