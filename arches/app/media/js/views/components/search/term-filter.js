@@ -14,10 +14,10 @@ define([
                 this.filter.terms = ko.observableArray();
                 this.filter.tags = ko.observableArray();
 
-                var updated = ko.computed(function() {
+                var updatedTerms = ko.computed(function() {
                     return ko.toJS(this.filter.terms);
                 }, this);
-                updated.subscribe(function() {
+                updatedTerms.subscribe(function() {
                     this.updateQuery();
                 }, this);
 
@@ -32,7 +32,11 @@ define([
                 }, this);
                 
                 var queryObj = this.query();
-                queryObj.termFilter = ko.toJSON(terms);
+                if (terms.length > 0){
+                    queryObj.termFilter = ko.toJSON(terms);
+                } else {
+                    delete queryObj.termFilter;
+                }
                 this.query(queryObj);
             },
 
