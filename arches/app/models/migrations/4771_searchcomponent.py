@@ -18,12 +18,16 @@ class Migration(migrations.Migration):
             name='SearchComponent',
             fields=[
                 ('searchcomponentid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ('name', models.TextField(unique=True)),
+                ('name', models.TextField()),
                 ('icon', models.TextField(default=None)),
+                ('modulename', models.TextField(blank=True, null=True)),
+                ('classname', models.TextField(blank=True, null=True)),
+                ('componenttype', models.TextField()),
                 ('componentpath', models.TextField(unique=True)),
-                ('componentname', models.TextField()),
+                ('componentname', models.TextField(unique=True)),
                 ('config', django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True)),
                 ('sortorder', models.IntegerField(blank=True, default=None, null=True)),
+                ('enabled', models.BooleanField(default=False)),
             ],
             options={
                 'db_table': 'search_compnent',
