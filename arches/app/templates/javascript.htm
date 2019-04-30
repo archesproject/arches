@@ -414,8 +414,8 @@
         {% autoescape off %}return {{geoms}};{% endautoescape %}
     });
 
-    define('search-components', ['views/components/search/term-filter','views/components/search/time-filter'], function () {
-        return
+    define('search-components', [{% for component in search_components %}'{{ component.componentpath }}',{% endfor %}], function () {
+         return;
     });
 
     define('leaflet-draw-local', [

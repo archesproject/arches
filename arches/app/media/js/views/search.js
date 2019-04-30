@@ -6,21 +6,11 @@ define([
     'arches',
     'viewmodels/alert',
     'search-components',
-    'views/components/search/base-filter',
-    'views/components/search/time-filter',
-    'views/components/search/term-filter',
-    'views/components/search/map-filter',
-    'views/components/search/provisional-filter',
-    'views/components/search/advanced-search',
-    'views/components/search/resource-type-filter',
-    'views/components/search/related-resources-filter',
-    'views/components/search/search-results',
-    'views/components/search/saved-searches',
     'views/base-manager',
     'view-data',
     'search-data',
     'views/components/simple-switch'
-], function($, _, ko, koMapping, arches, AlertViewModel, SearchComponents, BaseFilter, TimeFilter, TermFilter, MapFilter, ProvisionalFilter, AdvancedSearch, ResourceTypeFilter, RelatedResourcesManager, SearchResults, SavedSearches, BaseManagerView, viewData, searchData) {
+], function($, _, ko, koMapping, arches, AlertViewModel, SearchComponents, BaseManagerView, viewData, searchData) {
     // a method to track the old and new values of a subscribable
     // from https://github.com/knockout/knockout/issues/914
     //
