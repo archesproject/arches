@@ -69,7 +69,6 @@ urlpatterns = [
     url(r'^concepts/get_pref_label', concept.get_pref_label, name="get_pref_label"),
     url(r'^conceptvalue/', concept.concept_value, name="concept_value"),
     url(r'^search$', search.SearchView.as_view(), name="search_home"),
-    url(r'^new_search$', search.NewSearchView.as_view(), name="new_search_home"),
     url(r'^search/terms$', search.search_terms, name="search_terms"),
     url(r'^search/resources$', search.search_results, name="search_results"),
     url(r'^search/time_wheel_config$', search.time_wheel_config, name="time_wheel_config"),
