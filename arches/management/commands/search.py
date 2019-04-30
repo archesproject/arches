@@ -61,37 +61,6 @@ class Command(BaseCommand):
         dt_source = imp.load_source('', source)
         details = dt_source.details
 
-        # dt = models.DDataType(
-        #     datatype=details['datatype'],
-        #     iconclass=details['iconclass'],
-        #     modulename=os.path.basename(source),
-        #     classname=details['classname'],
-        #     defaultwidget=details['defaultwidget'],
-        #     defaultconfig=details['defaultconfig'],
-        #     configcomponent=details['configcomponent'],
-        #     configname=details['configname'],
-        #     isgeometric=details['isgeometric']
-        #     )
-
-
-        # if len(models.DDataType.objects.filter(datatype=dt.datatype)) == 0:
-        #     dt.save()
-        # else:
-        #     print "{0} already exists".format(dt.datatype)
-
-
-        # details = {}
-
-        # try:
-        #     with open(source) as f:
-        #         details = json.load(f)
-        # except IOError as err:
-        #     details = json.loads(source)
-
-        import ipdb
-        ipdb.set_trace()
-        
-
         try:
             uuid.UUID(details['searchcomponentid'])
         except:
@@ -118,7 +87,6 @@ class Command(BaseCommand):
         Updates an existing search component in the arches db
 
         """
-        import json
 
         details = {}
 
