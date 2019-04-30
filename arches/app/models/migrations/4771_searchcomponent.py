@@ -15,7 +15,6 @@ def forwards_func(apps, schema_editor):
         for file in files:
             filename, file_extension = os.path.splitext(file)
             if file_extension == '.py':
-                print filename
                 management.call_command('search', 'register', source=os.path.join(root, file))
 
 def reverse_func(apps, schema_editor):

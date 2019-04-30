@@ -18,7 +18,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import uuid
-import json
 import imp
 from arches.app.models import models
 from django.core.management.base import BaseCommand, CommandError
@@ -37,7 +36,7 @@ class Command(BaseCommand):
                             help='Search Component json file or string to be loaded')
 
         parser.add_argument('-n', '--name', action='store', dest='name', default='',
-                            help='The name of the search component')
+                            help='The js component name of the search component')
 
     def handle(self, *args, **options):
         if options['operation'] == 'register':
@@ -65,7 +64,7 @@ class Command(BaseCommand):
             uuid.UUID(details['searchcomponentid'])
         except:
             details['searchcomponentid'] = unicode(uuid.uuid4())
-            print "Registering the search component with componentid:", details['searchcomponentid']
+            print "Registering the search component, %s, with componentid: %s" % (details['name'], details['searchcomponentid'])
 
         instance = models.SearchComponent(
             searchcomponentid=details['searchcomponentid'],
@@ -88,34 +87,30 @@ class Command(BaseCommand):
 
         """
 
-        details = {}
+        dt_source = imp.load_source('', source)
+        name = dt_source.details['componentname']
 
-        with open(source) as f:
-            details = json.load(f)
-
-        instance = models.SearchComponent.objects.get(name=details["name"])
-        instance.icon = details['icon']
-        instance.component = details['component']
-        instance.componentname = details['componentname']
-        instance.config = details['config']
-        instance.save()
+        self.unregister(name)
+        self.register(source)
 
     def unregister(self, name):
         """
         Removes the search component from the system
 
         """
+        
         try:
-            instance = models.SearchComponent.objects.get(name=name)
+            instance = models.SearchComponent.objects.get(componentname=name)
             instance.delete()
         except Exception as e:
             print e
 
     def list(self):
         """
-        Lists registered plugins
+        Lists registered search components
 
         """
+
         try:
             instances = models.SearchComponent.objects.all()
             for instance in instances:
