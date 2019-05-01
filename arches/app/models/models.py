@@ -662,7 +662,7 @@ class ResourceInstance(models.Model):
         db_table = 'resource_instances'
 
 
-class TileModel(models.Model): #Tile
+class TileModel(models.Model):  # Tile
     """
     the data JSONField has this schema:
 
@@ -739,9 +739,11 @@ class TileModel(models.Model): #Tile
 
     def save(self, *args, **kwargs):
         if(self.sortorder is None or (self.provisionaledits is not None and self.data == {})):
-            sortorder_max = TileModel.objects.filter(nodegroup_id=self.nodegroup_id, resourceinstance_id=self.resourceinstance_id).aggregate(Max('sortorder'))['sortorder__max']
+            sortorder_max = TileModel.objects.filter(
+                nodegroup_id=self.nodegroup_id,
+                resourceinstance_id=self.resourceinstance_id).aggregate(Max('sortorder'))['sortorder__max']
             self.sortorder = sortorder_max + 1 if sortorder_max is not None else 0
-        super(TileModel, self).save(*args, **kwargs) # Call the "real" save() method.
+        super(TileModel, self).save(*args, **kwargs)  # Call the "real" save() method.
 
 
 class Value(models.Model):
@@ -755,23 +757,25 @@ class Value(models.Model):
         managed = True
         db_table = 'values'
 
+
 class FileValue(models.Model):
-    valueid = models.UUIDField(primary_key=True, default=uuid.uuid1) # This field type is a guess.
+    valueid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     concept = models.ForeignKey('Concept', db_column='conceptid')
     valuetype = models.ForeignKey('DValueType', db_column='valuetype')
     value = models.FileField(upload_to='concepts')
     language = models.ForeignKey('DLanguage', db_column='languageid', blank=True, null=True)
+
     class Meta:
         managed = False
         db_table = 'values'
 
     def geturl(self):
-        if self.value != None:
+        if self.value is not None:
             return self.value.url
         return ''
 
     def getname(self):
-        if self.value != None:
+        if self.value is not None:
             return self.value.name
         return ''
 
@@ -787,12 +791,13 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
         try:
             if os.path.isfile(instance.value.path):
                 os.remove(instance.value.path)
-        ## except block added to deal with S3 file deletion
-        ## see comments on 2nd answer below
-        ## http://stackoverflow.com/questions/5372934/how-do-i-get-django-admin-to-delete-files-when-i-remove-an-object-from-the-datab
-        except:
+        # except block added to deal with S3 file deletion
+        # see comments on 2nd answer below
+        # http://stackoverflow.com/questions/5372934/how-do-i-get-django-admin-to-delete-files-when-i-remove-an-object-from-the-datab
+        except Exception as e:
             storage, name = instance.value.storage, instance.value.name
             storage.delete(name)
+
 
 @receiver(pre_save, sender=FileValue)
 def auto_delete_file_on_change(sender, instance, **kwargs):
