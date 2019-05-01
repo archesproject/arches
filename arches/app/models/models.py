@@ -280,6 +280,7 @@ class TileRevisionLog(models.Model):
 class File(models.Model):
     fileid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     path = models.FileField(upload_to='uploadedfiles')
+    tile = models.ForeignKey('TileModel', db_column='tileid', null=True, on_delete=models.CASCADE)
 
     class Meta:
         managed = True
