@@ -14,7 +14,7 @@
         "bootstrap-colorpicker": "^2.3.6",
         "chosen-js": "1.8.2",
         "ckeditor": "~4.6.2",
-        "codemirror": "^5.24.0",
+        "codemirror": "^5.46.0",
         "core-js": "^2.5.7",
         "d3": "3.5.17",
         "datatables.net": "~1.10.12",
