@@ -1031,7 +1031,6 @@ class FileListDataType(BaseDataType):
         return previously_saved_data
 
     def handle_request(self, current_tile, request, node):
-
         previously_saved_tile = models.TileModel.objects.filter(pk=current_tile.tileid)
         user = request.user
         if hasattr(request.user, 'userprofile') is not True:
@@ -1058,6 +1057,7 @@ class FileListDataType(BaseDataType):
         for file_data in files:
             file_model = models.File()
             file_model.path = file_data
+            file_model.tile = current_tile
             file_model.save()
             if current_tile_data[str(node.pk)] is not None:
                 for file_json in current_tile_data[str(node.pk)]:
