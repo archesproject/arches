@@ -2,11 +2,11 @@ import arches
 import json
 import os
 import subprocess
+import urllib
 from arches.management.commands import utils
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from django.core.management.base import BaseCommand, CommandError
-import urllib, json
 
 
 class Command(BaseCommand):
