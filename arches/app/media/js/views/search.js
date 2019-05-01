@@ -85,7 +85,13 @@ define([
         
             filtersLoaded = ko.computed(function(){
                 var allLoaded = true;
-                _.each(this.filters, function(value, key, list) {
+                var filters = _.filter(this.filters, function(filter, key) {
+                    var filter = _.find(this.filtersList, function(f) {
+                        return f.enabled && f.componentname === key;
+                    }, this);
+                    return filter;
+                }, this);
+                _.each(filters, function(value, key, list) {
                     if (!value()) {
                         allLoaded = false;
                     }
