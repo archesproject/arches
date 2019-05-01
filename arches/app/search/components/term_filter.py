@@ -4,7 +4,7 @@ details = {
     "icon": "",
     "modulename": "term_filter.py",
     "classname": "TermFilter",
-    "componenttype": "text-input",
+    "type": "text-input",
     "componentpath": "views/components/search/term-filter",
     "componentname": "term-filter",
     "config": {},

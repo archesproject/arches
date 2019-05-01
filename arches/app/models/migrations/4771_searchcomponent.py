@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
                 ('icon', models.TextField(default=None)),
                 ('modulename', models.TextField(blank=True, null=True)),
                 ('classname', models.TextField(blank=True, null=True)),
-                ('componenttype', models.TextField()),
+                ('type', models.TextField()),
                 ('componentpath', models.TextField(unique=True)),
                 ('componentname', models.TextField(unique=True)),
                 ('config', django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True)),

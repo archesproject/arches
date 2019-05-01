@@ -4,7 +4,7 @@ details = {
     "icon": "fa fa-code-fork",
     "modulename": "",
     "classname": "",
-    "componenttype": "filter",
+    "type": "filter",
     "componentpath": "views/components/search/related-resources-filter",
     "componentname": "related-resources-filter",
     "config": {},

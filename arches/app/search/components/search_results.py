@@ -4,7 +4,7 @@ details = {
     "icon": "",
     "modulename": "",
     "classname": "",
-    "componenttype": "results-list",
+    "type": "results-list",
     "componentpath": "views/components/search/search-results",
     "componentname": "search-results",
     "config": {},

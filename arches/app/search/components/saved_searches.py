@@ -4,7 +4,7 @@ details = {
     "icon": "fa fa-bookmark",
     "modulename": "",
     "classname": "",
-    "componenttype": "filter",
+    "type": "filter",
     "componentpath": "views/components/search/saved-searches",
     "componentname": "saved-searches",
     "config": {},

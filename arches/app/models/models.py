@@ -647,7 +647,7 @@ class SearchComponent(models.Model):
     icon = models.TextField(default=None)
     modulename = models.TextField(blank=True, null=True)
     classname = models.TextField(blank=True, null=True)
-    componenttype = models.TextField()
+    type = models.TextField()
     componentpath = models.TextField(unique=True)
     componentname = models.TextField(unique=True)
     config = JSONField(blank=True, null=True)
@@ -663,6 +663,10 @@ class SearchComponent(models.Model):
 
     def get_class_module(self):
         return get_class_from_modulename(self.modulename, self.classname, settings.SEARCH_COMPONENT_LOCATIONS)
+
+    def toJSON(self):
+        from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+        return JSONSerializer().serialize(self)
 
 
 class TileModel(models.Model): #Tile

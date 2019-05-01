@@ -72,7 +72,7 @@ class Command(BaseCommand):
             icon=details['icon'],
             modulename=os.path.basename(source),
             classname=details['classname'],
-            componenttype=details['componenttype'],
+            type=details['type'],
             componentpath=details['componentpath'],
             componentname=details['componentname'],
             config=details['config'],

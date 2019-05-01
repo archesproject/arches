@@ -4,7 +4,7 @@ details = {
     "icon": "",
     "modulename": "",
     "classname": "",
-    "componenttype": "resource-type-filter",
+    "type": "resource-type-filter",
     "componentpath": "views/components/search/resource-type-filter",
     "componentname": "resource-type-filter",
     "config": {},

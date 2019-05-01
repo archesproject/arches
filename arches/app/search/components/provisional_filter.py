@@ -4,7 +4,7 @@ details = {
     "icon": "",
     "modulename": "provisional_filter.py",
     "classname": "ProvisionalFilter",
-    "componenttype": "",
+    "type": "",
     "componentpath": "views/components/search/provisional-filter",
     "componentname": "provisional-filter",
     "config": {},

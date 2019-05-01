@@ -4,7 +4,7 @@ details = {
     "icon": "fa fa-check-circle-o",
     "modulename": "advanced_search.py",
     "classname": "AdvancedSearch",
-    "componenttype": "filter",
+    "type": "filter",
     "componentpath": "views/components/search/advanced-search",
     "componentname": "advanced-search",
     "config": {},

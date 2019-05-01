@@ -4,7 +4,7 @@ details = {
     "icon": "fa fa-calendar",
     "modulename": "time_filter.py",
     "classname": "TimeFilter",
-    "componenttype": "filter",
+    "type": "filter",
     "componentpath": "views/components/search/time-filter",
     "componentname": "time-filter",
     "config": {},
