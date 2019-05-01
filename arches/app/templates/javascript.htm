@@ -415,7 +415,9 @@
     });
 
     define('search-components', [{% for component in search_components %}'{{ component.componentpath }}',{% endfor %}], function () {
-         return;
+            return {% autoescape off %}[{% for component in search_components %}
+                {{component.toJSON}},
+            {% endfor %}]{% endautoescape %};
     });
 
     define('leaflet-draw-local', [

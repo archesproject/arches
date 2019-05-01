@@ -58,10 +58,9 @@ define([
 
     var CommonSearchViewModel = function() {
         this.filters = {};
-        this.filtersList = [];
-        searchData.search_components.forEach(function(component) {
-            this.filters[component.name] = ko.observable(null);
-            this.filtersList.push(component);
+        this.filtersList = SearchComponents;
+        SearchComponents.forEach(function(component) {
+            this.filters[component.componentname] = ko.observable(null);
         }, this);
         this.tags = ko.observableArray();
         this.selectedTab = ko.observable('map-filter');

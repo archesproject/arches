@@ -40,9 +40,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             <div class="" style="margin-top: 0px;">
                 <div class="" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
-                    <!-- ko if: filter.type === 'filter' -->
+                    <!-- ko if: filter.type === 'filter' && filter.enabled -->
                     {% if user|can_read_resource_instance %}
-                    <button class="btn search-type-btn relative" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.name}, click: function(){sharedStateObject.selectedTab('related-resource-manager')}">
+                    <button class="btn search-type-btn relative" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.name}, click: function(){sharedStateObject.selectedTab(filter.componentname)}">
                         <i class="fa fa-code-fork"></i>
                         <p data-bind="text: filter.name"></p>
                     </button>
@@ -63,12 +63,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- Card Container -->
                 <div class="card-form-preview-container">
                     <div class="tab-content relative" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
+                        <!-- ko if: filter.type === 'filter' && filter.enabled -->
                         <div class="tab-pane map-filter-panel" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.name}">
                             <div data-bind="component: {
-                                name: filter.name,
+                                name: filter.componentname,
                                 params: $parent.sharedStateObject
                             }"></div>
                         </div>
+                        <!-- /ko -->
                     </div>
                 </div>
             </div>
