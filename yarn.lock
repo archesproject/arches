@@ -1591,10 +1591,10 @@ inherits@^2.0.3, inherits@~2.0.1, inherits@~2.0.3:
   resolved "https://registry.yarnpkg.com/inherits/-/inherits-2.0.3.tgz#633c2c83e3da42a502f52466022480f4208261de"
   integrity sha1-Yzwsg+PaQqUC9SRmAiSA9CCCYd4=
 
-ionicons@~2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/ionicons/-/ionicons-2.0.1.tgz#ca398113293ea870244f538f0aabbd4b5b209a3e"
-  integrity sha1-yjmBEyk+qHAkT1OPCqu9S1sgmj4=
+ionicons@~4.5.6:
+  version "4.5.6"
+  resolved "https://registry.yarnpkg.com/ionicons/-/ionicons-4.5.6.tgz#f3b5d2446e7e1b30e67ddcd1fc563271acc60f3c"
+  integrity sha512-/F3U/rxdLPGl8eUW5dMouhBBoJuUPrlFO6rkoz4VNuw1lxP6l+bFtsDA8MaVM1dHABp+gIHxtpt+IhwmB3oIfA==
 
 irregular-plurals@^1.0.0:
   version "1.4.0"
