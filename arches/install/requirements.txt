@@ -11,7 +11,7 @@ lxml==4.2.5
 mapbox-vector-tile==1.2.0
 mapnik==0.1
 SPARQLWrapper==1.8.2
-django-recaptcha==1.4.0
+django-recaptcha==2.0.4
 python-jose==2.0.2
 edtf==2.7.0
 couchdb==1.2
