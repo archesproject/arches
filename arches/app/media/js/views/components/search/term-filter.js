@@ -5,7 +5,8 @@ define([
     'views/components/search/base-filter',
     'bindings/term-search'
 ], function(ko, koMapping, _, BaseFilter, termSearchComponent) {
-    return ko.components.register('term-filter', {
+    var component_name = 'term-filter';
+    return ko.components.register(component_name, {
         viewModel: BaseFilter.extend({
             initialize: function(options) {
                 options.name = 'Term Filter';
@@ -21,7 +22,7 @@ define([
                     this.updateQuery();
                 }, this);
 
-                options.filters['term-filter'](this);
+                options.filters[component_name](this);
 
                 this.restoreState();
             },
@@ -33,22 +34,22 @@ define([
                 
                 var queryObj = this.query();
                 if (terms.length > 0){
-                    queryObj.termFilter = ko.toJSON(terms);
+                    queryObj[component_name] = ko.toJSON(terms);
                 } else {
-                    delete queryObj.termFilter;
+                    delete queryObj[component_name];
                 }
                 this.query(queryObj);
             },
 
             restoreState: function() {
                 var query = this.query();
-                if ('termFilter' in query) {
-                    query.termFilter = JSON.parse(query.termFilter);
-                    if (query.termFilter.length > 0) {
-                        query.termFilter.forEach(function(term){
+                if (component_name in query) {
+                    query[component_name] = JSON.parse(query[component_name]);
+                    if (query[component_name].length > 0) {
+                        query[component_name].forEach(function(term){
                             term.inverted = ko.observable(term.inverted);
                         });
-                        this.filter.terms(query.termFilter);
+                        this.filter.terms(query[component_name]);
                     }
                 }
             },

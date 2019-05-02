@@ -83,13 +83,12 @@ define([
             this.viewModel.sharedStateObject = new CommonSearchViewModel();
             _.extend(this, this.viewModel.sharedStateObject);
         
-            filtersLoaded = ko.computed(function(){
+            var filtersLoaded = ko.computed(function(){
                 var allLoaded = true;
                 var filters = _.filter(this.filters, function(filter, key) {
-                    var filter = _.find(this.filtersList, function(f) {
+                    return _.find(this.filtersList, function(f) {
                         return f.enabled && f.componentname === key;
                     }, this);
-                    return filter;
                 }, this);
                 _.each(filters, function(value, key, list) {
                     if (!value()) {

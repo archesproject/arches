@@ -34,6 +34,7 @@ from arches.app.models.graph import Graph
 from arches.app.models.system_settings import settings
 from arches.app.utils.pagination import get_paginator
 from arches.app.utils.response import JSONResponse
+from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.date_utils import ExtendedDateFormat
 from arches.app.search.search_engine_factory import SearchEngineFactory
@@ -357,47 +358,59 @@ def build_search_results_dsl(request):
     nested_agg.add_aggregation(nested_agg_filter)
     query.add_aggregation(nested_agg)
 
-    if term_filter != '':
-        for term in JSONDeserializer().deserialize(term_filter):
-            term_query = Bool()
-            provisional_term_filter = Bool()
-            if term['type'] == 'term' or term['type'] == 'string':
-                string_filter = Bool()
-                if term['type'] == 'term':
-                    string_filter.must(Match(field='strings.string', query=term['value'], type='phrase'))
-                elif term['type'] == 'string':
-                    string_filter.should(Match(field='strings.string', query=term['value'], type='phrase_prefix'))
-                    string_filter.should(Match(field='strings.string.folded', query=term['value'], type='phrase_prefix'))
 
-                if include_provisional == False:
-                    string_filter.must_not(Match(field='strings.provisional', query='true', type='phrase'))
-                elif include_provisional == 'only provisional':
-                    string_filter.must_not(Match(field='strings.provisional', query='false', type='phrase'))
+    search_components = models.SearchComponent.objects.all()
+    def get_filter(filtertype):
+        for component in search_components:
+            if component.componentname == 'term-filter':
+                return get_class_from_modulename(component.modulename, component.classname, settings.SEARCH_COMPONENT_LOCATIONS)
 
-                string_filter.filter(Terms(field='strings.nodegroup_id', terms=permitted_nodegroups))
-                nested_string_filter = Nested(path='strings', query=string_filter)
-                if term['inverted']:
-                    search_query.must_not(nested_string_filter)
-                else:
-                    search_query.must(nested_string_filter)
-                    # need to set min_score because the query returns results with score 0 and those have to be removed, which I don't think it should be doing
-                    query.min_score('0.01')
-            elif term['type'] == 'concept':
-                concept_ids = _get_child_concepts(term['value'])
-                conceptid_filter = Bool()
-                conceptid_filter.filter(Terms(field='domains.conceptid', terms=concept_ids))
-                conceptid_filter.filter(Terms(field='domains.nodegroup_id', terms=permitted_nodegroups))
+    for filter_type, querystring in request.GET.items():
+        if filter_type == 'term-filter':
+            search_filter = get_filter(filter_type)()
+            search_filter.append_dsl(querystring, search_query, permitted_nodegroups, include_provisional)
 
-                if include_provisional == False:
-                    conceptid_filter.must_not(Match(field='domains.provisional', query='true', type='phrase'))
-                elif include_provisional == 'only provisional':
-                    conceptid_filter.must_not(Match(field='domains.provisional', query='false', type='phrase'))
+    # if term_filter != '':
+    #     for term in JSONDeserializer().deserialize(term_filter):
+    #         term_query = Bool()
+    #         provisional_term_filter = Bool()
+    #         if term['type'] == 'term' or term['type'] == 'string':
+    #             string_filter = Bool()
+    #             if term['type'] == 'term':
+    #                 string_filter.must(Match(field='strings.string', query=term['value'], type='phrase'))
+    #             elif term['type'] == 'string':
+    #                 string_filter.should(Match(field='strings.string', query=term['value'], type='phrase_prefix'))
+    #                 string_filter.should(Match(field='strings.string.folded', query=term['value'], type='phrase_prefix'))
 
-                nested_conceptid_filter = Nested(path='domains', query=conceptid_filter)
-                if term['inverted']:
-                    search_query.must_not(nested_conceptid_filter)
-                else:
-                    search_query.filter(nested_conceptid_filter)
+    #             if include_provisional == False:
+    #                 string_filter.must_not(Match(field='strings.provisional', query='true', type='phrase'))
+    #             elif include_provisional == 'only provisional':
+    #                 string_filter.must_not(Match(field='strings.provisional', query='false', type='phrase'))
+
+    #             string_filter.filter(Terms(field='strings.nodegroup_id', terms=permitted_nodegroups))
+    #             nested_string_filter = Nested(path='strings', query=string_filter)
+    #             if term['inverted']:
+    #                 search_query.must_not(nested_string_filter)
+    #             else:
+    #                 search_query.must(nested_string_filter)
+    #                 # need to set min_score because the query returns results with score 0 and those have to be removed, which I don't think it should be doing
+    #                 query.min_score('0.01')
+    #         elif term['type'] == 'concept':
+    #             concept_ids = _get_child_concepts(term['value'])
+    #             conceptid_filter = Bool()
+    #             conceptid_filter.filter(Terms(field='domains.conceptid', terms=concept_ids))
+    #             conceptid_filter.filter(Terms(field='domains.nodegroup_id', terms=permitted_nodegroups))
+
+    #             if include_provisional == False:
+    #                 conceptid_filter.must_not(Match(field='domains.provisional', query='true', type='phrase'))
+    #             elif include_provisional == 'only provisional':
+    #                 conceptid_filter.must_not(Match(field='domains.provisional', query='false', type='phrase'))
+
+    #             nested_conceptid_filter = Nested(path='domains', query=conceptid_filter)
+    #             if term['inverted']:
+    #                 search_query.must_not(nested_conceptid_filter)
+    #             else:
+    #                 search_query.filter(nested_conceptid_filter)
 
     if type_filter != '':
         for resouceTypeFilter in JSONDeserializer().deserialize(type_filter):
