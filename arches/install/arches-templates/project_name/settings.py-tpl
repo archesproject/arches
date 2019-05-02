@@ -54,6 +54,24 @@ DATABASES = {
     }
 }
 
+INSTALLED_APPS = (
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'django.contrib.gis',
+    'arches',
+    'arches.app.models',
+    'arches.management',
+    'guardian',
+    'captcha',
+    'revproxy',
+    'corsheaders',
+    'oauth2_provider',
+    '{{ project_name }}',
+)
 
 ALLOWED_HOSTS = []
 
