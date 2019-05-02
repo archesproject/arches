@@ -15,5 +15,5 @@ details = {
 
 class ProvisionalFilter():
 
-    def append_dsl(self, dsl):
+    def append_dsl(self, querysting_params, query_dsl, permitted_nodegroups, include_provisional):
         pass

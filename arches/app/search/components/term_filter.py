@@ -18,9 +18,9 @@ details = {
 
 class TermFilter():
 
-    def append_dsl(self, querysting_params, search_query, permitted_nodegroups, include_provisional):
+    def append_dsl(self, querysting_params, query_dsl, permitted_nodegroups, include_provisional):
+        search_query = Bool()
         for term in JSONDeserializer().deserialize(querysting_params):
-            term_query = Bool()
             provisional_term_filter = Bool()
             if term['type'] == 'term' or term['type'] == 'string':
                 string_filter = Bool()
@@ -42,7 +42,7 @@ class TermFilter():
                 else:
                     search_query.must(nested_string_filter)
                     # need to set min_score because the query returns results with score 0 and those have to be removed, which I don't think it should be doing
-                    query.min_score('0.01')
+                    query_dsl.min_score('0.01')
             elif term['type'] == 'concept':
                 concept_ids = _get_child_concepts(term['value'])
                 conceptid_filter = Bool()
@@ -59,4 +59,6 @@ class TermFilter():
                     search_query.must_not(nested_conceptid_filter)
                 else:
                     search_query.filter(nested_conceptid_filter)
+
+        query_dsl.add_query(search_query)
 

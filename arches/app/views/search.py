@@ -305,7 +305,6 @@ def get_provisional_type(request):
     return result
 
 def build_search_results_dsl(request):
-    term_filter = request.GET.get('termFilter', '')
     spatial_filter = JSONDeserializer().deserialize(request.GET.get('mapFilter', '{}'))
     include_provisional = get_provisional_type(request)
     type_filter = request.GET.get('typeFilter', '')
@@ -358,17 +357,23 @@ def build_search_results_dsl(request):
     nested_agg.add_aggregation(nested_agg_filter)
     query.add_aggregation(nested_agg)
 
-
     search_components = models.SearchComponent.objects.all()
+
     def get_filter(filtertype):
         for component in search_components:
-            if component.componentname == 'term-filter':
+            if component.componentname == filtertype:
                 return get_class_from_modulename(component.modulename, component.classname, settings.SEARCH_COMPONENT_LOCATIONS)
 
+    # import ipdb
+    # ipdb.set_trace()
     for filter_type, querystring in request.GET.items():
-        if filter_type == 'term-filter':
-            search_filter = get_filter(filter_type)()
-            search_filter.append_dsl(querystring, search_query, permitted_nodegroups, include_provisional)
+        print filter_type
+        search_filter = get_filter(filter_type)
+        print search_filter
+        if search_filter:
+            search_filter().append_dsl(querystring, query, permitted_nodegroups, include_provisional)
+        print query.dsl
+
 
     # if term_filter != '':
     #     for term in JSONDeserializer().deserialize(term_filter):
@@ -420,40 +425,40 @@ def build_search_results_dsl(request):
             else:
                 search_query.must(term)
 
-    if 'features' in spatial_filter:
-        if len(spatial_filter['features']) > 0:
-            feature_geom = spatial_filter['features'][0]['geometry']
-            feature_properties = {}
-            if 'properties' in spatial_filter['features'][0]:
-                feature_properties = spatial_filter['features'][0]['properties']
-            buffer = {'width':0,'unit':'ft'}
-            if 'buffer' in feature_properties:
-                buffer = feature_properties['buffer']
-            search_buffer = _buffer(feature_geom, buffer['width'], buffer['unit'])
-            feature_geom = JSONDeserializer().deserialize(search_buffer.json)
-            geoshape = GeoShape(field='geometries.geom.features.geometry', type=feature_geom['type'], coordinates=feature_geom['coordinates'] )
+    # if 'features' in spatial_filter:
+    #     if len(spatial_filter['features']) > 0:
+    #         feature_geom = spatial_filter['features'][0]['geometry']
+    #         feature_properties = {}
+    #         if 'properties' in spatial_filter['features'][0]:
+    #             feature_properties = spatial_filter['features'][0]['properties']
+    #         buffer = {'width':0,'unit':'ft'}
+    #         if 'buffer' in feature_properties:
+    #             buffer = feature_properties['buffer']
+    #         search_buffer = _buffer(feature_geom, buffer['width'], buffer['unit'])
+    #         feature_geom = JSONDeserializer().deserialize(search_buffer.json)
+    #         geoshape = GeoShape(field='geometries.geom.features.geometry', type=feature_geom['type'], coordinates=feature_geom['coordinates'] )
 
 
-            invert_spatial_search = False
-            if 'inverted' in feature_properties:
-                invert_spatial_search = feature_properties['inverted']
+    #         invert_spatial_search = False
+    #         if 'inverted' in feature_properties:
+    #             invert_spatial_search = feature_properties['inverted']
 
-            spatial_query = Bool()
-            if invert_spatial_search == True:
-                spatial_query.must_not(geoshape)
-            else:
-                spatial_query.filter(geoshape)
+    #         spatial_query = Bool()
+    #         if invert_spatial_search == True:
+    #             spatial_query.must_not(geoshape)
+    #         else:
+    #             spatial_query.filter(geoshape)
 
-            # get the nodegroup_ids that the user has permission to search
-            spatial_query.filter(Terms(field='geometries.nodegroup_id', terms=permitted_nodegroups))
+    #         # get the nodegroup_ids that the user has permission to search
+    #         spatial_query.filter(Terms(field='geometries.nodegroup_id', terms=permitted_nodegroups))
 
-            if include_provisional == False:
-                spatial_query.filter(Terms(field='geometries.provisional', terms=['false']))
+    #         if include_provisional == False:
+    #             spatial_query.filter(Terms(field='geometries.provisional', terms=['false']))
 
-            elif include_provisional == 'only provisional':
-                spatial_query.filter(Terms(field='geometries.provisional', terms=['true']))
+    #         elif include_provisional == 'only provisional':
+    #             spatial_query.filter(Terms(field='geometries.provisional', terms=['true']))
 
-            search_query.filter(Nested(path='geometries', query=spatial_query))
+    #         search_query.filter(Nested(path='geometries', query=spatial_query))
 
     if 'fromDate' in temporal_filter and 'toDate' in temporal_filter:
         now = str(datetime.utcnow())
