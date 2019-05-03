@@ -216,8 +216,7 @@ def search_results(request):
     except Exception as err:
         return JSONResponse(err.message, status=500)
 
-    dsl = search_results_dsl['query']
-    search_buffer = search_results_dsl['search_buffer']
+    dsl = search_results_dsl.pop('query', None)
     dsl.include('graph_id')
     dsl.include('root_ontology_class')
     dsl.include('resourceinstanceid')
@@ -258,7 +257,8 @@ def search_results(request):
 
         ret = {}
         ret['results'] = results
-        ret['search_buffer'] = JSONSerializer().serialize(search_buffer) if search_buffer != None else None
+        for key, value in search_results_dsl.items():
+            ret[key] = value
         ret['paginator'] = {}
         ret['paginator']['current_page'] = page.number
         ret['paginator']['has_next'] = page.has_next()
@@ -305,7 +305,6 @@ def get_provisional_type(request):
     return result
 
 def build_search_results_dsl(request):
-    spatial_filter = JSONDeserializer().deserialize(request.GET.get('mapFilter', '{}'))
     include_provisional = get_provisional_type(request)
     type_filter = request.GET.get('typeFilter', '')
 
@@ -314,8 +313,6 @@ def build_search_results_dsl(request):
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
     temporal_filter = JSONDeserializer().deserialize(request.GET.get('temporalFilter', '{}'))
     advanced_filters = JSONDeserializer().deserialize(request.GET.get('advanced', '[]'))
-    search_buffer = None
-    se = SearchEngineFactory().create()
 
     if export != None:
         limit = settings.SEARCH_EXPORT_ITEMS_PER_PAGE
@@ -325,7 +322,10 @@ def build_search_results_dsl(request):
         limit = settings.SEARCH_ITEMS_PER_PAGE
     limit = int(request.GET.get('limit', limit))
 
-    query = Query(se, start=limit*int(page-1), limit=limit)
+    se = SearchEngineFactory().create()
+    resultsObj = {
+        'query': Query(se, start=limit*int(page-1), limit=limit)
+    }
     search_query = Bool()
 
     nested_agg = NestedAgg(path='points', name='geo_aggs')
@@ -355,7 +355,7 @@ def build_search_results_dsl(request):
     nested_agg_filter.add_aggregation(GeoHashGridAgg(field='points.point', name='grid', precision=settings.HEX_BIN_PRECISION))
     nested_agg_filter.add_aggregation(GeoBoundsAgg(field='points.point', name='bounds'))
     nested_agg.add_aggregation(nested_agg_filter)
-    query.add_aggregation(nested_agg)
+    resultsObj['query'].add_aggregation(nested_agg)
 
     search_components = models.SearchComponent.objects.all()
 
@@ -364,15 +364,12 @@ def build_search_results_dsl(request):
             if component.componentname == filtertype:
                 return get_class_from_modulename(component.modulename, component.classname, settings.SEARCH_COMPONENT_LOCATIONS)
 
-    # import ipdb
-    # ipdb.set_trace()
     for filter_type, querystring in request.GET.items():
-        print filter_type
         search_filter = get_filter(filter_type)
-        print search_filter
         if search_filter:
-            search_filter().append_dsl(querystring, query, permitted_nodegroups, include_provisional)
-        print query.dsl
+            ret = search_filter().append_dsl(querystring, resultsObj['query'], permitted_nodegroups, include_provisional)
+            if ret is not None:
+                resultsObj[filter_type] = ret
 
 
     # if term_filter != '':
@@ -557,10 +554,8 @@ def build_search_results_dsl(request):
             advanced_query.should(grouped_query)
         search_query.must(advanced_query)
 
-    query.add_query(search_query)
-    if search_buffer != None:
-        search_buffer = search_buffer.geojson
-    return {'query': query, 'search_buffer':search_buffer}
+    resultsObj['query'].add_query(search_query)
+    return resultsObj
 
 def get_permitted_nodegroups(user):
     return [str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(user, 'models.read_nodegroup')]
