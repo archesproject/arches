@@ -75,6 +75,22 @@ define([
         this.searchResults = {'timestamp': ko.observable()};
         this.isResourceRelatable = function(){};
         this.toggleRelationshipCandidacy = function(){};
+
+        this.filtersLoaded = ko.computed(function(){
+            var allLoaded = true;
+            var filters = _.filter(this.filters, function(filter, key) {
+                return _.find(this.filtersList, function(f) {
+                    return f.enabled && f.componentname === key;
+                }, this);
+            }, this);
+            _.each(filters, function(value, key, list) {
+                if (!value()) {
+                    allLoaded = false;
+                }
+            });
+            return allLoaded;
+        }, this);
+
     };
 
     var SearchView = BaseManagerView.extend({
@@ -82,29 +98,14 @@ define([
 
             this.viewModel.sharedStateObject = new CommonSearchViewModel();
             _.extend(this, this.viewModel.sharedStateObject);
-        
-            var filtersLoaded = ko.computed(function(){
-                var allLoaded = true;
-                var filters = _.filter(this.filters, function(filter, key) {
-                    return _.find(this.filtersList, function(f) {
-                        return f.enabled && f.componentname === key;
-                    }, this);
-                }, this);
-                _.each(filters, function(value, key, list) {
-                    if (!value()) {
-                        allLoaded = false;
-                    }
-                });
-                return allLoaded;
-            }, this);
 
-            filtersLoaded.subscribe(function(allLoaded) {
+            this.filtersLoaded.subscribe(function(allLoaded) {
                 if (allLoaded) {
                     console.log('Filters All Loaded');
                     this.doQuery();
                 }
             }, this);
-
+        
             this.queryString = ko.computed(function() {
                 return JSON.stringify(this.query());
             }, this);

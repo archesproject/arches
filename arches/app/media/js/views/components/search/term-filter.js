@@ -22,6 +22,23 @@ define([
                     this.updateQuery();
                 }, this);
 
+                this.filter.tags.subscribe(function(tags){
+                    _.each(tags, function(tag){
+                        if(tag.status === 'deleted'){
+                            var found = _.find(this.filter.tags, function(currentTag){
+                               return tag.value.type === currentTag.type;
+                            }, this)
+                            if(!found){
+                                _.each(this.filters, function(filter){
+                                    if(!!filter() && filter().name === tag.value.type){
+                                        filter().clear();
+                                    }
+                                }, this);
+                            }
+                        }
+                    }, this);
+                }, this, "arrayChange");
+
                 options.filters[componentName](this);
 
                 this.restoreState();

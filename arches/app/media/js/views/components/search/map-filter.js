@@ -70,16 +70,19 @@ function(ko, BaseFilter, arches) {
                 }, this);
 
                 var filterUpdated = ko.computed(function() {
-                    return ko.toJS(this.filter.feature_collection());
+                    return JSON.stringify(ko.toJS(this.filter.feature_collection())) + this.filter.inverted();
                 }, this);
                 filterUpdated.subscribe(function() {
                     this.updateQuery();
                 }, this);
 
                 options.filters[componentName](this);
+
+                this.restoreState();
             },
 
             updateQuery: function(filterParams) {
+                var self = this;
                 var queryObj = this.query();
                 if (this.filter.feature_collection().features.length > 0) {
                     if (this.getFilter('term-filter').hasTag(this.type) === false) {
@@ -88,21 +91,20 @@ function(ko, BaseFilter, arches) {
                     this.filter.feature_collection().features[0].properties['inverted'] = this.filter.inverted();
                     queryObj[componentName] = ko.toJSON(this.filter.feature_collection());
                 } else {
-                    this.clear();
+                    //this.clear();
+                    delete queryObj[componentName];
                 }
                 this.query(queryObj);
             },
 
             restoreState: function() {
-                var inverted;
                 var query = this.query();
                 if (componentName in query) {
-                    query[componentName] = JSON.parse(query[componentName]);
-                    //this.query = query[componentName];
-                    if (query[componentName].features.length > 0) {
-                        this.filter.feature_collection(query[componentName]);
+                    query = JSON.parse(query[componentName]);
+                    if (query.features.length > 0) {
                         this.filter.inverted(query.features[0].properties.inverted);
                         this.getFilter('term-filter').addTag('Map Filter Enabled', this.name, this.filter.inverted);
+                        this.filter.feature_collection(query);
                     }
                 }
             },
