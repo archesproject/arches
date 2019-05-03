@@ -38,8 +38,8 @@ define([
             return;
         },
 
-        getFilter: function(filterName) {
-            return 
+        getFilter: function(filterName, callback) {
+            return this.filters[filterName]();
         }
     });
 });

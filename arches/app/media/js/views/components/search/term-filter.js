@@ -5,8 +5,8 @@ define([
     'views/components/search/base-filter',
     'bindings/term-search'
 ], function(ko, koMapping, _, BaseFilter, termSearchComponent) {
-    var component_name = 'term-filter';
-    return ko.components.register(component_name, {
+    var componentName = 'term-filter';
+    return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
             initialize: function(options) {
                 options.name = 'Term Filter';
@@ -22,7 +22,7 @@ define([
                     this.updateQuery();
                 }, this);
 
-                options.filters[component_name](this);
+                options.filters[componentName](this);
 
                 this.restoreState();
             },
@@ -34,22 +34,22 @@ define([
                 
                 var queryObj = this.query();
                 if (terms.length > 0){
-                    queryObj[component_name] = ko.toJSON(terms);
+                    queryObj[componentName] = ko.toJSON(terms);
                 } else {
-                    delete queryObj[component_name];
+                    delete queryObj[componentName];
                 }
                 this.query(queryObj);
             },
 
             restoreState: function() {
                 var query = this.query();
-                if (component_name in query) {
-                    query[component_name] = JSON.parse(query[component_name]);
-                    if (query[component_name].length > 0) {
-                        query[component_name].forEach(function(term){
+                if (componentName in query) {
+                    query[componentName] = JSON.parse(query[componentName]);
+                    if (query[componentName].length > 0) {
+                        query[componentName].forEach(function(term){
                             term.inverted = ko.observable(term.inverted);
                         });
-                        this.filter.terms(query[component_name]);
+                        this.filter.terms(query[componentName]);
                     }
                 }
             },

@@ -5,7 +5,8 @@ define([
     'views/components/widgets/map',
 ],
 function(ko, BaseFilter, arches) {
-    return ko.components.register('map-filter', {
+    var componentName = 'map-filter';
+    return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
             initialize: function(options) {
                 options.name = "Map Filter";
@@ -18,7 +19,9 @@ function(ko, BaseFilter, arches) {
                         results: this.searchResults.results.hits.hits,
                         geo_aggs: this.searchResults.results.aggregations.geo_aggs.inner.buckets[0]
                     });
-                    this.searchBuffer(this.searchResults.search_buffer);
+                    if(!!this.searchResults[componentName]) {
+                        this.searchBuffer(this.searchResults[componentName].search_buffer);
+                    }
                 }, this);
 
                 this.resizeOnChange = ko.computed(function() {
@@ -66,19 +69,40 @@ function(ko, BaseFilter, arches) {
                     }
                 }, this);
 
-                options.filters['map-filter'](this);
+                var filterUpdated = ko.computed(function() {
+                    return ko.toJS(this.filter.feature_collection());
+                }, this);
+                filterUpdated.subscribe(function() {
+                    this.updateQuery();
+                }, this);
+
+                options.filters[componentName](this);
+            },
+
+            updateQuery: function(filterParams) {
+                var queryObj = this.query();
+                if (this.filter.feature_collection().features.length > 0) {
+                    if (this.getFilter('term-filter').hasTag(this.type) === false) {
+                        this.getFilter('term-filter').addTag('Map Filter Enabled', this.name, this.filter.inverted);
+                    }
+                    this.filter.feature_collection().features[0].properties['inverted'] = this.filter.inverted();
+                    queryObj[componentName] = ko.toJSON(this.filter.feature_collection());
+                } else {
+                    this.clear();
+                }
+                this.query(queryObj);
             },
 
             restoreState: function() {
                 var inverted;
                 var query = this.query();
-                if ('mapFilter' in query) {
-                    query.mapFilter = JSON.parse(query.mapFilter);
-                    //this.query = query.mapFilter;
-                    if (query.mapFilter.features.length > 0) {
-                        this.filter.feature_collection(query.mapFilter);
+                if (componentName in query) {
+                    query[componentName] = JSON.parse(query[componentName]);
+                    //this.query = query[componentName];
+                    if (query[componentName].features.length > 0) {
+                        this.filter.feature_collection(query[componentName]);
                         this.filter.inverted(query.features[0].properties.inverted);
-                        this.termFilter.addTag('Map Filter Enabled', this.name, this.filter.inverted);
+                        this.getFilter('term-filter').addTag('Map Filter Enabled', this.name, this.filter.inverted);
                     }
                 }
             },
@@ -92,20 +116,7 @@ function(ko, BaseFilter, arches) {
                         });
                     }
                 }
-                this.termFilter.removeTag('Map Filter Enabled');
-            },
-
-            appendFilters: function(filterParams) {
-                if (this.filter.feature_collection().features.length > 0) {
-                    if (this.termFilter.hasTag(this.type) === false) {
-                        this.termFilter.addTag('Map Filter Enabled', this.name, this.filter.inverted);
-                    }
-                    this.filter.feature_collection().features[0].properties['inverted'] = this.filter.inverted();
-                    filterParams.mapFilter = ko.toJSON(this.filter.feature_collection());
-                } else {
-                    this.clear();
-                }
-                return this.filter.feature_collection().features.length === 0;
+                this.getFilter('term-filter').removeTag('Map Filter Enabled');
             }
         }),
         template: { require: 'text!templates/views/components/search/map-filter.htm' }
