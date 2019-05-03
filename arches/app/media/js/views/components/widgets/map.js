@@ -1322,7 +1322,9 @@ define([
                             unit: self.bufferUnit()
                         };
                         self.value().features[0] = self.queryFeature;
-                        self.updateSearchQueryLayer([{geometry: JSON.parse(self.searchBuffer())},self.queryFeature]);
+                        if (!!self.searchBuffer()) {
+                            self.updateSearchQueryLayer([{geometry: JSON.parse(self.searchBuffer())},self.queryFeature]);
+                        }
                     } else {
                         self.queryFeature.properties.buffer = {
                             width: 0,
