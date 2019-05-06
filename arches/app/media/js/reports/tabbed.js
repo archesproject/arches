@@ -8,7 +8,7 @@ define([
     'knockstrap',
     'bindings/chosen',
     'views/components/widgets/map'
-], function(_, ko, koMapping, $, ReportViewModel, arches) {
+], function(_, ko, koMapping, $, ReportViewModel) {
     return ko.components.register('tabbed-report', {
         viewModel: function(params) {
             var self = this;
