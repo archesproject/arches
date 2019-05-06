@@ -9,10 +9,11 @@ define([
     'bindings/time-wheel'
 ],
 function(_, ko, moment, BaseFilter, arches) {
-    return ko.components.register('time-filter', {
+    var componentName = 'time-filter';
+    return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
             initialize: function(options) {
-                var self = this;
+                BaseFilter.prototype.initialize.call(this, options);
                 this.name = 'Time Filter';
                 this.filter = {
                     fromDate: ko.observable(null),
@@ -21,15 +22,15 @@ function(_, ko, moment, BaseFilter, arches) {
                     inverted: ko.observable(false)
                 };
                 this.filter.fromDate.subscribe(function (fromDate) {
-                    var toDate = self.filter.toDate();
+                    var toDate = this.filter.toDate();
                     if (fromDate && toDate && !this.isFromLessThanTo(fromDate, toDate)) {
-                        self.filter.toDate(fromDate);
+                        this.filter.toDate(fromDate);
                     }
                 }, this);
                 this.filter.toDate.subscribe(function (toDate) {
-                    var fromDate = self.filter.fromDate();
+                    var fromDate = this.filter.fromDate();
                     if (fromDate && toDate && !this.isFromLessThanTo(fromDate, toDate)) {
-                        self.filter.fromDate(toDate);
+                        this.filter.fromDate(toDate);
                     }
                 }, this);
                 this.dateRangeType = ko.observable('custom');
@@ -41,14 +42,14 @@ function(_, ko, moment, BaseFilter, arches) {
                 this.getTimeWheelConfig();
                 this.selectedPeriod.subscribe(function (d) {
                     if (d) {
-                        var start = moment(0, 'YYYY').add(d.start, 'years').format(self.format);
-                        var end = moment(0, 'YYYY').add(d.end, 'years').format(self.format);
-                        self.dateRangeType('custom');
-                        self.filter.fromDate(end);
-                        self.filter.toDate(end);
-                        self.filter.fromDate(start);
+                        var start = moment(0, 'YYYY').add(d.start, 'years').format(this.format);
+                        var end = moment(0, 'YYYY').add(d.end, 'years').format(this.format);
+                        this.dateRangeType('custom');
+                        this.filter.fromDate(end);
+                        this.filter.toDate(end);
+                        this.filter.fromDate(start);
                     }
-                })
+                }, this);
 
                 this.dateRangeType.subscribe(function(value) {
                     var today = moment();
@@ -89,12 +90,28 @@ function(_, ko, moment, BaseFilter, arches) {
 
                 this.filterChanged = ko.computed(function(){
                     if(!!this.filter.fromDate() || !!this.filter.toDate()){
-                        this.termFilter.addTag(this.name, this.name, this.filter.inverted);
+                        this.getFilter('term-filter').addTag(this.name, this.name, this.filter.inverted);
                     }
                     return ko.toJSON(this.filter);
                 }, this).extend({ deferred: true });
 
-                BaseFilter.prototype.initialize.call(this, options);
+                this.filterChanged.subscribe(function() {
+                    this.updateQuery();
+                }, this);
+
+                this.filters[componentName](this);
+                this.restoreState();
+            },
+
+            updateQuery: function() {
+                var queryObj = this.query();
+                var filters_applied = !!this.filter.fromDate() || !!this.filter.toDate();
+                if(filters_applied){
+                    queryObj[componentName] = ko.toJSON(this.filter);
+                } else {
+                    delete queryObj[componentName];
+                }
+                this.query(queryObj);
             },
 
             getTimeWheelConfig: function(){
@@ -111,28 +128,18 @@ function(_, ko, moment, BaseFilter, arches) {
                 });
             },
 
-            appendFilters: function(filterParams) {
-                var filters_applied = !!this.filter.fromDate() || !!this.filter.toDate();
-                if(filters_applied){
-                    filterParams.temporalFilter = ko.toJSON(this.filter);
-                }
-                return filters_applied;
-            },
-
-            restoreState: function(query) {
-                var doQuery = false;
-                if ('temporalFilter' in query) {
-                    query.temporalFilter = JSON.parse(query.temporalFilter);
-                    this.filter.inverted(!!query.temporalFilter.inverted);
-                    this.termFilter.addTag(this.name, this.name, this.filter.inverted);
+            restoreState: function() {
+                var query = this.query();
+                if (componentName in query) {
+                    query[componentName] = JSON.parse(query[componentName]);
+                    this.filter.inverted(!!query[componentName].inverted);
+                    this.getFilter('term-filter').addTag(this.name, this.name, this.filter.inverted);
                     ['fromDate', 'toDate', 'dateNodeId'].forEach(function(key) {
-                        if (key in query.temporalFilter) {
-                            this.filter[key](query.temporalFilter[key]);
+                        if (key in query[componentName]) {
+                            this.filter[key](query[componentName][key]);
                         }
                     }, this);
-                    doQuery = true;
                 }
-                return doQuery;
             },
 
             isFromLessThanTo: function(fromDate, toDate) {
@@ -158,7 +165,7 @@ function(_, ko, moment, BaseFilter, arches) {
                 this.filter.dateNodeId(null);
                 this.filter.inverted(false);
                 this.dateRangeType('custom');
-                this.termFilter.removeTag(this.name);
+                this.getFilter('term-filter').removeTag(this.name);
                 this.selectedPeriod(null);
                 return;
             }

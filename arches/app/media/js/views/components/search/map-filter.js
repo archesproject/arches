@@ -76,8 +76,7 @@ function(ko, BaseFilter, arches) {
                     this.updateQuery();
                 }, this);
 
-                options.filters[componentName](this);
-
+                this.filters[componentName](this);
                 this.restoreState();
             },
 

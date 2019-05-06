@@ -1,5 +1,6 @@
+from arches.app.models.concept import Concept
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Term, Terms, GeoShape, Range, MinAgg, MaxAgg, RangeAgg, Aggregation, GeoHashGridAgg, GeoBoundsAgg, FiltersAgg, NestedAgg
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Nested, Terms
 
 details = {
     "searchcomponentid": "",
@@ -21,7 +22,6 @@ class TermFilter():
     def append_dsl(self, querysting_params, query_dsl, permitted_nodegroups, include_provisional):
         search_query = Bool()
         for term in JSONDeserializer().deserialize(querysting_params):
-            provisional_term_filter = Bool()
             if term['type'] == 'term' or term['type'] == 'string':
                 string_filter = Bool()
                 if term['type'] == 'term':
@@ -30,7 +30,7 @@ class TermFilter():
                     string_filter.should(Match(field='strings.string', query=term['value'], type='phrase_prefix'))
                     string_filter.should(Match(field='strings.string.folded', query=term['value'], type='phrase_prefix'))
 
-                if include_provisional == False:
+                if include_provisional is False:
                     string_filter.must_not(Match(field='strings.provisional', query='true', type='phrase'))
                 elif include_provisional == 'only provisional':
                     string_filter.must_not(Match(field='strings.provisional', query='false', type='phrase'))
@@ -49,7 +49,7 @@ class TermFilter():
                 conceptid_filter.filter(Terms(field='domains.conceptid', terms=concept_ids))
                 conceptid_filter.filter(Terms(field='domains.nodegroup_id', terms=permitted_nodegroups))
 
-                if include_provisional == False:
+                if include_provisional is False:
                     conceptid_filter.must_not(Match(field='domains.provisional', query='true', type='phrase'))
                 elif include_provisional == 'only provisional':
                     conceptid_filter.must_not(Match(field='domains.provisional', query='false', type='phrase'))
@@ -62,3 +62,9 @@ class TermFilter():
 
         query_dsl.add_query(search_query)
 
+
+def _get_child_concepts(conceptid):
+    ret = set([conceptid])
+    for row in Concept().get_child_concepts(conceptid, ['prefLabel']):
+        ret.add(row[0])
+    return list(ret)

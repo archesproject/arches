@@ -39,8 +39,7 @@ define([
                     }, this);
                 }, this, "arrayChange");
 
-                options.filters[componentName](this);
-
+                this.filters[componentName](this);
                 this.restoreState();
             },
 

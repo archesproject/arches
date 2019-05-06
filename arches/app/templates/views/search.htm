@@ -42,7 +42,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
                     <!-- ko if: filter.type === 'filter' && filter.enabled -->
                     {% if user|can_read_resource_instance %}
-                    <button class="btn search-type-btn relative" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}, click: function(){sharedStateObject.selectedTab(filter.componentname)}">
+                    <button class="btn search-type-btn relative" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}, click: function(){$parent.sharedStateObject.selectedTab(filter.componentname)}">
                         <i class="fa fa-code-fork"></i>
                         <p data-bind="text: filter.name"></p>
                     </button>
