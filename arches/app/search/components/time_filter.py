@@ -2,6 +2,7 @@ from datetime import datetime
 from arches.app.utils.date_utils import ExtendedDateFormat
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.search.elasticsearch_dsl_builder import Bool, Nested, Term, Terms, Range
+from arches.app.search.components.base import BaseSearchFilter
 
 details = {
     "searchcomponentid": "",
@@ -18,7 +19,7 @@ details = {
 }
 
 
-class TimeFilter():
+class TimeFilter(BaseSearchFilter):
 
     def append_dsl(self, querysting_params, query_dsl, permitted_nodegroups, include_provisional):
         search_query = Bool()

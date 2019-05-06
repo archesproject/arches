@@ -58,28 +58,30 @@ class Command(BaseCommand):
         """
 
         dt_source = imp.load_source('', source)
-        details = dt_source.details
 
-        try:
-            uuid.UUID(details['searchcomponentid'])
-        except:
-            details['searchcomponentid'] = unicode(uuid.uuid4())
-            print "Registering the search component, %s, with componentid: %s" % (details['name'], details['searchcomponentid'])
+        if getattr(dt_source, 'details', None):
+            details = dt_source.details
 
-        instance = models.SearchComponent(
-            searchcomponentid=details['searchcomponentid'],
-            name=details['name'],
-            icon=details['icon'],
-            modulename=os.path.basename(source),
-            classname=details['classname'],
-            type=details['type'],
-            componentpath=details['componentpath'],
-            componentname=details['componentname'],
-            config=details['config'],
-            sortorder=details['sortorder']
-        )
+            try:
+                uuid.UUID(details['searchcomponentid'])
+            except:
+                details['searchcomponentid'] = unicode(uuid.uuid4())
+                print "Registering the search component, %s, with componentid: %s" % (details['name'], details['searchcomponentid'])
 
-        instance.save()
+            instance = models.SearchComponent(
+                searchcomponentid=details['searchcomponentid'],
+                name=details['name'],
+                icon=details['icon'],
+                modulename=os.path.basename(source),
+                classname=details['classname'],
+                type=details['type'],
+                componentpath=details['componentpath'],
+                componentname=details['componentname'],
+                config=details['config'],
+                sortorder=details['sortorder']
+            )
+
+            instance.save()
 
     def update(self, source):
         """

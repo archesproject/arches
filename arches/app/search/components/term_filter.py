@@ -1,6 +1,7 @@
 from arches.app.models.concept import Concept
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Nested, Terms
+from arches.app.search.components.base import BaseSearchFilter
 
 details = {
     "searchcomponentid": "",
@@ -17,7 +18,7 @@ details = {
 }
 
 
-class TermFilter():
+class TermFilter(BaseSearchFilter):
 
     def append_dsl(self, querysting_params, query_dsl, permitted_nodegroups, include_provisional):
         search_query = Bool()

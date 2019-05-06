@@ -2,6 +2,7 @@ from django.contrib.gis.geos import GEOSGeometry
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.elasticsearch_dsl_builder import Bool, Nested, Terms, GeoShape
+from arches.app.search.components.base import BaseSearchFilter
 
 details = {
     "searchcomponentid": "",
@@ -18,7 +19,7 @@ details = {
 }
 
 
-class MapFilter():
+class MapFilter(BaseSearchFilter):
 
     def append_dsl(self, querysting_params, query_dsl, permitted_nodegroups, include_provisional):
         search_query = Bool()
