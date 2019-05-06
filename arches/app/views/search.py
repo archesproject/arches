@@ -34,12 +34,12 @@ from arches.app.models.graph import Graph
 from arches.app.models.system_settings import settings
 from arches.app.utils.pagination import get_paginator
 from arches.app.utils.response import JSONResponse
-from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.date_utils import ExtendedDateFormat
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Term, Terms, GeoShape, Range, MinAgg, MaxAgg, RangeAgg, Aggregation, GeoHashGridAgg, GeoBoundsAgg, FiltersAgg, NestedAgg
 from arches.app.search.time_wheel import TimeWheel
+from arches.app.search.components.base import SearchFilterFactory
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.views.base import BaseManagerView, MapBaseManagerView
 from arches.app.views.concept import get_preflabel_from_conceptid
@@ -357,17 +357,12 @@ def build_search_results_dsl(request):
     nested_agg.add_aggregation(nested_agg_filter)
     resultsObj['query'].add_aggregation(nested_agg)
 
-    search_components = models.SearchComponent.objects.all()
 
-    def get_filter(filtertype):
-        for component in search_components:
-            if component.componentname == filtertype:
-                return get_class_from_modulename(component.modulename, component.classname, settings.SEARCH_COMPONENT_LOCATIONS)
-
+    search_filter_factory = SearchFilterFactory()
     for filter_type, querystring in request.GET.items():
-        search_filter = get_filter(filter_type)
+        search_filter = search_filter_factory.get_filter(filter_type)
         if search_filter:
-            ret = search_filter().append_dsl(querystring, resultsObj['query'], permitted_nodegroups, include_provisional)
+            ret = search_filter.append_dsl(querystring, resultsObj['query'], permitted_nodegroups, include_provisional)
             if ret is not None:
                 resultsObj[filter_type] = ret
 
