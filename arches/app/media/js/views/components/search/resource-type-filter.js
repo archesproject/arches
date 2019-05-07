@@ -2,7 +2,8 @@ define([
     'knockout',
     'views/components/search/base-filter'
 ], function(ko, BaseFilter) {
-    return ko.components.register('resource-type-filter', {
+    var componentName = 'resource-type-filter';
+    return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
             initialize: function(options) {
                 BaseFilter.prototype.initialize.call(this, options);
@@ -10,20 +11,40 @@ define([
                 this.name = 'Resource Type Filter';
                 
                 this.filter = ko.observableArray();
+
+                var filterUpdated = ko.computed(function() {
+                    return JSON.stringify(ko.toJS(this.filter()));
+                }, this);
+                filterUpdated.subscribe(function() {
+                    this.updateQuery();
+                }, this);
+
+                this.filters[componentName](this);
+                this.restoreState();
             },
 
-            restoreState: function(query) {
+            updateQuery: function() {
+                var queryObj = this.query();
+                if(this.filter().length > 0){
+                    queryObj[componentName] = ko.toJSON(this.filter);
+                } else {
+                    delete queryObj[componentName];
+                }
+                this.query(queryObj);
+            },
+
+            restoreState: function() {
                 var doQuery = false;
-                if ('typeFilter' in query) {
-                    query.typeFilter = JSON.parse(query.typeFilter);
-                    if (query.typeFilter.length > 0) {
-                        query.typeFilter.forEach(function(type){
+                var query = this.query();
+                if (componentName in query) {
+                    query[componentName] = JSON.parse(query[componentName]);
+                    if (query[componentName].length > 0) {
+                        query[componentName].forEach(function(type){
                             type.inverted = ko.observable(!!type.inverted);
-                            this.termFilter.addTag(type.name, this.name, type.inverted);
+                            this.getFilter('term-filter').addTag(type.name, this.name, type.inverted);
                         }, this);
-                        this.filter(query.typeFilter);
+                        this.filter(query[componentName]);
                     }
-                    doQuery = true;
                 }
                 return doQuery;
             },
@@ -32,21 +53,13 @@ define([
                 this.filter.removeAll();
             },
 
-            appendFilters: function(filterParams) {
-                if(this.filter().length > 0){
-                    filterParams.typeFilter = ko.toJSON(this.filter);
-                }
-
-                return this.filter().length > 0;
-            },
-
             selectModelType: function(item){
                 this.filter().forEach(function(item){
-                    this.termFilter.removeTag(item.name);
+                    this.getFilter('term-filter').removeTag(item.name);
                 }, this);
                 if(!!item){
                     var inverted = ko.observable(false);
-                    this.termFilter.addTag(item.name(), this.name, inverted);
+                    this.getFilter('term-filter').addTag(item.name(), this.name, inverted);
                     this.filter([{graphid:item.graphid, name: item.name(), inverted: inverted}]);
                 }else{
                     this.clear();
