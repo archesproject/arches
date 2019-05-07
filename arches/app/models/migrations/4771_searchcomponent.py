@@ -38,12 +38,11 @@ class Migration(migrations.Migration):
                 ('type', models.TextField()),
                 ('componentpath', models.TextField(unique=True)),
                 ('componentname', models.TextField(unique=True)),
-                ('config', django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True)),
                 ('sortorder', models.IntegerField(blank=True, default=None, null=True)),
                 ('enabled', models.BooleanField(default=False)),
             ],
             options={
-                'db_table': 'search_compnent',
+                'db_table': 'search_component',
                 'managed': True,
             },
         ),

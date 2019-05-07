@@ -7,7 +7,6 @@ details = {
     "type": "",
     "componentpath": "views/components/search/provisional-filter",
     "componentname": "provisional-filter",
-    "config": {},
     "sortorder": "0",
     "enabled": True
 }

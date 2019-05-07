@@ -13,7 +13,6 @@ details = {
     "type": "filter",
     "componentpath": "views/components/search/map-filter",
     "componentname": "map-filter",
-    "config": {},
     "sortorder": "0",
     "enabled": True
 }

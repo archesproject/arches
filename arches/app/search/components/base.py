@@ -2,19 +2,18 @@ from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils.module_importer import get_class_from_modulename
 
-details = {
-    "searchcomponentid": "",  # leave blank for the system to generate a uuid
-    "name": "",  # the name that shows up in the UI
-    "icon": "",  # the icon class to use
-    "modulename": "base.py",  # the name of this file
-    "classname": "BaseSearchFilter",  # the classname below",
-    "type": "filter",  # 'filter' if you want the component to show up dynamically
-    "componentpath": "views/components/search/...",  # path to ko component
-    "componentname": "advanced-search",  # lowercase unique name
-    "config": {},  # config values to pass to the component
-    "sortorder": "0",  # order in which to display dynamically added filters to the UI
-    "enabled": True  # True to enable in the system
-}
+# details = {
+#     "searchcomponentid": "",  # leave blank for the system to generate a uuid
+#     "name": "",  # the name that shows up in the UI
+#     "icon": "",  # the icon class to use
+#     "modulename": "base.py",  # the name of this file
+#     "classname": "BaseSearchFilter",  # the classname below",
+#     "type": "filter",  # 'filter' if you want the component to show up dynamically
+#     "componentpath": "views/components/search/...",  # path to ko component
+#     "componentname": "advanced-search",  # lowercase unique name
+#     "sortorder": "0",  # order in which to display dynamically added filters to the UI
+#     "enabled": True  # True to enable in the system
+# }
 
 
 class BaseSearchFilter():

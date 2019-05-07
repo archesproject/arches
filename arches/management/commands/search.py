@@ -77,8 +77,8 @@ class Command(BaseCommand):
                 type=details['type'],
                 componentpath=details['componentpath'],
                 componentname=details['componentname'],
-                config=details['config'],
-                sortorder=details['sortorder']
+                sortorder=details['sortorder'],
+                enabled=details['enabled']
             )
 
             instance.save()

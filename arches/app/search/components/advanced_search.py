@@ -14,7 +14,6 @@ details = {
     "type": "filter",
     "componentpath": "views/components/search/advanced-search",
     "componentname": "advanced-search",
-    "config": {},
     "sortorder": "0",
     "enabled": True
 }

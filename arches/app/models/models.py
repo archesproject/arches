@@ -650,7 +650,6 @@ class SearchComponent(models.Model):
     type = models.TextField()
     componentpath = models.TextField(unique=True)
     componentname = models.TextField(unique=True)
-    config = JSONField(blank=True, null=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
     enabled = models.BooleanField(default=False)
 
@@ -659,7 +658,7 @@ class SearchComponent(models.Model):
 
     class Meta:
         managed = True
-        db_table = 'search_compnent'
+        db_table = 'search_component'
 
     def get_class_module(self):
         return get_class_from_modulename(self.modulename, self.classname, settings.SEARCH_COMPONENT_LOCATIONS)
