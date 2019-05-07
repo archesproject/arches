@@ -60,14 +60,6 @@ define([
                             }
                         }
                     }, this);
-                }).fail(function(response) {
-                    console.log(response);
-                    // if (typeof onFail === 'function') {
-                    //     onFail(response);
-                    // }
-                }).always(function(response){
-                    console.log(response);
-                    // loading(false);
                 });
 
                 this.filter = {

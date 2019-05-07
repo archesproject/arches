@@ -117,8 +117,6 @@ define([
             }, this);
 
             BaseManagerView.prototype.initialize.call(this, options);
-
-            x = this;
         },
 
         doQuery: function() {
