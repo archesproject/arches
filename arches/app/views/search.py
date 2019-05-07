@@ -358,11 +358,11 @@ def build_search_results_dsl(request):
     resultsObj['query'].add_aggregation(nested_agg)
 
 
-    search_filter_factory = SearchFilterFactory()
+    search_filter_factory = SearchFilterFactory(request)
     for filter_type, querystring in request.GET.items():
         search_filter = search_filter_factory.get_filter(filter_type)
         if search_filter:
-            ret = search_filter.append_dsl(querystring, resultsObj['query'], permitted_nodegroups, include_provisional)
+            ret = search_filter.append_dsl(resultsObj['query'], permitted_nodegroups, include_provisional)
             if ret is not None:
                 resultsObj[filter_type] = ret
 
@@ -527,29 +527,30 @@ def build_search_results_dsl(request):
 
     #     search_query.filter(temporal_query)
 
-    datatype_factory = DataTypeFactory()
-    if len(advanced_filters) > 0:
-        advanced_query = Bool()
-        grouped_query = Bool()
-        grouped_queries = [grouped_query]
-        for index, advanced_filter in enumerate(advanced_filters):
-            tile_query = Bool()
-            for key, val in advanced_filter.iteritems():
-                if key != 'op':
-                    node = models.Node.objects.get(pk=key)
-                    if request.user.has_perm('read_nodegroup', node.nodegroup):
-                        datatype = datatype_factory.get_instance(node.datatype)
-                        datatype.append_search_filters(val, node, tile_query, request)
-            nested_query = Nested(path='tiles', query=tile_query)
-            if advanced_filter['op'] == 'or' and index != 0:
-                grouped_query = Bool()
-                grouped_queries.append(grouped_query)
-            grouped_query.must(nested_query)
-        for grouped_query in grouped_queries:
-            advanced_query.should(grouped_query)
-        search_query.must(advanced_query)
+    # datatype_factory = DataTypeFactory()
+    # if len(advanced_filters) > 0:
+    #     advanced_query = Bool()
+    #     grouped_query = Bool()
+    #     grouped_queries = [grouped_query]
+    #     for index, advanced_filter in enumerate(advanced_filters):
+    #         tile_query = Bool()
+    #         for key, val in advanced_filter.iteritems():
+    #             if key != 'op':
+    #                 node = models.Node.objects.get(pk=key)
+    #                 if request.user.has_perm('read_nodegroup', node.nodegroup):
+    #                     datatype = datatype_factory.get_instance(node.datatype)
+    #                     datatype.append_search_filters(val, node, tile_query, request)
+    #         nested_query = Nested(path='tiles', query=tile_query)
+    #         if advanced_filter['op'] == 'or' and index != 0:
+    #             grouped_query = Bool()
+    #             grouped_queries.append(grouped_query)
+    #         grouped_query.must(nested_query)
+    #     for grouped_query in grouped_queries:
+    #         advanced_query.should(grouped_query)
+    #     search_query.must(advanced_query)
 
     resultsObj['query'].add_query(search_query)
+    print search_query
     return resultsObj
 
 def get_permitted_nodegroups(user):

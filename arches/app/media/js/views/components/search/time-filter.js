@@ -115,15 +115,15 @@ function(_, ko, moment, BaseFilter, arches) {
             },
 
             getTimeWheelConfig: function(){
-                var self = this;
                 $.ajax({
                     type: "GET",
+                    context: this,
                     url: arches.urls.time_wheel_config,
                     success: function(response) {
-                        self.wheelConfig(response);
+                        this.wheelConfig(response);
                     },
                     error: function(response) {
-                        self.breadCrumb(response.responseText);
+                        this.breadCrumb(response.responseText);
                     }
                 });
             },
