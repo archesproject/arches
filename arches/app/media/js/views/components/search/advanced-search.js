@@ -13,49 +13,73 @@ define([
             initialize: function(options) {
                 var self = this;
                 BaseFilter.prototype.initialize.call(this, options);
-                this.searchableGraphs = [];
-                this.cards = options.cards;
+                this.searchableGraphs = ko.observableArray();
                 this.datatypelookup = {};
                 this.facetFilterText = ko.observable('');
-                _.each(options.datatypes, function(datatype) {
-                    this.datatypelookup[datatype.datatype] = datatype;
-                }, this);
-                _.each(options.cards, function(card) {
-                    card.nodes = _.filter(options.nodes, function(node) {
-                        return node.nodegroup_id === card.nodegroup_id;
-                    });
-                    card.addFacet = function() {
-                        self.newFacet(card);
-                    };
-                }, this);
-                _.each(options.graphs, function(graph) {
-                    if (graph.isresource && graph.isactive) {
-                        var graphCards = _.filter(options.cards, function(card) {
-                            return card.graph_id === graph.graphid && card.nodes.length > 0;
+
+                $.ajax({
+                    type: "GET",
+                    url: arches.urls.api_search_component_data + componentName,
+                    context: this
+                }).done(function(response) {
+                    console.log(response);
+                    this.cards = response.cards;
+                    _.each(response.datatypes, function(datatype) {
+                        this.datatypelookup[datatype.datatype] = datatype;
+                    }, this);
+                    _.each(response.cards, function(card) {
+                        card.nodes = _.filter(response.nodes, function(node) {
+                            return node.nodegroup_id === card.nodegroup_id;
                         });
-                        if (graphCards.length > 0) {
-                            _.each(graphCards, function(card) {
-                                card.getGraph = function() {
-                                    return graph;
-                                };
+                        card.addFacet = function() {
+                            self.newFacet(card);
+                        };
+                    }, this);
+                    _.each(response.graphs, function(graph) {
+                        if (graph.isresource && graph.isactive) {
+                            var graphCards = _.filter(response.cards, function(card) {
+                                return card.graph_id === graph.graphid && card.nodes.length > 0;
                             });
-                            graph.cards = ko.computed(function() {
-                                var facetFilterText = this.facetFilterText().toLowerCase();
-                                if (facetFilterText) {
-                                    return _.filter(graphCards, function(card) {
-                                        return card.name.toLowerCase().indexOf(facetFilterText) > -1;
-                                    });
-                                } else {
-                                    return graphCards;
-                                }
-                            }, this);
-                            this.searchableGraphs.push(graph);
+                            if (graphCards.length > 0) {
+                                _.each(graphCards, function(card) {
+                                    card.getGraph = function() {
+                                        return graph;
+                                    };
+                                });
+                                graph.cards = ko.computed(function() {
+                                    var facetFilterText = this.facetFilterText().toLowerCase();
+                                    if (facetFilterText) {
+                                        return _.filter(graphCards, function(card) {
+                                            return card.name.toLowerCase().indexOf(facetFilterText) > -1;
+                                        });
+                                    } else {
+                                        return graphCards;
+                                    }
+                                }, this);
+                                this.searchableGraphs.push(graph);
+                            }
                         }
-                    }
-                }, this);
+                    }, this);
+                }).fail(function(response) {
+                    console.log(response);
+                    // if (typeof onFail === 'function') {
+                    //     onFail(response);
+                    // }
+                }).always(function(response){
+                    console.log(response);
+                    // loading(false);
+                });
+
                 this.filter = {
                     facets: ko.observableArray()
                 };
+
+                var filterUpdated = ko.computed(function() {
+                    return JSON.stringify(ko.toJS(this.filter.facets()));
+                }, this);
+                filterUpdated.subscribe(function() {
+                    this.updateQuery();
+                }, this);
 
                 this.filters[componentName](this);
                 this.restoreState();

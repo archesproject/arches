@@ -579,7 +579,7 @@ class Card(APIBase):
                                     # if the tile has authoritaive data and the current user is not the owner,
                                     # we don't send the provisional data of other users back to the client.
                                     tile.provisionaledits = None
-                if append_tile == True:
+                if append_tile is True:
                     provisionaltiles.append(tile)
             tiles = provisionaltiles
 
@@ -605,6 +605,7 @@ class Card(APIBase):
         }
 
         return JSONResponse(context, indent=4)
+
 
 class SearchComponentData(APIBase):
 

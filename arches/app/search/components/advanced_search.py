@@ -46,6 +46,7 @@ class AdvancedSearch(BaseSearchFilter):
         for grouped_query in grouped_queries:
             advanced_query.should(grouped_query)
         search_query.must(advanced_query)
+        query_dsl.add_query(search_query)
 
     def view_data(self):
         ret = {}
