@@ -64,7 +64,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="card-form-preview-container">
                     <div class="tab-content relative" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
                         <!-- ko if: filter.type === 'filter' && filter.enabled -->
-                        <div class="tab-pane map-filter-panel" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}">
+                        <div class="tab-pane" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}">
                             <div data-bind="component: {
                                 name: filter.componentname,
                                 params: $parent.sharedStateObject
@@ -85,7 +85,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <script>
         define('search-data', [], function() {
             return {{% autoescape off %}
-                search_components: [{'name': 'term-filter', 'type': 'text-input'}, {'name': 'search-results', 'type': 'results-list'}, {'name': 'map-filter', 'type': 'filter'}, {'name': 'related-resources-filter', 'type': 'filter'}],
                 searchable_nodes: {{ searchable_nodes }},
                 resource_cards: {{ resource_cards }},
                 datatypes: {{ datatypes_json }},
