@@ -229,7 +229,8 @@
                 collector_designer: function(surveyid){return "{% url 'collector_designer' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', surveyid)},
                 collector_manager: "{% url 'collector_manager' %}",
                 help_template: "{% url 'help_templates' %}",
-                api_card: "{% url 'api_card' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '')
+                api_card: "{% url 'api_card' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
+                api_search_component_data: "{% url 'api_search_component_data' 'aaaa'%}".replace('aaaa', ''),
             },
             confirmNav: {
                 title: "{% trans 'Edits pending...' %}",
