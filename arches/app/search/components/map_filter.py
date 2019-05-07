@@ -21,8 +21,9 @@ details = {
 
 class MapFilter(BaseSearchFilter):
 
-    def append_dsl(self, querysting_params, query_dsl, permitted_nodegroups, include_provisional):
+    def append_dsl(self, query_dsl, permitted_nodegroups, include_provisional):
         search_query = Bool()
+        querysting_params = self.request.GET.get(details['componentname'], '')
         spatial_filter = JSONDeserializer().deserialize(querysting_params)
         if 'features' in spatial_filter:
             if len(spatial_filter['features']) > 0:

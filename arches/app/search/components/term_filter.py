@@ -20,8 +20,9 @@ details = {
 
 class TermFilter(BaseSearchFilter):
 
-    def append_dsl(self, querysting_params, query_dsl, permitted_nodegroups, include_provisional):
+    def append_dsl(self, query_dsl, permitted_nodegroups, include_provisional):
         search_query = Bool()
+        querysting_params = self.request.GET.get(details['componentname'], '')
         for term in JSONDeserializer().deserialize(querysting_params):
             if term['type'] == 'term' or term['type'] == 'string':
                 string_filter = Bool()

@@ -18,8 +18,10 @@ details = {
 
 
 class BaseSearchFilter():
+    def __init__(self, request=None):
+        self.request = request
 
-    def append_dsl(self, querysting_params, query_dsl, permitted_nodegroups, include_provisional):
+    def append_dsl(self, query_dsl, permitted_nodegroups, include_provisional):
         """
         used to append ES query dsl to the search request
 
@@ -37,7 +39,8 @@ class BaseSearchFilter():
 
 
 class SearchFilterFactory(object):
-    def __init__(self):
+    def __init__(self, request=None):
+        self.request = request
         self.search_filters = {search_filter.componentname: search_filter for search_filter in models.SearchComponent.objects.all()}
         self.search_filters_instances = {}
 
@@ -50,7 +53,7 @@ class SearchFilterFactory(object):
                 filter_instance = None
                 class_method = get_class_from_modulename(search_filter.modulename, search_filter.classname, settings.SEARCH_COMPONENT_LOCATIONS)
                 if class_method:
-                    filter_instance = class_method()
+                    filter_instance = class_method(self.request)
                 self.search_filters_instances[search_filter.componentname] = filter_instance
             return filter_instance
         else:
