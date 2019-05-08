@@ -13,8 +13,8 @@ function(_, ko, moment, BaseFilter, arches) {
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
             initialize: function(options) {
+                options.name = 'Time Filter';
                 BaseFilter.prototype.initialize.call(this, options);
-                this.name = 'Time Filter';
                 this.filter = {
                     fromDate: ko.observable(null),
                     toDate: ko.observable(null),

@@ -15,8 +15,8 @@ function(BaseFilter, ko, koMapping) {
             },
 
             initialize: function(options) {
+                options.name = 'Paging Filter';
                 BaseFilter.prototype.initialize.call(this, options);
-                this.name = 'Search Results';
                 this.page = ko.observable(1);
                 this.paginator = koMapping.fromJS({});
                 this.showPaginator = ko.observable(false);
@@ -25,7 +25,7 @@ function(BaseFilter, ko, koMapping) {
                     this.updateResults(this.searchResults);
                 }, this);
 
-                this.filters['search-results'](this);
+                this.filters[componentName](this);
                 this.restoreState();
             },
 

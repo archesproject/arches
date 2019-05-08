@@ -12,6 +12,7 @@ define([
         viewModel: BaseFilter.extend({
             initialize: function(options) {
                 var self = this;
+                options.name = 'Advanced Search Filter';
                 BaseFilter.prototype.initialize.call(this, options);
                 this.searchableGraphs = ko.observableArray();
                 this.datatypelookup = {};

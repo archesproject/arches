@@ -6,9 +6,8 @@ define([
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
             initialize: function(options) {
+                options.name = 'Resource Type Filter';
                 BaseFilter.prototype.initialize.call(this, options);
-                
-                this.name = 'Resource Type Filter';
                 
                 this.filter = ko.observableArray();
 

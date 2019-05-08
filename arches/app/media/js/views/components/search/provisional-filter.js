@@ -6,8 +6,8 @@ define([
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
             initialize: function(options) {
+                options.name = 'Provisional Filter';
                 BaseFilter.prototype.initialize.call(this, options);
-                this.name = 'Provisional Filter';
                 this.filter = ko.observableArray();
                 this.provisionalOptions = [{'name': 'Authoritative'},{'name': 'Provisional'}];
 

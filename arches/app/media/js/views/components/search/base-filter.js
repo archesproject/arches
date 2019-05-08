@@ -16,6 +16,7 @@ define([
 
         initialize: function(options) {
             $.extend(this, options);
+            console.log('loading ' + this.name);
         },
 
         getFilter: function(filterName, callback) {
