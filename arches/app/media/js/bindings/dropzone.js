@@ -3,7 +3,7 @@ define([
     'underscore',
     'knockout',
     'dropzone'
-], function(_, $, ko, dropzone) {
+], function($, _, ko, dropzone) {
     /**
      * @constructor
      * @name dropzone
