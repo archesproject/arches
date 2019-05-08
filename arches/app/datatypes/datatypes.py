@@ -1060,12 +1060,23 @@ class FileListDataType(BaseDataType):
             file_model.tile = current_tile
             if models.TileModel.objects.filter(pk=current_tile.tileid).count() > 0:
                 file_model.save()
-                if current_tile_data[str(node.pk)] is not None:
-                    for file_json in current_tile_data[str(node.pk)]:
-                        if file_json["name"] == file_data.name and file_json["url"] is None:
-                            file_json["file_id"] = str(file_model.pk)
-                            file_json["url"] = str(file_model.path.url)
-                            file_json["status"] = 'uploaded'
+            if current_tile_data[str(node.pk)] is not None:
+                resave_tile = False
+                updated_file_records = []
+                for file_json in current_tile_data[str(node.pk)]:
+                    if file_json["name"] == file_data.name and file_json["url"] is None:
+                        file_json["file_id"] = str(file_model.pk)
+                        file_json["url"] = str(file_model.path.url)
+                        file_json["status"] = 'uploaded'
+                        resave_tile = True
+                    updated_file_records.append(file_json)
+                if resave_tile is True:
+                    # resaving model to assign url from file_model
+                    # importing proxy model errors, so cannot use super on the proxy model to save
+                    if previously_saved_tile.count() == 1:
+                        tile_to_update = previously_saved_tile[0]
+                        tile_to_update.data[str(node.pk)] = updated_file_records
+                        tile_to_update.save()
 
     def transform_import_values(self, value, nodeid):
         '''
