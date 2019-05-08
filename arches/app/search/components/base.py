@@ -2,6 +2,7 @@ from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils.module_importer import get_class_from_modulename
 
+details = {}
 # details = {
 #     "searchcomponentid": "",  # leave blank for the system to generate a uuid
 #     "name": "",  # the name that shows up in the UI

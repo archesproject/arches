@@ -305,67 +305,22 @@ def get_provisional_type(request):
     return result
 
 def build_search_results_dsl(request):
-    include_provisional = get_provisional_type(request)
-    type_filter = request.GET.get('typeFilter', '')
-
-    export = request.GET.get('export', None)
-    mobile_download = request.GET.get('mobiledownload', None)
-    page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
-    temporal_filter = JSONDeserializer().deserialize(request.GET.get('temporalFilter', '{}'))
-    advanced_filters = JSONDeserializer().deserialize(request.GET.get('advanced', '[]'))
-
-    if export != None:
-        limit = settings.SEARCH_EXPORT_ITEMS_PER_PAGE
-    elif mobile_download != None:
-        limit = request.GET['resourcecount']
-    else:
-        limit = settings.SEARCH_ITEMS_PER_PAGE
-    limit = int(request.GET.get('limit', limit))
-
     se = SearchEngineFactory().create()
     resultsObj = {
-        'query': Query(se, start=limit*int(page-1), limit=limit)
+        'query': Query(se)
     }
-    search_query = Bool()
 
-    nested_agg = NestedAgg(path='points', name='geo_aggs')
-    nested_agg_filter = FiltersAgg(name='inner')
-
+    include_provisional = get_provisional_type(request)
     permitted_nodegroups = get_permitted_nodegroups(request.user)
-    geo_agg_filter = Bool()
-
-    if include_provisional == True:
-        geo_agg_filter.filter(Terms(field='points.provisional', terms=['false','true']))
-
-    else:
-        provisional_resource_filter = Bool()
-
-        if include_provisional == False:
-            provisional_resource_filter.filter(Terms(field='provisional_resource', terms=['false', 'partial']))
-            geo_agg_filter.filter(Terms(field='points.provisional', terms=['false']))
-
-        elif include_provisional == 'only provisional':
-            provisional_resource_filter.filter(Terms(field='provisional_resource', terms=['true', 'partial']))
-            geo_agg_filter.filter(Terms(field='points.provisional', terms=['true']))
-
-        search_query.must(provisional_resource_filter)
-
-    geo_agg_filter.filter(Terms(field='points.nodegroup_id', terms=permitted_nodegroups))
-    nested_agg_filter.add_filter(geo_agg_filter)
-    nested_agg_filter.add_aggregation(GeoHashGridAgg(field='points.point', name='grid', precision=settings.HEX_BIN_PRECISION))
-    nested_agg_filter.add_aggregation(GeoBoundsAgg(field='points.point', name='bounds'))
-    nested_agg.add_aggregation(nested_agg_filter)
-    resultsObj['query'].add_aggregation(nested_agg)
 
     search_filter_factory = SearchFilterFactory(request)
-    for filter_type, querystring in request.GET.items():
+    for filter_type, querystring in request.GET.items() + [('search-results', '')]:
         search_filter = search_filter_factory.get_filter(filter_type)
         if search_filter:
             ret = search_filter.append_dsl(resultsObj['query'], permitted_nodegroups, include_provisional)
             if ret is not None:
                 resultsObj[filter_type] = ret
 
-    resultsObj['query'].add_query(search_query)
     return resultsObj
 
 def get_permitted_nodegroups(user):
