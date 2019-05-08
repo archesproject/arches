@@ -60,9 +60,9 @@ class MapFilter(BaseSearchFilter):
 
         search_results_object['query'].add_query(search_query)
 
-        if details.componentname not in search_results_object:
-            search_results_object[details.componentname] = {}
-        search_results_object[details.componentname]['search_buffer'] = search_buffer.geojson
+        if details['componentname'] not in search_results_object:
+            search_results_object[details['componentname']] = {}
+        search_results_object[details['componentname']]['search_buffer'] = search_buffer.geojson
 
 
 def _buffer(geojson, width=0, unit='ft'):

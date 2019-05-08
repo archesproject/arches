@@ -33,7 +33,7 @@ class PagingFilter(BaseSearchFilter):
         search_results_object['query'].start = limit*int(page-1)
         search_results_object['query'].limit = limit
 
-    def post_search_hook(search_results_object, results):
+    def post_search_hook(self, search_results_object, results):
         total = results['hits']['total']
         page = 1 if self.request.GET.get('page') == '' else int(self.request.GET.get('page', 1))
 
@@ -51,4 +51,6 @@ class PagingFilter(BaseSearchFilter):
         ret['end_index'] = page.end_index()
         ret['pages'] = pages
 
-        return {'paginator': ret}
+        if details['componentname'] not in search_results_object:
+            search_results_object[details['componentname']] = {}
+        search_results_object[details['componentname']]['paginator'] = ret
