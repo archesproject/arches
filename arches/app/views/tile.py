@@ -60,9 +60,11 @@ class TileData(View):
     def handle_save_error(self, e, tile_id='', title=_('Saving tile failed'), message=None):
         title = title
         if message is None:
-            message = str(e)
+            message = type(e).__name__
             if hasattr(e, 'message') and e.message:
-                message += "({0})".format(e.message)
+                message += ": {0}".format(e.message)
+        else:
+            message = str(e)
 
         logger.error(title +
                      ''' [Tile id: {tile_id}] \
@@ -71,7 +73,7 @@ class TileData(View):
                      .format(tile_id=tile_id,
                              message=message,
                              trace=traceback.format_exc()))
-        print('returning', title, message)
+
         return JSONResponse({'status': 'false', 'message':
                              [_(title), _(str(message))]}, status=500)
 
