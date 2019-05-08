@@ -164,6 +164,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
 
             restoreState: function(){
                 this.page(ko.utils.unwrapObservable(this.query.page));
+                this.updateResults(this.searchResults);
             },
 
             viewReport: function(resourceinstance){
