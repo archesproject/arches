@@ -22,7 +22,6 @@ define([
                     url: arches.urls.api_search_component_data + componentName,
                     context: this
                 }).done(function(response) {
-                    console.log(response);
                     this.cards = response.cards;
                     _.each(response.datatypes, function(datatype) {
                         this.datatypelookup[datatype.datatype] = datatype;
