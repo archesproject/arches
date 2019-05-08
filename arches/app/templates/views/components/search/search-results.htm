@@ -9,18 +9,10 @@
     <div id="search-results-container">
         <div class="search-inline-filters">
             {% if user_is_reviewer %}
-            <div class="resource-selector-button pull-right" data-bind="with:$parent.provisionalFilter">
-                <div class="btn-group btn-group-xs">
-                    <button class="btn btn-primary btn-active-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="true"> {% trans "QA Type" %} <i class="dropdown-caret fa fa-caret-down"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-right">
-                        <li><a href="#" data-bind="click: selectProvisional.bind($data, null)">{% trans "All edits" %}</a></li>
-                        <!-- ko foreach: provisionalOptions -->
-                        <li><a href="#" data-bind="text: name, click: $parent.selectProvisional.bind($parent)"></a></li>
-                        <!-- /ko -->
-                    </ul>
-                </div>
-            </div>
+            <div data-bind="component: {
+                name: 'provisional-filter',
+                params: $parent.sharedStateObject
+            }"></div>
             {% endif %}
             <div data-bind="component: {
                 name: 'resource-type-filter',

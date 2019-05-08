@@ -1,3 +1,5 @@
+from arches.app.search.elasticsearch_dsl_builder import Bool, Terms
+
 details = {
     "searchcomponentid": "",
     "name": "Provisional Filter",
@@ -15,4 +17,15 @@ details = {
 class ProvisionalFilter():
 
     def append_dsl(self, query_dsl, permitted_nodegroups, include_provisional):
-        pass
+        search_query = Bool()
+        if include_provisional is not True:
+            provisional_resource_filter = Bool()
+
+            if include_provisional is False:
+                provisional_resource_filter.filter(Terms(field='provisional_resource', terms=['false', 'partial']))
+
+            elif include_provisional is 'only provisional':
+                provisional_resource_filter.filter(Terms(field='provisional_resource', terms=['true', 'partial']))
+
+            search_query.must(provisional_resource_filter)
+            query_dsl.add_query(search_query)
