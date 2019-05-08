@@ -20,7 +20,7 @@ details = {
 
 class MapFilter(BaseSearchFilter):
 
-    def append_dsl(self, query_dsl, permitted_nodegroups, include_provisional):
+    def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
         search_query = Bool()
         querysting_params = self.request.GET.get(details['componentname'], '')
         spatial_filter = JSONDeserializer().deserialize(querysting_params)
@@ -58,9 +58,11 @@ class MapFilter(BaseSearchFilter):
 
                 search_query.filter(Nested(path='geometries', query=spatial_query))
 
-        query_dsl.add_query(search_query)
+        search_results_object['query'].add_query(search_query)
 
-        return {'search_buffer': search_buffer.geojson}
+        if details.componentname not in search_results_object:
+            search_results_object[details.componentname] = {}
+        search_results_object[details.componentname]['search_buffer'] = search_buffer.geojson
 
 
 def _buffer(geojson, width=0, unit='ft'):

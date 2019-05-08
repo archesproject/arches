@@ -18,7 +18,7 @@ details = {
 
 class PagingFilter(BaseSearchFilter):
 
-    def append_dsl(self, query_dsl, permitted_nodegroups, include_provisional):
+    def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
         export = self.request.GET.get('export', None)
         mobile_download = self.request.GET.get('mobiledownload', None)
         page = 1 if self.request.GET.get('page') == '' else int(self.request.GET.get('page', 1))
@@ -30,10 +30,10 @@ class PagingFilter(BaseSearchFilter):
         else:
             limit = settings.SEARCH_ITEMS_PER_PAGE
         limit = int(self.request.GET.get('limit', limit))
-        query_dsl.start = limit*int(page-1)
-        query_dsl.limit = limit
+        search_results_object['query'].start = limit*int(page-1)
+        search_results_object['query'].limit = limit
 
-    def post_search_hook(results):
+    def post_search_hook(search_results_object, results):
         total = results['hits']['total']
         page = 1 if self.request.GET.get('page') == '' else int(self.request.GET.get('page', 1))
 

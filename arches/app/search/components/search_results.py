@@ -18,7 +18,7 @@ details = {
 
 class SearchResultsFilter(BaseSearchFilter):
 
-    def append_dsl(self, query_dsl, permitted_nodegroups, include_provisional):
+    def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
         export = self.request.GET.get('export', None)
         mobile_download = self.request.GET.get('mobiledownload', None)
         page = 1 if self.request.GET.get('page') == '' else int(self.request.GET.get('page', 1))
@@ -30,8 +30,8 @@ class SearchResultsFilter(BaseSearchFilter):
         else:
             limit = settings.SEARCH_ITEMS_PER_PAGE
         limit = int(self.request.GET.get('limit', limit))
-        query_dsl.start = limit*int(page-1)
-        query_dsl.limit = limit
+        search_results_object['query'].start = limit*int(page-1)
+        search_results_object['query'].limit = limit
 
 
         nested_agg = NestedAgg(path='points', name='geo_aggs')
@@ -53,4 +53,4 @@ class SearchResultsFilter(BaseSearchFilter):
         nested_agg_filter.add_aggregation(GeoHashGridAgg(field='points.point', name='grid', precision=settings.HEX_BIN_PRECISION))
         nested_agg_filter.add_aggregation(GeoBoundsAgg(field='points.point', name='bounds'))
         nested_agg.add_aggregation(nested_agg_filter)
-        query_dsl.add_aggregation(nested_agg)
+        search_results_object['query'].add_aggregation(nested_agg)

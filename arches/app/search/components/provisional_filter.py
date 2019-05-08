@@ -16,7 +16,7 @@ details = {
 
 class ProvisionalFilter():
 
-    def append_dsl(self, query_dsl, permitted_nodegroups, include_provisional):
+    def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
         search_query = Bool()
         if include_provisional is not True:
             provisional_resource_filter = Bool()
@@ -28,4 +28,4 @@ class ProvisionalFilter():
                 provisional_resource_filter.filter(Terms(field='provisional_resource', terms=['true', 'partial']))
 
             search_query.must(provisional_resource_filter)
-            query_dsl.add_query(search_query)
+            search_results_object['query'].add_query(search_query)
