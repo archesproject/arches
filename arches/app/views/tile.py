@@ -103,7 +103,7 @@ class TileData(View):
                         clean_resource_cache(old_tile)
                     except ObjectDoesNotExist as e:
                         return self.handle_save_error(e, _('This tile is no longer available'),
-                                               _('It was likely deleted by another user'))
+                                                      _('It was likely deleted by another user'))
 
                 tile = Tile(data)
 
