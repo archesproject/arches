@@ -16,7 +16,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import uuid, importlib
+import uuid
+import importlib
 import datetime
 import json
 import pytz
@@ -198,7 +199,6 @@ class Tile(models.TileModel):
             datatype = datatype_factory.get_instance(node.datatype)
             datatype.clean(self, nodeid)
             if request is not None:
-                datatype.handle_request(self, request, node)
                 if self.data[nodeid] == None and node.isrequired == True:
                     if len(node.cardxnodexwidget_set.all()) > 0:
                         missing_nodes.append(node.cardxnodexwidget_set.all()[0].label)
@@ -221,6 +221,14 @@ class Tile(models.TileModel):
             if errors != None:
                 errors += error
         return errors
+
+    def datatype_post_save_actions(self, request=None):
+        for nodeid, value in self.data.items():
+            datatype_factory = DataTypeFactory()
+            node = models.Node.objects.get(nodeid=nodeid)
+            datatype = datatype_factory.get_instance(node.datatype)
+            if request is not None:
+                datatype.handle_request(self, request, node)
 
     def save(self, *args, **kwargs):
         request = kwargs.pop('request', None)
@@ -277,6 +285,7 @@ class Tile(models.TileModel):
                 user = {}
             else:
                 self.validate([])
+                self.datatype_post_save_actions(request)
             if creating_new_tile is True:
                 self.save_edit(
                     user=user,
