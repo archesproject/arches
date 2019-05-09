@@ -53,15 +53,35 @@ define([
         SearchComponents.forEach(function(component) {
             this.filters[component.componentname] = ko.observable(null);
         }, this);
-        //this.tags = ko.observableArray();
-        this.selectedTab = ko.observable('map-filter');
+        var firstEnabledFilter = _.find(this.filtersList, function(filter) {
+            return filter.type === 'filter' && filter.enabled === true;
+        }, this);
+        this.selectedTab = ko.observable(firstEnabledFilter.componentname);
         this.resultsExpanded = ko.observable(true);
         this.query = ko.observable(getQueryObject());
         this.mouseoverInstanceId = ko.observable();
         this.mapLinkData = ko.observable(null);
         this.searchResults = {'timestamp': ko.observable()};
-        this.isResourceRelatable = function(){};
-        this.toggleRelationshipCandidacy = function(){};
+        this.isResourceRelatable = function(graphId) {
+            console.log('in isResourceRelatable')
+            var relatable = false;
+            if (this.graph) {
+                relatable = _.contains(this.graph.relatable_resource_model_ids, graphId);
+            }
+            return relatable;
+        };
+        this.toggleRelationshipCandidacy = function() {
+            console.log('in toggleRelationshipCandidacy')
+            var self = this;
+            return function(resourceinstanceid){
+                var candidate = _.contains(self.relationshipCandidates(), resourceinstanceid);
+                if (candidate) {
+                    self.relationshipCandidates.remove(resourceinstanceid);
+                } else {
+                    self.relationshipCandidates.push(resourceinstanceid);
+                }
+            };
+        };
     };
 
     var SearchView = BaseManagerView.extend({

@@ -29,7 +29,6 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                 this.showRelationships = ko.observable();
                 this.mouseoverInstanceId = ko.observable();
                 this.relationshipCandidates = ko.observableArray();
-                this.mapLinkData = ko.observable(null);
                 this.selectedResourceId = ko.observable(null);
 
                 this.showRelationships.subscribe(function(res) {
@@ -40,9 +39,11 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                     this.updateResults(this.searchResults);
                 }, this);
 
-                this.showRelatedResourceLink = ko.observable(false);
                 this.filters['search-results'](this);
                 this.restoreState();
+
+                this.mapFilter = this.getFilter('map-filter');
+                this.relatedResourcesManager = this.getFilter('related-resources-filter');
             },
 
             mouseoverInstance: function() {
@@ -57,36 +58,16 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                 var self = this;
                 return function(resourceinstance){
                     if (resourceinstance === undefined) {
-                        resourceinstance = self.viewModel.relatedResourcesManager.currentResource();
-                        if (self.viewModel.relatedResourcesManager.showGraph() === true) {
-                            self.viewModel.relatedResourcesManager.showGraph(false);
+                        resourceinstance = self.relatedResourcesManager.currentResource();
+                        if (self.relatedResourcesManager.showGraph() === true) {
+                            self.relatedResourcesManager.showGraph(false);
                         }
                     }
                     self.showRelationships(resourceinstance);
-                    if (self.viewModel.selectedTab() !== self.viewModel.relatedResourcesManager) {
-                        self.viewModel.selectedTab(self.viewModel.relatedResourcesManager);
+                    if (self.selectedTab() !== 'related-resources-filter') {
+                        self.selectedTab('related-resources-filter');
                     }
                 };
-            },
-
-            toggleRelationshipCandidacy: function() {
-                var self = this;
-                return function(resourceinstanceid){
-                    var candidate = _.contains(self.relationshipCandidates(), resourceinstanceid);
-                    if (candidate) {
-                        self.relationshipCandidates.remove(resourceinstanceid);
-                    } else {
-                        self.relationshipCandidates.push(resourceinstanceid);
-                    }
-                };
-            },
-
-            isResourceRelatable: function(graphId) {
-                var relatable = false;
-                if (this.viewModel.graph) {
-                    relatable = _.contains(this.viewModel.graph.relatable_resource_model_ids, graphId);
-                }
-                return relatable;
             },
 
             updateResults: function(response){
@@ -130,8 +111,8 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                         point: point,
                         mapLinkClicked: function() {
                             self.selectedResourceId(result._source.resourceinstanceid);
-                            if (self.viewModel.selectedTab() !== self.viewModel.mapFilter) {
-                                self.viewModel.selectedTab(self.viewModel.mapFilter);
+                            if (self.selectedTab() !== 'map-filter') {
+                                self.selectedTab('map-filter');
                             }
                             self.mapLinkData(mapData.geom);
                         },
