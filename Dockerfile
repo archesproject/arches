@@ -56,11 +56,17 @@ RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main" >> /etc
 	apt-get update -y &&\
 	apt-get install -y postgresql-client-9.6
 
+######################
+# Add LDAP libraries #
+######################
+
+#RUN apt-get update && apt-get install -y libldap2-dev libsasl2-dev   && \
+#      . ../ENV/bin/activate                                          && \
+#      pip install -U django-auth-ldap
 
 ## Clean up obsolete folders and packages
 RUN rm -rf /var/lib/apt/lists/*
 RUN rm -rf /tmp/*
-
 
 # From here, run commands from ARCHES_ROOT
 WORKDIR ${ARCHES_ROOT}
