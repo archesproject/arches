@@ -15,13 +15,7 @@ function(ko, BaseFilter, arches) {
                 this.aggregations = ko.observable();
                 this.searchBuffer = ko.observable();
                 this.searchResults.timestamp.subscribe(function(timestamp) {
-                    this.aggregations({
-                        results: this.searchResults.results.hits.hits,
-                        geo_aggs: this.searchResults.results.aggregations.geo_aggs.inner.buckets[0]
-                    });
-                    if(!!this.searchResults[componentName]) {
-                        this.searchBuffer(this.searchResults[componentName].search_buffer);
-                    }
+                    this.updateResults();
                 }, this);
 
                 this.resizeOnChange = ko.computed(function() {
@@ -106,6 +100,10 @@ function(ko, BaseFilter, arches) {
                         this.filter.feature_collection(query);
                     }
                 }
+                this.updateResults();
+            },
+
+            updateResults: function() {
                 this.aggregations({
                     results: this.searchResults.results.hits.hits,
                     geo_aggs: this.searchResults.results.aggregations.geo_aggs.inner.buckets[0]
