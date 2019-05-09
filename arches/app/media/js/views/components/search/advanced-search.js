@@ -133,11 +133,6 @@ define([
                         }
                     }, this);
                 }
-            },
-
-            clear: function() {
-                this.filter.facets([]);
-                return;
             }
         }),
         template: { require: 'text!templates/views/components/search/advanced-search.htm' }

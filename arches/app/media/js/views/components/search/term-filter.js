@@ -70,10 +70,6 @@ define([
                 }
             },
 
-            clear: function() {
-                this.filter.terms.removeAll();
-            },
-
             addTag: function(term, type, inverted){
                 this.filter.tags.unshift({
                     inverted: inverted,
