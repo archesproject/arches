@@ -19,21 +19,6 @@ details = {
 class SearchResultsFilter(BaseSearchFilter):
 
     def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
-        export = self.request.GET.get('export', None)
-        mobile_download = self.request.GET.get('mobiledownload', None)
-        page = 1 if self.request.GET.get('page') == '' else int(self.request.GET.get('page', 1))
-
-        if export is not None:
-            limit = settings.SEARCH_EXPORT_ITEMS_PER_PAGE
-        elif mobile_download is not None:
-            limit = self.request.GET['resourcecount']
-        else:
-            limit = settings.SEARCH_ITEMS_PER_PAGE
-        limit = int(self.request.GET.get('limit', limit))
-        search_results_object['query'].start = limit*int(page-1)
-        search_results_object['query'].limit = limit
-
-
         nested_agg = NestedAgg(path='points', name='geo_aggs')
         nested_agg_filter = FiltersAgg(name='inner')
         geo_agg_filter = Bool()

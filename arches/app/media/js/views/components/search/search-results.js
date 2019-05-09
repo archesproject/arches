@@ -28,13 +28,13 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
 
                 this.total = ko.observable();
                 this.results = ko.observableArray();
-                this.page = ko.observable(1);
-                this.paginator = koMapping.fromJS({});
-                this.showPaginator = ko.observable(false);
+                // this.page = ko.observable(1);
+                // this.paginator = koMapping.fromJS({});
+                // this.showPaginator = ko.observable(false);
                 this.showRelationships = ko.observable();
                 this.mouseoverInstanceId = ko.observable();
                 this.relationshipCandidates = ko.observableArray();
-                this.userRequestedNewPage = ko.observable(false);
+                // this.userRequestedNewPage = ko.observable(false);
                 this.mapLinkData = ko.observable(null);
                 this.selectedResourceId = ko.observable(null);
 
@@ -89,12 +89,12 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                 };
             },
 
-            newPage: function(page){
-                if(page){
-                    this.userRequestedNewPage(true);
-                    this.page(page);
-                }
-            },
+            // newPage: function(page){
+            //     if(page){
+            //         this.userRequestedNewPage(true);
+            //         this.page(page);
+            //     }
+            // },
 
             isResourceRelatable: function(graphId) {
                 var relatable = false;
@@ -106,13 +106,13 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
 
             updateResults: function(response){
                 var self = this;
-                koMapping.fromJS(response.paginator, this.paginator);
-                this.showPaginator(true);
+                // koMapping.fromJS(response.paginator, this.paginator);
+                // this.showPaginator(true);
                 var data = $('div[name="search-result-data"]').data();
 
                 this.total(response.results.hits.total);
                 this.results.removeAll();
-                this.userRequestedNewPage(false);
+                //this.userRequestedNewPage(false);
                 this.selectedResourceId(null);
                 this.userIsReviewer = response.reviewer;
                 response.results.hits.hits.forEach(function(result){
@@ -163,7 +163,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
             },
 
             restoreState: function(){
-                this.page(ko.utils.unwrapObservable(this.query.page));
+                // this.page(ko.utils.unwrapObservable(this.query.page));
                 this.updateResults(this.searchResults);
             },
 

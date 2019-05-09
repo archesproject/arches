@@ -210,13 +210,25 @@ def select_geoms_for_results(features, geojson_nodes, user_is_reviewer):
 
     return res
 
-def search_results(request):
+def search_results(request):    
+    se = SearchEngineFactory().create()
+    search_results_object = {
+        'query': Query(se)
+    }
+
+    include_provisional = get_provisional_type(request)
+    permitted_nodegroups = get_permitted_nodegroups(request.user)
+
+    search_filter_factory = SearchFilterFactory(request)
     try:
-        search_results_dsl = build_search_results_dsl(request)
+        for filter_type, querystring in request.GET.items() + [('search-results', '')]:
+            search_filter = search_filter_factory.get_filter(filter_type)
+            if search_filter:
+                search_filter.append_dsl(search_results_object, permitted_nodegroups, include_provisional)
     except Exception as err:
         return JSONResponse(err.message, status=500)
 
-    dsl = search_results_dsl.pop('query', None)
+    dsl = search_results_object.pop('query', None)
     dsl.include('graph_id')
     dsl.include('root_ontology_class')
     dsl.include('resourceinstanceid')
@@ -230,18 +242,13 @@ def search_results(request):
         dsl.include('tiles')
 
     results = dsl.search(index='resources')
+    print dsl.dsl
 
     if results is not None:
         user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
-        total = results['hits']['total']
-        page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
-
-        paginator, pages = get_paginator(request, results, total, page, settings.SEARCH_ITEMS_PER_PAGE)
-        page = paginator.page(page)
 
         # only reuturn points and geometries a user is allowed to view
         geojson_nodes = get_nodegroups_by_datatype_and_perm(request, 'geojson-feature-collection', 'read_nodegroup')
-        permitted_nodegroups = get_permitted_nodegroups(request.user)
 
         for result in results['hits']['hits']:
             result['_source']['points'] = select_geoms_for_results(result['_source']['points'], geojson_nodes, user_is_reviewer)
@@ -257,18 +264,15 @@ def search_results(request):
 
         ret = {}
         ret['results'] = results
-        for key, value in search_results_dsl.items():
+
+        for filter_type, querystring in request.GET.items() + [('search-results', '')]:
+            search_filter = search_filter_factory.get_filter(filter_type)
+            if search_filter:
+                search_filter.post_search_hook(search_results_object, results)
+
+        for key, value in search_results_object.items():
             ret[key] = value
-        ret['paginator'] = {}
-        ret['paginator']['current_page'] = page.number
-        ret['paginator']['has_next'] = page.has_next()
-        ret['paginator']['has_previous'] = page.has_previous()
-        ret['paginator']['has_other_pages'] = page.has_other_pages()
-        ret['paginator']['next_page_number'] = page.next_page_number() if page.has_next() else None
-        ret['paginator']['previous_page_number'] = page.previous_page_number() if page.has_previous() else None
-        ret['paginator']['start_index'] = page.start_index()
-        ret['paginator']['end_index'] = page.end_index()
-        ret['paginator']['pages'] = pages
+            
         ret['reviewer'] = user_is_reviewer
         ret['timestamp'] = datetime.now()
 
