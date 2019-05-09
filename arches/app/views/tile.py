@@ -16,9 +16,11 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import uuid, importlib, json as jsonparser
+import importlib
+import json as jsonparser
 import logging
 import traceback
+import uuid
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from arches.app.models.resource import Resource
@@ -38,6 +40,7 @@ from django.db import transaction
 from arches.app.models.resource import EditLog
 
 logger = logging.getLogger(__name__)
+
 
 @method_decorator(can_edit_resource_instance(), name='dispatch')
 class TileData(View):
