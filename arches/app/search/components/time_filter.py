@@ -13,7 +13,7 @@ details = {
     "type": "filter",
     "componentpath": "views/components/search/time-filter",
     "componentname": "time-filter",
-    "sortorder": "0",
+    "sortorder": "1",
     "enabled": True
 }
 

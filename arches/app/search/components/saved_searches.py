@@ -7,6 +7,6 @@ details = {
     "type": "filter",
     "componentpath": "views/components/search/saved-searches",
     "componentname": "saved-searches",
-    "sortorder": "0",
+    "sortorder": "2",
     "enabled": True
 }

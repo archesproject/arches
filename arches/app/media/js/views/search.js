@@ -29,11 +29,6 @@ define([
         });
     };
 
-    // var BaseSharedObject = function(params) {
-    //     return this.apply(this, params);
-    // };
-
-
     var getQueryObject = function() {
         var query = _.chain(decodeURIComponent(location.search).slice(1).split('&'))
             // Split each array item into [key, value]
@@ -47,29 +42,21 @@ define([
             .object()
             // Return the value of the chain operation
             .value();
-
-        // if ('page' in query) {
-        //     query.page = JSON.parse(query.page);
-        // } else {
-        //     query.page = 1;
-        // }
         return query;
     };
 
     var CommonSearchViewModel = function() {
         this.filters = {};
-        this.filtersList = SearchComponents;
+        this.filtersList = _.sortBy(SearchComponents, function(filter) {
+            return filter.sortorder;
+        }, this);
         SearchComponents.forEach(function(component) {
             this.filters[component.componentname] = ko.observable(null);
         }, this);
-        this.tags = ko.observableArray();
+        //this.tags = ko.observableArray();
         this.selectedTab = ko.observable('map-filter');
         this.resultsExpanded = ko.observable(true);
         this.query = ko.observable(getQueryObject());
-        //this.page = ko.observable(1);
-        // this.getFilter = function(filterName) {
-        //     return this.filter
-        // };
         this.mouseoverInstanceId = ko.observable();
         this.mapLinkData = ko.observable(null);
         this.searchResults = {'timestamp': ko.observable()};

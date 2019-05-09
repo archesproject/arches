@@ -43,7 +43,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <!-- ko if: filter.type === 'filter' && filter.enabled -->
                     {% if user|can_read_resource_instance %}
                     <button class="btn search-type-btn relative" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}, click: function(){$parent.sharedStateObject.selectedTab(filter.componentname)}">
-                        <i class="fa fa-code-fork"></i>
+                        <i data-bind="css: filter.icon"></i>
                         <p data-bind="text: filter.name"></p>
                     </button>
                     {% endif %}
