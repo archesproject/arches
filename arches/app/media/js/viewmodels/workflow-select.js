@@ -11,7 +11,6 @@ define([
             //     desc: "An area that may be re-developed pr newly built"
             // }
         ]);
-        console.log(this.workflows)
     };
     return WorkflowSelect;
 });
