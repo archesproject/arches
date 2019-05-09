@@ -75,49 +75,19 @@ define([
         this.searchResults = {'timestamp': ko.observable()};
         this.isResourceRelatable = function(){};
         this.toggleRelationshipCandidacy = function(){};
-
-        this.filtersLoaded = ko.computed(function(){
-            var allLoaded = true;
-            var filters = _.filter(this.filters, function(filter, key) {
-                var f = _.find(this.filtersList, function(f) {
-                    return f.enabled && f.componentname === key;
-                }, this);
-                //console.log(f.componentname)
-                return f
-            }, this);
-            _.each(filters, function(value, key, list) {
-                if (!value()) {
-                    allLoaded = false;
-                }
-            });
-            return allLoaded;
-        }, this);
-
     };
 
     var SearchView = BaseManagerView.extend({
         initialize: function(options) {
-
             this.viewModel.sharedStateObject = new CommonSearchViewModel();
             _.extend(this, this.viewModel.sharedStateObject);
 
-            this.viewModel.crap = new CommonSearchViewModel();
-            var self = this;
-
-            // this.filtersLoaded.subscribe(function(allLoaded) {
-            //     if (allLoaded) {
-            //         console.log('Filters All Loaded');
-            //         this.doQuery();
-            //     }
-            // }, this);
-        
             this.queryString = ko.computed(function() {
                 return JSON.stringify(this.query());
             }, this);
 
             this.queryString.subscribe(function() {
                 this.isNewQuery = true;
-                //this.viewModel.searchResults.page(1);
                 this.doQuery();
             }, this);
 
@@ -128,7 +98,6 @@ define([
 
         doQuery: function() {
             var queryString = JSON.parse(this.queryString());
-            //queryString.page = this.page();
             if (this.updateRequest) {
                 this.updateRequest.abort();
             }
@@ -159,12 +128,6 @@ define([
                     this.updateRequest = undefined;
                     window.history.pushState({}, '', '?' + $.param(queryString).split('+').join('%20'));
                 }
-            });
-        },
-
-        clear: function() {
-            _.each(this.filters, function(filter) {
-                filter.clear();
             });
         }
     });

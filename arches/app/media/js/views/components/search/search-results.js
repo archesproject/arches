@@ -23,33 +23,25 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
             initialize: function(options) {
                 options.name = 'Search Results';
                 BaseFilter.prototype.initialize.call(this, options);
-                var self = this;
-                _.extend(this, options);
 
                 this.total = ko.observable();
                 this.results = ko.observableArray();
-                // this.page = ko.observable(1);
-                // this.paginator = koMapping.fromJS({});
-                // this.showPaginator = ko.observable(false);
                 this.showRelationships = ko.observable();
                 this.mouseoverInstanceId = ko.observable();
                 this.relationshipCandidates = ko.observableArray();
-                // this.userRequestedNewPage = ko.observable(false);
                 this.mapLinkData = ko.observable(null);
                 this.selectedResourceId = ko.observable(null);
 
                 this.showRelationships.subscribe(function(res) {
-                    self.selectedResourceId(res.resourceinstanceid);
-                });
-
-                options.filters['search-results'](this);
+                    this.selectedResourceId(res.resourceinstanceid);
+                }, this);
 
                 this.searchResults.timestamp.subscribe(function(timestamp) {
                     this.updateResults(this.searchResults);
                 }, this);
 
                 this.showRelatedResourceLink = ko.observable(false);
-
+                this.filters['search-results'](this);
                 this.restoreState();
             },
 
@@ -89,13 +81,6 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                 };
             },
 
-            // newPage: function(page){
-            //     if(page){
-            //         this.userRequestedNewPage(true);
-            //         this.page(page);
-            //     }
-            // },
-
             isResourceRelatable: function(graphId) {
                 var relatable = false;
                 if (this.viewModel.graph) {
@@ -106,13 +91,10 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
 
             updateResults: function(response){
                 var self = this;
-                // koMapping.fromJS(response.paginator, this.paginator);
-                // this.showPaginator(true);
                 var data = $('div[name="search-result-data"]').data();
 
                 this.total(response.results.hits.total);
                 this.results.removeAll();
-                //this.userRequestedNewPage(false);
                 this.selectedResourceId(null);
                 this.userIsReviewer = response.reviewer;
                 response.results.hits.hits.forEach(function(result){
@@ -163,7 +145,6 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
             },
 
             restoreState: function(){
-                // this.page(ko.utils.unwrapObservable(this.query.page));
                 this.updateResults(this.searchResults);
             },
 
