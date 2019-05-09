@@ -78,7 +78,8 @@ class Command(BaseCommand):
             componentname=details['componentname'],
             config=details['config'],
             slug=details['slug'],
-            sortorder=details['sortorder']
+            sortorder=details['sortorder'],
+            type=details['type']
         )
 
         instance.save()
@@ -100,6 +101,7 @@ class Command(BaseCommand):
         instance.component = details['component']
         instance.componentname = details['componentname']
         instance.config = details['config']
+        instance.type = details['type']
         instance.save()
 
     def unregister(self, name):

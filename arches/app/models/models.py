@@ -1042,6 +1042,7 @@ class Plugin(models.Model):
     config = JSONField(blank=True, null=True, db_column='config')
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
+    type = models.TextField(blank=True, default=None)
 
     def __unicode__(self):
         return self.name
