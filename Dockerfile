@@ -68,7 +68,6 @@ RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main" >> /etc
 RUN rm -rf /var/lib/apt/lists/*
 RUN rm -rf /tmp/*
 
-
 # From here, run commands from ARCHES_ROOT
 WORKDIR ${ARCHES_ROOT}
 

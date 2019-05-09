@@ -31,7 +31,7 @@ services:
         - DJANGO_DEBUG=False
         # - DJANGO_REMOTE_DEBUG=False
         - DOMAIN_NAMES=localhost
-        - USE_LDAP=True
+        # - USE_LDAP=True
         # LDAP environment variables
         # - "AUTH_LDAP_SERVER_URI=ldaps://"
         # - "AUTH_LDAP_BIND_DN=cn=django_agent,dc=example,dc=org"
