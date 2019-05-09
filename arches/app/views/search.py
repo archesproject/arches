@@ -197,19 +197,6 @@ def get_resource_model_label(result):
     else:
         return ''
 
-def select_geoms_for_results(features, geojson_nodes, user_is_reviewer):
-    res = []
-    for feature in features:
-        if 'provisional' in feature:
-            if feature['provisional'] == False or (user_is_reviewer is True and feature['provisional'] is True):
-                if feature['nodegroup_id'] in geojson_nodes:
-                    res.append(feature)
-        else:
-            if feature['nodegroup_id'] in geojson_nodes:
-                res.append(feature)
-
-    return res
-
 def search_results(request):    
     se = SearchEngineFactory().create()
     search_results_object = {
@@ -242,38 +229,21 @@ def search_results(request):
         dsl.include('tiles')
 
     results = dsl.search(index='resources')
-    print dsl.dsl
 
     if results is not None:
-        user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
-
-        # only reuturn points and geometries a user is allowed to view
-        geojson_nodes = get_nodegroups_by_datatype_and_perm(request, 'geojson-feature-collection', 'read_nodegroup')
-
-        for result in results['hits']['hits']:
-            result['_source']['points'] = select_geoms_for_results(result['_source']['points'], geojson_nodes, user_is_reviewer)
-            result['_source']['geometries'] = select_geoms_for_results(result['_source']['geometries'], geojson_nodes, user_is_reviewer)
-            try:
-                permitted_tiles = []
-                for tile in result['_source']['tiles']:
-                    if tile['nodegroup_id'] in permitted_nodegroups:
-                        permitted_tiles.append(tile)
-                result['_source']['tiles'] = permitted_tiles
-            except KeyError:
-                pass
+        # allow filters to modify the results
+        for filter_type, querystring in request.GET.items() + [('search-results', '')]:
+            search_filter = search_filter_factory.get_filter(filter_type)
+            if search_filter:
+                search_filter.post_search_hook(search_results_object, results, permitted_nodegroups)
 
         ret = {}
         ret['results'] = results
 
-        for filter_type, querystring in request.GET.items() + [('search-results', '')]:
-            search_filter = search_filter_factory.get_filter(filter_type)
-            if search_filter:
-                search_filter.post_search_hook(search_results_object, results)
-
         for key, value in search_results_object.items():
             ret[key] = value
             
-        ret['reviewer'] = user_is_reviewer
+        ret['reviewer'] = request.user.groups.filter(name='Resource Reviewer').exists()
         ret['timestamp'] = datetime.now()
 
         return JSONResponse(ret)
@@ -308,34 +278,8 @@ def get_provisional_type(request):
 
     return result
 
-def build_search_results_dsl(request):
-    se = SearchEngineFactory().create()
-    resultsObj = {
-        'query': Query(se)
-    }
-
-    include_provisional = get_provisional_type(request)
-    permitted_nodegroups = get_permitted_nodegroups(request.user)
-
-    search_filter_factory = SearchFilterFactory(request)
-    for filter_type, querystring in request.GET.items() + [('search-results', '')]:
-        search_filter = search_filter_factory.get_filter(filter_type)
-        if search_filter:
-            ret = search_filter.append_dsl(resultsObj['query'], permitted_nodegroups, include_provisional)
-            if ret is not None:
-                resultsObj[filter_type] = ret
-
-    return resultsObj
-
 def get_permitted_nodegroups(user):
     return [str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(user, 'models.read_nodegroup')]
-
-def get_nodegroups_by_datatype_and_perm(request, datatype, permission):
-    nodes = []
-    for node in models.Node.objects.filter(datatype=datatype):
-        if request.user.has_perm(permission, node.nodegroup):
-            nodes.append(str(node.nodegroup_id))
-    return nodes
 
 def buffer(request):
     spatial_filter = JSONDeserializer().deserialize(request.GET.get('filter', {'geometry':{'type':'','coordinates':[]},'buffer':{'width':'0','unit':'ft'}}))

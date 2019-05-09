@@ -35,7 +35,7 @@ class PagingFilter(BaseSearchFilter):
 
         print limit, limit*int(page-1)
 
-    def post_search_hook(self, search_results_object, results):
+    def post_search_hook(self, search_results_object, results, permitted_nodegroups):
         total = results['hits']['total']
         page = 1 if self.request.GET.get(details['componentname']) == '' else int(self.request.GET.get(details['componentname'], 1))
 

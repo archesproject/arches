@@ -1,3 +1,4 @@
+from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.search.elasticsearch_dsl_builder import Bool, Terms, NestedAgg, FiltersAgg, GeoHashGridAgg, GeoBoundsAgg
 from arches.app.search.components.base import BaseSearchFilter
@@ -39,3 +40,41 @@ class SearchResultsFilter(BaseSearchFilter):
         nested_agg_filter.add_aggregation(GeoBoundsAgg(field='points.point', name='bounds'))
         nested_agg.add_aggregation(nested_agg_filter)
         search_results_object['query'].add_aggregation(nested_agg)
+
+    def post_search_hook(self, search_results_object, results, permitted_nodegroups):
+        user_is_reviewer = self.request.user.groups.filter(name='Resource Reviewer').exists()
+
+        # only reuturn points and geometries a user is allowed to view
+        geojson_nodes = get_nodegroups_by_datatype_and_perm(self.request, 'geojson-feature-collection', 'read_nodegroup')
+
+        for result in results['hits']['hits']:
+            result['_source']['points'] = select_geoms_for_results(result['_source']['points'], geojson_nodes, user_is_reviewer)
+            result['_source']['geometries'] = select_geoms_for_results(result['_source']['geometries'], geojson_nodes, user_is_reviewer)
+            try:
+                permitted_tiles = []
+                for tile in result['_source']['tiles']:
+                    if tile['nodegroup_id'] in permitted_nodegroups:
+                        permitted_tiles.append(tile)
+                result['_source']['tiles'] = permitted_tiles
+            except KeyError:
+                pass
+
+def get_nodegroups_by_datatype_and_perm(request, datatype, permission):
+    nodes = []
+    for node in models.Node.objects.filter(datatype=datatype):
+        if request.user.has_perm(permission, node.nodegroup):
+            nodes.append(str(node.nodegroup_id))
+    return nodes
+
+def select_geoms_for_results(features, geojson_nodes, user_is_reviewer):
+    res = []
+    for feature in features:
+        if 'provisional' in feature:
+            if feature['provisional'] is False or (user_is_reviewer is True and feature['provisional'] is True):
+                if feature['nodegroup_id'] in geojson_nodes:
+                    res.append(feature)
+        else:
+            if feature['nodegroup_id'] in geojson_nodes:
+                res.append(feature)
+
+    return res
