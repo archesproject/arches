@@ -288,7 +288,7 @@ if ARCHES_USE_LDAP:
 
     # Baseline configuration.
     AUTHENTICATION_BACKENDS = ('django_auth_ldap.backend.LDAPBackend',) + AUTHENTICATION_BACKENDS
-    AUTH_LDAP_SERVER_URI = 'ldap://openldap:389'
+    AUTH_LDAP_SERVER_URI = 'ldap://'
 
     # TLS: (use 'ldaps://')
     #
