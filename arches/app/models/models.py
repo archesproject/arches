@@ -22,6 +22,7 @@ from django.contrib.postgres.fields import JSONField
 from django.core.files.storage import FileSystemStorage
 from django.core.validators import RegexValidator
 from django.db.models import Q, Max
+from django.db.models.signals import post_delete, pre_save
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
@@ -280,6 +281,7 @@ class TileRevisionLog(models.Model):
 class File(models.Model):
     fileid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     path = models.FileField(upload_to='uploadedfiles')
+    tile = models.ForeignKey('TileModel', db_column='tileid', null=True, on_delete=models.CASCADE)
 
     class Meta:
         managed = True
@@ -288,28 +290,29 @@ class File(models.Model):
 
 # These two event listeners auto-delete files from filesystem when they are unneeded:
 # from http://stackoverflow.com/questions/16041232/django-delete-filefield
-@receiver(models.signals.post_delete, sender=File)
-def auto_delete_file_on_delete(sender, instance, **kwargs):
+@receiver(post_delete, sender=File)
+def delete_file_on_delete(sender, instance, **kwargs):
     """Deletes file from filesystem
     when corresponding `File` object is deleted.
     """
+
     if instance.path:
         try:
             if os.path.isfile(instance.path.path):
                 os.remove(instance.path.path)
-        ## except block added to deal with S3 file deletion
-        ## see comments on 2nd answer below
-        ## http://stackoverflow.com/questions/5372934/how-do-i-get-django-admin-to-delete-files-when-i-remove-an-object-from-the-datab
-        except:
+        # except block added to deal with S3 file deletion
+        # see comments on 2nd answer below
+        # http://stackoverflow.com/questions/5372934/how-do-i-get-django-admin-to-delete-files-when-i-remove-an-object-from-the-datab
+        except Exception as e:
             storage, name = instance.path.storage, instance.path.name
             storage.delete(name)
 
-@receiver(models.signals.pre_save, sender=File)
-def auto_delete_file_on_change(sender, instance, **kwargs):
+
+@receiver(pre_save, sender=File)
+def delete_file_on_change(sender, instance, **kwargs):
     """Deletes file from filesystem
     when corresponding `File` object is changed.
     """
-
     if not instance.pk:
         return False
 
@@ -325,6 +328,7 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
                 os.remove(old_file.path)
         except Exception:
             return False
+
 
 class Function(models.Model):
     functionid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
@@ -745,9 +749,11 @@ class TileModel(models.Model): #Tile
 
     def save(self, *args, **kwargs):
         if(self.sortorder is None or (self.provisionaledits is not None and self.data == {})):
-            sortorder_max = TileModel.objects.filter(nodegroup_id=self.nodegroup_id, resourceinstance_id=self.resourceinstance_id).aggregate(Max('sortorder'))['sortorder__max']
+            sortorder_max = TileModel.objects.filter(
+                nodegroup_id=self.nodegroup_id,
+                resourceinstance_id=self.resourceinstance_id).aggregate(Max('sortorder'))['sortorder__max']
             self.sortorder = sortorder_max + 1 if sortorder_max is not None else 0
-        super(TileModel, self).save(*args, **kwargs) # Call the "real" save() method.
+        super(TileModel, self).save(*args, **kwargs)  # Call the "real" save() method.
 
 
 class Value(models.Model):
@@ -761,30 +767,32 @@ class Value(models.Model):
         managed = True
         db_table = 'values'
 
+
 class FileValue(models.Model):
-    valueid = models.UUIDField(primary_key=True, default=uuid.uuid1) # This field type is a guess.
+    valueid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     concept = models.ForeignKey('Concept', db_column='conceptid')
     valuetype = models.ForeignKey('DValueType', db_column='valuetype')
     value = models.FileField(upload_to='concepts')
     language = models.ForeignKey('DLanguage', db_column='languageid', blank=True, null=True)
+
     class Meta:
         managed = False
         db_table = 'values'
 
     def geturl(self):
-        if self.value != None:
+        if self.value is not None:
             return self.value.url
         return ''
 
     def getname(self):
-        if self.value != None:
+        if self.value is not None:
             return self.value.name
         return ''
 
 
 # These two event listeners auto-delete files from filesystem when they are unneeded:
 # from http://stackoverflow.com/questions/16041232/django-delete-filefield
-@receiver(models.signals.post_delete, sender=FileValue)
+@receiver(post_delete, sender=FileValue)
 def auto_delete_file_on_delete(sender, instance, **kwargs):
     """Deletes file from filesystem
     when corresponding `FileValue` object is deleted.
@@ -793,14 +801,15 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
         try:
             if os.path.isfile(instance.value.path):
                 os.remove(instance.value.path)
-        ## except block added to deal with S3 file deletion
-        ## see comments on 2nd answer below
-        ## http://stackoverflow.com/questions/5372934/how-do-i-get-django-admin-to-delete-files-when-i-remove-an-object-from-the-datab
-        except:
+        # except block added to deal with S3 file deletion
+        # see comments on 2nd answer below
+        # http://stackoverflow.com/questions/5372934/how-do-i-get-django-admin-to-delete-files-when-i-remove-an-object-from-the-datab
+        except Exception as e:
             storage, name = instance.value.storage, instance.value.name
             storage.delete(name)
 
-@receiver(models.signals.pre_save, sender=FileValue)
+
+@receiver(pre_save, sender=FileValue)
 def auto_delete_file_on_change(sender, instance, **kwargs):
     """Deletes file from filesystem
     when corresponding `FileValue` object is changed.

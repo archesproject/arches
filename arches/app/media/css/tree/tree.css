@@ -204,6 +204,12 @@ a.filtered > span:hover {
     color: #425965;
 }
 
+.jstree-default .func-node {
+    background: #3acaa1;
+    color: #fff;
+    border-width: 2px;
+}
+
 .jstree-default .child-selected.filtered {
     background: #3acaa1;
     color: #fff;

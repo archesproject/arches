@@ -138,8 +138,18 @@ class NumberDataType(BaseDataType):
         try:
             if value is not None:
                 decimal.Decimal(value)
-        except:
-            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} {3}- {4}. {5}'.format(self.datatype_model.datatype, value, source, row_number, 'not a properly formatted number', 'This data was not imported.')})
+        except Exception as e:
+            dt = self.datatype_model.datatype
+            errors.append({
+                'type': 'ERROR',
+                'message': 'datatype: {0}, value: {1} {2} {3} - {4}. {5}'.format(
+                                                                                dt,
+                                                                                value,
+                                                                                source,
+                                                                                row_number,
+                                                                                'not a properly formatted number',
+                                                                                'This data was not saved.')
+                                                                                })
         return errors
 
     def transform_import_values(self, value, nodeid):
@@ -1018,7 +1028,6 @@ class FileListDataType(BaseDataType):
         return previously_saved_data
 
     def handle_request(self, current_tile, request, node):
-
         previously_saved_tile = models.TileModel.objects.filter(pk=current_tile.tileid)
         user = request.user
         if hasattr(request.user, 'userprofile') is not True:
@@ -1045,13 +1054,26 @@ class FileListDataType(BaseDataType):
         for file_data in files:
             file_model = models.File()
             file_model.path = file_data
-            file_model.save()
+            file_model.tile = current_tile
+            if models.TileModel.objects.filter(pk=current_tile.tileid).count() > 0:
+                file_model.save()
             if current_tile_data[str(node.pk)] is not None:
+                resave_tile = False
+                updated_file_records = []
                 for file_json in current_tile_data[str(node.pk)]:
                     if file_json["name"] == file_data.name and file_json["url"] is None:
                         file_json["file_id"] = str(file_model.pk)
                         file_json["url"] = str(file_model.path.url)
                         file_json["status"] = 'uploaded'
+                        resave_tile = True
+                    updated_file_records.append(file_json)
+                if resave_tile is True:
+                    # resaving model to assign url from file_model
+                    # importing proxy model errors, so cannot use super on the proxy model to save
+                    if previously_saved_tile.count() == 1:
+                        tile_to_update = previously_saved_tile[0]
+                        tile_to_update.data[str(node.pk)] = updated_file_records
+                        tile_to_update.save()
 
     def transform_import_values(self, value, nodeid):
         '''

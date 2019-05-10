@@ -23,19 +23,15 @@ when you run "manage.py test".
 Replace this with more appropriate tests for your application.
 """
 
-import os
-import json
-import uuid
 from tests import test_settings
+from tests.base_test import ArchesTestCase
 from django.db import connection
 from django.core import management
-from tests.base_test import ArchesTestCase
-from arches.app.models.tile import Tile
-from arches.app.models import models
-from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.auth.models import User
 from django.http import HttpRequest
-from django.core.exceptions import ObjectDoesNotExist
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.models.tile import Tile
+from arches.app.search.mappings import prepare_terms_index, delete_terms_index, \
+    prepare_concepts_index, delete_concepts_index, prepare_search_index, delete_search_index
 
 # these tests can be run from the command line via
 # python manage.py test tests/models/tile_model_tests.py --pattern="*.py" --settings="tests.test_settings"
@@ -68,6 +64,14 @@ class TileTests(ArchesTestCase):
         cursor = connection.cursor()
         cursor.execute(sql)
 
+        delete_terms_index()
+        delete_concepts_index()
+        delete_search_index()
+
+        prepare_terms_index(create=True)
+        prepare_concepts_index(create=True)
+        prepare_search_index(create=True)
+
     @classmethod
     def tearDownClass(cls):
         sql = """
@@ -84,6 +88,10 @@ class TileTests(ArchesTestCase):
 
         cursor = connection.cursor()
         cursor.execute(sql)
+
+        delete_terms_index()
+        delete_concepts_index()
+        delete_search_index()
 
     def setUp(self):
         cursor = connection.cursor()

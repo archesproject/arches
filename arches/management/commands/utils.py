@@ -1,18 +1,19 @@
 import os
 import codecs
 
-def get_yn_input(msg="are you sure you want to continue?",default="Y"):
+
+def get_yn_input(msg="are you sure you want to continue?", default="Y"):
     '''
     function can be passed a custom message and will use that prompt to get
     a y/n response. default defines what will happen if enter is hit with no
     input.
     '''
 
-    if not default in ["Y", "N"]:
+    if default not in ["Y", "N"]:
         raise Exception("function must be called with default = 'Y' or 'N'")
 
     if default == "Y":
-        o = raw_input(msg+" [Y/n] ")
+        o = raw_input(msg + " [Y/n] ")
         if o.lower().startswith("y") or o == "":
             ret = True
         else:
@@ -20,7 +21,7 @@ def get_yn_input(msg="are you sure you want to continue?",default="Y"):
             ret = False
 
     if default == "N":
-        o = raw_input(msg+" [y/N] ")
+        o = raw_input(msg + " [y/N] ")
         if o.lower().startswith("n") or o == "":
             print "operation cancelled."
             ret = False
@@ -29,16 +30,19 @@ def get_yn_input(msg="are you sure you want to continue?",default="Y"):
 
     return ret
 
+
 def write_to_file(fileName, contents, mode='w', encoding='utf-8', **kwargs):
     ensure_dir(fileName)
     file = codecs.open(fileName, mode=mode, encoding=encoding, **kwargs)
     file.write(contents)
     file.close()
 
+
 def ensure_dir(f):
     d = os.path.dirname(f)
     if not os.path.exists(d):
         os.makedirs(d)
+
 
 def get_valid_path(path):
     '''
@@ -52,6 +56,7 @@ def get_valid_path(path):
         result = os.path.join(os.getcwd(), path)
     return result
 
+
 def print_message(message):
-    border = '*'*80
+    border = '*' * 80
     print '{1}\n{0}\n{1}'.format(message, border)
