@@ -7,10 +7,8 @@ define([
     'viewmodels/alert',
     'search-components',
     'views/base-manager',
-    'view-data',
-    'search-data',
     'views/components/simple-switch'
-], function($, _, ko, koMapping, arches, AlertViewModel, SearchComponents, BaseManagerView, viewData, searchData) {
+], function($, _, ko, koMapping, arches, AlertViewModel, SearchComponents, BaseManagerView) {
     // a method to track the old and new values of a subscribable
     // from https://github.com/knockout/knockout/issues/914
     //
@@ -63,7 +61,6 @@ define([
         this.mapLinkData = ko.observable(null);
         this.searchResults = {'timestamp': ko.observable()};
         this.isResourceRelatable = function(graphId) {
-            console.log('in isResourceRelatable')
             var relatable = false;
             if (this.graph) {
                 relatable = _.contains(this.graph.relatable_resource_model_ids, graphId);
@@ -71,7 +68,6 @@ define([
             return relatable;
         };
         this.toggleRelationshipCandidacy = function() {
-            console.log('in toggleRelationshipCandidacy')
             var self = this;
             return function(resourceinstanceid){
                 var candidate = _.contains(self.relationshipCandidates(), resourceinstanceid);

@@ -88,6 +88,15 @@ function(_, ko, moment, BaseFilter, arches) {
                     this.filter.fromDate(from);
                 }, this);
 
+                $.ajax({
+                    type: "GET",
+                    url: arches.urls.api_search_component_data + componentName,
+                    context: this
+                }).done(function(response) {
+                    this.date_nodes = response.date_nodes;
+                    this.graph_models = response.graph_models;
+                });
+
                 this.filterChanged = ko.computed(function(){
                     if(!!this.filter.fromDate() || !!this.filter.toDate()){
                         this.getFilter('term-filter').addTag(this.name, this.name, this.filter.inverted);

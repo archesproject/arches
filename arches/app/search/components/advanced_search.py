@@ -55,9 +55,15 @@ class AdvancedSearch(BaseSearchFilter):
         resource_cards = models.CardModel.objects.filter(graph__isresource=True, graph__isactive=True)
         datatypes = models.DDataType.objects.all()
 
+        # only allow cards that the user has permission to read
+        searchable_cards = []
+        for card in resource_cards:
+            if self.request.user.has_perm('read_nodegroup', card.nodegroup):
+                searchable_cards.append(card)
+
         ret['graphs'] = resource_graphs
         ret['datatypes'] = datatypes
         ret['nodes'] = searchable_nodes
-        ret['cards'] = resource_cards
+        ret['cards'] = searchable_cards
 
         return ret

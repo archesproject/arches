@@ -56,45 +56,21 @@ except ImportError:
 class SearchView(MapBaseManagerView):
 
     def get(self, request):
-        saved_searches = JSONSerializer().serialize(settings.SAVED_SEARCHES)
         map_layers = models.MapLayer.objects.all()
         map_markers = models.MapMarker.objects.all()
         map_sources = models.MapSource.objects.all()
-        date_nodes = models.Node.objects.filter(Q(datatype='date') | Q(datatype='edtf'), graph__isresource=True, graph__isactive=True)
         resource_graphs = models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
-        searchable_datatypes = [d.pk for d in models.DDataType.objects.filter(issearchable=True)]
-        searchable_nodes = models.Node.objects.filter(graph__isresource=True, graph__isactive=True, datatype__in=searchable_datatypes, issearchable=True)
-        resource_cards = models.CardModel.objects.filter(graph__isresource=True, graph__isactive=True)
-        datatypes = models.DDataType.objects.all()
         geocoding_providers = models.Geocoder.objects.all()
         search_components = models.SearchComponent.objects.all()
-        # only allow cards that the user has permission to read
-        searchable_cards = []
-        for card in resource_cards:
-            if request.user.has_perm('read_nodegroup', card.nodegroup):
-                searchable_cards.append(card)
-
-        # only allow date nodes that the user has permission to read
-        searchable_date_nodes = []
-        for node in date_nodes:
-            if request.user.has_perm('read_nodegroup', node.nodegroup):
-                searchable_date_nodes.append(node)
 
         context = self.get_context_data(
-            resource_cards=JSONSerializer().serialize(searchable_cards),
-            searchable_nodes=JSONSerializer().serialize(searchable_nodes),
-            saved_searches=saved_searches,
-            date_nodes=searchable_date_nodes,
             map_layers=map_layers,
             map_markers=map_markers,
             map_sources=map_sources,
             geocoding_providers=geocoding_providers,
             search_components=search_components,
             main_script='views/search',
-            resource_graphs=resource_graphs,
-            datatypes=datatypes,
-            datatypes_json=JSONSerializer().serialize(datatypes),
-            user_is_reviewer=request.user.groups.filter(name='Resource Reviewer').exists()
+            resource_graphs=resource_graphs
         )
 
         graphs = JSONSerializer().serialize(
@@ -109,7 +85,6 @@ class SearchView(MapBaseManagerView):
                      'disable_instance_creation',
                      'ontology_id'])
         context['graphs'] = graphs
-        context['graph_models'] = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         context['nav']['title'] = _('Search')
         context['nav']['icon'] = 'fa-search'
         context['nav']['search'] = False

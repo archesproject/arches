@@ -610,7 +610,7 @@ class Card(APIBase):
 class SearchComponentData(APIBase):
 
     def get(self, request, componentname):
-        search_filter_factory = SearchFilterFactory()
+        search_filter_factory = SearchFilterFactory(request)
         search_filter = search_filter_factory.get_filter(componentname)
         if search_filter:
             return JSONResponse(search_filter.view_data())

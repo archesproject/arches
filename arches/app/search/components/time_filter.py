@@ -1,8 +1,11 @@
 from datetime import datetime
+from arches.app.models import models
+from arches.app.models.system_settings import settings
 from arches.app.utils.date_utils import ExtendedDateFormat
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.search.elasticsearch_dsl_builder import Bool, Nested, Term, Terms, Range
 from arches.app.search.components.base import BaseSearchFilter
+from django.db.models import Q
 
 details = {
     "searchcomponentid": "",
@@ -100,3 +103,15 @@ class TimeFilter(BaseSearchFilter):
             search_query.filter(temporal_query)
 
             search_results_object['query'].add_query(search_query)
+
+    def view_data(self):
+        ret = {}
+        date_nodes = models.Node.objects.filter(Q(datatype='date') | Q(datatype='edtf'), graph__isresource=True, graph__isactive=True)
+        searchable_date_nodes = []
+        for node in date_nodes:
+            if self.request.user.has_perm('read_nodegroup', node.nodegroup):
+                searchable_date_nodes.append(node)
+
+        ret['date_nodes'] = searchable_date_nodes
+        ret['graph_models'] = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+        return ret
