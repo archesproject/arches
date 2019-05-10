@@ -104,7 +104,7 @@ define([
                         var graphid = params.node ? ko.unwrap(params.node.config.graphid) : undefined;
                         var data = {
                             no_filters: true,
-                            page: page
+                            'paging-filter': page
                         };
                         if (graphid && graphid.length > 0) {
                             data.no_filters = false;
@@ -135,7 +135,7 @@ define([
                 results: function (data, page) {
                     return {
                         results: data.results.hits.hits,
-                        more: data.paginator.has_next
+                        more: data['paging-filter'].paginator.has_next
                     };
                 }
             },
