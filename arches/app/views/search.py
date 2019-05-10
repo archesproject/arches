@@ -17,41 +17,31 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 
-import csv
 from datetime import datetime
 from django.shortcuts import render
-from django.apps import apps
-from django.contrib.gis.geos import GEOSGeometry, Polygon
+from django.contrib.gis.geos import GEOSGeometry
 from django.core.cache import cache
-from django.db import connection
-from django.db.models import Q, Max, Min
 from django.http import HttpResponseNotFound
-from django.utils.module_loading import import_string
 from django.utils.translation import ugettext as _
 from arches.app.models import models
 from arches.app.models.concept import Concept
-from arches.app.models.graph import Graph
 from arches.app.models.system_settings import settings
-from arches.app.utils.pagination import get_paginator
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.date_utils import ExtendedDateFormat
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Term, Terms, GeoShape, Range, MinAgg, MaxAgg, RangeAgg, Aggregation, GeoHashGridAgg, GeoBoundsAgg, FiltersAgg, NestedAgg
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Terms, MaxAgg, Aggregation
 from arches.app.search.time_wheel import TimeWheel
 from arches.app.search.components.base import SearchFilterFactory
-from arches.app.utils.data_management.resources.exporter import ResourceExporter
-from arches.app.views.base import BaseManagerView, MapBaseManagerView
+from arches.app.views.base import MapBaseManagerView
 from arches.app.views.concept import get_preflabel_from_conceptid
-from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
-
 
 
 try:
     from cStringIO import StringIO
 except ImportError:
     from StringIO import StringIO
+
 
 class SearchView(MapBaseManagerView):
 
@@ -129,7 +119,7 @@ def search_terms(request):
     base_agg.add_aggregation(top_concept_agg)
     base_agg.add_aggregation(nodegroupid_agg)
     query.add_aggregation(base_agg)
-    results = query.search(index='terms,concepts') or {'hits': {'hits':[]}}
+    results = query.search(index='terms,concepts') or {'hits': {'hits': []}}
 
     i = 0
     ret = []
@@ -166,13 +156,14 @@ def get_resource_model_label(result):
     if len(result['nodegroupid']['buckets']) > 0:
         for nodegroup in result['nodegroupid']['buckets']:
             nodegroup_id = nodegroup['key']
-            node = models.Node.objects.get(nodeid = nodegroup_id)
+            node = models.Node.objects.get(nodeid=nodegroup_id)
             graph = node.graph
         return "{0} - {1}".format(graph.name, node.name)
     else:
         return ''
 
-def search_results(request):    
+
+def search_results(request):
     se = SearchEngineFactory().create()
     search_results_object = {
         'query': Query(se)
@@ -217,13 +208,14 @@ def search_results(request):
 
         for key, value in search_results_object.items():
             ret[key] = value
-            
+
         ret['reviewer'] = request.user.groups.filter(name='Resource Reviewer').exists()
         ret['timestamp'] = datetime.now()
 
         return JSONResponse(ret)
     else:
         return HttpResponseNotFound(_("There was an error retrieving the search results"))
+
 
 def get_provisional_type(request):
     """
@@ -235,34 +227,37 @@ def get_provisional_type(request):
     result = False
     provisional_filter = JSONDeserializer().deserialize(request.GET.get('provisionalFilter', '[]'))
     user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
-    if user_is_reviewer != False:
+    if user_is_reviewer is not False:
         if len(provisional_filter) == 0:
             result = True
         else:
             inverted = provisional_filter[0]['inverted']
             if provisional_filter[0]['provisionaltype'] == 'Provisional':
-                if inverted == False:
+                if inverted is False:
                     result = 'only provisional'
                 else:
                     result = False
             if provisional_filter[0]['provisionaltype'] == 'Authoritative':
-                if inverted == False:
+                if inverted is False:
                     result = False
                 else:
                     result = 'only provisional'
 
     return result
 
+
 def get_permitted_nodegroups(user):
     return [str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(user, 'models.read_nodegroup')]
 
+
 def buffer(request):
-    spatial_filter = JSONDeserializer().deserialize(request.GET.get('filter', {'geometry':{'type':'','coordinates':[]},'buffer':{'width':'0','unit':'ft'}}))
+    spatial_filter = JSONDeserializer().deserialize(request.GET.get('filter', {'geometry': {'type': '', 'coordinates': []}, 'buffer': {'width': '0', 'unit': 'ft'}}))
 
     if spatial_filter['geometry']['coordinates'] != '' and spatial_filter['geometry']['type'] != '':
-        return JSONResponse(_buffer(spatial_filter['geometry'],spatial_filter['buffer']['width'],spatial_filter['buffer']['unit']), geom_format='json')
+        return JSONResponse(_buffer(spatial_filter['geometry'], spatial_filter['buffer']['width'], spatial_filter['buffer']['unit']), geom_format='json')
 
     return JSONResponse()
+
 
 def _buffer(geojson, width=0, unit='ft'):
     geojson = JSONSerializer().serialize(geojson)
@@ -283,11 +278,13 @@ def _buffer(geojson, width=0, unit='ft'):
 
     return geom
 
+
 def _get_child_concepts(conceptid):
     ret = set([conceptid])
     for row in Concept().get_child_concepts(conceptid, ['prefLabel']):
         ret.add(row[0])
     return list(ret)
+
 
 def time_wheel_config(request):
     time_wheel = TimeWheel()
