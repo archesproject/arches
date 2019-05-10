@@ -28,6 +28,7 @@ class PluginView(MapBaseManagerView):
     action = None
 
     def get(self, request, pluginid=None, slug=None):
+        url_params = dict(request.GET.items())
         if slug is not None:
             plugin = models.Plugin.objects.get(slug=slug)
         else:
@@ -44,10 +45,11 @@ class PluginView(MapBaseManagerView):
         map_sources = models.MapSource.objects.all()
         geocoding_providers = models.Geocoder.objects.all()
         templates = models.ReportTemplate.objects.all()
-
+        plugin_data = JSONSerializer().serializeToPython(plugin)
+        plugin_data.update({"urlparams": url_params})
         context = self.get_context_data(
             plugin=plugin,
-            plugin_json=JSONSerializer().serialize(plugin),
+            plugin_json=JSONSerializer().serialize(plugin_data),
             main_script='views/plugin',
             resource_graphs=resource_graphs,
             widgets=widgets,
@@ -67,7 +69,7 @@ class PluginView(MapBaseManagerView):
                 templates,
                 sort_keys=False,
                 exclude=['name', 'description']
-            ),
+            )
         )
 
         context['nav']['title'] = ''
