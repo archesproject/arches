@@ -10,7 +10,7 @@ define([
         params.configKeys = ['placeholder'];
         this.multiple = params.multiple || false;
         this.value = params.value || undefined;
-        this.disable = params.disable || function(){return false};
+        this.disable = params.disable || function(){return false;};
         this.disableMessage = params.disableMessage || '';
 
         WidgetViewModel.apply(this, [params]);
@@ -60,7 +60,7 @@ define([
                     }
                 }
             });
-        }
+        };
         this.value.subscribe(updateName);
 
         this.displayValue = ko.computed(function() {
@@ -76,8 +76,8 @@ define([
         });
         updateName();
 
-        var url = ko.observable(arches.urls.search_results)
-        this.url = url
+        var url = ko.observable(arches.urls.search_results);
+        this.url = url;
         this.select2Config = {
             value: this.value,
             clickBubble: true,
@@ -87,7 +87,7 @@ define([
             allowClear: true,
             disabled: this.disabled,
             ajax: {
-                url: function(){return url()},
+                url: function(){return url();},
                 dataType: 'json',
                 quietMillis: 250,
                 data: function (term, page) {
@@ -97,10 +97,10 @@ define([
                     // var isUrl = val.target.value.match(regex)
                     var isUrl = term.startsWith('http');
                     if (isUrl) {
-                        url(term.replace('search', 'search/resources'))
-                        return {}
+                        url(term.replace('search', 'search/resources'));
+                        return {};
                     } else {
-                        url(arches.urls.search_results)
+                        url(arches.urls.search_results);
                         var graphid = params.node ? ko.unwrap(params.node.config.graphid) : undefined;
                         var data = {
                             no_filters: true,
@@ -113,7 +113,7 @@ define([
                                     return {
                                         "graphid": id,
                                         "inverted": false
-                                    }
+                                    };
                                 })
                             );
                         }
@@ -146,14 +146,14 @@ define([
                 if (self.disable(item) === false) {
                     return item._source.displayname;
                 } else {
-                    return '<span>' + item._source.displayname + ' ' + self.disableMessage + '</span>'
+                    return '<span>' + item._source.displayname + ' ' + self.disableMessage + '</span>';
                 }
             },
             formatResultCssClass: function(item) {
                 if (self.disable(item) === false) {
                     return '';
                 } else {
-                    return 'disabled'
+                    return 'disabled';
                 }
             },
             formatSelection: function(item) {
@@ -183,7 +183,7 @@ define([
                             $.ajax(arches.urls.resource_descriptors + value, {
                                 dataType: "json"
                             }).done(function(data) {
-                                nameLookup[value] = data.displayname
+                                nameLookup[value] = data.displayname;
                                 setSelectionData();
                             });
                         }
