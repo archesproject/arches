@@ -23,7 +23,7 @@ def reverse_func(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4375_add_unique_constraint_models'),
+        ('models', '4684_updates_tabbed_report_configs'),
     ]
 
     operations = [
