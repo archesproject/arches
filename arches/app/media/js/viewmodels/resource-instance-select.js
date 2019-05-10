@@ -103,12 +103,10 @@ define([
                         url(arches.urls.search_results);
                         var graphid = params.node ? ko.unwrap(params.node.config.graphid) : undefined;
                         var data = {
-                            no_filters: true,
                             'paging-filter': page
                         };
                         if (graphid && graphid.length > 0) {
-                            data.no_filters = false;
-                            data.typeFilter = JSON.stringify(
+                            data['resource-type-filter'] = JSON.stringify(
                                 graphid.map(function(id) {
                                     return {
                                         "graphid": id,
@@ -118,8 +116,7 @@ define([
                             );
                         }
                         if (term) {
-                            data.no_filters = false;
-                            data.termFilter = JSON.stringify([{
+                            data['term-filter'] = JSON.stringify([{
                                 "inverted": false,
                                 "type": "string",
                                 "context": "",
