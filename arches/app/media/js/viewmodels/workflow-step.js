@@ -1,7 +1,8 @@
 define([
     'knockout',
-    'underscore'
-], function(ko, _) {
+    'underscore',
+    'knockout-mapping'
+], function(ko, _, koMapping) {
     var WorkflowStep = function(config) {
         this.classUnvisited = 'workflow-step-icon';
         this.classActive = 'workflow-step-icon active';
@@ -15,7 +16,25 @@ define([
             return config.workflow.activeStep() === this;
         }, this);
 
-        _.extend(this, config);
+        this.parseUrlParams = function(){
+            //parses params in the current url for the current step
+            var urlparams = new window.URLSearchParams(window.location.search);
+            var res = {};
+            urlparams.forEach(function(v, k){res[k] = v;});
+            return res;
+        };
+
+        this.urlParams = this.parseUrlParams();
+
+        this.getForwardUrlParams = ko.pureComputed(function(){
+            return {};
+        });
+
+        this.getBackwardUrlParams = ko.pureComputed(function(){
+            return {};
+        });
+
+        _.extend(this, koMapping.fromJS(config));
 
         this.iconClass = ko.computed(function(){
             var ret = '';
@@ -26,7 +45,7 @@ define([
             }else {
                 ret = this.classUnvisited;
             }
-            return ret + ' ' + this.icon;
+            return ret + ' ' + ko.unwrap(this.icon);
         }, this);
     };
     return WorkflowStep;
