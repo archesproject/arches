@@ -5,7 +5,7 @@ define([
 ], function($, ko, Step) {
     var Workflow = function(config) {
         var self = this;
-        var urlParams = new URLSearchParams(window.location.search);
+        var urlParams = new window.URLSearchParams(window.location.search);
         var initstep = Number(urlParams.get('step')) || undefined;
         this.steps = config.steps || [];
         this.activeStep = ko.observable();
