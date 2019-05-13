@@ -10,16 +10,21 @@ define([
 ], function(_, $, arches, ko, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel) {
     function viewModel(params) {
         var self = this;
-        var url = arches.urls.api_card + (params.resourceid || params.graphid);
+        var url = arches.urls.api_card + (ko.unwrap(params.resourceid) || ko.unwrap(params.graphid));
 
         this.card = ko.observable();
         this.tile = ko.observable();
         this.loading = params.loading || ko.observable(false);
         this.alert = params.alert || ko.observable(null);
-        this.resourceId = ko.observable(params.resourceid);
+        this.resourceId = params.resourceid;
         this.complete = params.complete || ko.observable();
 
+        this.stepurl = ko.pureComputed(function() {
+            return '';
+        });
+
         this.loading(true);
+
         $.getJSON(url, function(data) {
             var handlers = {
                 'after-update': [],
@@ -104,14 +109,14 @@ define([
             };
 
             flattenTree(topCards, []).forEach(function(item) {
-                if (item.constructor.name === 'CardViewModel' && item.nodegroupid === params.nodegroupid) {
-                    if (params.parenttileid && item.parent && params.parenttileid !== item.parent.tileid) {
+                if (item.constructor.name === 'CardViewModel' && item.nodegroupid === ko.unwrap(params.nodegroupid)) {
+                    if (ko.unwrap(params.parenttileid) && item.parent && ko.unwrap(params.parenttileid) !== item.parent.tileid) {
                         return;
                     }
                     self.card(item);
-                    if (params.tileid) {
+                    if (ko.unwrap(params.tileid)) {
                         ko.unwrap(item.tiles).forEach(function(tile) {
-                            if (tile.tileid === params.tileid) {
+                            if (tile.tileid === ko.unwrap(params.tileid)) {
                                 self.tile(tile);
                             }
                         });
@@ -121,7 +126,7 @@ define([
                 }
             });
             self.loading(false);
-            self.complete(!!params.tileid);
+            self.complete(!!ko.unwrap(params.tileid));
         });
 
         self.saveTile = function(tile, callback) {
@@ -138,8 +143,8 @@ define([
                     )
                 );
             }, function(tile) {
-                params.resourceid = tile.resourceinstance_id;
-                params.tileid = tile.tileid;
+                params.resourceid(tile.resourceinstance_id);
+                params.tileid(tile.tileid);
                 self.resourceId(tile.resourceinstance_id);
                 self.complete(true);
                 if (typeof callback === 'function') {
