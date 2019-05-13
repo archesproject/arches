@@ -19,10 +19,6 @@ define([
         this.resourceId = params.resourceid;
         this.complete = params.complete || ko.observable();
 
-        this.stepurl = ko.pureComputed(function() {
-            return '';
-        });
-
         this.loading(true);
 
         $.getJSON(url, function(data) {
