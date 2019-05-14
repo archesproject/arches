@@ -45,6 +45,9 @@ DATABASES = {
     }
 }
 
+PG_SUPERUSER = ""
+PG_SUPERUSER_PW = ""
+
 COUCHDB_URL = 'http://admin:admin@localhost:5984' # defaults to localhost:5984
 
 # from http://django-guardian.readthedocs.io/en/stable/configuration.html#anonymous-user-name
