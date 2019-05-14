@@ -734,7 +734,7 @@ class Command(BaseCommand):
 
         if setup_db is not False:
             if setup_db.lower() in ('t', 'true', 'y', 'yes'):
-                self.setup_db(settings.PACKAGE_NAME)
+                management.call_command("setup_db", force=True)
 
         if load_project_extensions is not False:
             if load_project_extensions.lower() in ('t', 'true', 'y', 'yes'):
@@ -848,6 +848,13 @@ class Command(BaseCommand):
         WARNING: This will destroy data
 
         """
+
+        print("\n"+"~"*80+"\n"
+              "Warning: This command is now deprecated. From now on please use\n\n"
+              "    python manage.py setup_db [--force]\n\nThe --force argument will "
+              "suppress the interactive confirmation prompt.\n"+"~"*80)
+
+        exit()
 
         db_settings = settings.DATABASES['default']
         truncate_path = os.path.join(settings.ROOT_DIR, 'db', 'install', 'truncate_db.sql')
