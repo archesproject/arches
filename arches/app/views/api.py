@@ -1,9 +1,9 @@
-import os
-import sys
 import json
-import uuid
+import logging
+import os
 import re
-import traceback
+import sys
+import uuid
 from django.shortcuts import render
 from django.views.generic import View
 from django.views.decorators.csrf import csrf_exempt
@@ -14,6 +14,7 @@ from django.http.request import QueryDict
 from django.core import management
 from django.core.urlresolvers import reverse
 from django.utils.decorators import method_decorator
+from django.utils.translation import ugettext as _
 from revproxy.views import ProxyView
 from oauth2_provider.views import ProtectedResourceView
 from arches.app.models import models
@@ -35,6 +36,8 @@ from arches.app.utils.decorators import group_required
 from pyld.jsonld import compact, frame, from_rdf
 from rdflib import RDF
 from rdflib.namespace import SKOS, DCTERMS
+
+logger = logging.getLogger(__name__)
 
 try:
     from cStringIO import StringIO
@@ -62,128 +65,134 @@ class CouchdbProxy(ProtectedResourceView, ProxyView):
     p = re.compile(r"project_(?P<surveyid>[\w-]{36})")
 
     def dispatch(self, request, path):
-        if path is None or path == '':
-            return super(CouchdbProxy, self).dispatch(request, path)
-        else:
-            m = self.p.match(path)
-            surveyid = ''
-            if m is not None:
-                surveyid = m.groupdict().get("surveyid")
-                if MobileSurvey.objects.filter(pk=surveyid).exists() is False:
-                    message = 'The survey you are attempting to sync is no longer available on the server'
-                    return JSONResponse({'notification': message}, status=500)
-                else:
-                    try:
-                        if userCanAccessMobileSurvey(request, surveyid):
-                            return super(CouchdbProxy, self).dispatch(request, path)
-                        else:
-                            return JSONResponse('Sync Failed', status=403)
-                    except Exception as e:
-                        print e
-                        pass
+        try:
+            if path is None or path == '':
+                return super(CouchdbProxy, self).dispatch(request, path)
+            else:
+                m = self.p.match(path)
+                surveyid = ''
+                if m is not None:
+                    surveyid = m.groupdict().get("surveyid")
+                    if MobileSurvey.objects.filter(pk=surveyid).exists() is False:
+                        message = _('The survey you are attempting to sync is no longer available on the server')
+                        return JSONResponse({'notification': message}, status=500)
+                    else:
+                        try:
+                            if userCanAccessMobileSurvey(request, surveyid):
+                                return super(CouchdbProxy, self).dispatch(request, path)
+                            else:
+                                return JSONResponse(_('Sync Failed. User unauthorized to sync project'), status=403)
+                        except Exception:
+                            logger.exception(_('Unable to determine user access to collector project'))
+                            pass
+        except Exception:
+            logger.exception(_('Failed to dispatch Couch proxy'))
 
-        return JSONResponse('Sync failed', status=500)
+        return JSONResponse(_('Sync failed'), status=500)
 
 
 class APIBase(View):
 
     def dispatch(self, request, *args, **kwargs):
-        get_params = request.GET.copy()
-        accept = request.META.get('HTTP_ACCEPT')
-        format = request.GET.get('format', False)
-        format_values = {
-            'application/ld+json': 'json-ld',
-            'application/json': 'json',
-            'application/xml': 'xml',
-        }
-        if not format and accept in format_values:
-            get_params['format'] = format_values[accept]
-        for key, value in request.META.iteritems():
-            if key.startswith('HTTP_X_ARCHES_'):
-                if key.replace('HTTP_X_ARCHES_', '').lower() not in request.GET:
-                    get_params[key.replace('HTTP_X_ARCHES_', '').lower()] = value
-        get_params._mutable = False
-        request.GET = get_params
+        try:
+            get_params = request.GET.copy()
+            accept = request.META.get('HTTP_ACCEPT')
+            format = request.GET.get('format', False)
+            format_values = {
+                'application/ld+json': 'json-ld',
+                'application/json': 'json',
+                'application/xml': 'xml',
+            }
+            if not format and accept in format_values:
+                get_params['format'] = format_values[accept]
+            for key, value in request.META.iteritems():
+                if key.startswith('HTTP_X_ARCHES_'):
+                    if key.replace('HTTP_X_ARCHES_', '').lower() not in request.GET:
+                        get_params[key.replace('HTTP_X_ARCHES_', '').lower()] = value
+            get_params._mutable = False
+            request.GET = get_params
+
+        except Exception:
+            logger.exception(_('Failed to create API request'))
+
         return super(APIBase, self).dispatch(request, *args, **kwargs)
 
 
 class Sync(APIBase):
 
     def get(self, request, surveyid=None):
-        ret = 'Sync was successful'
-        try:
-            can_sync = userCanAccessMobileSurvey(request, surveyid)
-            if can_sync:
+        can_sync = userCanAccessMobileSurvey(request, surveyid)
+        if can_sync:
+            try:
                 management.call_command('mobile', operation='sync_survey', id=surveyid, user=request.user.id)
-                return JSONResponse(ret)
-            else:
-                return JSONResponse('Sync Failed', status=403)
-        except Exception as e:
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            formatted = traceback.format_exception(exc_type, exc_value, exc_traceback)
-            if len(formatted):
-                for message in formatted:
-                    print message
-            ret = {'Syncfailed': {'stacktrace': formatted}}
+            except Exception:
+                logger.exception(_('Sync Failed'))
 
-        return JSONResponse(ret, status=500)
+            return JSONResponse(_('Sync Failed'))
+        else:
+            return JSONResponse(_('Sync Failed'), status=403)
 
 
 class Surveys(APIBase):
 
     def get(self, request, surveyid=None):
-        if hasattr(request.user, 'userprofile') is not True:
-            models.UserProfile.objects.create(user=request.user)
+        try:
+            if hasattr(request.user, 'userprofile') is not True:
+                models.UserProfile.objects.create(user=request.user)
 
-        def get_child_cardids(card, cardset):
-            for child_card in models.CardModel.objects.filter(nodegroup__parentnodegroup_id=card.nodegroup_id):
-                cardset.add(str(child_card.cardid))
-                get_child_cardids(child_card, cardset)
+            def get_child_cardids(card, cardset):
+                for child_card in models.CardModel.objects.filter(nodegroup__parentnodegroup_id=card.nodegroup_id):
+                    cardset.add(str(child_card.cardid))
+                    get_child_cardids(child_card, cardset)
 
-        group_ids = list(request.user.groups.values_list('id', flat=True))
+            group_ids = list(request.user.groups.values_list('id', flat=True))
 
-        if request.GET.get('status', None) is not None:
-            ret = {}
-            surveys = MobileSurvey.objects.filter(users__in=[request.user]).distinct()
-            for survey in surveys:
-                survey.deactivate_expired_survey()
-                survey = survey.serialize_for_mobile()
-                ret[survey['id']] = {}
-                for key in ['active', 'name', 'description', 'startdate', 'enddate', 'onlinebasemaps', 'bounds', 'tilecache']:
-                    ret[survey['id']][key] = survey[key]
-            response = JSONResponse(ret, indent=4)
-        else:
-            viewable_nodegroups = request.user.userprofile.viewable_nodegroups
-            editable_nodegroups = request.user.userprofile.editable_nodegroups
-            permitted_nodegroups = viewable_nodegroups.union(editable_nodegroups)
-            projects = MobileSurvey.objects.filter(users__in=[request.user], active=True).distinct()
-            if surveyid:
-                projects = projects.filter(pk=surveyid)
+            if request.GET.get('status', None) is not None:
+                ret = {}
+                surveys = MobileSurvey.objects.filter(users__in=[request.user]).distinct()
+                for survey in surveys:
+                    survey.deactivate_expired_survey()
+                    survey = survey.serialize_for_mobile()
+                    ret[survey['id']] = {}
+                    for key in ['active', 'name', 'description', 'startdate', 'enddate', 'onlinebasemaps', 'bounds', 'tilecache']:
+                        ret[survey['id']][key] = survey[key]
+                response = JSONResponse(ret, indent=4)
+            else:
+                viewable_nodegroups = request.user.userprofile.viewable_nodegroups
+                editable_nodegroups = request.user.userprofile.editable_nodegroups
+                permitted_nodegroups = viewable_nodegroups.union(editable_nodegroups)
+                projects = MobileSurvey.objects.filter(users__in=[request.user], active=True).distinct()
+                if surveyid:
+                    projects = projects.filter(pk=surveyid)
 
-            projects_for_couch = []
-            for project in projects:
-                project.deactivate_expired_survey()
-                projects_for_couch.append(project.serialize_for_mobile())
-            
-            for project in projects_for_couch:
-                project['mapboxkey'] = settings.MAPBOX_API_KEY
-                permitted_cards = set()
-                ordered_project_cards = project['cards']
-                for rootcardid in project['cards']:
-                    card = models.CardModel.objects.get(cardid=rootcardid)
-                    if str(card.nodegroup_id) in permitted_nodegroups:
-                        permitted_cards.add(str(card.cardid))
-                        get_child_cardids(card, permitted_cards)
-                project['cards'] = list(permitted_cards)
-                for graph in project['graphs']:
-                    cards = []
-                    for card in graph['cards']:
-                        if card['cardid'] in project['cards']:
-                            card['relative_position'] = ordered_project_cards.index(
-                                card['cardid']) if card['cardid'] in ordered_project_cards else None
-                            cards.append(card)
-                    graph['cards'] = sorted(cards, key=lambda x: x['relative_position'])
-            response = JSONResponse(projects_for_couch, indent=4)
+                projects_for_couch = []
+                for project in projects:
+                    project.deactivate_expired_survey()
+                    projects_for_couch.append(project.serialize_for_mobile())
+
+                for project in projects_for_couch:
+                    project['mapboxkey'] = settings.MAPBOX_API_KEY
+                    permitted_cards = set()
+                    ordered_project_cards = project['cards']
+                    for rootcardid in project['cards']:
+                        card = models.CardModel.objects.get(cardid=rootcardid)
+                        if str(card.nodegroup_id) in permitted_nodegroups:
+                            permitted_cards.add(str(card.cardid))
+                            get_child_cardids(card, permitted_cards)
+                    project['cards'] = list(permitted_cards)
+                    for graph in project['graphs']:
+                        cards = []
+                        for card in graph['cards']:
+                            if card['cardid'] in project['cards']:
+                                card['relative_position'] = ordered_project_cards.index(
+                                    card['cardid']) if card['cardid'] in ordered_project_cards else None
+                                cards.append(card)
+                        graph['cards'] = sorted(cards, key=lambda x: x['relative_position'])
+                response = JSONResponse(projects_for_couch, indent=4)
+        except Exception:
+            logger.exception(_('Unable to fetch collector projects'))
+            response = JSONResponse(_('Unable to fetch collector projects'), indent=4)
+
         return response
 
 
@@ -227,7 +236,7 @@ class Resources(APIBase):
 
             try:
                 indent = int(request.GET.get('indent', None))
-            except:
+            except Exception:
                 indent = None
 
             if resourceid:
@@ -238,14 +247,10 @@ class Resources(APIBase):
                             resourceinstanceids=[resourceid], indent=indent, user=request.user)
                         out = output[0]['outputfile'].getvalue()
                     except models.ResourceInstance.DoesNotExist:
+                        logger.exception()
                         return JSONResponse(status=404)
                     except Exception as e:
-                        exc_type, exc_value, exc_traceback = sys.exc_info()
-                        formatted = traceback.format_exception(exc_type, exc_value, exc_traceback)
-                        if len(formatted):
-                            for message in formatted:
-                                print message
-                        return JSONResponse(status=500, reason=e)
+                        logger.exception()
                 elif format == 'json':
                     out = Resource.objects.get(pk=resourceid)
                     out.load_tiles()
@@ -284,7 +289,7 @@ class Resources(APIBase):
                 page_size = settings.API_MAX_PAGE_SIZE
                 try:
                     page = int(request.GET.get('page', None))
-                except:
+                except Exception:
                     page = 1
 
                 start = ((page - 1) * page_size)
@@ -348,7 +353,7 @@ class Resources(APIBase):
     def put(self, request, resourceid, slug=None, graphid=None):
         try:
             indent = int(request.PUT.get('indent', None))
-        except:
+        except Exception:
             indent = None
 
         if not user_can_edit_resources(user=request.user):
@@ -390,7 +395,7 @@ class Resources(APIBase):
     def post(self, request, resourceid=None, slug=None, graphid=None):
         try:
             indent = int(request.POST.get('indent', None))
-        except:
+        except Exception:
             indent = None
 
         try:
@@ -456,7 +461,7 @@ class Concepts(APIBase):
 
             try:
                 indent = int(request.GET.get('indent', None))
-            except:
+            except Exception:
                 indent = None
             if conceptid:
                 try:
