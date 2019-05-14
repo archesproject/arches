@@ -91,7 +91,7 @@ LOGGING = {
     },
     'handlers': {
         'file': {
-            'level': 'WARNING', # DEBUG, INFO, WARNING, ERROR
+            'level': 'WARNING',  # DEBUG, INFO, WARNING, ERROR
             'class': 'logging.FileHandler',
             'filename': os.path.join(APP_ROOT, 'arches.log'),
             'formatter': 'console'
