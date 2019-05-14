@@ -60,7 +60,7 @@ matrix:
         - yarn install
         - npm install cypress --save-dev
         - wait-on http://localhost:9200/
-        - python manage.py packages -o setup_db
+        - python manage.py setup_db --force
       cache:
         npm: true
         directories:
