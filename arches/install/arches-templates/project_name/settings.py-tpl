@@ -94,6 +94,11 @@ LOGGING = {   'disable_existing_loggers': False,
 
 MEDIA_ROOT =  os.path.join(APP_ROOT)
 
+
+# Unique session cookie ensures that logins are treated separately for each app
+SESSION_COOKIE_NAME = '{{ project_name }}'
+
+
 TILE_CACHE_CONFIG = {
     "name": "Disk",
     "path": os.path.join(APP_ROOT, 'tileserver', 'cache')
