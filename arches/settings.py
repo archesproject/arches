@@ -130,6 +130,8 @@ RESOURCE_EDITOR_GROUPS = (
     'Crowdsource Editor'
 )
 
+# Unique session cookie ensures that logins are treated separately for each app
+SESSION_COOKIE_NAME = 'arches'
 
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  #<-- Only need to uncomment this for testing without an actual email server
 # EMAIL_USE_TLS = True
