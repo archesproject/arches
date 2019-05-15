@@ -128,16 +128,18 @@ define([
 
             this.setConstraints = function(arr) {
                 var self = this;
-                arr.forEach(function(constraint){
-                    var constraintViewModel = new CardConstraintsViewModel({
-                        constraint: koMapping.fromJS(constraint),
-                        widgets: self.widgets()
+                if (arr) {
+                    arr.forEach(function(constraint){
+                        var constraintViewModel = new CardConstraintsViewModel({
+                            constraint: koMapping.fromJS(constraint),
+                            widgets: self.widgets()
+                        });
+                        constraintViewModel.constraint.nodes.subscribe(function(){
+                            self.toJSON();
+                        }, self);
+                        self.constraints.push(constraintViewModel);
                     });
-                    constraintViewModel.constraint.nodes.subscribe(function(){
-                        self.toJSON();
-                    }, self);
-                    self.constraints.push(constraintViewModel);
-                });
+                }
             };
 
             this.sourceData = attributes;
