@@ -34,7 +34,7 @@ define([
                 nodes: [],
                 cardid: card.cardid,
                 constraintid: uuid.generate()
-            }]
+            }];
         };
 
         this.flattenTree = function(parents, flatList) {
