@@ -1,4 +1,5 @@
 define([
+    'jquery',
     'underscore',
     'knockout',
     'knockout-mapping',
@@ -6,7 +7,7 @@ define([
     'arches',
     'datatype-config-components',
     'bindings/let'
-], function(_, ko, koMapping, BaseFilter, arches) {
+], function($, _, ko, koMapping, BaseFilter, arches) {
     var componentName = 'advanced-search';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({

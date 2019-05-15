@@ -1,4 +1,5 @@
 define([
+    'jquery',
     'underscore',
     'knockout',
     'moment',
@@ -8,7 +9,7 @@ define([
     'bindings/chosen',
     'bindings/time-wheel'
 ],
-function(_, ko, moment, BaseFilter, arches) {
+function($, _, ko, moment, BaseFilter, arches) {
     var componentName = 'time-filter';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({

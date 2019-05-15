@@ -1,8 +1,7 @@
 define([
     'jquery',
-    'backbone',
-    'knockout'
-], function($, Backbone, ko) {
+    'backbone'
+], function($, Backbone) {
     return Backbone.View.extend({
         constructor: function() {
             this.name = 'Base Filter';
@@ -19,7 +18,7 @@ define([
             console.log('loading ' + this.name);
         },
 
-        getFilter: function(filterName, callback) {
+        getFilter: function(filterName) {
             return this.filters[filterName]();
         }
     });

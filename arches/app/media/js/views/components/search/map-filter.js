@@ -1,10 +1,11 @@
 define([
+    'underscore',
     'knockout',
     'views/components/search/base-filter',
     'arches',
     'views/components/widgets/map',
 ],
-function(ko, BaseFilter, arches) {
+function(_, ko, BaseFilter, arches) {
     var componentName = 'map-filter';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
@@ -22,8 +23,8 @@ function(ko, BaseFilter, arches) {
                     return ko.unwrap(options.resizeOnChange);
                 });
                 this.filter.feature_collection = ko.observable({
-                  "type": "FeatureCollection",
-                  "features": []
+                    "type": "FeatureCollection",
+                    "features": []
                 });
                 this.filter.inverted = ko.observable(false);
                 var basemaps = _.filter(arches.mapLayers, function(layer) {
@@ -117,8 +118,8 @@ function(ko, BaseFilter, arches) {
                 if (reset_features !== false){
                     if (this.filter.feature_collection().features.length > 0) {
                         this.filter.feature_collection({
-                          "type": "FeatureCollection",
-                          "features": []
+                            "type": "FeatureCollection",
+                            "features": []
                         });
                     }
                 }
