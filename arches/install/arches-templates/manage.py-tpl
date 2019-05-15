@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 '''
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
@@ -17,7 +19,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 
-#!/usr/bin/env python
 import os
 import sys
 

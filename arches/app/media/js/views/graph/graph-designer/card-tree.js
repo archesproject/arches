@@ -141,6 +141,7 @@ define([
             graphiconclass: params.graph.iconclass,
             graph: params.graph,
             graphModel: params.graphModel,
+            appliedFunctions: params.appliedFunctions(),
             expandAll: function() {
                 toggleAll(true);
             },
@@ -170,6 +171,7 @@ define([
                 }
                 return new CardViewModel({
                     card: card,
+                    appliedFunctions: params.appliedFunctions(),
                     graphModel: params.graphModel,
                     tile: null,
                     resourceId: ko.observable(),
@@ -370,7 +372,26 @@ define([
                 });
             },
             selection: selection,
-            filter: filter
+            filter: filter,
+            isFuncNode: function() {
+                var appFuncs = null, appFuncDesc = false, appFuncName = false, nodegroupId = null;
+                if(params.card && this.appliedFunctions()) {
+                    appFuncs = this.appliedFunctions();
+                    nodegroupId = params.card.nodegroup_id;
+                    for(var i = 0; i < appFuncs.length; i++) {
+                        if(appFuncs[i]['config']['description']['nodegroup_id']) {
+                            appFuncDesc = appFuncs[i]['config']['description']['nodegroup_id'];
+                        }
+                        if(appFuncs[i]['config']['name']['nodegroup_id']) {
+                            appFuncName = appFuncs[i]['config']['name']['nodegroup_id'];
+                        }
+                        if(nodegroupId === appFuncDesc || nodegroupId === appFuncName) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
         });
         var topCard = self.topCards()[0];
         if (topCard != null) {

@@ -78,6 +78,9 @@ define([
             cardid: self.cardid,
             constraintid:  uuid.generate()
         }];
+
+        var appliedFunctions = params.appliedFunctions;
+
         if (params.multiselect) {
             selection = params.selection || ko.observableArray([]);
         } else {
@@ -136,6 +139,7 @@ define([
         _.extend(this, nodegroup, {
             isWritable: isWritable,
             model: cardModel,
+            appliedFunctions: appliedFunctions,
             multiselect: params.multiselect,
             widgets: cardModel.widgets,
             parent: params.tile,
@@ -337,6 +341,26 @@ define([
                     loading: loading,
                     cardwidgets: params.cardwidgets,
                 });
+            },
+            isFuncNode: function() {
+                var appFuncDesc = false, appFuncName = false, nodegroupId = null;
+                if(params.appliedFunctions && params.card) {
+                    for(var i=0; i < self.appliedFunctions.length; i++) {
+                        if(self.appliedFunctions[i]['config']['description']['nodegroup_id']) {
+                            appFuncDesc = self.appliedFunctions[i]['config']['description']['nodegroup_id'];
+                        }
+                        if(self.appliedFunctions[i]['config']['name']['nodegroup_id']) {
+                            appFuncName = self.appliedFunctions[i]['config']['name']['nodegroup_id'];
+                        }
+                        nodegroupId = params.card.nodegroup_id;
+                        if(nodegroupId === appFuncDesc) {
+                            return "* This card data will show as the resource description.";
+                        } else if(nodegroupId === appFuncName) {
+                            return "* This card data will show as the resource name.";
+                        }
+                    }
+                }
+                return false;
             }
         });
 

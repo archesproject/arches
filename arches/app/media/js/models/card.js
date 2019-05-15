@@ -47,6 +47,7 @@ define([
             this.disabled = ko.observable();
             this.component_id = ko.observable();
             this.constraints = ko.observableArray();
+            this.appliedFunctions = attributes.appliedFunctions;
 
             this.set('cards', this.cards);
             this.set('nodes', this.nodes);
@@ -72,6 +73,8 @@ define([
             this.set('component_id', this.component_id);
             this.set('config', {});
             this.set('constraints', this.constraints);
+            this.set('appliedFunctions', this.appliedFunctions);
+
             this.cardComponentLookup = cardComponentLookup;
             this.configKeys = ko.observableArray();
             this.disposables = [];
