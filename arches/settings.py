@@ -318,18 +318,29 @@ CORS_ORIGIN_ALLOW_ALL = True
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'console': {
+            'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+        },
+    },
     'handlers': {
         'file': {
-            'level': 'DEBUG',
+            'level': 'WARNING',  # DEBUG, INFO, WARNING, ERROR
             'class': 'logging.FileHandler',
             'filename': os.path.join(ROOT_DIR, 'arches.log'),
+            'formatter': 'console'
         },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'console'
+        }
     },
     'loggers': {
         'arches': {
-            'handlers': ['file'],
+            'handlers': ['file', 'console'],
             'level': 'DEBUG',
-            'propagate': True,
+            'propagate': True
         }
     }
 }
