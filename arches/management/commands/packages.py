@@ -693,8 +693,10 @@ class Command(BaseCommand):
 
         """
 
+        management.call_command("setup_db", force=True)
+
         print("\n"+"~"*80+"\n"
-              "Warning: This command is now deprecated. From now on please use\n\n"
+              "Warning: This command will be deprecated in Arches 4.5. From now on please use\n\n"
               "    python manage.py setup_db [--force]\n\nThe --force argument will "
               "suppress the interactive confirmation prompt.\n"+"~"*80)
 
