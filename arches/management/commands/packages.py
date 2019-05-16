@@ -700,30 +700,6 @@ class Command(BaseCommand):
               "    python manage.py setup_db [--force]\n\nThe --force argument will "
               "suppress the interactive confirmation prompt.\n"+"~"*80)
 
-        exit()
-
-        db_settings = settings.DATABASES['default']
-        truncate_path = os.path.join(settings.ROOT_DIR, 'db', 'install', 'truncate_db.sql')
-        db_settings['truncate_path'] = truncate_path
-
-        truncate_db.create_sqlfile(db_settings, truncate_path)
-
-        os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d postgres -f "%(truncate_path)s"' % db_settings)
-
-        self.delete_indexes()
-        prepare_term_index(create=True)
-        prepare_resource_relations_index(create=True)
-        management.call_command('migrate')
-
-        self.import_graphs(os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Model.json'), overwrite_graphs=True)
-        self.import_business_data(os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings.json'), overwrite=True)
-
-        local_settings_available = os.path.isfile(os.path.join(settings.SYSTEM_SETTINGS_LOCAL_PATH))
-
-        if local_settings_available == True:
-            self.import_business_data(settings.SYSTEM_SETTINGS_LOCAL_PATH, overwrite=True)
-
-
     def setup_indexes(self):
         management.call_command('es', operation='setup_indexes')
 
