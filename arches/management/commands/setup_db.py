@@ -50,7 +50,10 @@ class Command(BaseCommand):
 
         self.setup_db()
 
-    def get_admin_connection(self):
+    def get_connection(self):
+        """This method acquires a connection to the database, first trying to use
+        separate PG_SUPERUSER and PG_SUPERUSER_PW credentials, and if they are not
+        provided then it falls back on the default credentials in DATABASES."""
 
         db = settings.DATABASES['default']
 
@@ -87,8 +90,11 @@ class Command(BaseCommand):
                 # If that connection fails, this is probably a non-superuser
                 # whose database has not yet been created.
                 safestr = " ".join([i for i in conn_string.split(" ") if not i.startswith("password")])
-                print("Error connecting to db with these settings: "+safestr)
                 print(str(e))
+                print("Error connecting to db with these settings: "+safestr)
+                print("\nHave you created the database yet? The quickest way to do so is to supply Postgres "
+                      "superuser credentials in the PG_SUPERUSER and PG_SUPERUSER_PW settings, and then "
+                      "re-run this same command.")
                 exit()
 
         # autocommit false
@@ -112,6 +118,8 @@ class Command(BaseCommand):
     def drop_and_recreate_db(self, cursor):
 
         arches_db = settings.DATABASES['default']
+
+        print("Drop and recreate the database...")
         terminate_sql = """
 SELECT pg_terminate_backend(pid) FROM pg_stat_activity
     WHERE datname IN ('{}', '{}');""".format(arches_db['NAME'], arches_db['POSTGIS_TEMPLATE'])
@@ -119,20 +127,17 @@ SELECT pg_terminate_backend(pid) FROM pg_stat_activity
         cursor.execute(terminate_sql)
 
         drop_query = """
-DROP DATABASE IF EXISTS {0};
-""".format(arches_db['NAME'])
-        print("Dropping old database..." + drop_query)
+DROP DATABASE IF EXISTS {0};""".format(arches_db['NAME'])
+        print(drop_query)
         cursor.execute(drop_query)
-        print("    done")
 
         create_query = """
 CREATE DATABASE {}
     WITH OWNER = {}
         ENCODING = 'UTF8'
         CONNECTION LIMIT=-1
-        TEMPLATE = {};
-""".format(arches_db['NAME'], arches_db['USER'], arches_db['POSTGIS_TEMPLATE'])
-        print('Creating new database... ' + create_query)
+        TEMPLATE = {};""".format(arches_db['NAME'], arches_db['USER'], arches_db['POSTGIS_TEMPLATE'])
+        print(create_query+"\n")
         cursor.execute(create_query)
 
     def setup_db(self):
@@ -141,12 +146,12 @@ CREATE DATABASE {}
         WARNING: This will destroy data
         """
 
-        conn = self.get_admin_connection()
+        conn = self.get_connection()
         cursor = conn.cursor()
 
         # figure out if this is a superuser or not
-        cursor.execute("select current_setting('is_superuser')")
-        superuser = True if cursor.fetchone() == ("on",) else False
+        cursor.execute("SELECT current_setting('is_superuser')")
+        superuser = True if cursor.fetchone()[0] == "on" else False
 
         if superuser:
             self.drop_and_recreate_db(cursor)
