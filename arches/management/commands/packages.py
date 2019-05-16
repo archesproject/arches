@@ -30,7 +30,6 @@ from django.forms.models import model_to_dict
 import arches.app.utils.data_management.resources.remover as resource_remover
 import arches.app.utils.data_management.resource_graphs.exporter as graph_exporter
 import arches.app.utils.data_management.resource_graphs.importer as graph_importer
-from arches.db.install import truncate_db
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils.data_management.resources.exporter import ResourceExporter

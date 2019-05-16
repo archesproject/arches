@@ -25,15 +25,15 @@ from django.conf import settings
 from django.core import management
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connection
-from arches.db.install import truncate_db
 from arches.app.search.mappings import prepare_terms_index, prepare_resource_relations_index
 from arches.management.commands.utils import get_yn_input
 
 
 class Command(BaseCommand):
     """
-    Commands for managing the loading and running of packages in Arches
-
+    Command to setup and refresh the database. Can be used initially to create
+    the database for the first time, or iteratively to wipe and recreate it
+    during development.
     """
 
     def add_arguments(self, parser):
