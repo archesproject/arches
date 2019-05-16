@@ -41,13 +41,6 @@ def confirm_system_requirements():
     else:
         pass
 
-    # CHECK POSTGRES VERSION
-    try:
-        postgres_version = subprocess.check_output(["psql", "--version"])
-    except OSError:
-        print('ERROR: Arches requires psql. Please install and then rerun this file again.')
-        sys.exit(101)
-
     return True
 
 def run_virtual_environment(env='ENV'):
