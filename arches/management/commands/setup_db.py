@@ -112,11 +112,11 @@ class Command(BaseCommand):
     def drop_and_recreate_db(self, cursor):
 
         arches_db = settings.DATABASES['default']
-        try:
-            cursor.execute("SELECT pg_terminate_backend(pid) from pg_stat_activity where datname={0};".format(
-                arches_db['NAME']))
-        except psycopg2.ProgrammingError as e:
-            pass
+        terminate_sql = """
+SELECT pg_terminate_backend(pid) FROM pg_stat_activity
+    WHERE datname IN ('{}', '{}');""".format(arches_db['NAME'], arches_db['POSTGIS_TEMPLATE'])
+        print(terminate_sql)
+        cursor.execute(terminate_sql)
 
         drop_query = """
 DROP DATABASE IF EXISTS {0};
