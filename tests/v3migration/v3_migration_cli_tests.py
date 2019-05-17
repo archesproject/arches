@@ -242,7 +242,7 @@ class v3MigrationTests(ArchesTestCase):
         self.load_v4_reference_data()
 
         # initial checks on the database contents
-        self.assertEqual(ResourceInstance.objects.all().count(), 0)
+        ResourceInstance.objects.all().delete()
         self.assertEqual(Tile.objects.all().count(), 0)
 
         # now do a much more granular set of tests on the import process itself
