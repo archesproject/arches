@@ -678,17 +678,6 @@ class v3SkosConverter:
                 uuid_lookup[preflabel_val] = new_uuid
                 return new_uuid
 
-        def new_preflabel_uuid(preflabel):
-            """
-            Concept Values in Arches have a UUID (stored in the embedded JSON)
-            and a 1-1 mapping with their Concept; if a Collection shares a
-            prefLabel with a Concept, it needs a new ID to avoid
-            clobbering the same attribute on the existing Concept
-            """
-            working = json.loads(preflabel.text)
-            working['id'] = unicode(uuid.uuid4())
-            preflabel.text = json.dumps(working)
-
         if uuid_collection_file:
             with open(uuid_collection_file, "rb") as openfile:
                 uuid_lookup = json.loads(openfile.read())
@@ -726,8 +715,6 @@ class v3SkosConverter:
                 # give the collection a UUID based on the prefLabel
                 col_preflabel = working_concept.find('./skos:prefLabel',
                                                      namespaces=namespaces)
-
-                new_preflabel_uuid(col_preflabel)
 
                 col_uuid = new_or_existing_uuid(col_preflabel, uuid_lookup=uuid_lookup)
                 fq_uuid = namespaces['arches'] + col_uuid
