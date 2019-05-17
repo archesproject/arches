@@ -669,7 +669,13 @@ class v3SkosConverter:
             return a new or existing UUID for the collection based on
             whether we already have one for the JSON's `value` key
             """
-            preflabel_val = json.loads(preflabel.text)['value']
+
+            # If the prefLabel.text can't be parsed as json, then just
+            # use it raw, with the assumption it is the label itself.
+            try:
+                preflabel_val = json.loads(preflabel.text)['value']
+            except ValueError:
+                preflabel_val = preflabel.text
 
             if preflabel_val in uuid_lookup:
                 return uuid_lookup[preflabel_val]
