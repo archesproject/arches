@@ -165,7 +165,7 @@ define([
                     if (item._source) {
                         return item._source.displayname;
                     } else {
-                        return '<b> Create a new ' + item.name + ' . . . </b>'
+                        return '<b> Create a new ' + item.name + ' . . . </b>';
                     }
                 } else {
                     return '<span>' + item._source.displayname + ' ' + self.disableMessage + '</span>'
@@ -192,7 +192,7 @@ define([
                         return {
                             _id: item.id,
                             _source: {
-                                displayname: item.name
+                                displayname: item.name;
                             }
                         };
                     });
@@ -213,7 +213,7 @@ define([
                                 $.ajax(arches.urls.resource_descriptors + value, {
                                     dataType: "json"
                                 }).done(function(data) {
-                                    nameLookup[value] = data.displayname
+                                    nameLookup[value] = data.displayname;
                                     setSelectionData();
                                 });
                             }
