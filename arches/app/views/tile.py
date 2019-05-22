@@ -16,9 +16,11 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import uuid, importlib, json as jsonparser
+import importlib
+import json as jsonparser
 import logging
 import traceback
+import uuid
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from arches.app.models.resource import Resource
@@ -39,6 +41,7 @@ from arches.app.models.resource import EditLog
 
 logger = logging.getLogger(__name__)
 
+
 @method_decorator(can_edit_resource_instance(), name='dispatch')
 class TileData(View):
     action = 'update_tile'
@@ -57,14 +60,33 @@ class TileData(View):
                     tile.provisionaledits = provisionaledits
                 tile.save(provisional_edit_log_details={"user": reviewer, "action": "delete edit", "edit": edit, "provisional_editor": provisional_editor})
 
+    def handle_save_error(self, e, tile_id='', title=_('Saving tile failed'), message=None):
+        title = title
+        if message is None:
+            message = type(e).__name__
+            if hasattr(e, 'message') and e.message:
+                message += ": {0}".format(e.message)
+        else:
+            message = str(e)
+
+        logger.error(title +
+                     ''' [Tile id: {tile_id}] \
+                     [Exception message: {message}] \
+                     [Exception trace: {trace}]'''
+                     .format(tile_id=tile_id,
+                             message=message,
+                             trace=traceback.format_exc()))
+
+        return JSONResponse({'status': 'false', 'message':
+                             [_(title), _(str(message))]}, status=500)
 
     def post(self, request):
         if self.action == 'update_tile':
             json = request.POST.get('data', None)
             accepted_provisional = request.POST.get('accepted_provisional', None)
-            if accepted_provisional != None:
+            if accepted_provisional is not None:
                 accepted_provisional_edit = JSONDeserializer().deserialize(accepted_provisional)
-            if json != None:
+            if json is not None:
                 data = JSONDeserializer().deserialize(json)
                 if data['resourceinstance_id'] == '':
                     data['resourceinstance_id'] = uuid.uuid4()
@@ -78,65 +100,62 @@ class TileData(View):
                     data['resourceinstance_id'] = resource.pk
                     resource.index()
                 tile_id = data['tileid']
-                if tile_id != None and tile_id != '':
+                if tile_id is not None and tile_id != '':
                     try:
                         old_tile = Tile.objects.get(pk=tile_id)
                         clean_resource_cache(old_tile)
-                    except ObjectDoesNotExist:
-                        return JSONResponse({'status':'false','message': [_('This tile is no longer available'), _('It was likely deleted by another user')]}, status=500)
+                    except ObjectDoesNotExist as e:
+                        return self.handle_save_error(e, _('This tile is no longer available'),
+                                                      _('It was likely deleted by another user'))
+
                 tile = Tile(data)
+
                 if tile.filter_by_perm(request.user, 'write_nodegroup'):
-                    with transaction.atomic():
-                        try:
-                            if accepted_provisional == None:
-                                try:
-                                    tile.save(request=request)
-                                except TileValidationError as e:
-                                    resource_tiles = models.TileModel.objects.filter(
-                                        resourceinstance=tile.resourceinstance)
-                                    if resource_tiles.count() == 0:
-                                        Resource.objects.get(pk=tile.resourceinstance_id).delete(request.user, 'test')
-                                    return JSONResponse({'status': 'false', 'message': [e.message, _('Unable to Save. Please verify your input is valid')]}, status=500)
-                                except Exception as e:
-                                    message = "Unable to save. A {0} has occurred. Arguments: {1!r}".format(type(e).__name__, e.args)
-                                    return JSONResponse({'status': 'false', 'message': [message, _('Please contact your system administrator')]}, status=500)
-                            else:
-                                if accepted_provisional is not None:
-                                    provisional_editor = User.objects.get(pk=accepted_provisional_edit["user"])
-                                tile.save(provisional_edit_log_details={"user": request.user, "action": "accept edit", "edit": accepted_provisional_edit, "provisional_editor": provisional_editor})
+                    try:
+                        with transaction.atomic():
+                            try:
+                                if accepted_provisional is None:
+                                    try:
+                                        tile.save(request=request)
+                                    except TileValidationError as e:
+                                        resource_tiles = models.TileModel.objects.filter(
+                                            resourceinstance=tile.resourceinstance)
+                                        if resource_tiles.count() == 0:
+                                            Resource.objects.get(pk=tile.resourceinstance_id).delete(request.user)
+                                        title = _('Unable to save. Please verify your input is valid')
+                                        return self.handle_save_error(e, tile_id, title=title)
+                                else:
+                                    if accepted_provisional is not None:
+                                        provisional_editor = User.objects.get(pk=accepted_provisional_edit["user"])
+                                        prov_edit_log_details = {
+                                            "user": request.user,
+                                            "action": "accept edit",
+                                            "edit": accepted_provisional_edit,
+                                            "provisional_editor": provisional_editor
+                                            }
+                                    tile.save(provisional_edit_log_details=prov_edit_log_details)
 
-                            if tile.provisionaledits is not None and str(request.user.id) in tile.provisionaledits:
-                                tile.data = tile.provisionaledits[str(request.user.id)]['value']
+                                if tile.provisionaledits is not None and str(request.user.id) in tile.provisionaledits:
+                                    tile.data = tile.provisionaledits[str(request.user.id)]['value']
 
-                        except ValidationError as e:
-                            return JSONResponse({'status':'false','message':e.args}, status=500)
-                        except Exception as e:
-                            exception_title = 'Saving tile failed'
-                            exception_message = str(e)
-                            if hasattr(e, 'message') and e.message:
-                                exception_message += "({0})".format(e.message)
+                            except Exception as e:
+                                return self.handle_save_error(e, tile_id)
 
-                            logger.error(exception_title +
-                                         ''' [Tile id: {tile_id}] \
-                                         [Exception message: {message}] \
-                                         [Exception trace: {trace}]'''
-                                         .format(tile_id=tile_id,
-                                                 message=exception_message,
-                                                 trace=traceback.format_exc()))
+                            tile.after_update_all()
+                            clean_resource_cache(tile)
+                            update_system_settings_cache(tile)
 
-                            return JSONResponse({'status': 'false', 'message':
-                                                 [_(exception_title), _(str(exception_message))]}, status=500)
-                        tile.after_update_all()
-                        clean_resource_cache(tile)
-                        update_system_settings_cache(tile)
+                    except Exception as e:
+                        return self.handle_save_error(e, tile_id)
 
                     return JSONResponse(tile)
                 else:
-                    return JSONResponse({'status':'false','message': [_('Request Failed'), _('Permission Denied')]}, status=500)
+                    response = {'status': 'false', 'message': [_('Request Failed'), _('Permission Denied')]}
+                    return JSONResponse(response, status=500)
 
         if self.action == 'reorder_tiles':
             json = request.body
-            if json != None:
+            if json is not None:
                 data = JSONDeserializer().deserialize(json)
 
                 if 'tiles' in data and len(data['tiles']) > 0:
