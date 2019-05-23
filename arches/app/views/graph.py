@@ -166,6 +166,7 @@ class GraphDesignerView(GraphBaseView):
         datatypes = models.DDataType.objects.all()
         datatypes_json = JSONSerializer().serialize(datatypes, exclude=['modulename', 'isgeometric'])
         branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True)
+        applied_functions = JSONSerializer().serialize(models.FunctionXGraph.objects.filter(graph=self.graph))
         cards = self.graph.cardmodel_set.order_by('sortorder').prefetch_related('cardxnodexwidget_set')
         constraints = []
         for card in cards:
@@ -214,6 +215,7 @@ class GraphDesignerView(GraphBaseView):
             map_layers=map_layers,
             map_markers=map_markers,
             map_sources=map_sources,
+            applied_functions=applied_functions,
             geocoding_providers=geocoding_providers,
             report_templates=templates,
             restricted_nodegroups=[str(nodegroup) for nodegroup in restricted_nodegroups],

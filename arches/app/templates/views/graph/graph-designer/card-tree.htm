@@ -17,9 +17,14 @@
         <ul class="jstree-container-ul jstree-children" aria-expanded="true">
             <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': rootExpanded, 'jstree-closed' : !rootExpanded()}">
                 <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}"></i>
-                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { selection('root'); }, css: {'jstree-clicked': selection() === 'root'}">
+                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { selection('root'); }, css: {'jstree-clicked': selection() === 'root', 'func-node': isFuncNode()}">
                     <strong>
-                        <i data-bind="css: (graphiconclass() != (null || '') ? graphiconclass() : 'fa fa-question')" role="presentation"></i>
+                        <!-- ko if: !isFuncNode -->
+                        <i data-bind="css: graphiconclass != (null || '') ? graphiconclass : 'fa fa-question'" role="presentation"></i>
+                        <!-- /ko -->
+                        <!-- ko if: isFuncNode -->
+                        <i class="fa fa-code" role="presentation"></i>
+                        <!-- /ko -->
                         <span data-bind="text: graphname"></span>
                     </strong>
                      {% trans "(edit report)" %}

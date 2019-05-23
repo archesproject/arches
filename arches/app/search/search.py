@@ -178,6 +178,14 @@ class SearchEngine(object):
     def count(self, **kwargs):
         kwargs = self._add_prefix(**kwargs)
         kwargs['doc_type'] = kwargs.pop('doc_type', '_doc')
+        body = kwargs.pop('body', None)
+
+        # need to only pass in the query key as other keys (eg: _source) are not allowed
+        if body:
+            query = body.pop('query', None)
+            if query:
+                kwargs['body'] = {'query': query}
+
         count = self.es.count(**kwargs)
         if count is not None:
             return count['count']

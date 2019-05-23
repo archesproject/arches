@@ -7,9 +7,10 @@ define([
     'models/card-widget',
     'arches',
     'require',
+    'uuid',
     'utils/dispose',
     'viewmodels/tile'
-], function($, _, ko, koMapping, CardModel, CardWidgetModel, arches, require, dispose) {
+], function($, _, ko, koMapping, CardModel, CardWidgetModel, arches, require, uuid, dispose) {
     /**
     * A viewmodel used for generic cards
     *
@@ -71,6 +72,15 @@ define([
         var multiselect = params.multiselect || false;
         var isWritable = params.card.is_writable || false;
         var selection;
+        var emptyConstraint = [{
+            uniquetoallinstances: false,
+            nodes:[],
+            cardid: self.cardid,
+            constraintid:  uuid.generate()
+        }];
+
+        var appliedFunctions = params.appliedFunctions;
+
         if (params.multiselect) {
             selection = params.selection || ko.observableArray([]);
         } else {
@@ -83,7 +93,8 @@ define([
             data: _.extend(params.card, {
                 widgets: params.cardwidgets,
                 nodes: params.graphModel.get('nodes'),
-                nodegroup: nodegroup
+                nodegroup: nodegroup,
+                constraints: params.constraints
             }),
             datatypelookup: params.graphModel.get('datatypelookup'),
         });
@@ -128,12 +139,14 @@ define([
         _.extend(this, nodegroup, {
             isWritable: isWritable,
             model: cardModel,
+            appliedFunctions: appliedFunctions,
             multiselect: params.multiselect,
             widgets: cardModel.widgets,
             parent: params.tile,
             parentCard: params.parentCard,
             expanded: ko.observable(false),
             perms: perms,
+            constraints: params.constraints || emptyConstraint,
             permsLiteral: permsLiteral,
             scrollTo: ko.pureComputed(function() {
                 return scrollTo() === this;
@@ -328,6 +341,26 @@ define([
                     loading: loading,
                     cardwidgets: params.cardwidgets,
                 });
+            },
+            isFuncNode: function() {
+                var appFuncDesc = false, appFuncName = false, nodegroupId = null;
+                if(params.appliedFunctions && params.card) {
+                    for(var i=0; i < self.appliedFunctions.length; i++) {
+                        if(self.appliedFunctions[i]['config']['description']['nodegroup_id']) {
+                            appFuncDesc = self.appliedFunctions[i]['config']['description']['nodegroup_id'];
+                        }
+                        if(self.appliedFunctions[i]['config']['name']['nodegroup_id']) {
+                            appFuncName = self.appliedFunctions[i]['config']['name']['nodegroup_id'];
+                        }
+                        nodegroupId = params.card.nodegroup_id;
+                        if(nodegroupId === appFuncDesc) {
+                            return "* This card data will show as the resource description.";
+                        } else if(nodegroupId === appFuncName) {
+                            return "* This card data will show as the resource name.";
+                        }
+                    }
+                }
+                return false;
             }
         });
 

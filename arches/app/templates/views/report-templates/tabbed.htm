@@ -1,0 +1,54 @@
+
+{% extends "views/report-templates/default.htm" %}
+{% load i18n %}
+
+{% block header %}
+<div>
+    <ul class="tabbed-report-tab-list">
+    <!-- ko foreach: {data: tabs, as: 'tab'}  -->
+        <li data-bind="click: function(){ $parent.makeActiveTab(tab) }, css: { 'active-report-tab': $parent.activeTab()['name'] == tab['name'] }" class="report-tab">
+            <a><span><i data-bind="attr: {class: ('fa '+ tab['icon'])}"></i></span></a>
+        </li>
+    <!-- /ko -->
+    </ul>
+</div>
+
+<div class="tab-banner">
+    <div><span><i class="fa fa-file-o"></i></span><span data-bind="">[Location Info]</span></div>
+    <div><span data-bind="text: activeTab()['name']"></span></div>
+</div>
+{% endblock header %}
+
+{% block body %}
+
+    <!--ko if: hasProvisionalData() && (editorContext === false) -->
+    <div class="report-provisional-flag">{% trans 'This resource has provisional edits (not displayed in this report) that are pending review' %}</div>
+    <!--/ko-->
+    <!--ko if: hasProvisionalData() && (editorContext === true && report.userisreviewer === true) -->
+    <div class="report-provisional-flag">{% trans 'This resource has provisional edits (not displayed in this report) that are pending review' %}</div>
+    <!--/ko-->
+    <!--ko if: hasProvisionalData() && (editorContext === true && report.userisreviewer === false) -->
+    <div class="report-provisional-flag">{% trans 'This resource has provisional edits that are pending review' %}</div>
+    <!--/ko-->
+
+    <div class="rp-report-section relative rp-report-section-root">
+        <div class="rp-report-section-title">
+            <!-- ko foreach: { data: activeCards, as: 'card' } -->
+                <!-- ko if: $index() !== 0 --><hr class="rp-tile-separator"><!-- /ko -->
+                <div class="rp-card-section">
+                    <!-- ko component: {
+                        name: card.model.cardComponentLookup[card.model.component_id()].componentname,
+                        params: {
+                            state: 'report',
+                            card: card
+                        }
+                    } --> <!-- /ko -->
+                </div>
+            <!-- /ko -->
+        </div>
+    </div>
+
+    {% endblock body %}
+
+
+
