@@ -66,6 +66,7 @@ define([
                 });
                 return !nodegroup || !nodegroup.parentnodegroup_id;
             }).map(function(card) {
+                params.nodegroupid = params.nodegroupid || card.nodegroup_id;
                 return new CardViewModel({
                     card: card,
                     graphModel: graphModel,
