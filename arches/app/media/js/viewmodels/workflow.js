@@ -1,17 +1,34 @@
 define([
     'jquery',
     'knockout',
+    'knockout-mapping',
     'viewmodels/workflow-step'
-], function($, ko, Step) {
+], function($, ko, koMapping, Step) {
     var Workflow = function(config) {
         var self = this;
-        var urlParams = new window.URLSearchParams(window.location.search);
-        var initstep = Number(urlParams.get('step')) || undefined;
         this.steps = config.steps || [];
         this.activeStep = ko.observable();
+        this.previousStep = ko.observable();
         this.ready = ko.observable(false);
         this.loading = config.loading || ko.observable(false);
         this.alert = config.alert || ko.observable(null);
+        this.state = {steps:{}};
+        this.advance = true;
+
+        this.restoreStateFromURL = function(){
+            if (Object.keys(self.state.steps).length === 0) {
+                self.advance = false;
+            } else {
+                self.advance = true;
+            }
+            var urlparams = new window.URLSearchParams(window.location.search);
+            var res = {};
+            urlparams.forEach(function(v, k){res[k] = v;});
+            res.steps = res.steps ? JSON.parse(res.steps) : {};
+            this.state = res;
+        };
+
+        this.restoreStateFromURL();
 
         this.ready.subscribe(function() {
             self.steps.forEach(function(step, i) {
@@ -21,35 +38,28 @@ define([
                     step.alert = self.alert;
                     self.steps[i] = new Step(step);
                     self.steps[i].complete.subscribe(function(complete) {
-                        if (complete) self.next();
+                        if (complete && self.advance) self.next();
                     });
                 }
                 self.steps[i]._index = i;
             });
-            if (initstep) {
-                self.activeStep(self.steps[initstep - 1]);
+            if (self.state.activestep) {
+                self.activeStep(self.steps[self.state.activestep]);
             }
             else if(self.steps.length > 0) {
                 self.activeStep(self.steps[0]);
             }
         });
 
-        this.updateUrl = function(step, direction) {
+        this.updateUrl = function() {
             //Updates the url with the parameters needed for the next step
-            var urlparams;
-            if (direction === 'forward') {
-                urlparams = step.getForwardUrlParams();
-                urlparams.step = step._index + 2;
-            } else if (direction === 'backward') {
-                urlparams = step.getBackwardUrlParams();
-                urlparams.step = step._index;
-            }
+            var urlparams = JSON.parse(JSON.stringify(this.state)); //deep copy
+            urlparams.steps = JSON.stringify(this.state.steps);
             history.pushState(null, '', window.location.pathname + '?' + $.param(urlparams));
         };
 
         this.next = function(){
             var activeStep = self.activeStep();
-            self.updateUrl(activeStep, 'forward');
             if (activeStep && activeStep.complete() && activeStep._index < self.steps.length - 1) {
                 self.activeStep(self.steps[activeStep._index+1]);
             }
@@ -57,7 +67,6 @@ define([
 
         this.back = function(){
             var activeStep = self.activeStep();
-            self.updateUrl(activeStep, 'backward');
             if (activeStep && activeStep._index > 0) {
                 self.activeStep(self.steps[activeStep._index-1]);
             }
