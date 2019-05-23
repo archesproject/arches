@@ -13,7 +13,6 @@ define([
         this.value = params.value || undefined;
         this.disable = params.disable || function(){return false;};
         this.disableMessage = params.disableMessage || '';
-        this.showCard = ko.observable(false);
 
         WidgetViewModel.apply(this, [params]);
 
@@ -224,11 +223,10 @@ define([
                                 resourceid: ko.observable(),
                                 tileid: ko.observable()
                             };
-                            self.showCard(true);
                             self.newTileStep(params);
                             params.complete.subscribe(function() {
                                 self.value(params.resourceid());
-                                self.showCard(false);
+                                self.newTileStep(null);
                             });
                         }
                     }

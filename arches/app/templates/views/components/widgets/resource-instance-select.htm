@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block form %}
-<div class="row widget-wrapper" data-bind="visible: !showCard()">
+<div class="row widget-wrapper" data-bind="visible: !newTileStep()">
     <div class="form-group">
         <label class="control-label widget-input-label" data-bind="text:label">
         </label>
@@ -21,7 +21,7 @@
     </div>
 </div>
 <!-- ko if: newTileStep -->
-<div style="position: absolute; background: white;" data-bind="with: newTileStep, visible: showCard">
+<div class="create-resource-instance-card-component" data-bind="with: newTileStep">
   <!-- ko component: {
   name: 'new-tile-step',
   params: $data
