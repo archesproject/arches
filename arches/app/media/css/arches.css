@@ -13249,6 +13249,11 @@ a.jstree-anchor.permissions-widget {
     font-size: 18px;
 }
 
+.create-resource-instance-card-component {
+  position: absolute;
+  background: white;
+}
+
 @keyframes loader {
     0% {
         background: #ddd;
