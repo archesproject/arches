@@ -8,8 +8,20 @@ define([
         viewModel: function(params) {
             var self = this;
             var layers = [];
+            var geojsonSourceFactory = function() {
+                return {
+                    "type": "geojson",
+                    "data": {
+                        "type": "FeatureCollection",
+                        "features": []
+                    }
+                };
+            };
+
             this.basemaps = [];
             this.activeBasemap = ko.observable();
+            this.activeTab = ko.observable();
+
             arches.mapLayers.forEach(function(layer) {
                 if (!layer.isoverlay) self.basemaps.push(layer);
                 if (layer.addtomap) {
@@ -21,40 +33,16 @@ define([
             this.mapStyle = {
                 "version": 8,
                 "sources": $.extend(true, {
-                    "resource": {
-                        "type": "geojson",
-                        "data": {
-                            "type": "FeatureCollection",
-                            "features": []
-                        }
-                    },
-                    "search-results-hex": {
-                        "type": "geojson",
-                        "data": {
-                            "type": "FeatureCollection",
-                            "features": []
-                        }
-                    },
-                    "search-results-hashes": {
-                        "type": "geojson",
-                        "data": {
-                            "type": "FeatureCollection",
-                            "features": []
-                        }
-                    },
-                    "search-results-points": {
-                        "type": "geojson",
-                        "data": {
-                            "type": "FeatureCollection",
-                            "features": []
-                        }
-                    }
+                    "resource": geojsonSourceFactory(),
+                    "search-results-hex": geojsonSourceFactory(),
+                    "search-results-hashes": geojsonSourceFactory(),
+                    "search-results-points": geojsonSourceFactory()
                 }, arches.mapSources),
                 "sprite": arches.mapboxSprites,
                 "glyphs": arches.mapboxGlyphs,
                 "layers": layers
             };
-            this.activeTab = ko.observable();
+
             this.toggleTab = function(tabName) {
                 if (self.activeTab() === tabName) {
                     self.activeTab(null);
