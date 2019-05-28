@@ -502,6 +502,7 @@ input[type="checkbox"] {
 .workflow-step-body {
     background-color: #eee;
     height: 100%;
+    padding-bottom: 207px;
 }
 
 .workflow-nav-controls {
@@ -643,7 +644,7 @@ input[type="checkbox"] {
 .tab-subheader-sm p {
     color: #28496c;
     font-size: 14px;
-    font-weight: 600; 
+    font-weight: 600;
     margin-bottom: 0;
 }
 
@@ -898,7 +899,7 @@ ul.tabbed-report-tab-list {
 .tab-site-visit-container > p {
     color: #28496c;
     font-size: 14px;
-    font-weight: 600; 
+    font-weight: 600;
     margin-bottom: 0;
 }
 
@@ -929,7 +930,7 @@ ul.tabbed-report-tab-list {
 .tab-site-visit-details p {
     color: #28496c;
     font-size: 13px;
-    font-weight: 600; 
+    font-weight: 600;
     margin-bottom: 4px;
 }
 
@@ -999,7 +1000,7 @@ ul.tabbed-report-tab-list {
 
 .tab-site-visit-empty-details {
     padding-top: 16px;
-    width: 70%; 
+    width: 70%;
 }
 
 .tab-site-visit-empty-details p {
@@ -1015,7 +1016,7 @@ ul.tabbed-report-tab-list {
 .tab-communications-container > div > div p {
     color: #28496c;
     font-size: 14px;
-    font-weight: 600; 
+    font-weight: 600;
     margin-bottom: 0;
     /* redundant with other p styles? */
 }
@@ -13027,6 +13028,11 @@ ul.select2-choices:after {
     color: #999;
     margin-top: -8px;
     margin-bottom: 10px;
+}
+
+.card-component-wrapper-editor {
+    height: 100%;
+    padding-bottom: 50px;
 }
 
 .card-header {
