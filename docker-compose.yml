@@ -88,7 +88,7 @@ services:
 
     elasticsearch:
       container_name: elasticsearch
-      image: elasticsearch:5.2
+      image: docker.elastic.co/elasticsearch/elasticsearch:6.7.1
       volumes:
         - elasticsearch-data:/usr/share/elasticsearch/data
       ports:

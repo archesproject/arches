@@ -30,6 +30,7 @@ define([
     var scrollTo = ko.observable();
     var displayname = ko.observable(data.displayname);
     var resourceId = ko.observable(data.resourceid);
+    var appliedFunctions = ko.observable(data['appliedFunctions']);
     var selectedTile = ko.computed(function() {
         var item = selection();
         if (item && typeof item !== 'string') {
@@ -100,6 +101,7 @@ define([
             handlers: handlers,
             cards: data.cards,
             tiles: tiles,
+            appliedFunctions: appliedFunctions(),
             selection: selection,
             scrollTo: scrollTo,
             loading: loading,
@@ -145,6 +147,7 @@ define([
         reviewer: data.userisreviewer,
         graphiconclass: data.graphiconclass,
         relationship_types: data.relationship_types,
+        // appliedFunctions: appliedFunctions(),
         graph: {
             graphid: data.graphid,
             name: data.graphname,

@@ -30,13 +30,16 @@ from django.core import management
 # these tests can be run from the command line via
 # python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
 
+
 def setUpModule():
     pass
+
 
 def tearDownModule():
     se = SearchEngineFactory().create()
     se.delete_index(index='terms,concepts')
     se.delete_index(index='resources')
+    se.delete_index(index='resource_relations')
 
 
 class ArchesTestCase(TestCase):
