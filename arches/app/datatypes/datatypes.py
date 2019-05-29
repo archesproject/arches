@@ -1065,7 +1065,7 @@ class FileListDataType(BaseDataType):
                             print 'file does not exist'
 
         files = request.FILES.getlist('file-list_' + str(node.pk), [])
-        logger.info('saving' + ''.join(files))
+        logger.info('saving' + ' '.join([str(f) for f in files]))
         for file_data in files:
             file_model = models.File()
             file_model.path = file_data
