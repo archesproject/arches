@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import json
 import couchdb
 import urlparse
+import logging
 from datetime import datetime
 from datetime import timedelta
 from django.db import transaction
@@ -322,7 +323,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
             data['bounds'].upper()
             data['bounds'] = json.loads(data['bounds'])
         except AttributeError as e:
-            print('bounds is not a string')
+            pass
 
         if 'features' in data['bounds']:
             for feature in data['bounds']['features']:
