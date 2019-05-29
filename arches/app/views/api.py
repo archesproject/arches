@@ -139,7 +139,6 @@ class Surveys(APIBase):
         try:
             if hasattr(request.user, 'userprofile') is not True:
                 models.UserProfile.objects.create(user=request.user)
-
             def get_child_cardids(card, cardset):
                 for child_card in models.CardModel.objects.filter(nodegroup__parentnodegroup_id=card.nodegroup_id):
                     cardset.add(str(child_card.cardid))

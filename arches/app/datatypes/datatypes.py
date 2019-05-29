@@ -2,6 +2,7 @@ import uuid
 import json
 import decimal
 import importlib
+import logging
 import distutils
 import base64
 import re
@@ -34,6 +35,7 @@ from rdflib import Namespace, URIRef, Literal, Graph, BNode
 from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS
 archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
+logger = logging.getLogger(__name__)
 
 EARTHCIRCUM = 40075016.6856
 PIXELSPERTILE = 256
@@ -356,7 +358,7 @@ class EDTFDataType(BaseDataType):
 
     def validate(self, value, row_number=None, source=''):
         errors = []
-        if not ExtendedDateFormat(value).is_valid():
+        if not ExtendedDateFormat(value).is_valid() and value is not None:
             errors.append({'type': 'ERROR', 'message': '{0} {1} is not in the correct Extended Date Time Format, see http://www.loc.gov/standards/datetime/ for supported formats. This data was not imported.'.format(value, row_number)})
 
         return errors
@@ -1064,7 +1066,7 @@ class FileListDataType(BaseDataType):
                             print 'file does not exist'
 
         files = request.FILES.getlist('file-list_' + str(node.pk), [])
-
+        logger.info('saving' + ''.join(files))
         for file_data in files:
             file_model = models.File()
             file_model.path = file_data

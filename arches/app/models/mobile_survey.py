@@ -16,6 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import uuid
 import json
 import urlparse
+import logging
 from datetime import datetime
 from datetime import timedelta
 from copy import copy, deepcopy
@@ -37,6 +38,7 @@ from arches.app.utils.couch import Couch
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 import arches.app.views.search as search
 
+logger = logging.getLogger(__name__)
 
 
 class MobileSurvey(models.MobileSurveyModel):
@@ -231,8 +233,9 @@ class MobileSurvey(models.MobileSurveyModel):
             models.UserProfile.objects.create(user=user)
         if user.userprofile.is_reviewer():
             user_id = str(user.id)
-            if user_id in tile.provisionaledits:
-                tile.provisionaledits.pop(user_id, None)
+            if tile.provisionaledits:
+                if user_id in tile.provisionaledits:
+                    tile.provisionaledits.pop(user_id, None)
 
     def get_provisional_edit(self, doc, tile, sync_user_id, db):
         if doc['provisionaledits'] != '':
@@ -284,7 +287,6 @@ class MobileSurvey(models.MobileSurveyModel):
         if userid is not None:
             sync_user = User.objects.get(pk=userid)
             sync_user_id = str(sync_user.id)
-
         with transaction.atomic():
             couch_docs = self.couch.all_docs(db)
             for row in couch_docs:
@@ -302,9 +304,7 @@ class MobileSurvey(models.MobileSurveyModel):
                             else:
                                 self.save_revision_log(row.doc, synclog, 'update')
 
-                            print('Resource {0} Saved'.format(row.doc['resourceinstanceid']))
-                    else:
-                        print('{0}: already saved'.format(row.doc['_rev']))
+                            logger.info('Resource {0} saved by {1}'.format(row.doc['resourceinstanceid'], sync_user.username))
 
             for row in couch_docs:
                 if row.doc['type'] == 'tile' and \
@@ -335,11 +335,10 @@ class MobileSurvey(models.MobileSurveyModel):
                                 prov_edit = self.get_provisional_edit(row.doc, tile, sync_user_id, db)
                                 if prov_edit is not None:
                                     tile.data = prov_edit
-
                             self.handle_reviewer_edits(sync_user, tile)
                             tile.save(user=sync_user)
                             self.save_revision_log(row.doc, synclog, action)
-                            print('Tile {0} Saved'.format(row.doc['tileid']))
+                            logger.info('Tile {0} saved by {1}'.format(row.doc['tileid'], sync_user.username))
                             db.compact()
 
     def append_to_instances(self, request, instances, resource_type_id):
@@ -359,7 +358,7 @@ class MobileSurvey(models.MobileSurveyModel):
         resource_types = self.datadownloadconfig['resources']
         all_instances = {}
         if query in ('', None) and len(resource_types) == 0:
-            print "No resources or data query defined"
+            print("No resources or data query defined")
         else:
             request = HttpRequest()
             request.user = self.lasteditedby
