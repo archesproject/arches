@@ -5,6 +5,7 @@ define([
     'arches',
 ], function(ko, $, WidgetViewModel, arches) {
     var nameLookup = {};
+    require(['views/components/workflows/new-tile-step']);
     var ResourceInstanceSelectViewModel = function(params) {
         var self = this;
         params.configKeys = ['placeholder'];
@@ -16,8 +17,9 @@ define([
         WidgetViewModel.apply(this, [params]);
 
         var displayName = ko.observable('');
+        self.newTileStep = ko.observable();
 
-        this.valueList = ko.computed(function () {
+        this.valueList = ko.computed(function() {
             var valueList = self.value();
             displayName();
             if (!self.multiple && valueList) {
@@ -29,7 +31,7 @@ define([
             return [];
         });
 
-        this.valueObjects = ko.computed(function () {
+        this.valueObjects = ko.computed(function() {
             displayName();
             return self.valueList().map(function(value) {
                 return {
@@ -44,7 +46,7 @@ define([
 
         var updateName = function() {
             var names = [];
-            self.valueList().forEach(function (val) {
+            self.valueList().forEach(function(val) {
                 if (val) {
                     if (nameLookup[val]) {
                         names.push(nameLookup[val]);
@@ -76,6 +78,15 @@ define([
         });
         updateName();
 
+        var relatedResourceModels = ko.computed(function() {
+            var ids = params.node.config.graphid();
+            return arches.resources.filter(function(graph) {
+                return ids.indexOf(graph.graphid) >= 0;
+            }).map(function(g) {
+                return {name: g.name, _id: g.graphid, isGraph: true};
+            });
+        }, this);
+
         var url = ko.observable(arches.urls.search_results);
         this.url = url;
         this.select2Config = {
@@ -90,7 +101,7 @@ define([
                 url: function(){return url();},
                 dataType: 'json',
                 quietMillis: 250,
-                data: function (term, page) {
+                data: function(term, page) {
                     //TODO This regex isn't working, but it would nice fix it so that we can do more robust url checking
                     // var expression = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
                     // var regex = new RegExp(expression);
@@ -129,7 +140,13 @@ define([
                         return data;
                     }
                 },
-                results: function (data, page) {
+
+                results: function(data, page) {
+                    if (!data.paginator.has_next) {
+                        relatedResourceModels().forEach(function(val) {
+                            data.results.hits.hits.push(val);
+                        });
+                    }
                     return {
                         results: data.results.hits.hits,
                         more: data['paging-filter'].paginator.has_next
@@ -141,7 +158,11 @@ define([
             },
             formatResult: function(item) {
                 if (self.disable(item) === false) {
-                    return item._source.displayname;
+                    if (item._source) {
+                        return item._source.displayname;
+                    } else {
+                        return '<b> Create a new ' + item.name + ' . . . </b>';
+                    }
                 } else {
                     return '<span>' + item._source.displayname + ' ' + self.disableMessage + '</span>';
                 }
@@ -154,11 +175,15 @@ define([
                 }
             },
             formatSelection: function(item) {
-                return item._source.displayname;
+                if (item._source) {
+                    return item._source.displayname;
+                } else {
+                    return item.name;
+                }
             },
             initSelection: function(el, callback) {
                 var valueList = self.valueList();
-                var setSelectionData = function () {
+                var setSelectionData = function() {
                     var valueData = self.valueObjects().map(function(item) {
                         return {
                             _id: item.id,
@@ -174,14 +199,31 @@ define([
                 };
                 valueList.forEach(function(value) {
                     if (value) {
-                        if (nameLookup[value]) {
-                            setSelectionData();
-                        } else {
-                            $.ajax(arches.urls.resource_descriptors + value, {
-                                dataType: "json"
-                            }).done(function(data) {
-                                nameLookup[value] = data.displayname;
+                        var modelIds = relatedResourceModels().map(function(model) {
+                            return model._id;
+                        });
+                        if (!(modelIds.indexOf(value) > -1)) {
+                            if (nameLookup[value]) {
                                 setSelectionData();
+                            } else {
+                                $.ajax(arches.urls.resource_descriptors + value, {
+                                    dataType: "json"
+                                }).done(function(data) {
+                                    nameLookup[value] = data.displayname;
+                                    setSelectionData();
+                                });
+                            }
+                        } else {
+                            var params = {
+                                graphid: value,
+                                complete: ko.observable(false),
+                                resourceid: ko.observable(),
+                                tileid: ko.observable()
+                            };
+                            self.newTileStep(params);
+                            params.complete.subscribe(function() {
+                                self.value(params.resourceid());
+                                self.newTileStep(null);
                             });
                         }
                     }
