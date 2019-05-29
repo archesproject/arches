@@ -1522,12 +1522,12 @@ class ResourceInstanceDataType(BaseDataType):
     def validate(self, value, row_number=None, source=''):
         errors = []
         id_list = self.get_id_list(value)
-
-        for resourceid in id_list:
-            try:
-                models.ResourceInstance.objects.get(pk=resourceid)
-            except:
-                errors.append({'type': 'WARNING', 'message': 'The resource id: {0} does not exist in the system. The data for this card will be available in the system once resource {0} is loaded.'.format(resourceid)})
+        if id_list is not None:
+            for resourceid in id_list:
+                try:
+                    models.ResourceInstance.objects.get(pk=resourceid)
+                except Exception:
+                    errors.append({'type': 'WARNING', 'message': 'The resource id: {0} does not exist in the system. The data for this card will be available in the system once resource {0} is loaded.'.format(resourceid)})
         return errors
 
     def get_display_value(self, tile, node):
