@@ -3,7 +3,7 @@ psycopg2-binary==2.7.4
 elasticsearch>=6.0.0,<7.0.0
 rdflib==4.2.2
 unicodecsv==0.14.1
-django-guardian==1.4.9
+django-guardian==1.5.1
 TileStache==1.51.13
 python-memcached==1.59
 lxml==4.2.5
