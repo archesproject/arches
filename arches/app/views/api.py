@@ -33,6 +33,7 @@ from arches.app.utils.permission_backend import user_can_read_resources
 from arches.app.utils.permission_backend import user_can_edit_resources
 from arches.app.utils.permission_backend import user_can_read_concepts
 from arches.app.utils.decorators import group_required
+from arches.app.search.components.base import SearchFilterFactory
 from pyld.jsonld import compact, frame, from_rdf
 from rdflib import RDF
 from rdflib.namespace import SKOS, DCTERMS
@@ -589,7 +590,7 @@ class Card(APIBase):
                                     # if the tile has authoritaive data and the current user is not the owner,
                                     # we don't send the provisional data of other users back to the client.
                                     tile.provisionaledits = None
-                if append_tile == True:
+                if append_tile is True:
                     provisionaltiles.append(tile)
             tiles = provisionaltiles
 
@@ -615,3 +616,13 @@ class Card(APIBase):
         }
 
         return JSONResponse(context, indent=4)
+
+
+class SearchComponentData(APIBase):
+
+    def get(self, request, componentname):
+        search_filter_factory = SearchFilterFactory(request)
+        search_filter = search_filter_factory.get_filter(componentname)
+        if search_filter:
+            return JSONResponse(search_filter.view_data())
+        return JSONResponse(status=404)

@@ -485,6 +485,8 @@ BUSINESS_DATA_FILES = (
 
 DATATYPE_LOCATIONS = ['arches.app.datatypes',]
 FUNCTION_LOCATIONS = ['arches.app.functions',]
+SEARCH_COMPONENT_LOCATIONS = ['arches.app.search.components',]
+
 # If you are manually managing your resource tile cache, you may want to "seed"
 # the cache (or prerender some tiles) for low zoom levels.  You can do this by
 # running:

@@ -376,12 +376,12 @@ class MobileSurvey(models.MobileSurveyModel):
                 try:
                     for res_type in resource_types:
                         instances = {}
-                        request.GET['typeFilter'] = json.dumps([{'graphid': res_type, 'inverted': False}])
-                        request.GET['mapFilter'] = map_filter
+                        request.GET['resource-type-filter'] = json.dumps([{'graphid': res_type, 'inverted': False}])
+                        request.GET['map-filter'] = map_filter
                         request.GET['resourcecount'] = self.datadownloadconfig['count']
                         self.append_to_instances(request, instances, res_type)
                         if len(instances.keys()) < int(self.datadownloadconfig['count']):
-                            request.GET['mapFilter'] = '{}'
+                            request.GET['map-filter'] = '{}'
                             request.GET['resourcecount'] = int(
                                 self.datadownloadconfig['count']) - len(instances.keys())
                             self.append_to_instances(request, instances, res_type)

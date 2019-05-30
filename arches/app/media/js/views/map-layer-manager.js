@@ -376,8 +376,7 @@ define([
         dataType: "json",
         url: arches.urls.search_results,
         data: {
-            no_filters: true,
-            page: 1
+            'paging-filter': 1
         },
         success: function (results) {
             results.results.aggregations.geo_aggs = results.results.aggregations.geo_aggs.inner.buckets[0]
