@@ -1,5 +1,7 @@
+<div data-bind="click: function(){console.log(this)}">Add Reference Number<span><i class="fa fa-plus"></i></span></div>
 <!-- ko if: tile() && card() -->
-<div>We got to the Core Arches workflow step</div>
+<div data-bind="click: function(){console.log(this.card())}" >Click to console card</div>
+<div data-bind="click: function(){console.log(this.tile())}" >Click to console tile</div>
 <div data-bind="component: {
     name: cardComponentLookup[card().model.component_id()].componentname,
     params: {
@@ -11,4 +13,12 @@
         form: $data
     }
 }"></div>
+    <div data-bind="click: function(){console.log(tiles())}" >CLICK FOR DATA</div>
+    <!-- ko foreach: {data: tiles, as: 'tile'} -->
+        <div></div>
+        <h4>Agency:</h4>
+        <div data-bind="text: tile.data['2c8dff14-567b-11e9-b920-dca90488358a']"></div>
+        <h5>Identifier:</h5>
+        <div data-bind="text: tile.data['67677266-567b-11e9-a2bb-dca90488358a']" ></div>
+    <!-- /ko -->
 <!-- /ko -->

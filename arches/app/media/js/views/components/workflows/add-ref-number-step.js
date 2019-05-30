@@ -14,6 +14,7 @@ define([
 
         this.card = ko.observable();
         this.tile = ko.observable();
+        this.tiles = ko.observableArray([]);
         this.loading = params.loading || ko.observable(false);
         this.alert = params.alert || ko.observable(null);
         this.resourceId = params.resourceid;
@@ -140,6 +141,8 @@ define([
                     )
                 );
             }, function(tile) {
+                self.tiles.push(tile);
+                console.log(params);
                 params.resourceid(tile.resourceinstance_id);
                 params.tileid(tile.tileid);
                 self.resourceId(tile.resourceinstance_id);
