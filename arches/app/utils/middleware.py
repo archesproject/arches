@@ -24,6 +24,15 @@ class SetAnonymousUser(MiddlewareMixin):
             except:
                 pass
 
+class ModifyAuthorizationHeader(MiddlewareMixin):
+    def process_request(self, request):
+        # for OAuth authentication to work, we must use the standard
+        # HTTP_AUTHORIZATION header. So, if the request has the alternate
+        # HTTP_X_AUTHORIZATION header, update the request to use the standard
+        if request.META.get('HTTP_X_AUTHORIZATION', None) is not None:
+            request.META['HTTP_AUTHORIZATION'] = request.META.get('HTTP_X_AUTHORIZATION')
+            del request.META['HTTP_X_AUTHORIZATION']
+
 
 class JWTAuthenticationMiddleware(MiddlewareMixin):
     """
