@@ -517,13 +517,14 @@ class v3Importer:
     with the rm_configs content itself). An optional truncate argument can be
     used to limit the number of resources that are loaded from the v3 json. """
 
-    def __init__(self, v3_data_dir, v4_graph_name, v3_json_file, truncate=None, exclude=[], only=[]):
+    def __init__(self, v3_data_dir, v4_graph_name, v3_resource_file=None,
+                 truncate=None, exclude=[], only=[]):
 
-        if not os.path.isfile(v3_json_file):
+        if v3_resource_file is not None and not os.path.isfile(v3_resource_file):
             raise Exception("v3 business data file {} does not exist".format(
-                v3_json_file))
+                v3_resource_file))
 
-        self.source_file = v3_json_file
+        self.source_file = v3_resource_file
 
         self.v4_graph = Graph.objects.get(name=v4_graph_name)
         self.v4_graph_name = v4_graph_name
@@ -540,8 +541,16 @@ class v3Importer:
         # create better node_lookup that holds more information
         self.node_lookup = self.augment_node_lookup()
 
+        # these properties have to do with how many/which resources to convert
+        self.truncate = truncate
+        self.exclude = exclude
+        self.only = only
+
         # finally, do the actual loading of the v3 data into this class
-        self.v3_resources = self.load_v3_data(truncate=truncate, exclude=exclude, only=only)
+        if v3_resource_file.endswith(".jsonl"):
+            self.v3_resources = []
+        else:
+            self.v3_resources = self.load_v3_data(truncate=truncate, exclude=exclude, only=only)
 
     def augment_node_lookup(self):
         """takes the node lookup csv and converts to a dictionary
@@ -593,6 +602,13 @@ class v3Importer:
 
         return self.v3_resources
 
+    def process_one_resource(self, v3_json, verbose=False):
+        """ changes a single v3 json resource into a v4 json resource """
+
+        v3_resource = v3PreparedResource(v3_json['entityid'], self.v4_graph.graphid, v3_json)
+        v3_resource.process(self.v4_nodes, self.node_lookup, verbose=verbose)
+        return v3_resource.get_json()
+
     def convert_v3_data(self, verbose=False):
         """ creates v4 resources from all the loaded v3 resources in
         self.v3_resources. returns these resources. """
@@ -600,10 +616,7 @@ class v3Importer:
         resources = []
         for res in self.v3_resources:
 
-            v3_resource = v3PreparedResource(res['entityid'], self.v4_graph.graphid, res)
-            v3_resource.process(self.v4_nodes, self.node_lookup, verbose=verbose)
-            v4_json = v3_resource.get_json()
-
+            v4_json = self.process_one_resource(res, verbose=verbose)
             resources.append(v4_json)
 
         return resources
@@ -620,6 +633,49 @@ class v3Importer:
         out_json = self.get_v4_json(verbose=verbose)
         with open(dest_path, 'wb') as openfile:
             openfile.write(JSONSerializer().serialize(out_json, indent=4))
+
+        return dest_path
+
+    def write_v4_jsonl(self, dest_path, verbose=False):
+
+        ct = 0
+        with open(self.source_file, "rb") as openv3:
+
+            lines = openv3.readlines()
+            with open(dest_path, "wb") as openv4:
+                for line in lines:
+                    v3_json = json.loads(line)
+
+                    # set of checks that basically mimicks what happens
+                    # in the load_v3_data method that is used for JSON.
+                    if v3_json["entitytypeid"] != self.v3_graph_name:
+                        continue
+                    if len(v3_json['child_entities']) == 0:
+                        continue
+                    resid = v3_json['entityid']
+                    if len(self.only) > 0 and resid not in self.only:
+                        continue
+                    if resid in self.exclude:
+                        continue
+
+                    v4_json = self.process_one_resource(v3_json, verbose=verbose)
+                    v4_line = JSONSerializer().serialize(v4_json)
+
+                    openv4.write(v4_line+"\n")
+                    ct += 1
+
+                    # simple progress printing
+                    if ct % 1000 == 0:
+                        print(ct)
+                    elif ct % 100 == 0:
+                        print("."),
+                    if ct == self.truncate:
+                        break
+
+        print(ct)
+        if ct == 0:
+            os.remove(dest_path)
+            return False
 
         return dest_path
 
