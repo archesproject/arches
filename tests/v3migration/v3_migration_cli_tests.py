@@ -225,13 +225,13 @@ class v3MigrationTests(ArchesTestCase):
         temp_file = os.path.join(self.pkg, 'business_data', 'single_resource.json')
         management.call_command('v3', 'write-v4-json',
                                 target=self.pkg,
-                                truncate=10,
+                                number=10,
                                 resource_models=all_models
                                 )
 
         # basic test to make sure the v4 file has been created. No tests on
         # the actual data load operations are performed up to this point.
-        v4_bd = os.path.join(self.pkg, 'business_data', 'Historic Resource.json')
+        v4_bd = os.path.join(self.pkg, 'business_data', 'v3sample-Historic Resource.json')
         self.assertTrue(os.path.isfile(v4_bd))
 
         # return early if the migration data should not actually be loaded

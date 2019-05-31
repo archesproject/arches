@@ -1,0 +1,2625 @@
+{
+    "business_data": {
+        "resources": [
+            {
+                "resourceinstance": {
+                    "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6", 
+                    "legacyid": "cdcc206d-f80d-4cc3-8685-40e8949158f8", 
+                    "resourceinstanceid": "cdcc206d-f80d-4cc3-8685-40e8949158f8"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "48315a71-943d-11e8-90d3-94659cf754d0": "e105b697-df95-459b-a9f1-86fd4c44118e"
+                        }, 
+                        "nodegroup_id": "48315a71-943d-11e8-90d3-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "cdcc206d-f80d-4cc3-8685-40e8949158f8", 
+                        "sortorder": 0, 
+                        "tileid": "6c1fee30-83d7-11e9-96e0-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "13e63511-943d-11e8-984c-94659cf754d0": "6e67fa52-0189-4093-b908-c74fb0da3eeb", 
+                            "13e63512-943d-11e8-ab12-94659cf754d0": "\n\n\n\n\n<style type=\"text/css\">\np.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Calibri; color: #000000}\np.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Calibri; color: #000000; min-height: 14.0px}\n</style>\n\n\n<p class=\"p1\">\"The North Block of St. Joseph\u2019s College was built in 1920, with construction of the West Block following in 1925. They are the only pre-war constructions within the school premises.</p>\n<p class=\"p2\"><br></p>\n<p class=\"p1\">In 1875, six La Salle Brothers took over St. Saviour\u2019s College (founded in 1864) and renamed it St. Joseph\u2019s College. The College became a grant-in-aid school in 1880. Due to the increase in students, the College moved to Caine Road in 1876 and then to Glenealy below Robinson Road in 1881. The 1918 earthquake caused severe damage to the school premises, and the College moved to its present site at 7 Kennedy Road, which had previously been home to the German Club (the Club Germania). The North Block was opened in 1920 to house classrooms. Comprising a chapel, a hall and laboratories, the West Block was opened in 1925. During the Japanese Occupation (1941-1945), the College was used by the Japanese as a hospital store.</p>\n<p class=\"p2\"><br></p>\n<p class=\"p1\">The North Block is a four-storey building flanked by two towers at both ends and has verandahs on one side. The exterior facade facing Cotton Tree Drive is decorated with two-storey giant Ionic order columns. The elevation facing the internal open space of a multi-purpose ball court is surrounded by an open corridor comprising nine arched bays with a Serliana-styled pediment in the centre. The West Block is also a four-storey structure enclosed by solid walls and punched windows and surmounted by a turret.\"</p><p class=\"p1\"><br></p><p class=\"p1\">[Source:&nbsp;http://www.amo.gov.hk/en/monuments_70.php]</p>"
+                        }, 
+                        "nodegroup_id": "13e60e01-943d-11e8-b76c-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "cdcc206d-f80d-4cc3-8685-40e8949158f8", 
+                        "sortorder": 0, 
+                        "tileid": "6c1fee32-83d7-11e9-ac42-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c32-943d-11e8-b3fb-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "cdcc206d-f80d-4cc3-8685-40e8949158f8", 
+                        "sortorder": 0, 
+                        "tileid": "abcd3052-bd74-493e-bdbd-d2e02566914a"
+                    }, 
+                    {
+                        "data": {
+                            "2672e522-943d-11e8-8df1-94659cf754d0": "7 Kennedy Road, Central, Hong Kong Island", 
+                            "26733347-943d-11e8-9aaa-94659cf754d0": "ed665b7f-9f64-45c6-a14f-9329fa7caa87"
+                        }, 
+                        "nodegroup_id": "2672e522-943d-11e8-8df1-94659cf754d0", 
+                        "parenttile_id": "abcd3052-bd74-493e-bdbd-d2e02566914a", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "cdcc206d-f80d-4cc3-8685-40e8949158f8", 
+                        "sortorder": 0, 
+                        "tileid": "6c1fee35-83d7-11e9-a985-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c35-943d-11e8-86b9-94659cf754d0", 
+                        "parenttile_id": "abcd3052-bd74-493e-bdbd-d2e02566914a", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "cdcc206d-f80d-4cc3-8685-40e8949158f8", 
+                        "sortorder": 0, 
+                        "tileid": "6c1fee36-83d7-11e9-a8db-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c38-943d-11e8-8c8a-94659cf754d0", 
+                        "parenttile_id": "abcd3052-bd74-493e-bdbd-d2e02566914a", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "cdcc206d-f80d-4cc3-8685-40e8949158f8", 
+                        "sortorder": 0, 
+                        "tileid": "6c1fee37-83d7-11e9-ae8a-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c3b-943d-11e8-8b15-94659cf754d0", 
+                        "parenttile_id": "abcd3052-bd74-493e-bdbd-d2e02566914a", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "cdcc206d-f80d-4cc3-8685-40e8949158f8", 
+                        "sortorder": 0, 
+                        "tileid": "6c1fee38-83d7-11e9-b154-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "26733340-943d-11e8-9720-94659cf754d0": {
+                                "features": [
+                                    {
+                                        "geometry": {
+                                            "coordinates": [
+                                                114.158658013045, 
+                                                22.2768121762546
+                                            ], 
+                                            "type": "Point"
+                                        }, 
+                                        "id": "ef583651-ec56-4cf9-950d-5cf177643d2a", 
+                                        "properties": {}, 
+                                        "type": "Feature"
+                                    }
+                                ], 
+                                "type": "FeatureCollection"
+                            }
+                        }, 
+                        "nodegroup_id": "26733340-943d-11e8-9720-94659cf754d0", 
+                        "parenttile_id": "abcd3052-bd74-493e-bdbd-d2e02566914a", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "cdcc206d-f80d-4cc3-8685-40e8949158f8", 
+                        "sortorder": 0, 
+                        "tileid": "6c1fee39-83d7-11e9-8819-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26733343-943d-11e8-9704-94659cf754d0", 
+                        "parenttile_id": "abcd3052-bd74-493e-bdbd-d2e02566914a", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "cdcc206d-f80d-4cc3-8685-40e8949158f8", 
+                        "sortorder": 0, 
+                        "tileid": "6c1fee3a-83d7-11e9-90b5-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "3c5799cf-943d-11e8-a34b-94659cf754d0": "1385bddf-30e8-40b0-b175-cfaf6d906488", 
+                            "3c5799d2-943d-11e8-874e-94659cf754d0": "1920-01-01"
+                        }, 
+                        "nodegroup_id": "3c5772c1-943d-11e8-9753-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "cdcc206d-f80d-4cc3-8685-40e8949158f8", 
+                        "sortorder": 0, 
+                        "tileid": "6c225f31-83d7-11e9-8e57-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "3c5799cf-943d-11e8-a34b-94659cf754d0": "1385bddf-30e8-40b0-b175-cfaf6d906488", 
+                            "3c5799d2-943d-11e8-874e-94659cf754d0": "1925-01-01"
+                        }, 
+                        "nodegroup_id": "3c5772c1-943d-11e8-9753-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "cdcc206d-f80d-4cc3-8685-40e8949158f8", 
+                        "sortorder": 0, 
+                        "tileid": "6c225f33-83d7-11e9-8e9e-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "54188893-943d-11e8-9011-94659cf754d0": 4, 
+                            "54188894-943d-11e8-bb0e-94659cf754d0": "5ecb13bf-7973-4cb6-8284-058c1e51cb7d", 
+                            "5418af9f-943d-11e8-8c73-94659cf754d0": "c336e4bf-7397-48b9-9540-e7f067de7b94"
+                        }, 
+                        "nodegroup_id": "54188890-943d-11e8-897e-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "cdcc206d-f80d-4cc3-8685-40e8949158f8", 
+                        "sortorder": 0, 
+                        "tileid": "6c225f35-83d7-11e9-aecc-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "440786e6-943d-11e8-b6dc-94659cf754d0": "4f6e4793-420d-4fca-85eb-1a8fa8dde8ed"
+                        }, 
+                        "nodegroup_id": "440786e2-943d-11e8-8bbe-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "cdcc206d-f80d-4cc3-8685-40e8949158f8", 
+                        "sortorder": 0, 
+                        "tileid": "6c24a921-83d7-11e9-9c07-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "086df56e-943d-11e8-b150-94659cf754d0": "1945-01-01"
+                        }, 
+                        "nodegroup_id": "086dce53-943d-11e8-807a-94659cf754d0", 
+                        "parenttile_id": "0d72d4de-ff4f-40ef-8829-99e6606cea55", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "cdcc206d-f80d-4cc3-8685-40e8949158f8", 
+                        "sortorder": 0, 
+                        "tileid": "ecf258a4-0535-4dca-bc5a-590cc03c6b64"
+                    }, 
+                    {
+                        "data": {
+                            "086df56a-943d-11e8-bb62-94659cf754d0": [
+                                "56bbc38b-9b0c-45be-9f71-5705cd35c2c5"
+                            ], 
+                            "086df56b-943d-11e8-9f46-94659cf754d0": "8b616e08-490d-4190-bfe4-eeda675aff18"
+                        }, 
+                        "nodegroup_id": "086df55e-943d-11e8-a6bc-94659cf754d0", 
+                        "parenttile_id": "0d72d4de-ff4f-40ef-8829-99e6606cea55", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "cdcc206d-f80d-4cc3-8685-40e8949158f8", 
+                        "sortorder": 0, 
+                        "tileid": "407903cd-2958-4207-9e90-eeb73a95c12b"
+                    }, 
+                    {
+                        "data": {
+                            "086df56e-943d-11e8-b150-94659cf754d0": "1941-01-01", 
+                            "086e1c71-943d-11e8-9185-94659cf754d0": "1945-01-01"
+                        }, 
+                        "nodegroup_id": "086dce53-943d-11e8-807a-94659cf754d0", 
+                        "parenttile_id": "0d72d4de-ff4f-40ef-8829-99e6606cea55", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "cdcc206d-f80d-4cc3-8685-40e8949158f8", 
+                        "sortorder": 0, 
+                        "tileid": "ef412856-2c19-4536-8600-1550aa1863bf"
+                    }, 
+                    {
+                        "data": {
+                            "086df56a-943d-11e8-bb62-94659cf754d0": [
+                                "d34ce0f8-bc0f-46a3-8da7-6cbbe9c366e3"
+                            ], 
+                            "086df56b-943d-11e8-9f46-94659cf754d0": "48fc9f62-ce99-42bc-b655-ae52d8524fa7"
+                        }, 
+                        "nodegroup_id": "086df55e-943d-11e8-a6bc-94659cf754d0", 
+                        "parenttile_id": "0d72d4de-ff4f-40ef-8829-99e6606cea55", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "cdcc206d-f80d-4cc3-8685-40e8949158f8", 
+                        "sortorder": 0, 
+                        "tileid": "bdb39d1b-74f9-4fd0-9307-a6626e82d565"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "086dce56-943d-11e8-ab5e-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "cdcc206d-f80d-4cc3-8685-40e8949158f8", 
+                        "sortorder": 0, 
+                        "tileid": "0d72d4de-ff4f-40ef-8829-99e6606cea55"
+                    }, 
+                    {
+                        "data": {
+                            "086df566-943d-11e8-ba38-94659cf754d0": "c22dd393-f572-43b2-a476-bc33d40637b0"
+                        }, 
+                        "nodegroup_id": "086dce50-943d-11e8-93c6-94659cf754d0", 
+                        "parenttile_id": "0d72d4de-ff4f-40ef-8829-99e6606cea55", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "cdcc206d-f80d-4cc3-8685-40e8949158f8", 
+                        "sortorder": 0, 
+                        "tileid": "6c24a924-83d7-11e9-ac5f-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "086df56e-943d-11e8-b150-94659cf754d0": "1875-01-01", 
+                            "086df570-943d-11e8-8ebb-94659cf754d0": [
+                                "0a148bf3-e222-4b60-a1bf-f181a0a733c3"
+                            ], 
+                            "086e1c71-943d-11e8-9185-94659cf754d0": "1941-01-01"
+                        }, 
+                        "nodegroup_id": "086dce53-943d-11e8-807a-94659cf754d0", 
+                        "parenttile_id": "0d72d4de-ff4f-40ef-8829-99e6606cea55", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "cdcc206d-f80d-4cc3-8685-40e8949158f8", 
+                        "sortorder": 0, 
+                        "tileid": "6c24a925-83d7-11e9-b991-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "086df56a-943d-11e8-bb62-94659cf754d0": [
+                                "d34ce0f8-bc0f-46a3-8da7-6cbbe9c366e3"
+                            ], 
+                            "086df56b-943d-11e8-9f46-94659cf754d0": "8b616e08-490d-4190-bfe4-eeda675aff18"
+                        }, 
+                        "nodegroup_id": "086df55e-943d-11e8-a6bc-94659cf754d0", 
+                        "parenttile_id": "0d72d4de-ff4f-40ef-8829-99e6606cea55", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "cdcc206d-f80d-4cc3-8685-40e8949158f8", 
+                        "sortorder": 0, 
+                        "tileid": "6c24a926-83d7-11e9-83d8-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "185b6981-943d-11e8-8310-94659cf754d0": "St. Joseph's College (North and West Blocks) \u8056\u7d04\u745f\u66f8\u9662\u5317\u5ea7\u53ca\u897f\u5ea7", 
+                            "185b9091-943d-11e8-8c9e-94659cf754d0": "a4c88313-52c5-4b6a-9579-3fc5aad17335"
+                        }, 
+                        "nodegroup_id": "185b6981-943d-11e8-8310-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "cdcc206d-f80d-4cc3-8685-40e8949158f8", 
+                        "sortorder": 0, 
+                        "tileid": "6c1da441-83d7-11e9-a7e0-94659cf754d0"
+                    }
+                ]
+            }, 
+            {
+                "resourceinstance": {
+                    "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6", 
+                    "legacyid": "49f391ee-6ce4-47d8-abf2-83732424ccf8", 
+                    "resourceinstanceid": "49f391ee-6ce4-47d8-abf2-83732424ccf8"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "48315a71-943d-11e8-90d3-94659cf754d0": "65153fb9-8cff-4c60-b53b-b5e7423b46a3"
+                        }, 
+                        "nodegroup_id": "48315a71-943d-11e8-90d3-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "49f391ee-6ce4-47d8-abf2-83732424ccf8", 
+                        "sortorder": 0, 
+                        "tileid": "6c2ce683-83d7-11e9-b06d-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "48315a71-943d-11e8-90d3-94659cf754d0": "e105b697-df95-459b-a9f1-86fd4c44118e"
+                        }, 
+                        "nodegroup_id": "48315a71-943d-11e8-90d3-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "49f391ee-6ce4-47d8-abf2-83732424ccf8", 
+                        "sortorder": 0, 
+                        "tileid": "6c2ce685-83d7-11e9-9c12-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "13e63511-943d-11e8-984c-94659cf754d0": "6e67fa52-0189-4093-b908-c74fb0da3eeb", 
+                            "13e63512-943d-11e8-ab12-94659cf754d0": "\n\n\n\n\n<style type=\"text/css\">\np.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Calibri; color: #000000}\np.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Calibri; color: #000000; min-height: 14.0px}\n</style>\n\n\n<p class=\"p1\">\"The Man Mo Temple Compound on Hollywood Road in Sheung Wan comprising three blocks \u2013 Man Mo Temple, Lit Shing Kung and Kung Sor \u2013 was built between 1847 and 1862 by wealthy Chinese merchants, primarily for the worship of Man Cheong (God of Literature) and Mo Tai (God of Martial Arts). Lit Shing Kung was built for the worship of all the Chinese gods, while Kung Sor served as a meeting place and a venue for dealing with matters related to the Chinese community in the neighbourhood. The three blocks are separated by two alleys.</p>\n<p class=\"p2\"><br></p>\n<p class=\"p1\">Man Mo Temple was officially entrusted to Tung Wah Hospital with the enactment of the Man Mo Temple Ordinance in 1908. Even today, the Board of Directors of the Tung Wah Group of Hospitals and community celebrities still congregate at the temple every year for the Autumn Sacrificial Rites to pay homage to Man Cheong and Mo Tai and to pray for prosperity for Hong Kong. The temple is of paramount historical and social value to the territory, as it represents the traditional social organisation and religious practices of the Chinese community in old Hong Kong.</p>\n<p class=\"p2\"><br></p>\n<p class=\"p1\">Man Mo Temple is a two-hall-three-bay structure fronted by two granite drum platforms. A pair of screen doors is placed in the front hall. In accordance with the traditional Chinese architectural layout, the rear hall housing the altars of the deities is a few steps higher than the front hall. The two halls are separated by a courtyard covered by a double-eaved hip-and-gable roof supported by four granite columns at the corner of the courtyard and flanked by two side chambers with humpbacked roofs. Lit Shing Kung, attached to Man Mo Temple on the left, originally comprised three halls and two courtyards, which were later covered by steel roofs. Kung Sor is now a simple one-hall structure; the historical granite doorframe on which the year of construction can be found is still well preserved .</p>\n<p class=\"p2\"><br></p>\n<p class=\"p1\">The magnificent Man Mo Temple Compound is a fine example of traditional Chinese vernacular architecture and is exquisitely decorated with ceramic figurines, granite and wood carvings, plaster mouldings and murals, all of which exhibit superb traditional craftsmanship.\"</p><p class=\"p1\"><br></p><p class=\"p1\">[Source:&nbsp;http://www.amo.gov.hk/en/monuments_96.php]</p>"
+                        }, 
+                        "nodegroup_id": "13e60e01-943d-11e8-b76c-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "49f391ee-6ce4-47d8-abf2-83732424ccf8", 
+                        "sortorder": 0, 
+                        "tileid": "6c2f3070-83d7-11e9-bf57-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "440786e6-943d-11e8-b6dc-94659cf754d0": "c7c418a5-bb33-4bb4-8988-20d6c0d8d5f4", 
+                            "440786e7-943d-11e8-a7e4-94659cf754d0": [
+                                "cc6ceea0-cc47-4b16-8f8d-c67aaac692d3"
+                            ]
+                        }, 
+                        "nodegroup_id": "440786e2-943d-11e8-8bbe-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "49f391ee-6ce4-47d8-abf2-83732424ccf8", 
+                        "sortorder": 0, 
+                        "tileid": "6c2f3072-83d7-11e9-bfe8-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "086dce56-943d-11e8-ab5e-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "49f391ee-6ce4-47d8-abf2-83732424ccf8", 
+                        "sortorder": 0, 
+                        "tileid": "c96bd5e9-bc85-4459-ba9d-ffe610da8c1b"
+                    }, 
+                    {
+                        "data": {
+                            "086df566-943d-11e8-ba38-94659cf754d0": "76028a21-94e9-49ac-a5db-e928e8ab5a9c"
+                        }, 
+                        "nodegroup_id": "086dce50-943d-11e8-93c6-94659cf754d0", 
+                        "parenttile_id": "c96bd5e9-bc85-4459-ba9d-ffe610da8c1b", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "49f391ee-6ce4-47d8-abf2-83732424ccf8", 
+                        "sortorder": 0, 
+                        "tileid": "6c2f3075-83d7-11e9-a935-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "086df56e-943d-11e8-b150-94659cf754d0": "1847-01-01"
+                        }, 
+                        "nodegroup_id": "086dce53-943d-11e8-807a-94659cf754d0", 
+                        "parenttile_id": "c96bd5e9-bc85-4459-ba9d-ffe610da8c1b", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "49f391ee-6ce4-47d8-abf2-83732424ccf8", 
+                        "sortorder": 0, 
+                        "tileid": "6c2f3076-83d7-11e9-9d31-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "086df56a-943d-11e8-bb62-94659cf754d0": [
+                                "56bbc38b-9b0c-45be-9f71-5705cd35c2c5"
+                            ], 
+                            "086df56b-943d-11e8-9f46-94659cf754d0": "7847a926-3b66-489c-9449-21a17a879cda"
+                        }, 
+                        "nodegroup_id": "086df55e-943d-11e8-a6bc-94659cf754d0", 
+                        "parenttile_id": "c96bd5e9-bc85-4459-ba9d-ffe610da8c1b", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "49f391ee-6ce4-47d8-abf2-83732424ccf8", 
+                        "sortorder": 0, 
+                        "tileid": "6c2f3077-83d7-11e9-b20f-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c32-943d-11e8-b3fb-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "49f391ee-6ce4-47d8-abf2-83732424ccf8", 
+                        "sortorder": 0, 
+                        "tileid": "2a37d9ae-24f0-4051-8d7a-9ea416479782"
+                    }, 
+                    {
+                        "data": {
+                            "2672e522-943d-11e8-8df1-94659cf754d0": "124-126, 128 & 130 Hollywood Road, Sheung Wan, Hong Kong Islang", 
+                            "26733347-943d-11e8-9aaa-94659cf754d0": "ed665b7f-9f64-45c6-a14f-9329fa7caa87"
+                        }, 
+                        "nodegroup_id": "2672e522-943d-11e8-8df1-94659cf754d0", 
+                        "parenttile_id": "2a37d9ae-24f0-4051-8d7a-9ea416479782", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "49f391ee-6ce4-47d8-abf2-83732424ccf8", 
+                        "sortorder": 0, 
+                        "tileid": "6c31a170-83d7-11e9-9bae-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c35-943d-11e8-86b9-94659cf754d0", 
+                        "parenttile_id": "2a37d9ae-24f0-4051-8d7a-9ea416479782", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "49f391ee-6ce4-47d8-abf2-83732424ccf8", 
+                        "sortorder": 0, 
+                        "tileid": "6c31a171-83d7-11e9-8ee3-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c38-943d-11e8-8c8a-94659cf754d0", 
+                        "parenttile_id": "2a37d9ae-24f0-4051-8d7a-9ea416479782", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "49f391ee-6ce4-47d8-abf2-83732424ccf8", 
+                        "sortorder": 0, 
+                        "tileid": "6c31a172-83d7-11e9-92de-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "26733348-943d-11e8-a0f9-94659cf754d0": "60149eed-9148-439c-bc8e-63bacea24ea7", 
+                            "2673334a-943d-11e8-ad3a-94659cf754d0": "Sheung Wan"
+                        }, 
+                        "nodegroup_id": "26730c3b-943d-11e8-8b15-94659cf754d0", 
+                        "parenttile_id": "2a37d9ae-24f0-4051-8d7a-9ea416479782", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "49f391ee-6ce4-47d8-abf2-83732424ccf8", 
+                        "sortorder": 0, 
+                        "tileid": "6c31a173-83d7-11e9-8320-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "26733340-943d-11e8-9720-94659cf754d0": {
+                                "features": [
+                                    {
+                                        "geometry": {
+                                            "coordinates": [
+                                                [
+                                                    [
+                                                        114.15013797611, 
+                                                        22.2840110828472
+                                                    ], 
+                                                    [
+                                                        114.150302931964, 
+                                                        22.2838907111415
+                                                    ], 
+                                                    [
+                                                        114.150347188413, 
+                                                        22.2839453127528
+                                                    ], 
+                                                    [
+                                                        114.150316343009, 
+                                                        22.2839713726052
+                                                    ], 
+                                                    [
+                                                        114.150253311097, 
+                                                        22.2839986733978
+                                                    ], 
+                                                    [
+                                                        114.150174185931, 
+                                                        22.2840582387449
+                                                    ], 
+                                                    [
+                                                        114.15013797611, 
+                                                        22.2840110828472
+                                                    ]
+                                                ]
+                                            ], 
+                                            "type": "Polygon"
+                                        }, 
+                                        "id": "74500a0a-713d-4809-b580-ac0363a32306", 
+                                        "properties": {}, 
+                                        "type": "Feature"
+                                    }
+                                ], 
+                                "type": "FeatureCollection"
+                            }
+                        }, 
+                        "nodegroup_id": "26733340-943d-11e8-9720-94659cf754d0", 
+                        "parenttile_id": "2a37d9ae-24f0-4051-8d7a-9ea416479782", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "49f391ee-6ce4-47d8-abf2-83732424ccf8", 
+                        "sortorder": 0, 
+                        "tileid": "6c31a174-83d7-11e9-a47a-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26733343-943d-11e8-9704-94659cf754d0", 
+                        "parenttile_id": "2a37d9ae-24f0-4051-8d7a-9ea416479782", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "49f391ee-6ce4-47d8-abf2-83732424ccf8", 
+                        "sortorder": 0, 
+                        "tileid": "6c31a175-83d7-11e9-bc2d-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "1f818d22-943d-11e8-9a3c-94659cf754d0": "00835727-9cfe-448c-ba9d-8c0361a1783a", 
+                            "1f818d24-943d-11e8-b16e-94659cf754d0": "2017-04-28", 
+                            "1f818d25-943d-11e8-bfa9-94659cf754d0": "2017-04-28"
+                        }, 
+                        "nodegroup_id": "1f816611-943d-11e8-8418-94659cf754d0", 
+                        "parenttile_id": "5d92a3b4-ae1c-47e8-98ac-1f1cc8882871", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "49f391ee-6ce4-47d8-abf2-83732424ccf8", 
+                        "sortorder": 0, 
+                        "tileid": "46b0bec8-9fc4-4888-80b4-9c91fecee67d"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "1f816614-943d-11e8-8a63-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "49f391ee-6ce4-47d8-abf2-83732424ccf8", 
+                        "sortorder": 0, 
+                        "tileid": "5d92a3b4-ae1c-47e8-98ac-1f1cc8882871"
+                    }, 
+                    {
+                        "data": {
+                            "1f818d22-943d-11e8-9a3c-94659cf754d0": "51a60c44-33a7-4e76-a714-a5f1f4052ed3", 
+                            "1f818d24-943d-11e8-b16e-94659cf754d0": "2017-03-17", 
+                            "1f818d25-943d-11e8-bfa9-94659cf754d0": "2017-03-17"
+                        }, 
+                        "nodegroup_id": "1f816611-943d-11e8-8418-94659cf754d0", 
+                        "parenttile_id": "5d92a3b4-ae1c-47e8-98ac-1f1cc8882871", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "49f391ee-6ce4-47d8-abf2-83732424ccf8", 
+                        "sortorder": 0, 
+                        "tileid": "6c31a178-83d7-11e9-bd94-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "3c5799cf-943d-11e8-a34b-94659cf754d0": "1385bddf-30e8-40b0-b175-cfaf6d906488", 
+                            "3c5799d2-943d-11e8-874e-94659cf754d0": "1847-01-01"
+                        }, 
+                        "nodegroup_id": "3c5772c1-943d-11e8-9753-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "49f391ee-6ce4-47d8-abf2-83732424ccf8", 
+                        "sortorder": 0, 
+                        "tileid": "6c34126f-83d7-11e9-9eef-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "185b6981-943d-11e8-8310-94659cf754d0": "Man Mo Temple Compound (Sheung Wan) \u6587\u6b66\u5edf (\u4e0a\u74b0)", 
+                            "185b9091-943d-11e8-8c9e-94659cf754d0": "a4c88313-52c5-4b6a-9579-3fc5aad17335"
+                        }, 
+                        "nodegroup_id": "185b6981-943d-11e8-8310-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "49f391ee-6ce4-47d8-abf2-83732424ccf8", 
+                        "sortorder": 0, 
+                        "tileid": "6c2ce681-83d7-11e9-b1aa-94659cf754d0"
+                    }
+                ]
+            }, 
+            {
+                "resourceinstance": {
+                    "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6", 
+                    "legacyid": "abe7385c-fe96-44a3-bbd0-47009aa555dc", 
+                    "resourceinstanceid": "abe7385c-fe96-44a3-bbd0-47009aa555dc"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "4c2d1922-943d-11e8-9449-94659cf754d0": [
+                                "54715c7e-7ca4-47f9-a66e-c329128030cb"
+                            ]
+                        }, 
+                        "nodegroup_id": "4c2d1922-943d-11e8-9449-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "abe7385c-fe96-44a3-bbd0-47009aa555dc", 
+                        "sortorder": 0, 
+                        "tileid": "6c341273-83d7-11e9-8ef6-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "48315a71-943d-11e8-90d3-94659cf754d0": "e105b697-df95-459b-a9f1-86fd4c44118e"
+                        }, 
+                        "nodegroup_id": "48315a71-943d-11e8-90d3-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "abe7385c-fe96-44a3-bbd0-47009aa555dc", 
+                        "sortorder": 0, 
+                        "tileid": "6c365c61-83d7-11e9-86ae-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "185b6981-943d-11e8-8310-94659cf754d0": "St. John's College", 
+                            "185b9091-943d-11e8-8c9e-94659cf754d0": "a4c88313-52c5-4b6a-9579-3fc5aad17335"
+                        }, 
+                        "nodegroup_id": "185b6981-943d-11e8-8310-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "abe7385c-fe96-44a3-bbd0-47009aa555dc", 
+                        "sortorder": 0, 
+                        "tileid": "6c341271-83d7-11e9-8493-94659cf754d0"
+                    }
+                ]
+            }, 
+            {
+                "resourceinstance": {
+                    "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6", 
+                    "legacyid": "817b34f3-662f-480f-9c8b-362b150441aa", 
+                    "resourceinstanceid": "817b34f3-662f-480f-9c8b-362b150441aa"
+                }, 
+                "tiles": [
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c32-943d-11e8-b3fb-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "817b34f3-662f-480f-9c8b-362b150441aa", 
+                        "sortorder": 0, 
+                        "tileid": "b28f4cc6-b2bc-478d-baff-f7092529f1a5"
+                    }, 
+                    {
+                        "data": {
+                            "2672e522-943d-11e8-8df1-94659cf754d0": "Green Island", 
+                            "26733347-943d-11e8-9aaa-94659cf754d0": "ed665b7f-9f64-45c6-a14f-9329fa7caa87"
+                        }, 
+                        "nodegroup_id": "2672e522-943d-11e8-8df1-94659cf754d0", 
+                        "parenttile_id": "b28f4cc6-b2bc-478d-baff-f7092529f1a5", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "817b34f3-662f-480f-9c8b-362b150441aa", 
+                        "sortorder": 0, 
+                        "tileid": "6c3c28c2-83d7-11e9-be17-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c35-943d-11e8-86b9-94659cf754d0", 
+                        "parenttile_id": "b28f4cc6-b2bc-478d-baff-f7092529f1a5", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "817b34f3-662f-480f-9c8b-362b150441aa", 
+                        "sortorder": 0, 
+                        "tileid": "6c3c28c3-83d7-11e9-aaf4-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c38-943d-11e8-8c8a-94659cf754d0", 
+                        "parenttile_id": "b28f4cc6-b2bc-478d-baff-f7092529f1a5", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "817b34f3-662f-480f-9c8b-362b150441aa", 
+                        "sortorder": 0, 
+                        "tileid": "6c3c28c4-83d7-11e9-b189-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c3b-943d-11e8-8b15-94659cf754d0", 
+                        "parenttile_id": "b28f4cc6-b2bc-478d-baff-f7092529f1a5", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "817b34f3-662f-480f-9c8b-362b150441aa", 
+                        "sortorder": 0, 
+                        "tileid": "6c3c28c5-83d7-11e9-be6a-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "26733340-943d-11e8-9720-94659cf754d0": {
+                                "features": [
+                                    {
+                                        "geometry": {
+                                            "coordinates": [
+                                                114.111209735572, 
+                                                22.2830121186452
+                                            ], 
+                                            "type": "Point"
+                                        }, 
+                                        "id": "8bc78b08-68a5-4343-a64d-1da797d40ccc", 
+                                        "properties": {}, 
+                                        "type": "Feature"
+                                    }
+                                ], 
+                                "type": "FeatureCollection"
+                            }
+                        }, 
+                        "nodegroup_id": "26733340-943d-11e8-9720-94659cf754d0", 
+                        "parenttile_id": "b28f4cc6-b2bc-478d-baff-f7092529f1a5", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "817b34f3-662f-480f-9c8b-362b150441aa", 
+                        "sortorder": 0, 
+                        "tileid": "6c3c28c6-83d7-11e9-b57a-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26733343-943d-11e8-9704-94659cf754d0", 
+                        "parenttile_id": "b28f4cc6-b2bc-478d-baff-f7092529f1a5", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "817b34f3-662f-480f-9c8b-362b150441aa", 
+                        "sortorder": 0, 
+                        "tileid": "6c3c28c7-83d7-11e9-817a-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "48315a71-943d-11e8-90d3-94659cf754d0": "65153fb9-8cff-4c60-b53b-b5e7423b46a3"
+                        }, 
+                        "nodegroup_id": "48315a71-943d-11e8-90d3-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "817b34f3-662f-480f-9c8b-362b150441aa", 
+                        "sortorder": 0, 
+                        "tileid": "6c3e99c1-83d7-11e9-9369-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "13e63511-943d-11e8-984c-94659cf754d0": "6e67fa52-0189-4093-b908-c74fb0da3eeb", 
+                            "13e63512-943d-11e8-ab12-94659cf754d0": "\n\n\n\n\n<style type=\"text/css\">\np.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Calibri; color: #000000}\n</style>\n\n\n<p class=\"p1\">\"The Green Island lighthouse compound comprises an old lighthouse built in 1875, a new lighthouse built in 1904, former European quarters and a former keeper\u2019s house. Both the old and the new lighthouses have illuminated the course for thousands of vessels entering Hong Kong waters from the western approach for over a century and have played an important role in Hong Kong\u2019s maritime history.</p><p class=\"p2\"><br></p><p class=\"p1\">The Green Island lighthouse started operation on 1 July 1875, about three months after Hong Kong\u2019s first lighthouse was erected at Cape D\u2019Aguilar. A plan to move the lantern of the Cape D\u2019Aguilar lighthouse to Green Island was proposed in 1901, and this required the construction of a taller and larger tower to accommodate it.</p><p class=\"p2\"><br></p><p class=\"p1\">The construction of a new lighthouse adjacent to the old one on Green Island commenced in 1904 and was completed in 1905, and the old lighthouse then lost its original function. The new lighthouse was fully automated in the 1970s and is still in use today.</p><p class=\"p2\"><br></p><p class=\"p1\">The old lighthouse is a 12-metre tall small circular tower constructed of granite with a doorway that features projected rock-faced quoins. On the walls are two cross-shaped openings resembling the arrow slits found in mediaeval European castles that are designed to admit air and light.</p><p class=\"p2\"><br></p><p class=\"p1\">The new lighthouse is also a circular tower. Constructed of granite and concrete, it is about 17.5 metres tall with a steel lantern on top. The whole structure is painted white to ensure its high visibility for seafarers as well as to provide thermal insulation and protection for the structure itself. The spiral staircase is of fine masonry with beautiful railings, while the entrance and window are in the form of segmental arches with ornamental plaster mouldings.</p><p class=\"p2\"><br></p><p class=\"p1\">Probably built in the late 19th century, the former European staff quarters forms an integral part of the lighthouse compound. The building is adorned with Classical features, such as the front porch supported by columns with modified capitals. The quarters was originally a single-storey building, but an upper floor was added in 1923.&nbsp;</p><p class=\"p2\"><br></p><p class=\"p1\">The former keeper\u2019s house is a one-storey flat-roofed block in a simple L-shape; it features segmental arched windows and overhanging eaves.</p><p class=\"p2\"><br></p><p class=\"p1\">\n\n\n\n\n<style type=\"text/css\">\np.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Calibri; color: #000000}\np.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Calibri; color: #000000; min-height: 14.0px}\n</style>\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n</p><p class=\"p1\">The 1950s saw the duties of lighthouse keeper previously fulfilled by Europeans gradually taken over by local staff, but they also became redundant when automatic equipment was introduced in the 1970s. The two buildings serving as quarters for the lighthouse staff were then converted and used as the Police Recreation Centre for a time. Today, the former quarters, the former keeper\u2019s house and the surrounding area (except for the two lighthouses) are leased to the Wu Oi Christian Centre as a youth drug treatment and rehabilitation centre.\"</p><p class=\"p1\"><br></p><p class=\"p1\">[Source:&nbsp;http://www.amo.gov.hk/en/monuments_86.php]</p>"
+                        }, 
+                        "nodegroup_id": "13e60e01-943d-11e8-b76c-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "817b34f3-662f-480f-9c8b-362b150441aa", 
+                        "sortorder": 0, 
+                        "tileid": "6c3e99c3-83d7-11e9-a5da-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "3c5799cf-943d-11e8-a34b-94659cf754d0": "1385bddf-30e8-40b0-b175-cfaf6d906488", 
+                            "3c5799d2-943d-11e8-874e-94659cf754d0": "1875-01-01"
+                        }, 
+                        "nodegroup_id": "3c5772c1-943d-11e8-9753-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "817b34f3-662f-480f-9c8b-362b150441aa", 
+                        "sortorder": 0, 
+                        "tileid": "6c3e99c5-83d7-11e9-a99b-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "3c5799cf-943d-11e8-a34b-94659cf754d0": "1385bddf-30e8-40b0-b175-cfaf6d906488", 
+                            "3c5799d2-943d-11e8-874e-94659cf754d0": "1904-01-01"
+                        }, 
+                        "nodegroup_id": "3c5772c1-943d-11e8-9753-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "817b34f3-662f-480f-9c8b-362b150441aa", 
+                        "sortorder": 0, 
+                        "tileid": "6c40e3b1-83d7-11e9-8fbe-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "54188893-943d-11e8-9011-94659cf754d0": 17.5, 
+                            "54188894-943d-11e8-bb0e-94659cf754d0": "8af13bfd-ff0f-45fd-9ba2-7757b183faf1", 
+                            "5418af9f-943d-11e8-8c73-94659cf754d0": "a0b02501-98b5-4863-92e6-a84ccaf4277d"
+                        }, 
+                        "nodegroup_id": "54188890-943d-11e8-897e-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "817b34f3-662f-480f-9c8b-362b150441aa", 
+                        "sortorder": 0, 
+                        "tileid": "beb259ca-c0fe-46b7-9f3b-7b501d04d357"
+                    }, 
+                    {
+                        "data": {
+                            "54188893-943d-11e8-9011-94659cf754d0": 12, 
+                            "54188894-943d-11e8-bb0e-94659cf754d0": "8af13bfd-ff0f-45fd-9ba2-7757b183faf1", 
+                            "5418af9f-943d-11e8-8c73-94659cf754d0": "a0b02501-98b5-4863-92e6-a84ccaf4277d"
+                        }, 
+                        "nodegroup_id": "54188890-943d-11e8-897e-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "817b34f3-662f-480f-9c8b-362b150441aa", 
+                        "sortorder": 0, 
+                        "tileid": "6c40e3b3-83d7-11e9-bfc0-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "1f816614-943d-11e8-8a63-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "817b34f3-662f-480f-9c8b-362b150441aa", 
+                        "sortorder": 0, 
+                        "tileid": "48618d48-6d12-4392-badd-b197a8aecdf2"
+                    }, 
+                    {
+                        "data": {
+                            "1f818d22-943d-11e8-9a3c-94659cf754d0": "51a60c44-33a7-4e76-a714-a5f1f4052ed3", 
+                            "1f818d24-943d-11e8-b16e-94659cf754d0": "2017-03-17", 
+                            "1f818d25-943d-11e8-bfa9-94659cf754d0": "2017-03-17"
+                        }, 
+                        "nodegroup_id": "1f816611-943d-11e8-8418-94659cf754d0", 
+                        "parenttile_id": "48618d48-6d12-4392-badd-b197a8aecdf2", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "817b34f3-662f-480f-9c8b-362b150441aa", 
+                        "sortorder": 0, 
+                        "tileid": "6c40e3b6-83d7-11e9-9309-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "185b6981-943d-11e8-8310-94659cf754d0": "Green Island Lighthouse Compound \u9752\u6d32\u71c8\u5854\u5efa\u7bc9\u7fa4", 
+                            "185b9091-943d-11e8-8c9e-94659cf754d0": "a4c88313-52c5-4b6a-9579-3fc5aad17335"
+                        }, 
+                        "nodegroup_id": "185b6981-943d-11e8-8310-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "817b34f3-662f-480f-9c8b-362b150441aa", 
+                        "sortorder": 0, 
+                        "tileid": "6c3c28c9-83d7-11e9-a4d3-94659cf754d0"
+                    }
+                ]
+            }, 
+            {
+                "resourceinstance": {
+                    "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6", 
+                    "legacyid": "59b7ebbb-7bb8-4857-892e-218ac65248cf", 
+                    "resourceinstanceid": "59b7ebbb-7bb8-4857-892e-218ac65248cf"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "185b6981-943d-11e8-8310-94659cf754d0": "Hei Lo", 
+                            "185b9091-943d-11e8-8c9e-94659cf754d0": "466260e8-4825-48d2-b8aa-7d1befefe74b"
+                        }, 
+                        "nodegroup_id": "185b6981-943d-11e8-8310-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "59b7ebbb-7bb8-4857-892e-218ac65248cf", 
+                        "sortorder": 0, 
+                        "tileid": "3c52954a-0ee3-4bb9-91ed-dac99dc18989"
+                    }, 
+                    {
+                        "data": {
+                            "48315a71-943d-11e8-90d3-94659cf754d0": "e105b697-df95-459b-a9f1-86fd4c44118e"
+                        }, 
+                        "nodegroup_id": "48315a71-943d-11e8-90d3-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "59b7ebbb-7bb8-4857-892e-218ac65248cf", 
+                        "sortorder": 0, 
+                        "tileid": "6c492112-83d7-11e9-a3b9-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "13e63511-943d-11e8-984c-94659cf754d0": "6e67fa52-0189-4093-b908-c74fb0da3eeb", 
+                            "13e63512-943d-11e8-ab12-94659cf754d0": "\n\n\n\n\n<style type=\"text/css\">\np.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Calibri; color: #000000}\np.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Calibri; color: #000000; min-height: 14.0px}\n</style>\n\n\n<p class=\"p1\">\"King Yin Lei is a rare surviving example of the Chinese Renaissance style that reflects the excellence of design and construction in both Chinese and Western architecture in Hong Kong. The \u2018East meets West\u2019 methods used in its construction make the building a rarity in Hong Kong as well as an outstanding work of art.</p>\n<p class=\"p2\"><br></p>\n<p class=\"p1\">Originally named \u2018Hei Lo\u2019, the building was designed by the architectural office of A.R.F. Raven and built in around 1937 for Mrs Shum Li Po-lun, the first owner, whose husband, Shum Yat-chor, was a notable merchant and philanthropist in Xinhui in Guangdong. The residence was sold in 1978 to Yeo (Yow) Chei-man and his son Yow Mok-shing, who renamed it \u2018King Yin Lei\u2019.</p>\n<p class=\"p2\"><br></p>\n<p class=\"p1\">The building is an important landmark in the historical development of Hong Kong. As one of the luxury historic houses located on the hillside of Hong Kong Island, the building not only bears witness to the growing wealth and rising status of the Chinese community before the Second World War, but also represents an earlier phase of Hong Kong history in which a Chinese upper-class residential area took shape in Mid-Levels.</p>\n<p class=\"p2\"><br></p>\n<p class=\"p1\">The fa\u00e7ade of the building is a popular spot for visitors to take photographs in front of, while its social value also lies in the role it has played in Hong Kong\u2019s entertainment industry and film heritage: the mansion has featured in several internationally renowned productions, including Soldier of Fortune(1955), and the local television series Delightful Dream of the Capital (1980). All of this reflects the beautifully scenic character of the site.</p>\n<p class=\"p2\"><br></p>\n<p class=\"p1\">The building was sold to a new owner in August 2007, and work to remove the roof tiles, stone features and window frames was noticed on the site in early September 2007. Full restoration of Kin Yin Lei commenced in September 2008 and was completed in December 2010.\"</p><p class=\"p1\"><br></p><p class=\"p1\">[Source:&nbsp;http://www.amo.gov.hk/en/monuments_85.php]</p>"
+                        }, 
+                        "nodegroup_id": "13e60e01-943d-11e8-b76c-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "59b7ebbb-7bb8-4857-892e-218ac65248cf", 
+                        "sortorder": 0, 
+                        "tileid": "6c492114-83d7-11e9-ab2b-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "086df566-943d-11e8-ba38-94659cf754d0": "b61b9f8c-4e84-4ae2-9b69-b0635a3da13d"
+                        }, 
+                        "nodegroup_id": "086dce50-943d-11e8-93c6-94659cf754d0", 
+                        "parenttile_id": "899b1336-8361-4713-9a3d-6976b99d4063", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "59b7ebbb-7bb8-4857-892e-218ac65248cf", 
+                        "sortorder": 0, 
+                        "tileid": "60c1f733-8226-4dd8-bbcc-e01390e1c739"
+                    }, 
+                    {
+                        "data": {
+                            "086df566-943d-11e8-ba38-94659cf754d0": "cf47ef5b-4a68-4be9-9b08-bfa77964a5fc"
+                        }, 
+                        "nodegroup_id": "086dce50-943d-11e8-93c6-94659cf754d0", 
+                        "parenttile_id": "899b1336-8361-4713-9a3d-6976b99d4063", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "59b7ebbb-7bb8-4857-892e-218ac65248cf", 
+                        "sortorder": 0, 
+                        "tileid": "dcc37a1f-a787-4611-89d9-1a83a97d8e61"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "086dce56-943d-11e8-ab5e-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "59b7ebbb-7bb8-4857-892e-218ac65248cf", 
+                        "sortorder": 0, 
+                        "tileid": "899b1336-8361-4713-9a3d-6976b99d4063"
+                    }, 
+                    {
+                        "data": {
+                            "086df566-943d-11e8-ba38-94659cf754d0": "6725fc32-f6f8-4b5e-b39d-2f30e5e8a979"
+                        }, 
+                        "nodegroup_id": "086dce50-943d-11e8-93c6-94659cf754d0", 
+                        "parenttile_id": "899b1336-8361-4713-9a3d-6976b99d4063", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "59b7ebbb-7bb8-4857-892e-218ac65248cf", 
+                        "sortorder": 0, 
+                        "tileid": "6c4b6b01-83d7-11e9-a04c-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "086df56e-943d-11e8-b150-94659cf754d0": "1937-01-01", 
+                            "086df56f-943d-11e8-b0fe-94659cf754d0": "58fad312-51f9-4fa9-a900-8853260c0b2e", 
+                            "086e1c71-943d-11e8-9185-94659cf754d0": "2010-01-01"
+                        }, 
+                        "nodegroup_id": "086dce53-943d-11e8-807a-94659cf754d0", 
+                        "parenttile_id": "899b1336-8361-4713-9a3d-6976b99d4063", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "59b7ebbb-7bb8-4857-892e-218ac65248cf", 
+                        "sortorder": 0, 
+                        "tileid": "6c4b6b02-83d7-11e9-9c72-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "086df56a-943d-11e8-bb62-94659cf754d0": [
+                                "d34ce0f8-bc0f-46a3-8da7-6cbbe9c366e3"
+                            ], 
+                            "086df56b-943d-11e8-9f46-94659cf754d0": "8b976287-78c7-4ba5-b9fa-14f5091fa3c9"
+                        }, 
+                        "nodegroup_id": "086df55e-943d-11e8-a6bc-94659cf754d0", 
+                        "parenttile_id": "899b1336-8361-4713-9a3d-6976b99d4063", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "59b7ebbb-7bb8-4857-892e-218ac65248cf", 
+                        "sortorder": 0, 
+                        "tileid": "6c4b6b03-83d7-11e9-aee0-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c32-943d-11e8-b3fb-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "59b7ebbb-7bb8-4857-892e-218ac65248cf", 
+                        "sortorder": 0, 
+                        "tileid": "04ac611a-335f-4158-96d4-95833e10d774"
+                    }, 
+                    {
+                        "data": {
+                            "2672e522-943d-11e8-8df1-94659cf754d0": "No. 45 Stubbs Road, Hong Kong Island", 
+                            "26733347-943d-11e8-9aaa-94659cf754d0": "ed665b7f-9f64-45c6-a14f-9329fa7caa87"
+                        }, 
+                        "nodegroup_id": "2672e522-943d-11e8-8df1-94659cf754d0", 
+                        "parenttile_id": "04ac611a-335f-4158-96d4-95833e10d774", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "59b7ebbb-7bb8-4857-892e-218ac65248cf", 
+                        "sortorder": 0, 
+                        "tileid": "6c4b6b06-83d7-11e9-9617-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c35-943d-11e8-86b9-94659cf754d0", 
+                        "parenttile_id": "04ac611a-335f-4158-96d4-95833e10d774", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "59b7ebbb-7bb8-4857-892e-218ac65248cf", 
+                        "sortorder": 0, 
+                        "tileid": "6c4b6b07-83d7-11e9-a6a2-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c38-943d-11e8-8c8a-94659cf754d0", 
+                        "parenttile_id": "04ac611a-335f-4158-96d4-95833e10d774", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "59b7ebbb-7bb8-4857-892e-218ac65248cf", 
+                        "sortorder": 0, 
+                        "tileid": "6c4b6b08-83d7-11e9-8be0-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c3b-943d-11e8-8b15-94659cf754d0", 
+                        "parenttile_id": "04ac611a-335f-4158-96d4-95833e10d774", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "59b7ebbb-7bb8-4857-892e-218ac65248cf", 
+                        "sortorder": 0, 
+                        "tileid": "6c4ddc00-83d7-11e9-a3ee-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "26733340-943d-11e8-9720-94659cf754d0": {
+                                "features": [
+                                    {
+                                        "geometry": {
+                                            "coordinates": [
+                                                114.181085303724, 
+                                                22.266726134363
+                                            ], 
+                                            "type": "Point"
+                                        }, 
+                                        "id": "9e259a05-c638-42f0-8b4a-e4bc3972a221", 
+                                        "properties": {}, 
+                                        "type": "Feature"
+                                    }
+                                ], 
+                                "type": "FeatureCollection"
+                            }
+                        }, 
+                        "nodegroup_id": "26733340-943d-11e8-9720-94659cf754d0", 
+                        "parenttile_id": "04ac611a-335f-4158-96d4-95833e10d774", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "59b7ebbb-7bb8-4857-892e-218ac65248cf", 
+                        "sortorder": 0, 
+                        "tileid": "6c4ddc01-83d7-11e9-866f-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26733343-943d-11e8-9704-94659cf754d0", 
+                        "parenttile_id": "04ac611a-335f-4158-96d4-95833e10d774", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "59b7ebbb-7bb8-4857-892e-218ac65248cf", 
+                        "sortorder": 0, 
+                        "tileid": "6c4ddc02-83d7-11e9-beba-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "185b6981-943d-11e8-8310-94659cf754d0": "Ultamia", 
+                            "185b9091-943d-11e8-8c9e-94659cf754d0": "466260e8-4825-48d2-b8aa-7d1befefe74b"
+                        }, 
+                        "nodegroup_id": "185b6981-943d-11e8-8310-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "59b7ebbb-7bb8-4857-892e-218ac65248cf", 
+                        "sortorder": 0, 
+                        "tileid": "6c4ddc04-83d7-11e9-b346-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "3c5799cf-943d-11e8-a34b-94659cf754d0": "1385bddf-30e8-40b0-b175-cfaf6d906488", 
+                            "3c5799d2-943d-11e8-874e-94659cf754d0": "1937-01-01"
+                        }, 
+                        "nodegroup_id": "3c5772c1-943d-11e8-9753-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "59b7ebbb-7bb8-4857-892e-218ac65248cf", 
+                        "sortorder": 0, 
+                        "tileid": "6c4ddc06-83d7-11e9-9900-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "1f818d22-943d-11e8-9a3c-94659cf754d0": "51a60c44-33a7-4e76-a714-a5f1f4052ed3", 
+                            "1f818d24-943d-11e8-b16e-94659cf754d0": "2017-06-06", 
+                            "1f818d25-943d-11e8-bfa9-94659cf754d0": "2017-06-06"
+                        }, 
+                        "nodegroup_id": "1f816611-943d-11e8-8418-94659cf754d0", 
+                        "parenttile_id": "f34763f0-fdf7-4e85-8ccd-5555ca0578a9", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "59b7ebbb-7bb8-4857-892e-218ac65248cf", 
+                        "sortorder": 0, 
+                        "tileid": "cd083e69-6084-40f7-bd22-718b5a7d065f"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "1f816614-943d-11e8-8a63-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "59b7ebbb-7bb8-4857-892e-218ac65248cf", 
+                        "sortorder": 0, 
+                        "tileid": "f34763f0-fdf7-4e85-8ccd-5555ca0578a9"
+                    }, 
+                    {
+                        "data": {
+                            "1f818d22-943d-11e8-9a3c-94659cf754d0": "9f7b580c-3a89-40b6-b015-10ddcbbaa128", 
+                            "1f818d24-943d-11e8-b16e-94659cf754d0": "2017-06-06", 
+                            "1f818d25-943d-11e8-bfa9-94659cf754d0": "2011-01-01"
+                        }, 
+                        "nodegroup_id": "1f816611-943d-11e8-8418-94659cf754d0", 
+                        "parenttile_id": "f34763f0-fdf7-4e85-8ccd-5555ca0578a9", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "59b7ebbb-7bb8-4857-892e-218ac65248cf", 
+                        "sortorder": 0, 
+                        "tileid": "6c5025f0-83d7-11e9-89d4-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "185b6981-943d-11e8-8310-94659cf754d0": "King Yin Lei \u666f\u8ce2\u91cc", 
+                            "185b9091-943d-11e8-8c9e-94659cf754d0": "a4c88313-52c5-4b6a-9579-3fc5aad17335"
+                        }, 
+                        "nodegroup_id": "185b6981-943d-11e8-8310-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "59b7ebbb-7bb8-4857-892e-218ac65248cf", 
+                        "sortorder": 0, 
+                        "tileid": "6c492110-83d7-11e9-b849-94659cf754d0"
+                    }
+                ]
+            }, 
+            {
+                "resourceinstance": {
+                    "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6", 
+                    "legacyid": "8a26a222-962f-4f82-b00d-b182668920d1", 
+                    "resourceinstanceid": "8a26a222-962f-4f82-b00d-b182668920d1"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "48315a71-943d-11e8-90d3-94659cf754d0": "65153fb9-8cff-4c60-b53b-b5e7423b46a3"
+                        }, 
+                        "nodegroup_id": "48315a71-943d-11e8-90d3-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "8a26a222-962f-4f82-b00d-b182668920d1", 
+                        "sortorder": 0, 
+                        "tileid": "6c5751e2-83d7-11e9-8e97-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "48315a71-943d-11e8-90d3-94659cf754d0": "7bc95638-94bc-44b7-8ce9-ac92c0a5d379"
+                        }, 
+                        "nodegroup_id": "48315a71-943d-11e8-90d3-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "8a26a222-962f-4f82-b00d-b182668920d1", 
+                        "sortorder": 0, 
+                        "tileid": "6c586352-83d7-11e9-899d-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "13e63511-943d-11e8-984c-94659cf754d0": "6e67fa52-0189-4093-b908-c74fb0da3eeb", 
+                            "13e63512-943d-11e8-ab12-94659cf754d0": "\n\n\n\n\n<style type=\"text/css\">\np.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Calibri; color: #000000}\n</style>\n\n\n<p class=\"p1\">\"Water supply in Hong Kong before the 1860s mainly relied on basic sources such as wells and streams. The continual increase in the population and the accompanying expansion of the city from the middle of the 19th century onwards made the permanent provision of fresh water resources a matter of great urgency and accelerated the construction of reservoirs. The first water supply scheme was mooted during the governorship of Sir Hercules Robinson from 1859 to 1865. Completed in 1863, Pok Fu Lam Reservoir was the first reservoir ever built in Hong Kong; a series of extensions was undertaken between 1866 and 1871.\"</p><p class=\"p1\"><br></p><p class=\"p1\">[Source:&nbsp;http://www.amo.gov.hk/en/monuments_87.php]</p>"
+                        }, 
+                        "nodegroup_id": "13e60e01-943d-11e8-b76c-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "8a26a222-962f-4f82-b00d-b182668920d1", 
+                        "sortorder": 0, 
+                        "tileid": "6c586354-83d7-11e9-ac35-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c32-943d-11e8-b3fb-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "8a26a222-962f-4f82-b00d-b182668920d1", 
+                        "sortorder": 0, 
+                        "tileid": "f48b1ddc-5ea2-4e93-b4f9-1df42d4f119a"
+                    }, 
+                    {
+                        "data": {
+                            "2672e522-943d-11e8-8df1-94659cf754d0": "Pok Fu Lam Reservoir Road, Pok Fu Lam, Hong Kong Island", 
+                            "26733347-943d-11e8-9aaa-94659cf754d0": "ed665b7f-9f64-45c6-a14f-9329fa7caa87"
+                        }, 
+                        "nodegroup_id": "2672e522-943d-11e8-8df1-94659cf754d0", 
+                        "parenttile_id": "f48b1ddc-5ea2-4e93-b4f9-1df42d4f119a", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "8a26a222-962f-4f82-b00d-b182668920d1", 
+                        "sortorder": 0, 
+                        "tileid": "6c586357-83d7-11e9-b94e-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c35-943d-11e8-86b9-94659cf754d0", 
+                        "parenttile_id": "f48b1ddc-5ea2-4e93-b4f9-1df42d4f119a", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "8a26a222-962f-4f82-b00d-b182668920d1", 
+                        "sortorder": 0, 
+                        "tileid": "6c586358-83d7-11e9-82f3-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c38-943d-11e8-8c8a-94659cf754d0", 
+                        "parenttile_id": "f48b1ddc-5ea2-4e93-b4f9-1df42d4f119a", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "8a26a222-962f-4f82-b00d-b182668920d1", 
+                        "sortorder": 0, 
+                        "tileid": "6c586359-83d7-11e9-9096-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c3b-943d-11e8-8b15-94659cf754d0", 
+                        "parenttile_id": "f48b1ddc-5ea2-4e93-b4f9-1df42d4f119a", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "8a26a222-962f-4f82-b00d-b182668920d1", 
+                        "sortorder": 0, 
+                        "tileid": "6c58635a-83d7-11e9-9949-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "26733340-943d-11e8-9720-94659cf754d0": {
+                                "features": [
+                                    {
+                                        "geometry": {
+                                            "coordinates": [
+                                                114.137420282065, 
+                                                22.2652306029842
+                                            ], 
+                                            "type": "Point"
+                                        }, 
+                                        "id": "016afb76-5198-4556-b564-dbba6d940519", 
+                                        "properties": {}, 
+                                        "type": "Feature"
+                                    }
+                                ], 
+                                "type": "FeatureCollection"
+                            }
+                        }, 
+                        "nodegroup_id": "26733340-943d-11e8-9720-94659cf754d0", 
+                        "parenttile_id": "f48b1ddc-5ea2-4e93-b4f9-1df42d4f119a", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "8a26a222-962f-4f82-b00d-b182668920d1", 
+                        "sortorder": 0, 
+                        "tileid": "6c5ad451-83d7-11e9-b7d6-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26733343-943d-11e8-9704-94659cf754d0", 
+                        "parenttile_id": "f48b1ddc-5ea2-4e93-b4f9-1df42d4f119a", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "8a26a222-962f-4f82-b00d-b182668920d1", 
+                        "sortorder": 0, 
+                        "tileid": "6c5ad452-83d7-11e9-a60a-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "086dce56-943d-11e8-ab5e-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "8a26a222-962f-4f82-b00d-b182668920d1", 
+                        "sortorder": 0, 
+                        "tileid": "ab3abd70-32cf-431e-b6e4-c4e0fb8cf698"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "086dce50-943d-11e8-93c6-94659cf754d0", 
+                        "parenttile_id": "ab3abd70-32cf-431e-b6e4-c4e0fb8cf698", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "8a26a222-962f-4f82-b00d-b182668920d1", 
+                        "sortorder": 0, 
+                        "tileid": "6c5ad455-83d7-11e9-8362-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "086dce53-943d-11e8-807a-94659cf754d0", 
+                        "parenttile_id": "ab3abd70-32cf-431e-b6e4-c4e0fb8cf698", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "8a26a222-962f-4f82-b00d-b182668920d1", 
+                        "sortorder": 0, 
+                        "tileid": "6c5ad456-83d7-11e9-b894-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "086df56a-943d-11e8-bb62-94659cf754d0": [
+                                "56bbc38b-9b0c-45be-9f71-5705cd35c2c5"
+                            ], 
+                            "086df56b-943d-11e8-9f46-94659cf754d0": "cafd7203-b909-40cb-aed6-011e63d70c1d"
+                        }, 
+                        "nodegroup_id": "086df55e-943d-11e8-a6bc-94659cf754d0", 
+                        "parenttile_id": "ab3abd70-32cf-431e-b6e4-c4e0fb8cf698", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "8a26a222-962f-4f82-b00d-b182668920d1", 
+                        "sortorder": 0, 
+                        "tileid": "6c5ad457-83d7-11e9-8b51-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "3c5799cf-943d-11e8-a34b-94659cf754d0": "1385bddf-30e8-40b0-b175-cfaf6d906488", 
+                            "3c5799d2-943d-11e8-874e-94659cf754d0": "1863-01-01"
+                        }, 
+                        "nodegroup_id": "3c5772c1-943d-11e8-9753-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "8a26a222-962f-4f82-b00d-b182668920d1", 
+                        "sortorder": 0, 
+                        "tileid": "6c5ad459-83d7-11e9-84bf-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "1f816614-943d-11e8-8a63-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "8a26a222-962f-4f82-b00d-b182668920d1", 
+                        "sortorder": 0, 
+                        "tileid": "72dd49f8-ba5e-437f-80b9-44bb316e4166"
+                    }, 
+                    {
+                        "data": {
+                            "1f818d22-943d-11e8-9a3c-94659cf754d0": "51a60c44-33a7-4e76-a714-a5f1f4052ed3", 
+                            "1f818d24-943d-11e8-b16e-94659cf754d0": "2017-03-17", 
+                            "1f818d25-943d-11e8-bfa9-94659cf754d0": "2017-03-17"
+                        }, 
+                        "nodegroup_id": "1f816611-943d-11e8-8418-94659cf754d0", 
+                        "parenttile_id": "72dd49f8-ba5e-437f-80b9-44bb316e4166", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "8a26a222-962f-4f82-b00d-b182668920d1", 
+                        "sortorder": 0, 
+                        "tileid": "6c5d1e41-83d7-11e9-bafb-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "185b6981-943d-11e8-8310-94659cf754d0": "Pok Fu Lam Reservoir (6 Historic Structures) \u8584\u6276\u6797\u6c34\u5858", 
+                            "185b9091-943d-11e8-8c9e-94659cf754d0": "a4c88313-52c5-4b6a-9579-3fc5aad17335"
+                        }, 
+                        "nodegroup_id": "185b6981-943d-11e8-8310-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "8a26a222-962f-4f82-b00d-b182668920d1", 
+                        "sortorder": 0, 
+                        "tileid": "6c5507f1-83d7-11e9-81eb-94659cf754d0"
+                    }
+                ]
+            }, 
+            {
+                "resourceinstance": {
+                    "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6", 
+                    "legacyid": "642d6123-79e1-41e7-accc-a6576ad5cb22", 
+                    "resourceinstanceid": "642d6123-79e1-41e7-accc-a6576ad5cb22"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "4c2d1922-943d-11e8-9449-94659cf754d0": [
+                                "1cbcf1f1-6cc1-4ac4-b97c-54aff58be736"
+                            ]
+                        }, 
+                        "nodegroup_id": "4c2d1922-943d-11e8-9449-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "642d6123-79e1-41e7-accc-a6576ad5cb22", 
+                        "sortorder": 0, 
+                        "tileid": "6c644a30-83d7-11e9-8b21-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "48315a71-943d-11e8-90d3-94659cf754d0": "4b7379fe-363a-4e3e-ac39-1e1d092e50f0"
+                        }, 
+                        "nodegroup_id": "48315a71-943d-11e8-90d3-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "642d6123-79e1-41e7-accc-a6576ad5cb22", 
+                        "sortorder": 0, 
+                        "tileid": "6c644a32-83d7-11e9-826e-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "13e63511-943d-11e8-984c-94659cf754d0": "282abb61-ebe9-43f8-b18e-8a749b5f4398", 
+                            "13e63512-943d-11e8-ab12-94659cf754d0": "<p style=\"line-height: 18.5714px;\"><span style=\"color: rgb(0, 0, 0); font-size: 12px;\">This bay has historical importance for its waterfall, which provided fresh water to the British and European sailors who would refill their supply on way to other Asian trade ports. &nbsp;The notion of Hong Kong island having an abundance of flowing fresh water not only made this island valuable, but also caused inhabitants to name the area \"Fragrant Harbour\" (which originally referred to Aberdeen Harbour nearby this bay). &nbsp;\"Fragrant Harbour\", which in translation became \"Hong Kong\", ultimately referred to the whole of the territory.</span></p><p style=\"line-height: 18.5714px;\"><span style=\"font-size: 12px; color: rgb(0, 0, 0);\">Notes: &nbsp;One of</span><span style=\"font-size: 12px; color: rgb(0, 0, 0);\">&nbsp;the current uses of the bay is the ritual of&nbsp;\u9f8d\u6b78\u5009\u6d77 which means \"the dragon returning to the sea\". &nbsp;It is part of the</span><span style=\"color: rgb(0, 0, 255);\"><span style=\"font-size: 12px;\">&nbsp;Fire Dragon Dance</span></span><span style=\"font-size: 12px; color: rgb(0, 0, 0);\">&nbsp;of</span><span style=\"font-size: 12px; color: rgb(0, 0, 255);\">&nbsp;Pokfulam Village</span><span style=\"font-size: 12px; color: rgb(0, 0, 0);\">, and features the crafted dragon entering Waterfall Bay and \"swimming\" out into the sea.</span></p>"
+                        }, 
+                        "nodegroup_id": "13e60e01-943d-11e8-b76c-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "642d6123-79e1-41e7-accc-a6576ad5cb22", 
+                        "sortorder": 0, 
+                        "tileid": "6c644a34-83d7-11e9-a23a-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c32-943d-11e8-b3fb-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "642d6123-79e1-41e7-accc-a6576ad5cb22", 
+                        "sortorder": 0, 
+                        "tileid": "d68761b0-46fc-4dc8-b44e-40e90d42cd0d"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "2672e522-943d-11e8-8df1-94659cf754d0", 
+                        "parenttile_id": "d68761b0-46fc-4dc8-b44e-40e90d42cd0d", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "642d6123-79e1-41e7-accc-a6576ad5cb22", 
+                        "sortorder": 0, 
+                        "tileid": "6c66bb31-83d7-11e9-8de5-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c35-943d-11e8-86b9-94659cf754d0", 
+                        "parenttile_id": "d68761b0-46fc-4dc8-b44e-40e90d42cd0d", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "642d6123-79e1-41e7-accc-a6576ad5cb22", 
+                        "sortorder": 0, 
+                        "tileid": "6c66bb32-83d7-11e9-b0ed-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c38-943d-11e8-8c8a-94659cf754d0", 
+                        "parenttile_id": "d68761b0-46fc-4dc8-b44e-40e90d42cd0d", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "642d6123-79e1-41e7-accc-a6576ad5cb22", 
+                        "sortorder": 0, 
+                        "tileid": "6c67a58f-83d7-11e9-9974-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c3b-943d-11e8-8b15-94659cf754d0", 
+                        "parenttile_id": "d68761b0-46fc-4dc8-b44e-40e90d42cd0d", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "642d6123-79e1-41e7-accc-a6576ad5cb22", 
+                        "sortorder": 0, 
+                        "tileid": "6c67a590-83d7-11e9-b028-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "26733340-943d-11e8-9720-94659cf754d0": {
+                                "features": [
+                                    {
+                                        "geometry": {
+                                            "coordinates": [
+                                                [
+                                                    [
+                                                        114.133251235169, 
+                                                        22.2526186870726
+                                                    ], 
+                                                    [
+                                                        114.132988378685, 
+                                                        22.2524151262983
+                                                    ], 
+                                                    [
+                                                        114.132940098923, 
+                                                        22.2521619161417
+                                                    ], 
+                                                    [
+                                                        114.132746979874, 
+                                                        22.2520228986062
+                                                    ], 
+                                                    [
+                                                        114.132451936882, 
+                                                        22.252008003862
+                                                    ], 
+                                                    [
+                                                        114.132516309899, 
+                                                        22.2513824231776
+                                                    ], 
+                                                    [
+                                                        114.133535549324, 
+                                                        22.2507667696169
+                                                    ], 
+                                                    [
+                                                        114.134313389939, 
+                                                        22.2508660687614
+                                                    ], 
+                                                    [
+                                                        114.134275839012, 
+                                                        22.2511341760998
+                                                    ], 
+                                                    [
+                                                        114.133948609513, 
+                                                        22.2515264062812
+                                                    ], 
+                                                    [
+                                                        114.13351945607, 
+                                                        22.2518590563335
+                                                    ], 
+                                                    [
+                                                        114.133219048661, 
+                                                        22.2520278635205
+                                                    ], 
+                                                    [
+                                                        114.133219048661, 
+                                                        22.2523207931562
+                                                    ], 
+                                                    [
+                                                        114.133251235169, 
+                                                        22.2526186870726
+                                                    ]
+                                                ]
+                                            ], 
+                                            "type": "Polygon"
+                                        }, 
+                                        "id": "ef660699-9590-432a-844b-2fd458c8f8f2", 
+                                        "properties": {}, 
+                                        "type": "Feature"
+                                    }
+                                ], 
+                                "type": "FeatureCollection"
+                            }
+                        }, 
+                        "nodegroup_id": "26733340-943d-11e8-9720-94659cf754d0", 
+                        "parenttile_id": "d68761b0-46fc-4dc8-b44e-40e90d42cd0d", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "642d6123-79e1-41e7-accc-a6576ad5cb22", 
+                        "sortorder": 0, 
+                        "tileid": "6c67a591-83d7-11e9-9f6b-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26733343-943d-11e8-9704-94659cf754d0", 
+                        "parenttile_id": "d68761b0-46fc-4dc8-b44e-40e90d42cd0d", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "642d6123-79e1-41e7-accc-a6576ad5cb22", 
+                        "sortorder": 0, 
+                        "tileid": "6c67a592-83d7-11e9-9f2f-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "185b6981-943d-11e8-8310-94659cf754d0": "Waterfall Bay (\u7011\u5e03\u7063)", 
+                            "185b9091-943d-11e8-8c9e-94659cf754d0": "a4c88313-52c5-4b6a-9579-3fc5aad17335"
+                        }, 
+                        "nodegroup_id": "185b6981-943d-11e8-8310-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "642d6123-79e1-41e7-accc-a6576ad5cb22", 
+                        "sortorder": 0, 
+                        "tileid": "6c644a2e-83d7-11e9-be4b-94659cf754d0"
+                    }
+                ]
+            }, 
+            {
+                "resourceinstance": {
+                    "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6", 
+                    "legacyid": "3480ca1a-5c52-4962-8d20-22a33c28dcc3", 
+                    "resourceinstanceid": "3480ca1a-5c52-4962-8d20-22a33c28dcc3"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "185b6981-943d-11e8-8310-94659cf754d0": "The University of Hong Kong, Loke Yew Hall", 
+                            "185b9091-943d-11e8-8c9e-94659cf754d0": "466260e8-4825-48d2-b8aa-7d1befefe74b"
+                        }, 
+                        "nodegroup_id": "185b6981-943d-11e8-8310-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "3480ca1a-5c52-4962-8d20-22a33c28dcc3", 
+                        "sortorder": 0, 
+                        "tileid": "f1c7341f-55f1-4011-afdc-56c3fbc1d83d"
+                    }, 
+                    {
+                        "data": {
+                            "48315a71-943d-11e8-90d3-94659cf754d0": "e105b697-df95-459b-a9f1-86fd4c44118e"
+                        }, 
+                        "nodegroup_id": "48315a71-943d-11e8-90d3-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "3480ca1a-5c52-4962-8d20-22a33c28dcc3", 
+                        "sortorder": 0, 
+                        "tileid": "6c6ed181-83d7-11e9-bcb5-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "1f816614-943d-11e8-8a63-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "3480ca1a-5c52-4962-8d20-22a33c28dcc3", 
+                        "sortorder": 0, 
+                        "tileid": "b008326c-d33b-4f60-b3bf-f0d4a5a58f86"
+                    }, 
+                    {
+                        "data": {
+                            "1f818d22-943d-11e8-9a3c-94659cf754d0": "51a60c44-33a7-4e76-a714-a5f1f4052ed3", 
+                            "1f818d24-943d-11e8-b16e-94659cf754d0": "2016-05-09", 
+                            "1f818d25-943d-11e8-bfa9-94659cf754d0": "1984-01-01"
+                        }, 
+                        "nodegroup_id": "1f816611-943d-11e8-8418-94659cf754d0", 
+                        "parenttile_id": "b008326c-d33b-4f60-b3bf-f0d4a5a58f86", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "3480ca1a-5c52-4962-8d20-22a33c28dcc3", 
+                        "sortorder": 0, 
+                        "tileid": "6c6ed184-83d7-11e9-a651-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "086df56e-943d-11e8-b150-94659cf754d0": "1946-01-01"
+                        }, 
+                        "nodegroup_id": "086dce53-943d-11e8-807a-94659cf754d0", 
+                        "parenttile_id": "f65644c8-a62d-4022-97f7-7c1269852d60", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "3480ca1a-5c52-4962-8d20-22a33c28dcc3", 
+                        "sortorder": 0, 
+                        "tileid": "03e824bf-70b9-460e-80aa-3ee0cd2b6929"
+                    }, 
+                    {
+                        "data": {
+                            "086df56a-943d-11e8-bb62-94659cf754d0": [
+                                "56bbc38b-9b0c-45be-9f71-5705cd35c2c5"
+                            ], 
+                            "086df56b-943d-11e8-9f46-94659cf754d0": "6547e15c-7b81-435b-95c6-941411732668"
+                        }, 
+                        "nodegroup_id": "086df55e-943d-11e8-a6bc-94659cf754d0", 
+                        "parenttile_id": "f65644c8-a62d-4022-97f7-7c1269852d60", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "3480ca1a-5c52-4962-8d20-22a33c28dcc3", 
+                        "sortorder": 0, 
+                        "tileid": "fe7e479b-847f-496d-b3a3-9d0ddd53a7e2"
+                    }, 
+                    {
+                        "data": {
+                            "086df56e-943d-11e8-b150-94659cf754d0": "1941-01-01", 
+                            "086e1c71-943d-11e8-9185-94659cf754d0": "1945-01-01"
+                        }, 
+                        "nodegroup_id": "086dce53-943d-11e8-807a-94659cf754d0", 
+                        "parenttile_id": "f65644c8-a62d-4022-97f7-7c1269852d60", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "3480ca1a-5c52-4962-8d20-22a33c28dcc3", 
+                        "sortorder": 0, 
+                        "tileid": "633f7efa-97f0-4902-a343-9ee402a9f6a1"
+                    }, 
+                    {
+                        "data": {
+                            "086df56a-943d-11e8-bb62-94659cf754d0": [
+                                "d34ce0f8-bc0f-46a3-8da7-6cbbe9c366e3"
+                            ], 
+                            "086df56b-943d-11e8-9f46-94659cf754d0": "48fc9f62-ce99-42bc-b655-ae52d8524fa7"
+                        }, 
+                        "nodegroup_id": "086df55e-943d-11e8-a6bc-94659cf754d0", 
+                        "parenttile_id": "f65644c8-a62d-4022-97f7-7c1269852d60", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "3480ca1a-5c52-4962-8d20-22a33c28dcc3", 
+                        "sortorder": 0, 
+                        "tileid": "ed7cc703-33a6-49f8-aa19-30c62da1edb1"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "086dce56-943d-11e8-ab5e-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "3480ca1a-5c52-4962-8d20-22a33c28dcc3", 
+                        "sortorder": 0, 
+                        "tileid": "f65644c8-a62d-4022-97f7-7c1269852d60"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "086dce50-943d-11e8-93c6-94659cf754d0", 
+                        "parenttile_id": "f65644c8-a62d-4022-97f7-7c1269852d60", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "3480ca1a-5c52-4962-8d20-22a33c28dcc3", 
+                        "sortorder": 0, 
+                        "tileid": "6c714281-83d7-11e9-a334-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "086df56e-943d-11e8-b150-94659cf754d0": "1912-01-01", 
+                            "086df56f-943d-11e8-b0fe-94659cf754d0": "aabef022-a667-4cd2-9caa-86ec36b71fc9", 
+                            "086e1c71-943d-11e8-9185-94659cf754d0": "1941-01-01"
+                        }, 
+                        "nodegroup_id": "086dce53-943d-11e8-807a-94659cf754d0", 
+                        "parenttile_id": "f65644c8-a62d-4022-97f7-7c1269852d60", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "3480ca1a-5c52-4962-8d20-22a33c28dcc3", 
+                        "sortorder": 0, 
+                        "tileid": "6c714282-83d7-11e9-bcb3-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "086df56a-943d-11e8-bb62-94659cf754d0": [
+                                "d34ce0f8-bc0f-46a3-8da7-6cbbe9c366e3"
+                            ], 
+                            "086df56b-943d-11e8-9f46-94659cf754d0": "6547e15c-7b81-435b-95c6-941411732668"
+                        }, 
+                        "nodegroup_id": "086df55e-943d-11e8-a6bc-94659cf754d0", 
+                        "parenttile_id": "f65644c8-a62d-4022-97f7-7c1269852d60", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "3480ca1a-5c52-4962-8d20-22a33c28dcc3", 
+                        "sortorder": 0, 
+                        "tileid": "6c714283-83d7-11e9-b58b-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "440786e6-943d-11e8-b6dc-94659cf754d0": "8c628ad3-50a5-45ca-bd0e-509b774d0956"
+                        }, 
+                        "nodegroup_id": "440786e2-943d-11e8-8bbe-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "3480ca1a-5c52-4962-8d20-22a33c28dcc3", 
+                        "sortorder": 0, 
+                        "tileid": "29c4de18-c0fa-426d-b648-ffe9f391d656"
+                    }, 
+                    {
+                        "data": {
+                            "440786e6-943d-11e8-b6dc-94659cf754d0": "44cc738e-eca7-4a3b-bbe8-2d23aaf89f77"
+                        }, 
+                        "nodegroup_id": "440786e2-943d-11e8-8bbe-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "3480ca1a-5c52-4962-8d20-22a33c28dcc3", 
+                        "sortorder": 0, 
+                        "tileid": "e8199455-89a1-4ec5-a89c-3d3d683f6d7f"
+                    }, 
+                    {
+                        "data": {
+                            "440786e6-943d-11e8-b6dc-94659cf754d0": "4f6e4793-420d-4fca-85eb-1a8fa8dde8ed", 
+                            "440786e7-943d-11e8-a7e4-94659cf754d0": [
+                                "cc6ceea0-cc47-4b16-8f8d-c67aaac692d3"
+                            ]
+                        }, 
+                        "nodegroup_id": "440786e2-943d-11e8-8bbe-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "3480ca1a-5c52-4962-8d20-22a33c28dcc3", 
+                        "sortorder": 0, 
+                        "tileid": "6c714285-83d7-11e9-bc0d-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "40609ef4-943d-11e8-821f-94659cf754d0": "1945-12-26", 
+                            "40609efa-943d-11e8-aa97-94659cf754d0": "<p><span id=\"docs-internal-guid-34b64211-cafe-4aa8-117e-b9bb4eeac387\"></span></p><p dir=\"ltr\" style=\"margin-top: 0pt; margin-bottom: 0pt;\"><span style=\"vertical-align: baseline;\">Post WWII Condition of HKU Main Building:  (Source: HKU archives)</span></p><ol><li style=\"margin-top: 0pt; margin-bottom: 0pt;\"><span style=\"vertical-align: baseline;\">There was a memorandum of Reconstitution of University (dated December 8</span><span style=\"vertical-align: super;\">th</span><span style=\"vertical-align: baseline;\">, 1945) prepared by Lt. Col. Gordon King (former dean of School of Medicine), which provided a brief assessment from preliminary inspection of HKU buildings done by L. W. Amps Lt. Col., from C. A. Works and Lt. Col. Gordon King himself on November 26</span><span style=\"vertical-align: super;\">th</span><span style=\"vertical-align: baseline;\">, 1945.</span></li><li style=\"margin-top: 0pt; margin-bottom: 0pt;\"><span style=\"vertical-align: baseline;\">Most of the damages were from looting (woods for fuel, lead piping, coppers and brass fitting)</span></li><li style=\"margin-top: 0pt; margin-bottom: 0pt;\"><span style=\"vertical-align: baseline;\">Assessment of Great Hall:</span></li><ol><li style=\"margin-top: 0pt; margin-bottom: 0pt;\"><span style=\"line-height: 18.5714px;\">timber beams and wood floor were removed</span></li><li style=\"margin-top: 0pt; margin-bottom: 0pt;\"><span style=\"line-height: 18.5714px;\">steel roof was still intact</span></li><li style=\"margin-top: 0pt; margin-bottom: 0pt;\"><span style=\"line-height: 18.5714px;\">plaster was still in good condition</span></li><li style=\"margin-top: 0pt; margin-bottom: 0pt;\"><span style=\"vertical-align: baseline;\"><p dir=\"ltr\" style=\"margin-top: 0pt; margin-bottom: 0pt; line-height: 18.5714px;\"><span style=\"vertical-align: baseline;\">The initial repair suggestion was to add temporary galvanized iron sheet for the roof to protect the plaster.</span></p></span></li></ol><li style=\"margin-top: 0pt; margin-bottom: 0pt;\"><span style=\"vertical-align: baseline;\"><span style=\"color: rgb(51, 51, 51); line-height: 18.5714px;\">Library remained untouched, due to the efforts of Mr. Chan Kwan Po</span></span></li><li style=\"margin-top: 0pt; margin-bottom: 0pt;\"><span style=\"vertical-align: baseline;\">Art lecture rooms were structurally sound, the roof was intact, and the plaster was in a good condition, timber floor and some joinery were removed.</span></li><li style=\"margin-top: 0pt; margin-bottom: 0pt;\"><span style=\"vertical-align: baseline;\">Engineering drawing office and registrar office in annex were demolished and it was later found that the bricks of this building were used elsewhere.</span></li><li style=\"margin-top: 0pt; margin-bottom: 0pt;\"><span style=\"vertical-align: baseline;\">Report of a Committee on the Development of the University (dated March 1939) mentioned the possibility of relocating the university to a larger site outside the town.</span></li><li style=\"margin-top: 0pt; margin-bottom: 0pt;\"><span style=\"vertical-align: baseline;\">October 1</span><span style=\"vertical-align: super;\">st</span><span style=\"vertical-align: baseline;\">, 1946 was set as the date of the re-opening of the university, with 1</span><span style=\"vertical-align: super;\">st</span><span style=\"vertical-align: baseline;\"> year classes in Arts, Science, Medicine, and possibly Engineering.</span></li></ol>", 
+                            "40609efb-943d-11e8-bffe-94659cf754d0": "9357e715-b2dd-4548-be48-832a4ecfabe9"
+                        }, 
+                        "nodegroup_id": "406077e2-943d-11e8-93f7-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "3480ca1a-5c52-4962-8d20-22a33c28dcc3", 
+                        "sortorder": 0, 
+                        "tileid": "6c738c71-83d7-11e9-b30d-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "4c2d1922-943d-11e8-9449-94659cf754d0": [
+                                "54715c7e-7ca4-47f9-a66e-c329128030cb"
+                            ]
+                        }, 
+                        "nodegroup_id": "4c2d1922-943d-11e8-9449-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "3480ca1a-5c52-4962-8d20-22a33c28dcc3", 
+                        "sortorder": 0, 
+                        "tileid": "6c738c73-83d7-11e9-b2b5-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "3c5799cf-943d-11e8-a34b-94659cf754d0": "1385bddf-30e8-40b0-b175-cfaf6d906488", 
+                            "3c5799d2-943d-11e8-874e-94659cf754d0": "1912-01-01"
+                        }, 
+                        "nodegroup_id": "3c5772c1-943d-11e8-9753-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "3480ca1a-5c52-4962-8d20-22a33c28dcc3", 
+                        "sortorder": 0, 
+                        "tileid": "6c738c75-83d7-11e9-92e6-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "13e63511-943d-11e8-984c-94659cf754d0": "6e67fa52-0189-4093-b908-c74fb0da3eeb", 
+                            "13e63512-943d-11e8-ab12-94659cf754d0": "<div style=\"text-align: justify;\">\"The Main Building of The University of Hong Kong is the oldest structure on the campus, which was donated to the university by Sir Hormusjee Nawrojee Mody, a well-known Parsi businessman and philanthropist. Construction of the building started in 1910 and was completed in 1912. Following the outbreak of the Pacific War in December 1941, the Main Building was used as a temporary hospital. It was seriously damaged during the final stages of the Japanese Occupation (1941-1945), and university classes did not resume there until October 1946.</div><div style=\"text-align: justify;\"><br></div><div style=\"text-align: justify;\">Classical in style, this well-proportioned, three-storey red-brick building supported by granite columns of the Ionic order is designed symmetrically around the central axis of the clock tower and features pairs of turrets at both ends of the principal facade. Pediments surmount the entrance portico and the elevations of the east and west wings.\"</div><div style=\"text-align: justify;\"><br></div><div style=\"text-align: justify;\">[Source:&nbsp;http://www.amo.gov.hk/en/monuments_27.php\"</div>"
+                        }, 
+                        "nodegroup_id": "13e60e01-943d-11e8-b76c-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "3480ca1a-5c52-4962-8d20-22a33c28dcc3", 
+                        "sortorder": 0, 
+                        "tileid": "6c75fd71-83d7-11e9-ab9a-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "2672e522-943d-11e8-8df1-94659cf754d0": "Pok Fu Lam", 
+                            "26733347-943d-11e8-9aaa-94659cf754d0": "4bbe0b0e-3a0f-4390-9e9a-d9697e05cc50"
+                        }, 
+                        "nodegroup_id": "2672e522-943d-11e8-8df1-94659cf754d0", 
+                        "parenttile_id": "d14f1ca3-c110-4f15-878a-54c3c3edb453", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "3480ca1a-5c52-4962-8d20-22a33c28dcc3", 
+                        "sortorder": 0, 
+                        "tileid": "4f235f7c-460c-4a90-80e2-363b873a226c"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c32-943d-11e8-b3fb-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "3480ca1a-5c52-4962-8d20-22a33c28dcc3", 
+                        "sortorder": 0, 
+                        "tileid": "d14f1ca3-c110-4f15-878a-54c3c3edb453"
+                    }, 
+                    {
+                        "data": {
+                            "2672e522-943d-11e8-8df1-94659cf754d0": "The University of Hong Kong, Hong Kong Island", 
+                            "26733347-943d-11e8-9aaa-94659cf754d0": "ed665b7f-9f64-45c6-a14f-9329fa7caa87"
+                        }, 
+                        "nodegroup_id": "2672e522-943d-11e8-8df1-94659cf754d0", 
+                        "parenttile_id": "d14f1ca3-c110-4f15-878a-54c3c3edb453", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "3480ca1a-5c52-4962-8d20-22a33c28dcc3", 
+                        "sortorder": 0, 
+                        "tileid": "6c76e7d0-83d7-11e9-b6da-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c35-943d-11e8-86b9-94659cf754d0", 
+                        "parenttile_id": "d14f1ca3-c110-4f15-878a-54c3c3edb453", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "3480ca1a-5c52-4962-8d20-22a33c28dcc3", 
+                        "sortorder": 0, 
+                        "tileid": "6c76e7d1-83d7-11e9-afc3-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c38-943d-11e8-8c8a-94659cf754d0", 
+                        "parenttile_id": "d14f1ca3-c110-4f15-878a-54c3c3edb453", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "3480ca1a-5c52-4962-8d20-22a33c28dcc3", 
+                        "sortorder": 0, 
+                        "tileid": "6c76e7d2-83d7-11e9-8a08-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c3b-943d-11e8-8b15-94659cf754d0", 
+                        "parenttile_id": "d14f1ca3-c110-4f15-878a-54c3c3edb453", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "3480ca1a-5c52-4962-8d20-22a33c28dcc3", 
+                        "sortorder": 0, 
+                        "tileid": "6c76e7d3-83d7-11e9-9d21-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "26733340-943d-11e8-9720-94659cf754d0": {
+                                "features": [
+                                    {
+                                        "geometry": {
+                                            "coordinates": [
+                                                [
+                                                    [
+                                                        114.137972820908, 
+                                                        22.2843462601004
+                                                    ], 
+                                                    [
+                                                        114.137692465691, 
+                                                        22.2843606926268
+                                                    ], 
+                                                    [
+                                                        114.13769051455, 
+                                                        22.2843260838199
+                                                    ], 
+                                                    [
+                                                        114.13743612873, 
+                                                        22.2843367583885
+                                                    ], 
+                                                    [
+                                                        114.137412381765, 
+                                                        22.2837341950904
+                                                    ], 
+                                                    [
+                                                        114.138195245569, 
+                                                        22.2837012519073
+                                                    ], 
+                                                    [
+                                                        114.138217855267, 
+                                                        22.2843036233347
+                                                    ], 
+                                                    [
+                                                        114.137971038651, 
+                                                        22.2843125689604
+                                                    ], 
+                                                    [
+                                                        114.137972820908, 
+                                                        22.2843462601004
+                                                    ]
+                                                ], 
+                                                [
+                                                    [
+                                                        114.137593880979, 
+                                                        22.2840691998573
+                                                    ], 
+                                                    [
+                                                        114.137599977844, 
+                                                        22.2842106260317
+                                                    ], 
+                                                    [
+                                                        114.137750902897, 
+                                                        22.2842048847678
+                                                    ], 
+                                                    [
+                                                        114.137745299206, 
+                                                        22.2840634552628
+                                                    ], 
+                                                    [
+                                                        114.137593880979, 
+                                                        22.2840691998573
+                                                    ]
+                                                ], 
+                                                [
+                                                    [
+                                                        114.13790239838, 
+                                                        22.284195359772
+                                                    ], 
+                                                    [
+                                                        114.13804695797, 
+                                                        22.2841901446724
+                                                    ], 
+                                                    [
+                                                        114.138040104723, 
+                                                        22.2840503385346
+                                                    ], 
+                                                    [
+                                                        114.137895048364, 
+                                                        22.2840562385688
+                                                    ], 
+                                                    [
+                                                        114.13790239838, 
+                                                        22.284195359772
+                                                    ]
+                                                ], 
+                                                [
+                                                    [
+                                                        114.137582567596, 
+                                                        22.283845954316
+                                                    ], 
+                                                    [
+                                                        114.137588967194, 
+                                                        22.2839580309803
+                                                    ], 
+                                                    [
+                                                        114.137739392783, 
+                                                        22.2839513761893
+                                                    ], 
+                                                    [
+                                                        114.137734231962, 
+                                                        22.283840208881
+                                                    ], 
+                                                    [
+                                                        114.137582567596, 
+                                                        22.283845954316
+                                                    ]
+                                                ], 
+                                                [
+                                                    [
+                                                        114.137890758909, 
+                                                        22.2839427971109
+                                                    ], 
+                                                    [
+                                                        114.138035570027, 
+                                                        22.2839366668224
+                                                    ], 
+                                                    [
+                                                        114.138030269967, 
+                                                        22.2838273431622
+                                                    ], 
+                                                    [
+                                                        114.13788896677, 
+                                                        22.2838330462052
+                                                    ], 
+                                                    [
+                                                        114.137890758909, 
+                                                        22.2839427971109
+                                                    ]
+                                                ]
+                                            ], 
+                                            "type": "Polygon"
+                                        }, 
+                                        "id": "7f8f8e46-7f7a-4669-974c-41aa67072d96", 
+                                        "properties": {}, 
+                                        "type": "Feature"
+                                    }
+                                ], 
+                                "type": "FeatureCollection"
+                            }
+                        }, 
+                        "nodegroup_id": "26733340-943d-11e8-9720-94659cf754d0", 
+                        "parenttile_id": "d14f1ca3-c110-4f15-878a-54c3c3edb453", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "3480ca1a-5c52-4962-8d20-22a33c28dcc3", 
+                        "sortorder": 0, 
+                        "tileid": "6c76e7d4-83d7-11e9-ae91-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26733343-943d-11e8-9704-94659cf754d0", 
+                        "parenttile_id": "d14f1ca3-c110-4f15-878a-54c3c3edb453", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "3480ca1a-5c52-4962-8d20-22a33c28dcc3", 
+                        "sortorder": 0, 
+                        "tileid": "6c76e7d5-83d7-11e9-a6c7-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "54188893-943d-11e8-9011-94659cf754d0": 3, 
+                            "54188894-943d-11e8-bb0e-94659cf754d0": "5ecb13bf-7973-4cb6-8284-058c1e51cb7d", 
+                            "5418af9f-943d-11e8-8c73-94659cf754d0": "c336e4bf-7397-48b9-9540-e7f067de7b94"
+                        }, 
+                        "nodegroup_id": "54188890-943d-11e8-897e-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "3480ca1a-5c52-4962-8d20-22a33c28dcc3", 
+                        "sortorder": 0, 
+                        "tileid": "6c76e7d7-83d7-11e9-88ab-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "185b6981-943d-11e8-8310-94659cf754d0": "The University of Hong Kong, Main Building \u9999\u6e2f\u5927\u5b78\u672c\u90e8\u5927\u6a13\u5916\u90e8", 
+                            "185b9091-943d-11e8-8c9e-94659cf754d0": "a4c88313-52c5-4b6a-9579-3fc5aad17335"
+                        }, 
+                        "nodegroup_id": "185b6981-943d-11e8-8310-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "3480ca1a-5c52-4962-8d20-22a33c28dcc3", 
+                        "sortorder": 0, 
+                        "tileid": "6c6c6081-83d7-11e9-a3e3-94659cf754d0"
+                    }
+                ]
+            }, 
+            {
+                "resourceinstance": {
+                    "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6", 
+                    "legacyid": "1717bcca-8aec-4c84-be10-02ba7c74e10b", 
+                    "resourceinstanceid": "1717bcca-8aec-4c84-be10-02ba7c74e10b"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "185b6981-943d-11e8-8310-94659cf754d0": "Environmental Protection Department Resource Centre", 
+                            "185b9091-943d-11e8-8c9e-94659cf754d0": "466260e8-4825-48d2-b8aa-7d1befefe74b"
+                        }, 
+                        "nodegroup_id": "185b6981-943d-11e8-8310-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1717bcca-8aec-4c84-be10-02ba7c74e10b", 
+                        "sortorder": 0, 
+                        "tileid": "932b41ae-072a-4c57-9e18-2f3269d90d20"
+                    }, 
+                    {
+                        "data": {
+                            "185b6981-943d-11e8-8310-94659cf754d0": "Former Wan Chai Post Office \u820a\u7063\u4ed4\u90f5\u653f\u5c40 ", 
+                            "185b9091-943d-11e8-8c9e-94659cf754d0": "0339d37d-bbbf-4c64-85e1-b92fc740f2fa"
+                        }, 
+                        "nodegroup_id": "185b6981-943d-11e8-8310-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1717bcca-8aec-4c84-be10-02ba7c74e10b", 
+                        "sortorder": 0, 
+                        "tileid": "6c7e13c1-83d7-11e9-b688-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "48315a71-943d-11e8-90d3-94659cf754d0": "e105b697-df95-459b-a9f1-86fd4c44118e"
+                        }, 
+                        "nodegroup_id": "48315a71-943d-11e8-90d3-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1717bcca-8aec-4c84-be10-02ba7c74e10b", 
+                        "sortorder": 0, 
+                        "tileid": "6c8084c0-83d7-11e9-8ff3-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "13e63511-943d-11e8-984c-94659cf754d0": "6e67fa52-0189-4093-b908-c74fb0da3eeb", 
+                            "13e63512-943d-11e8-ab12-94659cf754d0": "\n\n\n\n\n<style type=\"text/css\">\np.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Calibri; color: #000000}\n</style>\n\n\n<p class=\"p1\">\"The Old Wan Chai Post Office is the oldest surviving post office building in Hong Kong. This L-shaped building situated at the junction of Wan Chai Gap Road and Queen's Road East, was erected between 1912 and 1913, and opened on 1 March 1915 as the Wan Chai Post Office. It is a simple pitched-roof structure with attractive gable ends and mouldings. The building is now operated by the Environmental Protection Department as a resource centre.\"</p><p class=\"p1\"><br></p><p class=\"p1\">[Source:&nbsp;http://www.amo.gov.hk/en/monuments_40.php]</p>"
+                        }, 
+                        "nodegroup_id": "13e60e01-943d-11e8-b76c-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1717bcca-8aec-4c84-be10-02ba7c74e10b", 
+                        "sortorder": 0, 
+                        "tileid": "6c8084c2-83d7-11e9-b2df-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "3c5799cf-943d-11e8-a34b-94659cf754d0": "1385bddf-30e8-40b0-b175-cfaf6d906488", 
+                            "3c5799d2-943d-11e8-874e-94659cf754d0": "1915-03-01"
+                        }, 
+                        "nodegroup_id": "3c5772c1-943d-11e8-9753-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1717bcca-8aec-4c84-be10-02ba7c74e10b", 
+                        "sortorder": 0, 
+                        "tileid": "6c8084c4-83d7-11e9-9020-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c32-943d-11e8-b3fb-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1717bcca-8aec-4c84-be10-02ba7c74e10b", 
+                        "sortorder": 0, 
+                        "tileid": "124f435b-8826-4e5e-af73-cd56f569ee46"
+                    }, 
+                    {
+                        "data": {
+                            "2672e522-943d-11e8-8df1-94659cf754d0": "221 Queen's Road East, Wan Chai, Hong Kong Island", 
+                            "26733347-943d-11e8-9aaa-94659cf754d0": "ed665b7f-9f64-45c6-a14f-9329fa7caa87"
+                        }, 
+                        "nodegroup_id": "2672e522-943d-11e8-8df1-94659cf754d0", 
+                        "parenttile_id": "124f435b-8826-4e5e-af73-cd56f569ee46", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1717bcca-8aec-4c84-be10-02ba7c74e10b", 
+                        "sortorder": 0, 
+                        "tileid": "6c8084c7-83d7-11e9-ad62-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c35-943d-11e8-86b9-94659cf754d0", 
+                        "parenttile_id": "124f435b-8826-4e5e-af73-cd56f569ee46", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1717bcca-8aec-4c84-be10-02ba7c74e10b", 
+                        "sortorder": 0, 
+                        "tileid": "6c8084c8-83d7-11e9-a573-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c38-943d-11e8-8c8a-94659cf754d0", 
+                        "parenttile_id": "124f435b-8826-4e5e-af73-cd56f569ee46", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1717bcca-8aec-4c84-be10-02ba7c74e10b", 
+                        "sortorder": 0, 
+                        "tileid": "6c82f5c0-83d7-11e9-a50b-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "2673334a-943d-11e8-ad3a-94659cf754d0": "Wan Chai"
+                        }, 
+                        "nodegroup_id": "26730c3b-943d-11e8-8b15-94659cf754d0", 
+                        "parenttile_id": "124f435b-8826-4e5e-af73-cd56f569ee46", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1717bcca-8aec-4c84-be10-02ba7c74e10b", 
+                        "sortorder": 0, 
+                        "tileid": "6c82f5c1-83d7-11e9-a839-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "26733340-943d-11e8-9720-94659cf754d0": {
+                                "features": [
+                                    {
+                                        "geometry": {
+                                            "coordinates": [
+                                                [
+                                                    [
+                                                        114.173340425193, 
+                                                        22.2742668441035
+                                                    ], 
+                                                    [
+                                                        114.173328355253, 
+                                                        22.2742345772845
+                                                    ], 
+                                                    [
+                                                        114.173372611701, 
+                                                        22.274219684904
+                                                    ], 
+                                                    [
+                                                        114.173341766298, 
+                                                        22.2741253664574
+                                                    ], 
+                                                    [
+                                                        114.17337529391, 
+                                                        22.2741141971634
+                                                    ], 
+                                                    [
+                                                        114.173414185941, 
+                                                        22.2742457465689
+                                                    ], 
+                                                    [
+                                                        114.173340425193, 
+                                                        22.2742668441035
+                                                    ]
+                                                ]
+                                            ], 
+                                            "type": "Polygon"
+                                        }, 
+                                        "id": "87cac140-9c2b-42dd-a234-a0bab6e8e8ab", 
+                                        "properties": {}, 
+                                        "type": "Feature"
+                                    }
+                                ], 
+                                "type": "FeatureCollection"
+                            }
+                        }, 
+                        "nodegroup_id": "26733340-943d-11e8-9720-94659cf754d0", 
+                        "parenttile_id": "124f435b-8826-4e5e-af73-cd56f569ee46", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1717bcca-8aec-4c84-be10-02ba7c74e10b", 
+                        "sortorder": 0, 
+                        "tileid": "6c82f5c2-83d7-11e9-a593-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26733343-943d-11e8-9704-94659cf754d0", 
+                        "parenttile_id": "124f435b-8826-4e5e-af73-cd56f569ee46", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1717bcca-8aec-4c84-be10-02ba7c74e10b", 
+                        "sortorder": 0, 
+                        "tileid": "6c82f5c3-83d7-11e9-a2da-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "086df56e-943d-11e8-b150-94659cf754d0": "1992-01-01", 
+                            "086df56f-943d-11e8-b0fe-94659cf754d0": "2ef540f4-a9fa-48b8-8277-3871584dac7a"
+                        }, 
+                        "nodegroup_id": "086dce53-943d-11e8-807a-94659cf754d0", 
+                        "parenttile_id": "5d4420c7-1e73-4be8-bb03-40e3602367a8", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1717bcca-8aec-4c84-be10-02ba7c74e10b", 
+                        "sortorder": 0, 
+                        "tileid": "022d9625-ebac-4403-ab66-63ea915c30d6"
+                    }, 
+                    {
+                        "data": {
+                            "086df56a-943d-11e8-bb62-94659cf754d0": [
+                                "56bbc38b-9b0c-45be-9f71-5705cd35c2c5"
+                            ], 
+                            "086df56b-943d-11e8-9f46-94659cf754d0": "007df8f6-77a0-4360-8d95-53b1502d1027"
+                        }, 
+                        "nodegroup_id": "086df55e-943d-11e8-a6bc-94659cf754d0", 
+                        "parenttile_id": "5d4420c7-1e73-4be8-bb03-40e3602367a8", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1717bcca-8aec-4c84-be10-02ba7c74e10b", 
+                        "sortorder": 0, 
+                        "tileid": "fc317b47-d025-4d0d-8df3-4f1f512a5ab9"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "086dce56-943d-11e8-ab5e-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1717bcca-8aec-4c84-be10-02ba7c74e10b", 
+                        "sortorder": 0, 
+                        "tileid": "5d4420c7-1e73-4be8-bb03-40e3602367a8"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "086dce50-943d-11e8-93c6-94659cf754d0", 
+                        "parenttile_id": "5d4420c7-1e73-4be8-bb03-40e3602367a8", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1717bcca-8aec-4c84-be10-02ba7c74e10b", 
+                        "sortorder": 0, 
+                        "tileid": "6c82f5c6-83d7-11e9-88ea-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "086df56e-943d-11e8-b150-94659cf754d0": "1915-03-01", 
+                            "086e1c71-943d-11e8-9185-94659cf754d0": "1992-01-01"
+                        }, 
+                        "nodegroup_id": "086dce53-943d-11e8-807a-94659cf754d0", 
+                        "parenttile_id": "5d4420c7-1e73-4be8-bb03-40e3602367a8", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1717bcca-8aec-4c84-be10-02ba7c74e10b", 
+                        "sortorder": 0, 
+                        "tileid": "6c82f5c7-83d7-11e9-8b16-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "086df56a-943d-11e8-bb62-94659cf754d0": [
+                                "d34ce0f8-bc0f-46a3-8da7-6cbbe9c366e3"
+                            ], 
+                            "086df56b-943d-11e8-9f46-94659cf754d0": "7d26ae93-2329-44e2-b656-e73baadc87ef"
+                        }, 
+                        "nodegroup_id": "086df55e-943d-11e8-a6bc-94659cf754d0", 
+                        "parenttile_id": "5d4420c7-1e73-4be8-bb03-40e3602367a8", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1717bcca-8aec-4c84-be10-02ba7c74e10b", 
+                        "sortorder": 0, 
+                        "tileid": "6c82f5c8-83d7-11e9-9980-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "1f816614-943d-11e8-8a63-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1717bcca-8aec-4c84-be10-02ba7c74e10b", 
+                        "sortorder": 0, 
+                        "tileid": "8477487d-1e25-42ea-b256-1c35264f2352"
+                    }, 
+                    {
+                        "data": {
+                            "1f818d22-943d-11e8-9a3c-94659cf754d0": "51a60c44-33a7-4e76-a714-a5f1f4052ed3", 
+                            "1f818d24-943d-11e8-b16e-94659cf754d0": "2017-03-15", 
+                            "1f818d25-943d-11e8-bfa9-94659cf754d0": "1990-05-18"
+                        }, 
+                        "nodegroup_id": "1f816611-943d-11e8-8418-94659cf754d0", 
+                        "parenttile_id": "8477487d-1e25-42ea-b256-1c35264f2352", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1717bcca-8aec-4c84-be10-02ba7c74e10b", 
+                        "sortorder": 0, 
+                        "tileid": "6c853fb2-83d7-11e9-8270-94659cf754d0"
+                    }
+                ]
+            }, 
+            {
+                "resourceinstance": {
+                    "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6", 
+                    "legacyid": "1e9baf4d-6a42-49ed-bd02-f9960c255510", 
+                    "resourceinstanceid": "1e9baf4d-6a42-49ed-bd02-f9960c255510"
+                }, 
+                "tiles": [
+                    {
+                        "data": {
+                            "13e63511-943d-11e8-984c-94659cf754d0": "6e67fa52-0189-4093-b908-c74fb0da3eeb", 
+                            "13e63512-943d-11e8-ab12-94659cf754d0": "\n\n\n\n\n<style type=\"text/css\">\np.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Calibri; color: #032add}\np.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Calibri; color: #032add; min-height: 14.0px}\n</style>\n\n\n<p class=\"p1\"><span style=\"color: rgb(0, 0, 0);\">\"Built with financial assistance from Sir Paul Chater and Professor G. P. Jordan among others, this building was originally designed to house the student union and was officially opened by the then Governor, Sir Reginald Stubbs, in February 1919. It was temporarily used by the Registry after the Second World War, was later converted into the Senior Common Room in 1974 and housed the Department of Music from 1989 to 2012. The building was named in honour of Mr Hung Hing-ying in 1986 in recognition of his family\u2019s donations to the university.</span></p>\n<p class=\"p2\"><span style=\"color: rgb(0, 0, 0);\"><br></span></p>\n<p class=\"p1\"><span style=\"color: rgb(0, 0, 0);\">The two-storey Classic Revival red-brick building has an impressive rotunda at the centre and two rectangular blocks projecting on each side as wings, each of which has a tall chimney stack on the south elevation and colonnaded verandahs on the north elevation.\"</span></p><p class=\"p1\"><span style=\"color: rgb(0, 0, 0);\"><br></span></p><p class=\"p1\"><span style=\"color: rgb(0, 0, 0);\">[Source:&nbsp;http://www.amo.gov.hk/en/monuments_57.php]</span></p>"
+                        }, 
+                        "nodegroup_id": "13e60e01-943d-11e8-b76c-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1e9baf4d-6a42-49ed-bd02-f9960c255510", 
+                        "sortorder": 0, 
+                        "tileid": "942f223b-5eaf-492c-a4a1-ed05d985fcc6"
+                    }, 
+                    {
+                        "data": {
+                            "13e63511-943d-11e8-984c-94659cf754d0": "6a84569c-4dd5-435e-9f77-d2e8f901ac52", 
+                            "13e63512-943d-11e8-ab12-94659cf754d0": "<p><span style=\"font-size: 12px;\">This pretty building was originally designed to house the University Union and until 1946 was known as the Union Building and was the first home to the Student Union of University of Hong Kong. It was opened in 1919, having been constructed with the support of Professor C. A. Middleton Smith, Sir Catchick Paul Chater and Professor G. P. Jordan, the Acting Vice-Chancellor of the University at the time.<br><br>After World War II, the Building was adapted for administrative purposes. In 1974 it was converted for use as a Senior Common Room for the University's academic and senior administrative staff.<br><br>In 1986 the Building was renamed in honour of Mr Hung Hing Ying, in recognition of his support of the University, and for many years housed the Department of Music. In 1995 the Hung Hing Ying Building was declared a monument by the Hong Kong Government.</span></p><p><span style=\"font-size: 12px;\">The building was the home of the Department of Music from November 1996 to January 2013, when the Department moved to the Run Run Shaw Tower of the Centennial Campus. Performances were occasionally held in the rotunda area under the magnificent central dome.<br></span></p><p><span style=\"color: rgb(255, 255, 255); font-family: Verdana, Arial, Helvetica, sans-serif; background-color: rgb(255, 255, 255); font-size: 12px;\"><br></span></p><p><span style=\"color: rgb(255, 255, 255); font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px; background-color: rgb(51, 51, 51);\"><br></span></p>"
+                        }, 
+                        "nodegroup_id": "13e60e01-943d-11e8-b76c-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1e9baf4d-6a42-49ed-bd02-f9960c255510", 
+                        "sortorder": 0, 
+                        "tileid": "93e88390-4b93-4c28-ba2e-93d5dcda502c"
+                    }, 
+                    {
+                        "data": {
+                            "13e63511-943d-11e8-984c-94659cf754d0": "6a84569c-4dd5-435e-9f77-d2e8f901ac52", 
+                            "13e63512-943d-11e8-ab12-94659cf754d0": "<p><span style=\"font-size: 12px;\">The two-storey Hung Hing Ying Building sits squarely in front of the Main Building. The central dome, entrance portico and balanced architectural proportions are strongly neoclassical, while its red brick walls complement the Edwardian Baroque aesthetics of the earlier Main Building. The Hung Hing Ying Building is the only building in the University campus with a dome-shaped structure, and the dome share the same axis of the Main Building's clock tower.</span></p><p><span style=\"font-size: 12px;\">The most&nbsp;noticeable changes to the building was an east wing was added in 1962.</span><span style=\"color: rgb(255, 255, 255); font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px; background-color: rgb(51, 51, 51);\"><br></span></p>"
+                        }, 
+                        "nodegroup_id": "13e60e01-943d-11e8-b76c-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1e9baf4d-6a42-49ed-bd02-f9960c255510", 
+                        "sortorder": 0, 
+                        "tileid": "6c8b0c14-83d7-11e9-b4da-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "4c2d1922-943d-11e8-9449-94659cf754d0": [
+                                "54715c7e-7ca4-47f9-a66e-c329128030cb"
+                            ]
+                        }, 
+                        "nodegroup_id": "4c2d1922-943d-11e8-9449-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1e9baf4d-6a42-49ed-bd02-f9960c255510", 
+                        "sortorder": 0, 
+                        "tileid": "6c8d7d10-83d7-11e9-acc0-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "48315a71-943d-11e8-90d3-94659cf754d0": "e105b697-df95-459b-a9f1-86fd4c44118e"
+                        }, 
+                        "nodegroup_id": "48315a71-943d-11e8-90d3-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1e9baf4d-6a42-49ed-bd02-f9960c255510", 
+                        "sortorder": 0, 
+                        "tileid": "6c8d7d12-83d7-11e9-98d4-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "2672e522-943d-11e8-8df1-94659cf754d0": "Latitude(N):22\u00b0 17' 5.0\", Longitude(E):114\u00b0 8' 16.0\"", 
+                            "26733347-943d-11e8-9aaa-94659cf754d0": "4bbe0b0e-3a0f-4390-9e9a-d9697e05cc50"
+                        }, 
+                        "nodegroup_id": "2672e522-943d-11e8-8df1-94659cf754d0", 
+                        "parenttile_id": "5a022a01-1f77-4291-b033-2bd1efa0c963", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1e9baf4d-6a42-49ed-bd02-f9960c255510", 
+                        "sortorder": 0, 
+                        "tileid": "f4e834c8-3db1-4b5e-bfd5-82fb549c7b51"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c32-943d-11e8-b3fb-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1e9baf4d-6a42-49ed-bd02-f9960c255510", 
+                        "sortorder": 0, 
+                        "tileid": "5a022a01-1f77-4291-b033-2bd1efa0c963"
+                    }, 
+                    {
+                        "data": {
+                            "2672e522-943d-11e8-8df1-94659cf754d0": "University of Hong Kong, Bonham Road, Hong Kong", 
+                            "26733347-943d-11e8-9aaa-94659cf754d0": "ed665b7f-9f64-45c6-a14f-9329fa7caa87"
+                        }, 
+                        "nodegroup_id": "2672e522-943d-11e8-8df1-94659cf754d0", 
+                        "parenttile_id": "5a022a01-1f77-4291-b033-2bd1efa0c963", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1e9baf4d-6a42-49ed-bd02-f9960c255510", 
+                        "sortorder": 0, 
+                        "tileid": "6c8d7d15-83d7-11e9-a60e-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c35-943d-11e8-86b9-94659cf754d0", 
+                        "parenttile_id": "5a022a01-1f77-4291-b033-2bd1efa0c963", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1e9baf4d-6a42-49ed-bd02-f9960c255510", 
+                        "sortorder": 0, 
+                        "tileid": "6c8fc700-83d7-11e9-9777-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c38-943d-11e8-8c8a-94659cf754d0", 
+                        "parenttile_id": "5a022a01-1f77-4291-b033-2bd1efa0c963", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1e9baf4d-6a42-49ed-bd02-f9960c255510", 
+                        "sortorder": 0, 
+                        "tileid": "6c8fc701-83d7-11e9-9b35-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26730c3b-943d-11e8-8b15-94659cf754d0", 
+                        "parenttile_id": "5a022a01-1f77-4291-b033-2bd1efa0c963", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1e9baf4d-6a42-49ed-bd02-f9960c255510", 
+                        "sortorder": 0, 
+                        "tileid": "6c8fc702-83d7-11e9-a42c-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "26733340-943d-11e8-9720-94659cf754d0": {
+                                "features": [
+                                    {
+                                        "geometry": {
+                                            "coordinates": [
+                                                [
+                                                    [
+                                                        114.137713983953, 
+                                                        22.2846154217004
+                                                    ], 
+                                                    [
+                                                        114.137711301744, 
+                                                        22.2845657841108
+                                                    ], 
+                                                    [
+                                                        114.137726053893, 
+                                                        22.2845695069306
+                                                    ], 
+                                                    [
+                                                        114.137727394998, 
+                                                        22.2845223512053
+                                                    ], 
+                                                    [
+                                                        114.137739464938, 
+                                                        22.2845099418013
+                                                    ], 
+                                                    [
+                                                        114.137771651446, 
+                                                        22.2845099418013
+                                                    ], 
+                                                    [
+                                                        114.137783721387, 
+                                                        22.2845273149666
+                                                    ], 
+                                                    [
+                                                        114.137801155746, 
+                                                        22.2845087008608
+                                                    ], 
+                                                    [
+                                                        114.13782931894, 
+                                                        22.2845087008608
+                                                    ], 
+                                                    [
+                                                        114.137845412194, 
+                                                        22.284524833086
+                                                    ], 
+                                                    [
+                                                        114.137846753299, 
+                                                        22.2844689907602
+                                                    ], 
+                                                    [
+                                                        114.137866869866, 
+                                                        22.2844689907602
+                                                    ], 
+                                                    [
+                                                        114.137868210971, 
+                                                        22.2844367262951
+                                                    ], 
+                                                    [
+                                                        114.137889668643, 
+                                                        22.2844367262951
+                                                    ], 
+                                                    [
+                                                        114.137891009748, 
+                                                        22.284470231701
+                                                    ], 
+                                                    [
+                                                        114.137909785211, 
+                                                        22.284470231701
+                                                    ], 
+                                                    [
+                                                        114.137905761897, 
+                                                        22.2845260740263
+                                                    ], 
+                                                    [
+                                                        114.137925878465, 
+                                                        22.2845074599203
+                                                    ], 
+                                                    [
+                                                        114.137956723868, 
+                                                        22.2845062189799
+                                                    ], 
+                                                    [
+                                                        114.137964770495, 
+                                                        22.2845273149666
+                                                    ], 
+                                                    [
+                                                        114.137984887063, 
+                                                        22.2845087008608
+                                                    ], 
+                                                    [
+                                                        114.13803450793, 
+                                                        22.2845099418013
+                                                    ], 
+                                                    [
+                                                        114.138035849034, 
+                                                        22.284619144519
+                                                    ], 
+                                                    [
+                                                        114.137921855151, 
+                                                        22.2846179035795
+                                                    ], 
+                                                    [
+                                                        114.13789771527, 
+                                                        22.2846327948527
+                                                    ], 
+                                                    [
+                                                        114.137858823239, 
+                                                        22.2846315539133
+                                                    ], 
+                                                    [
+                                                        114.137842729985, 
+                                                        22.2846179035795
+                                                    ], 
+                                                    [
+                                                        114.137713983953, 
+                                                        22.2846154217004
+                                                    ]
+                                                ]
+                                            ], 
+                                            "type": "Polygon"
+                                        }, 
+                                        "id": "003de90b-dd17-4cd5-8e63-ef408385cee5", 
+                                        "properties": {}, 
+                                        "type": "Feature"
+                                    }
+                                ], 
+                                "type": "FeatureCollection"
+                            }
+                        }, 
+                        "nodegroup_id": "26733340-943d-11e8-9720-94659cf754d0", 
+                        "parenttile_id": "5a022a01-1f77-4291-b033-2bd1efa0c963", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1e9baf4d-6a42-49ed-bd02-f9960c255510", 
+                        "sortorder": 0, 
+                        "tileid": "6c8fc703-83d7-11e9-9294-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "26733343-943d-11e8-9704-94659cf754d0", 
+                        "parenttile_id": "5a022a01-1f77-4291-b033-2bd1efa0c963", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1e9baf4d-6a42-49ed-bd02-f9960c255510", 
+                        "sortorder": 0, 
+                        "tileid": "6c8fc704-83d7-11e9-9aee-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "54188893-943d-11e8-9011-94659cf754d0": 2, 
+                            "54188894-943d-11e8-bb0e-94659cf754d0": "5ecb13bf-7973-4cb6-8284-058c1e51cb7d", 
+                            "5418af9f-943d-11e8-8c73-94659cf754d0": "c336e4bf-7397-48b9-9540-e7f067de7b94"
+                        }, 
+                        "nodegroup_id": "54188890-943d-11e8-897e-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1e9baf4d-6a42-49ed-bd02-f9960c255510", 
+                        "sortorder": 0, 
+                        "tileid": "6c8fc706-83d7-11e9-84c9-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "086dce56-943d-11e8-ab5e-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1e9baf4d-6a42-49ed-bd02-f9960c255510", 
+                        "sortorder": 0, 
+                        "tileid": "68b04f46-4966-4d9b-807c-c75dd5a0296c"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "086dce50-943d-11e8-93c6-94659cf754d0", 
+                        "parenttile_id": "68b04f46-4966-4d9b-807c-c75dd5a0296c", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1e9baf4d-6a42-49ed-bd02-f9960c255510", 
+                        "sortorder": 0, 
+                        "tileid": "6c923800-83d7-11e9-8267-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "086df56e-943d-11e8-b150-94659cf754d0": "1919-01-01", 
+                            "086df56f-943d-11e8-b0fe-94659cf754d0": "a8246532-444e-468d-a569-9d8092358ae2"
+                        }, 
+                        "nodegroup_id": "086dce53-943d-11e8-807a-94659cf754d0", 
+                        "parenttile_id": "68b04f46-4966-4d9b-807c-c75dd5a0296c", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1e9baf4d-6a42-49ed-bd02-f9960c255510", 
+                        "sortorder": 0, 
+                        "tileid": "6c923801-83d7-11e9-9e0f-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "086df56a-943d-11e8-bb62-94659cf754d0": [
+                                "56bbc38b-9b0c-45be-9f71-5705cd35c2c5"
+                            ], 
+                            "086df56b-943d-11e8-9f46-94659cf754d0": "6547e15c-7b81-435b-95c6-941411732668"
+                        }, 
+                        "nodegroup_id": "086df55e-943d-11e8-a6bc-94659cf754d0", 
+                        "parenttile_id": "68b04f46-4966-4d9b-807c-c75dd5a0296c", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1e9baf4d-6a42-49ed-bd02-f9960c255510", 
+                        "sortorder": 0, 
+                        "tileid": "6c923802-83d7-11e9-92de-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "440786e6-943d-11e8-b6dc-94659cf754d0": "b4b1d3f5-1b5e-452a-a965-1d03ff3971ca"
+                        }, 
+                        "nodegroup_id": "440786e2-943d-11e8-8bbe-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1e9baf4d-6a42-49ed-bd02-f9960c255510", 
+                        "sortorder": 0, 
+                        "tileid": "6c923804-83d7-11e9-a9a8-94659cf754d0"
+                    }, 
+                    {
+                        "data": {}, 
+                        "nodegroup_id": "1f816614-943d-11e8-8a63-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1e9baf4d-6a42-49ed-bd02-f9960c255510", 
+                        "sortorder": 0, 
+                        "tileid": "d2b9b0a0-fd57-4e90-830e-c0d5fcdfea05"
+                    }, 
+                    {
+                        "data": {
+                            "1f818d22-943d-11e8-9a3c-94659cf754d0": "51a60c44-33a7-4e76-a714-a5f1f4052ed3", 
+                            "1f818d24-943d-11e8-b16e-94659cf754d0": "2017-03-17", 
+                            "1f818d25-943d-11e8-bfa9-94659cf754d0": "1995-01-01"
+                        }, 
+                        "nodegroup_id": "1f816611-943d-11e8-8418-94659cf754d0", 
+                        "parenttile_id": "d2b9b0a0-fd57-4e90-830e-c0d5fcdfea05", 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1e9baf4d-6a42-49ed-bd02-f9960c255510", 
+                        "sortorder": 0, 
+                        "tileid": "6c923807-83d7-11e9-a522-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "13e63511-943d-11e8-984c-94659cf754d0": "a27bc4f6-4584-43ef-b703-129bf6262934", 
+                            "13e63512-943d-11e8-ab12-94659cf754d0": "*Note: Only the exterior of the building is graded as a Declared Monument."
+                        }, 
+                        "nodegroup_id": "13e60e01-943d-11e8-b76c-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1e9baf4d-6a42-49ed-bd02-f9960c255510", 
+                        "sortorder": 0, 
+                        "tileid": "6c9481ee-83d7-11e9-a07b-94659cf754d0"
+                    }, 
+                    {
+                        "data": {
+                            "185b6981-943d-11e8-8310-94659cf754d0": "Hung Hing Ying Building \u9999\u6e2f\u5927\u5b78\u5b54\u6176\u7192\u6a13", 
+                            "185b9091-943d-11e8-8c9e-94659cf754d0": "a4c88313-52c5-4b6a-9579-3fc5aad17335"
+                        }, 
+                        "nodegroup_id": "185b6981-943d-11e8-8310-94659cf754d0", 
+                        "parenttile_id": null, 
+                        "provisionaledits": null, 
+                        "resourceinstance_id": "1e9baf4d-6a42-49ed-bd02-f9960c255510", 
+                        "sortorder": 0, 
+                        "tileid": "6c8b0c12-83d7-11e9-b1c8-94659cf754d0"
+                    }
+                ]
+            }
+        ]
+    }
+}
