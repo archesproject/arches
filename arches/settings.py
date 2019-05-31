@@ -20,6 +20,11 @@ import os
 import inspect
 
 
+try:
+    from corsheaders.defaults import default_headers
+except ImportError:  # unable to import corsheaders prior to installing requirements.txt in setup.py
+    pass
+
 #########################################
 ###          STATIC SETTINGS          ###
 #########################################
@@ -303,6 +308,7 @@ MIDDLEWARE = [
     #'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'arches.app.utils.middleware.ModifyAuthorizationHeader',
     'oauth2_provider.middleware.OAuth2TokenMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     #'arches.app.utils.middleware.JWTAuthenticationMiddleware',
@@ -316,6 +322,13 @@ ROOT_URLCONF = 'arches.urls'
 WSGI_APPLICATION = 'arches.wsgi.application'
 
 CORS_ORIGIN_ALLOW_ALL = True
+
+try:
+    CORS_ALLOW_HEADERS = list(default_headers) + [
+        'x-authorization',
+    ]
+except Exception as e:
+    print(e)
 
 LOGGING = {
     'version': 1,

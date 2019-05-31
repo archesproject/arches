@@ -198,7 +198,7 @@ class MobileSurvey(models.MobileSurveyModel):
                 singlepart = GeoUtils().convert_multipart_to_singlepart(bounds)
                 ret['bounds'] = singlepart
         except TypeError as e:
-            print 'Could not parse', ret['bounds'], e
+            logger.error('Could not parse {0}, {1}'.format(ret['bounds'], e))
         return ret
 
     def serialize(self, fields=None, exclude=None):
