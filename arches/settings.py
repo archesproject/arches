@@ -296,7 +296,6 @@ INSTALLED_APPS = (
 
 MIDDLEWARE = [
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
-    'arches.app.utils.middleware.ModifyAuthorizationHeader',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -304,6 +303,7 @@ MIDDLEWARE = [
     #'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'arches.app.utils.middleware.ModifyAuthorizationHeader',
     'oauth2_provider.middleware.OAuth2TokenMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     #'arches.app.utils.middleware.JWTAuthenticationMiddleware',
