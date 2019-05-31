@@ -36,7 +36,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                 }, this);
 
                 this.searchResults.timestamp.subscribe(function(timestamp) {
-                    this.updateResults(this.searchResults);
+                    this.updateResults();
                 }, this);
 
                 this.filters['search-results'](this);
@@ -70,63 +70,65 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                 };
             },
 
-            updateResults: function(response){
+            updateResults: function(){
                 var self = this;
                 var data = $('div[name="search-result-data"]').data();
 
-                this.total(response.results.hits.total);
-                this.results.removeAll();
-                this.selectedResourceId(null);
-                this.userIsReviewer = response.reviewer;
-                response.results.hits.hits.forEach(function(result){
-                    var graphdata = _.find(viewdata.graphs, function(graphdata){
-                        return result._source.graph_id === graphdata.graphid;
-                    });
-                    var point = null;
-                    if (result._source.points.length > 0) {
-                        point = result._source.points[0].point;
-                    }
-                    var mapData = result._source.geometries.reduce(function(fc1, fc2) {
-                        fc1.geom.features = fc1.geom.features.concat(fc2.geom.features);
-                        return fc1;
-                    }, {
-                        "geom": {
-                            "type": "FeatureCollection",
-                            "features": []
+                if (!!this.searchResults.results){
+                    this.total(this.searchResults.results.hits.total);
+                    this.results.removeAll();
+                    this.selectedResourceId(null);
+                    this.userIsReviewer = this.searchResults.reviewer;
+                    this.searchResults.results.hits.hits.forEach(function(result){
+                        var graphdata = _.find(viewdata.graphs, function(graphdata){
+                            return result._source.graph_id === graphdata.graphid;
+                        });
+                        var point = null;
+                        if (result._source.points.length > 0) {
+                            point = result._source.points[0].point;
                         }
-                    });
-                    this.results.push({
-                        displayname: result._source.displayname,
-                        resourceinstanceid: result._source.resourceinstanceid,
-                        displaydescription: result._source.displaydescription,
-                        "map_popup": result._source.map_popup,
-                        "provisional_resource": result._source.provisional_resource,
-                        geometries: ko.observableArray(result._source.geometries),
-                        iconclass: graphdata ? graphdata.iconclass : '',
-                        showrelated: this.showRelatedResources(result._source.resourceinstanceid),
-                        mouseoverInstance: this.mouseoverInstance(result._source.resourceinstanceid),
-                        relationshipcandidacy: this.toggleRelationshipCandidacy(result._source.resourceinstanceid),
-                        ontologyclass: result._source.root_ontology_class,
-                        relatable: this.isResourceRelatable(result._source.graph_id),
-                        point: point,
-                        mapLinkClicked: function() {
-                            self.selectedResourceId(result._source.resourceinstanceid);
-                            if (self.selectedTab() !== 'map-filter') {
-                                self.selectedTab('map-filter');
+                        var mapData = result._source.geometries.reduce(function(fc1, fc2) {
+                            fc1.geom.features = fc1.geom.features.concat(fc2.geom.features);
+                            return fc1;
+                        }, {
+                            "geom": {
+                                "type": "FeatureCollection",
+                                "features": []
                             }
-                            self.mapLinkData(mapData.geom);
-                        },
-                        selected: ko.computed(function() {
-                            return result._source.resourceinstanceid === ko.unwrap(self.selectedResourceId);
-                        })
-                    });
-                }, this);
+                        });
+                        this.results.push({
+                            displayname: result._source.displayname,
+                            resourceinstanceid: result._source.resourceinstanceid,
+                            displaydescription: result._source.displaydescription,
+                            "map_popup": result._source.map_popup,
+                            "provisional_resource": result._source.provisional_resource,
+                            geometries: ko.observableArray(result._source.geometries),
+                            iconclass: graphdata ? graphdata.iconclass : '',
+                            showrelated: this.showRelatedResources(result._source.resourceinstanceid),
+                            mouseoverInstance: this.mouseoverInstance(result._source.resourceinstanceid),
+                            relationshipcandidacy: this.toggleRelationshipCandidacy(result._source.resourceinstanceid),
+                            ontologyclass: result._source.root_ontology_class,
+                            relatable: this.isResourceRelatable(result._source.graph_id),
+                            point: point,
+                            mapLinkClicked: function() {
+                                self.selectedResourceId(result._source.resourceinstanceid);
+                                if (self.selectedTab() !== 'map-filter') {
+                                    self.selectedTab('map-filter');
+                                }
+                                self.mapLinkData(mapData.geom);
+                            },
+                            selected: ko.computed(function() {
+                                return result._source.resourceinstanceid === ko.unwrap(self.selectedResourceId);
+                            })
+                        });
+                    }, this);
+                }
 
                 return data;
             },
 
             restoreState: function(){
-                this.updateResults(this.searchResults);
+                this.updateResults();
             },
 
             viewReport: function(resourceinstance){
