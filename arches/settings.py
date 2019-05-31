@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import inspect
-
+from corsheaders.defaults import default_headers
 
 #########################################
 ###          STATIC SETTINGS          ###
@@ -296,6 +296,7 @@ INSTALLED_APPS = (
 
 MIDDLEWARE = [
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'arches.app.utils.middleware.ModifyAuthorizationHeader',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -316,6 +317,9 @@ ROOT_URLCONF = 'arches.urls'
 WSGI_APPLICATION = 'arches.wsgi.application'
 
 CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'x-authorization',
+]
 
 LOGGING = {
     'version': 1,
