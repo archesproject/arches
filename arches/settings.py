@@ -322,9 +322,13 @@ ROOT_URLCONF = 'arches.urls'
 WSGI_APPLICATION = 'arches.wsgi.application'
 
 CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOW_HEADERS = list(default_headers) + [
-    'x-authorization',
-]
+
+try:
+    CORS_ALLOW_HEADERS = list(default_headers) + [
+        'x-authorization',
+    ]
+except Exception as e:
+    print(e)
 
 LOGGING = {
     'version': 1,
