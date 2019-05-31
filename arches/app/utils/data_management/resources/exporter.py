@@ -21,7 +21,10 @@ class ResourceExporter(object):
     def __init__(self, file_format):
         self.filetypes = {'csv': CsvWriter, 'kml': KmlWriter, 'shp': ShpWriter, 'json': JsonWriter}
         self.format = file_format
-        self.writer = self.filetypes[file_format]()
+        if file_format == "jsonl":
+            self.writer = JsonWriter(jsonl=True)
+        else:
+            self.writer = self.filetypes[file_format]()
 
     def export(self, resources=None, zip=False, search_results=True, dest_dir=None):
         result=None

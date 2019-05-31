@@ -354,7 +354,11 @@ class Command(BaseCommand):
         """
         Exports resources to archesjson
         """
-        resource_exporter = ResourceExporter('json')
+        if data_dest.endswith(".jsonl"):
+            format = "jsonl"
+        else:
+            format = "json"
+        resource_exporter = ResourceExporter(format)
         resource_exporter.export(search_results=False, dest_dir=data_dest)
         related_resources = [{'RESOURCEID_FROM':rr.entityid1, 'RESOURCEID_TO':rr.entityid2,'RELATION_TYPE':rr.relationshiptype,'START_DATE':rr.datestarted,'END_DATE':rr.dateended,'NOTES':rr.notes} for rr in models.RelatedResource.objects.all()] 
         relations_file = os.path.splitext(data_dest)[0] + '.relations'
