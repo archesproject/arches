@@ -250,28 +250,42 @@ class Command(BaseCommand):
         v3_data_dir = os.path.join(package_dir, "v3data")
         endmsg = "\n  -- You can load these resources later with:\n"
 
-        v3_files = glob(os.path.join(package_dir, 'v3data', 'business_data', '*.json'))
+        # get all json and jsonl files in the business_data directory
+        v3_files = glob(os.path.join(package_dir, 'v3data', 'business_data', '*.json*'))
+
         if len(v3_files) == 0:
-            print "\nThere is no v3 data to import. Put v3 json in {}".format(v3_data_dir)
+            print "\nThere is no v3 data to import. Put v3 json or jsonl in {}".format(v3_data_dir)
             exit()
 
-        business_data = v3_files[0]
-
-        if len(v3_files) > 1:
-            print "\nOnly one v3 file can be imported. This file will be used"\
-                ":\n\n  {}".format(business_data)
-
         sources = []
-        for rm in resource_models:
 
-            print rm
-            output_file = os.path.join(package_dir, 'business_data', rm+".json")
-            importer = v3Importer(v3_data_dir, rm, business_data,
-                                  truncate=truncate, exclude=exclude, only=only)
-            output = importer.write_v4_json(output_file, verbose=verbose)
-            sources.append(output_file)
-            endmsg += '\n  python manage.py packages -o import_business_data -s '\
-                '"{}" -ow overwrite'.format(output)
+        # in the process of adjusting this to not only take multiple business_data
+        # files, but also to accept and process jsonl files.
+        for v3_file in v3_files:
+            infilename = os.path.basename(v3_file)
+            print "Processing", infilename
+            ext = os.path.splitext(v3_file)[1]
+
+            for rm in resource_models:
+
+                print(rm)
+                importer = v3Importer(v3_data_dir, rm, v3_resource_file=v3_file,
+                                      truncate=truncate, exclude=exclude, only=only)
+
+                outfilename = os.path.splitext(infilename)[0]+"-"+rm+os.path.splitext(infilename)[1]
+                output_file = os.path.join(package_dir, 'business_data', outfilename)
+
+                if ext == ".json":
+                    print "processing normal json"
+                    output = importer.write_v4_json(output_file, verbose=verbose)
+                elif ext == ".jsonl":
+                    print "processing jsonl"
+                    output = importer.write_v4_jsonl(output_file, verbose=verbose)
+
+                if output is not False:
+                    sources.append(output_file)
+                    endmsg += '\n  python manage.py packages -o import_business_data -s '\
+                        '"{}" -ow overwrite'.format(output)
 
         if direct_import:
             for source in sources:
