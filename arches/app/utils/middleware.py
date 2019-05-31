@@ -13,6 +13,7 @@ from jose import jwt, jws, JWSError
 
 HTTP_HEADER_ENCODING = 'iso-8859-1'
 
+
 class SetAnonymousUser(MiddlewareMixin):
     def process_request(self, request):
         # for OAuth authentication to work, we can't automatically assign 
@@ -21,8 +22,9 @@ class SetAnonymousUser(MiddlewareMixin):
         if request.path != reverse('oauth2:authorize') and request.user.is_anonymous():
             try:
                 request.user = User.objects.get(username='anonymous')
-            except:
+            except Exception:
                 pass
+
 
 class ModifyAuthorizationHeader(MiddlewareMixin):
     def process_request(self, request):
