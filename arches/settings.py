@@ -311,7 +311,6 @@ MIDDLEWARE = [
     'arches.app.utils.middleware.ModifyAuthorizationHeader',
     'oauth2_provider.middleware.OAuth2TokenMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    #'arches.app.utils.middleware.JWTAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'arches.app.utils.middleware.SetAnonymousUser',
