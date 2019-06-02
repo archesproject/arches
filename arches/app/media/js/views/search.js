@@ -90,7 +90,6 @@ define([
             }, this);
 
             this.queryString.subscribe(function() {
-                this.isNewQuery = true;
                 this.doQuery();
             }, this);
 

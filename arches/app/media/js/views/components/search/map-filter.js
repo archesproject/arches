@@ -105,10 +105,12 @@ function(_, ko, BaseFilter, arches) {
             },
 
             updateResults: function() {
-                this.aggregations({
-                    results: this.searchResults.results.hits.hits,
-                    geo_aggs: this.searchResults.results.aggregations.geo_aggs.inner.buckets[0]
-                });
+                if (!!this.searchResults.results){
+                    this.aggregations({
+                        results: this.searchResults.results.hits.hits,
+                        geo_aggs: this.searchResults.results.aggregations.geo_aggs.inner.buckets[0]
+                    });
+                }
                 if(!!this.searchResults[componentName]) {
                     this.searchBuffer(this.searchResults[componentName].search_buffer);
                 }
