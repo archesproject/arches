@@ -58,7 +58,6 @@ class Command(BaseCommand):
                     print('updating', module)
                     print(e)
 
-
     def update_extensions(self):
         self.register('widgets', 'widget')
         self.register('card_components', 'card_component')
@@ -66,7 +65,6 @@ class Command(BaseCommand):
         self.register('plugins', 'plugin')
         self.register('reports', 'report')
         self.register('datatypes', 'datatype')
-
 
     def update_project_templates(self):
         """
