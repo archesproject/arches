@@ -13,8 +13,8 @@ define([
 
             var notifyValueChange = function(value){
                 var val = terms().concat(tags());
-                searchbox.select2('data', val)//.trigger('change');
-            }
+                searchbox.select2('data', val); //.trigger('change');
+            };
 
             terms.subscribe(function (value) {
                 notifyValueChange(value);
@@ -90,7 +90,11 @@ define([
                 formatResult: function(result, container, query, escapeMarkup) {
                     var markup = [];
                     var indent = result.type === 'concept' || result.type === 'term' ? 'term-search-item indent' : (result.type === 'string' ? 'term-search-item' : 'term-search-group');
-                    window.Select2.util.markMatch(result.text, query.term, markup, escapeMarkup);
+                    if (result.type === 'group') {
+                        markup.push(result.text);
+                    } else {
+                        window.Select2.util.markMatch(result.text, query.term, markup, escapeMarkup);
+                    }
                     var context = result.context_label != '' ? '<i class="concept_result_schemaname">(' + _.escape(result.context_label) + ')</i>' : '';
                     var formatedresult = '<span class="' + indent + '">' + markup.join("") + '</span>' + context;
                     return formatedresult;
