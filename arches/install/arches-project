@@ -2,14 +2,15 @@
 
 import arches
 import argparse
-import subprocess
 import codecs
+import django
+import errno
+import imp
 import os
 import sys
-import imp
-import errno
+import subprocess
+import shutil
 from importlib import import_module
-import django
 from django.utils.crypto import get_random_string
 from django.core.management.utils import handle_extensions
 from django.core.management.templates import TemplateCommand
@@ -54,6 +55,9 @@ def command_create_app(args):
     proj_name = options['name']
     cmd.handle(options)
     yarn_path = os.path.join(os.getcwd(), proj_name, proj_name)
+    packagejson_path_src = os.path.join(os.path.dirname(arches.__file__), 'install', 'package.json')
+    packagejson_path_dst = os.path.join(yarn_path, 'packages.json')
+    shutil.copy(packagejson_path_src, packagejson_path_dst)
     os.chdir(yarn_path)
     subprocess.call("yarn install", shell=True)
     if os.path.isdir(os.path.join(os.getcwd(), 'logs')) is not True:

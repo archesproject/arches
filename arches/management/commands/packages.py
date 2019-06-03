@@ -89,7 +89,6 @@ class Command(BaseCommand):
                 'save_system_settings',
                 'add_mapbox_layer',
                 'seed_resource_tile_cache',
-                'update_project_templates',
                 'load_package',
                 'create_package',
                 'update_package',
@@ -281,9 +280,6 @@ class Command(BaseCommand):
 
         if options['operation'] == 'create_mapping_file':
             self.create_mapping_file(options['dest_dir'], options['graphs'])
-
-        if options['operation'] == 'update_project_templates':
-            self.update_project_templates()
 
         if options['operation'] in ['load', 'load_package']:
             self.load_package(
@@ -785,21 +781,6 @@ class Command(BaseCommand):
             css_files = glob.glob(os.path.join(css_source, '*.css'))
             for css_file in css_files:
                 shutil.copy(css_file, css_dest)
-
-    def update_project_templates(self):
-        """
-        Moves files from the arches project to the arches-templates directory to
-        ensure that they remain in sync. Adds and comments out settings that are
-        whitelisted into the settings_local.py template
-
-        """
-        files = [
-            {'src': 'arches/app/templates/index.htm',
-                'dst': 'arches/install/arches-templates/project_name/templates/index.htm'},
-            {'src': 'package.json',
-                'dst': 'arches/install/arches-templates/project_name/package.json'}]
-        for f in files:
-            shutil.copyfile(f['src'], f['dst'])
 
     def setup(self, package_name, es_install_location=None):
         """
