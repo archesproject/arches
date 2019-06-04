@@ -51,6 +51,21 @@ define([
                 }
             };
 
+            this.setupMap = function(map) {
+                self.map = map;
+
+                self.activeBasemap.subscribe(function(basemap) {
+                    var style = map.getStyle();
+                    style.layers = basemap.layer_definitions;
+                    arches.mapLayers.forEach(function(layer) {
+                        if (!layer.isoverlay && layer.addtomap) {
+                            layers = layers.concat(layer.layer_definitions);
+                        }
+                    });
+                    map.setStyle(style);
+                });
+            };
+
             CardComponentViewModel.apply(this, [params]);
         },
         template: {

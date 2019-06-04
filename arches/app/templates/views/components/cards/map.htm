@@ -30,10 +30,17 @@
         </div>
     </div>
     <!--ko if: activeTab() -->
-        <div class="map-card-sidepanel" data-bind="text: activeTab"></div>
+        <div class="map-card-sidepanel">
+            <!--ko if: activeTab() === 'basemap' -->
+                <!--ko foreach: basemaps -->
+                <div data-bind="text: name, click: $parent.activeBasemap"></div>
+                <!--/ko -->
+            <!--/ko -->
+        </div>
     <!--/ko -->
     <div class="map-card-container" data-bind="mapboxgl: {
-            mapOptions: { style: mapStyle }
+            mapOptions: { style: mapStyle },
+            afterRender: setupMap
         }">
     </div>
 </div>
