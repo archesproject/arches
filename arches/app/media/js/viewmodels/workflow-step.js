@@ -16,23 +16,9 @@ define([
             return config.workflow.activeStep() === this;
         }, this);
 
-        this.parseUrlParams = function(){
-            //parses params in the current url for the current step
-            var urlparams = new window.URLSearchParams(window.location.search);
-            var res = {};
-            urlparams.forEach(function(v, k){res[k] = v;});
-            return res;
+        this.value = function(){
+            return {};
         };
-
-        this.urlParams = this.parseUrlParams();
-
-        this.getForwardUrlParams = ko.pureComputed(function(){
-            return {};
-        });
-
-        this.getBackwardUrlParams = ko.pureComputed(function(){
-            return {};
-        });
 
         _.extend(this, koMapping.fromJS(config));
 
