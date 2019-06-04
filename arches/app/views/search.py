@@ -52,6 +52,7 @@ class SearchView(MapBaseManagerView):
         resource_graphs = models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
         geocoding_providers = models.Geocoder.objects.all()
         search_components = models.SearchComponent.objects.all()
+        datatypes = models.DDataType.objects.all()
 
         context = self.get_context_data(
             map_layers=map_layers,
@@ -60,7 +61,8 @@ class SearchView(MapBaseManagerView):
             geocoding_providers=geocoding_providers,
             search_components=search_components,
             main_script='views/search',
-            resource_graphs=resource_graphs
+            resource_graphs=resource_graphs,
+            datatypes=datatypes
         )
 
         graphs = JSONSerializer().serialize(
