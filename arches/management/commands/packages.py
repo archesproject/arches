@@ -55,9 +55,36 @@ class Command(BaseCommand):
     """
 
     def add_arguments(self, parser):
-        parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
-            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'load_concept_scheme', 'export_business_data', 'export_graphs', 'add_tileserver_layer', 'delete_tileserver_layer','delete_mapbox_layer',
-            'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data','import_business_data_relations', 'import_mapping_file', 'save_system_settings', 'add_mapbox_layer', 'seed_resource_tile_cache', 'update_project_templates','load_package', 'create_package', 'update_package', 'export_package_configs', 'import_node_value_data'],
+        parser.add_argument(
+            '-o', '--operation', action='store', dest='operation', default='setup',
+            choices=[
+                'setup',
+                'install',
+                'setup_db',
+                'setup_indexes',
+                'start_elasticsearch',
+                'setup_elasticsearch',
+                'build_permissions',
+                'load_concept_scheme',
+                'export_business_data',
+                'export_graphs',
+                'add_tileserver_layer',
+                'delete_tileserver_layer',
+                'delete_mapbox_layer',
+                'create_mapping_file',
+                'import_reference_data',
+                'import_graphs',
+                'import_business_data',
+                'import_business_data_relations',
+                'import_mapping_file',
+                'save_system_settings',
+                'add_mapbox_layer',
+                'seed_resource_tile_cache',
+                'load_package',
+                'create_package',
+                'update_package',
+                'export_package_configs',
+                'import_node_value_data'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' +
@@ -201,9 +228,6 @@ class Command(BaseCommand):
 
         if options['operation'] == 'create_mapping_file':
             self.create_mapping_file(options['dest_dir'], options['graphs'])
-
-        if options['operation'] == 'update_project_templates':
-            self.update_project_templates()
 
         if options['operation'] in ['load', 'load_package']:
             self.load_package(options['source'], options['setup_db'], options['overwrite'], options['stage'], options['yes'])
@@ -621,121 +645,6 @@ class Command(BaseCommand):
             css_files = glob.glob(os.path.join(css_source, '*.css'))
             for css_file in css_files:
                 shutil.copy(css_file, css_dest)
-
-
-    def update_project_templates(self):
-        """
-        Moves files from the arches project to the arches-templates directory to
-        ensure that they remain in sync. Adds and comments out settings that are
-        whitelisted into the settings_local.py template
-
-        """
-        files = [
-            {'src': 'arches/app/templates/index.htm', 'dst':'arches/install/arches-templates/project_name/templates/index.htm'},
-            {'src':'package.json', 'dst':'arches/install/arches-templates/project_name/package.json'}
-            ]
-        for f in files:
-            shutil.copyfile(f['src'], f['dst'])
-
-        settings_whitelist = [
-            'APP_NAME',
-            'APP_TITLE',
-            'COPYRIGHT_TEXT',
-            'COPYRIGHT_YEAR',
-            'MODE',
-            'CACHES',
-            'DATABASES',
-            'DEBUG',
-            'RESOURCE_IMPORT_LOG',
-            'INTERNAL_IPS',
-            'ANONYMOUS_USER_NAME',
-            'ELASTICSEARCH_HTTP_PORT',
-            'SEARCH_BACKEND',
-            'ELASTICSEARCH_HOSTS',
-            'ELASTICSEARCH_CONNECTION_OPTIONS',
-            'ROOT_DIR',
-            'ONTOLOGY_PATH',
-            'ONTOLOGY_BASE',
-            'ONTOLOGY_BASE_VERSION',
-            'ONTOLOGY_BASE_NAME',
-            'ONTOLOGY_BASE_ID',
-            'ONTOLOGY_EXT',
-            'ADMINS',
-            'MANAGERS',
-            'POSTGIS_VERSION',
-            'USE_I18N',
-            'TIME_ZONE',
-            'USE_TZ',
-            'LANGUAGE_CODE',
-            'LOCALE_PATHS',
-            'USE_L10N',
-            'MEDIA_URL',
-            'MEDIA_ROOT',
-            'DATATYPE_LOCATIONS',
-            'STATIC_ROOT',
-            'STATIC_URL',
-            'TILE_CACHE_CONFIG',
-            'ADMIN_MEDIA_PREFIX',
-            'STATICFILES_DIRS',
-            'STATICFILES_FINDERS',
-            'TEMPLATES',
-            'AUTHENTICATION_BACKENDS',
-            'INSTALLED_APPS',
-            'MIDDLEWARE_CLASSES',
-            'ROOT_URLCONF',
-            'WSGI_APPLICATION',
-            'LOGGING',
-            'LOGIN_URL',
-            'SYSTEM_SETTINGS_LOCAL_PATH',
-            'AUTH_PASSWORD_VALIDATORS',
-            'EMAIL_BACKEND',
-            'EMAIL_USE_TLS',
-            'EMAIL_HOST',
-            'EMAIL_HOST_USER',
-            'EMAIL_HOST_PASSWORD',
-            'EMAIL_PORT',
-            'DATE_IMPORT_EXPORT_FORMAT',
-            'ANALYSIS_COORDINATE_SYSTEM_SRID',
-            'CACHE_BY_USER'
-            ]
-
-        with open('arches/install/arches-templates/project_name/settings_local.py-tpl', 'w') as f:
-            for setting_key in dir(settings):
-                if setting_key in settings_whitelist:
-                    setting_value = getattr(settings, setting_key)
-                    if type(setting_value) == dict or type(setting_value) == list:
-                        val = "\n{0} = {1}\n\n\n".format(setting_key, JSONSerializer().serialize(setting_value, indent=4))
-                        val = val.replace(' false', ' False').replace(' true', ' True').replace(' null', ' None')
-                    elif type(setting_value) == tuple:
-                        braces = ('(',')')
-                        val = "\n{0} = {1}\n".format(setting_key, braces[0])
-                        for value in setting_value:
-                            val = val + "    " + str(value) + ',\n'
-                        val = val + "{0}\n\n\n".format(braces[1])
-                    else:
-                        try:
-                            setting_value.upper()
-                            val = "{0} = '{1}'\n\n".format(setting_key, setting_value)
-                        except:
-                            val = "{0} = {1}\n\n".format(setting_key, setting_value)
-
-                    f.write(val)
-
-        lines = None
-        with open('arches/install/arches-templates/project_name/settings_local.py-tpl', 'r') as f:
-            lines = f.readlines()
-
-        with open('arches/install/arches-templates/project_name/settings_local.py-tpl', 'w') as f:
-            f.write('import os\n')
-            cwd = os.getcwd()
-
-            for line in lines:
-                line = line.replace(cwd, '')
-                if len(line) > 1:
-                    f.write('#' + line)
-                else:
-                    f.write(line)
-
 
     def setup(self, package_name, es_install_location=None):
         """
