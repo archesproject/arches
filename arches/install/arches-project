@@ -56,7 +56,7 @@ def command_create_app(args):
     cmd.handle(options)
     yarn_path = os.path.join(os.getcwd(), proj_name, proj_name)
     packagejson_path_src = os.path.join(os.path.dirname(arches.__file__), 'install', 'package.json')
-    packagejson_path_dst = os.path.join(yarn_path, 'packages.json')
+    packagejson_path_dst = os.path.join(yarn_path, 'package.json')
     shutil.copy(packagejson_path_src, packagejson_path_dst)
     os.chdir(yarn_path)
     subprocess.call("yarn install", shell=True)
