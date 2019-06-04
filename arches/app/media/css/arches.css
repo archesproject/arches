@@ -4922,6 +4922,14 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     font-weight: 700;
 }
 
+.term-search-item {
+    font-weight: 400;
+}
+
+.term-search-group {
+    font-weight: 700;
+}
+
 .concept_result_schemaname {
     font-size: 11px;
     padding-left: 10px;
@@ -13196,6 +13204,11 @@ a.jstree-anchor.permissions-widget {
 .create-resource-instance-card-component {
   position: absolute;
   background: white;
+}
+
+.indent {
+    text-indent: 10px;
+    padding-left: 10px;
 }
 
 @keyframes loader {

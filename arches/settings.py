@@ -459,6 +459,7 @@ SEARCH_EXPORT_ITEMS_PER_PAGE = 100000
 RELATED_RESOURCES_PER_PAGE = 15
 RELATED_RESOURCES_EXPORT_LIMIT = 10000
 SEARCH_DROPDOWN_LENGTH = 100
+SEARCH_TERM_SENSITIVITY = 3 # a lower number will give more "Fuzzy" matches, recomend between 0-4, see "prefix_length" at https://www.elastic.co/guide/en/elasticsearch/reference/6.7/query-dsl-fuzzy-query.html#_parameters_7
 WORDS_PER_SEARCH_TERM = 10 # set to None for unlimited number of words allowed for search terms
 
 ETL_USERNAME = 'ETL' # override this setting in your packages settings.py file

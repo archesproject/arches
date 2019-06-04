@@ -102,7 +102,7 @@ def search_terms(request):
     boolquery = Bool()
     boolquery.should(Match(field='value', query=searchString.lower(), type='phrase_prefix'))
     boolquery.should(Match(field='value.folded', query=searchString.lower(), type='phrase_prefix'))
-    boolquery.should(Match(field='value.folded', query=searchString.lower(), fuzziness='AUTO'))
+    boolquery.should(Match(field='value.folded', query=searchString.lower(), fuzziness='AUTO', prefix_length=settings.SEARCH_TERM_SENSITIVITY))
 
     if user_is_reviewer is False:
         boolquery.filter(Terms(field='provisional', terms=['false']))
