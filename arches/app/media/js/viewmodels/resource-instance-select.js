@@ -153,7 +153,7 @@ define([
                 },
 
                 results: function(data, page) {
-                    if (!data.paginator.has_next) {
+                    if (!data['paging-filter'].paginator.has_next) {
                         if (relatedResourceModels()) {
                             relatedResourceModels().forEach(function(val) {
                                 data.results.hits.hits.push(val);
